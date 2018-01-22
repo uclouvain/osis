@@ -168,5 +168,5 @@ class AcademicCalendarViewTestCase(TestCase):
 
         self.assertTrue(mock_render.called)
         request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'academic_calendar.html')
+        self.assertEqual(template, 'academic_calendar_form.html')
 

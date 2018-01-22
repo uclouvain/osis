@@ -1,0 +1,14 @@
+version: "2"
+
+checks:
+  file-lines:
+    enabled: false
+
+plugins:
+  pep8:
+    enabled: true
+
+exclude_patterns:
+- "**/tests/"
+- "**/migrations/"
+- "**/fixtures/"

@@ -26,6 +26,8 @@
 import datetime
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
+from django.views.decorators.http import require_http_methods
+
 from base.forms.academic_calendar import AcademicCalendarForm
 from base.models.enums import academic_calendar_type
 from base import models as mdl
@@ -112,6 +114,7 @@ def academic_calendar_read(request, academic_calendar_id):
 
 @login_required
 @permission_required('base.can_access_academic_calendar', raise_exception=True)
+@require_http_methods(['GET'])  # Temporary prevent sumbit modification
 def academic_calendar_form(request, academic_calendar_id):
     academic_calendar = mdl.academic_calendar.find_by_id(academic_calendar_id)
     if request.method == 'GET':

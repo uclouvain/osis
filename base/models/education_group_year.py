@@ -61,7 +61,7 @@ class EducationGroupYearAdmin(admin.ModelAdmin):
 class EducationGroupYear(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    acronym = models.CharField(max_length=15, db_index=True)
+    acronym = models.CharField(max_length=40, db_index=True)
     title = models.CharField(max_length=255)
     title_english = models.CharField(max_length=240, blank=True, null=True)
     academic_year = models.ForeignKey('AcademicYear')

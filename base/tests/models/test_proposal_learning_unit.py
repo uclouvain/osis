@@ -45,3 +45,12 @@ class TestSearch(TestCase):
 
         self.proposal_learning_unit.delete()
         self.assertFalse(proposal_learning_unit.have_a_proposal(a_learning_unit_year))
+
+    def test_find_by_folder(self):
+        folder = self.proposal_learning_unit.folder
+        self.assertTrue(proposal_learning_unit.find_by_folder(folder))
+
+        self.proposal_learning_unit.delete()
+
+        self.assertFalse(proposal_learning_unit.find_by_folder(folder))
+

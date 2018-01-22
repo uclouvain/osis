@@ -34,9 +34,9 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden
 from django.test import TestCase, RequestFactory
 
-
+import base.business.learning_unit
 from base.forms import learning_units
-from base.forms.learning_units import CreateLearningUnitYearForm
+from base.forms.learning_units import CreateLearningUnitYearForm, LearningUnitYearForm
 from base.models import learning_unit_component
 from base.models import learning_unit_component_class
 from base.models.academic_year import AcademicYear
@@ -64,9 +64,11 @@ from base.models.enums import entity_container_year_link_type
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.user import SuperUserFactory
+from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.business import learning_unit as learning_unit_business
 from django.utils.translation import ugettext_lazy as _
+
+from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory
 
@@ -169,7 +171,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(len(context['container_types']),
                          len(learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES))
         self.assertTrue(context['experimental_phase'])
-        self.assertIsNone(context['learning_units'])
+        self.assertEqual(context['learning_units'], [])
 
     @mock.patch('base.views.layout.render')
     def test_learning_units_search_with_acronym_filtering(self, mock_render):
@@ -779,6 +781,20 @@ class LearningUnitViewTestCase(TestCase):
         messages = list(response.context['messages'])
         self.assertEqual(messages[0].message, _('too_many_results'))
 
+    def test_get_username_with_no_person(self):
+        a_username = 'dupontm'
+        a_user = UserFactory(username=a_username)
+        self.assertEqual(base.business.learning_unit._get_name_or_username(a_user), a_username)
+
+    def test_get_username_with_person(self):
+        a_user = UserFactory(username='dupontm')
+        last_name='dupont'
+        first_name='marcel'
+        self.person = PersonFactory(user=a_user, last_name=last_name, first_name=first_name)
+        self.assertEqual(base.business.learning_unit._get_name_or_username(a_user), '{}, {}'.format(last_name, first_name))
+
+    def test_prepare_xls_content_no_data(self):
+        self.assertEqual(base.business.learning_unit.prepare_xls_content([]), [])
 
 class LearningUnitCreate(TestCase):
     def setUp(self):
@@ -913,3 +929,60 @@ class LearningUnitYearAdd(TestCase):
 
         response = self.client.post(self.url, data=form_data)
         self.assertEqual(response.status_code, 200)
+
+
+class TestCreateXls(TestCase):
+    def setUp(self):
+        self.learning_unit_year = LearningUnitYearFactory(learning_container_year=LearningContainerYearFactory(),
+                                                          acronym="LOSI1452")
+        self.requirement_entity_container = EntityContainerYearFactory(
+            learning_container_year=self.learning_unit_year.learning_container_year,
+            type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+        self.allocation_entity_container = EntityContainerYearFactory(
+            learning_container_year=self.learning_unit_year.learning_container_year,
+            type=entity_container_year_link_type.ALLOCATION_ENTITY)
+
+        self.user = UserFactory()
+
+    @mock.patch("osis_common.document.xls_build.generate_xls")
+    def test_generate_xls_data_with_no_data(self, mock_generate_xls):
+        learning_unit_business.create_xls(self.user, [])
+        expected_argument = expected_argument = _generate_xls_build_parameter([], self.user)
+        mock_generate_xls.assert_called_with(expected_argument)
+
+
+    @mock.patch("osis_common.document.xls_build.generate_xls")
+    def test_generate_xls_data_with_a_learning_unit(self, mock_generate_xls):
+        a_form = LearningUnitYearForm({"acronym": self.learning_unit_year.acronym})
+        self.assertTrue(a_form.is_valid())
+        found_learning_units = learning_unit_business.get_learning_units(a_form, learning_unit_business.SIMPLE_SEARCH)
+        learning_unit_business.create_xls(self.user, found_learning_units)
+        xls_data = [[self.learning_unit_year.academic_year.name, self.learning_unit_year.acronym,
+                    self.learning_unit_year.title,
+                    xls_build.translate(self.learning_unit_year.learning_container_year.container_type),
+                    xls_build.translate(self.learning_unit_year.subtype), None, None, self.learning_unit_year.credits,
+                    xls_build.translate(self.learning_unit_year.status)]]
+        expected_argument = _generate_xls_build_parameter(xls_data, self.user)
+        mock_generate_xls.assert_called_with(expected_argument)
+
+
+def _generate_xls_build_parameter(xls_data, user):
+    return {xls_build.LIST_DESCRIPTION_KEY: "Liste d'activités",
+            xls_build.FILENAME_KEY: 'Learning_units',
+            xls_build.USER_KEY: user.username,
+            xls_build.WORKSHEETS_DATA:
+                [{xls_build.CONTENT_KEY: xls_data,
+                  xls_build.HEADER_TITLES_KEY: [str(_('academic_year_small')),
+                                                str(_('code')),
+                                                str(_('title')),
+                                                str(_('type')),
+                                                str(_('subtype')),
+                                                str(_('requirement_entity_small')),
+                                                str(_('allocation_entity_small')),
+                                                str(_('credits')),
+                                                str(_('active_title'))],
+                 xls_build.WORKSHEET_TITLE_KEY: 'Learning_units',
+                 }
+                ]
+            }
+

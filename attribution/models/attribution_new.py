@@ -33,7 +33,8 @@ from attribution.models.enums import function
 class AttributionNewAdmin(AuditableModelAdmin):
     list_display = ('tutor', 'score_responsible', 'function', 'learning_container_year', 'start_year', 'end_year', 'changed')
     list_filter = ('learning_container_year__academic_year', 'score_responsible')
-    fieldsets = ((None, {'fields': ('learning_container_year', 'tutor', 'score_responsible', 'start_year', 'end_year')}),)
+    fieldsets = ((None, {'fields': ('learning_container_year', 'tutor', 'function', 'score_responsible', 'start_year',
+                                    'end_year')}),)
     raw_id_fields = ('learning_container_year', 'tutor')
     search_fields = ['tutor__person__first_name', 'tutor__person__last_name', 'learning_container_year__acronym',
                      'tutor__person__global_id', 'function']
@@ -51,7 +52,7 @@ class AttributionNew(AuditableModel):
     changed = models.DateTimeField(null=True, auto_now=True)
     learning_container_year = models.ForeignKey('base.LearningContainerYear')
     tutor = models.ForeignKey('base.Tutor')
-    function = models.CharField(max_length=35, blank=True, null=True, choices=function.FUNCTIONS, db_index=True)
+    function = models.CharField(max_length=35, choices=function.FUNCTIONS, db_index=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     start_year = models.IntegerField(blank=True, null=True)

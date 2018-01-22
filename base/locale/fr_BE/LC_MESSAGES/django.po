@@ -386,7 +386,7 @@ msgid "encoding_status_notended"
 msgstr "Il reste encore des notes à encoder."
 
 msgid "end_date"
-msgstr "Date de fin"
+msgstr "Échéance Prof"
 
 msgid "end_date_teacher"
 msgstr "Échéance Prof"
@@ -2437,3 +2437,25 @@ msgstr "Entité académique"
 
 msgid "folder_number"
 msgstr "Dossier n°{}"
+
+msgid "produce_xls"
+msgstr "Produire un excel avec la liste des résultats"
+
+msgid "produce_xls_lu"
+msgstr "Xls avec les activités"
+
+msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
+msgstr "%(date)s doit être comprise entre %(start_date)s et %(end_date)s"
+
+msgid "success_cancel_proposal"
+msgstr "La proposition pour {} a été annulée."
+
+msgid "cancel_proposal"
+msgstr "Annuler proposition"
+
+msgid "msg_confirm_cancel_proposal"
+msgstr "Etes-vous certain de vouloir annuler la proposition ?"
+
+msgid "The administrative data has been successfully modified"
+msgstr "Les données administratives ont été sauvées avec succès"
+

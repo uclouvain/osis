@@ -60,7 +60,7 @@ def publish_to_portal(global_ids=None):
 
 def _compute_list(global_ids=None):
     attribution_list = _get_all_attributions_with_charges(global_ids)
-    attribution_list = _group_attributions_by_global_id(attribution_list)
+    attribution_list = _group_attributions_by_global_id(attribution_list, global_ids)
     return list(attribution_list.values())
 
 
@@ -87,16 +87,20 @@ def _get_all_attributions_with_charges(global_ids):
             )
 
 
-def _group_attributions_by_global_id(attribution_list):
-    attributions_grouped = {}
+def _group_attributions_by_global_id(attribution_list, global_ids):
     computation_datetime = time.mktime(timezone.now().timetuple())
+    attributions_grouped = {global_id: _get_default_attribution_dict(global_id, computation_datetime)
+                            for global_id in global_ids} if global_ids is not None else {}
+
     for attribution in attribution_list:
         key = attribution.tutor.person.global_id
-        attributions_grouped.setdefault(key, {'global_id': key,
-                                              'computation_datetime': computation_datetime,
-                                              'attributions': []})
+        attributions_grouped.setdefault(key, _get_default_attribution_dict(key, computation_datetime))
         attributions_grouped[key]['attributions'].extend(_split_attribution_by_learning_unit_year(attribution))
     return attributions_grouped
+
+
+def _get_default_attribution_dict(global_id, computation_datetime):
+    return {'global_id': global_id, 'computation_datetime': computation_datetime, 'attributions': []}
 
 
 def _split_attribution_by_learning_unit_year(attribution):
@@ -116,7 +120,7 @@ def _split_attribution_by_learning_unit_year(attribution):
                     'end_year': attribution.end_year,
                     'function': attribution.function,
                     'year': lunit_year.academic_year.year,
-                    'weight': str(lunit_year.credits)
+                    'weight': str(lunit_year.credits) if lunit_year.credits else ''
             }).update({
                 allocation_charge_key: str(attrib_charge.allocation_charge)
             })

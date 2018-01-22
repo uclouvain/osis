@@ -1,3 +1,7 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=37a30b73c9ca86e79442503327038e6b7fe540d4cdeec8ecde1bfe9a43e19d9a
+
 language: python
 python: "3.4.5"
 
@@ -18,7 +22,16 @@ before_install:
 install:
   - "pip install -r travis-requirements.txt"
 
-script: "python3 manage.py compilemessages && python3 manage.py test"
+before_script:
+  - "curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter"
+  - "chmod +x ./cc-test-reporter"
+  - "./cc-test-reporter before-build"
+
+script: "python3 manage.py compilemessages && coverage run manage.py test"
+
+after_script:
+  - "coverage xml"
+  - "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
 
 notifications:
   slack: osisteam:2M3DtIOGE4clU1DF8r6k8NQD

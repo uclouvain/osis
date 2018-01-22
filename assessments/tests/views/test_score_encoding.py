@@ -33,6 +33,7 @@ from django.test import TestCase, RequestFactory
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from assessments.business.score_encoding_list import ScoresEncodingList
+from base.models.enums import exam_enrollment_justification_type
 
 from base.tests.models import test_exam_enrollment, test_offer_enrollment, \
     test_learning_unit_enrollment, test_session_exam, test_offer_year
@@ -56,12 +57,13 @@ from base.tests.factories.student import StudentFactory
 class OnlineEncodingTest(TestCase):
     def setUp(self):
         self.request_factory = RequestFactory()
-        academic_year = _get_academic_year()
+        academic_year = _get_academic_year(year=2017)
         academic_calendar = AcademicCalendarFactory.build(title="Submission of score encoding - 1",
                                                           start_date=academic_year.start_date,
                                                           end_date=academic_year.end_date,
                                                           academic_year=academic_year,
                                                           reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+
         academic_calendar.save(functions=[])
         SessionExamCalendarFactory(academic_calendar=academic_calendar, number_session=number_session.ONE)
 
@@ -136,7 +138,7 @@ class OnlineEncodingTest(TestCase):
     def test_pgm_encoding_with_justification_for_a_student(self):
         self.client.force_login(self.program_manager_2.person.user)
         url = reverse('online_encoding_form', args=[self.learning_unit_year.id])
-        self.client.post(url, data=self.get_form_with_all_students_filled_and_one_with_justification())
+        self.client.post(url, data=self.get_form_with_all_students_filled_and_one_with_justification_justified())
 
         self.refresh_exam_enrollments_from_db()
         self.assert_exam_enrollments(self.enrollments[0], None, None, None, None)
@@ -165,11 +167,25 @@ class OnlineEncodingTest(TestCase):
     def test_tutor_encoding_with_all_students_and_a_justification(self):
         self.client.force_login(self.tutor.person.user)
         url = reverse('online_encoding_form', args=[self.learning_unit_year.id])
-        self.client.post(url, data=self.get_form_with_all_students_filled_and_one_with_justification())
+        self.client.post(url, data=self.get_form_with_all_students_filled_and_one_with_justification_unjustified())
 
         self.refresh_exam_enrollments_from_db()
         self.assert_exam_enrollments(self.enrollments[0], 15, None, None, None)
-        self.assert_exam_enrollments(self.enrollments[1], None, None, "ABSENCE_JUSTIFIED", None)
+        self.assert_exam_enrollments(self.enrollments[1], None, None, "ABSENCE_UNJUSTIFIED", None)
+
+    def test_tutor_encoding_with_absence_justified(self):
+        """A tutor cannot use value 'absence justified'. It is reserved to program manager """
+        self.enrollments[1].justification_draft = exam_enrollment_justification_type.CHEATING
+        self.enrollments[1].save()
+
+        # Try to pass 'absence_justified'
+        self.client.force_login(self.tutor.person.user)
+        url = reverse('online_encoding_form', args=[self.learning_unit_year.id])
+        self.client.post(url, data=self.get_form_with_all_students_filled_and_one_with_justification_justified())
+
+        self.refresh_exam_enrollments_from_db()
+        self.assert_exam_enrollments(self.enrollments[0], 15, None, None, None)
+        self.assert_exam_enrollments(self.enrollments[1], None, None, exam_enrollment_justification_type.CHEATING, None)
 
     def test_pgm_double_encoding_for_a_student(self):
         self.client.force_login(self.program_manager_1.person.user)
@@ -220,7 +236,7 @@ class OnlineEncodingTest(TestCase):
         self.client.force_login(self.program_manager_2.person.user)
         mock_send_email.return_value = None
         url = reverse('online_encoding_form', args=[self.learning_unit_year.id])
-        self.client.post(url, data=self.get_form_with_all_students_filled_and_one_with_justification())
+        self.client.post(url, data=self.get_form_with_all_students_filled_and_one_with_justification_unjustified())
 
         self.assertTrue(mock_send_email.called)
         (persons, enrollments, learning_unit_acronym, offer_acronym), kwargs = mock_send_email.call_args
@@ -261,7 +277,19 @@ class OnlineEncodingTest(TestCase):
                 "score_changed_" + str(exam_enrollment_2.id): "true"
                 }
 
-    def get_form_with_all_students_filled_and_one_with_justification(self):
+    def get_form_with_all_students_filled_and_one_with_justification_unjustified(self):
+        exam_enrollment_1 = self.enrollments[0]
+        exam_enrollment_2 = self.enrollments[1]
+
+        return {"score_" + str(exam_enrollment_1.id): "15",
+                "justification_" + str(exam_enrollment_1.id): "",
+                "score_changed_" + str(exam_enrollment_1.id): "true",
+                "score_" + str(exam_enrollment_2.id): "",
+                "justification_" + str(exam_enrollment_2.id): "ABSENCE_UNJUSTIFIED",
+                "score_changed_" + str(exam_enrollment_2.id): "true"
+                }
+
+    def get_form_with_all_students_filled_and_one_with_justification_justified(self):
         exam_enrollment_1 = self.enrollments[0]
         exam_enrollment_2 = self.enrollments[1]
 
@@ -294,10 +322,10 @@ class OutsideEncodingPeriodTest(TestCase):
         self.client.force_login(self.user)
 
         # Create context out of range
-        self.academic_year = _get_academic_year()
+        self.academic_year = _get_academic_year(2017)
         self.academic_calendar = AcademicCalendarFactory.build(title="Submission of score encoding - 1",
-                                                          academic_year=self.academic_year,
-                                                          reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+                                                               academic_year=self.academic_year,
+                                                               reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         self.academic_calendar.save(functions=[])
         self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=self.academic_calendar,
                                                                 number_session=number_session.ONE)
@@ -327,13 +355,14 @@ class OutsideEncodingPeriodTest(TestCase):
 
         # Submission of score encoding - 1 [Two day before today]
         self.academic_calendar.end_date = timezone.now() - timedelta(days=2)
+        self.academic_calendar.start_date = timezone.now() - timedelta(days=20)
         self.academic_calendar.save(functions=[])
 
         # Create submission of score encoding - 2 [Start in 100 days]
         ac = AcademicCalendarFactory.build(title="Submission of score encoding - 2",
                                            academic_year=self.academic_year,
-                                           start_date=timezone.now() + timedelta(days=100),
-                                           end_date=timezone.now() + timedelta(days=130),
+                                           start_date=self.academic_calendar.end_date + timedelta(days=100),
+                                           end_date=self.academic_calendar.end_date + timedelta(days=130),
                                            reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         ac.save(functions=[])
         SessionExamCalendarFactory(academic_calendar=ac, number_session=number_session.TWO)
@@ -359,7 +388,7 @@ class GetScoreEncodingViewProgramManagerTest(TestCase):
         self.client.force_login(self.user)
 
         # Set user as program manager of two offer
-        academic_year = _get_academic_year()
+        academic_year = _get_academic_year(2017)
         self.offer_year_bio2ma = OfferYearFactory(acronym="BIO2MA", title="Master en Biologie",
                                                   academic_year=academic_year)
         self.offer_year_bio2bac = OfferYearFactory(acronym="BIO2BAC", title="Bachelier en Biologie",
@@ -460,10 +489,13 @@ def prepare_exam_enrollment_for_double_encoding_validation(exam_enrollment):
     exam_enrollment.save()
 
 
-def _get_academic_year():
-    start_date = timezone.now() - timedelta(days=5)
+def _get_academic_year(year=None):
+    start_date = timezone.now()
     end_date = timezone.now() + timedelta(days=220)
-    return AcademicYearFactory(year=timezone.now().year, start_date=start_date, end_date=end_date)
+    if year:
+        return AcademicYearFactory(year=year)
+    else:
+        return AcademicYearFactory(year=timezone.now().year, start_date=start_date, end_date=end_date)
 
 
 def add_permission(user, codename):

@@ -24,12 +24,20 @@
 #
 ##############################################################################
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.decorators import login_required, permission_required
-from base import models as mdl
 
+from base import models as mdl
+from base.business.education_group import can_user_edit_administrative_data
 from base.forms.education_groups import EducationGroupFilter, MAX_RECORDS
+from base.forms.education_groups_administrative_data import CourseEnrollmentForm, AdministrativeDataFormset
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.program_manager import is_program_manager
 
 from . import layout
 from cms.enums import entity_name
@@ -45,6 +53,7 @@ CREDITS_MIN = "credits_min"
 CREDITS_MAX = "credits_max"
 BLOCK = "block"
 SESSIONS_DEROGATION = "sessions_derogation"
+NUMBER_SESSIONS = 3
 
 
 @login_required
@@ -186,7 +195,36 @@ def _education_group_administrative_data_tab(request, education_group_year_id):
                                                        education_group_year)})
     context.update({'scores_exam_diffusion': get_sessions_dates(academic_calendar_type.SCORES_EXAM_DIFFUSION,
                                                                 education_group_year)})
+    context.update({"can_edit_administrative_data":
+                        can_user_edit_administrative_data(request.user, education_group_year.education_group)})
     return layout.render(request, "education_group/tab_administrative_data.html", context)
+
+
+@login_required
+@permission_required('base.can_edit_education_group_administrative_data', raise_exception=True)
+def education_group_edit_administrative_data(request, education_group_year_id):
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+    if not is_program_manager(request.user, education_group=education_group_year.education_group):
+        raise PermissionDenied("Only program managers of the education group can edit.")
+
+    formset_session = AdministrativeDataFormset(request.POST or None,
+                                                form_kwargs={'education_group_year': education_group_year})
+
+    offer_year_calendar = mdl.offer_year_calendar.search(education_group_year_id=education_group_year_id,
+                                                         academic_calendar_reference=academic_calendar_type.COURSE_ENROLLMENT).first()
+
+    course_enrollment = CourseEnrollmentForm(request.POST or None, instance=offer_year_calendar)
+
+    course_enrollment_validity = course_enrollment.is_valid()
+    formset_session_validity = formset_session.is_valid()
+
+    if course_enrollment_validity and formset_session_validity:
+        formset_session.save()
+        course_enrollment.save()
+        messages.add_message(request, messages.SUCCESS, _('The administrative data has been successfully modified'))
+        return HttpResponseRedirect(reverse('education_group_administrative', args=(education_group_year_id,)))
+
+    return layout.render(request, "education_group/tab_edit_administrative_data.html", locals())
 
 
 def get_root(education_group_year_id, request):
@@ -200,17 +238,17 @@ def get_root(education_group_year_id, request):
 
 def get_sessions_dates(an_academic_calendar_type, an_education_group_year):
     date_dict = {}
-    cpt = 1
-    while cpt <= 3:
-        session1 = mdl.session_exam_calendar.get_by_session_reference_and_academic_year(cpt,
-                                                                                        an_academic_calendar_type,
-                                                                                        an_education_group_year.academic_year)
-        if session1:
-            dates = mdl.offer_year_calendar.get_by_education_group_year_and_academic_calendar(session1.academic_calendar,
+
+    for session_number in range(NUMBER_SESSIONS):
+        session = mdl.session_exam_calendar.get_by_session_reference_and_academic_year(session_number+1,
+                                                                                       an_academic_calendar_type,
+                                                                                       an_education_group_year.academic_year)
+        if session:
+            dates = mdl.offer_year_calendar.get_by_education_group_year_and_academic_calendar(session.academic_calendar,
                                                                                               an_education_group_year)
-            key = 'session{}'.format(cpt)
+            key = 'session{}'.format(session_number+1)
             date_dict.update({key: dates})
-        cpt = cpt + 1
+
     return date_dict
 
 

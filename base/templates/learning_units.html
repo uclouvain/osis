@@ -99,5 +99,13 @@
                 }
             })
     ;});
+
+    $("#btn_produce_xls").click(function(e) {
+        e.preventDefault();
+        $("#xls_status").val('xls');
+        $("#form_learning_units").submit();
+        $("#xls_status").val('');
+    });
+
 </script>
 {% endblock %}

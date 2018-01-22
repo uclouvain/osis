@@ -23,11 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+from datetime import datetime
 
 from django.contrib import admin
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
+from django.utils import formats
 from django.utils.translation import ugettext as _
 
 from base.models import offer_year
@@ -71,6 +72,27 @@ class OfferYearCalendar(models.Model):
                 self.end_date = end_date
                 self.save()
 
+    def clean(self):
+        try:
+            self.end_start_dates_validation()
+        except AttributeError as e:
+            raise ValidationError(e)
+
+        if not hasattr(self, 'academic_calendar'):
+            return None
+
+        self._check_is_in_calendar_range(self.start_date)
+        self._check_is_in_calendar_range(self.end_date)
+
+    def _check_is_in_calendar_range(self, date):
+        if date and not self.academic_calendar.start_date <= date.date() <= self.academic_calendar.end_date:
+            info = {
+                "date": formats.localize_input(date.date()),
+                "start_date": formats.localize_input(self.academic_calendar.start_date),
+                "end_date": formats.localize_input(self.academic_calendar.end_date),
+            }
+            raise ValidationError(_('%(date)s must be set within %(start_date)s and %(end_date)s'), params=info)
+
     def save(self, *args, **kwargs):
         self.end_start_dates_validation()
         super(OfferYearCalendar, self).save(*args, **kwargs)
@@ -96,7 +118,7 @@ class OfferYearCalendar(models.Model):
         elif date_oyc:
             return datetime(year=date_oyc.year, month=date_oyc.month, day=date_oyc.day)
         else:
-            None
+            return None
 
     def get_start_date(self):
         return self._get_date('start_date')
@@ -142,7 +164,7 @@ def _create_from_academic_calendar(academic_calendar):
 
 
 def find_by_academic_calendar(academic_cal):
-    return OfferYearCalendar.objects.filter(academic_calendar=academic_cal.id)
+    return OfferYearCalendar.objects.filter(academic_calendar=academic_cal)
 
 
 def find_offer_year_events(offer_yr):
@@ -178,9 +200,26 @@ def find_latest_end_date_by_academic_calendar(academic_calendar_id):
         return None
 
 
+def find_by_education_group_year(education_group_year):
+    return OfferYearCalendar.objects.filter(education_group_year=education_group_year)
+
+
 def get_by_education_group_year_and_academic_calendar(an_academic_calendar, an_education_group_year):
     try:
         return OfferYearCalendar.objects.get(academic_calendar=an_academic_calendar,
                                              education_group_year=an_education_group_year)
     except ObjectDoesNotExist:
         return None
+
+
+def search(education_group_year_id=None, academic_calendar_reference=None):
+
+    queryset = OfferYearCalendar.objects
+
+    if education_group_year_id is not None:
+        queryset = queryset.filter(education_group_year=education_group_year_id)
+
+    if academic_calendar_reference is not None:
+        queryset = queryset.filter(academic_calendar__reference=academic_calendar_reference)
+
+    return queryset

@@ -24,21 +24,24 @@
 #
 ##############################################################################
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import PermissionDenied
 
 
 from base.business.learning_unit_proposal import compute_form_initial_data, compute_proposal_type, \
-    is_eligible_for_modification_proposal
+    is_eligible_for_modification_proposal, is_eligible_for_cancel_of_proposal, reinitialize_data_before_proposal, \
+    delete_learning_unit_proposal
 from base.forms.learning_unit_proposal import LearningUnitProposalModificationForm
 from base.models.enums import proposal_state
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
+from base.models.proposal_learning_unit import ProposalLearningUnit
 
 
 @login_required
+@permission_required('base.can_propose_learningunit', raise_exception=True)
 def propose_modification_of_learning_unit(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, id=learning_unit_year_id)
     user_person = get_object_or_404(Person, user=request.user)
@@ -56,7 +59,8 @@ def propose_modification_of_learning_unit(request, learning_unit_year_id):
             type_proposal = compute_proposal_type(form.initial, form.cleaned_data)
             form.save(learning_unit_year, user_person, type_proposal, proposal_state.ProposalState.FACULTY.name)
             messages.add_message(request, messages.SUCCESS,
-                                 _("success_modification_proposal").format(type_proposal, learning_unit_year.acronym))
+                                 _("success_modification_proposal")
+                                 .format(_(type_proposal), learning_unit_year.acronym))
             return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
     else:
         form = LearningUnitProposalModificationForm(initial=initial_data)
@@ -65,3 +69,20 @@ def propose_modification_of_learning_unit(request, learning_unit_year_id):
                                                                         'person': user_person,
                                                                         'form': form,
                                                                         'experimental_phase': True})
+
+
+@login_required
+@permission_required('base.can_propose_learningunit', raise_exception=True)
+def cancel_proposal_of_learning_unit(request, learning_unit_year_id):
+    learning_unit_year = get_object_or_404(LearningUnitYear, id=learning_unit_year_id)
+    user_person = get_object_or_404(Person, user=request.user)
+    learning_unit_proposal = get_object_or_404(ProposalLearningUnit, learning_unit_year=learning_unit_year)
+
+    if not is_eligible_for_cancel_of_proposal(learning_unit_proposal, user_person):
+        raise PermissionDenied("Learning unit proposal cannot be cancelled.")
+
+    reinitialize_data_before_proposal(learning_unit_proposal, learning_unit_year)
+    delete_learning_unit_proposal(learning_unit_proposal)
+    messages.add_message(request, messages.SUCCESS,
+                         _("success_cancel_proposal").format(learning_unit_year.acronym))
+    return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)

@@ -390,7 +390,7 @@ msgid "encoding_status_notended"
 msgstr "It remains notes to encode."
 
 msgid "end_date"
-msgstr "End date"
+msgstr "Teacher Deadline"
 
 msgid "end_date_teacher"
 msgstr "Teacher Deadline"
@@ -2430,3 +2430,24 @@ msgstr "Academic entity"
 
 msgid "folder_number"
 msgstr "Folder n°{}"
+
+msgid "produce_xls"
+msgstr "Produce an Excel file with the list of results"
+
+msgid "produce_xls_lu"
+msgstr "Xls with learning units"
+
+msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
+msgstr ""
+
+msgid "success_cancel_proposal"
+msgstr "The proposal for {} was cancelled."
+
+msgid "cancel_proposal"
+msgstr "Cancel proposal"
+
+msgid "msg_confirm_cancel_proposal"
+msgstr "Are you certain that you want to cancel the learning unit proposal ?"
+
+msgid "The administrative data has been successfully modified"
+msgstr ""

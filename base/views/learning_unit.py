@@ -42,13 +42,15 @@ from base.business.learning_unit import create_learning_unit, create_learning_un
     get_common_context_learning_unit_year, get_cms_label_data, \
     extract_volumes_from_data, get_same_container_year_components, get_components_identification, show_subtype, \
     get_organization_from_learning_unit_year, get_campus_from_learning_unit_year, \
-    get_all_attributions, get_last_academic_years
+    get_all_attributions, get_last_academic_years, get_search_form, \
+    get_learning_units, SIMPLE_SEARCH, SERVICE_COURSES_SEARCH, create_xls
 from base.forms.common import TooManyResultsException
 from base.models import proposal_learning_unit, entity_version
+from base.models.campus import Campus
 from base.models.enums import learning_container_year_types, learning_unit_year_subtypes
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.learning_container import LearningContainer
-from base.forms.learning_units import LearningUnitYearForm, CreateLearningUnitYearForm, EMPTY_FIELD
+from base.forms.learning_units import CreateLearningUnitYearForm, EMPTY_FIELD
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm, LearningUnitPedagogyEditForm
 from base.forms.learning_unit_component import LearningUnitComponentEditForm
@@ -63,9 +65,6 @@ CMS_LABEL_PEDAGOGY = ['resume', 'bibliography', 'teaching_methods', 'evaluation_
                       'other_informations', 'online_resources']
 
 LEARNING_UNIT_CREATION_SPAN_YEARS = 6
-
-SIMPLE_SEARCH = 1
-SERVICE_COURSES_SEARCH = 2
 
 
 @login_required
@@ -95,6 +94,8 @@ def learning_unit_identification(request, learning_unit_year_id):
     context['components'] = get_components_identification(learning_unit_year)
     context['can_propose'] = learning_unit_proposal.is_eligible_for_modification_proposal(learning_unit_year, person)
     context['proposal'] = proposal_learning_unit.find_by_learning_unit_year(learning_unit_year)
+    context['can_cancel_proposal'] = learning_unit_proposal.\
+        is_eligible_for_cancel_of_proposal(context['proposal'], person) if context['proposal'] else False
     context['proposal_folder_entity_version'] = \
         entity_version.get_by_entity_and_date(context['proposal'].folder.entity, None) if context['proposal'] else None
     context['can_delete'] = learning_unit_deletion.can_delete_learning_unit_year(person, learning_unit_year)
@@ -385,7 +386,7 @@ def check_acronym(request):
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def check_code(request):
     campus_id = request.GET['campus']
-    campus = mdl.campus.find_by_id(campus_id)
+    campus = get_object_or_404(Campus, id=campus_id)
     return JsonResponse({'code': campus.code}, safe=False)
 
 
@@ -402,23 +403,17 @@ def learning_units_service_course(request):
 
 
 def _learning_units_search(request, search_type):
-    if request.GET.get('academic_year_id'):
-        form = LearningUnitYearForm(request.GET)
-    else:
-        form = LearningUnitYearForm()
-
-    found_learning_units = None
+    form = get_search_form(request)
+    found_learning_units = []
     try:
         if form.is_valid():
-
-            if search_type == SIMPLE_SEARCH:
-                found_learning_units = form.get_activity_learning_units()
-            elif search_type == SERVICE_COURSES_SEARCH:
-                found_learning_units = form.get_service_course_learning_units()
-
+            found_learning_units = get_learning_units(form, search_type)
             _check_if_display_message(request, found_learning_units)
     except TooManyResultsException:
         messages.add_message(request, messages.ERROR, _('too_many_results'))
+
+    if request.GET.get('xls_status') == "xls":
+        return create_xls(request.user, found_learning_units)
 
     context = {
         'form': form,

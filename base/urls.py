@@ -26,8 +26,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls import url, include
-
-from attribution.views import attribution
+from attribution.views import attribution, tutor_application
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, education_group, learning_unit_proposal
 import base.views.learning_unit_deletion
@@ -57,6 +56,8 @@ urlpatterns = [
 
     url(r'^api/v1/', include([
         url(r'^entities/$', entity.post_entities, name='post_entities'),
+        url(r'^tutor_application/recompute_portal$', tutor_application.recompute_portal,
+            name='recompute_tutor_application_portal'),
         url(r'^attribution/recompute_portal$', attribution.recompute_portal, name='recompute_attribution_portal'),
     ])),
 
@@ -97,7 +98,9 @@ urlpatterns = [
                 name="learning_unit_attributions"),
             url(r'^proposal/', include([
                 url(r'^modification/$', learning_unit_proposal.propose_modification_of_learning_unit,
-                    name="learning_unit_modification_proposal")
+                    name="learning_unit_modification_proposal"),
+                url(r'^cancel/$', learning_unit_proposal.cancel_proposal_of_learning_unit,
+                    name="learning_unit_cancel_proposal")
             ])),
             url(r'^specifications/$', learning_unit.learning_unit_specifications, name="learning_unit_specifications"),
             url(r'^specifications/edit/$', learning_unit.learning_unit_specifications_edit,
@@ -152,8 +155,10 @@ urlpatterns = [
             url(r'^diplomas/$', education_group.education_group_diplomas, name='education_group_diplomas'),
             url(r'^informations/$', education_group.education_group_general_informations,
                 name='education_group_general_informations'),
-
-            url(r'^administrative/$', education_group.education_group_administrative_data, name='education_group_administrative'),
+            url(r'^administrative/', include([
+                url(u'^$', education_group.education_group_administrative_data, name='education_group_administrative'),
+                url(u'^edit/$', education_group.education_group_edit_administrative_data,
+                    name='education_group_edit_administrative')])),
             url(r'^content/$', education_group.education_group_content, name='education_group_content'),
         ]))
     ])),

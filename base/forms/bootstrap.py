@@ -45,4 +45,8 @@ def set_form_control(self):
         attr_class = self.fields[field].widget.attrs.get('class') or ''
         # Exception because we don't apply form-control on widget checkbox
         if self.fields[field].widget.template_name != 'django/forms/widgets/checkbox.html':
-            self.fields[field].widget.attrs['class'] = attr_class + ' form-control'
+            if isinstance(self.fields[field].widget, forms.MultiWidget):
+                for widget in self.fields[field].widget.widgets:
+                    widget.attrs['class'] = ' '.join((widget.attrs.get('class', ''), 'form-control'))
+            else:
+                self.fields[field].widget.attrs['class'] = ' '.join((attr_class, 'form-control'))

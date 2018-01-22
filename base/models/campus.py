@@ -57,4 +57,7 @@ def find_administration_campuses():
 
 
 def find_by_id(campus_id):
-    return Campus.objects.get(id=campus_id)
+    try:
+        return Campus.objects.get(id=campus_id)
+    except Campus.DoesNotExist:
+        return None

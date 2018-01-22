@@ -212,9 +212,10 @@ def is_enrollment_changed(enrollment, is_program_manager):
 def can_modify_exam_enrollment(enrollment, is_program_manager):
     if is_program_manager:
         return not is_deadline_reached(enrollment)
-    else:
-        return not is_deadline_reached(enrollment, is_program_manager) and \
-               not enrollment.score_final and not enrollment.justification_final
+
+    return not is_deadline_reached(enrollment, False) and \
+           not enrollment.score_final and not enrollment.justification_final and \
+           enrollment.justification_encoded != exam_enrollment_justification_type.ABSENCE_JUSTIFIED
 
 
 def is_deadline_reached(enrollment, is_program_manager=True):

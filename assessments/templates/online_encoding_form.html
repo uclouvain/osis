@@ -203,7 +203,7 @@
                                     </option>
                                 {% else %}
                                     <option value="ABSENCE_UNJUSTIFIED"
-                                        {% if enrollment.justification_draft == 'ABSENCE_UNJUSTIFIED' %}
+                                        {% if enrollment.justification_draft == 'ABSENCE_UNJUSTIFIED' or enrollment.justification_final == 'ABSENCE_JUSTIFIED' %}
                                             selected
                                         {% endif %}>
                                             {% trans 'absent' %}

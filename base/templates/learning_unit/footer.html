@@ -35,8 +35,13 @@
         <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
              {% if "base.can_propose_learningunit" in perms %}
             <li {% if not can_propose %}class="disabled"{% endif %}>
-                <a {% if not proposal %} href="{% url "learning_unit_modification_proposal" learning_unit_year_id=learning_unit_year.id %}" {% endif %}>
+                <a {% if can_propose %} href="{% url "learning_unit_modification_proposal" learning_unit_year_id=learning_unit_year.id %}" {% endif %}>
                     {% trans 'Put in proposal' %}
+                </a>
+            </li>
+            <li {% if not can_cancel_proposal %}class="disabled"{% endif %}>
+                <a {% if can_cancel_proposal %}  href="#" data-toggle="modal" data-target="#modalCancelProposal" {% endif %}>
+                    {% trans 'cancel_proposal' %}
                 </a>
             </li>
             {% endif %}
@@ -51,5 +56,22 @@
             {% endif %}
         </ul>
     </div>
+
+    {% if can_cancel_proposal %}
+    <!-- Modal to cancel proposal-->
+    <div class="modal fade" id="modalCancelProposal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            {% trans "msg_confirm_cancel_proposal" %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "close" %}</button>
+            <a href="{% url "learning_unit_cancel_proposal" learning_unit_year_id=learning_unit_year.id %}" role="button" class="btn btn-danger">{% trans "confirm" %}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
 </div>
 {% endif %}

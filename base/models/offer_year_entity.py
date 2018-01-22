@@ -41,7 +41,7 @@ class OfferYearEntityAdmin(admin.ModelAdmin):
 class OfferYearEntity(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    offer_year = models.ForeignKey('OfferYear')
+    offer_year = models.ForeignKey('OfferYear', blank=True, null=True)
     entity = models.ForeignKey('Entity')
     type = models.CharField(max_length=30, blank=True, null=True, choices=offer_year_entity_type.TYPES)
     education_group_year = models.ForeignKey('EducationGroupYear', blank=True, null=True)

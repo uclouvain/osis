@@ -135,6 +135,19 @@ class AttributionJsonTest(TestCase):
         )
         self.assertEqual(len(attrib_tutor_2['attributions']), 1)
 
+    def test_with_multiple_global_id(self):
+        global_id = self.tutor_2.person.global_id
+        global_id_with_no_attributions = "4598989898"
+        attrib_list = attribution_json._compute_list(global_ids=[global_id, global_id_with_no_attributions])
+        self.assertIsInstance(attrib_list, list)
+        self.assertEqual(len(attrib_list), 2)
+
+        attribution_data = next(
+            (attrib for attrib in attrib_list if attrib['global_id'] == global_id_with_no_attributions),
+            None
+        )
+        self.assertFalse(attribution_data['attributions'])
+
 
 def _create_learning_unit_year_with_components(academic_year, l_container, acronym, subtype):
     l_unit_year = LearningUnitYearFactory(academic_year=academic_year, learning_container_year=l_container,

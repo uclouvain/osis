@@ -64,3 +64,7 @@ def find_by_learning_unit_year(a_learning_unit_year):
 
 def have_a_proposal(a_learning_unit_year):
     return ProposalLearningUnit.objects.filter(learning_unit_year=a_learning_unit_year).count() > 0
+
+
+def find_by_folder(a_folder):
+    return ProposalLearningUnit.objects.filter(folder=a_folder)
