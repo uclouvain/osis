@@ -32,7 +32,6 @@ from base.models.enums import education_group_categories
 from base.tests.factories.academic_calendar import AcademicCalendarEducationGroupEditionFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.user import UserFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin
 from rules_management.enums import MINI_TRAINING_DAILY_MANAGEMENT, MINI_TRAINING_PGRM_ENCODING_PERIOD
 
@@ -73,7 +72,7 @@ class TestMiniTrainingModelForm(EducationGroupYearModelFormMixin):
         context = self.form_class(
             parent=self.parent_education_group_year,
             education_group_type=self.education_group_type,
-            user=UserFactory(),
+            user=self.user,
         ).get_context()
         self.assertTrue(context, MINI_TRAINING_DAILY_MANAGEMENT)
 
@@ -88,6 +87,28 @@ class TestMiniTrainingModelForm(EducationGroupYearModelFormMixin):
         context = self.form_class(
             parent=self.parent_education_group_year,
             education_group_type=self.education_group_type,
-            user=UserFactory(),
+            user=self.user,
         ).get_context()
         self.assertTrue(context, MINI_TRAINING_PGRM_ENCODING_PERIOD)
+
+    def test_preselect_management_entity_from_parent(self):
+        self.parent_education_group_year.education_group_type = EducationGroupTypeFactory(
+            category=education_group_categories.TRAINING
+        )
+        self.parent_education_group_year.save()
+        self._test_preselect_management_entity_from_training_parent(self.form_class)
+
+    @patch('base.forms.education_group.common.find_authorized_types')
+    def test_no_preselect_management_entity_from_training_parent_case_no_training_parent(self, mock_authorized_types):
+        mock_authorized_types.return_value = EducationGroupType.objects.all()
+        self.parent_education_group_year.education_group_type = EducationGroupTypeFactory(
+            category=education_group_categories.GROUP
+        )
+        self.parent_education_group_year.save()
+
+        form = MiniTrainingYearModelForm(
+            parent=self.parent_education_group_year,
+            education_group_type=self.education_group_type,
+            user=self.user
+        )
+        self.assertIsNone(form.fields["management_entity"].initial)

@@ -27,10 +27,7 @@ import datetime
 import pickle
 import time
 
-from django.core.cache import caches
-
-# FIXME replace pickle by json to be serialized in redis
-cache = caches["default"]
+from base.utils.cache import cache
 
 CACHE_NOTIFICATIONS_TIMEOUT = 300  # seconds -> 5 min
 NOTIFICATIONS_KEY = "notifications_unread_user_{}"

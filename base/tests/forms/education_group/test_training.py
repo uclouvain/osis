@@ -44,8 +44,9 @@ from base.tests.factories.certificate_aim import CertificateAimFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
 from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
-from base.tests.factories.entity_version import MainEntityVersionFactory, EntityVersionFactory
-from base.tests.factories.user import UserFactory
+from base.tests.factories.entity_version import MainEntityVersionFactory
+from base.tests.factories.person import PersonFactory
+from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.language import LanguageFactory
@@ -65,7 +66,7 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
         context = self.form_class(
             parent=self.parent_education_group_year,
             education_group_type=self.education_group_type,
-            user=UserFactory(),
+            user=self.user,
         ).get_context()
         self.assertTrue(context, TRAINING_DAILY_MANAGEMENT)
 
@@ -80,20 +81,25 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
         context = self.form_class(
             parent=self.parent_education_group_year,
             education_group_type=self.education_group_type,
-            user=UserFactory(),
+            user=self.user,
         ).get_context()
         self.assertTrue(context, TRAINING_PGRM_ENCODING_PERIOD)
 
 
-class TestPostponementEducationGroupYearMixin(TestCase):
+class TestPostponementEducationGroupYear(TestCase):
     def setUp(self):
-        self.education_group_year = TrainingFactory(academic_year=create_current_academic_year())
+        administration_entity_version = MainEntityVersionFactory()
+        management_entity_version = MainEntityVersionFactory()
+
+        self.education_group_year = TrainingFactory(
+            academic_year=create_current_academic_year(),
+            management_entity=management_entity_version.entity,
+            administration_entity=administration_entity_version.entity,
+        )
         self.education_group_type = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING
         )
 
-        EntityVersionFactory(entity=self.education_group_year.administration_entity)
-        EntityVersionFactory(entity=self.education_group_year.management_entity)
         self.list_acs = GenerateAcademicYear(get_current_year(), get_current_year() + 40).academic_years
 
         self.data = {
@@ -103,7 +109,7 @@ class TestPostponementEducationGroupYearMixin(TestCase):
             'credits': 42,
             'acronym': 'CRSCHOIXDVLD',
             'partial_acronym': 'LDVLD101R',
-            'management_entity': MainEntityVersionFactory().pk,
+            'management_entity': management_entity_version.pk,
             'administration_entity': MainEntityVersionFactory().pk,
             'main_teaching_campus': "",
             'academic_year': create_current_academic_year().pk,
@@ -115,15 +121,20 @@ class TestPostponementEducationGroupYearMixin(TestCase):
             "constraint_type": "",
         }
 
+        # Create user and attached it to management entity
+        person = PersonFactory()
+        PersonEntityFactory(person=person, entity=self.education_group_year.management_entity)
+        self.user = person.user
+
     def test_init(self):
         # In case of creation
-        form = TrainingForm({}, user=UserFactory(), education_group_type=self.education_group_type)
+        form = TrainingForm({}, user=self.user, education_group_type=self.education_group_type)
         self.assertFalse(form.dict_initial_egy)
 
         # In case of update
         form = TrainingForm(
             {},
-            user=UserFactory(),
+            user=self.user,
             instance=self.education_group_year
         )
         dict_initial_egy = model_to_dict_fk(
@@ -137,7 +148,7 @@ class TestPostponementEducationGroupYearMixin(TestCase):
         form = TrainingForm(
             self.data,
             instance=self.education_group_year,
-            user=UserFactory()
+            user=self.user
         )
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
@@ -153,7 +164,7 @@ class TestPostponementEducationGroupYearMixin(TestCase):
         self.education_group_year.refresh_from_db()
 
         self.data["title"] = "Defence Against the Dark Arts"
-        form = TrainingForm(self.data, instance=self.education_group_year, user=UserFactory())
+        form = TrainingForm(self.data, instance=self.education_group_year, user=self.user)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
@@ -174,7 +185,7 @@ class TestPostponementEducationGroupYearMixin(TestCase):
         form = TrainingForm(
             self.data,
             instance=self.education_group_year,
-            user=UserFactory()
+            user=self.user
         )
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
@@ -197,7 +208,7 @@ class TestPostponementEducationGroupYearMixin(TestCase):
         form = TrainingForm(
             self.data,
             instance=self.education_group_year,
-            user=UserFactory()
+            user=self.user
         )
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
@@ -224,7 +235,7 @@ class TestPostponementEducationGroupYearMixin(TestCase):
 
         self.data["secondary_domains"] = '|'.join([str(domain.pk) for domain in domains])
 
-        form = TrainingForm(self.data, instance=self.education_group_year, user=UserFactory())
+        form = TrainingForm(self.data, instance=self.education_group_year, user=self.user)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
@@ -259,10 +270,12 @@ class TestPermissionField(TestCase):
             permissions=self.permissions,
         )
 
-        self.user_with_perm = UserFactory()
+        person = PersonFactory()
+        self.user_with_perm = person.user
         self.user_with_perm.user_permissions.add(self.permissions[2])
 
-        self.user_without_perm = UserFactory()
+        person = PersonFactory()
+        self.user_without_perm = person.user
         self.user_without_perm.user_permissions.add(PermissionFactory())
 
         self.education_group_type = EducationGroupTypeFactory(
