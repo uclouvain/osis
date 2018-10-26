@@ -63,46 +63,26 @@ class ChargeRepartitionBaseViewMixin(RulesRequiredMixin):
     def parent_luy(self):
         return self.luy.parent
 
-    @cached_property
-    def attributions(self):
-        lecturing_charges = AttributionChargeNew.objects\
+    @staticmethod
+    def find_attributions(luy):
+        lecturing_charges = AttributionChargeNew.objects \
             .filter(learning_component_year__type=learning_component_year_type.LECTURING)
-        prefetch_lecturing_charges  = Prefetch("attributionchargenew_set", queryset=lecturing_charges,
-                                               to_attr="lecturing_charges")
+        prefetch_lecturing_charges = Prefetch("attributionchargenew_set", queryset=lecturing_charges,
+                                              to_attr="lecturing_charges")
 
-        practical_charges = AttributionChargeNew.objects\
+        practical_charges = AttributionChargeNew.objects \
             .filter(learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES)
         prefetch_practical_charges = Prefetch("attributionchargenew_set", queryset=practical_charges,
                                               to_attr="practical_charges")
 
-        learning_unit_components = LearningUnitComponent.objects.filter(learning_unit_year=self.parent_luy)
-        attributions = AttributionNew.objects\
-            .filter(attributionchargenew__learning_component_year__learningunitcomponent__in=learning_unit_components)\
-            .distinct("id")\
-            .prefetch_related(prefetch_lecturing_charges)\
-            .prefetch_related(prefetch_practical_charges)\
+        learning_unit_components = LearningUnitComponent.objects.filter(learning_unit_year=luy)
+        attributions = AttributionNew.objects \
+            .filter(attributionchargenew__learning_component_year__learningunitcomponent__in=learning_unit_components) \
+            .distinct("id") \
+            .prefetch_related(prefetch_lecturing_charges) \
+            .prefetch_related(prefetch_practical_charges) \
             .select_related("tutor__person")
         return attributions
-
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["learning_unit_year"] = self.luy
-        context["attributions"] = self.attributions
-        return context
-
-    def get_success_url(self):
-        return reverse("learning_unit_attributions", args=[self.kwargs["learning_unit_year_id"]])
-
-
-class SelectAttributionView(ChargeRepartitionBaseViewMixin, TemplateView):
-    template_name = "learning_unit/select_attribution.html"
-
-
-class AddChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
-    template_name = "learning_unit/add_charge_repartition.html"
-    form_class = AttributionChargeRepartitionFormSet
-    success_message = _("Repartition added")
 
     @cached_property
     def attribution(self):
@@ -122,6 +102,38 @@ class AddChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, Su
             .select_related("tutor__person") \
             .get(id=self.kwargs["attribution_id"])
         return attribution
+
+    @cached_property
+    def attributions(self):
+        # TO DEFINE
+        return AttributionNew.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["learning_unit_year"] = self.luy
+        return context
+
+    def get_success_url(self):
+        return reverse("learning_unit_attributions", args=[self.kwargs["learning_unit_year_id"]])
+
+
+class SelectAttributionView(ChargeRepartitionBaseViewMixin, TemplateView):
+    template_name = "learning_unit/select_attribution.html"
+
+    @cached_property
+    def attributions(self):
+        return self.find_attributions(self.parent_luy)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["attributions"] = self.attributions
+        return context
+
+
+class AddChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
+    template_name = "learning_unit/add_charge_repartition.html"
+    form_class = AttributionChargeRepartitionFormSet
+    success_message = _("Repartition added")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -155,25 +167,6 @@ class EditChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, S
     form_class = AttributionChargeNewFormSet
     success_message = _("Repartition edited")
 
-    @cached_property
-    def attribution(self):
-        lecturing_charges = AttributionChargeNew.objects \
-            .filter(learning_component_year__type=learning_component_year_type.LECTURING)
-        prefetch_lecturing_charges = Prefetch("attributionchargenew_set", queryset=lecturing_charges,
-                                              to_attr="lecturing_charges")
-
-        practical_charges = AttributionChargeNew.objects \
-            .filter(learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES)
-        prefetch_practical_charges = Prefetch("attributionchargenew_set", queryset=practical_charges,
-                                              to_attr="practical_charges")
-
-        attribution = AttributionNew.objects \
-            .prefetch_related(prefetch_lecturing_charges) \
-            .prefetch_related(prefetch_practical_charges) \
-            .select_related("tutor__person") \
-            .get(id=self.kwargs["attribution_id"])
-        return attribution
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["formset"] = context["form"]
@@ -201,16 +194,9 @@ class RemoveChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin,
     pk_url_kwarg = "attribution_id"
     success_message = _("Repartition removed")
 
-    @cached_property
-    def attribution(self):
-        return AttributionNew.objects \
-            .select_related("tutor__person") \
-            .get(id=self.kwargs["attribution_id"])
-
     def delete(self, request, *args, **kwargs):
         delete_attribution(self.kwargs["attribution_id"])
         success_url = self.get_success_url()
-        # TODO check why no messages
         messages.success(self.request, self.success_message)
         return HttpResponseRedirect(success_url)
 
