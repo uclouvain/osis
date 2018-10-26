@@ -52,7 +52,6 @@ class VolumeField(forms.DecimalField):
 
 
 class VolumeEditionForm(forms.Form):
-
     requirement_entity_key = 'volume_' + entity_types.REQUIREMENT_ENTITY.lower()
     additional_requirement_entity_1_key = 'volume_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1.lower()
     additional_requirement_entity_2_key = 'volume_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2.lower()
@@ -88,7 +87,7 @@ class VolumeEditionForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.component = kwargs.pop('component')
         self.learning_unit_year = kwargs.pop('learning_unit_year')
-        self.entities = kwargs.pop('entities')
+        self.entities = kwargs.pop('entities', [])
         self.is_faculty_manager = kwargs.pop('is_faculty_manager', False)
 
         self.title = self.component.acronym
@@ -120,6 +119,28 @@ class VolumeEditionForm(forms.Form):
         for key, field in self.fields.items():
             if key not in self._faculty_manager_fields:
                 field.disabled = True
+
+    def clean(self):
+        """
+        Prevent faculty users to a volume to 0 if there was a value other than 0.
+        Also, prevent the faculty user from putting a volume if its value was 0.
+        """
+        cleaned_data = super().clean()
+
+        if self.is_faculty_manager:
+
+            if 0 in [self.initial.get("volume_q1"), self.initial.get("volume_q2")]:
+                if 0 not in [self.cleaned_data.get("volume_q1"), self.cleaned_data["volume_q2"]]:
+                    self.add_error("volume_q1", _("One of the partial volumes must have a value to 0."))
+                    self.add_error("volume_q2", _("One of the partial volumes must have a value to 0."))
+
+            else:
+                if self.cleaned_data.get("volume_q1") == 0:
+                    self.add_error("volume_q1", _("The volume cannot be set to 0."))
+                if self.cleaned_data.get("volume_q2") == 0:
+                    self.add_error("volume_q2", _("The volume cannot be set to 0."))
+
+        return cleaned_data
 
     def get_entity_fields(self):
         entity_keys = [self.requirement_entity_key, self.additional_requirement_entity_1_key,
@@ -213,6 +234,7 @@ class VolumeEditionFormsetContainer:
     """
     Create and Manage a set of VolumeEditionFormsets
     """
+
     def __init__(self, request, learning_units, person):
         self.formsets = OrderedDict()
         self.learning_units = learning_units

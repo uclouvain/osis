@@ -23,14 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from django.contrib.auth.models import Group
 from django.test import TestCase, RequestFactory
+from django.utils.translation import gettext
 
 from base.business.learning_unit_year_with_context import get_with_context
 from base.forms.learning_unit.edition_volume import VolumeEditionForm, VolumeEditionBaseFormset, \
     VolumeEditionFormsetContainer
 from base.models.person import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.person import PersonFactory
 
 
@@ -85,7 +88,7 @@ class TestVolumeEditionForm(TestCase):
                 initial=component_values,
                 component=component,
                 entities=self.learning_unit_with_context.entities)
-            self.assertTrue(form.is_valid()) # Accept that vol_q1 + vol_q2 is not equal to vol_tot
+            self.assertTrue(form.is_valid())  # Accept that vol_q1 + vol_q2 is not equal to vol_tot
 
     def test_post_volume_form_wrong_volume_tot_requirement(self):
         for component, component_values in self.learning_unit_with_context.components.items():
@@ -96,7 +99,7 @@ class TestVolumeEditionForm(TestCase):
                 initial=component_values,
                 component=component,
                 entities=self.learning_unit_with_context.entities)
-            self.assertTrue(form.is_valid()) # Accept that vol_tot * cp is not equal to vol_global
+            self.assertTrue(form.is_valid())  # Accept that vol_tot * cp is not equal to vol_global
 
     def test_post_volume_form_wrong_vol_req_entity(self):
         for component, component_values in self.learning_unit_with_context.components.items():
@@ -107,7 +110,7 @@ class TestVolumeEditionForm(TestCase):
                 initial=component_values,
                 component=component,
                 entities=self.learning_unit_with_context.entities)
-            self.assertTrue(form.is_valid()) # Accept that vol_global is not equal to sum of volumes of entities
+            self.assertTrue(form.is_valid())  # Accept that vol_global is not equal to sum of volumes of entities
 
     def test_post_volume_form_partim_q1(self):
         for component, component_values in self.learning_unit_with_context.components.items():
@@ -131,8 +134,6 @@ class TestVolumeEditionForm(TestCase):
                 entities=self.learning_unit_with_context.entities)
             actual_entity_fields = form.get_entity_fields()
             self.assertEqual(len(actual_entity_fields), 3)
-
-
 
 
 def _get_wrong_data_empty_field():
@@ -219,8 +220,8 @@ class TestVolumeEditionFormsetContainer(TestCase):
 
         self.assertEqual(len(volume_edition_formset_container.formsets), 2)
         self.assertCountEqual(list(volume_edition_formset_container.formsets.keys()),
-                         [self.learning_unit_year_full,
-                          self.learning_unit_year_partim])
+                              [self.learning_unit_year_full,
+                               self.learning_unit_year_partim])
 
         first_formset = volume_edition_formset_container.formsets[self.learning_unit_year_full]
         self.assertEqual(len(first_formset.forms), 2)
@@ -256,7 +257,7 @@ class TestVolumeEditionFormsetContainer(TestCase):
             request_factory.post(None, data=data_forms),
             self.learning_units_with_context, self.central_manager)
 
-        self.assertTrue(volume_edition_formset_container.is_valid()) # Volumes of partims can be greater than parent's
+        self.assertTrue(volume_edition_formset_container.is_valid())  # Volumes of partims can be greater than parent's
 
     def test_post_volume_edition_formset_container__vol_tot_full_can_be_equal_to_partim(self):
         request_factory = RequestFactory()
@@ -270,7 +271,6 @@ class TestVolumeEditionFormsetContainer(TestCase):
 
         self.assertTrue(volume_edition_formset_container.is_valid())
 
-
     def test_get_volume_edition_formset_container_as_faculty_manager(self):
         request_factory = RequestFactory()
 
@@ -280,8 +280,8 @@ class TestVolumeEditionFormsetContainer(TestCase):
 
         self.assertEqual(len(volume_edition_formset_container.formsets), 2)
         self.assertCountEqual(list(volume_edition_formset_container.formsets.keys()),
-                         [self.learning_unit_year_full,
-                          self.learning_unit_year_partim])
+                              [self.learning_unit_year_full,
+                               self.learning_unit_year_partim])
 
         full_formset = volume_edition_formset_container.formsets[self.learning_unit_year_full]
         first_form = full_formset.forms[0]
@@ -305,6 +305,39 @@ class TestVolumeEditionFormsetContainer(TestCase):
         fields = first_form.fields
         for key, field in fields.items():
             self.assertFalse(field.disabled)
+
+    def test_volume_edition_as_faculty_manager(self):
+        component = LearningComponentYearFactory()
+        form = VolumeEditionForm(
+            data={'volume_q1': 12, 'volume_q2': 12},
+            component=component,
+            learning_unit_year=self.learning_unit_year_full,
+            is_faculty_manager=True, initial={'volume_q1': 0, 'volume_q2': 12}
+        )
+
+        form.is_valid()
+        self.assertEqual(form.errors['volume_q2'], [gettext('One of the partial volumes must have a value to 0.')])
+        self.assertEqual(form.errors['volume_q1'], [gettext('One of the partial volumes must have a value to 0.')])
+
+        form = VolumeEditionForm(
+            data={'volume_q1': 0, 'volume_q2': 12},
+            component=component,
+            learning_unit_year=self.learning_unit_year_full,
+            is_faculty_manager=True, initial={'volume_q1': 12, 'volume_q2': 12}
+        )
+
+        form.is_valid()
+        self.assertEqual(form.errors['volume_q1'], [gettext('The volume cannot be set to 0.')])
+
+        form = VolumeEditionForm(
+            data={'volume_q1': 12, 'volume_q2': 0},
+            component=component,
+            learning_unit_year=self.learning_unit_year_full,
+            is_faculty_manager=True, initial={'volume_q1': 12, 'volume_q2': 12}
+        )
+
+        form.is_valid()
+        self.assertEqual(form.errors['volume_q2'], [gettext('The volume cannot be set to 0.')])
 
 
 def get_valid_formset_data(prefix, is_partim=False):
