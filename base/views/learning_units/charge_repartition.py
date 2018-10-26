@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import itertools
-
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Prefetch
@@ -165,6 +163,7 @@ class AddChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, Su
 
 
 class EditChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
+    rules = [lambda luy, person: perms.is_eligible_to_manage_charge_repartition(luy, person) or perms.is_eligible_to_manage_attributions(luy, person)]
     template_name = "learning_unit/add_charge_repartition.html"
     form_class = AttributionChargeNewFormSet
 
@@ -175,8 +174,8 @@ class EditChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, S
         return context
 
     def get_form_kwargs(self):
-        lecturing_charge = self.attribution.lecturing_charges[0]
-        practical_charge = self.attribution.practical_charges[0]
+        lecturing_charge = self.attribution.lecturing_charges[0] if self.attribution.lecturing_charges else None
+        practical_charge = self.attribution.practical_charges[0] if self.attribution.practical_charges else None
         form_kwargs = super().get_form_kwargs()
         form_kwargs["form_kwargs"] = {
             "instances": [lecturing_charge, practical_charge]
@@ -184,8 +183,9 @@ class EditChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, S
         return form_kwargs
 
     def form_valid(self, formset):
-        for form in formset:
-            form.save()
+        types = (learning_component_year_type.LECTURING, learning_component_year_type.PRACTICAL_EXERCISES)
+        for form, component_type in zip(formset, types):
+            form.save(self.attribution, self.luy, component_type)
         return super().form_valid(formset)
 
     def get_success_message(self, cleaned_data):
@@ -194,6 +194,7 @@ class EditChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, S
 
 
 class RemoveChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, SuccessMessageMixin, DeleteView):
+    rules = [lambda luy, person: perms.is_eligible_to_manage_charge_repartition(luy, person) or perms.is_eligible_to_manage_attributions(luy, person)]
     model = AttributionNew
     template_name = "learning_unit/remove_charge_repartition_confirmation.html"
     pk_url_kwarg = "attribution_id"

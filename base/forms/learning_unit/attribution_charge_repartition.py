@@ -57,6 +57,20 @@ class AttributionChargeNewForm(ModelForm):
         model = AttributionChargeNew
         fields = ["allocation_charge"]
 
+    def save(self, attribution_new_obj, luy_obj, component_type):
+        attribution_charge_obj = super().save(commit=False)
+
+        learning_component_year = LearningComponentYear.objects.get(
+            type=component_type,
+            learningunitcomponent__learning_unit_year=luy_obj
+        )
+
+        attribution_charge_obj.attribution = attribution_new_obj
+        attribution_charge_obj.learning_component_year = learning_component_year
+        attribution_charge_obj.save()
+
+        return attribution_charge_obj
+
 
 class BaseAttributionChargeNewFormSet(BaseFormSet):
     def get_form_kwargs(self, index):

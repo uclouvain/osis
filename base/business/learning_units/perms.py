@@ -161,10 +161,29 @@ def is_eligible_to_manage_charge_repartition(learning_unit_year, person):
     return _is_eligible_to_manage_charge_repartition(learning_unit_year, person)
 
 
+def is_eligible_to_manage_attributions(learning_unit_year, person):
+    return _is_eligible_to_manage_attributions(learning_unit_year, person)
+
+
 def _is_eligible_to_manage_charge_repartition(learning_unit_year, person):
     return _has_person_the_right_to_manage_charge_repartition(person) and \
            is_learning_unit_year_a_partim(learning_unit_year, person) and \
            person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+
+def _is_eligible_to_manage_attributions(learning_unit_year, person):
+    container_types = (learning_container_year_types.OTHER_COLLECTIVE, learning_container_year_types.OTHER_INDIVIDUAL,
+                       learning_container_year_types.MASTER_THESIS)
+    return _has_person_the_right_to_manage_attributions(person) and \
+           _is_learning_unit_year_of_type(learning_unit_year, container_types) and \
+           person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+
+
+def _has_person_the_right_to_manage_attributions(person):
+    return person.user.has_perm("base.can_manage_attribution")
+
+
+def _is_learning_unit_year_of_type(luy, container_types):
+    return luy.learning_container_year.container_type in container_types
 
 
 def _has_person_the_right_to_manage_charge_repartition(person):

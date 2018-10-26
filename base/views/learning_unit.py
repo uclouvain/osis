@@ -132,6 +132,8 @@ def learning_unit_attributions(request, learning_unit_year_id):
             learning_unit_year=learning_unit_year_id)
     context["can_manage_charge_repartition"] = \
         business_perms.is_eligible_to_manage_charge_repartition(context["learning_unit_year"], person)
+    context["can_manage_attribution"] = \
+        business_perms.is_eligible_to_manage_attributions(context["learning_unit_year"], person)
     context['experimental_phase'] = True
 
     warning_msgs = get_charge_repartition_warning_messages(context["learning_unit_year"].learning_container_year)

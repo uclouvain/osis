@@ -60,7 +60,7 @@
                                 <td>{{ value.PRACTICAL_EXERCISES | default_if_none:0 | floatformat:2 }}</td>
                                 <td>{{ value.substitute | default_if_none:'' }}</td>
                                 <td>
-                                    {% if can_manage_charge_repartition %}
+                                    {% if can_manage_charge_repartition or can_manage_attribution %}
                                     <a href="#" class="remove-attribution-btn" data-form="{% url "edit_charge_repartition" learning_unit_year.id key %}"><span class="glyphicon glyphicon-edit"></span> </a>
                                     <a href="#" class="remove-attribution-btn" data-form="{% url "remove_charge_repartition" learning_unit_year.id key %}"><span class="glyphicon glyphicon-trash"></span> </a>
                                     {% endif %}
