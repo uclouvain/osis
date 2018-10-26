@@ -419,20 +419,17 @@ def _get_default_common_value_learning_unit_year(learning_container_year, subtyp
 
 def _setup_learning_component_cm(learning_unit_year):
     return _setup_learning_component_year(learning_unit_year,
-                                          component_type.LECTURING,
-                                          DEFAULT_ACRONYM_COMPONENT["LECTURING"])
+                                          component_type.LECTURING)
 
 
 def _setup_learning_component_tp(learning_unit_year):
     return _setup_learning_component_year(learning_unit_year,
-                                          component_type.PRACTICAL_EXERCISES,
-                                          DEFAULT_ACRONYM_COMPONENT["PRACTICAL_EXERCISES"])
+                                          component_type.PRACTICAL_EXERCISES)
 
 
-def _setup_learning_component_year(learning_unit_year, component_type, acronym):
+def _setup_learning_component_year(learning_unit_year, component_type):
     component = LearningComponentYearFactory(learning_container_year=learning_unit_year.learning_container_year,
                                              type=component_type,
-                                             acronym=acronym,
                                              planned_classes=1)
 
     LearningUnitComponentFactory(learning_unit_year=learning_unit_year, learning_component_year=component)
