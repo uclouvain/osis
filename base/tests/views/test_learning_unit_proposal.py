@@ -570,7 +570,7 @@ class TestGroupActionsOnProposals(TestCase):
         self.assertIn(_("No proposals was selected."), messages)
 
     @mock.patch("base.business.learning_unit_proposal.cancel_proposals_and_send_report",
-                side_effect=lambda proposals, author, research_criteria:{})
+                side_effect=lambda proposals, author, research_criteria: {})
     def test_when_action_is_back_to_initial(self, mock_cancel_proposals):
         post_data = {"action": ACTION_BACK_TO_INITIAL, "selected_action": [self.proposals[0].id]}
         response = self.client.post(self.url, data=post_data, follow=True)
