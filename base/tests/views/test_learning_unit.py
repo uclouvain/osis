@@ -1608,6 +1608,6 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
         tutor_name = Person.get_str(self.attribution_full.tutor.person.first_name,
                                     self.attribution_full.tutor.person.middle_name,
                                     self.attribution_full.tutor.person.last_name)
-        tutor_name_with_function = "{} ({})".format(tutor_name, self.attribution_full.function)
+        tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.function))
         self.assertListEqual(msgs,
                              [_(CHARGE_REPARTITION_WARNING_MESSAGE) % {"tutor":tutor_name_with_function}])
