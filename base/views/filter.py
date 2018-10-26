@@ -23,27 +23,42 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
+from operator import itemgetter
 
-from base.utils import notifications
-from base.views import layout
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+
+from base.models.campus import Campus
+from base.models.entity import Entity
+from base.models.organization_address import find_distinct_by_country
 from osis_common.decorators.ajax import ajax_required
 
 
-@login_required
+# TODO :: On peut combiner les différentes vues en faisant passer les paramètres via le GET et en uniformisant
+# le JsonResponse.
 @ajax_required
-@require_POST
-def clear_user_notifications(request):
-    user = request.user
-    notifications.clear_user_notifications(user)
-    return layout.render(request, "blocks/notifications_inner.html", {})
+def filter_cities_by_country(request):
+    """ Ajax request to filter the cities choice field """
+    country = request.GET.get('country')
+    cities = find_distinct_by_country(country)
+    return JsonResponse(list(cities), safe=False)
+
+
+@ajax_required
+def filter_campus_by_city(request):
+    """ Ajax request to filter the campus choice field """
+    city = request.GET.get('city')
+    campuses = Campus.objects.filter(
+        organization__organizationaddress__city=city
+    ).distinct('organization__name').order_by('organization__name').values('pk', 'organization__name')
+    return JsonResponse(list(campuses), safe=False)
 
 
 @login_required
 @ajax_required
-@require_POST
-def mark_notifications_as_read(request):
-    user = request.user
-    notifications.mark_notifications_as_read(user)
-    return layout.render(request, "blocks/notifications_inner.html", {})
+def filter_organizations_by_country(request):
+    country_id = request.GET.get('country')
+    organizations = Entity.objects.filter(country__pk=country_id).distinct('organization')\
+        .values('organization__pk', 'organization__name')
+    return JsonResponse(sorted(list(organizations), key=itemgetter('organization__name')),
+                        safe=False)

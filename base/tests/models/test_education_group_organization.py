@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,22 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
+from django.test import TestCase
+from django.db import IntegrityError
 
-from base.models.utils.utils import ChoiceEnum
-
-UNIQUE = "UNIQUE"
-SEPARATE = "SEPARATE"
-NOT_CONCERNED = "NOT_CONCERNED"
-
-COORGANIZATION_DIPLOMA_TYPE = (
-    (UNIQUE, _(UNIQUE)),
-    (SEPARATE, _(SEPARATE)),
-    (NOT_CONCERNED, _(NOT_CONCERNED)),
-)
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
+from base.tests.factories.organization import OrganizationFactory
 
 
-class DiplomaCoorganizationTypes(ChoiceEnum):
-    UNIQUE = "UNIQUE"
-    SEPARATE = "SEPARATE"
-    NOT_CONCERNED = "NOT_CONCERNED"
+class EducationGroupOrganizationTest(TestCase):
+
+    def setUp(self):
+        self.education_group_year = EducationGroupYearFactory()
+        self.organization = OrganizationFactory()
+
+    def test_unique(self):
+        EducationGroupOrganizationFactory(education_group_year=self.education_group_year,
+                                          organization=self.organization)
+        with self.assertRaises(IntegrityError):
+            EducationGroupOrganizationFactory(education_group_year=self.education_group_year,
+                                              organization=self.organization)

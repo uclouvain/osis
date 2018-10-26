@@ -56,8 +56,10 @@ class NodeBranchJsTree:
         ).exclude(prerequisite__exact='')
 
         return self.education_group_year.groupelementyear_set.all() \
-                                        .annotate(has_prerequisites=Exists(has_prerequisite)) \
-                                        .select_related('child_branch__academic_year', 'child_leaf__academic_year')
+            .annotate(has_prerequisites=Exists(has_prerequisite)) \
+            .select_related('child_branch__academic_year',
+                            'child_leaf__academic_year',
+                            'child_leaf__learning_container_year')
 
     def to_json(self):
         group_element_year_pk = self.group_element_year.pk if self.group_element_year else '#'

@@ -23,9 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
-from osis_common.models import osis_model_admin
 from django.conf import settings
+from django.db import models
+
+from osis_common.models import osis_model_admin
 from .text_label import TextLabel
 
 
@@ -63,3 +64,12 @@ def search(text_entity, labels=None, language=None):
         queryset = queryset.filter(language=language)
 
     return queryset.select_related('text_label')
+
+
+def get_label_translation(text_entity, label, language):
+    translated_text_label = search(
+        text_entity=text_entity,
+        labels=[label],
+        language=language
+    )
+    return translated_text_label.get().label if translated_text_label else label

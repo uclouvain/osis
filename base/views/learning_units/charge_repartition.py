@@ -114,6 +114,7 @@ class AddChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, Su
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["formset"] = context["form"]
+        context["attribution"] = self.tuple_attribution_charges[0][0]
         return context
 
     def get_initial(self):
@@ -152,6 +153,7 @@ class EditChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, S
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["formset"] = context["form"]
+        context["attribution"] = self.tuple_attribution_charges[0][0]
         return context
 
     def get_form_kwargs(self):

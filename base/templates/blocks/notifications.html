@@ -3,62 +3,42 @@
 {% get_notifications as list_notifications %}
 {% get_number_unread_notifications list_notifications as  number_unread_notifications %}
 
-<li class="dropdown">
-    <a href="#" id="notifications_dropdown" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+<li class="dropdown" id="notifications_dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
        aria-expanded="false" id="bt_user">
-        <span class="glyphicon glyphicon-bell {% if number_unread_notifications %}notification{% endif %}"></span>
+        <span class="glyphicon glyphicon-bell {% if number_unread_notifications %}notification{% endif %}" id="notifications_bell"></span>
     </a>
-    <div class="dropdown-menu" aria-labelledby="dLabel">
-        <p class="text-center">
-            <small >
-                <b>{% blocktrans with number_notifications=number_unread_notifications %}{{ number_notifications }} unread notification(s){% endblocktrans %}</b>
-            </small>
-        </p>
-        <ul class="list-unstyled" aria-labelledby="dLabel" style="overflow-y: auto; max-height: 250px">
-            {% for notification in list_notifications %}
-                <li class="divider"></li>
-                <li>
-                    {% if notification.unread %}
-                        <p class="text-nowrap" style="padding-left: 10px;padding-right: 15px">
-                            <span class="glyphicon glyphicon-calendar"></span>{{ notification.verb }}
-                        </p>
-                    {% else %}
-                        <p class="text-nowrap text-muted" style="padding-left: 10px;padding-right: 15px">
-                            <span class="glyphicon glyphicon-calendar" style="padding-right: 5px"></span><small>{{ notification.verb }}</small>
-                        </p>
-                    {% endif %}
-
-                </li>
-                {% if forloop.last %}
-                    <li class="divider"></li>
-                {% endif %}
-            {% endfor %}
-
-        </ul>
-        {% if list_notifications%}
-        <p class="text-center">
-            <a href="#" id="lnk_clear_notifications">{% trans "Clear notifications" %}</a>
-        </p>
-        {% endif %}
+    <div class="dropdown-menu" aria-labelledby="dLabel" id="notifications_content">
+        {% include "blocks/notifications_inner.html" %}
     </div>
 </li>
 
 {% if list_notifications %}
 <script>
     url_mark_as_read = "{% url "mark_notifications_as_read" %}";
-    $("#notifications_dropdown").click(function(){
+    $("#notifications_dropdown").on("hidden.bs.dropdown", function(){
         $.ajax({
           method: "POST",
-          url: url_mark_as_read
+          url: url_mark_as_read,
+          context: this,
+          success: function(result){
+              $("#notifications_content", this).html(result);
+              $("#notifications_bell", this).removeClass("notification");
+          }
         })
-    })
+    });
 
     url_clear_notifications = "{% url "clear_notifications" %}";
-        $("#lnk_clear_notifications").click(function(){
+        $("#notifications_dropdown").on("click", "#lnk_clear_notifications",function(){
             $.ajax({
               method: "POST",
-              url: url_clear_notifications
+              url: url_clear_notifications,
+              context: $("#notifications_dropdown"),
+              success: function(result){
+                  $("#notifications_content", this).html(result);
+                  $("#notifications_bell", this).removeClass("notification");
+              }
             })
-        })
+        });
 </script>
 {% endif %}

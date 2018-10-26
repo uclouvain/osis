@@ -41,19 +41,21 @@ class PostponeContent:
 
     def __init__(self, instance):
         if not isinstance(instance, EducationGroupYear) or not instance.is_training():
-            raise TypeError(_('The education group is not a training'))
+            raise NotPostponeError(_('The education group is not a training.'))
 
         self.instance = instance
 
         self.current_year = starting_academic_year()
         self.next_academic_year = self.current_year.next()
 
-        if self.instance.education_group.end_year < self.next_academic_year.year:
-            raise NotPostponeError(_("The end date of the education group is smaller than the year of postponement"))
+        end_year = self.instance.education_group.end_year
+        if end_year and end_year < self.next_academic_year.year:
+            raise NotPostponeError(_("The end date of the education group is smaller than the year of postponement."))
 
-        self.errors = []
+        if not self.instance.groupelementyear_set.exists():
+            raise NotPostponeError(_("This training has no content to postpone."))
+
         self.result = []
-
         self.instance_n1 = self.get_instance_n1(self.instance)
 
     @transaction.atomic

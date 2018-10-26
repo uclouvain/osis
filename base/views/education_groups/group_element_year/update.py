@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
@@ -48,9 +47,9 @@ from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.utils.utils import get_object_or_none
 from base.views.common import display_success_messages, display_warning_messages
-from base.views.mixins import AjaxTemplateMixin, FlagMixin, RulesRequiredMixin
 from base.views.education_groups import perms
 from base.views.education_groups.select import build_success_message, build_success_json_response
+from base.views.mixins import AjaxTemplateMixin, FlagMixin, RulesRequiredMixin
 
 
 @login_required
@@ -199,22 +198,21 @@ class GenericUpdateGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessM
     raise_exception = True
     rules = [perms.can_change_education_group]
 
-    @abc.abstractmethod
     def _call_rule(self, rule):
-        return False
+        """ The permission is computed from the education_group_year """
+        return rule(self.request.user, self.education_group_year)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['root'] = self.kwargs["root_id"]
         return context
 
+    @property
+    def education_group_year(self):
+        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("education_group_year_id"))
+
     def get_root(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
-
-
-class PostponeGroupElementYearView(GenericUpdateGroupElementYearMixin, UpdateView):
-    # TODO
-    pass
 
 
 class UpdateGroupElementYearView(GenericUpdateGroupElementYearMixin, UpdateView):
@@ -222,20 +220,12 @@ class UpdateGroupElementYearView(GenericUpdateGroupElementYearMixin, UpdateView)
     form_class = UpdateGroupElementYearForm
     template_name = "education_group/group_element_year_comment.html"
 
-    def _call_rule(self, rule):
-        """ The permission is computed from the education_group_year """
-        return rule(self.request.user, self.education_group_year)
-
     # SuccessMessageMixin
     def get_success_message(self, cleaned_data):
         return _("The comments of %(acronym)s has been updated") % {'acronym': self.object.child}
 
     def get_success_url(self):
         return reverse("education_group_content", args=[self.kwargs["root_id"], self.education_group_year.pk])
-
-    @property
-    def education_group_year(self):
-        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("education_group_year_id"))
 
 
 class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView):
@@ -252,11 +242,7 @@ class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView)
 
     def _call_rule(self, rule):
         """ The permission is computed from the parent education_group_year """
-        return rule(self.request.user, self.group_element_year.parent)
+        return rule(self.request.user, self.get_object().parent)
 
     def get_success_url(self):
         return self.kwargs.get('http_referer')
-
-    @property
-    def group_element_year(self):
-        return get_object_or_404(GroupElementYear, pk=self.kwargs.get("group_element_year_id"))

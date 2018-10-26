@@ -29,6 +29,7 @@ import time
 
 from base.utils.cache import cache
 
+
 CACHE_NOTIFICATIONS_TIMEOUT = 300  # seconds -> 5 min
 NOTIFICATIONS_KEY = "notifications_unread_user_{}"
 NOTIFICATIONS_TIMESTAMP = "notifications_last_read_user_{}"
@@ -96,7 +97,7 @@ def get_notifications_last_time_read_for_user(user):
 
 def set_notifications_last_read_as_now_for_user(user):
     cache_key = make_notifications_timestamp_cache_key(user)
-    cache.set(cache_key, str(time.time()))
+    cache.set(cache_key, str(time.time()), timeout=None)
 
 
 def make_notifications_timestamp_cache_key(user):

@@ -88,7 +88,7 @@ def create_education_group(request, category, education_group_type_pk, parent_id
     parent = get_object_or_404(EducationGroupYear, id=parent_id) if parent_id is not None else None
     education_group_type = get_object_or_404(EducationGroupType, pk=education_group_type_pk)
 
-    initial_academic_year = parent.academic_year if parent else \
+    initial_academic_year = parent.academic_year_id if parent else \
         cache.get_filter_value_from_cache(request.user, reverse('education_groups'), 'academic_year')
     form_education_group_year = FORMS_BY_CATEGORY[category](
         request.POST or None,

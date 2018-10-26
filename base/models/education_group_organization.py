@@ -29,6 +29,7 @@ from django.utils.functional import cached_property
 from base.models import organization_address
 from base.models.enums import diploma_coorganization
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from django.utils.translation import ugettext_lazy as _
 
 
 class EducationGroupOrganizationAdmin(OsisModelAdmin):
@@ -42,13 +43,17 @@ class EducationGroupOrganization(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     education_group_year = models.ForeignKey('EducationGroupYear')
     organization = models.ForeignKey('Organization')
-    all_students = models.BooleanField(default=False)
-    enrollment_place = models.BooleanField(default=False)
+    all_students = models.BooleanField(default=False, verbose_name=_('for_all_students'))
+    enrollment_place = models.BooleanField(default=False, verbose_name=_('Reference institution'))
     diploma = models.CharField(max_length=40,
-                               choices=diploma_coorganization.DiplomaCoorganizationTypes.choices(),
-                               default=diploma_coorganization.DiplomaCoorganizationTypes.NOT_CONCERNED.value)
-    is_producing_cerfificate = models.BooleanField(default=False)
-    is_producing_annexe = models.BooleanField(default=False)
+                               choices=diploma_coorganization.COORGANIZATION_DIPLOMA_TYPE,
+                               default=diploma_coorganization.DiplomaCoorganizationTypes.NOT_CONCERNED.value,
+                               verbose_name=_('UCL Diploma'))
+    is_producing_cerfificate = models.BooleanField(default=False, verbose_name=_('Producing certificat'))
+    is_producing_annexe = models.BooleanField(default=False, verbose_name=_('Producing annexe'))
+
+    class Meta:
+        unique_together = ('education_group_year', 'organization', )
 
     @cached_property
     def address(self):
@@ -56,6 +61,5 @@ class EducationGroupOrganization(models.Model):
 
 
 def search(**kwargs):
-
     if "education_group_year" in kwargs:
         return EducationGroupOrganization.objects.filter(education_group_year=kwargs['education_group_year'])
