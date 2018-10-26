@@ -326,10 +326,10 @@ class EducationGroupYear(models.Model):
     )
 
     # TODO :: rename credits into expected_credits
-    credits = models.IntegerField(
+    credits = models.PositiveIntegerField(
         blank=True,
         null=True,
-        verbose_name=_("credits")
+        verbose_name=_("credits"),
     )
 
     remark = models.TextField(
@@ -345,13 +345,17 @@ class EducationGroupYear(models.Model):
     )
 
     min_constraint = models.IntegerField(
-        blank=True, null=True,
-        verbose_name=_("minimum constraint")
+        blank=True,
+        null=True,
+        verbose_name=_("minimum constraint"),
+        validators=[MinValueValidator(1)]
     )
 
     max_constraint = models.IntegerField(
-        blank=True, null=True,
-        verbose_name=_("maximum constraint")
+        blank=True,
+        null=True,
+        verbose_name=_("maximum constraint"),
+        validators=[MinValueValidator(1)]
     )
 
     constraint_type = models.CharField(
