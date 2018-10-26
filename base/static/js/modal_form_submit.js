@@ -17,20 +17,23 @@ var formAjaxSubmit = function (form, modal) {
             type: $(this).attr('method'),
             url: $(this).attr('action'),
             data: $(this).serialize(),
+            context: this,
             success: function (xhr, ajaxOptions, thrownError) {
-
                 //Stay on the form if there are errors.
                 if ($(xhr).find('.has-error').length > 0) {
                     $(modal).find('.modal-content').html(xhr);
                     // Add compatibility with ckeditor and related textareas
                     bindTextArea();
                     formAjaxSubmit(form, modal);
+                    this.dispatchEvent(new CustomEvent("formAjaxSubmit:error", {}));
                 } else {
                     redirect_after_success(modal, xhr);
+                    this.dispatchEvent(new CustomEvent("formAjaxSubmit:success", {}));
                 }
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 // handle response errors here
+                this.dispatchEvent(new CustomEvent("formAjaxSubmit:error", {}));
             }
         });
     });
@@ -49,4 +52,3 @@ function CKupdate(){
     for (let instance in CKEDITOR.instances )
         CKEDITOR.instances[instance].updateElement();
 }
-

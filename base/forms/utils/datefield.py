@@ -126,7 +126,8 @@ class DateRangeField(forms.DateField):
 
     def __init__(self, base=forms.DateField(), input_formats=None, **kwargs):
         """
-        :param base: can be either DateField or DateTimeField, which will be used to do conversions for beginning and end of interval.
+        :param base: can be either DateField or DateTimeField, which will be used
+        to do conversions for beginning and end of interval.
         :param input_formats: is passed into base if present
         """
         super(DateRangeField, self).__init__(**kwargs)
@@ -134,7 +135,7 @@ class DateRangeField(forms.DateField):
         if input_formats is not None:
             self.base.input_formats = input_formats
         else:
-            self.base.input_formats = [DATE_FORMAT,]
+            self.base.input_formats = [DATE_FORMAT]
 
     def to_python(self, value):
         if self.required is False and not value:

@@ -58,7 +58,7 @@ class TestXlsBuild(TestCase):
         component_1 = LearningUnitComponentFactory(learning_unit_year=self.learning_unit_yr_1)
         self.attribution_1 = AttributionChargeNewFactory(learning_component_year=component_1.learning_component_year)
         self.learning_unit_yr_1.attribution_charge_news = attribution_charge_new. \
-            find_attribution_charge_new_by_learning_unit_year(self.learning_unit_yr_1)
+            find_attribution_charge_new_by_learning_unit_year_as_dict(self.learning_unit_yr_1)
         self.user = UserFactory()
 
     def test_prepare_xls_content_no_data(self):

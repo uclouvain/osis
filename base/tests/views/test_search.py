@@ -31,11 +31,12 @@ from base.forms.search.search_tutor import TutorSearchForm
 from base.tests.factories.person import PersonWithPermissionsFactory, PersonFactory
 from base.tests.factories.tutor import TutorFactory
 
+NUMBER_TUTORS = 10
+
 
 class TestSearchTutors(TestCase):
     @classmethod
     def setUpTestData(cls):
-        NUMBER_TUTORS = 10
         cls.tutors = [TutorFactory() for _ in range(NUMBER_TUTORS)]
         cls.url = reverse("search_tutors")
 
@@ -43,7 +44,6 @@ class TestSearchTutors(TestCase):
 
     def setUp(self):
         self.client.force_login(self.person.user)
-
 
     def test_when_user_not_logged(self):
         self.client.logout()

@@ -60,13 +60,32 @@
 {{ form_education_group_year.media }}
 
 <style>
-    /* Overrided to get items in list */
-    .select2-container .select2-selection--multiple {
-        box-sizing: border-box;
-        cursor: pointer;
-        display: inline-grid;
-        min-height: 32px;
-        user-select: none;
-        -webkit-user-select: none;
+
+    .select2-container--default .select2-selection--multiple .select2-selection__rendered{
+        display: grid;
+        padding: 0 0 5px 0;
     }
+
+    {# Not displiaying possibility to remove all selected elements #}
+    .select2-container--default .select2-selection--multiple .select2-selection__clear{
+        display:none;
+    }
+
+    /* Overrided to get items in list */
+    .select2-container .select2-selection--multiple,
+    .select2-container--open .select2-dropdown--above {
+        max-width: 870px;
+        min-width: 870px;
+    }
+
+    @media screen and (max-width: 960px) {
+        {# To align dropdown list to the width of selected elements #}
+        .select2-container--open .select2-dropdown--above,
+        .select2-container .select2-selection--multiple {
+            max-width: 500px;
+            min-width: 500px;
+        }
+    }
+
+
 </style>

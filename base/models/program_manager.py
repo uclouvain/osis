@@ -166,7 +166,9 @@ def find_by_person_academic_year(a_person=None, an_academic_yr=None, entity_list
 
 
 def find_by_offer_year_person(a_person, offer_yr):
-    return ProgramManager.objects.select_related("person").select_related("offer_year").filter(person=a_person, offer_year=offer_yr)
+    return ProgramManager.objects.select_related("person")\
+                                 .select_related("offer_year")\
+                                 .filter(person=a_person, offer_year=offer_yr)
 
 
 def find_by_education_group(an_education_group):

@@ -60,5 +60,8 @@ class EducationGroupCertificateAim(models.Model):
         on_delete=models.PROTECT,
     )
 
+    class Meta:
+        unique_together = ('education_group_year', 'certificate_aim',)
+
     def __str__(self):
         return "{} - {}".format(self.education_group_year, self.certificate_aim)

@@ -53,19 +53,13 @@ class OrganizationSearch(PermissionRequiredMixin, FilterView):
 
 
 class DetailOrganization(PermissionRequiredMixin, DetailView):
-    model = EntityVersion
+    model = Organization
     template_name = "organization/organization.html"
 
     permission_required = 'base.can_access_organization'
     raise_exception = True
 
     pk_url_kwarg = "organization_id"
-
-    def get_object(self, queryset=None):
-        # TODO set onetoone link between entity and organization
-        return EntityVersion.objects.filter(
-            parent__isnull=True, entity__organization=self.kwargs[self.pk_url_kwarg]
-        ).first()
 
 
 @login_required

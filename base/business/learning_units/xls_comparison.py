@@ -240,7 +240,7 @@ def _get_data(learning_unit_yr, new_line, first_data):
         _get_entity_to_display(learning_unit_yr.entities.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1)),
         _get_entity_to_display(learning_unit_yr.entities.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2)),
         xls_build.translate(learning_unit_yr.professional_integration),
-        organization.title if organization else EMPTY_VALUE,
+        organization.name if organization else EMPTY_VALUE,
         learning_unit_yr.campus if learning_unit_yr.campus else EMPTY_VALUE,
         get_partims_as_str(learning_unit_yr.get_partims_related())
     ]

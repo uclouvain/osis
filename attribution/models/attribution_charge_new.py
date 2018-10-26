@@ -39,6 +39,7 @@ class AttributionChargeNewAdmin(admin.ModelAdmin):
 
 class AttributionChargeNew(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     attribution = models.ForeignKey('AttributionNew')
     learning_component_year = models.ForeignKey('base.LearningComponentYear')
     allocation_charge = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)

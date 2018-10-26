@@ -45,7 +45,10 @@ class LearningUnitEnrollment(SerializableModel):
     date_enrollment = models.DateField()
     learning_unit_year = models.ForeignKey('LearningUnitYear')
     offer_enrollment = models.ForeignKey('OfferEnrollment')
-    enrollment_state = models.CharField(max_length=20, choices=learning_unit_enrollment_state.STATES, blank=True, null=True)
+    enrollment_state = models.CharField(max_length=20, choices=learning_unit_enrollment_state.STATES, default="")
+
+    class Meta:
+        unique_together = ('offer_enrollment', 'learning_unit_year', 'enrollment_state',)
 
     @property
     def student(self):
@@ -60,12 +63,13 @@ class LearningUnitEnrollment(SerializableModel):
 
 
 def find_by_learningunit_enrollment(learning_unit_year):
-    return LearningUnitEnrollment.objects.filter(learning_unit_year=learning_unit_year).order_by('offer_enrollment__student__person__last_name',
-                                                                                                 'offer_enrollment__student__person__first_name')
+    return LearningUnitEnrollment.objects.filter(learning_unit_year=learning_unit_year) \
+                                         .order_by('offer_enrollment__student__person__last_name',
+                                                   'offer_enrollment__student__person__first_name')
 
 
 def find_by_student(a_student):
-    return LearningUnitEnrollment.objects.filter(offer_enrollment__student=a_student)\
+    return LearningUnitEnrollment.objects.filter(offer_enrollment__student=a_student) \
         .order_by('-learning_unit_year__academic_year__year',
                   'learning_unit_year__acronym')
 
@@ -76,4 +80,3 @@ def find_by_offer_enrollment(an_offer_enrollment):
 
 def find_by_learning_unit_year(a_learning_unit_year):
     return LearningUnitEnrollment.objects.filter(learning_unit_year=a_learning_unit_year)
-

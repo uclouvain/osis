@@ -42,8 +42,10 @@ from base.views import learning_achievement, search, education_groups
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, notifications
 from base.views import teaching_material
+from base.views.learning_units.charge_repartition import AddChargeRepartition, \
+    RemoveChargeRepartition, EditChargeRepartition, SelectAttributionView
 from base.views.learning_units.external import create as create_external
-from base.views.learning_units.external.search import filter_cities_by_country, filter_campus_by_city
+from base.views.filter import filter_cities_by_country, filter_campus_by_city
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked
 from base.views.learning_units.proposal import create, update
@@ -51,7 +53,8 @@ from base.views.learning_units.update import update_learning_unit, learning_unit
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
-
+    url(r'^entity_autocomplete/$', base.views.learning_units.update.EntityAutocomplete.as_view(),
+        name='entity_autocomplete'),
     url(r'^academic_actors/$', institution.academic_actors, name='academic_actors'),
 
     url(r'^academic_calendars/', include([
@@ -132,7 +135,16 @@ urlpatterns = [
                 url(r'^toggle_summary_locked/$', toggle_summary_locked,
                     name="learning_unit_pedagogy_toggle_summary_locked")
             ])),
-            url(r'^attributions/$', learning_unit.learning_unit_attributions, name="learning_unit_attributions"),
+            url(r'^attributions/', include([
+                url(r'^$', learning_unit.learning_unit_attributions, name="learning_unit_attributions"),
+                url(r'^select/$', SelectAttributionView.as_view(), name="select_attribution"),
+                url(r'^add/(?P<attribution_id>[0-9]+)/$', AddChargeRepartition.as_view(),
+                    name="add_charge_repartition"),
+                url(r'^edit/(?P<attribution_id>[0-9]+)/$', EditChargeRepartition.as_view(),
+                    name="edit_charge_repartition"),
+                url(r'^remove/(?P<attribution_id>[0-9]+)/$', RemoveChargeRepartition.as_view(),
+                    name="remove_charge_repartition"),
+            ])),
             url(r'^proposal/', include([
                 url(r'^modification/$', update.learning_unit_modification_proposal,
                     name="learning_unit_modification_proposal"),
@@ -261,7 +273,10 @@ urlpatterns = [
     ])),
     url(r'^ajax_select/', include(ajax_select_urls)),
     url(r'^clear_filter/$', base.views.search.clear_filter, name="clear_filter"),
-    url(r'^notifications/clear/$', base.views.notifications.clear_user_notifications, name="clear_notifications")
+    url(r'^notifications/', include([
+        url(r'^clear/$', base.views.notifications.clear_user_notifications, name="clear_notifications"),
+        url(r'^mark_as_read/$', base.views.notifications.mark_notifications_as_read, name="mark_notifications_as_read"),
+    ])),
 
 ]
 

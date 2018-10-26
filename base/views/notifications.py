@@ -24,10 +24,10 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 
 from base.utils import notifications
+from base.views import layout
 from osis_common.decorators.ajax import ajax_required
 
 
@@ -37,4 +37,13 @@ from osis_common.decorators.ajax import ajax_required
 def clear_user_notifications(request):
     user = request.user
     notifications.clear_user_notifications(user)
-    return HttpResponse()
+    return layout.render(request, "blocks/notifications_inner.html", {})
+
+
+@login_required
+@ajax_required
+@require_POST
+def mark_notifications_as_read(request):
+    user = request.user
+    notifications.mark_notifications_as_read(user)
+    return layout.render(request, "blocks/notifications_inner.html", {})

@@ -24,6 +24,7 @@
 #
 ##############################################################################
 
+
 def delete_admin_action(actions):
     if 'delete_selected' in actions:
         del actions['delete_selected']

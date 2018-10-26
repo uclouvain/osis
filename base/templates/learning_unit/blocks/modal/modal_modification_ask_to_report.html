@@ -44,10 +44,12 @@
 <script>
 function enable_postponement(){
     $("#id_postponement").val(1);
+    $('#modalReport').modal('hide');
     $('form').submit()
 }
 function disable_postponement(){
     $("#id_postponement").val(0);
+    $('#modalReport').modal('hide');
     $('form').submit()
 }
 </script>

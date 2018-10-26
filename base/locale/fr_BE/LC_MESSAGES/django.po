@@ -1049,6 +1049,9 @@ msgstr "Notes sauvegardées, le bouton sauvegarder n'est plus présent"
 msgid "scores_must_be_between_0_and_20"
 msgstr "Les notes doivent être comprise entre 0 et 20"
 
+msgid "Search..."
+msgstr "Recherche..."
+
 msgid "search_for_a_file"
 msgstr "Recherche d'un fichier"
 
@@ -3293,6 +3296,32 @@ msgstr "Aide"
 msgid "Are you sure you want to detach this content?"
 msgstr "Êtes-vous sûr·e de vouloir détacher ce contenu?"
 
+msgid "Are you sure you want to postpone the content of %(root)s?"
+msgstr "Êtes-vous sûr·e de vouloir reporter le contenu de %(root)s?"
+
+msgid "%(count)d education group has been postponed with success"
+msgid_plural "%(count)d education groups have been postponed with success"
+msgstr[0] "%(count)d formation a été reportée avec succès"
+msgstr[1] "%(count)d formations ont été reportées avec succès"
+
+msgid "The education group is not a training."
+msgstr "L'organisation de formation n'est pas une formation."
+
+msgid "The end date of the education group is smaller than the year of postponement."
+msgstr "La date de fin de la formation est plus petite que l'année de report."
+
+msgid "This training has no content to postpone."
+msgstr "La formation n'a pas de contenu à reporter."
+
+msgid "The root does not exist in the next academic year."
+msgstr "La racine n'existe pas dans l'anné academique suivante."
+
+msgid "The content has already been postponed."
+msgstr "Le contenu a déjà été reporté."
+
+msgid "Copy the content"
+msgstr "Recopier le contenu"
+
 msgid "detach"
 msgstr "détacher"
 
@@ -4010,8 +4039,8 @@ msgstr "Accès direct"
 msgid "Access with additional training"
 msgstr "Accès moyennant compléments de formation"
 
-msgid "%(number_notifications)s notification(s)"
-msgstr "%(number_notifications)s notification(s)"
+msgid "%(number_notifications)s unread notification(s)"
+msgstr "%(number_notifications)s notification(s) non lu(s)"
 
 msgid "Producing certificat"
 msgstr "Production du diplôme / certificat"
@@ -4024,3 +4053,44 @@ msgstr "Diplôme avec l'UCL"
 
 msgid "Reference institution"
 msgstr "Institution de référence"
+
+msgid "EDITION_OF_GENERAL_INFORMATION"
+msgstr "Modification des informations générales"
+
+msgid "Repartition added for %(tutor)s (%(function)s)"
+msgstr "Répartition ajoutée pour %(tutor)s (%(function)s)"
+
+msgid "Repartition modified for %(tutor)s (%(function)s)"
+msgstr "Répartition modifiée pour %(tutor)s (%(function)s)"
+
+msgid "Repartition removed for %(tutor)s (%(function)s)"
+msgstr "Répartition supprimée pour %(tutor)s (%(function)s)"
+
+msgid "Manage repartition"
+msgstr "Gérer la répartition"
+
+msgid "No attributions exist for the parent learning unit"
+msgstr "Aucune attribution n’existe pour le cours parent"
+
+msgid "The sum of volumes for the partims for professor %(tutor)s is superior to the volume of parent learning unit "
+      "for this professor"
+msgstr "La somme des volumes des partims pour le professeur %(tutor)s est supérieure au volume horaire du cours parent "
+       "pour ce professeur"
+
+msgid "Clear notifications"
+msgstr "Supprimer notifications"
+
+msgid "Coorganization"
+msgstr "Coorganization"
+
+msgid "Are you sure you want to delete the coorganization?"
+msgstr "Êtes-vous certain de vouloir supprimer la coorganisation"
+
+msgid "The coorganization modifications has been saved"
+msgstr "Les données de la coorganisation ont été sauvegardées"
+
+msgid "There is already a coorganization with this organization"
+msgstr "Il y a déjà une co-organisation avec cette institution"
+
+msgid "The coorganization has been created"
+msgstr "La nouvelle coorganisation a bien été créee"

@@ -23,75 +23,79 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-from unittest.mock import MagicMock, Mock
 
 from django.test import TestCase
 
+from base.tests.factories.notifications import NotificationFactory
 from base.tests.factories.user import UserFactory
 from base.utils.cache import cache
-from base.utils.notifications import make_notifications_cache_key, are_notifications_already_loaded, \
-    get_notifications_last_date_read_for_user, set_notifications_last_read_as_today_for_user, clear_user_notifications, \
-    get_notifications_in_cache, get_user_notifications
+from base.utils.notifications import clear_user_notifications, \
+    get_user_notifications, mark_notifications_as_read, get_user_unread_notifications, get_user_read_notifications
 
 
 class TestNotificationsBaseClass(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user_without_data = UserFactory()
-        cls.user_with_data = UserFactory()
-        cls.user_with_empty_data = UserFactory()
+        cls.user_without_notifications = UserFactory()
+        cls.user_with_notifications = UserFactory()
 
-        cls.notifications = ["Notif 1", "Notif 2", "Notif 3"]
-
-    def setUp(self):
-        self.set_cache_data(self.user_with_data, self.notifications)
-        self.set_cache_data(self.user_with_empty_data, [])
-
-    def set_cache_data(self, user, data):
-        cache_key = make_notifications_cache_key(user)
-        cache.set(cache_key, data)
+        cls.unread_notifications = [NotificationFactory(recipient=cls.user_with_notifications) for _ in range(5)]
+        cls.read_notifications = [NotificationFactory(recipient=cls.user_with_notifications, unread=False)
+                                  for _ in range(3)]
+        cls.all_notifications = cls.unread_notifications + cls.read_notifications
 
     def tearDown(self):
         cache.clear()
 
-class TestGetUserNotifications(TestNotificationsBaseClass):
-    def test_when_data_in_cache(self):
-        self.assertEqual(self.notifications,
-                         get_user_notifications(self.user_with_data))
+    @staticmethod
+    def transform_method(obj):
+        return obj
 
-    def test_when_should_return_unread_data_if_data_not_in_cache(self):
-        self.assertEqual([],
-                         get_user_notifications(self.user_without_data))
+    def assert_queryset_equal(self, qs, values):
+        return self.assertQuerysetEqual(qs, values, transform=self.transform_method, ordered=False)
+
+
+class TestGetUserNotifications(TestNotificationsBaseClass):
+    def test_should_return_empty_list_when_user_has_no_notifications(self):
+        self.assert_queryset_equal(get_user_notifications(self.user_without_notifications),
+                                   [])
+
+    def test_should_return_unread_first_then_read_notifications_when_user_got_notifications(self):
+        returned_notifications = get_user_notifications(self.user_with_notifications)
+        self.assert_queryset_equal(returned_notifications,
+                                   self.all_notifications)
+        self.assertCountEqual(returned_notifications[:5],
+                              self.unread_notifications)
 
 
 class TestClearNotifications(TestNotificationsBaseClass):
-    def test_do_not_raise_exception_when_no_cache_data(self):
-        clear_user_notifications(self.user_without_data)
-        self.assertIsNone(get_notifications_in_cache(self.user_without_data))
+    def test_user_should_have_no_notifications_after_clear(self):
+        self.assert_queryset_equal(get_user_notifications(self.user_with_notifications),
+                                   self.all_notifications)
 
-    def test_cache_for_user_should_be_empty_after_clear(self):
-        clear_user_notifications(self.user_with_data)
-        self.assertIsNone(get_notifications_in_cache(self.user_with_data))
+        clear_user_notifications(self.user_with_notifications)
 
+        self.assert_queryset_equal(get_user_notifications(self.user_with_notifications),
+                                   [])
 
-class TestAreNotificationsAlreadyLoaded(TestNotificationsBaseClass):
-    def test_return_false_when_key_user_data_not_in_cache(self):
-        self.assertFalse(are_notifications_already_loaded(self.user_without_data))
+class TestMarkNotificationsAsRead(TestNotificationsBaseClass):
+    def test_all_notifications_should_be_read_after_method_call(self):
+        self.assert_queryset_equal(
+            get_user_unread_notifications(self.user_with_notifications),
+            self.unread_notifications
+        )
+        self.assert_queryset_equal(
+            get_user_read_notifications(self.user_with_notifications),
+            self.read_notifications
+        )
 
-    def test_return_true_when_empty_data_in_cache(self):
-        self.assertTrue(are_notifications_already_loaded(self.user_with_empty_data))
+        mark_notifications_as_read(self.user_with_notifications)
 
-    def test_return_true_when_data_in_cache(self):
-        self.assertTrue(are_notifications_already_loaded(self.user_with_data))
-
-
-class TestCacheTimestamp(TestNotificationsBaseClass):
-    def test_get_last_date_read_should_return_none_if_user_never_read_notifications_before(self):
-        self.assertIsNone(get_notifications_last_date_read_for_user(self.user_without_data))
-
-    def test_return_date_last_set(self):
-        today = datetime.date.today()
-        set_notifications_last_read_as_today_for_user(self.user_without_data)
-        self.assertEqual(today,
-                         get_notifications_last_date_read_for_user(self.user_without_data))
+        self.assert_queryset_equal(
+            get_user_unread_notifications(self.user_with_notifications),
+            []
+        )
+        self.assert_queryset_equal(
+            get_user_read_notifications(self.user_with_notifications),
+            list(self.user_with_notifications.notifications.all())
+        )

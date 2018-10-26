@@ -37,6 +37,7 @@
         {% include "learning_unit/blocks/tabs.html" %}
         <div class="tab-content" id="tab_content">
             <div role="tabpanel" class="tab-pane active" id="attributions">
+
                 <table class="table">
                     <thead>
                         <th>{% trans 'tutor' %}</th>
@@ -46,6 +47,7 @@
                         <th>Volume 1</th>
                         <th>Volume 2</th>
                         <th>{% trans 'substitute' %}</th>
+                        <th></th>
                     </thead>
                     <tbody>
                         {% for key,value in attribution_charge_news.items %}
@@ -57,12 +59,44 @@
                                 <td>{{ value.LECTURING | default_if_none:0 | floatformat:2 }}</td>
                                 <td>{{ value.PRACTICAL_EXERCISES | default_if_none:0 | floatformat:2 }}</td>
                                 <td>{{ value.substitute | default_if_none:'' }}</td>
+                                <td>
+                                    {% if can_manage_charge_repartition %}
+                                    <a href="#" class="remove-attribution-btn" data-form="{% url "edit_charge_repartition" learning_unit_year.id key %}"><span class="glyphicon glyphicon-edit"></span> </a>
+                                    <a href="#" class="remove-attribution-btn" data-form="{% url "remove_charge_repartition" learning_unit_year.id key %}"><span class="glyphicon glyphicon-trash"></span> </a>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                {% if can_manage_charge_repartition %}
+                <a href="{% url "select_attribution" learning_unit_year.id %}" class="btn btn-default" role="button">
+                    {% trans "Manage repartition" %}
+                </a>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="form-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" id="modal_dialog_id">
+      <div class="modal-content" id="form-modal-content">
+
+     </div>
+   </div>
+ </div>
+
+<script type="text/javascript" src="{% static "js/modal_form_submit.js" %}"></script>
+<script type="application/javascript">
+    $(".remove-attribution-btn").click(function(ev) {
+        ev.preventDefault();
+        var url = $(this).data("form");
+        $('#form-modal-content').load(url, function () {
+            $('#form-modal').modal('toggle');
+            formAjaxSubmit('#form-modal-body form', '#form-modal');
+        });
+        return false;
+    });
+</script>
 {% endblock %}

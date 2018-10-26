@@ -60,15 +60,15 @@
                         <dl class="col-md-4">
 
                             <dt>{% trans 'organization_name'%}</dt>
-                            <dd>{{ object.title | title }}</dd>
+                            <dd>{{ object.name | title }}</dd>
                         </dl>
                         <dl class="col-md-4">
                             <dt>{% trans 'website' %}</dt>
-                            <dd><a href="{{ object.entity.website }}">{{ object.entity.website }}</a></dd>
+                            <dd><a href="{{ object.website }}">{{ object.website }}</a></dd>
                         </dl>
                         <dl class="col-md-2">
                             <dt>{% trans 'type' %}</dt>
-                            <dd>{{ object.organization.get_type_display }}</dd>
+                            <dd>{{ object.get_type_display }}</dd>
                         </dl>
                         <dl class="col-md-2">
                             <dt>{% trans 'start_date' %}</dt>
@@ -80,7 +80,7 @@
                         </dl>
                     </div>
                     <br>
-                    {% with object.entity.organization.organizationaddress_set.all as addresses %}
+                    {% with object.organizationaddress_set.all as addresses %}
                         {% if addresses %}
                             <label>{% trans 'address(ses)' %}</label>
                             <br>
@@ -116,7 +116,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for campus in object.organization.campus_set.all %}
+                        {% for campus in object.campus_set.all %}
                             <tr>
                                 <td> {{ campus.name | default_if_none:''}} </td>
                             </tr>

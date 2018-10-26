@@ -123,7 +123,10 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         widgets = {
             'certificate_aims': autocomplete.ModelSelect2Multiple(
                 url='certificate_aim_autocomplete',
-                attrs={'data-html': True},
+                attrs={
+                    'data-html': True,
+                    'data-placeholder': _('Search...'),
+                },
                 forward=['section'],
             )
         }

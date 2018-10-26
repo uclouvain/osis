@@ -24,10 +24,12 @@
 #
 ##############################################################################
 from django import template
+
 register = template.Library()
 
+
 @register.filter
-def getattr (obj, args):
+def getattr(obj, args):
     """ Try to get an attribute from an object.
 
     Example: {% if block|getattr:"editable,True" %}
@@ -44,6 +46,6 @@ def getattr (obj, args):
     try:
         return obj.__getattribute__(attribute)
     except AttributeError:
-         return  obj.__dict__.get(attribute, default)
+        return obj.__dict__.get(attribute, default)
     except:
         return default

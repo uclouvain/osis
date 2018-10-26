@@ -21,23 +21,17 @@
                 {{ education_group_year.partial_acronym }} - {{ education_group_year.title }}
             {% endif %}
             <small style="color:black;font-family:Verdana;">
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ education_group_year.academic_year }}</small>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ education_group_year.academic_year }}
+            </small>
         </h2>
     </div>
 {% endblock %}
 
 {% block modal %}
-    {{ block.super }}
     {% if group_to_parent %}
         {% url_resolver_match as url_resolver_match %}
         {% url 'education_groups_management' as management_url %}
         {% url_add_query management_url root_id=parent.id element_id=education_group_year.id group_element_year_id=group_to_parent action="detach" source=url_resolver_match as detach_url %}
         {% include "blocks/modal/modal_ajax.html" with modal_url=detach_url click_id="btn_operation_detach_"|addstr:group_to_parent form_id="form_detach_confirm" %}
     {% endif %}
-
-    {% url 'group_content' root_id=parent.id education_group_year_id=education_group_year.id as group_content %}
-    {% include "blocks/modal/modal_ajax.html" with modal_url=group_content click_id="btn_operation_pdf_content" form_id="form_pdf_content" %}
-
-    {% url 'delete_education_group' root.pk education_group_year.education_group.pk as delete_url %}
-    {% include "blocks/modal/modal_ajax.html" with modal_url=delete_url click_id="link_delete" form_id="form_delete_education_group" %}
 {% endblock %}

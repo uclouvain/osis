@@ -30,9 +30,9 @@ from base.models.organization import Organization
 
 
 class OrganizationFilter(django_filters.FilterSet):
-    entity__entityversion__acronym = django_filters.CharFilter(lookup_expr='icontains', label=_('acronym'))
-    entity__entityversion__title = django_filters.CharFilter(lookup_expr='icontains', label=_('title'))
+    acronym = django_filters.CharFilter(lookup_expr='icontains', label=_('acronym'))
+    name = django_filters.CharFilter(lookup_expr='icontains', label=_('name'))
 
     class Meta:
         model = Organization
-        fields = ['entity__entityversion__acronym', 'entity__entityversion__title', 'type']
+        fields = ['acronym', 'name', 'type']

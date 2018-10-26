@@ -68,10 +68,10 @@ class LearningUnitYearAdmin(SerializableModelAdmin):
 
     def apply_learning_unit_year_postponement(self, request, queryset):
         # Potential circular imports
-        from base.business.learning_units.automatic_postponement import fetch_learning_unit_to_postpone
+        from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponement
         from base.views.common import display_success_messages, display_error_messages
 
-        result, errors = fetch_learning_unit_to_postpone(queryset.filter(learning_container_year__isnull=False))
+        result, errors = LearningUnitAutomaticPostponement(queryset.filter(learning_container_year__isnull=False))
         count = len(result)
         display_success_messages(
             request, ngettext(
@@ -217,8 +217,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     def get_learning_unit_next_year(self):
         try:
-            return LearningUnitYear.objects.get(learning_unit=self.learning_unit,
-                                                academic_year__year=(self.academic_year.year + 1))
+            return self.learning_unit.learningunityear_set.get(academic_year__year=(self.academic_year.year + 1))
         except LearningUnitYear.DoesNotExist:
             return None
 

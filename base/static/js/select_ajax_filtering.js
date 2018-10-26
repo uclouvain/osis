@@ -29,3 +29,17 @@ jQuery.fn.filterCampusByCity = function(campus_node, ajax_url){
         })
     });
 };
+
+// Ajax request to update the campus list
+jQuery.fn.filterOrganizationByCountry = function(country_node, organization_node, ajax_url){
+    $(this).on('change', function () {
+        $.getJSON(ajax_url,{country: $(this).val(), ajax: 'true'}, function(j){
+            organization_node.html('');
+            let options = '';
+            for (let i = 0; i < j.length; i++) {
+                options += '<option value="' + j[i].organization__pk + '">' + j[i].organization__name + '</option>';
+            }
+            organization_node.html(options);
+        })
+    });
+};

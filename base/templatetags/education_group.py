@@ -39,7 +39,7 @@ from base.business.education_group import can_user_edit_administrative_data
 from base.business.education_groups.perms import is_eligible_to_delete_education_group, \
     is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_change_achievement, \
-    is_eligible_to_delete_achievement
+    is_eligible_to_delete_achievement, is_eligible_to_postpone_education_group
 from base.models.enums.learning_unit_year_periodicity import BIENNIAL_EVEN, BIENNIAL_ODD, ANNUAL
 
 OPTIONAL_PNG = base.STATIC_URL + 'img/education_group_year/optional.png'
@@ -108,19 +108,14 @@ BRANCH_CONSTRAINT = """\
         </div>
 """
 
-# TODO use inclusion tag
-LI_TEMPLATE = """
-<li class="{}" id="{}">
-    <a href="{}" data-toggle="tooltip" title="{}">{}</a>
-</li>
-"""
-
+# TODO Use inclusion tags instead
 BUTTON_TEMPLATE = """
 <button title="{}" class="btn btn-default btn-sm" id="{}" data-toggle="tooltip-wrapper" name="action" {}>
     <i class="fa {}"></i>
 </button>
 """
 
+# TODO Use inclusion tags instead
 BUTTON_ORDER_TEMPLATE = """
 <button type="submit" title="{}" class="btn btn-default btn-sm" 
     id="{}" data-toggle="tooltip-wrapper" name="action" value="{}" {}>
@@ -138,40 +133,53 @@ ICONS = {
 register = template.Library()
 
 
-@register.simple_tag(takes_context=True)
+@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_deletion_perm(context, url, message, url_id="link_delete"):
-    return li_with_permission(context, is_eligible_to_delete_education_group, url, message, url_id)
+    return li_with_permission(context, is_eligible_to_delete_education_group, url, message, url_id, True)
 
 
-@register.simple_tag(takes_context=True)
+@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_update_perm(context, url, message, url_id="link_update"):
     return li_with_permission(context, is_eligible_to_change_education_group, url, message, url_id)
 
 
-@register.simple_tag(takes_context=True)
+@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_create_perm_training(context, url, message, url_id="link_create_training"):
-    return li_with_permission(context, is_eligible_to_add_training, url, message, url_id)
+    return li_with_permission(context, is_eligible_to_add_training, url, message, url_id, True)
 
 
-@register.simple_tag(takes_context=True)
+@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_create_perm_mini_training(context, url, message, url_id="link_create_mini_training"):
-    return li_with_permission(context, is_eligible_to_add_mini_training, url, message, url_id)
+    return li_with_permission(context, is_eligible_to_add_mini_training, url, message, url_id, True)
 
 
-@register.simple_tag(takes_context=True)
+@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_create_perm_group(context, url, message, url_id="link_create_group"):
-    return li_with_permission(context, is_eligible_to_add_group, url, message, url_id)
+    return li_with_permission(context, is_eligible_to_add_group, url, message, url_id, True)
 
 
-def li_with_permission(context, permission, url, message, url_id):
+@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
+def li_with_postpone_perm_training(context, url, message, url_id="link_postpone_training"):
+    return li_with_permission(context, is_eligible_to_postpone_education_group, url, message, url_id, True)
+
+
+def li_with_permission(context, permission, url, message, url_id, load_modal=False):
     permission_denied_message, disabled, root = _get_permission(context, permission)
 
     if not disabled:
         href = url
     else:
         href = "#"
+        load_modal = False
 
-    return mark_safe(LI_TEMPLATE.format(disabled, url_id, href, permission_denied_message, message))
+    return {
+        "class_li": disabled,
+        "load_modal": load_modal,
+        "url": href,
+        "id_li": url_id,
+        "title": permission_denied_message,
+        "text": message,
+    }
 
 
 def _get_permission(context, permission):
@@ -367,9 +375,18 @@ def link_detach_education_group(context):
     return _custom_link_education_group(context, action="Detach", onclick="""onclick="select()" """)
 
 
-@register.simple_tag(takes_context=True)
-def link_pdf_content_education_group(context):
-    return _custom_link_pdf_content(context, action="Generate pdf", onclick="")
+@register.inclusion_tag('blocks/button/li_template.html')
+def link_pdf_content_education_group(url):
+    action = _("Generate pdf")
+
+    return {
+        "class_li": "",
+        "load_modal": True,
+        "url": url,
+        "id_li": "btn_operation_pdf_content",
+        "title": action,
+        "text": action,
+    }
 
 
 def _custom_link_education_group(context, action, onclick):
@@ -387,26 +404,6 @@ def _custom_link_education_group(context, action, onclick):
             title += " " + _("It is not possible to {action} the root element.".format(action=str.lower(action)))
 
         a_attributes = """ title="{title}" """.format(title=title)
-    text = _(action)
-    html_template = """
-        <li {li_attributes}>
-            <a {a_attributes} data-toggle="tooltip">{text}</a>
-        </li>
-    """
-
-    return mark_safe(
-        html_template.format(
-            li_attributes=li_attributes,
-            a_attributes=a_attributes,
-            text=text,
-        )
-    )
-
-
-def _custom_link_pdf_content(context, action, onclick):
-    li_attributes = """ id="btn_operation_pdf_content" """
-    a_attributes = """ href="#" title="{title}" {onclick} """.format(title=_(action), onclick=onclick)
-
     text = _(action)
     html_template = """
         <li {li_attributes}>

@@ -24,52 +24,50 @@
 #
 ##############################################################################
 from django.db import models
-from django.utils.functional import cached_property
+from django.utils.safestring import mark_safe
 
-from base.models.entity_version import EntityVersion
 from base.models.enums import organization_type
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
 class OrganizationAdmin(SerializableModelAdmin):
-    list_display = ('title', 'acronym', 'type', 'changed')
-    search_fields = ['acronym', 'title']
+    list_display = ('name', 'acronym', 'type', 'changed', 'logo_tag')
+    search_fields = ['acronym', 'nom']
 
 
 class Organization(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
-    type = models.CharField(
-        max_length=30,
-        blank=True,
-        choices=organization_type.ORGANIZATION_TYPE,
-    )
+    name = models.CharField(max_length=255)
+    code = models.CharField(max_length=50, blank=True)
+    acronym = models.CharField(max_length=20, blank=True)
+    website = models.URLField(max_length=255, blank=True)
 
-    @cached_property
-    def latest_version(self):
-        return EntityVersion.objects.filter(parent__isnull=True, entity__organization=self)\
-            .order_by("start_date").last()
+    type = models.CharField(max_length=30, blank=True,
+                            choices=organization_type.ORGANIZATION_TYPE,
+                            default='')
+
+    start_date = models.DateTimeField(null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
+
+    prefix = models.CharField(max_length=30, blank=True)
+    logo = models.ImageField(upload_to='organization_logos', null=True, blank=True)
 
     def __str__(self):
-        return "{}".format(self.latest_version)
+        return "{}".format(self.name)
+
+    def logo_tag(self):
+        if self.logo:
+            return mark_safe('<img src="%s" height="30"/>' % self.logo.url)
+        return ""
+
+    logo_tag.short_description = 'Logo'
 
     class Meta:
         permissions = (
             ("can_access_organization", "Can access organization"),
         )
-
-    @cached_property
-    def title(self):
-        return getattr(self.latest_version, "title", "")
-
-    @cached_property
-    def logo(self):
-        return getattr(self.latest_version, "logo", None)
-
-    @cached_property
-    def acronym(self):
-        return getattr(self.latest_version, "acronym", "")
 
     @property
     def country(self):

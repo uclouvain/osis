@@ -147,18 +147,37 @@ class LearningUnitYearComparaisonTest(TestCase):
         current_volume_q1 = 20
         next_volume_q1 = 10
 
-        data_volumes_previous = {'volumes': {'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0, 'VOLUME_TOTAL': Decimal('12.00'),
-                                    'VOLUME_GLOBAL': previous_volume_global, 'PLANNED_CLASSES': previous_planned_classes, 'VOLUME_Q1': None,
-                                    'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0, 'VOLUME_Q2': Decimal('30.00'),
-                                    'VOLUME_REQUIREMENT_ENTITY': 12.0}}
-        data_volumes_current = {'volumes': {'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0, 'VOLUME_TOTAL': Decimal('12.00'),
-                                            'VOLUME_GLOBAL': current_volume_global, 'PLANNED_CLASSES': current_planned_classes, 'VOLUME_Q1': current_volume_q1,
-                                            'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0, 'VOLUME_Q2': Decimal('30.00'),
-                                            'VOLUME_REQUIREMENT_ENTITY': 12.0}}
-        data_volumes_next = {'volumes': {'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0, 'VOLUME_TOTAL': Decimal('12.00'),
-                                            'VOLUME_GLOBAL': 12.0, 'PLANNED_CLASSES': 1, 'VOLUME_Q1': next_volume_q1,
-                                            'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0, 'VOLUME_Q2': Decimal('30.00'),
-                                            'VOLUME_REQUIREMENT_ENTITY': 12.0}}
+        data_volumes_previous = {
+            'volumes': {
+                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0, 'VOLUME_TOTAL': Decimal('12.00'),
+                'VOLUME_GLOBAL': previous_volume_global,
+                'PLANNED_CLASSES': previous_planned_classes,
+                'VOLUME_Q1': None,
+                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0, 'VOLUME_Q2': Decimal('30.00'),
+                'VOLUME_REQUIREMENT_ENTITY': 12.0
+            }
+        }
+
+        data_volumes_current = {
+            'volumes': {
+                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0,
+                'VOLUME_TOTAL': Decimal('12.00'),
+                'VOLUME_GLOBAL': current_volume_global,
+                'PLANNED_CLASSES': current_planned_classes,
+                'VOLUME_Q1': current_volume_q1,
+                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0,
+                'VOLUME_Q2': Decimal('30.00'),
+                'VOLUME_REQUIREMENT_ENTITY': 12.0
+            }
+        }
+        data_volumes_next = {
+            'volumes': {
+                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0, 'VOLUME_TOTAL': Decimal('12.00'),
+                'VOLUME_GLOBAL': 12.0, 'PLANNED_CLASSES': 1, 'VOLUME_Q1': next_volume_q1,
+                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0, 'VOLUME_Q2': Decimal('30.00'),
+                'VOLUME_REQUIREMENT_ENTITY': 12.0
+            }
+        }
 
         data = compare_volumes(data_volumes_current, data_volumes_previous, data_volumes_next)
         self.assertEqual(data.get('VOLUME_GLOBAL'), [previous_volume_global, current_volume_global, 12.0])

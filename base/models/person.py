@@ -110,10 +110,14 @@ class Person(SerializableModel):
         return " ".join([self.last_name or "", self.first_name or ""]).strip()
 
     def __str__(self):
+        return self.get_str(self.first_name, self.middle_name, self.last_name)
+
+    @staticmethod
+    def get_str(first_name, middle_name, last_name):
         return " ".join([
-            ("{},".format(self.last_name) if self.last_name else "").upper(),
-            self.first_name or "",
-            self.middle_name or ""
+            ("{},".format(last_name) if last_name else "").upper(),
+            first_name or "",
+            middle_name or ""
         ]).strip()
 
     @cached_property
@@ -129,6 +133,7 @@ class Person(SerializableModel):
             ("is_administrator", "Is administrator"),
             ("is_institution_administrator", "Is institution administrator "),
             ("can_edit_education_group_administrative_data", "Can edit education group administrative data"),
+            ("can_manage_charge_repartition", "Can manage charge repartition"),
         )
 
     def is_linked_to_entity_in_charge_of_learning_unit_year(self, learning_unit_year):

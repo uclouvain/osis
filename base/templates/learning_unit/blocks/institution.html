@@ -4,15 +4,45 @@
     <div class="panel-body">
         <div class="form-group">
             {% if learning_unit_year.campus %}
-                <label>{% trans 'institution'%}</label><br>
+                <label>{% trans 'institution' %}</label><br>
                 {{ learning_unit_year.campus.organization.name }}
             {% endif %}
         </div>
         {% bootstrap_field learning_unit_year_form.campus %}
         {% for form in entity_container_form.forms %}
-            {% bootstrap_field form.entity %}
+            {% if forloop.first %}
+                <div>
+                    {% bootstrap_field form.entity %}
+                </div>
+            {% elif forloop.counter == 2 %}
+                <div class="row">
+                    {% bootstrap_field form.entity form_group_class="col-md-9" %}
+                    {% bootstrap_field form.country form_group_class="col-md-3" %}
+                </div>
+            {% else %}
+                <div class="row">
+                    {% bootstrap_field form.entity form_group_class="col-md-9" %}
+                    <br>
+                    {% bootstrap_field form.country show_label=False form_group_class="col-md-3" %}
+                </div>
+            {% endif %}
+            <br>
         {% endfor %}
         {% bootstrap_field learning_unit_year_form.academic_year %}
     </div>
 </div>
+
+{{ entity_container_form.0.media }}
+
+<style>
+    /* Overrided to get items in list */
+    .select2-container .select2-selection--multiple {
+        box-sizing: border-box;
+        cursor: pointer;
+        display: inline-grid;
+        min-height: 32px;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+</style>
 

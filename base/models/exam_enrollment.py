@@ -25,15 +25,16 @@
 ##############################################################################
 from decimal import *
 
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import When, Case, Q, Sum, Count, IntegerField, F
-from django.db.models.functions import Concat
 from django.utils.translation import ugettext as _
-from django.core.validators import MaxValueValidator, MinValueValidator
-from base.models import person, session_exam_deadline, \
-                        academic_year as academic_yr, offer_year, program_manager, tutor
+
 from attribution.models import attribution
-from base.models.enums import exam_enrollment_state as enrollment_states, exam_enrollment_justification_type as justification_types
+from base.models import person, session_exam_deadline, \
+    academic_year as academic_yr, offer_year, program_manager, tutor
+from base.models.enums import exam_enrollment_state as enrollment_states, \
+    exam_enrollment_justification_type as justification_types
 from base.models.exceptions import JustificationValueException
 from base.models.utils.admin_extentions import remove_delete_action
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -57,14 +58,14 @@ class ExamEnrollment(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     score_draft = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
-                                      validators=[MinValueValidator(0,message="scores_must_be_between_0_and_20"),
+                                      validators=[MinValueValidator(0, message="scores_must_be_between_0_and_20"),
                                                   MaxValueValidator(20, message="scores_must_be_between_0_and_20")])
     score_reencoded = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
                                           validators=[MinValueValidator(0, message="scores_must_be_between_0_and_20"),
                                                       MaxValueValidator(20, message="scores_must_be_between_0_and_20")])
     score_final = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
                                       validators=[MinValueValidator(0, message="scores_must_be_between_0_and_20"),
-                                                  MaxValueValidator(20,message="scores_must_be_between_0_and_20")])
+                                                  MaxValueValidator(20, message="scores_must_be_between_0_and_20")])
     justification_draft = models.CharField(max_length=20, blank=True, null=True,
                                            choices=justification_types.JUSTIFICATION_TYPES)
     justification_reencoded = models.CharField(max_length=20, blank=True, null=True,
@@ -167,7 +168,7 @@ def find_by_ids(ids):
 
 
 def get_session_exam_deadline(enrollment):
-    if hasattr(enrollment.learning_unit_enrollment.offer_enrollment, 'session_exam_deadlines') and\
+    if hasattr(enrollment.learning_unit_enrollment.offer_enrollment, 'session_exam_deadlines') and \
             enrollment.learning_unit_enrollment.offer_enrollment.session_exam_deadlines:
         # Prefetch related
         return enrollment.learning_unit_enrollment.offer_enrollment.session_exam_deadlines[0]
@@ -196,7 +197,7 @@ def get_deadline(enrollment):
     exam_deadline = get_session_exam_deadline(enrollment)
     if exam_deadline:
         return exam_deadline.deadline_tutor_computed if exam_deadline.deadline_tutor_computed else \
-               exam_deadline.deadline
+            exam_deadline.deadline
     return None
 
 
@@ -272,8 +273,8 @@ def get_progress(session_exm_list, learning_unt):
 
 def find_exam_enrollments_by_session_learningunit(session_exm, a_learning_unit_year):
     enrollments = ExamEnrollment.objects.filter(session_exam=session_exm) \
-                                        .filter(enrollment_state=enrollment_states.ENROLLED) \
-                                        .filter(learning_unit_enrollment__learning_unit_year=a_learning_unit_year)
+        .filter(enrollment_state=enrollment_states.ENROLLED) \
+        .filter(learning_unit_enrollment__learning_unit_year=a_learning_unit_year)
     return enrollments
 
 
@@ -288,7 +289,7 @@ def get_progress_by_learning_unit_years_and_offer_years(user,
     else:
         offer_year_ids = offer_year.find_by_user(user).values_list('id', flat=True)
 
-    tutor_user=None
+    tutor_user = None
     if not program_manager.is_program_manager(user):
         tutor_user = tutor.find_by_user(user)
 
@@ -300,7 +301,7 @@ def get_progress_by_learning_unit_years_and_offer_years(user,
                                         academic_year=academic_year,
                                         with_session_exam_deadline=False)
 
-    return queryset.values('session_exam','learning_unit_enrollment__learning_unit_year',
+    return queryset.values('session_exam', 'learning_unit_enrollment__learning_unit_year',
                            'learning_unit_enrollment__offer_enrollment__offer_year') \
         .annotate(
         total_exam_enrollments=Count('id'),
@@ -405,19 +406,19 @@ def find_for_score_encodings(session_exam_number,
 
     if with_session_exam_deadline:
         queryset = queryset.prefetch_related(
-                         models.Prefetch('learning_unit_enrollment__offer_enrollment__sessionexamdeadline_set',
-                                         queryset=session_exam_deadline.filter_by_nb_session(session_exam_number),
-                                         to_attr="session_exam_deadlines")
-                   )
+            models.Prefetch('learning_unit_enrollment__offer_enrollment__sessionexamdeadline_set',
+                            queryset=session_exam_deadline.filter_by_nb_session(session_exam_number),
+                            to_attr="session_exam_deadlines")
+        )
 
     return queryset.select_related('learning_unit_enrollment__offer_enrollment__offer_year') \
-                   .select_related('session_exam')\
-                   .select_related('learning_unit_enrollment__offer_enrollment__student__person')\
-                   .select_related('learning_unit_enrollment__learning_unit_year')
+        .select_related('session_exam') \
+        .select_related('learning_unit_enrollment__offer_enrollment__student__person') \
+        .select_related('learning_unit_enrollment__learning_unit_year')
 
 
 def find_by_student(a_student):
-    return ExamEnrollment.objects.filter(learning_unit_enrollment__offer_enrollment__student=a_student)\
+    return ExamEnrollment.objects.filter(learning_unit_enrollment__offer_enrollment__student=a_student) \
         .order_by('-learning_unit_enrollment__learning_unit_year__academic_year__year',
                   'session_exam__number_session',
                   'learning_unit_enrollment__learning_unit_year__acronym')

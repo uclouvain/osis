@@ -30,7 +30,7 @@
     <form method="POST" action="{% url 'academic_calendar_delete' pk=academic_calendar.pk %}">
         {% csrf_token %}
         <div class="modal-body">
-            {% trans "Are you sure you want to delete the event" %}"{{ academic_calendar }}" ?
+            {% trans "Are you sure you want to delete the event" %}"{{ academic_calendar }} ?
          </div>
          <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "cancel" %}</button>

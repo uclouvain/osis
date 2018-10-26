@@ -51,3 +51,11 @@ class LearningComponentYearFactory(factory.django.DjangoModelFactory):
             self.planned_classes = 0
         else:
             self.planned_classes = 1
+
+
+class LecturingLearningComponentYearFactory(LearningComponentYearFactory):
+    type=learning_component_year_type.LECTURING
+
+
+class PracticalLearningComponentYearFactory(LearningComponentYearFactory):
+    type=learning_component_year_type.PRACTICAL_EXERCISES

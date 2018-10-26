@@ -138,11 +138,11 @@ table.volumes thead{
     content: "";
     display: block;
     position: absolute;
-    width: 11px;
-    height: 11px;
+    width: 6px;
+    height: 6px;
     background: red;
     top: -3px;
-    right: 0;
+    right: -2px;
     border-radius: 50%;
 }
 

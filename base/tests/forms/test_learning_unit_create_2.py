@@ -444,26 +444,6 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
                                  learning_unit_instance=self.learning_unit_year.learning_unit)
         self.assertFalse(form.is_valid(), form.errors)
 
-    def test_update_case_wrong_entity_container_type(self):
-        organization = OrganizationFactory(type=MAIN)
-        allocation_entity_version = EntityVersionFactory(entity_type=FACULTY)
-        allocation_entity_version.entity.organization = organization
-        allocation_entity_version.entity.save()
-
-        self.learning_unit_year.learning_container_year.container_type = MASTER_THESIS
-        self.learning_unit_year.learning_container_year.save()
-
-        PersonEntityFactory(person=self.person, entity=allocation_entity_version.entity)
-        post_data = dict(self.post_data)
-        post_data['allocation_entity-entity'] = allocation_entity_version.id
-
-        form = _instanciate_form(self.learning_unit_year.academic_year, post_data=post_data, person=self.person,
-                                 learning_unit_instance=self.learning_unit_year.learning_unit)
-        self.assertFalse(form.is_valid(), form.errors)
-        self.assertEqual(form.errors[0]['allocation_entity']['entity'],
-                         [_("Requirement and allocation entities must be linked "
-                            "to the same faculty for this learning unit type.")])
-
     def test_update_case_credits_too_high_3_digits(self):
         post_data = dict(self.post_data)
         post_data['credits'] = factory.fuzzy.FuzzyDecimal(MAXIMUM_CREDITS + 1, 999, 2).fuzz()

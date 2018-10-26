@@ -29,7 +29,7 @@ from unittest import mock
 from django.contrib.auth.models import Permission
 from django.core.cache import cache
 from django.http import HttpResponseForbidden
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -43,7 +43,6 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
-from base.views.education_groups import search
 
 FILTER_DATA = {"acronym": "LBIR", "title": "dummy filter"}
 
@@ -83,21 +82,14 @@ class TestEducationGroupSearchView(TestCase):
         expected_keys_found = ["form", "object_list", "object_list_count", "experimental_phase", "enums", "person"]
         self.assertTrue(all(key in response.context.keys() for key in expected_keys_found))
 
-    @mock.patch('base.views.layout.render')
-    @mock.patch("base.views.education_groups.search._check_if_display_message", side_effect=lambda *args,**kwargs: True)
     @mock.patch("base.utils.cache._save_filter_to_cache", side_effect=lambda *args,**kwargs: True)
-    def test_search_education_group_cache_filter(self, mock_save_filter_to_cache, mock_display_msg, mock_layout_render):
-        request_factory = RequestFactory()
-        request = request_factory.get(
-            self.url,
-            data=FILTER_DATA
-        )
-        request.user = self.person.user
-        search.education_groups(request)
-
+    def test_search_education_group_cache_filter(self, mock_save_filter_to_cache):
+        response = self.client.get(self.url, data=FILTER_DATA)
         self.assertTrue(mock_save_filter_to_cache.called)
+
         # Ensure that we don't cache field related to xls
-        mock_save_filter_to_cache.assert_called_once_with(request, exclude_params=['xls_status', 'xls_order_col'])
+        mock_save_filter_to_cache.assert_called_once_with(response.wsgi_request,
+                                                          exclude_params=['xls_status', 'xls_order_col'])
 
 
 class TestEducationGroupDataSearchFilter(TestCase):

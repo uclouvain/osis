@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+import json
 from unittest import mock
 
 from django.contrib import messages
@@ -45,6 +46,7 @@ from base.models.enums import learning_unit_year_periodicity, learning_container
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -57,7 +59,7 @@ from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.tests.forms.test_edition_form import get_valid_formset_data
 from base.views.learning_unit import learning_unit_identification, learning_unit_components
 from base.views.learning_units.update import learning_unit_edition_end_date, learning_unit_volumes_management, \
-    update_learning_unit, _get_learning_units_for_context
+    update_learning_unit, _get_learning_units_for_context, EntityAutocomplete
 
 
 @override_flag('learning_unit_update', active=True)
@@ -373,8 +375,8 @@ class TestEditLearningUnit(TestCase):
 @override_flag('learning_unit_update', active=True)
 class TestLearningUnitVolumesManagement(TestCase):
     def setUp(self):
-        self.academic_years = GenerateAcademicYear(start_year=get_current_year(), end_year=get_current_year()+10)
-        self.generate_container = GenerateContainer(start_year=get_current_year(), end_year=get_current_year()+10)
+        self.academic_years = GenerateAcademicYear(start_year=get_current_year(), end_year=get_current_year() + 10)
+        self.generate_container = GenerateContainer(start_year=get_current_year(), end_year=get_current_year() + 10)
         self.generated_container_year = self.generate_container.generated_container_years[0]
 
         self.container_year = self.generated_container_year.learning_container_year
@@ -387,9 +389,9 @@ class TestLearningUnitVolumesManagement(TestCase):
         self.person.user.user_permissions.add(edit_learning_unit_permission)
 
         self.url = reverse('learning_unit_volumes_management', kwargs={
-                'learning_unit_year_id': self.learning_unit_year.id,
-                'form_type': 'full'
-            })
+            'learning_unit_year_id': self.learning_unit_year.id,
+            'form_type': 'full'
+        })
 
         self.client.force_login(self.person.user)
         self.user = self.person.user
@@ -621,3 +623,38 @@ class TestLearningUnitVolumesManagement(TestCase):
             _get_learning_units_for_context(self.learning_unit_year, with_family=False),
             [self.learning_unit_year]
         )
+
+
+class TestEntityAutocomplete(TestCase):
+    def setUp(self):
+        self.super_user = SuperUserFactory()
+        self.url = reverse("entity_autocomplete")
+        today = datetime.date.today()
+        self.entity_version = EntityVersionFactory(
+            entity_type=entity_type.SCHOOL,
+            start_date=today.replace(year=1900),
+            end_date=None,
+            acronym="DRT"
+        )
+
+    def test_when_param_is_digit_assert_searching_on_code(self):
+        # When searching on "code"
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(
+            self.url, data={'q': 'DRT', 'forward': '{"country": "%s"}' % self.entity_version.entity.country.id}
+        )
+        self._assert_result_is_correct(response)
+
+    def test_with_filter_by_section(self):
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(
+            self.url, data={'forward': '{"country": "%s"}' % self.entity_version.entity.country.id}
+        )
+        self._assert_result_is_correct(response)
+
+    def _assert_result_is_correct(self, response):
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['text'], str(self.entity_version.verbose_title))

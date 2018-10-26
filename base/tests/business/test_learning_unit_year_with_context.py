@@ -59,7 +59,7 @@ class LearningUnitYearWithContextTestCase(TestCase):
                                                               entity_container_year=self.entity_container_yr,
                                                               repartition_volume=None)
 
-        self.entity_components_yr = [self.entity_component_yr,]
+        self.entity_components_yr = [self.entity_component_yr, ]
 
     def test_get_floated_only_element_of_list(self):
         a_list = []
@@ -88,7 +88,7 @@ class LearningUnitYearWithContextTestCase(TestCase):
                                                              ) for x in range(3)]
         components = [EntityComponentYearFactory(entity_container_year=entity_containers_year[x],
                                                  learning_component_year=learning_component_year,
-                                                 repartition_volume=x+5
+                                                 repartition_volume=x + 5
                                                  ) for x in range(3)]
         wanted_response = {
             "REQUIREMENT_ENTITY": 5,

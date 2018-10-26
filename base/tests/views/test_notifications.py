@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
+from unittest import mock, skip
 
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed
 from django.test import TestCase
@@ -31,18 +31,7 @@ from django.urls import reverse
 
 from base.tests.factories.user import UserFactory
 
-
-class TestClearUserNotifications(TestCase):
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = UserFactory()
-
-        cls.url = reverse("clear_notifications")
-
-    def setUp(self):
-        self.client.force_login(self.user)
-
+class TestNotificationsViewMixin:
     def test_user_must_be_logged(self):
         self.client.logout()
         response = self.client.post(self.url, data={})
@@ -59,6 +48,16 @@ class TestClearUserNotifications(TestCase):
 
         self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
 
+
+class TestClearUserNotifications(TestCase, TestNotificationsViewMixin):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.url = reverse("clear_notifications")
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
     def test_make_call_to_clear_notifications_method(self):
         from base.utils import notifications
         real_method = notifications.clear_user_notifications
@@ -71,3 +70,26 @@ class TestClearUserNotifications(TestCase):
         notifications.clear_user_notifications.assert_called_once_with(self.user)
 
         notifications.clear_user_notifications = real_method
+
+
+class TestMarkNotificationsAsRead(TestCase, TestNotificationsViewMixin):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.url = reverse("mark_notifications_as_read")
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
+    def test_make_call_to_mark_notifications_as_read_method(self):
+        from base.utils import notifications
+        real_method = notifications.mark_notifications_as_read
+
+        notifications.mark_notifications_as_read = mock.MagicMock()
+        response = self.client.post(self.url, {},
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        notifications.mark_notifications_as_read.assert_called_once_with(self.user)
+
+        notifications.mark_notifications_as_read = real_method

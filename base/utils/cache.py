@@ -85,5 +85,13 @@ def clear_cached_filter(request):
     cache.delete(key)
 
 
+def get_filter_value_from_cache(user, path, filter_key):
+    key = _get_filter_key(user, path)
+    filter_cached = cache.get(key)
+    if filter_cached:
+        return filter_cached.get(filter_key)
+    return None
+
+
 def _get_filter_key(user, path):
     return "_".join([PREFIX_CACHE_KEY, str(user.id), path])

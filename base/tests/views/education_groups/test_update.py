@@ -46,7 +46,6 @@ from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.certificate_aim import CertificateAimFactory
-from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.education_group_year import GroupFactory, TrainingFactory
@@ -55,6 +54,7 @@ from base.tests.factories.entity_version import EntityVersionFactory, MainEntity
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
+from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory
 from base.utils.cache import cache
 from base.views.education_groups.update import update_education_group, _get_success_redirect_url
@@ -148,6 +148,7 @@ class TestUpdate(TestCase):
 
     def test_post(self):
         new_entity_version = MainEntityVersionFactory()
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
 
         data = {
             'title': 'Cours au choix',
@@ -185,6 +186,7 @@ class TestUpdate(TestCase):
         )
 
         new_entity_version = MainEntityVersionFactory()
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
         list_domains = [domain.pk for domain in self.domains]
         data = {
             'title': 'Cours au choix',

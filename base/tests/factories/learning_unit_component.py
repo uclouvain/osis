@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
-import factory.fuzzy
-import string
 import operator
-from base.models.enums import component_type
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
+import string
+
+import factory.fuzzy
 from factory.django import DjangoModelFactory
+
+from base.models.enums import component_type
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 
 
 class LearningUnitComponentFactory(DjangoModelFactory):
@@ -39,6 +40,17 @@ class LearningUnitComponentFactory(DjangoModelFactory):
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
 
-    learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
-    learning_component_year = factory.SubFactory(LearningComponentYearFactory)
+    learning_unit_year = factory.SubFactory(LearningUnitYearFakerFactory)
+    learning_component_year = factory.LazyAttribute(
+        lambda obj: LearningComponentYearFactory(learning_container_year=obj.learning_unit_year.learning_container_year,
+                                                 type=obj.type)
+    )
     type = factory.Iterator(component_type.COMPONENT_TYPES, getter=operator.itemgetter(0))
+
+
+class LecturingLearningUnitComponentFactory(LearningUnitComponentFactory):
+    type = component_type.LECTURING
+
+
+class PracticalLearningUnitComponentFactory(LearningUnitComponentFactory):
+    type = component_type.PRACTICAL_EXERCISES

@@ -31,7 +31,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import F, Case, When, Prefetch
+from django.db.models import F, Case, When
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
@@ -41,9 +41,8 @@ from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
 from base.business.education_groups import perms
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
+from base.business.education_groups.perms import is_eligible_to_edit_general_information
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
-from base.models.certificate_aim import CertificateAim
-from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, academic_calendar_type, education_group_types
 from base.models.person import Person
@@ -84,6 +83,8 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
 
     limited_by_category = None
 
+    with_tree = True
+
     def get_person(self):
         return get_object_or_404(Person, user=self.request.user)
 
@@ -96,12 +97,14 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         # This objects are mandatory for all education group views
         context['person'] = self.get_person()
 
-        root = self.get_root()
+        self.root = self.get_root()
         # TODO same param
-        context['root'] = root
-        context['root_id'] = root.pk
-        context['parent'] = root
-        context['tree'] = json.dumps(NodeBranchJsTree(root).to_json())
+        context['root'] = self.root
+        context['root_id'] = self.root.pk
+        context['parent'] = self.root
+
+        if self.with_tree:
+            context['tree'] = json.dumps(NodeBranchJsTree(self.root).to_json())
 
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
@@ -160,7 +163,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(is_common_education_group_year),
-            'can_edit_information': self.request.user.has_perm('base.can_edit_educationgroup_pedagogy'),
+            'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object']),
         })
 
         return context
@@ -356,7 +359,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
 
         context.update({
             'admission_condition_form': admission_condition_form,
-            'can_edit_information': self.request.user.has_perm('base.can_edit_educationgroup_pedagogy'),
+            'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object']),
             'info': {
                 'is_specific': is_specific,
                 'is_common': is_common,

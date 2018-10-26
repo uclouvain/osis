@@ -163,20 +163,20 @@ class TestComputeProposalType(TestCase):
         self.assertEqual(proposal_type.ProposalType.CREATION.name, actual_proposal_type)
 
     def test_return_suppression_type_when_suppresion_is_initial_proposal_type(self):
-        proposal = ProposalLearningUnitFactory(type=ProposalType.SUPPRESSION.name )
+        proposal = ProposalLearningUnitFactory(type=ProposalType.SUPPRESSION.name)
         actual_proposal_type = compute_proposal_type(proposal, proposal.learning_unit_year)
         self.assertEqual(proposal_type.ProposalType.SUPPRESSION.name, actual_proposal_type)
 
     def test_return_transformation_when_data_changed_consist_of_first_letter(self):
         proposal = ProposalLearningUnitFactory(type=ProposalType.MODIFICATION.name, initial_data={
-            'learning_unit_year':{'acronym': 'bibi'}})
+            'learning_unit_year': {'acronym': 'bibi'}})
 
         actual_proposal_type = compute_proposal_type(proposal, proposal.learning_unit_year)
         self.assertEqual(proposal_type.ProposalType.TRANSFORMATION.name, actual_proposal_type)
 
     def test_return_modification_when_data_changed_consist_of_other_fields_than_first_letter_or_acronym(self):
         proposal = ProposalLearningUnitFactory(type=ProposalType.MODIFICATION.name, initial_data={
-            'learning_container_year':{'common_title': 'bibi'}})
+            'learning_container_year': {'common_title': 'bibi'}})
         actual_proposal_type = compute_proposal_type(proposal, proposal.learning_unit_year)
         self.assertEqual(proposal_type.ProposalType.MODIFICATION.name, actual_proposal_type)
 
@@ -199,8 +199,8 @@ def create_academic_years():
 
     for i in range(1, academic_years_to_create + 1):
         new_academic_year = AcademicYearFactory.build(
-            year=current_academic_year.year+i,
-            start_date=current_academic_year.start_date + datetime.timedelta(days=365*i),
+            year=current_academic_year.year + i,
+            start_date=current_academic_year.start_date + datetime.timedelta(days=365 * i),
             end_date=current_academic_year.end_date + datetime.timedelta(days=365 * i))
         super(AcademicYear, new_academic_year).save()
         academic_years.append(new_academic_year)
@@ -234,7 +234,7 @@ class TestConsolidateProposals(TestCase):
             ERROR: [],
             SUCCESS: [_("Proposal %(acronym)s (%(academic_year)s) successfully consolidated.") % {
                 "acronym": proposal.learning_unit_year.acronym,
-                "academic_year":proposal.learning_unit_year.academic_year
+                "academic_year": proposal.learning_unit_year.academic_year
             } for proposal in self.proposals]
         })
 
@@ -249,7 +249,7 @@ def mock_message_by_level(*args, **kwargs):
 class TestConsolidateProposal(TestCase):
     def test_when_proposal_is_not_accepted_nor_refused(self):
         states = (state for state, value in proposal_state.ProposalState.__members__.items()
-                  if state not in PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES )
+                  if state not in PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES)
         for state in states:
             with self.subTest(state=state):
                 proposal = ProposalLearningUnitFactory(state=state)
@@ -292,7 +292,7 @@ class TestConsolidateProposal(TestCase):
                     "end_year": academic_years[initial_end_year_index].year
                 }
             })
-        random_end_acad_year_index = fuzzy.FuzzyInteger(initial_end_year_index+1, len(academic_years)-1).fuzz()
+        random_end_acad_year_index = fuzzy.FuzzyInteger(initial_end_year_index + 1, len(academic_years) - 1).fuzz()
         suppression_proposal.learning_unit_year.learning_unit.end_year = academic_years[random_end_acad_year_index].year
         suppression_proposal.learning_unit_year.learning_unit.save()
         consolidate_proposal(suppression_proposal)
@@ -308,7 +308,7 @@ class TestConsolidateProposal(TestCase):
 
     @mock.patch("base.business.learning_unit_proposal.update_learning_unit_year_with_report")
     def test_when_proposal_of_type_modification_and_accepted(self, mock_update_learning_unit_with_report):
-        generatorContainer = GenerateContainer(datetime.date.today().year-2, datetime.date.today().year)
+        generatorContainer = GenerateContainer(datetime.date.today().year - 2, datetime.date.today().year)
         proposal = ProposalLearningUnitFactory(
             state=proposal_state.ProposalState.ACCEPTED.name,
             type=proposal_type.ProposalType.MODIFICATION.name,

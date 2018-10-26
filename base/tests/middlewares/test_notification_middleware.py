@@ -46,32 +46,32 @@ class TestSendAcademicCalendarNotifications(TestCase):
                                                                    end_date=cls.today + datetime.timedelta(weeks=3))
 
     def setUp(self):
-        self.method_set = notification_middleware.set_notifications_last_read_as_today_for_user
-        self.method_get = notification_middleware.get_notifications_last_date_read_for_user
+        self.method_set = notification_middleware.set_notifications_last_read_as_now_for_user
+        self.method_get = notification_middleware.get_notifications_last_time_read_for_user
 
-        notification_middleware.set_notifications_last_read_as_today_for_user = Mock()
-        notification_middleware.get_notifications_last_date_read_for_user = Mock()
+        notification_middleware.set_notifications_last_read_as_now_for_user = Mock()
+        notification_middleware.get_notifications_last_time_read_for_user = Mock()
 
 
     def tearDown(self):
-        notification_middleware.set_notifications_last_read_as_today_for_user = self.method_set
-        notification_middleware.get_notifications_last_date_read_for_user = self.method_get
+        notification_middleware.set_notifications_last_read_as_now_for_user = self.method_set
+        notification_middleware.get_notifications_last_time_read_for_user = self.method_get
 
     def test_create_no_notifications_if_date_last_read_is_today(self):
-        notification_middleware.get_notifications_last_date_read_for_user.return_value = self.today
+        notification_middleware.get_notifications_last_time_read_for_user.return_value = self.today
         notification_middleware.send_academic_calendar_notifications(self.user)
 
         self.assertQuerysetEqual(self.user.notifications.unread(), [])
-        notification_middleware.set_notifications_last_read_as_today_for_user.assert_called_once_with(self.user)
-        notification_middleware.get_notifications_last_date_read_for_user.assert_called_once_with(self.user)
+        notification_middleware.set_notifications_last_read_as_now_for_user.assert_called_once_with(self.user)
+        notification_middleware.get_notifications_last_time_read_for_user.assert_called_once_with(self.user)
 
 
     def test_create_notifications_of_academic_calendar_events_within_2_weeks_if_no_last_read(self):
-        notification_middleware.get_notifications_last_date_read_for_user.return_value = None
+        notification_middleware.get_notifications_last_time_read_for_user.return_value = None
         notification_middleware.send_academic_calendar_notifications(self.user)
 
         self.assertCountEqual([notif.verb for notif in self.user.notifications.unread()],
                          [str(self.academic_calendar_today), str(self.academic_calendar_in_1_week)])
 
-        notification_middleware.set_notifications_last_read_as_today_for_user.assert_called_once_with(self.user)
-        notification_middleware.get_notifications_last_date_read_for_user.assert_called_once_with(self.user)
+        notification_middleware.set_notifications_last_read_as_now_for_user.assert_called_once_with(self.user)
+        notification_middleware.get_notifications_last_time_read_for_user.assert_called_once_with(self.user)

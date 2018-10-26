@@ -25,11 +25,12 @@
 ##############################################################################
 import datetime
 
+from django.db.models import Q
 from notifications.signals import notify
 
 from base.models.academic_calendar import AcademicCalendar
-from base.utils.notifications import get_notifications_last_date_read_for_user, \
-    set_notifications_last_read_as_today_for_user, are_notifications_already_loaded
+from base.utils.notifications import get_notifications_last_time_read_for_user, \
+    set_notifications_last_read_as_now_for_user, apply_function_if_data_not_in_cache
 
 ALERT_WEEK = 2
 
@@ -39,21 +40,24 @@ class NotificationMiddleware(object):
         self.get_response = get_response
 
     def __call__(self, request):
-        if not are_notifications_already_loaded(request.user):
+        if request.user.is_authenticated:
             send_academic_calendar_notifications(request.user)
 
         response = self.get_response(request)
         return response
 
 
+@apply_function_if_data_not_in_cache
 def send_academic_calendar_notifications(user):
-    date_last_read = get_notifications_last_date_read_for_user(user)
+    time_last_read = get_notifications_last_time_read_for_user(user)
     ac_qs = AcademicCalendar.objects.starting_within(weeks=ALERT_WEEK).order_by("start_date", "end_date")
 
-    if date_last_read:
-        ac_qs = ac_qs.filter(start_date__gt=date_last_read+datetime.timedelta(weeks=ALERT_WEEK))
+    if time_last_read:
+        ac_qs = ac_qs.filter(Q(start_date__gt=time_last_read+datetime.timedelta(weeks=ALERT_WEEK))
+                             | Q(changed__gt=time_last_read))
 
     for ac_obj in ac_qs:
-        notify.send(ac_obj, recipient=user, verb=str(ac_obj))
+        verb = "{} ({})".format(ac_obj.title, ac_obj.start_date.strftime("%d/%m"))
+        notify.send(ac_obj, recipient=user, verb=verb)
 
-    set_notifications_last_read_as_today_for_user(user)
+    set_notifications_last_read_as_now_for_user(user)

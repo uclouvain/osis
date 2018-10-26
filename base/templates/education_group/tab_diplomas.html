@@ -31,6 +31,9 @@
     <div class="panel-heading">
         <div class="row">
             {% include "education_group/blocks/hamburger_button.html" %}
+            <div class="pull-right" style="margin-right: 15px;">
+                {% include "education_group/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown" tab_to_show='diplomas_certificates'%}
+            </div>
         </div>
     </div>
     <div class="panel-body" id="tabs">

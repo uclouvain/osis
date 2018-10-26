@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,20 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import forms
+from django.test import TestCase
+from django.db import IntegrityError
 
-from base.forms.bootstrap import BootstrapModelForm
-from base.models import offer_year_calendar
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
+from base.tests.factories.organization import OrganizationFactory
 
 
-class OfferYearCalendarForm(BootstrapModelForm):
-    start_date = forms.DateField(widget=forms.DateInput(format='%d/%m/%Y'),
-                                 input_formats=('%d/%m/%Y', ),
-                                 required=True)
-    end_date = forms.DateField(widget=forms.DateInput(format='%d/%m/%Y'),
-                               input_formats=('%d/%m/%Y', ),
-                               required=True)
+class EducationGroupOrganizationTest(TestCase):
 
-    class Meta:
-        model = offer_year_calendar.OfferYearCalendar
-        fields = ['offer_year', 'start_date', 'end_date', 'customized']
+    def setUp(self):
+        self.education_group_year = EducationGroupYearFactory()
+        self.organization = OrganizationFactory()
+
+    def test_unique(self):
+        EducationGroupOrganizationFactory(education_group_year=self.education_group_year,
+                                          organization=self.organization)
+        with self.assertRaises(IntegrityError):
+            EducationGroupOrganizationFactory(education_group_year=self.education_group_year,
+                                              organization=self.organization)

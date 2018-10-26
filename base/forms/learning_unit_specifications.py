@@ -44,8 +44,8 @@ class LearningUnitSpecificationsForm(forms.Form):
         language_iso = self.language[0]
         texts_list = translated_text.search(entity=entity_name.LEARNING_UNIT_YEAR,
                                             reference=self.learning_unit_year.id,
-                                            language=language_iso)\
-                                    .exclude(text__isnull=True)
+                                            language=language_iso) \
+            .exclude(text__isnull=True)
 
         set_trans_txt(self, texts_list)
 

@@ -27,6 +27,7 @@ from itertools import chain
 
 from django.db import models
 from base.models.enums import structure_type
+from base.models.utils.utils import get_object_or_none
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -78,10 +79,7 @@ def find_structures():
 
 
 def find_by_id(structure_id):
-    try:
-        return Structure.objects.get(pk=structure_id)
-    except:
-        return None
+    return get_object_or_none(Structure, pk=structure_id)
 
 
 def search(acronym=None, title=None, type=None):

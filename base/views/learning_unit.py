@@ -24,17 +24,21 @@
 #
 ##############################################################################
 import collections
+import itertools
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
+from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
 from django.utils.translation import ugettext_lazy as _
 
 from attribution.business import attribution_charge_new
+from attribution.models.attribution_charge_new import AttributionChargeNew
+from attribution.models.attribution_new import AttributionNew
 from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, find_language_in_settings, \
@@ -47,7 +51,9 @@ from base.forms.learning_class import LearningClassEditForm
 from base.forms.learning_unit_component import LearningUnitComponentEditForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models import education_group_year
+from base.models.enums import learning_unit_year_subtypes
 from base.models.person import Person
+from base.views.common import display_warning_messages
 from base.views.learning_units.common import get_learning_unit_identification_context, \
     get_common_context_learning_unit_year, get_text_label_translated
 from cms.models import text_label
@@ -118,12 +124,18 @@ def learning_unit_components(request, learning_unit_year_id):
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def learning_unit_attributions(request, learning_unit_year_id):
+    person = get_object_or_404(Person, user=request.user)
     context = get_common_context_learning_unit_year(learning_unit_year_id,
-                                                    get_object_or_404(Person, user=request.user))
+                                                    person)
     context['attribution_charge_news'] = \
-        attribution_charge_new.find_attribution_charge_new_by_learning_unit_year(
+        attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
             learning_unit_year=learning_unit_year_id)
+    context["can_manage_charge_repartition"] = \
+        business_perms.is_eligible_to_manage_charge_repartition(context["learning_unit_year"], person)
     context['experimental_phase'] = True
+
+    warning_msgs = get_charge_repartition_warning_messages(context["learning_unit_year"].learning_container_year)
+    display_warning_messages(request, warning_msgs)
     return layout.render(request, "learning_unit/attributions.html", context)
 
 
@@ -307,3 +319,42 @@ def _get_changed_organization(context, context_prev, context_next):
 
 def _has_changed(data_reference, data_1, data_2, key):
     return data_reference.get(key) != data_1.get(key) or data_reference.get(key) != data_2.get(key)
+
+
+CHARGE_REPARTITION_WARNING_MESSAGE = "The sum of volumes for the partims for professor %(tutor)s is superior to the " \
+                                     "volume of parent learning unit for this professor"
+
+
+def get_charge_repartition_warning_messages(learning_container_year):
+    total_charges_by_attribution_and_learning_subtype = AttributionChargeNew.objects \
+        .filter(attribution__learning_container_year=learning_container_year) \
+        .order_by("attribution__tutor", "attribution__function", "attribution__start_year") \
+        .values("attribution__tutor", "attribution__tutor__person__first_name",
+                "attribution__tutor__person__middle_name", "attribution__tutor__person__last_name",
+                "attribution__function", "attribution__start_year",
+                "learning_component_year__learningunitcomponent__learning_unit_year__subtype") \
+        .annotate(total_volume=Sum("allocation_charge")) \
+
+    charges_by_attribution = itertools.groupby(total_charges_by_attribution_and_learning_subtype,
+                                               lambda rec: "{}_{}_{}".format(rec["attribution__tutor"],
+                                                                             rec["attribution__start_year"],
+                                                                             rec["attribution__function"]))
+    msgs = []
+    for attribution_key, charges in charges_by_attribution:
+        charges = list(charges)
+        subtype_key = "learning_component_year__learningunitcomponent__learning_unit_year__subtype"
+        full_total_charges = next(
+            (charge["total_volume"] for charge in charges if charge[subtype_key] == learning_unit_year_subtypes.FULL),
+            0)
+        partim_total_charges = next(
+            (charge["total_volume"] for charge in charges if charge[subtype_key] == learning_unit_year_subtypes.PARTIM),
+            0)
+        if partim_total_charges > full_total_charges:
+            tutor_name = Person.get_str(charges[0]["attribution__tutor__person__first_name"],
+                                        charges[0]["attribution__tutor__person__middle_name"],
+                                        charges[0]["attribution__tutor__person__last_name"])
+            tutor_name_with_function = "{} ({})".format(tutor_name,
+                                                        _(charges[0]["attribution__function"]))
+            msg = _(CHARGE_REPARTITION_WARNING_MESSAGE) % {"tutor": tutor_name_with_function}
+            msgs.append(msg)
+    return msgs

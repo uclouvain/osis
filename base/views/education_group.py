@@ -46,7 +46,9 @@ from base.models.admission_condition import AdmissionConditionLine, AdmissionCon
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
+from base.models.person import get_user_interface_language
 from cms.enums import entity_name
+from cms.models import translated_text_label
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from osis_common.decorators.ajax import ajax_required
@@ -132,6 +134,7 @@ def education_group_year_pedagogy_edit_get(request, education_group_year_id):
         'education_group_year': education_group_year,
     }
     label_name = request.GET.get('label')
+    context['label'] = label_name
     initial_values = {'label': label_name}
     fr_text = TranslatedText.objects.filter(reference=str(education_group_year_id),
                                             text_label__label=label_name,
@@ -148,6 +151,11 @@ def education_group_year_pedagogy_edit_get(request, education_group_year_id):
     form = EducationGroupPedagogyEditForm(initial=initial_values)
     context['form'] = form
     context['group_to_parent'] = request.GET.get("group_to_parent") or '0'
+    context['translated_label'] = translated_text_label.get_label_translation(
+        text_entity=entity_name.OFFER_YEAR,
+        label=label_name,
+        language=get_user_interface_language(request.user)
+    )
     return layout.render(request, 'education_group/pedagogy_edit.html', context)
 
 
@@ -285,6 +293,7 @@ def education_group_year_admission_condition_update_text_post(request, root_id, 
 def education_group_year_admission_condition_update_text_get(request, education_group_year_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     section = request.GET['section']
+    title = request.GET['title']
 
     form = UpdateTextForm(initial={
         'section': section,
@@ -294,6 +303,7 @@ def education_group_year_admission_condition_update_text_get(request, education_
 
     context = {
         'form': form,
+        'title': title,
     }
     return layout.render(request, 'education_group/condition_text_edit.html', context)
 

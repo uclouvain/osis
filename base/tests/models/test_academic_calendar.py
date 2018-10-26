@@ -153,6 +153,7 @@ class TestIsAcademicCalendarHasStarted(TestCase):
             (academic_calendar_type.COURSE_ENROLLMENT, academic_calendar_type.COURSE_ENROLLMENT),
             (academic_calendar_type.SUMMARY_COURSE_SUBMISSION, academic_calendar_type.SUMMARY_COURSE_SUBMISSION),
             (academic_calendar_type.EDUCATION_GROUP_EDITION, academic_calendar_type.EDUCATION_GROUP_EDITION),
+            (academic_calendar_type.EDITION_OF_GENERAL_INFORMATION, academic_calendar_type.EDITION_OF_GENERAL_INFORMATION),
         )
         self.assertCountEqual(
             academic_calendar_type.ACADEMIC_CALENDAR_TYPES,

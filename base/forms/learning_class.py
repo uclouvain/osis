@@ -24,8 +24,8 @@
 #
 ##############################################################################
 from django import forms
+
 from base import models as mdl
-from django.utils.translation import ugettext_lazy as _
 
 
 class LearningClassEditForm(forms.ModelForm):
@@ -45,9 +45,9 @@ class LearningClassEditForm(forms.ModelForm):
 
     def load_initial(self):
         self.fields['used_by'].initial = _get_links_between_learning_unit_component_and_class(
-                                            self.learning_unit_year,
-                                            self.learning_component_year,
-                                            self.instance).exists()
+            self.learning_unit_year,
+            self.learning_component_year,
+            self.instance).exists()
 
     def save(self, commit=True):
         super(LearningClassEditForm, self).save(commit)
@@ -66,10 +66,10 @@ class LearningClassEditForm(forms.ModelForm):
     def create_link(self):
         # Create a link between learning_class_year and learning_unit_component
         links = _get_links_between_learning_unit_component_and_class(
-                    self.learning_unit_year,
-                    self.learning_component_year,
-                    self.instance
-                )
+            self.learning_unit_year,
+            self.learning_component_year,
+            self.instance
+        )
         if not links.exists():
             learning_unit_component = mdl.learning_unit_component.search(self.learning_component_year,
                                                                          self.learning_unit_year).first()
@@ -80,10 +80,10 @@ class LearningClassEditForm(forms.ModelForm):
 
     def delete_link(self):
         links = _get_links_between_learning_unit_component_and_class(
-                    self.learning_unit_year,
-                    self.learning_component_year,
-                    self.instance
-                )
+            self.learning_unit_year,
+            self.learning_component_year,
+            self.instance
+        )
         if links.exists():
             for l in links:
                 l.delete()
@@ -92,8 +92,8 @@ class LearningClassEditForm(forms.ModelForm):
 def _get_links_between_learning_unit_component_and_class(learning_unit_year,
                                                          learning_component_year,
                                                          learning_class_year):
-    learning_unit_component_ids = list(mdl.learning_unit_component.search(learning_component_year, learning_unit_year)\
-                                                                  .values_list('id', flat=True))
+    learning_unit_component_ids = list(mdl.learning_unit_component.search(learning_component_year, learning_unit_year)
+                                       .values_list('id', flat=True))
     return mdl.learning_unit_component_class.search(
         learning_unit_component=learning_unit_component_ids,
         learning_class_year=learning_class_year

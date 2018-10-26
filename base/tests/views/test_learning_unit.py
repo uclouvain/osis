@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import datetime
-import random
 from unittest import mock
 
 import factory.fuzzy
@@ -42,6 +41,8 @@ from waffle.testutils import override_flag
 
 import base.business.learning_unit
 import base.business.xls
+from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit as learning_unit_business
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit.search_form import LearningUnitYearForm, LearningUnitSearchForm
@@ -57,9 +58,8 @@ from base.models.enums import learning_container_year_types, organization_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_MUST_HAVE_SAME_ENTITIES
 from base.models.enums.learning_unit_year_subtypes import FULL
-from base.models.person import FACULTY_MANAGER_GROUP
+from base.models.person import FACULTY_MANAGER_GROUP, Person
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -76,15 +76,17 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
+from base.tests.factories.learning_unit_component import LearningUnitComponentFactory, \
+    LecturingLearningUnitComponentFactory, PracticalLearningUnitComponentFactory
 from base.tests.factories.learning_unit_component_class import LearningUnitComponentClassFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_unit_year
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_unit_year, \
+    LearningUnitYearPartimFactory, LearningUnitYearFullFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.views.learning_unit import learning_unit_components, learning_class_year_edit, learning_unit_specifications, \
-    learning_unit_formations
+    learning_unit_formations, get_charge_repartition_warning_messages, CHARGE_REPARTITION_WARNING_MESSAGE
 from base.views.learning_unit import learning_unit_identification, learning_unit_comparison
 from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
@@ -924,8 +926,8 @@ class LearningUnitViewTestCase(TestCase):
         qs = 'learning_component_year_id={}'.format(self.learning_component_yr.id)
 
         response = self.client.post('{}?{}'.format(url, qs), data={"planned_classes": "1"})
-        self.assertRaises(ObjectDoesNotExist, learning_unit_component.LearningUnitComponent.objects.filter(
-            pk=learning_unit_compnt.id).first())
+        with self.assertRaises(ObjectDoesNotExist):
+            learning_unit_component.LearningUnitComponent.objects.filter(pk=learning_unit_compnt.id).get()
 
     def test_component_save_create_link(self):
         learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
@@ -1144,12 +1146,6 @@ class LearningUnitViewTestCase(TestCase):
     def get_empty_acronym(self):
         faulty_dict = dict(self.get_valid_data())
         faulty_dict["acronym"] = ""
-        return faulty_dict
-
-    def get_faulty_allocation_entity(self):
-        faulty_dict = dict(self.get_valid_data())
-        faulty_dict["container_type"] = random.choice(LEARNING_CONTAINER_YEAR_TYPES_MUST_HAVE_SAME_ENTITIES)
-        faulty_dict["allocation_entity"] = self.entity_version_2.id
         return faulty_dict
 
     def get_faulty_requirement_entity(self):
@@ -1532,4 +1528,86 @@ class TestLearningAchievements(TestCase):
             self.assertTrue(result[key])
 
 
+class TestGetChargeRepartitionWarningMessage(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.full_luy = LearningUnitYearFullFactory()
+        cls.partim_luy_1 = LearningUnitYearPartimFactory(academic_year=cls.full_luy.academic_year,
+                                                         learning_container_year=cls.full_luy.learning_container_year)
+        cls.partim_luy_2 = LearningUnitYearPartimFactory(academic_year=cls.full_luy.academic_year,
+                                                         learning_container_year=cls.full_luy.learning_container_year)
+        cls.attribution_full = AttributionNewFactory(
+            learning_container_year=cls.full_luy.learning_container_year
+        )
+        cls.full_lecturing_unit_component = LecturingLearningUnitComponentFactory(learning_unit_year=cls.full_luy)
+        cls.full_practical_unit_component = PracticalLearningUnitComponentFactory(learning_unit_year=cls.full_luy)
 
+        cls.partim_1_lecturing_unit_component = \
+            LecturingLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_1)
+        cls.partim_1_practical_unit_component = \
+            PracticalLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_1)
+
+        cls.partim_2_lecturing_unit_component = \
+            LecturingLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_2)
+        cls.partim_2_practical_unit_component = \
+            PracticalLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_2)
+
+        cls.charge_lecturing = AttributionChargeNewFactory(
+            attribution=cls.attribution_full,
+            learning_component_year=cls.full_lecturing_unit_component.learning_component_year,
+            allocation_charge=20
+        )
+        cls.charge_practical = AttributionChargeNewFactory(
+            attribution=cls.attribution_full,
+            learning_component_year=cls.full_practical_unit_component.learning_component_year,
+            allocation_charge=20
+        )
+
+        cls.attribution_partim_1 = cls.attribution_full
+        cls.attribution_partim_1.id = None
+        cls.attribution_partim_1.save()
+
+        cls.attribution_partim_2 = cls.attribution_full
+        cls.attribution_partim_2.id = None
+        cls.attribution_partim_2.save()
+
+    def setUp(self):
+        self.charge_lecturing_1 = AttributionChargeNewFactory(
+            attribution=self.attribution_partim_1,
+            learning_component_year=self.partim_1_lecturing_unit_component.learning_component_year,
+            allocation_charge=10
+        )
+        self.charge_practical_1 = AttributionChargeNewFactory(
+            attribution=self.attribution_partim_1,
+            learning_component_year=self.partim_1_practical_unit_component.learning_component_year,
+            allocation_charge=10
+        )
+
+        self.charge_lecturing_2 = AttributionChargeNewFactory(
+            attribution=self.attribution_partim_2,
+            learning_component_year=self.partim_2_lecturing_unit_component.learning_component_year,
+            allocation_charge=10
+        )
+        self.charge_practical_2 = AttributionChargeNewFactory(
+            attribution=self.attribution_partim_2,
+            learning_component_year=self.partim_2_practical_unit_component.learning_component_year,
+            allocation_charge=10
+        )
+
+    def test_should_not_give_warning_messages_when_volume_partim_inferior_or_equal_to_volume_parent(self):
+        msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
+
+        self.assertEqual(msgs,
+                         [])
+
+    def test_should_give_warning_messages_when_volume_partim_superior_to_volume_parent(self):
+        self.charge_lecturing_1.allocation_charge = 50
+        self.charge_lecturing_1.save()
+
+        msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
+        tutor_name = Person.get_str(self.attribution_full.tutor.person.first_name,
+                                    self.attribution_full.tutor.person.middle_name,
+                                    self.attribution_full.tutor.person.last_name)
+        tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.function))
+        self.assertListEqual(msgs,
+                             [_(CHARGE_REPARTITION_WARNING_MESSAGE) % {"tutor":tutor_name_with_function}])

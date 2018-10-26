@@ -38,7 +38,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl
 from base.models.utils import native
-from base.views import academic_calendar
 from . import layout
 
 ITEMS_PER_PAGE = 25

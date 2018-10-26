@@ -30,7 +30,7 @@ from django.db.models import Count, OuterRef, Exists
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ngettext
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import entity_version
@@ -49,9 +49,38 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 class EducationGroupYearAdmin(OsisModelAdmin):
     list_display = ('acronym', 'title', 'academic_year', 'education_group_type', 'changed')
     list_filter = ('academic_year', 'education_group_type')
-    raw_id_fields = ('education_group_type', 'academic_year', 'education_group', 'enrollment_campus',
-                     'main_teaching_campus', 'primary_language')
+    raw_id_fields = (
+        'education_group_type', 'academic_year',
+        'education_group', 'enrollment_campus',
+        'main_teaching_campus', 'primary_language'
+    )
     search_fields = ['acronym']
+
+    actions = [
+        'resend_messages_to_queue',
+        'apply_education_group_year_postponement'
+    ]
+
+    def apply_education_group_year_postponement(self, request, queryset):
+        # Potential circular imports
+        from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponement
+        from base.views.common import display_success_messages, display_error_messages
+
+        result, errors = EducationGroupAutomaticPostponement(queryset).postpone()
+        count = len(result)
+        display_success_messages(
+            request, ngettext(
+                '%(count)d education group has been postponed with success',
+                '%(count)d education groups have been postponed with success', count
+            ) % {'count': count}
+        )
+        if errors:
+            display_error_messages(request, "{} : {}".format(
+                _("The following education groups ended with error"),
+                ", ".join([str(error) for error in errors])
+            ))
+
+    apply_education_group_year_postponement.short_description = _("Apply postponement on education group year")
 
 
 class EducationGroupYearManager(models.Manager):
@@ -218,9 +247,10 @@ class EducationGroupYear(models.Model):
         max_length=320,
         blank=True,
         default="",
+        verbose_name=_('professionnal_title')
     )
 
-    joint_diploma = models.BooleanField(default=False)
+    joint_diploma = models.BooleanField(default=False, verbose_name=_('university_certificate_desc'))
 
     diploma_printing_orientation = models.CharField(
         max_length=30,
@@ -233,6 +263,7 @@ class EducationGroupYear(models.Model):
         max_length=140,
         blank=True,
         default="",
+        verbose_name=_('diploma_title')
     )
 
     inter_organization_information = models.CharField(
@@ -292,7 +323,6 @@ class EducationGroupYear(models.Model):
         db_index=True,
         null=True,
         verbose_name=_("code"),
-        validators=[RegexValidator(regex="^([A-Z]{3,5})([0-9]{3})([A-Z])$")]
     )
 
     # TODO :: rename credits into expected_credits
@@ -531,7 +561,7 @@ class EducationGroupYear(models.Model):
 
     @cached_property
     def coorganizations(self):
-        return self.educationgrouporganization_set.all()
+        return self.educationgrouporganization_set.all().order_by('all_students')
 
     def is_training(self):
         if self.education_group_type:
@@ -609,6 +639,12 @@ class EducationGroupYear(models.Model):
             raise ValidationError({'duration': _("field_is_required")})
         elif self.duration is not None and self.duration_unit is None:
             raise ValidationError({'duration_unit': _("field_is_required")})
+
+    def next_year(self):
+        try:
+            return self.education_group.educationgroupyear_set.get(academic_year__year=(self.academic_year.year + 1))
+        except EducationGroupYear.DoesNotExist:
+            return None
 
 
 def find_by_id(an_id):

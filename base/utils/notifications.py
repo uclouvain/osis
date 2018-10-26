@@ -24,60 +24,85 @@
 #
 ##############################################################################
 import datetime
+import pickle
 import time
 
 from base.utils.cache import cache
 
-CACHE_NOTIFICATIONS_TIMEOUT = 1800  # seconds -> 30 min
-NOTIFICATIONS_KEY = "notifications_user_{}"
+
+CACHE_NOTIFICATIONS_TIMEOUT = 300  # seconds -> 5 min
+NOTIFICATIONS_KEY = "notifications_unread_user_{}"
 NOTIFICATIONS_TIMESTAMP = "notifications_last_read_user_{}"
 
 
+def cache_queryset_function(function):
+    def wrapper(user, *args, **kwargs):
+        cache_key = make_notifications_cache_key(user)
+
+        pickled_qs = cache.get(cache_key)
+        if pickled_qs:
+            return pickle.loads(pickled_qs)
+
+        qs = function(user, *args, **kwargs)
+        cache.set(cache_key, pickle.dumps(qs), CACHE_NOTIFICATIONS_TIMEOUT)
+        return qs
+    return wrapper
+
+
+def invalidate_cache(function):
+    def wrapper(user, *args, **kwargs):
+        cache_key = make_notifications_cache_key(user)
+        cache.delete(cache_key)
+        return function(user, *args, **kwargs)
+    return wrapper
+
+
+def apply_function_if_data_not_in_cache(function):
+    def wrapper(user, *args, **kwargs):
+        cache_key = make_notifications_cache_key(user)
+        if cache.get(cache_key) is not None:
+            return None
+        return function(user, *args, **kwargs)
+    return wrapper
+
+
+@cache_queryset_function
 def get_user_notifications(user):
-    notifications_cached = get_notifications_in_cache(user)
-    return notifications_cached if notifications_cached is not None else set_notifications_in_cache(user)
+    return user.notifications.all().order_by("-unread")
 
 
-def get_notifications_in_cache(user):
-    cache_key = make_notifications_cache_key(user)
-    return cache.get(cache_key)
+def get_user_unread_notifications(user):
+    return user.notifications.unread()
 
 
-def set_notifications_in_cache(user):
-    cache_key = make_notifications_cache_key(user)
-    notifications = [notification.verb for notification in user.notifications.unread()]
-
-    cache.set(cache_key, notifications, CACHE_NOTIFICATIONS_TIMEOUT)
-
-    return notifications
+def get_user_read_notifications(user):
+    return user.notifications.read()
 
 
+@invalidate_cache
+def mark_notifications_as_read(user):
+    user.notifications.mark_all_as_read()
+
+
+@invalidate_cache
 def clear_user_notifications(user):
-    cache_key = make_notifications_cache_key(user)
-    cache.delete(cache_key)
-
-    user.notifications.mark_all_as_deleted()
+    user.notifications.all().delete()
 
 
-def are_notifications_already_loaded(user):
-    cache_key = make_notifications_cache_key(user)
-    return cache_key in cache
-
-
-def get_notifications_last_date_read_for_user(user):
+def get_notifications_last_time_read_for_user(user):
     cache_key = make_notifications_timestamp_cache_key(user)
     timestamp_last_read = cache.get(cache_key)
-    return datetime.date.fromtimestamp(float(timestamp_last_read)) if timestamp_last_read else None
+    return datetime.datetime.fromtimestamp(float(timestamp_last_read)) if timestamp_last_read else None
 
 
-def set_notifications_last_read_as_today_for_user(user):
+def set_notifications_last_read_as_now_for_user(user):
     cache_key = make_notifications_timestamp_cache_key(user)
-    cache.set(cache_key, str(time.time()))
-
-
-def make_notifications_cache_key(user):
-    return NOTIFICATIONS_KEY.format(user.pk)
+    cache.set(cache_key, str(time.time()), timeout=None)
 
 
 def make_notifications_timestamp_cache_key(user):
     return NOTIFICATIONS_TIMESTAMP.format(user.pk)
+
+
+def make_notifications_cache_key(user):
+    return NOTIFICATIONS_KEY.format(user.pk)

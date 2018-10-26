@@ -106,6 +106,15 @@ class LearningUnitYearFakerFactory(DjangoModelFactory):
     periodicity = factory.Iterator(learning_unit_year_periodicity.PERIODICITY_TYPES, getter=operator.itemgetter(0))
 
 
+class LearningUnitYearFullFactory(LearningUnitYearFactory):
+    subtype = learning_unit_year_subtypes.FULL
+
+
+class LearningUnitYearPartimFactory(LearningUnitYearFactory):
+    subtype = learning_unit_year_subtypes.PARTIM
+
+
+
 def create_learning_unit_year(academic_yr, title, learning_unit):
     return LearningUnitYearFactory(acronym='LDROI1001',
                                    academic_year=academic_yr,

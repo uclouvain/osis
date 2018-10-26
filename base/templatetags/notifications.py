@@ -35,3 +35,10 @@ def get_notifications(context):
     user = context["request"].user
 
     return get_user_notifications(user)
+
+
+@register.simple_tag()
+def get_number_unread_notifications(notifications):
+    return len(
+        [notification for notification in notifications if notification.unread]
+    )
