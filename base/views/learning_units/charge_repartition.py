@@ -63,27 +63,6 @@ class ChargeRepartitionBaseViewMixin(RulesRequiredMixin):
     def parent_luy(self):
         return self.luy.parent
 
-    @staticmethod
-    def find_attributions(luy):
-        lecturing_charges = AttributionChargeNew.objects \
-            .filter(learning_component_year__type=learning_component_year_type.LECTURING)
-        prefetch_lecturing_charges = Prefetch("attributionchargenew_set", queryset=lecturing_charges,
-                                              to_attr="lecturing_charges")
-
-        practical_charges = AttributionChargeNew.objects \
-            .filter(learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES)
-        prefetch_practical_charges = Prefetch("attributionchargenew_set", queryset=practical_charges,
-                                              to_attr="practical_charges")
-
-        learning_unit_components = LearningUnitComponent.objects.filter(learning_unit_year=luy)
-        attributions = AttributionNew.objects \
-            .filter(attributionchargenew__learning_component_year__learningunitcomponent__in=learning_unit_components) \
-            .distinct("id") \
-            .prefetch_related(prefetch_lecturing_charges) \
-            .prefetch_related(prefetch_practical_charges) \
-            .select_related("tutor__person")
-        return attributions
-
     @cached_property
     def attribution(self):
         lecturing_charges = AttributionChargeNew.objects \
@@ -103,11 +82,6 @@ class ChargeRepartitionBaseViewMixin(RulesRequiredMixin):
             .get(id=self.kwargs["attribution_id"])
         return attribution
 
-    @cached_property
-    def attributions(self):
-        # TO DEFINE
-        return AttributionNew.objects.none()
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["learning_unit_year"] = self.luy
@@ -122,7 +96,30 @@ class SelectAttributionView(ChargeRepartitionBaseViewMixin, TemplateView):
 
     @cached_property
     def attributions(self):
-        return self.find_attributions(self.parent_luy)
+        lecturing_charges = AttributionChargeNew.objects \
+            .filter(learning_component_year__type=learning_component_year_type.LECTURING)
+        prefetch_lecturing_charges = Prefetch("attributionchargenew_set", queryset=lecturing_charges,
+                                              to_attr="lecturing_charges")
+
+        practical_charges = AttributionChargeNew.objects \
+            .filter(learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES)
+        prefetch_practical_charges = Prefetch("attributionchargenew_set", queryset=practical_charges,
+                                              to_attr="practical_charges")
+        attributions_to_exclude = AttributionChargeNew.objects \
+            .filter(learning_component_year__learningunitcomponent__learning_unit_year=self.luy) \
+            .annotate(id_text=Concat("attribution__tutor__person__global_id", "attribution__function")) \
+            .values_list("id_text", flat=True)
+
+        parent_learning_unit_components = LearningUnitComponent.objects.filter(learning_unit_year=self.parent_luy)
+        parent_attributions = AttributionNew.objects \
+            .filter(attributionchargenew__learning_component_year__learningunitcomponent__in=parent_learning_unit_components) \
+            .distinct("id") \
+            .annotate(id_text=Concat("tutor__person__global_id", "function")) \
+            .exclude(id_text__in=attributions_to_exclude) \
+            .prefetch_related(prefetch_lecturing_charges) \
+            .prefetch_related(prefetch_practical_charges) \
+            .select_related("tutor__person")
+        return parent_attributions
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -141,8 +138,10 @@ class AddChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, Su
         return context
 
     def get_initial(self):
-        lecturing_allocation_charge = self.attribution.lecturing_charges[0].allocation_charge
-        practical_allocation_charge = self.attribution.practical_charges[0].allocation_charge
+        lecturing_allocation_charge = self.attribution.lecturing_charges[0].allocation_charge \
+            if self.attribution.lecturing_charges else None
+        practical_allocation_charge = self.attribution.practical_charges[0].allocation_charge \
+            if self.attribution.practical_charges else None
         initial_data = [
             {"allocation_charge": lecturing_allocation_charge},
             {"allocation_charge": practical_allocation_charge}
