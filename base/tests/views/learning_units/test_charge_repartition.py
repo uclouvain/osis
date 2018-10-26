@@ -123,9 +123,10 @@ class TestSelectAttributionView(TestChargeRepartitionMixin, TestCase):
         response = self.client.get(self.url)
 
         context = response.context
-        self.assertListEqual(
+        self.assertQuerysetEqual(
             context["attributions"],
-            [(self.attribution_full, self.charge_lecturing_full, self.charge_practical_full)]
+            [self.attribution_full],
+            transform=lambda obj: obj
         )
 
     def test_should_exclude_attributions_for_which_repartition_has_been_done(self):
@@ -145,7 +146,7 @@ class TestSelectAttributionView(TestChargeRepartitionMixin, TestCase):
         response = self.client.get(self.url)
 
         context = response.context
-        self.assertListEqual(
+        self.assertQuerysetEqual(
             context["attributions"],
             []
         )
