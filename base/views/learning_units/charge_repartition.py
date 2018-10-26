@@ -133,7 +133,6 @@ class SelectAttributionView(ChargeRepartitionBaseViewMixin, TemplateView):
 class AddChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
     template_name = "learning_unit/add_charge_repartition.html"
     form_class = AttributionChargeRepartitionFormSet
-    success_message = _("Repartition added")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -161,11 +160,14 @@ class AddChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, Su
 
         return super().form_valid(formset)
 
+    def get_success_message(self, cleaned_data):
+        return _("Repartition added for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
+                                                                     "function": _(self.attribution.function)}
+
 
 class EditChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
     template_name = "learning_unit/add_charge_repartition.html"
     form_class = AttributionChargeNewFormSet
-    success_message = _("Repartition edited")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -187,12 +189,15 @@ class EditChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, S
             form.save()
         return super().form_valid(formset)
 
+    def get_success_message(self, cleaned_data):
+        return _("Repartition modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
+                                                                         "function": _(self.attribution.function)}
+
 
 class RemoveChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin, SuccessMessageMixin, DeleteView):
     model = AttributionNew
     template_name = "learning_unit/remove_charge_repartition_confirmation.html"
     pk_url_kwarg = "attribution_id"
-    success_message = _("Repartition removed")
 
     def delete(self, request, *args, **kwargs):
         delete_attribution(self.kwargs["attribution_id"])
@@ -204,6 +209,10 @@ class RemoveChargeRepartition(ChargeRepartitionBaseViewMixin, AjaxTemplateMixin,
         context = super().get_context_data(**kwargs)
         context["attribution"] = self.attribution
         return context
+
+    def get_success_message(self, cleaned_data):
+        return _("Repartition removed for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
+                                                                        "function": _(self.attribution.function)}
 
 
 def delete_attribution(attribution_pk):

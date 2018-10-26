@@ -354,7 +354,7 @@ def get_charge_repartition_warning_messages(learning_container_year):
                                         charges[0]["attribution__tutor__person__middle_name"],
                                         charges[0]["attribution__tutor__person__last_name"])
             tutor_name_with_function = "{} ({})".format(tutor_name,
-                                                        charges[0]["attribution__function"])
+                                                        _(charges[0]["attribution__function"]))
             msg = _(CHARGE_REPARTITION_WARNING_MESSAGE) % {"tutor": tutor_name_with_function}
             msgs.append(msg)
     return msgs
