@@ -2138,6 +2138,16 @@
                 "offeryear"
             ],
             [
+                "change_educationgroup",
+                "base",
+                "educationgroup"
+            ],
+            [
+                "change_educationgroupyear",
+                "base",
+                "educationgroupyear"
+            ],
+            [
                 "is_administrator",
                 "base",
                 "person"
@@ -2351,6 +2361,21 @@
                 "delete_propositionrole",
                 "dissertation",
                 "propositionrole"
+            ],
+            [
+                "add_topiceducationgroup",
+                "dissertation",
+                "topiceducationgroup"
+            ],
+            [
+                "change_topiceducationgroup",
+                "dissertation",
+                "topiceducationgroup"
+            ],
+            [
+                "delete_topiceducationgroup",
+                "dissertation",
+                "topiceducationgroup"
             ],
             [
                 "change_messagehistory",
