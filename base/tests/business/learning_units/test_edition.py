@@ -455,10 +455,10 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertEqual(len(error_list), 10)
 
         tests_cases = [
-            {'field': 'volume_additional_requirement_entity_1', 'value': 10.0, 'next_value': 20.0},
-            {'field': 'volume_total', 'value': 60.0, 'next_value': 50.0},
-            {'field': 'volume_q1', 'value': 40.0, 'next_value': 35.0},
-            {'field': 'volume_q2', 'value': 20.0, 'next_value': 15.0}
+            {'field': 'volume_additional_requirement_entity_1', 'value': "10.00", 'next_value': "20.00"},
+            {'field': 'volume_total', 'value': "60.0", 'next_value': "50.0"},
+            {'field': 'volume_q1', 'value': "40.0", 'next_value': "35.0"},
+            {'field': 'volume_q2', 'value': "20.0", 'next_value': "15.0"}
         ]
         for test in tests_cases:
             with self.subTest(test=test):

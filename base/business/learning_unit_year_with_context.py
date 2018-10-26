@@ -121,13 +121,13 @@ def _get_requirement_entities_volumes(entity_components_year):
         entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
     ]
     return {
-        entity_type: _get_floated_only_element_of_list([ecy.repartition_volume for ecy in entity_components_year
+        entity_type: _get_decimal_only_element_of_list([ecy.repartition_volume for ecy in entity_components_year
                                                         if ecy.entity_container_year.type == entity_type], default=0)
         for entity_type in needed_entity_types
     }
 
 
-def _get_floated_only_element_of_list(a_list, default=None):
+def _get_decimal_only_element_of_list(a_list, default=None):
     len_of_list = len(a_list)
     if not len_of_list:
         return default
