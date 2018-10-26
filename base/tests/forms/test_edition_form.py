@@ -327,7 +327,7 @@ class TestVolumeEditionFormsetContainer(TestCase):
         )
 
         form.is_valid()
-        self.assertEqual(form.errors['volume_q1'], [gettext('The volume cannot be set to 0.')])
+        self.assertEqual(form.errors['volume_q1'], [gettext('The volume can not be set to 0.')])
 
         form = VolumeEditionForm(
             data={'volume_q1': 12, 'volume_q2': 0},
@@ -337,7 +337,7 @@ class TestVolumeEditionFormsetContainer(TestCase):
         )
 
         form.is_valid()
-        self.assertEqual(form.errors['volume_q2'], [gettext('The volume cannot be set to 0.')])
+        self.assertEqual(form.errors['volume_q2'], [gettext('The volume can not be set to 0.')])
 
 
 def get_valid_formset_data(prefix, is_partim=False):
