@@ -52,7 +52,6 @@ class VolumeField(forms.DecimalField):
 
 
 class VolumeEditionForm(forms.Form):
-
     requirement_entity_key = 'volume_' + entity_types.REQUIREMENT_ENTITY.lower()
     additional_requirement_entity_1_key = 'volume_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1.lower()
     additional_requirement_entity_2_key = 'volume_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2.lower()
@@ -213,6 +212,7 @@ class VolumeEditionFormsetContainer:
     """
     Create and Manage a set of VolumeEditionFormsets
     """
+
     def __init__(self, request, learning_units, person):
         self.formsets = OrderedDict()
         self.learning_units = learning_units
@@ -309,15 +309,7 @@ class SimplifiedVolumeForm(forms.ModelForm):
             self.instance.planned_classes = 0
         else:
             self.instance.planned_classes = 1
-        # FIXME: Use Instance in formset
-        instance, created = LearningComponentYear.objects.update_or_create(
-            learning_container_year=self.instance.learning_container_year,
-            type=self.instance.type,
-            defaults={'hourly_volume_total_annual': self.instance.hourly_volume_total_annual,
-                      'hourly_volume_partial_q1': self.instance.hourly_volume_partial_q1,
-                      'hourly_volume_partial_q2': self.instance.hourly_volume_partial_q2,
-                      'acronym': self.instance.acronym}
-        )
+        instance = super().save(commit)
         LearningUnitComponent.objects.update_or_create(
             learning_unit_year=self._learning_unit_year,
             learning_component_year=instance

@@ -29,6 +29,7 @@ from decimal import Decimal
 
 import factory.fuzzy
 
+from base.forms.learning_unit.learning_unit_create import DEFAULT_ACRONYM_COMPONENT
 from base.models import academic_year as mdl_academic_year
 from base.models.academic_year import LEARNING_UNIT_CREATION_SPAN_YEARS, compute_max_academic_year_adjournment
 from base.models.enums import entity_container_year_link_type, learning_container_year_types, \
@@ -418,17 +419,20 @@ def _get_default_common_value_learning_unit_year(learning_container_year, subtyp
 
 def _setup_learning_component_cm(learning_unit_year):
     return _setup_learning_component_year(learning_unit_year,
-                                          component_type.LECTURING)
+                                          component_type.LECTURING,
+                                          DEFAULT_ACRONYM_COMPONENT["LECTURING"])
 
 
 def _setup_learning_component_tp(learning_unit_year):
     return _setup_learning_component_year(learning_unit_year,
-                                          component_type.PRACTICAL_EXERCISES)
+                                          component_type.PRACTICAL_EXERCISES,
+                                          DEFAULT_ACRONYM_COMPONENT["PRACTICAL_EXERCISES"])
 
 
-def _setup_learning_component_year(learning_unit_year, component_type):
+def _setup_learning_component_year(learning_unit_year, component_type, acronym):
     component = LearningComponentYearFactory(learning_container_year=learning_unit_year.learning_container_year,
                                              type=component_type,
+                                             acronym=acronym,
                                              planned_classes=1)
 
     LearningUnitComponentFactory(learning_unit_year=learning_unit_year, learning_component_year=component)
