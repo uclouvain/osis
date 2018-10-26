@@ -56,8 +56,8 @@
                                             <label id="label_{{ label.label }}"
                                                    {% if label.type == 'common' %}class="education_group_year-common italic"{% endif %}>{{ label.translation }}</label>
                                             {% if label.type == 'specific' and can_edit_information %}
-                                                <a class="pedagogy-edit-btn pull-right" href="#"
-                                                   data-form="{{ post_url }}?label={{ label.translation.split|join:"%20"}}"
+                                                <a class="pedagogy-edit-btn" href="#"
+                                                   data-form="{{ post_url }}?label={{ label.label }}"
                                                    title="{% trans 'edit' %}">
                                                     <span class="glyphicon glyphicon-edit"
                                                           aria-hidden="true"></span>
@@ -99,16 +99,15 @@
 {% block script %}
     <script>
         {% if can_edit_information %}
-
-        $('div#panel-data').on('click', 'a.pedagogy-edit-btn', function (evt) {
-            evt.preventDefault();
-            var url = $(this).data("form");
-            var pedagogy_edit_modal = $("#pedagogy_edit");
-            pedagogy_edit_modal.load(url, function () {
-                $(this).modal('show');
+            $('div#panel-data').on('click', 'a.pedagogy-edit-btn', function (evt) {
+                evt.preventDefault();
+                var url = $(this).data("form");
+                var pedagogy_edit_modal = $("#pedagogy_edit");
+                pedagogy_edit_modal.load(url, function () {
+                    $(this).modal('show');
+                });
+                return false;
             });
-            return false;
-        });
         {% endif %}
     </script>
 {% endblock %}

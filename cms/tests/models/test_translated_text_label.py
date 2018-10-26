@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,29 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.test import TestCase
 
-from django.http import JsonResponse
-
-from base.models.campus import Campus
-from base.models.organization_address import find_distinct_by_country
-from osis_common.decorators.ajax import ajax_required
-
-
-# TODO :: On peut combiner les différentes vues en faisant passer les paramètres via le GET et en uniformisant
-# le JsonResponse.
-@ajax_required
-def filter_cities_by_country(request):
-    """ Ajax request to filter the cities choice field """
-    country = request.GET.get('country')
-    cities = find_distinct_by_country(country)
-    return JsonResponse(list(cities), safe=False)
+from cms.enums import entity_name
+from cms.models.translated_text_label import get_label_translation
+from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 
 
-@ajax_required
-def filter_campus_by_city(request):
-    """ Ajax request to filter the campus choice field """
-    city = request.GET.get('city')
-    campuses = Campus.objects.filter(
-        organization__organizationaddress__city=city
-    ).distinct('organization__name').order_by('organization__name').values('pk', 'organization__name')
-    return JsonResponse(list(campuses), safe=False)
+class TranslatedTextLabelTest(TestCase):
+    def test_get_label_translation(self):
+        text_label = TextLabelFactory(
+            entity=entity_name.OFFER_YEAR,
+            label='TEST_LABEL'
+        )
+        TranslatedTextLabelFactory(
+            language='fr-be',
+            text_label=text_label,
+            label='TEST_LABEL_TRANSLATED'
+        )
+        self.assertEqual(
+            get_label_translation(
+                text_entity=entity_name.OFFER_YEAR,
+                label='TEST_LABEL',
+                language='fr-be'
+            ),
+            'TEST_LABEL_TRANSLATED'
+        )

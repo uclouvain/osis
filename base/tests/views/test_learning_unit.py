@@ -926,8 +926,8 @@ class LearningUnitViewTestCase(TestCase):
         qs = 'learning_component_year_id={}'.format(self.learning_component_yr.id)
 
         response = self.client.post('{}?{}'.format(url, qs), data={"planned_classes": "1"})
-        self.assertRaises(ObjectDoesNotExist, learning_unit_component.LearningUnitComponent.objects.filter(
-            pk=learning_unit_compnt.id).first())
+        with self.assertRaises(ObjectDoesNotExist):
+            learning_unit_component.LearningUnitComponent.objects.filter(pk=learning_unit_compnt.id).get()
 
     def test_component_save_create_link(self):
         learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
@@ -1608,6 +1608,6 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
         tutor_name = Person.get_str(self.attribution_full.tutor.person.first_name,
                                     self.attribution_full.tutor.person.middle_name,
                                     self.attribution_full.tutor.person.last_name)
-        tutor_name_with_function = "{} ({})".format(tutor_name, self.attribution_full.function)
+        tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.function))
         self.assertListEqual(msgs,
                              [_(CHARGE_REPARTITION_WARNING_MESSAGE) % {"tutor":tutor_name_with_function}])

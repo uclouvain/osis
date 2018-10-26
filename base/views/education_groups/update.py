@@ -23,9 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from gettext import ngettext
+
 from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.html import format_html
@@ -33,6 +36,7 @@ from django.utils.translation import ugettext_lazy as _
 from waffle.decorators import waffle_flag
 
 from base import models as mdl_base
+from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.forms.education_group.common import EducationGroupModelForm
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
@@ -40,10 +44,14 @@ from base.forms.education_group.training import TrainingForm
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_categories import TRAINING
 from base.views import layout
-from base.views.common import display_success_messages, display_warning_messages
+from base.views.common import display_success_messages, display_warning_messages, display_error_messages
+from base.views.education_groups import perms
+from base.views.education_groups.detail import EducationGroupGenericDetailView
 from base.views.education_groups.perms import can_change_education_group
 from base.views.learning_units.perms import PermissionDecoratorWithUser
+from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 
 
 @login_required
@@ -115,9 +123,9 @@ def _get_success_redirect_url(root, education_group_year):
     is_current_viewed_deleted = not mdl_base.education_group_year.search(id=education_group_year.id).exists()
     if is_current_viewed_deleted:
         # Case current updated is deleted, we will take the latest existing [At this stage, we always have lastest]
-        qs = mdl_base.education_group_year.search().filter(education_group=education_group_year.education_group)\
-                                                   .order_by('academic_year__year')\
-                                                   .last()
+        qs = mdl_base.education_group_year.search().filter(education_group=education_group_year.education_group) \
+            .order_by('academic_year__year') \
+            .last()
         url = reverse("education_group_read", args=[qs.pk, qs.id])
     else:
         url = reverse("education_group_read", args=[root.pk, education_group_year.id])
@@ -190,3 +198,47 @@ def _update_mini_training(request, education_group_year, root):
         "education_group_year": education_group_year,
         "form_education_group": form.forms[EducationGroupModelForm]
     })
+
+
+class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, EducationGroupGenericDetailView):
+    template_name = "education_group/group_element_year/confirm_postpone_content_inner.html"
+
+    # FlagMixin
+    flag = "education_group_update"
+
+    # RulesRequiredMixin
+    rules = [perms.can_change_education_group]
+
+    limited_by_category = TRAINING
+    with_tree = False
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["warning_message"] = _("Are you sure you want to postpone the content of %(root)s?") % {
+            "root": self.root
+        }
+        return context
+
+    def post(self, request, **kwargs):
+        success = ""
+        error = ""
+        try:
+            postponer = PostponeContent(self.get_root())
+            postponer.postpone()
+            count = len(postponer.result)
+            success = ngettext(
+                '%(count)d education group has been postponed with success',
+                '%(count)d education groups have been postponed with success', count
+            ) % {'count': count}
+            display_success_messages(request, success)
+        except NotPostponeError as e:
+            error = str(e)
+            display_error_messages(request, error)
+
+        return redirect(reverse(
+                "education_group_read",
+                args=[
+                    kwargs["root_id"],
+                    kwargs["education_group_year_id"]
+                ]
+            ))

@@ -27,7 +27,7 @@
 {% endcomment %}
 {% block details %}
     <style>
-        dt{
+        dt {
             margin-bottom: 5px;
         }
     </style>
@@ -69,7 +69,7 @@
                         </dl>
                         {% dl_with_parent 'activities in English' 'english_activities' %}
                         {% dl_with_parent 'other_language_activities' %}
-                        {% dl_with_parent  'main domain' 'main_domain' %}
+                        {% dl_with_parent 'main domain' 'main_domain' %}
 
                         {# TODO dl_with_parent needs to manage list #}
                         <div>
@@ -111,83 +111,147 @@
         </div>
         {% include 'education_group/blocks/remarks.html' %}
         <div class="panel panel-default">
-            <div class="panel-body">
+            <div class="panel-body" id="panel_coorganization">
                 <label>{% trans 'program_coorganization' %}</label>
                 {% if education_group_year.coorganizations %}
                     <table class="table" id="tbl_coorganization">
                         <thead>
-                            <tr>
-                                <th>{% trans 'institution' %}</th>
-                                <th></th>
-                                <th>{% trans 'for_all_students' %}</th>
-                                <th>{% trans 'Reference institution' %}</th>
-                                <th>{% trans 'UCL Diploma' %}</th>
-                                <th>{% trans 'Producing certificat' %}</th>
-                                <th>{% trans 'Producing annexe' %}</th>
-                            </tr>
+                        <tr>
+                            <th>{% trans 'institution' %}</th>
+                            <th></th>
+                            <th>{% trans 'for_all_students' %}</th>
+                            <th>{% trans 'Reference institution' %}</th>
+                            <th>{% trans 'UCL Diploma' %}</th>
+                            <th>{% trans 'Producing certificat' %}</th>
+                            <th>{% trans 'Producing annexe' %}</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
                         </thead>
                         <tbody>
-                            {% for coorganization in education_group_year.coorganizations %}
-                                <tr>
-                                    <td>
+                        {% for coorganization in education_group_year.coorganizations %}
+                            <tr>
+                                <td>
+                                    <span id="coorganization_id_{{ coorganization.id }}">
+                                        {{ coorganization.address.country.name }} - {{ coorganization.address.city }}<br>
+                                    {{ coorganization.organization.name }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if coorganization.organization.logo %}
+                                        <img src="{{ coorganization.organization.logo.url }}" width="50px"/>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ coorganization.all_students | yesno | title }}
+                                </td>
+                                <td>
+                                    {{ coorganization.enrollment_place | yesno | title }}
+                                </td>
+                                <td>
+                                    {% if coorganization.diploma %}
+                                        {% trans coorganization.diploma %}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ coorganization.is_producing_cerfificate | yesno |title }}
+                                </td>
+                                <td>
+                                    {{ coorganization.is_producing_annexe | yesno | title }}
+                                </td>
+                                <td>
+                                    {% if  can_change_education_group %}
+                                    <a href="#" title="{% trans 'edit' %}"
+                                       class="btn coorganization-edit-btn" role="button"
+                                       id="{{ "btn_coorganization_edit_"|db_table_with_pk:coorganization }}">
+                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if  can_change_education_group %}
+                                    <a class="trigger_modal btn"
+                                       data-url="{% url 'coorganization_delete' root.pk education_group_year.id coorganization.pk %}"
+                                       id="btn_delete_coorganization_{{ coorganization.id }}"
+                                       title="{% trans 'delete' %}">
+                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% url 'coorganization_edit' root_id=root.pk education_group_year_id=education_group_year.id coorganization_id=coorganization.id  as update_url %}
+                            {% include "blocks/modal/modal_ajax.html" with modal_url=update_url click_id="btn_coorganization_edit_"|db_table_with_pk:coorganization form_id="coorganization-form" %}
+
+                        {% endfor %}
+                        {% for coorganization in parent.coorganizations %}
+                            <tr class="text-primary">
+                                <td>
+                                        <span id="coorganization_id_{{ coorganization.id }}">
                                         {{ coorganization.address.country.name }} - {{ coorganization.address.city }}<br>
                                         {{ coorganization.organization.name }}
-                                    </td>
-                                    <td>{% if coorganization.organization.logo %}
+                                        </span>
+                                </td>
+                                <td>
+                                    {% if coorganization.organization.logo %}
                                         <img src="{{ coorganization.organization.logo.url }}" width="50px"/>
                                     {% endif %}
-                                    </td>
-                                    <td>
-                                        {{ coorganization.all_students | yesno | title}}
-                                    </td>
-                                    <td>
-                                        {{ coorganization.enrollment_place | yesno | title}}
-                                    </td>
-                                    <td>
-                                        {% if coorganization.diploma %}
-                                            {% trans coorganization.diploma %}
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {{ coorganization.is_producing_cerfificate | yesno |title}}
-                                    </td>
-                                    <td>
-                                        {{ coorganization.is_producing_annexe | yesno | title}}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            {% for coorganization in parent.coorganizations %}
-                                <tr class="text-primary">
-                                    <td>
-                                        {{ coorganization.address.country.name }} - {{ coorganization.address.city }}<br>
-                                        {{ coorganization.organization.title }}
-                                    </td>
-                                    <td>{% if coorganization.organization.logo %}
-                                        <img src="{{ coorganization.organization.logo.url }}" width="50px"/>
+                                </td>
+                                <td>
+                                    {{ coorganization.all_students | yesno | title }}
+                                </td>
+                                <td>
+                                    {{ coorganization.enrollment_place | yesno | title }}
+                                </td>
+                                <td>
+                                    {% if coorganization.diploma %}
+                                        {% trans coorganization.diploma %}
                                     {% endif %}
-                                    </td>
-                                    <td>
-                                        {{ coorganization.all_students | yesno | title}}
-                                    </td>
-                                    <td>
-                                        {{ coorganization.enrollment_place | yesno | title}}
-                                    </td>
-                                    <td>
-                                        {% if coorganization.diploma and coorganization.diploma %}
-                                            {% trans coorganization.diploma %}
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {{ coorganization.is_producing_cerfificate | yesno |title}}
-                                    </td>
-                                    <td>
-                                        {{ coorganization.is_producing_annexe | yesno | title}}
-                                    </td>
-                                </tr>
-                            {% endfor %}
+                                </td>
+                                <td>
+                                    {{ coorganization.is_producing_cerfificate | yesno |title }}
+                                </td>
+                                <td>
+                                    {{ coorganization.is_producing_annexe | yesno | title }}
+                                </td>
+                                <td>
+                                    {% if  can_change_education_group %}
+                                    <a href="#" title="{% trans 'edit' %}"
+                                       class="btn coorganization-edit-btn" role="button"
+                                       id="{{ "btn_coorganization_edit_"|db_table_with_pk:coorganization }}">
+                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                    </a>
+                                     {% endif %}
+                                </td>
+                                <td>
+                                    {% if  can_change_education_group %}
+                                    <a class="trigger_modal btn"
+                                       data-url="{% url 'coorganization_delete' root.pk education_group_year.id coorganization.pk %}"
+                                       id="btn_delete_coorganization_{{ coorganization.id }}"
+                                       title="{% trans 'delete' %}">
+                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% url 'coorganization_edit' root_id=root.pk education_group_year_id=education_group_year.id coorganization_id=coorganization.id  as update_url %}
+                            {% include "blocks/modal/modal_ajax.html" with modal_url=update_url click_id="btn_coorganization_edit_"|db_table_with_pk:coorganization form_id="coorganization-form" %}
+                        {% endfor %}
                         </tbody>
                     </table>
                 {% endif %}
+                <br>
+                {% if can_change_education_group %}
+                    <a class="btn btn-info btn-sm coorganization-edit-btn"
+                       id="btn_coorganization_create"
+                       data-form="{% url 'coorganization_create' root_id=root.pk education_group_year_id=education_group_year.id %}"
+                       title="{% trans 'create' %}"
+                       style="margin-top:10px;">
+                        {% trans 'add_another' %}
+                    </a>
+                    {% url 'coorganization_create' root_id=root.pk education_group_year_id=education_group_year.id as create_url %}
+                    {% include "blocks/modal/modal_ajax.html" with modal_url=create_url click_id="btn_coorganization_create" form_id="coorganization-form" %}
+                {% endif %}
+
             </div>
         </div>
     {% endwith %}
@@ -195,25 +259,36 @@
 {% endblock %}
 {% block script %}
     <script>
-        $(document).ready(function() {
-            $('#tbl_coorganization').DataTable(
-                {
-                    columnDefs: [
-                        { targets: 0, type: 'diacritics-neutralise'},
-                        { targets: 3, type: 'diacritics-neutralise'},
-                    ],
-                    "stateSave": true,
-                    "paging" : false,
-                    "ordering" : true,
-                    "info"  : false,
-                    "searching" : false,
-                    "language": {
-                        "oAria": {
-                            "sSortAscending":  "{% trans 'datatable_sortascending'%}",
-                            "sSortDescending": "{% trans 'datatable_sortdescending'%}"
-                        }
+        $(document).ready(function () {
+            $('#tbl_coorganization').DataTable({
+                columnDefs: [
+                    {targets: 3, type: 'diacritics-neutralise'},
+                    {targets: 1, orderable: false},
+                    {targets: 7, orderable: false},
+                    {targets: 8, orderable: false}
+                ],
+                "paging": false,
+                "ordering": true,
+                "info": false,
+                "searching": false,
+                "language": {
+                    "oAria": {
+                        "sSortAscending": "{% trans 'datatable_sortascending'%}",
+                        "sSortDescending": "{% trans 'datatable_sortdescending'%}"
                     }
+                },
+                "order": [[2, "desc"], [0, "asc"]]
+            });
+
+            $(".coorganization-edit-btn").click(function (ev) {
+                ev.preventDefault();
+                var url = $(this).data("form");
+                var coorganization_edit_modal = $("#coorganization_edit");
+                coorganization_edit_modal.load(url, function () { // load the url into the modal
+                    $(this).modal('show');
                 });
+                return false;
+            });
         });
     </script>
 {% endblock %}

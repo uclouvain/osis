@@ -3303,6 +3303,32 @@ msgstr ""
 msgid "Are you sure you want to detach this content?"
 msgstr ""
 
+msgid "Are you sure you want to postpone the content of %(root)s?"
+msgstr ""
+
+msgid "%(count)d education group has been postponed with success"
+msgid_plural "%(count)d education groups have been postponed with success"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "The education group is not a training."
+msgstr ""
+
+msgid "The end date of the education group is smaller than the year of postponement."
+msgstr ""
+
+msgid "This training has no content to postpone."
+msgstr ""
+
+msgid "The root does not exist in the next academic year."
+msgstr ""
+
+msgid "The content has already been postponed."
+msgstr ""
+
+msgid "Copy the content"
+msgstr ""
+
 msgid "detach"
 msgstr ""
 
@@ -4024,13 +4050,28 @@ msgstr ""
 msgid "EDITION_OF_GENERAL_INFORMATION"
 msgstr "Edition of general information"
 
-msgid "Repartition added"
+msgid "Coorganization"
 msgstr ""
 
-msgid "Repartition edited"
+msgid "Are you sure you want to delete the coorganization?"
 msgstr ""
 
-msgid "Repartition removed"
+msgid "The coorganization modifications has been saved"
+msgstr ""
+
+msgid "There is already a coorganization with this organization"
+msgstr ""
+
+msgid "The coorganization has been created"
+msgstr ""
+
+msgid "Repartition added for %(tutor)s (%(function)s)"
+msgstr ""
+
+msgid "Repartition modified for %(tutor)s (%(function)s)"
+msgstr ""
+
+msgid "Repartition removed for %(tutor)s (%(function)s)"
 msgstr ""
 
 msgid "Manage repartition"
@@ -4041,4 +4082,7 @@ msgstr ""
 
 msgid "The sum of volumes for the partims for professor %(tutor)s is superior to the volume of parent learning unit "
       "for this professor"
+msgstr ""
+
+msgid "Clear notifications"
 msgstr ""

@@ -123,7 +123,8 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
             "duration": forms.NumberInput(attrs={'min': 1}),
         }
 
-    def __init__(self, *args, education_group_type=None, **kwargs):
+    def __init__(self, *args, education_group_type=None, user=None, **kwargs):
+        self.user = user
         self.parent = kwargs.pop("parent", None)
 
         if not education_group_type and not kwargs.get('instance'):
@@ -137,6 +138,7 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
         super().__init__(*args, **kwargs)
         self._set_initial_values()
         self._filter_education_group_type()
+        self._filter_management_entity_according_to_person()
         self._init_and_disable_academic_year()
         self._preselect_entity_version_from_entity_value()
 
@@ -148,6 +150,9 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
             self.fields['enrollment_campus'].initial = default_campus
         if 'primary_language' in self.fields:
             self.fields['primary_language'].initial = Language.objects.filter(code='FR').first()
+
+        if self.parent and 'management_entity' in self.fields:
+            self.fields['management_entity'].initial = self.parent.management_entity_version
 
     def _filter_education_group_type(self):
         # When the type is already given, we need to disabled the field
@@ -167,6 +172,11 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
         if getattr(self.instance, 'management_entity', None):
             self.initial['management_entity'] = get_last_version(self.instance.management_entity).pk
 
+    def _filter_management_entity_according_to_person(self):
+        if 'management_entity' in self.fields:
+            self.fields['management_entity'].queryset = \
+                self.fields['management_entity'].queryset.filter(entity__in=self.user.person.linked_entities)
+
     def _disable_field(self, key, initial_value=None):
         field = self.fields[key]
         if initial_value:
@@ -178,6 +188,11 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
 
     def clean_acronym(self):
         data_cleaned = self.cleaned_data.get('acronym')
+        if data_cleaned:
+            return data_cleaned.upper()
+
+    def clean_partial_acronym(self):
+        data_cleaned = self.cleaned_data.get('partial_acronym')
         if data_cleaned:
             return data_cleaned.upper()
 
@@ -302,9 +317,7 @@ class EducationGroupTypeForm(forms.Form):
             parents=parent
         )
 
-        self.fields["name"].label = _("Which type of %(category)s do you want to create ?") % {
-            "category": _(category)
-        }
+        self.fields["name"].label = _("Which type of %(category)s do you want to create ?") % {"category": _(category)}
 
 
 class SelectLanguage(forms.Form):

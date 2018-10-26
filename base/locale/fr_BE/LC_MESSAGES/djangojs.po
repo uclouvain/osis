@@ -86,3 +86,6 @@ msgstr "Sélectionner"
 
 msgid "Release"
 msgstr ""
+
+msgid "There is already a coorganization with this organization"
+msgstr "Il y a déjà une coorganization existante avec cette institution"

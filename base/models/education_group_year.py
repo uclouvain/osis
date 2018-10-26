@@ -323,7 +323,6 @@ class EducationGroupYear(models.Model):
         db_index=True,
         null=True,
         verbose_name=_("code"),
-        validators=[RegexValidator(regex="^([A-Z]{3,5})([0-9]{3})([A-Z])$")]
     )
 
     # TODO :: rename credits into expected_credits
@@ -563,7 +562,7 @@ class EducationGroupYear(models.Model):
 
     @cached_property
     def coorganizations(self):
-        return self.educationgrouporganization_set.all()
+        return self.educationgrouporganization_set.all().order_by('all_students')
 
     def is_training(self):
         if self.education_group_type:

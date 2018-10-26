@@ -28,15 +28,20 @@
 
 {% features_or "education_group_create" as show_button %}
 {% if show_button %}
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
         <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {% trans 'actions' %}
         <span class="caret"></span>
     </button>
     <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
         {% flag "education_group_create" %}
-            {% li_with_create_perm_group "#" _('New Education Group') %}
-            {% li_with_create_perm_training "#" _('New Training') %}
-            {% li_with_create_perm_mini_training "#" _('New Mini-Training') %}
+            {% url 'select_education_group_type' enums.GROUP as create_group_url %}
+            {% url 'select_education_group_type' enums.TRAINING as create_training_url %}
+            {% url 'select_education_group_type' enums.MINI_TRAINING as create_mini_training_url %}
+
+            {% li_with_create_perm_group create_group_url _('New Education Group') %}
+            {% li_with_create_perm_training create_training_url _('New Training') %}
+            {% li_with_create_perm_mini_training create_mini_training_url _('New Mini-Training') %}
         {% endflag %}
     </ul>
 {% endif %}

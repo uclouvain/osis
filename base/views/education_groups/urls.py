@@ -26,12 +26,15 @@
 from django.conf.urls import url, include
 
 from base.views import education_group
+from base.views.education_groups.coorganization import CreateEducationGroupOrganizationView, \
+    UpdateEducationGroupOrganizationView, CoorganizationDeleteView
 from base.views.education_groups.group_element_year.read import pdf_content
 from base.views.education_groups.learning_unit import detail as learning_unit_detail, update as learning_unit_update
 from base.views.education_groups.select import education_group_select, learning_unit_select
-from base.views.education_groups.update import CertificateAimAutocomplete
+from base.views.education_groups.update import CertificateAimAutocomplete, PostponeGroupElementYearView
 from . import search, create, detail, update, delete, group_element_year
 from .achievement.urls import urlpatterns as urlpatterns_achievement
+import base.views.filter
 
 urlpatterns = [
     url(
@@ -117,9 +120,16 @@ urlpatterns = [
         url(r'^group_content/', group_element_year.read.ReadEducationGroupTypeView.as_view(), name="group_content"),
         url(r'^pdf_content/(?P<language>[a-z\-]+)', pdf_content, name="pdf_content"),
 
-        url(r'^postpone/(?P<group_element_year_id>[0-9]+)/',
-            group_element_year.update.PostponeGroupElementYearView.as_view(),
-            name="postpone_education_group"),
+        url(r'^postpone/', PostponeGroupElementYearView.as_view(), name="postpone_education_group"),
+
+        url(r'^coorganization/create/$', CreateEducationGroupOrganizationView.as_view(),
+            name="coorganization_create"),
+        url(r'^coorganization/edit/(?P<coorganization_id>[0-9]+)/$',
+            UpdateEducationGroupOrganizationView.as_view(),
+            name="coorganization_edit"),
+        url(r'^coorganization/delete/(?P<coorganization_id>[0-9]+)$',
+            CoorganizationDeleteView.as_view(),
+            name="coorganization_delete"),
     ])),
     url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([
         url(r'^utilization/$',
@@ -132,4 +142,6 @@ urlpatterns = [
             learning_unit_update.LearningUnitPrerequisite.as_view(),
             name='learning_unit_prerequisite_update'),
     ])),
+    url(r'^filter_organizations_by_country$', base.views.filter.filter_organizations_by_country,
+        name='filter_organizations_by_country'),
 ]

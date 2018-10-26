@@ -68,6 +68,7 @@ CUSTOM_LI_TEMPLATE = """
 
 class TestEducationGroupAsCentralManagerTag(TestCase):
     """ This class will test the tag as central manager """
+
     def setUp(self):
         self.education_group_year = TrainingFactory()
         self.person = CentralManagerFactory("delete_educationgroup", "change_educationgroup", "add_educationgroup")
@@ -75,15 +76,25 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
 
         self.url = reverse('delete_education_group', args=[self.education_group_year.id, self.education_group_year.id])
         self.client.force_login(user=self.person.user)
+        self.request = RequestFactory().get("")
         self.context = {
             "person": self.person,
             "education_group_year": self.education_group_year,
-            "request": RequestFactory().get("")
+            "request": self.request
         }
 
     def test_li_with_deletion_perm(self):
         result = li_with_deletion_perm(self.context, self.url, DELETE_MSG)
-        self.assertEqual(result, ENABLED_LI.format("link_delete", self.url, DELETE_MSG))
+        self.assertEqual(
+            result, {
+                'load_modal': True,
+                'title': '',
+                'class_li': '',
+                'id_li': 'link_delete',
+                'url': self.url,
+                'text': DELETE_MSG
+            }
+        )
 
     def test_button_with_permission(self):
         result = button_with_permission(self.context, "title", "id", "edit")
@@ -99,7 +110,16 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         relation.child_type.save()
 
         result = li_with_create_perm_training(self.context, self.url, "")
-        self.assertHTMLEqual(result, ENABLED_LI.format("link_create_training", self.url, ""))
+        self.assertEqual(
+            result, {
+                'load_modal': True,
+                'id_li': 'link_create_training',
+                'url': self.url,
+                'title': '',
+                'class_li': '',
+                'text': ''
+            }
+        )
 
     def test_li_with_create_perm_mini_training(self):
         relation = AuthorizedRelationshipFactory(parent_type=self.education_group_year.education_group_type)
@@ -107,7 +127,16 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         relation.child_type.save()
 
         result = li_with_create_perm_mini_training(self.context, self.url, "")
-        self.assertHTMLEqual(result, ENABLED_LI.format("link_create_mini_training", self.url, ""))
+        self.assertEqual(
+            result, {
+                'load_modal': True,
+                'id_li': 'link_create_mini_training',
+                'url': self.url,
+                'title': '',
+                'class_li': '',
+                'text': ''
+            }
+        )
 
     def test_li_with_create_perm_group(self):
         relation = AuthorizedRelationshipFactory(parent_type=self.education_group_year.education_group_type)
@@ -115,7 +144,16 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         relation.child_type.save()
 
         result = li_with_create_perm_group(self.context, self.url, "")
-        self.assertHTMLEqual(result, ENABLED_LI.format("link_create_group", self.url, ""))
+
+        self.assertEqual(
+            result, {
+                'load_modal': True,
+                'title': '',
+                'class_li': '',
+                'id_li': 'link_create_group',
+                'url': self.url, 'text': ''
+            }
+        )
 
     def test_li_with_create_perm_training_disabled(self):
         result = li_with_create_perm_training(self.context, self.url, "")
@@ -126,7 +164,16 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
             "type": self.education_group_year.education_group_type.name
         }
         msg = msg.capitalize()
-        self.assertHTMLEqual(result, DISABLED_LI.format("link_create_training", msg, ""))
+        self.assertEqual(
+            result, {
+                'load_modal': False,
+                'title': msg,
+                'class_li': 'disabled',
+                'id_li': 'link_create_training',
+                'url': "#",
+                'text': ''
+            }
+        )
 
     def test_li_with_create_perm_mini_training_disabled(self):
         result = li_with_create_perm_mini_training(self.context, self.url, "")
@@ -136,7 +183,16 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
             "type": self.education_group_year.education_group_type.name
         }
         msg = msg.capitalize()
-        self.assertHTMLEqual(result, DISABLED_LI.format("link_create_mini_training", msg, ""))
+        self.assertEqual(
+            result, {
+                'load_modal': False,
+                'title': msg,
+                'class_li': 'disabled',
+                'id_li': 'link_create_mini_training',
+                'url': "#",
+                'text': ''
+            }
+        )
 
     def test_li_with_create_perm_group_disabled(self):
         result = li_with_create_perm_group(self.context, self.url, "")
@@ -146,7 +202,16 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
             "type": self.education_group_year.education_group_type.name
         }
         msg = msg.capitalize()
-        self.assertHTMLEqual(result, DISABLED_LI.format("link_create_group", msg, ""))
+        self.assertEqual(
+            result, {
+                'load_modal': False,
+                'title': msg,
+                'class_li': 'disabled',
+                'id_li': 'link_create_group',
+                'url': "#",
+                'text': ''
+            }
+        )
 
     def test_tag_detach_education_group_permitted_and_possible(self):
         self.context['can_change_education_group'] = True
@@ -204,11 +269,26 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
                 _(""), ),
             text=_('Generate pdf'),
         )
-        self.assertHTMLEqual(result, expected_result)
+        self.assertEqual(
+            result,
+            {
+                'url': {
+                    'person': self.person,
+                    'education_group_year': self.education_group_year,
+                    'request': self.request
+                },
+                'text': 'Générer le pdf',
+                'class_li': '',
+                'title': 'Générer le pdf',
+                'id_li': 'btn_operation_pdf_content',
+                'load_modal': True
+            }
+        )
 
 
 class TestEducationGroupAsFacultyManagerTag(TestCase):
     """ This class will test the tag as faculty manager """
+
     def setUp(self):
         self.education_group_year = TrainingFactory()
         self.person = FacultyManagerFactory("delete_educationgroup", "change_educationgroup", "add_educationgroup")
@@ -253,13 +333,31 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         self.academic_calendar.delete()
 
         result = li_with_deletion_perm(self.context, self.url, DELETE_MSG)
-        self.assertEqual(result, DISABLED_LI.format("link_delete", PERMISSION_DENIED_MSG, DELETE_MSG))
+        self.assertEqual(
+            result, {
+                'load_modal': False,
+                'title': PERMISSION_DENIED_MSG,
+                'class_li': 'disabled',
+                'id_li': 'link_delete',
+                'url': "#",
+                'text': DELETE_MSG
+            }
+        )
 
     def test_li_tag_case_inside_education_group_edition_period(self):
         self.education_group_year.academic_year = self.next_ac
 
         result = li_with_deletion_perm(self.context, self.url, DELETE_MSG)
-        self.assertEqual(result, ENABLED_LI.format("link_delete", self.url, DELETE_MSG))
+        self.assertEqual(
+            result, {
+                'load_modal': True,
+                'text': DELETE_MSG,
+                'class_li': '',
+                'id_li': "link_delete",
+                'url': self.url,
+                'title': ''
+            }
+        )
 
     def test_li_tag_case_mini_training_disabled(self):
         """
@@ -270,7 +368,17 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         result = li_with_create_perm_mini_training(self.context, self.url, "")
         msg = _("The user has not permission to create a %(category)s.") % {"category": _(MINI_TRAINING)}
         msg = msg.capitalize()
-        self.assertHTMLEqual(result, DISABLED_LI.format("link_create_mini_training", msg, ""))
+
+        self.assertEqual(
+            result, {
+                'load_modal': False,
+                'title': msg,
+                'class_li': 'disabled',
+                'id_li': 'link_create_mini_training',
+                'url': "#",
+                'text': ''
+            }
+        )
 
     def test_li_tag_case_training_disabled(self):
         """
@@ -281,7 +389,16 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         result = li_with_create_perm_training(self.context, self.url, "")
         msg = _("The user has not permission to create a %(category)s.") % {"category": _(TRAINING)}
         msg = msg.capitalize()
-        self.assertHTMLEqual(result, DISABLED_LI.format("link_create_training", msg, ""))
+        self.assertEqual(
+            result, {
+                'load_modal': False,
+                'title': msg,
+                'class_li': 'disabled',
+                'id_li': 'link_create_training',
+                'url': "#",
+                'text': ''
+            }
+        )
 
     def test_button_edit_administrative_data(self):
         result = button_edit_administrative_data(self.context)

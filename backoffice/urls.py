@@ -39,6 +39,7 @@ urlpatterns = (
     url(r'^' + settings.ADMIN_URL, admin.site.urls),
     url(r'', include('base.urls')),
     url(r'^jsi18n/$', JavaScriptCatalog.as_view(packages=packages), name='javascript-catalog'),
+    url(r'^hijack/', include('hijack.urls', namespace='hijack')),
 )
 
 if 'assistant' in settings.INSTALLED_APPS:

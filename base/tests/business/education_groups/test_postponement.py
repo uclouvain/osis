@@ -182,16 +182,16 @@ class TestPostpone(TestCase):
             self.postponer = PostponeContent(self.current_education_group_year)
         self.assertEqual(
             str(cm.exception),
-            _("The end date of the education group is smaller than the year of postponement")
+            _("The end date of the education group is smaller than the year of postponement.")
         )
 
     def test_init_wrong_instance(self):
         self.current_education_group_year.education_group_type.category = GROUP
         self.current_education_group_year.education_group_type.save()
 
-        with self.assertRaises(TypeError) as cm:
+        with self.assertRaises(NotPostponeError) as cm:
             self.postponer = PostponeContent(self.current_education_group_year)
-        self.assertEqual(str(cm.exception), _("The education group is not a training"))
+        self.assertEqual(str(cm.exception), _("The education group is not a training."))
 
     def test_postpone_with_child_branch(self):
         self.postponer = PostponeContent(self.current_education_group_year)

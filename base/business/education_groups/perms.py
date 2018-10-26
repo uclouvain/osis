@@ -26,6 +26,7 @@
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext_lazy as _, pgettext
 
+from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.models.academic_calendar import AcademicCalendar
 from base.models.education_group_type import find_authorized_types
 from base.models.enums import academic_calendar_type
@@ -63,8 +64,17 @@ def is_eligible_to_change_education_group(person, education_group, raise_excepti
 
 
 def is_eligible_to_postpone_education_group(person, education_group, raise_exception=False):
-    return check_permission(person, "base.change_educationgroup", raise_exception) and \
-           _is_eligible_education_group(person, education_group, raise_exception)
+    result = check_permission(person, "base.change_educationgroup", raise_exception) and \
+             _is_eligible_education_group(person, education_group, raise_exception)
+
+    try:
+        # Check if the education group is valid
+        PostponeContent(education_group)
+    except NotPostponeError as e:
+        result = False
+        if raise_exception:
+            raise PermissionDenied(str(e))
+    return result
 
 
 def is_eligible_to_add_achievement(person, education_group, raise_exception=False):

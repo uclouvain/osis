@@ -37,6 +37,7 @@ from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_component_year_type
+from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_component import LearningUnitComponent
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -590,16 +591,36 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertIsInstance(error_list, list)
         self.assertEqual(len(error_list), 6)
 
+    def test_extends_only_components_of_learning_unit_year(self):
+        # Creating partim with components for the same learningContainerYear
+        _create_learning_unit_year_with_components(self.learning_container_year,
+                                                   create_lecturing_component=True,
+                                                   create_pratical_component=True,
+                                                   subtype=learning_unit_year_subtypes.PARTIM)
+
+        inital_components_count = LearningComponentYear.objects.all().count()
+        number_of_components = LearningUnitComponent.objects.filter(learning_unit_year=self.learning_unit_year).count()
+        expected_count = inital_components_count + number_of_components
+        next_year = self.academic_year.year + 1
+
+        business_edition.duplicate_learning_unit_year(self.learning_unit_year, AcademicYearFactory(year=next_year))
+
+        # assert components of partims are not duplicated too
+        self.assertEqual(LearningComponentYear.objects.all().count(), expected_count)
+
 
 def _create_learning_unit_year_with_components(l_container, create_lecturing_component=True,
-                                               create_pratical_component=True):
+                                               create_pratical_component=True, subtype=None):
+    if not subtype:
+        subtype = learning_unit_year_subtypes.FULL
     language = LanguageFactory(code='EN', name='English')
     a_learning_unit_year = LearningUnitYearFactory(learning_container_year=l_container,
                                                    acronym=l_container.acronym,
                                                    academic_year=l_container.academic_year,
                                                    status=True,
                                                    language=language,
-                                                   campus=CampusFactory(name='MIT'))
+                                                   campus=CampusFactory(name='MIT'),
+                                                   subtype=subtype)
 
     if create_lecturing_component:
         a_component = LearningComponentYearFactory(

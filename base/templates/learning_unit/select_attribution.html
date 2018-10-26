@@ -50,20 +50,20 @@
                         <th></th>
                     </thead>
                     <tbody>
-                        {% for attribution,lecturing_charge,practical_charge in attributions %}
+                        {% for attribution in attributions %}
                             <tr>
                                 <td>{{ attribution.tutor.person }}</td>
                                 <td>{% trans attribution.function %}</td>
                                 <td>{{ attribution.start_year | default_if_none:'' }}</td>
                                 <td>{{ attribution.duration | default_if_none:'' }}</td>
-                                <td>{{ lecturing_charge.allocation_charge | default_if_none:0 | floatformat:2 }}</td>
-                                <td>{{ practical_charge.allocation_charge | default_if_none:0 | floatformat:2 }}</td>
+                                <td>{{ attribution.lecturing_charges.0.allocation_charge | default_if_none:0 | floatformat:2 }}</td>
+                                <td>{{ attribution.practical_charges.0.allocation_charge | default_if_none:0 | floatformat:2 }}</td>
                                 <td>{{ attribution.substitute | default_if_none:'' }}</td>
                                 <td>
                                     <a href="#"
                                        class="btn btn-primary charge-repartition-btn"
                                        role="button"
-                                       data-form="{% url "add_charge_repartition" learning_unit_year.id attribution.id %}">
+                                       data-form="{% url 'add_charge_repartition' learning_unit_year.id attribution.id %}">
                                         {% trans "add" %}
                                     </a>
                                 </td>
@@ -77,13 +77,14 @@
                             <strong>{% trans "No attributions exist for the parent learning unit" %}</strong>
                         </p>
                 {% endif %}
+                <a href="{% url 'learning_unit_attributions' learning_unit_year_id=learning_unit_year.id %}"  class="btn btn-default" role="button">{% trans "cancel" %}</a>
             </div>
         </div>
     </div>
 </div>
 
 <div class="modal fade" id="form-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" id="modal_dialog_id">
+    <div class="modal-dialog modal-lg" id="modal_dialog_id">
       <div class="modal-content" id="form-modal-content">
 
      </div>

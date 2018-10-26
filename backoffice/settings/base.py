@@ -81,6 +81,9 @@ INSTALLED_APPS = (
     'django_celery_results',
     'notifications',
     'django_filters',
+    'hijack',
+    'compat',
+    'hijack_admin',
 )
 
 MIDDLEWARE = (
@@ -406,7 +409,6 @@ if CACHE_ENABLED:
             "LOCATION": os.environ.get("REDIS_LOCATIONS", "redis://127.0.0.1:6379").split(),
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
-                "SERIALIZER": "django_redis.serializers.json.JSONSerializer",
                 "SOCKET_CONNECT_TIMEOUT": 2,
                 "SOCKET_TIMEOUT": 2,
                 "PASSWORD": os.environ.get("REDIS_PASSWORD", "")
@@ -416,3 +418,10 @@ if CACHE_ENABLED:
     }
 
 WAFFLE_FLAG_DEFAULT = os.environ.get("WAFFLE_FLAG_DEFAULT", "False").lower() == 'true'
+
+
+# HIJACK
+HIJACK_LOGIN_REDIRECT_URL = '/'  # Where admins are redirected to after hijacking a user
+HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user/'  # Where admins are redirected to after releasing a user
+HIJACK_ALLOW_GET_REQUESTS = True
+HIJACK_USE_BOOTSTRAP = True

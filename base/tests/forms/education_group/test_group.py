@@ -40,7 +40,8 @@ from base.tests.factories.academic_calendar import AcademicCalendarEducationGrou
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import GroupFactory
-from base.tests.factories.user import UserFactory
+from base.tests.factories.person import PersonFactory
+from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin, _get_valid_post_data
 from rules_management.enums import GROUP_DAILY_MANAGEMENT, GROUP_PGRM_ENCODING_PERIOD
 
@@ -83,7 +84,7 @@ class TestGroupModelFormModelForm(EducationGroupYearModelFormMixin):
             regex_rule="([A-Z]{2})(.*)"
         )
 
-        form = GroupYearModelForm(education_group_type=self.education_group_type, user=UserFactory())
+        form = GroupYearModelForm(education_group_type=self.education_group_type, user=self.user)
 
         self.assertEqual(form.fields["acronym"].initial, "yolo")
         self.assertEqual(form.fields["acronym"].required, False)
@@ -95,7 +96,7 @@ class TestGroupModelFormModelForm(EducationGroupYearModelFormMixin):
         context = self.form_class(
             parent=self.parent_education_group_year,
             education_group_type=self.education_group_type,
-            user=UserFactory(),
+            user=self.user,
         ).get_context()
         self.assertTrue(context, GROUP_DAILY_MANAGEMENT)
 
@@ -110,9 +111,22 @@ class TestGroupModelFormModelForm(EducationGroupYearModelFormMixin):
         context = self.form_class(
             parent=self.parent_education_group_year,
             education_group_type=self.education_group_type,
-            user=UserFactory(),
+            user=self.user,
         ).get_context()
         self.assertTrue(context, GROUP_PGRM_ENCODING_PERIOD)
+
+    def test_preselect_management_entity_from_training_parent_case_parent(self):
+        self._test_preselect_management_entity_from_parent(self.form_class)
+
+    @patch('base.forms.education_group.common.find_authorized_types')
+    def test_no_preselect_management_entity_from_training_parent_case_no_parent(self, mock_authorized_types):
+        mock_authorized_types.return_value = EducationGroupType.objects.all()
+        form = GroupYearModelForm(
+            parent=None,
+            education_group_type=self.education_group_type,
+            user=self.user
+        )
+        self.assertIsNone(form.fields["management_entity"].initial)
 
 
 class TestGroupForm(TestCase):
@@ -121,11 +135,16 @@ class TestGroupForm(TestCase):
         self.expected_educ_group_year, self.post_data = _get_valid_post_data(self.category)
         self.egt = self.expected_educ_group_year.education_group_type
 
+        # Create user and attached it to management entity
+        person = PersonFactory()
+        PersonEntityFactory(person=person, entity=self.expected_educ_group_year.management_entity)
+        self.user = person.user
+
     def test_create(self):
         form = GroupForm(
             data=self.post_data,
             parent=None,
-            user=UserFactory(),
+            user=self.user,
             education_group_type=self.egt
         )
 
@@ -143,7 +162,7 @@ class TestGroupForm(TestCase):
     @patch('base.forms.education_group.common.find_authorized_types', return_value=EducationGroupType.objects.all())
     def test_create_with_parent(self, mock_find_authorized_types):
         parent = GroupFactory()
-        form = GroupForm(data=self.post_data, parent=parent, user=UserFactory(), education_group_type=self.egt)
+        form = GroupForm(data=self.post_data, parent=parent, user=self.user, education_group_type=self.egt)
 
         self.assertTrue(form.is_valid(), form.errors)
 
@@ -163,5 +182,5 @@ class TestGroupPostponedList(EducationGroupYearModelFormMixin):
 
     def test_group_doesnt_have_post_save_method(self):
         instance = self.parent_education_group_year
-        form = GroupForm(data={}, user=UserFactory(), instance=instance)
+        form = GroupForm(data={}, user=self.user, instance=instance)
         self.assertFalse(hasattr(form, '_post_save'))
