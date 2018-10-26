@@ -27,6 +27,7 @@ import itertools
 
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Prefetch
 from django.db.models.functions import Concat
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -42,6 +43,7 @@ from base.business.learning_units import perms
 from base.forms.learning_unit.attribution_charge_repartition import AttributionChargeRepartitionFormSet, \
     AttributionChargeNewFormSet
 from base.models.enums import learning_component_year_type
+from base.models.learning_unit_component import LearningUnitComponent
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views.mixins import AjaxTemplateMixin, RulesRequiredMixin
@@ -62,32 +64,32 @@ class ChargeRepartitionBaseViewMixin(RulesRequiredMixin):
         return self.luy.parent
 
     @cached_property
-    def attribution_charges(self):
+    def attributions(self):
         # FIXME Find a better approach to compare attributions of parent and child
-        child_attributions = AttributionChargeNew.objects \
-            .filter(learning_component_year__learningunitcomponent__learning_unit_year=self.luy) \
-            .annotate(id_text=Concat("attribution__tutor__person__global_id", "attribution__function")) \
-            .values_list("id_text", flat=True)
-        return AttributionChargeNew.objects \
-            .filter(learning_component_year__learningunitcomponent__learning_unit_year=self.parent_luy) \
-            .annotate(id_text=Concat("attribution__tutor__person__global_id", "attribution__function")) \
-            .exclude(id_text__in=child_attributions) \
-            .order_by("attribution", "learning_component_year__type") \
-            .select_related("attribution__tutor__person", "learning_component_year")
+        lecturing_charges = AttributionChargeNew.objects\
+            .filter(learning_component_year__type=learning_component_year_type.LECTURING)
+        prefetch_lecturing_charges  = Prefetch("attributionchargenew_set", queryset=lecturing_charges,
+                                               to_attr="lecturing_charges")
 
-    @cached_property
-    def tuple_attribution_charges(self):
-        return [
-            (attribution, *list(charges)) for attribution, charges in itertools.groupby(
-                self.attribution_charges,
-                lambda attribution_charge: attribution_charge.attribution
-            )
-        ]
+        practical_charges = AttributionChargeNew.objects\
+            .filter(learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES)
+        prefetch_practical_charges = Prefetch("attributionchargenew_set", queryset=practical_charges,
+                                              to_attr="practical_charges")
+
+        learning_unit_components = LearningUnitComponent.objects.filter(learning_unit_year=self.parent_luy)
+        attributions = AttributionNew.objects\
+            .filter(attributionchargenew__learning_component_year__learningunitcomponent__in=learning_unit_components)\
+            .distinct("id")\
+            .prefetch_related(prefetch_lecturing_charges)\
+            .prefetch_related(prefetch_practical_charges)\
+            .select_related("tutor__person")
+        return attributions
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["learning_unit_year"] = self.luy
-        context["attributions"] = self.tuple_attribution_charges
+        context["attributions"] = self.attributions
         return context
 
     def get_success_url(self):

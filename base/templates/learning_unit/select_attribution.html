@@ -50,14 +50,14 @@
                         <th></th>
                     </thead>
                     <tbody>
-                        {% for attribution,lecturing_charge,practical_charge in attributions %}
+                        {% for attribution in attributions %}
                             <tr>
                                 <td>{{ attribution.tutor.person }}</td>
                                 <td>{% trans attribution.function %}</td>
                                 <td>{{ attribution.start_year | default_if_none:'' }}</td>
                                 <td>{{ attribution.duration | default_if_none:'' }}</td>
-                                <td>{{ lecturing_charge.allocation_charge | default_if_none:0 | floatformat:2 }}</td>
-                                <td>{{ practical_charge.allocation_charge | default_if_none:0 | floatformat:2 }}</td>
+                                <td>{{ attribution.lecturing_charges.0.allocation_charge | default_if_none:0 | floatformat:2 }}</td>
+                                <td>{{ attribution.practical_charges.0.allocation_charge | default_if_none:0 | floatformat:2 }}</td>
                                 <td>{{ attribution.substitute | default_if_none:'' }}</td>
                                 <td>
                                     <a href="#"
