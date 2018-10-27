@@ -87,7 +87,8 @@ from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.views.learning_unit import learning_unit_components, learning_class_year_edit, learning_unit_specifications, \
     learning_unit_formations, get_charge_repartition_warning_messages, CHARGE_REPARTITION_WARNING_MESSAGE
-from base.views.learning_unit import learning_unit_identification, learning_unit_comparison
+from base.views.learning_unit import learning_unit_comparison
+from base.views.learning_units.detail import learning_unit_identification
 from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.search import learning_units

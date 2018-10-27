@@ -46,7 +46,6 @@ from base.models.enums import learning_unit_year_periodicity, learning_container
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
-from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -57,9 +56,10 @@ from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.tests.forms.test_edition_form import get_valid_formset_data
-from base.views.learning_unit import learning_unit_identification, learning_unit_components
+from base.views.learning_unit import learning_unit_components
+from base.views.learning_units.detail import learning_unit_identification
 from base.views.learning_units.update import learning_unit_edition_end_date, learning_unit_volumes_management, \
-    update_learning_unit, _get_learning_units_for_context, EntityAutocomplete
+    update_learning_unit, _get_learning_units_for_context
 
 
 @override_flag('learning_unit_update', active=True)
