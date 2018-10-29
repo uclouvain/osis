@@ -30,9 +30,7 @@
 
             <form method="post" id="form_delete_attribution" action="{{ request.path }}">
                 {% csrf_token %}
-                {% for attribution, lecturing_charge, practical_charge in attributions %}
-                    <p>{% trans "delete" %} {{ attribution.tutor.person }} ({% trans attribution.function  %})</p>
-                {% endfor %}
+                <p>{% trans "delete" %} {{ attribution.tutor.person }} ({% trans attribution.function  %})</p>
                 <p>{%trans "are_you_sure" %}</p>
 
                 {% if not request.is_ajax %}
