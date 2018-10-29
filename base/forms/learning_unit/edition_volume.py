@@ -318,6 +318,7 @@ class SimplifiedVolumeForm(forms.ModelForm):
         """
         Prevent faculty users to a volume to 0 if there was a value other than 0.
         Also, prevent the faculty user from putting a volume if its value was 0.
+        # FIXME Refactor this method with the clean of VolumeEditionForm
         """
         cleaned_data = super().clean()
 
