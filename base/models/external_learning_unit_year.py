@@ -48,7 +48,6 @@ class ExternalLearningUnitYear(models.Model):
         max_length=15,
         db_index=True,
         blank=True,
-        null=True,
         verbose_name=_('external_code')
     )
 
@@ -62,9 +61,19 @@ class ExternalLearningUnitYear(models.Model):
         ]
     )
 
-    url = models.URLField(max_length=255, blank=True, null=True, verbose_name=_('url of the learning unit'))
-    learning_unit_year = models.OneToOneField('LearningUnitYear')
-    requesting_entity = models.ForeignKey('Entity', verbose_name=_('requesting_entity'))
+    url = models.URLField(max_length=255, blank=True, verbose_name=_('url of the learning unit'))
+
+    learning_unit_year = models.OneToOneField(
+        'LearningUnitYear',
+        on_delete=models.CASCADE,
+        verbose_name=_('learning unit year'),
+    )
+
+    requesting_entity = models.ForeignKey(
+        'Entity',
+        verbose_name=_('requesting_entity'),
+        on_delete=models.PROTECT,
+    )
 
     author = models.ForeignKey('Person', null=True)
     date = models.DateTimeField(auto_now=True)
