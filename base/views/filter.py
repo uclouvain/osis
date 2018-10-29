@@ -23,14 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from operator import itemgetter
-
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 
 from base.models.campus import Campus
-from base.models.entity import Entity
-from base.models.organization import Organization
 from base.models.organization_address import find_distinct_by_country
 from osis_common.decorators.ajax import ajax_required
 
