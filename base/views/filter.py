@@ -30,6 +30,7 @@ from django.http import JsonResponse
 
 from base.models.campus import Campus
 from base.models.entity import Entity
+from base.models.organization import Organization
 from base.models.organization_address import find_distinct_by_country
 from osis_common.decorators.ajax import ajax_required
 
@@ -57,8 +58,11 @@ def filter_campus_by_city(request):
 @login_required
 @ajax_required
 def filter_organizations_by_country(request):
+    qs = Organization.objects.filter(entity__country__isnull=False)
+
     country_id = request.GET.get('country')
-    organizations = Entity.objects.filter(country__pk=country_id).distinct('organization')\
-        .values('organization__pk', 'organization__name')
-    return JsonResponse(sorted(list(organizations), key=itemgetter('organization__name')),
-                        safe=False)
+    if country_id and country_id.isnumeric():
+        qs = qs.filter(entity__country__pk=country_id)
+
+    qs = qs.distinct().order_by('name').values('pk', 'name')
+    return JsonResponse(list(qs), safe=False)
