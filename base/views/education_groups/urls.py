@@ -146,6 +146,4 @@ urlpatterns = [
             learning_unit_update.LearningUnitPrerequisite.as_view(),
             name='learning_unit_prerequisite_update'),
     ])),
-    url(r'^filter_organizations_by_country$', base.views.filter.filter_organizations_by_country,
-        name='filter_organizations_by_country'),
 ]

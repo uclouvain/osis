@@ -53,16 +53,3 @@ def filter_campus_by_city(request):
         organization__organizationaddress__city=city
     ).distinct('organization__name').order_by('organization__name').values('pk', 'organization__name')
     return JsonResponse(list(campuses), safe=False)
-
-
-@login_required
-@ajax_required
-def filter_organizations_by_country(request):
-    qs = Organization.objects.filter(entity__country__isnull=False)
-
-    country_id = request.GET.get('country')
-    if country_id and country_id.isnumeric():
-        qs = qs.filter(entity__country__pk=country_id)
-
-    qs = qs.distinct().order_by('name').values('pk', 'name')
-    return JsonResponse(list(qs), safe=False)
