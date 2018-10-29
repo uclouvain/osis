@@ -56,8 +56,8 @@
                                 <td>{% trans value.function %}</td>
                                 <td>{{ value.start_year | default_if_none:'' }}</td>
                                 <td>{{ value.duration | default_if_none:'' }}</td>
-                                <td>{{ value.LECTURING | default_if_none:0 | floatformat:2 }}</td>
-                                <td>{{ value.PRACTICAL_EXERCISES | default_if_none:0 | floatformat:2 }}</td>
+                                <td>{{ value.LECTURING | floatformat:2 }}</td>
+                                <td>{{ value.PRACTICAL_EXERCISES | floatformat:2 }}</td>
                                 <td>{{ value.substitute | default_if_none:'' }}</td>
                                 <td>
                                     {% if can_manage_charge_repartition or can_manage_attribution %}
