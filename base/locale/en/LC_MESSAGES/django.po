@@ -4086,3 +4086,6 @@ msgstr ""
 
 msgid "Clear notifications"
 msgstr ""
+
+msgid "Publish"
+msgstr "Publish"
