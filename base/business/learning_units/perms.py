@@ -66,7 +66,6 @@ def is_eligible_for_modification(learning_unit_year, person):
 
 def is_eligible_for_modification_end_date(learning_unit_year, person):
     return conjunction(
-        _any_existing_proposal_in_epc,
         negation(is_learning_unit_year_in_past),
         is_eligible_for_modification,
         _is_person_eligible_to_modify_end_date_based_on_container_type
