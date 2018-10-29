@@ -148,7 +148,7 @@ class EducationGroupRead(EducationGroupGenericDetailView):
     def show_coorganization(self):
         """Co-organization doesn't have sense for 2M (120/180-240) """
         return self.object.education_group_type.category == TRAINING and \
-                self.object.education_group_type.name not in [PGRM_MASTER_120, PGRM_MASTER_180_240]
+            self.object.education_group_type.name not in [PGRM_MASTER_120, PGRM_MASTER_180_240]
 
 
 class EducationGroupDiplomas(EducationGroupGenericDetailView):
