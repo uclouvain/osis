@@ -113,8 +113,10 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
     def get_instance_form(self, form_name):
         return {
             "attribution_form": self.attribution,
-            "lecturing_charge_form": self.attribution.lecturing_charges[0] if self.attribution.lecturing_charges else None,
-            "practical_charge_form": self.attribution.practical_charges[0] if self.attribution.practical_charges else None
+            "lecturing_charge_form": self.attribution.lecturing_charges[0] if self.attribution.lecturing_charges
+            else None,
+            "practical_charge_form": self.attribution.practical_charges[0] if self.attribution.practical_charges
+            else None
         }.get(form_name)
 
     def forms_valid(self, forms):

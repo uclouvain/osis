@@ -26,6 +26,7 @@
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Prefetch
 from django.db.models.functions import Concat
+from django.http import HttpResponseRedirect
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView
@@ -35,10 +36,10 @@ from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.business.learning_units import perms
 from base.forms.learning_unit.attribution_charge_repartition import AttributionChargeRepartitionFormSet, \
-    AttributionChargeNewFormSet
+    AttributionChargeNewFormSet, LecturingAttributionChargeForm, PracticalAttributionChargeForm
 from base.models.enums import learning_component_year_type
 from base.models.learning_unit_component import LearningUnitComponent
-from base.views.learning_units.attribution import AttributionBaseViewMixin
+from base.views.learning_units.attribution import AttributionBaseViewMixin, EditAttributionView
 from base.views.mixins import AjaxTemplateMixin
 
 
@@ -115,31 +116,22 @@ class AddChargeRepartition(AttributionBaseViewMixin, AjaxTemplateMixin, SuccessM
                                                                       "function": _(self.attribution.function)}
 
 
-class EditChargeRepartition(AttributionBaseViewMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
-    rules = [lambda luy, person: perms.is_eligible_to_manage_charge_repartition(luy, person) or perms.is_eligible_to_manage_attributions(luy, person)]
+class EditChargeRepartition(EditAttributionView):
+    rules = [perms.is_eligible_to_manage_charge_repartition]
     template_name = "learning_unit/add_charge_repartition.html"
-    form_class = AttributionChargeNewFormSet
+    form_classes = {
+        "lecturing_charge_form": LecturingAttributionChargeForm,
+        "practical_charge_form": PracticalAttributionChargeForm
+    }
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["formset"] = context["form"]
-        context["attribution"] = self.attribution
-        return context
+    def forms_valid(self, forms):
+        lecturing_charge_form = forms["lecturing_charge_form"]
+        practical_charge_form = forms["practical_charge_form"]
 
-    def get_form_kwargs(self):
-        lecturing_charge = self.attribution.lecturing_charges[0] if self.attribution.lecturing_charges else None
-        practical_charge = self.attribution.practical_charges[0] if self.attribution.practical_charges else None
-        form_kwargs = super().get_form_kwargs()
-        form_kwargs["form_kwargs"] = {
-            "instances": [lecturing_charge, practical_charge]
-        }
-        return form_kwargs
+        for form in (lecturing_charge_form, practical_charge_form):
+            form.save(self.attribution, self.luy)
 
-    def form_valid(self, formset):
-        types = (learning_component_year_type.LECTURING, learning_component_year_type.PRACTICAL_EXERCISES)
-        for form, component_type in zip(formset, types):
-            form.save(self.attribution, self.luy, component_type)
-        return super().form_valid(formset)
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_message(self, cleaned_data):
         return _("Repartition modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,

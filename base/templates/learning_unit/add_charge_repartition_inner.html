@@ -49,9 +49,8 @@
                             <td>{% trans attribution.function %}</td>
                             <td>{{ attribution.start_year | default_if_none:'' }}</td>
                             <td>{{ attribution.duration | default_if_none:'' }}</td>
-                            {% for form in formset %}
-                            <td>{% bootstrap_field form.allocation_charge show_label=False %}</td>
-                            {% endfor %}
+                            <td>{% bootstrap_field lecturing_charge_form.allocation_charge show_label=False %}</td>
+                            <td>{% bootstrap_field practical_charge_form.allocation_charge show_label=False %}</td>
                             <td>{{ value.PRACTICAL_EXERCISES | default_if_none:0 | floatformat:2 }}</td>
                             <td>{{ attribution.substitute | default_if_none:'' }}</td>
                         </tr>
