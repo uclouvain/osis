@@ -23,13 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.forms import ModelForm, formset_factory, BaseFormSet
+from django.forms import ModelForm, formset_factory, BaseFormSet, inlineformset_factory
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
+from attribution.models.attribution_new import AttributionNew
+from base.models.enums import learning_component_year_type
 from base.models.learning_component_year import LearningComponentYear
 
 
-class AttributionChargeRepartitionForm(ModelForm):
+class AttributionForm(ModelForm):
+    class Meta:
+        model = AttributionNew
+        fields = ["function", "start_year", "start_year"]
+
+
+class AttributionChargeForm(ModelForm):
     class Meta:
         model = AttributionChargeNew
         fields = ["allocation_charge"]
@@ -49,7 +57,19 @@ class AttributionChargeRepartitionForm(ModelForm):
         return attribution_charge_obj
 
 
-AttributionChargeRepartitionFormSet = formset_factory(AttributionChargeRepartitionForm, max_num=2, min_num=2)
+class LecturingAttributionChargeForm(AttributionChargeForm):
+
+    def save(self, attribution_new_obj, luy_obj):
+        super().save(attribution_new_obj, luy_obj, learning_component_year_type.LECTURING)
+
+
+class PracticalAttributionChargeForm(AttributionChargeForm):
+
+    def save(self, attribution_new_obj, luy_obj):
+        super().save(attribution_new_obj, luy_obj, learning_component_year_type.PRACTICAL_EXERCISES)
+
+
+AttributionChargeRepartitionFormSet = formset_factory(AttributionChargeForm, max_num=2, min_num=2)
 
 
 class AttributionChargeNewForm(ModelForm):

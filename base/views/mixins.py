@@ -27,11 +27,13 @@ import waffle
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DeleteView
+from django.views.generic.base import ContextMixin, TemplateResponseMixin
+from django.views.generic.edit import ProcessFormView
 
 from base.views import common
 
@@ -131,3 +133,90 @@ class DeleteViewWithDependencies(FlagMixin, RulesRequiredMixin, AjaxTemplateMixi
         result = super().delete(request, *args, **kwargs)
         common.display_success_messages(request, _(self.success_message))
         return result
+
+
+# https://gist.github.com/badri/4a1be2423ce9353373e1b3f2cc67b80b
+class MultiFormMixin(ContextMixin):
+    form_classes = {}
+    prefixes = {}
+
+    initial = {}
+    prefix = None
+    success_url = None
+
+    def get_form_classes(self):
+        return self.form_classes
+
+    def get_forms(self, form_classes):
+        return dict([(key, self._create_form(key, class_name)) \
+                     for key, class_name in form_classes.items()])
+
+    def get_all_forms(self):
+        return self.get_forms(self.form_classes)
+
+    def get_form_kwargs(self, form_name):
+        kwargs = {}
+        kwargs.update({'initial': self.get_initial(form_name)})
+        kwargs.update({'prefix': self.get_prefix(form_name)})
+        if self.request.method in ('POST', 'PUT'):
+            kwargs.update({
+                'data': self.request.POST,
+                'files': self.request.FILES,
+            })
+        return kwargs
+
+    def forms_valid(self, forms):
+        return HttpResponseRedirect(self.get_success_url())
+
+    def forms_invalid(self, forms):
+        return self.render_to_response(self.get_context_data(**forms))
+
+    def get_initial(self, form_name):
+        initial_method = 'get_%s_initial' % form_name
+        if hasattr(self, initial_method):
+            return getattr(self, initial_method)()
+        else:
+            return {}
+
+    def get_prefix(self, form_name):
+        return self.prefixes.get(form_name, self.prefix)
+
+    def get_success_url(self):
+        return self.success_url
+
+    def _create_form(self, form_name, form_class):
+        form_kwargs = self.get_form_kwargs(form_name)
+        form = form_class(**form_kwargs)
+        return form
+
+
+class ProcessMultipleFormsView(ProcessFormView):
+
+    def get(self, request, *args, **kwargs):
+        form_classes = self.get_form_classes()
+        forms = self.get_forms(form_classes)
+        return self.render_to_response(self.get_context_data(**forms))
+
+    def post(self, request, *args, **kwargs):
+        form_classes = self.get_form_classes()
+        return self.process_forms(form_classes)
+
+    def process_forms(self, form_classes):
+        forms = self.get_forms(form_classes)
+        forms_are_valid = all(form.is_valid() for key, form in forms.items())
+        if forms_are_valid:
+            return self.forms_valid(forms)
+        else:
+            return self.forms_invalid(forms)
+
+
+class BaseMultipleFormsView(MultiFormMixin, ProcessMultipleFormsView):
+    """
+    A base view for displaying several forms.
+    """
+
+
+class MultiFormsView(TemplateResponseMixin, BaseMultipleFormsView):
+    """
+    A view for displaying several forms, and rendering a template response.
+    """
