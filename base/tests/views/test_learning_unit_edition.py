@@ -97,19 +97,11 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
         self.assertEqual(response.status_code, 403)
 
     @mock.patch('base.business.learning_units.perms.is_eligible_for_modification_end_date')
-    @mock.patch('base.views.layout.render')
-    def test_view_learning_unit_edition_get(self, mock_render, mock_perms):
+    def test_view_learning_unit_edition_get(self, mock_perms):
         mock_perms.return_value = True
+        response = self.client.get(reverse(learning_unit_edition_end_date, args=[self.learning_unit_year.id]))
+        self.assertTemplateUsed(response, "learning_unit/simple/update_end_date.html")
 
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse(learning_unit_edition_end_date, args=[self.learning_unit_year.id]))
-        request.user = self.a_superuser
-
-        learning_unit_edition_end_date(request, self.learning_unit_year.id)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, "learning_unit/simple/update_end_date.html")
 
     @mock.patch('base.business.learning_units.perms.is_eligible_for_modification_end_date')
     def test_view_learning_unit_edition_post(self, mock_perms):
