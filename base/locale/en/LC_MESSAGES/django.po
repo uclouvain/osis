@@ -4086,3 +4086,9 @@ msgstr ""
 
 msgid "Clear notifications"
 msgstr ""
+
+msgid "One of the partial volumes must have a value to 0."
+msgstr ""
+
+msgid "The volume can not be set to 0."
+msgstr ""
