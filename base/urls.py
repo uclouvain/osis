@@ -51,11 +51,20 @@ from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
+from base.views.organization import OrganizationAutocomplete
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
-    url(r'^entity_autocomplete/$', base.views.learning_units.update.EntityAutocomplete.as_view(),
-        name='entity_autocomplete'),
+    url(
+        r'^entity_autocomplete/$',
+        base.views.learning_units.update.EntityAutocomplete.as_view(),
+        name='entity_autocomplete',
+    ),
+    url(
+        r'^organization-autocomplete/$',
+        OrganizationAutocomplete.as_view(),
+        name='organization_autocomplete',
+    ),
     url(r'^academic_actors/$', institution.academic_actors, name='academic_actors'),
 
     url(r'^academic_calendars/', include([
