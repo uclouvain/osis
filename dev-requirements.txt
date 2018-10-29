@@ -3,3 +3,4 @@
 django-pdb
 django-extensions
 django-debug-toolbar
+tblib

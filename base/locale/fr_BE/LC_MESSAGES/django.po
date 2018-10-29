@@ -4057,14 +4057,14 @@ msgstr "Institution de référence"
 msgid "EDITION_OF_GENERAL_INFORMATION"
 msgstr "Modification des informations générales"
 
-msgid "Repartition added"
-msgstr "Répartition ajoutée"
+msgid "Repartition added for %(tutor)s (%(function)s)"
+msgstr "Répartition ajoutée pour %(tutor)s (%(function)s)"
 
-msgid "Repartition edited"
-msgstr "Répartition modifiée"
+msgid "Repartition modified for %(tutor)s (%(function)s)"
+msgstr "Répartition modifiée pour %(tutor)s (%(function)s)"
 
-msgid "Repartition removed"
-msgstr "Répartition supprimée"
+msgid "Repartition removed for %(tutor)s (%(function)s)"
+msgstr "Répartition supprimée pour %(tutor)s (%(function)s)"
 
 msgid "Manage repartition"
 msgstr "Gérer la répartition"
