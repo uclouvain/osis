@@ -41,16 +41,17 @@ from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit.edition_volume import VolumeEditionFormsetContainer
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
 from base.models.entity_version import find_pedagogical_entities_version, \
-    find_all_current_entities_version, EntityVersion
+    find_all_current_entities_version
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views import layout
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages
-from base.views.learning_unit import learning_unit_identification, learning_unit_components
+from base.views.learning_unit import learning_unit_components
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context, \
     get_common_context_learning_unit_year
+from base.views.learning_units.detail import learning_unit_identification
 
 
 @login_required
@@ -78,7 +79,7 @@ def learning_unit_edition_end_date(request, learning_unit_year_id):
             display_error_messages(request, e.args[0])
 
     context['form'] = form
-    return layout.render(request, 'learning_unit/simple/update_end_date.html', context)
+    return render(request, 'learning_unit/simple/update_end_date.html', context)
 
 
 def _get_current_learning_unit_year_id(learning_unit_to_edit, learning_unit_year_id):
