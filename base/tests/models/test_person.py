@@ -32,7 +32,15 @@ from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.test import override_settings
 from base.models import person
+from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import person_source_type
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
+from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
 from base.models.person import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, get_user_interface_language, \
     change_language
@@ -144,9 +152,9 @@ class PersonTest(PersonTestCase):
 
     def test_calculate_age(self):
         a_person = PersonFactory()
-        a_person.birth_date = datetime.datetime.now() - datetime.timedelta(days=((30*365)+15))
+        a_person.birth_date = datetime.datetime.now() - datetime.timedelta(days=((30 * 365) + 15))
         self.assertEqual(person.calculate_age(a_person), 30)
-        a_person.birth_date = datetime.datetime.now() - datetime.timedelta(days=((30*365)-5))
+        a_person.birth_date = datetime.datetime.now() - datetime.timedelta(days=((30 * 365) - 5))
         self.assertEqual(person.calculate_age(a_person), 29)
 
     def test_is_central_manager(self):
@@ -192,7 +200,7 @@ class PersonTest(PersonTestCase):
     def test_str_function_with_data(self):
         self.person_with_user.middle_name = "Junior"
         self.person_with_user.save()
-        self.assertEqual(self.person_with_user.__str__(),"DOE, John Junior")
+        self.assertEqual(self.person_with_user.__str__(), "DOE, John Junior")
 
     def test_change_language_with_user_with_person(self):
         change_language(self.user_for_person, "en")
@@ -201,3 +209,37 @@ class PersonTest(PersonTestCase):
 
     def test_change_language_with_user_without_person(self):
         self.assertFalse(change_language(self.an_user, "en"))
+
+    def test_is_linked_to_entity_in_charge_of_learning_unit_year(self):
+        person_entity = PersonEntityFactory(person=self.person_with_user)
+        luy = LearningUnitYearFactory()
+
+        self.assertFalse(
+            self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
+        )
+
+        EntityContainerYearFactory(
+            learning_container_year=luy.learning_container_year,
+            entity=person_entity.entity,
+            type=REQUIREMENT_ENTITY
+        )
+
+        self.assertTrue(
+            self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
+        )
+
+    def test_is_linked_to_entity_in_charge_of_external_learning_unit_year(self):
+        person_entity = PersonEntityFactory(person=self.person_with_user)
+        luy = LearningUnitYearFactory()
+        external_luy = ExternalLearningUnitYearFactory(learning_unit_year=luy)
+
+        self.assertFalse(
+            self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
+        )
+
+        external_luy.requesting_entity = person_entity.entity
+        external_luy.save()
+
+        self.assertTrue(
+            self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
+        )
