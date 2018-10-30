@@ -36,7 +36,7 @@ from base.views.learning_units.common import show_success_learning_unit_year_cre
 
 @login_required
 @waffle_flag("learning_unit_external_create")
-@permission_required('base.can_propose_learningunit', raise_exception=True)
+@permission_required('base.add_externallearningunityear', raise_exception=True)
 def get_external_learning_unit_creation_form(request, academic_year):
     person = get_object_or_404(Person, user=request.user)
     academic_year = get_object_or_404(AcademicYear, pk=academic_year)
