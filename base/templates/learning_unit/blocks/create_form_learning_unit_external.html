@@ -40,14 +40,16 @@
             </div>
             {% bootstrap_field learning_container_year_form.container_type form_group_class="col-md-4" %}
 
+{#            {% bootstrap_field learning_unit_year_form.periodicity form_group_class="col-md-4" %}#}
+
 
         </div>
         <br>
         <div class="row">
             {% bootstrap_field learning_unit_year_form.credits form_group_class="col-md-3" %}
             {% bootstrap_field learning_unit_external_form.external_credits form_group_class="col-md-3" %}
-            {% bootstrap_field learning_unit_year_form.status form_group_class="col-md-4" %}
-            {% bootstrap_field learning_unit_year_form.language form_group_class="col-md-2" %}
+            {% bootstrap_field learning_unit_year_form.status form_group_class="col-md-2" %}
+            {% bootstrap_field learning_unit_year_form.language form_group_class="col-md-4" %}
         </div>
         <br>
         {% include "learning_unit/blocks/titles.html" %}
