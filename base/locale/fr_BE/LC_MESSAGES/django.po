@@ -4094,3 +4094,9 @@ msgstr "Il y a déjà une co-organisation avec cette institution"
 
 msgid "The coorganization has been created"
 msgstr "La nouvelle coorganisation a bien été créee"
+
+msgid "One of the partial volumes must have a value to 0."
+msgstr "Un des volumes partiels doit avoir une valeur à 0."
+
+msgid "The volume can not be set to 0."
+msgstr "Le volume ne peut pas être mis à 0."

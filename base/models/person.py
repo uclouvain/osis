@@ -248,4 +248,7 @@ def find_by_firstname_or_lastname(name):
 
 
 def is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person):
+    # TODO  The external LUY maybe should have additional perm
+    if learning_unit_year.is_external():
+        return True
     return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)

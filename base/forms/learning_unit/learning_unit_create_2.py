@@ -280,7 +280,8 @@ class FullForm(LearningUnitBaseForm):
                 'data': data,
                 'queryset': LearningComponentYear.objects.filter(
                     learningunitcomponent__learning_unit_year=self.instance
-                ) if self.instance else LearningComponentYear.objects.none()
+                ) if self.instance else LearningComponentYear.objects.none(),
+                'person': self.person
             }
 
         }
