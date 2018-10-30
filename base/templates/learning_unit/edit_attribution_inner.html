@@ -1,13 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>{% load bootstrap3 i18n %}
+{% load bootstrap3 i18n %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -32,49 +23,43 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% if request.is_ajax %}
-<div class="modal-content" id="form-modal-content">
 
-        <div id="form-modal-body" class="modal-body">
-{% endif %}
+<div id="form-modal-body" class="modal-body">
 
-            <form method="post" id="form_charge_repartition" action="{{ request.path }}">
-                {% csrf_token %}
-                 {{ formset.management_form }}
-                <table class="table">
-                    <thead>
-                        <th>{% trans 'tutor' %}</th>
-                        <th>{% trans 'function' %}</th>
-                        <th>{% trans 'start' %}</th>
-                        <th>{% trans 'duration' %}</th>
-                        <th>Volume 1</th>
-                        <th>Volume 2</th>
-                        <th>{% trans 'substitute' %}</th>
-                        <th></th>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{{ attribution.tutor.person }}</td>
-                            <td>{% bootstrap_field attribution_form.function show_label=False %}</td>
-                            <td>{% bootstrap_field attribution_form.start_year show_label=False %}</td>
-                            <td>{% bootstrap_field attribution_form.duration show_label=False %}</td>
-                            <td>{% bootstrap_field lecturing_charge_form.allocation_charge show_label=False %}</td>
-                            <td>{% bootstrap_field practical_charge_form.allocation_charge show_label=False %}</td>
-                            <td>{{ value.PRACTICAL_EXERCISES | default_if_none:0 | floatformat:2 }}</td>
-                            <td>{{ attribution.substitute | default_if_none:'' }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                {% if not request.is_ajax %}
-                    <input type="submit" value="{% trans "i_confirm" %}" class="btn btn-danger"/>
-                {% endif %}
-            </form>
-        </div>
-
-{% if request.is_ajax %}
-       <div class="modal-footer">
-           <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
-           <input type="submit" value="{% trans "save" %}" class="btn btn-primary" onclick="$('#form_charge_repartition').submit();"/>
-       </div>
+    <form method="post" id="form_charge_repartition" action="{{ request.path }}">
+        {% csrf_token %}
+         {{ formset.management_form }}
+        <table class="table">
+            <thead>
+                <th>{% trans 'tutor' %}</th>
+                <th>{% trans 'function' %}</th>
+                <th>{% trans 'start' %}</th>
+                <th>{% trans 'duration' %}</th>
+                <th>Volume 1</th>
+                <th>Volume 2</th>
+                <th>{% trans 'substitute' %}</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ attribution.tutor.person }}</td>
+                    <td>{% bootstrap_field attribution_form.function show_label=False %}</td>
+                    <td>{% bootstrap_field attribution_form.start_year show_label=False %}</td>
+                    <td>{% bootstrap_field attribution_form.duration show_label=False %}</td>
+                    <td>{% bootstrap_field lecturing_charge_form.allocation_charge show_label=False %}</td>
+                    <td>{% bootstrap_field practical_charge_form.allocation_charge show_label=False %}</td>
+                    <td>{{ value.PRACTICAL_EXERCISES | default_if_none:0 | floatformat:2 }}</td>
+                    <td>{{ attribution.substitute | default_if_none:'' }}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% if not request.is_ajax %}
+            <input type="submit" value="{% trans "i_confirm" %}" class="btn btn-danger"/>
+        {% endif %}
+    </form>
 </div>
-{% endif %}
+
+<div class="modal-footer">
+   <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+   <input type="submit" value="{% trans "save" %}" class="btn btn-primary" onclick="$('#form_charge_repartition').submit();"/>
+</div>

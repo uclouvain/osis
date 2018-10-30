@@ -169,7 +169,7 @@ class TestAddChargeRepartition(TestChargeRepartitionMixin, TestCase):
 
         self.mocked_permission_function.assert_called_once_with(self.learning_unit_year, self.person)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "learning_unit/add_charge_repartition.html")
+        self.assertTemplateUsed(response, "learning_unit/add_charge_repartition_inner.html")
 
     def test_post(self):
         data = {
@@ -204,7 +204,7 @@ class TestEditChargeRepartition(TestChargeRepartitionMixin, TestCase):
 
         self.mocked_permission_function.assert_called_once_with(self.learning_unit_year, self.person)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "learning_unit/add_charge_repartition.html")
+        self.assertTemplateUsed(response, "learning_unit/add_charge_repartition_inner.html")
 
     def test_post(self):
         data = {
@@ -238,7 +238,7 @@ class TestRemoveChargeRepartition(TestChargeRepartitionMixin, TestCase):
 
         self.mocked_permission_function.assert_called_once_with(self.learning_unit_year, self.person)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "learning_unit/remove_charge_repartition_confirmation.html")
+        self.assertTemplateUsed(response, "learning_unit/remove_charge_repartition_confirmation_inner.html")
 
     def test_delete_data(self):
         response = self.client.delete(self.url)

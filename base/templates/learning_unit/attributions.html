@@ -61,12 +61,12 @@
                                 <td>{{ value.substitute | default_if_none:'' }}</td>
                                 <td>
                                     {% if can_manage_attribution %}
-                                        <a href="#" class="remove-attribution-btn" data-form="{% url "update_attribution" learning_unit_year.id key %}"><span class="glyphicon glyphicon-edit"></span> </a>
-                                        <a href="#" class="remove-attribution-btn" data-form="{% url "remove_charge_repartition" learning_unit_year.id key %}"><span class="glyphicon glyphicon-trash"></span> </a>
+                                        <a href="#" class="trigger_modal" data-url="{% url "update_attribution" learning_unit_year.id key %}"><span class="glyphicon glyphicon-edit"></span> </a>
+                                        <a href="#" class="trigger_modal" data-url="{% url "remove_charge_repartition" learning_unit_year.id key %}"><span class="glyphicon glyphicon-trash"></span> </a>
                                     {% endif %}
                                     {% if can_manage_charge_repartition%}
-                                    <a href="#" class="remove-attribution-btn" data-form="{% url "edit_charge_repartition" learning_unit_year.id key %}"><span class="glyphicon glyphicon-edit"></span> </a>
-                                    <a href="#" class="remove-attribution-btn" data-form="{% url "remove_charge_repartition" learning_unit_year.id key %}"><span class="glyphicon glyphicon-trash"></span> </a>
+                                    <a href="#" class="trigger_modal" data-url="{% url "edit_charge_repartition" learning_unit_year.id key %}"><span class="glyphicon glyphicon-edit"></span> </a>
+                                    <a href="#" class="trigger_modal" data-url="{% url "remove_charge_repartition" learning_unit_year.id key %}"><span class="glyphicon glyphicon-trash"></span> </a>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -83,24 +83,4 @@
     </div>
 </div>
 
-<div class="modal fade" id="form-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" id="modal_dialog_id">
-      <div class="modal-content" id="form-modal-content">
-
-     </div>
-   </div>
- </div>
-
-<script type="text/javascript" src="{% static "js/modal_form_submit.js" %}"></script>
-<script type="application/javascript">
-    $(".remove-attribution-btn").click(function(ev) {
-        ev.preventDefault();
-        var url = $(this).data("form");
-        $('#form-modal-content').load(url, function () {
-            $('#form-modal').modal('toggle');
-            formAjaxSubmit('#form-modal-body form', '#form-modal');
-        });
-        return false;
-    });
-</script>
 {% endblock %}

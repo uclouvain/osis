@@ -88,7 +88,7 @@ class AttributionBaseViewMixin(RulesRequiredMixin):
 
 class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsView):
     rules = [perms.is_eligible_to_manage_attributions]
-    template_name = "learning_unit/edit_attribution.html"
+    template_name = "learning_unit/edit_attribution_inner.html"
     form_classes = {
         "attribution_form": AttributionForm,
         "lecturing_charge_form": LecturingAttributionChargeForm,
@@ -137,7 +137,7 @@ class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, SuccessMess
     rules = [lambda luy, person: perms.is_eligible_to_manage_charge_repartition(luy, person)
              or perms.is_eligible_to_manage_attributions(luy, person)]
     model = AttributionNew
-    template_name = "learning_unit/remove_charge_repartition_confirmation.html"
+    template_name = "learning_unit/remove_charge_repartition_confirmation_inner.html"
     pk_url_kwarg = "attribution_id"
 
     def delete(self, request, *args, **kwargs):
