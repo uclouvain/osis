@@ -119,14 +119,14 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
             else None
         }.get(form_name)
 
-    def attribution_form_valid(self, form):
-        form.save()
+    def attribution_form_valid(self, attribution_form):
+        attribution_form.save()
 
-    def lecturing_charge_form_valid(self, form):
-        form.save(self.attribution, self.luy)
+    def lecturing_charge_form_valid(self, lecturing_charge_form):
+        lecturing_charge_form.save(self.attribution, self.luy)
 
-    def practical_charge_form_valid(self, form):
-        form.save(self.attribution, self.luy)
+    def practical_charge_form_valid(self, practical_charge_form):
+        practical_charge_form.save(self.attribution, self.luy)
 
     def get_success_message(self, cleaned_data):
         return _("Attribution modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,

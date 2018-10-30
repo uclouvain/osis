@@ -98,6 +98,15 @@ class AjaxTemplateMixin:
         else:
             return redirect
 
+    def forms_valid(self, forms):
+        redirect = super().forms_valid(forms)
+
+        # When the form is saved, we return only the url, not all the template
+        if self.request.is_ajax():
+            return JsonResponse({"success": True, "success_url": self.get_success_url()})
+        else:
+            return redirect
+
     def delete(self, request, *args, **kwargs):
         redirect = super().delete(request, *args, **kwargs)
 
@@ -210,8 +219,7 @@ class ProcessMultipleFormsView(ProcessFormView):
         forms_are_valid = all(form.is_valid() for key, form in forms.items())
         if forms_are_valid:
             return self.forms_valid(forms)
-        else:
-            return self.forms_invalid(forms)
+        return self.forms_invalid(forms)
 
 
 class BaseMultipleFormsView(MultiFormMixin, ProcessMultipleFormsView):
