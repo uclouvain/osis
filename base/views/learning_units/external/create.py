@@ -48,4 +48,4 @@ def get_external_learning_unit_creation_form(request, academic_year):
                                                          'learning_unit_successfuly_created')
         return redirect('learning_unit', learning_unit_year_id=learning_unit_year.pk)
 
-    return render(request, "learning_unit/simple/creation_external.html", external_form.get_context())
+    return render(request, "learning_unit/external/creation_external.html", external_form.get_context())
