@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+from decimal import Decimal
 
 from django.test import TestCase
 
@@ -61,18 +62,18 @@ class LearningUnitYearWithContextTestCase(TestCase):
 
         self.entity_components_yr = [self.entity_component_yr, ]
 
-    def test_get_floated_only_element_of_list(self):
+    def test_get_decimal_only_element_of_list(self):
         a_list = []
-        self.assertIsNone(learning_unit_year_with_context._get_floated_only_element_of_list(a_list))
-        self.assertEqual(learning_unit_year_with_context._get_floated_only_element_of_list(a_list, 0), 0)
+        self.assertIsNone(learning_unit_year_with_context._get_decimal_only_element_of_list(a_list))
+        self.assertEqual(learning_unit_year_with_context._get_decimal_only_element_of_list(a_list, 0), 0)
 
         a_list = [17]
-        self.assertEqual(learning_unit_year_with_context._get_floated_only_element_of_list(a_list), 17.0)
-        self.assertEqual(type(learning_unit_year_with_context._get_floated_only_element_of_list(a_list)), float)
+        self.assertEqual(learning_unit_year_with_context._get_decimal_only_element_of_list(a_list), 17.0)
+        self.assertEqual(type(learning_unit_year_with_context._get_decimal_only_element_of_list(a_list)), int)
 
         a_list = [1, 2]
         with self.assertRaisesMessage(ValueError, "The provided list should contain 0 or 1 elements"):
-            learning_unit_year_with_context._get_floated_only_element_of_list(a_list)
+            learning_unit_year_with_context._get_decimal_only_element_of_list(a_list)
 
     def test_get_requirement_entities_volumes(self):
         academic_year = AcademicYearFactory(year=2016)
