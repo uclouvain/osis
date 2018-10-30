@@ -144,7 +144,7 @@ class DeleteViewWithDependencies(FlagMixin, RulesRequiredMixin, AjaxTemplateMixi
         return result
 
 
-# https://gist.github.com/badri/4a1be2423ce9353373e1b3f2cc67b80b
+# Inspired by https://gist.github.com/badri/4a1be2423ce9353373e1b3f2cc67b80b
 class MultiFormMixin(ContextMixin):
     form_classes = {}
     prefixes = {}
