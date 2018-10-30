@@ -441,7 +441,7 @@ class EducationGroupYear(models.Model):
 
     class Meta:
         verbose_name = _("education group year")
-        unique_together = (('education_group', 'academic_year'), ('acronym', 'academic_year'),)
+        unique_together = ('education_group', 'academic_year')
 
     def __str__(self):
         return "{} - {} - {}".format(
