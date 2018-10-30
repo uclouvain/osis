@@ -173,8 +173,8 @@ class TestAddChargeRepartition(TestChargeRepartitionMixin, TestCase):
 
     def test_post(self):
         data = {
-            'lecturing_form-allocation_charge': 50,  # Lecturing
-            'practical_form-allocation_charge': 10  # Practical
+            'lecturing_form-allocation_charge': 50,
+            'practical_form-allocation_charge': 10
         }
         response = self.client.post(self.url, data=data)
 
@@ -208,8 +208,8 @@ class TestEditChargeRepartition(TestChargeRepartitionMixin, TestCase):
 
     def test_post(self):
         data = {
-            'lecturing_form-allocation_charge': 50,  # Lecturing
-            'practical_form-allocation_charge': 10  # Practical
+            'lecturing_form-allocation_charge': 50,
+            'practical_form-allocation_charge': 10
         }
         response = self.client.post(self.url, data=data)
 

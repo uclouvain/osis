@@ -61,7 +61,7 @@ class LearningUnitYearFactory(DjangoModelFactory):
     learning_unit = factory.SubFactory(LearningUnitFactory)
     learning_container_year = factory.SubFactory(LearningContainerYearFactory)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
+                                               datetime.datetime(2017, 3, 1))
     acronym = factory.Sequence(lambda n: 'LFAC%04d' % n)
     specific_title = factory.Sequence(lambda n: 'Learning unit year - %d' % n)
     specific_title_english = factory.Sequence(lambda n: 'Learning unit year english - %d' % n)
@@ -112,7 +112,6 @@ class LearningUnitYearFullFactory(LearningUnitYearFactory):
 
 class LearningUnitYearPartimFactory(LearningUnitYearFactory):
     subtype = learning_unit_year_subtypes.PARTIM
-
 
 
 def create_learning_unit_year(academic_yr, title, learning_unit):
