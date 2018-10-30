@@ -1530,6 +1530,21 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
         self.assertEqual(msgs,
                          [])
 
+    def test_should_not_fail_when_no_charges(self):
+        self.charge_lecturing_1.allocation_charge = None
+        self.charge_lecturing_1.save()
+        self.charge_lecturing_2.allocation_charge = None
+        self.charge_lecturing_2.save()
+        self.charge_practical_1.allocation_charge = None
+        self.charge_practical_1.save()
+        self.charge_practical_2.allocation_charge = None
+        self.charge_practical_2.save()
+
+        msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
+
+        self.assertEqual(msgs,
+                         [])
+
     def test_should_give_warning_messages_when_volume_partim_superior_to_volume_parent(self):
         self.charge_lecturing_1.allocation_charge = 50
         self.charge_lecturing_1.save()
