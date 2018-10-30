@@ -95,7 +95,7 @@
                                     <div class="col-md-3">
                                         <label {{ differences|get_difference_css:'credits' }}>{% trans 'credits'%}</label><br>
                                         <span {{ differences|get_difference_css:'credits' }} id="id_credits">
-                                            {{ learning_unit_year.credits.normalize }}
+                                            {{ learning_unit_year.credits|floatformat }}
                                         </span>
                                     </div>
                                     <div class="col-md-3">
