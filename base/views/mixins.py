@@ -157,7 +157,7 @@ class MultiFormMixin(ContextMixin):
         return self.form_classes
 
     def get_forms(self, form_classes):
-        return dict([(key, self._create_form(key, class_name)) \
+        return dict([(key, self._create_form(key, class_name))
                      for key, class_name in form_classes.items()])
 
     def get_all_forms(self):

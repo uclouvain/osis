@@ -75,6 +75,19 @@ class SelectAttributionView(AttributionBaseViewMixin, TemplateView):
         return context
 
 
+class EditChargeRepartition(EditAttributionView):
+    rules = [perms.is_eligible_to_manage_charge_repartition]
+    template_name = "learning_unit/add_charge_repartition.html"
+    form_classes = {
+        "lecturing_charge_form": LecturingAttributionChargeForm,
+        "practical_charge_form": PracticalAttributionChargeForm
+    }
+
+    def get_success_message(self, cleaned_data):
+        return _("Repartition modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
+                                                                         "function": _(self.attribution.function)}
+
+
 class AddChargeRepartition(EditAttributionView):
     rules = [perms.is_eligible_to_manage_charge_repartition]
     template_name = "learning_unit/add_charge_repartition.html"
@@ -112,16 +125,3 @@ class AddChargeRepartition(EditAttributionView):
     def get_success_message(self, cleaned_data):
         return _("Repartition added for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
                                                                       "function": _(self.attribution.function)}
-
-
-class EditChargeRepartition(EditAttributionView):
-    rules = [perms.is_eligible_to_manage_charge_repartition]
-    template_name = "learning_unit/add_charge_repartition.html"
-    form_classes = {
-        "lecturing_charge_form": LecturingAttributionChargeForm,
-        "practical_charge_form": PracticalAttributionChargeForm
-    }
-
-    def get_success_message(self, cleaned_data):
-        return _("Repartition modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
-                                                                         "function": _(self.attribution.function)}
