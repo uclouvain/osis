@@ -3003,6 +3003,11 @@
                 "externallearningunityear"
             ],
             [
+                "add_externallearningunityear",
+                "base",
+                "externallearningunityear"
+            ],
+            [
                 "can_create_learningunit",
                 "base",
                 "learningunit"
@@ -3172,6 +3177,11 @@
             ],
             [
                 "can_access_externallearningunityear",
+                "base",
+                "externallearningunityear"
+            ],
+            [
+                "add_externallearningunityear",
                 "base",
                 "externallearningunityear"
             ],
