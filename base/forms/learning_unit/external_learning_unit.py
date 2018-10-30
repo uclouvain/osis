@@ -171,9 +171,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             'data': data,
             'instance': self.instance,
             'initial': {'status': True,
-                        'academic_year': default_ac_year,
-                        'periodicity': ANNUAL,
-                        },
+                        'academic_year': default_ac_year},
             'person': self.person,
             'subtype': self.subtype
         }

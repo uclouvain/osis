@@ -163,7 +163,6 @@ class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
 class ExternalLearningUnitYearModelForm(LearningUnitYearModelForm):
 
     class Meta(LearningUnitYearModelForm.Meta):
-        model = LearningUnitYear
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
                   'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure',
                   'professional_integration', 'campus', 'language')
