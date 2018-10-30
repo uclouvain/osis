@@ -33,9 +33,9 @@
     <div class="panel-heading">
         <div class="row">
             {% include "education_group/blocks/hamburger_button.html" %}
-            {% if can_edit_information %}
+            {% if can_edit_information  and url_exists %}
             <div class="pull-right" style="margin-right: 15px;">
-                <a class="btn btn-default" style="margin-right: 20px;">
+                <a class="btn btn-default" style="margin-right: 20px;" href={{ url_to_publish }}>
                     {% trans 'Publish' %}
                 </a>
             </div>

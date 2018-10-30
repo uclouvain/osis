@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import json
+import requests
 from collections import OrderedDict, namedtuple
 
 from ckeditor.widgets import CKEditorWidget
@@ -50,6 +51,7 @@ from cms import models as mdl_cms
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from backoffice.settings.local import URL_TO_PUBLISH
 
 SECTIONS_WITH_TEXT = (
     'ucl_bachelors',
@@ -159,11 +161,20 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         context = super().get_context_data(**kwargs)
 
         is_common_education_group_year = self.object.acronym.startswith('common-')
+        code = self.object.acronym
+        anac = str(self.object.academic_year)[0:4]
+        url, exists = URL_TO_PUBLISH.format(anac, code), True
+
+        request = requests.get(url)
+        if request.status_code == 404:
+            exists = False
 
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(is_common_education_group_year),
             'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object']),
+            'url_to_publish': url,
+            'url_exists': exists
         })
 
         return context
