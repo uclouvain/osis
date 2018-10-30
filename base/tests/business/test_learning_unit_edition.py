@@ -53,6 +53,7 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_component_year import EntityComponentYearFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -730,8 +731,53 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         new_luy_teaching_material_count = mdl_teaching_material.find_by_learning_unit_year(new_luy).count()
         new_luy_educational_information = translated_text.build_list_of_cms_content_by_reference(new_luy.id)
 
-        self.assertEquals(last_luy_teaching_material_count, new_luy_teaching_material_count)
+        self.assertEqual(last_luy_teaching_material_count, new_luy_teaching_material_count)
         self.assertCountEqual(last_luy_educational_information, new_luy_educational_information)
+
+    def test_postpone_end_date_with_external_learning_unit(self):
+        start_year_full = self.starting_academic_year.year - 1
+        end_year_full = self.starting_academic_year.year + 1
+        expected_end_year_full = end_year_full + 2
+        academic_year_of_new_end_date = academic_year.find_academic_year_by_year(expected_end_year_full)
+
+        learning_unit_full_annual = self.setup_learning_unit(start_year=start_year_full, end_year=end_year_full)
+
+        luy_list = self.setup_list_of_learning_unit_years_full(
+            list_of_academic_years=self.list_of_academic_years,
+            learning_unit_full=learning_unit_full_annual,
+            periodicity=learning_unit_year_periodicity.ANNUAL
+        )
+        for luy in luy_list:
+            ExternalLearningUnitYearFactory(learning_unit_year=luy, external_acronym="Yolo")
+
+        edit_learning_unit_end_date(learning_unit_full_annual, academic_year_of_new_end_date)
+
+        new_luy = mdl_luy.find_latest_by_learning_unit(learning_unit_full_annual)
+
+        self.assertEqual(new_luy.externallearningunityear.external_acronym, "Yolo")
+
+    def test_shorten_end_date_with_external_learning_unit(self):
+        start_year_full = self.starting_academic_year.year - 3
+        end_year_full = self.starting_academic_year.year
+        expected_end_year_full = end_year_full - 2
+        academic_year_of_new_end_date = academic_year.find_academic_year_by_year(expected_end_year_full)
+
+        learning_unit_full_annual = self.setup_learning_unit(start_year=start_year_full, end_year=end_year_full)
+
+        luy_list = self.setup_list_of_learning_unit_years_full(
+            list_of_academic_years=self.list_of_academic_years,
+            learning_unit_full=learning_unit_full_annual,
+            periodicity=learning_unit_year_periodicity.ANNUAL
+        )
+        for luy in luy_list:
+            ExternalLearningUnitYearFactory(learning_unit_year=luy, external_acronym="Yolo")
+
+        edit_learning_unit_end_date(learning_unit_full_annual, academic_year_of_new_end_date)
+
+        new_luy = mdl_luy.find_latest_by_learning_unit(learning_unit_full_annual)
+        self.assertEqual(learning_unit_full_annual.end_year, academic_year_of_new_end_date.year)
+        self.assertEqual(new_luy.externallearningunityear.external_acronym, "Yolo")
+
 
 
 def _create_classes(learning_component_year, number_classes):

@@ -1,6 +1,5 @@
-{% load staticfiles %}
-{% load i18n %}
-{% load bootstrap3 %}
+{% load staticfiles i18n bootstrap3 static %}
+
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -44,6 +43,7 @@
         <button type="submit" class="btn" data-dismiss="modal">{% trans 'save' %} </button>
     {% endif %}
 </form>
+{{ form.media }}
 
 {% if request.is_ajax %}
     </div>
@@ -54,26 +54,3 @@
     </div>
 </div>
 {% endif %}
-
-{% block script %}
-    <script src="{% static 'js/select_ajax_filtering.js' %}"></script>
-    <script>
-        function initOrganizationFilter() {
-            const countryNode = $("select#id_country");
-            const organizationNode = $("select#id_organization");
-            const ajaxUrl = "{% url "filter_organizations_by_country" %}";
-
-            if (countryNode && organizationNode)
-                countryNode.filterOrganizationByCountry(countryNode, organizationNode, ajaxUrl);
-        }
-
-        $(document).ready(function() {
-            initOrganizationFilter();
-
-            const formElem = document.querySelector("#coorganization-form");
-            formElem.addEventListener("formAjaxSubmit:error", function(){
-                initOrganizationFilter();
-            });
-        });
-    </script>
-{% endblock %}

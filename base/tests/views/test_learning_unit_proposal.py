@@ -73,7 +73,7 @@ from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
-from base.views.learning_unit import learning_unit_identification
+from base.views.learning_units.detail import learning_unit_identification
 from base.views.learning_units.proposal.update import update_learning_unit_proposal, \
     learning_unit_modification_proposal, \
     learning_unit_suppression_proposal
@@ -577,7 +577,7 @@ class TestGroupActionsOnProposals(TestCase):
                 side_effect=lambda proposals, author, research_criteria: {})
     def test_when_action_is_back_to_initial(self, mock_cancel_proposals):
         post_data = {"action": ACTION_BACK_TO_INITIAL, "selected_action": [self.proposals[0].id]}
-        response = self.client.post(self.url, data=post_data, follow=True)
+        self.client.post(self.url, data=post_data, follow=True)
 
         proposals, author, research_criteria = mock_cancel_proposals.call_args[0]
         self.assertEqual(list(proposals), [self.proposals[0]])
@@ -588,7 +588,7 @@ class TestGroupActionsOnProposals(TestCase):
                 side_effect=lambda proposals, author, research_criteria: {})
     def test_when_action_is_consolidate(self, mock_consolidate):
         post_data = {"action": ACTION_CONSOLIDATE, "selected_action": [self.proposals[0].id]}
-        response = self.client.post(self.url, data=post_data, follow=True)
+        self.client.post(self.url, data=post_data, follow=True)
 
         proposals, author, research_criteria = mock_consolidate.call_args[0]
         self.assertEqual(list(proposals), [self.proposals[0]])
@@ -608,7 +608,7 @@ class TestGroupActionsOnProposals(TestCase):
     def test_when_action_is_force_state(self, mock_force_state):
         post_data = {"action": ACTION_FORCE_STATE, "selected_action": [self.proposals[0].id, self.proposals[2].id],
                      "state": proposal_state.ProposalState.ACCEPTED.name}
-        response = self.client.post(self.url, data=post_data, follow=True)
+        self.client.post(self.url, data=post_data, follow=True)
 
         proposals, author, new_state = mock_force_state.call_args[0]
         self.assertCountEqual(list(proposals), [self.proposals[0], self.proposals[2]])
