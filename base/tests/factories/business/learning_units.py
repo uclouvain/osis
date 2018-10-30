@@ -29,6 +29,7 @@ from decimal import Decimal
 
 import factory.fuzzy
 
+from base.forms.learning_unit.learning_unit_create import DEFAULT_ACRONYM_COMPONENT
 from base.models import academic_year as mdl_academic_year
 from base.models.academic_year import LEARNING_UNIT_CREATION_SPAN_YEARS, compute_max_academic_year_adjournment
 from base.models.enums import entity_container_year_link_type, learning_container_year_types, \
