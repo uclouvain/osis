@@ -43,7 +43,7 @@ class TestCreateExternalLearningUnitView(TestCase):
         self.user = UserFactory()
         self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
-        self.user.user_permissions.add(Permission.objects.get(codename="can_propose_learningunit"))
+        self.user.user_permissions.add(Permission.objects.get(codename="add_externallearningunityear"))
         self.person = PersonFactory(user=self.user)
         self.client.force_login(self.user)
         self.academic_year = create_current_academic_year()
@@ -56,7 +56,7 @@ class TestCreateExternalLearningUnitView(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_create_get_permission_denied(self):
-        self.user.user_permissions.remove(Permission.objects.get(codename="can_propose_learningunit"))
+        self.user.user_permissions.remove(Permission.objects.get(codename="add_externallearningunityear"))
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
