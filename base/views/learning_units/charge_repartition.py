@@ -116,7 +116,7 @@ class AddChargeRepartition(EditAttributionView):
 
     def get_practical_charge_form_initial(self):
         practical_allocation_charge = self.attribution.practical_charges[0].allocation_charge \
-            if self.attribution.lecturing_charges else None
+            if self.attribution.practical_charges else None
         return {"allocation_charge": practical_allocation_charge}
 
     def get_instance_form(self, form_name):
