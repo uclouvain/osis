@@ -318,4 +318,25 @@
         "groups": [],
         "users": []
     }
-}]
+},
+{
+    "model": "waffle.flag",
+    "pk": 18,
+    "fields": {
+        "name": "learning_unit_external_create",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-10-30T12:00:40",
+        "modified": "2018-10-30T12:00:53.975",
+        "groups": [],
+        "users": []
+    }
+}
+]
