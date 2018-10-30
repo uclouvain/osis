@@ -124,15 +124,6 @@ class EditChargeRepartition(EditAttributionView):
         "practical_charge_form": PracticalAttributionChargeForm
     }
 
-    def forms_valid(self, forms):
-        lecturing_charge_form = forms["lecturing_charge_form"]
-        practical_charge_form = forms["practical_charge_form"]
-
-        for form in (lecturing_charge_form, practical_charge_form):
-            form.save(self.attribution, self.luy)
-
-        return HttpResponseRedirect(self.get_success_url())
-
     def get_success_message(self, cleaned_data):
         return _("Repartition modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
                                                                          "function": _(self.attribution.function)}

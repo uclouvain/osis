@@ -166,6 +166,10 @@ class MultiFormMixin(ContextMixin):
         return kwargs
 
     def forms_valid(self, forms):
+        for form_name, form in forms.items():
+            form_valid_method = '{form_name}_valid'.format(form_name=form_name)
+            if hasattr(self, form_valid_method):
+                getattr(self, form_valid_method)(form)
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_invalid(self, forms):

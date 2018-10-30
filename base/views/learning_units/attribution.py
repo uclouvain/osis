@@ -119,16 +119,14 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
             else None
         }.get(form_name)
 
-    def forms_valid(self, forms):
-        attribution_form = forms["attribution_form"]
-        lecturing_charge_form = forms["lecturing_charge_form"]
-        practical_charge_form = forms["practical_charge_form"]
+    def attribution_form_valid(self, form):
+        form.save()
 
-        attribution_form.save()
+    def lecturing_charge_form_valid(self, form):
+        form.save(self.attribution, self.luy)
 
-        for form in (lecturing_charge_form, practical_charge_form):
-            form.save(self.attribution, self.luy)
-        return super().forms_valid(forms)
+    def practical_charge_form_valid(self, form):
+        form.save(self.attribution, self.luy)
 
     def get_success_message(self, cleaned_data):
         return _("Attribution modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
@@ -152,7 +150,6 @@ class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, SuccessMess
         context = super().get_context_data(**kwargs)
         context["attribution"] = self.attribution
         return context
-
 
     def get_success_message(self, cleaned_data):
         return _("Repartition removed for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
