@@ -248,11 +248,10 @@ def publish(request, education_group_year_id, root_id):
     if publish_request.status_code == HttpResponseNotFound.status_code:
         display_error_messages(request, _("This program has no page to publish on it"))
     else:
-        display_success_messages(
-            request,
-            _("The program are published. Click here %(url)s to display it") % {'url': url.split("?")[0]},
-            extra_tags="safe"
-        )
+        url_to_display = url.split("?")[0]
+        message = _("The program are published. Click on the link to display it : ") + \
+            "<a href=" + url_to_display + ">" + education_group_year.acronym + "</a>"
+        display_success_messages(request, message, extra_tags='safe')
 
     return redirect(reverse('education_group_general_informations',
                             kwargs={'root_id': root_id, 'education_group_year_id': education_group_year_id}))

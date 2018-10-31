@@ -4093,5 +4093,5 @@ msgstr "Publish"
 msgid "This program has no page to publish on it"
 msgstr "This program has no page to publish on it"
 
-msgid "The program are published. Click here %(url)s to display it"
-msgstr "The program are published. Click <a href='%(url)s'>here</a> to display it"
+msgid "The program are published. Click on the link to display it : "
+msgstr "The program are published. Click on the link to display it : "
