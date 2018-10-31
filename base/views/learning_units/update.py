@@ -52,7 +52,6 @@ from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context, \
     get_common_context_learning_unit_year
 from base.views.learning_units.detail import learning_unit_identification
-from base.views.learning_units.external.update import update_external_learning_unit
 
 
 @login_required
@@ -97,11 +96,6 @@ def _get_current_learning_unit_year_id(learning_unit_to_edit, learning_unit_year
 @perms.can_perform_learning_unit_modification
 def update_learning_unit(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
-
-    if learning_unit_year.is_external():
-        # The externals have their own view.
-        return update_external_learning_unit(request, learning_unit_year)
-
     person = get_object_or_404(Person, user=request.user)
 
     learning_unit_full_instance = None
@@ -117,7 +111,8 @@ def update_learning_unit(request, learning_unit_year_id):
         end_postponement=end_postponement,
         learning_unit_instance=learning_unit_year.learning_unit,
         learning_unit_full_instance=learning_unit_full_instance,
-        data=request.POST or None
+        data=request.POST or None,
+        external=learning_unit_year.is_external(),
     )
 
     if postponement_form.is_valid():
@@ -128,7 +123,13 @@ def update_learning_unit(request, learning_unit_year_id):
     context = postponement_form.get_context()
     context["learning_unit_year"] = learning_unit_year
     context["is_update"] = True
-    return render(request, 'learning_unit/simple/update.html', context)
+
+    if learning_unit_year.is_external():
+        template = "learning_unit/external/update.html"
+    else:
+        template = 'learning_unit/simple/update.html'
+
+    return render(request, template, context)
 
 
 @login_required
