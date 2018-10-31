@@ -27,7 +27,10 @@ from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
 
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.models.enums.education_group_categories import TRAINING
+from base.models.enums.education_group_types import CAPAES, PGRM_MASTER_120
+from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, GroupFactory, \
+    MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
@@ -36,7 +39,62 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 
 
-class TestDetail(TestCase):
+class TestReadEducationGroup(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.person = PersonFactory(user=cls.user)
+        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+
+    def test_training_template_used(self):
+        training = TrainingFactory()
+        url = reverse("education_group_read", args=[training.pk, training.pk])
+        expected_template = "education_group/identification_training_details.html"
+
+        self.client.force_login(self.user)
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, expected_template)
+
+    def test_mini_training_template_used(self):
+        mini_training = MiniTrainingFactory()
+        url = reverse("education_group_read", args=[mini_training.pk, mini_training.pk])
+        expected_template = "education_group/identification_mini_training_details.html"
+
+        self.client.force_login(self.user)
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, expected_template)
+
+    def test_group_template_used(self):
+        group = GroupFactory()
+        url = reverse("education_group_read", args=[group.pk, group.pk])
+        expected_template = "education_group/identification_group_details.html"
+
+        self.client.force_login(self.user)
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, expected_template)
+
+    def test_show_coorganization_case_not_2m(self):
+        training_not_2m = EducationGroupYearFactory(
+            education_group_type__category=TRAINING,
+            education_group_type__name=CAPAES
+        )
+        url = reverse("education_group_read", args=[training_not_2m.pk, training_not_2m.pk])
+        self.client.force_login(self.user)
+        response = self.client.get(url)
+        self.assertTrue(response.context['show_coorganization'])
+
+    def test_show_coorganization_case_2m(self):
+        training_2m = EducationGroupYearFactory(
+            education_group_type__category=TRAINING,
+            education_group_type__name=PGRM_MASTER_120
+        )
+        url = reverse("education_group_read", args=[training_2m.pk, training_2m.pk])
+        self.client.force_login(self.user)
+        response = self.client.get(url)
+        self.assertFalse(response.context['show_coorganization'])
+
+
+class TestUtilizationTab(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonFactory()

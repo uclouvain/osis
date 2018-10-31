@@ -32,8 +32,8 @@ from django.forms import ModelChoiceField
 from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
-from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
-    LearningContainerModelForm, LearningContainerYearModelForm
+from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningContainerModelForm, \
+    LearningContainerYearModelForm, ExternalLearningUnitYearModelForm
 from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
 from base.forms.learning_unit.learning_unit_partim import merge_data
 from base.forms.utils.acronym_field import ExternalAcronymField
@@ -43,6 +43,7 @@ from base.models.campus import Campus
 from base.models.entity_version import get_last_version, EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import EXTERNAL
+from base.models.enums.learning_unit_year_periodicity import ANNUAL
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from reference.models import language
 from reference.models.country import Country
@@ -113,7 +114,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
     form_cls = form_cls_to_validate = [
         LearningUnitModelForm,
-        LearningUnitYearModelForm,
+        ExternalLearningUnitYearModelForm,
         LearningContainerModelForm,
         LearningContainerYearExternalModelForm,
         ExternalLearningUnitModelForm
@@ -126,7 +127,9 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
         super().__init__(instances_data, *args, **kwargs)
         self.learning_unit_year_form.fields['acronym'] = ExternalAcronymField()
         self.learning_unit_year_form.fields['campus'] = CampusChoiceField(
-            queryset=Campus.objects.order_by('organization__name').distinct('organization__name')
+            queryset=Campus.objects.order_by('organization__name')
+                                   .distinct('organization__name')
+                                   .select_related('organization')
         )
 
     @property
@@ -136,6 +139,10 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
     @property
     def learning_container_year_form(self):
         return self.forms[LearningContainerYearExternalModelForm]
+
+    @property
+    def learning_unit_year_form(self):
+        return self.forms[ExternalLearningUnitYearModelForm]
 
     def _build_instance_data(self, data, default_ac_year):
         return {
@@ -147,7 +154,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
                 'data': data,
                 'instance': self.instance.learning_container_year.learning_container if self.instance else None,
             },
-            LearningUnitYearModelForm: self._build_instance_data_learning_unit_year(data, default_ac_year),
+            ExternalLearningUnitYearModelForm: self._build_instance_data_learning_unit_year(data, default_ac_year),
             LearningContainerYearExternalModelForm: self._build_instance_data_learning_container_year(data),
             ExternalLearningUnitModelForm: self._build_instance_data_external_learning_unit(data)
         }

@@ -311,7 +311,7 @@ def get_charge_repartition_warning_messages(learning_container_year):
                 "attribution__tutor__person__middle_name", "attribution__tutor__person__last_name",
                 "attribution__function", "attribution__start_year",
                 "learning_component_year__learningunitcomponent__learning_unit_year__subtype") \
-        .annotate(total_volume=Sum("allocation_charge")) \
+        .annotate(total_volume=Sum("allocation_charge"))
 
     charges_by_attribution = itertools.groupby(total_charges_by_attribution_and_learning_subtype,
                                                lambda rec: "{}_{}_{}".format(rec["attribution__tutor"],
@@ -327,6 +327,8 @@ def get_charge_repartition_warning_messages(learning_container_year):
         partim_total_charges = next(
             (charge["total_volume"] for charge in charges if charge[subtype_key] == learning_unit_year_subtypes.PARTIM),
             0)
+        partim_total_charges = partim_total_charges or 0
+        full_total_charges = full_total_charges or 0
         if partim_total_charges > full_total_charges:
             tutor_name = Person.get_str(charges[0]["attribution__tutor__person__first_name"],
                                         charges[0]["attribution__tutor__person__middle_name"],

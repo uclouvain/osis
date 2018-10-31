@@ -80,6 +80,8 @@ urlpatterns = [
             name='education_group_general_informations'),
         url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
             name="education_group_pedagogy_edit"),
+        url(r'^informations/publish/$', detail.publish,
+            name="education_group_publish"),
         url(r'^administrative/', include([
             url(u'^$', detail.EducationGroupAdministrativeData.as_view(), name='education_group_administrative'),
             url(u'^edit/$', education_group.education_group_edit_administrative_data,

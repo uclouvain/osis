@@ -122,8 +122,8 @@ def is_eligible_to_consolidate_proposal(proposal, person):
 def can_edit_summary_locked_field(learning_unit_year, person):
     flag = Flag.get('educational_information_block_action')
     return flag.is_active_for_user(person.user) and \
-        person.is_faculty_manager() and \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+           person.is_faculty_manager() and \
+           person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 
 def can_update_learning_achievement(learning_unit_year, person):
@@ -251,7 +251,7 @@ def _is_attached_to_initial_entity(learning_unit_proposal, a_person):
 
 
 def _is_container_type_course_dissertation_or_internship(learning_unit_year, _):
-    return learning_unit_year.learning_container_year and\
+    return learning_unit_year.learning_container_year and \
            learning_unit_year.learning_container_year.container_type in FACULTY_UPDATABLE_CONTAINER_TYPES
 
 
@@ -299,7 +299,7 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
 
     # Case Tutor: We need to check if today is between submission date
     if tutor.is_tutor(person.user):
-        return can_user_edit_educational_information(user=person.user, learning_unit_year_id=learning_unit_year.id).\
+        return can_user_edit_educational_information(user=person.user, learning_unit_year_id=learning_unit_year.id). \
             is_valid()
 
     return False
@@ -325,7 +325,7 @@ def _is_calendar_opened_to_edit_educational_information(*, learning_unit_year_id
 
     now = datetime.datetime.now(tz=get_tzinfo())
     value = convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
-        convert_date_to_datetime(submission_dates["end_date"])
+            convert_date_to_datetime(submission_dates["end_date"])
     if not value:
         raise PermissionDenied(_("Not in period to edit educational information."))
 

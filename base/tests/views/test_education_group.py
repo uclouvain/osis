@@ -30,7 +30,9 @@ from http import HTTPStatus
 from unittest import mock
 
 import bs4
+from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
+from django.contrib.messages import get_messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse
 from django.test import TestCase, RequestFactory
@@ -436,6 +438,28 @@ class EducationGroupGeneralInformations(TestCase):
                                                            self.education_group_child.id,
                                                            self.education_group_parent.id)
 
+        self.assertEqual(response.status_code, 302)
+
+    def test_education_group_year_pedagogy_publish_not_found(self):
+        url = reverse('education_group_publish', args = (self.education_group_child.id, self.education_group_parent.id))
+        response = self.client.get(url)
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        msg_level = [m.level for m in get_messages(response.wsgi_request)]
+        self.assertEqual(len(msg), 1)
+        self.assertIn(messages.ERROR, msg_level)
+        self.assertEqual(response.status_code, 302)
+
+    def test_education_group_year_pedagogy_publish_found(self):
+        academic_year = AcademicYearFactory(year=datetime.datetime.now().year)
+        type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
+        education_group_child = EducationGroupYearFactory(acronym="SINF1BA", academic_year=academic_year,
+                                                          education_group_type=type_training)
+        url = reverse('education_group_publish', args=(self.education_group_parent.id, education_group_child.id))
+        response = self.client.get(url)
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        msg_level = [m.level for m in get_messages(response.wsgi_request)]
+        self.assertEqual(len(msg), 1)
+        self.assertIn(messages.SUCCESS, msg_level)
         self.assertEqual(response.status_code, 302)
 
 
