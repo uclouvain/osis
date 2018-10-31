@@ -28,7 +28,6 @@ import itertools
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
-from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
@@ -38,7 +37,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from attribution.business import attribution_charge_new
 from attribution.models.attribution_charge_new import AttributionChargeNew
-from attribution.models.attribution_new import AttributionNew
 from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, find_language_in_settings, \
@@ -54,8 +52,7 @@ from base.models import education_group_year
 from base.models.enums import learning_unit_year_subtypes
 from base.models.person import Person
 from base.views.common import display_warning_messages
-from base.views.learning_units.common import get_learning_unit_identification_context, \
-    get_common_context_learning_unit_year, get_text_label_translated
+from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models import text_label
 from . import layout
 from base.business.learning_unit import get_learning_unit_comparison_context
@@ -63,25 +60,6 @@ from base.business.learning_unit import get_learning_unit_comparison_context
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
                      'ADDITIONAL_REQUIREMENT_ENTITY_1', 'ADDITIONAL_REQUIREMENT_ENTITY_2',
                      'campus', 'organization']
-
-
-@login_required
-def learning_unit_identification(request, learning_unit_year_id):
-    person = get_object_or_404(Person, user=request.user)
-    context = get_learning_unit_identification_context(learning_unit_year_id, person)
-
-    learning_unit_year = context['learning_unit_year']
-
-    if learning_unit_year.is_external():
-        template = "learning_unit/external/read.html"
-        permission = 'base.can_access_externallearningunityear'
-    else:
-        template = "learning_unit/identification.html"
-        permission = 'base.can_access_learningunit'
-
-    if not person.user.has_perm(permission):
-        raise PermissionDenied
-    return layout.render(request, template, context)
 
 
 @login_required
@@ -333,7 +311,7 @@ def get_charge_repartition_warning_messages(learning_container_year):
                 "attribution__tutor__person__middle_name", "attribution__tutor__person__last_name",
                 "attribution__function", "attribution__start_year",
                 "learning_component_year__learningunitcomponent__learning_unit_year__subtype") \
-        .annotate(total_volume=Sum("allocation_charge")) \
+        .annotate(total_volume=Sum("allocation_charge"))
 
     charges_by_attribution = itertools.groupby(total_charges_by_attribution_and_learning_subtype,
                                                lambda rec: "{}_{}_{}".format(rec["attribution__tutor"],
@@ -349,6 +327,8 @@ def get_charge_repartition_warning_messages(learning_container_year):
         partim_total_charges = next(
             (charge["total_volume"] for charge in charges if charge[subtype_key] == learning_unit_year_subtypes.PARTIM),
             0)
+        partim_total_charges = partim_total_charges or 0
+        full_total_charges = full_total_charges or 0
         if partim_total_charges > full_total_charges:
             tutor_name = Person.get_str(charges[0]["attribution__tutor__person__first_name"],
                                         charges[0]["attribution__tutor__person__middle_name"],

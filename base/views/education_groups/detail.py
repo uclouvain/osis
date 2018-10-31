@@ -49,6 +49,8 @@ from base.business.education_groups.perms import is_eligible_to_edit_general_inf
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, academic_calendar_type, education_group_types
+from base.models.enums.education_group_categories import TRAINING
+from base.models.enums.education_group_types import PGRM_MASTER_120, PGRM_MASTER_180_240
 from base.models.person import Person
 from base.views.common import display_error_messages, display_success_messages
 from cms import models as mdl_cms
@@ -141,11 +143,17 @@ class EducationGroupRead(EducationGroupGenericDetailView):
             education_group_language.language.name for education_group_language in
             mdl.education_group_language.find_by_education_group_year(self.object)
         ]
+        context["show_coorganization"] = self.show_coorganization()
 
         return context
 
     def get_template_names(self):
         return self.templates.get(self.object.education_group_type.category)
+
+    def show_coorganization(self):
+        """Co-organization doesn't have sense for 2M (120/180-240) """
+        return self.object.education_group_type.category == TRAINING and \
+            self.object.education_group_type.name not in [PGRM_MASTER_120, PGRM_MASTER_180_240]
 
 
 class EducationGroupDiplomas(EducationGroupGenericDetailView):

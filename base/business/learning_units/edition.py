@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.db import IntegrityError, transaction, Error
 from django.db.models import F
 from django.urls import reverse
@@ -143,7 +142,23 @@ def duplicate_learning_unit_year(old_learn_unit_year, new_academic_year):
     _duplicate_teaching_material(duplicated_luy)
     _duplicate_cms_data(duplicated_luy)
     duplicated_luy.save()
+
+    _duplicate_external(old_learn_unit_year, duplicated_luy)
+
     return duplicated_luy
+
+
+def _duplicate_external(old_learning_unit_year, new_learning_unit_year):
+    if old_learning_unit_year.is_external():
+        try:
+            return update_related_object(
+                old_learning_unit_year.externallearningunityear,
+                "learning_unit_year",
+                new_learning_unit_year,
+            )
+        # Dirty data
+        except LearningUnitYear.DoesNotExist:
+            pass  # TODO Maybe we should return a error
 
 
 def _duplicate_learning_container_year(new_learn_unit_year, new_academic_year, old_learn_unit_year):
@@ -442,12 +457,12 @@ def _get_differences(obj1, obj2, fields_to_compare):
         next_year_value = getattr(obj2, field_name, None)
         error_list.append(_("The value of field '%(field)s' is different between year %(year)s - %(value)s "
                             "and year %(next_year)s - %(next_value)s") % {
-            'field': fields_to_compare[field_name],
-            'year': obj1.academic_year,
-            'value': _get_translated_value(current_value),
-            'next_year': obj2.academic_year,
-            'next_value':  _get_translated_value(next_year_value)
-        })
+                              'field': fields_to_compare[field_name],
+                              'year': obj1.academic_year,
+                              'value': _get_translated_value(current_value),
+                              'next_year': obj2.academic_year,
+                              'next_value': _get_translated_value(next_year_value)
+                          })
     return error_list
 
 
@@ -476,12 +491,12 @@ def _check_postponement_conflict_on_entity_container_year(lcy, next_lcy):
         next_year_entity = next_year_entities.get(entity_type)
         error_list.append(_("The value of field '%(field)s' is different between year %(year)s - %(value)s "
                             "and year %(next_year)s - %(next_value)s") % {
-            'field': _(entity_type.lower()),
-            'year': lcy.academic_year,
-            'value': current_entity.most_recent_acronym if current_entity else _('no_data'),
-            'next_year': next_lcy.academic_year,
-            'next_value': next_year_entity.most_recent_acronym if next_year_entity else _('no_data')
-        })
+                              'field': _(entity_type.lower()),
+                              'year': lcy.academic_year,
+                              'value': current_entity.most_recent_acronym if current_entity else _('no_data'),
+                              'next_year': next_lcy.academic_year,
+                              'next_value': next_year_entity.most_recent_acronym if next_year_entity else _('no_data')
+                          })
     return error_list
 
 
@@ -592,26 +607,26 @@ def _get_volumes_diff(current_volumes_data, next_year_volumes_data):
 
 def _get_error_volume_field_diff(field_diff, current_component, next_year_component, values_diff):
     return _("The value of field '%(field)s' for the learning unit %(acronym)s (%(component_type)s) "
-             "is different between year %(year)s - %(value)s and year %(next_year)s - %(next_value)s") %\
-        {
-                'field': _(field_diff.lower()),
-                'acronym': current_component.learning_container_year.acronym,
-                'component_type': _(current_component.type) if current_component.type else 'NT',
-                'year': current_component.learning_container_year.academic_year,
-                'value': values_diff.get('current') or _('no_data'),
-                'next_year': next_year_component.learning_container_year.academic_year,
-                'next_value': values_diff.get('next_year') or _('no_data')
-        }
+             "is different between year %(year)s - %(value)s and year %(next_year)s - %(next_value)s") % \
+           {
+               'field': _(field_diff.lower()),
+               'acronym': current_component.learning_container_year.acronym,
+               'component_type': _(current_component.type) if current_component.type else 'NT',
+               'year': current_component.learning_container_year.academic_year,
+               'value': values_diff.get('current') or _('no_data'),
+               'next_year': next_year_component.learning_container_year.academic_year,
+               'next_value': values_diff.get('next_year') or _('no_data')
+           }
 
 
 def _get_error_component_not_found(acronym, component_type, existing_academic_year, not_found_academic_year):
     return _("There is not %(component_type)s for the learning unit %(acronym)s - %(year)s but exist in"
              " %(existing_year)s") % {
-        'component_type': _(component_type),
-        'acronym': acronym,
-        'year': not_found_academic_year,
-        'existing_year': existing_academic_year
-    }
+               'component_type': _(component_type),
+               'acronym': acronym,
+               'year': not_found_academic_year,
+               'existing_year': existing_academic_year
+           }
 
 
 class ConsistencyError(Error):

@@ -23,9 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from dal import autocomplete
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.db.utils import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
@@ -150,3 +151,20 @@ def organization_address_delete(request, organization_address_id):
     return HttpResponseRedirect(
         reverse("organization_read", args=[organization_address.organization.pk])
     )
+
+
+class OrganizationAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Organization.objects.filter(entity__country__isnull=False)
+
+        country = self.forwarded.get('country', None)
+        if country:
+            qs = qs.filter(entity__country=country)
+
+        if self.q:
+            qs = qs.filter(name__icontains=self.q)
+
+        return qs.distinct().order_by('name')
+
+    def get_result_label(self, result):
+        return result.name

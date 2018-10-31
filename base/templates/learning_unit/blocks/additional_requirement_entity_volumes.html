@@ -1,9 +1,9 @@
 {% if REQUIREMENT_ENTITY %}
-<td>{{ component.volumes.VOLUME_REQUIREMENT_ENTITY.normalize | default_if_none:'' }}</td>
+    <td>{{ component.volumes.VOLUME_REQUIREMENT_ENTITY|floatformat | default_if_none:'0' }}</td>
 {% endif %}
 {% if ADDITIONAL_REQUIREMENT_ENTITY_1 %}
-    <td>{{ component.volumes.VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1.normalize | default_if_none:'' }}</td>
+    <td>{{ component.volumes.VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1|floatformat | default_if_none:'0' }}</td>
 {% endif %}
 {% if ADDITIONAL_REQUIREMENT_ENTITY_2 %}
-    <td>{{ component.volumes.VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2.normalize | default_if_none:'' }}</td>
+    <td>{{ component.volumes.VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2|floatformat | default_if_none:'0' }}</td>
 {% endif %}

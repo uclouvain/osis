@@ -52,7 +52,6 @@ class VolumeField(forms.DecimalField):
 
 
 class VolumeEditionForm(forms.Form):
-
     requirement_entity_key = 'volume_' + entity_types.REQUIREMENT_ENTITY.lower()
     additional_requirement_entity_1_key = 'volume_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1.lower()
     additional_requirement_entity_2_key = 'volume_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2.lower()
@@ -88,7 +87,7 @@ class VolumeEditionForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.component = kwargs.pop('component')
         self.learning_unit_year = kwargs.pop('learning_unit_year')
-        self.entities = kwargs.pop('entities')
+        self.entities = kwargs.pop('entities', [])
         self.is_faculty_manager = kwargs.pop('is_faculty_manager', False)
 
         self.title = self.component.acronym
@@ -120,6 +119,28 @@ class VolumeEditionForm(forms.Form):
         for key, field in self.fields.items():
             if key not in self._faculty_manager_fields:
                 field.disabled = True
+
+    def clean(self):
+        """
+        Prevent faculty users to a volume to 0 if there was a value other than 0.
+        Also, prevent the faculty user from putting a volume if its value was 0.
+        """
+        cleaned_data = super().clean()
+
+        if self.is_faculty_manager:
+
+            if 0 in [self.initial.get("volume_q1"), self.initial.get("volume_q2")]:
+                if 0 not in [self.cleaned_data.get("volume_q1"), self.cleaned_data.get("volume_q2")]:
+                    self.add_error("volume_q1", _("One of the partial volumes must have a value to 0."))
+                    self.add_error("volume_q2", _("One of the partial volumes must have a value to 0."))
+
+            else:
+                if self.cleaned_data.get("volume_q1") == 0:
+                    self.add_error("volume_q1", _("The volume can not be set to 0."))
+                if self.cleaned_data.get("volume_q2") == 0:
+                    self.add_error("volume_q2", _("The volume can not be set to 0."))
+
+        return cleaned_data
 
     def get_entity_fields(self):
         entity_keys = [self.requirement_entity_key, self.additional_requirement_entity_1_key,
@@ -213,6 +234,7 @@ class VolumeEditionFormsetContainer:
     """
     Create and Manage a set of VolumeEditionFormsets
     """
+
     def __init__(self, request, learning_units, person):
         self.formsets = OrderedDict()
         self.learning_units = learning_units
@@ -271,20 +293,49 @@ class SimplifiedVolumeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.component_type = kwargs.pop('component_type')
+        self.is_faculty_manager = kwargs.pop('is_faculty_manager', False)
+
         super().__init__(*args, **kwargs)
         self.instance.type = self.component_type
         self.instance.acronym = DEFAULT_ACRONYM_COMPONENT[self.component_type]
 
     class Meta:
         model = LearningComponentYear
-        fields = ('planned_classes', 'hourly_volume_total_annual', 'hourly_volume_partial_q1',
-                  'hourly_volume_partial_q2')
+        fields = (
+            'planned_classes',
+            'hourly_volume_total_annual',
+            'hourly_volume_partial_q1',
+            'hourly_volume_partial_q2'
+        )
         widgets = {
             'hourly_volume_total_annual': forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
             'hourly_volume_partial_q1': forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
             'hourly_volume_partial_q2': forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
             'volume_declared_vacant': forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
         }
+
+    def clean(self):
+        """
+        Prevent faculty users to a volume to 0 if there was a value other than 0.
+        Also, prevent the faculty user from putting a volume if its value was 0.
+        # FIXME Refactor this method with the clean of VolumeEditionForm
+        """
+        cleaned_data = super().clean()
+
+        if self.is_faculty_manager:
+            if 0 in [self.instance.hourly_volume_partial_q1, self.instance.hourly_volume_partial_q2]:
+                if 0 not in [self.cleaned_data.get("hourly_volume_partial_q1"),
+                             self.cleaned_data.get("hourly_volume_partial_q2")]:
+                    self.add_error("hourly_volume_partial_q1", _("One of the partial volumes must have a value to 0."))
+                    self.add_error("hourly_volume_partial_q2", _("One of the partial volumes must have a value to 0."))
+
+            else:
+                if self.cleaned_data.get("hourly_volume_partial_q1") == 0:
+                    self.add_error("hourly_volume_partial_q1", _("The volume can not be set to 0."))
+                if self.cleaned_data.get("hourly_volume_partial_q2") == 0:
+                    self.add_error("hourly_volume_partial_q2", _("The volume can not be set to 0."))
+
+        return cleaned_data
 
     def save(self, commit=True):
         if self.need_to_create_untyped_component():
@@ -310,7 +361,7 @@ class SimplifiedVolumeForm(forms.ModelForm):
         else:
             self.instance.planned_classes = 1
         instance = super().save(commit)
-        LearningUnitComponent.objects.get_or_create(
+        LearningUnitComponent.objects.update_or_create(
             learning_unit_year=self._learning_unit_year,
             learning_component_year=instance
         )
@@ -325,7 +376,7 @@ class SimplifiedVolumeForm(forms.ModelForm):
 
     def _create_entity_component_years(self, learning_unit_components, requirement_entity_container):
         for learning_unit_component in learning_unit_components:
-            EntityComponentYear.objects.get_or_create(
+            EntityComponentYear.objects.update_or_create(
                 entity_container_year=requirement_entity_container,
                 learning_component_year=learning_unit_component.learning_component_year
             )
@@ -345,9 +396,14 @@ class SimplifiedVolumeForm(forms.ModelForm):
 
 
 class SimplifiedVolumeFormset(forms.BaseModelFormSet):
+    def __init__(self, data, person, *args, **kwargs):
+        super().__init__(data, *args, **kwargs)
+        self.is_faculty_manager = person.is_faculty_manager() and not person.is_central_manager()
+
     def get_form_kwargs(self, index):
         kwargs = super().get_form_kwargs(index)
         kwargs['component_type'] = [LECTURING, PRACTICAL_EXERCISES][index]
+        kwargs['is_faculty_manager'] = self.is_faculty_manager
         return kwargs
 
     @property
@@ -385,6 +441,10 @@ class SimplifiedVolumeFormset(forms.BaseModelFormSet):
         return super().save(commit)
 
 
-SimplifiedVolumeManagementForm = modelformset_factory(model=LearningComponentYear, form=SimplifiedVolumeForm,
-                                                      formset=SimplifiedVolumeFormset,
-                                                      extra=2, max_num=2)
+SimplifiedVolumeManagementForm = modelformset_factory(
+    model=LearningComponentYear,
+    form=SimplifiedVolumeForm,
+    formset=SimplifiedVolumeFormset,
+    extra=2,
+    max_num=2
+)

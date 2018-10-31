@@ -137,6 +137,9 @@ class Person(SerializableModel):
         )
 
     def is_linked_to_entity_in_charge_of_learning_unit_year(self, learning_unit_year):
+        if learning_unit_year.is_external():
+            return self.is_attached_entity(learning_unit_year.externallearningunityear.requesting_entity)
+
         entities = Entity.objects.filter(
             entitycontaineryear__learning_container_year=learning_unit_year.learning_container_year,
             entitycontaineryear__type=REQUIREMENT_ENTITY
