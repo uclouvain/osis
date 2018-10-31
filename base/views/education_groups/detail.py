@@ -241,18 +241,16 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         }
 
 
-def publish(request, education_group_year_id, root_id):
+def publish( request, education_group_year_id, root_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     url = URL_TO_PUBLISH.format(anac=education_group_year.academic_year.year, code=education_group_year.acronym)
     publish_request = requests.get(url)
-
     if publish_request.status_code == HttpResponseNotFound.status_code:
         display_error_messages(request, _("This program has no page to publish on it"))
     else:
-        url_to_display = url.split("?")[0]
         display_success_messages(
             request,
-            _("The program are published. Click here %(url)s to display it") % {'url': url_to_display},
+            _("The program are published. Click here %(url)s to display it") % {'url': url.split("?")[0]},
             extra_tags="safe"
         )
 

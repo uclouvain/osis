@@ -438,6 +438,14 @@ class EducationGroupGeneralInformations(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
+    @mock.patch('base.views.education_groups.detail.display_error_messages')
+    def test_education_group_year_pedagogy_publish(self, mock_display_error_messages):
+        from base.views.education_groups.detail import publish
+        request = RequestFactory()
+        response = publish(request, self.education_group_child.id, self.education_group_parent.id)
+        self.assertTrue(mock_display_error_messages.called)
+        self.assertEqual(response.status_code, 302)
+
 
 @override_flag('education_group_update', active=True)
 class EducationGroupViewTestCase(TestCase):
