@@ -52,6 +52,7 @@ from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context, \
     get_common_context_learning_unit_year
 from base.views.learning_units.detail import learning_unit_identification
+from base.views.learning_units.external.update import update_external_learning_unit
 
 
 @login_required
@@ -96,6 +97,11 @@ def _get_current_learning_unit_year_id(learning_unit_to_edit, learning_unit_year
 @perms.can_perform_learning_unit_modification
 def update_learning_unit(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
+
+    if learning_unit_year.is_external():
+        # The externals have their own view.
+        return update_external_learning_unit(request, learning_unit_year)
+
     person = get_object_or_404(Person, user=request.user)
 
     learning_unit_full_instance = None

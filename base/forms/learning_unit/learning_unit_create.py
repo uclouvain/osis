@@ -108,7 +108,8 @@ class LearningUnitYearModelForm(forms.ModelForm):
             self.fields['academic_year'].disabled = True
 
             # we cannot edit the internship subtype if the container_type is not internship
-            if self.instance.learning_container_year.container_type != INTERNSHIP:
+            if 'internship_subtype' in self.fields and \
+                    self.instance.learning_container_year.container_type != INTERNSHIP:
                 self.fields['internship_subtype'].disabled = True
 
         self.fields['campus'].queryset = find_main_campuses()
@@ -163,9 +164,9 @@ class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
 class ExternalLearningUnitYearModelForm(LearningUnitYearModelForm):
 
     class Meta(LearningUnitYearModelForm.Meta):
-        fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
-                  'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure',
-                  'professional_integration', 'campus', 'language')
+        fields = ('academic_year', 'acronym', 'specific_title',
+                  'specific_title_english', 'credits',
+                  'status', 'campus', 'language')
 
 
 class LearningContainerYearModelForm(forms.ModelForm):
