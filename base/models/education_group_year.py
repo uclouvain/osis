@@ -97,7 +97,6 @@ class EducationGroupYear(models.Model):
         max_length=40,
         db_index=True,
         verbose_name=_("acronym"),
-        validators=[RegexValidator(regex="^([A-Z]{2,4})([0-9]?)(.*)$")]
     )
 
     title = models.CharField(
