@@ -98,7 +98,6 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
     @cached_property
     def instance(self):
         if self.learning_unit_instance:
-            print(self.academic_year, self.learning_unit_instance)
             return LearningUnitYear.objects.filter(
                 academic_year=self.academic_year,
                 learning_unit=self.learning_unit_instance,
