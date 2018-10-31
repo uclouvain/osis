@@ -29,15 +29,14 @@ from decimal import Decimal
 
 import factory.fuzzy
 
-from base.forms.learning_unit.learning_unit_create import DEFAULT_ACRONYM_COMPONENT
 from base.models import academic_year as mdl_academic_year
 from base.models.academic_year import LEARNING_UNIT_CREATION_SPAN_YEARS, compute_max_academic_year_adjournment
 from base.models.enums import entity_container_year_link_type, learning_container_year_types, \
     learning_unit_year_periodicity, learning_unit_year_subtypes, component_type
 from base.models.enums import entity_type
-from base.models.enums import quadrimesters
 from base.models.enums import learning_unit_year_session
 from base.models.enums import organization_type
+from base.models.enums import quadrimesters
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity_component_year import EntityComponentYearFactory
