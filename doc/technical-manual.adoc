@@ -254,29 +254,59 @@ This error is not present while debugging.
 
 ==== Internationalization
 
-OSIS has adopted a different approach when it comes to internationalization (I18N). Text messages within Python code and template files are keywords instead of text in plain English. Hardcoding keywords forces us to create a translation file for each supported language, instead of relying on hardcoded messages for the default language. For example, instead of:
+OSIS follow the same approach as for the internationalization described in Django project (I180N).
+In some areas, we have adopted  more strict rules:
 
-    <p>{% trans 'Hello World' %}</p>
+- Use of %()s format is the default standard adopted.
 
-we use:
+    # Bad
+    locale/fr_BE/LC_MESSAGES/django.po
+    msgid "Hello {name}"
+    msgstr "Salut {name}"
 
-    <p>{% trans 'hello_world' %}</p>
+    # Good
+    locale/fr_BE/LC_MESSAGES/django.po
+    msgid "Hello %(name)s"
+    msgstr "Salut %(name)s"
 
-which is translated into English and French respectively:
+- Keywords msgid is now forbidden ! (Previously, it was the standard adopted in OSIS)
 
-    locale/en/LC_MESSAGES/django.po
-    msgid "hello_world"
-    msgstr "Hello World!"
-
+    # Bad
     locale/fr_BE/LC_MESSAGES/django.po
     msgid "hello_world"
-    msgstr "Salut monde!"
+    msgstr "Salut le monde!"
 
-It is important to add that we add translations manually in the translation files instead of using `./manage.py makemessages`. We have noticed some strange behaviors, such as confusing "all" with "ill", and the translation files are changed much more than necessary, causing lots of conflicts when multiple developers contribute to the translations.
+    # Good
+    locale/fr_BE/LC_MESSAGES/django.po
+    msgid "Hello world!"
+    msgstr "Salut le monde!"
 
-Once the translations are done, we finally compile the messages into `.mo` files:
+- Case differences between msgid/msgstr is not allowed
 
-    $ ./manage.py compilemessages
+    # Bad
+    locale/fr_BE/LC_MESSAGES/django.po
+    msgid "HellO"
+    msgstr "bonjour"
+
+    # Good
+    locale/fr_BE/LC_MESSAGES/django.po
+    msgid "Hello"
+    msgstr "Salut"
+
+- Translation without named parameters is not allowed
+
+    # Bad
+    locale/fr_BE/LC_MESSAGES/django.po
+    msgid "Hello {}"
+    msgstr "Salut {}"
+
+    # Good
+    locale/fr_BE/LC_MESSAGES/django.po
+    msgid "Hello {name}"
+    msgstr "Salut {name}"
+
+- `.po` file must be generated with `./manage.py makemessages` and sorted by alphabetical order (`--sort-output` option)
+
 
 Only `.po` files are committed to the repository. `.mo` files are ignored in the `.gitignore` file.
 
