@@ -40,7 +40,11 @@ def get_external_learning_unit_creation_form(request, academic_year):
     person = get_object_or_404(Person, user=request.user)
     academic_year = get_object_or_404(AcademicYear, pk=academic_year)
 
-    external_form = ExternalLearningUnitBaseForm(person, academic_year, request.POST or None)
+    external_form = ExternalLearningUnitBaseForm(
+        person=person,
+        academic_year=academic_year,
+        data=request.POST or None
+    )
 
     if external_form.is_valid():
         learning_unit_year = external_form.save()

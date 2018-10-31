@@ -135,7 +135,9 @@ class LearningUnitYearModelForm(forms.ModelForm):
         }
 
     def post_clean(self, container_type):
-        if container_type != INTERNSHIP and self.instance.internship_subtype:
+        if "internship_subtype" in self.fields \
+                and container_type != INTERNSHIP \
+                and self.instance.internship_subtype:
             self.add_error("internship_subtype", _("This field cannot be set"))
 
         return not self.errors
