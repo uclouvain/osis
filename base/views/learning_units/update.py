@@ -111,7 +111,8 @@ def update_learning_unit(request, learning_unit_year_id):
         end_postponement=end_postponement,
         learning_unit_instance=learning_unit_year.learning_unit,
         learning_unit_full_instance=learning_unit_full_instance,
-        data=request.POST or None
+        data=request.POST or None,
+        external=learning_unit_year.is_external(),
     )
 
     if postponement_form.is_valid():
@@ -122,7 +123,13 @@ def update_learning_unit(request, learning_unit_year_id):
     context = postponement_form.get_context()
     context["learning_unit_year"] = learning_unit_year
     context["is_update"] = True
-    return render(request, 'learning_unit/simple/update.html', context)
+
+    if learning_unit_year.is_external():
+        template = "learning_unit/external/update.html"
+    else:
+        template = 'learning_unit/simple/update.html'
+
+    return render(request, template, context)
 
 
 @login_required

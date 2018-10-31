@@ -1,0 +1,86 @@
+{% load staticfiles i18n bootstrap3 %}
+
+<form method="post" id="LearningUnitYearForm" data-validate-url="{% url 'check_acronym' subtype %}">
+    {% csrf_token %}
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="panel panel-default">
+                {% bootstrap_form_errors learning_unit_year_form %}
+                {% bootstrap_form_errors learning_unit_form %}
+                {% bootstrap_form_errors learning_container_year_form %}
+                {% bootstrap_form_errors learning_unit_external_form %}
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="form-group col-md-4 acronym-group required_field">
+                            {% bootstrap_label learning_unit_year_form.acronym.label label_class="control-label" %}
+                            <abbr title="{% trans 'acronym_rules' %}">
+                                            <span class="glyphicon glyphicon-question-sign"
+                                                  title="{% trans 'acronym_rules' %}" style="font-size: 11pt;"></span>
+                            </abbr>
+                            {% bootstrap_field learning_unit_year_form.acronym show_label=False %}
+                        </div>
+                        {% bootstrap_field learning_container_year_form.container_type form_group_class="form-group col-md-4" %}
+                    </div>
+                    <div class="row">
+                        {% bootstrap_field learning_unit_year_form.credits form_group_class="form-group col-md-3" %}
+                        {% bootstrap_field learning_unit_external_form.external_credits form_group_class="form-group col-md-3" %}
+                        {% bootstrap_field learning_unit_year_form.status form_group_class="form-group col-md-2" %}
+                        {% bootstrap_field learning_unit_year_form.language form_group_class="form-group col-md-4" %}
+                    </div>
+                    {% include "learning_unit/blocks/titles.html" %}
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        {% bootstrap_field learning_unit_external_form.external_acronym form_group_class="form-group col-md-3" %}
+                        {% bootstrap_field learning_unit_external_form.url form_group_class="form-group col-md-9" %}
+                        {% bootstrap_field learning_unit_external_form.requesting_entity form_group_class="form-group col-md-6" %}
+                    </div>
+                    {% bootstrap_field learning_unit_form.faculty_remark %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    {% bootstrap_field learning_container_year_form.country %}
+                    {% bootstrap_field learning_container_year_form.city %}
+                    {% bootstrap_field learning_unit_year_form.campus %}
+                    {% bootstrap_field learning_unit_year_form.academic_year %}
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    {% trans 'introduced_by' %}
+                    {% if learning_unit_year %}
+                        {{ learning_unit_year.externallearningunityear.author }}
+                    {% else %}
+                        {{ learning_unit_external_form.person }}
+                    {% endif %}
+                    <br><br>
+
+                    {% trans 'the' %}
+                    {% if learning_unit_year %}
+                        {{ learning_unit_year.externallearningunityear.date| date:"SHORT_DATE_FORMAT" }}
+                    {% else %}
+                        {% now "SHORT_DATE_FORMAT" %}
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<script src="{% static 'js/select_ajax_filtering.js' %}"></script>
+<script>
+    let country_node = $("select#id_country");
+    let city_node = $("select#id_city");
+    let campus_node = $("select#id_campus");
+
+    country_node.filterCityByCountry(city_node, campus_node, "{% url "filter_cities_by_country" %}");
+    city_node.filterCampusByCity(campus_node, "{% url "filter_campus_by_city" %}");
+
+</script>
