@@ -28,7 +28,6 @@
 
     <form method="post" id="form_charge_repartition" action="{{ request.path }}">
         {% csrf_token %}
-         {{ formset.management_form }}
         <table class="table">
             <thead>
                 <th>{% trans 'tutor' %}</th>
@@ -38,7 +37,6 @@
                 <th>Volume 1</th>
                 <th>Volume 2</th>
                 <th>{% trans 'substitute' %}</th>
-                <th></th>
             </thead>
             <tbody>
                 <tr>
@@ -48,7 +46,6 @@
                     <td>{{ attribution.duration | default_if_none:'' }}</td>
                     <td>{% bootstrap_field lecturing_charge_form.allocation_charge show_label=False %}</td>
                     <td>{% bootstrap_field practical_charge_form.allocation_charge show_label=False %}</td>
-                    <td>{{ value.PRACTICAL_EXERCISES | default_if_none:0 | floatformat:2 }}</td>
                     <td>{{ attribution.substitute | default_if_none:'' }}</td>
                 </tr>
             </tbody>

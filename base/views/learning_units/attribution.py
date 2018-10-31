@@ -23,8 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from dal import autocomplete
 from django.contrib import messages
-from django.db.models import Prefetch
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Prefetch, Q
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -35,10 +38,11 @@ from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.business.learning_units import perms
 from base.forms.learning_unit.attribution_charge_repartition import AttributionForm, LecturingAttributionChargeForm, \
-    PracticalAttributionChargeForm
+    PracticalAttributionChargeForm, AttributionCreationForm
 from base.models.enums import learning_component_year_type
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
+from base.models.tutor import Tutor
 from base.views.mixins import AjaxTemplateMixin, RulesRequiredMixin, MultiFormsView, MultiFormsSuccessMessageMixin
 
 
@@ -126,9 +130,51 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
     def practical_charge_form_valid(self, practical_charge_form):
         practical_charge_form.save(attribution=self.attribution, learning_unit_year=self.luy)
 
-    def get_success_message(self):
+    def get_success_message(self, forms):
         return _("Attribution modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
                                                                          "function": _(self.attribution.function)}
+
+
+class AddAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSuccessMessageMixin, MultiFormsView):
+    rules = [perms.is_eligible_to_manage_attributions]
+    template_name = "learning_unit/add_attribution_inner.html"
+    form_classes = {
+        "attribution_form": AttributionCreationForm,
+        "lecturing_charge_form": LecturingAttributionChargeForm,
+        "practical_charge_form": PracticalAttributionChargeForm
+    }
+    prefixes = {
+        "attribution_form": "attribution_form",
+        "lecturing_charge_form": "lecturing_form",
+        "practical_charge_form": "practical_form"
+    }
+
+    def forms_valid(self, forms):
+        attribution_form = forms["attribution_form"]
+        lecturing_charge_form = forms["lecturing_charge_form"]
+        practical_charge_form = forms["practical_charge_form"]
+
+        attribution_form.save(learning_unit_year=self.luy)
+        lecturing_charge_form.save(attribution=attribution_form.instance, learning_unit_year=self.luy)
+        practical_charge_form.save(attribution=attribution_form.instance, learning_unit_year=self.luy)
+        success_message = self.get_success_message(forms)
+        if success_message:
+            messages.success(self.request, success_message)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def attribution_form_valid(self, attribution_form):
+        attribution_form.save(learning_unit_year=self.luy)
+
+    def lecturing_charge_form_valid(self, lecturing_charge_form):
+        pass
+
+    def practical_charge_form_valid(self, practical_charge_form):
+        pass
+
+    def get_success_message(self, forms):
+        attribution = forms["attribution_form"].instance
+        return _("Attribution added for %(tutor)s (%(function)s)") % {"tutor": attribution.tutor.person,
+                                                                      "function": _(attribution.function)}
 
 
 class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView):
@@ -150,6 +196,19 @@ class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView)
             messages.success(self.request, success_message)
         return response
 
-    def get_success_message(self):
+    def get_success_message(self, forms):
         return _("Attribution removed for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
                                                                         "function": _(self.attribution.function)}
+
+
+class TutorAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Tutor.objects.all()
+
+        if self.q:
+            qs = qs.filter(Q(person__last_name__icontains=self.q) | Q(person__first_name__icontains=self.q))
+
+        return qs.select_related("person").order_by("person__last_name", "person__first_name")
+
+    def get_result_label(self, result):
+        return str(result)

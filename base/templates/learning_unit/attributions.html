@@ -88,6 +88,14 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                {% if can_manage_attribution %}
+                <a  class="btn btn-default trigger_modal"
+                    role="button"
+                    data-url="{% url "add_attribution" learning_unit_year.id %}"
+                    data-modal_class="modal-lg">
+                    {% trans "Add attribution" %}
+                </a>
+                {% endif %}
                 {% if can_manage_charge_repartition %}
                 <a href="{% url "select_attribution" learning_unit_year.id %}" class="btn btn-default" role="button">
                     {% trans "Manage repartition" %}
