@@ -24,14 +24,12 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import redirect, get_object_or_404, render
+from django.shortcuts import get_object_or_404, render
 from waffle.decorators import waffle_flag
 
-from base.forms.learning_unit.external_learning_unit import ExternalLearningUnitBaseForm
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
 from base.models.academic_year import AcademicYear
 from base.models.person import Person
-from base.views.learning_units.common import show_success_learning_unit_year_creation_message
 from base.views.learning_units.create import _save_and_redirect
 
 
