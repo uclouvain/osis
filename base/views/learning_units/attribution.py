@@ -196,7 +196,7 @@ class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView)
             messages.success(self.request, success_message)
         return response
 
-    def get_success_message(self, forms):
+    def get_success_message(self):
         return _("Attribution removed for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
                                                                         "function": _(self.attribution.function)}
 
