@@ -24,9 +24,7 @@
 #
 ##############################################################################
 from django.contrib import messages
-from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Prefetch
-from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -41,7 +39,7 @@ from base.forms.learning_unit.attribution_charge_repartition import AttributionF
 from base.models.enums import learning_component_year_type
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
-from base.views.mixins import AjaxTemplateMixin, RulesRequiredMixin, MultiFormsView
+from base.views.mixins import AjaxTemplateMixin, RulesRequiredMixin, MultiFormsView, MultiFormsSuccessMessageMixin
 
 
 class AttributionBaseViewMixin(RulesRequiredMixin):
@@ -86,7 +84,7 @@ class AttributionBaseViewMixin(RulesRequiredMixin):
         return reverse("learning_unit_attributions", args=[self.kwargs["learning_unit_year_id"]])
 
 
-class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsView):
+class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSuccessMessageMixin, MultiFormsView):
     rules = [perms.is_eligible_to_manage_attributions]
     template_name = "learning_unit/edit_attribution_inner.html"
     form_classes = {
@@ -128,12 +126,12 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
     def practical_charge_form_valid(self, practical_charge_form):
         practical_charge_form.save(attribution=self.attribution, learning_unit_year=self.luy)
 
-    def get_success_message(self, cleaned_data):
+    def get_success_message(self):
         return _("Attribution modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
                                                                          "function": _(self.attribution.function)}
 
 
-class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, SuccessMessageMixin, DeleteView):
+class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView):
     rules = [lambda luy, person: perms.is_eligible_to_manage_charge_repartition(luy, person)
              or perms.is_eligible_to_manage_attributions(luy, person)]
     model = AttributionNew
@@ -145,6 +143,13 @@ class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, SuccessMess
         context["attribution"] = self.attribution
         return context
 
-    def get_success_message(self, cleaned_data):
-        return _("Repartition removed for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
+    def delete(self, request, *args, **kwargs):
+        success_message = self.get_success_message()
+        response = super().delete(request, *args, **kwargs)
+        if success_message:
+            messages.success(self.request, success_message)
+        return response
+
+    def get_success_message(self):
+        return _("Attribution removed for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
                                                                         "function": _(self.attribution.function)}

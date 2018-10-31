@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import waffle
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
@@ -232,3 +233,16 @@ class MultiFormsView(TemplateResponseMixin, BaseMultipleFormsView):
     """
     A view for displaying several forms, and rendering a template response.
     """
+
+
+class MultiFormsSuccessMessageMixin:
+
+    def forms_valid(self, forms):
+        response = super().forms_valid(forms)
+        success_message = self.get_success_message()
+        if success_message:
+            messages.success(self.request, success_message)
+        return response
+
+    def get_success_message(self):
+        return ""
