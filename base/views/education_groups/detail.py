@@ -241,7 +241,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         }
 
 
-def publish( request, education_group_year_id, root_id):
+def publish(request, education_group_year_id, root_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     url = URL_TO_PUBLISH.format(anac=education_group_year.academic_year.year, code=education_group_year.acronym)
     publish_request = requests.get(url)
