@@ -28,9 +28,11 @@ from django.shortcuts import redirect, get_object_or_404, render
 from waffle.decorators import waffle_flag
 
 from base.forms.learning_unit.external_learning_unit import ExternalLearningUnitBaseForm
+from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
 from base.models.academic_year import AcademicYear
 from base.models.person import Person
 from base.views.learning_units.common import show_success_learning_unit_year_creation_message
+from base.views.learning_units.create import _save_and_redirect
 
 
 @login_required
@@ -40,16 +42,14 @@ def get_external_learning_unit_creation_form(request, academic_year):
     person = get_object_or_404(Person, user=request.user)
     academic_year = get_object_or_404(AcademicYear, pk=academic_year)
 
-    external_form = ExternalLearningUnitBaseForm(
+    postponement_form = LearningUnitPostponementForm(
         person=person,
-        academic_year=academic_year,
-        data=request.POST or None
+        start_postponement=academic_year,
+        data=request.POST or None,
+        external=True,
     )
 
-    if external_form.is_valid():
-        learning_unit_year = external_form.save()
-        show_success_learning_unit_year_creation_message(request, learning_unit_year,
-                                                         'learning_unit_successfuly_created')
-        return redirect('learning_unit', learning_unit_year_id=learning_unit_year.pk)
+    if postponement_form.is_valid():
+        return _save_and_redirect(postponement_form, request)
 
-    return render(request, "learning_unit/external/create.html", external_form.get_context())
+    return render(request, "learning_unit/external/create.html", postponement_form.get_context())
