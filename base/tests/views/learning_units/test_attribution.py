@@ -69,7 +69,7 @@ class TestEditAttribution(TestCase):
         self.patcher = patch.object(RulesRequiredMixin, "test_func", return_value=True)
         self.mocked_permission_function = self.patcher.start()
 
-    def addCleanup(self, function, *args, **kwargs):
+    def tearDown(self):
         self.patcher.stop()
 
     def test_login_required(self):

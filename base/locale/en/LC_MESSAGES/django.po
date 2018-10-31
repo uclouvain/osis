@@ -4098,3 +4098,12 @@ msgstr ""
 
 msgid "The volume can not be set to 0."
 msgstr ""
+
+msgid "Publish"
+msgstr "Publish"
+
+msgid "This program has no page to publish on it"
+msgstr "This program has no page to publish on it"
+
+msgid "The program are published. Click on the link to display it : "
+msgstr "The program are published. Click on the link to display it : "
