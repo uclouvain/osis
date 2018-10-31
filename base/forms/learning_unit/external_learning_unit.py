@@ -129,8 +129,8 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
         self.learning_unit_year_form.fields['acronym'] = ExternalAcronymField()
         self.learning_unit_year_form.fields['campus'] = CampusChoiceField(
             queryset=Campus.objects.order_by('organization__name')
-                .distinct('organization__name')
-                .select_related('organization')
+                                   .distinct('organization__name')
+                                   .select_related('organization')
         )
 
     @property
