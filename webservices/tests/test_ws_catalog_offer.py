@@ -590,9 +590,9 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
             'content': {
                 'alert_message': 'alert',
                 'ca_bacs_cond_generales': 'this is a test',
-                'ca_bacs_cond_particulieres': '',
-                'ca_bacs_examen_langue': '',
-                'ca_bacs_cond_speciales': '',
+                'ca_bacs_cond_particulieres': None,
+                'ca_bacs_examen_langue': None,
+                'ca_bacs_cond_speciales': None,
             }
         })
 
@@ -682,6 +682,37 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
         useless, condition_admissions_section = remove_conditions_admission(response_json['sections'])
         sections = condition_admissions_section['content']['sections']
         self.assertEqual(len(sections['university_bachelors']['records']['ucl_bachelors']), 1)
+
+    def test_empty_string_evaluated_as_null(self):
+        education_group_year = EducationGroupYearMasterFactory()
+
+        admission_condition = AdmissionCondition.objects.create(education_group_year=education_group_year)
+        acl = AdmissionConditionLine.objects.create(
+            admission_condition=admission_condition,
+            section='ucl_bachelors',
+            conditions='dummy conditions',
+            diploma=''
+        )
+
+        iso_language, language = 'fr-be', 'fr'
+        data = {
+            'anac': education_group_year.academic_year.year,
+            'code_offre': education_group_year.acronym,
+            'sections': [
+                'conditions_admissions'
+            ]
+        }
+        response = self.post(education_group_year.academic_year.year, language, education_group_year.acronym, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content_type, 'application/json')
+
+        response_json = response.json()
+        useless, condition_admissions_section = remove_conditions_admission(response_json['sections'])
+        sections = condition_admissions_section['content']['sections']
+        self.assertEqual(len(sections['university_bachelors']['records']['ucl_bachelors']), 1)
+        cond_admission_line = sections['university_bachelors']['records']['ucl_bachelors'][0]
+        self.assertEqual(cond_admission_line['conditions'], acl.conditions)
+        self.assertIsNone(cond_admission_line['diploma'])
 
 
 class WebServiceParametersValidationTestCase(TestCase):
