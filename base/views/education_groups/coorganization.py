@@ -88,4 +88,3 @@ class UpdateEducationGroupOrganizationView(CommonEducationGroupOrganizationView,
 class CoorganizationDeleteView(CommonEducationGroupOrganizationView, DeleteView):
     pk_url_kwarg = "coorganization_id"
     template_name = "education_group/blocks/modal/modal_organization_confirm_delete_inner.html"
-
