@@ -155,6 +155,43 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_FR, 'evaluation', 'Évaluation'),
     (settings.LANGUAGE_CODE_FR, 'structure', 'Structure'),
     (settings.LANGUAGE_CODE_FR, 'programme_detaille', 'Programme Détaillé'),
+    (settings.LANGUAGE_CODE_FR, 'welcome_introduction', 'Introduction'),
+    (settings.LANGUAGE_CODE_FR, 'welcome_job', 'Votre Futur Job'),
+    (settings.LANGUAGE_CODE_FR, 'welcome_profil', 'Votre profil'),
+    (settings.LANGUAGE_CODE_FR, 'welcome_programme', 'Votre Programme'),
+    (settings.LANGUAGE_CODE_FR, 'welcome_parcours', 'Votre Parcours'),
+    (settings.LANGUAGE_CODE_FR, 'caap', "Cours et Acquis d'Apprentissage du Programme"),
+    (settings.LANGUAGE_CODE_FR, 'acces_professions', 'Accès aux Professions'),
+    (settings.LANGUAGE_CODE_FR, 'bacheliers_concernes', 'Bacheliers Concernés'),
+    (settings.LANGUAGE_CODE_FR, 'infos_pratiques', 'Informations Pratiques'),
+    (settings.LANGUAGE_CODE_FR, 'mineures', 'Mineures'),
+    (settings.LANGUAGE_CODE_FR, 'majeures', 'Majeures'),
+    (settings.LANGUAGE_CODE_FR, 'finalites', 'Finalités'),
+    (settings.LANGUAGE_CODE_FR, 'finalites_didactiques', 'Finalités Didactique'),
+    (settings.LANGUAGE_CODE_EN, 'comp_acquis', 'Learning Outcomes'),
+    (settings.LANGUAGE_CODE_EN, 'pedagogie', 'Pedagogy'),
+    (settings.LANGUAGE_CODE_EN, 'contacts', 'Contacts'),
+    (settings.LANGUAGE_CODE_EN, 'mobilite', 'Mobility'),
+    (settings.LANGUAGE_CODE_EN, 'formations_accessibles', 'Possible Trainings'),
+    (settings.LANGUAGE_CODE_EN, 'certificats', 'Certificates'),
+    (settings.LANGUAGE_CODE_EN, 'module_complementaire', 'Supplementary Modules'),
+    (settings.LANGUAGE_CODE_EN, 'evaluation', 'Evaluation'),
+    (settings.LANGUAGE_CODE_EN, 'structure', 'Structure'),
+    (settings.LANGUAGE_CODE_EN, 'programme_detaille', 'Detailed Programme'),
+    (settings.LANGUAGE_CODE_EN, 'welcome_introduction', 'Introduction'),
+    (settings.LANGUAGE_CODE_EN, 'welcome_job', 'Your Future Job'),
+    (settings.LANGUAGE_CODE_EN, 'welcome_profil', 'Your Profile'),
+    (settings.LANGUAGE_CODE_EN, 'welcome_programme', 'Your Programme'),
+    (settings.LANGUAGE_CODE_EN, 'welcome_parcours', 'Votre Parcours'),
+    (settings.LANGUAGE_CODE_EN, 'caap', "The Programme's Courses and Learning Outcomes"),
+    (settings.LANGUAGE_CODE_EN, 'acces_professions', 'Accès aux Professions'),
+    (settings.LANGUAGE_CODE_EN, 'bacheliers_concernes', 'Concerned Bachelors'),
+    (settings.LANGUAGE_CODE_EN, 'infos_pratiques', 'Informations Pratiques'),
+    (settings.LANGUAGE_CODE_EN, 'mineures', 'Minors'),
+    (settings.LANGUAGE_CODE_EN, 'majeures', 'Majors'),
+    (settings.LANGUAGE_CODE_EN, 'finalites', 'Focuses'),
+    (settings.LANGUAGE_CODE_EN, 'finalites_didactiques', 'Teaching Focuses'),
+
 ]
 
 MAPPING_LABEL_TEXTUAL = collections.defaultdict(dict)
@@ -181,6 +218,10 @@ def get_mapping_label_texts(context, labels):
                 text_label=text_label,
                 language=context.language,
                 label=find_translated_label(context.language, label))
+        else:
+            record = records.first()
+            record.label = find_translated_label(context.language, label)
+            record.save()
 
         mapping_label_text_label[label] = text_label
     return mapping_label_text_label
