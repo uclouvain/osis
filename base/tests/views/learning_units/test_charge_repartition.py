@@ -37,6 +37,7 @@ from base.tests.factories.learning_unit_component import LecturingLearningUnitCo
     PracticalLearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, LearningUnitYearPartimFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
+from base.views.mixins import RulesRequiredMixin
 
 
 class TestChargeRepartitionMixin:
@@ -87,8 +88,7 @@ class TestChargeRepartitionMixin:
         self.attribution = AttributionNew.objects.get(id=attribution_id)
         self.client.force_login(self.person.user)
 
-        self.patcher = patch("base.business.learning_units.perms._is_eligible_to_manage_charge_repartition",
-                             return_value=True)
+        self.patcher = patch.object(RulesRequiredMixin, "test_func", return_value=True)
         self.mocked_permission_function = self.patcher.start()
 
     def addCleanup(self, function, *args, **kwargs):
@@ -115,7 +115,7 @@ class TestSelectAttributionView(TestChargeRepartitionMixin, TestCase):
     def test_template_used(self):
         response = self.client.get(self.url)
 
-        self.mocked_permission_function.assert_called_once_with(self.learning_unit_year, self.person)
+        self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "learning_unit/select_attribution.html")
 
@@ -167,7 +167,7 @@ class TestAddChargeRepartition(TestChargeRepartitionMixin, TestCase):
     def test_template_used_with_get(self):
         response = self.client.get(self.url)
 
-        self.mocked_permission_function.assert_called_once_with(self.learning_unit_year, self.person)
+        self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "learning_unit/add_charge_repartition_inner.html")
 
@@ -202,7 +202,7 @@ class TestEditChargeRepartition(TestChargeRepartitionMixin, TestCase):
     def test_template_used_with_get(self):
         response = self.client.get(self.url)
 
-        self.mocked_permission_function.assert_called_once_with(self.learning_unit_year, self.person)
+        self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "learning_unit/add_charge_repartition_inner.html")
 
@@ -236,7 +236,7 @@ class TestRemoveChargeRepartition(TestChargeRepartitionMixin, TestCase):
     def test_template_used_with_get(self):
         response = self.client.get(self.url)
 
-        self.mocked_permission_function.assert_called_once_with(self.learning_unit_year, self.person)
+        self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "learning_unit/remove_charge_repartition_confirmation_inner.html")
 

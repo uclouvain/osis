@@ -104,10 +104,10 @@ class AddChargeRepartition(EditAttributionView):
         return copy_attribution
 
     def lecturing_charge_form_valid(self, lecturing_charge_form):
-        lecturing_charge_form.save(self.get_copy_attribution, self.luy)
+        lecturing_charge_form.save(attribution=self.get_copy_attribution, learning_unit_year=self.luy)
 
     def practical_charge_form_valid(self, practical_charge_form):
-        practical_charge_form.save(self.get_copy_attribution, self.luy)
+        practical_charge_form.save(attribution=self.get_copy_attribution, learning_unit_year=self.luy)
 
     def get_lecturing_charge_form_initial(self):
         lecturing_allocation_charge = self.attribution.lecturing_charges[0].allocation_charge \

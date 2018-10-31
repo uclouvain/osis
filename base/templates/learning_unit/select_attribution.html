@@ -60,8 +60,7 @@
                                 <td>{{ attribution.practical_charges.0.allocation_charge | floatformat:2 }}</td>
                                 <td>{{ attribution.substitute | default_if_none:'' }}</td>
                                 <td>
-                                    <a href="#"
-                                       class="btn btn-primary trigger_modal"
+                                    <a class="btn btn-primary trigger_modal"
                                        role="button"
                                        data-url="{% url 'add_charge_repartition' learning_unit_year.id attribution.id %}"
                                        data-modal_class="modal-lg">

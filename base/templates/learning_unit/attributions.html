@@ -61,24 +61,24 @@
                                 <td>{{ value.substitute | default_if_none:'' }}</td>
                                 <td>
                                     {% if can_manage_attribution %}
-                                        <a href="#" class="trigger_modal"
+                                        <a class="trigger_modal"
                                            data-url="{% url "update_attribution" learning_unit_year.id key %}"
                                            data-modal_class="modal-lg">
                                             <span class="glyphicon glyphicon-edit"></span>
                                         </a>
-                                        <a href="#" class="trigger_modal"
+                                        <a class="trigger_modal"
                                            data-url="{% url "remove_charge_repartition" learning_unit_year.id key %}">
                                             <span class="glyphicon glyphicon-trash"></span>
                                         </a>
                                     {% endif %}
                                     {% if can_manage_charge_repartition%}
-                                        <a href="#" class="trigger_modal"
+                                        <a class="trigger_modal"
                                            data-url="{% url "edit_charge_repartition" learning_unit_year.id key %}"
                                            data-modal_class="modal-lg">
                                             <span class="glyphicon glyphicon-edit">
 
                                             </span> </a>
-                                        <a href="#" class="trigger_modal"
+                                        <a class="trigger_modal"
                                            data-url="{% url "remove_charge_repartition" learning_unit_year.id key %}">
                                             <span class="glyphicon glyphicon-trash"></span>
                                         </a>

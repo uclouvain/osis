@@ -123,10 +123,10 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
         attribution_form.save()
 
     def lecturing_charge_form_valid(self, lecturing_charge_form):
-        lecturing_charge_form.save(self.attribution, self.luy)
+        lecturing_charge_form.save(attribution=self.attribution, learning_unit_year=self.luy)
 
     def practical_charge_form_valid(self, practical_charge_form):
-        practical_charge_form.save(self.attribution, self.luy)
+        practical_charge_form.save(attribution=self.attribution, learning_unit_year=self.luy)
 
     def get_success_message(self, cleaned_data):
         return _("Attribution modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
@@ -140,12 +140,6 @@ class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, SuccessMess
     template_name = "learning_unit/remove_charge_repartition_confirmation_inner.html"
     pk_url_kwarg = "attribution_id"
 
-    def delete(self, request, *args, **kwargs):
-        delete_attribution(self.kwargs["attribution_id"])
-        success_url = self.get_success_url()
-        messages.success(self.request, self.success_message)
-        return HttpResponseRedirect(success_url)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["attribution"] = self.attribution
@@ -154,11 +148,3 @@ class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, SuccessMess
     def get_success_message(self, cleaned_data):
         return _("Repartition removed for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
                                                                         "function": _(self.attribution.function)}
-
-
-def delete_attribution(attribution_pk):
-    attribution_charges = AttributionChargeNew.objects.filter(attribution=attribution_pk)
-    for charge in attribution_charges:
-        charge.delete()
-
-    AttributionNew.objects.get(pk=attribution_pk).delete()

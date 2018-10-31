@@ -36,6 +36,7 @@ from base.tests.factories.learning_unit_component import LecturingLearningUnitCo
     PracticalLearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
+from base.views.mixins import RulesRequiredMixin
 
 
 class TestEditAttribution(TestCase):
@@ -43,7 +44,7 @@ class TestEditAttribution(TestCase):
     def setUpTestData(cls):
         cls.learning_unit_year = LearningUnitYearFullFactory()
         cls.lecturing_unit_component = LecturingLearningUnitComponentFactory(learning_unit_year=cls.learning_unit_year)
-        cls.practical_unit_component = PracticalLearningUnitComponentFactory( learning_unit_year=cls.learning_unit_year)
+        cls.practical_unit_component = PracticalLearningUnitComponentFactory(learning_unit_year=cls.learning_unit_year)
         cls.person = PersonWithPermissionsFactory('can_access_learningunit')
 
     def setUp(self):
@@ -62,8 +63,7 @@ class TestEditAttribution(TestCase):
         self.client.force_login(self.person.user)
         self.url = reverse("update_attribution", args=[self.learning_unit_year.id, self.attribution.id])
 
-        self.patcher = patch("base.business.learning_units.perms._is_eligible_to_manage_attributions",
-                             return_value=True)
+        self.patcher = patch.object(RulesRequiredMixin, "test_func", return_value=True)
         self.mocked_permission_function = self.patcher.start()
 
     def addCleanup(self, function, *args, **kwargs):
@@ -78,7 +78,7 @@ class TestEditAttribution(TestCase):
     def test_template_used_with_get(self):
         response = self.client.get(self.url)
 
-        self.mocked_permission_function.assert_called_once_with(self.learning_unit_year, self.person)
+        self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "learning_unit/edit_attribution_inner.html")
 
