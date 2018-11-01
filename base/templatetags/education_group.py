@@ -109,13 +109,6 @@ BRANCH_CONSTRAINT = """\
 """
 
 # TODO Use inclusion tags instead
-BUTTON_TEMPLATE = """
-<button title="{}" class="btn btn-default btn-sm" id="{}" data-toggle="tooltip-wrapper" name="action" {}>
-    <i class="fa {}"></i>
-</button>
-"""
-
-# TODO Use inclusion tags instead
 BUTTON_ORDER_TEMPLATE = """
 <button type="submit" title="{}" class="btn btn-default btn-sm" 
     id="{}" data-toggle="tooltip-wrapper" name="action" value="{}" {}>
