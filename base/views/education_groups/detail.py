@@ -203,6 +203,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
     def get_translated_labels_and_content(self, section, user_language, common_education_group_year):
         records = []
+
         sections = self.get_appropriate_sections()
         for label, selectors in section.labels:
             records.extend(
@@ -263,7 +264,10 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             code = education_group_year.acronym
             type = ""
         url = settings.URL_TO_GET_SECTIONS.format(type=type, anac=education_group_year.academic_year.year, code=code)
-        sections_request = requests.get(url).json()
+        try:
+            sections_request = requests.get(url).json()
+        except:
+            sections_request = {'sections': []}
         return sections_request['sections']
 
 
