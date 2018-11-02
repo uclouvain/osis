@@ -24,15 +24,13 @@
 #
 ##############################################################################
 import functools
-import itertools
 import operator
 
 from dal import autocomplete
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.postgres.search import SearchVector, SearchQuery, TrigramSimilarity, TrigramDistance
-from django.db.models import Prefetch, Q, Value
-from django.db.models.functions import Concat
+from django.contrib.postgres.search import SearchVector, SearchQuery
+from django.db.models import Prefetch, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
