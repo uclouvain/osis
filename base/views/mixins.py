@@ -239,10 +239,10 @@ class MultiFormsSuccessMessageMixin:
 
     def forms_valid(self, forms):
         response = super().forms_valid(forms)
-        success_message = self.get_success_message()
+        success_message = self.get_success_message(forms)
         if success_message:
             messages.success(self.request, success_message)
         return response
 
-    def get_success_message(self):
+    def get_success_message(self, forms):
         return ""

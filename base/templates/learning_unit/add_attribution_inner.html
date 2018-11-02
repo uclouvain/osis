@@ -40,7 +40,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>{{ attribution.tutor.person }}</td>
+                    <td>{% bootstrap_field attribution_form.tutor show_label=False %}</td>
                     <td>{% bootstrap_field attribution_form.function show_label=False %}</td>
                     <td>{% bootstrap_field attribution_form.start_year show_label=False %}</td>
                     <td>{% bootstrap_field attribution_form.duration show_label=False %}</td>
@@ -51,6 +51,7 @@
             </tbody>
         </table>
     </form>
+    {{ attribution_form.media }}
 </div>
 
 <div class="modal-footer">

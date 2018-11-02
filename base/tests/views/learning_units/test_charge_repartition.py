@@ -225,7 +225,7 @@ class TestEditChargeRepartition(TestChargeRepartitionMixin, TestCase):
 class TestRemoveChargeRepartition(TestChargeRepartitionMixin, TestCase):
     def setUp(self):
         super().setUp()
-        self.url = reverse("remove_charge_repartition", args=[self.learning_unit_year.id, self.attribution.id])
+        self.url = reverse("remove_attribution", args=[self.learning_unit_year.id, self.attribution.id])
 
     def test_login_required(self):
         self.client.logout()

@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from dal import autocomplete
 from django import forms
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.models.enums import learning_component_year_type
 from base.models.learning_component_year import LearningComponentYear
+from base.models.tutor import Tutor
 
 
 class AttributionForm(forms.ModelForm):
@@ -46,6 +48,34 @@ class AttributionForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.end_year = instance.start_year + self.cleaned_data["duration"] - 1
+        if commit:
+            instance.save()
+        return instance
+
+
+class AttributionCreationForm(AttributionForm):
+    tutor = forms.ModelChoiceField(
+        queryset=Tutor.objects.all().select_related("person").order_by("person__last_name", "person__first_name"),
+        required=True,
+        widget=autocomplete.ModelSelect2(
+            url='tutor_autocomplete',
+            attrs={'data-theme': 'bootstrap', 'data-width': 'null', 'data-placeholder': '---------'}
+        ),
+    )
+
+    class Meta:
+        model = AttributionNew
+        fields = ["tutor", "function", "start_year"]
+
+    class Media:
+        css = {
+            'all': ('css/select2-bootstrap.css',)
+        }
+
+    def save(self, commit=True, **kwargs):
+        luy = kwargs.pop("learning_unit_year")
+        instance = super().save(commit=False)
+        instance.learning_container_year = luy.learning_container_year
         if commit:
             instance.save()
         return instance
