@@ -4065,13 +4065,19 @@ msgstr ""
 msgid "The coorganization has been created"
 msgstr ""
 
+msgid "Attribution added for %(tutor)s (%(function)s)"
+msgstr ""
+
+msgid "Attribution modified for %(tutor)s (%(function)s)"
+msgstr ""
+
 msgid "Repartition added for %(tutor)s (%(function)s)"
 msgstr ""
 
 msgid "Repartition modified for %(tutor)s (%(function)s)"
 msgstr ""
 
-msgid "Repartition removed for %(tutor)s (%(function)s)"
+msgid "Attribution removed for %(tutor)s (%(function)s)"
 msgstr ""
 
 msgid "Manage repartition"
