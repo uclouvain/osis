@@ -203,6 +203,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
     def get_translated_labels_and_content(self, section, user_language, common_education_group_year):
         records = []
+        sections = self.get_appropriate_sections()
         for label, selectors in section.labels:
             records.extend(
                 self.get_selectors(common_education_group_year, label, selectors, user_language)
