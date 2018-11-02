@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from distutils.command.config import config
 from django import template
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import PermissionDenied
@@ -52,27 +53,54 @@ def li_edit_date_lu(context, url, message, url_id="link_edit_date_lu"):
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_suppression_proposal(context, url, message, url_id="link_proposal_suppression", js_script=''):
-    return li_with_permission_for_proposal(context, is_eligible_to_create_modification_proposal, url, message, url_id, True,js_script, context['learning_unit_year'])
+    data = _get_common_data(context, js_script, message, url, url_id)
+    data['permission_function'] = is_eligible_to_create_modification_proposal
+    data['obj'] = context['learning_unit_year']
+    data['load_modal'] = True
+    return li_with_permission_for_proposal(data)
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_modification_proposal(context, url, message, url_id="link_proposal_modification", js_script=''):
-    return li_with_permission_for_proposal(context, is_eligible_to_create_modification_proposal, url, message, url_id, False, js_script, context['learning_unit_year'])
+    data = _get_common_data(context, js_script, message, url, url_id)
+    data['permission_function'] = is_eligible_to_create_modification_proposal
+    data['obj'] = context['learning_unit_year']
+    return li_with_permission_for_proposal(data)
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_edit_proposal(context, url, message, url_id="link_proposal_edit", js_script=''):
-    return li_with_permission_for_proposal(context, is_eligible_to_edit_proposal, url, message, url_id, False, js_script, context['proposal'])
+    data = _get_common_data(context, js_script, message, url, url_id)
+    data['permission_function'] = is_eligible_to_edit_proposal
+    data['obj'] = context['proposal']
+    return li_with_permission_for_proposal(data)
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_cancel_proposal(context, url, message, url_id="link_cancel_proposal", js_script=''):
-    return li_with_permission_for_proposal(context, is_eligible_for_cancel_of_proposal, url, message, url_id, False, js_script, context['proposal'])
+    data = _get_common_data(context, js_script, message, url, url_id)
+    data['permission_function'] = is_eligible_for_cancel_of_proposal
+    data['obj'] = context['proposal']
+    return li_with_permission_for_proposal(data)
+
+
+def _get_common_data(context, js_script, message, url, url_id):
+    data = {'context': context,
+            'url': url,
+            'message': message,
+            'url_id': url_id,
+            'load_modal': False,
+            'js_script': js_script,
+            }
+    return data
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_consolidate_proposal(context, url, message, url_id="link_consolidate_proposal", js_script=''):
-    return li_with_permission_for_proposal(context, is_eligible_to_consolidate_proposal, url, message, url_id, False, js_script, context['proposal'])
+    data = _get_common_data(context, js_script, message, url, url_id)
+    data['permission_function'] = is_eligible_to_consolidate_proposal
+    data['obj'] = context['proposal']
+    return li_with_permission_for_proposal(data)
 
 
 @register.inclusion_tag('blocks/button/li_template_lu.html', takes_context=True)
@@ -116,7 +144,16 @@ def _get_permission(context, permission):
     return permission_denied_message, "" if result else "disabled"
 
 
-def li_with_permission_for_proposal(context, permission, url, message, url_id, load_modal=False, js_script='', obj=None):
+def li_with_permission_for_proposal(data):
+    context = data['context']
+    permission = data['permission_function']
+    url = data['url']
+    message = data['message']
+    url_id = data['url_id']
+    load_modal = data.get('load_modal', False)
+    js_script = data.get('js_script', '')
+    obj = data['obj']
+
     proposal = context['proposal']
     person = find_by_user(context.get('user'))
 
@@ -147,15 +184,13 @@ def li_with_permission_for_proposal(context, permission, url, message, url_id, l
     }
 
 
-def _get_permission_proposal(context, permission, proposal):
+def _get_permission_proposal(context, permission, object):
+    # object is sometimes a proposal, sometimes a learning_unit_year it's why it's call 'object'
     permission_denied_message = ""
 
     person = find_by_user(context.get('user'))
     try:
-        # attention ça marche pour certains test avec la ligne ci-dessous et pour d'autre avec la suivante
-
-        result = permission(proposal, person, raise_exception=True)
-        # result = permission(proposal.learning_unit_year, person, raise_exception=True)
+        result = permission(object, person, raise_exception=True)
     except PermissionDenied as e:
         result = False
         permission_denied_message = str(e)

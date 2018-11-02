@@ -46,7 +46,6 @@ from osis_common.utils.perms import conjunction, disjunction, negation, BasePerm
 from django.core.exceptions import PermissionDenied
 
 
-
 FACULTY_UPDATABLE_CONTAINER_TYPES = (learning_container_year_types.COURSE,
                                      learning_container_year_types.DISSERTATION,
                                      learning_container_year_types.INTERNSHIP)
@@ -56,9 +55,9 @@ PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name,
 YEAR_LIMIT_LUE_MODIFICATION = 2018
 
 MSG_EXISTING_PROPOSAL_IN_EPC = "Existing proposal in epc"
-MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE = "You are not eligible to modify the end date of this learning unit. You should be" \
-                                     " central manager or the learning unit has to be a partim or the learning unit as" \
-                                     " to be a course/dissertation/internship"
+MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE = "You are not eligible to modify the end date of this learning unit. You should " \
+                                     "be central manager or the learning unit has to be a partim or the learning unit" \
+                                     " as to be a course/dissertation/internship"
 MSG_CANNOT_MODIFY_ON_PREVIOUS_ACADEMIC_YR = "You can't modify learning unit of a previous year"
 MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY = "You can only modify a learning unit when your are linked to its requirement " \
                                       "entity"
@@ -66,8 +65,8 @@ MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE = "Person not in accordance wit
 MSG_NOT_PROPOSAL_STATE_FACULTY = "You are faculty manager and the proposal state is not 'Faculty', so you can't edit"
 MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL = "You are not eligible to cancel proposal"
 MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL = "You are not eligible to edit proposal"
-MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY = "You are not attached to initial or current requirement entity, so you can't" \
-                                          " edit proposal"
+MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY = "You are not attached to initial or current requirement entity, so you " \
+                                          "can't edit proposal"
 MSG_NOT_GOOD_RANGE_OF_YEARS = "Not in range of years which can be edited by you"
 MSG_NOT_ELIGIBLE_TO_CONSOLIDATE_PROPOSAL = "You are not eligible to consolidate proposal"
 MSG_NO_RIGHTS_TO_CONSOLIDATE = "You dont' have the rights to consolidate"
@@ -114,13 +113,14 @@ def is_eligible_to_create_partim(learning_unit_year, person, raise_exception=Fal
 
 
 def is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception=False):
-    result = _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
-             not(is_learning_unit_year_in_past(learning_unit_year, person, raise_exception))and \
-             not(is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception))and \
-             _is_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception)and \
-             not(is_learning_unit_year_in_proposal(learning_unit_year, person, raise_exception))and \
-             is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person, raise_exception)
-    #TODO detailled why button is disabled
+    result = \
+        _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
+        not(is_learning_unit_year_in_past(learning_unit_year, person, raise_exception))and \
+        not(is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception))and \
+        _is_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception)and \
+        not(is_learning_unit_year_in_proposal(learning_unit_year, person, raise_exception))and \
+        is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person, raise_exception)
+    #  TODO detail why button is disabled
     can_raise_exception(
         raise_exception, result,
         MSG_NOT_ELIGIBLE_TO_CREATE_MODIFY_PROPOSAL
@@ -129,12 +129,13 @@ def is_eligible_to_create_modification_proposal(learning_unit_year, person, rais
 
 
 def is_eligible_for_cancel_of_proposal(proposal, person, raise_exception=False):
-    result = _is_person_in_accordance_with_proposal_state(proposal, person, raise_exception) and \
-             _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception) and \
-             _has_person_the_right_to_make_proposal(proposal, person, raise_exception)
+    result = \
+        _is_person_in_accordance_with_proposal_state(proposal, person, raise_exception) and \
+        _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception) and \
+        _has_person_the_right_to_make_proposal(proposal, person, raise_exception)
     can_raise_exception(
         raise_exception, result,
-        "You are not eligible to cancel proposal"
+        MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL
     )
     return result
 
@@ -151,6 +152,7 @@ def is_eligible_to_edit_proposal(proposal, person, raise_exception=False):
         MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL
     )
     return result
+
 
 def is_eligible_to_consolidate_proposal(proposal, person, raise_exception=False):
     msg = ''
@@ -172,7 +174,6 @@ def is_eligible_to_consolidate_proposal(proposal, person, raise_exception=False)
         msg
     )
     return result
-
 
 
 def can_edit_summary_locked_field(learning_unit_year, person):
@@ -218,8 +219,8 @@ def _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_
             MSG_NOT_PROPOSAL_STATE_FACULTY
         )
         return False
-    if (proposal.type == ProposalType.MODIFICATION.name and
-                proposal.learning_unit_year.academic_year.year != starting_academic_year().year + 1):
+    if proposal.type == ProposalType.MODIFICATION.name and \
+                    proposal.learning_unit_year.academic_year.year != starting_academic_year().year + 1:
         return False
     return True
 
@@ -239,7 +240,6 @@ def _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit
     return result
 
 
-
 def is_eligible_to_manage_charge_repartition(learning_unit_year, person):
     return person.user.has_perm("base.can_manage_charge_repartition") and \
         learning_unit_year.is_partim() and \
@@ -252,6 +252,7 @@ def is_eligible_to_manage_attributions(learning_unit_year, person):
     return person.user.has_perm("base.can_manage_attribution") and \
         learning_unit_year.learning_container_year.container_type in container_types and \
         person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+
 
 def _is_person_central_manager(_, person, raise_exception):
     return person.is_central_manager()
@@ -360,13 +361,13 @@ def _is_attached_to_initial_or_current_requirement_entity(proposal, person, rais
     )
     return result
 
+
 def _is_attached_to_initial_entity(learning_unit_proposal, a_person):
     if not learning_unit_proposal.initial_data.get("entities") or \
             not learning_unit_proposal.initial_data["entities"].get(REQUIREMENT_ENTITY):
         return False
     initial_entity_requirement_id = learning_unit_proposal.initial_data["entities"][REQUIREMENT_ENTITY]
     return a_person.is_attached_entities(Entity.objects.filter(pk=initial_entity_requirement_id))
-
 
 
 def _is_container_type_course_dissertation_or_internship(learning_unit_year, _, raise_exception):
@@ -380,6 +381,7 @@ def _is_container_type_course_dissertation_or_internship(learning_unit_year, _, 
         "This learning unit isn't eligible for end date modification"
     )
     return result
+
 
 def learning_unit_year_permissions(learning_unit_year, person):
     return {
