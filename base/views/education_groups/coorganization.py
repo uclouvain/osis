@@ -60,7 +60,9 @@ class CommonEducationGroupOrganizationView(RulesRequiredMixin, AjaxTemplateMixin
         return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
 
     def get_success_url(self):
-        return reverse("education_group_read", args=[self.kwargs["root_id"], self.object.education_group_year.pk])
+        return reverse(
+            'education_group_read', args=[self.kwargs["root_id"], self.kwargs["education_group_year_id"]]
+        ).rstrip('/') + "#panel_coorganization"
 
 
 class CreateEducationGroupOrganizationView(CommonEducationGroupOrganizationView, CreateView):
@@ -86,8 +88,3 @@ class UpdateEducationGroupOrganizationView(CommonEducationGroupOrganizationView,
 class CoorganizationDeleteView(CommonEducationGroupOrganizationView, DeleteView):
     pk_url_kwarg = "coorganization_id"
     template_name = "education_group/blocks/modal/modal_organization_confirm_delete_inner.html"
-
-    def get_success_url(self):
-        return reverse(
-            'education_group_read', args=[self.kwargs["root_id"], self.kwargs["education_group_year_id"]]
-        ).rstrip('/') + "#panel_coorganization"
