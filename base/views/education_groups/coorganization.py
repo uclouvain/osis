@@ -30,7 +30,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import UpdateView, CreateView, DeleteView
 
-from base.forms.education_group.organization import OrganizationEditForm
+from base.forms.education_group.coorganization import CoorganizationEditForm
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year import EducationGroupYear
 from base.views.education_groups import perms
@@ -41,7 +41,7 @@ class CommonEducationGroupOrganizationView(RulesRequiredMixin, AjaxTemplateMixin
     model = EducationGroupOrganization
     context_object_name = "coorganization"
 
-    form_class = OrganizationEditForm
+    form_class = CoorganizationEditForm
     template_name = "education_group/organization_edit.html"
 
     # RulesRequiredMixin
