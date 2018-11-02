@@ -57,7 +57,7 @@ def li_edit_date_lu(context, url, message, url_id="link_edit_date_lu"):
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_suppression_proposal(context, url, message, url_id="link_proposal_suppression", js_script=''):
-    data = _get_common_proposal_data(context, js_script, message, url, url_id)
+    data = _get_common_proposal_data(context, message, url, url_id)
     data['permission_function'] = is_eligible_to_create_modification_proposal
     data['obj'] = context['learning_unit_year']
     data['load_modal'] = True
@@ -66,7 +66,7 @@ def li_suppression_proposal(context, url, message, url_id="link_proposal_suppres
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_modification_proposal(context, url, message, url_id="link_proposal_modification", js_script=''):
-    data = _get_common_proposal_data(context, js_script, message, url, url_id)
+    data = _get_common_proposal_data(context, message, url, url_id)
     data['permission_function'] = is_eligible_to_create_modification_proposal
     data['obj'] = context['learning_unit_year']
     return li_with_permission_for_proposal(data)
@@ -74,7 +74,7 @@ def li_modification_proposal(context, url, message, url_id="link_proposal_modifi
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_edit_proposal(context, url, message, url_id="link_proposal_edit", js_script=''):
-    data = _get_common_proposal_data(context, js_script, message, url, url_id)
+    data = _get_common_proposal_data(context, message, url, url_id)
     data['permission_function'] = is_eligible_to_edit_proposal
     data['obj'] = context['proposal']
     return li_with_permission_for_proposal(data)
@@ -82,28 +82,29 @@ def li_edit_proposal(context, url, message, url_id="link_proposal_edit", js_scri
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_cancel_proposal(context, url, message, url_id="link_cancel_proposal", js_script=''):
-    data = _get_common_proposal_data(context, js_script, message, url, url_id)
+    data = _get_common_proposal_data(context, message, url, url_id)
     data['permission_function'] = is_eligible_for_cancel_of_proposal
     data['obj'] = context['proposal']
     return li_with_permission_for_proposal(data)
 
 
-def _get_common_proposal_data(context, js_script, message, url, url_id):
+def _get_common_proposal_data(context, message, url, url_id):
     data = {'context': context,
             'url': url,
             'message': message,
             'url_id': url_id,
             'load_modal': False,
-            'js_script': js_script,
+            'js_script': '',
             }
     return data
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_consolidate_proposal(context, url, message, url_id="link_consolidate_proposal", js_script=''):
-    data = _get_common_proposal_data(context, js_script, message, url, url_id)
+    data = _get_common_proposal_data(context, message, url, url_id)
     data['permission_function'] = is_eligible_to_consolidate_proposal
     data['obj'] = context['proposal']
+    data['js_script'] = js_script
     return li_with_permission_for_proposal(data)
 
 
