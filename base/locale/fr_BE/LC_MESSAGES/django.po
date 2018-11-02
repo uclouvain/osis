@@ -4115,3 +4115,6 @@ msgstr "Ce programme n'a pas de page sur laquelle le publier"
 
 msgid "The program are published. Click on the link to display it : "
 msgstr "Le programme a été publié. Cliquez sur le lien pour l'afficher : "
+
+msgid "Unable to retrieve appropriate sections for this programs"
+msgstr "Impossible de récupérer les sections pertinentes pour le programme consulté"

@@ -4107,3 +4107,6 @@ msgstr "This program has no page to publish on it"
 
 msgid "The program are published. Click on the link to display it : "
 msgstr "The program are published. Click on the link to display it : "
+
+msgid "Unable to retrieve appropriate sections for this programs"
+msgstr "Unable to retrieve appropriate sections for this programs"
