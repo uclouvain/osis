@@ -56,7 +56,8 @@ function CKupdate() {
 
 $(".trigger_modal").click(function () {
     let url = $(this).data("url");
-
+    let modal_class = $(this).data("modal_class");
+    $('#modal_dialog_id').attr("class", "modal-dialog").addClass(modal_class);
     $('#form-ajax-modal').modal('toggle');
 
     $('#form-modal-ajax-content').load(url, function () {
