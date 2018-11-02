@@ -68,6 +68,7 @@
     <script type="text/javascript" src="{% static 'js/jquery-validation/jquery.validate.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/diacritics-sort.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jstree.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/modal_form_submit.js' %}"></script>
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 
     {% block header %}
@@ -373,6 +374,9 @@
 
     $(".trigger_modal").click(function () {
         let url = $(this).data("url");
+        let modal_class = $(this).data("modal_class");
+
+        $('#modal_dialog_id').attr("class", "modal-dialog").addClass(modal_class);
 
         $('#form-ajax-modal').modal('toggle');
 
