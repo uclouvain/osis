@@ -144,9 +144,10 @@ def is_eligible_to_edit_proposal(proposal, person, raise_exception=False):
     if not proposal:
         return False
 
-    result = _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception) and \
-             _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_exception) and \
-             _has_person_the_right_edit_proposal(proposal, person)
+    result = \
+        _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception) and \
+        _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_exception) and \
+        _has_person_the_right_edit_proposal(proposal, person)
     can_raise_exception(
         raise_exception, result,
         MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL
@@ -207,8 +208,8 @@ def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_e
             MSG_NOT_ELIGIBLE_TO_DELETE_LU
         )
         return checked_ok
-    
-    
+
+
 def _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_exception=False):
     if person.is_central_manager():
         return True
@@ -220,7 +221,7 @@ def _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_
         )
         return False
     if proposal.type == ProposalType.MODIFICATION.name and \
-                    proposal.learning_unit_year.academic_year.year != starting_academic_year().year + 1:
+       proposal.learning_unit_year.academic_year.year != starting_academic_year().year + 1:
         return False
     return True
 
