@@ -4065,13 +4065,19 @@ msgstr ""
 msgid "The coorganization has been created"
 msgstr ""
 
-msgid "Repartition added"
+msgid "Attribution added for %(tutor)s (%(function)s)"
 msgstr ""
 
-msgid "Repartition edited"
+msgid "Attribution modified for %(tutor)s (%(function)s)"
 msgstr ""
 
-msgid "Repartition removed"
+msgid "Repartition added for %(tutor)s (%(function)s)"
+msgstr ""
+
+msgid "Repartition modified for %(tutor)s (%(function)s)"
+msgstr ""
+
+msgid "Attribution removed for %(tutor)s (%(function)s)"
 msgstr ""
 
 msgid "Manage repartition"
@@ -4086,6 +4092,21 @@ msgstr ""
 
 msgid "Clear notifications"
 msgstr ""
+
+msgid "One of the partial volumes must have a value to 0."
+msgstr ""
+
+msgid "The volume can not be set to 0."
+msgstr ""
+
+msgid "Publish"
+msgstr "Publish"
+
+msgid "This program has no page to publish on it"
+msgstr "This program has no page to publish on it"
+
+msgid "The program are published. Click on the link to display it : "
+msgstr "The program are published. Click on the link to display it : "
 
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
@@ -4130,4 +4151,7 @@ msgid "Proposal not in eligible state for consolidation"
 msgstr ""
 
 msgid "Can delete according to the type of the learning unit"
+msgstr ""
+
+msgid "You are not eligible to create/modify proposal"
 msgstr ""

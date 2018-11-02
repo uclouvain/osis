@@ -120,6 +120,14 @@ class Person(SerializableModel):
             middle_name or ""
         ]).strip()
 
+    @property
+    def age(self):
+        if not self.birth_date:
+            return None
+        today = date.today()
+        return today.year - self.birth_date.year - \
+            ((today.month, today.day) < (self.birth_date.month, self.birth_date.day))
+
     @cached_property
     def linked_entities(self):
         entities_id = set()
@@ -134,9 +142,13 @@ class Person(SerializableModel):
             ("is_institution_administrator", "Is institution administrator "),
             ("can_edit_education_group_administrative_data", "Can edit education group administrative data"),
             ("can_manage_charge_repartition", "Can manage charge repartition"),
+            ("can_manage_attribution", "Can manage attribution"),
         )
 
     def is_linked_to_entity_in_charge_of_learning_unit_year(self, learning_unit_year):
+        if learning_unit_year.is_external():
+            return self.is_attached_entity(learning_unit_year.externallearningunityear.requesting_entity)
+
         entities = Entity.objects.filter(
             entitycontaineryear__learning_container_year=learning_unit_year.learning_container_year,
             entitycontaineryear__type=REQUIREMENT_ENTITY

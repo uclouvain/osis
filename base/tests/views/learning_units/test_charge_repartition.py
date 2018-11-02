@@ -37,6 +37,7 @@ from base.tests.factories.learning_unit_component import LecturingLearningUnitCo
     PracticalLearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, LearningUnitYearPartimFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
+from base.views.mixins import RulesRequiredMixin
 
 
 class TestChargeRepartitionMixin:
@@ -87,11 +88,10 @@ class TestChargeRepartitionMixin:
         self.attribution = AttributionNew.objects.get(id=attribution_id)
         self.client.force_login(self.person.user)
 
-        self.patcher = patch("base.business.learning_units.perms._is_eligible_to_manage_charge_repartition",
-                             return_value=True)
+        self.patcher = patch.object(RulesRequiredMixin, "test_func", return_value=True)
         self.mocked_permission_function = self.patcher.start()
 
-    def addCleanup(self, function, *args, **kwargs):
+    def tearDown(self):
         self.patcher.stop()
 
     def clean_partim_charges(self):
@@ -115,7 +115,7 @@ class TestSelectAttributionView(TestChargeRepartitionMixin, TestCase):
     def test_template_used(self):
         response = self.client.get(self.url)
 
-        self.mocked_permission_function.assert_called_once_with(self.learning_unit_year, self.person)
+        self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "learning_unit/select_attribution.html")
 
@@ -123,9 +123,10 @@ class TestSelectAttributionView(TestChargeRepartitionMixin, TestCase):
         response = self.client.get(self.url)
 
         context = response.context
-        self.assertListEqual(
+        self.assertQuerysetEqual(
             context["attributions"],
-            [(self.attribution_full, self.charge_lecturing_full, self.charge_practical_full)]
+            [self.attribution_full],
+            transform=lambda obj: obj
         )
 
     def test_should_exclude_attributions_for_which_repartition_has_been_done(self):
@@ -145,7 +146,7 @@ class TestSelectAttributionView(TestChargeRepartitionMixin, TestCase):
         response = self.client.get(self.url)
 
         context = response.context
-        self.assertListEqual(
+        self.assertQuerysetEqual(
             context["attributions"],
             []
         )
@@ -166,18 +167,14 @@ class TestAddChargeRepartition(TestChargeRepartitionMixin, TestCase):
     def test_template_used_with_get(self):
         response = self.client.get(self.url)
 
-        self.mocked_permission_function.assert_called_once_with(self.learning_unit_year, self.person)
+        self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "learning_unit/add_charge_repartition.html")
+        self.assertTemplateUsed(response, "learning_unit/add_charge_repartition_inner.html")
 
     def test_post(self):
         data = {
-            'form-TOTAL_FORMS': '2',
-            'form-INITIAL_FORMS': '2',
-            'form-MAX_NUM_FORMS': '2',
-            'form-MIN_NUM_FORMS': '2',
-            'form-0-allocation_charge': 50,  # Lecturing
-            'form-1-allocation_charge': 10  # Practical
+            'lecturing_form-allocation_charge': 50,
+            'practical_form-allocation_charge': 10
         }
         response = self.client.post(self.url, data=data)
 
@@ -205,18 +202,14 @@ class TestEditChargeRepartition(TestChargeRepartitionMixin, TestCase):
     def test_template_used_with_get(self):
         response = self.client.get(self.url)
 
-        self.mocked_permission_function.assert_called_once_with(self.learning_unit_year, self.person)
+        self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "learning_unit/add_charge_repartition.html")
+        self.assertTemplateUsed(response, "learning_unit/add_charge_repartition_inner.html")
 
     def test_post(self):
         data = {
-            'form-TOTAL_FORMS': '2',
-            'form-INITIAL_FORMS': '2',
-            'form-MAX_NUM_FORMS': '2',
-            'form-MIN_NUM_FORMS': '2',
-            'form-0-allocation_charge': 50,  # Lecturing
-            'form-1-allocation_charge': 10  # Practical
+            'lecturing_form-allocation_charge': 50,
+            'practical_form-allocation_charge': 10
         }
         response = self.client.post(self.url, data=data)
 
@@ -232,7 +225,7 @@ class TestEditChargeRepartition(TestChargeRepartitionMixin, TestCase):
 class TestRemoveChargeRepartition(TestChargeRepartitionMixin, TestCase):
     def setUp(self):
         super().setUp()
-        self.url = reverse("remove_charge_repartition", args=[self.learning_unit_year.id, self.attribution.id])
+        self.url = reverse("remove_attribution", args=[self.learning_unit_year.id, self.attribution.id])
 
     def test_login_required(self):
         self.client.logout()
@@ -243,9 +236,9 @@ class TestRemoveChargeRepartition(TestChargeRepartitionMixin, TestCase):
     def test_template_used_with_get(self):
         response = self.client.get(self.url)
 
-        self.mocked_permission_function.assert_called_once_with(self.learning_unit_year, self.person)
+        self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "learning_unit/remove_charge_repartition_confirmation.html")
+        self.assertTemplateUsed(response, "learning_unit/remove_charge_repartition_confirmation_inner.html")
 
     def test_delete_data(self):
         response = self.client.delete(self.url)

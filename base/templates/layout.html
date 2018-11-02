@@ -68,6 +68,7 @@
     <script type="text/javascript" src="{% static 'js/jquery-validation/jquery.validate.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/diacritics-sort.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jstree.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/modal_form_submit.js' %}"></script>
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 
     {% block header %}
@@ -183,6 +184,32 @@
                                                id="lnk_dropdown_academic actors">{% trans 'academic_actors' %}</a></li>
                                     {% endif %}
                                 </ul>
+                            </li>
+                        {% endif %}
+                        {% if "partnership" in installed_apps and perms.partnership.can_access_partnerships %}
+                            <li class="dropdown">
+                              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true"
+                                   aria-expanded="false"
+                                   id="lnk_home_dropdown_partnerships">{% trans 'partnerships' %}
+                                  <span
+                                    class="caret"></span></a>
+                              <ul class="dropdown-menu">
+                                <li><a href="{% url 'partnerships:list' %}"
+                                       id="lnk_dropdown_partnerships">{% trans 'partnerships' %}</a></li>
+                                {% if perms.partnership.change_uclmanagemententity %}
+                                  <li><a href="{% url 'partnerships:ucl_management_entities:list' %}"
+                                         id="lnk_dropdown_uclmanagemententities">{% trans 'ucl_management_entities' %}</a></li>
+                                {% endif %}
+                                <li><a href="{% url 'partnerships:partners:list' %}"
+                                       id="lnk_dropdown_partners">{% trans 'partners' %}</a></li>
+                                <li><a href="{% url 'partnerships:list' %}?agreeements=1"
+                                       id="lnk_dropdown_agreements">{% trans 'agreements' %}</a></li>
+                                {% if perms.partnership.change_partnershipconfiguration %}
+                                  <li><a href="{% url 'partnerships:configuration_update' %}"
+                                         id="lnk_dropdown_general_conf">{% trans 'general_configuration' %}</a></li>
+                                {% endif %}
+                              </ul>
                             </li>
                         {% endif %}
                         <li>
@@ -310,7 +337,7 @@
     {% block modal %}
     {% endblock %}
 
-    <div class="modal fade" id="form-ajax-modal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="form-ajax-modal" role="dialog">
         <div class="modal-dialog" id="modal_dialog_id">
             <div class="modal-content" id="form-modal-ajax-content">
                 {# loading ajax requests #}
@@ -347,6 +374,9 @@
 
     $(".trigger_modal").click(function () {
         let url = $(this).data("url");
+        let modal_class = $(this).data("modal_class");
+
+        $('#modal_dialog_id').attr("class", "modal-dialog").addClass(modal_class);
 
         $('#form-ajax-modal').modal('toggle');
 

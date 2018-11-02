@@ -55,13 +55,14 @@ def create_learning_units_year(start_year, end_year, learning_unit):
 class LearningUnitYearFactory(DjangoModelFactory):
     class Meta:
         model = "base.LearningUnitYear"
+        django_get_or_create = ('acronym', 'academic_year')
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     academic_year = factory.SubFactory(AcademicYearFactory)
     learning_unit = factory.SubFactory(LearningUnitFactory)
     learning_container_year = factory.SubFactory(LearningContainerYearFactory)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
+                                               datetime.datetime(2017, 3, 1))
     acronym = factory.Sequence(lambda n: 'LFAC%04d' % n)
     specific_title = factory.Sequence(lambda n: 'Learning unit year - %d' % n)
     specific_title_english = factory.Sequence(lambda n: 'Learning unit year english - %d' % n)
@@ -112,7 +113,6 @@ class LearningUnitYearFullFactory(LearningUnitYearFactory):
 
 class LearningUnitYearPartimFactory(LearningUnitYearFactory):
     subtype = learning_unit_year_subtypes.PARTIM
-
 
 
 def create_learning_unit_year(academic_yr, title, learning_unit):

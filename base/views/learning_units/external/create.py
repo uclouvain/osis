@@ -24,29 +24,30 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from waffle.decorators import waffle_flag
 
-from base.forms.learning_unit.external_learning_unit import ExternalLearningUnitBaseForm
+from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
 from base.models.academic_year import AcademicYear
 from base.models.person import Person
-from base.views import layout
-from base.views.learning_units.common import show_success_learning_unit_year_creation_message
+from base.views.learning_units.create import _save_and_redirect
 
 
 @login_required
 @waffle_flag("learning_unit_external_create")
-@permission_required('base.can_propose_learningunit', raise_exception=True)
+@permission_required('base.add_externallearningunityear', raise_exception=True)
 def get_external_learning_unit_creation_form(request, academic_year):
     person = get_object_or_404(Person, user=request.user)
     academic_year = get_object_or_404(AcademicYear, pk=academic_year)
 
-    external_form = ExternalLearningUnitBaseForm(person, academic_year, request.POST or None)
+    postponement_form = LearningUnitPostponementForm(
+        person=person,
+        start_postponement=academic_year,
+        data=request.POST or None,
+        external=True,
+    )
 
-    if external_form.is_valid():
-        learning_unit_year = external_form.save()
-        show_success_learning_unit_year_creation_message(request, learning_unit_year,
-                                                         'learning_unit_successfuly_created')
-        return redirect('learning_unit', learning_unit_year_id=learning_unit_year.pk)
+    if postponement_form.is_valid():
+        return _save_and_redirect(postponement_form, request)
 
-    return layout.render(request, "learning_unit/simple/creation_external.html", external_form.get_context())
+    return render(request, "learning_unit/external/create.html", postponement_form.get_context())

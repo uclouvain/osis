@@ -41,6 +41,7 @@ class OrganizationAddress(models.Model):
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     city = models.CharField(max_length=255)
     country = models.ForeignKey('reference.Country')
+    is_main = models.BooleanField(default=False)
 
 
 def find_by_organization(organization):

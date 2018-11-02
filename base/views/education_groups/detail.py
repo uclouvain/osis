@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import json
+import requests
 from collections import OrderedDict, namedtuple
 
 from ckeditor.widgets import CKEditorWidget
@@ -32,10 +33,12 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import F, Case, When
-from django.shortcuts import get_object_or_404
+from django.http import HttpResponseNotFound
+from django.shortcuts import get_object_or_404, redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView
+from django.urls import reverse
 
 from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
@@ -45,7 +48,10 @@ from base.business.education_groups.perms import is_eligible_to_edit_general_inf
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, academic_calendar_type, education_group_types
+from base.models.enums.education_group_categories import TRAINING
+from base.models.enums.education_group_types import PGRM_MASTER_120, PGRM_MASTER_180_240
 from base.models.person import Person
+from base.views.common import display_error_messages, display_success_messages
 from cms import models as mdl_cms
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
@@ -136,11 +142,17 @@ class EducationGroupRead(EducationGroupGenericDetailView):
             education_group_language.language.name for education_group_language in
             mdl.education_group_language.find_by_education_group_year(self.object)
         ]
+        context["show_coorganization"] = self.show_coorganization()
 
         return context
 
     def get_template_names(self):
         return self.templates.get(self.object.education_group_type.category)
+
+    def show_coorganization(self):
+        """Co-organization doesn't have sense for 2M (120/180-240) """
+        return self.object.education_group_type.category == TRAINING and \
+            self.object.education_group_type.name not in [PGRM_MASTER_120, PGRM_MASTER_180_240]
 
 
 class EducationGroupDiplomas(EducationGroupGenericDetailView):
@@ -163,7 +175,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(is_common_education_group_year),
-            'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object']),
+            'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object'])
         })
 
         return context
@@ -234,6 +246,22 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             french: fr_translated_text.text if fr_translated_text else None,
             english: en_translated_text.text if en_translated_text else None,
         }
+
+
+def publish(request, education_group_year_id, root_id):
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+    url = settings.URL_TO_PUBLISH.format(anac=education_group_year.academic_year.year, code=education_group_year.acronym)
+    publish_request = requests.get(url)
+    if publish_request.status_code == HttpResponseNotFound.status_code:
+        display_error_messages(request, _("This program has no page to publish on it"))
+    else:
+        url_to_display = url.split("?")[0]
+        message = _("The program are published. Click on the link to display it : ") + \
+            "<a href=" + url_to_display + ">" + education_group_year.acronym + "</a>"
+        display_success_messages(request, message, extra_tags='safe')
+
+    return redirect(reverse('education_group_general_informations',
+                            kwargs={'root_id': root_id, 'education_group_year_id': education_group_year_id}))
 
 
 def _get_cms_label_data(cms_label, user_language):
