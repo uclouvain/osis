@@ -66,6 +66,28 @@ class ImportReddotTestCase(TestCase):
         self.assertEqual(admission_condition.text_ca_bacs_cond_speciales,
                          info['ca_bacs_cond_speciales']['text-common'])
 
+    def test_load_admission_conditions_common(self):
+        item = {
+            "year": 2018,
+            "2m.alert_message": "Test",
+        }
+        self.command.json_content = item
+        academic_year = AcademicYearFactory(year=2018)
+        education_group_year_common = EducationGroupYearFactory(
+            academic_year=academic_year,
+            acronym='common-2m'
+        )
+        self.command.load_admission_conditions_common()
+
+        common = EducationGroupYear.objects.filter(
+            academic_year=education_group_year_common.academic_year,
+            acronym='common-2m'
+        ).first()
+
+        admission_condition = AdmissionCondition.objects.get(education_group_year=common)
+        self.assertEqual(admission_condition.text_alert_message,
+                         item['2m.alert_message'])
+
     def test_save_condition_line_of_row_with_no_admission_condition_line(self):
         education_group_year = EducationGroupYearFactory()
 
@@ -137,6 +159,11 @@ class ImportReddotTestCase(TestCase):
 
         mock_bachelor.assert_called_with({'year': 2018, 'acronym': 'bacs'}, 2018)
         mock_generic.assert_called_with('actu2m', {'year': 2018, 'acronym': 'actu2m'}, 2018)
+
+    def test_load_admission_conditions_generic(self):
+        self.command.json_content = [{'year': 2018, 'acronym': 'bacs'}, {'year': 2018, 'acronym': 'actu2m'}]
+        self.command.load_admission_conditions_generic('actu2m', )
+
 
     def test_set_values_for_text_row_of_condition_admission_raise_exception(self):
         with self.assertRaises(Exception):
@@ -222,6 +249,19 @@ class ImportReddotTestCase(TestCase):
         context = None
         offer = {'year': education_group_year_list[0].academic_year.year}
         import_common_offer(context, offer, None)
+        mocker.assert_called_with(offer, education_group_year_list[0], None, context)
+
+    @mock.patch('base.management.commands.import_reddot.import_offer_and_items')
+    def test_import_offer(self, mocker):
+        education_group_year_list = [EducationGroupYearFactory()]
+        from base.management.commands.import_reddot import import_offer
+        context = None
+        offer = {
+            'year': education_group_year_list[0].academic_year.year,
+            'info': "",
+            'acronym': education_group_year_list[0].acronym
+        }
+        import_offer(context, offer, None)
         mocker.assert_called_with(offer, education_group_year_list[0], None, context)
 
 
