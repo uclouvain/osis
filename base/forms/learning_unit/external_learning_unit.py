@@ -43,7 +43,6 @@ from base.models.campus import Campus
 from base.models.entity_version import get_last_version, EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import EXTERNAL
-from base.models.enums.learning_unit_year_periodicity import ANNUAL
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from reference.models import language
 from reference.models.country import Country
@@ -120,10 +119,12 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
         ExternalLearningUnitModelForm
     ]
 
-    def __init__(self, person, academic_year, data=None, *args, **kwargs):
+    def __init__(self, person, academic_year, learning_unit_instance=None, data=None, *args, **kwargs):
         self.academic_year = academic_year
         self.person = person
-        instances_data = self._build_instance_data(data, academic_year)
+        self.learning_unit_instance = learning_unit_instance
+        instances_data = self._build_instance_data(data)
+
         super().__init__(instances_data, *args, **kwargs)
         self.learning_unit_year_form.fields['acronym'] = ExternalAcronymField()
         self.learning_unit_year_form.fields['campus'] = CampusChoiceField(
@@ -144,7 +145,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
     def learning_unit_year_form(self):
         return self.forms[ExternalLearningUnitYearModelForm]
 
-    def _build_instance_data(self, data, default_ac_year):
+    def _build_instance_data(self, data):
         return {
             LearningUnitModelForm: {
                 'data': merge_data(data, {'periodicity': 'ANNUAL'}),
@@ -154,7 +155,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
                 'data': data,
                 'instance': self.instance.learning_container_year.learning_container if self.instance else None,
             },
-            ExternalLearningUnitYearModelForm: self._build_instance_data_learning_unit_year(data, default_ac_year),
+            ExternalLearningUnitYearModelForm: self._build_instance_data_learning_unit_year(data),
             LearningContainerYearExternalModelForm: self._build_instance_data_learning_container_year(data),
             ExternalLearningUnitModelForm: self._build_instance_data_external_learning_unit(data)
         }
@@ -162,16 +163,18 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
     def _build_instance_data_external_learning_unit(self, data):
         return {
             'data': data,
-            'instance': None,
+            'instance': self.instance and self.instance.externallearningunityear,
             'person': self.person
         }
 
-    def _build_instance_data_learning_unit_year(self, data, default_ac_year):
+    def _build_instance_data_learning_unit_year(self, data):
         return {
             'data': data,
             'instance': self.instance,
-            'initial': {'status': True,
-                        'academic_year': default_ac_year},
+            'initial': {
+                'status': True,
+                'academic_year': self.academic_year
+            } if not self.instance else {},
             'person': self.person,
             'subtype': self.subtype
         }
@@ -179,7 +182,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
     def _build_instance_data_learning_container_year(self, data):
         return {
             'data': data,
-            'instance': self.instance.learning_container_year if self.instance else None,
+            'instance': self.instance and self.instance.learning_container_year,
             'initial': {
                 # Default language French
                 'language': language.find_by_code('FR'),
@@ -189,6 +192,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
     def get_context(self):
         return {
+            'learning_unit_year': self.instance,
             'subtype': self.subtype,
             'learning_unit_form': self.learning_unit_form,
             'learning_unit_year_form': self.learning_unit_year_form,

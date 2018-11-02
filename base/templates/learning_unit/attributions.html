@@ -60,43 +60,52 @@
                                 <td>{{ value.PRACTICAL_EXERCISES | floatformat:2 }}</td>
                                 <td>{{ value.substitute | default_if_none:'' }}</td>
                                 <td>
-                                    {% if can_manage_charge_repartition %}
-                                    <a href="#" class="remove-attribution-btn" data-form="{% url "edit_charge_repartition" learning_unit_year.id key %}"><span class="glyphicon glyphicon-edit"></span> </a>
-                                    <a href="#" class="remove-attribution-btn" data-form="{% url "remove_charge_repartition" learning_unit_year.id key %}"><span class="glyphicon glyphicon-trash"></span> </a>
+                                    {% if can_manage_attribution %}
+                                        <a class="trigger_modal"
+                                           data-url="{% url "update_attribution" learning_unit_year.id key %}"
+                                           data-modal_class="modal-lg">
+                                            <span class="glyphicon glyphicon-edit"></span>
+                                        </a>
+                                        <a class="trigger_modal"
+                                           data-url="{% url "remove_attribution" learning_unit_year.id key %}">
+                                            <span class="glyphicon glyphicon-trash"></span>
+                                        </a>
+                                    {% endif %}
+                                    {% if can_manage_charge_repartition%}
+                                        <a class="trigger_modal"
+                                           data-url="{% url "edit_charge_repartition" learning_unit_year.id key %}"
+                                           data-modal_class="modal-lg">
+                                            <span class="glyphicon glyphicon-edit">
+
+                                            </span> </a>
+                                        <a class="trigger_modal"
+                                           data-url="{% url "remove_attribution" learning_unit_year.id key %}">
+                                            <span class="glyphicon glyphicon-trash"></span>
+                                        </a>
                                     {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                {% if can_manage_charge_repartition %}
-                <a href="{% url "select_attribution" learning_unit_year.id %}" class="btn btn-default" role="button">
-                    {% trans "Manage repartition" %}
+                {% if learning_unit_year.is_full %}
+                <a  class="btn btn-default trigger_modal {% if not can_manage_attribution %}disabled{% endif %}"
+                    role="button"
+                    data-url="{% url "add_attribution" learning_unit_year.id %}"
+                    data-modal_class="modal-lg">
+                    {% trans "Add attribution" %}
                 </a>
                 {% endif %}
+                {% if learning_unit_year.is_partim %}
+                <a href="{% url "select_attribution" learning_unit_year.id %}"
+                   class="btn btn-default {% if not can_manage_charge_repartition %}disabled{% endif %}"
+                   role="button">
+                    {% trans "Manage repartition" %}
+                </a>
+            {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="form-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" id="modal_dialog_id">
-      <div class="modal-content" id="form-modal-content">
-
-     </div>
-   </div>
- </div>
-
-<script type="text/javascript" src="{% static "js/modal_form_submit.js" %}"></script>
-<script type="application/javascript">
-    $(".remove-attribution-btn").click(function(ev) {
-        ev.preventDefault();
-        var url = $(this).data("form");
-        $('#form-modal-content').load(url, function () {
-            $('#form-modal').modal('toggle');
-            formAjaxSubmit('#form-modal-body form', '#form-modal');
-        });
-        return false;
-    });
-</script>
 {% endblock %}

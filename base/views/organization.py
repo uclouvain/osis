@@ -155,11 +155,14 @@ def organization_address_delete(request, organization_address_id):
 
 class OrganizationAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Organization.objects.filter(entity__country__isnull=False)
+        qs = Organization.objects.all()
 
         country = self.forwarded.get('country', None)
         if country:
-            qs = qs.filter(entity__country=country)
+            qs = qs.filter(
+                organizationaddress__is_main=True,
+                organizationaddress__country=country,
+            )
 
         if self.q:
             qs = qs.filter(name__icontains=self.q)

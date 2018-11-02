@@ -40,7 +40,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView
 from django.urls import reverse
 
-from backoffice.settings.local import URL_TO_PUBLISH
 from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
 from base.business.education_groups import perms
@@ -251,7 +250,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
 def publish(request, education_group_year_id, root_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    url = URL_TO_PUBLISH.format(anac=education_group_year.academic_year.year, code=education_group_year.acronym)
+    url = settings.URL_TO_PUBLISH.format(anac=education_group_year.academic_year.year, code=education_group_year.acronym)
     publish_request = requests.get(url)
     if publish_request.status_code == HttpResponseNotFound.status_code:
         display_error_messages(request, _("This program has no page to publish on it"))
