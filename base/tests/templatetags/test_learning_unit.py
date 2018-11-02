@@ -31,7 +31,6 @@ from base.templatetags.learning_unit import get_difference_css, has_proposal, ge
     DIFFERENCE_CSS
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from django.utils.safestring import mark_safe

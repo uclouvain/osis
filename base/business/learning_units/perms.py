@@ -26,7 +26,7 @@
 import datetime
 
 from django.core.exceptions import PermissionDenied
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, pgettext
 from waffle.models import Flag
 
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
@@ -43,6 +43,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import is_person_linked_to_entity_in_charge_of_learning_unit
 from osis_common.utils.datetime import get_tzinfo, convert_date_to_datetime
 from osis_common.utils.perms import conjunction, disjunction, negation, BasePerm
+from django.core.exceptions import PermissionDenied
 
 FACULTY_UPDATABLE_CONTAINER_TYPES = (learning_container_year_types.COURSE,
                                      learning_container_year_types.DISSERTATION,
@@ -50,74 +51,126 @@ FACULTY_UPDATABLE_CONTAINER_TYPES = (learning_container_year_types.COURSE,
 
 PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name,
                                           ProposalState.REFUSED.name)
+YEAR_LIMIT_LUE_MODIFICATION = 2018
+
+MSG_EXISTING_PROPOSAL_IN_EPC = "Existing proposal in epc"
+MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE = "You are not eligible to modify the end date of this learning unit. You should be" \
+                                     " central manager or the learning unit has to be a partim or the learning unit as" \
+                                     " to be a course/dissertation/internship"
+MSG_CANNOT_MODIFY_ON_PREVIOUS_ACADEMIC_YR = "You can't modify learning unit of a previous year"
+MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY = "You can only modify a learning unit when your are linked to its requirement " \
+                                      "entity"
+MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE = "Person not in accordance with proposal state"
+MSG_NOT_PROPOSAL_STATE_FACULTY = "You are faculty manager and the proposal state is not 'Faculty', so you can't edit"
+MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL = "You are not eligible to cancel proposal"
+MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL = "You are not eligible to edit proposal"
+MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY = "You are not attached to initial or current requirement entity, so you can't" \
+                                          " edit proposal"
+MSG_NOT_GOOD_RANGE_OF_YEARS = "Not in range of years which can be edited by you"
+MSG_NOT_ELIGIBLE_TO_CONSOLIDATE_PROPOSAL = "You are not eligible to consolidate proposal"
+MSG_NO_RIGHTS_TO_CONSOLIDATE = "You dont' have the rights to consolidate"
+MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES = "Proposal not in eligible state for consolidation"
+MSG_CAN_DELETE_ACCORDING_TO_TYPE = "Can delete according to the type of the learning unit"
+MSG_NOT_ELIGIBLE_TO_DELETE_LU = "Not eligible to delete learning units"
 
 
-def _any_existing_proposal_in_epc(learning_unit_year, _):
-    return not learning_unit_year.learning_unit.existing_proposal_in_epc
+def _any_existing_proposal_in_epc(learning_unit_year, _, raise_exception=False):
+    result = not learning_unit_year.learning_unit.existing_proposal_in_epc
+    can_raise_exception(
+        raise_exception,
+        result,
+        MSG_EXISTING_PROPOSAL_IN_EPC,
+        )
+    return result
 
 
-def is_eligible_for_modification(learning_unit_year, person):
+def is_eligible_for_modification(learning_unit_year, person, raise_exception=False):
+    result = \
+        is_year_editable(learning_unit_year, person, raise_exception) and \
+        _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
+        _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception) and \
+        is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise_exception)
+    return result
+
+
+def is_eligible_for_modification_end_date(learning_unit_year, person, raise_exception=False):
+    return \
+        is_year_editable(learning_unit_year, person, raise_exception) and \
+        _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
+        not (is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
+        is_eligible_for_modification(learning_unit_year, person, raise_exception) and \
+        _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person, raise_exception)
+
+
+def is_eligible_to_create_partim(learning_unit_year, person, raise_exception=False):
     return conjunction(
         _any_existing_proposal_in_epc,
-        _is_learning_unit_year_in_range_to_be_modified,
-        is_person_linked_to_entity_in_charge_of_learning_unit
-    )(learning_unit_year, person)
-
-
-def is_eligible_for_modification_end_date(learning_unit_year, person):
-    return conjunction(
-        _any_existing_proposal_in_epc,
-        negation(is_learning_unit_year_in_past),
-        is_eligible_for_modification,
-        _is_person_eligible_to_modify_end_date_based_on_container_type
-    )(learning_unit_year, person)
-
-
-def is_eligible_to_create_partim(learning_unit_year, person):
-    return conjunction(
-        _any_existing_proposal_in_epc,
-        is_person_linked_to_entity_in_charge_of_learning_unit,
+        is_person_linked_to_entity_in_charge_of_lu,
         is_academic_year_in_range_to_create_partim,
         is_learning_unit_year_full
-    )(learning_unit_year, person)
+    )(learning_unit_year, person, raise_exception)
 
 
-def is_eligible_to_create_modification_proposal(learning_unit_year, person):
-    return conjunction(
-        _any_existing_proposal_in_epc,
-        negation(is_learning_unit_year_in_past),
-        negation(is_learning_unit_year_a_partim),
-        _is_container_type_course_dissertation_or_internship,
-        negation(is_learning_unit_year_in_proposal),
-        is_person_linked_to_entity_in_charge_of_learning_unit
-    )(learning_unit_year, person)
+def is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception=False):
+    result = _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
+        not(is_learning_unit_year_in_past(learning_unit_year, person, raise_exception))and \
+        not(is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception))and \
+        _is_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception)and \
+        not(is_learning_unit_year_in_proposal(learning_unit_year, person, raise_exception))and \
+        is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person, raise_exception)
+
+    can_raise_exception(
+        raise_exception, result,
+        "You are not eligible to create/modify proposal"
+    )
+    return result
 
 
-def is_eligible_for_cancel_of_proposal(proposal, person):
-    return conjunction(
-        _is_person_in_accordance_with_proposal_state,
-        _is_attached_to_initial_or_current_requirement_entity,
-        _has_person_the_right_to_make_proposal
-    )(proposal, person)
+def is_eligible_for_cancel_of_proposal(proposal, person, raise_exception=False):
+    result = _is_person_in_accordance_with_proposal_state(proposal, person, raise_exception) and \
+        _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception) and \
+        _has_person_the_right_to_make_proposal(proposal, person, raise_exception)
+    can_raise_exception(
+        raise_exception, result,
+        "You are not eligible to cancel proposal"
+    )
+    return result
 
 
-def is_eligible_to_edit_proposal(proposal, person):
+def is_eligible_to_edit_proposal(proposal, person, raise_exception=False):
     if not proposal:
         return False
 
-    return conjunction(
-        _is_attached_to_initial_or_current_requirement_entity,
-        _is_person_eligible_to_edit_proposal_based_on_state,
-        _has_person_the_right_edit_proposal,
-    )(proposal, person)
+    result = _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception) and \
+        _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_exception) and \
+        _has_person_the_right_edit_proposal(proposal, person)
+    can_raise_exception(
+        raise_exception, result,
+        MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL
+    )
+    return result
 
 
-def is_eligible_to_consolidate_proposal(proposal, person):
-    return conjunction(
-        _has_person_the_right_to_consolidate,
-        _is_proposal_in_state_to_be_consolidated,
-        _is_attached_to_initial_or_current_requirement_entity
-    )(proposal, person)
+def is_eligible_to_consolidate_proposal(proposal, person, raise_exception=False):
+    msg = ''
+    result = _has_person_the_right_to_consolidate(proposal, person)
+
+    if not result:
+        msg = MSG_NO_RIGHTS_TO_CONSOLIDATE
+    else:
+        result = _is_proposal_in_state_to_be_consolidated(proposal, person)
+        if not result:
+            msg = MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES
+        else:
+            result = _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception)
+            if not result:
+                msg = MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY
+    can_raise_exception(
+        raise_exception,
+        result,
+        msg
+    )
+    return result
 
 
 def can_edit_summary_locked_field(learning_unit_year, person):
@@ -131,17 +184,37 @@ def can_update_learning_achievement(learning_unit_year, person):
     return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 
-def is_eligible_to_delete_learning_unit_year(learning_unit_year, person):
-    return conjunction(
-        _any_existing_proposal_in_epc,
-        _can_delete_learning_unit_year_according_type
-    )(learning_unit_year, person) and person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_exception=False):
+    checked_ok = \
+        _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
+        _can_delete_learning_unit_year_according_type(learning_unit_year, person, raise_exception)
+
+    if checked_ok:
+        result = person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+        can_raise_exception(
+            raise_exception,
+            result,
+            MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY
+        )
+        return result
+    else:
+        can_raise_exception(
+            raise_exception,
+            checked_ok,
+            MSG_NOT_ELIGIBLE_TO_DELETE_LU
+        )
+        return checked_ok
 
 
-def _is_person_eligible_to_edit_proposal_based_on_state(proposal, person):
+def _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_exception=False):
     if person.is_central_manager():
         return True
     if proposal.state != ProposalState.FACULTY.name:
+        can_raise_exception(
+            raise_exception,
+            False,
+            MSG_NOT_PROPOSAL_STATE_FACULTY
+        )
         return False
     if (proposal.type == ProposalType.MODIFICATION.name and
             proposal.learning_unit_year.academic_year.year != starting_academic_year().year + 1):
@@ -149,12 +222,19 @@ def _is_person_eligible_to_edit_proposal_based_on_state(proposal, person):
     return True
 
 
-def _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person):
-    return disjunction(
+def _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person, raise_exception=False):
+    result = disjunction(
         _is_person_central_manager,
         _is_learning_unit_year_a_partim,
-        negation(_is_container_type_course_dissertation_or_internship)
-    )(learning_unit_year, person)
+        negation(_is_container_type_course_dissertation_or_internship2),
+    )(learning_unit_year, person, raise_exception)
+
+    can_raise_exception(
+        raise_exception,
+        result,
+        MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE,
+    )
+    return result
 
 
 def is_eligible_to_manage_charge_repartition(learning_unit_year, person):
@@ -162,29 +242,41 @@ def is_eligible_to_manage_charge_repartition(learning_unit_year, person):
 
 
 def _is_eligible_to_manage_charge_repartition(learning_unit_year, person):
-    return _has_person_the_right_to_manage_charge_repartition(person) and \
-           is_learning_unit_year_a_partim(learning_unit_year, person) and \
-           person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+    return \
+        _has_person_the_right_to_manage_charge_repartition(person) and \
+        is_learning_unit_year_a_partim(learning_unit_year, person) and \
+        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 
 def _has_person_the_right_to_manage_charge_repartition(person):
     return person.user.has_perm("base.can_manage_charge_repartition")
 
 
-def _is_person_central_manager(_, person):
-    return person.is_central_manager()
+def _is_person_central_manager(_, person, raise_exception):
+    if person:
+        return person.is_central_manager()
+    return False
 
 
-def _is_learning_unit_year_a_partim(learning_unit_year, _):
+def _is_learning_unit_year_a_partim(learning_unit_year, _, raise_exception=False):
     return learning_unit_year.is_partim()
 
 
-def _is_person_in_accordance_with_proposal_state(proposal, person):
-    return (person.is_central_manager()) or proposal.state == ProposalState.FACULTY.name
+def _is_person_in_accordance_with_proposal_state(proposal, person, raise_exception=False):
+    result = (person.is_central_manager()) or proposal.state == ProposalState.FACULTY.name
+    can_raise_exception(
+        raise_exception, result,
+        MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE
+    )
+    return result
 
 
-def _has_person_the_right_to_make_proposal(_, person):
-    return person.user.has_perm('base.can_propose_learningunit')
+def _has_person_the_right_to_make_proposal(_, person, raise_exception=False):
+    result = person.user.has_perm('base.can_propose_learningunit')
+    can_raise_exception(
+        raise_exception, result,
+        "_has_person_the_right_to_make_proposal")
+    return result
 
 
 def _has_person_the_right_edit_proposal(_, person):
@@ -195,23 +287,29 @@ def _has_person_the_right_to_consolidate(_, person):
     return person.user.has_perm('base.can_consolidate_learningunit_proposal')
 
 
-def is_learning_unit_year_full(learning_unit_year, _):
+def is_learning_unit_year_full(learning_unit_year, _, raise_exception=False):
     return learning_unit_year.is_full()
 
 
-def is_learning_unit_year_in_past(learning_unit_year, _):
-    return learning_unit_year.is_past()
+def is_learning_unit_year_in_past(learning_unit_year, _, raise_exception=False):
+    result = learning_unit_year.is_past()
+    can_raise_exception(
+        raise_exception,
+        not result,
+        MSG_CANNOT_MODIFY_ON_PREVIOUS_ACADEMIC_YR
+    )
+    return result
 
 
-def is_learning_unit_year_a_partim(learning_unit_year, _):
+def is_learning_unit_year_a_partim(learning_unit_year, _, raise_exception=False):
     return learning_unit_year.is_partim()
 
 
-def is_learning_unit_year_in_proposal(learning_unit_year, _):
+def is_learning_unit_year_in_proposal(learning_unit_year, _, raise_exception=False):
     return proposal_learning_unit.is_learning_unit_in_proposal(learning_unit_year.learning_unit)
 
 
-def is_academic_year_in_range_to_create_partim(learning_unit_year, person):
+def is_academic_year_in_range_to_create_partim(learning_unit_year, person, raise_exception=False):
     current_acy = starting_academic_year()
     luy_acy = learning_unit_year.academic_year
     max_range = MAX_ACADEMIC_YEAR_FACULTY if person.is_faculty_manager() else MAX_ACADEMIC_YEAR_CENTRAL
@@ -219,28 +317,49 @@ def is_academic_year_in_range_to_create_partim(learning_unit_year, person):
     return current_acy.year <= luy_acy.year <= current_acy.year + max_range
 
 
-def _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person):
-    return person.is_central_manager() or learning_unit_year.can_update_by_faculty_manager()
+def _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception):
+    result = person.is_central_manager() or learning_unit_year.can_update_by_faculty_manager()
+    can_raise_exception(
+        raise_exception,
+        result,
+        MSG_NOT_GOOD_RANGE_OF_YEARS,
+        )
+    return result
 
 
 def _is_proposal_in_state_to_be_consolidated(proposal, _):
     return proposal.state in PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
 
 
-def _can_delete_learning_unit_year_according_type(learning_unit_year, person):
+def _can_delete_learning_unit_year_according_type(learning_unit_year, person, raise_exception=False):
     if not person.is_central_manager() and person.is_faculty_manager():
         container_type = learning_unit_year.learning_container_year.container_type
-
-        return not (
-                container_type == learning_container_year_types.COURSE and learning_unit_year.is_full()
+        result = not (
+            container_type == learning_container_year_types.COURSE and learning_unit_year.is_full()
         ) and container_type not in [learning_container_year_types.DISSERTATION,
                                      learning_container_year_types.INTERNSHIP]
-    return True
+    else:
+        result = True
+
+    can_raise_exception(
+        raise_exception,
+        result,
+        MSG_CAN_DELETE_ACCORDING_TO_TYPE
+    )
+    return result
 
 
-def _is_attached_to_initial_or_current_requirement_entity(proposal, person):
-    return _is_attached_to_initial_entity(proposal, person) or \
-           person.is_linked_to_entity_in_charge_of_learning_unit_year(proposal.learning_unit_year)
+def _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception=False):
+    result = \
+        _is_attached_to_initial_entity(proposal, person) or \
+        person.is_linked_to_entity_in_charge_of_learning_unit_year(proposal.learning_unit_year)
+
+    can_raise_exception(
+        raise_exception,
+        result,
+        MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY
+    )
+    return result
 
 
 def _is_attached_to_initial_entity(learning_unit_proposal, a_person):
@@ -251,9 +370,17 @@ def _is_attached_to_initial_entity(learning_unit_proposal, a_person):
     return a_person.is_attached_entities(Entity.objects.filter(pk=initial_entity_requirement_id))
 
 
-def _is_container_type_course_dissertation_or_internship(learning_unit_year, _):
-    return learning_unit_year.learning_container_year and\
-           learning_unit_year.learning_container_year.container_type in FACULTY_UPDATABLE_CONTAINER_TYPES
+def _is_container_type_course_dissertation_or_internship(learning_unit_year, _, raise_exception):
+    result = \
+        learning_unit_year.learning_container_year and \
+        learning_unit_year.learning_container_year.container_type in FACULTY_UPDATABLE_CONTAINER_TYPES
+
+    can_raise_exception(
+        raise_exception,
+        result,
+        "This learning unit isn't eligible for end date modification"
+    )
+    return result
 
 
 def learning_unit_year_permissions(learning_unit_year, person):
@@ -354,3 +481,45 @@ class can_learning_unit_year_educational_information_be_udpated(BasePerm):
     predicates = (
         _is_learning_unit_year_summary_editable,
     )
+
+
+def is_year_editable(learning_unit_year, person, raise_exception):
+    result = learning_unit_year.academic_year.year >= YEAR_LIMIT_LUE_MODIFICATION
+    can_raise_exception(raise_exception,
+                        result,
+                        "You can't modify learning unit under year : %(year)d" % {"year": YEAR_LIMIT_LUE_MODIFICATION})
+    return result
+
+
+def can_raise_exception(raise_exception, result, msg):
+    if raise_exception and not result:
+        raise PermissionDenied(_(msg))
+
+
+def is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise_exception=False):
+    result = False
+    if person:
+        result = is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person, raise_exception)
+
+    can_raise_exception(
+        raise_exception,
+        result,
+        MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY
+        )
+    return result
+
+
+def is_not_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception):
+    result = negation(_is_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception))
+    can_raise_exception(
+        raise_exception,
+        result,
+        "This learning unit is not eligible for proposal creation/modification"
+    )
+    return result
+
+
+def _is_container_type_course_dissertation_or_internship2(learning_unit_year, _, raise_exception):
+    return \
+        learning_unit_year.learning_container_year and \
+        learning_unit_year.learning_container_year.container_type in FACULTY_UPDATABLE_CONTAINER_TYPES
