@@ -23,10 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+import itertools
+import operator
+
 from dal import autocomplete
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Prefetch, Q
+from django.contrib.postgres.search import SearchVector, SearchQuery, TrigramSimilarity, TrigramDistance
+from django.db.models import Prefetch, Q, Value
+from django.db.models.functions import Concat
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -205,10 +211,16 @@ class TutorAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = Tutor.objects.all()
 
+        # FIXME Use trigram search
         if self.q:
-            qs = qs.filter(Q(person__last_name__icontains=self.q) | Q(person__first_name__icontains=self.q))
+            search_queries = functools.reduce(operator.and_,
+                                              (SearchQuery(word) for word in self.q.split()))
+            qs = qs.annotate(search=SearchVector("person__first_name", "person__middle_name", "person__last_name")) \
+                .filter(Q(search=search_queries) | Q(person__global_id=self.q))
 
         return qs.select_related("person").order_by("person__last_name", "person__first_name")
 
     def get_result_label(self, result):
-        return str(result)
+        return "{last_name} {first_name} ({age})".format(last_name=result.person.last_name,
+                                                         first_name=result.person.first_name,
+                                                         age=result.person.age)
