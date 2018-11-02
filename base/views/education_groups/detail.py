@@ -49,7 +49,7 @@ from base.models.admission_condition import AdmissionCondition, AdmissionConditi
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, academic_calendar_type, education_group_types
 from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import PGRM_MASTER_120, PGRM_MASTER_180_240
+from base.models.enums.education_group_types import PGRM_MASTER_120, PGRM_MASTER_180_240, DEEPENING
 from base.models.person import Person
 from base.views.common import display_error_messages, display_success_messages
 from cms import models as mdl_cms
@@ -246,6 +246,24 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             french: fr_translated_text.text if fr_translated_text else None,
             english: en_translated_text.text if en_translated_text else None,
         }
+
+    def get_appropriate_sections(self):
+        education_group_year = self.object
+        minor = education_group_year.is_minor
+        deep = education_group_year.education_group_type.name == DEEPENING
+        special = minor or deep
+        if special:
+            code = education_group_year.partial_acronym
+            if minor:
+                type = "-min"
+            elif deep:
+                type = "-app"
+        else:
+            code = education_group_year.acronym
+            type = ""
+        url = settings.URL_TO_GET_SECTIONS.format(type=type, anac=education_group_year.academic_year.year, code=code)
+        sections_request = requests.get(url).json()
+        return sections_request['sections']
 
 
 def publish(request, education_group_year_id, root_id):
