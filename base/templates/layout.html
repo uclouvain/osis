@@ -336,7 +336,7 @@
     {% block modal %}
     {% endblock %}
 
-    <div class="modal fade" id="form-ajax-modal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="form-ajax-modal" role="dialog">
         <div class="modal-dialog" id="modal_dialog_id">
             <div class="modal-content" id="form-modal-ajax-content">
                 {# loading ajax requests #}
@@ -369,20 +369,8 @@
 
 {% block script %}
 {% endblock %}
-<script>
 
-    $(".trigger_modal").click(function () {
-        let url = $(this).data("url");
-
-        $('#form-ajax-modal').modal('toggle');
-
-        $('#form-modal-ajax-content').load(url, function () {
-            bindTextArea();
-            formAjaxSubmit('#form-modal-body form', '#form-ajax-modal');
-        });
-    });
-
-</script>
+<script type="text/javascript" src="{% static "js/modal_form_submit.js" %}"></script>
 
 {% analytical_body_bottom %}
 </body>

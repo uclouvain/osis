@@ -26,12 +26,3 @@
         </h2>
     </div>
 {% endblock %}
-
-{% block modal %}
-    {% if group_to_parent %}
-        {% url_resolver_match as url_resolver_match %}
-        {% url 'education_groups_management' as management_url %}
-        {% url_add_query management_url root_id=parent.id element_id=education_group_year.id group_element_year_id=group_to_parent action="detach" source=url_resolver_match as detach_url %}
-        {% include "blocks/modal/modal_ajax.html" with modal_url=detach_url click_id="btn_operation_detach_"|addstr:group_to_parent form_id="form_detach_confirm" %}
-    {% endif %}
-{% endblock %}

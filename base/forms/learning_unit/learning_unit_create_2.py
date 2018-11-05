@@ -34,12 +34,13 @@ from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementFo
 from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
     LearningContainerModelForm, LearningContainerYearModelForm
-from base.models import learning_unit_year, academic_year
+from base.models import academic_year
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL
 from base.models.campus import Campus
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY
 from base.models.learning_component_year import LearningComponentYear
+from base.models.learning_unit_year import LearningUnitYear
 from reference.models import language
 
 ID_FIELD = "id"
@@ -97,8 +98,8 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
     @cached_property
     def instance(self):
         if self.learning_unit_instance:
-            return learning_unit_year.search(
-                academic_year_id=self.academic_year.id,
+            return LearningUnitYear.objects.filter(
+                academic_year=self.academic_year,
                 learning_unit=self.learning_unit_instance,
                 subtype=self.subtype
             ).get()

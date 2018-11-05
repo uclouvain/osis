@@ -30,6 +30,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 class OrganizationAddressAdmin(OsisModelAdmin):
     list_display = ('organization', 'label', 'location', 'postal_code', 'city', 'country')
+    search_fields = ['organization__name', 'label', 'country__name']
 
 
 class OrganizationAddress(models.Model):
@@ -41,6 +42,7 @@ class OrganizationAddress(models.Model):
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     city = models.CharField(max_length=255)
     country = models.ForeignKey('reference.Country')
+    is_main = models.BooleanField(default=False)
 
 
 def find_by_organization(organization):

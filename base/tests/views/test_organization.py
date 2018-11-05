@@ -147,7 +147,11 @@ class TestOrganizationAutocomplete(TestCase):
         self.url = reverse("organization_autocomplete")
 
         self.organization = OrganizationFactory(name="Université de Louvain")
-        self.entity = EntityFactory(organization=self.organization, country__iso_code='BE')
+        self.organization_address = OrganizationAddressFactory(
+            organization=self.organization,
+            country__iso_code='BE',
+            is_main=True
+        )
 
     def test_when_filter_without_country_data_forwarded_result_found(self):
         self.client.force_login(user=self.super_user)
@@ -171,7 +175,7 @@ class TestOrganizationAutocomplete(TestCase):
         self.client.force_login(user=self.super_user)
         response = self.client.get(
             self.url,
-            data={'forward': '{"country": "%s"}' % self.entity.country.pk}
+            data={'forward': '{"country": "%s"}' % self.organization_address.country.pk}
         )
         expected_results = [{'text': self.organization.name, 'id': str(self.organization.pk)}]
 
@@ -186,6 +190,20 @@ class TestOrganizationAutocomplete(TestCase):
         response = self.client.get(
             self.url,
             data={'forward': '{"country": "%s"}' % country.pk}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        results = self._get_results_from_autocomplete_response(response)
+        self.assertListEqual(results, [])
+
+    def test_when_filter_with_country_data_forwarded_no_result_found_case_not_main(self):
+        self.organization_address.is_main = False
+        self.organization_address.save()
+
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(
+            self.url,
+            data={'forward': '{"country": "%s"}' % self.organization_address.country.pk}
         )
 
         self.assertEqual(response.status_code, 200)

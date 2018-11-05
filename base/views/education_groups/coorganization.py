@@ -30,7 +30,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import UpdateView, CreateView, DeleteView
 
-from base.forms.education_group.organization import OrganizationEditForm
+from base.forms.education_group.coorganization import CoorganizationEditForm
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year import EducationGroupYear
 from base.views.education_groups import perms
@@ -41,7 +41,7 @@ class CommonEducationGroupOrganizationView(RulesRequiredMixin, AjaxTemplateMixin
     model = EducationGroupOrganization
     context_object_name = "coorganization"
 
-    form_class = OrganizationEditForm
+    form_class = CoorganizationEditForm
     template_name = "education_group/organization_edit.html"
 
     # RulesRequiredMixin
@@ -60,7 +60,9 @@ class CommonEducationGroupOrganizationView(RulesRequiredMixin, AjaxTemplateMixin
         return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
 
     def get_success_url(self):
-        return reverse("education_group_read", args=[self.kwargs["root_id"], self.object.education_group_year.pk])
+        return reverse(
+            'education_group_read', args=[self.kwargs["root_id"], self.kwargs["education_group_year_id"]]
+        ).rstrip('/') + "#panel_coorganization"
 
 
 class CreateEducationGroupOrganizationView(CommonEducationGroupOrganizationView, CreateView):
@@ -86,8 +88,3 @@ class UpdateEducationGroupOrganizationView(CommonEducationGroupOrganizationView,
 class CoorganizationDeleteView(CommonEducationGroupOrganizationView, DeleteView):
     pk_url_kwarg = "coorganization_id"
     template_name = "education_group/blocks/modal/modal_organization_confirm_delete_inner.html"
-
-    def get_success_url(self):
-        return reverse(
-            'education_group_read', args=[self.kwargs["root_id"], self.kwargs["education_group_year_id"]]
-        ).rstrip('/') + "#panel_coorganization"
