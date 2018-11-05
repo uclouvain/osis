@@ -297,13 +297,13 @@ In some areas, we have adopted  more strict rules:
 
     # Bad
     locale/fr_BE/LC_MESSAGES/django.po
-    msgid "Hello {}"
-    msgstr "Salut {}"
+    msgid "Hello %s"
+    msgstr "Salut %s"
 
     # Good
     locale/fr_BE/LC_MESSAGES/django.po
-    msgid "Hello {name}"
-    msgstr "Salut {name}"
+    msgid "Hello %(name)s"
+    msgstr "Salut %(name)s"
 
 - `.po` file must be generated with `./manage.py makemessages` and sorted by alphabetical order (`--sort-output` option)
 
