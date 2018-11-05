@@ -188,8 +188,9 @@ def can_update_learning_achievement(learning_unit_year, person):
 
 def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_exception=False):
     msg = None
-    checked_ok = _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
-                 _can_delete_learning_unit_year_according_type(learning_unit_year, person, raise_exception)
+    checked_ok = \
+        _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
+        _can_delete_learning_unit_year_according_type(learning_unit_year, person, raise_exception)
     if not checked_ok:
         msg = MSG_NOT_ELIGIBLE_TO_DELETE_LU
     elif not person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year):
