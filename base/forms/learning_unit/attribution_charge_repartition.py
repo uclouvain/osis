@@ -25,6 +25,7 @@
 ##############################################################################
 from dal import autocomplete
 from django import forms
+from django.forms import TextInput
 from django.utils.translation import ugettext_lazy as _
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
@@ -35,7 +36,7 @@ from base.models.tutor import Tutor
 
 
 class AttributionForm(forms.ModelForm):
-    duration = forms.IntegerField(min_value=1, required=True)
+    duration = forms.IntegerField(min_value=1, required=True, label=_("duration"))
 
     class Meta:
         model = AttributionNew
@@ -107,6 +108,14 @@ class AttributionChargeForm(forms.ModelForm):
 class LecturingAttributionChargeForm(AttributionChargeForm):
     component_type = learning_component_year_type.LECTURING
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["allocation_charge"].label = "Volume 1"
+
 
 class PracticalAttributionChargeForm(AttributionChargeForm):
     component_type = learning_component_year_type.PRACTICAL_EXERCISES
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["allocation_charge"].label = "Volume 2"

@@ -30,9 +30,9 @@
 <div id="form-modal-body" class="modal-body">
     <form method="post" id="form_change_attribution" action="{{ request.path }}">
         {% csrf_token %}
-        {% bootstrap_form_errors attribution_form form_group_class="col-md-6" %}
-        {% bootstrap_form_errors lecturing_charge_form form_group_class="col-md-6" %}
-        {% bootstrap_form_errors practical_charge_form form_group_class="col-md-6" %}
+        {% bootstrap_form_errors attribution_form %}
+        {% bootstrap_form_errors lecturing_charge_form %}
+        {% bootstrap_form_errors practical_charge_form %}
         <div class="row">
             {% if attribution %}
                 <div class="col-md-6">
@@ -47,20 +47,12 @@
         <br>
         <div class="row">
             {% bootstrap_field attribution_form.start_year form_group_class="col-md-6" %}
-            <div class="col-md-6">
-                <label>{% trans 'duration' %}</label>
-                {% bootstrap_field attribution_form.duration show_label=False %}
-            </div>
+            {% bootstrap_field attribution_form.duration form_group_class="col-md-6" %}
         </div>
+        <br>
         <div class="row">
-            <div class="col-md-6">
-                <label>Volume 1</label>
-                {% bootstrap_field practical_charge_form.allocation_charge show_label=False %}
-            </div>
-            <div class="col-md-6">
-                <label>Volume 2</label>
-                {% bootstrap_field practical_charge_form.allocation_charge show_label=False %}
-            </div>
+            {% bootstrap_field lecturing_charge_form.allocation_charge form_group_class="col-md-6" %}
+            {% bootstrap_field practical_charge_form.allocation_charge form_group_class="col-md-6" %}
         </div>
     </form>
     {{ attribution_form.media }}
