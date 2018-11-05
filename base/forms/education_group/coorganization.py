@@ -34,14 +34,14 @@ from reference.models.country import Country
 from base.models.organization import Organization
 
 
-class OrganizationEditForm(forms.ModelForm):
+class CoorganizationEditForm(forms.ModelForm):
     country = ModelChoiceField(
-        queryset=Country.objects.filter(entity__isnull=False).distinct().order_by('name'),
+        queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
         label=_("country"),
     )
 
     organization = ModelChoiceField(
-        queryset=Organization.objects.filter(entity__country__isnull=False).distinct().order_by('name'),
+        queryset=Organization.objects.all(),
         required=True,
         label=_("institution"),
         widget=autocomplete.ModelSelect2(
@@ -71,9 +71,9 @@ class OrganizationEditForm(forms.ModelForm):
             self.instance.education_group_year = education_group_year
 
         if self.instance.pk:
-            country = Country.objects.filter(entity__organization=self.instance.organization).first()
+            country = Country.objects.filter(organizationaddress__organization=self.instance.organization).first()
         else:
-            country = Country.objects.filter(entity__isnull=False, iso_code="BE").first()
+            country = Country.objects.filter(organizationaddress__isnull=False, iso_code="BE").first()
         self.fields['country'].initial = country
 
     def check_unique_constraint_between_education_group_year_organization(self):
@@ -90,5 +90,5 @@ class OrganizationEditForm(forms.ModelForm):
         return True
 
     def is_valid(self):
-        return super(OrganizationEditForm, self).is_valid() and \
+        return super(CoorganizationEditForm, self).is_valid() and \
                self.check_unique_constraint_between_education_group_year_organization()

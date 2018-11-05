@@ -30,6 +30,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 class OrganizationAddressAdmin(OsisModelAdmin):
     list_display = ('organization', 'label', 'location', 'postal_code', 'city', 'country')
+    search_fields = ['organization__name', 'label', 'country__name']
 
 
 class OrganizationAddress(models.Model):

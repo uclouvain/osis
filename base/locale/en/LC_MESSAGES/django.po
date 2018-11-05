@@ -4080,6 +4080,9 @@ msgstr ""
 msgid "Attribution removed for %(tutor)s (%(function)s)"
 msgstr ""
 
+msgid "Add attribution"
+msgstr ""
+
 msgid "Manage repartition"
 msgstr ""
 

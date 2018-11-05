@@ -4072,6 +4072,9 @@ msgstr "Répartition modifiée pour %(tutor)s (%(function)s)"
 msgid "Attribution removed for %(tutor)s (%(function)s)"
 msgstr "Attribution supprimée pour %(tutor)s (%(function)s)"
 
+msgid "Add attribution"
+msgstr "Ajouter attribution"
+
 msgid "Manage repartition"
 msgstr "Gérer la répartition"
 

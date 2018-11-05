@@ -32,7 +32,7 @@ from django.utils.translation import ugettext_lazy as _, pgettext
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
-from base.templatetags.education_group import li_with_deletion_perm, button_with_permission, BUTTON_TEMPLATE, \
+from base.templatetags.education_group import li_with_deletion_perm, button_with_permission, \
     button_order_with_permission, BUTTON_ORDER_TEMPLATE, li_with_create_perm_training, \
     li_with_create_perm_mini_training, li_with_create_perm_group, link_detach_education_group, \
     link_pdf_content_education_group, button_edit_administrative_data, dl_with_parent
@@ -97,8 +97,16 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         )
 
     def test_button_with_permission(self):
-        result = button_with_permission(self.context, "title", "id", "edit")
-        self.assertEqual(result, BUTTON_TEMPLATE.format("title", "id", "", "fa-edit"))
+        result = button_with_permission(self.context, "title", "edit", "#")
+        self.assertDictEqual(
+            result, {
+                'title': 'title',
+                'class_button': 'btn-default btn-sm ',
+                'load_modal': True,
+                'url': '#',
+                'icon': 'fa-edit'
+            }
+        )
 
     def test_button_order_with_permission(self):
         result = button_order_with_permission(self.context, "title", "id", "edit")
@@ -216,9 +224,9 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     def test_tag_detach_education_group_permitted_and_possible(self):
         self.context['can_change_education_group'] = True
         self.context['group_to_parent'] = '1'
-        result = link_detach_education_group(self.context)
+        result = link_detach_education_group(self.context, "#")
         expected_result = CUSTOM_LI_TEMPLATE.format(
-            li_attributes="""id="btn_operation_detach_1" """,
+            li_attributes=""" class="trigger_modal" id="btn_operation_detach_1" data-url="#" """,
             a_attributes=""" href="#" title="{}" onclick="select()" """.format(_('Detach')),
             text=_('Detach'),
         )
@@ -227,7 +235,7 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     def test_tag_detach_education_group_not_permitted(self):
         self.context['can_change_education_group'] = False
         self.context['group_to_parent'] = '1'
-        result = link_detach_education_group(self.context)
+        result = link_detach_education_group(self.context, "#")
         expected_result = CUSTOM_LI_TEMPLATE.format(
             li_attributes=""" class="disabled" """,
             a_attributes=""" title="{}" """.format(_("The user has not permission to change education groups.")),
@@ -238,7 +246,7 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     def test_tag_detach_education_group_not_possible(self):
         self.context['can_change_education_group'] = True
         self.context['group_to_parent'] = '0'
-        result = link_detach_education_group(self.context)
+        result = link_detach_education_group(self.context, "#")
         expected_result = CUSTOM_LI_TEMPLATE.format(
             li_attributes=""" class="disabled" """,
             a_attributes=""" title=" {}" """.format(_("It is not possible to detach the root element.")),
@@ -249,7 +257,7 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     def test_tag_detach_education_group_not_permitted_nor_possible(self):
         self.context['can_change_education_group'] = False
         self.context['group_to_parent'] = '0'
-        result = link_detach_education_group(self.context)
+        result = link_detach_education_group(self.context, "#")
         expected_result = CUSTOM_LI_TEMPLATE.format(
             li_attributes=""" class="disabled" """,
             a_attributes=""" title="{} {}" """.format(
@@ -319,14 +327,32 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         """ This test ensure that as faculty manager, the button tag is disabled when outside of encoding period"""
         self.academic_calendar.delete()
 
-        result = button_with_permission(self.context, "title", "id", "edit")
-        self.assertEqual(result, BUTTON_TEMPLATE.format(PERMISSION_DENIED_MSG, "id", "disabled", "fa-edit"))
+        result = button_with_permission(self.context, "title", "edit", "#")
+        self.assertDictEqual(
+            result,
+            {
+                'class_button': 'btn-default btn-sm disabled',
+                'load_modal': True,
+                'url': '#',
+                'title': _("The education group edition period is not open."),
+                'icon': 'fa-edit'
+            }
+        )
 
     def test_button_tag_case_inside_education_group_edition_period(self):
         self.education_group_year.academic_year = self.next_ac
 
-        result = button_with_permission(self.context, "title", "id", "edit")
-        self.assertEqual(result, BUTTON_TEMPLATE.format("title", "id", "", "fa-edit"))
+        result = button_with_permission(self.context, "title", "edit", "#")
+        self.assertDictEqual(
+            result,
+            {
+                'load_modal': True,
+                'title': 'title',
+                'class_button': 'btn-default btn-sm ',
+                'url': '#',
+                'icon': 'fa-edit'
+            }
+        )
 
     def test_li_tag_case_not_in_education_group_edition_period(self):
         """ This test ensure that as faculty manager, the li tag is disabled when outside of encoding period"""
