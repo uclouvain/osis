@@ -25,10 +25,12 @@
 ##############################################################################
 from django.db import models
 from django.core import serializers
+from reversion.admin import VersionAdmin
+
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
-class CountryAdmin(SerializableModelAdmin):
+class CountryAdmin(VersionAdmin):
     list_display = ('uuid', 'name', 'iso_code', 'nationality', 'european_union', 'dialing_code', 'cref_code', 'currency',
                     'continent')
     list_filter = ('european_union',)
