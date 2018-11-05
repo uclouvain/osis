@@ -108,14 +108,20 @@ class AttributionChargeForm(forms.ModelForm):
 class LecturingAttributionChargeForm(AttributionChargeForm):
     component_type = learning_component_year_type.LECTURING
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["allocation_charge"].label = "Volume 1"
+    class Meta:
+        model = AttributionChargeNew
+        fields = ('allocation_charge',)
+        labels = {
+            'allocation_charge': _("Volume 1"),
+        }
 
 
 class PracticalAttributionChargeForm(AttributionChargeForm):
     component_type = learning_component_year_type.PRACTICAL_EXERCISES
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["allocation_charge"].label = "Volume 2"
+    class Meta:
+        model = AttributionChargeNew
+        fields = ('allocation_charge',)
+        labels = {
+            'allocation_charge': _("Volume 2"),
+        }

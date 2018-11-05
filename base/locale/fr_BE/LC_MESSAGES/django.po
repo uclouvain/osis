@@ -4166,3 +4166,9 @@ msgstr "Vous ne pouvez pas supprimer cette unité d'enseignement en raison de so
 
 msgid "You are not eligible to create/modify proposal"
 msgstr "Vous ne pouvez pas créer/modifier les propositions"
+
+msgid "Volume 1"
+msgstr ""
+
+msgid "Volume 2"
+msgstr ""
