@@ -25,6 +25,7 @@
 ##############################################################################
 from dal import autocomplete
 from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
@@ -61,6 +62,7 @@ class AttributionCreationForm(AttributionForm):
             url='tutor_autocomplete',
             attrs={'data-theme': 'bootstrap', 'data-width': 'null', 'data-placeholder': '---------'}
         ),
+        label=_('tutor'),
     )
 
     class Meta:
