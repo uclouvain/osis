@@ -108,9 +108,7 @@ class AttributionChargeForm(forms.ModelForm):
 class LecturingAttributionChargeForm(AttributionChargeForm):
     component_type = learning_component_year_type.LECTURING
 
-    class Meta:
-        model = AttributionChargeNew
-        fields = ('allocation_charge',)
+    class Meta(AttributionChargeForm.Meta):
         labels = {
             'allocation_charge': _("Volume 1"),
         }
@@ -119,9 +117,7 @@ class LecturingAttributionChargeForm(AttributionChargeForm):
 class PracticalAttributionChargeForm(AttributionChargeForm):
     component_type = learning_component_year_type.PRACTICAL_EXERCISES
 
-    class Meta:
-        model = AttributionChargeNew
-        fields = ('allocation_charge',)
+    class Meta(AttributionChargeForm.Meta):
         labels = {
             'allocation_charge': _("Volume 2"),
         }
