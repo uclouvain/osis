@@ -4138,7 +4138,7 @@ msgid "This learning unit isn't eligible for end date modification"
 msgstr "Cette unité d'enseignement n'est pas éligible pour un modification de date de fin"
 
 msgid "Isn't a proposal"
-msgstr "Ce n'est pas un proposition"
+msgstr "Ce n'est pas une proposition"
 
 msgid "Proposal isn't on current learning unit year"
 msgstr "La proposition n'est pas sur l'année en cours"
