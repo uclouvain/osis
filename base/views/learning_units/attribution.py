@@ -94,7 +94,7 @@ class AttributionBaseViewMixin(RulesRequiredMixin):
 
 class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSuccessMessageMixin, MultiFormsView):
     rules = [perms.is_eligible_to_manage_attributions]
-    template_name = "learning_unit/edit_attribution_inner.html"
+    template_name = "learning_unit/attribution_inner.html"
     form_classes = {
         "attribution_form": AttributionForm,
         "lecturing_charge_form": LecturingAttributionChargeForm,
@@ -141,7 +141,7 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
 
 class AddAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSuccessMessageMixin, MultiFormsView):
     rules = [perms.is_eligible_to_manage_attributions]
-    template_name = "learning_unit/add_attribution_inner.html"
+    template_name = "learning_unit/attribution_inner.html"
     form_classes = {
         "attribution_form": AttributionCreationForm,
         "lecturing_charge_form": LecturingAttributionChargeForm,

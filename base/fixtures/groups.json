@@ -3101,6 +3101,11 @@
                 "can_manage_charge_repartition",
                 "base",
                 "person"
+            ],
+            [
+                "can_manage_attribution",
+                "base",
+                "person"
             ]
         ]
     }
