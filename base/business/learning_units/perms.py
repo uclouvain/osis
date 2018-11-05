@@ -157,25 +157,21 @@ def is_eligible_to_edit_proposal(proposal, person, raise_exception=False):
 
 
 def is_eligible_to_consolidate_proposal(proposal, person, raise_exception=False):
-    msg = ''
-    result = _has_person_the_right_to_consolidate(proposal, person)
+    msg = None
 
-    if not result:
+    if not _has_person_the_right_to_consolidate(proposal, person):
         msg = MSG_NO_RIGHTS_TO_CONSOLIDATE
-    else:
-        result = _is_proposal_in_state_to_be_consolidated(proposal, person)
-        if not result:
-            msg = MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES
-        else:
-            result = _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception)
-            if not result:
-                msg = MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY
-    can_raise_exception(
-        raise_exception,
-        result,
-        msg
-    )
-    return result
+    elif not _is_proposal_in_state_to_be_consolidated(proposal, person):
+        msg = MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES
+    elif not _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception):
+        msg = MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY
+    if msg:
+        can_raise_exception(
+            raise_exception,
+            False,
+            msg
+        )
+    return True
 
 
 def can_edit_summary_locked_field(learning_unit_year, person):
@@ -190,25 +186,19 @@ def can_update_learning_achievement(learning_unit_year, person):
 
 
 def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_exception=False):
-    checked_ok = \
-        _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
-        _can_delete_learning_unit_year_according_type(learning_unit_year, person, raise_exception)
-
-    if checked_ok:
-        result = person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+    msg = None
+    if not conjunction(_any_existing_proposal_in_epc(learning_unit_year, person, raise_exception), _can_delete_learning_unit_year_according_type(learning_unit_year, person, raise_exception)):
+        msg = MSG_NOT_ELIGIBLE_TO_DELETE_LU
+    elif not person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year):
+        msg = MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY
+    if msg:
         can_raise_exception(
             raise_exception,
-            result,
-            MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY
+            False,
+            msg
         )
-        return result
-    else:
-        can_raise_exception(
-            raise_exception,
-            checked_ok,
-            MSG_NOT_ELIGIBLE_TO_DELETE_LU
-        )
-        return checked_ok
+        return False
+    return True
 
 
 def _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_exception=False):
