@@ -207,7 +207,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_translated_labels_and_content(self, section, user_language, common_education_group_year, sections_list):
         records = []
         for label, selectors in section.labels:
-            if sections_list.__len__() == 0 or label in sections_list:
+            if not sections_list or label in sections_list:
                 records.extend(
                     self.get_selectors(common_education_group_year, label, selectors, user_language)
                 )
