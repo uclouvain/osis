@@ -50,6 +50,7 @@ class LearningUnitFactory(DjangoModelFactory):
     end_year = factory.LazyAttribute(lambda obj: factory.fuzzy.FuzzyInteger(obj.start_year + 1, obj.start_year + 9).fuzz())
     faculty_remark = factory.fuzzy.FuzzyText(length=255)
     other_remark = factory.fuzzy.FuzzyText(length=255)
+    existing_proposal_in_epc = False
 
 
 class LearningUnitFakerFactory(DjangoModelFactory):

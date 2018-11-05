@@ -9,6 +9,6 @@
     {% endif %}
 {% else %}
     <li class="{{ class_li }}" id="{{ id_li }}">
-        <a href="{{ url }}" data-toggle="tooltip" title="{{ title }}" class="{{ class_a }}">{{ text }}</a>
+        <a href="{{ url }}" data-toggle="tooltip" title="{{ title }}" class="{{ class_a }}" onclick="{{ js_script }}">{{ text }}</a>
     </li>
 {% endif %}
