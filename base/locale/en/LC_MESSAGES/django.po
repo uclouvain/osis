@@ -4110,3 +4110,51 @@ msgstr "This program has no page to publish on it"
 
 msgid "The program are published. Click on the link to display it : "
 msgstr "The program are published. Click on the link to display it : "
+
+msgid "You can't modify learning unit under year : %(year)d"
+msgstr ""
+
+msgid "You can only modify a learning unit when your are linked to its requirement entity"
+msgstr ""
+
+msgid "Existing proposal in epc"
+msgstr ""
+
+msgid "You can't modify end date of a previous year"
+msgstr ""
+
+msgid "This learning unit is not eligible for proposal creation/modification"
+msgstr ""
+
+msgid "This learning unit isn't eligible for end date modification"
+msgstr ""
+
+msgid "Isn't a proposal"
+msgstr ""
+
+msgid "Proposal isn't on current learning unit year"
+msgstr ""
+
+msgid "Not in range of years which can be edited by you"
+msgstr ""
+
+msgid "Person not in accordance with proposal state"
+msgstr ""
+
+msgid "You are not eligible to modify the end date of this learning unit. You should be central manager or the learning unit has to be a partim or the learning unit as to be a course/dissertation/internship"
+msgstr ""
+
+msgid "You are not eligible to consolidate proposal"
+msgstr ""
+
+msgid "You dont' have the rights to consolidate"
+msgstr ""
+
+msgid "Proposal not in eligible state for consolidation"
+msgstr ""
+
+msgid "Can delete according to the type of the learning unit"
+msgstr ""
+
+msgid "You are not eligible to create/modify proposal"
+msgstr ""
