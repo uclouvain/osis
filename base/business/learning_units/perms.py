@@ -74,6 +74,7 @@ MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES = "Proposal not in eligible st
 MSG_CAN_DELETE_ACCORDING_TO_TYPE = "Can delete according to the type of the learning unit"
 MSG_NOT_ELIGIBLE_TO_DELETE_LU = "Not eligible to delete learning units"
 MSG_NOT_ELIGIBLE_TO_CREATE_MODIFY_PROPOSAL = "You are not eligible to create/modify proposal"
+MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR = "You can't modify proposal which is on an other year"
 
 
 def _any_existing_proposal_in_epc(learning_unit_year, _, raise_exception=False):
@@ -222,6 +223,11 @@ def _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_
         return False
     if proposal.type == ProposalType.MODIFICATION.name and \
        proposal.learning_unit_year.academic_year.year != starting_academic_year().year + 1:
+        can_raise_exception(
+            raise_exception,
+            False,
+            MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR
+        )
         return False
     return True
 
