@@ -4167,3 +4167,6 @@ msgstr ""
 
 msgid "Indicate the name or the FGS"
 msgstr ""
+
+msgid "This learning unit isn't eligible for modification because of it's type"
+msgstr ""

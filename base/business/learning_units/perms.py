@@ -45,7 +45,6 @@ from osis_common.utils.datetime import get_tzinfo, convert_date_to_datetime
 from osis_common.utils.perms import conjunction, disjunction, negation, BasePerm
 from django.core.exceptions import PermissionDenied
 
-
 FACULTY_UPDATABLE_CONTAINER_TYPES = (learning_container_year_types.COURSE,
                                      learning_container_year_types.DISSERTATION,
                                      learning_container_year_types.INTERNSHIP)
@@ -75,6 +74,7 @@ MSG_CAN_DELETE_ACCORDING_TO_TYPE = "Can delete according to the type of the lear
 MSG_NOT_ELIGIBLE_TO_DELETE_LU = "Not eligible to delete learning units"
 MSG_NOT_ELIGIBLE_TO_CREATE_MODIFY_PROPOSAL = "You are not eligible to create/modify proposal"
 MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR = "You can't modify proposal which is on an other year"
+MSG_NOT_ELIGIBLE_FOR_MODIFICATION_BECAUSE_OF_TYPE = "This learning unit isn't eligible for modification because of it's type"
 
 
 def _any_existing_proposal_in_epc(learning_unit_year, _, raise_exception=False):
@@ -380,7 +380,7 @@ def _is_container_type_course_dissertation_or_internship(learning_unit_year, _, 
     can_raise_exception(
         raise_exception,
         result,
-        "This learning unit isn't eligible for end date modification"
+        MSG_NOT_ELIGIBLE_FOR_MODIFICATION_BECAUSE_OF_TYPE
     )
     return result
 
