@@ -44,6 +44,7 @@ class AttributionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["start_year"].required = True
         if self.instance:
             self.fields["duration"].initial = self.instance.duration
 
@@ -84,8 +85,8 @@ class AttributionCreationForm(AttributionForm):
         instance = super().save(commit=False)
         instance.learning_container_year = luy.learning_container_year
         tutor, create = Tutor.objects.get_or_create(person=self.cleaned_data["person"])
+        instance.tutor = tutor
         if commit:
-            instance.tutor = tutor
             instance.save()
         return instance
 
