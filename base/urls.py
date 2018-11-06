@@ -61,8 +61,8 @@ urlpatterns = [
         name='entity_autocomplete'),
     url(r'^organization-autocomplete/$', OrganizationAutocomplete.as_view(),
         name='organization_autocomplete'),
-    url(r'^person-autocomplete/$', EmployeeAutocomplete.as_view(),
-        name='person_autocomplete'),
+    url(r'^employee-autocomplete/$', EmployeeAutocomplete.as_view(),
+        name='employee_autocomplete'),
     url(r'^academic_actors/$', institution.academic_actors, name='academic_actors'),
 
     url(r'^academic_calendars/', include([

@@ -31,7 +31,7 @@ from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.models.enums import learning_component_year_type
 from base.models.learning_component_year import LearningComponentYear
-from base.models.person import Person
+from base.models.person import EmployeeManager, Person
 from base.models.tutor import Tutor
 
 
@@ -58,10 +58,10 @@ class AttributionForm(forms.ModelForm):
 
 class AttributionCreationForm(AttributionForm):
     person = forms.ModelChoiceField(
-        queryset=Person.objects.filter(employee=True).order_by("last_name", "first_name"),
+        queryset=Person.employees.all(),
         required=True,
         widget=autocomplete.ModelSelect2(
-            url='person_autocomplete',
+            url='employee_autocomplete',
             attrs={
                 'data-theme': 'bootstrap',
                 'data-width': 'null',

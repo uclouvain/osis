@@ -36,7 +36,7 @@ from base.models.person import Person
 
 class EmployeeAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Person.objects.filter(employee=True)
+        qs = Person.employees.all()
 
         # FIXME Use trigram search
         if self.q:
