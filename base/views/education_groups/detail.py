@@ -254,7 +254,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_appropriate_sections(self):
         education_group_year = self.object
         minor = education_group_year.is_minor
-        deep = education_group_year.education_group_type.name == DEEPENING
+        deep = education_group_year.is_deepening
         special = minor or deep
         if special:
             code = education_group_year.partial_acronym
