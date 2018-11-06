@@ -171,7 +171,7 @@ def _duplicate_learning_container_year(new_learn_unit_year, new_academic_year, o
 def _get_or_create_container_year(new_learn_unit_year, new_academic_year):
     queryset = LearningContainerYear.objects.filter(
         academic_year=new_academic_year,
-        learning_container=new_learn_unit_year.learning_unit.learning_container
+        learning_container=new_learn_unit_year.learning_container_year.learning_container
     )
     # Sometimes, the container already exists, we can directly use it and its entitycontaineryear
     if not queryset.exists():
