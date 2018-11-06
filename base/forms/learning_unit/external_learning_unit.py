@@ -119,7 +119,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
         ExternalLearningUnitModelForm
     ]
 
-    def __init__(self, person, academic_year, learning_unit_instance=None, data=None, *args, **kwargs):
+    def __init__(self, person, academic_year, learning_unit_instance=None, data=None, start_year=None, *args, **kwargs):
         self.academic_year = academic_year
         self.person = person
         self.learning_unit_instance = learning_unit_instance
@@ -132,6 +132,8 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
                                    .distinct('organization__name')
                                    .select_related('organization')
         )
+
+        self.start_year = self.instance.learning_unit.start_year if self.instance else start_year
 
     @property
     def learning_unit_external_form(self):
@@ -206,7 +208,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
         learning_container = self.learning_container_form.save(commit)
         learning_unit = self.learning_unit_form.save(
-            start_year=self.learning_unit_year_form.instance.academic_year.year,
+            start_year=self.start_year,
             learning_container=learning_container,
             commit=commit
         )
