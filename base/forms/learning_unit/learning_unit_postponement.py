@@ -102,14 +102,14 @@ class LearningUnitPostponementForm:
     def _compute_max_postponement_year(self):
         max_postponement_year = academic_year.compute_max_academic_year_adjournment()
         end_year = self.end_postponement.year if self.end_postponement else None
-        return min(end_year,  max_postponement_year) if end_year else max_postponement_year
+        return min(end_year, max_postponement_year) if end_year else max_postponement_year
 
     def _compute_forms_to_insert_update_delete(self, data):
         max_postponement_year = self._compute_max_postponement_year()
         ac_year_postponement_range = academic_year.find_academic_years(start_year=self.start_postponement.year,
                                                                        end_year=max_postponement_year)
         existing_learn_unit_years = learning_unit_year.LearningUnitYear.objects \
-            .filter(academic_year__year__gte=self.start_postponement.year)\
+            .filter(academic_year__year__gte=self.start_postponement.year) \
             .filter(learning_unit=self.learning_unit_instance) \
             .select_related('learning_container_year', 'learning_unit', 'academic_year') \
             .order_by('academic_year__year')
@@ -123,12 +123,12 @@ class LearningUnitPostponementForm:
                     self._instantiate_base_form_as_update(luy, index_form=index)
                     for index, luy in enumerate(existing_learn_unit_years)
                     if luy.academic_year.year > max_postponement_year
-                    ]
+                ]
                 to_update = [
                     self._instantiate_base_form_as_update(luy, index_form=index, data=data)
                     for index, luy in enumerate(existing_learn_unit_years)
                     if luy.academic_year.year <= max_postponement_year
-                    ]
+                ]
                 existing_ac_years = [luy.academic_year for luy in existing_learn_unit_years]
                 to_insert = []
                 # FIXME: We use data copy because data is immuniable and acronym, academic_year and container_type
@@ -150,7 +150,7 @@ class LearningUnitPostponementForm:
                 to_insert = [
                     self._instantiate_base_form_as_insert(ac_year, data)
                     for index, ac_year in enumerate(ac_year_postponement_range)
-                    ]
+                ]
 
         self._forms_to_delete = to_delete
         self._forms_to_upsert = to_update + to_insert
@@ -321,7 +321,7 @@ class LearningUnitPostponementForm:
                 component = None
 
             if component and component.repartition_volume != reparation_volume:
-                name = component.learning_component_year.acronym + "-"\
+                name = component.learning_component_year.acronym + "-" \
                        + component.entity_container_year.entity.most_recent_acronym
 
                 self.consistency_errors.setdefault(luy.academic_year, []).append(
