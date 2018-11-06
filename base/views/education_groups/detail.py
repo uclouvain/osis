@@ -50,7 +50,7 @@ from base.models.admission_condition import AdmissionCondition, AdmissionConditi
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, academic_calendar_type, education_group_types
 from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import PGRM_MASTER_120, PGRM_MASTER_180_240, DEEPENING
+from base.models.enums.education_group_types import PGRM_MASTER_120, PGRM_MASTER_180_240
 from base.models.person import Person
 from base.views.common import display_error_messages, display_success_messages
 from cms import models as mdl_cms
