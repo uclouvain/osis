@@ -23,14 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
-import operator
 
-from dal import autocomplete
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.postgres.search import SearchVector, SearchQuery
-from django.db.models import Prefetch, Q
+from django.db.models import Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -202,22 +197,3 @@ class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView)
     def get_success_message(self):
         return _("Attribution removed for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
                                                                         "function": _(self.attribution.function)}
-
-
-class PersonAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        qs = Person.objects.filter(employee=True)
-
-        # FIXME Use trigram search
-        if self.q:
-            search_queries = functools.reduce(operator.and_,
-                                              (SearchQuery(word) for word in self.q.split()))
-            qs = qs.annotate(search=SearchVector("first_name", "middle_name", "last_name")) \
-                .filter(Q(search=search_queries) | Q(global_id=self.q))
-
-        return qs.order_by("last_name", "first_name")
-
-    def get_result_label(self, result):
-        return "{last_name} {first_name} ({age})".format(last_name=result.last_name,
-                                                         first_name=result.first_name,
-                                                         age=result.age)
