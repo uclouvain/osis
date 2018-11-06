@@ -57,7 +57,7 @@ class AttributionForm(forms.ModelForm):
 
 class AttributionCreationForm(AttributionForm):
     person = forms.ModelChoiceField(
-        queryset=Person.objects.all().order_by("last_name", "first_name"),
+        queryset=Person.objects.filter(employee=True).order_by("last_name", "first_name"),
         required=True,
         widget=autocomplete.ModelSelect2(
             url='person_autocomplete',
