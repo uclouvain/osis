@@ -74,7 +74,8 @@ MSG_CAN_DELETE_ACCORDING_TO_TYPE = "Can delete according to the type of the lear
 MSG_NOT_ELIGIBLE_TO_DELETE_LU = "Not eligible to delete learning units"
 MSG_NOT_ELIGIBLE_TO_CREATE_MODIFY_PROPOSAL = "You are not eligible to create/modify proposal"
 MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR = "You can't modify proposal which is on an other year"
-MSG_NOT_ELIGIBLE_FOR_MODIFICATION_BECAUSE_OF_TYPE = "This learning unit isn't eligible for modification because of it's type"
+MSG_NOT_ELIGIBLE_FOR_MODIFICATION_BECAUSE_OF_TYPE = "This learning unit isn't eligible for modification because of " \
+                                                    "it's type"
 
 
 def _any_existing_proposal_in_epc(learning_unit_year, _, raise_exception=False):
