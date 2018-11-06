@@ -60,7 +60,7 @@ class AttributionCreationForm(AttributionForm):
         required=True,
         widget=autocomplete.ModelSelect2(
             url='tutor_autocomplete',
-            attrs={'data-theme': 'bootstrap', 'data-width': 'null', 'data-placeholder': _('name_or_fgs')}
+            attrs={'data-theme': 'bootstrap', 'data-width': 'null', 'data-placeholder': _('Indicate the name or the FGS')}
         ),
         label=_('tutor'),
     )

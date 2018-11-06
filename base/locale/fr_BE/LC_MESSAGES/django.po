@@ -4173,5 +4173,5 @@ msgstr ""
 msgid "Volume 2"
 msgstr ""
 
-msgid "name_or_fgs"
+msgid "Indicate the name or the FGS"
 msgstr "Indiquer le nom ou le FGS"
