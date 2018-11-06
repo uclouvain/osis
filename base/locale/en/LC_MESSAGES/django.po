@@ -4165,5 +4165,8 @@ msgstr ""
 msgid "Volume 2"
 msgstr ""
 
+msgid "Unable to retrieve appropriate sections for this programs"
+msgstr "Unable to retrieve appropriate sections for this programs"
+
 msgid "Indicate the name or the FGS"
 msgstr ""

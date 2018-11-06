@@ -462,6 +462,11 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertIn(messages.SUCCESS, msg_level)
         self.assertEqual(response.status_code, 302)
 
+    def test_education_group_year_pedagogy_publish_when_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
 
 @override_flag('education_group_update', active=True)
 class EducationGroupViewTestCase(TestCase):
