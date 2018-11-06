@@ -38,6 +38,10 @@ from base.views.learning_units.create import _save_and_redirect
 @permission_required('base.add_externallearningunityear', raise_exception=True)
 def get_external_learning_unit_creation_form(request, academic_year):
     person = get_object_or_404(Person, user=request.user)
+
+    if request.POST.get('academic_year'):
+        academic_year = request.POST.get('academic_year')
+
     academic_year = get_object_or_404(AcademicYear, pk=academic_year)
 
     postponement_form = LearningUnitPostponementForm(
