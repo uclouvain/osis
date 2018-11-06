@@ -4175,3 +4175,6 @@ msgstr ""
 
 msgid "Unable to retrieve appropriate sections for this programs"
 msgstr "Impossible de récupérer les sections pertinentes pour le programme consulté"
+
+msgid "Indicate the name or the FGS"
+msgstr "Indiquer le nom ou le FGS"
