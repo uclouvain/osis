@@ -72,22 +72,22 @@ def assessments(request):
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 @user_passes_test(_is_not_inside_scores_encodings_period, login_url=reverse_lazy('scores_encoding'))
 def outside_period(request):
-    date_format = str(_('date_format'))
+    date_format = str('%m/%d/%Y')
     latest_session_exam = mdl.session_exam_calendar.get_latest_session_exam()
     closest_new_session_exam = mdl.session_exam_calendar.get_closest_new_session_exam()
 
     if latest_session_exam:
         session_number = latest_session_exam.number_session
         str_date = latest_session_exam.academic_calendar.end_date.strftime(date_format)
-        messages.add_message(request, messages.WARNING, _('outside_scores_encodings_period_latest_session') % (session_number,str_date))
+        messages.add_message(request, messages.WARNING, _("The period of scores' encoding %s is closed since %s") % (session_number,str_date))
 
     if closest_new_session_exam:
         session_number = closest_new_session_exam.number_session
         str_date = closest_new_session_exam.academic_calendar.start_date.strftime(date_format)
-        messages.add_message(request, messages.WARNING, _('outside_scores_encodings_period_closest_session') % (session_number,str_date))
+        messages.add_message(request, messages.WARNING, _("The period of scores' encoding %s will be open %s") % (session_number,str_date))
 
     if not messages.get_messages(request):
-        messages.add_message(request, messages.WARNING, _('score_encoding_period_not_open'))
+        messages.add_message(request, messages.WARNING, _("The period of scores' encoding is not opened"))
     return layout.render(request, "outside_scores_encodings_period.html", {})
 
 
@@ -155,7 +155,7 @@ def scores_encoding(request):
         all_offers = mdl.offer_year.find_by_user(request.user, academic_yr=academic_yr)
 
         if not score_encoding_progress_list:
-            messages.add_message(request, messages.WARNING, "%s" % _('no_result'))
+            messages.add_message(request, messages.WARNING, "%s" % _('No result!'))
 
         context.update({'offer_list': all_offers,
                         'tutor_list': all_tutors,
@@ -313,7 +313,7 @@ def specific_criteria_submission(request):
         is_program_manager = mdl.program_manager.is_program_manager(request.user)
         bulk_send_messages_to_notify_encoding_progress(request, updated_enrollments, is_program_manager)
         if updated_enrollments:
-            messages.add_message(request, messages.SUCCESS, "%s %s" % (len(updated_enrollments), _('scores_saved')))
+            messages.add_message(request, messages.SUCCESS, "%s %s" % (len(updated_enrollments), _('score(s) saved')))
         return specific_criteria(request)
 
 
@@ -338,7 +338,7 @@ def online_double_encoding_form(request, learning_unit_year_id=None):
             context = _preserve_encoded_values(request, context)
             return online_double_encoding_get_form(request, context, learning_unit_year_id)
         elif not scores_list:
-            messages.add_message(request, messages.WARNING, "%s" % _('no_dubble_score_encoded_comparison_impossible'))
+            messages.add_message(request, messages.WARNING, "%s" % _("No double score encoded ; nothing to compare."))
             return online_encoding(request, learning_unit_year_id=learning_unit_year_id)
         else:
             context = _get_double_encoding_context(request, learning_unit_year_id)
@@ -393,7 +393,7 @@ def export_xls(request, learning_unit_year_id):
     if scores_list.enrollments:
         return score_encoding_export.export_xls(scores_list.enrollments)
     else:
-        messages.add_message(request, messages.WARNING, _('no_student_to_encode_xls'))
+        messages.add_message(request, messages.WARNING, _("No students to encode by excel"))
         return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
 
 
@@ -515,7 +515,8 @@ def online_double_encoding_get_form(request, data=None, learning_unit_year_id=No
     if len(data['enrollments']) > 0:
         return layout.render(request, "online_double_encoding_form.html", data)
     else:
-        messages.add_message(request, messages.WARNING, "%s" % _('no_score_encoded_double_encoding_impossible'))
+        messages.add_message(request, messages.WARNING,
+                             "%s" % _("No new scores encoded. The double encoding needs new scores."))
         return online_encoding(request, learning_unit_year_id=learning_unit_year_id)
 
 
@@ -568,7 +569,7 @@ def _get_specific_criteria_context(request):
     if request.method == 'POST':
         # Make a search
         if not registration_id and not last_name and not first_name and not justification and not offer_year_id:
-            messages.add_message(request, messages.WARNING, "%s" % _('minimum_one_criteria'))
+            messages.add_message(request, messages.WARNING, "%s" % _("Please choose at least one criteria!"))
         else:
             _append_search_to_specific_criteria_context(request, context)
     return context
@@ -585,7 +586,7 @@ def _append_search_to_specific_criteria_context(request, context):
     )
     context.update(scores_list.__dict__)
     if not scores_list.enrollments:
-        messages.add_message(request, messages.WARNING, _('no_result'))
+        messages.add_message(request, messages.WARNING, _('No result!'))
 
 
 def _get_double_encoding_context(request, learning_unit_year_id):

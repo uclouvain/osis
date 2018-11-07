@@ -144,37 +144,39 @@ def __coloring_non_editable(ws, row_number, score, justification):
 
 
 def __display_creation_date_with_message_about_state(ws, row_number):
-    date_format = str(_('date_format'))
+    date_format = str(_('%m/%d/%Y'))
     printing_date = timezone.now()
     printing_date = printing_date.strftime(date_format)
 
-    ws.cell(row=row_number, column=1).value = str('%s' % (_('warn_user_data_can_change') % printing_date))
+    ws.cell(row=row_number, column=1).value = str(
+        '%s' % (_("Les données présentes sur ce document correspondent à l'état du système en date du %s et sont "
+                  "susceptibles d'évoluer") % printing_date))
     ws.cell(row=row_number, column=1).font = Font(color=colors.RED)
 
 
 def __display_warning_about_students_deliberated(ws, row_number):
-    ws.cell(row=row_number, column=1).value = str(_('students_deliberated_are_not_shown'))
+    ws.cell(row=row_number, column=1).value = str(_("Students deliberated are not shown"))
     ws.cell(row=row_number, column=1).font = Font(color=colors.RED)
 
 
 def __display_legends(ws):
     ws.append([
-        str(_('justification')),
-        str(_('justification_values_accepted') % mdl.exam_enrollment.justification_label_authorized())
+        str(_('Justification')),
+        str(_("Accepted value: %s ") % mdl.exam_enrollment.justification_label_authorized())
     ])
     ws.append([
         str(''),
-        str(_('justification_other_values') % justification_other_values())
+        str(_("Other values: %s ") % justification_other_values())
     ])
     ws.append([
-        str(_('numbered_score')),
-        str(_('score_legend') % "0 - 20")
+        str(_('Numbered scores')),
+        str(_('Score legend: %s (0=Score of presence)') % "0 - 20")
     ])
 
 
 def justification_other_values():
-    return "%s, %s" % (_('unjustified_absence_export_legend'),
-                       _('justified_absence_export_legend'))
+    return "%s, %s" % (_('S=Unjustified Absence'),
+                       _('M=Justified Absence'))
 
 
 def __get_session_exam_deadline(exam_enroll):
