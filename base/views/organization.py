@@ -37,10 +37,13 @@ from django_filters.views import FilterView
 
 from base import models as mdl
 from base.forms.organization import OrganizationFilter
+from base.models.campus import Campus
 from base.models.entity_version import EntityVersion
 from base.models.organization import Organization
+from base.models.organization_address import find_distinct_by_country
 from base.views import layout
 from reference import models as mdlref
+from reference.models.country import Country
 
 
 class OrganizationSearch(PermissionRequiredMixin, FilterView):
@@ -171,3 +174,35 @@ class OrganizationAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetV
 
     def get_result_label(self, result):
         return result.name
+
+
+class CountryAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Country.objects.filter(organizationaddress__isnull=False).distinct()
+
+        if self.q:
+            qs = qs.filter(name__icontains=self.q)
+
+        return qs.distinct().order_by('name')
+
+
+class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Campus.objects.all()
+
+        country = self.forwarded.get('country', None)
+        city = self.forwarded.get('city', None)
+
+        if country:
+            qs = qs.filter(organization__organizationaddress__country=country)
+
+        if city:
+            qs = qs.filter(organization__organizationaddress__city=city)
+
+        if self.q:
+            qs = qs.filter(organization__name__icontains=self.q)
+
+        return qs.select_related('organization').order_by('organization__name')
+
+    def get_result_label(self, result):
+        return "{} ({})".format(result.organization.name, result.name)
