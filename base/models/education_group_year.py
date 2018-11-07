@@ -654,6 +654,12 @@ class EducationGroupYear(models.Model):
         except EducationGroupYear.DoesNotExist:
             return None
 
+    def previous_year(self):
+        try:
+            return self.education_group.educationgroupyear_set.get(academic_year__year=(self.academic_year.year - 1))
+        except EducationGroupYear.DoesNotExist:
+            return None
+
 
 def find_by_id(an_id):
     try:
