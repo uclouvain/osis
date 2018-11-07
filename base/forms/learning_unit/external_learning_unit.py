@@ -25,9 +25,9 @@
 ##############################################################################
 from collections.__init__ import OrderedDict
 
+from dal import autocomplete
 from django import forms
 from django.db import transaction
-from django.db.models import BLANK_CHOICE_DASH
 from django.forms import ModelChoiceField
 from django.utils.translation import ugettext_lazy as _
 
@@ -37,21 +37,13 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm,
 from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
 from base.forms.learning_unit.learning_unit_partim import merge_data
 from base.forms.utils.acronym_field import ExternalAcronymField
-from base.forms.utils.dynamic_field import DynamicChoiceField
 from base.models import entity_version
-from base.models.campus import Campus
 from base.models.entity_version import get_last_version, EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
-from base.models.organization_address import find_distinct_by_country
 from reference.models import language
 from reference.models.country import Country
-
-
-class CampusChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return "{}".format(obj.organization.name)
 
 
 class LearningContainerYearExternalModelForm(LearningContainerYearModelForm):
@@ -68,29 +60,34 @@ class LearningContainerYearExternalModelForm(LearningContainerYearModelForm):
 
 class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
     country = ModelChoiceField(
-        queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
+        queryset=Country.objects.all(),
         required=False,
-        label=_("country")
+        label=_("country"),
+        widget=autocomplete.ModelSelect2(url='country-autocomplete')
     )
-    city = DynamicChoiceField(required=False, label=_('city'))
 
     def __init__(self, *args, instance=None, initial=None, **kwargs):
-        choices = BLANK_CHOICE_DASH
         if instance and isinstance(initial, dict):
+            # TODO Impossible to determine which is the main address
             organization_address = instance.campus.organization.organizationaddress_set.order_by('is_main').first()
+
             if organization_address:
                 country = organization_address.country
                 initial["country"] = country.pk
-                initial["city"] = organization_address.city
-                choices = ((city, city) for city in find_distinct_by_country(country).values_list('city', flat=True))
 
-        super().__init__(*args, instance=instance, initial=initial, **kwargs)
-        self.fields["city"].choices = choices
+        super().__init__(*args, instance=instance, initial=initial, external=True, **kwargs)
 
     class Meta(LearningUnitYearModelForm.Meta):
         fields = ('academic_year', 'acronym', 'specific_title',
                   'specific_title_english', 'credits',
                   'status', 'campus', 'language')
+
+        widgets = {
+            'campus': autocomplete.ModelSelect2(
+                url='campus-autocomplete',
+                forward=["country"]
+            )
+        }
 
 
 class ExternalLearningUnitModelForm(forms.ModelForm):
@@ -149,12 +146,6 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
         super().__init__(instances_data, *args, **kwargs)
         self.learning_unit_year_form.fields['acronym'] = ExternalAcronymField()
-        self.learning_unit_year_form.fields['campus'] = CampusChoiceField(
-            queryset=Campus.objects.order_by('organization__name')
-                           .distinct('organization__name')
-                           .select_related('organization')
-        )
-
         self.start_year = self.instance.learning_unit.start_year if self.instance else start_year
 
     @property

@@ -161,7 +161,6 @@ class TestLearningUnitYearForExternalModelForm(TestCase):
             person=self.person, data=None,
             subtype=FULL, instance=luy, initial={})
         self.assertEqual(form.initial["country"], address.country.pk)
-        self.assertEqual(form.initial["city"], address.city)
 
 
 class TestExternalLearningUnitSearchForm(TestCase):
