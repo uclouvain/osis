@@ -69,7 +69,7 @@ def is_eligible_to_postpone_education_group(person, education_group, raise_excep
 
     try:
         # Check if the education group is valid
-        PostponeContent(education_group)
+        PostponeContent(education_group.previous_year())
     except NotPostponeError as e:
         result = False
         if raise_exception:

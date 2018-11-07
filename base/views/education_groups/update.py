@@ -222,7 +222,7 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
         success = ""
         error = ""
         try:
-            postponer = PostponeContent(self.get_root())
+            postponer = PostponeContent(self.get_root().previous_year())
             postponer.postpone()
             count = len(postponer.result)
             success = ngettext(
