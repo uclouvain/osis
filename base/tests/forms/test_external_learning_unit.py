@@ -42,7 +42,7 @@ from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory
@@ -155,7 +155,7 @@ class TestLearningUnitYearForExternalModelForm(TestCase):
         campus = CampusFactory()
         address = OrganizationAddressFactory(is_main=True, organization=campus.organization)
 
-        luy = LearningUnitYearFactory(campus=campus)
+        luy = LearningUnitYearFullFactory(campus=campus)
 
         form = LearningUnitYearForExternalModelForm(
             person=self.person, data=None,
