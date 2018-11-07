@@ -40,7 +40,6 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView
 from django.urls import reverse
-from urllib3.exceptions import NewConnectionError
 
 from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
@@ -273,7 +272,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         )
         try:
             sections_request = requests.get(url, timeout=settings.REQUESTS_TIMEOUT).json()
-        except (json.JSONDecodeError, TimeoutError, NewConnectionError):
+        except (json.JSONDecodeError, TimeoutError, requests.exceptions.ConnectionError):
             display_error_messages(self.request, _("Unable to retrieve appropriate sections for this programs"))
             sections_request = {'sections': []}
         return sections_request['sections']
