@@ -272,7 +272,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         )
         try:
             sections_request = requests.get(url, timeout=settings.REQUESTS_TIMEOUT).json()
-        except (json.JSONDecodeError, TimeoutError) as e:
+        except (json.JSONDecodeError, TimeoutError, ConnectionError) as e:
             display_error_messages(self.request, _("Unable to retrieve appropriate sections for this programs"))
             sections_request = {'sections': []}
         return sections_request['sections']
