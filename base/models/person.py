@@ -52,11 +52,19 @@ class PersonAdmin(SerializableModelAdmin):
     list_filter = ('gender', 'language')
 
 
+class EmployeeManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(employee=True).order_by("last_name", "first_name")
+
+
 class Person(SerializableModel):
     GENDER_CHOICES = (
         ('F', _('female')),
         ('M', _('male')),
         ('U', _('unknown')))
+
+    objects = models.Manager()
+    employees = EmployeeManager()
 
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
