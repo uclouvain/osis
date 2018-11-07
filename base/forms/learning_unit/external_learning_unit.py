@@ -85,7 +85,7 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
         widgets = {
             'campus': autocomplete.ModelSelect2(
                 url='campus-autocomplete',
-                forward=["country", "city"]
+                forward=["country"]
             )
         }
 

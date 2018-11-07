@@ -27,6 +27,7 @@ from dal import autocomplete
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.db.models import Q
 from django.db.utils import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
@@ -191,16 +192,12 @@ class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
         qs = Campus.objects.all()
 
         country = self.forwarded.get('country', None)
-        city = self.forwarded.get('city', None)
 
         if country:
             qs = qs.filter(organization__organizationaddress__country=country)
 
-        if city:
-            qs = qs.filter(organization__organizationaddress__city=city)
-
         if self.q:
-            qs = qs.filter(organization__name__icontains=self.q)
+            qs = qs.filter(Q(organization__name__icontains=self.q) | Q(name__icontains=self.q))
 
         return qs.select_related('organization').order_by('organization__name')
 
