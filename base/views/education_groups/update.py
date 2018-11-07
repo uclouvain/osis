@@ -213,7 +213,7 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["warning_message"] = _("Are you sure you want to postpone the content of %(root)s?") % {
+        context["warning_message"] = _("Are you sure you want to postpone the content in %(root)s?") % {
             "root": self.root
         }
         return context

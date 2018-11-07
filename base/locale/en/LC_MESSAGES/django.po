@@ -3303,7 +3303,7 @@ msgstr ""
 msgid "Are you sure you want to detach this content?"
 msgstr ""
 
-msgid "Are you sure you want to postpone the content of %(root)s?"
+msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr ""
 
 msgid "%(count)d education group has been postponed with success"

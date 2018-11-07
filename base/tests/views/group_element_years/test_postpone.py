@@ -85,7 +85,7 @@ class TestPostpone(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context["warning_message"],
-            _("Are you sure you want to postpone the content of %(root)s?") % {"root": self.next_education_group_year}
+            _("Are you sure you want to postpone the content in %(root)s?") % {"root": self.next_education_group_year}
         )
 
     def test_post_with_error(self):
