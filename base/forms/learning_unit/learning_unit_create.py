@@ -163,14 +163,6 @@ class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
         }
 
 
-class ExternalLearningUnitYearModelForm(LearningUnitYearModelForm):
-
-    class Meta(LearningUnitYearModelForm.Meta):
-        fields = ('academic_year', 'acronym', 'specific_title',
-                  'specific_title_english', 'credits',
-                  'status', 'campus', 'language')
-
-
 class LearningContainerYearModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.person = kwargs.pop('person')
