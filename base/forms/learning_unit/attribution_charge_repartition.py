@@ -25,6 +25,7 @@
 ##############################################################################
 from dal import autocomplete
 from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
@@ -34,7 +35,7 @@ from base.models.tutor import Tutor
 
 
 class AttributionForm(forms.ModelForm):
-    duration = forms.IntegerField(min_value=1, required=True)
+    duration = forms.IntegerField(min_value=1, required=True, label=_("duration"))
 
     class Meta:
         model = AttributionNew
@@ -59,8 +60,13 @@ class AttributionCreationForm(AttributionForm):
         required=True,
         widget=autocomplete.ModelSelect2(
             url='tutor_autocomplete',
-            attrs={'data-theme': 'bootstrap', 'data-width': 'null', 'data-placeholder': '---------'}
+            attrs={
+                'data-theme': 'bootstrap',
+                'data-width': 'null',
+                'data-placeholder': _('Indicate the name or the FGS')
+            }
         ),
+        label=_('tutor'),
     )
 
     class Meta:
@@ -105,6 +111,16 @@ class AttributionChargeForm(forms.ModelForm):
 class LecturingAttributionChargeForm(AttributionChargeForm):
     component_type = learning_component_year_type.LECTURING
 
+    class Meta(AttributionChargeForm.Meta):
+        labels = {
+            'allocation_charge': _("Volume 1"),
+        }
+
 
 class PracticalAttributionChargeForm(AttributionChargeForm):
     component_type = learning_component_year_type.PRACTICAL_EXERCISES
+
+    class Meta(AttributionChargeForm.Meta):
+        labels = {
+            'allocation_charge': _("Volume 2"),
+        }

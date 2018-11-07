@@ -88,7 +88,7 @@ class LearningContainerModelForm(forms.ModelForm):
 
 class LearningUnitYearModelForm(forms.ModelForm):
 
-    def __init__(self, data, person, subtype, *args, **kwargs):
+    def __init__(self, data, person, subtype, *args, external=False, **kwargs):
         super().__init__(data, *args, **kwargs)
 
         self.instance.subtype = subtype
@@ -112,7 +112,8 @@ class LearningUnitYearModelForm(forms.ModelForm):
                     self.instance.learning_container_year.container_type != INTERNSHIP:
                 self.fields['internship_subtype'].disabled = True
 
-        self.fields['campus'].queryset = find_main_campuses()
+        if not external:
+            self.fields['campus'].queryset = find_main_campuses()
         self.fields['language'].queryset = find_all_languages()
 
     class Meta:
@@ -161,14 +162,6 @@ class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
         field_classes = {
             'acronym': PartimAcronymField
         }
-
-
-class ExternalLearningUnitYearModelForm(LearningUnitYearModelForm):
-
-    class Meta(LearningUnitYearModelForm.Meta):
-        fields = ('academic_year', 'acronym', 'specific_title',
-                  'specific_title_english', 'credits',
-                  'status', 'campus', 'language')
 
 
 class LearningContainerYearModelForm(forms.ModelForm):

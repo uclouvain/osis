@@ -31,9 +31,11 @@ from waffle.testutils import override_flag
 
 from base.models.entity_version import EntityVersion
 from base.models.enums.learning_container_year_types import EXTERNAL
+from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
 from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
@@ -51,9 +53,12 @@ class TestUpdateExternalLearningUnitView(TestCase):
         self.client.force_login(self.user)
 
         self.academic_year = create_current_academic_year()
-        self.external = ExternalLearningUnitYearFactory()
-        self.external.learning_unit_year.learning_container_year.container_type = EXTERNAL
-        self.external.learning_unit_year.learning_container_year.save()
+
+        luy = LearningUnitYearFullFactory(academic_year=self.academic_year)
+        self.external = ExternalLearningUnitYearFactory(learning_unit_year=luy)
+
+        luy.learning_container_year.container_type = EXTERNAL
+        luy.learning_container_year.save()
 
         EntityVersionFactory(entity=self.external.requesting_entity)
         PersonEntityFactory(person=self.person, entity=self.external.requesting_entity)
