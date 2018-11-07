@@ -31,7 +31,7 @@ from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.models.enums import learning_component_year_type
 from base.models.learning_component_year import LearningComponentYear
-from base.models.person import EmployeeManager, Person
+from base.models.person import Person
 from base.models.tutor import Tutor
 
 
