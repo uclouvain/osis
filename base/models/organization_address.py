@@ -37,6 +37,9 @@ class OrganizationAddress(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     organization = models.ForeignKey('Organization')
+    # TODO is_main and label are similar.
+    # TODO rename label to type
+    # FIXME Create a FK directly between Organization and Address for main address.
     label = models.CharField(max_length=20)
     location = models.CharField(max_length=255)
     postal_code = models.CharField(max_length=20, blank=True, null=True)
