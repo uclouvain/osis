@@ -308,6 +308,9 @@
             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'experimental_phase' %}.
         </div>
     {% endif %}
+
+    {% include "template_messages.html" %}
+
     {# FIXME ! It is forbidden to add something in the main layout for a specific need. Use messages instead !#}
     {% if warnings %}
         <div class="alert alert-warning" style="margin-bottom: 10px">
@@ -326,8 +329,6 @@
             </div>
         </div>
     {% endif %}
-
-    {% include "template_messages.html" %}
 
     {% block header_content %}
     {% endblock %}
