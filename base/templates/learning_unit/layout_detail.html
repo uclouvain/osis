@@ -1,7 +1,6 @@
-{% extends "learning_unit/layout_detail.html" %}
-{% load staticfiles %}
-{% load i18n bootstrap3 %}
-
+{% extends "layout.html" %}
+{% load i18n %}
+{% load learning_unit %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -26,15 +25,33 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+{% block breadcrumb %}
+    {% include "learning_unit/breadcrumb.html" %}
+{% endblock %}
 
-{% block content_tab %}
-    <div class="panel-body" id="tabs" >
-        <div class="tab-content" id="tab_content">
-            {% url 'learning_unit_pedagogy_edit' learning_unit_year_id=learning_unit_year.id as post_url %}
+{% block content %}
 
-            {% include "learning_unit/blocks/panel/educational_informations.html" %}
+    {% include "learning_unit/blocks/header.html" %}
+    {% if messages_deletion %}
+        {% include "learning_unit/deletion_msg.html" %}
+    {% endif %}
+    <div class="panel panel-default">
+        <div class="panel-heading text-right">
+            {% block action_top %}
+            {% endblock %}
+        </div>
+        <div class="panel-body" id="tabs">
+            {% block tabs %}
+                {% include "learning_unit/blocks/tabs.html" %}
+            {% endblock tabs %}
+
+            <div class="tab-content">
+                {% block content_tab %}{% endblock %}
+            </div>
+        </div>
+        <div class="panel-footer text-right">
+            {% block action_bottom %}
+            {% endblock %}
         </div>
     </div>
-
-<div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
 {% endblock %}
