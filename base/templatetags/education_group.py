@@ -40,6 +40,7 @@ from base.business.education_groups.perms import is_eligible_to_delete_education
     is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_change_achievement, \
     is_eligible_to_delete_achievement, is_eligible_to_postpone_education_group
+from base.models.academic_year import AcademicYear
 from base.models.enums.learning_unit_year_periodicity import BIENNIAL_EVEN, BIENNIAL_ODD, ANNUAL
 
 OPTIONAL_PNG = base.STATIC_URL + 'img/education_group_year/optional.png'
@@ -152,10 +153,18 @@ def li_with_create_perm_group(context, url, message, url_id="link_create_group")
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
-def li_with_postpone_perm_training(context, url, url_id="link_postpone_training"):
+def li_with_postpone_perm_training(context, url_id="link_postpone_training"):
+    root = context['root']
     education_group_year = context['education_group_year']
+    url = reverse('postpone_education_group', args=[root.pk, education_group_year.pk])
+
+    try:
+        last_academic_year = education_group_year.academic_year.past()
+    except AcademicYear.DoesNotExist:
+        last_academic_year = "last year"
+
     message = _('Copy the content from %(previous_anac)s to %(current_anac)s') % {
-        'previous_anac':  str(education_group_year.academic_year.past()),
+        'previous_anac':  str(last_academic_year),
         'current_anac':  str(education_group_year.academic_year)
 
     }

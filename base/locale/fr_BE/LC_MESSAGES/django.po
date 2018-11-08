@@ -3299,10 +3299,16 @@ msgstr "Êtes-vous sûr·e de vouloir détacher ce contenu?"
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr "Êtes-vous sûr·e de vouloir reporter le contenu dans %(root)s?"
 
-msgid "%(count)d education group has been postponed with success"
-msgid_plural "%(count)d education groups have been postponed with success"
-msgstr[0] "%(count)d formation a été reportée avec succès"
-msgstr[1] "%(count)d formations ont été reportées avec succès"
+msgid "%(count)d education group has been postponed with success."
+msgid_plural "%(count)d education groups have been postponed with success."
+msgstr[0] "%(count)d formation a été reportée avec succès."
+msgstr[1] "%(count)d formations ont été reportées avec succès."
+
+msgid "You are not allowed to postpone this training in the past."
+msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le passé."
+
+msgid "You are not allowed to postpone this training in the future."
+msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le future."
 
 msgid "The education group is not a training."
 msgstr "L'organisation de formation n'est pas une formation."

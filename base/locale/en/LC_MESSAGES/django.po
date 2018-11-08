@@ -3306,8 +3306,8 @@ msgstr ""
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr ""
 
-msgid "%(count)d education group has been postponed with success"
-msgid_plural "%(count)d education groups have been postponed with success"
+msgid "%(count)d education group has been postponed with success."
+msgid_plural "%(count)d education groups have been postponed with success."
 msgstr[0] ""
 msgstr[1] ""
 

@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from gettext import ngettext
 
 from dal import autocomplete
 from django import forms
@@ -31,7 +30,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ngettext
 from waffle.decorators import waffle_flag
 
 from base import models as mdl_base
@@ -219,20 +218,17 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
         return context
 
     def post(self, request, **kwargs):
-        success = ""
-        error = ""
         try:
             postponer = PostponeContent(self.get_root().previous_year())
             postponer.postpone()
             count = len(postponer.result)
             success = ngettext(
-                '%(count)d education group has been postponed with success',
-                '%(count)d education groups have been postponed with success', count
+                "%(count)d education group has been postponed with success.",
+                "%(count)d education groups have been postponed with success.", count
             ) % {'count': count}
             display_success_messages(request, success)
         except NotPostponeError as e:
-            error = str(e)
-            display_error_messages(request, error)
+            display_error_messages(request, str(e))
 
         return redirect(reverse(
                 "education_group_read",
