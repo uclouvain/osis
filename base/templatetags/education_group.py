@@ -192,7 +192,7 @@ def _get_permission(context, permission):
     return permission_denied_message, "" if result else "disabled", root
 
 
-@register.inclusion_tag('blocks/button/button_with_perm.html', takes_context=True)
+@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def button_edit_administrative_data(context):
     education_group_year = context.get('education_group_year')
 
