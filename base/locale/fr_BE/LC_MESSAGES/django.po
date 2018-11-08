@@ -4178,3 +4178,6 @@ msgstr "Impossible de récupérer les sections pertinentes pour le programme con
 
 msgid "Indicate the name or the FGS"
 msgstr "Indiquer le nom ou le FGS"
+
+msgid "This learning unit isn't eligible for modification because of it's type"
+msgstr "Cette unité d'enseignement n'est pas éligible pour la modification en raison de son type"
