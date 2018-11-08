@@ -152,7 +152,13 @@ def li_with_create_perm_group(context, url, message, url_id="link_create_group")
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
-def li_with_postpone_perm_training(context, url, message, url_id="link_postpone_training"):
+def li_with_postpone_perm_training(context, url, url_id="link_postpone_training"):
+    education_group_year = context['education_group_year']
+    message = _('Copy the content from %(previous_anac)s to %(current_anac)s') % {
+        'previous_anac':  str(education_group_year.academic_year.past()),
+        'current_anac':  str(education_group_year.academic_year)
+
+    }
     return li_with_permission(context, is_eligible_to_postpone_education_group, url, message, url_id, True)
 
 
