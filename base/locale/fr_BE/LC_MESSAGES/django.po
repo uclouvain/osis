@@ -3296,8 +3296,8 @@ msgstr "Aide"
 msgid "Are you sure you want to detach this content?"
 msgstr "Êtes-vous sûr·e de vouloir détacher ce contenu?"
 
-msgid "Are you sure you want to postpone the content of %(root)s?"
-msgstr "Êtes-vous sûr·e de vouloir reporter le contenu de %(root)s?"
+msgid "Are you sure you want to postpone the content in %(root)s?"
+msgstr "Êtes-vous sûr·e de vouloir reporter le contenu dans %(root)s?"
 
 msgid "%(count)d education group has been postponed with success"
 msgid_plural "%(count)d education groups have been postponed with success"
