@@ -28,8 +28,9 @@ import operator
 
 from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.postgres.search import SearchQuery, SearchVector
-from django.db.models import Q
+from django.contrib.postgres.search import SearchQuery, SearchVector, TrigramSimilarity
+from django.db.models import Q, Value
+from django.db.models.functions import Concat
 
 from base.models.person import Person
 
@@ -37,13 +38,13 @@ from base.models.person import Person
 class EmployeeAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = Person.employees.all()
-
-        # FIXME Use trigram search
         if self.q:
-            search_queries = functools.reduce(operator.and_,
-                                              (SearchQuery(word) for word in self.q.split()))
-            qs = qs.annotate(search=SearchVector("first_name", "middle_name", "last_name")) \
-                .filter(Q(search=search_queries) | Q(global_id=self.q))
+            similarity_expression = TrigramSimilarity(
+                Concat("first_name", Value(" "), "middle_name", Value(" "), "last_name"),
+                self.q
+            )
+            qs = qs.annotate(similarity=similarity_expression) \
+                .filter(Q(similarity__gte=0.3) | Q(global_id=self.q))
 
         return qs.order_by("last_name", "first_name")
 
