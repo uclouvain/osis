@@ -43,8 +43,8 @@ from base.views import learning_unit, offer, common, institution, organization, 
     my_osis, entity, student, notifications
 from base.views import teaching_material
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
-from base.views.learning_units.attribution import DeleteAttribution, EditAttributionView, AddAttribution, \
-    TutorAutocomplete
+from base.views.learning_units.attribution import DeleteAttribution, EditAttributionView, AddAttribution
+from base.views.person import EmployeeAutocomplete
 from base.views.learning_units.charge_repartition import AddChargeRepartition, \
     EditChargeRepartition, SelectAttributionView
 from base.views.learning_units.detail import learning_unit_identification
@@ -65,8 +65,8 @@ urlpatterns = [
         name='country-autocomplete'),
     url(r'^campus-autocomplete/$', CampusAutocomplete.as_view(),
         name='campus-autocomplete'),
-    url(r'^tutor-autocomplete/$', TutorAutocomplete.as_view(),
-        name='tutor_autocomplete'),
+    url(r'^employee-autocomplete/$', EmployeeAutocomplete.as_view(),
+        name='employee_autocomplete'),
     url(r'^academic_actors/$', institution.academic_actors, name='academic_actors'),
 
     url(r'^academic_calendars/', include([

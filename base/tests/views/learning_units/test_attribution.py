@@ -141,8 +141,10 @@ class TestAddAttribution(TestCase):
         self.assertTemplateUsed(response, "learning_unit/attribution_inner.html")
 
     def test_post(self):
+        self.person.employee = True
+        self.person.save()
         data = {
-            'attribution_form-tutor': self.tutor.id,
+            'attribution_form-person': self.tutor.person.id,
             'attribution_form-function': COORDINATOR,
             'attribution_form-start_year': 2018,
             'attribution_form-duration': 3,

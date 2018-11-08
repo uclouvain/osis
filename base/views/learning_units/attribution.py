@@ -23,14 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
-import operator
 
-from dal import autocomplete
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.postgres.search import SearchVector, SearchQuery
-from django.db.models import Prefetch, Q
+from django.db.models import Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -46,7 +41,6 @@ from base.forms.learning_unit.attribution_charge_repartition import AttributionF
 from base.models.enums import learning_component_year_type
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
-from base.models.tutor import Tutor
 from base.views.mixins import AjaxTemplateMixin, RulesRequiredMixin, MultiFormsView, MultiFormsSuccessMessageMixin
 
 
@@ -203,22 +197,3 @@ class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView)
     def get_success_message(self):
         return _("Attribution removed for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
                                                                         "function": _(self.attribution.function)}
-
-
-class TutorAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        qs = Tutor.objects.all()
-
-        # FIXME Use trigram search
-        if self.q:
-            search_queries = functools.reduce(operator.and_,
-                                              (SearchQuery(word) for word in self.q.split()))
-            qs = qs.annotate(search=SearchVector("person__first_name", "person__middle_name", "person__last_name")) \
-                .filter(Q(search=search_queries) | Q(person__global_id=self.q))
-
-        return qs.select_related("person").order_by("person__last_name", "person__first_name")
-
-    def get_result_label(self, result):
-        return "{last_name} {first_name} ({age})".format(last_name=result.person.last_name,
-                                                         first_name=result.person.first_name,
-                                                         age=result.person.age)
