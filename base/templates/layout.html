@@ -316,7 +316,7 @@
         <div class="alert alert-warning" style="margin-bottom: 10px">
             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'warnings_detected' %}
             <a role="button" data-toggle="collapse" href="#CollapseWarnings" aria-expanded="false"
-               aria-controls="collapse_classes" style="border:0;padding:0;">
+               aria-controls="" style="border:0;padding:0;">
                     <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
                           style="color:#8a6d3b"></span>
             </a>
@@ -369,6 +369,11 @@
 </nav>
 
 {% block script %}
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $('#CollapseWarnings').collapse('toggle');
+    });
+    </script>
 {% endblock %}
 
 <script type="text/javascript" src="{% static "js/modal_form_submit.js" %}"></script>
