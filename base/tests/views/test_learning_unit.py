@@ -1253,10 +1253,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/pedagogy.html')
         self.assertIsInstance(response.context['form_french'], LearningUnitPedagogyForm)
         self.assertIsInstance(response.context['form_english'], LearningUnitPedagogyForm)
-        # Verify URL [Specific redirection]
-        self.assertEqual(response.context['create_teaching_material_urlname'], 'teaching_material_create')
-        self.assertEqual(response.context['update_teaching_material_urlname'], 'teaching_material_edit')
-        self.assertEqual(response.context['delete_teaching_material_urlname'], 'teaching_material_delete')
 
     def test_learning_unit_specification(self):
         learning_unit_year = LearningUnitYearFactory()
