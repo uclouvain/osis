@@ -63,6 +63,7 @@ class Person(SerializableModel):
         ('M', _('male')),
         ('U', _('unknown')))
 
+    objects = SerializableModelManager()
     employees = EmployeeManager()
 
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
