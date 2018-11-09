@@ -47,6 +47,9 @@ class PostponeContent:
 
         During the initialization, we'll also check if the current instance has a content to postpone.
         """
+        if not isinstance(instance, EducationGroupYear):
+            raise NotPostponeError(_('You are not allowed to copy the content of this kind of education group.'))
+
         self.instance = instance
         self.current_year = starting_academic_year()
         self.next_academic_year = self.current_year.next()
@@ -57,9 +60,6 @@ class PostponeContent:
         self.instance_n1 = self.get_instance_n1(self.instance)
 
     def check_instance(self):
-        if not isinstance(self.instance, EducationGroupYear):
-            raise NotPostponeError(_('You are not allowed to copy the content of this kind of education group.'))
-
         if self.instance.is_training():
             pass
         elif self.instance.education_group_type.name in MINITRAINING_TO_POSTONE:
