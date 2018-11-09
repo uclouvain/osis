@@ -26,6 +26,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from ordered_model.models import OrderedModel
+from reversion.admin import VersionAdmin
 
 from base.models.abstracts.abstract_education_group_achievement import AbstractEducationGroupAchievement, \
     AbstractEducationGroupAchievementAdmin
@@ -41,7 +42,7 @@ class EducationGroupDetailedAchievementAdmin(AbstractEducationGroupAchievementAd
         return ['education_group_achievement__education_group_year__acronym'] + super().get_search_fields(request)
 
 
-class EducationGroupDetailedAchievement(AbstractEducationGroupAchievement):
+class EducationGroupDetailedAchievement(VersionAdmin, AbstractEducationGroupAchievement):
     education_group_achievement = models.ForeignKey(
         'EducationGroupAchievement',
         verbose_name=_("education group achievement"),

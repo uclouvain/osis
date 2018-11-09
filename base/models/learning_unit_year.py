@@ -31,6 +31,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, ngettext
+from reversion.admin import VersionAdmin
 
 from base.models import entity_container_year as mdl_entity_container_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
@@ -56,7 +57,7 @@ def academic_year_validator(value):
         raise ValidationError(_('learning_unit_creation_academic_year_max_error').format(academic_year_max))
 
 
-class LearningUnitYearAdmin(SerializableModelAdmin):
+class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('external_id', 'acronym', 'specific_title', 'academic_year', 'credits', 'changed', 'structure',
                     'status')
     list_filter = ('academic_year', 'decimal_scores', 'summary_locked')

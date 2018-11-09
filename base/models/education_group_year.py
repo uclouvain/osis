@@ -31,6 +31,7 @@ from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, ngettext
+from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import entity_version
@@ -46,7 +47,7 @@ from base.models.prerequisite import Prerequisite
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class EducationGroupYearAdmin(OsisModelAdmin):
+class EducationGroupYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('acronym', 'title', 'academic_year', 'education_group_type', 'changed')
     list_filter = ('academic_year', 'education_group_type')
     raw_id_fields = (
