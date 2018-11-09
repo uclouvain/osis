@@ -315,11 +315,11 @@
     {% if warnings %}
         <div class="alert alert-warning" style="margin-bottom: 10px">
             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'warnings_detected' %}
-            <a role="button" data-toggle="collapse" href="#CollapseWarnings" aria-expanded="false"
-               aria-controls="" style="border:0;padding:0;">
-                    <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
-                          style="color:#8a6d3b"></span>
-            </a>
+            <button id="btn_expandButton" type="button" class="btn" data-toggle="collapse" data-target="#CollapseWarnings"
+                    style="background-color: transparent;">
+                <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
+                      style="color:#8a6d3b"></span>
+            </button>
             <div class="collapse" id="CollapseWarnings">
                 <ul>
                     {% for warning in warnings %}
@@ -371,7 +371,19 @@
 {% block script %}
     <script type="text/javascript">
     $(document).ready(function(){
+        //To open by default collapse of warnings
         $('#CollapseWarnings').collapse('toggle');
+
+        $("#CollapseWarnings").on("hide.bs.collapse", function(){
+            $(".btn").html('<span id="expandButton" class="glyphicon glyphicon-collapse-down" style="color:#8a6d3b"></span>');
+
+            $("#btn_expandButton").attr("title", gettext("Open"));
+        });
+
+        $("#CollapseWarnings").on("show.bs.collapse", function(){
+            $(".btn").html('<span id="expandButton"  class="glyphicon glyphicon-collapse-up" style="color:#8a6d3b"></span>');
+            $("#btn_expandButton").attr("title", gettext("Collapse"));
+        });
     });
     </script>
 {% endblock %}
