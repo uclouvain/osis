@@ -63,6 +63,10 @@ def is_entity_manager(user):
     return EntityManager.objects.filter(person__user=user).count() > 0
 
 
+def has_perm_entity_manager(user):
+    return user.has_perm('base.is_entity_manager')
+
+
 def find_entities_with_descendants_from_entity_managers(entities_manager):
     entities_with_descendants = []
     entities_by_id = entity_version.build_current_entity_version_structure_in_memory()
