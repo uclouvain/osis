@@ -88,3 +88,9 @@ msgstr ""
 
 msgid "Release"
 msgstr ""
+
+msgid "Open"
+msgstr ""
+
+msgid "Collapse"
+msgstr ""
