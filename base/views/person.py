@@ -40,9 +40,10 @@ class EmployeeAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView)
         qs = Person.employees.all()
         if self.q:
             qs = qs.filter(
-                Q(last_name__icontains=self.q)|
-                Q(first_name__icontains=self.q)|
-                Q(middle_name__icontains=self.q))
+                Q(last_name__icontains=self.q) |
+                Q(first_name__icontains=self.q) |
+                Q(middle_name__icontains=self.q)
+            )
         return qs.order_by("last_name", "first_name")
 
     def get_result_label(self, result):
