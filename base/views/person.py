@@ -39,12 +39,11 @@ class EmployeeAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView)
     def get_queryset(self):
         qs = Person.employees.all()
         if self.q:
-            similarity_expression = TrigramSimilarity(
-                Concat("first_name", Value(" "), "middle_name", Value(" "), "last_name"),
-                self.q
+            qs = qs.filter(
+                Q(last_name__icontains=self.q) |
+                Q(first_name__icontains=self.q) |
+                Q(middle_name__icontains=self.q)
             )
-            qs = qs.annotate(similarity=similarity_expression) \
-                .filter(Q(similarity__gte=0.3) | Q(global_id=self.q))
         return qs.order_by("last_name", "first_name")
 
     def get_result_label(self, result):
