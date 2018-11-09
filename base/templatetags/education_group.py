@@ -40,6 +40,7 @@ from base.business.education_groups.perms import is_eligible_to_delete_education
     is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_change_achievement, \
     is_eligible_to_delete_achievement, is_eligible_to_postpone_education_group
+from base.models.academic_year import AcademicYear
 from base.models.enums.learning_unit_year_periodicity import BIENNIAL_EVEN, BIENNIAL_ODD, ANNUAL
 
 OPTIONAL_PNG = base.STATIC_URL + 'img/education_group_year/optional.png'
@@ -109,13 +110,6 @@ BRANCH_CONSTRAINT = """\
 """
 
 # TODO Use inclusion tags instead
-BUTTON_TEMPLATE = """
-<button title="{}" class="btn btn-default btn-sm" id="{}" data-toggle="tooltip-wrapper" name="action" {}>
-    <i class="fa {}"></i>
-</button>
-"""
-
-# TODO Use inclusion tags instead
 BUTTON_ORDER_TEMPLATE = """
 <button type="submit" title="{}" class="btn btn-default btn-sm" 
     id="{}" data-toggle="tooltip-wrapper" name="action" value="{}" {}>
@@ -159,7 +153,21 @@ def li_with_create_perm_group(context, url, message, url_id="link_create_group")
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
-def li_with_postpone_perm_training(context, url, message, url_id="link_postpone_training"):
+def li_with_postpone_perm_training(context, url_id="link_postpone_training"):
+    root = context['root']
+    education_group_year = context['education_group_year']
+    url = reverse('postpone_education_group', args=[root.pk, education_group_year.pk])
+
+    try:
+        last_academic_year = education_group_year.academic_year.past()
+    except AcademicYear.DoesNotExist:
+        last_academic_year = "last year"
+
+    message = _('Copy the content from %(previous_anac)s to %(current_anac)s') % {
+        'previous_anac':  str(last_academic_year),
+        'current_anac':  str(education_group_year.academic_year)
+
+    }
     return li_with_permission(context, is_eligible_to_postpone_education_group, url, message, url_id, True)
 
 
@@ -199,7 +207,7 @@ def _get_permission(context, permission):
     return permission_denied_message, "" if result else "disabled", root
 
 
-@register.inclusion_tag('blocks/button/button_with_perm.html', takes_context=True)
+@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def button_edit_administrative_data(context):
     education_group_year = context.get('education_group_year')
 
@@ -232,14 +240,20 @@ def button_order_with_permission(context, title, id_button, value):
     return mark_safe(BUTTON_ORDER_TEMPLATE.format(title, id_button, value, disabled, ICONS[value]))
 
 
-@register.simple_tag(takes_context=True)
-def button_with_permission(context, title, id_a, value):
+@register.inclusion_tag("blocks/button/button_template.html", takes_context=True)
+def button_with_permission(context, title, value, url):
     permission_denied_message, disabled, root = _get_permission(context, is_eligible_to_change_education_group)
 
     if disabled:
         title = permission_denied_message
 
-    return mark_safe(BUTTON_TEMPLATE.format(title, id_a, disabled, ICONS[value]))
+    return {
+        'load_modal': True,
+        'title': title,
+        'class_button': "btn-default btn-sm " + disabled,
+        'icon': ICONS[value],
+        'url': url,
+    }
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
@@ -371,28 +385,13 @@ def url_resolver_match(context):
 
 
 @register.simple_tag(takes_context=True)
-def link_detach_education_group(context):
-    return _custom_link_education_group(context, action="Detach", onclick="""onclick="select()" """)
-
-
-@register.inclusion_tag('blocks/button/li_template.html')
-def link_pdf_content_education_group(url):
-    action = _("Generate pdf")
-
-    return {
-        "class_li": "",
-        "load_modal": True,
-        "url": url,
-        "id_li": "btn_operation_pdf_content",
-        "title": action,
-        "text": action,
-    }
-
-
-def _custom_link_education_group(context, action, onclick):
+def link_detach_education_group(context, url):
+    onclick = """onclick="select()" """
+    action = "Detach"
     if context['can_change_education_group'] and context['group_to_parent'] != '0':
-        li_attributes = """ id="btn_operation_detach_{group_to_parent}" """.format(
-            group_to_parent=context['group_to_parent']
+        li_attributes = """ id="btn_operation_detach_{group_to_parent}" class="trigger_modal" data-url={url} """.format(
+            group_to_parent=context['group_to_parent'],
+            url=url,
         )
         a_attributes = """ href="#" title="{title}" {onclick} """.format(title=_(action), onclick=onclick)
     else:
@@ -418,6 +417,20 @@ def _custom_link_education_group(context, action, onclick):
             text=text,
         )
     )
+
+
+@register.inclusion_tag('blocks/button/li_template.html')
+def link_pdf_content_education_group(url):
+    action = _("Generate pdf")
+
+    return {
+        "class_li": "",
+        "load_modal": True,
+        "url": url,
+        "id_li": "btn_operation_pdf_content",
+        "title": action,
+        "text": action,
+    }
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=True)

@@ -23,49 +23,108 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.forms import ModelForm, formset_factory, BaseFormSet
+from dal import autocomplete
+from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
+from attribution.models.attribution_new import AttributionNew
+from base.models.enums import learning_component_year_type
 from base.models.learning_component_year import LearningComponentYear
+from base.models.person import Person
+from base.models.tutor import Tutor
 
 
-class AttributionChargeRepartitionForm(ModelForm):
+class AttributionForm(forms.ModelForm):
+    duration = forms.IntegerField(min_value=1, required=True, label=_("duration"))
+
+    class Meta:
+        model = AttributionNew
+        fields = ["function", "start_year"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["start_year"].required = True
+        if self.instance:
+            self.fields["duration"].initial = self.instance.duration
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.end_year = instance.start_year + self.cleaned_data["duration"] - 1
+        if commit:
+            instance.save()
+        return instance
+
+
+class AttributionCreationForm(AttributionForm):
+    person = forms.ModelChoiceField(
+        queryset=Person.employees.all(),
+        required=True,
+        widget=autocomplete.ModelSelect2(
+            url='employee_autocomplete',
+            attrs={
+                'data-theme': 'bootstrap',
+                'data-width': 'null',
+                'data-placeholder': _('Indicate the name or the FGS')
+            }
+        ),
+        label=_('tutor'),
+    )
+
+    class Meta:
+        model = AttributionNew
+        fields = ["person", "function", "start_year"]
+
+    class Media:
+        css = {
+            'all': ('css/select2-bootstrap.css',)
+        }
+
+    def save(self, commit=True, **kwargs):
+        luy = kwargs.pop("learning_unit_year")
+        instance = super().save(commit=False)
+        instance.learning_container_year = luy.learning_container_year
+        tutor, create = Tutor.objects.get_or_create(person=self.cleaned_data["person"])
+        instance.tutor = tutor
+        if commit:
+            instance.save()
+        return instance
+
+
+class AttributionChargeForm(forms.ModelForm):
+    component_type = None
+
     class Meta:
         model = AttributionChargeNew
         fields = ["allocation_charge"]
 
-    def save(self, attribution_new_obj, luy_obj, component_type):
+    def save(self, commit=True, **kwargs):
+        attribution_new_obj = kwargs.pop("attribution")
+        luy_obj = kwargs.pop("learning_unit_year")
+        learning_component_year = LearningComponentYear.objects.get(type=self.component_type,
+                                                                    learningunitcomponent__learning_unit_year=luy_obj)
+
         attribution_charge_obj = super().save(commit=False)
-
-        learning_component_year = LearningComponentYear.objects.get(
-            type=component_type,
-            learningunitcomponent__learning_unit_year=luy_obj
-        )
-
         attribution_charge_obj.attribution = attribution_new_obj
         attribution_charge_obj.learning_component_year = learning_component_year
-        attribution_charge_obj.save()
-
+        if commit:
+            attribution_charge_obj.save()
         return attribution_charge_obj
 
 
-AttributionChargeRepartitionFormSet = formset_factory(AttributionChargeRepartitionForm, max_num=2, min_num=2)
+class LecturingAttributionChargeForm(AttributionChargeForm):
+    component_type = learning_component_year_type.LECTURING
+
+    class Meta(AttributionChargeForm.Meta):
+        labels = {
+            'allocation_charge': _("Volume 1"),
+        }
 
 
-class AttributionChargeNewForm(ModelForm):
-    class Meta:
-        model = AttributionChargeNew
-        fields = ["allocation_charge"]
+class PracticalAttributionChargeForm(AttributionChargeForm):
+    component_type = learning_component_year_type.PRACTICAL_EXERCISES
 
-
-class BaseAttributionChargeNewFormSet(BaseFormSet):
-    def get_form_kwargs(self, index):
-        kwargs = super().get_form_kwargs(index)
-        kwargs["instance"] = kwargs["instances"][index]
-        del kwargs["instances"]
-        return kwargs
-
-
-AttributionChargeNewFormSet = formset_factory(AttributionChargeNewForm, formset=BaseAttributionChargeNewFormSet,
-                                              max_num=2,
-                                              min_num=2)
+    class Meta(AttributionChargeForm.Meta):
+        labels = {
+            'allocation_charge': _("Volume 2"),
+        }

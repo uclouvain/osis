@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
-{% load staticfiles %}
 {% load i18n %}
+{% load learning_unit %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -26,20 +26,32 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-{% include "learning_unit/breadcrumb.html" %}
+    {% include "learning_unit/breadcrumb.html" %}
 {% endblock %}
 
 {% block content %}
 
-{% include "learning_unit/blocks/header.html" %}
-<div class="panel panel-default" >
-    <div class="panel-body" id="tabs" >
-        {% include "learning_unit/blocks/tabs.html" %}
-        <div class="tab-content" id="tab_content">
-            <div role="tabpanel" class="tab-pane active" id="attributions">
-                {% include "learning_unit/add_charge_repartition_inner.html" %}
+    {% include "learning_unit/blocks/header.html" %}
+    {% if messages_deletion %}
+        {% include "learning_unit/deletion_msg.html" %}
+    {% endif %}
+    <div class="panel panel-default">
+        <div class="panel-heading text-right">
+            {% block action_top %}
+            {% endblock %}
+        </div>
+        <div class="panel-body" id="tabs">
+            {% block tabs %}
+                {% include "learning_unit/blocks/tabs.html" %}
+            {% endblock tabs %}
+
+            <div class="tab-content">
+                {% block content_tab %}{% endblock %}
             </div>
         </div>
+        <div class="panel-footer text-right">
+            {% block action_bottom %}
+            {% endblock %}
+        </div>
     </div>
-</div>
 {% endblock %}

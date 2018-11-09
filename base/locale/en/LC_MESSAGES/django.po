@@ -3303,15 +3303,15 @@ msgstr ""
 msgid "Are you sure you want to detach this content?"
 msgstr ""
 
-msgid "Are you sure you want to postpone the content of %(root)s?"
+msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr ""
 
-msgid "%(count)d education group has been postponed with success"
-msgid_plural "%(count)d education groups have been postponed with success"
+msgid "%(count)d education group has been postponed with success."
+msgid_plural "%(count)d education groups have been postponed with success."
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "The education group is not a training."
+msgid "You are not allowed to copy the content of this kind of education group."
 msgstr ""
 
 msgid "The end date of the education group is smaller than the year of postponement."
@@ -3326,7 +3326,7 @@ msgstr ""
 msgid "The content has already been postponed."
 msgstr ""
 
-msgid "Copy the content"
+msgid "Copy the content from %(previous_anac)s to %(current_anac)s"
 msgstr ""
 
 msgid "detach"
@@ -4065,13 +4065,22 @@ msgstr ""
 msgid "The coorganization has been created"
 msgstr ""
 
+msgid "Attribution added for %(tutor)s (%(function)s)"
+msgstr ""
+
+msgid "Attribution modified for %(tutor)s (%(function)s)"
+msgstr ""
+
 msgid "Repartition added for %(tutor)s (%(function)s)"
 msgstr ""
 
 msgid "Repartition modified for %(tutor)s (%(function)s)"
 msgstr ""
 
-msgid "Repartition removed for %(tutor)s (%(function)s)"
+msgid "Attribution removed for %(tutor)s (%(function)s)"
+msgstr ""
+
+msgid "Add attribution"
 msgstr ""
 
 msgid "Manage repartition"
@@ -4101,3 +4110,66 @@ msgstr "This program has no page to publish on it"
 
 msgid "The program are published. Click on the link to display it : "
 msgstr "The program are published. Click on the link to display it : "
+
+msgid "You can't modify learning unit under year : %(year)d"
+msgstr ""
+
+msgid "You can only modify a learning unit when your are linked to its requirement entity"
+msgstr ""
+
+msgid "Existing proposal in epc"
+msgstr ""
+
+msgid "You can't modify end date of a previous year"
+msgstr ""
+
+msgid "This learning unit is not eligible for proposal creation/modification"
+msgstr ""
+
+msgid "This learning unit isn't eligible for end date modification"
+msgstr ""
+
+msgid "Isn't a proposal"
+msgstr ""
+
+msgid "Proposal isn't on current learning unit year"
+msgstr ""
+
+msgid "Not in range of years which can be edited by you"
+msgstr ""
+
+msgid "Person not in accordance with proposal state"
+msgstr ""
+
+msgid "You are not eligible to modify the end date of this learning unit. You should be central manager or the learning unit has to be a partim or the learning unit as to be a course/dissertation/internship"
+msgstr ""
+
+msgid "You are not eligible to consolidate proposal"
+msgstr ""
+
+msgid "You dont' have the rights to consolidate"
+msgstr ""
+
+msgid "Proposal not in eligible state for consolidation"
+msgstr ""
+
+msgid "Can delete according to the type of the learning unit"
+msgstr ""
+
+msgid "You are not eligible to create/modify proposal"
+msgstr ""
+
+msgid "Volume 1"
+msgstr ""
+
+msgid "Volume 2"
+msgstr ""
+
+msgid "Unable to retrieve appropriate sections for this programs"
+msgstr "Unable to retrieve appropriate sections for this programs"
+
+msgid "Indicate the name or the FGS"
+msgstr ""
+
+msgid "This learning unit isn't eligible for modification because of it's type"
+msgstr ""

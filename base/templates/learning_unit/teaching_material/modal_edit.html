@@ -24,25 +24,23 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<div class="modal-dialog" role="document">
-    <div class="modal-content">
-        <form method="POST" action="{{ request.path }}">
-            {% csrf_token %}
-            <div class="modal-header">
-                <h4>{% trans 'Teaching material' %}</h4>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    {% bootstrap_field form.title form_group_class="col-md-12" %}
-                </div>
-                <div class="row">
-                    {% bootstrap_field form.mandatory  form_group_class="col-md-12" %}
-                </div>
-             </div>
-             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "cancel" %}</button>
-                <button type="submit" class="btn btn-primary">{% trans "save" %}</button>
-             </div>
-        </form>
+
+<form method="POST" action="{{ request.path }}">
+    {% csrf_token %}
+    <div class="modal-header">
+        <h4>{% trans 'Teaching material' %}</h4>
     </div>
-</div>
+    <div class="modal-body">
+        <div class="row">
+            {% bootstrap_field form.title form_group_class="col-md-12" %}
+        </div>
+        <div class="row">
+            {% bootstrap_field form.mandatory form_group_class="col-md-12" %}
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">{% trans "save" %}</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "cancel" %}</button>
+    </div>
+</form>
+

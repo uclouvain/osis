@@ -22,7 +22,7 @@ function isValueEmpty(html_id){
 
 
 function isDisabledField(html_id){
-    return document.getElementById(html_id).disabled === true
+    return $("#"+html_id).is(':disabled');
 }
 
 

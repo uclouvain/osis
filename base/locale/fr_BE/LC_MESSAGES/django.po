@@ -2973,10 +2973,10 @@ msgid "warnings_detected"
 msgstr "Nous avons détecté des incohérences dans les données suivantes :"
 
 msgid "Volumes are inconsistent"
-msgstr "Les volumes sont inconsistants"
+msgstr "Les volumes sont incohérents"
 
 msgid "Volumes of {} are inconsistent"
-msgstr "Les volumes de {} sont inconsistants"
+msgstr "Les volumes de {} sont incohérents"
 
 msgid "planned classes cannot be 0 while volume is greater than 0"
 msgstr "le nombre de classes prévues ne peut être 0 si le volume est supérieur à 0"
@@ -3296,16 +3296,22 @@ msgstr "Aide"
 msgid "Are you sure you want to detach this content?"
 msgstr "Êtes-vous sûr·e de vouloir détacher ce contenu?"
 
-msgid "Are you sure you want to postpone the content of %(root)s?"
-msgstr "Êtes-vous sûr·e de vouloir reporter le contenu de %(root)s?"
+msgid "Are you sure you want to postpone the content in %(root)s?"
+msgstr "Êtes-vous sûr·e de vouloir reporter le contenu dans %(root)s?"
 
-msgid "%(count)d education group has been postponed with success"
-msgid_plural "%(count)d education groups have been postponed with success"
-msgstr[0] "%(count)d formation a été reportée avec succès"
-msgstr[1] "%(count)d formations ont été reportées avec succès"
+msgid "%(count)d education group has been postponed with success."
+msgid_plural "%(count)d education groups have been postponed with success."
+msgstr[0] "%(count)d formation a été reportée avec succès."
+msgstr[1] "%(count)d formations ont été reportées avec succès."
 
-msgid "The education group is not a training."
-msgstr "L'organisation de formation n'est pas une formation."
+msgid "You are not allowed to postpone this training in the past."
+msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le passé."
+
+msgid "You are not allowed to postpone this training in the future."
+msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le futur."
+
+msgid "You are not allowed to copy the content of this kind of education group."
+msgstr "Vous n'êtes pas autorisé de copier le contenu de ce type d'organisation de formation."
 
 msgid "The end date of the education group is smaller than the year of postponement."
 msgstr "La date de fin de la formation est plus petite que l'année de report."
@@ -3319,8 +3325,8 @@ msgstr "La racine n'existe pas dans l'anné academique suivante."
 msgid "The content has already been postponed."
 msgstr "Le contenu a déjà été reporté."
 
-msgid "Copy the content"
-msgstr "Recopier le contenu"
+msgid "Copy the content from %(previous_anac)s to %(current_anac)s"
+msgstr "Recopier le contenu de %(previous_anac)s à %(current_anac)s"
 
 msgid "detach"
 msgstr "détacher"
@@ -4057,14 +4063,23 @@ msgstr "Institution de référence"
 msgid "EDITION_OF_GENERAL_INFORMATION"
 msgstr "Modification des informations générales"
 
+msgid "Attribution added for %(tutor)s (%(function)s)"
+msgstr "Attribution ajoutée pour %(tutor)s (%(function)s)"
+
+msgid "Attribution modified for %(tutor)s (%(function)s)"
+msgstr "Attribution modifiée pour %(tutor)s (%(function)s)"
+
 msgid "Repartition added for %(tutor)s (%(function)s)"
 msgstr "Répartition ajoutée pour %(tutor)s (%(function)s)"
 
 msgid "Repartition modified for %(tutor)s (%(function)s)"
 msgstr "Répartition modifiée pour %(tutor)s (%(function)s)"
 
-msgid "Repartition removed for %(tutor)s (%(function)s)"
-msgstr "Répartition supprimée pour %(tutor)s (%(function)s)"
+msgid "Attribution removed for %(tutor)s (%(function)s)"
+msgstr "Attribution supprimée pour %(tutor)s (%(function)s)"
+
+msgid "Add attribution"
+msgstr "Ajouter attribution"
 
 msgid "Manage repartition"
 msgstr "Gérer la répartition"
@@ -4109,3 +4124,66 @@ msgstr "Ce programme n'a pas de page sur laquelle le publier"
 
 msgid "The program are published. Click on the link to display it : "
 msgstr "Le programme a été publié. Cliquez sur le lien pour l'afficher : "
+
+msgid "You can't modify learning unit under year : %(year)d"
+msgstr "Vous ne pouvez pas modifier une unité d'enseignement dont l'année est inférieure à %(year)d"
+
+msgid "You can only modify a learning unit when your are linked to its requirement entity"
+msgstr "Vous ne pouvez modifier une unité d'enseignement qui si vous êtes attaché à son entité responsable du cahier des charges"
+
+msgid "Existing proposal in epc"
+msgstr "Il existe des propositions dans EPC"
+
+msgid "You can't modify end date of a previous year"
+msgstr "Vous ne pouvez pas modifier la date de fin pour une année précédente"
+
+msgid "This learning unit is not eligible for proposal creation/modification"
+msgstr "Cette unité d'enseignement n'est pas éligible pour une création/modification de proposition"
+
+msgid "This learning unit isn't eligible for end date modification"
+msgstr "Cette unité d'enseignement n'est pas éligible pour un modification de date de fin"
+
+msgid "Isn't a proposal"
+msgstr "Ce n'est pas une proposition"
+
+msgid "Proposal isn't on current learning unit year"
+msgstr "La proposition n'est pas sur l'année en cours"
+
+msgid "Not in range of years which can be edited by you"
+msgstr "L'unité d'enseignement n'est pas dans la fourchette d'années que vous pouvez modifier"
+
+msgid "Person not in accordance with proposal state"
+msgstr ""
+
+msgid "You are not eligible to modify the end date of this learning unit. You should be central manager or the learning unit has to be a partim or the learning unit as to be a course/dissertation/internship"
+msgstr "Vous ne pouvez pas modifier la date de fin de cette unité d'enseignement. Vous devriez être gestionnaire central ou la ue devrait être un partim ou encore l'unité d'enseignement devrait être un cours/mémoire/stage"
+
+msgid "You are not eligible to consolidate proposal"
+msgstr "Vous ne pouvez pas consoilder les propositions"
+
+msgid "You dont' have the rights to consolidate"
+msgstr "Vous n'avez pas le droit de consolider"
+
+msgid "Proposal not in eligible state for consolidation"
+msgstr "La proposition n'est pas dans un état éligible à la consolidation"
+
+msgid "Can delete according to the type of the learning unit"
+msgstr "Vous ne pouvez pas supprimer cette unité d'enseignement en raison de son type"
+
+msgid "You are not eligible to create/modify proposal"
+msgstr "Vous ne pouvez pas créer/modifier les propositions"
+
+msgid "Volume 1"
+msgstr ""
+
+msgid "Volume 2"
+msgstr ""
+
+msgid "Unable to retrieve appropriate sections for this programs"
+msgstr "Impossible de récupérer les sections pertinentes pour le programme consulté"
+
+msgid "Indicate the name or the FGS"
+msgstr "Indiquer le nom ou le FGS"
+
+msgid "This learning unit isn't eligible for modification because of it's type"
+msgstr "Cette unité d'enseignement n'est pas éligible pour la modification en raison de son type"

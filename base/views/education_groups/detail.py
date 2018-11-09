@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import json
+
 import requests
 from collections import OrderedDict, namedtuple
 
@@ -40,7 +41,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView
 from django.urls import reverse
 
-from backoffice.settings.local import URL_TO_PUBLISH
 from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
 from base.business.education_groups import perms
@@ -194,20 +194,23 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         Section = namedtuple('Section', 'title labels')
         user_language = mdl.person.get_user_interface_language(self.request.user)
         sections_with_translated_labels = []
+        sections_list = self.get_appropriate_sections()
         for section in settings.SECTION_LIST:
             translated_labels = self.get_translated_labels_and_content(section,
                                                                        user_language,
-                                                                       common_education_group_year)
+                                                                       common_education_group_year,
+                                                                       sections_list)
 
             sections_with_translated_labels.append(Section(section.title, translated_labels))
         return sections_with_translated_labels
 
-    def get_translated_labels_and_content(self, section, user_language, common_education_group_year):
+    def get_translated_labels_and_content(self, section, user_language, common_education_group_year, sections_list):
         records = []
         for label, selectors in section.labels:
-            records.extend(
-                self.get_selectors(common_education_group_year, label, selectors, user_language)
-            )
+            if not sections_list or label in sections_list:
+                records.extend(
+                    self.get_selectors(common_education_group_year, label, selectors, user_language)
+                )
         return records
 
     def get_selectors(self, common_education_group_year, label, selectors, user_language):
@@ -248,11 +251,41 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             english: en_translated_text.text if en_translated_text else None,
         }
 
+    def get_appropriate_sections(self):
+        education_group_year = self.object
+        minor = education_group_year.is_minor
+        deep = education_group_year.is_deepening
+        special = minor or deep
+        if special:
+            code = education_group_year.partial_acronym
+            if minor:
+                type_education_group_year = "-min"
+            elif deep:
+                type_education_group_year = "-app"
+        else:
+            code = education_group_year.acronym
+            type_education_group_year = ""
+        url = settings.URL_TO_GET_SECTIONS.format(
+            type=type_education_group_year,
+            anac=education_group_year.academic_year.year,
+            code=code
+        )
+        try:
+            sections_request = requests.get(url, timeout=settings.REQUESTS_TIMEOUT).json()
+        except (json.JSONDecodeError, TimeoutError, requests.exceptions.ConnectionError):
+            display_error_messages(self.request, _("Unable to retrieve appropriate sections for this programs"))
+            sections_request = {'sections': []}
+        return sections_request['sections']
 
+
+@login_required
 def publish(request, education_group_year_id, root_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    url = URL_TO_PUBLISH.format(anac=education_group_year.academic_year.year, code=education_group_year.acronym)
-    publish_request = requests.get(url)
+    url = settings.URL_TO_PUBLISH.format(
+        anac=education_group_year.academic_year.year,
+        code=education_group_year.acronym
+    )
+    publish_request = requests.get(url, timeout=settings.REQUESTS_TIMEOUT)
     if publish_request.status_code == HttpResponseNotFound.status_code:
         display_error_messages(request, _("This program has no page to publish on it"))
     else:

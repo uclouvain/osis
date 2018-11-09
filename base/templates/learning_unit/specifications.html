@@ -1,6 +1,6 @@
-{% extends "layout.html" %}
-{% load staticfiles %}
-{% load i18n %}
+{% extends "learning_unit/layout_detail.html" %}
+{% load staticfiles getattr %}
+{% load i18n index %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -25,82 +25,188 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block breadcrumb %}
-{% include "learning_unit/breadcrumb.html" %}
-{% endblock %}
 
-{% load getattr %}
-
-{% block content %}
-
-{% include "learning_unit/blocks/header.html" %}
-<div class="panel panel-default" >
-    <div class="panel-body" id="tabs" >
-        {% include "learning_unit/blocks/tabs.html" %}
-
-        <div class="tab-content" id="tab_content">
-            <div role="tabpanel" class="tab-pane active" id="specifications">
-                <div class="row" style="margin-top:10px;">
-                    <div class="col-md-2">
-                        <label> {% trans 'language'%} </label>
-                    </div>
-                    <div class="col-md-5">
-                        <label> {{ form_french.language.1 }} </label>
-                    </div>
-                    <div class="col-md-5">
-                        <label> {{ form_english.language.1 }} </label>
-                    </div>
-                </div>
-                <hr/>
-                {% for label_key, label_translated in cms_labels_translated.items %}
-                    <div class="row" style="margin-top:10px;">
-                        <div class="col-md-2">
-                            <label> {{ label_translated }} </label>
-                        </div>
-                        <div class="col-md-5">
-                            {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement%}
-                            <a class="specification-edit-btn pull-right" href="#"
-                               data-form="{% url 'learning_unit_specifications_edit' learning_unit_year_id=learning_unit_year.id %}?language={{form_french.language.0}}&label={{label_key}}"
-                               title="{% trans 'edit' %}">
-                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                            </a>
-                            {% endif %}
-
-                            {{ form_french|getattr:label_key }}
-                        </div>
-                        <div class="col-md-5">
-                            {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
-                            <a class="specification-edit-btn pull-right" href="#"
-                               data-form="{% url 'learning_unit_specifications_edit' learning_unit_year_id=learning_unit_year.id %}?language={{form_english.language.0}}&label={{label_key}}"
-                               title="{% trans 'edit' %}">
-                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                            </a>
-                            {% endif %}
-
-                            {{ form_english|getattr:label_key }}
-                        </div>
-                    </div>
-                    <hr/>
-                {% endfor %}
-            {% include 'learning_unit/achievements.html' %}
+{% block content_tab %}
+    <div role="tabpanel" class="tab-pane active" id="specifications">
+        <div class="row" style="margin-top:10px;">
+            <div class="col-md-2">
+                <label> {% trans 'language' %} </label>
+            </div>
+            <div class="col-md-5">
+                <label> {{ form_french.language.1 }} </label>
+            </div>
+            <div class="col-md-5">
+                <label> {{ form_english.language.1 }} </label>
             </div>
         </div>
+        <hr/>
+        {% for label_key, label_translated in cms_labels_translated.items %}
+            <div class="row" style="margin-top:10px;">
+                <div class="col-md-2">
+                    <label> {{ label_translated }} </label>
+                </div>
+                <div class="col-md-5">
+                    {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
+                        <a class="trigger_modal pull-right"
+                           data-url="{% url 'learning_unit_specifications_edit' learning_unit_year_id=learning_unit_year.id %}?language={{ form_french.language.0 }}&label={{ label_key }}"
+                           data-modal_class="modal-lg"
+                           title="{% trans 'edit' %}">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                        </a>
+                    {% endif %}
+
+                    {{ form_french|getattr:label_key }}
+                </div>
+                <div class="col-md-5">
+                    {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
+                        <a class="trigger_modal pull-right" href="#"
+                           data-url="{% url 'learning_unit_specifications_edit' learning_unit_year_id=learning_unit_year.id %}?language={{ form_english.language.0 }}&label={{ label_key }}"
+                           data-modal_class="modal-lg"
+                           title="{% trans 'edit' %}">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                        </a>
+                    {% endif %}
+
+                    {{ form_english|getattr:label_key }}
+                </div>
+            </div>
+            <hr/>
+        {% endfor %}
+        <form method="post" action="{% url 'achievement_management' learning_unit_year_id=learning_unit_year.id %}"
+              id="form_achievements">
+            {% csrf_token %}
+            <input type="hidden" id="hdn_achievement_id" name="achievement_id"/>
+            <div class="row" style="margin-top:10px;">
+                <div class="col-md-2">
+                    <label>{% trans 'learning_achievements' %}</label>
+                    {% if not achievements_FR and can_update_learning_achievement %}
+                        <a class="btn btn-info btn-sm trigger_modal"
+                           data-url="{% url 'achievement_create_first' learning_unit_year_id=learning_unit_year.id %}?language_code=FR"
+                           data-modal_class="modal-lg"
+                           title="{% trans 'create' %}">
+                            {% trans 'add_another' %}
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="col-md-10">
+                    {% if achievements_FR %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% language LANGUAGE_CODE_FR %}
+                                    <label>{% trans 'learning_achievements_headline' %}</label>
+                                {% endlanguage %}
+                            </div>
+                            <div class="col-md-6">
+                                {% language LANGUAGE_CODE_EN %}
+                                    <label>{% trans 'learning_achievements_headline' %}</label>
+                                {% endlanguage %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% for achievement in achievements_FR %}
+                <a id="anchor_{{ achievement.id }}"></a>
+                <div class="row">
+                    <div class="col-md-2">
+                        {% if can_update_learning_achievement %}
+                            <div class="btn-group">
+                                <button type="submit" title="{% trans 'up' %}" class="btn btn-default btn-sm"
+                                        id="btn_operation_up_{{ achievement.id }}"
+                                        name="action" value="up"
+                                        {% if forloop.counter0 == 0 %}disabled{% endif %}>
+                                    <i class="fa fa-arrow-up"></i>
+                                </button>
+                                <button type="submit" title="{% trans 'down' %}" class="btn btn-default btn-sm"
+                                        id="btn_operation_down_{{ achievement.id }}"
+                                        name="action" value="down" {% if forloop.last %}disabled{% endif %}>
+                                    <i class="fa fa-arrow-down"></i>
+                                </button>
+
+                                <button type="submit" title="{% trans 'delete' %}"
+                                        class="btn btn-default btn-sm"
+                                        id="btn_operation_delete_{{ achievement.id }}"
+                                        name="action" value="delete">
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                    <i class="fa fa-arrow-remove"></i>
+                                </button>
+                            </div>
+                            <br>
+                            {{ achievement.code_name }}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-10">
+                        <div class="row" style="margin-top:10px;">
+                            <div class="col-md-5">{{ achievement.text| default_if_none:''|safe }}</div>
+                            <div class="col-md-1">
+                                {% if can_update_learning_achievement %}
+                                    <a class="trigger_modal pull-right"
+                                       data-url="{% url 'achievement_edit' learning_unit_year_id=learning_unit_year.id learning_achievement_id=achievement.id %}"
+                                       data-modal_class="modal-lg"
+                                       title="{% trans 'edit' %}">
+                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                    </a>
+
+                                {% endif %}
+                            </div>
+                            <div class="col-md-5">
+                                {% with achievement_en=achievements_EN|index:forloop.counter0 %}
+                                    {% if achievement_en %}
+                                        <a id="anchor_{{ achievement_en.id }}"></a>
+                                        {{ achievement_en.text| default_if_none:''|safe }}
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                            <div class="col-md-1">
+                                {% if can_update_learning_achievement %}
+                                    {% if  achievements_EN %}
+                                        {% with achievement_en=achievements_EN|index:forloop.counter0 %}
+                                            {% if achievement_en %}
+                                                <a class="trigger_modal pull-right"
+                                                   data-url="{% url 'achievement_edit' learning_unit_year_id=learning_unit_year.id learning_achievement_id=achievement_en.id %}"
+                                                   data-modal_class="modal-lg"
+                                                   title="{% trans 'edit' %}">
+                                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                                </a>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if forloop.last and can_update_learning_achievement %}
+                    <a class="btn btn-info btn-sm trigger_modal"
+                       data-url="{% url 'achievement_create' learning_unit_year_id=learning_unit_year.id learning_achievement_id=achievement.id %}?language_code=FR"
+                       data-modal_class="modal-lg" title="{% trans 'create' %}"
+                       style="margin-top:10px;">
+                        {% trans 'add_another' %}
+                    </a>
+                {% else %}
+                    <hr>
+                {% endif %}
+            {% endfor %}
+        </form>
+        {% block script %}
+            <script>
+                $(document).ready(function () {
+
+                    $("button[id^='btn_operation_']").click(function () {
+                        var id = this.id;
+                        id = id.replace('btn_operation_', '');
+                        var pos = id.indexOf("_");
+                        var achievement_id = id.substr(pos + 1);
+                        $('#hdn_achievement_id').val(achievement_id);
+                    });
+
+                    //Show confirm popup before delete application
+                    $("button[id^='btn_operation_delete_']").click(function () {
+                        return confirm(gettext('confirm_achievement_delete'));
+                    });
+                });
+            </script>
+        {% endblock %}
     </div>
-</div>
-
-<div class="modal fade" id="specification_edit" role="dialog" data-backdrop="static"></div>
-{% endblock %}
-
-{% block script %}
-    <script>
-        $(".specification-edit-btn").click(function(ev) {
-            ev.preventDefault();
-            var url = $(this).data("form"); // get the contact form url
-            var specification_edit_modal = $("#specification_edit");
-            specification_edit_modal.load(url, function() { // load the url into the modal
-                $(this).modal('show');
-            });
-            return false;
-        });
-    </script>
 {% endblock %}

@@ -13,7 +13,7 @@ django-statici18n==1.8.2
 factory_boy==2.8.1
 django-dotenv==1.4.2
 pendulum==1.2.0
-djangorestframework==3.8.2
+djangorestframework==3.9.0
 gitpython==2.1.9
 requests==2.19.1
 django-bootstrap3==10.0.1

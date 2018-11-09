@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator, MinValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Count, OuterRef, Exists
 from django.urls import reverse
@@ -40,7 +40,7 @@ from base.models.enums import academic_type, internship_presence, schedule_type,
 from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
 from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
-from base.models.enums.education_group_types import MINOR
+from base.models.enums.education_group_types import MINOR, DEEPENING
 from base.models.exceptions import MaximumOneParentAllowedException
 from base.models.prerequisite import Prerequisite
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -70,8 +70,8 @@ class EducationGroupYearAdmin(OsisModelAdmin):
         count = len(result)
         display_success_messages(
             request, ngettext(
-                '%(count)d education group has been postponed with success',
-                '%(count)d education groups have been postponed with success', count
+                "%(count)d education group has been postponed with success.",
+                "%(count)d education groups have been postponed with success.", count
             ) % {'count': count}
         )
         if errors:
@@ -454,6 +454,10 @@ class EducationGroupYear(models.Model):
         return self.education_group_type.name in MINOR
 
     @property
+    def is_deepening(self):
+        return self.education_group_type.name == DEEPENING
+
+    @property
     def verbose(self):
         return "{} - {}".format(self.partial_acronym or "", self.acronym)
 
@@ -647,6 +651,12 @@ class EducationGroupYear(models.Model):
     def next_year(self):
         try:
             return self.education_group.educationgroupyear_set.get(academic_year__year=(self.academic_year.year + 1))
+        except EducationGroupYear.DoesNotExist:
+            return None
+
+    def previous_year(self):
+        try:
+            return self.education_group.educationgroupyear_set.get(academic_year__year=(self.academic_year.year - 1))
         except EducationGroupYear.DoesNotExist:
             return None
 

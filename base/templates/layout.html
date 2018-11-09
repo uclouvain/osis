@@ -308,15 +308,18 @@
             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'experimental_phase' %}.
         </div>
     {% endif %}
+
+    {% include "template_messages.html" %}
+
     {# FIXME ! It is forbidden to add something in the main layout for a specific need. Use messages instead !#}
     {% if warnings %}
         <div class="alert alert-warning" style="margin-bottom: 10px">
             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'warnings_detected' %}
-            <a role="button" data-toggle="collapse" href="#CollapseWarnings" aria-expanded="false"
-               aria-controls="collapse_classes" style="border:0;padding:0;">
-                    <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
-                          style="color:#8a6d3b"></span>
-            </a>
+            <button id="btn_expandButton" type="button" class="btn" data-toggle="collapse" data-target="#CollapseWarnings"
+                    style="background-color: transparent;">
+                <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
+                      style="color:#8a6d3b"></span>
+            </button>
             <div class="collapse" id="CollapseWarnings">
                 <ul>
                     {% for warning in warnings %}
@@ -327,8 +330,6 @@
         </div>
     {% endif %}
 
-    {% include "template_messages.html" %}
-
     {% block header_content %}
     {% endblock %}
     {% block content %}
@@ -336,7 +337,7 @@
     {% block modal %}
     {% endblock %}
 
-    <div class="modal fade" id="form-ajax-modal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="form-ajax-modal" role="dialog">
         <div class="modal-dialog" id="modal_dialog_id">
             <div class="modal-content" id="form-modal-ajax-content">
                 {# loading ajax requests #}
@@ -368,21 +369,25 @@
 </nav>
 
 {% block script %}
-{% endblock %}
-<script>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        //To open by default collapse of warnings
+        $('#CollapseWarnings').collapse('toggle');
 
-    $(".trigger_modal").click(function () {
-        let url = $(this).data("url");
+        $("#CollapseWarnings").on("hide.bs.collapse", function(){
+            $(".btn").html('<span id="expandButton" class="glyphicon glyphicon-collapse-down" style="color:#8a6d3b"></span>');
+            $("#btn_expandButton").attr("title", gettext("Open"));
+        });
 
-        $('#form-ajax-modal').modal('toggle');
-
-        $('#form-modal-ajax-content').load(url, function () {
-            bindTextArea();
-            formAjaxSubmit('#form-modal-body form', '#form-ajax-modal');
+        $("#CollapseWarnings").on("show.bs.collapse", function(){
+            $(".btn").html('<span id="expandButton"  class="glyphicon glyphicon-collapse-up" style="color:#8a6d3b"></span>');
+            $("#btn_expandButton").attr("title", gettext("Collapse"));
         });
     });
+    </script>
+{% endblock %}
 
-</script>
+<script type="text/javascript" src="{% static "js/modal_form_submit.js" %}"></script>
 
 {% analytical_body_bottom %}
 </body>

@@ -88,7 +88,7 @@ class LearningContainerModelForm(forms.ModelForm):
 
 class LearningUnitYearModelForm(forms.ModelForm):
 
-    def __init__(self, data, person, subtype, *args, **kwargs):
+    def __init__(self, data, person, subtype, *args, external=False, **kwargs):
         super().__init__(data, *args, **kwargs)
 
         self.instance.subtype = subtype
@@ -108,10 +108,12 @@ class LearningUnitYearModelForm(forms.ModelForm):
             self.fields['academic_year'].disabled = True
 
             # we cannot edit the internship subtype if the container_type is not internship
-            if self.instance.learning_container_year.container_type != INTERNSHIP:
+            if 'internship_subtype' in self.fields and \
+                    self.instance.learning_container_year.container_type != INTERNSHIP:
                 self.fields['internship_subtype'].disabled = True
 
-        self.fields['campus'].queryset = find_main_campuses()
+        if not external:
+            self.fields['campus'].queryset = find_main_campuses()
         self.fields['language'].queryset = find_all_languages()
 
     class Meta:
@@ -134,7 +136,9 @@ class LearningUnitYearModelForm(forms.ModelForm):
         }
 
     def post_clean(self, container_type):
-        if container_type != INTERNSHIP and self.instance.internship_subtype:
+        if "internship_subtype" in self.fields \
+                and container_type != INTERNSHIP \
+                and self.instance.internship_subtype:
             self.add_error("internship_subtype", _("This field cannot be set"))
 
         return not self.errors
@@ -158,14 +162,6 @@ class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
         field_classes = {
             'acronym': PartimAcronymField
         }
-
-
-class ExternalLearningUnitYearModelForm(LearningUnitYearModelForm):
-
-    class Meta(LearningUnitYearModelForm.Meta):
-        fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
-                  'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure',
-                  'professional_integration', 'campus', 'language')
 
 
 class LearningContainerYearModelForm(forms.ModelForm):

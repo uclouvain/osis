@@ -42,29 +42,31 @@ from base.views import learning_achievement, search, education_groups
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, notifications
 from base.views import teaching_material
+from base.views.filter import filter_cities_by_country, filter_campus_by_city
+from base.views.learning_units.attribution import DeleteAttribution, EditAttributionView, AddAttribution
+from base.views.person import EmployeeAutocomplete
 from base.views.learning_units.charge_repartition import AddChargeRepartition, \
-    RemoveChargeRepartition, EditChargeRepartition, SelectAttributionView
+    EditChargeRepartition, SelectAttributionView
 from base.views.learning_units.detail import learning_unit_identification
 from base.views.learning_units.external import create as create_external
-from base.views.filter import filter_cities_by_country, filter_campus_by_city
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
-from base.views.organization import OrganizationAutocomplete
+from base.views.organization import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
-    url(
-        r'^entity_autocomplete/$',
-        base.views.learning_units.update.EntityAutocomplete.as_view(),
-        name='entity_autocomplete',
-    ),
-    url(
-        r'^organization-autocomplete/$',
-        OrganizationAutocomplete.as_view(),
-        name='organization_autocomplete',
-    ),
+    url(r'^entity_autocomplete/$', base.views.learning_units.update.EntityAutocomplete.as_view(),
+        name='entity_autocomplete'),
+    url(r'^organization-autocomplete/$', OrganizationAutocomplete.as_view(),
+        name='organization_autocomplete'),
+    url(r'^country-autocomplete/$', CountryAutocomplete.as_view(),
+        name='country-autocomplete'),
+    url(r'^campus-autocomplete/$', CampusAutocomplete.as_view(),
+        name='campus-autocomplete'),
+    url(r'^employee-autocomplete/$', EmployeeAutocomplete.as_view(),
+        name='employee_autocomplete'),
     url(r'^academic_actors/$', institution.academic_actors, name='academic_actors'),
 
     url(r'^academic_calendars/', include([
@@ -148,12 +150,18 @@ urlpatterns = [
             url(r'^attributions/', include([
                 url(r'^$', learning_unit.learning_unit_attributions, name="learning_unit_attributions"),
                 url(r'^select/$', SelectAttributionView.as_view(), name="select_attribution"),
-                url(r'^add/(?P<attribution_id>[0-9]+)/$', AddChargeRepartition.as_view(),
-                    name="add_charge_repartition"),
-                url(r'^edit/(?P<attribution_id>[0-9]+)/$', EditChargeRepartition.as_view(),
-                    name="edit_charge_repartition"),
-                url(r'^remove/(?P<attribution_id>[0-9]+)/$', RemoveChargeRepartition.as_view(),
-                    name="remove_charge_repartition"),
+                url(r'^update/(?P<attribution_id>[0-9]+)/$', EditAttributionView.as_view(),
+                    name="update_attribution"),
+                url(r'^create/$', AddAttribution.as_view(),
+                    name="add_attribution"),
+                url(r'^remove/(?P<attribution_id>[0-9]+)/$', DeleteAttribution.as_view(),
+                    name="remove_attribution"),
+                url(r'^charge_repartition/', include([
+                    url(r'^add/(?P<attribution_id>[0-9]+)/$', AddChargeRepartition.as_view(),
+                        name="add_charge_repartition"),
+                    url(r'^edit/(?P<attribution_id>[0-9]+)/$', EditChargeRepartition.as_view(),
+                        name="edit_charge_repartition"),
+                ])),
             ])),
             url(r'^proposal/', include([
                 url(r'^modification/$', update.learning_unit_modification_proposal,

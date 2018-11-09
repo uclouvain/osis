@@ -25,42 +25,28 @@
 ##############################################################################
 from collections.__init__ import OrderedDict
 
+from dal import autocomplete
 from django import forms
 from django.db import transaction
-from django.db.models import BLANK_CHOICE_DASH
 from django.forms import ModelChoiceField
 from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningContainerModelForm, \
-    LearningContainerYearModelForm, ExternalLearningUnitYearModelForm
+    LearningContainerYearModelForm, LearningUnitYearModelForm
 from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
 from base.forms.learning_unit.learning_unit_partim import merge_data
 from base.forms.utils.acronym_field import ExternalAcronymField
-from base.forms.utils.dynamic_field import DynamicChoiceField
 from base.models import entity_version
-from base.models.campus import Campus
 from base.models.entity_version import get_last_version, EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import EXTERNAL
-from base.models.enums.learning_unit_year_periodicity import ANNUAL
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from reference.models import language
 from reference.models.country import Country
 
 
-class CampusChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return "{}".format(obj.organization.name)
-
-
 class LearningContainerYearExternalModelForm(LearningContainerYearModelForm):
-    country = ModelChoiceField(
-        queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
-        required=False,
-        label=_("country")
-    )
-    city = DynamicChoiceField(required=False, label=_('city'), choices=BLANK_CHOICE_DASH)
 
     def prepare_fields(self):
         self.fields["container_type"].choices = ((EXTERNAL, _(EXTERNAL)),)
@@ -70,6 +56,38 @@ class LearningContainerYearExternalModelForm(LearningContainerYearModelForm):
     @staticmethod
     def clean_container_type():
         return EXTERNAL
+
+
+class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
+    country = ModelChoiceField(
+        queryset=Country.objects.all(),
+        required=False,
+        label=_("country"),
+        widget=autocomplete.ModelSelect2(url='country-autocomplete')
+    )
+
+    def __init__(self, *args, instance=None, initial=None, **kwargs):
+        if instance and isinstance(initial, dict):
+            # TODO Impossible to determine which is the main address
+            organization_address = instance.campus.organization.organizationaddress_set.order_by('is_main').first()
+
+            if organization_address:
+                country = organization_address.country
+                initial["country"] = country.pk
+
+        super().__init__(*args, instance=instance, initial=initial, external=True, **kwargs)
+
+    class Meta(LearningUnitYearModelForm.Meta):
+        fields = ('academic_year', 'acronym', 'specific_title',
+                  'specific_title_english', 'credits',
+                  'status', 'campus', 'language')
+
+        widgets = {
+            'campus': autocomplete.ModelSelect2(
+                url='campus-autocomplete',
+                forward=["country"]
+            )
+        }
 
 
 class ExternalLearningUnitModelForm(forms.ModelForm):
@@ -114,23 +132,21 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
     form_cls = form_cls_to_validate = [
         LearningUnitModelForm,
-        ExternalLearningUnitYearModelForm,
+        LearningUnitYearForExternalModelForm,
         LearningContainerModelForm,
         LearningContainerYearExternalModelForm,
         ExternalLearningUnitModelForm
     ]
 
-    def __init__(self, person, academic_year, data=None, *args, **kwargs):
+    def __init__(self, person, academic_year, learning_unit_instance=None, data=None, start_year=None, *args, **kwargs):
         self.academic_year = academic_year
         self.person = person
-        instances_data = self._build_instance_data(data, academic_year)
+        self.learning_unit_instance = learning_unit_instance
+        instances_data = self._build_instance_data(data)
+
         super().__init__(instances_data, *args, **kwargs)
         self.learning_unit_year_form.fields['acronym'] = ExternalAcronymField()
-        self.learning_unit_year_form.fields['campus'] = CampusChoiceField(
-            queryset=Campus.objects.order_by('organization__name')
-                                   .distinct('organization__name')
-                                   .select_related('organization')
-        )
+        self.start_year = self.instance.learning_unit.start_year if self.instance else start_year
 
     @property
     def learning_unit_external_form(self):
@@ -142,9 +158,9 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
     @property
     def learning_unit_year_form(self):
-        return self.forms[ExternalLearningUnitYearModelForm]
+        return self.forms[LearningUnitYearForExternalModelForm]
 
-    def _build_instance_data(self, data, default_ac_year):
+    def _build_instance_data(self, data):
         return {
             LearningUnitModelForm: {
                 'data': merge_data(data, {'periodicity': 'ANNUAL'}),
@@ -154,7 +170,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
                 'data': data,
                 'instance': self.instance.learning_container_year.learning_container if self.instance else None,
             },
-            ExternalLearningUnitYearModelForm: self._build_instance_data_learning_unit_year(data, default_ac_year),
+            LearningUnitYearForExternalModelForm: self._build_instance_data_learning_unit_year(data),
             LearningContainerYearExternalModelForm: self._build_instance_data_learning_container_year(data),
             ExternalLearningUnitModelForm: self._build_instance_data_external_learning_unit(data)
         }
@@ -162,16 +178,18 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
     def _build_instance_data_external_learning_unit(self, data):
         return {
             'data': data,
-            'instance': None,
+            'instance': self.instance and self.instance.externallearningunityear,
             'person': self.person
         }
 
-    def _build_instance_data_learning_unit_year(self, data, default_ac_year):
+    def _build_instance_data_learning_unit_year(self, data):
         return {
             'data': data,
             'instance': self.instance,
-            'initial': {'status': True,
-                        'academic_year': default_ac_year},
+            'initial': {
+                'status': True,
+                'academic_year': self.academic_year
+            } if not self.instance else {},
             'person': self.person,
             'subtype': self.subtype
         }
@@ -179,7 +197,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
     def _build_instance_data_learning_container_year(self, data):
         return {
             'data': data,
-            'instance': self.instance.learning_container_year if self.instance else None,
+            'instance': self.instance and self.instance.learning_container_year,
             'initial': {
                 # Default language French
                 'language': language.find_by_code('FR'),
@@ -189,6 +207,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
     def get_context(self):
         return {
+            'learning_unit_year': self.instance,
             'subtype': self.subtype,
             'learning_unit_form': self.learning_unit_form,
             'learning_unit_year_form': self.learning_unit_year_form,
@@ -202,7 +221,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
         learning_container = self.learning_container_form.save(commit)
         learning_unit = self.learning_unit_form.save(
-            start_year=self.learning_unit_year_form.instance.academic_year.year,
+            start_year=self.start_year,
             learning_container=learning_container,
             commit=commit
         )

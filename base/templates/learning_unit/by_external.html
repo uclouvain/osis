@@ -35,40 +35,41 @@
             {% if learning_units %}
                 <br>
                 <strong style="margin-left:10px;color:grey;">
-                    {{learning_units|length}}
+                    {{ learning_units|length }}
                     {% trans 'learning_units'|lower %}
                 </strong>
 
                 <table id="table_learning_units" class="table table-striped table-hover">
                     <thead>
                     <tr>
-                        <th>{% trans 'academic_year_small'%}</th>
-                        <th>{% trans 'code'%}</th>
-                        <th  id="lu_title_sort">{% trans 'title'%}</th>
-                        <th>{% trans 'institution'%}</th>
-                        <th>{% trans 'credits'%}</th>
-                        <th>{% trans 'status'%}</th>
+                        <th>{% trans 'academic_year_small' %}</th>
+                        <th>{% trans 'code' %}</th>
+                        <th id="lu_title_sort">{% trans 'title' %}</th>
+                        <th>{% trans 'institution' %}</th>
+                        <th>{% trans 'credits' %}</th>
+                        <th>{% trans 'status' %}</th>
                     </tr>
                     </thead>
                     {% for external_learning_unit_yr in learning_units %}
-                        <tr data-id="{{external_learning_unit_yr.id}}" data-value="{{external_learning_unit_yr.code_local}}">
+                        <tr data-id="{{ external_learning_unit_yr.id }}"
+                            data-value="{{ external_learning_unit_yr.code_local }}">
                             <td>{{ external_learning_unit_yr.learning_unit_year.academic_year.name }}</td>
                             <td><a href="{% url 'learning_unit' external_learning_unit_yr.learning_unit_year.id %}"
-                                   id="lnk_learning_unit_{{learning_unit.id}}">
-                                    {{ external_learning_unit_yr.learning_unit_year.acronym}}
-                                </a>
+                                   id="lnk_learning_unit_{{ learning_unit.id }}">
+                                {{ external_learning_unit_yr.learning_unit_year.acronym }}
+                            </a>
                             </td>
                             <td>{{ external_learning_unit_yr.learning_unit_year.complete_title | default_if_none:'' }}</td>
-                            <td>{{ external_learning_unit_yr.learning_unit_year.campus.organization | default_if_none:''}}</td>
-                            <td>{{ external_learning_unit_yr.external_credits | default_if_none:''}}</td>
+                            <td>{{ external_learning_unit_yr.learning_unit_year.campus.organization | default_if_none:'' }}</td>
+                            <td>{{ external_learning_unit_yr.external_credits | default_if_none:'' }}</td>
                             <td>
                                 {% if external_learning_unit_yr.learning_unit_year.status %}
                                     <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:green;"
-                                          title="{% trans  'active' %}"></span>
+                                          title="{% trans 'active' %}"></span>
                                     <div style="display:none;">1</div>
                                 {% else %}
                                     <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:gray;"
-                                          title="{% trans  'inactive' %}"></span>
+                                          title="{% trans 'inactive' %}"></span>
                                     <div style="display:none;">0</div>
                                 {% endif %}
                             </td>
