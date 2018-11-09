@@ -3308,7 +3308,7 @@ msgid "You are not allowed to postpone this training in the past."
 msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le passé."
 
 msgid "You are not allowed to postpone this training in the future."
-msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le future."
+msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le futur."
 
 msgid "You are not allowed to copy the content of this kind of education group."
 msgstr "Vous n'êtes pas autorisé de copier le contenu de ce type d'organisation de formation."
