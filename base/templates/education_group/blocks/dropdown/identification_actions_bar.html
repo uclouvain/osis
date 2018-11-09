@@ -101,8 +101,7 @@
 
                 {% flag "education_group_update" %}
                     <li class="divider"></li>
-                    {% url 'postpone_education_group' root.pk education_group_year.pk as postpone_content_url %}
-                    {% li_with_postpone_perm_training postpone_content_url _('Copy the content') %}
+                    {% li_with_postpone_perm_training %}
                 {% endflag %}
 
                 {% flag "pdf_content" %}
@@ -118,10 +117,9 @@
 {% block script %}
     <script>
         function select() {
-            $.ajax({
+            $.post({
                 url: '../select/',
                 data: {'element_id': {{ education_group_year.id }}},
-                type: 'POST',
                 dataType: 'json',
                 success: function (jsonResponse) {
                     displayInfoMessage(jsonResponse, 'message_info_container');
