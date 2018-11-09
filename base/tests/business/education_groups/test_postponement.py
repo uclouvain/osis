@@ -33,12 +33,13 @@ from base.business.utils.model import model_to_dict_fk
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import entity_type
 from base.models.enums import organization_type
-from base.models.enums.education_group_categories import GROUP
+from base.models.enums.education_group_categories import GROUP, MINI_TRAINING
+from base.models.enums.education_group_types import OPTION
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_language import EducationGroupLanguageFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory
 from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -149,12 +150,12 @@ class TestPostpone(TestCase):
 
         self.education_group = EducationGroupFactory(end_year=self.next_academic_year.year)
 
-        self.current_education_group_year = EducationGroupYearFactory(education_group=self.education_group,
+        self.current_education_group_year = TrainingFactory(education_group=self.education_group,
                                                                       academic_year=self.current_academic_year)
 
         self.current_group_element_year = GroupElementYearFactory(parent=self.current_education_group_year)
 
-        self.next_education_group_year = EducationGroupYearFactory(education_group=self.education_group,
+        self.next_education_group_year = TrainingFactory(education_group=self.education_group,
                                                                    academic_year=self.next_academic_year)
 
     def test_init_postponement(self):
@@ -191,7 +192,18 @@ class TestPostpone(TestCase):
 
         with self.assertRaises(NotPostponeError) as cm:
             self.postponer = PostponeContent(self.current_education_group_year)
-        self.assertEqual(str(cm.exception), _("The education group is not a training."))
+        self.assertEqual(str(cm.exception),
+                         _('You are not allowed to copy the content of this kind of education group.'))
+
+    def test_init_wrong_instance_minitraining(self):
+        self.current_education_group_year.education_group_type.category = MINI_TRAINING
+        self.current_education_group_year.education_group_type.name = OPTION
+        self.current_education_group_year.education_group_type.save()
+
+        with self.assertRaises(NotPostponeError) as cm:
+            self.postponer = PostponeContent(self.current_education_group_year)
+        self.assertEqual(str(cm.exception),
+                         _("You are not allowed to copy the content of this kind of education group."))
 
     def test_postpone_with_child_branch(self):
         self.postponer = PostponeContent(self.current_education_group_year)
