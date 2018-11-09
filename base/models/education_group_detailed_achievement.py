@@ -32,7 +32,7 @@ from base.models.abstracts.abstract_education_group_achievement import AbstractE
     AbstractEducationGroupAchievementAdmin
 
 
-class EducationGroupDetailedAchievementAdmin(AbstractEducationGroupAchievementAdmin):
+class EducationGroupDetailedAchievementAdmin(VersionAdmin, AbstractEducationGroupAchievementAdmin):
     raw_id_fields = ('education_group_achievement',)
 
     def get_list_display(self, request):
@@ -42,7 +42,7 @@ class EducationGroupDetailedAchievementAdmin(AbstractEducationGroupAchievementAd
         return ['education_group_achievement__education_group_year__acronym'] + super().get_search_fields(request)
 
 
-class EducationGroupDetailedAchievement(VersionAdmin, AbstractEducationGroupAchievement):
+class EducationGroupDetailedAchievement(AbstractEducationGroupAchievement):
     education_group_achievement = models.ForeignKey(
         'EducationGroupAchievement',
         verbose_name=_("education group achievement"),
