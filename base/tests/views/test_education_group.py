@@ -280,13 +280,14 @@ class EducationGroupGeneralInformations(TestCase):
     @classmethod
     def setUpTestData(cls):
         academic_year = AcademicYearFactory()
-
-        type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
+        cls.current_academic_year = AcademicYearFactory(year=datetime.datetime.now().year)
+        cls.type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
+        cls.type_minor = EducationGroupTypeFactory(name="Access minor")
+        cls.type_deepening = EducationGroupTypeFactory(name="Deepening")
         cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=academic_year,
-                                                               education_group_type=type_training)
+                                                               education_group_type=cls.type_training)
         cls.education_group_child = EducationGroupYearFactory(acronym="Child_1", academic_year=academic_year,
-                                                              education_group_type=type_training)
-
+                                                              education_group_type=cls.type_training)
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
 
         cls.cms_label_for_child = TranslatedTextFactory(text_label=TextLabelFactory(entity=entity_name.OFFER_YEAR),
@@ -441,7 +442,7 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_education_group_year_pedagogy_publish_not_found(self):
-        url = reverse('education_group_publish', args = (self.education_group_child.id, self.education_group_parent.id))
+        url = reverse('education_group_publish', args=(self.education_group_child.id, self.education_group_parent.id))
         response = self.client.get(url)
         msg = [m.message for m in get_messages(response.wsgi_request)]
         msg_level = [m.level for m in get_messages(response.wsgi_request)]
@@ -450,15 +451,12 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_education_group_year_pedagogy_publish_found(self):
-        academic_year = AcademicYearFactory(year=datetime.datetime.now().year)
-        type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
-        education_group_child = EducationGroupYearFactory(acronym="SINF1BA", academic_year=academic_year,
-                                                          education_group_type=type_training)
-        url = reverse('education_group_publish', args=(self.education_group_parent.id, education_group_child.id))
+        education_group_real = EducationGroupYearFactory(acronym="SINF1BA", academic_year=self.current_academic_year,
+                                                         education_group_type=self.type_training)
+        url = reverse('education_group_publish', args=(self.education_group_parent.id, education_group_real.id))
         response = self.client.get(url)
         msg = [m.message for m in get_messages(response.wsgi_request)]
         msg_level = [m.level for m in get_messages(response.wsgi_request)]
-
         self.assertEqual(len(msg), 1)
         self.assertIn(messages.SUCCESS, msg_level)
         self.assertEqual(response.status_code, 302)
@@ -469,11 +467,10 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
     def test_education_group_year_pedagogy_publish_minor(self):
-        academic_year = AcademicYearFactory(year=datetime.datetime.now().year)
-        type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
-        education_group_child = EducationGroupYearFactory(partial_acronym="LANGL100I", academic_year=academic_year,
-                                                          education_group_type=type_training)
-        url = reverse('education_group_publish', args=(self.education_group_parent.id, education_group_child.id))
+        education_group_minor = EducationGroupYearFactory(partial_acronym="LALLE100I",
+                                                          academic_year=self.current_academic_year,
+                                                          education_group_type=self.type_minor)
+        url = reverse('education_group_publish', args=(self.education_group_parent.id, education_group_minor.id))
         response = self.client.get(url)
         msg = [m.message for m in get_messages(response.wsgi_request)]
         msg_level = [m.level for m in get_messages(response.wsgi_request)]
@@ -481,12 +478,11 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertIn(messages.SUCCESS, msg_level)
         self.assertEqual(response.status_code, 302)
 
-    def test_education_group_year_pedagogy_publish_deepenings(self):
-        academic_year = AcademicYearFactory(year=datetime.datetime.now().year)
-        type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
-        education_group_child = EducationGroupYearFactory(partial_acronym="LDRT100P", academic_year=academic_year,
-                                                          education_group_type=type_training)
-        url = reverse('education_group_publish', args=(self.education_group_parent.id, education_group_child.id))
+    def test_education_group_year_pedagogy_publish_deepening(self):
+        education_group_deep = EducationGroupYearFactory(partial_acronym="LDRT100P",
+                                                         academic_year=self.current_academic_year,
+                                                         education_group_type=self.type_deepening)
+        url = reverse('education_group_publish', args=(self.education_group_parent.id, education_group_deep.id))
         response = self.client.get(url)
         msg = [m.message for m in get_messages(response.wsgi_request)]
         msg_level = [m.level for m in get_messages(response.wsgi_request)]
