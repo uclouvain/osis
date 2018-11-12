@@ -49,5 +49,5 @@ APPS_TO_TEST += OPTIONAL_APPS
 MIDDLEWARE += OPTIONAL_MIDDLEWARES
 INTERNAL_IPS += OPTIONAL_INTERNAL_IPS
 
-URL_TO_PUBLISH = 'https://uclouvain.be/prog-{anac}-{code}'
+URL_TO_PUBLISH = 'https://uclouvain.be/prog-{anac}{type}-{code}'
 URL_TO_GET_SECTIONS = "https://uclouvain.be/prog-{anac}{type}-{code}"
