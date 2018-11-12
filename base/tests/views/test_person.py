@@ -50,7 +50,7 @@ class TestPersonAutoComplete(TestCase):
             transform=lambda obj: obj
         )
 
-        autocomplete_instance.q = "Dupont Jane"
+        autocomplete_instance.q = "Dupont"
         self.assertQuerysetEqual(
             autocomplete_instance.get_queryset(),
             [self.jean],
