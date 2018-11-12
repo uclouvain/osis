@@ -64,7 +64,6 @@ class CourseEnrollmentForm(BootstrapForm):
         return range_date
 
     def clean(self):
-
         if not self.instance and self.cleaned_data["range_date"]:
             self.instance = _get_new_course_enrollment_calendar(self.education_group_year)
 
