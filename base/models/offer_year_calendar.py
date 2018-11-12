@@ -41,7 +41,7 @@ class OfferYearCalendarAdmin(OsisModelAdmin):
 
 
 class OfferYearCalendar(AbstractCalendar):
-    offer_year = models.ForeignKey('OfferYear')
+    offer_year = models.ForeignKey('OfferYear', blank=True, null=True)
     education_group_year = models.ForeignKey('EducationGroupYear', blank=True, null=True)
 
     class Meta:
