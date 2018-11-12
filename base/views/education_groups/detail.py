@@ -254,11 +254,12 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_appropriate_sections(self):
         education_group_year = self.object
         code, type_education_group_year = _get_code_and_type(education_group_year)
-        url = settings.URL_TO_GET_SECTIONS.format(
+        url = settings.URL_TO_PORTAL_UCL.format(
             type=type_education_group_year,
             anac=education_group_year.academic_year.year,
             code=code
         )
+        url += "?" + settings.GET_SECTION_PARAM
         try:
             sections_request = requests.get(url, timeout=settings.REQUESTS_TIMEOUT).json()
         except (json.JSONDecodeError, TimeoutError, requests.exceptions.ConnectionError):
@@ -287,11 +288,12 @@ def _get_code_and_type(education_group_year):
 def publish(request, education_group_year_id, root_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     code, type_education_group_year = _get_code_and_type(education_group_year)
-    url = settings.URL_TO_PUBLISH.format(
+    url = settings.URL_TO_PORTAL_UCL.format(
         type=type_education_group_year,
         anac=education_group_year.academic_year.year,
         code=code
     )
+    url += "?" + settings.REFRESH_PARAM
     publish_request = requests.get(url, timeout=settings.REQUESTS_TIMEOUT)
     if publish_request.status_code == HttpResponseNotFound.status_code:
         display_error_messages(request, _("This program has no page to publish on it"))
