@@ -30,6 +30,7 @@ from base.business.education_groups.postponement import duplicate_education_grou
 from base.business.utils.model import update_related_object
 from base.models.academic_year import starting_academic_year
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import MINITRAINING_TO_POSTONE
 
 
 class NotPostponeError(Error):
@@ -40,13 +41,36 @@ class PostponeContent:
     """ Duplicate the content of a education group year content to the next academic year """
 
     def __init__(self, instance):
-        if not isinstance(instance, EducationGroupYear) or not instance.is_training():
-            raise NotPostponeError(_('The education group is not a training.'))
+        """
+        The instance must be a training in the current academic year with an end year greater than
+        the next academic year.
+
+        During the initialization, we'll also check if the current instance has a content to postpone.
+        """
+        if not isinstance(instance, EducationGroupYear):
+            raise NotPostponeError(_('You are not allowed to copy the content of this kind of education group.'))
 
         self.instance = instance
-
         self.current_year = starting_academic_year()
         self.next_academic_year = self.current_year.next()
+
+        self.check_instance()
+
+        self.result = []
+        self.instance_n1 = self.get_instance_n1(self.instance)
+
+    def check_instance(self):
+        if self.instance.is_training():
+            pass
+        elif self.instance.education_group_type.name in MINITRAINING_TO_POSTONE:
+            pass
+        else:
+            raise NotPostponeError(_('You are not allowed to copy the content of this kind of education group.'))
+
+        if self.instance.academic_year.year < self.current_year.year:
+            raise NotPostponeError(_("You are not allowed to postpone this training in the past."))
+        if self.instance.academic_year.year > self.current_year.year:
+            raise NotPostponeError(_("You are not allowed to postpone this training in the future."))
 
         end_year = self.instance.education_group.end_year
         if end_year and end_year < self.next_academic_year.year:
@@ -55,11 +79,25 @@ class PostponeContent:
         if not self.instance.groupelementyear_set.exists():
             raise NotPostponeError(_("This training has no content to postpone."))
 
-        self.result = []
-        self.instance_n1 = self.get_instance_n1(self.instance)
+    def get_instance_n1(self, instance):
+        try:
+            next_instance = instance.education_group.educationgroupyear_set.filter(
+                academic_year=self.next_academic_year
+            ).get()
+        except EducationGroupYear.DoesNotExist:
+            raise NotPostponeError(_("The root does not exist in the next academic year."))
+
+        if next_instance.groupelementyear_set.exists():
+            raise NotPostponeError(_("The content has already been postponed."))
+
+        return next_instance
 
     @transaction.atomic
     def postpone(self, instance=None):
+        """
+        We'll postpone first the group_element_years of the root,
+        after that, we'll postponement recursively all the child branches and child leafs.
+        """
         if not instance:
             instance = self.instance
             next_instance = self.instance_n1
@@ -77,24 +115,11 @@ class PostponeContent:
 
         return next_instance
 
-    def get_instance_n1(self, instance):
-        try:
-            next_instance = instance.education_group.educationgroupyear_set.filter(
-                academic_year=self.next_academic_year
-            ).get()
-        except EducationGroupYear.DoesNotExist:
-            raise NotPostponeError(_("The root does not exist in the next academic year."))
-
-        if next_instance.groupelementyear_set.exists():
-            raise NotPostponeError(_("The content has already been postponed."))
-
-        return next_instance
-
     @staticmethod
     def _postpone_child_leaf(old_gr, new_gr):
         """
         During the postponement of the learning units, we will take the next learning unit year
-        but if it does not exist for N+1, we will attach the old instance .
+        but if it does not exist for N+1, we will attach the current instance .
         """
         old_luy = old_gr.child_leaf
         new_luy = old_luy.get_learning_unit_next_year() or old_luy

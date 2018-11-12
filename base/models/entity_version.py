@@ -44,6 +44,7 @@ from osis_common.utils.datetime import get_tzinfo
 PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS = [
     "ILV",
     "IUFC",
+    "CCR"
 ]
 
 

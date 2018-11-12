@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator, MinValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Count, OuterRef, Exists
 from django.urls import reverse
@@ -70,8 +70,8 @@ class EducationGroupYearAdmin(OsisModelAdmin):
         count = len(result)
         display_success_messages(
             request, ngettext(
-                '%(count)d education group has been postponed with success',
-                '%(count)d education groups have been postponed with success', count
+                "%(count)d education group has been postponed with success.",
+                "%(count)d education groups have been postponed with success.", count
             ) % {'count': count}
         )
         if errors:

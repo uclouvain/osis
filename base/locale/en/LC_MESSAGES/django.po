@@ -3306,12 +3306,12 @@ msgstr ""
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr ""
 
-msgid "%(count)d education group has been postponed with success"
-msgid_plural "%(count)d education groups have been postponed with success"
+msgid "%(count)d education group has been postponed with success."
+msgid_plural "%(count)d education groups have been postponed with success."
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "The education group is not a training."
+msgid "You are not allowed to copy the content of this kind of education group."
 msgstr ""
 
 msgid "The end date of the education group is smaller than the year of postponement."
@@ -3326,7 +3326,7 @@ msgstr ""
 msgid "The content has already been postponed."
 msgstr ""
 
-msgid "Copy the content"
+msgid "Copy the content from %(previous_anac)s to %(current_anac)s"
 msgstr ""
 
 msgid "detach"

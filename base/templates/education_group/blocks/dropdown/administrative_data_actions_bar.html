@@ -1,5 +1,6 @@
 {% load staticfiles %}
 {% load i18n %}
+{% load format waffle_tags feature_flag education_group %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -24,27 +25,23 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+{% if "base" in perms %}
+    {% features_or "education_group_update" as show_button %}
 
-<form class="pedagogy-form" role="form" method="POST" action="{{ request.path }}">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">×</button>
-        <h4>
-            {{ text_label_translated.label }}
-            {% if label_name not in cms_label_pedagogy_fr_only %}
-                - {{ language_translated.1 }}
-            {% endif %}
-        </h4>
-    </div>
-    <div class="modal-body">
-        {% csrf_token %}
-        {{ form.trans_text }}
-        {{ form.cms_id }}
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" type="submit">
-            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}
-        </button>
-        <button type="submit" class="btn" data-dismiss="modal">{% trans 'cancel' %} </button>
-    </div>
-</form>
+    {% if show_button %}
+        <div class="dropdown {{ dropdirection }}">
+
+            <button id="dLabel" class="btn btn-default" type="button" data-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false">
+                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {% trans 'actions' %}
+                <span class="caret"></span>
+            </button>
+
+
+            <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+                {% button_edit_administrative_data %}
+            </ul>
+        </div>
+    {% endif %}
+{% endif %}
 

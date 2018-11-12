@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "learning_unit/layout_detail.html" %}
 {% load staticfiles %}
 {% load i18n bootstrap3 %}
 
@@ -26,22 +26,15 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block breadcrumb %}
-{% include "learning_unit/breadcrumb.html" %}
-{% endblock %}
 
-{% block content %}
-{% include "learning_unit/blocks/header.html" %}
-<div class="panel panel-default" >
+{% block content_tab %}
     <div class="panel-body" id="tabs" >
-        {% include "learning_unit/blocks/tabs.html" %}
         <div class="tab-content" id="tab_content">
             {% url 'learning_unit_pedagogy_edit' learning_unit_year_id=learning_unit_year.id as post_url %}
 
             {% include "learning_unit/blocks/panel/educational_informations.html" %}
         </div>
     </div>
-</div>
 
 <div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
 {% endblock %}

@@ -1,6 +1,5 @@
-{% extends "layout.html" %}
-{% load staticfiles %}
-{% load i18n %}
+{% extends "learning_unit/layout_detail.html" %}
+{% load staticfiles i18n %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -25,62 +24,52 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block breadcrumb %}
-{% include "learning_unit/breadcrumb.html" %}
-{% endblock %}
 
-{% block content %}
-
-{% include "learning_unit/blocks/header.html" %}
-<div class="panel panel-default" >
-    <div class="panel-body" id="tabs" >
-        {% include "learning_unit/blocks/tabs.html" %}
-        <div class="tab-content" id="tab_content">
-            <div role="tabpanel" class="tab-pane active" id="attributions">
-                {% if attributions %}
-                <table class="table">
-                    <thead>
-                        <th>{% trans 'tutor' %}</th>
-                        <th>{% trans 'function' %}</th>
-                        <th>{% trans 'start' %}</th>
-                        <th>{% trans 'duration' %}</th>
-                        <th>Volume 1</th>
-                        <th>Volume 2</th>
-                        <th>{% trans 'substitute' %}</th>
-                        <th></th>
-                    </thead>
-                    <tbody>
-                        {% for attribution in attributions %}
-                            <tr>
-                                <td>{{ attribution.tutor.person }}</td>
-                                <td>{% trans attribution.function %}</td>
-                                <td>{{ attribution.start_year | default_if_none:'' }}</td>
-                                <td>{{ attribution.duration | default_if_none:'' }}</td>
-                                <td>{{ attribution.lecturing_charges.0.allocation_charge | floatformat:2 }}</td>
-                                <td>{{ attribution.practical_charges.0.allocation_charge | floatformat:2 }}</td>
-                                <td>{{ attribution.substitute | default_if_none:'' }}</td>
-                                <td>
-                                    <a class="btn btn-primary trigger_modal"
-                                       role="button"
-                                       data-url="{% url 'add_charge_repartition' learning_unit_year.id attribution.id %}"
-                                       data-modal_class="modal-lg">
-                                        {% trans "add" %}
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                    <br>
-                        <p class="text-center">
-                            <strong>{% trans "No attributions exist for the parent learning unit" %}</strong>
-                        </p>
-                {% endif %}
-                <a href="{% url 'learning_unit_attributions' learning_unit_year_id=learning_unit_year.id %}"  class="btn btn-default" role="button">{% trans "cancel" %}</a>
-            </div>
-        </div>
+{% block content_tab %}
+    <div role="tabpanel" class="tab-pane active" id="attributions">
+        {% if attributions %}
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>{% trans 'tutor' %}</th>
+                    <th>{% trans 'function' %}</th>
+                    <th>{% trans 'start' %}</th>
+                    <th>{% trans 'duration' %}</th>
+                    <th>Volume 1</th>
+                    <th>Volume 2</th>
+                    <th>{% trans 'substitute' %}</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for attribution in attributions %}
+                    <tr>
+                        <td>{{ attribution.tutor.person }}</td>
+                        <td>{% trans attribution.function %}</td>
+                        <td>{{ attribution.start_year | default_if_none:'' }}</td>
+                        <td>{{ attribution.duration | default_if_none:'' }}</td>
+                        <td>{{ attribution.lecturing_charges.0.allocation_charge | floatformat:2 }}</td>
+                        <td>{{ attribution.practical_charges.0.allocation_charge | floatformat:2 }}</td>
+                        <td>{{ attribution.substitute | default_if_none:'' }}</td>
+                        <td>
+                            <a class="btn btn-primary trigger_modal"
+                               role="button"
+                               data-url="{% url 'add_charge_repartition' learning_unit_year.id attribution.id %}"
+                               data-modal_class="modal-lg">
+                                {% trans "add" %}
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <br>
+            <p class="text-center">
+                <strong>{% trans "No attributions exist for the parent learning unit" %}</strong>
+            </p>
+        {% endif %}
+        <a href="{% url 'learning_unit_attributions' learning_unit_year_id=learning_unit_year.id %}"
+           class="btn btn-default" role="button">{% trans "cancel" %}</a>
     </div>
-</div>
-
 {% endblock %}

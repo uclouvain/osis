@@ -24,17 +24,14 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<div class="modal-dialog" role="document">
-    <div class="modal-content">
-        <form method="POST" action="{{ request.path }}">
-            {% csrf_token %}
-            <div class="modal-body">
-                {% trans "Are you sure you want to delete the teaching material?" %}
-             </div>
-             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "cancel" %}</button>
-                <button type="submit" class="btn btn-danger">{% trans "confirm" %}</button>
-             </div>
-        </form>
+
+<form method="POST" action="{{ request.path }}">
+    {% csrf_token %}
+    <div class="modal-body">
+        {% trans "Are you sure you want to delete the teaching material?" %}
     </div>
-</div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-danger">{% trans "confirm" %}</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "cancel" %}</button>
+    </div>
+</form>
