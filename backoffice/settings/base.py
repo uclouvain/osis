@@ -427,3 +427,8 @@ HIJACK_ALLOW_GET_REQUESTS = True
 HIJACK_USE_BOOTSTRAP = True
 
 REQUESTS_TIMEOUT = 20
+
+# PEDAGOGY INFORMATION
+URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/prog-{anac}{type}-{code}")
+REFRESH_PARAM = os.environ.get("REFRESH_PARAM", "")
+GET_SECTION_PARAM = os.environ.get("GET_SECTION_PARAM", "")
