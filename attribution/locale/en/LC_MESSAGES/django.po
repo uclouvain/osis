@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-28 11:56+0200\n"
+"POT-Creation-Date: 2018-11-12 12:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,20 +17,211 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:12
+#: templates/manage_my_courses/blocks/submission_dates.html:34
+#, fuzzy
+#| msgid "manage_educational_information"
+msgid "Educational information ending"
+msgstr "Manage educational information"
+
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:11
+#: templates/manage_my_courses/blocks/submission_dates.html:29
+#, fuzzy
+#| msgid "manage_educational_information"
+msgid "Educational information opening"
+msgstr "Manage educational information"
+
+#: business/xls_build.py:38
+msgid "LECTURING"
+msgstr ""
+
+#: business/xls_build.py:39
+msgid "PRACTICAL_EXERCISES"
+msgstr ""
+
+#: templates/summary_responsible.html:31
+#: templates/summary_responsible_edit.html:30
+msgid "academic_actors"
+msgstr ""
+
+#: business/xls_build.py:42
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:7
+msgid "academic_year_small"
+msgstr ""
+
+#: business/xls_build.py:50
+msgid "active_title"
+msgstr ""
+
+#: business/xls_build.py:48
+msgid "allocation_entity_small"
+msgstr ""
+
+#: templates/summary_responsible_edit.html:71
+msgid "cancel"
+msgstr ""
+
+#: business/xls_build.py:43
+msgid "code"
+msgstr ""
+
+#: templates/summary_responsible.html:54 templates/summary_responsible.html:87
+#, fuzzy
+#| msgid "courses"
+msgid "course_code"
+msgstr "Courses"
+
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:8
 msgid "courses"
 msgstr "Courses"
 
-msgid "desc_lnk_summary_responsible"
-msgstr "Management of the summary responsibles"
+#: business/xls_build.py:49
+msgid "credits"
+msgstr ""
 
+#: templates/manage_my_courses/list_my_courses_summary_editable.html:66
+msgid "datatable_sortascending"
+msgstr ""
+
+#: templates/manage_my_courses/list_my_courses_summary_editable.html:67
+msgid "datatable_sortdescending"
+msgstr ""
+
+#: templates/summary_responsible.html:109
+msgid "display_tutors"
+msgstr ""
+
+#: business/xls_build.py:39
+msgid "duration"
+msgstr ""
+
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:14
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:39
+msgid "editable"
+msgstr ""
+
+#: templates/manage_my_courses/blocks/tabs.html:32
+#: templates/manage_my_courses/educational_information.html:32
+#, fuzzy
+#| msgid "manage_educational_information"
+msgid "educational_information"
+msgstr "Manage educational information"
+
+#: templates/summary_responsible.html:86
+msgid "entity"
+msgstr ""
+
+#: business/xls_build.py:38 models/attribution_new.py:57
+msgid "function"
+msgstr ""
+
+#: templates/summary_responsible.html:30
+#: templates/summary_responsible_edit.html:29
+msgid "institution"
+msgstr ""
+
+#: templates/summary_responsible.html:59 templates/summary_responsible.html:88
+msgid "learning_unit_title"
+msgstr ""
+
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:23
+#: templates/manage_my_courses/educational_information.html:30
+#: templates/manage_my_courses/list_my_courses_summary_editable.html:31
+#: templates/manage_my_courses/list_my_courses_summary_editable.html:36
 msgid "manage_educational_information"
 msgstr "Manage educational information"
 
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:48
 msgid "no_attribution_summary_editable"
 msgstr "There is no course for which you can edit educational information."
 
+#: templates/summary_responsible.html:80
+msgid "no_result"
+msgstr ""
+
+#: models/tutor_application.py:48
+msgid "publish_application_to_portal"
+msgstr ""
+
+#: models/attribution_new.py:49
+msgid "publish_attribution_to_portal"
+msgstr ""
+
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:10
+msgid "requirement_entity"
+msgstr ""
+
+#: business/xls_build.py:47
+msgid "requirement_entity_small"
+msgstr ""
+
+#: templates/summary_responsible.html:69
+#, fuzzy
+#| msgid "summary_responsible"
+msgid "responsible"
+msgstr "Summary responsible"
+
+#: templates/summary_responsible_edit.html:69
+msgid "save"
+msgstr ""
+
+#: templates/summary_responsible.html:75
+msgid "search"
+msgstr ""
+
+#: models/attribution_new.py:60
+msgid "start"
+msgstr ""
+
+#: business/xls_build.py:39
+msgid "start_year"
+msgstr ""
+
+#: templates/summary_responsible_edit.html:46
+msgid "status"
+msgstr ""
+
+#: business/xls_build.py:38
+msgid "substitute"
+msgstr ""
+
+#: business/xls_build.py:46
+msgid "subtype"
+msgstr ""
+
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:13
+#: templates/summary_responsible_edit.html:31
+#: templates/summary_responsible_edit.html:47
 msgid "summary_responsible"
 msgstr "Summary responsible"
 
+#: templates/summary_responsible.html:32 templates/summary_responsible.html:36
 msgid "summary_responsibles"
 msgstr "Summary responsibles"
+
+#: business/xls_build.py:44
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:9
+msgid "title"
+msgstr ""
+
+#: business/xls_build.py:38 templates/summary_responsible.html:64
+#: templates/summary_responsible.html:89
+#: templates/summary_responsible_edit.html:45
+msgid "tutor"
+msgstr ""
+
+#: templates/summary_responsible_edit.html:36
+msgid "tutors_of_course"
+msgstr ""
+
+#: business/xls_build.py:45
+msgid "type"
+msgstr ""
+
+#: templates/summary_responsible_edit.html:69
+msgid "update"
+msgstr ""
+
+#: templates/summary_responsible.html:123
+msgid "without_attribution"
+msgstr ""
