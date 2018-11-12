@@ -31,6 +31,7 @@ from base.forms.education_groups_administrative_data import AdministrativeDataSe
     DATE_FORMAT
 from base.forms.utils.datefield import DATETIME_FORMAT
 from base.models.enums import academic_calendar_type
+from base.models.academic_calendar import AcademicCalendar
 from base.models.offer_year_calendar import OfferYearCalendar
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -60,7 +61,7 @@ class TestAdministrativeDataForm(TestCase):
         ]
 
     def test_initial(self):
-        SessionFormSet = formset_factory(form=AdministrativeDataSessionForm, formset=AdministrativeDataFormSet, extra=1)
+        SessionFormSet = formset_factory(form=AdministrativeDataSessionForm, formset=AdministrativeDataFormSet)
         formset_session = SessionFormSet(form_kwargs={'education_group_year': self.education_group_year})
         for form in formset_session:
             for field in form.fields.values():
@@ -91,7 +92,7 @@ class TestAdministrativeDataForm(TestCase):
             'form-TOTAL_FORMS': '1'
         }
 
-        SessionFormSet = formset_factory(form=AdministrativeDataSessionForm, formset=AdministrativeDataFormSet, extra=1)
+        SessionFormSet = formset_factory(form=AdministrativeDataSessionForm, formset=AdministrativeDataFormSet)
         formset_session = SessionFormSet(data=form_data,
                                          form_kwargs={'education_group_year': self.education_group_year})
 
@@ -124,7 +125,7 @@ class TestAdministrativeDataForm(TestCase):
             'form-TOTAL_FORMS': '1'
         }
 
-        SessionFormSet = formset_factory(form=AdministrativeDataSessionForm, formset=AdministrativeDataFormSet, extra=1)
+        SessionFormSet = formset_factory(form=AdministrativeDataSessionForm, formset=AdministrativeDataFormSet)
         formset_session = SessionFormSet(data=form_data,
                                          form_kwargs={'education_group_year': self.education_group_year})
 
@@ -144,3 +145,65 @@ class TestAdministrativeDataForm(TestCase):
         self.assertEqual(list(result.get('list_offer_year_calendar')),
                          list(OfferYearCalendar.objects.filter(education_group_year=self.education_group_year,
                                                                academic_calendar__in=acs)))
+
+    def test_dont_save_while_new_and_no_date(self):
+        education_group_yr = EducationGroupYearFactory(academic_year=self.academic_year)
+
+        exam_enrollment_start = '20/12/{}'.format(self.academic_year.year)
+        exam_enrollment_end = '15/01/{}'.format(self.academic_year.year+1)
+
+        form_data = {
+            'form-0-exam_enrollment_range': exam_enrollment_start + ' - ' + exam_enrollment_end,
+            'form-0-scores_exam_diffusion': '',
+            'form-INITIAL_FORMS': 0,
+            'form-MAX_NUM_FORMS': '1000',
+            'form-MIN_NUM_FORMS': '0',
+            'form-TOTAL_FORMS': '1'
+        }
+
+        SessionFormSet = formset_factory(form=AdministrativeDataSessionForm, formset=AdministrativeDataFormSet)
+        formset_session = SessionFormSet(data=form_data,
+                                         form_kwargs={'education_group_year': education_group_yr})
+
+        self.assertEqual(formset_session.errors, [{}])
+        self.assertTrue(formset_session.is_valid())
+        oyc = formset_session.forms[0]._get_offer_year_calendar('exam_enrollment_range')
+        self.assertIsNone(oyc.id)
+        oyc = formset_session.forms[0]._get_offer_year_calendar('scores_exam_diffusion')
+        self.assertIsNone(oyc.id)
+
+        formset_session.save()
+
+        self.assertEqual(len(self._search_offer_year_calendar(education_group_yr,
+                                                              academic_calendar_type.EXAM_ENROLLMENTS)),
+                         1)
+        self.assertEqual(len(self._search_offer_year_calendar(education_group_yr,
+                                                              academic_calendar_type.SCORES_EXAM_DIFFUSION)),
+                         0)
+
+    def test_get_new_offer_year_calendar(self):
+        education_group_yr = EducationGroupYearFactory(academic_year=self.academic_year)
+        SessionFormSet = formset_factory(form=AdministrativeDataSessionForm, formset=AdministrativeDataFormSet)
+
+        form_data = {
+            'form-0-exam_enrollment_range': '20/12/{}'.format(self.academic_year.year) + ' - ' + '15/01/{}'.format(
+                self.academic_year.year + 1),
+            'form-0-scores_exam_diffusion': '',
+            'form-INITIAL_FORMS': 0,
+            'form-MAX_NUM_FORMS': '1000',
+            'form-MIN_NUM_FORMS': '0',
+            'form-TOTAL_FORMS': '1'
+        }
+        formset_session = SessionFormSet(data=form_data,
+                                         form_kwargs={'education_group_year': education_group_yr})
+        oyc = formset_session.forms[0]._get_offer_year_calendar('scores_exam_diffusion')
+        self.assertIsNone(oyc.id)
+        self.assertEqual(oyc.education_group_year, education_group_yr)
+        self.assertIsNone(oyc.offer_year)
+
+    def _search_offer_year_calendar(self, education_group_yr, a_reference):
+        academic_calendar = AcademicCalendar.objects.get(sessionexamcalendar__number_session=1,
+                                                         academic_year=education_group_yr.academic_year,
+                                                         reference=a_reference)
+        return OfferYearCalendar.objects.filter(education_group_year=education_group_yr,
+                                                academic_calendar=academic_calendar)
