@@ -57,11 +57,7 @@ class CourseEnrollmentForm(BootstrapForm):
     def clean_range_date(self):
         range_date = self.cleaned_data["range_date"]
         if not self.instance:
-            cal = AcademicCalendar.objects.get(academic_year=self.education_group_year.academic_year,
-                                               reference=academic_calendar_type.COURSE_ENROLLMENT)
-            oyc = offer_year_calendar.OfferYearCalendar(education_group_year=self.education_group_year,
-                                                        academic_calendar=cal)
-            self.instance = oyc
+            self.instance = _get_new_course_enrollment_calendar(self.education_group_year)
         _set_values_in_offer_year_calendar(self.instance,
                                            range_date)
 
@@ -70,11 +66,7 @@ class CourseEnrollmentForm(BootstrapForm):
     def clean(self):
 
         if not self.instance and self.cleaned_data["range_date"]:
-            cal = AcademicCalendar.objects.get(academic_year=self.education_group_year.academic_year,
-                                               reference=academic_calendar_type.COURSE_ENROLLMENT)
-            oyc = offer_year_calendar.OfferYearCalendar(education_group_year=self.education_group_year,
-                                                        academic_calendar=cal)
-            self.instance = oyc
+            self.instance = _get_new_course_enrollment_calendar(self.education_group_year)
 
         if self.instance:
             try:
@@ -84,6 +76,17 @@ class CourseEnrollmentForm(BootstrapForm):
 
     def save(self):
         self.instance.save()
+
+
+def _get_new_course_enrollment_calendar(education_group_yr):
+    try:
+        cal = AcademicCalendar.objects.get(academic_year=education_group_yr.academic_year,
+                                           reference=academic_calendar_type.COURSE_ENROLLMENT)
+
+        return offer_year_calendar.OfferYearCalendar(education_group_year=education_group_yr,
+                                                     academic_calendar=cal)
+    except ObjectDoesNotExist:
+        return None
 
 
 class AdministrativeDataSessionForm(BootstrapForm):
