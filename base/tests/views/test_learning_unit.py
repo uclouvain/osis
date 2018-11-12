@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import datetime
-import random
 from unittest import mock
 
 import factory.fuzzy
@@ -42,7 +41,10 @@ from waffle.testutils import override_flag
 
 import base.business.learning_unit
 import base.business.xls
+from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit as learning_unit_business
+from base.business.learning_unit import LEARNING_UNIT_TITLES_PART1, LEARNING_UNIT_TITLES_PART2
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit.search_form import LearningUnitYearForm, LearningUnitSearchForm
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm
@@ -57,9 +59,8 @@ from base.models.enums import learning_container_year_types, organization_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_MUST_HAVE_SAME_ENTITIES
 from base.models.enums.learning_unit_year_subtypes import FULL
-from base.models.person import FACULTY_MANAGER_GROUP
+from base.models.person import FACULTY_MANAGER_GROUP, Person
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -76,17 +77,21 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
+from base.tests.factories.learning_unit_component import LearningUnitComponentFactory, \
+    LecturingLearningUnitComponentFactory, PracticalLearningUnitComponentFactory
 from base.tests.factories.learning_unit_component_class import LearningUnitComponentClassFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_unit_year
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_unit_year, \
+    LearningUnitYearPartimFactory, LearningUnitYearFullFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
+from base.views.learning_unit import learning_unit_comparison
 from base.views.learning_unit import learning_unit_components, learning_class_year_edit, learning_unit_specifications, \
-    learning_unit_formations
-from base.views.learning_unit import learning_unit_identification, learning_unit_comparison
+    learning_unit_formations, get_charge_repartition_warning_messages, CHARGE_REPARTITION_WARNING_MESSAGE, \
+    learning_unit_attributions
 from base.views.learning_units.create import create_partim_form
+from base.views.learning_units.detail import learning_unit_identification
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.search import learning_units
 from base.views.learning_units.search import learning_units_service_course
@@ -96,8 +101,6 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory
-from base.business.learning_unit import LEARNING_UNIT_TITLES_PART1, LEARNING_UNIT_TITLES_PART2, get_entity_acronym
-from base.business.learning_unit_xls import _get_absolute_credits
 
 
 @override_flag('learning_unit_create', active=True)
@@ -279,8 +282,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
 
     @mock.patch('base.views.learning_units.perms.business_perms.is_person_linked_to_entity_in_charge_of_learning_unit',
                 side_effect=lambda *args: True)
-
-    @mock.patch('base.forms.learning_unit.learning_unit_partim.PartimForm.is_valid', side_effect=lambda *args : False)
+    @mock.patch('base.forms.learning_unit.learning_unit_partim.PartimForm.is_valid', side_effect=lambda *args: False)
     def test_create_partim_when_invalid_form_no_redirection(self, mock_is_valid, mock_is_pers_linked_to_entity_charge):
         response = self.client.post(self.url, data={})
         self.assertTemplateUsed(response, "learning_unit/simple/creation_partim.html")
@@ -585,45 +587,27 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(template, 'learning_units.html')
         self.assertEqual(len(context['learning_units']), number_of_results)
 
-    @mock.patch('base.views.layout.render')
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_learning_unit_read(self, mock_program_manager, mock_render):
-        mock_program_manager.return_value = True
-
+    def test_learning_unit_read(self):
         learning_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year)
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=learning_container_year,
                                                      subtype=learning_unit_year_subtypes.FULL)
 
-        request = self.create_learning_unit_request(learning_unit_year)
+        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
 
-        learning_unit_identification(request, learning_unit_year.id)
+        self.assertTemplateUsed(response, 'learning_unit/identification.html')
+        self.assertEqual(response.context['learning_unit_year'], learning_unit_year)
 
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/identification.html')
-        self.assertEqual(context['learning_unit_year'], learning_unit_year)
-
-    @mock.patch('base.views.layout.render')
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_external_learning_unit_read(self, mock_program_manager, mock_render):
-        mock_program_manager.return_value = True
-
+    def test_external_learning_unit_read(self):
         external_learning_unit_year = ExternalLearningUnitYearFactory(
             learning_unit_year__subtype=learning_unit_year_subtypes.FULL,
         )
         learning_unit_year = external_learning_unit_year.learning_unit_year
 
-        request = self.create_learning_unit_request(learning_unit_year)
-        learning_unit_identification(request, learning_unit_year.id)
+        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
 
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/external/read.html')
-        self.assertEqual(context['learning_unit_year'], learning_unit_year)
+        self.assertTemplateUsed(response, 'learning_unit/external/read.html')
+        self.assertEqual(response.context['learning_unit_year'], learning_unit_year)
 
     def test_external_learning_unit_read_permission_denied(self):
         learning_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year)
@@ -647,14 +631,10 @@ class LearningUnitViewTestCase(TestCase):
         response = client.get(reverse(learning_unit_identification, args=[learning_unit_year.id]))
         self.assertEqual(response.status_code, 200)
 
-    @mock.patch('base.views.layout.render')
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_warnings_learning_unit_read(self, mock_program_manager, mock_render):
-        mock_program_manager.return_value = True
-
+    def test_warnings_learning_unit_read(self):
         learning_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year,
                                                                container_type=learning_container_year_types.INTERNSHIP)
-        parent = LearningUnitYearFactory(academic_year=self.current_academic_year,
+        LearningUnitYearFactory(academic_year=self.current_academic_year,
                                          learning_container_year=learning_container_year,
                                          internship_subtype=internship_subtypes.TEACHING_INTERNSHIP,
                                          subtype=learning_unit_year_subtypes.FULL,
@@ -667,16 +647,10 @@ class LearningUnitViewTestCase(TestCase):
                                                             periodicity=learning_unit_year_periodicity.ANNUAL,
                                                             status=True)
 
-        request = self.create_learning_unit_request(partim_without_internship)
+        response = self.client.get(reverse('learning_unit', args=[partim_without_internship.pk]))
 
-        learning_unit_identification(request, partim_without_internship.id)
-
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/identification.html')
-        self.assertEqual(len(context['warnings']), 3)
+        self.assertTemplateUsed(response, 'learning_unit/identification.html')
+        self.assertEqual(len(response.context['warnings']), 3)
 
     def test_learning_unit__with_faculty_manager_when_can_edit_end_date(self):
         learning_container_year = LearningContainerYearFactory(
@@ -764,11 +738,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(len(components_dict.get('components')), 1)
         self.assertEqual(len(components_dict.get('components')[0]['learning_component_year'].classes), 2)
 
-    @mock.patch('base.views.layout.render')
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_get_partims_identification_tabs(self, mock_program_manager, mock_render):
-        mock_program_manager.return_value = True
-
+    def test_get_partims_identification_tabs(self):
         learning_unit_container_year = LearningContainerYearFactory(
             academic_year=self.current_academic_year
         )
@@ -797,15 +767,10 @@ class LearningUnitViewTestCase(TestCase):
             academic_year=self.current_academic_year
         )
 
-        request = self.create_learning_unit_request(learning_unit_year)
-        learning_unit_identification(request, learning_unit_year.id)
+        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
 
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/identification.html')
-        self.assertEqual(len(context['learning_container_year_partims']), 3)
+        self.assertTemplateUsed(response, 'learning_unit/identification.html')
+        self.assertEqual(len(response.context['learning_container_year_partims']), 3)
 
     @mock.patch('base.views.layout.render')
     def test_learning_unit_formation(self, mock_render):
@@ -924,8 +889,8 @@ class LearningUnitViewTestCase(TestCase):
         qs = 'learning_component_year_id={}'.format(self.learning_component_yr.id)
 
         response = self.client.post('{}?{}'.format(url, qs), data={"planned_classes": "1"})
-        self.assertRaises(ObjectDoesNotExist, learning_unit_component.LearningUnitComponent.objects.filter(
-            pk=learning_unit_compnt.id).first())
+        with self.assertRaises(ObjectDoesNotExist):
+            learning_unit_component.LearningUnitComponent.objects.filter(pk=learning_unit_compnt.id).get()
 
     def test_component_save_create_link(self):
         learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
@@ -1146,12 +1111,6 @@ class LearningUnitViewTestCase(TestCase):
         faulty_dict["acronym"] = ""
         return faulty_dict
 
-    def get_faulty_allocation_entity(self):
-        faulty_dict = dict(self.get_valid_data())
-        faulty_dict["container_type"] = random.choice(LEARNING_CONTAINER_YEAR_TYPES_MUST_HAVE_SAME_ENTITIES)
-        faulty_dict["allocation_entity"] = self.entity_version_2.id
-        return faulty_dict
-
     def get_faulty_requirement_entity(self):
         """We will create an entity + entity version that user cannot create on it"""
         entity = EntityFactory(country=self.country, organization=self.organization)
@@ -1284,62 +1243,38 @@ class LearningUnitViewTestCase(TestCase):
         existing_language_code = 'en'
         self.assertEqual(learning_unit_business.find_language_in_settings(existing_language_code), ('en', 'English'))
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_unit_pedagogy(self, mock_render):
+    def test_learning_unit_pedagogy(self):
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=self.learning_container_yr,
                                                      subtype=learning_unit_year_subtypes.FULL)
 
-        request = self.create_learning_unit_request(learning_unit_year)
+        response = self.client.get(reverse(learning_unit_pedagogy, args=[learning_unit_year.pk]))
 
-        learning_unit_pedagogy(request, learning_unit_year.id)
+        self.assertTemplateUsed(response, 'learning_unit/pedagogy.html')
+        self.assertIsInstance(response.context['form_french'], LearningUnitPedagogyForm)
+        self.assertIsInstance(response.context['form_english'], LearningUnitPedagogyForm)
 
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/pedagogy.html')
-        self.assertIsInstance(context['form_french'], LearningUnitPedagogyForm)
-        self.assertIsInstance(context['form_english'], LearningUnitPedagogyForm)
-        # Verify URL [Specific redirection]
-        self.assertEqual(context['create_teaching_material_urlname'], 'teaching_material_create')
-        self.assertEqual(context['update_teaching_material_urlname'], 'teaching_material_edit')
-        self.assertEqual(context['delete_teaching_material_urlname'], 'teaching_material_delete')
-
-    @mock.patch('base.views.layout.render')
-    def test_learning_unit_specification(self, mock_render):
+    def test_learning_unit_specification(self):
         learning_unit_year = LearningUnitYearFactory()
         fr = LanguageFactory(code='FR')
         en = LanguageFactory(code='EN')
         learning_unit_achievements_fr = LearningAchievementFactory(language=fr, learning_unit_year=learning_unit_year)
         learning_unit_achievements_en = LearningAchievementFactory(language=en, learning_unit_year=learning_unit_year)
 
-        request = self.create_learning_unit_request(learning_unit_year)
+        response = self.client.get(reverse(learning_unit_specifications, args=[learning_unit_year.pk]))
 
-        learning_unit_specifications(request, learning_unit_year.id)
+        self.assertTemplateUsed(response, 'learning_unit/specifications.html')
+        self.assertIsInstance(response.context['form_french'], LearningUnitSpecificationsForm)
+        self.assertIsInstance(response.context['form_english'], LearningUnitSpecificationsForm)
+        self.assertCountEqual(response.context['achievements_FR'], [learning_unit_achievements_fr])
+        self.assertCountEqual(response.context['achievements_EN'], [learning_unit_achievements_en])
 
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/specifications.html')
-        self.assertIsInstance(context['form_french'], LearningUnitSpecificationsForm)
-        self.assertIsInstance(context['form_english'], LearningUnitSpecificationsForm)
-        self.assertCountEqual(context['achievements_FR'], [learning_unit_achievements_fr])
-        self.assertCountEqual(context['achievements_EN'], [learning_unit_achievements_en])
-
-    @mock.patch('base.views.layout.render')
-    def test_learning_unit_attributions(self, mock_render):
+    def test_learning_unit_attributions(self):
         learning_unit_yr = LearningUnitYearFactory()
 
-        request = self.create_learning_unit_request(learning_unit_yr)
+        response = self.client.get(reverse(learning_unit_attributions, args=[learning_unit_yr.id]))
 
-        from base.views.learning_unit import learning_unit_attributions
-
-        learning_unit_attributions(request, learning_unit_yr.id)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/attributions.html')
+        self.assertTemplateUsed(response, 'learning_unit/attributions.html')
 
     @mock.patch('base.views.layout.render')
     def test_learning_unit_specifications_edit(self, mock_render):
@@ -1375,15 +1310,8 @@ class LearningUnitViewTestCase(TestCase):
                                        kwargs={'learning_unit_year_id': learning_unit_year.id})
         self.assertRedirects(response, expected_redirection, fetch_redirect_response=False)
 
-    def create_learning_unit_request(self, learning_unit_year):
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse('learning_unit', args=[learning_unit_year.pk]))
-        request.user = self.a_superuser
-        return request
-
-    @mock.patch('base.views.layout.render')
     @mock.patch('base.models.program_manager.is_program_manager')
-    def test_learning_unit_comparison(self, mock_program_manager, mock_render):
+    def test_learning_unit_comparison(self, mock_program_manager):
         mock_program_manager.return_value = True
         learning_unit = LearningUnitFactory()
         learning_unit_year_1 = create_learning_unit_year(self.current_academic_year,
@@ -1398,20 +1326,14 @@ class LearningUnitViewTestCase(TestCase):
                                                             'next title',
                                                             learning_unit)
 
-        request = self.create_learning_unit_request(learning_unit_year_1)
+        response = self.client.get(reverse(learning_unit_comparison, args=[learning_unit_year_1.pk]))
 
-        learning_unit_comparison(request, learning_unit_year_1.id)
-
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/comparison.html')
-        self.assertEqual(context['previous_academic_yr'], previous_academic_yr)
-        self.assertEqual(context['next_academic_yr'], next_academic_yr)
-        self.assertEqual(context['fields'], ['specific_title'])
-        self.assertEqual(context['previous_values'], {'specific_title': previous_learning_unit_year.specific_title})
-        self.assertEqual(context['next_values'], {'specific_title': next_learning_unit_year.specific_title})
+        self.assertTemplateUsed(response, 'learning_unit/comparison.html')
+        self.assertEqual(response.context['previous_academic_yr'], previous_academic_yr)
+        self.assertEqual(response.context['next_academic_yr'], next_academic_yr)
+        self.assertEqual(response.context['fields'], ['specific_title'])
+        self.assertEqual(response.context['previous_values'], {'specific_title': previous_learning_unit_year.specific_title})
+        self.assertEqual(response.context['next_values'], {'specific_title': next_learning_unit_year.specific_title})
 
 
 class TestCreateXls(TestCase):
@@ -1532,4 +1454,101 @@ class TestLearningAchievements(TestCase):
             self.assertTrue(result[key])
 
 
+class TestGetChargeRepartitionWarningMessage(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.full_luy = LearningUnitYearFullFactory()
+        cls.partim_luy_1 = LearningUnitYearPartimFactory(academic_year=cls.full_luy.academic_year,
+                                                         learning_container_year=cls.full_luy.learning_container_year)
+        cls.partim_luy_2 = LearningUnitYearPartimFactory(academic_year=cls.full_luy.academic_year,
+                                                         learning_container_year=cls.full_luy.learning_container_year)
+        cls.attribution_full = AttributionNewFactory(
+            learning_container_year=cls.full_luy.learning_container_year
+        )
+        cls.full_lecturing_unit_component = LecturingLearningUnitComponentFactory(learning_unit_year=cls.full_luy)
+        cls.full_practical_unit_component = PracticalLearningUnitComponentFactory(learning_unit_year=cls.full_luy)
 
+        cls.partim_1_lecturing_unit_component = \
+            LecturingLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_1)
+        cls.partim_1_practical_unit_component = \
+            PracticalLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_1)
+
+        cls.partim_2_lecturing_unit_component = \
+            LecturingLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_2)
+        cls.partim_2_practical_unit_component = \
+            PracticalLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_2)
+
+        cls.charge_lecturing = AttributionChargeNewFactory(
+            attribution=cls.attribution_full,
+            learning_component_year=cls.full_lecturing_unit_component.learning_component_year,
+            allocation_charge=20
+        )
+        cls.charge_practical = AttributionChargeNewFactory(
+            attribution=cls.attribution_full,
+            learning_component_year=cls.full_practical_unit_component.learning_component_year,
+            allocation_charge=20
+        )
+
+        cls.attribution_partim_1 = cls.attribution_full
+        cls.attribution_partim_1.id = None
+        cls.attribution_partim_1.save()
+
+        cls.attribution_partim_2 = cls.attribution_full
+        cls.attribution_partim_2.id = None
+        cls.attribution_partim_2.save()
+
+    def setUp(self):
+        self.charge_lecturing_1 = AttributionChargeNewFactory(
+            attribution=self.attribution_partim_1,
+            learning_component_year=self.partim_1_lecturing_unit_component.learning_component_year,
+            allocation_charge=10
+        )
+        self.charge_practical_1 = AttributionChargeNewFactory(
+            attribution=self.attribution_partim_1,
+            learning_component_year=self.partim_1_practical_unit_component.learning_component_year,
+            allocation_charge=10
+        )
+
+        self.charge_lecturing_2 = AttributionChargeNewFactory(
+            attribution=self.attribution_partim_2,
+            learning_component_year=self.partim_2_lecturing_unit_component.learning_component_year,
+            allocation_charge=10
+        )
+        self.charge_practical_2 = AttributionChargeNewFactory(
+            attribution=self.attribution_partim_2,
+            learning_component_year=self.partim_2_practical_unit_component.learning_component_year,
+            allocation_charge=10
+        )
+
+    def test_should_not_give_warning_messages_when_volume_partim_inferior_or_equal_to_volume_parent(self):
+        msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
+
+        self.assertEqual(msgs,
+                         [])
+
+    def test_should_not_fail_when_no_charges(self):
+        self.charge_lecturing_1.allocation_charge = None
+        self.charge_lecturing_1.save()
+        self.charge_lecturing_2.allocation_charge = None
+        self.charge_lecturing_2.save()
+        self.charge_practical_1.allocation_charge = None
+        self.charge_practical_1.save()
+        self.charge_practical_2.allocation_charge = None
+        self.charge_practical_2.save()
+
+        msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
+
+        self.assertEqual(msgs,
+                         [])
+
+    def test_should_give_warning_messages_when_volume_partim_superior_to_volume_parent(self):
+        self.charge_lecturing_1.allocation_charge = 50
+        self.charge_lecturing_1.save()
+
+        msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
+        tutor_name = Person.get_str(self.attribution_full.tutor.person.first_name,
+                                    self.attribution_full.tutor.person.middle_name,
+                                    self.attribution_full.tutor.person.last_name)
+        tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.function))
+        self.assertListEqual(msgs,
+                             [_(CHARGE_REPARTITION_WARNING_MESSAGE) % {"tutor": tutor_name_with_function}])

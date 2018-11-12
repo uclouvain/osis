@@ -27,8 +27,7 @@
 from django.test import TestCase
 from django.utils import timezone
 
-from attribution.business.attribution_charge_new import find_attribution_charge_new_by_learning_unit_year
-from attribution.models.attribution_charge_new import AttributionChargeNew
+from attribution.business.attribution_charge_new import find_attribution_charge_new_by_learning_unit_year_as_dict
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -47,7 +46,5 @@ class TestAttributionChargeNew(TestCase):
         ]
 
     def test_find_attribution_charge_new_by_learning_unit_year(self):
-        result = find_attribution_charge_new_by_learning_unit_year(self.l_unit_1)
+        result = find_attribution_charge_new_by_learning_unit_year_as_dict(self.l_unit_1)
         self.assertEqual(len(result), 5)
-
-

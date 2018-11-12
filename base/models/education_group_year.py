@@ -24,13 +24,13 @@
 #
 ##############################################################################
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator, MinValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Count, OuterRef, Exists
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ngettext
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import entity_version
@@ -40,7 +40,7 @@ from base.models.enums import academic_type, internship_presence, schedule_type,
 from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
 from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
-from base.models.enums.education_group_types import MINOR
+from base.models.enums.education_group_types import MINOR, DEEPENING
 from base.models.exceptions import MaximumOneParentAllowedException
 from base.models.prerequisite import Prerequisite
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -49,9 +49,38 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 class EducationGroupYearAdmin(OsisModelAdmin):
     list_display = ('acronym', 'title', 'academic_year', 'education_group_type', 'changed')
     list_filter = ('academic_year', 'education_group_type')
-    raw_id_fields = ('education_group_type', 'academic_year', 'education_group', 'enrollment_campus',
-                     'main_teaching_campus', 'primary_language')
+    raw_id_fields = (
+        'education_group_type', 'academic_year',
+        'education_group', 'enrollment_campus',
+        'main_teaching_campus', 'primary_language'
+    )
     search_fields = ['acronym']
+
+    actions = [
+        'resend_messages_to_queue',
+        'apply_education_group_year_postponement'
+    ]
+
+    def apply_education_group_year_postponement(self, request, queryset):
+        # Potential circular imports
+        from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponement
+        from base.views.common import display_success_messages, display_error_messages
+
+        result, errors = EducationGroupAutomaticPostponement(queryset).postpone()
+        count = len(result)
+        display_success_messages(
+            request, ngettext(
+                "%(count)d education group has been postponed with success.",
+                "%(count)d education groups have been postponed with success.", count
+            ) % {'count': count}
+        )
+        if errors:
+            display_error_messages(request, "{} : {}".format(
+                _("The following education groups ended with error"),
+                ", ".join([str(error) for error in errors])
+            ))
+
+    apply_education_group_year_postponement.short_description = _("Apply postponement on education group year")
 
 
 class EducationGroupYearManager(models.Manager):
@@ -68,7 +97,6 @@ class EducationGroupYear(models.Model):
         max_length=40,
         db_index=True,
         verbose_name=_("acronym"),
-        validators=[RegexValidator(regex="^([A-Z]{2,4})([0-9]?)(.*)$")]
     )
 
     title = models.CharField(
@@ -218,9 +246,10 @@ class EducationGroupYear(models.Model):
         max_length=320,
         blank=True,
         default="",
+        verbose_name=_('professionnal_title')
     )
 
-    joint_diploma = models.BooleanField(default=False)
+    joint_diploma = models.BooleanField(default=False, verbose_name=_('university_certificate_desc'))
 
     diploma_printing_orientation = models.CharField(
         max_length=30,
@@ -233,6 +262,7 @@ class EducationGroupYear(models.Model):
         max_length=140,
         blank=True,
         default="",
+        verbose_name=_('diploma_title')
     )
 
     inter_organization_information = models.CharField(
@@ -292,14 +322,13 @@ class EducationGroupYear(models.Model):
         db_index=True,
         null=True,
         verbose_name=_("code"),
-        validators=[RegexValidator(regex="^([A-Z]{3,5})([0-9]{3})([A-Z])$")]
     )
 
     # TODO :: rename credits into expected_credits
-    credits = models.IntegerField(
+    credits = models.PositiveIntegerField(
         blank=True,
         null=True,
-        verbose_name=_("credits")
+        verbose_name=_("credits"),
     )
 
     remark = models.TextField(
@@ -315,13 +344,17 @@ class EducationGroupYear(models.Model):
     )
 
     min_constraint = models.IntegerField(
-        blank=True, null=True,
-        verbose_name=_("minimum constraint")
+        blank=True,
+        null=True,
+        verbose_name=_("minimum constraint"),
+        validators=[MinValueValidator(1)]
     )
 
     max_constraint = models.IntegerField(
-        blank=True, null=True,
-        verbose_name=_("maximum constraint")
+        blank=True,
+        null=True,
+        verbose_name=_("maximum constraint"),
+        validators=[MinValueValidator(1)]
     )
 
     constraint_type = models.CharField(
@@ -402,7 +435,12 @@ class EducationGroupYear(models.Model):
         "base.CertificateAim",
         through="EducationGroupCertificateAim",
         related_name="education_group_years",
+        blank=True,
     )
+
+    class Meta:
+        verbose_name = _("education group year")
+        unique_together = ('education_group', 'academic_year')
 
     def __str__(self):
         return "{} - {} - {}".format(
@@ -414,6 +452,10 @@ class EducationGroupYear(models.Model):
     @property
     def is_minor(self):
         return self.education_group_type.name in MINOR
+
+    @property
+    def is_deepening(self):
+        return self.education_group_type.name == DEEPENING
 
     @property
     def verbose(self):
@@ -458,9 +500,6 @@ class EducationGroupYear(models.Model):
         if self.duration and self.duration_unit:
             return "{} {}".format(self.duration, _(self.duration_unit))
         return ""
-
-    class Meta:
-        verbose_name = _("education group year")
 
     def get_absolute_url(self):
         return reverse("education_group_read", args=[self.pk])
@@ -530,7 +569,7 @@ class EducationGroupYear(models.Model):
 
     @cached_property
     def coorganizations(self):
-        return self.educationgrouporganization_set.all()
+        return self.educationgrouporganization_set.all().order_by('all_students')
 
     def is_training(self):
         if self.education_group_type:
@@ -608,6 +647,18 @@ class EducationGroupYear(models.Model):
             raise ValidationError({'duration': _("field_is_required")})
         elif self.duration is not None and self.duration_unit is None:
             raise ValidationError({'duration_unit': _("field_is_required")})
+
+    def next_year(self):
+        try:
+            return self.education_group.educationgroupyear_set.get(academic_year__year=(self.academic_year.year + 1))
+        except EducationGroupYear.DoesNotExist:
+            return None
+
+    def previous_year(self):
+        try:
+            return self.education_group.educationgroupyear_set.get(academic_year__year=(self.academic_year.year - 1))
+        except EducationGroupYear.DoesNotExist:
+            return None
 
 
 def find_by_id(an_id):

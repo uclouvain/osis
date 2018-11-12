@@ -82,21 +82,6 @@ class TestEducationGroupAchievementAction(TestCase):
         self.achievement_0.refresh_from_db()
         self.assertEqual(self.achievement_0.order, 1)
 
-    def test_form_valid_delete(self):
-        response = self.client.post(
-            reverse(
-                "education_group_achievements_actions",
-                args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
-                    self.achievement_0.pk,
-                ]), data={"action": "delete"}
-        )
-
-        self.assertEqual(response.status_code, 302)
-        with self.assertRaises(ObjectDoesNotExist):
-            self.achievement_0.refresh_from_db()
-
     def test_form_invalid(self):
         response = self.client.post(
             reverse(
@@ -157,6 +142,53 @@ class TestUpdateEducationGroupAchievement(TestCase):
                     self.education_group_year.pk,
                     self.achievement_2.pk,
                 ]), data={"code_name": code}
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+
+class TestDeleteEducationGroupAchievement(TestCase):
+
+    def setUp(self):
+
+        self.education_group_year = EducationGroupYearFactory()
+
+        self.achievement_0 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
+        self.achievement_1 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
+        self.achievement_2 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
+
+        self.user = UserFactory()
+        self.person = PersonFactory(user=self.user)
+        self.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        self.user.user_permissions.add(Permission.objects.get(codename="delete_educationgroupachievement"))
+        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
+        self.client.force_login(self.user)
+
+    def test_delete(self):
+        response = self.client.post(
+            reverse(
+                "delete_education_group_achievement",
+                args=[
+                    self.education_group_year.pk,
+                    self.education_group_year.pk,
+                    self.achievement_0.pk,
+                ]), data={}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        with self.assertRaises(ObjectDoesNotExist):
+            self.achievement_0.refresh_from_db()
+
+    def test_permission_denied(self):
+        self.user.user_permissions.remove(Permission.objects.get(codename="delete_educationgroupachievement"))
+        response = self.client.post(
+            reverse(
+                "delete_education_group_achievement",
+                args=[
+                    self.education_group_year.pk,
+                    self.education_group_year.pk,
+                    self.achievement_2.pk,
+                ]), data={}
         )
 
         self.assertEqual(response.status_code, 403)

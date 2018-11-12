@@ -346,7 +346,7 @@ class TestLearningUnitXls(TestCase):
                                                                        attribution=an_attribution,
                                                                        allocation_charge=5.0)
 
-        luy.attribution_charge_news = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year(luy)
+        luy.attribution_charge_news = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(luy)
         expected_common = [
             xls_build.translate(luy.periodicity),
             xls_build.translate(luy.status),

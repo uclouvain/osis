@@ -67,6 +67,6 @@ class EntityVersionTestCase(TestCase):
             start_date=self.current_academic_year.start_date + datetime.timedelta(days=19),
             end_date=self.current_academic_year.end_date + datetime.timedelta(days=1),
         )
-        all_entity_version = [entity_version_before_ac,entity_version_in_ac]
+        all_entity_version = [entity_version_before_ac, entity_version_in_ac]
         self.assertEqual(find_entity_version_according_academic_year(all_entity_version, self.current_academic_year),
                          entity_version_in_ac)

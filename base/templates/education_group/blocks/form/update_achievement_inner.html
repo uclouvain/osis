@@ -27,31 +27,31 @@
 
 {% if request.is_ajax %}
     <div class="modal-content" id="form-modal-content">
-        <div id="form-modal-body" class="modal-body">
+    <div id="form-modal-body" class="modal-body">
 {% endif %}
 
-    <form method="post" id="form_achievement" action="{{ request.path }}">
-        {% csrf_token %}
-        {% bootstrap_field form.code_name %}
+<form method="post" id="form_achievement" action="{{ request.path }}">
+    {% csrf_token %}
+    {% bootstrap_field form.code_name %}
 
-        <ul class="nav nav-tabs">
-            <li class="active"><a data-toggle="tab" href="#french_text">{{ form.french_text.label }}</a></li>
-            <li><a data-toggle="tab" href="#english_text">{{ form.english_text.label }}</a></li>
-        </ul>
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#french_text">{{ form.french_text.label }}</a></li>
+        <li><a data-toggle="tab" href="#english_text">{{ form.english_text.label }}</a></li>
+    </ul>
 
-        <div class="tab-content">
-            <div id="french_text" class="tab-pane fade in active">
-                <p>{% bootstrap_field form.french_text show_label=False %}</p>
-            </div>
-            <div id="english_text" class="tab-pane fade">
-                <p>{% bootstrap_field form.english_text show_label=False %}</p>
-            </div>
+    <div class="tab-content">
+        <div id="french_text" class="tab-pane fade in active">
+            <p>{% bootstrap_field form.french_text show_label=False %}</p>
         </div>
+        <div id="english_text" class="tab-pane fade">
+            <p>{% bootstrap_field form.english_text show_label=False %}</p>
+        </div>
+    </div>
 
-        {% if not request.is_ajax %}
-            <input type="submit" value="{% trans "i_confirm" %}" class="btn btn-primary"/>
-        {% endif %}
-    </form>
+    {% if not request.is_ajax %}
+        <input type="submit" value="{% trans "i_confirm" %}" class="btn btn-primary"/>
+    {% endif %}
+</form>
 
 {% if request.is_ajax %}
     <div class="modal-footer">
@@ -59,19 +59,5 @@
         <input type="submit" value="{% trans "save" %}" class="btn btn-primary"
                onclick="CKupdate();$('#form_achievement').submit();"/>
     </div>
-</div>
-<script>
-    $(function() {
-        // Bind the textarea with ckeditor widget
-        CKEDITOR.replace('id_french_text', $('#id_french_text').data('config'));
-        CKEDITOR.replace('id_english_text', $('#id_english_text').data('config'))
-    });
-
-    // Before submitting, we need to update textarea with ckeditor element.
-    function CKupdate(){
-        for ( instance in CKEDITOR.instances )
-            CKEDITOR.instances[instance].updateElement();
-    }
-</script>
-
+    </div>
 {% endif %}

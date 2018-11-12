@@ -27,7 +27,7 @@
 {% endcomment %}
 {% block details %}
     <style>
-        dt{
+        dt {
             margin-bottom: 5px;
         }
     </style>
@@ -69,7 +69,7 @@
                         </dl>
                         {% dl_with_parent 'activities in English' 'english_activities' %}
                         {% dl_with_parent 'other_language_activities' %}
-                        {% dl_with_parent  'main domain' 'main_domain' %}
+                        {% dl_with_parent 'main domain' 'main_domain' %}
 
                         {# TODO dl_with_parent needs to manage list #}
                         <div>
@@ -110,84 +110,45 @@
             </div>
         </div>
         {% include 'education_group/blocks/remarks.html' %}
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <label>{% trans 'program_coorganization' %}</label>
-                {% if education_group_year.coorganizations %}
-                    <table class="table" id="tbl_coorganization">
-                        <tr>
-                            <th>{% trans 'institution' %}</th>
-                            <th></th>
-                            <th>{% trans 'for_all_students' %}</th>
-                            <th>{% trans 'enrollment_campus' %}</th>
-                            <th>{% trans 'diploma' %}</th>
-                        </tr>
-                        {% for c in education_group_year.coorganizations %}
-                            <tr>
-                                <td>
-                                    {{ c.address.country.name }} - {{ c.address.city }}<br>
-                                    {{ c.organization.name }}
-                                </td>
-                                <td>{% if c.organization.logo %}
-                                    <img src="{{ c.organization.logo.url }}" width="50px"/>
-                                {% endif %}
-                                </td>
-                                <td>
-                                    {% if c.all_students %}
-                                        {% trans 'yes' %}
-                                    {% else %}
-                                        {% trans 'no' %}
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if c.enrollment_place %}
-                                        {% trans 'yes' %}
-                                    {% else %}
-                                        {% trans 'no' %}
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if c.diploma %}
-                                        {% trans coorganization.diploma %}
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        {% for c in parent.coorganizations %}
-                            <tr class="text-primary">
-                                <td>
-                                    {{ c.address.country.name }} - {{ c.address.city }}<br>
-                                    {{ c.organization.name }}
-                                </td>
-                                <td>{% if c.organization.logo %}
-                                    <img src="{{ c.organization.logo.url }}" width="50px"/>
-                                {% endif %}
-                                </td>
-                                <td>
-                                    {% if c.all_students%}
-                                        {% trans 'yes' %}
-                                    {% else %}
-                                        {% trans 'no' %}
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if c.enrollment_place %}
-                                        {% trans 'yes' %}
-                                    {% else %}
-                                        {% trans 'no' %}
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if c.diploma %}
-                                        {% trans coorganization.diploma %}
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                {% endif %}
-            </div>
-        </div>
+
+        {% if show_coorganization %}
+            {% include 'education_group/blocks/coorganization.html' %}
+        {% endif %}
     {% endwith %}
 
+{% endblock %}
+{% block script %}
+    <script>
+        $(document).ready(function () {
+            $('#tbl_coorganization').DataTable({
+                columnDefs: [
+                    {targets: 3, type: 'diacritics-neutralise'},
+                    {targets: 1, orderable: false},
+                    {targets: 7, orderable: false},
+                    {targets: 8, orderable: false}
+                ],
+                "paging": false,
+                "ordering": true,
+                "info": false,
+                "searching": false,
+                "language": {
+                    "oAria": {
+                        "sSortAscending": "{% trans 'datatable_sortascending'%}",
+                        "sSortDescending": "{% trans 'datatable_sortdescending'%}"
+                    }
+                },
+                "order": [[2, "desc"], [0, "asc"]]
+            });
+
+            $(".coorganization-edit-btn").click(function (ev) {
+                ev.preventDefault();
+                var url = $(this).data("form");
+                var coorganization_edit_modal = $("#coorganization_edit");
+                coorganization_edit_modal.load(url, function () { // load the url into the modal
+                    $(this).modal('show');
+                });
+                return false;
+            });
+        });
+    </script>
 {% endblock %}

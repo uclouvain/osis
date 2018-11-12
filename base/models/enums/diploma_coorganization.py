@@ -23,8 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from enum import Enum
+from django.utils.translation import ugettext_lazy as _
+
 from base.models.utils.utils import ChoiceEnum
+
+UNIQUE = "UNIQUE"
+SEPARATE = "SEPARATE"
+NOT_CONCERNED = "NOT_CONCERNED"
+
+COORGANIZATION_DIPLOMA_TYPE = (
+    (UNIQUE, _(UNIQUE)),
+    (SEPARATE, _(SEPARATE)),
+    (NOT_CONCERNED, _(NOT_CONCERNED)),
+)
 
 
 class DiplomaCoorganizationTypes(ChoiceEnum):

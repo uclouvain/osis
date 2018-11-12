@@ -36,3 +36,8 @@ class EducationGroupOrganizationFactory(factory.django.DjangoModelFactory):
 
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
     organization = factory.SubFactory(OrganizationFactory)
+    all_students = False
+    enrollment_place = False
+    diploma = "UNIQUE"
+    is_producing_cerfificate = False
+    is_producing_annexe = False

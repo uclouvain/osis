@@ -32,6 +32,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.timezone import now
+from django.utils.translation import ugettext_lazy as _
 
 from base.models.entity import Entity
 from base.models.enums import entity_type
@@ -43,6 +44,7 @@ from osis_common.utils.datetime import get_tzinfo
 PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS = [
     "ILV",
     "IUFC",
+    "CCR"
 ]
 
 
@@ -166,6 +168,12 @@ class EntityVersion(SerializableModel):
     start_date = models.DateField(db_index=True)
     end_date = models.DateField(db_index=True, blank=True, null=True)
 
+    logo = models.ImageField(
+        upload_to='organization_logos',
+        null=True,
+        blank=True,
+        verbose_name=_("logo")
+    )
     objects = EntityVersionQuerySet.as_manager()
 
     def __str__(self):
@@ -186,6 +194,11 @@ class EntityVersion(SerializableModel):
     def exists_now(self):
         now = datetime.datetime.now().date()
         return (not self.end_date) or (self.end_date and self.start_date < now < self.end_date)
+
+    @property
+    def verbose_title(self):
+        complete_title = ' - '.join(filter(None, [self.acronym, self.title]))
+        return complete_title
 
     def can_save_entity_version(self):
         return self.count_entity_versions_same_entity_overlapping_dates() == 0 and \

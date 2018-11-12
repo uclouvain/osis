@@ -27,7 +27,7 @@ import datetime
 
 from django.test import TestCase
 
-from base.business.education_groups.perms import is_education_group_creation_period_opened, check_permission, \
+from base.business.education_groups.perms import is_academic_calendar_opened, check_permission, \
     check_authorized_type
 from base.models.enums import academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
@@ -61,19 +61,35 @@ class TestPerms(TestCase):
         next_ac = AcademicYearFactory(year=current_ac.year + 1)
 
         # The period is closed
-        self.assertFalse(is_education_group_creation_period_opened(education_group))
+        self.assertFalse(
+            is_academic_calendar_opened(
+                education_group,
+                academic_calendar_type.EDUCATION_GROUP_EDITION
+            )
+        )
 
         opened_period = closed_period
         opened_period.start_date = today
         opened_period.save()
 
         # It is open the academic_year does not match
-        self.assertFalse(is_education_group_creation_period_opened(education_group))
+        self.assertFalse(
+            is_academic_calendar_opened(
+                education_group,
+                academic_calendar_type.EDUCATION_GROUP_EDITION
+            )
+        )
 
         # It is open and the education_group is in N+1 academic_year
         education_group.academic_year = next_ac
         education_group.save()
-        self.assertTrue(is_education_group_creation_period_opened(education_group, raise_exception=True))
+        self.assertTrue(
+            is_academic_calendar_opened(
+                education_group,
+                academic_calendar_type.EDUCATION_GROUP_EDITION,
+                raise_exception=True
+            )
+        )
 
     def is_person_central_manager(self):
         person = PersonFactory()
@@ -96,3 +112,50 @@ class TestPerms(TestCase):
     def test_check_authorized_type_without_parent(self):
         result = check_authorized_type(None, TRAINING)
         self.assertTrue(result)
+
+    def test_is_education_group_general_information_edit_period_opened(self):
+        person = PersonFactory()
+        education_group = EducationGroupYearFactory()
+        today = datetime.date.today()
+
+        current_ac = create_current_academic_year()
+
+        closed_period = AcademicCalendarFactory(
+            start_date=today + datetime.timedelta(days=1),
+            end_date=today + datetime.timedelta(days=3),
+            academic_year=current_ac,
+            reference=academic_calendar_type.EDITION_OF_GENERAL_INFORMATION,
+        )
+
+        next_ac = AcademicYearFactory(year=current_ac.year + 1)
+
+        # The period is closed
+        self.assertFalse(
+            is_academic_calendar_opened(
+                education_group,
+                academic_calendar_type.EDITION_OF_GENERAL_INFORMATION
+            )
+        )
+
+        opened_period = closed_period
+        opened_period.start_date = today
+        opened_period.save()
+
+        # It is open the academic_year does not match
+        self.assertFalse(
+            is_academic_calendar_opened(
+                education_group,
+                academic_calendar_type.EDITION_OF_GENERAL_INFORMATION
+            )
+        )
+
+        # It is open and the education_group is in N+1 academic_year
+        education_group.academic_year = next_ac
+        education_group.save()
+        self.assertTrue(
+            is_academic_calendar_opened(
+                education_group,
+                academic_calendar_type.EDITION_OF_GENERAL_INFORMATION,
+                raise_exception=True
+            )
+        )

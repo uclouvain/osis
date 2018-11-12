@@ -30,119 +30,42 @@
 <form method="post" id="UpdateTrainingForm">
     {% csrf_token %}
     <div class="panel panel-default">
+
         <div class="panel-heading">
             {% include "education_group/blocks/form/create_cancel_buttons.html" %}
         </div>
+
         <div class="panel-body">
-            <div class="row">
-                <div class="col-md-7">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <div class="row">
-                                {% bootstrap_field form_education_group_year.acronym form_group_class="col-md-6" %}
-                                {% bootstrap_field form_education_group_year.partial_acronym form_group_class="col-md-6" %}
-                            </div>
-                            <br>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label>{% trans 'category' %}</label><br>
-                                    <input value="{% trans form_education_group_year.category %}"
-                                           disabled class="form-control" >
-                                </div>
-                                {% bootstrap_field form_education_group_year.education_group_type form_group_class="col-md-6" %}
-                            </div>
-                            <br>
-                            <div class="row">
-                                {% bootstrap_field form_education_group_year.active form_group_class="col-md-6" %}
-                                {% bootstrap_field form_education_group_year.schedule_type form_group_class="col-md-6" %}
-                            </div>
-                            <br>
-                            <div class="row">
-                                {% bootstrap_field form_education_group_year.credits form_group_class="col-md-6" %}
-                                {% bootstrap_field form_education_group_year.constraint_type form_group_class="col-md-6" %}
-                            </div>
-                            <br>
-                            <div class="row">
-                                {% bootstrap_field form_education_group_year.min_constraint form_group_class="col-md-6" %}
-                                {% bootstrap_field form_education_group_year.max_constraint form_group_class="col-md-6" %}
-                            </div>
-                            <br>
-                            {% bootstrap_field form_education_group_year.title %}
-                            {% bootstrap_field form_education_group_year.title_english %}
-                            {% bootstrap_field form_education_group_year.keywords %}
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            {% bootstrap_field form_education_group_year.academic_type %}
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="{% if not request.GET.tab_to_show %} active {% endif %}">
+                    <a href="#description" aria-controls="description" role="tab" data-toggle="tab">
+                        {% trans 'identification' %}
+                    </a>
+                </li>
+                <li role="presentation" class="{% if request.GET.tab_to_show == 'diplomas_certificates' %} active {% endif %}">
+                    <a href="#diplomas_certificates" aria-controls="profile" role="tab" data-toggle="tab">
+                        {% trans 'diplomas_certificates' %}
+                    </a>
+                </li>
+            </ul>
+            <br>
 
-                            <div class="row">
-                                {% bootstrap_field form_education_group_year.duration form_group_class="col-md-2" %}
-                                {% bootstrap_field form_education_group_year.duration_unit form_group_class="col-md-4" %}
-                                {% bootstrap_field form_education_group_year.internship form_group_class="col-md-6" %}
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    {% bootstrap_field form_education_group_year.enrollment_enabled %}
-                                    {% bootstrap_field form_education_group_year.admission_exam %}
-                                    {% bootstrap_field form_education_group_year.university_certificate %}
-                                </div>
-                                <div class="col-md-6">
-                                    {% bootstrap_field form_education_group_year.partial_deliberation %}
-                                    {% bootstrap_field form_education_group_year.dissertation %}
-                                </div>
-                            </div>
-                            {% bootstrap_field form_education_group_year.decree_category %}
-                            {% bootstrap_field form_education_group_year.rate_code %}
-                            {% bootstrap_field form_education_group_year.primary_language %}
-                            {% bootstrap_field form_education_group_year.english_activities %}
-                            {% bootstrap_field form_education_group_year.other_language_activities %}
-                            {% bootstrap_field form_education_group_year.main_domain %}
-                            {# Load ajax queries#}
-                            {{ form_education_group_year.media }}
-                            {% bootstrap_field form_education_group_year.secondary_domains %}
-                            {% bootstrap_field form_education_group_year.internal_comment %}
-                            </div>
-                        </div>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane {% if not request.GET.tab_to_show %} active {% endif %}" id="description">
+                    {% include "education_group/blocks/form/training_tab_identification.html" %}
                 </div>
-                <div class="col-md-5">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            {% bootstrap_field form_education_group_year.management_entity %}
-                            {% bootstrap_field form_education_group_year.administration_entity %}
-                            {% bootstrap_field form_education_group_year.academic_year %}
-                            <div class="row">
-                                {% bootstrap_field form_education_group.start_year form_group_class="col-md-6" %}
-                                {% bootstrap_field form_education_group.end_year form_group_class="col-md-6" %}
-                            </div>
-                            <br>
-                            {% bootstrap_field form_education_group_year.enrollment_campus %}
-                            {% bootstrap_field form_education_group_year.main_teaching_campus %}
-                            {% bootstrap_field form_education_group_year.other_campus_activities %}
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            {% bootstrap_field form_education_group_year.funding %}
-                            {% bootstrap_field form_education_group_year.funding_direction %}
-                            {% bootstrap_field form_education_group_year.funding_cud %}
-                            {% bootstrap_field form_education_group_year.funding_direction_cud %}
-                        </div>
-                    </div>
 
-                </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    {% bootstrap_field form_education_group_year.remark %}
-                    {% bootstrap_field form_education_group_year.remark_english %}
+                <div role="tabpanel" class="tab-pane {% if request.GET.tab_to_show == 'diplomas_certificates' %} active {% endif %}" id="diplomas_certificates">
+                    {% include "education_group/blocks/form/training_tab_diploma.html" %}
                 </div>
             </div>
         </div>
+
         <div class="panel-footer text-right">
             {% include "education_group/blocks/form/create_cancel_buttons.html" %}
         </div>
+
     </div>
     {% include "blocks/modal/confirmation_modal.html" %}
 </form>

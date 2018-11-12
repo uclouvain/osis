@@ -23,64 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.db import transaction, Error
+
+from django.utils.translation import ugettext as _
 
 from base.business.learning_units.edition import duplicate_learning_unit_year
-from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear
+from base.business.utils.postponement import AutomaticPostponement
 from base.models.learning_unit_year import LearningUnitYear
-from base.utils.send_mail import send_mail_before_annual_procedure_of_automatic_postponement, \
-    send_mail_after_annual_procedure_of_automatic_postponement
+from base.utils.send_mail import send_mail_before_annual_procedure_of_automatic_postponement_of_luy, \
+    send_mail_after_annual_procedure_of_automatic_postponement_of_luy
 
 
-def fetch_learning_unit_to_postpone(queryset=None):
-    if not queryset:
-        queryset = LearningUnitYear.objects_with_container.all()
+class LearningUnitAutomaticPostponement(AutomaticPostponement):
+    model = LearningUnitYear
 
-    # Fetch N+6 and N+5 academic_years
-    last_academic_year = AcademicYear.objects.get(year=compute_max_academic_year_adjournment())
-    penultimate_academic_year = last_academic_year.past()
+    send_before = send_mail_before_annual_procedure_of_automatic_postponement_of_luy
+    send_after = send_mail_after_annual_procedure_of_automatic_postponement_of_luy
+    extend_method = duplicate_learning_unit_year
+    msg_result = _("%s learning unit(s) extended and %s error(s)")
 
-    # We take all learning unit years from N+5 academic year
-    qs_luy = queryset.filter(academic_year=penultimate_academic_year)
+    def get_queryset(self, queryset=None):
+        return super().get_queryset(queryset).filter(learning_container_year__isnull=False)
 
-    # Create filters to know which luys must be copied to N+6
-    luys_already_duplicated = qs_luy.filter(learning_unit__learningunityear__academic_year=last_academic_year)
-    luys_to_not_duplicate = qs_luy.filter(learning_unit__end_year__lt=last_academic_year.year)
-    luys_to_duplicate = qs_luy.difference(luys_already_duplicated, luys_to_not_duplicate)
+    def get_already_duplicated(self):
+        return self.queryset.filter(learning_unit__learningunityear__academic_year=self.last_academic_year)
 
-    # send statistics to the managers
-    send_mail_before_annual_procedure_of_automatic_postponement(last_academic_year, luys_to_duplicate,
-                                                                luys_already_duplicated, luys_to_not_duplicate)
-
-    result, errors = extend_learning_units_until_last_academic_year(last_academic_year, luys_to_duplicate)
-
-    # send statistics with results to the managers
-    send_mail_after_annual_procedure_of_automatic_postponement(last_academic_year, result, luys_already_duplicated,
-                                                               luys_to_not_duplicate, errors)
-
-    return result, errors
-
-
-def extend_learning_units_until_last_academic_year(last_academic_year, luys_to_duplicate):
-    result = []
-    errors = []
-    for luy in luys_to_duplicate:
-        try:
-            with transaction.atomic():
-                result.append(duplicate_learning_unit_year(luy, last_academic_year))
-        # General catch to be sure to not stop the rest of the duplication
-        except (Error, ObjectDoesNotExist, MultipleObjectsReturned):
-            errors.append(luy)
-
-    return result, errors
-
-
-MSG_RESULT = "%s learning unit(s) extended and %s error(s)"
-
-
-def serialize_postponement_results(result, errors):
-    return {
-        "msg": MSG_RESULT % (len(result), len(errors)),
-        "errors": [str(luy) for luy in errors]
-    }
+    def get_to_not_duplicated(self):
+        return self.queryset.filter(learning_unit__end_year__lt=self.last_academic_year.year)

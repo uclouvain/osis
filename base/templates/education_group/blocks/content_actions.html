@@ -24,29 +24,24 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<form id="form_group_element_year_actions" method="POST" style="display:inline;" action="{% url 'education_groups_management' %}">
-    <input type="hidden" name="root_id" value="{{ root.id }}" />
-    <input type="hidden" name="element_id" value="{{ group.child_id }}" />
-    <input type="hidden" name="group_element_year_id" value="{{ group.id }}" />
+<form id="form_group_element_year_actions" method="POST" style="display:inline;"
+      action="{% url 'education_groups_management' %}">
+    <input type="hidden" name="root_id" value="{{ root.id }}"/>
+    <input type="hidden" name="element_id" value="{{ group.child_id }}"/>
+    <input type="hidden" name="group_element_year_id" value="{{ group.id }}"/>
     {% csrf_token %}
-    {% button_order_with_permission _("up") "btn_operation_up_"|addstr:group.id  "up" %}
-    {% button_order_with_permission _("down") "btn_operation_down_"|addstr:group.id  "down" %}
+    <div class="btn-group">
+        {% button_order_with_permission _("up") "btn_operation_up_"|addstr:group.id "up" %}
+        {% button_order_with_permission _("down") "btn_operation_down_"|addstr:group.id "down" %}
+    </div>
 </form>
 
-
-{% with "btn_operation_detach_"|addstr:group.id as id_detach %}
-    {% button_with_permission _("Detach") id_detach "detach" %}
-
+<div class="btn-group">
     {% url_resolver_match as url_resolver_match %}
     {% url 'education_groups_management' as management_url %}
     {% url_add_query management_url root_id=root.id element_id=group.child_id group_element_year_id=group.id action="detach" source=url_resolver_match as detach_url %}
-    {% include "blocks/modal/modal_ajax.html" with modal_url=detach_url click_id=id_detach form_id="form_detach_confirm" %}
-{% endwith %}
-
-
-{% with "btn_operation_edit_"|addstr:group.id as id_edit %}
-    {% button_with_permission _("edit") id_edit "edit" %}
+    {% button_with_permission _("Detach") "detach" detach_url %}
 
     {% url 'group_element_year_management_comment' root_id=parent.id education_group_year_id=education_group_year.id group_element_year_id=group.id as update_comment_url %}
-    {% include "blocks/modal/modal_ajax.html" with modal_url=update_comment_url click_id=id_edit form_id="form_comment_update" %}
-{% endwith %}
+    {% button_with_permission _("edit") "edit" update_comment_url %}
+</div>

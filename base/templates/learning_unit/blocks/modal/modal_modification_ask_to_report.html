@@ -27,14 +27,14 @@
 <div class="modal fade" id="modalReport" tabindex="-1" role="dialog" aria-labelledby="modalReport">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <input type="hidden" value=1 name="postponement" id="id_postponement">
-
             <div class="modal-body">
                 {% trans "ask_to_report_modification" %}
             </div>
             <div class="modal-footer">
-                <button type="submit" id="btn_without_postponement"  class="btn btn-primary" onclick="disable_postponement();">{% trans 'no' %}</button>
-                <button type="submit" id="btn_with_postponement" class="btn btn-primary" onclick="enable_postponement();">{% trans 'yes' %}</button>
+                <button type="submit" id="btn_without_postponement" class="btn btn-primary"
+                        onclick="postponement(0);">{% trans 'no' %}</button>
+                <button type="submit" id="btn_with_postponement" class="btn btn-primary"
+                        onclick="postponement(1);">{% trans 'yes' %}</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "cancel" %}</button>
             </div>
         </div>
@@ -42,12 +42,11 @@
 </div>
 
 <script>
-function enable_postponement(){
-    $("#id_postponement").val(1);
-    $('form').submit()
-}
-function disable_postponement(){
-    $("#id_postponement").val(0);
-    $('form').submit()
-}
+    function postponement(val) {
+        let form = $('form');
+        let input = $("<input>").attr("type", "hidden").attr("name", "postponement").val(1);
+        form.append($(input));
+        $('#modalReport').modal('hide');
+        form.submit()
+    }
 </script>

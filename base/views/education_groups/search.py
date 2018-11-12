@@ -28,7 +28,7 @@ from collections import OrderedDict
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl
@@ -39,7 +39,6 @@ from base.models.enums import education_group_categories
 from base.models.person import Person
 from base.utils.cache import cache_filter
 from base.views.common import paginate_queryset
-from base.views import layout
 
 
 @login_required
@@ -47,12 +46,10 @@ from base.views import layout
 @cache_filter(exclude_params=['xls_status', 'xls_order_col'])
 def education_groups(request):
     person = get_object_or_404(Person, user=request.user)
-    if request.GET:
-        form = EducationGroupFilter(request.GET)
-    else:
-        current_academic_year = mdl.academic_year.current_academic_year()
-        form = EducationGroupFilter(initial={'academic_year': current_academic_year,
-                                             'category': education_group_categories.TRAINING})
+    current_academic_year = mdl.academic_year.current_academic_year()
+
+    form = EducationGroupFilter(request.GET or None, initial={'academic_year': current_academic_year,
+                                                              'category': education_group_categories.TRAINING})
 
     object_list = _get_object_list(form, request) if form.is_valid() else []
 
@@ -77,7 +74,7 @@ def education_groups(request):
         'person': person
     }
 
-    return layout.render(request, "education_group/search.html", context)
+    return render(request, "education_group/search.html", context)
 
 
 def _get_object_list(form, request):

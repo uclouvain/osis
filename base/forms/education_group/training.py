@@ -25,14 +25,19 @@
 ##############################################################################
 from ajax_select import register, LookupChannel
 from ajax_select.fields import AutoCompleteSelectMultipleField
+from dal import autocomplete
 from django import forms
 from django.db.models import Q
+from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_groups import shorten
 from base.business.education_groups.postponement import PostponementEducationGroupYearMixin
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, \
     MainEntitiesVersionChoiceField, EducationGroupYearModelForm
+from base.forms.utils.choice_field import add_blank
+from base.models.certificate_aim import CertificateAim
+from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.entity_version import get_last_version
 from base.models.enums import education_group_categories, rate_code, decree_category
@@ -45,12 +50,18 @@ class MainDomainChoiceField(forms.ModelChoiceField):
         return "{}:{} {}".format(domain.decree.name, domain.code, domain.name)
 
 
+def _get_section_choices():
+    return add_blank(CertificateAim.objects.values_list('section', 'section').distinct().order_by('section'))
+
+
 class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
     category = education_group_categories.TRAINING
 
     secondary_domains = AutoCompleteSelectMultipleField(
         'university_domains', required=False, help_text="", label=_('secondary domains').title()
     )
+
+    section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False)
 
     class Meta(EducationGroupYearModelForm.Meta):
         fields = [
@@ -96,6 +107,10 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             "secondary_domains",
             "decree_category",
             "rate_code",
+            'joint_diploma',
+            'diploma_printing_title',
+            'professional_title',
+            'certificate_aims',
         ]
 
         field_classes = {
@@ -104,6 +119,16 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
                 "administration_entity": MainEntitiesVersionChoiceField,
                 "main_domain": MainDomainChoiceField
             }
+        }
+        widgets = {
+            'certificate_aims': autocomplete.ModelSelect2Multiple(
+                url='certificate_aim_autocomplete',
+                attrs={
+                    'data-html': True,
+                    'data-placeholder': _('Search...'),
+                },
+                forward=['section'],
+            )
         }
 
     def __init__(self, *args, **kwargs):
@@ -125,6 +150,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         education_group_year.save()
         if not self.fields['secondary_domains'].disabled:
             self.save_secondary_domains()
+        self.save_certificate_aims()
         return education_group_year
 
     def save_secondary_domains(self):
@@ -134,6 +160,14 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             EducationGroupYearDomain.objects.get_or_create(
                 education_group_year=self.instance,
                 domain_id=domain_id,
+            )
+
+    def save_certificate_aims(self):
+        self.instance.certificate_aims.clear()
+        for certificate_aim in self.cleaned_data["certificate_aims"]:
+            EducationGroupCertificateAim.objects.get_or_create(
+                education_group_year=self.instance,
+                certificate_aim=certificate_aim,
             )
 
 

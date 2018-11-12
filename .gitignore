@@ -17,6 +17,7 @@ backoffice/server_settings.py
 .pydevproject
 *.mo
 /uploads/
+/.my_config/
 .env
 .coverage
 *.sh

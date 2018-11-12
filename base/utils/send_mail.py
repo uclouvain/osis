@@ -65,7 +65,7 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
     receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in persons]
     suject_data = {'learning_unit_name': learning_unit_name}
     template_base_data = {'learning_unit_name': learning_unit_name,
-                          'encoding_status':    _('encoding_status_ended') if all_encoded
+                          'encoding_status': _('encoding_status_ended') if all_encoded
                           else _('encoding_status_notended')
                           }
     header_txt = ['acronym', 'session_title', 'registration_number', 'lastname', 'firstname', 'score', 'documentation']
@@ -93,20 +93,20 @@ def send_mail_after_the_learning_unit_year_deletion(managers, acronym, academic_
     suject_data = {'learning_unit_acronym': acronym}
     template_base_data = {'learning_unit_acronym': acronym,
                           'academic_year': academic_year,
-                          'msg_list':msg_list,
+                          'msg_list': msg_list,
                           }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, suject_data, None)
     return message_service.send_messages(message_content)
 
 
-def send_mail_before_annual_procedure_of_automatic_postponement(
+def send_mail_before_annual_procedure_of_automatic_postponement_of_luy(
         end_academic_year, luys_to_postpone, luys_already_existing, luys_ending_this_year):
     html_template_ref = 'luy_before_auto_postponement_html'
     txt_template_ref = 'luy_before_auto_postponement_txt'
 
     permission = Permission.objects.filter(codename='can_receive_emails_about_automatic_postponement')
-    managers = Person.objects.filter(Q(user__groups__permissions=permission) | Q(user__user_permissions=permission))\
+    managers = Person.objects.filter(Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)) \
         .distinct()
 
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
@@ -121,13 +121,13 @@ def send_mail_before_annual_procedure_of_automatic_postponement(
     return message_service.send_messages(message_content)
 
 
-def send_mail_after_annual_procedure_of_automatic_postponement(
+def send_mail_after_annual_procedure_of_automatic_postponement_of_luy(
         end_academic_year, luys_postponed, luys_already_existing, luys_ending_this_year, luys_with_errors):
     html_template_ref = 'luy_after_auto_postponement_html'
     txt_template_ref = 'luy_after_auto_postponement_txt'
 
     permission = Permission.objects.filter(codename='can_receive_emails_about_automatic_postponement')
-    managers = Person.objects.filter(Q(user__groups__permissions=permission) | Q(user__user_permissions=permission))\
+    managers = Person.objects.filter(Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)) \
         .distinct()
 
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
@@ -137,6 +137,49 @@ def send_mail_after_annual_procedure_of_automatic_postponement(
                           'luys_already_existing': luys_already_existing.count(),
                           'luys_ending_this_year': luys_ending_this_year.count(),
                           'luys_with_errors': luys_with_errors
+                          }
+    message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
+                                                            template_base_data, None, None)
+    return message_service.send_messages(message_content)
+
+
+def send_mail_before_annual_procedure_of_automatic_postponement_of_egy(
+        end_academic_year, egys_to_postpone, egys_already_existing, egys_ending_this_year):
+    html_template_ref = 'egy_before_auto_postponement_html'
+    txt_template_ref = 'egy_before_auto_postponement_txt'
+
+    permission = Permission.objects.filter(codename='can_receive_emails_about_automatic_postponement')
+    managers = Person.objects.filter(Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)) \
+        .distinct()
+
+    receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
+    template_base_data = {'academic_year': current_academic_year().year,
+                          'end_academic_year': end_academic_year.year,
+                          'egys_to_postpone': egys_to_postpone.count(),
+                          'egys_already_existing': egys_already_existing.count(),
+                          'egys_ending_this_year': egys_ending_this_year.count(),
+                          }
+    message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
+                                                            template_base_data, None, None)
+    return message_service.send_messages(message_content)
+
+
+def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
+        end_academic_year, egys_postponed, egys_already_existing, egys_ending_this_year, egys_with_errors):
+    html_template_ref = 'egy_after_auto_postponement_html'
+    txt_template_ref = 'egy_after_auto_postponement_txt'
+
+    permission = Permission.objects.filter(codename='can_receive_emails_about_automatic_postponement')
+    managers = Person.objects.filter(Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)) \
+        .distinct()
+
+    receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
+    template_base_data = {'academic_year': current_academic_year().year,
+                          'end_academic_year': end_academic_year.year,
+                          'egys_postponed': len(egys_postponed),
+                          'egys_already_existing': egys_already_existing.count(),
+                          'egys_ending_this_year': egys_ending_this_year.count(),
+                          'egys_with_errors': egys_with_errors
                           }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
@@ -215,7 +258,7 @@ def _create_xls(parameters_dict):
     workbook = Workbook(encoding='utf-8')
     sheet_number = 0
     for worksheet_data in parameters_dict.get(xls_build.WORKSHEETS_DATA):
-        xls_build._build_worksheet(worksheet_data,  workbook, sheet_number)
+        xls_build._build_worksheet(worksheet_data, workbook, sheet_number)
         sheet_number = sheet_number + 1
 
     _build_worksheet_parameters(workbook, parameters_dict.get(xls_build.USER_KEY),
@@ -254,11 +297,11 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
     receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in persons]
     suject_data = {
         'learning_unit_acronym': learning_unit_acronym,
-        'offer_acronym':         offer_acronym
+        'offer_acronym': offer_acronym
     }
     template_base_data = {
-        'learning_unit_acronym':    learning_unit_acronym,
-        'offer_acronym':            offer_acronym,
+        'learning_unit_acronym': learning_unit_acronym,
+        'offer_acronym': offer_acronym,
     }
     enrollments_data = [
         (

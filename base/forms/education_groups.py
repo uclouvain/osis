@@ -28,7 +28,6 @@ from django.forms import ModelChoiceField
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.entity import get_entities_ids
-from base.forms.bootstrap import BootstrapForm
 from base.models import academic_year, education_group_year
 from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
@@ -60,7 +59,7 @@ class ModelChoiceFieldWithData(forms.ModelChoiceField):
         self.widget.data_attrs = self.queryset.in_bulk()
 
 
-class EducationGroupFilter(BootstrapForm):
+class EducationGroupFilter(forms.Form):
 
     academic_year = forms.ModelChoiceField(
         queryset=academic_year.find_academic_years(),

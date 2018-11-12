@@ -26,6 +26,8 @@
 from django.test import TestCase
 
 from base.forms.utils.choice_field import add_blank
+from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class TestAddBlank(TestCase):
@@ -36,3 +38,8 @@ class TestAddBlank(TestCase):
     def test_add_blank_tuple(self):
         result = add_blank((('yoda', 'jediMaster'),))
         self.assertEqual(result, ((None, '---------'), ('yoda', 'jediMaster')))
+
+    def test_add_blank_queryset(self):
+        luy = LearningUnitYearFactory()
+        result = add_blank(LearningUnitYear.objects.all().values_list('id', 'acronym'))
+        self.assertEqual(result, [(None, '---------'), (luy.id, luy.acronym)])

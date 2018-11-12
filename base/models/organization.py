@@ -24,32 +24,45 @@
 #
 ##############################################################################
 from django.db import models
+from django.utils.safestring import mark_safe
 
 from base.models.enums import organization_type
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
 class OrganizationAdmin(SerializableModelAdmin):
-    list_display = ('name', 'acronym', 'prefix', 'type', 'changed')
+    list_display = ('name', 'acronym', 'type', 'changed', 'logo_tag')
     search_fields = ['acronym', 'name']
 
 
 class Organization(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
+
     name = models.CharField(max_length=255)
-    code = models.CharField(max_length=50, blank=True, null=True)
-    acronym = models.CharField(max_length=20, blank=True, null=True)
-    website = models.URLField(max_length=255, blank=True, null=True)
-    type = models.CharField(max_length=30, blank=True, null=True, choices=organization_type.ORGANIZATION_TYPE,
-                            default='UNKNOWN')
+    code = models.CharField(max_length=50, blank=True)
+    acronym = models.CharField(max_length=20, blank=True)
+    website = models.URLField(max_length=255, blank=True)
+
+    type = models.CharField(max_length=30, blank=True,
+                            choices=organization_type.ORGANIZATION_TYPE,
+                            default='')
+
     start_date = models.DateTimeField(null=True)
-    end_date = models.DateTimeField(null=True)
-    prefix = models.CharField(max_length=30, blank=True, null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
+
+    prefix = models.CharField(max_length=30, blank=True)
     logo = models.ImageField(upload_to='organization_logos', null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return "{}".format(self.name)
+
+    def logo_tag(self):
+        if self.logo:
+            return mark_safe('<img src="%s" height="30"/>' % self.logo.url)
+        return ""
+
+    logo_tag.short_description = 'Logo'
 
     class Meta:
         permissions = (
@@ -67,22 +80,3 @@ class Organization(SerializableModel):
 
 def find_by_id(organization_id):
     return Organization.objects.get(pk=organization_id)
-
-
-def search(acronym=None, name=None, type=None):
-    out = None
-    queryset = Organization.objects
-
-    if acronym:
-        queryset = queryset.filter(acronym__icontains=acronym)
-
-    if name:
-        queryset = queryset.filter(name__icontains=name)
-
-    if type:
-        queryset = queryset.filter(type=type)
-
-    if acronym or name or type:
-        out = queryset
-
-    return out

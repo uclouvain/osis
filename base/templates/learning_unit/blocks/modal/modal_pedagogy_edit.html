@@ -24,37 +24,27 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<div class="modal-dialog" role="document" style="width:850px;">
-    <div class="modal-content">
-        <form class="pedagogy-form" role="form" method="POST"
-              action="{{ request.path }}">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">×</button>
-                <h4>
-                    {{ text_label_translated.label }}
-                    {% if label_name not in cms_label_pedagogy_fr_only %}
-                        - {{ language_translated.1 }}
-                    {% endif %}
-                </h4>
-            </div>
-            <div class="modal-body">
-                {% csrf_token %}
-                {{ form.trans_text }}
-                {{ form.cms_id }}
-            </div>
-            <div class="modal-footer">
-               <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}</button>
-               <button type="submit" class="btn" data-dismiss="modal">{% trans 'cancel' %} </button>
-          </div>
-        </form>
-    </div>
-</div>
 
-<script>
-    $(function() {
-        var richText = $('#id_trans_text');
-        // Get configuration of rich text field
-        var config = richText.data('config')
-        CKEDITOR.replace('id_trans_text', config)
-    });
-</script>
+<form class="pedagogy-form" role="form" method="POST" action="{{ request.path }}">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">×</button>
+        <h4>
+            {{ text_label_translated.label }}
+            {% if label_name not in cms_label_pedagogy_fr_only %}
+                - {{ language_translated.1 }}
+            {% endif %}
+        </h4>
+    </div>
+    <div class="modal-body">
+        {% csrf_token %}
+        {{ form.trans_text }}
+        {{ form.cms_id }}
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="submit">
+            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}
+        </button>
+        <button type="submit" class="btn" data-dismiss="modal">{% trans 'cancel' %} </button>
+    </div>
+</form>
+

@@ -46,20 +46,11 @@ class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
             self.get_object().up()
         elif form.cleaned_data['action'] == 'down':
             self.get_object().down()
-        elif form.cleaned_data['action'] == 'delete':
-            self.get_object().delete()
         return super().form_valid(form)
 
     def form_invalid(self, form):
         display_error_messages(self.request, _("Invalid action"))
         return HttpResponseRedirect(self.get_success_url())
-
-    def get_object(self, queryset=None):
-        """ With delete action, get_object must return None"""
-        try:
-            return super().get_object(queryset)
-        except Http404:
-            return None
 
 
 class UpdateEducationGroupAchievement(AjaxTemplateMixin, EducationGroupAchievementMixin, UpdateView):

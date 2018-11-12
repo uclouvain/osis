@@ -41,23 +41,25 @@ class TestEducationalInformation(TestCase):
         self.person_lu_1 = PersonFactory()
         self.tutor_lu1_1 = TutorFactory(person=self.person_lu_1)
         self.attribution_lu1 = AttributionFactory(learning_unit_year=self.learning_unit_year_1, tutor=self.tutor_lu1_1)
-        self.learning_unit_year_1.summary_status=False
-        self.learning_unit_year_1.summary_responsibles=[self.attribution_lu1]
+        self.learning_unit_year_1.summary_status = False
+        self.learning_unit_year_1.summary_responsibles = [self.attribution_lu1]
 
         self.learning_unit_year_2 = LearningUnitYearFakerFactory()
         self.person_lu_2 = PersonFactory()
         self.tutor_lu1_2_1 = TutorFactory(person=self.person_lu_2)
         self.person_lu_3 = PersonFactory()
         self.tutor_lu2_2_2 = TutorFactory(person=self.person_lu_3)
-        self.attribution_lu2_1 = AttributionFactory(learning_unit_year=self.learning_unit_year_2, tutor=self.tutor_lu1_2_1)
-        self.attribution_lu2_2 = AttributionFactory(learning_unit_year=self.learning_unit_year_2, tutor=self.tutor_lu2_2_2)
-        self.learning_unit_year_2.summary_status=False
-        self.learning_unit_year_2.summary_responsibles=[self.attribution_lu2_1, self.attribution_lu2_2]
+        self.attribution_lu2_1 = AttributionFactory(learning_unit_year=self.learning_unit_year_2,
+                                                    tutor=self.tutor_lu1_2_1)
+        self.attribution_lu2_2 = AttributionFactory(learning_unit_year=self.learning_unit_year_2,
+                                                    tutor=self.tutor_lu2_2_2)
+        self.learning_unit_year_2.summary_status = False
+        self.learning_unit_year_2.summary_responsibles = [self.attribution_lu2_1, self.attribution_lu2_2]
 
         self.learning_unit_year_3 = LearningUnitYearFakerFactory()
         self.attribution_lu3 = AttributionFactory(learning_unit_year=self.learning_unit_year_3, tutor=self.tutor_lu1_1)
-        self.learning_unit_year_3.summary_status=False
-        self.learning_unit_year_3.summary_responsibles=[self.attribution_lu3]
+        self.learning_unit_year_3.summary_status = False
+        self.learning_unit_year_3.summary_responsibles = [self.attribution_lu3]
 
     def test_get_learning_unit_yr_list_with_one_responsible(self):
         learning_units = get_responsible_and_learning_unit_yr_list([self.learning_unit_year_1])
@@ -79,7 +81,7 @@ class TestEducationalInformation(TestCase):
 
     def test_get_learning_unit_yr_list_with_summary_already_updated(self):
         learning_unit_year_updated = LearningUnitYearFakerFactory()
-        learning_unit_year_updated.summary_status=True
+        learning_unit_year_updated.summary_status = True
         learning_units = get_responsible_and_learning_unit_yr_list([learning_unit_year_updated])
         self.assertCountEqual(learning_units, [])
 

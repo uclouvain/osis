@@ -23,11 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models import QuerySet
+from django.utils.translation import ugettext_lazy as _
+
 BLANK_CHOICE = [(None, "---------")]
+ALL_CHOICE = [("all", _('all_label'))]
 
 
 def add_blank(choices):
+    if isinstance(choices, QuerySet):
+        choices = list(choices)
     if isinstance(choices, list):
         return BLANK_CHOICE + choices
 
     return tuple(BLANK_CHOICE) + choices
+
+
+def add_all(choices):
+    if isinstance(choices, QuerySet):
+        choices = list(choices)
+    if isinstance(choices, list):
+        return ALL_CHOICE + choices
+
+    return tuple(ALL_CHOICE) + choices

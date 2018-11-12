@@ -54,7 +54,12 @@ class OfferYear(SerializableModel):
     parent = models.ForeignKey('self', blank=True, null=True, related_name='children', db_index=True)
     grade = models.CharField(max_length=20, blank=True, null=True, choices=GRADE_TYPES)
     entity_administration = models.ForeignKey('Structure', related_name='admministration', blank=True, null=True)
-    entity_administration_fac = models.ForeignKey('Structure', related_name='admministration_fac', blank=True, null=True)
+    entity_administration_fac = models.ForeignKey(
+        'Structure',
+        related_name='admministration_fac',
+        blank=True,
+        null=True
+    )
     entity_management = models.ForeignKey('Structure', related_name='management', blank=True, null=True)
     entity_management_fac = models.ForeignKey('Structure', related_name='management_fac', blank=True, null=True)
     recipient = models.CharField(max_length=255, blank=True, null=True)  # Recipient of scores cheets (Structure)

@@ -89,7 +89,7 @@ def _prepare_titles():
 def create_xls_attribution(user, found_learning_units, filters):
     for learning_unit_yr in found_learning_units:
         learning_unit_yr.attribution_charge_news = attribution_charge_new\
-            .find_attribution_charge_new_by_learning_unit_year(learning_unit_year=learning_unit_yr)
+            .find_attribution_charge_new_by_learning_unit_year_as_dict(learning_unit_year=learning_unit_yr)
 
     working_sheets_data = prepare_xls_content(found_learning_units)
     return xls_build.generate_xls(prepare_xls_parameters_list(user, working_sheets_data), filters)
