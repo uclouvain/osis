@@ -44,7 +44,7 @@ LEARNING_UNIT_TITLES = [
     str(_('title')),
     str(_('type')),
     str(_('subtype')),
-    str(_('requirement_entity_small')),
+    str(_('Req. Entity')),
     str(_('allocation_entity_small')),
     str(_('credits')),
     str(_('active_title'))

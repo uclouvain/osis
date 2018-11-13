@@ -3741,16 +3741,16 @@ msgstr "Remarque en anglais"
 
 #: forms/learning_unit/external_learning_unit.py:94
 #: models/external_learning_unit_year.py:74
-msgid "requesting_entity"
+msgid "Requesting entity"
 msgstr "Entité demandeuse"
 
 #: templates/education_group/group_element_year_comment_inner.html:36
 #: templates/learning_unit/blocks/panel/educational_informations.html:120
-msgid "required"
+msgid "Required"
 msgstr "Obligatoire"
 
 #: tests/forms/test_learning_unit_postponement.py:585
-msgid "requirement_entity"
+msgid "Requirement entity"
 msgstr "Entité resp. cahier des charges"
 
 #: business/learning_unit.py:63 business/learning_unit_xls.py:75
@@ -3760,21 +3760,21 @@ msgstr "Entité resp. cahier des charges"
 #: templates/learning_unit/by_proposal.html:57
 #: tests/forms/learning_unit/test_search_form.py:63
 #: tests/views/test_learning_unit_pedagogy.py:193
-msgid "requirement_entity_small"
+msgid "Req. Entity"
 msgstr "Ent. charge"
 
 #: templates/admin/data_maintenance.html:48
 msgid "reset"
-msgstr ""
+msgstr "réinitialiser"
 
 #: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:41
-msgid "responsible"
+msgid "Responsible"
 msgstr "Responsable"
 
 #: templates/admin/data_maintenance.html:53
 #: templates/student/exams_enrollments.html:51
 msgid "result"
-msgstr "Résultat"
+msgstr "résultat"
 
 #: templates/academic_calendar/academic_calendar_form.html:126
 #: templates/academic_calendar/academic_calendar_form.html:127
@@ -4278,51 +4278,44 @@ msgid "used_by"
 msgstr "Utilisation par l'unité d'enseignement"
 
 #: templates/registration/login.html:40
-msgid "user"
+msgid "User"
 msgstr "Utilisateur"
 
 #: templates/my_osis/profile.html:173
-msgid "user_interface_language"
+msgid "User interface language"
 msgstr "Langue de l'interface utilisateur"
 
 #: models/learning_container_year.py:57
 #: templates/learning_unit/identification.html:160
-msgid "vacant"
+msgid "Vacant"
 msgstr "Vacant"
 
 #: models/validation_rule.py:70
-#, fuzzy
-#| msgid "evaluations"
 msgid "validation rule"
-msgstr "Évaluations"
+msgstr "règle de validation"
 
 #: templates/learning_unit/by_proposal.html:54
-#, fuzzy
-#| msgid "validity"
-msgid "validite"
-msgstr "validité"
-
 #: models/education_group_year.py:116
 msgid "validity"
 msgstr "validité"
 
 #: templatetags/learning_unit.py:66 tests/templatetags/test_learning_unit.py:38
 #: tests/views/test_learning_unit_proposal.py:84
-msgid "value_before_proposal"
+msgid "Value before proposal"
 msgstr "Valeur avant proposition"
 
 #: templates/entity/tabs.html:41
-msgid "versions"
+msgid "Versions"
 msgstr "Versions"
 
 #: business/learning_units/xls_comparison.py:82
 #: business/learning_units/xls_comparison.py:92
 #: templates/learning_unit/components_identification.html:45
-msgid "vol_global"
+msgid "Vol. global"
 msgstr "Vol. global"
 
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:35
-msgid "volume"
+msgid "Volume"
 msgstr "Volume"
 
 #: models/learning_component_year.py:58
@@ -4330,7 +4323,7 @@ msgid "volume declared vacant"
 msgstr "volume déclaré vacant"
 
 #: forms/learning_unit/edition_volume.py:98
-msgid "volume_global"
+msgid "volume total global"
 msgstr "volume total global"
 
 #: business/learning_units/xls_comparison.py:77
@@ -4338,7 +4331,7 @@ msgstr "volume total global"
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:37
 #: templates/learning_unit/components.html:48
 #: templates/learning_unit/components_identification.html:33
-msgid "volume_partial"
+msgid "Vol. Q1"
 msgstr "Vol. Q1"
 
 #: business/learning_units/xls_comparison.py:78
@@ -4346,25 +4339,25 @@ msgstr "Vol. Q1"
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:39
 #: templates/learning_unit/components.html:49
 #: templates/learning_unit/components_identification.html:34
-msgid "volume_remaining"
+msgid "Vol. Q2 "
 msgstr "Vol. Q2"
 
 #: templates/learning_unit/volumes_management.html:34
 #: templates/learning_unit/volumes_management.html:44
-msgid "volumes_management"
-msgstr "Gestion des volumes horaires"
+msgid "Volumes management"
+msgstr "Gestion des volumes"
 
 #: templates/layout.html:317
-msgid "warnings_detected"
+msgid "We detected inconsistencies in the following data :"
 msgstr "Nous avons détecté des incohérences dans les données suivantes :"
 
 #: templates/layout.html:357 templates/organization/organization.html:66
-msgid "website"
+msgid "Website"
 msgstr "Site internet"
 
 #: forms/learning_unit/search_form.py:96
 #: templates/education_group/search.html:86
-msgid "with_entity_subordinated_small"
+msgid "With subord. ent."
 msgstr "Avec ent. subord."
 
 #: business/learning_units/comparison.py:86
@@ -4383,16 +4376,14 @@ msgstr "Avec ent. subord."
 #: tests/business/test_education_group.py:352 tests/business/test_xls.py:41
 #: tests/forms/test_learning_unit_postponement.py:532
 #: tests/forms/test_learning_unit_postponement.py:533
-#, fuzzy
-#| msgid "types"
 msgid "yes"
-msgstr "Types"
+msgstr "oui"
 
 #: templates/education_group/blocks/table_utilizations.html:52
 #: templates/learning_unit/identification.html:161
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
-msgstr ""
+msgstr "oui,non"
 
 #~ msgid "ID"
 #~ msgstr "ID"

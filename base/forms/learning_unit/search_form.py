@@ -70,7 +70,7 @@ class LearningUnitSearchForm(BaseSearchForm):
 
     requirement_entity_acronym = forms.CharField(
         max_length=20,
-        label=_('requirement_entity_small')
+        label=_('Req. Entity')
     )
 
     acronym = forms.CharField(
@@ -93,7 +93,7 @@ class LearningUnitSearchForm(BaseSearchForm):
         label=_('allocation_entity_small')
     )
 
-    with_entity_subordinated = forms.BooleanField(label=_('with_entity_subordinated_small'))
+    with_entity_subordinated = forms.BooleanField(label=_('With subord. ent.'))
 
     def clean_requirement_entity_acronym(self):
         return convert_to_uppercase(self.cleaned_data.get('requirement_entity_acronym'))

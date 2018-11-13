@@ -60,7 +60,7 @@ LEARNING_UNIT_TITLES_PART1 = [
     str(_('title')),
     str(_('type')),
     str(_('subtype')),
-    str(_('requirement_entity_small')),
+    str(_('Req. Entity')),
     str(_('proposal_type')),
     str(_('proposal_status')),
     str(_('credits')),

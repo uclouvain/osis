@@ -63,7 +63,7 @@ def academic_year(year):
 def get_difference_css(differences, parameter, default_if_none=""):
     if parameter in differences:
         return mark_safe(
-            " data-toggle=tooltip title='{} : {}' class={} ".format(_("value_before_proposal"),
+            " data-toggle=tooltip title='{} : {}' class={} ".format(_("Value before proposal"),
                                                                     differences[parameter] or default_if_none,
                                                                     "proposal_value"))
     return None

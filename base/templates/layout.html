@@ -314,7 +314,7 @@
     {# FIXME ! It is forbidden to add something in the main layout for a specific need. Use messages instead !#}
     {% if warnings %}
         <div class="alert alert-warning" style="margin-bottom: 10px">
-            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'warnings_detected' %}
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'We detected inconsistencies in the following data :' %}
             <button id="btn_expandButton" type="button" class="btn" data-toggle="collapse" data-target="#CollapseWarnings"
                     style="background-color: transparent;">
                 <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
@@ -354,7 +354,7 @@
                 href="{{ user_manual.global }}"
                 target="_blank" id="lnk_user_manual">{% trans 'documentation' %}</a> |
             <a href="http://uclouvain.github.io/osis/" target="_blank"
-               id="lnk_osis_website">{% trans 'website' %}</a> |
+               id="lnk_osis_website">{% trans 'Website' %}</a> |
             <a href="https://github.com/uclouvain/osis" target="_blank"
                id="lnk_osis_source_code">{% trans 'source_code' %}</a>
             {% if release_tag %}

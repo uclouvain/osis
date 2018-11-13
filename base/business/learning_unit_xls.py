@@ -72,7 +72,7 @@ LEARNING_UNIT_TITLES_PART1 = [
     str(_('title')),
     str(_('type')),
     str(_('subtype')),
-    "{} ({})".format(_('requirement_entity_small'), _('fac. level')),
+    "{} ({})".format(_('Req. Entity'), _('fac. level')),
     str(_('proposal_type')),
     str(_('proposal_status')),
     str(_('credits')),

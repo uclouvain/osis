@@ -170,7 +170,7 @@
             <br>
             <form method="post" action="{% url 'profile_lang' %}">
                 {% csrf_token %}
-                <label for="slt_ui_language">{% trans 'user_interface_language' %}</label>
+                <label for="slt_ui_language">{% trans 'User interface language' %}</label>
                 <select class="form-control" id="slt_ui_language"  name="ui_language"
                         onchange="">
                     {% for lang in supported_languages %}

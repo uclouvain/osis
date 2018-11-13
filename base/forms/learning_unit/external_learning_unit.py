@@ -91,7 +91,7 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
 
 
 class ExternalLearningUnitModelForm(forms.ModelForm):
-    requesting_entity = EntitiesVersionChoiceField(queryset=EntityVersion.objects.none(), label=_('requesting_entity'))
+    requesting_entity = EntitiesVersionChoiceField(queryset=EntityVersion.objects.none(), label=_('Requesting entity'))
     entity_version = None
 
     def __init__(self, data, person, *args, **kwargs):

@@ -81,7 +81,7 @@ from base.views.learning_units.search import PROPOSAL_SEARCH, learning_units_pro
     ACTION_BACK_TO_INITIAL, ACTION_FORCE_STATE
 from reference.tests.factories.language import LanguageFactory
 
-LABEL_VALUE_BEFORE_PROPOSAL = _('value_before_proposal')
+LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
 
 
 @override_flag('learning_unit_proposal_update', active=True)

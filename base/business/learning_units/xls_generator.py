@@ -40,7 +40,7 @@ def generate_xls_teaching_material(user, learning_units):
     titles = [
         str(_('code')).title(),
         str(_('title')).title(),
-        str(_('requirement_entity_small')).title(),
+        str(_('Req. Entity')).title(),
         str(_('bibliography')).title(),
         str(_('teaching materials')).title(),
         str(_('online resources')).title(),

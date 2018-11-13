@@ -4217,14 +4217,14 @@ msgid "value_before_proposal"
 msgstr "Value before proposal"
 
 #: templates/entity/tabs.html:41
-msgid "versions"
+msgid "Versions"
 msgstr "Versions"
 
 #: business/learning_units/xls_comparison.py:82
 #: business/learning_units/xls_comparison.py:92
 #: templates/learning_unit/components_identification.html:45
-msgid "vol_global"
-msgstr "Vol.global"
+msgid "Vol. global"
+msgstr "Vol. global"
 
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:35
 msgid "volume"

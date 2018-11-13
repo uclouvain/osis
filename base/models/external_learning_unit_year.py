@@ -71,7 +71,7 @@ class ExternalLearningUnitYear(models.Model):
 
     requesting_entity = models.ForeignKey(
         'Entity',
-        verbose_name=_('requesting_entity'),
+        verbose_name=_('Requesting entity'),
         on_delete=models.PROTECT,
     )
 
