@@ -80,7 +80,7 @@ class LearningUnitSearchForm(BaseSearchForm):
 
     tutor = forms.CharField(
         max_length=40,
-        label=_('tutor')
+        label=_('Tutor')
     )
 
     summary_responsible = forms.CharField(
@@ -171,7 +171,7 @@ class LearningUnitYearForm(LearningUnitSearchForm):
 
     title = forms.CharField(
         max_length=20,
-        label=_('title')
+        label=_('Title')
     )
 
     allocation_entity_acronym = forms.CharField(

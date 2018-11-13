@@ -34,9 +34,9 @@ WORKSHEET_TITLE = 'Proposals'
 XLS_FILENAME = 'Proposals'
 XLS_DESCRIPTION = "List_proposals"
 
-PROPOSAL_TITLES = [str(_('Req. Entity')), str(_('code')), str(_('title')), str(_('type')),
+PROPOSAL_TITLES = [str(_('Req. Entity')), str(_('code')), str(_('title')), str(_('Title')),
                    str(_('proposal_type')), str(_('proposal_status')), str(_('folder_num')),
-                   str(_('type_declaration_vacant')), str(_('periodicity')), str(_('credits')),
+                   str(_('Decision')), str(_('periodicity')), str(_('credits')),
                    str(_('allocation_entity_small')), str(_('proposal_date'))]
 
 

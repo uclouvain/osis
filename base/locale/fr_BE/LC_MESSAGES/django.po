@@ -4047,7 +4047,7 @@ msgstr "Gestion par équipe"
 
 #: models/abstracts/abstract_achievement.py:45
 msgid "text"
-msgstr "Texte"
+msgstr "texte"
 
 #: models/abstracts/abstract_education_group_achievement.py:46
 msgid "text in English"
@@ -4061,7 +4061,7 @@ msgstr "texte en français"
 #: templates/learning_unit/blocks/panel/proposal.html:28
 #: templates/learning_unit/blocks/proposal_user.html:16
 #: templates/learning_unit/external/read.html:68
-msgid "the"
+msgid "The"
 msgstr "Le"
 
 #: tests/views/test_learning_unit_pedagogy.py:240
@@ -4086,29 +4086,29 @@ msgstr "la liste à générer est vide."
 #: templates/learning_unit/summary_list.html:78
 #: templates/offer/tab_academic_calendar.html:48 templates/offers.html:79
 #: tests/views/test_learning_unit_pedagogy.py:192 utils/send_mail.py:230
-msgid "title"
+msgid "Title"
 msgstr "Intitulé"
 
 #: templates/education_group/tab_content.html:52
-msgid "title_code_formation"
-msgstr "Intitulé / Code OF"
+msgid "Formation's code"
+msgstr "Code OF"
 
 #: business/learning_unit.py:68 business/learning_unit_xls.py:80
 #: models/education_group_year.py:111
 #: templates/education_group/blocks/informations.html:53
-msgid "title_in_english"
+msgid "Title in English"
 msgstr "Intitulé en anglais"
 
 #: models/education_group_year.py:104
 #: templates/education_group/blocks/informations.html:47
-msgid "title_in_french"
+msgid "Title in French"
 msgstr "Intitulé en français"
 
 #: business/learning_units/edition.py:427
 #: business/learning_units/xls_comparison.py:65
 #: models/learning_unit_year.py:115
 #: tests/forms/test_learning_unit_postponement.py:517
-msgid "title_proper_to_UE"
+msgid "English title proper"
 msgstr "Intitulé propre"
 
 #: templates/education_group/tab_administrative_data.html:51
@@ -4121,37 +4121,37 @@ msgid "to"
 msgstr "à"
 
 #: models/learning_unit_year.py:245
-msgid "to_complete"
+msgid "To complete"
 msgstr "A compléter"
 
 #: tests/views/test_learning_unit.py:1215 views/learning_units/search.py:80
-msgid "too_many_results"
+msgid "Too many results! Please be more specific."
 msgstr ""
 "Votre recherche renvoie trop de résultats, veuillez affiner vos critères de "
 "recherche."
 
 #: templates/my_osis/my_message.html:62
-msgid "tooltip_delete_message"
+msgid "Delete message"
 msgstr "Supprimer le message"
 
 #: templates/my_osis/my_messages.html:55
-msgid "tooltip_execute_my_message_action"
+msgid "Execute selected action"
 msgstr "Exécuter l'action sélectionnée"
 
 #: templates/my_osis/my_messages.html:80
-msgid "tooltip_my_message_read"
+msgid "Show message"
 msgstr "Lire le message"
 
 #: templates/my_osis/my_messages.html:44
-msgid "tooltip_select_action"
+msgid "Select action to execute"
 msgstr "Sélectionner l'action à exécuter"
 
 #: templates/my_osis/my_messages.html:65
-msgid "tooltip_select_all_messages"
+msgid "Select all the messages"
 msgstr "Sélectionner tous les messages"
 
 #: templates/my_osis/my_message.html:60
-msgid "tooltip_to_my_messages"
+msgid "Back to messages"
 msgstr "Retourner à la liste des messages"
 
 #: templates/education_group/pdf_content.html:89
@@ -4160,14 +4160,14 @@ msgstr "formation"
 
 #: forms/education_group/common.py:311 models/education_group_type.py:79
 #: models/education_group_year.py:128
-msgid "training_type"
+msgid "Type of training"
 msgstr "Type de formation"
 
 #: templates/learning_unit/blocks/tabs.html:44
 #: templates/learning_unit/blocks/tabs.html:72
 #: templates/learning_unit/formations.html:47
 #: templates/learning_unit/proposal/tabs.html:45
-msgid "trainings"
+msgid "Trainings"
 msgstr "Formations"
 
 #: forms/learning_unit/attribution_charge_repartition.py:71
@@ -4177,14 +4177,14 @@ msgstr "Formations"
 #: templates/learning_unit/attributions.html:34
 #: templates/learning_unit/select_attribution.html:34
 #: tests/forms/learning_unit/test_search_form.py:64
-msgid "tutor"
+msgid "Tutor"
 msgstr "Enseignant·e"
 
 #: templates/learning_unit/blocks/modal/modal_xls_with_parameters.html:39
 #: templates/learning_unit/blocks/tabs.html:78
 #: templates/learning_unit/proposal/tabs.html:65
-msgid "tutors"
-msgstr "Enseignants"
+msgid "Tutors"
+msgstr "Enseignant·e·s"
 
 #: business/education_group.py:48 business/learning_unit.py:61
 #: business/learning_unit_xls.py:73 business/learning_units/edition.py:443
@@ -4203,33 +4203,31 @@ msgstr "Enseignants"
 #: templates/organization/organizations.html:63
 #: tests/forms/learning_unit/test_search_form.py:77 utils/send_mail.py:230
 msgid "type"
-msgstr "Type"
+msgstr "type"
 
 #: models/education_group_year.py:366
 msgid "type of constraint"
 msgstr "type de contrainte"
 
 #: templates/learning_unit/formations.html:45
-msgid "type_code_formation"
+msgid "Formation's type"
 msgstr "Type d'OF"
 
 #: business/proposal_xls.py:39 models/learning_container_year.py:59
 #: templates/learning_unit/identification.html:168
-msgid "type_declaration_vacant"
+msgid "Decision"
 msgstr "Décision"
 
 #: templates/layout.html:201
-#, fuzzy
-#| msgid "management_entity"
-msgid "ucl_management_entities"
+msgid "Management entity"
 msgstr "Entité de gestion"
 
 #: templates/academic_calendar/academic_calendars.html:112
-msgid "undated_events"
+msgid "Unscheduled events"
 msgstr "Événements non planifiés"
 
 #: models/education_group_year.py:182
-msgid "university_certificate"
+msgid "University certificate"
 msgstr "Certificat universitaire"
 
 #: models/education_group_year.py:252
@@ -4239,11 +4237,11 @@ msgstr "Mène à diplôme/à certificat"
 
 #: models/person.py:64
 msgid "unknown"
-msgstr "Indéfini"
+msgstr "indéfini"
 
 #: templates/learning_unit/blocks/summary_locked.html:12
 msgid "unlock"
-msgstr "Débloquer"
+msgstr "débloquer"
 
 #: templates/learning_unit/blocks/summary_locked.html:11
 msgid "unlock update for teacher"
@@ -4254,27 +4252,25 @@ msgstr "débloquer la mise à jour pour l'enseignant"
 #: templates/education_group/identification_training_details.html:95
 #: templates/education_group/identification_training_details.html:96
 msgid "unspecified"
-msgstr "Indéterminé"
+msgstr "indéterminé"
 
 #: templates/education_group/blocks/content_actions.html:34
 #: templates/education_group/blocks/form/achievement_action_bar.html:13
 #: templates/learning_unit/specifications.html:114
-msgid "up"
-msgstr "Remonter"
+msgid "Up"
+msgstr "Haut"
 
 #: templates/education_group/blocks/form/achievement_action_bar.html:8
-#, fuzzy
-#| msgid "updated"
-msgid "update"
-msgstr "Mis à jour"
+msgid "Update"
+msgstr "Mettre à jour"
 
 #: models/external_learning_unit_year.py:64
-msgid "url of the learning unit"
+msgid "URL of the learning unitt"
 msgstr "URL de l'unité d'enseignement"
 
 #: templates/learning_unit/class_edit.html:50
 #: templates/learning_unit/component_edit.html:50
-msgid "used_by"
+msgid "Used by learning unit"
 msgstr "Utilisation par l'unité d'enseignement"
 
 #: templates/registration/login.html:40

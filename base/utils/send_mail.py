@@ -227,7 +227,7 @@ def build_proposal_report_attachment(manager, proposals_with_results, operation,
         xls_build.WORKSHEETS_DATA: [
             {
                 xls_build.CONTENT_KEY: table_data,
-                xls_build.HEADER_TITLES_KEY: [_('academic_year_small'), _('code'), _('title'), _('type'),
+                xls_build.HEADER_TITLES_KEY: [_('academic_year_small'), _('code'), _('Title'), _('type'),
                                               _("proposal_status"), _('status'), _('Remarks')],
                 xls_build.WORKSHEET_TITLE_KEY: 'Report'
             }

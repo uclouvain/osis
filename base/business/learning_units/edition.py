@@ -424,7 +424,7 @@ def _check_postponement_conflict(luy, next_luy):
 def _check_postponement_conflict_on_learning_unit_year(luy, next_luy):
     fields_to_compare = {
         'acronym': _('acronym'),
-        'specific_title': _('title_proper_to_UE'),
+        'specific_title': _('English title proper'),
         'specific_title_english': _('english_title_proper_to_UE'),
         'subtype': _('subtype'),
         'credits': _('credits'),

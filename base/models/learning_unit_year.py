@@ -112,7 +112,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('code'),
                                validators=[RegexValidator(LEARNING_UNIT_ACRONYM_REGEX_ALL)])
     specific_title = models.CharField(max_length=255, blank=True, null=True,
-                                      verbose_name=_('title_proper_to_UE'))
+                                      verbose_name=_('English title proper'))
     specific_title_english = models.CharField(max_length=250, blank=True, null=True,
                                               verbose_name=_('english_title_proper_to_UE'))
     subtype = models.CharField(max_length=50, choices=learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
@@ -242,7 +242,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     @property
     def internship_subtype_verbose(self):
-        return _('to_complete') if self.learning_container_year and \
+        return _('To complete') if self.learning_container_year and \
                                    self.learning_container_year.container_type == INTERNSHIP and \
                                    not self.internship_subtype else self.internship_subtype
 

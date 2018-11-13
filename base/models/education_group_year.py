@@ -101,14 +101,14 @@ class EducationGroupYear(models.Model):
 
     title = models.CharField(
         max_length=255,
-        verbose_name=_("title_in_french")
+        verbose_name=_("Title in French")
     )
 
     title_english = models.CharField(
         max_length=240,
         blank=True,
         default="",
-        verbose_name=_("title_in_english")
+        verbose_name=_("Title in English")
     )
 
     academic_year = models.ForeignKey(
@@ -125,7 +125,7 @@ class EducationGroupYear(models.Model):
         'EducationGroupType',
         blank=False,
         null=True,
-        verbose_name=_("training_type")
+        verbose_name=_("Type of training")
     )
 
     active = models.CharField(
@@ -179,7 +179,7 @@ class EducationGroupYear(models.Model):
 
     university_certificate = models.BooleanField(
         default=False,
-        verbose_name=_('university_certificate')
+        verbose_name=_('University certificate')
     )
 
     enrollment_campus = models.ForeignKey(

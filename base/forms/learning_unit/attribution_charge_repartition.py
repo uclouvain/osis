@@ -68,7 +68,7 @@ class AttributionCreationForm(AttributionForm):
                 'data-placeholder': _('Indicate the name or the FGS')
             }
         ),
-        label=_('tutor'),
+        label=_('Tutor'),
     )
 
     class Meta:

@@ -31,7 +31,7 @@
     <input type="hidden" name="group_element_year_id" value="{{ group.id }}"/>
     {% csrf_token %}
     <div class="btn-group">
-        {% button_order_with_permission _("up") "btn_operation_up_"|addstr:group.id "up" %}
+        {% button_order_with_permission _("Up") "btn_operation_up_"|addstr:group.id "up" %}
         {% button_order_with_permission _("down") "btn_operation_down_"|addstr:group.id "down" %}
     </div>
 </form>

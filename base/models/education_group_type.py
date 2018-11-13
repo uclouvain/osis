@@ -76,7 +76,7 @@ class EducationGroupType(models.Model):
 
     name = models.CharField(
         max_length=255,
-        verbose_name=_('training_type'),
+        verbose_name=_('Type of training'),
     )
 
     def __str__(self):

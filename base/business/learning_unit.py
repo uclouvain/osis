@@ -57,7 +57,7 @@ XLS_DESCRIPTION = "List_activities"
 LEARNING_UNIT_TITLES_PART1 = [
     str(_('code')),
     str(_('academic_year_small')),
-    str(_('title')),
+    str(_('Title')),
     str(_('type')),
     str(_('subtype')),
     str(_('Req. Entity')),
@@ -65,7 +65,7 @@ LEARNING_UNIT_TITLES_PART1 = [
     str(_('proposal_status')),
     str(_('credits')),
     str(_('allocation_entity_small')),
-    str(_('title_in_english')),
+    str(_('Title in English')),
 ]
 
 LEARNING_UNIT_TITLES_PART2 = [

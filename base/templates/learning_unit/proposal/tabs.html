@@ -42,7 +42,7 @@
     </li>
     <li role="presentation" {% if request.path == url_formations %} class="active" {% endif %}>
         <a role="tab" href="#">
-		{% trans 'trainings' %}
+		{% trans 'Trainings' %}
 	</a>
     </li>
     <li role="presentation" {% if request.path == url_components %} class="active" {% endif %} data-toggle="tab">
@@ -62,7 +62,7 @@
     </li>
     <li role="presentation" {% if request.path == url_attributions %} class="active" {% endif %} data-toggle="tab">
         <a href="{% url 'learning_unit_attributions' learning_unit_year.id %}" role="tab">
-		 {% trans 'tutors' %}
+		 {% trans 'Tutors' %}
 	</a>
     </li>
 </ul>

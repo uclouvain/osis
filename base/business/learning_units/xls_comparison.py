@@ -62,7 +62,7 @@ LEARNING_UNIT_TITLES = [
     str(_('quadrimester')),
     str(_('session_title')),
     str(_('common_title')),
-    str(_('title_proper_to_UE')),
+    str(_('English title proper')),
     str(_('common_english_title')),
     str(_('english_title_proper_to_UE')),
     str(_('Req. Entities')),

@@ -77,7 +77,7 @@ def learning_units_search(request, search_type):
             found_learning_units = form.get_activity_learning_units()
             check_if_display_message(request, found_learning_units)
     except TooManyResultsException:
-        messages.add_message(request, messages.ERROR, _('too_many_results'))
+        messages.add_message(request, messages.ERROR, _('Too many results! Please be more specific.'))
 
     if request.POST.get('xls_status') == "xls":
         return create_xls(request.user, found_learning_units, _get_filter(form, search_type))
