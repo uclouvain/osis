@@ -130,3 +130,8 @@ def search(**kwargs):
         queryset = queryset.filter(offer_year=kwargs['offer_year'])
 
     return queryset
+
+
+def create_offer_year_calendar(education_group_yr, academic_calendar):
+    return OfferYearCalendar(education_group_year=education_group_yr,
+                             academic_calendar=academic_calendar)

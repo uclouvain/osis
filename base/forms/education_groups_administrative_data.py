@@ -30,7 +30,8 @@ from django.forms import formset_factory
 from base.forms.bootstrap import BootstrapForm
 from base.forms.utils.datefield import DateRangeField, DatePickerInput, DATE_FORMAT, DateTimePickerInput
 from base.models import offer_year_calendar
-from base.models.academic_calendar import AcademicCalendar
+from base.models.offer_year_calendar import create_offer_year_calendar
+from base.models.academic_calendar import AcademicCalendar, get_by_reference_and_academic_year
 from base.models.enums import academic_calendar_type
 from django.utils.translation import ugettext_lazy as _
 
@@ -42,9 +43,9 @@ NUMBER_SESSIONS = 3
 class CourseEnrollmentForm(BootstrapForm):
     range_date = DateRangeField(required=False, label=_("course_enrollment"))
 
-    def __init__(self, *args, education_group_yr=None, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.instance = kwargs.pop('instance')
-        self.education_group_year = education_group_yr
+        self.education_group_year = kwargs.pop('education_group_yr')
 
         super().__init__(*args, **kwargs)
         if self.instance:
@@ -57,7 +58,7 @@ class CourseEnrollmentForm(BootstrapForm):
     def clean_range_date(self):
         range_date = self.cleaned_data["range_date"]
         if not self.instance:
-            self.instance = _get_new_course_enrollment_calendar(self.education_group_year)
+            self.instance = _build_new_course_enrollment_offer_yr_calendar(self.education_group_year)
         _set_values_in_offer_year_calendar(self.instance,
                                            range_date)
 
@@ -65,7 +66,7 @@ class CourseEnrollmentForm(BootstrapForm):
 
     def clean(self):
         if not self.instance and self.cleaned_data.get("range_date"):
-            self.instance = _get_new_course_enrollment_calendar(self.education_group_year)
+            self.instance = _build_new_course_enrollment_offer_yr_calendar(self.education_group_year)
 
         if self.instance:
             try:
@@ -77,13 +78,12 @@ class CourseEnrollmentForm(BootstrapForm):
         self.instance.save()
 
 
-def _get_new_course_enrollment_calendar(education_group_yr):
+def _build_new_course_enrollment_offer_yr_calendar(education_group_yr):
     try:
-        cal = AcademicCalendar.objects.get(academic_year=education_group_yr.academic_year,
-                                           reference=academic_calendar_type.COURSE_ENROLLMENT)
+        cal = get_by_reference_and_academic_year(reference=academic_calendar_type.COURSE_ENROLLMENT,
+                                                 academic_year=education_group_yr.academic_year)
 
-        return offer_year_calendar.OfferYearCalendar(education_group_year=education_group_yr,
-                                                     academic_calendar=cal)
+        return create_offer_year_calendar(education_group_yr, cal)
     except ObjectDoesNotExist:
         return None
 
@@ -124,8 +124,8 @@ class AdministrativeDataSessionForm(BootstrapForm):
             academic_calendar = AcademicCalendar.objects.get(sessionexamcalendar__number_session=self.session,
                                                              academic_year=self.education_group_year.academic_year,
                                                              reference=ac_type)
-            return offer_year_calendar.OfferYearCalendar(education_group_year=self.education_group_year,
-                                                         academic_calendar=academic_calendar)
+            return create_offer_year_calendar(self.education_group_year,
+                                              academic_calendar)
 
     def _init_fields(self):
         for name, field in self.fields.items():
@@ -165,12 +165,13 @@ class AdministrativeDataSessionForm(BootstrapForm):
 
 
 def _set_values_in_offer_year_calendar(oyc, value):
-    if isinstance(value, tuple) and len(value) == 2:
-        oyc.start_date = convert_date_to_datetime(value[0])
-        oyc.end_date = convert_date_to_datetime(value[1])
-    else:
-        oyc.start_date = convert_date_to_datetime(value)
-        oyc.end_date = convert_date_to_datetime(value)
+    if oyc:
+        if isinstance(value, tuple) and len(value) == 2:
+            oyc.start_date = convert_date_to_datetime(value[0])
+            oyc.end_date = convert_date_to_datetime(value[1])
+        else:
+            oyc.start_date = convert_date_to_datetime(value)
+            oyc.end_date = convert_date_to_datetime(value)
     return oyc
 
 

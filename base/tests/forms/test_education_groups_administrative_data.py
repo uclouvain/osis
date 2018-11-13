@@ -28,7 +28,7 @@ from django.forms import formset_factory, MultiWidget
 from django.test import TestCase
 
 from base.forms.education_groups_administrative_data import AdministrativeDataSessionForm, AdministrativeDataFormSet, \
-    DATE_FORMAT, _get_new_course_enrollment_calendar, CourseEnrollmentForm
+    DATE_FORMAT, _build_new_course_enrollment_offer_yr_calendar, CourseEnrollmentForm
 from base.forms.utils.datefield import DATETIME_FORMAT
 from base.models.enums import academic_calendar_type
 from base.models.academic_calendar import AcademicCalendar
@@ -218,11 +218,11 @@ class TestCourseEnrollmentForm(TestCase):
 
     def test_get_new_course_enrollment_calendar(self):
         education_group_yr = EducationGroupYearFactory(academic_year=self.academic_year)
-        self.assertIsNone(_get_new_course_enrollment_calendar(education_group_yr))
+        self.assertIsNone(_build_new_course_enrollment_offer_yr_calendar(education_group_yr))
 
         academic_cal_course_enrollment = AcademicCalendarFactory(reference=academic_calendar_type.COURSE_ENROLLMENT,
                                                                  academic_year=self.academic_year)
-        new_oyc = _get_new_course_enrollment_calendar(education_group_yr)
+        new_oyc = _build_new_course_enrollment_offer_yr_calendar(education_group_yr)
 
         self.assertEqual(new_oyc.academic_calendar, academic_cal_course_enrollment)
         self.assertEqual(new_oyc.education_group_year, education_group_yr)
