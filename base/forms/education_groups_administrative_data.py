@@ -79,13 +79,13 @@ class CourseEnrollmentForm(BootstrapForm):
 
 
 def _build_new_course_enrollment_offer_yr_calendar(education_group_yr):
-    try:
-        cal = get_by_reference_and_academic_year(reference=academic_calendar_type.COURSE_ENROLLMENT,
-                                                 academic_year=education_group_yr.academic_year)
 
+    cal = get_by_reference_and_academic_year(academic_calendar_type.COURSE_ENROLLMENT,
+                                             education_group_yr.academic_year)
+    if cal:
         return create_offer_year_calendar(education_group_yr, cal)
-    except ObjectDoesNotExist:
-        return None
+
+    return None
 
 
 class AdministrativeDataSessionForm(BootstrapForm):
