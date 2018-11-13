@@ -41,189 +41,186 @@ msgstr ""
 
 #: templates/summary_responsible.html:31
 #: templates/summary_responsible_edit.html:30
-msgid "academic_actors"
-msgstr ""
+msgid "Academic actors"
+msgstr "Acteurs académiques"
 
 #: business/xls_build.py:42
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:7
-msgid "academic_year_small"
-msgstr ""
+msgid "Ac yr."
+msgstr "Anac."
 
 #: business/xls_build.py:50
-msgid "active_title"
-msgstr ""
+msgid "Active"
+msgstr "Actif"
 
 #: business/xls_build.py:48
-msgid "allocation_entity_small"
-msgstr ""
+msgid "Alloc. Ent."
+msgstr "Ent. attrib."
 
 #: templates/summary_responsible_edit.html:71
-msgid "cancel"
-msgstr ""
+msgid "Cancel"
+msgstr "Annuler"
 
 #: business/xls_build.py:43
-msgid "code"
-msgstr ""
+msgid "Code"
+msgstr "Code"
 
 #: templates/summary_responsible.html:54 templates/summary_responsible.html:87
 #, fuzzy
 #| msgid "courses"
-msgid "course_code"
-msgstr "Cours"
+msgid "Course code"
+msgstr "Code cours"
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:8
-msgid "courses"
+msgid "Courses"
 msgstr "Cours"
 
 #: business/xls_build.py:49
-msgid "credits"
-msgstr ""
+msgid "Credits"
+msgstr "Crédits"
 
 #: templates/manage_my_courses/list_my_courses_summary_editable.html:66
-msgid "datatable_sortascending"
-msgstr ""
+msgid "Activate to sort column by ascending order"
+msgstr "Activer pour trier la colonne par ordre croissant"
 
 #: templates/manage_my_courses/list_my_courses_summary_editable.html:67
-msgid "datatable_sortdescending"
-msgstr ""
+msgid "Activate to sort column by descending order"
+msgstr "Activer pour trier la colonne par ordre décroissant"
 
 #: templates/summary_responsible.html:109
-msgid "display_tutors"
-msgstr ""
+msgid "Display all tutors for this learning unit"
+msgstr "Afficher tous les enseignants pour ce cours"
 
 #: business/xls_build.py:39
-msgid "duration"
-msgstr ""
+msgid "Duration"
+msgstr "Durée"
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:14
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:39
-msgid "editable"
-msgstr ""
+msgid "Editable"
+msgstr "Modifiable"
 
 #: templates/manage_my_courses/blocks/tabs.html:32
 #: templates/manage_my_courses/educational_information.html:32
 #, fuzzy
 #| msgid "manage_educational_information"
-msgid "educational_information"
+msgid "Manage educational information"
 msgstr "Gérer les informations pédagogiques"
 
 #: templates/summary_responsible.html:86
-msgid "entity"
-msgstr ""
+msgid "Entity"
+msgstr "Entité"
 
 #: business/xls_build.py:38 models/attribution_new.py:57
-msgid "function"
-msgstr ""
+msgid "Function"
+msgstr "Fonction"
 
 #: templates/summary_responsible.html:30
 #: templates/summary_responsible_edit.html:29
-msgid "institution"
-msgstr ""
+msgid "Institution"
+msgstr "Institution"
 
 #: templates/summary_responsible.html:59 templates/summary_responsible.html:88
-msgid "learning_unit_title"
-msgstr ""
+msgid "Learning unit title"
+msgstr "Intitulé du cours"
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:23
 #: templates/manage_my_courses/educational_information.html:30
 #: templates/manage_my_courses/list_my_courses_summary_editable.html:31
 #: templates/manage_my_courses/list_my_courses_summary_editable.html:36
-msgid "manage_educational_information"
+msgid "Manage educational information"
 msgstr "Gérer les informations pédagogiques"
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:48
-msgid "no_attribution_summary_editable"
+msgid "There is no course for which you can edit educational information."
 msgstr ""
 "Il n'existe aucun cours dont vous pouvez modifier les informations "
 "pédagogiques."
 
 #: templates/summary_responsible.html:80
-msgid "no_result"
+msgid "No result"
 msgstr ""
 
 #: models/tutor_application.py:48
-msgid "publish_application_to_portal"
-msgstr ""
+msgid "Publish application to portal"
+msgstr "Publier la candidature sur portal"
 
 #: models/attribution_new.py:49
-msgid "publish_attribution_to_portal"
-msgstr ""
+msgid "Publish attribution to portal"
+msgstr "Publier l'attribution sur portal"
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:10
-msgid "requirement_entity"
-msgstr ""
+msgid "Requirement entity"
+msgstr "Entité resp. cahier des charges"
 
 #: business/xls_build.py:47
-msgid "requirement_entity_small"
-msgstr ""
+msgid "Req. Entity"
+msgstr "Ent. charge"
 
 #: templates/summary_responsible.html:69
 #, fuzzy
 #| msgid "summary_responsible"
-msgid "responsible"
+msgid "Summary responsible"
 msgstr "Responsable des infos pédagogiques"
 
 #: templates/summary_responsible_edit.html:69
-msgid "save"
-msgstr ""
+msgid "Save"
+msgstr "Enregistrer"
 
 #: templates/summary_responsible.html:75
-msgid "search"
-msgstr ""
+msgid "Search"
+msgstr "Recherche"
 
 #: models/attribution_new.py:60
-msgid "start"
-msgstr ""
+msgid "Start"
+msgstr "Début"
 
 #: business/xls_build.py:39
-msgid "start_year"
-msgstr ""
+msgid "Start year"
+msgstr "Année début"
 
 #: templates/summary_responsible_edit.html:46
-msgid "status"
-msgstr ""
+msgid "Status"
+msgstr "Statut"
 
 #: business/xls_build.py:38
-msgid "substitute"
-msgstr ""
+msgid "Substitute"
+msgstr "Suppléé"
 
 #: business/xls_build.py:46
-msgid "subtype"
-msgstr ""
-
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:13
-#: templates/summary_responsible_edit.html:31
-#: templates/summary_responsible_edit.html:47
-msgid "summary_responsible"
-msgstr "Responsable des infos pédagogiques"
+msgid "Subtype"
+msgstr "Sous-type"
 
 #: templates/summary_responsible.html:32 templates/summary_responsible.html:36
-msgid "summary_responsibles"
+msgid "Summary responsibles"
 msgstr "Responsables des infos pédagogiques"
 
 #: business/xls_build.py:44
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:9
-msgid "title"
-msgstr ""
+msgid "Title"
+msgstr "Intitulé"
 
 #: business/xls_build.py:38 templates/summary_responsible.html:64
 #: templates/summary_responsible.html:89
 #: templates/summary_responsible_edit.html:45
-msgid "tutor"
-msgstr ""
+msgid "Tutor"
+msgstr "Enseignant·e"
 
 #: templates/summary_responsible_edit.html:36
-msgid "tutors_of_course"
-msgstr ""
+msgid "Tutors of the course"
+msgstr "Enseignant·e·s du cours"
 
 #: business/xls_build.py:45
-msgid "type"
+msgid "Type"
 msgstr ""
 
 #: templates/summary_responsible_edit.html:69
-msgid "update"
-msgstr ""
+msgid "Update"
+msgstr "Modifier"
 
 #: templates/summary_responsible.html:123
-msgid "without_attribution"
-msgstr ""
+msgid "Without attribution"
+msgstr "Sans attribution"
+
+msgid "Educational information"
+msgstr "Infos pédagogiques"
