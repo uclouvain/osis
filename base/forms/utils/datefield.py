@@ -146,4 +146,6 @@ class DateRangeField(forms.DateField):
             raise ValidationError(_('The format of the range date is not valid'))
         start_date = self.base.to_python(values[0])
         end_date = self.base.to_python(values[1])
+        if start_date > end_date:
+            raise ValidationError(_('begin_date_lt_end_date'))
         return start_date, end_date

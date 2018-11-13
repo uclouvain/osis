@@ -133,7 +133,7 @@ msgid "back"
 msgstr "Retour"
 
 msgid "begin_date_lt_end_date"
-msgstr "La date de début doit etre égale ou inferieure à la date de fin"
+msgstr "La date de début doit être égale ou inférieure à la date de fin"
 
 msgid "birth_date"
 msgstr "Date de naissance"

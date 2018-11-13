@@ -39,6 +39,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from django.test.utils import override_settings
+from django.utils.translation import ugettext_lazy as _
 
 
 class TestAdministrativeDataForm(TestCase):
@@ -259,3 +260,19 @@ class TestCourseEnrollmentForm(TestCase):
                          .format(exam_enrollment_start,
                                  self.academic_year.start_date.strftime(DATE_FORMAT),
                                  self.academic_year.end_date.strftime(DATE_FORMAT)))
+
+    @override_settings(LANGUAGES=[('fr-be', 'Français'), ], LANGUAGE_CODE='fr-be')
+    def test_clean_with_validation_error_in_date(self):
+        education_group_yr = EducationGroupYearFactory(academic_year=self.academic_year)
+        AcademicCalendarFactory(reference=academic_calendar_type.COURSE_ENROLLMENT,
+                                academic_year=self.academic_year)
+
+        exam_enrollment_start = '20/12/{}'.format(self.academic_year.year)
+        exam_enrollment_end = '15/01/{}'.format(self.academic_year.year)
+
+        form = CourseEnrollmentForm(data={"range_date": exam_enrollment_start + ' - ' + exam_enrollment_end},
+                                    instance=None, education_group_yr=education_group_yr)
+        form.is_valid()
+        self.assertEqual(form.errors["range_date"][0],
+                         _('begin_date_lt_end_date'))
+
