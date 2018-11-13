@@ -27,6 +27,7 @@
 from django.test import TestCase
 
 from base.models import prerequisite_item
+from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
@@ -34,16 +35,40 @@ from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 class TestPrerequisiteItem(TestCase):
     def setUp(self):
+        self.learning_unit_is_prerequisite = LearningUnitFactory()
+        self.learning_unit_not_prerequisite = LearningUnitFactory()
         self.learning_unit_year_with_prerequisite = LearningUnitYearFactory()
         self.learning_unit_year_without_prerequisite = LearningUnitYearFactory()
         self.prerequisite = PrerequisiteFactory(learning_unit_year=self.learning_unit_year_with_prerequisite)
-        self.prerequisite_item = PrerequisiteItemFactory(prerequisite=self.prerequisite)
+        self.prerequisite_item = PrerequisiteItemFactory(
+            prerequisite=self.prerequisite,
+            learning_unit=self.learning_unit_is_prerequisite
+        )
 
-    def test_find_by_learning_unit_year(self):
+    def test_find_by_learning_unit_year_having_prerequisite(self):
         self.assertEqual(
-            list(prerequisite_item.find_by_learning_unit_year(self.learning_unit_year_with_prerequisite)),
+            list(prerequisite_item.find_by_learning_unit_year_having_prerequisite(
+                self.learning_unit_year_with_prerequisite)),
             [self.prerequisite_item]
         )
         self.assertFalse(
-            list(prerequisite_item.find_by_learning_unit_year(self.learning_unit_year_without_prerequisite))
+            list(prerequisite_item.find_by_learning_unit_year_having_prerequisite(
+                self.learning_unit_year_without_prerequisite))
+        )
+
+    def test_find_by_learning_unit_being_prerequisite(self):
+        self.assertEqual(
+            list(
+                prerequisite_item.find_by_learning_unit_being_prerequisite(
+                    self.learning_unit_is_prerequisite
+                )
+            ),
+            [self.prerequisite_item]
+        )
+        self.assertFalse(
+            list(
+                prerequisite_item.find_by_learning_unit_being_prerequisite(
+                    self.learning_unit_not_prerequisite
+                )
+            )
         )
