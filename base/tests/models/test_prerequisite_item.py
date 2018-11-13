@@ -35,15 +35,14 @@ from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 class TestPrerequisiteItem(TestCase):
     def setUp(self):
-        self.learning_unit = LearningUnitFactory()
+        self.learning_unit_is_prerequisite = LearningUnitFactory()
+        self.learning_unit_not_prerequisite = LearningUnitFactory()
         self.learning_unit_year_with_prerequisite = LearningUnitYearFactory()
         self.learning_unit_year_without_prerequisite = LearningUnitYearFactory()
-        self.prerequisite = PrerequisiteFactory(
-            learning_unit_year=self.learning_unit_year_with_prerequisite
-        )
+        self.prerequisite = PrerequisiteFactory(learning_unit_year=self.learning_unit_year_with_prerequisite)
         self.prerequisite_item = PrerequisiteItemFactory(
             prerequisite=self.prerequisite,
-            learning_unit=self.learning_unit
+            learning_unit=self.learning_unit_is_prerequisite
         )
 
     def test_find_by_learning_unit_year_having_prerequisite(self):
@@ -61,7 +60,7 @@ class TestPrerequisiteItem(TestCase):
         self.assertEqual(
             list(
                 prerequisite_item.find_by_learning_unit_being_prerequisite(
-                    self.learning_unit
+                    self.learning_unit_is_prerequisite
                 )
             ),
             [self.prerequisite_item]
@@ -69,7 +68,7 @@ class TestPrerequisiteItem(TestCase):
         self.assertFalse(
             list(
                 prerequisite_item.find_by_learning_unit_being_prerequisite(
-                    self.learning_unit_year_without_prerequisite.learning_unit
+                    self.learning_unit_not_prerequisite
                 )
             )
         )
