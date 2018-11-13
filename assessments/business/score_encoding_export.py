@@ -149,8 +149,8 @@ def __display_creation_date_with_message_about_state(ws, row_number):
     printing_date = printing_date.strftime(date_format)
 
     ws.cell(row=row_number, column=1).value = str(
-        '%s' % (_("Les données présentes sur ce document correspondent à l'état du système en date du %s et sont "
-                  "susceptibles d'évoluer") % printing_date))
+        '%s' % (_("The data presented on this document correspond to the state of the system dated %s "
+                  "and are likely to evolve") % printing_date))
     ws.cell(row=row_number, column=1).font = Font(color=colors.RED)
 
 

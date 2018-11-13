@@ -139,12 +139,12 @@
                href="{% url 'scores_encoding_download' learning_unit_year.id %}"
                role="button"
                data-toggle="tooltip" data-placement="bottom"
-               title="{% trans 'Download the excel file' %}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span> {% trans 'Get excel file'%}</a>
+               title="{% trans 'Download the Excel file' %}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span> {% trans 'Get Excel file'%}</a>
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#pnl_upload_score_modal"
                     id="bt_upload_score_modal"
                     {% if enrollments and progress == '100' and not is_program_manager %}
                         disabled
-                        title="{% trans 'All the scores were submitted. It is not possible inject excell file anymore.' %}"
+                        title="{% trans 'All the scores were submitted. It is not possible inject Excel file anymore.' %}"
                    {% else %}
                         title="{% trans 'Select an excel file to inject scores.' %}"
                    {% endif %}><span class="glyphicon glyphicon-upload" aria-hidden="true"></span> {% trans 'Inject XLS file' %}</button>
