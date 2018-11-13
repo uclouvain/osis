@@ -124,22 +124,22 @@ msgstr "%(acronym)s %(title)s [%(volumes)s] (%(credits)s credits)"
 
 #: business/education_groups/automatic_postponement.py:44
 #, python-format
-msgid "%s education group(s) extended and %s error(s)"
+msgid "%(number_extended)s education group(s) extended and %(number_error)s error(s)"
 msgstr ""
 
 #: models/admission_condition.py:111
 #, python-format
-msgid "%s is not an accepted value"
+msgid "%(access_value)s is not an accepted value"
 msgstr ""
 
 #: business/learning_units/automatic_postponement.py:42
 #, python-format
-msgid "%s learning unit(s) extended and %s error(s)"
+msgid "%(number_extended)s learning unit(s) extended and %(number_error)s error(s)"
 msgstr ""
 
 #: business/utils/postponement.py:50
 #, python-format
-msgid "%s object(s) extended and %s error(s)"
+msgid "%(number_extended)s object(s) extended and %(number_error)s error(s)"
 msgstr ""
 
 #: templates/education_group/pdf_content.html:109
@@ -164,19 +164,19 @@ msgid "A report has been sent."
 msgstr ""
 
 #: models/enums/exam_enrollment_justification_type.py:42
-msgid "ABSENCE_JUSTIFIED"
+msgid "Absence justified"
 msgstr ""
 
 #: models/enums/exam_enrollment_justification_type.py:41
-msgid "ABSENCE_UNJUSTIFIED"
+msgid "Absence unjustified"
 msgstr ""
 
 #: business/learning_units/comparison.py:90
-msgid "ACTIVE"
+msgid "Active"
 msgstr "Active"
 
 #: business/learning_unit.py:74 business/learning_unit.py:78
-msgid "ANNUAL"
+msgid "Annual"
 msgstr "Annual"
 
 #: business/learning_unit.py:85
@@ -196,7 +196,7 @@ msgstr ""
 #: templates/education_group/tab_admission_conditions.html:86
 #: templates/education_group/tab_admission_conditions.html:112
 msgid "Actions"
-msgstr "Actions"
+msgstr ""
 
 #: templates/learning_unit/attributions.html:88
 msgid "Add attribution"
