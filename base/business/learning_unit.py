@@ -71,11 +71,11 @@ LEARNING_UNIT_TITLES_PART1 = [
 LEARNING_UNIT_TITLES_PART2 = [
     str(_('periodicity')),
     str(_('active_title')),
-    "{} 1 - {}".format(_('Hourly vol.'), _('ANNUAL')),
+    "{} 1 - {}".format(_('Hourly vol.'), _('Annual')),
     "{} 1 - {}".format(_('Hourly vol.'), _('1st quadri')),
     "{} 1 - {}".format(_('Hourly vol.'), _('2nd quadri')),
     "{} 1".format(_('PLANNED_CLASSES')),
-    "{} 2 - {}".format(_('Hourly vol.'), _('ANNUAL')),
+    "{} 2 - {}".format(_('Hourly vol.'), _('Annual')),
     "{} 2 - {}".format(_('Hourly vol.'), _('1st quadri')),
     "{} 2 - {}".format(_('Hourly vol.'), _('2nd quadri')),
     "{} 2".format(_('PLANNED_CLASSES')),
@@ -161,8 +161,10 @@ def get_cms_label_data(cms_label, user_language):
 
 def _learning_unit_usage(a_learning_component_year):
     components = mdl_base.learning_unit_component.find_by_learning_component_year(a_learning_component_year)
-    return ", ".join(["{} ({})".format(c.learning_unit_year.acronym, _(c.learning_unit_year.quadrimester or '?'))
-                      for c in components])
+    return ", ".join(["{} ({})".format(
+        c.learning_unit_year.acronym,
+        _(c.learning_unit_year.quadrimester) if c.learning_unit_year.quadrimester else '?'
+    ) for c in components])
 
 
 def _learning_unit_usage_by_class(a_learning_class_year):

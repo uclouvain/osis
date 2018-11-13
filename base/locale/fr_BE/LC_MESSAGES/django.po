@@ -129,25 +129,24 @@ msgstr "%(acronym)s %(title)s [%(volumes)s] (%(credits)s crédits)"
 #: business/education_groups/automatic_postponement.py:44
 #, fuzzy, python-format
 #| msgid "this education group is not editable during this period."
-msgid "%s education group(s) extended and %s error(s)"
-msgstr ""
-"cette organisation de formation n'est pas édtiable durant cette période."
+msgid "%(number_extended)s education group(s) extended and %(number_error)s error(s)"
+msgstr "%(number_extended)s organisation(s) de formation reportée(s) et %(number_error)s erreur(s)"
 
 #: models/admission_condition.py:111
 #, python-format
-msgid "%s is not an accepted value"
-msgstr ""
+msgid "%(access_value)s is not an accepted value"
+msgstr "%(access_value)s n'est pas une valeur acceptée"
 
 #: business/learning_units/automatic_postponement.py:42
 #, fuzzy, python-format
 #| msgid "The following learning units ended with error"
-msgid "%s learning unit(s) extended and %s error(s)"
-msgstr "Les unités d'enseignement suivantes se sont terminées par une erreur"
+msgid "%(number_extended)s learning unit(s) extended and %(number_error)s error(s)"
+msgstr "%(number_extended)s unité d'enseignement(s) reportée(s) et %(number_error)s erreur(s)"
 
 #: business/utils/postponement.py:50
 #, python-format
 msgid "%s object(s) extended and %s error(s)"
-msgstr ""
+msgstr "%(number_extended)s object(s) reportée(s) et %(number_error)s erreur(s)"
 
 #: templates/education_group/pdf_content.html:109
 msgid "(optional)"
@@ -171,19 +170,19 @@ msgid "A report has been sent."
 msgstr "Un rapport a été envoyé."
 
 #: models/enums/exam_enrollment_justification_type.py:42
-msgid "ABSENCE_JUSTIFIED"
-msgstr ""
+msgid "Absence justified"
+msgstr "Absence justifiée"
 
 #: models/enums/exam_enrollment_justification_type.py:41
-msgid "ABSENCE_UNJUSTIFIED"
-msgstr ""
+msgid "Absence unjustified"
+msgstr "Absence injustifiée"
 
 #: business/learning_units/comparison.py:90
-msgid "ACTIVE"
+msgid "Active"
 msgstr "Actif"
 
 #: business/learning_unit.py:74 business/learning_unit.py:78
-msgid "ANNUAL"
+msgid "Annual"
 msgstr "Annuel"
 
 #: business/learning_unit.py:85
