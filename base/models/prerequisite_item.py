@@ -58,3 +58,7 @@ class PrerequisiteItem(models.Model):
             ('prerequisite', 'learning_unit',),
             ('prerequisite', 'group_number', 'position',),
         )
+
+
+def find_by_learning_unit_year(learning_unit_year):
+    return PrerequisiteItem.objects.filter(prerequisite__learning_unit_year=learning_unit_year)
