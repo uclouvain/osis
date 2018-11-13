@@ -72,7 +72,7 @@ def assessments(request):
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 @user_passes_test(_is_not_inside_scores_encodings_period, login_url=reverse_lazy('scores_encoding'))
 def outside_period(request):
-    date_format = str('%m/%d/%Y')
+    date_format = str(_('date_format'))
     latest_session_exam = mdl.session_exam_calendar.get_latest_session_exam()
     closest_new_session_exam = mdl.session_exam_calendar.get_closest_new_session_exam()
 

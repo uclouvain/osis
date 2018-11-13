@@ -144,7 +144,7 @@ def __coloring_non_editable(ws, row_number, score, justification):
 
 
 def __display_creation_date_with_message_about_state(ws, row_number):
-    date_format = str(_('%m/%d/%Y'))
+    date_format = str(_('date_format'))
     printing_date = timezone.now()
     printing_date = printing_date.strftime(date_format)
 
