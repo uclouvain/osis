@@ -125,10 +125,10 @@ $(document).ready(function () {
 
                             var detach_data = build_url_data(element_id, group_element_year_id, 'detach');
 
-                            $('#form-modal-content').load(management_url, detach_data, function (response, status, xhr) {
+                            $('#form-modal-ajax-content').load(management_url, detach_data, function (response, status, xhr) {
                                 if ( status === "success" ){
-                                    $('#form-modal').modal('toggle');
-                                    formAjaxSubmit('#form-modal-body form', '#form-modal');
+                                    $('#form-ajax-modal').modal('toggle');
+                                    formAjaxSubmit('#form-modal-ajax-content form', '#form-ajax-modal');
                                 }
                                 else {
                                     window.location.href = management_url + "?" + detach_data
