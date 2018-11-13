@@ -23,7 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.contrib.auth.models import Permission, Group
+from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.test import TestCase
@@ -44,6 +45,10 @@ HTTP_RESPONSE_OK = 200
 
 class SummaryResponsibleViewTestCase(TestCase):
     def setUp(self):
+        group, created = Group.objects.get_or_create(name='entity_managers')
+        content_type = ContentType.objects.get_for_model(EntityManager)
+        perm, created = Permission.objects.get_or_create(codename='is_entity_manager', content_type=content_type)
+        group.permissions.add(perm)
         self.person = PersonFactory()
         self.user = self.person.user
         self.tutor = TutorFactory(person=self.person)
