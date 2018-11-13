@@ -67,7 +67,7 @@
                     <span class="error">{{ form.title.errors }}</span>
                 </div>
                 <div class="col-md-2">
-                    <label for="txt_start_date">{% trans 'start_date'%}</label>
+                    <label for="txt_start_date">{% trans 'Start date'%}</label>
                     <input type="text" class="form-control"
                            value="{{ form.start_date.value| default_if_none:''| date_in_form_format }}"
                     name="start_date" id="txt_start_date"/>

@@ -132,7 +132,7 @@ class EducationGroupYear(models.Model):
         max_length=20,
         choices=active_status.ACTIVE_STATUS_LIST,
         default=active_status.ACTIVE,
-        verbose_name=_('status')
+        verbose_name=_('Status')
     )
 
     partial_deliberation = models.BooleanField(
@@ -249,7 +249,7 @@ class EducationGroupYear(models.Model):
         verbose_name=_('professionnal_title')
     )
 
-    joint_diploma = models.BooleanField(default=False, verbose_name=_('university_certificate_desc'))
+    joint_diploma = models.BooleanField(default=False, verbose_name=_('University certificate'))
 
     diploma_printing_orientation = models.CharField(
         max_length=30,

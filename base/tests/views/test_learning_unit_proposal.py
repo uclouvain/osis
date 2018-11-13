@@ -251,7 +251,7 @@ class TestLearningUnitModificationProposal(TestCase):
 
         messages_list = [str(message) for message in get_messages(response.wsgi_request)]
         self.assertIn(
-            _("success_modification_proposal").format(
+            _("You proposed a modification of type {} for the learning unit {}.").format(
                 _(proposal_type.ProposalType.MODIFICATION.name),
                 self.learning_unit_year.acronym),
             list(messages_list))
@@ -501,7 +501,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         self.assertEqual(a_proposal_learning_unit.author, self.person)
 
         messages = [str(message) for message in get_messages(response.wsgi_request)]
-        self.assertIn(_("success_modification_proposal").format(_(proposal_type.ProposalType.SUPPRESSION.name),
+        self.assertIn(_("You proposed a modification of type {} for the learning unit {}.").format(_(proposal_type.ProposalType.SUPPRESSION.name),
                                                                 self.learning_unit_year.acronym),
                       list(messages))
 

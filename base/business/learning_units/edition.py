@@ -426,11 +426,11 @@ def _check_postponement_conflict_on_learning_unit_year(luy, next_luy):
         'acronym': _('acronym'),
         'specific_title': _('English title proper'),
         'specific_title_english': _('english_title_proper_to_UE'),
-        'subtype': _('subtype'),
+        'subtype': _('Subtype'),
         'credits': _('credits'),
         'internship_subtype': _('internship_subtype'),
-        'status': _('status'),
-        'session': _('session_title'),
+        'status': _('Status'),
+        'session': _('Session derogation'),
         'quadrimester': _('quadrimester'),
         'campus': _('campus'),
         'language': _('language'),
@@ -444,7 +444,7 @@ def _check_postponement_conflict_on_learning_container_year(lcy, next_lcy):
         'common_title': _('common_title'),
         'common_title_english': _('common_english_title'),
         'acronym': _('acronym'),
-        'team': _('team_management')
+        'team': _('Team management')
     }
     return _get_differences(lcy, next_lcy, fields_to_compare)
 

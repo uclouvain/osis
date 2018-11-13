@@ -181,7 +181,7 @@ class LearningUnitEditionTestCase(TestCase):
                         "and year %(next_year)s - %(next_value)s"
         # Error : Status diff
         error_status = _(generic_error) % {
-            'field': _('status'),
+            'field': _('Status'),
             'year': self.learning_unit_year.academic_year,
             'value': _('yes'),
             'next_year': another_learning_unit_year.academic_year,

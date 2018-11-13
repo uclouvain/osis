@@ -160,12 +160,12 @@ class LearningUnitYearForm(LearningUnitSearchForm):
     )
 
     subtype = forms.ChoiceField(
-        label=_('subtype'),
+        label=_('Subtype'),
         choices=LearningUnitSearchForm.ALL_CHOICES + learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
     )
 
     status = forms.ChoiceField(
-        label=_('status'),
+        label=_('Status'),
         choices=LearningUnitSearchForm.ALL_CHOICES + active_status.ACTIVE_STATUS_LIST[:-1],
     )
 

@@ -58,7 +58,7 @@ class TestAcademicCalendarForm(TestCase):
             "end_date": datetime.date.today() - datetime.timedelta(days=2)
         })
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['start_date'], _('start_date_must_be_lower_than_end_date'))
+        self.assertEqual(form.errors['start_date'], _('Start date must be lower than end date'))
 
     @override_settings(USE_TZ=False)
     def test_with_end_date_inferior_to_offer_year_calendar_end_date(self):

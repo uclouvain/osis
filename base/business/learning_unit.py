@@ -59,7 +59,7 @@ LEARNING_UNIT_TITLES_PART1 = [
     str(_('academic_year_small')),
     str(_('Title')),
     str(_('type')),
-    str(_('subtype')),
+    str(_('Subtype')),
     str(_('Req. Entity')),
     str(_('proposal_type')),
     str(_('proposal_status')),
@@ -80,7 +80,7 @@ LEARNING_UNIT_TITLES_PART2 = [
     "{} 2 - {}".format(_('Hourly vol.'), _('2nd quadri')),
     "{} 2".format(_('PLANNED_CLASSES')),
     str(_('quadrimester')),
-    str(_('session_title')),
+    str(_('Session derogation')),
     str(_('language')),
     str(_('Absolute credits')),
 ]

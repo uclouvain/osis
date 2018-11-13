@@ -39,7 +39,7 @@
         <form id="form_data_maintenance" method="post" action="{% url 'data_maintenance' %}" >
             {% csrf_token %}
             <div class="form-group">
-                <label for="txa_sql_command">{% trans 'sql_command' %}</label>
+                <label for="txa_sql_command">{% trans 'SQL command' %}</label>
                 <textarea id="txa_sql_command" name="sql_command" class="form-control" rows="10">{{ sql_command | default_if_none:'' }}</textarea>
             </div>
             {% if request.user.is_superuser %}

@@ -144,7 +144,7 @@
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                    aria-haspopup="true"
-                                   aria-expanded="false" id="lnk_home_dropdown_parcours">{% trans 'student_path' %}<span
+                                   aria-expanded="false" id="lnk_home_dropdown_parcours">{% trans 'Student path' %}<span
                                         class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                     {% if 'assessments' in installed_apps and perms.base.can_access_evaluation %}
@@ -153,7 +153,7 @@
                                     {% endif %}
                                     {% if perms.base.can_access_student %}
                                         <li><a href="{% url 'students' %}"
-                                               id="lnk_dropdown_students">{% trans 'students_title' %}</a></li>
+                                               id="lnk_dropdown_students">{% trans 'Students' %}</a></li>
                                     {% endif %}
                                     {% if 'internship' in installed_apps and perms.internship.can_access_internship %}
                                         <li><a href="{% url 'internship' %}"
@@ -356,7 +356,7 @@
             <a href="http://uclouvain.github.io/osis/" target="_blank"
                id="lnk_osis_website">{% trans 'Website' %}</a> |
             <a href="https://github.com/uclouvain/osis" target="_blank"
-               id="lnk_osis_source_code">{% trans 'source_code' %}</a>
+               id="lnk_osis_source_code">{% trans 'Source code' %}</a>
             {% if release_tag %}
                 |<a href="https://github.com/uclouvain/osis/releases/tag/{{ release_tag }}" target="_blank"
                     id="lnk_latest_tag">v{{ release_tag }}</a>

@@ -53,7 +53,7 @@ class LearningContainerYear(SerializableModel):
                                             verbose_name=_('common_english_title'))
     acronym = models.CharField(max_length=10)
     changed = models.DateTimeField(null=True, auto_now=True)
-    team = models.BooleanField(default=False, verbose_name=_('team_management'))
+    team = models.BooleanField(default=False, verbose_name=_('Team management'))
     is_vacant = models.BooleanField(default=False,  verbose_name=_('Vacant'))
     type_declaration_vacant = models.CharField(max_length=100, blank=True, null=True,
                                                verbose_name=_('Decision'),
