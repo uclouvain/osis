@@ -27,6 +27,7 @@
 from django.test import TestCase
 
 from base.models import prerequisite_item
+from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
@@ -34,6 +35,7 @@ from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 class TestPrerequisiteItem(TestCase):
     def setUp(self):
+        self.learning_unit = LearningUnitFactory()
         self.learning_unit_year_with_prerequisite = LearningUnitYearFactory()
         self.learning_unit_year_without_prerequisite = LearningUnitYearFactory()
         self.prerequisite = PrerequisiteFactory(
@@ -41,7 +43,7 @@ class TestPrerequisiteItem(TestCase):
         )
         self.prerequisite_item = PrerequisiteItemFactory(
             prerequisite=self.prerequisite,
-            learning_unit=self.learning_unit_year_with_prerequisite.learning_unit
+            learning_unit=self.learning_unit
         )
 
     def test_find_by_learning_unit_year_having_prerequisite(self):
@@ -57,11 +59,17 @@ class TestPrerequisiteItem(TestCase):
 
     def test_find_by_learning_unit_year_being_prerequisite(self):
         self.assertEqual(
-            list(prerequisite_item.find_by_learning_unit_being_prerequisite(
-                self.learning_unit_year_with_prerequisite.learning_unit)),
+            list(
+                prerequisite_item.find_by_learning_unit_being_prerequisite(
+                    self.prerequisite_item.learning_unit
+                )
+            ),
             [self.prerequisite_item]
         )
         self.assertFalse(
-            list(prerequisite_item.find_by_learning_unit_being_prerequisite(
-                self.learning_unit_year_without_prerequisite.learning_unit))
+            list(
+                prerequisite_item.find_by_learning_unit_being_prerequisite(
+                    self.learning_unit_year_without_prerequisite.learning_unit
+                )
+            )
         )
