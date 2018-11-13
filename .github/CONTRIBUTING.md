@@ -95,6 +95,9 @@
 ### Ressources et dépendances :
 - Ne pas faire de référence à des librairie/ressources externes ; ajouter la librairie utilisée dans le dossier 'static'
 
+### Emails
+- Utiliser l'envoi de mail "générique" proposé dans `osis_common/messaging`
+
 ### Tests : 
 #### Vues :
 Idéalement lorsqu'on teste une view, on doit vérifier :
