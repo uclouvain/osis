@@ -9,15 +9,10 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0386_auto_20181109_1055'),
+        ('base', '0387_auto_20181112_1138'),
     ]
 
     operations = [
-        migrations.AlterModelManagers(
-            name='person',
-            managers=[
-            ],
-        ),
         migrations.AlterField(
             model_name='offeryearcalendar',
             name='offer_year',
