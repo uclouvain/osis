@@ -73,8 +73,8 @@ LEARNING_UNIT_TITLES_PART1 = [
     str(_('type')),
     str(_('Subtype')),
     "{} ({})".format(_('Req. Entity'), _('fac. level')),
-    str(_('proposal_type')),
-    str(_('proposal_status')),
+    str(_('Proposal type')),
+    str(_('Proposal status')),
     str(_('credits')),
     str(_('allocation_entity_small')),
     str(_('Title in English')),
@@ -194,7 +194,7 @@ def _prepare_legend_ws_data():
     return {
         xls_build.HEADER_TITLES_KEY: [str(_('Legend'))],
         xls_build.CONTENT_KEY: [
-            [SPACES, _('proposal_creation')],
+            [SPACES, _('Proposal of creation')],
             [SPACES, _('Proposal for modification')],
             [SPACES, _('Suppression proposal')],
             [SPACES, _('Transformation proposal')],

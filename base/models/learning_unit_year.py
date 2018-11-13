@@ -129,20 +129,25 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     session = models.CharField(max_length=50, blank=True, null=True,
                                choices=learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION,
                                verbose_name=_('Session derogation'))
-    quadrimester = models.CharField(max_length=9, blank=True, null=True, verbose_name=_('quadrimester'),
+    quadrimester = models.CharField(max_length=9, blank=True, null=True, verbose_name=_('Quadrimester'),
                                     choices=quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS)
-    attribution_procedure = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('procedure'),
-                                             choices=attribution_procedure.ATTRIBUTION_PROCEDURES)
+
+    attribution_procedure = models.CharField(
+        max_length=20, blank=True, null=True,
+        verbose_name=_('Procedure'),
+        choices=attribution_procedure.ATTRIBUTION_PROCEDURES
+    )
+
     summary_locked = models.BooleanField(default=False, verbose_name=_("blocked update for tutor"))
 
-    professional_integration = models.BooleanField(default=False, verbose_name=_('professional_integration'))
+    professional_integration = models.BooleanField(default=False, verbose_name=_('professional integration'))
 
     campus = models.ForeignKey('Campus', null=True, verbose_name=_("learning_location"))
 
     language = models.ForeignKey('reference.Language', null=True, verbose_name=_('language'))
 
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
-                                   verbose_name=_('periodicity'))
+                                   verbose_name=_('Periodicity'))
     _warnings = None
 
     class Meta:

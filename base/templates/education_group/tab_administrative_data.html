@@ -110,7 +110,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><label>{% trans 'scores_diffusion' %}</label></td>
+                                            <td><label>{% trans 'Scores diffusion' %}</label></td>
                                             <td>
                                                 {% if scores_exam_diffusion.session1 and scores_exam_diffusion.session1.start_date %}
                                                     {{ scores_exam_diffusion.session1.start_date| default_if_none:'-'|date:"d/m/Y"}} <label>{% trans 'at' %}</label> {{ scores_exam_diffusion.session1.start_date | default_if_none:'-'|date:"H:i"}}
@@ -180,7 +180,7 @@
                         </div>
                         <br>
                         <div class="panel panel-default">
-                            <div class="panel-heading"> <label>{% trans 'pgm_mgr_administration'%}</label></div>
+                            <div class="panel-heading"> <label>{% trans 'Administration'%}</label></div>
                             <div class="panel-body">
                                 {% if pgm_mgrs %}
                                     {% for pgm_mgr in pgm_mgrs %}

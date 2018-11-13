@@ -38,7 +38,7 @@ class OfferYearAdmin(SerializableModelAdmin):
 GRADE_TYPES = (
     ('BACHELOR', _('bachelor')),
     ('MASTER', _('master')),
-    ('DOCTORATE', _('ph_d')))
+    ('DOCTORATE', _('Ph.D')))
 
 
 class OfferYear(SerializableModel):

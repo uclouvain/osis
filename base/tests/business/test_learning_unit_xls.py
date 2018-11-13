@@ -205,7 +205,7 @@ class TestLearningUnitXls(TestCase):
         expected = {
             xls_build.HEADER_TITLES_KEY: [str(_('Legend'))],
             xls_build.CONTENT_KEY: [
-                [SPACES, _('proposal_creation')],
+                [SPACES, _('Proposal of creation')],
                 [SPACES, _('Proposal for modification')],
                 [SPACES, _('Suppression proposal')],
                 [SPACES, _('Transformation proposal')],

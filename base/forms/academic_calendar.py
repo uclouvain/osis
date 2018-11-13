@@ -93,7 +93,7 @@ class AcademicCalendarForm(bootstrap.BootstrapModelForm):
 
     def end_date_gt_start_date(self):
         if self.cleaned_data['end_date'] <= self.cleaned_data['start_date']:
-            self._errors['start_date'] = _('start_date_must_be_lower_than_end_date')
+            self._errors['start_date'] = _('Start date must be lower than end date')
             return False
         return True
 

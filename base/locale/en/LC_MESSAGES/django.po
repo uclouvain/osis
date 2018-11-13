@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-13 15:14+0100\n"
+"POT-Creation-Date: 2018-11-13 16:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,6 +21,10 @@ msgstr ""
 #: views/education_groups/group_element_year/update.py:236
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
+msgstr ""
+
+#: views/learning_units/educational_information.py:54
+msgid "\"Reminding mails sent"
 msgstr ""
 
 #: models/admission_condition.py:112
@@ -148,6 +152,14 @@ msgstr ""
 
 #: business/learning_unit.py:76 business/learning_unit.py:80
 msgid "2nd quadri"
+msgstr ""
+
+#: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:19
+msgid "<b>create</b> a new learning unit using that acronym"
+msgstr ""
+
+#: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:22
+msgid "<b>prolong</b> the learning unit of the same acronym"
 msgstr ""
 
 #: business/learning_unit_proposal.py:259
@@ -371,6 +383,10 @@ msgstr "Classes"
 msgid "Clear notifications"
 msgstr ""
 
+#: templates/logged_out.html:37
+msgid "Click to reconnect"
+msgstr ""
+
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:44
 #: templates/education_group/tab_admission_conditions.html:83
 #: templates/education_group/tab_admission_conditions.html:109
@@ -478,6 +494,12 @@ msgstr "Exam enrollments"
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:99
 msgid "Edit the proposal"
 msgstr ""
+
+#: templates/learning_units.html:88
+#, fuzzy
+#| msgid "educational_information"
+msgid "Education information status"
+msgstr "Educational information"
 
 #: forms/entity_calendar.py:43
 msgid "Educational information ending"
@@ -955,6 +977,12 @@ msgstr ""
 msgid "Prohibition to delete a learning unit before 2015."
 msgstr ""
 
+#: templates/learning_unit/blocks/panel/proposal.html:6
+#, fuzzy
+#| msgid "proposal"
+msgid "Proposal"
+msgstr "Proposal"
+
 #: tests/views/test_learning_unit_proposal.py:696
 #, python-format
 msgid "Proposal %(acronym)s (%(academic_year)s) successfully canceled."
@@ -975,6 +1003,51 @@ msgstr ""
 msgid "Proposal is neither accepted nor refused."
 msgstr ""
 
+#: templates/learning_unit/blocks/form/update_proposal.html:6
+#: templates/learning_unit/proposal/creation.html:9
+#, fuzzy
+#| msgid "proposal_management"
+msgid "Proposal management"
+msgstr "Proposal management"
+
+#: business/learning_unit_xls.py:197
+#: templates/blocks/button/learning_units_action_button.html:57
+#: templates/learning_unit/proposal/creation.html:4
+#: templates/learning_unit/simple/creation.html:40
+#: tests/business/test_learning_unit_xls.py:208
+#, fuzzy
+#| msgid "proposal_creation"
+msgid "Proposal of creation"
+msgstr "Proposal of creation"
+
+#: business/learning_unit.py:65 business/learning_unit_xls.py:77
+#: business/proposal_xls.py:38 forms/proposal/learning_unit_proposal.py:69
+#: templates/learning_unit/by_proposal.html:59 utils/send_mail.py:231
+#, fuzzy
+#| msgid "proposal_status"
+msgid "Proposal status"
+msgstr "Status proposal"
+
+#: business/learning_unit.py:64 business/learning_unit_xls.py:76
+#: business/proposal_xls.py:38 forms/proposal/learning_unit_proposal.py:63
+#: templates/learning_unit/by_proposal.html:58
+#, fuzzy
+#| msgid "proposal_type"
+msgid "Proposal type"
+msgstr "Proposal type"
+
+#: templates/learning_units.html:78 views/learning_units/search.py:206
+#, fuzzy
+#| msgid "proposal"
+msgid "Proposals"
+msgstr "Proposal"
+
+#: business/proposal_xls.py:40
+#, fuzzy
+#| msgid "proposal_date"
+msgid "Proposals date"
+msgstr "Proposals date"
+
 #: templates/education_group/tab_admission_conditions.html:38
 #: templates/education_group/tab_general_informations.html:39
 msgid "Publish"
@@ -992,6 +1065,15 @@ msgstr ""
 msgid "Quad. derog."
 msgstr ""
 
+#: business/learning_unit.py:82 business/learning_units/edition.py:434
+#: business/learning_units/xls_comparison.py:62
+#: models/learning_unit_year.py:132
+#: templates/learning_unit/blocks/form/volumes_management_form.html:39
+#, fuzzy
+#| msgid "quadrimester"
+msgid "Quadrimester"
+msgstr "Quadrimester"
+
 #: models/group_element_year.py:137
 #: templates/education_group/blocks/table_utilizations.html:37
 msgid "Quadrimester derogation"
@@ -1002,6 +1084,26 @@ msgstr ""
 msgid "Rate code"
 msgstr ""
 
+#: business/learning_units/xls_comparison.py:80
+#: business/learning_units/xls_comparison.py:90
+#, fuzzy
+#| msgid "real_classes"
+msgid "Real classes"
+msgstr "Real classes"
+
+#: templates/learning_unit/components.html:56
+#: templates/learning_unit/components_identification.html:41
+#, fuzzy
+#| msgid "planned_classrooms"
+msgid "Real/Planned classrooms"
+msgstr "Planned classrooms"
+
+#: templates/my_osis/my_message.html:44 templates/my_osis/my_messages.html:67
+#, fuzzy
+#| msgid "received_on"
+msgid "Received on"
+msgstr "Received on"
+
 #: templates/education_group/tab_admission_conditions.html:72
 msgid "Reduction"
 msgstr ""
@@ -1010,6 +1112,13 @@ msgstr ""
 #: templates/education_group/blocks/coorganization.html:38
 msgid "Reference institution"
 msgstr ""
+
+#: templates/education_group/pdf_content.html:107
+#: templates/student/students.html:43 templates/student/students.html:72
+#, fuzzy
+#| msgid "registration_id"
+msgid "Registration ID"
+msgstr "Registration ID"
 
 #: templates/education_group/pdf_content.html:69
 msgid "Registration form for the content of"
@@ -1080,11 +1189,58 @@ msgstr ""
 msgid "Responsible"
 msgstr "Responsible"
 
+#: templates/admin/data_maintenance.html:42
+msgid "SQL command"
+msgstr ""
+
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:41
 #: templates/education_group/tab_edit_administrative_data.html:81
 #: templates/entity/blocks/educational_summary_calendar_widget.html:39
 msgid "Save"
 msgstr ""
+
+#: models/education_group_year.py:218
+#, fuzzy
+#| msgid "schedule_type"
+msgid "Schedule type"
+msgstr "Schedule type"
+
+#: forms/education_groups_administrative_data.py:86
+#: templates/education_group/tab_administrative_data.html:113
+#, fuzzy
+#| msgid "scores_diffusion"
+msgid "Scores diffusion"
+msgstr "Scores diffusion"
+
+#: templates/offer/tabs.html:52
+#, fuzzy
+#| msgid "scores_encoding"
+msgid "Scores encoding"
+msgstr "Scores encoding"
+
+#: templates/academic_actors.html:49
+#, fuzzy
+#| msgid "scores_responsibles"
+msgid "Scores responsibles"
+msgstr "Scores responsibles"
+
+#: templates/entities.html:47
+#, fuzzy
+#| msgid "search_for_an_entity"
+msgid "Search for an entity"
+msgstr "Search for an entity"
+
+#: templates/organization/organizations.html:48
+#, fuzzy
+#| msgid "search_for_an_organization"
+msgid "Search for an organization"
+msgstr "Search for an organization"
+
+#: views/learning_units/search.py:200
+#, fuzzy
+#| msgid "search_type"
+msgid "Search type"
+msgstr "Search type"
 
 #: forms/education_group/training.py:128
 msgid "Search..."
@@ -1113,17 +1269,52 @@ msgstr "Select all the messages"
 msgid "Selected element"
 msgstr ""
 
+#: templates/learning_units.html:68 views/learning_units/search.py:207
+#, fuzzy
+#| msgid "service_course_search"
+msgid "Service courses"
+msgstr "Service courses"
+
 #: templates/education_group/tab_administrative_data.html:58
 #: templates/education_group/tab_administrative_data.html:59
 #: templates/education_group/tab_administrative_data.html:60
 msgid "Session"
 msgstr ""
 
+#: business/learning_unit.py:83 business/learning_units/edition.py:433
+#: business/learning_units/xls_comparison.py:63
+#: models/learning_unit_year.py:131
+#: templates/education_group/tab_edit_administrative_data.html:56
+#: templates/education_group/tab_edit_administrative_data.html:57
+#: templates/education_group/tab_edit_administrative_data.html:58
+#, fuzzy
+#| msgid "sessions_derogation"
+msgid "Session derogation"
+msgstr "Sessions in derogation"
+
+#: templates/offer/tab_identification.html:64
+#, fuzzy
+#| msgid "short_title"
+msgid "Short title"
+msgstr "Short title"
+
 #: templates/my_osis/my_messages.html:80
 #, fuzzy
 #| msgid "message"
 msgid "Show message"
 msgstr "Message"
+
+#: templates/education_group/tab_administrative_data.html:171
+#, fuzzy
+#| msgid "signatory_qualification"
+msgid "Signatory qualification"
+msgstr "Signatory's qualification"
+
+#: templates/layout.html:359
+#, fuzzy
+#| msgid "source_code"
+msgid "Source code"
+msgstr "Source code"
 
 #: templates/education_group/tab_admission_conditions.html:62
 #, fuzzy
@@ -1137,6 +1328,89 @@ msgstr "Conditions"
 msgid "Specific Conditions"
 msgstr "Conditions"
 
+#: models/education_group.py:46 models/education_group.py:77
+#: templates/learning_unit/add_charge_repartition_inner.html:35
+#: templates/learning_unit/attributions.html:36
+#: templates/learning_unit/select_attribution.html:36
+#, fuzzy
+#| msgid "start"
+msgid "Start"
+msgstr "Start"
+
+#: templates/academic_calendar/academic_calendar.html:52
+#: templates/academic_calendar/academic_calendar_form.html:70
+#: templates/entity/versions.html:46
+#: templates/offer/tab_academic_calendar.html:50
+#: templates/offer_year_calendar.html:46
+#: templates/organization/organization.html:74
+#, fuzzy
+#| msgid "start_date"
+msgid "Start date"
+msgstr "Start date"
+
+#: tests/forms/test_academic_calendar.py:61
+#, fuzzy
+#| msgid "start_date_must_be_lower_than_end_date"
+msgid "Start date must be lower than end date"
+msgstr "Start date must be lower than end date"
+
+#: models/learning_unit.py:60
+#, fuzzy
+#| msgid "start_year"
+msgid "Starting year"
+msgstr "Starting year"
+
+#: models/proposal_learning_unit.py:53
+#: templates/learning_unit/blocks/panel/proposal.html:21
+#, fuzzy
+#| msgid "state"
+msgid "State"
+msgstr "State"
+
+#: business/learning_units/edition.py:432
+#: forms/learning_unit/search_form.py:168 models/education_group_year.py:135
+#: templates/learning_unit/by_activity.html:101
+#: templates/learning_unit/by_external.html:50
+#: templates/learning_unit/summary_list.html:82
+#: tests/business/learning_units/test_edition.py:184 utils/send_mail.py:231
+#, fuzzy
+#| msgid "status"
+msgid "Status"
+msgstr "Status"
+
+#: templates/admin/data.html:57 templates/admin/storage.html:32
+#: templates/admin/storage.html:36
+#, fuzzy
+#| msgid "storage"
+msgid "Storage"
+msgstr "Storage"
+
+#: templates/offer/tab_identification.html:54
+#, fuzzy
+#| msgid "structure"
+msgid "Structure"
+msgstr "Structure"
+
+#: templates/student/student.html:32
+#, fuzzy
+#| msgid "students"
+msgid "Student"
+msgstr "students"
+
+#: templates/home.html:80 templates/layout.html:147
+#: templates/student/student.html:30 templates/student/students.html:30
+#: templates/studies.html:30 templates/studies.html:34
+#, fuzzy
+#| msgid "student_path"
+msgid "Student path"
+msgstr "Students' path"
+
+#: templates/student/students.html:54
+#, fuzzy
+#| msgid "student_path"
+msgid "Student search"
+msgstr "Students' path"
+
 #: templates/education_group/pdf_content.html:84
 msgid "Student's contact information"
 msgstr ""
@@ -1145,10 +1419,46 @@ msgstr ""
 msgid "Student's signature"
 msgstr ""
 
+#: templates/layout.html:156 templates/student/student.html:31
+#: templates/student/students.html:31 templates/student/students.html:36
+#, fuzzy
+#| msgid "students"
+msgid "Students"
+msgstr "students"
+
+#: templates/my_osis/my_messages.html:66
+#, fuzzy
+#| msgid "subject"
+msgid "Subject"
+msgstr "Subject"
+
+#: business/learning_unit_xls.py:235
+#: templates/learning_unit/add_charge_repartition_inner.html:39
+#: templates/learning_unit/attributions.html:40
+#: templates/learning_unit/select_attribution.html:40
+#: tests/business/test_learning_unit_xls.py:169
+#: tests/business/test_learning_unit_xls.py:381
+#, fuzzy
+#| msgid "substitute"
+msgid "Substitute"
+msgstr "Substitute"
+
+#: business/learning_unit.py:62 business/learning_unit_xls.py:74
+#: business/learning_units/edition.py:429
+#: business/learning_units/xls_comparison.py:57
+#: forms/learning_unit/search_form.py:163
+#: templates/learning_unit/by_activity.html:97
+#: templates/learning_unit/summary_list.html:80
+#, fuzzy
+#| msgid "subtype"
+msgid "Subtype"
+msgstr "Subtype"
+
 #: utils/send_mail.py:250
 msgid "Success"
 msgstr ""
 
+#: templates/academic_actors.html:57
 #: templates/learning_unit/blocks/panel/educational_informations.html:33
 msgid "Summary responsible(s)"
 msgstr ""
@@ -1164,6 +1474,13 @@ msgstr ""
 msgid "Teaching material"
 msgstr ""
 
+#: business/learning_units/edition.py:447 models/learning_container_year.py:56
+#: templates/learning_unit/identification.html:164
+#, fuzzy
+#| msgid "team_management"
+msgid "Team management"
+msgstr "Team management"
+
 #: templates/learning_unit/blocks/form/form_external.html:64
 #: templates/learning_unit/blocks/panel/proposal.html:28
 #: templates/learning_unit/blocks/proposal_user.html:16
@@ -1177,6 +1494,10 @@ msgstr "The"
 #: views/education_groups/group_element_year/update.py:128
 #, python-format
 msgid "The %(acronym)s has been moved"
+msgstr ""
+
+#: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:14
+msgid "The acronym <b>already exists</b>."
 msgstr ""
 
 #: views/education_group.py:89
@@ -1301,6 +1622,12 @@ msgstr ""
 #, python-format
 msgid "The learning unit has been updated until %(year)s."
 msgstr ""
+
+#: views/learning_units/update.py:182
+#, fuzzy
+#| msgid "learning_unit_updated"
+msgid "The learning unit has been updated."
+msgstr "Learning unit {acronym} successfully updated."
 
 #: business/learning_units/perms.py:449
 msgid "The learning unit is not summary editable."
@@ -1769,6 +2096,10 @@ msgstr ""
 msgid "We detected inconsistencies in the following data :"
 msgstr ""
 
+#: templates/server_error.html:35
+msgid "We will fix this as soon as possible"
+msgstr ""
+
 #: templates/layout.html:357 templates/organization/organization.html:66
 #, fuzzy
 #| msgid "website"
@@ -1818,6 +2149,12 @@ msgstr ""
 msgid "You are not summary responsible for this learning unit."
 msgstr ""
 
+#: templates/logged_out.html:36
+#, fuzzy
+#| msgid "succesfull_logout"
+msgid "You are succesfully logout."
+msgstr "You are succesfully logout."
+
 #: templates/education_group/protect_delete_inner.html:9
 msgid "You can not delete this object because some dependencies are protected"
 msgstr ""
@@ -1833,6 +2170,17 @@ msgstr ""
 msgid ""
 "You cannot attach \"%(child)s\" (type \"%(child_type)s\") to \"%(parent)s"
 "\" (type \"%(parent_type)s\")"
+msgstr ""
+
+#: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:16
+msgid "You have the choice between"
+msgstr ""
+
+#: tests/views/test_learning_unit_proposal.py:254
+#: tests/views/test_learning_unit_proposal.py:504
+#: views/learning_units/proposal/update.py:83
+#: views/learning_units/proposal/update.py:112
+msgid "You proposed a modification of type {} for the learning unit {}."
 msgstr ""
 
 #: models/exam_enrollment.py:42
@@ -2139,6 +2487,10 @@ msgstr "Birth Date"
 msgid "block"
 msgstr "Block"
 
+#: models/learning_unit_year.py:136
+msgid "blocked update for tutor"
+msgstr ""
+
 #: templates/learning_units.html:73 views/learning_units/search.py:208
 msgid "borrowed_course_search"
 msgstr "Borrowed courses"
@@ -2184,7 +2536,7 @@ msgstr "Campus"
 #: templates/learning_unit/blocks/modal/modal_pedagogy_edit.html:47
 #: templates/learning_unit/blocks/modal/modal_warning_state_modification.html:38
 #: templates/learning_unit/blocks/modal/modal_xls_with_parameters.html:42
-#: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:16
+#: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:30
 #: templates/learning_unit/blocks/save_cancel_buttons.html:7
 #: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:8
 #: templates/learning_unit/class_edit.html:54
@@ -2321,7 +2673,7 @@ msgstr "Components"
 msgid "confirm"
 msgstr "Yes, I confirm."
 
-#: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:8
+#: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:10
 msgid "confirm_your_action"
 msgstr "Confirm your action."
 
@@ -2350,7 +2702,7 @@ msgstr "Course enrollment"
 #: templates/education_group/blocks/coorganization.html:156
 #: templates/education_group/blocks/panel/panel_achievements.html:89
 #: templates/education_group/blocks/panel/panel_achievements.html:101
-#: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:14
+#: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:28
 #: templates/learning_unit/specifications.html:86
 #: templates/learning_unit/specifications.html:183
 msgid "create"
@@ -3845,78 +4197,9 @@ msgstr "Programs"
 msgid "project events"
 msgstr ""
 
-#: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:15
+#: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:29
 msgid "prolong"
 msgstr "Prolong"
-
-#: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:11
-msgid "prolong_or_create_learning_unit_message"
-msgstr ""
-"<p>The acronym <b>already exists</b>.</p><p>You have the choice between:"
-"<ul><li><b>create</b> a new learning unit using that acronym</"
-"li><li><b>prolong</b> the learning unit of the same acronym</li></ul>"
-
-#: templates/learning_unit/blocks/panel/proposal.html:6
-msgid "proposal"
-msgstr "Proposal"
-
-#: business/learning_unit_xls.py:197
-#: templates/blocks/button/learning_units_action_button.html:56
-#: templates/learning_unit/proposal/creation.html:4
-#: templates/learning_unit/simple/creation.html:40
-#: tests/business/test_learning_unit_xls.py:208
-msgid "proposal_creation"
-msgstr "Proposal of creation"
-
-#: business/proposal_xls.py:40
-msgid "proposal_date"
-msgstr "Proposals date"
-
-#: templates/learning_unit/blocks/form/update_proposal.html:6
-#: templates/learning_unit/proposal/creation.html:9
-msgid "proposal_management"
-msgstr "Proposal management"
-
-#: business/learning_unit.py:65 business/learning_unit_xls.py:77
-#: business/proposal_xls.py:38 forms/proposal/learning_unit_proposal.py:69
-#: templates/learning_unit/by_proposal.html:59 utils/send_mail.py:231
-msgid "proposal_status"
-msgstr "Status proposal"
-
-#: business/learning_unit.py:64 business/learning_unit_xls.py:76
-#: business/proposal_xls.py:38 forms/proposal/learning_unit_proposal.py:63
-#: templates/learning_unit/by_proposal.html:58
-msgid "proposal_type"
-msgstr "Proposal type"
-
-#: templates/learning_units.html:78 views/learning_units/search.py:206
-msgid "proposals_search"
-msgstr "Proposals"
-
-#: business/learning_unit.py:82 business/learning_units/edition.py:434
-#: business/learning_units/xls_comparison.py:62
-#: models/learning_unit_year.py:132
-#: templates/learning_unit/blocks/form/volumes_management_form.html:39
-msgid "quadrimester"
-msgstr "Quadrimester"
-
-#: business/learning_units/xls_comparison.py:80
-#: business/learning_units/xls_comparison.py:90
-msgid "real_classes"
-msgstr "Real classes"
-
-#: templates/learning_unit/components.html:56
-#: templates/learning_unit/components_identification.html:41
-msgid "real_on_planned_classrooms"
-msgstr "Real/Planned classrooms"
-
-#: templates/my_osis/my_message.html:44 templates/my_osis/my_messages.html:67
-msgid "received_on"
-msgstr "Received on"
-
-#: templates/logged_out.html:37
-msgid "redirect_to_login"
-msgstr "Click to reconnect"
 
 #: models/validation_rule.py:66
 #, fuzzy
@@ -3928,11 +4211,6 @@ msgstr "We will fix this as soon as possible"
 msgid "regex rule"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:107
-#: templates/student/students.html:43 templates/student/students.html:72
-msgid "registration_id"
-msgstr "Registration ID"
-
 #: models/group_element_year.py:93
 msgid "relative credits"
 msgstr ""
@@ -3942,7 +4220,9 @@ msgid "remark"
 msgstr "Remark"
 
 #: models/education_group_year.py:343
-msgid "remark_english"
+#, fuzzy
+#| msgid "remark_english"
+msgid "remark in english"
 msgstr "Remark in english"
 
 #: templates/admin/data_maintenance.html:48
@@ -3984,45 +4264,16 @@ msgstr "Result"
 msgid "save"
 msgstr "Save"
 
-#: models/education_group_year.py:218
-msgid "schedule_type"
-msgstr "Schedule type"
-
-#: forms/education_groups_administrative_data.py:86
-#: templates/education_group/tab_administrative_data.html:113
-msgid "scores_diffusion"
-msgstr "Scores diffusion"
-
-#: templates/offer/tabs.html:52
-msgid "scores_encoding"
-msgstr "Scores encoding"
-
-#: templates/academic_actors.html:49
-msgid "scores_responsibles"
-msgstr "Scores responsibles"
-
 #: utils/send_mail.py:335
 #, fuzzy
-#| msgid "scores_saved"
-msgid "scores_sheet"
-msgstr "score(s) saved"
+#| msgid "score_saved"
+msgid "score(s) saved"
+msgstr "score Saved"
 
 #: templates/learning_unit/blocks/form/search_form_proposal.html:50
 #, fuzzy
 #| msgid "search_type"
 msgid "search"
-msgstr "Search type"
-
-#: templates/entities.html:47
-msgid "search_for_an_entity"
-msgstr "Search for an entity"
-
-#: templates/organization/organizations.html:48
-msgid "search_for_an_organization"
-msgstr "Search for an organization"
-
-#: views/learning_units/search.py:200
-msgid "search_type"
 msgstr "Search type"
 
 #: forms/education_group/training.py:61 models/education_group_year.py:380
@@ -4038,159 +4289,13 @@ msgstr ""
 msgid "server_error"
 msgstr "A server error occured."
 
-#: templates/server_error.html:35
-msgid "server_error_message"
-msgstr "We will fix this as soon as possible"
-
-#: templates/learning_units.html:68 views/learning_units/search.py:207
-msgid "service_course_search"
-msgstr "Service courses"
-
-#: business/learning_unit.py:83 business/learning_units/edition.py:433
-#: business/learning_units/xls_comparison.py:63
-#: models/learning_unit_year.py:131
-#: templates/education_group/tab_edit_administrative_data.html:56
-#: templates/education_group/tab_edit_administrative_data.html:57
-#: templates/education_group/tab_edit_administrative_data.html:58
-msgid "session_title"
-msgstr "Session derogation"
-
-#: templates/offer/tab_identification.html:64
-msgid "short_title"
-msgstr "Short title"
-
-#: templates/education_group/tab_administrative_data.html:171
-msgid "signatory_qualification"
-msgstr "Signatory's qualification"
-
 #: templates/education_group/tabs.html:59
 msgid "skills and achievements"
 msgstr ""
 
-#: templates/layout.html:359
-msgid "source_code"
-msgstr "Source code"
-
-#: templates/admin/data_maintenance.html:42
-msgid "sql_command"
-msgstr ""
-
-#: models/education_group.py:46 models/education_group.py:77
-#: templates/learning_unit/add_charge_repartition_inner.html:35
-#: templates/learning_unit/attributions.html:36
-#: templates/learning_unit/select_attribution.html:36
-msgid "start"
-msgstr "Start"
-
-#: templates/academic_calendar/academic_calendar.html:52
-#: templates/academic_calendar/academic_calendar_form.html:70
-#: templates/entity/versions.html:46
-#: templates/offer/tab_academic_calendar.html:50
-#: templates/offer_year_calendar.html:46
-#: templates/organization/organization.html:74
-msgid "start_date"
-msgstr "Start date"
-
-#: forms/academic_calendar.py:96 tests/forms/test_academic_calendar.py:61
+#: forms/academic_calendar.py:96
 msgid "start_date_must_be_lower_than_end_date"
 msgstr "Start date must be lower than end date"
-
-#: models/learning_unit.py:60
-msgid "start_year"
-msgstr "Starting year"
-
-#: models/proposal_learning_unit.py:53
-#: templates/learning_unit/blocks/panel/proposal.html:21
-msgid "state"
-msgstr "State"
-
-#: business/learning_units/edition.py:432
-#: forms/learning_unit/search_form.py:168 models/education_group_year.py:135
-#: templates/learning_unit/by_activity.html:101
-#: templates/learning_unit/by_external.html:50
-#: templates/learning_unit/summary_list.html:82
-#: tests/business/learning_units/test_edition.py:184 utils/send_mail.py:231
-msgid "status"
-msgstr "Status"
-
-#: templates/admin/data.html:57 templates/admin/storage.html:32
-#: templates/admin/storage.html:36
-msgid "storage"
-msgstr "Storage"
-
-#: templates/offer/tab_identification.html:54
-msgid "structure"
-msgstr "Structure"
-
-#: templates/home.html:80 templates/layout.html:147
-#: templates/student/student.html:30 templates/student/students.html:30
-#: templates/studies.html:30 templates/studies.html:34
-msgid "student_path"
-msgstr "Students' path"
-
-#: templates/student/students.html:54
-#, fuzzy
-#| msgid "student_path"
-msgid "student_search"
-msgstr "Students' path"
-
-#: templates/student/student.html:32
-msgid "student_title"
-msgstr "Student"
-
-#: templates/layout.html:156 templates/student/student.html:31
-#: templates/student/students.html:31 templates/student/students.html:36
-msgid "students_title"
-msgstr "Students"
-
-#: templates/my_osis/my_messages.html:66
-msgid "subject"
-msgstr "Subject"
-
-#: business/learning_unit_xls.py:235
-#: templates/learning_unit/add_charge_repartition_inner.html:39
-#: templates/learning_unit/attributions.html:40
-#: templates/learning_unit/select_attribution.html:40
-#: tests/business/test_learning_unit_xls.py:169
-#: tests/business/test_learning_unit_xls.py:381
-msgid "substitute"
-msgstr "Substitute"
-
-#: business/learning_unit.py:62 business/learning_unit_xls.py:74
-#: business/learning_units/edition.py:429
-#: business/learning_units/xls_comparison.py:57
-#: forms/learning_unit/search_form.py:163
-#: templates/learning_unit/by_activity.html:97
-#: templates/learning_unit/summary_list.html:80
-msgid "subtype"
-msgstr "Subtype"
-
-#: templates/logged_out.html:36
-msgid "succesfull_logout"
-msgstr "You are succesfully logout."
-
-#: views/learning_units/educational_information.py:54
-msgid "success_mail_reminder"
-msgstr "Reminding mails sent"
-
-#: views/learning_units/update.py:182
-msgid "success_modification_learning_unit"
-msgstr "The learning unit has been updated."
-
-#: tests/views/test_learning_unit_proposal.py:254
-#: tests/views/test_learning_unit_proposal.py:504
-#: views/learning_units/proposal/update.py:83
-#: views/learning_units/proposal/update.py:112
-msgid "success_modification_proposal"
-msgstr "You proposed a modification of type {} for the learning unit {}."
-
-#: templates/learning_units.html:88
-msgid "summary_list"
-msgstr "Education information status"
-
-#: models/learning_unit_year.py:136
-msgid "summary_locked"
-msgstr "blocked update for tutor"
 
 #: forms/learning_unit/search_form.py:88
 #: templates/learning_unit/summary_list.html:81
@@ -4199,25 +4304,11 @@ msgstr "blocked update for tutor"
 msgid "summary_responsible"
 msgstr "Scores Responsible"
 
-#: templates/academic_actors.html:57
-#, fuzzy
-#| msgid "scores_responsibles"
-msgid "summary_responsibles"
-msgstr "Scores responsibles"
-
-#: business/learning_units/xls_generator.py:45
+#: business/learning_units/xls_generator.py:45 models/teaching_material.py:43
+#: models/teaching_material.py:44
 #: tests/views/test_learning_unit_pedagogy.py:195
 msgid "teaching materials"
 msgstr ""
-
-#: models/teaching_material.py:43 models/teaching_material.py:44
-msgid "teachingmaterial"
-msgstr ""
-
-#: business/learning_units/edition.py:447 models/learning_container_year.py:56
-#: templates/learning_unit/identification.html:164
-msgid "team_management"
-msgstr "Team management"
 
 #: models/abstracts/abstract_achievement.py:45
 msgid "text"
@@ -4341,6 +4432,58 @@ msgstr "Types"
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr ""
+
+#~ msgid "prolong_or_create_learning_unit_message"
+#~ msgstr ""
+#~ "<p>The acronym <b>already exists</b>.</p><p>You have the choice between:"
+#~ "<ul><li><b>create</b> a new learning unit using that acronym</"
+#~ "li><li><b>prolong</b> the learning unit of the same acronym</li></ul>"
+
+#~ msgid "proposals_search"
+#~ msgstr "Proposals"
+
+#~ msgid "real_on_planned_classrooms"
+#~ msgstr "Real/Planned classrooms"
+
+#~ msgid "redirect_to_login"
+#~ msgstr "Click to reconnect"
+
+#, fuzzy
+#~| msgid "scores_saved"
+#~ msgid "scores_sheet"
+#~ msgstr "score(s) saved"
+
+#~ msgid "server_error_message"
+#~ msgstr "We will fix this as soon as possible"
+
+#~ msgid "session_title"
+#~ msgstr "Session derogation"
+
+#~ msgid "student_title"
+#~ msgstr "Student"
+
+#~ msgid "students_title"
+#~ msgstr "Students"
+
+#~ msgid "success_mail_reminder"
+#~ msgstr "Reminding mails sent"
+
+#~ msgid "success_modification_learning_unit"
+#~ msgstr "The learning unit has been updated."
+
+#~ msgid "success_modification_proposal"
+#~ msgstr "You proposed a modification of type {} for the learning unit {}."
+
+#~ msgid "summary_list"
+#~ msgstr "Education information status"
+
+#~ msgid "summary_locked"
+#~ msgstr "blocked update for tutor"
+
+#, fuzzy
+#~| msgid "scores_responsibles"
+#~ msgid "summary_responsibles"
+#~ msgstr "Scores responsibles"
 
 #~ msgid "university_certificate_desc"
 #~ msgstr "University certificate"
@@ -4959,9 +5102,6 @@ msgstr ""
 #~ msgid "scores_responsible_title"
 #~ msgstr "Scores Responsible"
 
-#~ msgid "score_saved"
-#~ msgstr "score Saved"
-
 #~ msgid "score_submitted"
 #~ msgstr "Submitted"
 
@@ -5012,9 +5152,6 @@ msgstr ""
 
 #~ msgid "student_not_exist"
 #~ msgstr "The student (%s) doesn't exist"
-
-#~ msgid "students"
-#~ msgstr "students"
 
 #~ msgid "studies"
 #~ msgstr "Studies"
@@ -5342,9 +5479,6 @@ msgstr ""
 
 #~ msgid "schedules_conformity"
 #~ msgstr "Sched. conform. "
-
-#~ msgid "planned_classrooms"
-#~ msgstr "Planned classrooms"
 
 #~ msgid "class"
 #~ msgstr "Class"
@@ -5745,9 +5879,6 @@ msgstr ""
 
 #~ msgid "current_order"
 #~ msgstr "Current order"
-
-#~ msgid "sessions_derogation"
-#~ msgstr "Sessions in derogation"
 
 #~ msgid "SESSION_1"
 #~ msgstr "1"

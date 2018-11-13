@@ -28,7 +28,7 @@
 
 {% block breadcrumb %}
     <li><a href="{% url 'my_osis' %}" id="lnk_my_osis">{% trans 'my_osis' %}</a></li>
-    <li class="active">{% trans 'profile' %}</li>
+    <li class="active">{% trans 'Profile' %}</li>
 {% endblock %}
 {% block content %}
 
@@ -51,9 +51,9 @@
             </li>
         {% endif %}
         {% if programs_managers %}
-            <li role="presentation"><a href="#program" aria-controls="program" role="tab" data-toggle="tab">{% trans 'programs' %}</a></li>
+            <li role="presentation"><a href="#program" aria-controls="program" role="tab" data-toggle="tab">{% trans 'Programs' %}</a></li>
         {% endif %}
-        <li role="presentation"><a href="#preferences" aria-controls="preferences" role="tab" data-toggle="tab">{% trans 'preferences' %}</a></li>
+        <li role="presentation"><a href="#preferences" aria-controls="preferences" role="tab" data-toggle="tab">{% trans 'Preferences' %}</a></li>
     </ul>
 
     <div class="tab-content">

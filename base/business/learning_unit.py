@@ -61,15 +61,15 @@ LEARNING_UNIT_TITLES_PART1 = [
     str(_('type')),
     str(_('Subtype')),
     str(_('Req. Entity')),
-    str(_('proposal_type')),
-    str(_('proposal_status')),
+    str(_('Proposal type')),
+    str(_('Proposal status')),
     str(_('credits')),
     str(_('allocation_entity_small')),
     str(_('Title in English')),
 ]
 
 LEARNING_UNIT_TITLES_PART2 = [
-    str(_('periodicity')),
+    str(_('Periodicity')),
     str(_('active_title')),
     "{} 1 - {}".format(_('Hourly vol.'), _('Annual')),
     "{} 1 - {}".format(_('Hourly vol.'), _('1st quadri')),
@@ -79,7 +79,7 @@ LEARNING_UNIT_TITLES_PART2 = [
     "{} 2 - {}".format(_('Hourly vol.'), _('1st quadri')),
     "{} 2 - {}".format(_('Hourly vol.'), _('2nd quadri')),
     "{} 2".format(_('PLANNED_CLASSES')),
-    str(_('quadrimester')),
+    str(_('Quadrimester')),
     str(_('Session derogation')),
     str(_('language')),
     str(_('Absolute credits')),

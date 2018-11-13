@@ -44,12 +44,12 @@
     </li>
     <li role="presentation" {% if request.path == url_program_managers_tab %} class="active" {% endif %}>
         <a href="{% url 'offer_program_managers_tab' offer_year_id=offer_year.id %}" role="tab">
-            {% trans 'program_managers'%}
+            {% trans 'Program Managers'%}
         </a>
     </li>
     <li role="presentation" {% if request.path == url_score_encoding_tab or request.path == save_score_sheet_address %} class="active" {% endif %}>
         <a href="{% url 'offer_score_encoding_tab' offer_year_id=offer_year.id %}" role="tab">
-            {% trans 'scores_encoding' %}
+            {% trans 'Scores encoding' %}
         </a>
     </li>
 </ul>

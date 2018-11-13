@@ -53,7 +53,9 @@
         {% flag "learning_unit_proposal_create" %}
             {% if perms.base.can_edit_learning_unit_proposal %}
                 <li>
-                    <a href="{{ create_proposal_url }}" id="lnk_create_proposal_url">{% trans 'proposal_creation' %}</a>
+                    <a href="{{ create_proposal_url }}" id="lnk_create_proposal_url">
+                        {% trans 'Proposal of creation' %}
+                    </a>
                 </li>
             {% endif %}
         {% endflag %}

@@ -137,7 +137,7 @@ class EducationGroupYear(models.Model):
 
     partial_deliberation = models.BooleanField(
         default=False,
-        verbose_name=_('partial_deliberation')
+        verbose_name=_('Partial deliberation')
     )
 
     admission_exam = models.BooleanField(
@@ -215,7 +215,7 @@ class EducationGroupYear(models.Model):
         max_length=20,
         choices=schedule_type.SCHEDULE_TYPES,
         default=schedule_type.DAILY,
-        verbose_name=_('schedule_type')
+        verbose_name=_('Schedule type')
     )
 
     english_activities = models.CharField(
@@ -246,7 +246,7 @@ class EducationGroupYear(models.Model):
         max_length=320,
         blank=True,
         default="",
-        verbose_name=_('professionnal_title')
+        verbose_name=_('Professionnal title')
     )
 
     joint_diploma = models.BooleanField(default=False, verbose_name=_('University certificate'))
@@ -278,7 +278,7 @@ class EducationGroupYear(models.Model):
     primary_language = models.ForeignKey(
         'reference.Language',
         null=True,
-        verbose_name=_('primary_language'),
+        verbose_name=_('Primary language'),
     )
 
     language_association = models.CharField(
@@ -340,7 +340,7 @@ class EducationGroupYear(models.Model):
     remark_english = models.TextField(
         blank=True,
         default="",
-        verbose_name=_("remark_english")
+        verbose_name=_("remark in english")
     )
 
     min_constraint = models.IntegerField(

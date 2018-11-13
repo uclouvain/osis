@@ -60,13 +60,13 @@ class LearningUnitProposalForm(LearningUnitSearchForm):
                                    label=_('folder_num'),)
 
     proposal_type = forms.ChoiceField(
-        label=_('proposal_type'),
+        label=_('Proposal type'),
         choices=_get_sorted_choices(proposal_type.CHOICES),
         required=False
     )
 
     proposal_state = forms.ChoiceField(
-        label=_('proposal_status'),
+        label=_('Proposal status'),
         choices=_get_sorted_choices(proposal_state.CHOICES),
         required=False
     )

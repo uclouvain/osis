@@ -423,7 +423,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
             edit_learning_unit_end_date(learning_unit_full_annual, academic_year_of_new_end_date)
 
         self.assertEqual(str(context.exception),
-                         _('partim_greater_than_parent') % {
+                         _('The learning unit %(learning_unit)s has a partim %(partim)s with'
+                           ' an end year greater than %(year)s') % {
                              'learning_unit': learning_unit_full_annual.acronym,
                              'partim': list_partims[1].acronym,
                              'year': academic_year_of_new_end_date}
@@ -452,7 +453,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
             edit_learning_unit_end_date(learning_unit_full_annual, academic_year_of_new_end_date)
 
         self.assertEqual(str(context.exception),
-                         _('partim_greater_than_parent') % {
+                         _('The learning unit %(learning_unit)s has a partim %(partim)s with'
+                           ' an end year greater than %(year)s') % {
                              'learning_unit': learning_unit_full_annual.acronym,
                              'partim': list_partims[1].acronym,
                              'year': academic_year_of_new_end_date}
@@ -481,7 +483,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
             edit_learning_unit_end_date(learning_unit_full_annual, academic_year_of_new_end_date)
 
         self.assertEqual(str(context.exception),
-                         _('partim_greater_than_parent') % {
+                         _('The learning unit %(learning_unit)s has a partim %(partim)s '
+                           'with an end year greater than %(year)s') % {
                              'learning_unit': learning_unit_full_annual.acronym,
                              'partim': list_partims[1].acronym,
                              'year': academic_year_of_new_end_date}

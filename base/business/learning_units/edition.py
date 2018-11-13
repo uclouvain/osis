@@ -265,7 +265,8 @@ def _check_shorten_partims(learning_unit_to_edit, new_academic_year):
 def _check_shorten_partim(learning_unit_to_edit, new_academic_year, partim):
     if _get_actual_end_year(partim.learning_unit) > new_academic_year.year:
         raise IntegrityError(
-            _('partim_greater_than_parent') % {
+            _('The learning unit %(learning_unit)s has a partim %(partim)s with '
+              'an end year greater than %(year)s') % {
                 'learning_unit': learning_unit_to_edit.acronym,
                 'partim': partim.acronym,
                 'year': new_academic_year
@@ -431,7 +432,7 @@ def _check_postponement_conflict_on_learning_unit_year(luy, next_luy):
         'internship_subtype': _('internship_subtype'),
         'status': _('Status'),
         'session': _('Session derogation'),
-        'quadrimester': _('quadrimester'),
+        'quadrimester': _('Quadrimester'),
         'campus': _('campus'),
         'language': _('language'),
     }

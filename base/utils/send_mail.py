@@ -228,7 +228,7 @@ def build_proposal_report_attachment(manager, proposals_with_results, operation,
             {
                 xls_build.CONTENT_KEY: table_data,
                 xls_build.HEADER_TITLES_KEY: [_('academic_year_small'), _('code'), _('Title'), _('type'),
-                                              _("proposal_status"), _('Status'), _('Remarks')],
+                                              _("Proposal status"), _('Status'), _('Remarks')],
                 xls_build.WORKSHEET_TITLE_KEY: 'Report'
             }
         ],
@@ -332,7 +332,7 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
 
 
 def build_scores_sheet_attachment(list_exam_enrollments):
-    name = "%s.pdf" % _('scores_sheet')
+    name = "%s.pdf" % _('score(s) saved')
     mimetype = "application/pdf"
     content = paper_sheet.build_pdf(
         score_encoding_sheet.scores_sheet_data(list_exam_enrollments, tutor=None))

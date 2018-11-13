@@ -83,7 +83,7 @@ class AdministrativeDataSessionForm(BootstrapForm):
                                             label=_('DELIBERATION'), required=False)
 
     scores_exam_diffusion = forms.SplitDateTimeField(widget=DateTimePickerInput(),
-                                                     label=_("scores_diffusion"),
+                                                     label=_("Scores diffusion"),
                                                      required=False)
 
     def __init__(self, *args, **kwargs):
