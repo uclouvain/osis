@@ -41,5 +41,5 @@ class PrerequisiteItemFactory(factory.django.DjangoModelFactory):
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     learning_unit = factory.SubFactory(LearningUnitFakerFactory)
     prerequisite = factory.SubFactory(PrerequisiteFactory)
-    group_number = factory.fuzzy.FuzzyInteger(10)
-    position = factory.fuzzy.FuzzyInteger(10)
+    group_number = factory.Sequence(lambda n: n)
+    position = factory.Sequence(lambda n: n)

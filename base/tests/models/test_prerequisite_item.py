@@ -40,7 +40,10 @@ class TestPrerequisiteItem(TestCase):
         self.prerequisite_item = PrerequisiteItemFactory(prerequisite=self.prerequisite)
 
     def test_find_by_learning_unit_year(self):
-        self.assertNotEqual(
-            len(prerequisite_item.find_by_learning_unit_year(self.learning_unit_year_with_prerequisite)), 0)
         self.assertEqual(
-            len(prerequisite_item.find_by_learning_unit_year(self.learning_unit_year_without_prerequisite)), 0)
+            list(prerequisite_item.find_by_learning_unit_year(self.learning_unit_year_with_prerequisite)),
+            [self.prerequisite_item]
+        )
+        self.assertFalse(
+            list(prerequisite_item.find_by_learning_unit_year(self.learning_unit_year_without_prerequisite))
+        )
