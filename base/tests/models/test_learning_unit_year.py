@@ -46,7 +46,6 @@ from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
@@ -214,10 +213,10 @@ class LearningUnitYearTest(TestCase):
         self.assertEqual(self.learning_unit_year.container_common_title, '')
 
     def test_can_be_updated_by_faculty_manager(self):
-        previous_academic_years = GenerateAcademicYear(start_year=self.academic_year.year-3,
-                                                       end_year=self.academic_year.year-1).academic_years
-        next_academic_years = GenerateAcademicYear(start_year=self.academic_year.year+1,
-                                                   end_year=self.academic_year.year+3).academic_years
+        previous_academic_years = GenerateAcademicYear(start_year=self.academic_year.year - 3,
+                                                       end_year=self.academic_year.year - 1).academic_years
+        next_academic_years = GenerateAcademicYear(start_year=self.academic_year.year + 1,
+                                                   end_year=self.academic_year.year + 3).academic_years
         previous_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
                          for ac in previous_academic_years]
         next_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
@@ -606,7 +605,6 @@ class LearningUnitYearWarningsTest(TestCase):
         self.luy_full.credits = Decimal(5)
         self.luy_full.save()
         self.assertFalse(self.luy_full._check_credits_is_integer())
-
 
     def test_warning_planned_classes_zero_and_volume(self):
 

@@ -3003,6 +3003,11 @@
                 "externallearningunityear"
             ],
             [
+                "add_externallearningunityear",
+                "base",
+                "externallearningunityear"
+            ],
+            [
                 "can_create_learningunit",
                 "base",
                 "learningunit"
@@ -3096,6 +3101,11 @@
                 "can_manage_charge_repartition",
                 "base",
                 "person"
+            ],
+            [
+                "can_manage_attribution",
+                "base",
+                "person"
             ]
         ]
     }
@@ -3172,6 +3182,11 @@
             ],
             [
                 "can_access_externallearningunityear",
+                "base",
+                "externallearningunityear"
+            ],
+            [
+                "add_externallearningunityear",
                 "base",
                 "externallearningunityear"
             ],
@@ -3282,6 +3297,11 @@
             ],
             [
                 "can_manage_charge_repartition",
+                "base",
+                "person"
+            ],
+            [
+                "can_manage_attribution",
                 "base",
                 "person"
             ]

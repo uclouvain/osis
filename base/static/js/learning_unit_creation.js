@@ -22,7 +22,7 @@ function isValueEmpty(html_id){
 
 
 function isDisabledField(html_id){
-    return document.getElementById(html_id).disabled === true
+    return $("#"+html_id).is(':disabled');
 }
 
 
@@ -138,6 +138,9 @@ $(document).ready(function() {
             //It allow the specify a field that must not be pre-valided on client side
             ignore: ".ignore-js-validator input"
         });
+        if(isDisabledField('allocation_entity')){
+            document.getElementById('id_allocation_entity-country').disabled = true;
+        };
     });
     $.extend($.validator.messages, {
         required: trans_field_required,

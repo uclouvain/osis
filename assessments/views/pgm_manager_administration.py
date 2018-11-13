@@ -32,14 +32,14 @@ from rest_framework.renderers import JSONRenderer
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 import json
-from base.models.entity_manager import is_entity_manager
-
+from base.models.entity_manager import is_entity_manager, has_perm_entity_manager
 
 ALL_OPTION_VALUE = "-"
 ALL_OPTION_VALUE_ENTITY = "all_"
 
 
 @login_required
+@user_passes_test(has_perm_entity_manager)
 def pgm_manager_administration(request):
     administrator_entities = get_administrator_entities(request.user)
     current_academic_yr = mdl.academic_year.current_academic_year()

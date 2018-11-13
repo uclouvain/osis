@@ -1,6 +1,6 @@
 <!doctype html>
 {% load staticfiles i18n %}
-{% load analytical %}
+{% load analytical hijack_tags %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -40,8 +40,6 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
     <link rel="shortcut icon" href="
-
-
             {% if environment == 'LOCAL' %}{% static 'img/favicon_blue.ico' %}{% else %}{% static 'img/favicon.ico' %}{% endif %}"/>
     <link rel="stylesheet" href="{% static 'css/armata.css' %}" type='text/css'>
     <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
@@ -52,6 +50,7 @@
     <link rel="stylesheet" href="{% static 'css/tree.css' %}">
     <link rel="stylesheet" href="{% static 'css/jstree.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/dataTables.bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'hijack/hijack-styles.css' %}"/>
 
     <script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery-ui.js' %}"></script>
@@ -93,6 +92,7 @@
 {% elif environment == 'LOCAL' %} class="localmode"
 {% elif environment == 'QA' %} class="qamode"
 {% endif %}>
+{% hijack_notification %}
 {% analytical_body_top %}
 {% block layout_navbar_top %}
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -183,6 +183,32 @@
                                                id="lnk_dropdown_academic actors">{% trans 'academic_actors' %}</a></li>
                                     {% endif %}
                                 </ul>
+                            </li>
+                        {% endif %}
+                        {% if "partnership" in installed_apps and perms.partnership.can_access_partnerships %}
+                            <li class="dropdown">
+                              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true"
+                                   aria-expanded="false"
+                                   id="lnk_home_dropdown_partnerships">{% trans 'partnerships' %}
+                                  <span
+                                    class="caret"></span></a>
+                              <ul class="dropdown-menu">
+                                <li><a href="{% url 'partnerships:list' %}"
+                                       id="lnk_dropdown_partnerships">{% trans 'partnerships' %}</a></li>
+                                {% if perms.partnership.change_uclmanagemententity %}
+                                  <li><a href="{% url 'partnerships:ucl_management_entities:list' %}"
+                                         id="lnk_dropdown_uclmanagemententities">{% trans 'ucl_management_entities' %}</a></li>
+                                {% endif %}
+                                <li><a href="{% url 'partnerships:partners:list' %}"
+                                       id="lnk_dropdown_partners">{% trans 'partners' %}</a></li>
+                                <li><a href="{% url 'partnerships:list' %}?agreeements=1"
+                                       id="lnk_dropdown_agreements">{% trans 'agreements' %}</a></li>
+                                {% if perms.partnership.change_partnershipconfiguration %}
+                                  <li><a href="{% url 'partnerships:configuration_update' %}"
+                                         id="lnk_dropdown_general_conf">{% trans 'general_configuration' %}</a></li>
+                                {% endif %}
+                              </ul>
                             </li>
                         {% endif %}
                         <li>
@@ -282,15 +308,18 @@
             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'experimental_phase' %}.
         </div>
     {% endif %}
+
+    {% include "template_messages.html" %}
+
     {# FIXME ! It is forbidden to add something in the main layout for a specific need. Use messages instead !#}
     {% if warnings %}
         <div class="alert alert-warning" style="margin-bottom: 10px">
             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'warnings_detected' %}
-            <a role="button" data-toggle="collapse" href="#CollapseWarnings" aria-expanded="false"
-               aria-controls="collapse_classes" style="border:0;padding:0;">
-                    <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
-                          style="color:#8a6d3b"></span>
-            </a>
+            <button id="btn_expandButton" type="button" class="btn" data-toggle="collapse" data-target="#CollapseWarnings"
+                    style="background-color: transparent;">
+                <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
+                      style="color:#8a6d3b"></span>
+            </button>
             <div class="collapse" id="CollapseWarnings">
                 <ul>
                     {% for warning in warnings %}
@@ -301,8 +330,6 @@
         </div>
     {% endif %}
 
-    {% include "template_messages.html" %}
-
     {% block header_content %}
     {% endblock %}
     {% block content %}
@@ -310,7 +337,7 @@
     {% block modal %}
     {% endblock %}
 
-    <div class="modal fade" id="form-ajax-modal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="form-ajax-modal" role="dialog">
         <div class="modal-dialog" id="modal_dialog_id">
             <div class="modal-content" id="form-modal-ajax-content">
                 {# loading ajax requests #}
@@ -342,21 +369,25 @@
 </nav>
 
 {% block script %}
-{% endblock %}
-<script>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        //To open by default collapse of warnings
+        $('#CollapseWarnings').collapse('toggle');
 
-    $(".trigger_modal").click(function () {
-        let url = $(this).data("url");
+        $("#CollapseWarnings").on("hide.bs.collapse", function(){
+            $(".btn").html('<span id="expandButton" class="glyphicon glyphicon-collapse-down" style="color:#8a6d3b"></span>');
+            $("#btn_expandButton").attr("title", gettext("Open"));
+        });
 
-        $('#form-ajax-modal').modal('toggle');
-
-        $('#form-modal-ajax-content').load(url, function () {
-            bindTextArea();
-            formAjaxSubmit('#form-modal-body form', '#form-ajax-modal');
+        $("#CollapseWarnings").on("show.bs.collapse", function(){
+            $(".btn").html('<span id="expandButton"  class="glyphicon glyphicon-collapse-up" style="color:#8a6d3b"></span>');
+            $("#btn_expandButton").attr("title", gettext("Collapse"));
         });
     });
+    </script>
+{% endblock %}
 
-</script>
+<script type="text/javascript" src="{% static "js/modal_form_submit.js" %}"></script>
 
 {% analytical_body_bottom %}
 </body>

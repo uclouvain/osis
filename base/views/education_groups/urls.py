@@ -80,6 +80,8 @@ urlpatterns = [
             name='education_group_general_informations'),
         url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
             name="education_group_pedagogy_edit"),
+        url(r'^informations/publish/$', detail.publish,
+            name="education_group_publish"),
         url(r'^administrative/', include([
             url(u'^$', detail.EducationGroupAdministrativeData.as_view(), name='education_group_administrative'),
             url(u'^edit/$', education_group.education_group_edit_administrative_data,
@@ -122,14 +124,18 @@ urlpatterns = [
 
         url(r'^postpone/', PostponeGroupElementYearView.as_view(), name="postpone_education_group"),
 
-        url(r'^coorganization/create/$', CreateEducationGroupOrganizationView.as_view(),
-            name="coorganization_create"),
-        url(r'^coorganization/edit/(?P<coorganization_id>[0-9]+)/$',
-            UpdateEducationGroupOrganizationView.as_view(),
-            name="coorganization_edit"),
-        url(r'^coorganization/delete/(?P<coorganization_id>[0-9]+)$',
-            CoorganizationDeleteView.as_view(),
-            name="coorganization_delete"),
+
+        url(r'^coorganization/', include([
+            url(r'^create/$',
+                CreateEducationGroupOrganizationView.as_view(),
+                name="coorganization_create"),
+            url(r'^edit/(?P<coorganization_id>[0-9]+)/$',
+                UpdateEducationGroupOrganizationView.as_view(),
+                name="coorganization_edit"),
+            url(r'^delete/(?P<coorganization_id>[0-9]+)$',
+                CoorganizationDeleteView.as_view(),
+                name="coorganization_delete"),
+        ])),
     ])),
     url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([
         url(r'^utilization/$',
@@ -142,6 +148,4 @@ urlpatterns = [
             learning_unit_update.LearningUnitPrerequisite.as_view(),
             name='learning_unit_prerequisite_update'),
     ])),
-    url(r'^filter_organizations_by_country$', base.views.filter.filter_organizations_by_country,
-        name='filter_organizations_by_country'),
 ]

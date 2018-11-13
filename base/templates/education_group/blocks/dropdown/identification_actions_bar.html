@@ -62,14 +62,23 @@
                     <li {% if not can_change_education_group %} class="disabled" {% endif %}>
                         {% url 'education_groups_management' as management_url %}
                         <a {% if can_change_education_group %}
-                            href="{% url_add_query management_url root_id=parent.id element_id=education_group_year.id group_element_year_id=group_to_parent|default_if_none:0 action="attach" %}" {% endif %}>
+                            href="{% url_add_query management_url root_id=parent.id element_id=education_group_year.id group_element_year_id=group_to_parent|default_if_none:0 action="attach" %}"
+                        {% endif %}>
                             {% trans 'Attach' %}
                         </a>
                     </li>
                 {% endflag %}
 
                 {% flag "education_group_detach" %}
-                    {% link_detach_education_group %}
+                    {# TODO The url should be compute in template tag : link_detach_education_group #}
+                    {% if group_to_parent %}
+                        {% url_resolver_match as url_resolver_match %}
+                        {% url 'education_groups_management' as management_url %}
+                        {% url_add_query management_url root_id=parent.id element_id=education_group_year.id group_element_year_id=group_to_parent action="detach" source=url_resolver_match as detach_url %}
+
+                    {% endif %}
+
+                    {% link_detach_education_group detach_url %}
                 {% endflag %}
 
                 <li class="divider"></li>
@@ -92,8 +101,7 @@
 
                 {% flag "education_group_update" %}
                     <li class="divider"></li>
-                    {% url 'postpone_education_group' root.pk education_group_year.pk as postpone_content_url %}
-                    {% li_with_postpone_perm_training postpone_content_url _('Postpone Training') %}
+                    {% li_with_postpone_perm_training %}
                 {% endflag %}
 
                 {% flag "pdf_content" %}
@@ -109,10 +117,9 @@
 {% block script %}
     <script>
         function select() {
-            $.ajax({
+            $.post({
                 url: '../select/',
                 data: {'element_id': {{ education_group_year.id }}},
-                type: 'POST',
                 dataType: 'json',
                 success: function (jsonResponse) {
                     displayInfoMessage(jsonResponse, 'message_info_container');

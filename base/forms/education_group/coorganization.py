@@ -23,34 +23,44 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from dal import autocomplete
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import ModelChoiceField
 from django.utils.translation import ugettext_lazy as _
 
 from base.models.education_group_organization import EducationGroupOrganization
-from base.models.education_group_year import EducationGroupYear
 from reference.models.country import Country
-from base.models.organization import Organization, find_by_id
-from base.models.entity import Entity
+from base.models.organization import Organization
 
 
-class OrganizationEditForm(forms.ModelForm):
+class CoorganizationEditForm(forms.ModelForm):
     country = ModelChoiceField(
-        queryset=Country.objects.filter(entity__isnull=False).distinct().order_by('name'),
+        queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
         label=_("country"),
     )
 
     organization = ModelChoiceField(
-        queryset=Organization.objects.filter(entity__country__isnull=False).distinct().order_by('name'),
+        queryset=Organization.objects.all(),
         required=True,
-        label=_("institution")
+        label=_("institution"),
+        widget=autocomplete.ModelSelect2(
+            url='organization_autocomplete',
+            attrs={'data-theme': 'bootstrap', 'data-width': 'null', 'data-placeholder': '---------'},
+            forward=['country']
+        ),
     )
 
     class Meta:
         model = EducationGroupOrganization
         fields = ['country', 'organization', 'all_students', 'enrollment_place', 'diploma',
                   'is_producing_cerfificate', 'is_producing_annexe']
+
+    class Media:
+        css = {
+            'all': ('css/select2-bootstrap.css',)
+        }
+        js = ('js/education_group/coorganization.js',)
 
     def __init__(self, education_group_year=None, *args, **kwargs):
         if not education_group_year and not kwargs.get('instance'):
@@ -61,14 +71,10 @@ class OrganizationEditForm(forms.ModelForm):
             self.instance.education_group_year = education_group_year
 
         if self.instance.pk:
-            country = Country.objects.filter(entity__organization=self.instance.organization).first()
-            self.fields['country'].initial = country
-            self.fields['organization'].queryset = Organization.objects.filter(entity__country=country)\
-                                                                       .distinct()\
-                                                                       .order_by('name')
+            country = Country.objects.filter(organizationaddress__organization=self.instance.organization).first()
         else:
-            # TODO the default value should be set with the pk
-            self.fields['country'].initial = Country.objects.filter(entity__isnull=False, iso_code="BE").first()
+            country = Country.objects.filter(organizationaddress__isnull=False, iso_code="BE").first()
+        self.fields['country'].initial = country
 
     def check_unique_constraint_between_education_group_year_organization(self):
         qs = EducationGroupOrganization.objects.filter(
@@ -84,5 +90,5 @@ class OrganizationEditForm(forms.ModelForm):
         return True
 
     def is_valid(self):
-        return super(OrganizationEditForm, self).is_valid() and \
+        return super(CoorganizationEditForm, self).is_valid() and \
                self.check_unique_constraint_between_education_group_year_organization()

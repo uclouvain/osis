@@ -3,6 +3,7 @@
 {% load format %}
 {% load waffle_tags %}
 {% load feature_flag %}
+{% load learning_unit learning_unit_li %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -70,73 +71,47 @@
 
                     {% flag "learning_unit_update" %}
                         {% if "base.can_edit_learningunit" in perms %}
-                            <li {% if not can_edit %}class="disabled"{% endif %}>
-                                <a {% if can_edit %} href="{% url "edit_learning_unit" learning_unit_year_id=learning_unit_year.id %}" {% endif %}
-                               data-toggle="tooltip" title="{% trans 'Edit the learning unit' %}">
-                                    {% trans 'Modify' %}
-                                </a>
-                            </li>
+                            {% url "edit_learning_unit" learning_unit_year_id=learning_unit_year.id as edit_learning_unit_url %}
+                            {% li_edit_lu edit_learning_unit_url _('Modify')%}
                         {% endif %}
 
                         {% if "base.can_edit_learningunit_date" in perms %}
-                            <li {% if not can_edit_date %}class="disabled"{% endif %}>
-                                <a {% if can_edit_date %} href="{% url "learning_unit_edition" learning_unit_year_id=learning_unit_year.id %}" {% endif %}
-                                    data-toggle="tooltip" title="{% trans 'Edit learning unit end date' %}">
-                                    {% trans 'Modify end date' %}
-                                </a>
-                            </li>
+                            {% url "learning_unit_edition" learning_unit_year_id=learning_unit_year.id as learning_unit_edition_url%}
+                            {% li_edit_date_lu learning_unit_edition_url _('Modify end date') 'link_edit_date_learning_unit' %}
                             <li class="divider"></li>
                         {% endif %}
                     {% endflag %}
 
                     {% if "base.can_propose_learningunit" in perms %}
                         {% flag "learning_unit_proposal_create" %}
-                        <li {% if not can_propose %}class="disabled"{% endif %}>
-                            <a {% if can_propose %} href="{% url "learning_unit_modification_proposal" learning_unit_year_id=learning_unit_year.id %}" {% endif %}>
-                                {% trans 'Put in proposal' %}
-                            </a>
-                        </li>
-                        <li {% if not can_propose %}class="disabled"{% endif %}>
-                            <a {% if can_propose %} href="{% url "learning_unit_suppression_proposal" learning_unit_year_id=learning_unit_year.id %}" {% endif %}>
-                                {% trans 'Put in suppression proposal' %}
-                            </a>
-                        </li>
+
+                        {% url "learning_unit_modification_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_modification_proposal_url%}
+                        {% li_modification_proposal learning_unit_modification_proposal_url _('Put in proposal') 'link_proposal_modification' %}
+
+                        {% url "learning_unit_suppression_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_modification_proposal_url%}
+                        {% li_suppression_proposal learning_unit_suppression_proposal _('Put in suppression proposal') 'link_proposal_suppression' %}
+
                         <li class="divider"></li>
 
                     {% endflag %}
 
                     {% flag "learning_unit_proposal_update" %}
-                        <li {% if not can_edit_learning_unit_proposal %}class="disabled"{% endif %}>
-                            <a {% if can_edit_learning_unit_proposal %} href="{{ url_edit_proposal }}" {% endif %}>
-                                {% trans 'Edit the proposal' %}
-                            </a>
-                        </li>
+                        {% li_edit_proposal url_edit_proposal _('Edit the proposal') 'link_proposal_edit' %}
                     {% endflag %}
 
                     {% flag "learning_unit_proposal_delete" %}
-                        <li {% if not can_cancel_proposal %}class="disabled"{% endif %}>
-                            <a {% if can_cancel_proposal %}  href="#" data-toggle="modal" data-target="#modalCancelProposal" {% endif %}>
-                                {% trans 'Cancel the proposal' %}
-                            </a>
-                        </li>
-                        <li {% if not can_consolidate_proposal %}class="disabled"{% endif %}>
-                            <a {% if can_consolidate_proposal %}href="#" onclick="document.getElementById('form_consolidate').submit();"{% endif %}>
-                                {% trans 'Consolidate the proposal' %}
-                            </a>
-                        </li>
+
+                        {% url "learning_unit_cancel_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_cancel_proposal_url%}
+                        {% li_cancel_proposal learning_unit_cancel_proposal_url _('Cancel the proposal') 'link_cancel_proposal' %}
+
+                        {% li_consolidate_proposal '#' _('Consolidate the proposal') 'link_consolidate_proposal' 'document.getElementById(\"form_consolidate\").submit();' %}
                         <li class="divider"></li>
                         {% endflag %}
                     {% endif %}
 
                     {% flag "learning_unit_delete" %}
                         {% if "base.can_delete_learningunit" in perms %}
-                            <li {% if not can_delete %}class="disabled"{% endif %}>
-                                <a  {% if can_delete %} href="#" data-toggle="modal" data-target="#modalDeleteLuy" {% endif %}>
-                                    <span data-toggle="tooltip" title="{% trans 'Delete the learning unit for all academic years' %}">
-                                        {% trans 'delete' %}
-                                    </span>
-                                </a>
-                            </li>
+                            {% li_delete_all_lu "#" _('delete') '#modalDeleteLuy' 'link_delete_lus'  %}
                         {% endif %}
                     {% endflag %}
                     </ul>

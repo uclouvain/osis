@@ -29,6 +29,7 @@ import factory
 class CountryFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'reference.Country'
+        django_get_or_create = ('iso_code',)
 
     external_id = factory.Faker('text', max_nb_chars=100)
     iso_code = factory.Sequence(lambda n: str(n)[-2:])

@@ -26,7 +26,7 @@
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, ngettext
 from waffle.testutils import override_flag
 
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -54,7 +54,7 @@ class TestPostpone(TestCase):
         self.education_group_year = TrainingFactory(academic_year=self.current_academic_year,
                                                     education_group=self.education_group)
 
-        self.nex_education_group_year = TrainingFactory(
+        self.next_education_group_year = TrainingFactory(
             academic_year=self.next_academic_year,
             education_group=self.education_group,
             management_entity=self.education_group_year.management_entity
@@ -66,13 +66,13 @@ class TestPostpone(TestCase):
         self.url = reverse(
             "postpone_education_group",
             kwargs={
-                "root_id": self.education_group_year.pk,
-                "education_group_year_id": self.education_group_year.pk,
+                "root_id": self.next_education_group_year.pk,
+                "education_group_year_id": self.next_education_group_year.pk,
             }
         )
 
         self.redirect_url = reverse("education_group_read",
-                                    args=[self.education_group_year.pk, self.education_group_year.pk])
+                                    args=[self.next_education_group_year.pk, self.next_education_group_year.pk])
 
     def test_postpone_case_user_not_logged(self):
         self.client.logout()
@@ -85,22 +85,29 @@ class TestPostpone(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context["warning_message"],
-            _("Are you sure you want to postpone the content of %(root)s?") % {"root": self.education_group_year}
+            _("Are you sure you want to postpone the content in %(root)s?") % {"root": self.next_education_group_year}
         )
 
     def test_post_with_error(self):
-        self.nex_education_group_year.delete()
+        self.group_element_year.delete()
+        self.education_group_year.delete()
         response = self.client.post(self.url, follow=True)
         self.assertRedirects(response, self.redirect_url)
 
         message = list(response.context.get('messages'))[0]
         self.assertEqual(message.tags, "error")
-        self.assertTrue(_("The root does not exist in the next academic year.") in message.message)
 
     def test_post_with_success(self):
         response = self.client.post(self.url, follow=True)
         self.assertRedirects(response, self.redirect_url)
 
         message = list(response.context.get('messages'))[0]
+        print(message.message)
+        count = 1
+        msg = ngettext(
+            "%(count)d education group has been postponed with success.",
+            "%(count)d education groups have been postponed with success.", count
+        ) % {'count': count}
+
         self.assertEqual(message.tags, "success")
-        self.assertTrue(_("1 education group has been postponed with success") in message.message)
+        self.assertTrue(msg in message.message)

@@ -127,7 +127,7 @@ class EducationGroupYearModelFormMixin(TestCase):
         self.assertEqual(form.initial['management_entity'], expected_entity_version.id)
 
     @patch('base.forms.education_group.common.find_authorized_types')
-    def _test_preselect_management_entity_from_training_parent(self, form_class, mock_authorized_types):
+    def _test_preselect_management_entity_from_parent(self, form_class, mock_authorized_types):
         mock_authorized_types.return_value = EducationGroupType.objects.all()
 
         form = form_class(

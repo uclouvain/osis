@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator, MinValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Count, OuterRef, Exists
 from django.urls import reverse
@@ -40,7 +40,7 @@ from base.models.enums import academic_type, internship_presence, schedule_type,
 from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
 from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
-from base.models.enums.education_group_types import MINOR
+from base.models.enums.education_group_types import MINOR, DEEPENING
 from base.models.exceptions import MaximumOneParentAllowedException
 from base.models.prerequisite import Prerequisite
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -70,8 +70,8 @@ class EducationGroupYearAdmin(OsisModelAdmin):
         count = len(result)
         display_success_messages(
             request, ngettext(
-                '%(count)d education group has been postponed with success',
-                '%(count)d education groups have been postponed with success', count
+                "%(count)d education group has been postponed with success.",
+                "%(count)d education groups have been postponed with success.", count
             ) % {'count': count}
         )
         if errors:
@@ -97,7 +97,6 @@ class EducationGroupYear(models.Model):
         max_length=40,
         db_index=True,
         verbose_name=_("acronym"),
-        validators=[RegexValidator(regex="^([A-Z]{2,4})([0-9]?)(.*)$")]
     )
 
     title = models.CharField(
@@ -323,14 +322,13 @@ class EducationGroupYear(models.Model):
         db_index=True,
         null=True,
         verbose_name=_("code"),
-        validators=[RegexValidator(regex="^([A-Z]{3,5})([0-9]{3})([A-Z])$")]
     )
 
     # TODO :: rename credits into expected_credits
-    credits = models.IntegerField(
+    credits = models.PositiveIntegerField(
         blank=True,
         null=True,
-        verbose_name=_("credits")
+        verbose_name=_("credits"),
     )
 
     remark = models.TextField(
@@ -346,13 +344,17 @@ class EducationGroupYear(models.Model):
     )
 
     min_constraint = models.IntegerField(
-        blank=True, null=True,
-        verbose_name=_("minimum constraint")
+        blank=True,
+        null=True,
+        verbose_name=_("minimum constraint"),
+        validators=[MinValueValidator(1)]
     )
 
     max_constraint = models.IntegerField(
-        blank=True, null=True,
-        verbose_name=_("maximum constraint")
+        blank=True,
+        null=True,
+        verbose_name=_("maximum constraint"),
+        validators=[MinValueValidator(1)]
     )
 
     constraint_type = models.CharField(
@@ -436,6 +438,10 @@ class EducationGroupYear(models.Model):
         blank=True,
     )
 
+    class Meta:
+        verbose_name = _("education group year")
+        unique_together = ('education_group', 'academic_year')
+
     def __str__(self):
         return "{} - {} - {}".format(
             self.partial_acronym,
@@ -446,6 +452,14 @@ class EducationGroupYear(models.Model):
     @property
     def is_minor(self):
         return self.education_group_type.name in MINOR
+
+    @property
+    def is_deepening(self):
+        return self.education_group_type.name == DEEPENING
+
+    @property
+    def is_common(self):
+        return self.acronym.startswith('common-')
 
     @property
     def verbose(self):
@@ -490,9 +504,6 @@ class EducationGroupYear(models.Model):
         if self.duration and self.duration_unit:
             return "{} {}".format(self.duration, _(self.duration_unit))
         return ""
-
-    class Meta:
-        verbose_name = _("education group year")
 
     def get_absolute_url(self):
         return reverse("education_group_read", args=[self.pk])
@@ -644,6 +655,12 @@ class EducationGroupYear(models.Model):
     def next_year(self):
         try:
             return self.education_group.educationgroupyear_set.get(academic_year__year=(self.academic_year.year + 1))
+        except EducationGroupYear.DoesNotExist:
+            return None
+
+    def previous_year(self):
+        try:
+            return self.education_group.educationgroupyear_set.get(academic_year__year=(self.academic_year.year - 1))
         except EducationGroupYear.DoesNotExist:
             return None
 
