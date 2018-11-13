@@ -24,10 +24,9 @@
 #
 ##############################################################################
 import json
-
-import requests
 from collections import OrderedDict, namedtuple
 
+import requests
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.conf import settings
@@ -36,10 +35,11 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import F, Case, When
 from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView
-from django.urls import reverse
+from reversion.models import Version
 
 from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
@@ -144,6 +144,8 @@ class EducationGroupRead(EducationGroupGenericDetailView):
             mdl.education_group_language.find_by_education_group_year(self.object)
         ]
         context["show_coorganization"] = self.show_coorganization()
+
+        context["versions"] = Version.objects.get_for_object(self.object)
 
         return context
 

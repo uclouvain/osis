@@ -45,6 +45,36 @@
                             <br>
                             {% block details %}
                             {% endblock %}
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <table class="table table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th>Date/Time</th>
+                                            <th>User</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        <thead>
+                                        <tbody>
+                                        {% for version in versions %}
+                                            <tr>
+
+                                                <td>
+                                                    {{ version.revision.date_created }}
+                                                </td>
+                                                <td>
+                                                    {{ version.revision.user| default_if_none:"-" }}
+                                                </td>
+                                                <td>
+                                                    {{ version.revision.get_comment }}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -52,7 +82,6 @@
         </div>
         <div class="panel-footer text-right">
             {% include "education_group/blocks/dropdown/identification_actions_bar.html"  with dropdirection="dropup" %}
-
         </div>
     </div>
 {% endblock %}
