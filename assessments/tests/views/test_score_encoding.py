@@ -374,10 +374,14 @@ class OutsideEncodingPeriodTest(AcademicYearMockMixin, SessionExamCalendarMockMi
         self.assertEqual(len(messages), 2)
         self.assertEqual(messages[0].tags, 'warning')
         end_date_str = self.academic_calendar.end_date.strftime(date_format)
-        self.assertEqual(messages[0].message, _("The period of scores' encoding %s is closed since %s") % (1, end_date_str))
+        self.assertEqual(messages[0].message,
+                         _("The period of scores' encoding %(session_number)s is closed since %(str_date)s")
+                         % (1, end_date_str))
         self.assertEqual(messages[1].tags, 'warning')
         start_date_str = ac.start_date.strftime(date_format)
-        self.assertEqual(messages[1].message, _("The period of scores' encoding %s will be open %s") % (2, start_date_str))
+        self.assertEqual(messages[1].message,
+                         _("The period of scores' encoding %(session_number)s will be open %(str_date)s")
+                         % (2, start_date_str))
 
 
 class GetScoreEncodingViewProgramManagerTest(AcademicYearMockMixin, SessionExamCalendarMockMixin, TestCase):

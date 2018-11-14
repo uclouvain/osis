@@ -80,13 +80,15 @@ def outside_period(request):
         session_number = latest_session_exam.number_session
         str_date = latest_session_exam.academic_calendar.end_date.strftime(date_format)
         messages.add_message(request, messages.WARNING,
-                             _("The period of scores' encoding %s is closed since %s") % (session_number, str_date))
+                             _("The period of scores' encoding %(session_number)s is closed since %(str_date)s")
+                             % (session_number, str_date))
 
     if closest_new_session_exam:
         session_number = closest_new_session_exam.number_session
         str_date = closest_new_session_exam.academic_calendar.start_date.strftime(date_format)
         messages.add_message(request, messages.WARNING,
-                             _("The period of scores' encoding %s will be open %s") % (session_number, str_date))
+                             _("The period of scores' encoding %(session_number)s will be open %(str_date)s")
+                             % (session_number, str_date))
 
     if not messages.get_messages(request):
         messages.add_message(request, messages.WARNING, _("The period of scores' encoding is not opened"))

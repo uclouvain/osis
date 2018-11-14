@@ -48,7 +48,7 @@
                         <div class="alert alert-dismissible alert-warning text-justify">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
                             <p>
-                                {% trans 'If you customize one of the field below, it only change the address displayed on the score encodings sheets for the program %s. It will never change the address of any structure. The list below will help you to pre-fill in the form.' as info_address_changed_for_papersheet %}
+                                {% trans 'If you customize one of the field below, it only change the address displayed on the score encodings sheets for the program %(program)s. It will never change the address of any structure. The list below will help you to pre-fill in the form.' as info_address_changed_for_papersheet %}
                                 {{ info_address_changed_for_papersheet | format:offer_year.acronym }}.
                                 <br>
                                 <b>{% trans "NOTE : the 'Email' field is optional. You can fill in this field if you want it to appear on the score sheet." %}</b>

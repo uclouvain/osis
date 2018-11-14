@@ -78,7 +78,8 @@ def upload_scores_file(request, learning_unit_year_id=None):
             except IndexError:
                 messages.add_message(request, messages.ERROR,
                                      _("Your excel file isn't well structured. "
-                                       "Please follow the structure of the excel file provided (button '{}')")
+                                       "Please follow the structure of the excel file provided "
+                                       "(button '%(button_value)s')")
                                      .format(_("Via Excel"), _('Get Excel file')))
     else:
         for error_msg in [error_msg for error_msgs in form.errors.values() for error_msg in error_msgs]:
@@ -313,7 +314,9 @@ def _update_row(user, row, enrollments_managed_grouped, is_program_manager):
     enrollments = enrollments_managed_grouped.get(key, [])
 
     if not enrollments:
-        raise ValueError("%s!" % _("The enrollment to the activity %s doesn't exist") % (xls_learning_unit_acronym))
+        raise ValueError("%s!" %
+                         _("The enrollment to the activity %(xls_learning_unit_acronym)s doesn't exist")
+                         % xls_learning_unit_acronym)
 
     enrollment = enrollments[0]
 

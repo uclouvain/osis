@@ -286,7 +286,7 @@
                 <h4 class="modal-title" id="submissionScoresLabel">{% trans 'Submission' %}</h4>
             </div>
             <div class="modal-body">
-                <p class="help-block">{% trans "You will submit %s notes to faculty(ies). Warning : submitted scores <b>can't be modified anymore.</b>" as help_submission_scores_label %}{{ help_submission_scores_label | format:draft_scores_not_submitted | safe}}</p>
+                <p class="help-block">{% trans "You will submit %(draft_scores_not_submitted)s notes to faculty(ies). Warning : submitted scores <b>can't be modified anymore.</b>" as help_submission_scores_label %}{{ help_submission_scores_label | format:draft_scores_not_submitted | safe}}</p>
             </div>
             <div class="modal-footer">
                 <a class="btn btn-warning" href="{% url 'online_encoding_submission' learning_unit_year.id %}?{{ request.GET.urlencode }}"

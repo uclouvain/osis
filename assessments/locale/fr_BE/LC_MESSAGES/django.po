@@ -52,8 +52,8 @@ msgstr "Année académique"
 
 #: business/score_encoding_export.py:165
 #, python-format
-msgid "Accepted value: %s "
-msgstr "Valeur acceptée: %s "
+msgid "Accepted value: %(justification_label_authorized)s "
+msgstr "Valeur acceptée: %(justification_label_authorized)s "
 
 #: templates/scores_encoding.html:101 templates/scores_encoding.html:153
 #: templates/scores_encoding.html:196
@@ -310,7 +310,7 @@ msgstr "Récupérer le fichier Excel"
 #, python-format
 msgid ""
 "If you customize one of the field below, it only change the address "
-"displayed on the score encodings sheets for the program %%s. It will never "
+"displayed on the score encodings sheets for the program %(program)s. It will never "
 "change the address of any structure. The list below will help you to pre-"
 "fill in the form."
 msgstr ""
@@ -352,8 +352,8 @@ msgstr "Justification"
 
 #: business/score_encoding_sheet.py:110
 #, python-format
-msgid "Justification legend: %s"
-msgstr "Légende pour le champ 'Justification': %s"
+msgid "Justification legend: %(justification_label_authorized)s"
+msgstr "Légende pour le champ 'Justification': %(justification_label_authorized)s"
 
 #: templates/online_double_encoding_form.html:171
 #: templates/online_double_encoding_validation.html:280
@@ -529,8 +529,8 @@ msgstr "Autre tuteurs"
 
 #: business/score_encoding_export.py:169
 #, python-format
-msgid "Other values: %s "
-msgstr "Autre valeurs: %s "
+msgid "Other values: %(justification_other_values)s "
+msgstr "Autre valeurs: %(justification_other_values)s "
 
 #: templates/admin/modal/add_manager.html:10
 msgid "Person search"
@@ -681,8 +681,8 @@ msgstr "Note déjà soumise"
 
 #: business/score_encoding_export.py:173
 #, python-format
-msgid "Score legend: %s (0=Score of presence)"
-msgstr "Note légende: %s (0=Note de présence)"
+msgid "Score legend: %(score_legend)s (0=Score of presence)"
+msgstr "Note légende: %(score_legend)s (0=Note de présence)"
 
 #: tests/views/test_upload_xls_utils.py:214
 #: tests/views/test_upload_xls_utils.py:229
@@ -816,15 +816,15 @@ msgstr "Enregistrement temporaire (non soumis à la faculté pour le moment)"
 #, python-format
 msgid ""
 "The data presented on this document correspond to the state of the system "
-"dated %s and are likely to evolve"
+"dated %(printing_date)s and are likely to evolve"
 msgstr ""
 "Les données présentes sur ce document correspondent à l'état du système en "
 "date du %s et sont susceptibles d'évoluer"
 
 #: views/upload_xls_utils.py:316
 #, python-format
-msgid "The enrollment to the activity %s doesn't exist"
-msgstr "L'inscription à l'activité %s n'existe pas"
+msgid "The enrollment to the activity %(xls_learning_unit_acronym)s doesn't exist"
+msgstr "L'inscription à l'activité %(xls_learning_unit_acronym)s n'existe pas"
 
 #: forms/score_file.py:38 tests/views/test_upload_xls_utils.py:174
 #: views/upload_xls_utils.py:144
@@ -837,13 +837,13 @@ msgstr "Le gestionnaire devra conserver les programmes suivant : "
 
 #: tests/views/test_score_encoding.py:377 views/score_encoding.py:82
 #, python-format
-msgid "The period of scores' encoding %s is closed since %s"
-msgstr "La période d'encodage de notre %s est fermée depuis %s"
+msgid "The period of scores' encoding %(session_number)s is closed since %(str_date)s"
+msgstr "La période d'encodage de notre %(session_number)s est fermée depuis %(str_date)s"
 
 #: tests/views/test_score_encoding.py:380 views/score_encoding.py:87
 #, python-format
-msgid "The period of scores' encoding %s will be open %s"
-msgstr "La période d'encodage de notes %s va ouvrir %s"
+msgid "The period of scores' encoding %(session_number)s will be open %(str_date)s"
+msgstr "La période d'encodage de notes %(session_number)s va ouvrir %(str_date)s"
 
 #: tests/views/test_score_encoding.py:351 views/score_encoding.py:90
 msgid "The period of scores' encoding is not opened"
@@ -955,7 +955,7 @@ msgstr "Vous n'avez pas aucune note à encoder"
 #: templates/online_encoding.html:289
 #, python-format
 msgid ""
-"You will submit %%s notes to faculty(ies). Warning : submitted scores "
+"You will submit %(draft_scores_not_submitted)s notes to faculty(ies). Warning : submitted scores "
 "<b>can't be modified anymore.</b>"
 msgstr ""
 "Vous soumettrez %%s notes au(x) faculté(s). Attention : les notes soumises "
@@ -964,7 +964,7 @@ msgstr ""
 #: views/upload_xls_utils.py:80
 msgid ""
 "Your excel file isn't well structured. Please follow the structure of the "
-"excel file provided (button '{}')"
+"excel file provided (button '%(button_value)s')"
 msgstr ""
 "Votre fichier excel n'est pas bien structuré. Veuillez suivre la structure "
 "du ficheir excel à fournir (bouton '{}')"

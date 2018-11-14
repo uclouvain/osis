@@ -32,7 +32,7 @@ msgstr ""
 
 #: business/score_encoding_export.py:165
 #, python-format
-msgid "Accepted value: %s "
+msgid "Accepted value: %(justification_label_authorized)s "
 msgstr ""
 
 #: templates/scores_encoding.html:101 templates/scores_encoding.html:153
@@ -274,7 +274,7 @@ msgstr ""
 #, python-format
 msgid ""
 "If you customize one of the field below, it only change the address "
-"displayed on the score encodings sheets for the program %%s. It will never "
+"displayed on the score encodings sheets for the program %(program)s. It will never "
 "change the address of any structure. The list below will help you to pre-"
 "fill in the form."
 msgstr ""
@@ -312,7 +312,7 @@ msgstr ""
 
 #: business/score_encoding_sheet.py:110
 #, python-format
-msgid "Justification legend: %s"
+msgid "%(justification_label_authorized)s"
 msgstr ""
 
 #: templates/online_double_encoding_form.html:171
@@ -483,7 +483,7 @@ msgstr ""
 
 #: business/score_encoding_export.py:169
 #, python-format
-msgid "Other values: %s "
+msgid "Other values: %(justification_other_values)s "
 msgstr ""
 
 #: templates/admin/modal/add_manager.html:10
@@ -630,7 +630,7 @@ msgstr ""
 
 #: business/score_encoding_export.py:173
 #, python-format
-msgid "Score legend: %s (0=Score of presence)"
+msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr ""
 
 #: tests/views/test_upload_xls_utils.py:214
@@ -765,12 +765,12 @@ msgstr ""
 #, python-format
 msgid ""
 "The data presented on this document correspond to the state of the system "
-"dated %s and are likely to evolve"
+"dated %(printing_date)s and are likely to evolve"
 msgstr ""
 
 #: views/upload_xls_utils.py:316
 #, python-format
-msgid "The enrollment to the activity %s doesn't exist"
+msgid "The enrollment to the activity %(xls_learning_unit_acronym)s doesn't exist"
 msgstr ""
 
 #: forms/score_file.py:38 tests/views/test_upload_xls_utils.py:174
@@ -784,12 +784,12 @@ msgstr ""
 
 #: tests/views/test_score_encoding.py:377 views/score_encoding.py:82
 #, python-format
-msgid "The period of scores' encoding %s is closed since %s"
+msgid "The period of scores' encoding %(session_number)s is closed since %(str_date)s"
 msgstr ""
 
 #: tests/views/test_score_encoding.py:380 views/score_encoding.py:87
 #, python-format
-msgid "The period of scores' encoding %s will be open %s"
+msgid "The period of scores' encoding %(session_number)s will be open %(str_date)s"
 msgstr ""
 
 #: tests/views/test_score_encoding.py:351 views/score_encoding.py:90
@@ -892,14 +892,14 @@ msgstr ""
 #: templates/online_encoding.html:289
 #, python-format
 msgid ""
-"You will submit %%s notes to faculty(ies). Warning : submitted scores "
+"You will submit %(draft_scores_not_submitted)s notes to faculty(ies). Warning : submitted scores "
 "<b>can't be modified anymore.</b>"
 msgstr ""
 
 #: views/upload_xls_utils.py:80
 msgid ""
 "Your excel file isn't well structured. Please follow the structure of the "
-"excel file provided (button '{}')"
+"excel file provided (button '%(button_value)s')"
 msgstr ""
 
 #: business/score_encoding_export.py:147 business/score_encoding_export.py:183

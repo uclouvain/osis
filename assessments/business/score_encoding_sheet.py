@@ -107,7 +107,8 @@ def scores_sheet_data(exam_enrollments, tutor=None):
     data['publication_date'] = '%s/%s/%s' % (now.day, now.month, now.year)
     data['institution'] = 'Université catholique de Louvain'
     data['link_to_regulation'] = 'https://www.uclouvain.be/enseignement-reglements.html'
-    data['justification_legend'] = _('Justification legend: %s') % justification_label_authorized()
+    data['justification_legend'] = \
+        _('Justification legend: %(justification_label_authorized)s') % justification_label_authorized()
 
     # Will contain lists of examEnrollments splitted by learningUnitYear
     enrollments_by_learn_unit = _group_by_learning_unit_year_id(
