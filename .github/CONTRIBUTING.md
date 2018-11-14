@@ -8,7 +8,7 @@
 - Séparation des fonctions: deux lignes vides
 - Le nom d'une fonction doit être explicite et claire sur ce qu'elle fait (un 'get_' renvoie un élément, un 'search_' renvoie une liste d'élements...)
 
-### Indentation du code :
+### Coding style :
 - Pour représenter une structure de données (list, dict, etc.), on passe une ligne entre chaque élément, ainsi qu'après l'ouverture de la structure et avant sa fermeture.
 ```python
 # Mauvais
@@ -81,6 +81,7 @@ return render(
     }
 )
 ```
+- Voir en plus le [Coding Style de Django](https://docs.djangoproject.com/en/1.11/internals/contributing/writing-code/coding-style/).
 
 ### Documentation du code :
 - Documenter les fonctions (paramètres, fonctionnement, ce qu'elle renvoie)
