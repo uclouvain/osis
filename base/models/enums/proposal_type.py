@@ -35,4 +35,5 @@ class ProposalType(Enum):
     SUPPRESSION = "SUPPRESSION"
 
 
+# FIXME impossible to use correctly gettext with this constructor
 CHOICES = tuple((name, _(name)) for name, member in ProposalType.__members__.items())

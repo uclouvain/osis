@@ -35,4 +35,5 @@ class ProposalState(Enum):
     REFUSED = "REFUSED"
 
 
+# FIXME impossible to use correctly gettext with this constructor
 CHOICES = tuple((name, _(name)) for name, member in ProposalState.__members__.items())
