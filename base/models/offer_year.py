@@ -37,7 +37,7 @@ class OfferYearAdmin(SerializableModelAdmin):
 
 GRADE_TYPES = (
     ('BACHELOR', _('bachelor')),
-    ('MASTER', _('master')),
+    ('MASTER', _('Master')),
     ('DOCTORATE', _('Ph.D')))
 
 

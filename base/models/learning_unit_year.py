@@ -346,7 +346,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         if getattr(self, 'learning_container_year', None):
             if (self.learning_container_year.container_type == learning_container_year_types.INTERNSHIP and
                     not self.internship_subtype):
-                warnings.append(_('missing_internship_subtype'))
+                warnings.append(_('It is necessary to indicate the internship subtype.'))
         return warnings
 
     def _check_partim_parent_status(self):

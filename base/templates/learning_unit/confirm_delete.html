@@ -44,7 +44,7 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <p>{% trans 'learning_unit_years_to_delete' %} : </p>
+            <p>{% trans 'You will definitely delete the following learning units.' %} : </p>
             <ul>
                 {% for luy in learning_units_to_delete %}
                     <li> {{ luy }}</li>

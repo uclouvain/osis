@@ -128,10 +128,10 @@ def send_message_again(request, message_id):
     message_history = message_history_mdl.find_by_id(message_id)
 
     if not has_email(message_history):
-        messages.add_message(request, messages.ERROR, _('message_not_resent_no_email'))
+        messages.add_message(request, messages.ERROR, _("The message can't be sent again, no email provided."))
     else:
         send_mail.send_again(message_id)
-        messages.add_message(request, messages.INFO, _('message_resent_ok'))
+        messages.add_message(request, messages.INFO, _('The message was sent again.'))
     return HttpResponseRedirect(reverse('admin:base_messagehistory_changelist'))
 
 

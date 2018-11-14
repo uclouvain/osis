@@ -397,7 +397,7 @@ class ExternalLearningUnitYearForm(LearningUnitYearForm):
 
     def clean(self):
         if not self._has_criteria():
-            self.add_error(None, _('minimum_one_criteria'))
+            self.add_error(None, _('Please choose at least one criteria!'))
 
 
 def _get_value(data_cleaned):

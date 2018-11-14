@@ -96,13 +96,13 @@ class GroupElementYear(OrderedModel):
     min_credits = models.IntegerField(
         blank=True,
         null=True,
-        verbose_name=_("min_credits"),
+        verbose_name=_("Min. credits"),
     )
 
     max_credits = models.IntegerField(
         blank=True,
         null=True,
-        verbose_name=_("max_credits"),
+        verbose_name=_("Max. credits"),
     )
 
     is_mandatory = models.BooleanField(

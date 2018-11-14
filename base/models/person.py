@@ -60,7 +60,7 @@ class EmployeeManager(SerializableModelManager):
 class Person(SerializableModel):
     GENDER_CHOICES = (
         ('F', _('female')),
-        ('M', _('male')),
+        ('M', _('Male')),
         ('U', _('unknown')))
 
     objects = SerializableModelManager()

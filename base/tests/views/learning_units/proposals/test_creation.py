@@ -193,7 +193,7 @@ class LearningUnitViewTestCase(TestCase):
         learning_unit_form = CreationProposalBaseForm(self.get_empty_title_fields(), person=self.person)
         self.assertFalse(learning_unit_form.is_valid(), learning_unit_form.errors)
         lcy_errors = learning_unit_form.learning_unit_form_container.forms[LearningContainerYearModelForm].errors
-        self.assertEqual(lcy_errors['common_title'], [_('must_set_common_title_or_specific_title')])
+        self.assertEqual(lcy_errors['common_title'], [_('You must either set the common title or the specific title')])
 
     def test_proposal_learning_unit_add_with_valid_data_for_faculty_manager(self):
         learning_unit_form = CreationProposalBaseForm(self.get_valid_data(), person=self.faculty_person)

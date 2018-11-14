@@ -131,7 +131,7 @@
                                     {% endif %}
                                     {% if perms.base.can_access_learningunit %}
                                         <li><a href="{% url 'learning_units' %}"
-                                               id="lnk_dropdown_learning_units">{% trans 'learning_units' %}</a></li>
+                                               id="lnk_dropdown_learning_units">{% trans 'Learning units' %}</a></li>
                                     {% endif %}
                                     {% if perms.base.can_access_academicyear %}
                                         <li><a href="{% url 'academic_year' %}"
@@ -251,7 +251,7 @@
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{% url 'logout' %}?next=/" id="lnk_logout">
                                     <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
-                                    {% trans 'logout' %}</a></li>
+                                    {% trans 'Logout' %}</a></li>
                             </ul>
                         </li>
                         <li>
@@ -259,7 +259,7 @@
                         </li>
                     {% else %}
                         <li><a href="{% url 'login' %}" id="lnk_login"><span class="glyphicon glyphicon-lock"
-                                                                             aria-hidden="true"></span> {% trans 'login' %}
+                                                                             aria-hidden="true"></span> {% trans 'Login' %}
                         </a>
                         </li>
                     {% endif %}

@@ -25,7 +25,7 @@
 {% endcomment %}
 {% block breadcrumb %}
     <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
-    <li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'learning_units' %}</a></li>
+    <li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></li>
     <li><a href="{% url 'learning_unit' learning_unit_year.id %}" >{% if learning_unit_year.id %}{{ learning_unit_year.acronym }}{% else %}{% trans 'learning_unit' %}{% endif %}</a></li>
     <li class="active">{% trans 'Learning units comparison' %}</li>
 {% endblock %}

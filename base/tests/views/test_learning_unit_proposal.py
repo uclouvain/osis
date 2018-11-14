@@ -551,7 +551,7 @@ class TestLearningUnitProposalSearch(TestCase):
     def test_has_mininum_of_one_criteria(self):
         form = LearningUnitProposalForm({"non_existing_field": 'nothing_interestings'})
         self.assertFalse(form.is_valid(), form.errors)
-        self.assertIn(_("minimum_one_criteria"), form.errors['__all__'])
+        self.assertIn(_("Please choose at least one criteria!"), form.errors['__all__'])
 
 
 class TestGroupActionsOnProposals(TestCase):

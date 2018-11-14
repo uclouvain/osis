@@ -194,6 +194,6 @@ class LearningContainerYearModelForm(forms.ModelForm):
 
     def post_clean(self, specific_title):
         if not self.instance.common_title and not specific_title:
-            self.add_error("common_title", _("must_set_common_title_or_specific_title"))
+            self.add_error("common_title", _("You must either set the common title or the specific title"))
 
         return not self.errors

@@ -73,7 +73,7 @@ class LearningUnitProposalForm(LearningUnitSearchForm):
 
     def clean(self):
         if not self._has_criteria():
-            self.add_error(None, _('minimum_one_criteria'))
+            self.add_error(None, _('Please choose at least one criteria!'))
 
         return get_clean_data(self.cleaned_data)
 

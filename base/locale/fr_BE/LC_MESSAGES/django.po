@@ -3711,28 +3711,28 @@ msgstr ""
 #: templates/blocks/forms/search_form.html:44
 #: templates/learning_unit/blocks/form/search_form_external_learning_unit.html:45
 #: templates/learning_unit/blocks/form/search_form_learning_unit.html:75
-msgid "learning_unit_search"
+msgid "Learning unit search"
 msgstr "Recherche d'unités d'enseignement"
 
 #: templates/learning_unit/blocks/tabs.html:67
 #: templates/learning_unit/proposal/tabs.html:60
-msgid "learning_unit_specifications"
+msgid "Specifications"
 msgstr "Cahier des charges"
 
 #: business/learning_units/simple/deletion.py:266
 #: tests/business/test_learning_unit_deletion.py:240
-msgid "learning_unit_successfuly_deleted"
+msgid "Learning unit %(acronym)s (%(academic_year)s) successfuly deleted."
 msgstr ""
-"Unité d'enseignement {acronym} ({academic_year}) supprimée avec succès."
+"Unité d'enseignement %(acronym)s (%(academic_year)s) supprimée avec succès."
 
 #: business/learning_units/edition.py:134
-msgid "learning_unit_updated"
-msgstr "Unité d'enseignement {acronym} mise à jour avec succès"
+msgid "Learning unit %(acronym)s successfully updated."
+msgstr "Unité d'enseignement %(acronym)s mise à jour avec succès"
 
 #: templates/learning_unit/confirm_delete.html:47
 #: templates/learning_unit/deletion_msg.html:43
-msgid "learning_unit_years_to_delete"
-msgstr "Vous êtes sur le point de supprimer définitivement les UE suivantes"
+msgid "You will definitely delete the following learning units."
+msgstr "Vous êtes sur le point de supprimer définitivement les UE suivantes."
 
 #: templates/catalog.html:49 templates/layout.html:134
 #: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:42
@@ -3746,32 +3746,32 @@ msgstr "Vous êtes sur le point de supprimer définitivement les UE suivantes"
 #: templates/learning_unit/summary_list.html:70
 #: templates/learning_unit/volumes_management.html:31
 #: templates/learning_units.html:33 templates/learning_units.html:50
-msgid "learning_units"
+msgid "Learning units"
 msgstr "Unités d'enseignement"
 
 #: templates/student/student.html:75
-msgid "learning_units_enrollments"
+msgid "Learning units enrollments"
 msgstr "Inscription aux unités d'enseignement"
 
 #: templates/learning_unit/summary_list.html:58
-msgid "list of required teaching material"
+msgid "list of required teaching materials"
 msgstr "liste des supports de cours obligatoires"
 
 #: business/learning_units/xls_comparison.py:50
-msgid "list_learning_units_comparison"
+msgid "Comparison of learning units"
 msgstr "Liste comparative d'unités d'enseignement"
 
 #: models/external_learning_unit_year.py:57
-msgid "local_credits"
+msgid "Local credits"
 msgstr "Crédits locaux"
 
 #: templates/organization/organization_address.html:48
 #: templates/organization/organization_address_form.html:55
-msgid "location"
+msgid "Location"
 msgstr "Localité"
 
 #: templates/learning_unit/blocks/summary_locked.html:15
-msgid "lock"
+msgid "Lock"
 msgstr "Bloquer"
 
 #: templates/learning_unit/blocks/summary_locked.html:14
@@ -3779,26 +3779,21 @@ msgid "lock update for teacher"
 msgstr "bloquer la mise à jour pour l'enseignant"
 
 #: templates/registration/login.html:29
-msgid "log-in"
-msgstr "Log-in"
-
 #: templates/layout.html:262
-msgid "login"
+msgid "Login"
 msgstr "Login"
 
 #: models/entity_version.py:175
-#, fuzzy
-#| msgid "logout"
 msgid "logo"
-msgstr "Logout"
+msgstr "logo"
 
 #: templates/layout.html:254 templates/logged_out.html:31
-msgid "logout"
+msgid "Logout"
 msgstr "Logout"
 
 #: business/learning_units/simple/deletion.py:76
 #: tests/business/test_learning_unit_deletion.py:129
-msgid "lu_included_in_group"
+msgid "%(subtype)s %(acronym)s is included in the group %(group)s for the year %(year)s"
 msgstr ""
 "%(subtype)s %(acronym)s est repris dans le groupement %(group)s l’année "
 "%(year)s"
@@ -3808,49 +3803,41 @@ msgid "main domain"
 msgstr "domaine principal"
 
 #: models/person.py:63
-msgid "male"
+msgid "Male"
 msgstr "Masculin"
 
 #: templates/my_osis/profile.html:156
-msgid "managed_programs"
+msgid "Managed programs"
 msgstr "Programmes gérés"
 
 #: models/education_group_year.py:386
-msgid "management_entity"
+msgid "Management entity"
 msgstr "Entité de gestion"
 
 #: templates/mandates.html:30 templates/mandates.html:34
-msgid "mandates"
+msgid "Mandates"
 msgstr "Mandates"
 
 #: models/group_element_year.py:110
 #: templates/education_group/blocks/table_utilizations.html:35
 #: templates/education_group/tab_content.html:56
-msgid "mandatory"
-msgstr "Oblig."
+msgid "Mandatory"
+msgstr "Obligatoire"
 
 #: forms/my_message.py:39
-#, fuzzy
-#| msgid "mark_selected_messages_as_read"
-msgid "mark_selected_as_read"
-msgstr "Marquer les messages sélectionnés comme lus"
-
 #: templates/my_osis/my_messages.html:46
-msgid "mark_selected_messages_as_read"
+msgid "Mark selected messages as read"
 msgstr "Marquer les messages sélectionnés comme lus"
 
 #: forms/education_groups_administrative_data.py:74
 #: templates/education_group/tab_administrative_data.html:83
-msgid "marks_presentation"
+msgid "Marks presentation"
 msgstr "Remise des notes"
 
 #: models/offer_year.py:40
-msgid "master"
+msgid "Master"
 msgstr "Master"
 
-#: models/group_element_year.py:105
-#: templates/education_group/blocks/table_utilizations.html:34
-#: templates/education_group/tab_content.html:55
 msgid "max_credits"
 msgstr "Créd. max."
 
@@ -3858,85 +3845,79 @@ msgstr "Créd. max."
 msgid "maximum constraint"
 msgstr "contrainte maximum"
 
+#: models/group_element_year.py:105
+#: templates/education_group/blocks/table_utilizations.html:34
+#: templates/education_group/tab_content.html:55
 #: templates/education_group/group_element_year_comment_inner.html:41
-#, fuzzy
-#| msgid "max_credits"
-msgid "maximum credits"
+msgid "Max. credits"
 msgstr "Créd. max."
 
 #: templates/my_osis/my_message.html:32
-msgid "message"
+msgid "Message"
 msgstr "Message"
 
 #: views/my_osis.py:131
-msgid "message_not_resent_no_email"
+msgid "The message can't be sent again, no email provided."
 msgstr ""
 "Le message ne peut être réenvoyé , l'utilisateur n'a pas d'adresse mail."
 
 #: views/my_osis.py:134
-msgid "message_resent_ok"
+msgid "The message was sent again."
 msgstr "Le message à bien été réenvoyé."
 
 #: templates/my_osis/home.html:46 templates/my_osis/my_message.html:31
 #: templates/my_osis/my_messages.html:31
-msgid "messages"
+msgid "Messages"
 msgstr "Messages"
 
 #: templates/method_not_allowed.html:34
-msgid "method_not_allowed"
+msgid "Method not allowed"
 msgstr "Methode non autorisée"
-
-#: models/group_element_year.py:99
-#: templates/education_group/blocks/table_utilizations.html:33
-#: templates/education_group/tab_content.html:54
-msgid "min_credits"
-msgstr "Créd. min."
 
 #: models/education_group_year.py:349 models/education_group_year.py:644
 msgid "minimum constraint"
 msgstr "contrainte minimum"
 
+#: models/group_element_year.py:99
+#: templates/education_group/blocks/table_utilizations.html:33
+#: templates/education_group/tab_content.html:54
 #: templates/education_group/group_element_year_comment_inner.html:40
-#, fuzzy
-#| msgid "min_credits"
-msgid "minimum credits"
+msgid "Min. credits"
 msgstr "Créd. min."
 
 #: forms/learning_unit/search_form.py:400
 #: forms/proposal/learning_unit_proposal.py:76
 #: tests/forms/test_external_learning_unit.py:245
 #: tests/views/test_learning_unit_proposal.py:554
-msgid "minimum_one_criteria"
-msgstr "Veuillez remplir au moins 1 critère de recherche"
+msgid "Please choose at least one criteria!"
+msgstr "Veuillez remplir au moins 1 critère de recherche!"
 
 #: models/learning_unit_year.py:349
-msgid "missing_internship_subtype"
-msgstr "Il est nécessaire d'indiquer le sous-type de stage"
+msgid "It is necessary to indicate the internship subtype."
+msgstr "Il est nécessaire d'indiquer le sous-type de stage."
 
 #: templates/education_group/pdf_content.html:91
 #: templates/my_osis/profile.html:98
-msgid "mobile_phone"
+msgid "Mobile phone"
 msgstr "Téléphone mobile (GSM)"
 
 #: templates/learning_unit/learning_unit_layout.html:13
 #: templates/learning_unit/learning_unit_layout.html:25
-#, fuzzy
-#| msgid "identification"
-msgid "modification"
-msgstr "Identification"
+msgid "Modification"
+msgstr "Modification"
 
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:130
-msgid "msg_confirm_cancel_proposal"
-msgstr "Etes-vous certain de vouloir annuler la proposition ?"
+msgid "Are you certain that you want to cancel the learning unit proposal ?"
+msgstr "Êtes-vous certain de vouloir annuler la proposition ?"
 
 #: templates/learning_unit/blocks/modal/modal_confirm_delete.html:33
-msgid "msg_confirm_delete_luy"
+msgid "Are you certain that you want to delete the learning unit ?"
 msgstr ""
 "Etes-vous certain de vouloir supprimer définitivement cette unité "
 "d'enseignement ?"
 
 #: templates/registration/login.html:32
-msgid "msg_error_username_password_not_matching"
+msgid "Your username and password didn't match. Please try again."
 msgstr ""
 "La combinaison login/mot de passe entrée n'est pas valide. Veuillez "
 "réessayer."
@@ -3944,7 +3925,7 @@ msgstr ""
 #: forms/learning_unit/learning_unit_create.py:197
 #: forms/learning_unit/learning_unit_create_2.py:173
 #: tests/views/learning_units/proposals/test_creation.py:196
-msgid "must_set_common_title_or_specific_title"
+msgid "You must either set the common title or the specific title"
 msgstr "L'intitulé propre ou l'intitulé commun est requis."
 
 #: templates/my_osis/my_messages.html:35
@@ -4033,15 +4014,15 @@ msgid "no planned end"
 msgstr "pas de fin prévue"
 
 #: templates/student/exams_enrollments.html:50
-msgid "number_session"
+msgid "No. Session"
 msgstr "No. session"
 
 #: templates/offer_year_calendar.html:32
-msgid "offer_year_calendar"
+msgid "Calendar of the annual program"
 msgstr "Calendrier des programmes"
 
 #: templates/offers.html:64
-msgid "offer_year_search"
+msgid "Search of annual programs"
 msgstr "Recherche des programmes annualisés"
 
 #: templates/catalog.html:42 templates/layout.html:126

@@ -71,7 +71,7 @@ class AdministrativeDataSessionForm(BootstrapForm):
 
     scores_exam_submission = forms.DateField(widget=DatePickerInput(format=DATE_FORMAT),
                                              input_formats=[DATE_FORMAT, ],
-                                             label=_('marks_presentation'),
+                                             label=_('Marks presentation'),
                                              required=False)
 
     dissertation_submission = forms.DateField(widget=DatePickerInput(format=DATE_FORMAT),
