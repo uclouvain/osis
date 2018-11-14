@@ -8,6 +8,80 @@
 - Séparation des fonctions: deux lignes vides
 - Le nom d'une fonction doit être explicite et claire sur ce qu'elle fait (un 'get_' renvoie un élément, un 'search_' renvoie une liste d'élements...)
 
+### Indentation du code :
+- Pour représenter une structure de données (list, dict, etc.), on passe une ligne entre chaque élément, ainsi qu'après l'ouverture de la structure et avant sa fermeture.
+```python
+# Mauvais
+fruits = ['banane', 'pomme', 'poire']
+légumes = {'1': 'carotte', 
+    '2': 'courgette', 
+    '3': 'salade'}
+            
+# Bon
+fruits = [
+    'banane',
+    'pomme',
+    'poire',
+]
+légumes = {
+    '1': 'carotte', 
+    '2': 'courgette', 
+    '3': 'salade',
+}
+```
+
+- Le dernier élément de la structure a également une virgule. Cela permet d'éviter que cette ligne apparaisse dans le diff de git quand on rajoute un élément à la fin de structure.
+```python
+# Mauvais
+fruits = [
+    'banane',
+    'pomme',
+    'poire'
+]
+# Bon
+légumes = {
+    '1': 'carotte', 
+    '2': 'courgette', 
+    '3': 'salade',
+}
+```
+
+- Lors d'un appel de fonction à plusieurs paramètres, on passe une ligne entre chaque paramètre, ainsi qu'après l'ouverture de la liste de paramètres et avant sa fermeture.
+```python
+# Mauvais
+result = my_function(first_parameter, second_parameter, third_parameter)
+
+result = my_function(first_parameter, 
+                     second_parameter, 
+                     third_parameter)
+# Bon
+result = my_function(
+    first_parameter,
+    second_parameter,
+    third_parameter
+)
+```
+
+- Les règles précédentes sont cumulatives : 
+```python
+# Mauvais
+return render(request, "template.html", {
+        'students': students, 'faculties': faculties,
+        'teacher': teacher
+        })
+
+# Bon
+return render(
+    request,
+    "template.html",
+    {
+        'students': students,
+        'faculties': faculties,
+        'teacher': teacher,
+    }
+)
+```
+
 ### Documentation du code :
 - Documenter les fonctions (paramètres, fonctionnement, ce qu'elle renvoie)
 - Ne pas hésiter à laisser une ligne de commentaire dans le code, décrivant brièvement le fonctionnement d'algorithme plus compliqué/plus longs
