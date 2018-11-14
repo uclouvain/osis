@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-14 15:20+0100\n"
+"POT-Creation-Date: 2018-11-14 15:49+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -225,6 +225,7 @@ msgid "Academic start year"
 msgstr ""
 
 #: models/education_group_year.py:177
+#: templates/education_group/identification_training_details.html:40
 msgid "Academic type"
 msgstr ""
 
@@ -298,6 +299,10 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
+#: templates/education_group/identification_training_details.html:99
+msgid "Activities on other campus"
+msgstr ""
+
 #: templates/blocks/forms/create_cancel_buttons.html:31
 #: templates/blocks/forms/create_cancel_buttons_modal.html:29
 #: templates/learning_unit/blocks/panel/educational_informations.html:140
@@ -369,6 +374,7 @@ msgid "Administration"
 msgstr ""
 
 #: models/education_group_year.py:393
+#: templates/education_group/identification_training_details.html:94
 msgid "Administration entity"
 msgstr ""
 
@@ -381,6 +387,7 @@ msgid "Admission and Enrolment Procedures for general registration"
 msgstr ""
 
 #: models/education_group_year.py:145
+#: templates/education_group/identification_training_details.html:46
 msgid "Admission exam"
 msgstr ""
 
@@ -851,6 +858,10 @@ msgstr ""
 msgid "Direct Access"
 msgstr ""
 
+#: templates/education_group/identification_training_details.html:47
+msgid "Dissertation"
+msgstr ""
+
 #: forms/education_groups_administrative_data.py:79
 #: templates/education_group/tab_administrative_data.html:89
 msgid "Dissertation submission"
@@ -899,6 +910,7 @@ msgstr ""
 
 #: forms/learning_unit/attribution_charge_repartition.py:39
 #: models/education_group_year.py:302
+#: templates/education_group/identification_training_details.html:42
 #: templates/learning_unit/add_charge_repartition_inner.html:36
 #: templates/learning_unit/attributions.html:37
 #: templates/learning_unit/select_attribution.html:37
@@ -972,6 +984,11 @@ msgstr ""
 msgid "Elaboration and management of the formation catalogue."
 msgstr ""
 
+#: templates/education_group/identification_mini_training_details.html:39
+#: templates/education_group/identification_training_details.html:96
+msgid "End"
+msgstr ""
+
 #: templates/academic_calendar/academic_calendar.html:56
 #: templates/academic_calendar/academic_calendar_form.html:78
 #: templates/entity/versions.html:47
@@ -1020,6 +1037,7 @@ msgid "Enrolled to learning unit"
 msgstr ""
 
 #: models/education_group_year.py:190
+#: templates/education_group/identification_training_details.html:98
 msgid "Enrollment campus"
 msgstr ""
 
@@ -1028,6 +1046,7 @@ msgid "Enrollment date"
 msgstr ""
 
 #: models/education_group_year.py:317
+#: templates/education_group/identification_training_details.html:44
 msgid "Enrollment enabled"
 msgstr ""
 
@@ -1190,10 +1209,6 @@ msgstr ""
 
 #: templates/education_group/tab_content.html:52
 msgid "Formation's code"
-msgstr ""
-
-#: templates/learning_unit/formations.html:45
-msgid "Formation's type"
 msgstr ""
 
 #: templates/learning_unit/identification.html:77
@@ -1383,6 +1398,7 @@ msgid "International title"
 msgstr ""
 
 #: models/education_group_year.py:211
+#: templates/education_group/identification_training_details.html:43
 msgid "Internship"
 msgstr ""
 
@@ -1492,6 +1508,9 @@ msgstr ""
 
 #: business/learning_units/xls_comparison.py:74
 #: models/education_group_year.py:198 models/learning_unit_year.py:149
+#: templates/education_group/identification_group_details.html:38
+#: templates/education_group/identification_mini_training_details.html:40
+#: templates/education_group/identification_training_details.html:97
 #: views/learning_unit.py:291
 msgid "Learning location"
 msgstr ""
@@ -1621,7 +1640,11 @@ msgstr ""
 msgid "Managed programs"
 msgstr ""
 
-#: models/education_group_year.py:386 templates/layout.html:201
+#: models/education_group_year.py:386
+#: templates/education_group/identification_group_details.html:37
+#: templates/education_group/identification_mini_training_details.html:37
+#: templates/education_group/identification_training_details.html:93
+#: templates/layout.html:201
 msgid "Management entity"
 msgstr ""
 
@@ -2027,6 +2050,7 @@ msgid "Page not found."
 msgstr ""
 
 #: models/education_group_year.py:140
+#: templates/education_group/identification_training_details.html:45
 msgid "Partial deliberation"
 msgstr ""
 
@@ -2514,6 +2538,8 @@ msgid "Specifications"
 msgstr ""
 
 #: models/education_group.py:46 models/education_group.py:77
+#: templates/education_group/identification_mini_training_details.html:38
+#: templates/education_group/identification_training_details.html:95
 #: templates/learning_unit/add_charge_repartition_inner.html:35
 #: templates/learning_unit/attributions.html:36
 #: templates/learning_unit/select_attribution.html:36
@@ -3106,6 +3132,10 @@ msgstr ""
 msgid "Training"
 msgstr ""
 
+#: templates/learning_unit/formations.html:45
+msgid "Training type"
+msgstr ""
+
 #: templates/catalog.html:67 templates/education_group/layout.html:7
 #: templates/education_group/learning_unit/tab_prerequisite_group.html:38
 #: templates/layout.html:130 templates/learning_unit/blocks/tabs.html:44
@@ -3172,6 +3202,7 @@ msgid "University Bachelors"
 msgstr ""
 
 #: models/education_group_year.py:182 models/education_group_year.py:252
+#: templates/education_group/identification_training_details.html:49
 #: templates/education_group/tab_diplomas.html:50
 msgid "University certificate"
 msgstr ""
