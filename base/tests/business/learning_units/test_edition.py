@@ -206,7 +206,7 @@ class LearningUnitEditionTestCase(TestCase):
 
         # Error : Language diff
         error_language = _(generic_error) % {
-            'field': _('language'),
+            'field': _('Language'),
             'year': self.learning_container_year.academic_year,
             'value': getattr(self.learning_unit_year, 'language'),
             'next_year': another_learning_unit_year.academic_year,

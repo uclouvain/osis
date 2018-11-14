@@ -434,12 +434,12 @@ def _check_postponement_conflict_on_learning_unit_year(luy, next_luy):
         'specific_title_english': _('english_title_proper_to_UE'),
         'subtype': _('Subtype'),
         'credits': _('credits'),
-        'internship_subtype': _('internship_subtype'),
+        'internship_subtype': _('Internship subtype'),
         'status': _('Status'),
         'session': _('Session derogation'),
         'quadrimester': _('Quadrimester'),
         'campus': _('campus'),
-        'language': _('language'),
+        'language': _('Language'),
     }
     return _get_differences(luy, next_luy, fields_to_compare)
 
@@ -481,8 +481,11 @@ def _get_translated_value(value):
 
 
 def _check_postponement_learning_unit_year_proposal_state(nex_luy):
-    error_msg = _("learning_unit_in_proposal_cannot_save") % {'luy': nex_luy.acronym,
-                                                              'academic_year': nex_luy.academic_year}
+    error_msg = _("The learning unit %(luy)s is in proposal,"
+                  " can not save the change from the year %(academic_year)s") % {
+                    'luy': nex_luy.acronym,
+                    'academic_year': nex_luy.academic_year
+    }
     return [error_msg] if is_learning_unit_year_in_proposal(nex_luy) else []
 
 

@@ -164,7 +164,7 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(_get_attribution_line(attribution_dict),
                          "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
                              'SMITH, Aaron',
-                             _('function'),
+                             _('Function'),
                              _('CO_HOLDER'),
                              _('Substitute'),
                              '',
@@ -376,7 +376,7 @@ def expected_attribution_data(attribution_charge_new_lecturing, attribution_char
         expected_attribution = v
     expected_attribution = "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
         expected_attribution.get('person'),
-        _('function'),
+        _('Function'),
         _(expected_attribution.get('function')),
         _('Substitute'),
         '',

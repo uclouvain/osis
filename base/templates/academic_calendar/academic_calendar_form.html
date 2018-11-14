@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="{% static 'css/bootstrap-datepicker3.min.css' %}" type='text/css'>
 {% endblock %}
 {% block breadcrumb %}
-<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
+<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
 <li><a href="{% url 'academic_year' %}" id="lnk_academic_year">{% trans 'academic_year' %}</a></li>
 <li><a href="{% url 'academic_calendars' %}" id="lnk_academic_calendars">{% trans 'academic_calendars' %}</a></li>
 <li class="active">{% trans 'academic_calendar' %}</li>
@@ -101,7 +101,7 @@
             <br>
             <div class="row">
                 <div class="col-md-6">
-                    <label for="txt_highlight_title">{% trans 'highlight_title' %}</label>
+                    <label for="txt_highlight_title">{% trans 'Highlight title' %}</label>
                     {{ form.highlight_title}}
                     <span class="error">{{ form.highlight_title.errors }}</span>
                 </div>
@@ -113,7 +113,7 @@
                 </div>
             </div>
             <br>
-            <label for="txa_highlight_description">{% trans 'highlight_description' %}</label>
+            <label for="txa_highlight_description">{% trans 'Highlight description' %}</label>
             <textarea name="highlight_description" id="txa_highlight_description" class="form-control">{{ form.highlight_description.value | default_if_none:'' }}</textarea>
             <span class="error">{{ form.highlight_description.errors }}</span>
             <br>

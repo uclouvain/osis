@@ -118,7 +118,7 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                    aria-haspopup="true"
                                    aria-expanded="false"
-                                   id="lnk_home_dropdown_catalog">{% trans 'formation_catalogue' %}<span
+                                   id="lnk_home_dropdown_catalog">{% trans 'Formation catalogue' %}<span
                                         class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                     {% if perms.base.can_access_offer %}
@@ -127,7 +127,7 @@
                                     {% endif %}
                                     {% if perms.base.can_access_education_group %}
                                         <li><a href="{% url 'education_groups' %}"
-                                               id="lnk_dropdown_educationgroups">{% trans 'formations' %}</a></li>
+                                               id="lnk_dropdown_educationgroups">{% trans 'Trainings' %}</a></li>
                                     {% endif %}
                                     {% if perms.base.can_access_learningunit %}
                                         <li><a href="{% url 'learning_units' %}"
@@ -166,7 +166,7 @@
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                    aria-haspopup="true"
-                                   aria-expanded="false" id="lnk_home_dropdown_institution">{% trans 'institution' %}
+                                   aria-expanded="false" id="lnk_home_dropdown_institution">{% trans 'Institution' %}
                                     <span
                                             class="caret"></span></a>
                                 <ul class="dropdown-menu">
@@ -206,7 +206,7 @@
                                        id="lnk_dropdown_agreements">{% trans 'agreements' %}</a></li>
                                 {% if perms.partnership.change_partnershipconfiguration %}
                                   <li><a href="{% url 'partnerships:configuration_update' %}"
-                                         id="lnk_dropdown_general_conf">{% trans 'general_configuration' %}</a></li>
+                                         id="lnk_dropdown_general_conf">{% trans 'General configuration' %}</a></li>
                                 {% endif %}
                               </ul>
                             </li>

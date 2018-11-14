@@ -81,7 +81,7 @@ LEARNING_UNIT_TITLES_PART2 = [
     "{} 2".format(_('PLANNED_CLASSES')),
     str(_('Quadrimester')),
     str(_('Session derogation')),
-    str(_('language')),
+    str(_('Language')),
     str(_('Absolute credits')),
 ]
 CMS_LABEL_SPECIFICATIONS = ['themes_discussed', 'prerequisite']

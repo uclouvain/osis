@@ -57,7 +57,7 @@
                 </div>
 
                 <br>
-                <label>{% trans 'international_title'%}</label><br>
+                <label>{% trans 'International title'%}</label><br>
                 {{ offer_year.title_international | default_if_none:'-' }}
 
                 <br>
@@ -69,7 +69,7 @@
                 {{ offer_year.title_printable | default_if_none:'-' }}
 
                 <br>
-                <label>{% trans 'grade'%}</label><br>
+                <label>{% trans 'Grade'%}</label><br>
                 {{ offer_year.get_grade_display | default_if_none:'-' }}
             </div>
         </div>

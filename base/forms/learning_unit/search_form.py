@@ -340,7 +340,7 @@ class ExternalLearningUnitYearForm(LearningUnitYearForm):
     country = forms.ModelChoiceField(queryset=Country.objects.filter(organizationaddress__isnull=False)
                                      .distinct().order_by('name'),
                                      required=False, label=_("country"))
-    campus = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("institution"))
+    campus = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("Institution"))
     city = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("city"))
 
     def __init__(self, *args, **kwargs):

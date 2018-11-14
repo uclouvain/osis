@@ -28,7 +28,7 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
+<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
 <li><a href="{% url 'academic_year' %}" id="lnk_academic_year">{% trans 'academic_year' %}</a></li>
 <li><a href="{% url 'academic_calendars' %}" id="lnk_academic_calendars">{% trans 'academic_calendars' %}</a></li>
 <li class="active">{% trans 'event' %}</li>
@@ -65,13 +65,13 @@
             </div>
         </div>
         <br>
-        <label>{% trans 'label_jumbotron_details_academic_cal' %}</label><br>
+        <label>{% trans 'As displayed on the home page' %}</label><br>
         <div class="jumbotron">
             <h1>{{ academic_calendar.highlight_title| default_if_none:'' }}</h1>
             <p>{{ academic_calendar.highlight_description| default_if_none:'' }}</p>
             {% if academic_calendar.highlight_shortcut %}
             <p><a class="btn btn-primary btn-lg" href="/{{ academic_calendar.highlight_shortcut| default_if_none:'' }}" role="button"
-                  id="lnk_highlight" target="_blank">{% trans 'go'%}</a></p>
+                  id="lnk_highlight" target="_blank">{% trans 'Go'%}</a></p>
             {% endif %}
         </div>
 

@@ -7,7 +7,7 @@
 {% load learning_unit %}
 
 {% block breadcrumb %}
-<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
+<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
 <li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></li>
 <li><a href="{% url 'learning_unit' learning_unit_year.id %}" id="lnk_learning_units">{{learning_unit_year.acronym}}</a></li>
 <li class="active">{% trans 'Modification' %}</li>

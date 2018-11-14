@@ -656,7 +656,8 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
 
         ProposalLearningUnitFactory(learning_unit_year=luy)
 
-        msg_proposal = _("learning_unit_in_proposal_cannot_save") % {
+        msg_proposal = _("The learning unit %(luy)s is in proposal, can not save "
+                         "the change from the year %(academic_year)s") % {
             'luy': luy.acronym, 'academic_year': next_academic_year
         }
 

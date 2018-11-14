@@ -230,7 +230,7 @@ def _get_colored_rows(learning_units):
 def _get_attribution_line(an_attribution):
     return "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
         an_attribution.get('person'),
-        _('function'),
+        _('Function'),
         _(an_attribution.get('function')) if an_attribution.get('function') else '',
         _('Substitute'),
         an_attribution.get('substitute') if an_attribution.get('substitute') else '',

@@ -953,7 +953,8 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
         fields_to_update.update(learning_unit_year_fields_to_update)
         fields_to_update.update(learning_container_year_fields_to_update)
 
-        error_msg = _('learning_unit_in_proposal_cannot_save') % {
+        error_msg = _("The learning unit %(luy)s is in proposal, can not"
+                      " save the change from the year %(academic_year)s") % {
             'luy': luy_in_proposal.acronym,
             'academic_year': luy_in_proposal.academic_year
         }

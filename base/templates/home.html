@@ -47,7 +47,7 @@
                 <h3>{{ highlight.highlight_title }}</h3>
                 <small style="margin-bottom: 10px;">{{ highlight.highlight_description }}</small>
                 <p style="margin-top: 10px;"><a class="btn btn-primary btn-sm" href="/{{ highlight.highlight_shortcut }}"
-                      role="button">{% trans 'go' %}</a>
+                      role="button">{% trans 'Go' %}</a>
                 </p>
               </div>
             </div>
@@ -70,7 +70,7 @@
             {% if perms.base.can_access_catalog %}
                 <div class="col-md-1"><i class="fa fa-graduation-cap" style="font-size: 400%; color: #6699FF;"></i></div>
                 <div class="col-md-5">
-                    <h4 class="media-heading"><a href="{% url 'catalog' %}" id="lnk_home_catalog">{% trans 'formation_catalogue' %}</a></h4>
+                    <h4 class="media-heading"><a href="{% url 'catalog' %}" id="lnk_home_catalog">{% trans 'Formation catalogue' %}</a></h4>
                     <p>{% trans 'desc_lnk_home_catalog' %}</p>
                 </div>
             {% endif %}
@@ -87,7 +87,9 @@
             {% if perms.base.is_institution_administrator %}
                 <div class="col-md-1"><i class="fa fa-university" style="font-size: 400%; color: #6699FF;"></i></div>
                 <div class="col-md-5">
-                    <h4 class="media-heading"><a href="{% url 'institution' %}" id ="lnk_home_institution">{% trans 'institution' %}</a></h4>
+                    <h4 class="media-heading">
+                        <a href="{% url 'institution' %}" id ="lnk_home_institution">{% trans 'Institution' %}</a>
+                    </h4>
                     <p>{% trans 'desc_lnk_home_institution' %}</p>
                 </div>
             {% endif %}

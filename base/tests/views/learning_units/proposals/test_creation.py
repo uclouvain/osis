@@ -183,7 +183,7 @@ class LearningUnitViewTestCase(TestCase):
         luy_errors = learning_unit_form.learning_unit_form_container.forms[LearningUnitYearModelForm].errors
         lcy_errors = learning_unit_form.learning_unit_form_container.forms[LearningContainerYearModelForm].errors
 
-        self.assertEqual(luy_errors['acronym'], [_('field_is_required'), _('invalid_acronym')])
+        self.assertEqual(luy_errors['acronym'], [_('field_is_required'), _('Invalid code')])
         self.assertEqual(lcy_errors['container_type'], [_('field_is_required')])
         self.assertEqual(luy_errors['periodicity'], [_('field_is_required')])
         self.assertEqual(luy_errors['language'], [_('field_is_required')])

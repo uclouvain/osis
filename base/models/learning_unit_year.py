@@ -53,7 +53,11 @@ def academic_year_validator(value):
     academic = AcademicYear.objects.get(pk=value)
     academic_year_max = compute_max_academic_year_adjournment()
     if academic.year > academic_year_max:
-        raise ValidationError(_('learning_unit_creation_academic_year_max_error').format(academic_year_max))
+        raise ValidationError(
+            _('Please select an academic year lower than %(academic_year_max)d.') % {
+                'academic_year_max': academic_year_max,
+            }
+        )
 
 
 class LearningUnitYearAdmin(SerializableModelAdmin):
@@ -123,7 +127,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     decimal_scores = models.BooleanField(default=False)
     structure = models.ForeignKey('Structure', blank=True, null=True)
     internship_subtype = models.CharField(max_length=250, blank=True, null=True,
-                                          verbose_name=_('internship_subtype'),
+                                          verbose_name=_('Internship subtype'),
                                           choices=internship_subtypes.INTERNSHIP_SUBTYPES)
     status = models.BooleanField(default=False, verbose_name=_('active_title'))
     session = models.CharField(max_length=50, blank=True, null=True,
@@ -142,9 +146,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     professional_integration = models.BooleanField(default=False, verbose_name=_('professional integration'))
 
-    campus = models.ForeignKey('Campus', null=True, verbose_name=_("learning_location"))
+    campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"))
 
-    language = models.ForeignKey('reference.Language', null=True, verbose_name=_('language'))
+    language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'))
 
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
                                    verbose_name=_('Periodicity'))
@@ -243,7 +247,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     @property
     def status_verbose(self):
-        return _("active") if self.status else _("inactive")
+        return _("active") if self.status else _("Inactive")
 
     @property
     def internship_subtype_verbose(self):
@@ -312,7 +316,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         if self.acronym in learning_unit_years.values_list('acronym', flat=True):
             raise ValidationError({'acronym': _('already_existing_acronym')})
         if not re.match(REGEX_BY_SUBTYPE[self.subtype], self.acronym):
-            raise ValidationError({'acronym': _('invalid_acronym')})
+            raise ValidationError({'acronym': _('Invalid code')})
 
     @property
     def warnings(self):

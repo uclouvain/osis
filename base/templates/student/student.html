@@ -44,15 +44,15 @@
             </div>
 
             <div class="col-md-4">
-                <label>{% trans 'full_name'%}</label><br>
+                <label>{% trans 'Full name'%}</label><br>
                 {{ student.person }}
             </div>
             <div class="col-md-2">
-                <label>{% trans 'identification_number'%}</label><br>
+                <label>{% trans 'Number ID'%}</label><br>
                 {{ student.registration_id }}
             </div>
             <div class="col-md-2">
-                <label>{% trans 'gender'%}</label><br>
+                <label>{% trans 'Gender'%}</label><br>
                 {{ student.person.get_gender_display| default_if_none:''}}
             </div>
             <div class="col-md-2">

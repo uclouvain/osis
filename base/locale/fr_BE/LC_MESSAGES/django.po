@@ -3398,21 +3398,11 @@ msgstr "jj/mm/aaaa"
 #: templates/learning_unit/volumes_management.html:30
 #: templates/learning_units.html:32 templates/offer/breadcrumb.html:27
 #: templates/offer_year_calendar.html:30 templates/offers.html:30
-msgid "formation_catalogue"
+msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
-#: templates/education_group/layout.html:7
-#: templates/education_group/learning_unit/tab_prerequisite_group.html:38
-#: templates/layout.html:130
-msgid "formations"
-msgstr "Formations"
-
-#: templates/catalog.html:66
-msgid "formations_lnk"
-msgstr "Formations"
-
 #: templates/learning_unit/identification.html:77
-msgid "formerly"
+msgid "Formerly"
 msgstr "Anciennement"
 
 #: templates/education_group/tab_administrative_data.html:51
@@ -3421,11 +3411,11 @@ msgstr "Anciennement"
 #: templates/education_group/tab_administrative_data.html:78
 #: templatetags/learning_unit.py:44 templatetags/learning_unit.py:50
 #: tests/models/test_learning_unit.py:91 tests/models/test_learning_unit.py:93
-msgid "from"
+msgid "From"
 msgstr "De"
 
 #: templates/student/student.html:47
-msgid "full_name"
+msgid "Full name"
 msgstr "Nom complet"
 
 #: business/learning_unit_xls.py:233
@@ -3434,46 +3424,44 @@ msgstr "Nom complet"
 #: templates/learning_unit/select_attribution.html:35
 #: tests/business/test_learning_unit_xls.py:167
 #: tests/business/test_learning_unit_xls.py:379
-msgid "function"
+msgid "Function"
 msgstr "Fonction"
 
 #: models/education_group_year.py:150
-msgid "funding"
+msgid "Funding"
 msgstr "Finançable"
 
 #: models/education_group_year.py:162
-msgid "funding_cud"
+msgid "Funding international cooperation CCD/CUD"
 msgstr "Financement coopération internationale CCD/CUD"
 
 #: models/education_group_year.py:157
-msgid "funding_direction"
+msgid "Funding direction"
 msgstr "Orientation de financement"
 
 #: templates/my_osis/profile.html:83 templates/student/student.html:55
 #: templates/student/students.html:74
-msgid "gender"
+msgid "Gender"
 msgstr "Genre"
 
 #: templates/layout.html:209
-#, fuzzy
-#| msgid "general_informations"
-msgid "general_configuration"
-msgstr "Infos générales"
+msgid "General configuration"
+msgstr "Configuration générale"
 
 #: templates/education_group/tabs.html:53
-msgid "general_informations"
+msgid "General informations"
 msgstr "Infos générales"
 
 #: templates/learning_unit/by_proposal.html:40
-msgid "get_back_to_initial"
+msgid "Get back to initial data"
 msgstr "Retour à l'état initial"
 
 #: templates/academic_calendar/academic_calendar.html:74 templates/home.html:50
-msgid "go"
+msgid "Go"
 msgstr "Continuer"
 
 #: templates/offer/tab_identification.html:72
-msgid "grade"
+msgid "Grade"
 msgstr "Niveau"
 
 #: templates/education_group/learning_unit/tab_prerequisite_group.html:32
@@ -3483,7 +3471,7 @@ msgid "has the following prerequisites"
 msgstr "dispose des prérequis suivants"
 
 #: templates/academic_calendar/academic_calendar_form.html:116
-msgid "highlight_description"
+msgid "Highlight description"
 msgstr "Description de l'événement"
 
 #: templates/academic_calendar/academic_calendar_form.html:109
@@ -3491,7 +3479,7 @@ msgid "highlight_shortcut"
 msgstr "Titre raccourcis de l'événement"
 
 #: templates/academic_calendar/academic_calendar_form.html:104
-msgid "highlight_title"
+msgid "Highlight title"
 msgstr "Titre de l'événement"
 
 #: templates/noscript.html:36
@@ -3526,7 +3514,7 @@ msgstr "volume horaire total annuel"
 #: templates/learning_unit/remove_charge_repartition_confirmation_inner.html:35
 #: templates/learning_unit/remove_charge_repartition_confirmation_inner.html:42
 #: templates/learning_unit/simple/update_end_date.html:16
-msgid "i_confirm"
+msgid "Yes, I confirm."
 msgstr "Oui, je confirme."
 
 #: templates/education_group/blocks/form/training.html:42
@@ -3536,15 +3524,15 @@ msgstr "Oui, je confirme."
 #: templates/learning_unit/proposal/tabs.html:40
 #: templates/my_osis/profile.html:43 templates/offer/tabs.html:37
 #: templates/organization/organization.html:44
-msgid "identification"
+msgid "Identification"
 msgstr "Identification"
 
 #: templates/student/student.html:51
-msgid "identification_number"
+msgid "Number ID"
 msgstr "Matricule"
 
 #: templates/learning_unit/by_activity.html:136
-msgid "in_proposal"
+msgid "In proposal"
 msgstr "En proposition"
 
 #: business/learning_unit_proposal.py:54
@@ -3553,12 +3541,12 @@ msgstr "En proposition"
 #: models/learning_unit_year.py:246
 #: templates/learning_unit/by_activity.html:132
 #: templates/learning_unit/by_external.html:72
-msgid "inactive"
+msgid "Inactive"
 msgstr "Inactif"
 
 #: models/validation_rule.py:53
 msgid "initial value"
-msgstr ""
+msgstr "valeur initiale"
 
 #: business/learning_units/xls_comparison.py:73
 #: forms/education_group/coorganization.py:46
@@ -3574,65 +3562,63 @@ msgstr ""
 #: templates/organization/organization_address_form.html:31
 #: templates/organization/organization_form.html:31
 #: templates/organization/organizations.html:30
-msgid "institution"
+msgid "Institution"
 msgstr "Institution"
 
 #: templates/offer/tab_identification.html:60
-msgid "international_title"
+msgid "International title"
 msgstr "Titre international"
 
 #: models/education_group_year.py:211
-#, fuzzy
-#| msgid "internships"
-msgid "internship"
-msgstr "Stages"
+msgid "Internship"
+msgstr "Stage"
 
 #: business/learning_units/edition.py:435 models/learning_unit_year.py:126
-msgid "internship_subtype"
+msgid "Internship subtype"
 msgstr "Sous-type de stage"
 
 #: templates/layout.html:160 templates/studies.html:54
-msgid "internships"
+msgid "Internships"
 msgstr "Stages"
 
 #: templates/learning_unit/blocks/form/form_external.html:56
 #: templates/learning_unit/blocks/panel/proposal.html:25
 #: templates/learning_unit/external/read.html:67
-msgid "introduced_by"
+msgid "Introduced by"
 msgstr "Introduit par"
 
 #: models/learning_unit_year.py:315
 #: tests/views/learning_units/proposals/test_creation.py:186
-msgid "invalid_acronym"
+msgid "Invalid code"
 msgstr "Code non valide"
 
 #: templates/education_group/learning_unit/tab_utilization.html:34
 #: templates/education_group/tab_utilization.html:50
 msgid "is using in"
-msgstr "est utilisée dans :"
+msgstr "est utilisée dans"
 
 #: templates/noscript.html:33
-msgid "javascript_is_disabled"
+msgid "JavaScript is disabled on your browser, but OSIS does not work without JavaScript."
 msgstr ""
 "JavaScript est désactivé dans votre navigateur, mais OSIS ne fonctionne pas "
 "sans JavaScript."
 
 #: templates/education_group/tab_administrative_data.html:159
-msgid "jury"
+msgid "Jury"
 msgstr "Jury"
 
 #: models/education_group_year.py:295
 #: templates/education_group/blocks/informations.html:60
-msgid "keywords"
+msgid "Keywords"
 msgstr "Mots clés"
 
 #: templates/organization/organization_address.html:44
 #: templates/organization/organization_address_form.html:51
-msgid "label"
+msgid "Label"
 msgstr "Label"
 
 #: templates/academic_calendar/academic_calendar.html:68
-msgid "label_jumbotron_details_academic_cal"
+msgid "As displayed on the home page"
 msgstr "Comme présenté sur la page d'accueil"
 
 #: business/learning_unit.py:84 business/learning_units/edition.py:440
@@ -3642,68 +3628,50 @@ msgstr "Comme présenté sur la page d'accueil"
 #: templates/learning_unit/specifications.html:33
 #: templates/my_osis/profile.html:102
 #: tests/business/learning_units/test_edition.py:209
-msgid "language"
+msgid "Language"
 msgstr "Langue"
 
-#: templates/search/search.html:44
-#, fuzzy
-#| msgid "full_name"
-msgid "last_name"
-msgstr "Nom complet"
-
 #: templates/my_osis/profile.html:79
-#, fuzzy
-#| msgid "name"
-msgid "lastname"
+msgid "Lastname"
 msgstr "Nom"
 
 #: models/external_learning_unit_year.py:69 models/learning_achievement.py:46
-#, fuzzy
-#| msgid "learning_unit_search"
 msgid "learning unit year"
-msgstr "Recherche d'unités d'enseignement"
+msgstr "unité d'enseignement annualisé"
 
 #: templates/learning_unit/achievement_edit.html:42
 #: templates/learning_unit/specifications.html:81
-msgid "learning_achievements"
+msgid "Learning achievements"
 msgstr "Acquis d'apprentissage"
 
 #: templates/learning_unit/specifications.html:96
 #: templates/learning_unit/specifications.html:101
-msgid "learning_achievements_headline"
+msgid "At the end of this learning unit, the student is able to:"
 msgstr "A la fin de cette unité d'enseignement, l'étudiant est capable de:"
 
 #: business/learning_units/xls_comparison.py:74
 #: models/education_group_year.py:198 models/learning_unit_year.py:145
 #: views/learning_unit.py:291
-msgid "learning_location"
+msgid "Learning location"
 msgstr "Lieu d'enseignement"
 
 #: templates/learning_unit/breadcrumb.html:30
 #: templates/learning_unit/comparison.html:29
 #: templates/my_osis/profile.html:131
 #: templates/student/exams_enrollments.html:49
-msgid "learning_unit"
+msgid "Learning unit"
 msgstr "Unité d'enseignement"
 
-#: templates/learning_unit/blocks/manage_volumes_button.html:8
-#, fuzzy
-#| msgid "learning_unit_created"
-msgid "learning_unit_create"
-msgstr ""
-"L'unité d'enseignement %(learning_unit)s créée pour l'année academique "
-"%(academic_year)s"
-
 #: models/learning_unit_year.py:56
-msgid "learning_unit_creation_academic_year_max_error"
+msgid "Please select an academic year lower than %(academic_year_max)d."
 msgstr ""
-"Impossible de créer une UE dont l'année académique est supérieure à {}."
+"Impossible de créer une UE dont l'année académique est supérieure à %(academic_year_max)d."
 
 #: business/learning_units/edition.py:482
 #: forms/learning_unit/learning_unit_postponement.py:296
 #: tests/business/test_learning_unit_edition.py:956
 #: tests/forms/test_learning_unit_postponement.py:659
-msgid "learning_unit_in_proposal_cannot_save"
+msgid "The learning unit %(luy)s is in proposal, can not save the change from the year %(academic_year)s"
 msgstr ""
 "L'unité d'enseignement %(luy)s est en proposition, impossible de sauvegarder "
 "le changement à partir de l'année %(academic_year)s"

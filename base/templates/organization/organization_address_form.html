@@ -28,7 +28,7 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-  <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
+  <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'Institution' %}</a></li>
   <li><a href="{% url 'organizations' %}" id="lnk_organizations">{% trans 'Organizations' %}</a></li>
   <li><a href="{% url 'organization_read' organization_id=organization_id %}" id="lnk_organization">{% trans 'Organization' %}</a></li>
   <li class="active">{% trans 'Organization address' %}</li>
@@ -48,7 +48,7 @@
 
             <div class="row">
                 <div class="col-md-6">
-                    <label for="txt_organization_address_label">{% trans 'label' %}</label>
+                    <label for="txt_organization_address_label">{% trans 'Label' %}</label>
                     <input class="form-control" value="{{ organization_address.label | default_if_none:'' }}" name="organization_address_label" id="txt_organization_address_label" maxlength="20" required>
                 </div>
                 <div class="col-md-6">

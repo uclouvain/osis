@@ -57,7 +57,7 @@ LEARNING_UNIT_TITLES = [
     str(_('Subtype')),
     str(_('Internship subtype')),
     str(_('credits')),
-    str(_('language')),
+    str(_('Language')),
     str(_('Periodicity')),
     str(_('Quadrimester')),
     str(_('Session derogation')),
@@ -70,8 +70,8 @@ LEARNING_UNIT_TITLES = [
     str(_('Add. requ. ent. 1')),
     str(_('Add. requ. ent. 2')),
     str(_('Profes. integration')),
-    str(_('institution')),
-    str(_('learning_location')),
+    str(_('Institution')),
+    str(_('Learning location')),
     str(_('Partims')),
     "PM {}".format(_('code')),
     "PM {}".format(_('Vol. Q1')),
@@ -205,7 +205,7 @@ def _translate_status(value):
     if value:
         return _('active').title()
     else:
-        return _('inactive').title()
+        return _('Inactive')
 
 
 def _component_data(components, learning_component_yr_type):

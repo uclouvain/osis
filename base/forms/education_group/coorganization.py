@@ -43,7 +43,7 @@ class CoorganizationEditForm(forms.ModelForm):
     organization = ModelChoiceField(
         queryset=Organization.objects.all(),
         required=True,
-        label=_("institution"),
+        label=_("Institution"),
         widget=autocomplete.ModelSelect2(
             url='organization_autocomplete',
             attrs={'data-theme': 'bootstrap', 'data-width': 'null', 'data-placeholder': '---------'},

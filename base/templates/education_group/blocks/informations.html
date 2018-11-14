@@ -57,7 +57,7 @@
         {% if education_group_year.education_group_type.category != 'GROUP' %}
             <br>
             <div>
-                <label>{% trans 'keywords' %}</label><br>
+                <label>{% trans 'Keywords' %}</label><br>
                 <strong class="text-primary">{{ parent.keywords | default_if_none:'' }}</strong><br>
                 {{ education_group_year.keywords | default_if_none:'' }}
             </div>

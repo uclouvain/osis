@@ -147,19 +147,19 @@ class EducationGroupYear(models.Model):
 
     funding = models.BooleanField(
         default=False,
-        verbose_name=_('funding')
+        verbose_name=_('Funding')
     )
 
     funding_direction = models.CharField(
         max_length=1,
         blank=True,
         default="",
-        verbose_name=_('funding_direction')
+        verbose_name=_('Funding direction')
     )
 
     funding_cud = models.BooleanField(
         default=False,
-        verbose_name=_('funding_cud')  # cud = commission universitaire au développement
+        verbose_name=_('Funding international cooperation CCD/CUD')  # cud = commission universitaire au développement
     )
 
     funding_direction_cud = models.CharField(
@@ -195,7 +195,7 @@ class EducationGroupYear(models.Model):
         blank=True,
         null=True,
         related_name='teaching',
-        verbose_name=_("learning_location")
+        verbose_name=_("Learning location")
     )
 
     dissertation = models.BooleanField(
@@ -208,7 +208,7 @@ class EducationGroupYear(models.Model):
         choices=internship_presence.INTERNSHIP_PRESENCE,
         default=internship_presence.NO,
         null=True,
-        verbose_name=_('internship')
+        verbose_name=_('Internship')
     )
 
     schedule_type = models.CharField(
@@ -292,7 +292,7 @@ class EducationGroupYear(models.Model):
         max_length=320,
         blank=True,
         default="",
-        verbose_name=_('keywords')
+        verbose_name=_('Keywords')
     )
 
     duration = models.IntegerField(
