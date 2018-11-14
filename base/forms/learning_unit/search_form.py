@@ -59,13 +59,13 @@ MAX_RECORDS = 1000
 
 class LearningUnitSearchForm(BaseSearchForm):
     MAX_RECORDS = 1000
-    ALL_LABEL = (None, _('all_label'))
+    ALL_LABEL = (None, _('All label'))
     ALL_CHOICES = (ALL_LABEL,)
 
     academic_year_id = forms.ModelChoiceField(
-        label=_('academic_year_small'),
+        label=_('Ac yr.'),
         queryset=AcademicYear.objects.all(),
-        empty_label=_('all_label'),
+        empty_label=_('All label'),
     )
 
     requirement_entity_acronym = forms.CharField(
@@ -90,7 +90,7 @@ class LearningUnitSearchForm(BaseSearchForm):
 
     allocation_entity_acronym = forms.CharField(
         max_length=20,
-        label=_('allocation_entity_small')
+        label=_('Alloc. Ent.')
     )
 
     with_entity_subordinated = forms.BooleanField(label=_('With subord. ent.'))
@@ -176,12 +176,12 @@ class LearningUnitYearForm(LearningUnitSearchForm):
 
     allocation_entity_acronym = forms.CharField(
         max_length=20,
-        label=_('allocation_entity_small')
+        label=_('Alloc. Ent.')
     )
 
     faculty_borrowing_acronym = forms.CharField(
         max_length=20,
-        label=_("faculty_borrowing")
+        label=_("Faculty borrowing")
     )
 
     def __init__(self, *args, **kwargs):
@@ -339,9 +339,9 @@ def __is_borrowed_learning_unit(luy, map_entity_faculty, map_luy_entity, map_luy
 class ExternalLearningUnitYearForm(LearningUnitYearForm):
     country = forms.ModelChoiceField(queryset=Country.objects.filter(organizationaddress__isnull=False)
                                      .distinct().order_by('name'),
-                                     required=False, label=_("country"))
+                                     required=False, label=_("Country"))
     campus = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("Institution"))
-    city = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("city"))
+    city = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("City"))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -51,9 +51,9 @@ XLS_DESCRIPTION = _("Comparison of learning units")
 
 LEARNING_UNIT_TITLES = [
     str(_('code')),
-    str(_('academic_year_small')),
+    str(_('Ac yr.')),
     str(_('type')),
-    str(_('active_title')),
+    str(_('Active')),
     str(_('Subtype')),
     str(_('Internship subtype')),
     str(_('credits')),
@@ -61,12 +61,12 @@ LEARNING_UNIT_TITLES = [
     str(_('Periodicity')),
     str(_('Quadrimester')),
     str(_('Session derogation')),
-    str(_('common_title')),
+    str(_('Common title')),
     str(_('English title proper')),
-    str(_('common_english_title')),
-    str(_('english_title_proper_to_UE')),
+    str(_('Common English title')),
+    str(_('English title proper')),
     str(_('Req. Entities')),
-    str(_('allocation_entity_small')),
+    str(_('Alloc. Ent.')),
     str(_('Add. requ. ent. 1')),
     str(_('Add. requ. ent. 2')),
     str(_('Profes. integration')),
@@ -203,7 +203,7 @@ def extract_xls_data_from_learning_unit(learning_unit_yr, new_line, first_data):
 
 def _translate_status(value):
     if value:
-        return _('active').title()
+        return _('Active').title()
     else:
         return _('Inactive')
 

@@ -443,7 +443,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         )
 
         self.assertEqual(result["is_disabled"], "disabled")
-        self.assertEqual(result["text"], _("edit"))
+        self.assertEqual(result["text"], _("Edit"))
 
 
 class TestEducationGroupDlWithParent(TestCase):
@@ -458,14 +458,14 @@ class TestEducationGroupDlWithParent(TestCase):
     def test_dl_value_in_education_group(self):
         response = dl_with_parent(self.context, "acronym")
         self.assertEqual(response["value"], self.education_group_year.acronym)
-        self.assertEqual(response["label"], _("acronym"))
+        self.assertEqual(response["label"], _("Acronym"))
         self.assertEqual(response["parent_value"], None)
 
     def test_dl_value_in_parent(self):
         self.education_group_year.acronym = ""
         response = dl_with_parent(self.context, "acronym")
         self.assertEqual(response["value"], "")
-        self.assertEqual(response["label"], _("acronym"))
+        self.assertEqual(response["label"], _("Acronym"))
         self.assertEqual(response["parent_value"], self.parent.acronym)
 
     def test_dl_default_value(self):
@@ -474,7 +474,7 @@ class TestEducationGroupDlWithParent(TestCase):
         response = dl_with_parent(self.context, "acronym", default_value="avada kedavra")
 
         self.assertEqual(response["value"], "")
-        self.assertEqual(response["label"], _("acronym"))
+        self.assertEqual(response["label"], _("Acronym"))
         self.assertEqual(response["parent_value"], "")
         self.assertEqual(response["default_value"], "avada kedavra")
 

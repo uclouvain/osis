@@ -55,27 +55,27 @@
                 &nbsp;&nbsp;&nbsp;{{ organization_address.postal_code | default_if_none:'-' }}
             </div>
             <div class="col-md-4">
-                <label>{% trans 'city' %}</label><br>
+                <label>{% trans 'City' %}</label><br>
                 {{ organization_address.city | default_if_none:'-' }}
             </div>
             <div class="col-md-4">
-                <label>{% trans 'country' %}</label><br>
+                <label>{% trans 'Country' %}</label><br>
                 {{ organization_address.country | default_if_none:'-' }}
             </div>
         </div>
         <br>
         <div class=pull-right>
-            <a href="{% url 'organization_address_edit' organization_address_id=organization_address.id %}" title="{%trans 'edit'%}"
+            <a href="{% url 'organization_address_edit' organization_address_id=organization_address.id %}" title="{%trans 'Edit'%}"
                class="btn btn-primary" role="button" id="lnk_organization_edit">
-                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {% trans 'edit'%}
+                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {% trans 'Edit'%}
             </a>
-             <a href="{% url 'organization_address_delete' organization_address_id=organization_address.id %}" title="{%trans 'delete'%}"
+             <a href="{% url 'organization_address_delete' organization_address_id=organization_address.id %}" title="{%trans 'Delete'%}"
                class="btn btn-primary" role="button" id="lnk_organization_delete">
-                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans 'delete'%}
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans 'Delete'%}
             </a>
             <a href="{% url 'organization_read' organization_id=organization_address.organization.pk %}"
-               id="lnk_organization_read_{{organization_address.organization.id}}"  title="{%trans 'back'%}"
-               class="btn btn-default" role="button" ><span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span> {% trans 'back'%}</a>
+               id="lnk_organization_read_{{organization_address.organization.id}}"  title="{%trans 'Back'%}"
+               class="btn btn-default" role="button" ><span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span> {% trans 'Back'%}</a>
         </div>
     </div>
 </div>

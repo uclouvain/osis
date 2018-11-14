@@ -33,7 +33,7 @@
         <div style="margin-top:10px;">
             {% if proposals %}
                  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal_force_state">
-                    {% trans 'force_state' %}
+                    {% trans 'Force state' %}
                  </button>
                 <button type="button" class="btn btn-default" style="margin-left:10px;" id="btn_modal_get_back_to_initial"
                         data-toggle="modal" data-target="#modalBackToInitial">
@@ -41,7 +41,7 @@
                 </button>
                 <button type="button" class="btn btn-default" style="margin-left:10px;" id="btn_modal_consolidate"
                         data-toggle="modal" data-target="#modalConsolidate">
-                    {% trans 'consolidate' %}
+                    {% trans 'Consolidate' %}
                 </button>
                 {% include "learning_unit/blocks/dropdown/proposal_xls_actions_bar.html" with dropdirection="dropdown" %}
 
@@ -49,8 +49,8 @@
                 <thead>
                 <tr>
                     <th><input id="id_check_all" type="checkbox" name="check_all" title="Check All"></th>
-                    <th>{% trans 'folder'%}</th>
-                    <th>{% trans 'acronym'%}</th>
+                    <th>{% trans 'Folder'%}</th>
+                    <th>{% trans 'Acronym'%}</th>
                     <th>{% trans 'validity'%}</th>
                     <th>{% trans 'Title'%}</th>
                     <th>{% trans 'type'%}</th>

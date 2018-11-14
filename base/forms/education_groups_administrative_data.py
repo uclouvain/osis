@@ -39,7 +39,7 @@ NUMBER_SESSIONS = 3
 
 
 class CourseEnrollmentForm(BootstrapForm):
-    range_date = DateRangeField(required=False, label=_("course_enrollment"))
+    range_date = DateRangeField(required=False, label=_("Course enrollment"))
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.pop('instance')
@@ -76,7 +76,7 @@ class AdministrativeDataSessionForm(BootstrapForm):
 
     dissertation_submission = forms.DateField(widget=DatePickerInput(format=DATE_FORMAT),
                                               input_formats=[DATE_FORMAT, ],
-                                              label=_('dissertation_presentation'),
+                                              label=_('Dissertation submission'),
                                               required=False)
 
     deliberation = forms.SplitDateTimeField(widget=DateTimePickerInput(),

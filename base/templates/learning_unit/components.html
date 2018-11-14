@@ -119,10 +119,10 @@
             {% with component_number=forloop.counter0 classes_count=component.learning_component_year.classes|length|add:"1" %}
                 <tr class="class_year class_year_head collapse collapse_classes{{ component_number }}">
                     <td rowspan="{{ classes_count }}"></td>
-                    <td rowspan="{{ classes_count }}">{% trans 'classes' %}</td>
+                    <td rowspan="{{ classes_count }}">{% trans 'Classes' %}</td>
                     <td colspan="1">{% trans 'LU' %}</td>
                     <td colspan="2">{% trans 'code' %}</td>
-                    <td colspan="6">{% trans 'description' %}</td>
+                    <td colspan="6">{% trans 'Description' %}</td>
                 </tr>
                 {% for learning_class_year in component.learning_component_year.classes|dictsort:"acronym" %}
                     <tr class="class_year collapse collapse_classes{{ component_number }}">

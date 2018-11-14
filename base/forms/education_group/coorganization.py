@@ -37,7 +37,7 @@ from base.models.organization import Organization
 class CoorganizationEditForm(forms.ModelForm):
     country = ModelChoiceField(
         queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
-        label=_("country"),
+        label=_("Country"),
     )
 
     organization = ModelChoiceField(

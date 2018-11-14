@@ -184,10 +184,10 @@ class LearningUnitViewTestCase(TestCase):
         lcy_errors = learning_unit_form.learning_unit_form_container.forms[LearningContainerYearModelForm].errors
 
         self.assertEqual(luy_errors['acronym'], [_('field_is_required'), _('Invalid code')])
-        self.assertEqual(lcy_errors['container_type'], [_('field_is_required')])
-        self.assertEqual(luy_errors['periodicity'], [_('field_is_required')])
-        self.assertEqual(luy_errors['language'], [_('field_is_required')])
-        self.assertEqual(luy_errors['campus'], [_('field_is_required')])
+        self.assertEqual(lcy_errors['container_type'], [_('This field is required.')])
+        self.assertEqual(luy_errors['periodicity'], [_('This field is required.')])
+        self.assertEqual(luy_errors['language'], [_('This field is required.')])
+        self.assertEqual(luy_errors['campus'], [_('This field is required.')])
 
     def test_proposal_learning_unit_form_with_empty_title_fields(self):
         learning_unit_form = CreationProposalBaseForm(self.get_empty_title_fields(), person=self.person)

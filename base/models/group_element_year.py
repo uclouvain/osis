@@ -107,14 +107,14 @@ class GroupElementYear(OrderedModel):
 
     is_mandatory = models.BooleanField(
         default=False,
-        verbose_name=_("mandatory"),
+        verbose_name=_("Mandatory"),
     )
 
     block = models.CharField(
         max_length=7,
         blank=True,
         null=True,
-        verbose_name=_("block")
+        verbose_name=_("Block")
     )
 
     minor_access = models.BooleanField(default=False)

@@ -46,7 +46,7 @@
                 </li>
                 <li role="presentation">
                     <a data-toggle="tab" href="#tab_campus_list" role="tab">
-                        {% trans 'campus'%}
+                        {% trans 'Campus'%}
                     </a>
                 </li>
             </ul>
@@ -75,14 +75,14 @@
                             <dd>{{ object.start_date }}</dd>
                         </dl>
                         <dl class="col-md-2">
-                            <dt>{% trans 'end_date' %}</dt>
+                            <dt>{% trans 'End date' %}</dt>
                             <dd>{{ object.end_date | default_if_none:'-' }}</dd>
                         </dl>
                     </div>
                     <br>
                     {% with object.organizationaddress_set.all as addresses %}
                         {% if addresses %}
-                            <label>{% trans 'address(ses)' %}</label>
+                            <label>{% trans 'Address(es)' %}</label>
                             <br>
                             <div class="row">
                                 {% for address in addresses %}

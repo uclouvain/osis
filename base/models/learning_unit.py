@@ -58,11 +58,11 @@ class LearningUnit(SerializableModel):
     learning_container = models.ForeignKey('LearningContainer', blank=True, null=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     start_year = models.IntegerField(_('Starting year'))
-    end_year = models.IntegerField(blank=True, null=True, verbose_name=_('end_year_title'))
+    end_year = models.IntegerField(blank=True, null=True, verbose_name=_('End year'))
     # TODO is it useful?
     progress = None
 
-    faculty_remark = models.TextField(blank=True, null=True, verbose_name=_('faculty_remark'))
+    faculty_remark = models.TextField(blank=True, null=True, verbose_name=_('Faculty remark'))
 
     other_remark = models.TextField(
         blank=True,

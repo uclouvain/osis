@@ -96,7 +96,7 @@ class EducationGroupYear(models.Model):
     acronym = models.CharField(
         max_length=40,
         db_index=True,
-        verbose_name=_("acronym"),
+        verbose_name=_("Acronym"),
     )
 
     title = models.CharField(
@@ -142,7 +142,7 @@ class EducationGroupYear(models.Model):
 
     admission_exam = models.BooleanField(
         default=False,
-        verbose_name=_('admission_exam')
+        verbose_name=_('Admission exam')
     )
 
     funding = models.BooleanField(
@@ -187,7 +187,7 @@ class EducationGroupYear(models.Model):
         related_name='enrollment',
         blank=True,
         null=True,
-        verbose_name=_("enrollment_campus"),
+        verbose_name=_("Enrollment campus"),
     )
 
     main_teaching_campus = models.ForeignKey(
@@ -262,7 +262,7 @@ class EducationGroupYear(models.Model):
         max_length=140,
         blank=True,
         default="",
-        verbose_name=_('diploma_title')
+        verbose_name=_('Diploma title')
     )
 
     inter_organization_information = models.CharField(
@@ -299,7 +299,7 @@ class EducationGroupYear(models.Model):
         blank=True,
         null=True,
         default=1,  # We must set a default value for duration because duration_unit have a default value
-        verbose_name=_('duration'),
+        verbose_name=_('Duration'),
         validators=[MinValueValidator(1)]
     )
 
@@ -314,7 +314,7 @@ class EducationGroupYear(models.Model):
 
     enrollment_enabled = models.BooleanField(
         default=True,
-        verbose_name=_('enrollment_enabled')
+        verbose_name=_('Enrollment enabled')
     )
 
     partial_acronym = models.CharField(
@@ -390,7 +390,7 @@ class EducationGroupYear(models.Model):
 
     administration_entity = models.ForeignKey(
         Entity, null=True,
-        verbose_name=_("administration_entity"),
+        verbose_name=_("Administration entity"),
         related_name='administration_entity'
     )
 
@@ -439,7 +439,7 @@ class EducationGroupYear(models.Model):
     )
 
     class Meta:
-        verbose_name = _("education group year")
+        verbose_name = _("Education group year")
         unique_together = ('education_group', 'academic_year')
 
     def __str__(self):
@@ -621,16 +621,16 @@ class EducationGroupYear(models.Model):
     def clean_constraint_type(self):
         # If min or max has been set, constraint_type is required
         if self.min_constraint is not None or self.max_constraint is not None:
-            raise ValidationError({'constraint_type': _("field_is_required")})
+            raise ValidationError({'constraint_type': _("This field is required.")})
 
     def clean_min_max(self):
         # If constraint_type has been set, min and max are required
         error_dict = {}
         if self.min_constraint is None:
-            error_dict['min_constraint'] = ValidationError(_("field_is_required"), code='required')
+            error_dict['min_constraint'] = ValidationError(_("This field is required."), code='required')
 
         if self.max_constraint is None:
-            error_dict['max_constraint'] = ValidationError(_("field_is_required"), code='required')
+            error_dict['max_constraint'] = ValidationError(_("This field is required."), code='required')
 
         if error_dict:
             raise ValidationError(error_dict)
@@ -645,9 +645,9 @@ class EducationGroupYear(models.Model):
 
     def clean_duration_data(self):
         if self.duration_unit is not None and self.duration is None:
-            raise ValidationError({'duration': _("field_is_required")})
+            raise ValidationError({'duration': _("This field is required.")})
         elif self.duration is not None and self.duration_unit is None:
-            raise ValidationError({'duration_unit': _("field_is_required")})
+            raise ValidationError({'duration_unit': _("This field is required.")})
 
     def next_year(self):
         try:

@@ -71,7 +71,7 @@ class EducationGroupType(models.Model):
         max_length=25,
         choices=education_group_categories.CATEGORIES,
         default=education_group_categories.TRAINING,
-        verbose_name=_('category'),
+        verbose_name=_('Category'),
     )
 
     name = models.CharField(

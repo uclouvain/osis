@@ -66,7 +66,7 @@ class EntityContainerYearModelForm(forms.ModelForm):
         queryset=find_all_current_entities_version()
     )
     entity_type = ''
-    country = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False, label=_("country"))
+    country = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False, label=_("Country"))
 
     def __init__(self, *args, **kwargs):
         self.person = kwargs.pop('person')

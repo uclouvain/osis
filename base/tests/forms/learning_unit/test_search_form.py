@@ -59,7 +59,7 @@ class TestSearchForm(TestCase):
         })
         form = LearningUnitSearchForm(data)
         self.assertTrue(form.is_valid())
-        expected_research_criteria = [(_('academic_year_small'), self.academic_years[0]),
+        expected_research_criteria = [(_('Ac yr.'), self.academic_years[0]),
                                       (_('Req. Entity'), "INFO"),
                                       (_('Tutor'), "Jean Marcel")]
         actual_research_criteria = get_research_criteria(form)
@@ -73,7 +73,7 @@ class TestSearchForm(TestCase):
         })
         form = LearningUnitYearForm(data)
         self.assertTrue(form.is_valid())
-        expected_research_criteria = [(_('academic_year_small'), self.academic_years[0]),
+        expected_research_criteria = [(_('Ac yr.'), self.academic_years[0]),
                                       (_('type'), _(learning_container_year_types.COURSE))]
         actual_research_criteria = get_research_criteria(form)
         self.assertListEqual(expected_research_criteria, actual_research_criteria)

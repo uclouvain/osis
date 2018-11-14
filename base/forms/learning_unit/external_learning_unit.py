@@ -62,7 +62,7 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
     country = ModelChoiceField(
         queryset=Country.objects.all(),
         required=False,
-        label=_("country"),
+        label=_("Country"),
         widget=autocomplete.ModelSelect2(url='country-autocomplete')
     )
 

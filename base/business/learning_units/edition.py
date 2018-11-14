@@ -347,7 +347,7 @@ def check_postponement_conflict_report_errors(conflict_report):
         raise ConsistencyError(
             last_instance_updated,
             conflict_report.get('errors'),
-            _('error_modification_learning_unit')
+            _('An error occured when updating the learning unit.')
         )
 
 
@@ -429,16 +429,16 @@ def _check_postponement_conflict(luy, next_luy):
 
 def _check_postponement_conflict_on_learning_unit_year(luy, next_luy):
     fields_to_compare = {
-        'acronym': _('acronym'),
+        'acronym': _('Acronym'),
         'specific_title': _('English title proper'),
-        'specific_title_english': _('english_title_proper_to_UE'),
+        'specific_title_english': _('English title proper'),
         'subtype': _('Subtype'),
         'credits': _('credits'),
         'internship_subtype': _('Internship subtype'),
         'status': _('Status'),
         'session': _('Session derogation'),
         'quadrimester': _('Quadrimester'),
-        'campus': _('campus'),
+        'campus': _('Campus'),
         'language': _('Language'),
     }
     return _get_differences(luy, next_luy, fields_to_compare)
@@ -447,9 +447,9 @@ def _check_postponement_conflict_on_learning_unit_year(luy, next_luy):
 def _check_postponement_conflict_on_learning_container_year(lcy, next_lcy):
     fields_to_compare = {
         'container_type': _('type'),
-        'common_title': _('common_title'),
-        'common_title_english': _('common_english_title'),
-        'acronym': _('acronym'),
+        'common_title': _('Common title'),
+        'common_title_english': _('Common English title'),
+        'acronym': _('Acronym'),
         'team': _('Team management')
     }
     return _get_differences(lcy, next_lcy, fields_to_compare)

@@ -27,7 +27,7 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-    <li><a href="{% url 'my_osis' %}" id="lnk_my_osis">{% trans 'my_osis' %}</a></li>
+    <li><a href="{% url 'my_osis' %}" id="lnk_my_osis">{% trans 'My OSIS' %}</a></li>
     <li class="active">{% trans 'Messages' %}</li>
 {% endblock %}
 {% block content %}
@@ -44,13 +44,13 @@
                             id="slt_my_message_action" data-toggle="tooltip" data-placement="bottom" title="{% trans 'Select action to execute' %}">
                         <option value="" selected>-----</option>
                         <option value="MARK_AS_READ">{% trans 'Mark selected messages as read' %}</option>
-                        <option value="DELETE">{% trans 'delete_selected_messages' %}</option>
+                        <option value="DELETE">{% trans 'Delete selected messages' %}</option>
                     </select>
                 </div>
                 <div class="col-md-1">
                     <input type="submit"
                            class="btn btn-default"
-                           value="{% trans 'execute' %}"
+                           value="{% trans 'Execute' %}"
                            data-toggle="tooltip" data-placement="right"
                            title="{% trans 'Execute selected action' %}"
                            id="btn_my_message_action_execute"/>

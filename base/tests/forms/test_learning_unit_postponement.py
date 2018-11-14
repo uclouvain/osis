@@ -528,7 +528,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         expected_result = OrderedDict({
             next_academic_year: [
                 _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
-                    'col_name': _('active_title'),
+                    'col_name': _('Active'),
                     'new_value': _('yes') if new_status_value else _('no'),
                     'current_value': _('yes') if initial_status_value else _('no')
                 }
@@ -686,7 +686,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         expected_result = OrderedDict({
             next_academic_year: [
                 _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
-                    'col_name': _('additional_requirement_entity_2'),
+                    'col_name': _('Additional requirement entity 2'),
                     'new_value': '-',
                     'current_value': initial_entity
                 }

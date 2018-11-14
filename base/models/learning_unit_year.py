@@ -108,7 +108,7 @@ class ExtraManagerLearningUnitYear(models.Model):
 
 class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    academic_year = models.ForeignKey(AcademicYear, verbose_name=_('academic_year'),
+    academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
                                       validators=[academic_year_validator])
     learning_unit = models.ForeignKey('LearningUnit')
     learning_container_year = models.ForeignKey('LearningContainerYear', null=True)
@@ -118,7 +118,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     specific_title = models.CharField(max_length=255, blank=True, null=True,
                                       verbose_name=_('English title proper'))
     specific_title_english = models.CharField(max_length=250, blank=True, null=True,
-                                              verbose_name=_('english_title_proper_to_UE'))
+                                              verbose_name=_('English title proper'))
     subtype = models.CharField(max_length=50, choices=learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
                                default=learning_unit_year_subtypes.FULL)
     credits = models.DecimalField(null=True, max_digits=5, decimal_places=2,
@@ -129,7 +129,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     internship_subtype = models.CharField(max_length=250, blank=True, null=True,
                                           verbose_name=_('Internship subtype'),
                                           choices=internship_subtypes.INTERNSHIP_SUBTYPES)
-    status = models.BooleanField(default=False, verbose_name=_('active_title'))
+    status = models.BooleanField(default=False, verbose_name=_('Active'))
     session = models.CharField(max_length=50, blank=True, null=True,
                                choices=learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION,
                                verbose_name=_('Session derogation'))
@@ -247,7 +247,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     @property
     def status_verbose(self):
-        return _("active") if self.status else _("Inactive")
+        return _("Active") if self.status else _("Inactive")
 
     @property
     def internship_subtype_verbose(self):
@@ -314,7 +314,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     def clean_acronym(self, learning_unit_years):
         if self.acronym in learning_unit_years.values_list('acronym', flat=True):
-            raise ValidationError({'acronym': _('already_existing_acronym')})
+            raise ValidationError({'acronym': _('Existing acronym')})
         if not re.match(REGEX_BY_SUBTYPE[self.subtype], self.acronym):
             raise ValidationError({'acronym': _('Invalid code')})
 

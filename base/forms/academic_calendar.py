@@ -105,7 +105,7 @@ class AcademicCalendarForm(bootstrap.BootstrapModelForm):
 
     def start_date_and_end_date_are_set(self):
         if not self.cleaned_data.get('end_date') or not self.cleaned_data.get('start_date'):
-            error_msg = "{0}".format(_('dates_mandatory_error'))
+            error_msg = "{0}".format(_('Start date and end date are mandatory'))
             self._errors['start_date'] = error_msg
             return False
         return True

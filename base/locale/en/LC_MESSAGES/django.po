@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-14 11:57+0100\n"
+"POT-Creation-Date: 2018-11-14 12:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,12 +25,6 @@ msgstr ""
 #, python-format
 msgid "%(access_value)s is not an accepted value"
 msgstr ""
-
-#: models/group_element_year.py:163
-#: tests/views/education_groups/group_element_year/test_read.py:110
-#, python-format
-msgid "%(acronym)s %(title)s [%(volumes)s] (%(credits)s credits)"
-msgstr "%(acronym)s %(title)s [%(volumes)s] (%(credits)s credits)"
 
 #: business/education_groups/postponement.py:166
 #, python-format
@@ -81,7 +75,7 @@ msgstr[1] ""
 msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
 msgstr ""
 
-#: models/education_group.py:75 models/education_group_year.py:642
+#: models/education_group.py:75 models/education_group_year.py:640
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr ""
@@ -135,14 +129,6 @@ msgid ""
 "%(subtype)s %(acronym)s is included in the group %(group)s for the year "
 "%(year)s"
 msgstr ""
-
-#: models/education_group_year.py:470 models/group_element_year.py:153
-#: tests/models/test_education_group_year.py:92
-#: tests/views/education_groups/group_element_year/test_read.py:99
-#, fuzzy, python-format
-#| msgid "%(acronym)s %(title)s [%(volumes)s] (%(credits)s credits)"
-msgid "%(title)s (%(credits)s credits)"
-msgstr "%(acronym)s %(title)s [%(volumes)s] (%(credits)s credits)"
 
 #: templates/education_group/pdf_content.html:109
 msgid "(optional)"
@@ -382,16 +368,6 @@ msgstr "Messages"
 msgid "Beg. of attribution"
 msgstr ""
 
-#: models/enums/exam_enrollment_justification_type.py:43
-#, fuzzy
-#| msgid "CREATION"
-msgid "CHEATING"
-msgstr "Creation"
-
-#: tests/business/test_learning_unit_xls.py:168
-msgid "CO_HOLDER"
-msgstr "Co-holder"
-
 #: templates/offer_year_calendar.html:32
 msgid "Calendar of the annual program"
 msgstr ""
@@ -405,6 +381,12 @@ msgstr ""
 #, python-format
 msgid "Cannot set end year to %(end_year)s :"
 msgstr ""
+
+#: models/enums/exam_enrollment_justification_type.py:43
+#, fuzzy
+#| msgid "editing"
+msgid "Cheating"
+msgstr "Edition"
 
 #: forms/learning_unit/comparison.py:52
 msgid "Choose academic years"
@@ -424,6 +406,12 @@ msgstr ""
 #: templates/logged_out.html:37
 msgid "Click to reconnect"
 msgstr ""
+
+#: tests/business/test_learning_unit_xls.py:168
+#, fuzzy
+#| msgid "folder"
+msgid "Co-holder"
+msgstr "Folder"
 
 #: business/learning_units/xls_comparison.py:50
 #, fuzzy
@@ -466,11 +454,6 @@ msgstr ""
 msgid "Cred. rel./abs."
 msgstr ""
 
-#: forms/education_groups_administrative_data.py:83
-#: templates/education_group/tab_administrative_data.html:95
-msgid "DELIBERATION"
-msgstr "Deliberation"
-
 #: business/proposal_xls.py:39 models/learning_container_year.py:59
 #: templates/learning_unit/identification.html:168
 #, fuzzy
@@ -500,6 +483,13 @@ msgstr "Delete"
 msgid "Delete message"
 msgstr "Alert Message"
 
+#: forms/education_groups_administrative_data.py:83
+#: templates/education_group/tab_administrative_data.html:95
+#, fuzzy
+#| msgid "partial_deliberation"
+msgid "Deliberation"
+msgstr "Partial deliberation"
+
 #: templates/education_group/blocks/content_actions.html:43
 #: tests/templatetags/test_education_group.py:230
 #: tests/templatetags/test_education_group.py:231
@@ -526,14 +516,6 @@ msgstr ""
 #: templates/learning_unit/blocks/modal/modal_xls_with_parameters.html:37
 msgid "Do you want to export the following informations"
 msgstr ""
-
-#: models/enums/exam_enrollment_state.py:34
-msgid "ENROLLED"
-msgstr ""
-
-#: forms/education_groups_administrative_data.py:70
-msgid "EXAM_ENROLLMENTS"
-msgstr "Exam enrollments"
 
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:99
 msgid "Edit the proposal"
@@ -572,12 +554,18 @@ msgstr ""
 msgid "English title proper"
 msgstr "English title proper"
 
-#: forms/learning_unit/learning_unit_create.py:160
+#: forms/learning_unit/learning_unit_create.py:162
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:78
 #, fuzzy
 #| msgid "english_title_proper_to_UE"
 msgid "English title proper to the partim"
 msgstr "English title proper"
+
+#: models/enums/exam_enrollment_state.py:34
+#, fuzzy
+#| msgid "enrollments"
+msgid "Enrolled"
+msgstr "Enrollments"
 
 #: templates/learning_unit/formations.html:105
 msgid "Enrolled to learning unit"
@@ -592,12 +580,12 @@ msgid "Enrollments to training"
 msgstr ""
 
 #: forms/learning_unit/learning_unit_create.py:128
-#: forms/learning_unit/learning_unit_create.py:130
+#: forms/learning_unit/learning_unit_create.py:131
 #: tests/forms/test_learning_unit_create_2.py:456
-#: tests/forms/test_learning_unit_create_2.py:468
-#, fuzzy, python-brace-format
+#: tests/forms/test_learning_unit_create_2.py:470
+#, fuzzy, python-format
 #| msgid "Ensure this value is less than %(limit_value)s."
-msgid "Ensure this value is less than or equal to {max_value}."
+msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "Ensure this value is less than %(limit_value)s."
 
 #: forms/education_group/training.py:137
@@ -610,12 +598,11 @@ msgstr ""
 msgid "Entities"
 msgstr "Entities"
 
-#: business/learning_units/edition.py:200
-#: tests/business/test_learning_unit_edition.py:655
-msgid "Entity_not_exist"
-msgstr ""
-"The entity %(entity_acronym)s does not exist for the selected academic year "
-"%(academic_year)s"
+#: forms/education_groups_administrative_data.py:70
+#, fuzzy
+#| msgid "exams_enrollments"
+msgid "Exam enrollments"
+msgstr "Exams Enrollments"
 
 #: templates/my_osis/my_messages.html:55
 msgid "Execute selected action"
@@ -627,16 +614,12 @@ msgstr ""
 msgid "Export"
 msgstr ""
 
-#: tests/business/learning_units/test_comparison.py:70
-msgid "FULL"
-msgstr "Full"
-
 #: utils/send_mail.py:250
 msgid "Failure"
 msgstr ""
 
 #: templates/education_group/pdf_content.html:158
-msgid "For approval"
+msgid "For approval,"
 msgstr ""
 
 #: templates/education_group/tab_admission_conditions.html:93
@@ -702,6 +685,12 @@ msgstr ""
 #: tests/models/test_learning_unit.py:91 tests/models/test_learning_unit.py:93
 msgid "From"
 msgstr ""
+
+#: tests/business/learning_units/test_comparison.py:70
+#, fuzzy
+#| msgid "full_name"
+msgid "Full"
+msgstr "Full name"
 
 #: templates/student/student.html:47
 #, fuzzy
@@ -1285,12 +1274,6 @@ msgstr "Messages"
 msgid "My OSIS"
 msgstr "OSIS"
 
-#: models/enums/exam_enrollment_state.py:35
-#, fuzzy
-#| msgid "NOT_CONCERNED"
-msgid "NOT_ENROLLED"
-msgstr "Not concerned"
-
 #: forms/organization.py:34 forms/search/search_tutor.py:35
 #: templates/education_group/pdf_content.html:101
 #: templates/organization/organization.html:62
@@ -1430,6 +1413,12 @@ msgstr "Non university Bachelors"
 #: templates/learning_unit/blocks/panel/educational_informations.html:42
 msgid "None"
 msgstr ""
+
+#: models/enums/exam_enrollment_state.py:35
+#, fuzzy
+#| msgid "enrollments"
+msgid "Not enrolled"
+msgstr "Enrollments"
 
 #: business/learning_units/perms.py:455 business/learning_units/perms.py:461
 msgid "Not in period to edit educational information."
@@ -2380,6 +2369,14 @@ msgid ""
 "The end date of the education group is smaller than the year of postponement."
 msgstr ""
 
+#: business/learning_units/edition.py:200
+#: tests/business/test_learning_unit_edition.py:655
+#, python-format
+msgid ""
+"The entity %(entity_acronym)s does not exist for the selected academic year "
+"%(academic_year)s"
+msgstr ""
+
 #: business/learning_units/edition.py:520
 #: tests/business/learning_units/test_edition.py:321
 #, python-format
@@ -2448,7 +2445,7 @@ msgstr ""
 
 #: business/learning_units/edition.py:484
 #: forms/learning_unit/learning_unit_postponement.py:296
-#: tests/business/test_learning_unit_edition.py:956
+#: tests/business/test_learning_unit_edition.py:957
 #: tests/forms/test_learning_unit_postponement.py:659
 #, python-format
 msgid ""
@@ -2638,7 +2635,7 @@ msgstr ""
 msgid "There is not the learning unit %(acronym)s - %(next_year)s"
 msgstr ""
 
-#: forms/learning_unit/learning_unit_create.py:142
+#: forms/learning_unit/learning_unit_create.py:144
 msgid "This field cannot be set"
 msgstr ""
 
@@ -2718,7 +2715,7 @@ msgid "Title in French"
 msgstr "Title in French"
 
 #: forms/learning_unit/learning_unit_create.py:103
-#: forms/learning_unit/learning_unit_create.py:159
+#: forms/learning_unit/learning_unit_create.py:161
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:77
 #, fuzzy
 #| msgid "official_title_proper_to_partim"
@@ -3094,7 +3091,7 @@ msgstr ""
 msgid "You have the choice between"
 msgstr ""
 
-#: forms/learning_unit/learning_unit_create.py:197
+#: forms/learning_unit/learning_unit_create.py:199
 #: forms/learning_unit/learning_unit_create_2.py:173
 #: tests/views/learning_units/proposals/test_creation.py:196
 #, fuzzy
@@ -3649,11 +3646,15 @@ msgstr "Create"
 #: business/learning_unit.py:66 business/learning_unit_xls.py:78
 #: business/learning_units/edition.py:436
 #: business/learning_units/xls_comparison.py:59 business/proposal_xls.py:39
-#: models/education_group_year.py:331 models/enums/constraint_type.py:32
-#: models/learning_unit_year.py:126
+#: models/education_group_year.py:331 models/education_group_year.py:472
+#: models/enums/constraint_type.py:32 models/group_element_year.py:154
+#: models/group_element_year.py:170 models/learning_unit_year.py:126
 #: templates/learning_unit/by_activity.html:100
 #: templates/learning_unit/by_external.html:49
 #: templates/learning_unit/identification.html:84
+#: tests/models/test_education_group_year.py:93
+#: tests/views/education_groups/group_element_year/test_read.py:100
+#: tests/views/education_groups/group_element_year/test_read.py:114
 msgid "credits"
 msgstr "Credits"
 
@@ -4107,9 +4108,9 @@ msgstr "FGS"
 msgid "field reference"
 msgstr "Reference"
 
-#: models/education_group_year.py:626 models/education_group_year.py:632
-#: models/education_group_year.py:635 models/education_group_year.py:650
-#: models/education_group_year.py:652
+#: models/education_group_year.py:624 models/education_group_year.py:630
+#: models/education_group_year.py:633 models/education_group_year.py:648
+#: models/education_group_year.py:650
 #: tests/views/learning_units/proposals/test_creation.py:186
 #: tests/views/learning_units/proposals/test_creation.py:187
 #: tests/views/learning_units/proposals/test_creation.py:188
@@ -4249,11 +4250,11 @@ msgstr ""
 msgid "mandatory"
 msgstr "Mandatory"
 
-#: models/education_group_year.py:356 models/education_group_year.py:643
+#: models/education_group_year.py:356 models/education_group_year.py:641
 msgid "maximum constraint"
 msgstr ""
 
-#: models/education_group_year.py:349 models/education_group_year.py:644
+#: models/education_group_year.py:349 models/education_group_year.py:642
 msgid "minimum constraint"
 msgstr ""
 
@@ -4570,6 +4571,41 @@ msgstr "Types"
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr ""
+
+#~ msgid "%(acronym)s %(title)s [%(volumes)s] (%(credits)s credits)"
+#~ msgstr "%(acronym)s %(title)s [%(volumes)s] (%(credits)s credits)"
+
+#, fuzzy
+#~| msgid "%(acronym)s %(title)s [%(volumes)s] (%(credits)s credits)"
+#~ msgid "%(title)s (%(credits)s credits)"
+#~ msgstr "%(acronym)s %(title)s [%(volumes)s] (%(credits)s credits)"
+
+#, fuzzy
+#~| msgid "CREATION"
+#~ msgid "CHEATING"
+#~ msgstr "Creation"
+
+#~ msgid "CO_HOLDER"
+#~ msgstr "Co-holder"
+
+#~ msgid "DELIBERATION"
+#~ msgstr "Deliberation"
+
+#~ msgid "EXAM_ENROLLMENTS"
+#~ msgstr "Exam enrollments"
+
+#~ msgid "Entity_not_exist"
+#~ msgstr ""
+#~ "The entity %(entity_acronym)s does not exist for the selected academic "
+#~ "year %(academic_year)s"
+
+#~ msgid "FULL"
+#~ msgstr "Full"
+
+#, fuzzy
+#~| msgid "NOT_CONCERNED"
+#~ msgid "NOT_ENROLLED"
+#~ msgstr "Not concerned"
 
 #~ msgid "formations"
 #~ msgstr "Formations"
@@ -5132,9 +5168,6 @@ msgstr ""
 
 #~ msgid "enrollment_exam_not_exists"
 #~ msgstr "The enrollment to the activity %s doesn't exist"
-
-#~ msgid "enrollments"
-#~ msgstr "Enrollments"
 
 #~ msgid "exam_board_secretary"
 #~ msgstr "Exam board secretary"
@@ -5977,9 +6010,6 @@ msgstr ""
 
 #~ msgid "since"
 #~ msgstr "Since"
-
-#~ msgid "editing"
-#~ msgstr "Edition"
 
 #~ msgid "average"
 #~ msgstr "Average"

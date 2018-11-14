@@ -82,7 +82,7 @@
                             <a class="trigger_modal pull-right"
                                data-url="{{ post_url }}?language={{ form_french.language.0 }}&label={{ label_key }}"
                                data-modal_class="modal-lg"
-                               title="{% trans 'edit' %}">
+                               title="{% trans 'Edit' %}">
                                 <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                             </a>
                         {% endif %}
@@ -94,7 +94,7 @@
                                 <a class="trigger_modal pull-right"
                                    data-url="{{ post_url }}?language={{ form_english.language.0 }}&label={{ label_key }}"
                                    data-modal_class="modal-lg"
-                                   title="{% trans 'edit' %}">
+                                   title="{% trans 'Edit' %}">
                                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                                 </a>
                             {% endif %}
@@ -137,7 +137,7 @@
                 <div class="pull-right">
                     <a class="btn btn-primary trigger_modal"
                        data-url="{% url "teaching_material_create" learning_unit_year_id=learning_unit_year.pk %}">
-                        {% trans 'add' %}
+                        {% trans 'Add' %}
                     </a>
                 </div>
             {% endif %}

@@ -56,7 +56,7 @@ XLS_FILENAME = 'learning_units_filename'
 XLS_DESCRIPTION = "List_activities"
 LEARNING_UNIT_TITLES_PART1 = [
     str(_('code')),
-    str(_('academic_year_small')),
+    str(_('Ac yr.')),
     str(_('Title')),
     str(_('type')),
     str(_('Subtype')),
@@ -64,13 +64,13 @@ LEARNING_UNIT_TITLES_PART1 = [
     str(_('Proposal type')),
     str(_('Proposal status')),
     str(_('credits')),
-    str(_('allocation_entity_small')),
+    str(_('Alloc. Ent.')),
     str(_('Title in English')),
 ]
 
 LEARNING_UNIT_TITLES_PART2 = [
     str(_('Periodicity')),
-    str(_('active_title')),
+    str(_('Active')),
     "{} 1 - {}".format(_('Hourly vol.'), _('Annual')),
     "{} 1 - {}".format(_('Hourly vol.'), _('1st quadri')),
     "{} 1 - {}".format(_('Hourly vol.'), _('2nd quadri')),

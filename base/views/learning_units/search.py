@@ -205,7 +205,7 @@ def _get_search_type_label(search_type):
     return {
         PROPOSAL_SEARCH: _('Proposals'),
         SERVICE_COURSES_SEARCH: _('Service courses'),
-        BORROWED_COURSE: _('borrowed_course_search')
+        BORROWED_COURSE: _('Borrowed courses')
     }.get(search_type, _('activity_search'))
 
 

@@ -46,7 +46,7 @@
                         <br>
                         <div class="panel panel-default">
                             <div class="panel-body">
-                                <label>{% trans 'course_enrollment' %}</label><br>
+                                <label>{% trans 'Course enrollment' %}</label><br>
                                 {% if course_enrollment.dates and course_enrollment.dates.start_date %}
                                    <label>{% trans 'From' %}</label> {{course_enrollment.dates.start_date| default_if_none:'-'|date:"d/m/Y"}} <label>{% trans 'to' %}</label> {{course_enrollment.dates.end_date| default_if_none:'-'|date:"d/m/Y"}}
                                 {% endif %}
@@ -62,7 +62,7 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td><label>{% trans 'exams_enrollments' %}</label></td>
+                                            <td><label>{% trans 'Exams Enrollments' %}</label></td>
                                             <td>
                                                 {% if exam_enrollments.session1 and exam_enrollments.session1.start_date %}
                                                     <label>{% trans 'From' %}</label> {{exam_enrollments.session1.start_date| default_if_none:'-'|date:"d/m/Y"}} <label>{% trans 'to' %}</label> {{ exam_enrollments.session1.end_date| default_if_none:'-'|date:"d/m/Y" }}
@@ -86,7 +86,7 @@
                                             <td>{{scores_exam_submission.session3.start_date| default_if_none:'-'|date:"d/m/Y"}}</td>
                                         </tr>
                                         <tr>
-                                            <td><label>{% trans 'dissertation_presentation' %}</label></td>
+                                            <td><label>{% trans 'Dissertation submission' %}</label></td>
                                             <td>{{dissertation_submission.session1.start_date| default_if_none:'-'|date:"d/m/Y"}}</td>
                                             <td>{{dissertation_submission.session2.start_date| default_if_none:'-'|date:"d/m/Y"}}</td>
                                             <td>{{dissertation_submission.session3.start_date| default_if_none:'-'|date:"d/m/Y"}}</td>

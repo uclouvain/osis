@@ -35,9 +35,9 @@ XLS_FILENAME = 'Proposals'
 XLS_DESCRIPTION = "List_proposals"
 
 PROPOSAL_TITLES = [str(_('Req. Entity')), str(_('code')), str(_('title')), str(_('Title')),
-                   str(_('Proposal type')), str(_('Proposal status')), str(_('folder_num')),
+                   str(_('Proposal type')), str(_('Proposal status')), str(_('Folder num.')),
                    str(_('Decision')), str(_('Periodicity')), str(_('credits')),
-                   str(_('allocation_entity_small')), str(_('Proposals date'))]
+                   str(_('Alloc. Ent.')), str(_('Proposals date'))]
 
 
 def prepare_xls_content(proposals):

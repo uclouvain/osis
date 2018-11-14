@@ -47,7 +47,7 @@ class TestAcademicCalendarForm(TestCase):
             "description": "Description of an academic event"
         })
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['start_date'], _('dates_mandatory_error'))
+        self.assertEqual(form.errors['start_date'], _('Start date and end date are mandatory'))
 
     def test_with_start_date_higher_than_end_date(self):
         form = AcademicCalendarForm(data={

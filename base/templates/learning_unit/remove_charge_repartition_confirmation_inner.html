@@ -29,7 +29,7 @@
     <form method="post" id="form_delete_attribution" action="{{ request.path }}">
         {% csrf_token %}
         <p>{% trans "delete" %} {{ attribution.tutor.person }} ({% trans attribution.function  %})</p>
-        <p>{%trans "are_you_sure" %}</p>
+        <p>{%trans "Are you sure?" %}</p>
 
         {% if not request.is_ajax %}
             <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-danger"/>

@@ -48,7 +48,7 @@ class ExternalLearningUnitYear(models.Model):
         max_length=15,
         db_index=True,
         blank=True,
-        verbose_name=_('external_code')
+        verbose_name=_('External code')
     )
 
     external_credits = models.DecimalField(

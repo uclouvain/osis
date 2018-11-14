@@ -71,14 +71,14 @@
                 <div class="col-md-1"><i class="fa fa-graduation-cap" style="font-size: 400%; color: #6699FF;"></i></div>
                 <div class="col-md-5">
                     <h4 class="media-heading"><a href="{% url 'catalog' %}" id="lnk_home_catalog">{% trans 'Formation catalogue' %}</a></h4>
-                    <p>{% trans 'desc_lnk_home_catalog' %}</p>
+                    <p>{% trans 'Elaboration and management of the formation catalogue.' %}</p>
                 </div>
             {% endif %}
             {% if perms.base.can_access_student_path %}
                 <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
                 <div class="col-md-5">
                     <h4 class="media-heading"><a href="{% url 'studies' %}" id="lnk_home_studies">{% trans 'Student path' %}</a></h4>
-                    <p>{% trans 'desc_lnk_home_studies' %}</p>
+                    <p>{% trans "Management of students' path from their registration until their diploma." %}</p>
                 </div>
             {% endif %}
         </div>
@@ -90,13 +90,13 @@
                     <h4 class="media-heading">
                         <a href="{% url 'institution' %}" id ="lnk_home_institution">{% trans 'Institution' %}</a>
                     </h4>
-                    <p>{% trans 'desc_lnk_home_institution' %}</p>
+                    <p>{% trans 'Management of the institution.' %}</p>
                 </div>
             {% endif %}
             <div class="col-md-1"><span class="glyphicon glyphicon-user" aria-hidden="true" style="font-size: 400%; color: #6699FF;"></span></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'my_osis' %}">{% trans 'my_osis' %}</a></h4>
-                <p>{% trans 'desc_lnk_my_osis' %}</p>
+                <h4 class="media-heading"><a href="{% url 'my_osis' %}">{% trans 'My OSIS' %}</a></h4>
+                <p>{% trans 'Your personal details, configurations and other information related to you.' %}</p>
             </div>
         </div>
         <br>

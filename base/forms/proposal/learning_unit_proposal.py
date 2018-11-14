@@ -50,14 +50,14 @@ def _get_sorted_choices(tuple_of_choices):
 class LearningUnitProposalForm(LearningUnitSearchForm):
 
     entity_folder_id = forms.ChoiceField(
-        label=_('folder_entity'),
+        label=_('Folder entity'),
         choices=lazy(_get_entity_folder_id_ordered_by_acronym, list),
         required=False
     )
 
     folder_id = forms.IntegerField(min_value=0,
                                    required=False,
-                                   label=_('folder_num'),)
+                                   label=_('Folder num.'),)
 
     proposal_type = forms.ChoiceField(
         label=_('Proposal type'),

@@ -63,11 +63,11 @@
                     <input class="form-control" value="{{ organization_address.postal_code | default_if_none:'' }}" name="organization_address_postal_code" id="txt_organization_address_postal_code" maxlength="20" required>
                 </div>
                 <div class="col-md-4">
-                    <label for="address_city">{% trans 'city' %}</label>
+                    <label for="address_city">{% trans 'City' %}</label>
                     <input class="form-control" value="{{ organization_address.city | default_if_none:'' }}" name="organization_address_city" id="txt_organization_address_city" maxlength="255" required>
                 </div>
                 <div class="col-md-4">
-                    <label for="country">{% trans 'country'%}</label><br>
+                    <label for="country">{% trans 'Country'%}</label><br>
                     <select class="form-control" id="country" name="country">
                         {% for country in countries %}
                             <option value="{{ country.id }}" {% if organization_address.country.id == country.id %}selected{% endif %}>{{ country.name }}</option>

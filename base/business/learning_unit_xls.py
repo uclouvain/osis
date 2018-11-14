@@ -68,7 +68,7 @@ WITH_GRP = 'with_grp'
 
 LEARNING_UNIT_TITLES_PART1 = [
     str(_('code')),
-    str(_('academic_year_small')),
+    str(_('Ac yr.')),
     str(_('Title')),
     str(_('type')),
     str(_('Subtype')),
@@ -76,7 +76,7 @@ LEARNING_UNIT_TITLES_PART1 = [
     str(_('Proposal type')),
     str(_('Proposal status')),
     str(_('credits')),
-    str(_('allocation_entity_small')),
+    str(_('Alloc. Ent.')),
     str(_('Title in English')),
 ]
 

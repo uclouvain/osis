@@ -60,7 +60,7 @@
 <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" {% if search_type == 1 %} class="active" {% endif %}>
         <a href="{% url 'learning_units'%}" role="tab" id="lnk_activity_search">
-            {% trans 'activity_search'%}
+            {% trans 'learning unit'%}
         </a>
     </li>
     <li role="presentation" {% if search_type == 2 %} class="active" {% endif %}>
@@ -70,7 +70,7 @@
     </li>
     <li role="presentation" {% if search_type == 5 %} class="active" {% endif %}>
         <a href="{% url 'learning_units_borrowed_course'%}" role="tab" id="lnk_borrowed_course_search">
-            {% trans 'borrowed_course_search'%}
+            {% trans 'Borrowed courses'%}
         </a>
     </li>
     <li role="presentation" {% if search_type == 3 %} class="active" {% endif %}>
@@ -80,7 +80,7 @@
     </li>
     <li role="presentation" {% if search_type == 6 %} class="active" {% endif %}>
         <a href="{% url 'learning_units_external'%}" role="tab" id="lnk_external_search">
-            {% trans 'external_search'%}
+            {% trans 'External learning units'%}
         </a>
     </li>
     <li role="presentation" {% if search_type == 4 %} class="active" {% endif %}>
@@ -121,8 +121,8 @@
                 "searching" : false,
                 "language": {
                     "oAria": {
-                        "sSortAscending":  "{% trans 'datatable_sortascending'%}",
-                        "sSortDescending": "{% trans 'datatable_sortdescending'%}"
+                        "sSortAscending":  "{% trans 'activate to sort column ascending'%}",
+                        "sSortDescending": "{% trans 'activate to sort column descending'%}"
                     }
                 }
             });
