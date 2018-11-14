@@ -90,7 +90,10 @@ def dl_tooltip(context, instance, key, **kwargs):
         label_text = instance._meta.get_field(key).verbose_name.capitalize()
 
     if not value:
-        value = getattr(instance, key, default_if_none)
+        if hasattr(instance, "get_"+key+"_display"):
+            value = getattr(instance, "get_"+key+"_display")()
+        else:
+            value = getattr(instance, key, default_if_none)
 
     difference = get_difference_css(differences, key, default_if_none) or 'title="{}"'.format(_(title))
 
