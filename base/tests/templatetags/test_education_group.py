@@ -274,7 +274,7 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
             li_attributes=""" id="btn_operation_pdf_content" """,
             a_attributes=""" href="#" title="{}" {} """.format(
                 _("Generate pdf"),
-                _(""), ),
+                "", ),
             text=_('Generate pdf'),
         )
         self.assertEqual(
