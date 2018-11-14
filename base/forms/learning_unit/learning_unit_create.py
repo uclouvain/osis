@@ -100,7 +100,7 @@ class LearningUnitYearModelForm(forms.ModelForm):
 
         if subtype == learning_unit_year_subtypes.PARTIM:
             self.fields['acronym'] = PartimAcronymField()
-            self.fields['specific_title'].label = _('official_title_proper_to_partim')
+            self.fields['specific_title'].label = _('Title proper to the partim')
             self.fields['specific_title_english'].label = _('official_english_title_proper_to_partim')
 
         # Disabled fields when it's an update
@@ -156,8 +156,8 @@ class LearningUnitYearModelForm(forms.ModelForm):
 class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
     class Meta(LearningUnitYearModelForm.Meta):
         labels = {
-            'specific_title': _('official_title_proper_to_partim'),
-            'specific_title_english': _('official_english_title_proper_to_partim')
+            'specific_title': _('Title proper to the partim'),
+            'specific_title_english': _('English title proper to the partim')
         }
         field_classes = {
             'acronym': PartimAcronymField

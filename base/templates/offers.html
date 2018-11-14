@@ -28,12 +28,12 @@
 
 {% block breadcrumb %}
   <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue'%}</a></li>
-  <li class="active">{% trans 'offers' %}</li>
+  <li class="active">{% trans 'Offers' %}</li>
 
 {% endblock %}
 {% block content %}
 <div class="page-header">
-  <h2>{% trans 'offers' %}</h2>
+  <h2>{% trans 'Offers' %}</h2>
 </div>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -68,7 +68,7 @@
         </div>
     </div>
     {% if offer_years|length == 0 and init == "0" %}
-        <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
+        <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
     {% endif %}
     {% if offer_years|length > 0%}
         <table class="table table-striped table-hover">

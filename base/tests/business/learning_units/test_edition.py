@@ -162,7 +162,7 @@ class LearningUnitEditionTestCase(TestCase):
             'year': self.learning_unit_year.academic_year,
             'value': getattr(self.learning_unit_year, 'specific_title_english'),
             'next_year': another_learning_unit_year.academic_year,
-            'next_value': _('no_data')
+            'next_value': _('No data')
         }
         self.assertIn(error_specific_title_english, error_list)
 
@@ -372,7 +372,7 @@ class LearningUnitEditionTestCase(TestCase):
             'year': self.learning_container_year.academic_year,
             'value': self.add_requirement_entity_1.entity.most_recent_acronym,
             'next_year': another_learning_container_year.academic_year,
-            'next_value': _('no_data')
+            'next_value': _('No data')
         }
         self.assertIn(error_requirement_entity, error_list)
 

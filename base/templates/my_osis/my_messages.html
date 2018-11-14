@@ -32,7 +32,7 @@
 {% endblock %}
 {% block content %}
     <div class="page-header">
-        <h2>{% trans 'my_messages' %}</h2>
+        <h2>{% trans 'My Messages' %}</h2>
     </div>
     {% if my_messages_formset and my_message_action_form %}
         <form action="{% url 'my_messages_action' %}" method="post">

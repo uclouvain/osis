@@ -40,13 +40,13 @@
         {% flag "learning_unit_create" %}
             {% if perms.base.can_edit_learningunit %}
                 <li>
-                    <a href="{{ create_learning_unit_url }}" id="lnk_learning_unit_create">{% trans 'new_learning_unit' %}</a>
+                    <a href="{{ create_learning_unit_url }}" id="lnk_learning_unit_create">{% trans 'New learning unit' %}</a>
                 </li>
             {% endif %}
         {% endflag %}
         {% flag "learning_unit_external_create" %}
             <li>
-                <a href="{{ create_external_url }}" id="lnk_create_external_url">{% trans 'new_external_learning_unit' %}</a>
+                <a href="{{ create_external_url }}" id="lnk_create_external_url">{% trans 'New external learning unit' %}</a>
             </li>
             <li role="separator" class="divider"></li>
         {% endflag %}

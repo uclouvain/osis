@@ -35,7 +35,7 @@ from base.models.academic_year import AcademicYear, compute_max_academic_year_ad
 class LearningUnitEndDateForm(forms.Form):
     academic_year = forms.ModelChoiceField(required=False,
                                            queryset=AcademicYear.objects.none(),
-                                           empty_label=_('not_end_year'),
+                                           empty_label=_('no planned end'),
                                            label=_('academic_end_year')
                                            )
 

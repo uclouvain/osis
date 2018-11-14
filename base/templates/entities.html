@@ -56,7 +56,7 @@
     </div>
     {% endif %}
     {% if not entities_version %}
-        <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
+        <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
     {% endif %}
     <div {% if entities_version|length > 0 %} style="visibility:visible;display:block;" {%else%} style="visibility:hidden;display:none;" {% endif %}>
         <table class="table table-striped table-hover">

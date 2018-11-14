@@ -39,7 +39,7 @@
                             <button type="button" class="btn btn-default" style="margin-left:10px;"
                                     id="btn_modal_mail_educational_information_update_reminder"
                                     data-toggle="modal" data-target="#modal_mail_summary_reminder"
-                                    {% if not formset %}disabled title='{% trans 'need_no_reminder' %}'{% endif %}>
+                                    {% if not formset %}disabled title='{% trans 'Need no reminder' %}'{% endif %}>
                                 {% trans 'educational_information_update_reminder' %}
                             </button>
                         {% endflag %}
@@ -115,7 +115,7 @@
                     {% endfor %}
                 </table>
             {% else %}
-                <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
+                <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
             {% endif %}
             <form method="post" action="{% url 'email_educational_information_update' %}">
                 {% csrf_token %}

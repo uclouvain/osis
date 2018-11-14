@@ -47,7 +47,7 @@ def academic_years(start_year, end_year):
         return "{} {}".format(str_start_year, str_end_year)
     else:
         if start_year and not end_year:
-            return "{} {}-{} ({})".format(_('from'), start_year, str(start_year+1)[-2:], _('not_end_year'))
+            return "{} {}-{} ({})".format(_('from'), start_year, str(start_year+1)[-2:], _('no planned end'))
         else:
             return "-"
 

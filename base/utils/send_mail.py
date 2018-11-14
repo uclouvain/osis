@@ -354,7 +354,7 @@ def send_again(message_history_id):
         receiver = message_config.create_receiver(person.id, person.email, person.language)
         return message_service.send_again(receiver, message_history_id)
     else:
-        return _('no_receiver_error')
+        return _('No receiver for this message')
 
 
 def send_mail_for_educational_information_update(teachers, learning_units_years):

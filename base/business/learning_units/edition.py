@@ -472,7 +472,7 @@ def _get_differences(obj1, obj2, fields_to_compare):
 
 def _get_translated_value(value):
     if value is None:
-        return _('no_data')
+        return _('No data')
     if isinstance(value, bool):
         return _('yes') if value else _('no')
     return value
@@ -497,9 +497,9 @@ def _check_postponement_conflict_on_entity_container_year(lcy, next_lcy):
                             "and year %(next_year)s - %(next_value)s") % {
                               'field': _(entity_type.lower()),
                               'year': lcy.academic_year,
-                              'value': current_entity.most_recent_acronym if current_entity else _('no_data'),
+                              'value': current_entity.most_recent_acronym if current_entity else _('No data'),
                               'next_year': next_lcy.academic_year,
-                              'next_value': next_year_entity.most_recent_acronym if next_year_entity else _('no_data')
+                              'next_value': next_year_entity.most_recent_acronym if next_year_entity else _('No data')
                           })
     return error_list
 
@@ -617,9 +617,9 @@ def _get_error_volume_field_diff(field_diff, current_component, next_year_compon
                'acronym': current_component.learning_container_year.acronym,
                'component_type': _(current_component.type) if current_component.type else 'NT',
                'year': current_component.learning_container_year.academic_year,
-               'value': values_diff.get('current') or _('no_data'),
+               'value': values_diff.get('current') or _('No data'),
                'next_year': next_year_component.learning_container_year.academic_year,
-               'next_value': values_diff.get('next_year') or _('no_data')
+               'next_value': values_diff.get('next_year') or _('No data')
            }
 
 

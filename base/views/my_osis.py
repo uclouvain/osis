@@ -53,7 +53,7 @@ def my_messages_index(request):
     my_messages = message_history_mdl.find_my_messages(person.id)
     my_messages_formset = None
     if not my_messages:
-        messages.add_message(request, messages.INFO, _('no_messages'))
+        messages.add_message(request, messages.INFO, _('No Messages'))
     else:
         my_messages_formset = get_messages_formset(my_messages)
     return layout.render(request,
