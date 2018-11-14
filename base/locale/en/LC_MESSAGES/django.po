@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-14 16:05+0100\n"
+"POT-Creation-Date: 2018-11-14 17:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -240,6 +240,7 @@ msgstr ""
 #: templates/catalog.html:59 templates/education_group/pdf_content.html:17
 #: templates/layout.html:138
 #: templates/learning_unit/blocks/panel/proposal.html:10
+#: templates/learning_unit/identification.html:212
 #: templates/offer/tab_identification.html:46 templates/offers.html:43
 #: templates/offers.html:77
 msgid "Academic year"
@@ -263,6 +264,7 @@ msgstr ""
 #: business/learning_units/edition.py:452 forms/education_groups.py:84
 #: forms/entity.py:36 forms/organization.py:33 forms/utils/acronym_field.py:78
 #: forms/utils/acronym_field.py:128 models/education_group_year.py:99
+#: templates/education_group/blocks/informations.html:30
 #: templates/education_group/blocks/table_utilizations.html:30
 #: templates/education_group/search.html:148 templates/entities.html:65
 #: templates/entity/identification.html:51
@@ -355,6 +357,11 @@ msgstr ""
 msgid "Additional info"
 msgstr ""
 
+#: templates/learning_unit/identification.html:207
+msgid "Additional requirement entity 1"
+msgstr ""
+
+#: templates/learning_unit/identification.html:208
 #: tests/forms/test_learning_unit_postponement.py:689
 msgid "Additional requirement entity 2"
 msgstr ""
@@ -415,6 +422,10 @@ msgstr ""
 #: forms/learning_unit/search_form.py:93 forms/learning_unit/search_form.py:179
 #: templates/learning_unit/by_activity.html:99
 msgid "Alloc. Ent."
+msgstr ""
+
+#: templates/learning_unit/identification.html:206
+msgid "Allocation entity"
 msgstr ""
 
 #: business/learning_units/edition.py:350
@@ -616,6 +627,7 @@ msgstr ""
 #: templates/education_group/blocks/form/group.html:45
 #: templates/education_group/blocks/form/minitraining.html:47
 #: templates/education_group/blocks/form/training_tab_identification.html:39
+#: templates/education_group/blocks/informations.html:32
 msgid "Category"
 msgstr ""
 
@@ -662,6 +674,11 @@ msgstr ""
 msgid "Co-holder"
 msgstr ""
 
+#: templates/learning_unit/external/read.html:8
+#: templates/learning_unit/identification.html:47
+msgid "Code"
+msgstr ""
+
 #: templates/education_group/tab_content.html:51
 msgid "Code SCS"
 msgstr ""
@@ -673,13 +690,13 @@ msgstr ""
 
 #: business/learning_units/edition.py:451
 #: business/learning_units/xls_comparison.py:66
-#: models/learning_container_year.py:53
+#: models/learning_container_year.py:57
 msgid "Common English title"
 msgstr ""
 
 #: business/learning_units/edition.py:450
 #: business/learning_units/xls_comparison.py:64
-#: models/learning_container_year.py:51
+#: models/learning_container_year.py:55
 #: tests/business/learning_units/test_edition.py:247
 msgid "Common title"
 msgstr ""
@@ -739,6 +756,7 @@ msgstr ""
 #: forms/learning_unit/entity_form.py:69
 #: forms/learning_unit/external_learning_unit.py:65
 #: forms/learning_unit/search_form.py:342
+#: templates/learning_unit/external/read.html:57
 #: templates/organization/organization_address.html:62
 #: templates/organization/organization_address_form.html:70
 msgid "Country"
@@ -764,6 +782,7 @@ msgid "Cred. rel./abs."
 msgstr ""
 
 #: templates/education_group/blocks/informations.html:40
+#: templates/learning_unit/identification.html:84
 msgid "Credits"
 msgstr ""
 
@@ -785,7 +804,7 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: business/proposal_xls.py:39 models/learning_container_year.py:59
+#: business/proposal_xls.py:39 models/learning_container_year.py:63
 #: templates/learning_unit/identification.html:168
 msgid "Decision"
 msgstr ""
@@ -1393,7 +1412,9 @@ msgstr ""
 #: templates/home.html:91 templates/institution.html:29
 #: templates/institution.html:33 templates/layout.html:169
 #: templates/learning_unit/blocks/institution.html:7
-#: templates/learning_unit/by_external.html:48 templates/mandates.html:29
+#: templates/learning_unit/by_external.html:48
+#: templates/learning_unit/external/read.html:59
+#: templates/learning_unit/identification.html:197 templates/mandates.html:29
 #: templates/organization/organization.html:29
 #: templates/organization/organization_address.html:30
 #: templates/organization/organization_address_form.html:31
@@ -1423,7 +1444,7 @@ msgstr ""
 
 #: templates/learning_unit/blocks/form/form_external.html:56
 #: templates/learning_unit/blocks/panel/proposal.html:25
-#: templates/learning_unit/external/read.html:67
+#: templates/learning_unit/external/read.html:65
 msgid "Introduced by"
 msgstr ""
 
@@ -1520,7 +1541,8 @@ msgstr ""
 #: templates/education_group/identification_group_details.html:38
 #: templates/education_group/identification_mini_training_details.html:40
 #: templates/education_group/identification_training_details.html:97
-#: views/learning_unit.py:291
+#: templates/learning_unit/external/read.html:58
+#: templates/learning_unit/identification.html:198 views/learning_unit.py:291
 msgid "Learning location"
 msgstr ""
 
@@ -2414,6 +2436,7 @@ msgstr ""
 msgid "Required"
 msgstr ""
 
+#: templates/learning_unit/identification.html:205
 #: tests/forms/test_learning_unit_postponement.py:585
 msgid "Requirement entity"
 msgstr ""
@@ -2585,6 +2608,7 @@ msgstr ""
 
 #: business/learning_units/edition.py:438
 #: forms/learning_unit/search_form.py:168 models/education_group_year.py:135
+#: templates/education_group/blocks/informations.html:36
 #: templates/learning_unit/by_activity.html:101
 #: templates/learning_unit/by_external.html:50
 #: templates/learning_unit/summary_list.html:82
@@ -2675,7 +2699,7 @@ msgstr ""
 msgid "Teaching material"
 msgstr ""
 
-#: business/learning_units/edition.py:453 models/learning_container_year.py:56
+#: business/learning_units/edition.py:453 models/learning_container_year.py:60
 #: templates/learning_unit/identification.html:164
 msgid "Team management"
 msgstr ""
@@ -2683,7 +2707,7 @@ msgstr ""
 #: templates/learning_unit/blocks/form/form_external.html:64
 #: templates/learning_unit/blocks/panel/proposal.html:28
 #: templates/learning_unit/blocks/proposal_user.html:16
-#: templates/learning_unit/external/read.html:68
+#: templates/learning_unit/external/read.html:66
 msgid "The"
 msgstr ""
 
@@ -3182,6 +3206,10 @@ msgstr ""
 msgid "Tutors"
 msgstr ""
 
+#: templates/learning_unit/identification.html:68
+msgid "Type"
+msgstr ""
+
 #: templates/academic_calendar/academic_calendar_form.html:96
 msgid "Type of event"
 msgstr ""
@@ -3258,7 +3286,7 @@ msgstr ""
 msgid "Utilizations"
 msgstr ""
 
-#: models/learning_container_year.py:57
+#: models/learning_container_year.py:61
 #: templates/learning_unit/identification.html:160
 msgid "Vacant"
 msgstr ""
@@ -3509,15 +3537,6 @@ msgstr ""
 "The closure's date of '%s' of the academic calendar can't be lower than %s "
 "(end date of '%s' of the program '%s')"
 
-#: templates/education_group/blocks/informations.html:30
-#, fuzzy
-#| msgid "acronym_rules"
-msgid "acronym"
-msgstr ""
-"Site with one letter\n"
-"Acronym with min 2 et max 4 letters\n"
-"Number Code with 4 digit"
-
 #: templates/learning_unit/blocks/form/form_external.html:17
 #: templates/learning_unit/blocks/form/form_external.html:19
 #: templates/learning_unit/simple/creation.html:69
@@ -3644,10 +3663,6 @@ msgstr ""
 msgid "cancel"
 msgstr ""
 
-#: templates/education_group/blocks/informations.html:32
-msgid "category"
-msgstr ""
-
 #: templates/education_group/blocks/form/training_tab_diploma.html:36
 #: templates/education_group/tab_diplomas.html:65
 msgid "certificate aims"
@@ -3671,9 +3686,7 @@ msgstr ""
 #: templates/learning_unit/components.html:47
 #: templates/learning_unit/components.html:124
 #: templates/learning_unit/components_identification.html:32
-#: templates/learning_unit/external/read.html:8
 #: templates/learning_unit/formations.html:43
-#: templates/learning_unit/identification.html:47
 #: templates/learning_unit/summary_list.html:77
 #: templates/student/learning_units_enrollments.html:47
 #: templates/student/offers_enrollments.html:48
@@ -3711,7 +3724,6 @@ msgstr ""
 #: models/group_element_year.py:170 models/learning_unit_year.py:126
 #: templates/learning_unit/by_activity.html:100
 #: templates/learning_unit/by_external.html:49
-#: templates/learning_unit/identification.html:84
 #: tests/models/test_education_group_year.py:93
 #: tests/views/education_groups/group_element_year/test_read.py:100
 #: tests/views/education_groups/group_element_year/test_read.py:114
@@ -3877,6 +3889,14 @@ msgstr ""
 msgid "no planned end"
 msgstr ""
 
+#: templates/learning_unit/identification.html:112
+msgid "official_english_title_proper_to_partim"
+msgstr ""
+
+#: templates/learning_unit/identification.html:110
+msgid "official_title_proper_to_partim"
+msgstr ""
+
 #: templates/education_group/pdf_content.html:154
 msgid "on"
 msgstr ""
@@ -4023,10 +4043,6 @@ msgstr ""
 msgid "skills and achievements"
 msgstr ""
 
-#: templates/education_group/blocks/informations.html:36
-msgid "status"
-msgstr ""
-
 #: business/learning_units/xls_generator.py:45 models/teaching_material.py:43
 #: models/teaching_material.py:44
 #: tests/views/test_learning_unit_pedagogy.py:195
@@ -4075,7 +4091,7 @@ msgstr ""
 #: business/learning_unit_xls.py:73 business/learning_units/edition.py:449
 #: business/learning_units/xls_comparison.py:55 forms/education_groups.py:81
 #: forms/entity.py:38 forms/learning_unit/search_form.py:158
-#: models/learning_container_year.py:49 models/proposal_learning_unit.py:51
+#: models/learning_container_year.py:51 models/proposal_learning_unit.py:51
 #: templates/education_group/search.html:150 templates/entities.html:67
 #: templates/entity/identification.html:63
 #: templates/entity/identification.html:102 templates/entity/versions.html:45
@@ -4155,5 +4171,15 @@ msgstr ""
 msgid "yes,no"
 msgstr ""
 
-#~ msgid "academic_calendars"
+#, fuzzy
+#~| msgid "academic_calendars"
+#~ msgid "Academic years"
 #~ msgstr "Academic calendars"
+
+#, fuzzy
+#~| msgid "acronym_rules"
+#~ msgid "acronym"
+#~ msgstr ""
+#~ "Site with one letter\n"
+#~ "Acronym with min 2 et max 4 letters\n"
+#~ "Number Code with 4 digit"
