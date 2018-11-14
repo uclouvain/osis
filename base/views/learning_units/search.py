@@ -206,7 +206,7 @@ def _get_search_type_label(search_type):
         PROPOSAL_SEARCH: _('Proposals'),
         SERVICE_COURSES_SEARCH: _('Service courses'),
         BORROWED_COURSE: _('Borrowed courses')
-    }.get(search_type, _('activity_search'))
+    }.get(search_type, _('Learning units'))
 
 
 @login_required

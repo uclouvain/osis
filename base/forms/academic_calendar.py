@@ -83,11 +83,17 @@ class AcademicCalendarForm(bootstrap.BootstrapModelForm):
         date_format = str(_('date_format'))
         if off_year_calendar_max and self.cleaned_data['end_date'] and off_year_calendar_max.end_date \
                 and self.cleaned_data['end_date'] < off_year_calendar_max.end_date.date():
-            self._errors['end_date'] = "{}.".format((_('academic_calendar_offer_year_calendar_end_date_error')
-                                                     % (self.instance.title,
-                                                        off_year_calendar_max.end_date.date().strftime(date_format),
-                                                        self.instance.title,
-                                                        off_year_calendar_max.offer_year.acronym)))
+            self._errors['end_date'] = "{}.".format(
+                (
+                    _("The closure's date of '%s' of the academic calendar can't be lower than %s."
+                      ) % (
+                        self.instance.title,
+                        off_year_calendar_max.end_date.date().strftime(date_format),
+                        self.instance.title,
+                        off_year_calendar_max.offer_year.acronym
+                    )
+                )
+            )
             return False
         return True
 
