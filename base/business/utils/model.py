@@ -26,6 +26,9 @@
 import uuid
 from copy import copy
 
+from django.db.models import QuerySet
+from django.forms import model_to_dict
+
 
 def update_instance_model_from_data(instance, fields_to_update, exclude=()):
     fields_to_update_without_excluded = {field: value for field, value in fields_to_update.items()
@@ -56,3 +59,45 @@ def merge_two_dicts(dict_a, dict_b):
     form_data = dict(dict_a)
     form_data.update(dict_b)
     return form_data
+
+
+def model_to_dict_fk(instance, exclude=None):
+    """
+    It allows to transform an instance to a dict.
+      - for each FK, it add '_id'
+      - All querysetSet will be evaluated in list
+
+    This function is based on model_to_dict implementation.
+    """
+    data = model_to_dict(instance, exclude=exclude)
+
+    opts = instance._meta
+    for fk_field in filter(lambda field: field.is_relation, opts.concrete_fields):
+        if fk_field.name in data:
+            data[fk_field.name + "_id"] = data.pop(fk_field.name)
+
+    # All the queryset will be evaluate in list.
+    for key, value in data.items():
+        if isinstance(value, QuerySet):
+            data[key] = list(value)
+
+    return data
+
+
+def compare_objects(dict_1, dict_2):
+    return {
+        name: (value, dict_2[name])
+        for name, value in dict_1.items()
+        if dict_1[name] != dict_2[name]
+    }
+
+
+def update_object(obj, new_values_dict):
+    """
+    set new attr values on an object
+    ! list (m2m) attrs will be skipped. This elements should be managed in a M2M update
+    """
+    for attr, value in new_values_dict.items():
+        if not isinstance(value, list):
+            setattr(obj, attr, value)
+    return obj.save()

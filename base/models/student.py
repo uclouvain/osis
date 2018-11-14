@@ -51,7 +51,9 @@ class Student(SerializableModel):
         )
 
 
-def find_by(registration_id=None, person_name=None, person_username=None, person_first_name=None, full_registration=None):
+def find_by(registration_id=None, person_name=None,
+            person_username=None, person_first_name=None,
+            full_registration=None):
     """
     Find students by optional arguments. At least one argument should be informed
     otherwise it returns empty.

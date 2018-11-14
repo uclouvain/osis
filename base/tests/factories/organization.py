@@ -34,8 +34,5 @@ class OrganizationFactory(factory.DjangoModelFactory):
 
     external_id = factory.Faker('text', max_nb_chars=100)
     changed = factory.Faker('date_time_this_month', tzinfo=get_tzinfo())
-    name = factory.Faker('text', max_nb_chars=255)
-    acronym = factory.Faker('text', max_nb_chars=15)
-    website = factory.Faker('url')
-    prefix = factory.Faker('text', max_nb_chars=30)
+
     type = factory.Iterator(organization_type.ORGANIZATION_TYPE, getter=lambda c: c[0])

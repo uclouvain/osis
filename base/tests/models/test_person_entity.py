@@ -94,7 +94,7 @@ class PersonEntityTest(TestCase):
         self.assertEqual(len(list_filtered), 1)
 
     def _create_entity_structure(self):
-        self.organization = OrganizationFactory(name="Université catholique de Louvain", acronym="UCL")
+        self.organization = OrganizationFactory()
         # Create entities UCL
         self.root_entity = _create_entity_and_version_related_to(self.organization, "UCL")
         # SST entity

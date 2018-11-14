@@ -38,6 +38,7 @@ from base.forms.education_group.training import TrainingForm
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.utils import cache
 from base.views import layout
 from base.views.common import display_success_messages
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
@@ -87,11 +88,14 @@ def create_education_group(request, category, education_group_type_pk, parent_id
     parent = get_object_or_404(EducationGroupYear, id=parent_id) if parent_id is not None else None
     education_group_type = get_object_or_404(EducationGroupType, pk=education_group_type_pk)
 
+    initial_academic_year = parent.academic_year_id if parent else \
+        cache.get_filter_value_from_cache(request.user, reverse('education_groups'), 'academic_year')
     form_education_group_year = FORMS_BY_CATEGORY[category](
         request.POST or None,
         parent=parent,
         user=request.user,
-        education_group_type=education_group_type
+        education_group_type=education_group_type,
+        initial={'academic_year': initial_academic_year}
     )
 
     if form_education_group_year.is_valid():
@@ -122,9 +126,9 @@ def _common_success_redirect(request, form, parent=None):
 
 
 def _get_success_message_for_creation_education_group_year(parent_id, education_group_year):
-    MSG_KEY = "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly created."
+    msg_key = "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly created."
     link = reverse("education_group_read", args=[parent_id, education_group_year.id])
-    return _(MSG_KEY) % {
+    return _(msg_key) % {
         "link": link,
         "acronym": education_group_year.acronym,
         "academic_year": education_group_year.academic_year,

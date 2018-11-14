@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import requests
-
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import Http404

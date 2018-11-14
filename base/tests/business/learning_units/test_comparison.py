@@ -26,6 +26,7 @@
 
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.translation import gettext
 
 from base.models.learning_unit_year import LearningUnitYear
 from base.business.learning_units.comparison import get_keys, _get_changed_values, get_value, \
@@ -66,7 +67,7 @@ class TestComparison(TestCase):
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
     def test_get_value_for_enum(self):
         data = self.learning_unit_year.__dict__
-        self.assertEqual(get_value(LearningUnitYear, data, 'subtype'), 'Complet')
+        self.assertEqual(get_value(LearningUnitYear, data, 'subtype'), gettext('FULL'))
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
     def test_get_value(self):
@@ -147,18 +148,37 @@ class LearningUnitYearComparaisonTest(TestCase):
         current_volume_q1 = 20
         next_volume_q1 = 10
 
-        data_volumes_previous = {'volumes': {'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0, 'VOLUME_TOTAL': Decimal('12.00'),
-                                    'VOLUME_GLOBAL': previous_volume_global, 'PLANNED_CLASSES': previous_planned_classes, 'VOLUME_Q1': None,
-                                    'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0, 'VOLUME_Q2': Decimal('30.00'),
-                                    'VOLUME_REQUIREMENT_ENTITY': 12.0}}
-        data_volumes_current = {'volumes': {'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0, 'VOLUME_TOTAL': Decimal('12.00'),
-                                            'VOLUME_GLOBAL': current_volume_global, 'PLANNED_CLASSES': current_planned_classes, 'VOLUME_Q1': current_volume_q1,
-                                            'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0, 'VOLUME_Q2': Decimal('30.00'),
-                                            'VOLUME_REQUIREMENT_ENTITY': 12.0}}
-        data_volumes_next = {'volumes': {'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0, 'VOLUME_TOTAL': Decimal('12.00'),
-                                            'VOLUME_GLOBAL': 12.0, 'PLANNED_CLASSES': 1, 'VOLUME_Q1': next_volume_q1,
-                                            'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0, 'VOLUME_Q2': Decimal('30.00'),
-                                            'VOLUME_REQUIREMENT_ENTITY': 12.0}}
+        data_volumes_previous = {
+            'volumes': {
+                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0, 'VOLUME_TOTAL': Decimal('12.00'),
+                'VOLUME_GLOBAL': previous_volume_global,
+                'PLANNED_CLASSES': previous_planned_classes,
+                'VOLUME_Q1': None,
+                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0, 'VOLUME_Q2': Decimal('30.00'),
+                'VOLUME_REQUIREMENT_ENTITY': 12.0
+            }
+        }
+
+        data_volumes_current = {
+            'volumes': {
+                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0,
+                'VOLUME_TOTAL': Decimal('12.00'),
+                'VOLUME_GLOBAL': current_volume_global,
+                'PLANNED_CLASSES': current_planned_classes,
+                'VOLUME_Q1': current_volume_q1,
+                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0,
+                'VOLUME_Q2': Decimal('30.00'),
+                'VOLUME_REQUIREMENT_ENTITY': 12.0
+            }
+        }
+        data_volumes_next = {
+            'volumes': {
+                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0, 'VOLUME_TOTAL': Decimal('12.00'),
+                'VOLUME_GLOBAL': 12.0, 'PLANNED_CLASSES': 1, 'VOLUME_Q1': next_volume_q1,
+                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0, 'VOLUME_Q2': Decimal('30.00'),
+                'VOLUME_REQUIREMENT_ENTITY': 12.0
+            }
+        }
 
         data = compare_volumes(data_volumes_current, data_volumes_previous, data_volumes_next)
         self.assertEqual(data.get('VOLUME_GLOBAL'), [previous_volume_global, current_volume_global, 12.0])

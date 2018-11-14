@@ -28,7 +28,6 @@ from django.http import QueryDict
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
-from base.business import learning_container_year
 from base.business.utils.model import merge_two_dicts
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
 from base.forms.learning_unit.entity_form import EntityContainerBaseForm
@@ -153,7 +152,8 @@ class PartimForm(LearningUnitBaseForm):
                 'data': data,
                 'queryset': LearningComponentYear.objects.filter(
                     learningunitcomponent__learning_unit_year=self.instance)
-                if self.instance else LearningComponentYear.objects.none()
+                if self.instance else LearningComponentYear.objects.none(),
+                'person': self.person,
             }
         }
 

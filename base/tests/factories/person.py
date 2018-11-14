@@ -45,6 +45,7 @@ def generate_person_email(person, domain=None):
 class PersonFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.Person'
+        django_get_or_create = ('user',)  # One-to-one field
 
     first_name = factory.LazyAttribute(lambda person:
                                        person.user.first_name if person.user else factory.Faker('first_name'))

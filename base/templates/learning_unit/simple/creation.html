@@ -103,21 +103,7 @@
 
                 <div class="col-md-4">
                     {% block institution %}
-                        <div class="panel panel-default">
-                            <div class="panel-body">
-                                {% bootstrap_field learning_unit_year_form.campus %}
-                                {% bootstrap_field entity_container_form.0.entity %}
-                                {% bootstrap_field entity_container_form.1.entity %}
-                                {% bootstrap_field entity_container_form.2.entity %}
-                                {% bootstrap_field entity_container_form.3.entity %}
-                                <div class="row">
-                                    {% bootstrap_field learning_unit_year_form.academic_year form_group_class="col-md-7" %}
-                                    {% if learning_unit_form.end_year %}
-                                        {% bootstrap_field learning_unit_form.end_year form_group_class="col-md-5" %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+                        {% include "learning_unit/blocks/institution.html" %}
                     {% endblock %}
                     {% block create_proposal %}{% endblock %}
                 </div>

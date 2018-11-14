@@ -65,7 +65,7 @@
                                     <tr>
                                         <td width="10%">{{ group.code_scs }}</td>
                                         <td width="20%">{{ group.title }}</td>
-                                        <td width="12%">{{ group.relative_credits | default_if_none:'-' }} / {% if group.child %}{{ group.child.credits.normalize | default_if_none:'-' }}{% else %}-{% endif %}</td>
+                                        <td width="12%">{{ group.relative_credits | default_if_none:'-' }} / {% if group.child %}{{ group.child.credits|floatformat | default_if_none:'-' }}{% else %}-{% endif %}</td>
                                         <td width="6%">{{ group.min_credits | default_if_none:'-' }}</td>
                                         <td width="6%">{{ group.max_credits | default_if_none:'-' }}</td>
                                         <td width="6%">{{  group.is_mandatory | yesno }}</td>

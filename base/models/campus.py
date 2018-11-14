@@ -49,11 +49,6 @@ class Campus(SerializableModel):
         verbose_name_plural = 'campuses'
 
 
-def find_by_organization(organization):
-    return Campus.objects.filter(organization=organization)\
-                         .order_by('name')
-
-
 def find_main_campuses():
     return Campus.objects.filter(organization__type=MAIN).order_by('name').select_related('organization')
 

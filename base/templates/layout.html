@@ -1,7 +1,6 @@
 <!doctype html>
-{% load staticfiles %}
-{% load i18n %}
-{% load analytical %}
+{% load staticfiles i18n %}
+{% load analytical hijack_tags %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -38,7 +37,8 @@
 
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
     <link rel="shortcut icon" href="
             {% if environment == 'LOCAL' %}{% static 'img/favicon_blue.ico' %}{% else %}{% static 'img/favicon.ico' %}{% endif %}"/>
     <link rel="stylesheet" href="{% static 'css/armata.css' %}" type='text/css'>
@@ -50,6 +50,7 @@
     <link rel="stylesheet" href="{% static 'css/tree.css' %}">
     <link rel="stylesheet" href="{% static 'css/jstree.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/dataTables.bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'hijack/hijack-styles.css' %}"/>
 
     <script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery-ui.js' %}"></script>
@@ -70,9 +71,9 @@
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 
     {% block header %}
-    <noscript>
-      <meta http-equiv="refresh" content="0;url={% url 'noscript' %}">
-    </noscript>
+        <noscript>
+            <meta http-equiv="refresh" content="0;url={% url 'noscript' %}">
+        </noscript>
     {% endblock %}
     {% block style %}
     {% endblock style %}
@@ -80,15 +81,20 @@
         #alert_wrong_version {
             display: none;
         }
+
         body {
             font-family: 'Armata', sans-serif;
         }
     </style>
     {% analytical_head_bottom %}
 </head>
-<body {% if environment == 'DEV' %} class="devmode" {% elif environment == 'LOCAL' %} class="localmode" {% elif environment == 'QA' %} class="qamode" {% endif %}>
-    {% analytical_body_top %}
-    {% block layout_navbar_top %}
+<body {% if environment == 'DEV' %} class="devmode"
+{% elif environment == 'LOCAL' %} class="localmode"
+{% elif environment == 'QA' %} class="qamode"
+{% endif %}>
+{% hijack_notification %}
+{% analytical_body_top %}
+{% block layout_navbar_top %}
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container-fluid p0-50">
             <!-- Brand and toggle get grouped for better mobile display -->
@@ -108,70 +114,102 @@
                 {% if request.user.is_authenticated %}
                     <ul class="nav navbar-nav">
                         {% if perms.base.can_access_catalog %}
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                               aria-haspopup="true"
-                               aria-expanded="false"
-                               id="lnk_home_dropdown_catalog">{% trans 'formation_catalogue' %}<span
-                                    class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                {% if perms.base.can_access_offer %}
-                                    <li><a href="{% url 'offers' %}" id="lnk_dropdown_offers">{% trans 'offers' %}</a></li>
-                                {% endif %}
-                                {% if perms.base.can_access_education_group %}
-                                    <li><a href="{% url 'education_groups' %}" id="lnk_dropdown_educationgroups">{% trans 'formations' %}</a></li>
-                                {% endif %}
-                                {% if perms.base.can_access_learningunit %}
-                                    <li><a href="{% url 'learning_units' %}"
-                                           id="lnk_dropdown_learning_units">{% trans 'learning_units' %}</a></li>
-                                {% endif %}
-                                {%  if perms.base.can_access_academicyear %}
-                                    <li><a href="{% url 'academic_year' %}"
-                                           id="lnk_dropdown_academic_year">{% trans 'academic_year' %}</a></li>
-                                {% endif %}
-                            </ul>
-                        </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true"
+                                   aria-expanded="false"
+                                   id="lnk_home_dropdown_catalog">{% trans 'formation_catalogue' %}<span
+                                        class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    {% if perms.base.can_access_offer %}
+                                        <li><a href="{% url 'offers' %}"
+                                               id="lnk_dropdown_offers">{% trans 'offers' %}</a></li>
+                                    {% endif %}
+                                    {% if perms.base.can_access_education_group %}
+                                        <li><a href="{% url 'education_groups' %}"
+                                               id="lnk_dropdown_educationgroups">{% trans 'formations' %}</a></li>
+                                    {% endif %}
+                                    {% if perms.base.can_access_learningunit %}
+                                        <li><a href="{% url 'learning_units' %}"
+                                               id="lnk_dropdown_learning_units">{% trans 'learning_units' %}</a></li>
+                                    {% endif %}
+                                    {% if perms.base.can_access_academicyear %}
+                                        <li><a href="{% url 'academic_year' %}"
+                                               id="lnk_dropdown_academic_year">{% trans 'academic_year' %}</a></li>
+                                    {% endif %}
+                                </ul>
+                            </li>
                         {% endif %}
                         {% if perms.base.can_access_student_path %}
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                               aria-haspopup="true"
-                               aria-expanded="false" id="lnk_home_dropdown_parcours">{% trans 'student_path' %}<span
-                                    class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                {% if 'assessments' in installed_apps and perms.base.can_access_evaluation %}
-                                    <li><a href="{% url 'assessments' %}"
-                                           id="lnk_dropdown_evaluations">{% trans 'evaluations' %}</a></li>
-                                {% endif %}
-                                {% if perms.base.can_access_student %}
-                                    <li><a href="{% url 'students' %}"
-                                           id="lnk_dropdown_students">{% trans 'students_title' %}</a></li>
-                                {% endif %}
-                                {% if 'internship' in installed_apps and perms.internship.can_access_internship %}
-                                    <li><a href="{% url 'internship' %}"
-                                           id="lnk_dropdown_internships">{% trans 'internships' %}</a></li>
-                                {% endif %}
-                            </ul>
-                        </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true"
+                                   aria-expanded="false" id="lnk_home_dropdown_parcours">{% trans 'student_path' %}<span
+                                        class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    {% if 'assessments' in installed_apps and perms.base.can_access_evaluation %}
+                                        <li><a href="{% url 'assessments' %}"
+                                               id="lnk_dropdown_evaluations">{% trans 'evaluations' %}</a></li>
+                                    {% endif %}
+                                    {% if perms.base.can_access_student %}
+                                        <li><a href="{% url 'students' %}"
+                                               id="lnk_dropdown_students">{% trans 'students_title' %}</a></li>
+                                    {% endif %}
+                                    {% if 'internship' in installed_apps and perms.internship.can_access_internship %}
+                                        <li><a href="{% url 'internship' %}"
+                                               id="lnk_dropdown_internships">{% trans 'internships' %}</a></li>
+                                    {% endif %}
+                                </ul>
+                            </li>
                         {% endif %}
                         {% if perms.base.is_institution_administrator %}
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                               aria-haspopup="true"
-                               aria-expanded="false" id="lnk_home_dropdown_institution">{% trans 'institution' %} <span
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true"
+                                   aria-expanded="false" id="lnk_home_dropdown_institution">{% trans 'institution' %}
+                                    <span
+                                            class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    {% if perms.base.can_access_organization %}
+                                        <li><a href="{% url 'organizations' %}"
+                                               id="lnk_organizations">{% trans 'organizations' %}</a></li>
+                                    {% endif %}
+                                    {% if perms.base.can_access_structure %}
+                                        <li><a href="{% url 'entities' %}"
+                                               id="lnk_dropdown_entities">{% trans 'entities' %}</a></li>
+                                    {% endif %}
+                                    {% if perms.base.is_entity_manager %}
+                                        <li><a href="{% url 'academic_actors' %}"
+                                               id="lnk_dropdown_academic actors">{% trans 'academic_actors' %}</a></li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                        {% endif %}
+                        {% if "partnership" in installed_apps and perms.partnership.can_access_partnerships %}
+                            <li class="dropdown">
+                              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true"
+                                   aria-expanded="false"
+                                   id="lnk_home_dropdown_partnerships">{% trans 'partnerships' %}
+                                  <span
                                     class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                {% if perms.base.can_access_organization %}
-                                    <li><a href="{% url 'organizations' %}" id="lnk_organizations">{% trans 'organizations' %}</a></li>
+                              <ul class="dropdown-menu">
+                                <li><a href="{% url 'partnerships:list' %}"
+                                       id="lnk_dropdown_partnerships">{% trans 'partnerships' %}</a></li>
+                                {% if perms.partnership.change_uclmanagemententity %}
+                                  <li><a href="{% url 'partnerships:ucl_management_entities:list' %}"
+                                         id="lnk_dropdown_uclmanagemententities">{% trans 'ucl_management_entities' %}</a></li>
                                 {% endif %}
-                                {% if perms.base.can_access_structure  %}
-                                    <li><a href="{% url 'entities' %}" id="lnk_dropdown_entities">{% trans 'entities' %}</a></li>
+                                <li><a href="{% url 'partnerships:partners:list' %}"
+                                       id="lnk_dropdown_partners">{% trans 'partners' %}</a></li>
+                                <li><a href="{% url 'partnerships:list' %}?agreeements=1"
+                                       id="lnk_dropdown_agreements">{% trans 'agreements' %}</a></li>
+                                {% if perms.partnership.change_partnershipconfiguration %}
+                                  <li><a href="{% url 'partnerships:configuration_update' %}"
+                                         id="lnk_dropdown_general_conf">{% trans 'general_configuration' %}</a></li>
                                 {% endif %}
-                                {% if perms.base.is_entity_manager %}
-                                    <li><a href="{% url 'academic_actors' %}" id="lnk_dropdown_academic actors">{% trans 'academic_actors' %}</a></li>
-                                {% endif %}
-                            </ul>
-                        </li>
+                              </ul>
+                            </li>
                         {% endif %}
                         <li>
                             <a href="{{ user_manual.global }}" role="button" id="bt_help">{% trans 'Help' %}</a>
@@ -182,8 +220,8 @@
                     {% if request.user.is_authenticated %}
                         {% if perms.base.is_administrator %}
                             <li><a href="{% url 'data' %}" role="button" id="bt_administration">
-                                    <span class="glyphicon glyphicon-tower" aria-hidden="true"></span>
-                                    {% trans 'administration' %}</a></li>
+                                <span class="glyphicon glyphicon-tower" aria-hidden="true"></span>
+                                {% trans 'administration' %}</a></li>
                         {% endif %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
@@ -192,15 +230,16 @@
                                id="lnk_my_dropdow_language">{{ LANGUAGE_CODE }}<span
                                     class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                {% for lang in LANGUAGES%}
-                                    {% if lang.0 != LANGUAGE_CODE%}
+                                {% for lang in LANGUAGES %}
+                                    {% if lang.0 != LANGUAGE_CODE %}
                                         <li><a href="{% url 'lang_edit' lang.0 %}">{{ lang.0 }}</a></li>
                                     {% endif %}
                                 {% endfor %}
                             </ul>
                         </li>
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true"
                                aria-expanded="false" id="bt_user">
                                 <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
                                 {{ request.user.first_name }}
@@ -215,109 +254,141 @@
                                     {% trans 'logout' %}</a></li>
                             </ul>
                         </li>
+                        <li>
+                            {% include "blocks/notifications.html" %}
+                        </li>
                     {% else %}
                         <li><a href="{% url 'login' %}" id="lnk_login"><span class="glyphicon glyphicon-lock"
-                                                                             aria-hidden="true"></span> {% trans 'login' %}</a>
+                                                                             aria-hidden="true"></span> {% trans 'login' %}
+                        </a>
                         </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
-    {% endblock %}
-    {% if environment == 'DEV' %}
-        <div class="devorange">DEV</div>
-    {% elif environment == 'LOCAL'%}
-        <div class="localred">LOCAL</div>
-    {% elif environment == 'QA'%}
-        <div class="qagreen">QA</div>
-    {% endif %}
-    <div id="alert_wrong_version" class="container">
-        <div class="alert alert-warning">
-            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            {% trans 'old_browser_warning' %}
-        </div>
+{% endblock %}
+{% if environment == 'DEV' %}
+    <div class="devorange">DEV</div>
+{% elif environment == 'LOCAL' %}
+    <div class="localred">LOCAL</div>
+{% elif environment == 'QA' %}
+    <div class="qagreen">QA</div>
+{% endif %}
+<div id="alert_wrong_version" class="container">
+    <div class="alert alert-warning">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        {% trans 'old_browser_warning' %}
     </div>
-    {% if subject %}
-        <div class="container-fluid p0-50">
-            <div class="alert alert-warning" role="alert"><b>{{ subject }}</b><br>{{ notice }}</div>
-        </div>
-    {% endif %}
-
+</div>
+{% if subject %}
     <div class="container-fluid p0-50">
-        {% if request.user.is_authenticated %}
-            {% block breadcrumbarea %}
-                <ol class="breadcrumb">
-                    <li><a href="{% url 'home' %}" id="lnk_home_osis"><span class="glyphicon glyphicon-home"
-                                                                            aria-hidden="true"></span></a></li>
-                    {% block breadcrumb %}
-                    {% endblock %}
-                    <a href="{{ user_manual.contextual }}"
-                       target="help" id="lnk_user_manual_section"><span
-                            class="glyphicon glyphicon-question-sign pull-right"
-                            style="font-size: 14pt; color: green"
-                            aria-hidden="true"></span></a>
-                </ol>
-            {% endblock %}
-        {% endif %}
-        {% if experimental_phase %}
-            <div class="alert alert-warning" style="margin-bottom: 10px;">
-                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'experimental_phase' %}.
-            </div>
-        {% endif %}
-        {# FIXME ! It is forbidden to add something in the main layout for a specific need. Use messages instead !#}
-        {% if warnings %}
-            <div class="alert alert-warning" style="margin-bottom: 10px">
-                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'warnings_detected' %}
-                <a role="button" data-toggle="collapse" href="#CollapseWarnings" aria-expanded="false"
-                   aria-controls="collapse_classes" style="border:0;padding:0;">
-                    <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
-                          style="color:#8a6d3b"></span>
-                </a>
-                <div class="collapse" id="CollapseWarnings">
-                    <ul>
-                    {% for warning in warnings %}
-                         <li>{{ warning }}</li>
-                    {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        {% endif %}
-
-        {% include "template_messages.html" %}
-    
-        {% block header_content %}
-        {% endblock %}
-        {% block content %}
-        {% endblock %}
-        {% block modal %}
-        {% endblock %}
-        <br>
-        <br>
+        <div class="alert alert-warning" role="alert"><b>{{ subject }}</b><br>{{ notice }}</div>
     </div>
+{% endif %}
 
-    <nav class="navbar navbar-default navbar-fixed-bottom">
-        <div class="container-fluid p0-50">
-            <p class="navbar-text pull-left"><a
-                    href="{{ user_manual.global }}"
-                    target="_blank" id="lnk_user_manual">{% trans 'documentation' %}</a> |
-                <a href="http://uclouvain.github.io/osis/" target="_blank"
-                   id="lnk_osis_website">{% trans 'website' %}</a> |
-                <a href="https://github.com/uclouvain/osis" target="_blank"
-                   id="lnk_osis_source_code">{% trans 'source_code' %}</a>
-                {% if release_tag %}
-                |<a href="https://github.com/uclouvain/osis/releases/tag/{{ release_tag }}" target="_blank"
-                   id="lnk_latest_tag">v{{ release_tag }}</a>
-                {% endif %}
-            </p>
-
-            <p class="navbar-text pull-right"><span class="glyphicon glyphicon-copyright-mark"></span>  {% now "Y" %}  <a
-                    href="http://www.uclouvain.be" target="_blank" id="lnk_ucl">Université catholique de Louvain</a></p>
+<div class="container-fluid p0-50">
+    {% if request.user.is_authenticated %}
+        {% block breadcrumbarea %}
+            <ol class="breadcrumb">
+                <li><a href="{% url 'home' %}" id="lnk_home_osis"><span class="glyphicon glyphicon-home"
+                                                                        aria-hidden="true"></span></a></li>
+                {% block breadcrumb %}
+                {% endblock %}
+                <a href="{{ user_manual.contextual }}"
+                   target="help" id="lnk_user_manual_section"><span
+                        class="glyphicon glyphicon-question-sign pull-right"
+                        style="font-size: 14pt; color: green"
+                        aria-hidden="true"></span></a>
+            </ol>
+        {% endblock %}
+    {% endif %}
+    {% if experimental_phase %}
+        <div class="alert alert-warning" style="margin-bottom: 10px;">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'experimental_phase' %}.
         </div>
-    </nav>
+    {% endif %}
 
-    {% block script %}
+    {% include "template_messages.html" %}
+
+    {# FIXME ! It is forbidden to add something in the main layout for a specific need. Use messages instead !#}
+    {% if warnings %}
+        <div class="alert alert-warning" style="margin-bottom: 10px">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'warnings_detected' %}
+            <button id="btn_expandButton" type="button" class="btn" data-toggle="collapse" data-target="#CollapseWarnings"
+                    style="background-color: transparent;">
+                <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
+                      style="color:#8a6d3b"></span>
+            </button>
+            <div class="collapse" id="CollapseWarnings">
+                <ul>
+                    {% for warning in warnings %}
+                        <li>{{ warning }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% block header_content %}
     {% endblock %}
-    {% analytical_body_bottom %}
+    {% block content %}
+    {% endblock %}
+    {% block modal %}
+    {% endblock %}
+
+    <div class="modal fade" id="form-ajax-modal" role="dialog">
+        <div class="modal-dialog" id="modal_dialog_id">
+            <div class="modal-content" id="form-modal-ajax-content">
+                {# loading ajax requests #}
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+</div>
+
+<nav class="navbar navbar-default navbar-fixed-bottom">
+    <div class="container-fluid p0-50">
+        <p class="navbar-text pull-left"><a
+                href="{{ user_manual.global }}"
+                target="_blank" id="lnk_user_manual">{% trans 'documentation' %}</a> |
+            <a href="http://uclouvain.github.io/osis/" target="_blank"
+               id="lnk_osis_website">{% trans 'website' %}</a> |
+            <a href="https://github.com/uclouvain/osis" target="_blank"
+               id="lnk_osis_source_code">{% trans 'source_code' %}</a>
+            {% if release_tag %}
+                |<a href="https://github.com/uclouvain/osis/releases/tag/{{ release_tag }}" target="_blank"
+                    id="lnk_latest_tag">v{{ release_tag }}</a>
+            {% endif %}
+        </p>
+
+        <p class="navbar-text pull-right"><span class="glyphicon glyphicon-copyright-mark"></span> {% now "Y" %} <a
+                href="http://www.uclouvain.be" target="_blank" id="lnk_ucl">Université catholique de Louvain</a></p>
+    </div>
+</nav>
+
+{% block script %}
+    <script type="text/javascript">
+    $(document).ready(function(){
+        //To open by default collapse of warnings
+        $('#CollapseWarnings').collapse('toggle');
+
+        $("#CollapseWarnings").on("hide.bs.collapse", function(){
+            $(".btn").html('<span id="expandButton" class="glyphicon glyphicon-collapse-down" style="color:#8a6d3b"></span>');
+            $("#btn_expandButton").attr("title", gettext("Open"));
+        });
+
+        $("#CollapseWarnings").on("show.bs.collapse", function(){
+            $(".btn").html('<span id="expandButton"  class="glyphicon glyphicon-collapse-up" style="color:#8a6d3b"></span>');
+            $("#btn_expandButton").attr("title", gettext("Collapse"));
+        });
+    });
+    </script>
+{% endblock %}
+
+<script type="text/javascript" src="{% static "js/modal_form_submit.js" %}"></script>
+
+{% analytical_body_bottom %}
 </body>
 </html>

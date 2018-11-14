@@ -33,7 +33,7 @@ from base.models import entity_version
 from base.models.entity_version import find_last_entity_version_by_learning_unit_year_id
 from base.models.enums import organization_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
-from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -50,8 +50,7 @@ now = datetime.datetime.now()
 class EntityVersionTest(TestCase):
     def setUp(self):
         self.country = CountryFactory()
-        self.organization = OrganizationFactory(name="Université catholique de Louvain", acronym="UCL",
-                                                type=organization_type.MAIN)
+        self.organization = OrganizationFactory(type=organization_type.MAIN)
         self.entities = [EntityFactory(country=self.country, organization=self.organization) for x in range(3)]
         self.parent = EntityFactory(country=self.country, organization=self.organization)
         self.start_date = datetime.date(2015, 1, 1)
@@ -351,8 +350,6 @@ class EntityVersionLoadInMemoryTest(TestCase):
     def setUp(self):
         self.country = CountryFactory()
         self.organization = OrganizationFactory(
-            name="Université catholique de Louvain",
-            acronym="UCL",
             type=organization_type.MAIN
         )
         self.now = datetime.datetime.now(get_tzinfo())

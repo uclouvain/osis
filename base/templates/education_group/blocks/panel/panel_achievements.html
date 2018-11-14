@@ -57,14 +57,16 @@
                     </div>
 
                     <div class="col-md-2">
-                        {% url "education_group_achievements_actions" parent.pk education_group_year.pk achievement.pk as action_url%}
+                        {% url "education_group_achievements_actions" parent.pk education_group_year.pk achievement.pk as action_url %}
                         {% url 'update_education_group_achievement' root.pk education_group_year.pk achievement.pk as update_url %}
+                        {% url 'delete_education_group_achievement' root.pk education_group_year.pk achievement.pk as delete_url %}
                         {% include "education_group/blocks/form/achievement_action_bar.html" with obj=achievement %}
                     </div>
                 </div>
                 <br>
 
-                <div id="row_detail_achievement_{{ achievement.pk }}" class="row collapse in" style="padding-left: 20px">
+                <div id="row_detail_achievement_{{ achievement.pk }}" class="row collapse in"
+                     style="padding-left: 20px">
                     <div class="col-md-12">
                         {% for detail_achievement in achievement.educationgroupdetailedachievement_set.all %}
                             <div class="row" id="education_group_detail_achievement_{{ detail_achievement.pk }}">
@@ -79,16 +81,16 @@
                                 <div class="col-md-2">
                                     {% url "education_group_detailed_achievements_actions" parent.pk education_group_year.pk  achievement.pk detail_achievement.pk as action_url %}
                                     {% url 'update_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk detail_achievement.pk as update_url %}
+                                    {% url 'delete_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk detail_achievement.pk as delete_url %}
                                     {% include "education_group/blocks/form/achievement_action_bar.html" with obj=detail_achievement additional_class="btn-group-sm" %}
                                 </div>
                             </div>
                         {% endfor %}
-
-                        {% url 'create_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk as create_url %}
-                        <button title="{% trans 'create' %}"  class="btn btn-default btn-sm" id="btn_operation_create_detail_{{ achievement.pk }}" {% permission_create_achievement %}>
+                        <button title="{% trans 'create' %}" class="btn btn-default btn-sm trigger_modal"
+                                data-url="{% url 'create_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk %}"
+                                {% permission_create_achievement %}>
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                         </button>
-                        {% include "blocks/modal/modal_ajax.html" with modal_url=create_url click_id="btn_operation_create_detail_"|addstr:achievement.pk form_id="form_achievement" %}
                     </div>
                 </div>
                 <hr>
@@ -96,14 +98,14 @@
         </div>
     {% endfor %}
 
-    {% url 'create_education_group_achievement' root.pk education_group_year.pk as create_url %}
-    <button title="{% trans 'create' %}"  class="btn btn-default" id="btn_operation_create" {% permission_create_achievement %}>
+    <button title="{% trans 'create' %}" class="btn btn-default trigger_modal"
+            data-url="{% url 'create_education_group_achievement' root.pk education_group_year.pk %}"
+            {% permission_create_achievement %}>
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
     </button>
-    {% include "blocks/modal/modal_ajax.html" with modal_url=create_url click_id="btn_operation_create" form_id="form_achievement" %}
     <script>
-        $(function() {
-            $('.collapse_span').on('click', function() {
+        $(function () {
+            $('.collapse_span').on('click', function () {
                 $(this).toggleClass('glyphicon-chevron-right').toggleClass('glyphicon-chevron-down');
             });
         });

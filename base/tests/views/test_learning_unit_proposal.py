@@ -73,7 +73,7 @@ from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
-from base.views.learning_unit import learning_unit_identification
+from base.views.learning_units.detail import learning_unit_identification
 from base.views.learning_units.proposal.update import update_learning_unit_proposal, \
     learning_unit_modification_proposal, \
     learning_unit_suppression_proposal
@@ -522,7 +522,9 @@ class TestLearningUnitProposalSearch(TestCase):
                                                    end_date=create_current_academic_year().end_date)
         self.person_entity = PersonEntityFactory(person=self.person, entity=self.an_entity, with_child=True)
         self.client.force_login(self.person.user)
-        self.proposals = [_create_proposal_learning_unit() for _ in range(3)]
+        self.proposals = [_create_proposal_learning_unit("LOSIS1211"),
+                          _create_proposal_learning_unit("LOSIS1212"),
+                          _create_proposal_learning_unit("LOSIS1213")]
         for proposal in self.proposals:
             PersonEntityFactory(person=self.person, entity=proposal.entity)
 
@@ -532,10 +534,10 @@ class TestLearningUnitProposalSearch(TestCase):
 
         self.assertIsInstance(response.context['form'], LearningUnitProposalForm)
         self.assertEqual(response.context['search_type'], PROPOSAL_SEARCH)
-        self.assertCountEqual(list(response.context['proposals']), self.proposals)
+        self.assertEqual(len(response.context['proposals']), 1)
 
     def test_learning_units_proposal_search_by_tutor(self):
-        proposal = _create_proposal_learning_unit()
+        proposal = _create_proposal_learning_unit("LOSIS1211")
         tutor = TutorFactory(person=self.person)
         attribution = AttributionNewFactory(tutor=tutor)
         learning_unit_component = LearningUnitComponentFactory(learning_unit_year=proposal.learning_unit_year)
@@ -557,7 +559,9 @@ class TestGroupActionsOnProposals(TestCase):
     def setUpTestData(cls):
         cls.person = PersonFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        cls.proposals = [_create_proposal_learning_unit() for _ in range(3)]
+        cls.proposals = [_create_proposal_learning_unit("LOSIS1211"),
+                         _create_proposal_learning_unit("LOSIS1212"),
+                         _create_proposal_learning_unit("LOSIS1213")]
         cls.url = reverse(learning_units_proposal_search)
         create_current_academic_year()
 
@@ -570,10 +574,10 @@ class TestGroupActionsOnProposals(TestCase):
         self.assertIn(_("No proposals was selected."), messages)
 
     @mock.patch("base.business.learning_unit_proposal.cancel_proposals_and_send_report",
-                side_effect=lambda proposals, author, research_criteria:{})
+                side_effect=lambda proposals, author, research_criteria: {})
     def test_when_action_is_back_to_initial(self, mock_cancel_proposals):
         post_data = {"action": ACTION_BACK_TO_INITIAL, "selected_action": [self.proposals[0].id]}
-        response = self.client.post(self.url, data=post_data, follow=True)
+        self.client.post(self.url, data=post_data, follow=True)
 
         proposals, author, research_criteria = mock_cancel_proposals.call_args[0]
         self.assertEqual(list(proposals), [self.proposals[0]])
@@ -584,7 +588,7 @@ class TestGroupActionsOnProposals(TestCase):
                 side_effect=lambda proposals, author, research_criteria: {})
     def test_when_action_is_consolidate(self, mock_consolidate):
         post_data = {"action": ACTION_CONSOLIDATE, "selected_action": [self.proposals[0].id]}
-        response = self.client.post(self.url, data=post_data, follow=True)
+        self.client.post(self.url, data=post_data, follow=True)
 
         proposals, author, research_criteria = mock_consolidate.call_args[0]
         self.assertEqual(list(proposals), [self.proposals[0]])
@@ -604,7 +608,7 @@ class TestGroupActionsOnProposals(TestCase):
     def test_when_action_is_force_state(self, mock_force_state):
         post_data = {"action": ACTION_FORCE_STATE, "selected_action": [self.proposals[0].id, self.proposals[2].id],
                      "state": proposal_state.ProposalState.ACCEPTED.name}
-        response = self.client.post(self.url, data=post_data, follow=True)
+        self.client.post(self.url, data=post_data, follow=True)
 
         proposals, author, new_state = mock_force_state.call_args[0]
         self.assertCountEqual(list(proposals), [self.proposals[0], self.proposals[2]])
@@ -621,7 +625,7 @@ class TestLearningUnitProposalCancellation(TestCase):
         self.person.user.user_permissions.add(self.permission)
         self.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
 
-        self.learning_unit_proposal = _create_proposal_learning_unit()
+        self.learning_unit_proposal = _create_proposal_learning_unit("LOSIS1211")
         self.learning_unit_year = self.learning_unit_proposal.learning_unit_year
 
         requirement_entity_container = entity_container_year. \
@@ -738,10 +742,10 @@ def _test_entities_equal(learning_container_year, entities_values_dict):
     return True
 
 
-def _create_proposal_learning_unit():
+def _create_proposal_learning_unit(acronym):
     an_entity = EntityFactory()
     EntityVersionFactory(entity=an_entity)
-    a_learning_unit_year = LearningUnitYearFakerFactory(acronym="LOSIS1212", subtype=learning_unit_year_subtypes.FULL)
+    a_learning_unit_year = LearningUnitYearFactory(acronym=acronym, subtype=learning_unit_year_subtypes.FULL)
     an_entity_container_year = EntityContainerYearFactory(
         learning_container_year=a_learning_unit_year.learning_container_year,
         type=entity_container_year_link_type.REQUIREMENT_ENTITY,
@@ -1147,7 +1151,7 @@ class TestCreationProposalCancel(TestCase):
                 side_effect=lambda *args: True)
     @mock.patch('base.utils.send_mail.send_mail_cancellation_learning_unit_proposals')
     def test_cancel_proposal_of_learning_unit(self, mock_send_mail, mock_perms):
-        a_proposal = _create_proposal_learning_unit()
+        a_proposal = _create_proposal_learning_unit("LOSIS1211")
         luy = a_proposal.learning_unit_year
         url = reverse('learning_unit_cancel_proposal', args=[luy.id])
 

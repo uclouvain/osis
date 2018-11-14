@@ -23,11 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from dal import autocomplete
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 from waffle.decorators import waffle_flag
 
@@ -37,15 +40,18 @@ from base.business.learning_units.edition import ConsistencyError
 from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit.edition_volume import VolumeEditionFormsetContainer
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
+from base.models.entity_version import find_pedagogical_entities_version, \
+    find_all_current_entities_version
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views import layout
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages
-from base.views.learning_unit import learning_unit_identification, learning_unit_components
+from base.views.learning_unit import learning_unit_components
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context, \
     get_common_context_learning_unit_year
+from base.views.learning_units.detail import learning_unit_identification
 
 
 @login_required
@@ -73,7 +79,7 @@ def learning_unit_edition_end_date(request, learning_unit_year_id):
             display_error_messages(request, e.args[0])
 
     context['form'] = form
-    return layout.render(request, 'learning_unit/simple/update_end_date.html', context)
+    return render(request, 'learning_unit/simple/update_end_date.html', context)
 
 
 def _get_current_learning_unit_year_id(learning_unit_to_edit, learning_unit_year_id):
@@ -105,7 +111,8 @@ def update_learning_unit(request, learning_unit_year_id):
         end_postponement=end_postponement,
         learning_unit_instance=learning_unit_year.learning_unit,
         learning_unit_full_instance=learning_unit_full_instance,
-        data=request.POST or None
+        data=request.POST or None,
+        external=learning_unit_year.is_external(),
     )
 
     if postponement_form.is_valid():
@@ -116,7 +123,13 @@ def update_learning_unit(request, learning_unit_year_id):
     context = postponement_form.get_context()
     context["learning_unit_year"] = learning_unit_year
     context["is_update"] = True
-    return render(request, 'learning_unit/simple/update.html', context)
+
+    if learning_unit_year.is_external():
+        template = "learning_unit/external/update.html"
+    else:
+        template = 'learning_unit/simple/update.html'
+
+    return render(request, template, context)
 
 
 @login_required
@@ -174,3 +187,20 @@ def _save_form_and_display_messages(request, form):
                           % {'year': e.last_instance_updated.academic_year})
         display_error_messages(request, e.error_list)
     return records
+
+
+class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        country = self.forwarded.get('country', None)
+        if country and country == "all":
+            qs = find_all_current_entities_version().order_by('acronym')
+        elif country:
+            qs = find_all_current_entities_version().filter(entity__country__id=country).order_by('acronym')
+        else:
+            qs = find_pedagogical_entities_version()
+        if self.q:
+            qs = qs.filter(acronym__icontains=self.q).order_by('acronym')
+        return qs
+
+    def get_result_label(self, result):
+        return format_html(result.verbose_title)

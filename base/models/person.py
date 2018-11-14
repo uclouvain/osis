@@ -39,7 +39,7 @@ from base.models.entity import Entity
 from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums import person_source_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
 
 CENTRAL_MANAGER_GROUP = "central_managers"
 FACULTY_MANAGER_GROUP = "faculty_managers"
@@ -52,11 +52,19 @@ class PersonAdmin(SerializableModelAdmin):
     list_filter = ('gender', 'language')
 
 
+class EmployeeManager(SerializableModelManager):
+    def get_queryset(self):
+        return super().get_queryset().filter(employee=True).order_by("last_name", "first_name")
+
+
 class Person(SerializableModel):
     GENDER_CHOICES = (
         ('F', _('female')),
         ('M', _('male')),
         ('U', _('unknown')))
+
+    objects = SerializableModelManager()
+    employees = EmployeeManager()
 
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
@@ -110,11 +118,23 @@ class Person(SerializableModel):
         return " ".join([self.last_name or "", self.first_name or ""]).strip()
 
     def __str__(self):
+        return self.get_str(self.first_name, self.middle_name, self.last_name)
+
+    @staticmethod
+    def get_str(first_name, middle_name, last_name):
         return " ".join([
-            ("{},".format(self.last_name) if self.last_name else "").upper(),
-            self.first_name or "",
-            self.middle_name or ""
+            ("{},".format(last_name) if last_name else "").upper(),
+            first_name or "",
+            middle_name or ""
         ]).strip()
+
+    @property
+    def age(self):
+        if not self.birth_date:
+            return None
+        today = date.today()
+        return today.year - self.birth_date.year - \
+            ((today.month, today.day) < (self.birth_date.month, self.birth_date.day))
 
     @cached_property
     def linked_entities(self):
@@ -129,9 +149,14 @@ class Person(SerializableModel):
             ("is_administrator", "Is administrator"),
             ("is_institution_administrator", "Is institution administrator "),
             ("can_edit_education_group_administrative_data", "Can edit education group administrative data"),
+            ("can_manage_charge_repartition", "Can manage charge repartition"),
+            ("can_manage_attribution", "Can manage attribution"),
         )
 
     def is_linked_to_entity_in_charge_of_learning_unit_year(self, learning_unit_year):
+        if learning_unit_year.is_external():
+            return self.is_attached_entity(learning_unit_year.externallearningunityear.requesting_entity)
+
         entities = Entity.objects.filter(
             entitycontaineryear__learning_container_year=learning_unit_year.learning_container_year,
             entitycontaineryear__type=REQUIREMENT_ENTITY
@@ -241,5 +266,5 @@ def find_by_firstname_or_lastname(name):
     return Person.objects.filter(Q(first_name__icontains=name) | Q(last_name__icontains=name))
 
 
-def is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person):
+def is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person, raise_exception=False):
     return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)

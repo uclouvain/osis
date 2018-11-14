@@ -37,6 +37,7 @@ from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_component_year_type
+from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_component import LearningUnitComponent
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -96,7 +97,9 @@ class LearningUnitEditionTestCase(TestCase):
         LearningComponentYearFactory(acronym="PP", learning_container_year=a_learning_container_year)
         link_type = random.choice(ENTITY_TYPES_VOLUME)
 
-        business_edition.update_or_create_entity_container_year_with_components(an_entity, a_learning_container_year, link_type)
+        business_edition.update_or_create_entity_container_year_with_components(
+            an_entity, a_learning_container_year, link_type
+        )
         self.assertEqual(EntityContainerYear.objects.filter(
             learning_container_year=a_learning_container_year).count(), 1)
         self.assertEqual(EntityComponentYear.objects.filter(
@@ -112,7 +115,8 @@ class LearningUnitEditionTestCase(TestCase):
         LearningComponentYearFactory(acronym="PP", learning_container_year=a_learning_container_year)
         link_type = entity_container_year_link_type.ALLOCATION_ENTITY
 
-        business_edition.update_or_create_entity_container_year_with_components(an_entity, a_learning_container_year, link_type)
+        business_edition.update_or_create_entity_container_year_with_components(an_entity, a_learning_container_year,
+                                                                                link_type)
         self.assertEqual(EntityContainerYear.objects.filter(
             learning_container_year=a_learning_container_year).count(), 1)
         self.assertEqual(EntityComponentYear.objects.filter(
@@ -288,7 +292,7 @@ class LearningUnitEditionTestCase(TestCase):
 
         # No diff found
         error_list = business_edition._check_postponement_conflict_on_entity_container_year(
-            self.learning_container_year,another_learning_container_year
+            self.learning_container_year, another_learning_container_year
         )
         self.assertIsInstance(error_list, list)
         self.assertFalse(error_list)
@@ -506,11 +510,11 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertEqual(len(error_list), 1)
         error_expected = _("There is not %(component_type)s for the learning unit %(acronym)s - %(year)s but exist "
                            "in %(existing_year)s") % {
-                            'component_type': _(learning_component_year_type.LECTURING),
-                            'acronym': self.learning_container_year.acronym,
-                            'year': self.next_academic_year,
-                            'existing_year': self.learning_container_year.academic_year
-                        }
+                             'component_type': _(learning_component_year_type.LECTURING),
+                             'acronym': self.learning_container_year.acronym,
+                             'year': self.next_academic_year,
+                             'existing_year': self.learning_container_year.academic_year
+                         }
         self.assertIn(error_expected, error_list)
 
     def test_check_postponement_conflict_on_volumes_case_no_practical_exercise_component_current_year(self):
@@ -551,12 +555,12 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertIsInstance(error_list, list)
         self.assertEqual(len(error_list), 1)
         error_expected = _("There is not %(component_type)s for the learning unit %(acronym)s - %(year)s but exist "
-                               "in %(existing_year)s") % {
-                                'component_type': _(learning_component_year_type.PRACTICAL_EXERCISES),
-                                'acronym': self.learning_container_year.acronym,
-                                'year': self.learning_container_year.academic_year,
-                                'existing_year': self.next_academic_year
-                            }
+                           "in %(existing_year)s") % {
+                             'component_type': _(learning_component_year_type.PRACTICAL_EXERCISES),
+                             'acronym': self.learning_container_year.acronym,
+                             'year': self.learning_container_year.academic_year,
+                             'existing_year': self.next_academic_year
+                         }
         self.assertIn(error_expected, error_list)
 
     def test_check_postponement_conflict_on_all_sections(self):
@@ -587,15 +591,36 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertIsInstance(error_list, list)
         self.assertEqual(len(error_list), 6)
 
+    def test_extends_only_components_of_learning_unit_year(self):
+        # Creating partim with components for the same learningContainerYear
+        _create_learning_unit_year_with_components(self.learning_container_year,
+                                                   create_lecturing_component=True,
+                                                   create_pratical_component=True,
+                                                   subtype=learning_unit_year_subtypes.PARTIM)
 
-def _create_learning_unit_year_with_components(l_container, create_lecturing_component=True, create_pratical_component=True):
+        inital_components_count = LearningComponentYear.objects.all().count()
+        number_of_components = LearningUnitComponent.objects.filter(learning_unit_year=self.learning_unit_year).count()
+        expected_count = inital_components_count + number_of_components
+        next_year = self.academic_year.year + 1
+
+        business_edition.duplicate_learning_unit_year(self.learning_unit_year, AcademicYearFactory(year=next_year))
+
+        # assert components of partims are not duplicated too
+        self.assertEqual(LearningComponentYear.objects.all().count(), expected_count)
+
+
+def _create_learning_unit_year_with_components(l_container, create_lecturing_component=True,
+                                               create_pratical_component=True, subtype=None):
+    if not subtype:
+        subtype = learning_unit_year_subtypes.FULL
     language = LanguageFactory(code='EN', name='English')
     a_learning_unit_year = LearningUnitYearFactory(learning_container_year=l_container,
                                                    acronym=l_container.acronym,
                                                    academic_year=l_container.academic_year,
                                                    status=True,
                                                    language=language,
-                                                   campus=CampusFactory(name='MIT'))
+                                                   campus=CampusFactory(name='MIT'),
+                                                   subtype=subtype)
 
     if create_lecturing_component:
         a_component = LearningComponentYearFactory(
@@ -642,8 +667,8 @@ def _create_entity_component_year(luy, component_type, entity_container_year, re
 
 
 def _delete_components(luy, component_type):
-    LearningUnitComponent.objects.filter(learning_unit_year=luy,learning_component_year__type=component_type)\
-                                 .delete()
+    LearningUnitComponent.objects.filter(learning_unit_year=luy, learning_component_year__type=component_type) \
+        .delete()
 
 
 def _build_copy(instance):

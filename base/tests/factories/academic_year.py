@@ -41,13 +41,13 @@ def create_current_academic_year():
     now = datetime.datetime.now()
     ref_date = datetime.datetime(now.year, 9, 15)
     if now < ref_date:
-        start_date = datetime.date(now.year-1, 9, 15)
+        start_date = datetime.date(now.year - 1, 9, 15)
     else:
         start_date = datetime.date(now.year, 9, 15)
 
     return AcademicYearFakerFactory(year=start_date.year,
                                     start_date=start_date,
-                                    end_date=datetime.date(start_date.year+1, start_date.month, 30)
+                                    end_date=datetime.date(start_date.year + 1, start_date.month, 30)
                                     )
 
 
@@ -55,7 +55,7 @@ def get_current_year():
     now = datetime.datetime.now()
     ref_date = datetime.datetime(now.year, 9, 15)
     if now < ref_date:
-        start_date = datetime.date(now.year-1, 9, 15)
+        start_date = datetime.date(now.year - 1, 9, 15)
     else:
         start_date = datetime.date(now.year, 9, 15)
     return start_date.year
@@ -68,10 +68,10 @@ class AcademicYearFactory(DjangoModelFactory):
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
+                                               datetime.datetime(2017, 3, 1))
     year = factory.fuzzy.FuzzyInteger(1950, timezone.now().year)
     start_date = factory.LazyAttribute(lambda obj: datetime.date(obj.year, 9, 15))
-    end_date = factory.LazyAttribute(lambda obj: datetime.date(obj.year+1, 9, 30))
+    end_date = factory.LazyAttribute(lambda obj: datetime.date(obj.year + 1, 9, 30))
 
     @staticmethod
     def produce_in_past(from_year=None, quantity=3):
@@ -79,14 +79,14 @@ class AcademicYearFactory(DjangoModelFactory):
             from_year = datetime.date.today().year
         i = 0
         while i < quantity:
-            AcademicYearFactory(year=from_year-i)
+            AcademicYearFactory(year=from_year - i)
             i += 1
 
     @staticmethod
     def produce_in_future(current_year, quantity=10):
         i = 1
         academic_years = []
-        while i < quantity+1:
+        while i < quantity + 1:
             academic_years.append(AcademicYearFactory.build(year=current_year + i))
             i += 1
         AcademicYear.objects.bulk_create(academic_years)

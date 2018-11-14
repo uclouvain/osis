@@ -1,0 +1,59 @@
+{% load bootstrap3 i18n %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+
+<div id="form-modal-body" class="modal-body">
+
+    <form method="post" id="form_charge_repartition" action="{{ request.path }}">
+        {% csrf_token %}
+        <table class="table">
+            <thead>
+                <th>{% trans 'tutor' %}</th>
+                <th>{% trans 'function' %}</th>
+                <th>{% trans 'start' %}</th>
+                <th>{% trans 'duration' %}</th>
+                <th>Volume 1</th>
+                <th>Volume 2</th>
+                <th>{% trans 'substitute' %}</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ attribution.tutor.person }}</td>
+                    <td>{% trans attribution.function %}</td>
+                    <td>{{ attribution.start_year | default_if_none:'' }}</td>
+                    <td>{{ attribution.duration | default_if_none:'' }}</td>
+                    <td>{% bootstrap_field lecturing_charge_form.allocation_charge show_label=False %}</td>
+                    <td>{% bootstrap_field practical_charge_form.allocation_charge show_label=False %}</td>
+                    <td>{{ attribution.substitute | default_if_none:'' }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<div class="modal-footer">
+   <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+   <input type="submit" value="{% trans "save" %}" class="btn btn-primary" onclick="$('#form_charge_repartition').submit();"/>
+</div>

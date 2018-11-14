@@ -40,9 +40,10 @@ class ExternalOffer(SerializableModel):
     adhoc = models.BooleanField(default=True)  # If False == Official/validated, if True == Not Official/not validated
     domain = models.ForeignKey('reference.Domain', on_delete=models.CASCADE)
     grade_type = models.ForeignKey('reference.GradeType', blank=True, null=True, on_delete=models.CASCADE)
-    offer_year = models.ForeignKey('base.OfferYear', blank=True, null=True, on_delete=models.CASCADE) # Institution equivalence ("intern" offer)
-    national = models.BooleanField(default=False) # True if is Belgian else False
+
+    # Institution equivalence ("intern" offer)
+    offer_year = models.ForeignKey('base.OfferYear', blank=True, null=True, on_delete=models.CASCADE)
+    national = models.BooleanField(default=False)  # True if is Belgian else False
 
     def __str__(self):
         return self.name
-

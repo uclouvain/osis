@@ -153,6 +153,7 @@ class TestIsAcademicCalendarHasStarted(TestCase):
             (academic_calendar_type.COURSE_ENROLLMENT, academic_calendar_type.COURSE_ENROLLMENT),
             (academic_calendar_type.SUMMARY_COURSE_SUBMISSION, academic_calendar_type.SUMMARY_COURSE_SUBMISSION),
             (academic_calendar_type.EDUCATION_GROUP_EDITION, academic_calendar_type.EDUCATION_GROUP_EDITION),
+            (academic_calendar_type.EDITION_OF_GENERAL_INFORMATION, academic_calendar_type.EDITION_OF_GENERAL_INFORMATION),
         )
         self.assertCountEqual(
             academic_calendar_type.ACADEMIC_CALENDAR_TYPES,
@@ -175,3 +176,54 @@ class TestIsAcademicCalendarHasStarted(TestCase):
             academic_calendar_type.AD_HOC_CALENDAR_TYPES,
             academic_calendar_type.CALENDAR_TYPES
         )
+
+class TestGetStartingAcademicCalendar(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        today = datetime.date.today()
+        end_date = today + datetime.timedelta(weeks=10)
+
+        cls.academic_calendars_in_4_day = [
+            AcademicCalendarFactory(start_date=today + datetime.timedelta(days=4), end_date=end_date) for _ in range(3)
+        ]
+
+        cls.academic_calendars_in_2_weeks = [
+            AcademicCalendarFactory(start_date=today + datetime.timedelta(weeks=2), end_date=end_date) for _ in range(3)
+        ]
+
+        cls.academic_calendars_in_1_week_and_3_days = [
+            AcademicCalendarFactory(start_date=today + datetime.timedelta(days=3, weeks=1), end_date=end_date)
+            for _ in range(3)
+        ]
+
+    def test_when_inputing_nothing(self):
+        qs = academic_calendar.AcademicCalendar.objects.starting_within()
+        self.assertEqual(list(qs), [])
+
+    def test_when_inputing_only_days(self):
+        qs = academic_calendar.AcademicCalendar.objects.starting_within(days=5)
+        self.assertCountEqual(list(qs),
+                              self.academic_calendars_in_4_day)
+
+        qs = academic_calendar.AcademicCalendar.objects.starting_within(days=10)
+        self.assertCountEqual(list(qs),
+                              self.academic_calendars_in_4_day + self.academic_calendars_in_1_week_and_3_days)
+
+    def test_when_inputing_only_weeks(self):
+        qs = academic_calendar.AcademicCalendar.objects.starting_within(weeks=1)
+        self.assertCountEqual(list(qs),
+                              self.academic_calendars_in_4_day)
+
+        qs = academic_calendar.AcademicCalendar.objects.starting_within(weeks=2)
+        self.assertCountEqual(list(qs),
+                              self.academic_calendars_in_4_day + self.academic_calendars_in_1_week_and_3_days +
+                              self.academic_calendars_in_2_weeks)
+
+    def test_when_inputing_days_and_weeks(self):
+        qs = academic_calendar.AcademicCalendar.objects.starting_within(weeks=1, days=2)
+        self.assertCountEqual(list(qs),
+                              self.academic_calendars_in_4_day)
+
+        qs = academic_calendar.AcademicCalendar.objects.starting_within(weeks=1, days=5)
+        self.assertCountEqual(list(qs),
+                              self.academic_calendars_in_4_day + self.academic_calendars_in_1_week_and_3_days)

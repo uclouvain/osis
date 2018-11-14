@@ -36,4 +36,4 @@ def full_width(context):
     """
     offer_year = context['offer_year']
     return not offer_year.orientation_sibling or (
-        not offer_year.offer_year_children and not offer_year.offer_year_sibling)
+            not offer_year.offer_year_children and not offer_year.offer_year_sibling)

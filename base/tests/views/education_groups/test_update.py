@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+import json
 from http import HTTPStatus
 from unittest import mock
 from unittest.mock import patch
@@ -45,6 +45,7 @@ from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
+from base.tests.factories.certificate_aim import CertificateAimFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.education_group_year import GroupFactory, TrainingFactory
@@ -53,6 +54,8 @@ from base.tests.factories.entity_version import EntityVersionFactory, MainEntity
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
+from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.user import SuperUserFactory
 from base.utils.cache import cache
 from base.views.education_groups.update import update_education_group, _get_success_redirect_url
 from reference.tests.factories.domain import DomainFactory
@@ -145,6 +148,7 @@ class TestUpdate(TestCase):
 
     def test_post(self):
         new_entity_version = MainEntityVersionFactory()
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
 
         data = {
             'title': 'Cours au choix',
@@ -182,6 +186,7 @@ class TestUpdate(TestCase):
         )
 
         new_entity_version = MainEntityVersionFactory()
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
         list_domains = [domain.pk for domain in self.domains]
         data = {
             'title': 'Cours au choix',
@@ -573,3 +578,45 @@ class TestSelectAttach(TestCase):
             child_branch=self.child_education_group_year
         )
         self.assertEqual(expected_initial_group_element_year, self.initial_group_element_year)
+
+
+class TestCertificateAimAutocomplete(TestCase):
+    def setUp(self):
+        self.super_user = SuperUserFactory()
+        self.url = reverse("certificate_aim_autocomplete")
+        self.certificate_aim = CertificateAimFactory(
+            code=1234,
+            section=5,
+            description="description",
+        )
+
+    def test_user_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url, data={'q': '1234'})
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(results, [])
+
+    def test_when_param_is_digit_assert_searching_on_code(self):
+        # When searching on "code"
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(self.url, data={'q': '1234'})
+        self._assert_result_is_correct(response)
+
+    def test_assert_searching_on_description(self):
+        # When searching on "description"
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(self.url, data={'q': 'descr'})
+        self._assert_result_is_correct(response)
+
+    def test_with_filter_by_section(self):
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(self.url, data={'forward': '{"section": "5"}'})
+        self._assert_result_is_correct(response)
+
+    def _assert_result_is_correct(self, response):
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['id'], str(self.certificate_aim.id))

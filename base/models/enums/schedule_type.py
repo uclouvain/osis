@@ -25,7 +25,6 @@
 ##############################################################################
 from django.utils.translation import ugettext_lazy as _
 
-
 DAILY = 'DAILY'
 SHIFTED = 'SHIFTED'
 ADAPTED = 'ADAPTED'

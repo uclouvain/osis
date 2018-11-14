@@ -116,7 +116,7 @@ def create_xls_with_parameters(user, learning_units, filters, extra_configuratio
         titles_part1.append(str(HEADER_TEACHERS))
         for learning_unit_yr in learning_units:
             learning_unit_yr.attribution_charge_news = attribution_charge_new \
-                .find_attribution_charge_new_by_learning_unit_year(learning_unit_year=learning_unit_yr)
+                .find_attribution_charge_new_by_learning_unit_year_as_dict(learning_unit_year=learning_unit_yr)
 
     working_sheets_data = prepare_xls_content(learning_units, with_grp, with_attributions)
 

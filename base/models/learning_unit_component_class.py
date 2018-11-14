@@ -38,8 +38,11 @@ class LearningUnitComponentClass(models.Model):
     learning_class_year = models.ForeignKey('LearningClassYear')
 
     def save(self, *args, **kwargs):
-        if self.learning_unit_component.learning_component_year.id != self.learning_class_year.learning_component_year.id:
-            raise AttributeError("Learning Component Year is different in Learning Unit Component and Learning Class Year")
+        learning_component_year = self.learning_unit_component.learning_component_year
+        if learning_component_year.id != self.learning_class_year.learning_component_year.id:
+            raise AttributeError(
+                "Learning Component Year is different in Learning Unit Component and Learning Class Year"
+            )
         super(LearningUnitComponentClass, self).save(*args, **kwargs)
 
     class Meta:

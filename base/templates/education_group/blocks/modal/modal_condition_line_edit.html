@@ -34,10 +34,14 @@
             </div>
             <div class="modal-body">
                 {% csrf_token %}
+                <div class="row" id="modification_access">
+                    <div class="col-md-1" style="padding-top: 7px;"><b>{% trans 'Access' %}</b></div>
+                    <div class="col-md-8" style="padding-left: 0">{% bootstrap_field form.access show_label=False %}</div>
+                </div>
+                <br>
                 <ul class="nav nav-tabs" id="modification_tabs" role="tablist">
                     <li role="presentation" class="active"><a href="#modification_diploma">{% trans 'Diploma' %}</a></li>
                     <li role="presentation"><a href="#modification_conditions">{% trans 'Conditions' %}</a></li>
-                    <li role="presentation"><a href="#modification_access">{% trans 'Access' %}</a></li>
                     <li role="presentation"><a href="#modification_remarks">{% trans 'Remarks' %}</a></li>
                 </ul>
                 <div class="tab-content">
@@ -46,9 +50,6 @@
                     </div>
                     <div role="tabpanel" class="tab-pane" id="modification_conditions">
                         {% bootstrap_field form.conditions show_label=False %}
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="modification_access">
-                        {% bootstrap_field form.access show_label=False %}
                     </div>
                     <div role="tabpanel" class="tab-pane" id="modification_remarks">
                         {% bootstrap_field form.remarks show_label=False %}

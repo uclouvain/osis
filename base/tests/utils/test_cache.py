@@ -28,7 +28,7 @@ from django.urls import reverse
 
 from base.tests.factories.user import UserFactory
 from base.utils.cache import cache, clear_cached_filter, _get_filter_key, _restore_filter_from_cache, \
-    _save_filter_to_cache
+    _save_filter_to_cache, get_filter_value_from_cache
 
 
 class TestClearCachedFilter(TestCase):
@@ -38,7 +38,7 @@ class TestClearCachedFilter(TestCase):
         self.user = UserFactory()
 
         request_factory = RequestFactory()
-        self.request = request_factory.post(reverse("clear_filter"), data={'current_url':  self.url_cached})
+        self.request = request_factory.post(reverse("clear_filter"), data={'current_url': self.url_cached})
         self.request.user = self.user
 
     def tearDown(self):
@@ -60,7 +60,7 @@ class TestSaveAndRestoreFilterFromCache(TestCase):
     def setUp(self):
         cache.clear()
         self.data_cached = {
-            "name":"Axandre",
+            "name": "Axandre",
             "city": "City25",
         }
         self.user = UserFactory()
@@ -77,7 +77,7 @@ class TestSaveAndRestoreFilterFromCache(TestCase):
 
     def test_use_default_values_if_nothing_in_cache(self):
         default_values = {
-            "name":"A name",
+            "name": "A name",
             "city": "A city",
         }
         _restore_filter_from_cache(self.request_without_get_data, **default_values)
@@ -95,3 +95,29 @@ class TestSaveAndRestoreFilterFromCache(TestCase):
                             default_values)
         self.assertEqual(self.request.GET.dict(),
                          self.data_cached)
+
+
+class TestGetFilterValueFromCache(TestCase):
+    def setUp(self):
+        self.url_cached = 'dummy_url'
+        self.user = UserFactory()
+        key = _get_filter_key(self.user, self.url_cached)
+
+        filter_to_cached = {'filter_a': 'ABCD', 'filter_b': 'CDEF'}
+        cache.clear()
+        cache.set(key, filter_to_cached)
+
+    def tearDown(self):
+        cache.clear()
+
+    def test_get_filter_value_from_cache_case_success(self):
+        filter_values = get_filter_value_from_cache(self.user, self.url_cached, 'filter_a')
+        expected_value = 'ABCD'
+        self.assertEqual(filter_values, expected_value)
+
+    def test_get_filter_value_from_cache_case_no_filter_key_found(self):
+        self.assertIsNone(get_filter_value_from_cache(self.user, self.url_cached, 'filter_c'))
+
+    def test_get_filter_value_from_cache_case_no_cache_set(self):
+        cache.clear()
+        self.assertIsNone(get_filter_value_from_cache(self.user, self.url_cached, 'filter_c'))

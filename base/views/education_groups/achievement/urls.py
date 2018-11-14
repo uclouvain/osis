@@ -27,6 +27,8 @@ from django.conf.urls import url, include
 
 from base.views.education_groups.achievement.create import CreateEducationGroupAchievement, \
     CreateEducationGroupDetailedAchievement
+from base.views.education_groups.achievement.delete import DeleteEducationGroupAchievement, \
+    DeleteEducationGroupDetailedAchievement
 from base.views.education_groups.achievement.update import EducationGroupAchievementAction, \
     EducationGroupDetailedAchievementAction, UpdateEducationGroupAchievement, UpdateEducationGroupDetailedAchievement
 from base.views.education_groups.achievement.detail import EducationGroupSkillsAchievements
@@ -49,6 +51,10 @@ urlpatterns = [
             UpdateEducationGroupAchievement.as_view(),
             name='update_education_group_achievement'),
 
+        url(r'^delete$',
+            DeleteEducationGroupAchievement.as_view(),
+            name='delete_education_group_achievement'),
+
         url(r'^create',
             CreateEducationGroupDetailedAchievement.as_view(),
             name='create_education_group_detailed_achievement'),
@@ -61,6 +67,10 @@ urlpatterns = [
             url(r'^update$',
                 UpdateEducationGroupDetailedAchievement.as_view(),
                 name='update_education_group_detailed_achievement'),
+
+            url(r'^delete$',
+                DeleteEducationGroupDetailedAchievement.as_view(),
+                name='delete_education_group_detailed_achievement'),
 
         ]))
     ])),

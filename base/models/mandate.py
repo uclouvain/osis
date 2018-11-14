@@ -40,7 +40,7 @@ class Mandate(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     education_group = models.ForeignKey('EducationGroup', blank=True, null=True)
     function = models.CharField(max_length=20, choices=mandate_types.MANDATE_TYPES)
-    qualification = models.CharField(max_length=50,blank=True, null=True)
+    qualification = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return "{} {}".format(self.education_group, self.function)

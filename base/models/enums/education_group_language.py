@@ -25,5 +25,6 @@
 ##############################################################################
 from base.models.utils.utils import ChoiceEnum
 
+
 class EducationGroupLanguages(ChoiceEnum):
     PRIMARY_LANGUAGE = "PRIMARY_LANGUAGE"

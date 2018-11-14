@@ -24,16 +24,18 @@
 #
 ##############################################################################
 from django.db import models
+from django.utils.functional import cached_property
 
 from base.models import organization_address
 from base.models.enums import diploma_coorganization
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from django.utils.translation import ugettext_lazy as _
 
 
 class EducationGroupOrganizationAdmin(OsisModelAdmin):
     list_display = ('education_group_year', 'organization')
     raw_id_fields = ('education_group_year', 'organization')
-    search_fields = ['education_group_year']
+    search_fields = ['education_group_year__acronym']
 
 
 class EducationGroupOrganization(models.Model):
@@ -41,22 +43,23 @@ class EducationGroupOrganization(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     education_group_year = models.ForeignKey('EducationGroupYear')
     organization = models.ForeignKey('Organization')
-    all_students = models.BooleanField(default=False)
-    enrollment_place = models.BooleanField(default=False)
+    all_students = models.BooleanField(default=False, verbose_name=_('for_all_students'))
+    enrollment_place = models.BooleanField(default=False, verbose_name=_('Reference institution'))
     diploma = models.CharField(max_length=40,
-                               choices=diploma_coorganization.DiplomaCoorganizationTypes.choices(),
-                               default=diploma_coorganization.DiplomaCoorganizationTypes.NOT_CONCERNED.value)
+                               choices=diploma_coorganization.COORGANIZATION_DIPLOMA_TYPE,
+                               default=diploma_coorganization.DiplomaCoorganizationTypes.NOT_CONCERNED.value,
+                               verbose_name=_('UCL Diploma'))
+    is_producing_cerfificate = models.BooleanField(default=False, verbose_name=_('Producing certificat'))
+    is_producing_annexe = models.BooleanField(default=False, verbose_name=_('Producing annexe'))
 
-    _address = None
+    class Meta:
+        unique_together = ('education_group_year', 'organization', )
 
-    @property
+    @cached_property
     def address(self):
-        if not self._address:
-            self._address = organization_address.find_by_organization(self.organization).first()
-        return self._address
+        return organization_address.find_by_organization(self.organization).first()
 
 
 def search(**kwargs):
-
     if "education_group_year" in kwargs:
         return EducationGroupOrganization.objects.filter(education_group_year=kwargs['education_group_year'])

@@ -227,7 +227,7 @@ def admission_condition_line_to_dict(context, admission_condition_line):
     fields = ('diploma', 'conditions', 'remarks')
 
     result = {
-        field: (getattr(admission_condition_line, field + context.suffix_language) or '').strip()
+        field: (getattr(admission_condition_line, field + context.suffix_language) or '').strip() or None
         for field in fields
     }
 
@@ -236,7 +236,7 @@ def admission_condition_line_to_dict(context, admission_condition_line):
 
 
 def get_value_from_ac(admission_condition, field, context):
-    return getattr(admission_condition, 'text_{}{}'.format(field, context.suffix_language))
+    return getattr(admission_condition, 'text_{}{}'.format(field, context.suffix_language)) or None
 
 
 def response_for_bachelor(context):
@@ -268,7 +268,7 @@ def build_content_response(context, admission_condition, admission_condition_com
     get_value = functools.partial(get_value_from_ac, admission_condition=admission_condition_common, context=context)
 
     response = {
-        "free_text": getattr(admission_condition, 'text_free' + context.suffix_language),
+        "free_text": getattr(admission_condition, 'text_free' + context.suffix_language) or None,
     }
 
     if acronym_suffix in ('2a', '2mc'):
@@ -325,7 +325,7 @@ def build_response_master_sections(admission_condition, get_texts, group_by_sect
 
 def build_response_for_master_holders_second_university_degree(admission_condition, group_by_section_name, lang):
     return {
-        "text": getattr(admission_condition, 'text_holders_second_university_degree' + lang),
+        "text": getattr(admission_condition, 'text_holders_second_university_degree' + lang) or None,
         "records": {
             "graduates": group_by_section_name['graduates'],
             "masters": group_by_section_name['masters']
@@ -335,7 +335,7 @@ def build_response_for_master_holders_second_university_degree(admission_conditi
 
 def build_response_for_master_university_bachelors(admission_condition, group_by_section_name, lang):
     return {
-        "text": getattr(admission_condition, 'text_university_bachelors' + lang),
+        "text": getattr(admission_condition, 'text_university_bachelors' + lang) or None,
         "records": {
             "ucl_bachelors": group_by_section_name['ucl_bachelors'],
             "others_bachelors_french": group_by_section_name['others_bachelors_french'],

@@ -33,7 +33,6 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
-from base.tests.factories.prerequisite import PrerequisiteFactory
 
 
 class TestLearningUnitsAcronymsFromPrerequisite(TestCase):

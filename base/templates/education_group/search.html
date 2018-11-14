@@ -28,260 +28,252 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-  <li>
-      <a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue'%}</a>
-  </li>
-  <li class="active">{% trans 'education_groups' %}</li>
+    <li>
+        <a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a>
+    </li>
+    <li class="active">{% trans 'education_groups' %}</li>
 {% endblock %}
 
 {% block content %}
 
-<div class="page-header">
-    <div class="row">
-        <div class="col-md-10">
-            <h2>{% trans 'education_groups' %}</h2>
-        </div>
-        <div class="col-md-2" style="margin-top:20px;">
-            <div class="btn-group pull-right">
-                {% include "education_group/blocks/dropdown/education_groups_action_button.html" %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="panel panel-default">
-    <div class="panel-body">
-        <form method="get" action="{% url 'education_groups'%}" id="search_form">
-            <div class="row">
-                <div class="col-md-2">
-                    <label for="slt_academic_year">{% trans 'academic_year_small'%}</label>
-                    {{form.academic_year}}
-                </div>
-                <div class="col-md-2">
-                    <label for="id_acronym">{% trans 'acronym'%}</label>
-                     {{form.acronym}}
-                </div>
-                <div class="col-md-2">
-                    <label for="id_partial_acronym">{% trans 'code' %}</label>
-                    {{ form.partial_acronym }}
-                </div>
-
-                <div class="col-md-6">
-                    <label for="id_title">{% trans 'title'%}</label>
-                     {{form.title}}
-                </div>
-            </div>
-            <div class="row" style="margin-top:10px;">
-                <div class="col-md-2">
-                    <label for="id_category">{% trans 'category'%}</label>
-                     {{form.category}}
-                </div>
-                <div class="col-md-4">
-                    <label for="id_education_group_type">{% trans 'type'%}</label>
-                     {{form.education_group_type}}
-                </div>
-                <div class="col-md-2">
-                    <label for="id_requirement_entity_acronym">{% trans 'academic_entity_small' %}</label>
-                    {{ form.requirement_entity_acronym }}
-                </div>
-                <div class="col-md-2">
-                    <div style="display:inline-block;">
-                        <input type="checkbox" id="id_with_entity_subordinated"
-                               name="with_entity_subordinated" style="margin-top:37px;"
-                               {% if request.GET.with_entity_subordinated and 'on' == request.GET.with_entity_subordinated %}
-                               checked
-                               {% endif %} >
-                        <label>{% trans 'with_entity_subordinated_small' %}</label>
-                    </div>
-                </div>
-                <div class="col-md-2" >
-                    <br>
-                    <div class="btn-toolbar pull-right">
-                        <button type="submit" id="bt_submit_education_groups_search"
-                                class="btn btn-primary" role="button" >
-                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                        </button>
-                        {% include 'blocks/button/button_filter_refresh.html' %}
-                    </div>
-                </div>
-            </div>
-            <input type="hidden" id="xls_status" name="xls_status">
-            <input type="hidden" id="xls_order_col" name="xls_order_col">
-            <input type="hidden" id="xls_order" name="xls_order">
-        </form>
-        {% include 'learning_unit/blocks/form/search_form_reset.html' %}
-        <hr style="margin:10px -15px 10px -15px;">
+    <div class="page-header">
         <div class="row">
-            {% if object_list %}
-                <div class="row">
-                <div class="col-md-6">
-                    <strong style="margin-left:10px;color:grey;"> {{object_list_count}} {% trans 'education_groups'|lower %} </strong>
+            <div class="col-md-10">
+                <h2>{% trans 'education_groups' %}</h2>
+            </div>
+            <div class="col-md-2" style="margin-top:20px;">
+                <div class="btn-group pull-right">
+                    {% include "education_group/blocks/dropdown/education_groups_action_button.html" %}
                 </div>
-                <div class="col-md-6">
-                    <button id="dLabel" class="btn btn-default pull-right" type="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                            style="margin-right:10px;"
-                            title="{% trans 'Export' %}">
-                        <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
-                        <li>
-                            <a id="btn_produce_xls"
-                               style="margin-right:10px;"
-                               title="{% trans 'Produce xls with a list of education groups' %}" >
-                                &nbsp;{% trans 'List of trainings' %}
-                            </a>
-                        </li>
-                        <li>
-                            <a id="btn_produce_xls_administrative_data"
-                               style="margin-right:10px;" title="Produce xls of trainings with administrative data" >
-                                &nbsp;{% trans 'List of trainings with administrative data' %}
-                            </a>
-                        </li>
-                    </ul>
-                    <form id="download_xls" action="{{ request.path }}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" id="xls_status" name="xls_status">
-                    </form>
-                </div>
-                </div>
-
-
-            <table id="table_education_groups" class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th id="th_0_academic_year.year">{% trans 'academic_year_small'%}</th>
-                        <th id="th_1_acronym">{% trans 'acronym'%}</th>
-                        <th id="th_2_title">{% trans 'title'%}</th>
-                        <th id="th_3_education_group_type.name">{% trans 'type'%}</th>
-                        <th id="th_4_management_entity_version.acronym">{% trans 'entity'%}</th>
-                        <th id="th_5_partial_acronym">{% trans 'code'%}</th>
-                    </tr>
-                </thead>
-                {% for education_group_year in object_list %}
-                    <tr>
-                        <td>{{ education_group_year.academic_year}}</td>
-                        <td>
-                            <a href="{% url 'education_group_read' education_group_year.id education_group_year.id %}"
-                               id="lnk_offer_{education_group_year.id}}">{{ education_group_year.acronym }}</a>
-			            </td>
-                        <td>{{ education_group_year.title }}</td>
-                        <td>
-                            {% if education_group_year.education_group_type %}
-                                {% trans education_group_year.education_group_type.name %}
-                            {% endif %}
-                        </td>
-                        <td>{{ education_group_year.management_entity_version.acronym }}</td>
-                        <td>{{ education_group_year.partial_acronym | default_if_none:""  }}</td>
-                    </tr>
-                {% endfor %}
-            </table>
-                <div class="text-center">
-                    {% bootstrap_pagination object_list extra=request.GET.urlencode %}
-                </div>
-            {% endif %}
+            </div>
         </div>
     </div>
-</div>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form method="get" action="{% url 'education_groups' %}" id="search_form">
+                <div class="row">
+                    <div class="col-md-2">
+                        {% bootstrap_field form.academic_year %}
+                    </div>
+                    <div class="col-md-2">
+                        {% bootstrap_field form.acronym %}
+                    </div>
+                    <div class="col-md-2">
+                        {% bootstrap_field form.partial_acronym %}
+                    </div>
+                    <div class="col-md-6">
+                        {% bootstrap_field form.title %}
+                    </div>
+                </div>
+                <div class="row" style="margin-top:10px;">
+                    <div class="col-md-2">
+                        {% bootstrap_field form.category %}
+                    </div>
+                    <div class="col-md-4">
+                        {% bootstrap_field form.education_group_type %}
+                    </div>
+                    <div class="col-md-2">
+                        {% bootstrap_field form.requirement_entity_acronym %}
+                    </div>
+                    <div class="col-md-2">
+                        <div style="display:inline-block;">
+                            <input type="checkbox" id="id_with_entity_subordinated"
+                                   name="with_entity_subordinated" style="margin-top:37px;"
+                                    {% if request.GET.with_entity_subordinated and 'on' == request.GET.with_entity_subordinated %}
+                                   checked
+                                    {% endif %} >
+                            <label>{% trans 'with_entity_subordinated_small' %}</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <br>
+                        <div class="btn-toolbar pull-right">
+                            <button type="submit" id="bt_submit_education_groups_search"
+                                    class="btn btn-primary" role="button">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </button>
+                            {% include 'blocks/button/button_filter_refresh.html' %}
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="xls_status" name="xls_status">
+                <input type="hidden" id="xls_order_col" name="xls_order_col">
+                <input type="hidden" id="xls_order" name="xls_order">
+            </form>
+            {% include 'learning_unit/blocks/form/search_form_reset.html' %}
+            <hr style="margin:10px -15px 10px -15px;">
+            <div class="row">
+                {% if object_list %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong style="margin-left:10px;color:grey;"> {{ object_list_count }} {% trans 'education_groups'|lower %} </strong>
+                        </div>
+                        <div class="col-md-6">
+                            <button id="dLabel" class="btn btn-default pull-right" type="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                    style="margin-right:10px;"
+                                    title="{% trans 'Export' %}">
+                                <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+                                <li>
+                                    <a id="btn_produce_xls"
+                                       style="margin-right:10px;"
+                                       title="{% trans 'Produce xls with a list of education groups' %}">
+                                        &nbsp;{% trans 'List of trainings' %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="btn_produce_xls_administrative_data"
+                                       style="margin-right:10px;"
+                                       title="Produce xls of trainings with administrative data">
+                                        &nbsp;{% trans 'List of trainings with administrative data' %}
+                                    </a>
+                                </li>
+                            </ul>
+                            <form id="download_xls" action="{{ request.path }}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" id="xls_status" name="xls_status">
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <table id="table_education_groups" class="table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th id="th_0_academic_year.year">{% trans 'academic_year_small' %}</th>
+                            <th id="th_1_acronym">{% trans 'acronym' %}</th>
+                            <th id="th_2_title">{% trans 'title' %}</th>
+                            <th id="th_3_education_group_type.name">{% trans 'type' %}</th>
+                            <th id="th_4_management_entity_version.acronym">{% trans 'entity' %}</th>
+                            <th id="th_5_partial_acronym">{% trans 'code' %}</th>
+                        </tr>
+                        </thead>
+                        {% for education_group_year in object_list %}
+                            <tr>
+                                <td>{{ education_group_year.academic_year }}</td>
+                                <td>
+                                    <a href="{% url 'education_group_read' education_group_year.id education_group_year.id %}"
+                                       id="lnk_offer_{education_group_year.id}}">{{ education_group_year.acronym }}</a>
+                                </td>
+                                <td>{{ education_group_year.title }}</td>
+                                <td>
+                                    {% if education_group_year.education_group_type %}
+                                        {% trans education_group_year.education_group_type.name %}
+                                    {% endif %}
+                                </td>
+                                <td>{{ education_group_year.management_entity_version.acronym }}</td>
+                                <td>{{ education_group_year.partial_acronym | default_if_none:"" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <div class="text-center">
+                        {% bootstrap_pagination object_list extra=request.GET.urlencode %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 
 {% block script %}
-<script>
-    jQuery.fn.filterTypeByCategory = function(category) {
-        return this.each(function () {
-            var select = this;
-            var options = [];
-            $(select).find('option').each(function () {
-                options.push({
-                    value: $(this).val(),
-                    category: $(this).data('category'),
-                    text: $(this).text()
+    <script>
+        jQuery.fn.filterTypeByCategory = function (category) {
+            return this.each(function () {
+                var select = this;
+                var options = [];
+                $(select).find('option').each(function () {
+                    options.push({
+                        value: $(this).val(),
+                        category: $(this).data('category'),
+                        text: $(this).text()
+                    });
                 });
+                $(select).data('options', options);
+
+                $(category).on('change', function () {
+                    var current = $(select).val();
+                    var options = $(select).empty().data('options');
+                    var newCategory = $(category).val();
+
+                    $.each(options, function (i) {
+                        var option = options[i];
+                        if (option.category === newCategory || option.value === "" || newCategory === "") {
+                            $(select).append(
+                                $('<option>').text(option.text).val(option.value).data('category', option.category)
+                            );
+                            // Try to keep the old value
+                            if (current === option.value) {
+                                $(select).val(option.value)
+                            }
+                        }
+                    });
+                }).trigger('change');
             });
-            $(select).data('options', options);
+        };
 
-            $(category).on('change', function () {
-                var current = $(select).val();
-                var options = $(select).empty().data('options');
-                var newCategory = $(category).val();
-
-                $.each(options, function (i) {
-                    var option = options[i];
-                    if (option.category === newCategory || option.value === "" || newCategory === "") {
-                        $(select).append(
-                            $('<option>').text(option.text).val(option.value).data('category', option.category)
-                        );
-                        // Try to keep the old value
-                        if (current === option.value) {
-                            $(select).val(option.value)
+        $(document).ready(function () {
+            $('#table_education_groups').DataTable(
+                {
+                    columnDefs: [
+                        {targets: 2, type: 'diacritics-neutralise'}
+                    ],
+                    "stateSave": true,
+                    "paging": false,
+                    "ordering": true,
+                    "info": false,
+                    "searching": false,
+                    "language": {
+                        "oAria": {
+                            "sSortAscending": "{% trans 'datatable_sortascending'%}",
+                            "sSortDescending": "{% trans 'datatable_sortdescending'%}",
                         }
                     }
                 });
-            }).trigger('change');
+
+            $('#id_education_group_type').filterTypeByCategory($('#id_category'));
         });
-    };
 
-    $(document).ready(function()
-    {
-        $('#table_education_groups').DataTable(
-            {
-                columnDefs: [
-                    { targets: 2, type: 'diacritics-neutralise'}
-                ],
-                "stateSave": true,
-                "paging" : false,
-                "ordering" : true,
-                "info"  : false,
-                "searching" : false,
-                "language": {
-                    "oAria": {
-                        "sSortAscending":  "{% trans 'datatable_sortascending'%}",
-                        "sSortDescending": "{% trans 'datatable_sortdescending'%}",
-                    }
-                }
-            });
-
-        $('#id_education_group_type').filterTypeByCategory($('#id_category'));
-    });
-
-    $("#btn_produce_xls").click(function(e) {
-        e.preventDefault();
-        var status = $("#xls_status");
-        status.val('xls');
-        var table = $('#table_education_groups').DataTable();
-        var order = table.order();
-        $("#xls_order_col").val(get_ordering_column(order));
-        $("#xls_order").val(order[0][1]);
-        $("#search_form").submit();
-        status.val('');
-        $("#xls_order").val('');
-        $("#xls_order_col").val('');
-    });
+        $("#btn_produce_xls").click(function (e) {
+            e.preventDefault();
+            var status = $("#xls_status");
+            status.val('xls');
+            var table = $('#table_education_groups').DataTable();
+            var order = table.order();
+            $("#xls_order_col").val(get_ordering_column(order));
+            $("#xls_order").val(order[0][1]);
+            $("#search_form").submit();
+            status.val('');
+            $("#xls_order").val('');
+            $("#xls_order_col").val('');
+        });
 
 
-    $("#btn_produce_xls_administrative_data").click(function(e) {
-        e.preventDefault();
-        var status = $("#xls_status");
-        status.val('xls_administrative');
-        var table = $('#table_education_groups').DataTable();
-        var order = table.order();
-        $("#xls_order_col").val(get_ordering_column(order));
-        $("#xls_order").val(order[0][1]);
-        $("#search_form").submit();
-        status.val('');
-        $("#xls_order").val('');
-        $("#xls_order_col").val('');
-    });
+        $("#btn_produce_xls_administrative_data").click(function (e) {
+            e.preventDefault();
+            var status = $("#xls_status");
+            status.val('xls_administrative');
+            var table = $('#table_education_groups').DataTable();
+            var order = table.order();
+            $("#xls_order_col").val(get_ordering_column(order));
+            $("#xls_order").val(order[0][1]);
+            $("#search_form").submit();
+            status.val('');
+            $("#xls_order").val('');
+            $("#xls_order_col").val('');
+        });
 
 
-    function get_ordering_column(order){
-        var id_search = 'th_' + order[0][0] + '_';
-        var id_string = '[id^='+ id_search+']';
-        var element = document.querySelector(id_string).id;
-        var field_name = element.replace(id_search, "");
-        return field_name;
-    }
-</script>
+        function get_ordering_column(order) {
+            var id_search = 'th_' + order[0][0] + '_';
+            var id_string = '[id^=' + id_search + ']';
+            var element = document.querySelector(id_string).id;
+            var field_name = element.replace(id_search, "");
+            return field_name;
+        }
+    </script>
 {% endblock %}

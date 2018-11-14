@@ -1,28 +1,30 @@
-{%  load i18n format education_group  %}
+{% load i18n format education_group %}
 
 
 <form action="{{ action_url }}" method="post">
     {% csrf_token %}
     <div class="btn-group pull-right {{ additional_class }}" role="group" aria-label="actions">
 
-        <button  type="button" title="{% trans 'update' %}"  class="btn btn-default"
-                 id="{{ "btn_update_"|db_table_with_pk:obj }}" {% permission_change_achievement %}>
-            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+        <button type="button" title="{% trans 'update' %}" class="btn btn-primary trigger_modal"
+                data-url="{{ update_url }}" {% permission_change_achievement %}>
+            <span class="glyphicon glyphicon-edit"></span>
         </button>
-        <button type="submit" title="{% trans 'up' %}"  class="btn btn-default"
-                name="action" value="up" {% if forloop.counter0 == 0 %}disabled{% endif %} {% permission_change_achievement %} >
+
+        <button type="submit" title="{% trans 'up' %}" class="btn btn-default"
+                name="action" value="up"
+                {% if forloop.counter0 == 0 %}disabled{% endif %} {% permission_change_achievement %} >
             <i class="fa fa-arrow-up"></i>
         </button>
 
         <button type="submit" title="{% trans 'down' %}" class="btn btn-default"
-                name="action" value="down" {% if forloop.last %}disabled{% endif %} {% permission_change_achievement %} >
+                name="action" value="down"
+                {% if forloop.last %}disabled{% endif %} {% permission_change_achievement %} >
             <i class="fa fa-arrow-down"></i>
         </button>
 
-        <button type="submit" title="{% trans 'delete' %}"  class="btn btn-default"
-                name="action" value="delete" {% permission_change_achievement %} >
-            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        <button type="button" title="{% trans 'delete' %}" class="btn btn-danger trigger_modal"
+                data-url="{{ delete_url }}" {% permission_delete_achievement %}>
+            <span class="glyphicon glyphicon-remove"></span>
         </button>
     </div>
-    {% include "blocks/modal/modal_ajax.html" with modal_url=update_url click_id="btn_update_"|db_table_with_pk:obj form_id="form_achievement" %}
 </form>

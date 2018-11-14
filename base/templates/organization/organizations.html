@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+{% load staticfiles bootstrap3 %}
+{% load i18n %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
+    <li class="active">{% trans 'organizations' %}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h2>{% trans 'organizations' %}</h2>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <form method="get" action="{% url 'organizations_search'%}">
+                <div class="row">
+                    {% bootstrap_field filter.form.acronym form_group_class="col-md-3" %}
+                    {% bootstrap_field filter.form.name form_group_class="col-md-4" %}
+                    {% bootstrap_field filter.form.type form_group_class="col-md-3" %}
+                    <div class="col-md-2">
+                        <br>
+                        <button type="submit" id="bt_submit_organization_search" class="btn btn-primary" role="button"
+                                title="{% trans 'search_for_an_organization' %}">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="panel-body">
+            {% if object_list %}
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>{% trans 'acronym'%}</th>
+                        <th>{% trans 'organization_name'%}</th>
+                        <th>{% trans 'type'%}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for organization in object_list %}
+                        <tr>
+                            <td>{{ organization.logo_tag }}</td>
+                            <td>
+                                <a href="{% url 'organization_read' organization_id=organization.id %}"
+                                   id="lnk_organization_read_{{organization.id}}">{{ organization.acronym | default_if_none:'-' }}</a></td>
+                            <td>{{ organization.name }}</td>
+                            <td>{{ organization.get_type_display }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+            {% else %}
+                <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

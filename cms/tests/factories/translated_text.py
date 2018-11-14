@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
 import factory.fuzzy
+
 from .text_label import TextLabelFactory
 
 
@@ -40,5 +40,8 @@ class TranslatedTextFactory(factory.django.DjangoModelFactory):
 
 
 class TranslatedTextRandomFactory(TranslatedTextFactory):
-    # text = factory.Faker('sentence')
     text = factory.Faker('paragraph', nb_sentences=3, variable_nb_sentences=True, ext_word_list=None)
+
+
+class EnglishTranslatedTextRandomFactory(TranslatedTextRandomFactory):
+    language = 'en'

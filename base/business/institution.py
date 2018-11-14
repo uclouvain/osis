@@ -25,10 +25,10 @@
 ##############################################################################
 from django.shortcuts import get_object_or_404
 
-from base.models import entity_calendar, person_entity, academic_year
+from base.models import entity_calendar, academic_year
 from base.models.entity import Entity
-from base.models.person import Person
 from base.models.enums import academic_calendar_type
+from base.models.person import Person
 
 
 def find_summary_course_submission_dates_for_entity_version(entity_version):

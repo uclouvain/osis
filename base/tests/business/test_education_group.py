@@ -130,7 +130,7 @@ class EducationGroupTestCase(TestCase):
         self.assertTrue(can_user_edit_administrative_data(self.user, self.education_group_year))
 
     def _create_basic_entity_structure(self):
-        self.organization = OrganizationFactory(name="Université catholique de Louvain", acronym="UCL")
+        self.organization = OrganizationFactory()
         # Create entities UCL
         self.root_entity = _create_entity_and_version_related_to(self.organization, "UCL")
         # SST entity

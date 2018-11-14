@@ -26,13 +26,22 @@
 from django.conf.urls import url, include
 
 from base.views import education_group
+from base.views.education_groups.coorganization import CreateEducationGroupOrganizationView, \
+    UpdateEducationGroupOrganizationView, CoorganizationDeleteView
 from base.views.education_groups.group_element_year.read import pdf_content
 from base.views.education_groups.learning_unit import detail as learning_unit_detail, update as learning_unit_update
 from base.views.education_groups.select import education_group_select, learning_unit_select
+from base.views.education_groups.update import CertificateAimAutocomplete, PostponeGroupElementYearView
 from . import search, create, detail, update, delete, group_element_year
 from .achievement.urls import urlpatterns as urlpatterns_achievement
+import base.views.filter
 
 urlpatterns = [
+    url(
+        r'^certificate_aim_autocomplete/$',
+        CertificateAimAutocomplete.as_view(),
+        name='certificate_aim_autocomplete',
+    ),
 
     url(r'^$', search.education_groups, name='education_groups'),
     url(r'^select_lu/(?P<learning_unit_year_id>[0-9]+)$', learning_unit_select, name='learning_unit_select'),
@@ -71,6 +80,8 @@ urlpatterns = [
             name='education_group_general_informations'),
         url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
             name="education_group_pedagogy_edit"),
+        url(r'^informations/publish/$', detail.publish,
+            name="education_group_publish"),
         url(r'^administrative/', include([
             url(u'^$', detail.EducationGroupAdministrativeData.as_view(), name='education_group_administrative'),
             url(u'^edit/$', education_group.education_group_edit_administrative_data,
@@ -110,6 +121,21 @@ urlpatterns = [
         url(r'^delete/$', delete.DeleteGroupEducationView.as_view(), name="delete_education_group"),
         url(r'^group_content/', group_element_year.read.ReadEducationGroupTypeView.as_view(), name="group_content"),
         url(r'^pdf_content/(?P<language>[a-z\-]+)', pdf_content, name="pdf_content"),
+
+        url(r'^postpone/', PostponeGroupElementYearView.as_view(), name="postpone_education_group"),
+
+
+        url(r'^coorganization/', include([
+            url(r'^create/$',
+                CreateEducationGroupOrganizationView.as_view(),
+                name="coorganization_create"),
+            url(r'^edit/(?P<coorganization_id>[0-9]+)/$',
+                UpdateEducationGroupOrganizationView.as_view(),
+                name="coorganization_edit"),
+            url(r'^delete/(?P<coorganization_id>[0-9]+)$',
+                CoorganizationDeleteView.as_view(),
+                name="coorganization_delete"),
+        ])),
     ])),
     url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([
         url(r'^utilization/$',
