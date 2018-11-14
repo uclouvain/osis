@@ -27,13 +27,13 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            {% dl_with_parent _('acronym') 'acronym' class_dl="col-md-6" %}
+            {% dl_with_parent _('Acronym') 'acronym' class_dl="col-md-6" %}
             {% dl_with_parent  _('code') 'partial_acronym' class_dl="col-md-6" %}
-            {% dl_with_parent  _('category') 'education_group_type.category' class_dl="col-md-6" %}
+            {% dl_with_parent  _('Category') 'education_group_type.category' class_dl="col-md-6" %}
             {% dl_with_parent  _('Training type') 'education_group_type.name' class_dl="col-md-6" %}
 
             {% if education_group_year.education_group_type.category != 'GROUP' %}
-                {% dl_with_parent  _('status') 'active' class_dl="col-md-6" %}
+                {% dl_with_parent  _('Status') 'active' class_dl="col-md-6" %}
                 {% dl_with_parent  _('Schedule type') 'schedule_type' class_dl="col-md-6" %}
             {% endif %}
 

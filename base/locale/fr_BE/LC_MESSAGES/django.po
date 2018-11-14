@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-14 15:49+0100\n"
+"POT-Creation-Date: 2018-11-14 16:05+0100\n"
 "PO-Revision-Date: 2018-11-14 09:34+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -311,6 +311,7 @@ msgstr "Actions"
 msgid "Active"
 msgstr "Actif"
 
+#: templates/education_group/identification_training_details.html:71
 #: templates/education_group/identification_training_details.html:99
 msgid "Activities on other campus"
 msgstr "Activités sur d'autres sites"
@@ -777,6 +778,10 @@ msgstr "Créer"
 #: templates/education_group/tab_content.html:53
 msgid "Cred. rel./abs."
 msgstr "Créd. rel./abs."
+
+#: templates/education_group/blocks/informations.html:40
+msgid "Credits"
+msgstr "Crédits"
 
 #: templates/admin/data.html:30 templates/admin/data.html:34
 #: templates/admin/data_maintenance.html:30 templates/admin/storage.html:31
@@ -1274,18 +1279,22 @@ msgid "Function"
 msgstr "Fonction"
 
 #: models/education_group_year.py:150
+#: templates/education_group/identification_training_details.html:104
 msgid "Funding"
 msgstr "Finançable"
 
 #: models/education_group_year.py:157
+#: templates/education_group/identification_training_details.html:105
 msgid "Funding direction"
 msgstr "Orientation de financement"
 
 #: models/education_group_year.py:162
+#: templates/education_group/identification_training_details.html:106
 msgid "Funding international cooperation CCD/CUD"
 msgstr "Financement coopération internationale CCD/CUD"
 
 #: models/education_group_year.py:169
+#: templates/education_group/identification_training_details.html:107
 msgid "Funding international cooperation CCD/CUD direction"
 msgstr "Orientation coopération internationale CCD/CUD"
 
@@ -2469,6 +2478,7 @@ msgid "Save"
 msgstr ""
 
 #: models/education_group_year.py:218
+#: templates/education_group/blocks/informations.html:37
 msgid "Schedule type"
 msgstr "Type horaire"
 
@@ -3220,6 +3230,7 @@ msgstr ""
 msgid "Training"
 msgstr "Formation"
 
+#: templates/education_group/blocks/informations.html:33
 #: templates/learning_unit/formations.html:45
 msgid "Training type"
 msgstr "Type d'OF"
@@ -3625,6 +3636,7 @@ msgid "activate to sort column descending"
 msgstr "activer pour trier la colonne par ordre décroissant"
 
 #: models/education_group_year.py:226
+#: templates/education_group/identification_training_details.html:70
 msgid "activities in English"
 msgstr "activités en anglais"
 
@@ -3636,6 +3648,10 @@ msgstr ""
 #: templates/academic_calendar/academic_calendars.html:82
 msgid "ad hoc events"
 msgstr "événements ad hoc"
+
+#: templates/education_group/tab_skills_achievements.html:52
+msgid "additional informations"
+msgstr "informations supplémentaires"
 
 #: templates/layout.html:206
 msgid "agreements"
@@ -3740,6 +3756,7 @@ msgstr "attendus du diplôme"
 #: models/abstracts/abstract_achievement.py:44
 #: models/abstracts/abstract_education_group_achievement.py:44
 #: models/education_group_year.py:324 models/learning_unit_year.py:116
+#: templates/education_group/blocks/informations.html:31
 #: templates/education_group/blocks/table_utilizations.html:29
 #: templates/education_group/search.html:152
 #: templates/learning_unit/by_activity.html:94
@@ -3762,6 +3779,7 @@ msgid "comment"
 msgstr "commentaire"
 
 #: models/education_group_year.py:431
+#: templates/education_group/identification_training_details.html:86
 msgid "comment (internal)"
 msgstr "commentaire (interne)"
 
@@ -3921,14 +3939,17 @@ msgid "logo"
 msgstr "logo"
 
 #: models/education_group_year.py:373
+#: templates/education_group/identification_training_details.html:72
 msgid "main domain"
 msgstr "domaine principal"
 
 #: models/education_group_year.py:356 models/education_group_year.py:641
+#: templates/education_group/blocks/informations.html:43
 msgid "maximum constraint"
 msgstr "contrainte maximum"
 
 #: models/education_group_year.py:349 models/education_group_year.py:642
+#: templates/education_group/blocks/informations.html:42
 msgid "minimum constraint"
 msgstr "contrainte minimum"
 
@@ -4035,10 +4056,12 @@ msgid "relative credits"
 msgstr "crédits relatifs"
 
 #: models/education_group_year.py:337
+#: templates/education_group/blocks/remarks.html:29
 msgid "remark"
 msgstr "remarque"
 
 #: models/education_group_year.py:343
+#: templates/education_group/blocks/remarks.html:30
 msgid "remark in english"
 msgstr "remarque en anglais"
 
@@ -4125,6 +4148,10 @@ msgstr "texte en français"
 msgid "the list to generate is empty."
 msgstr "la liste à générer est vide."
 
+#: templates/education_group/tab_skills_achievements.html:50
+msgid "the program aims"
+msgstr "le programme vise"
+
 #: business/proposal_xls.py:37
 msgid "title"
 msgstr "titre"
@@ -4161,6 +4188,7 @@ msgid "type"
 msgstr "type"
 
 #: models/education_group_year.py:366
+#: templates/education_group/blocks/informations.html:41
 msgid "type of constraint"
 msgstr "type de contrainte"
 
