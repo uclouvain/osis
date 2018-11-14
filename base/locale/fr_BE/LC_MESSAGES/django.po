@@ -3861,15 +3861,9 @@ msgstr ""
 "Votre navigateur n'est pas à jour. Certaines fonctionnalités peuvent ne pas "
 "fonctionner correctement."
 
-# ################
-# ################
-# ################
-# ################
-# ################
-# ################
 #: templates/education_group/pdf_content.html:154
 msgid "on"
-msgstr "Le"
+msgstr "le"
 
 #: templates/education_group/blocks/panel/panel_achievements.html:32
 #: templates/education_group/blocks/panel/panel_achievements.html:37
@@ -3886,21 +3880,21 @@ msgstr "ressources en ligne"
 #: templates/organization/organization_address.html:32
 #: templates/organization/organization_address_form.html:33
 #: templates/organization/organization_form.html:33
-msgid "organization"
+msgid "Organization"
 msgstr "Organisation"
 
 #: templates/organization/organization_address.html:33
 #: templates/organization/organization_address_form.html:34
-msgid "organization_address"
+msgid "Organization address"
 msgstr "Adresse de l'organisation"
 
 #: tests/views/test_organization.py:125 views/organization.py:134
-msgid "organization_address_save_error"
+msgid "Impossible to save the organization address"
 msgstr "Impossible d'enregistrer l'adresse de l'organisation"
 
 #: templates/organization/organization.html:62
 #: templates/organization/organizations.html:62
-msgid "organization_name"
+msgid "Name"
 msgstr "Nom"
 
 #: templates/institution.html:42 templates/layout.html:175
@@ -3910,40 +3904,40 @@ msgstr "Nom"
 #: templates/organization/organization_form.html:32
 #: templates/organization/organizations.html:31
 #: templates/organization/organizations.html:36
-msgid "organizations"
+msgid "Organizations"
 msgstr "Organisations"
 
 #: templates/entity/tabs.html:37
-msgid "organogram"
+msgid "Organizational chart"
 msgstr "Organigramme"
 
 #: models/education_group_year.py:242
-msgid "other_campus_activities"
+msgid "Other languages activities"
 msgstr "Activités sur d'autres sites"
 
 #: models/education_group_year.py:234
-msgid "other_language_activities"
+msgid "Other languages activities"
 msgstr "Activité dans d'autres langues"
 
 #: models/learning_unit.py:66
-msgid "other_remark"
+msgid "Other remark"
 msgstr "Autre remarque"
 
 #: templates/education_group/tab_content.html:83
-msgid "own_comment"
+msgid "Own comment"
 msgstr "Commentaire propre"
 
 #: templates/page_not_found.html:34
-msgid "page_not_found"
-msgstr "Page inexistante"
+msgid "Page not found."
+msgstr "Page inexistante."
 
 #: utils/send_mail.py:271
 msgid "parameters"
-msgstr ""
+msgstr "paramètres"
 
 #: business/learning_units/edition.py:123
 #: tests/business/test_learning_unit_edition.py:531
-msgid "parent_greater_than_partim"
+msgid "The selected end year (%(partim_end_year)s) is greater than the end year of the parent %(lu_parent)s"
 msgstr ""
 "L'année de fin selectionnée (%(partim_end_year)s) est plus grande que "
 "l'année de fin du parent %(lu_parent)s"

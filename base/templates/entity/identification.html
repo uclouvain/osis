@@ -72,7 +72,7 @@
                     {% endif %}
                     {% if entity_version.entity.organization %}
                         <div class="col-md-6">
-                            <label>{% trans 'organization'%}</label><br>
+                            <label>{% trans 'Organization'%}</label><br>
                             <a href="{% url 'organization_read' organization_id=entity_version.entity.organization.id %}">{{ entity_version.entity.organization | default_if_none:'' }}</a>
                         </div>
                     {% endif %}

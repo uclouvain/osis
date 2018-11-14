@@ -63,7 +63,12 @@ class LearningUnit(SerializableModel):
     progress = None
 
     faculty_remark = models.TextField(blank=True, null=True, verbose_name=_('faculty_remark'))
-    other_remark = models.TextField(blank=True, null=True, verbose_name=_('other_remark'))
+
+    other_remark = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_('Other remark')
+    )
 
     def __str__(self):
         return "{}".format(self.id)

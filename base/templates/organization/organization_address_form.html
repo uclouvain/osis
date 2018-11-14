@@ -29,9 +29,9 @@
 
 {% block breadcrumb %}
   <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
-  <li><a href="{% url 'organizations' %}" id="lnk_organizations">{% trans 'organizations' %}</a></li>
-  <li><a href="{% url 'organization_read' organization_id=organization_id %}" id="lnk_organization">{% trans 'organization' %}</a></li>
-  <li class="active">{% trans 'organization_address' %}</li>
+  <li><a href="{% url 'organizations' %}" id="lnk_organizations">{% trans 'Organizations' %}</a></li>
+  <li><a href="{% url 'organization_read' organization_id=organization_id %}" id="lnk_organization">{% trans 'Organization' %}</a></li>
+  <li class="active">{% trans 'Organization address' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">

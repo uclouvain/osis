@@ -231,7 +231,7 @@ class EducationGroupYear(models.Model):
         choices=activity_presence.ACTIVITY_PRESENCES,
         blank=True,
         null=True,
-        verbose_name=_('other_language_activities')
+        verbose_name=_('Other languages activities')
     )
 
     other_campus_activities = models.CharField(
@@ -239,7 +239,7 @@ class EducationGroupYear(models.Model):
         choices=activity_presence.ACTIVITY_PRESENCES,
         blank=True,
         null=True,
-        verbose_name=_('other_campus_activities')
+        verbose_name=_('Other languages activities')
     )
 
     professional_title = models.CharField(

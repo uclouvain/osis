@@ -531,7 +531,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
             edit_learning_unit_end_date(learning_unit_partim_annual, None)
 
         self.assertEqual(str(context.exception),
-                         _('parent_greater_than_partim') % {
+                         _('The selected end year (%(partim_end_year)s) is greater '
+                           'than the end year of the parent %(lu_parent)s') % {
                              'partim_end_year': academic_year.find_academic_year_by_year(max_end_year + 1),
                              'lu_parent': learning_unit_full_annual.acronym
                          })

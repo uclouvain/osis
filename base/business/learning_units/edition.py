@@ -120,8 +120,11 @@ def _check_extend_partim(last_learning_unit_year, new_academic_year):
     if last_learning_unit_year.is_partim() and lu_parent:
         if _get_actual_end_year(lu_parent.learning_unit) < new_academic_year.year:
             raise IntegrityError(
-                _('parent_greater_than_partim') % {'partim_end_year': new_academic_year,
-                                                   'lu_parent': lu_parent.acronym}
+                _('The selected end year (%(partim_end_year)s) is greater '
+                  'than the end year of the parent %(lu_parent)s') % {
+                    'partim_end_year': new_academic_year,
+                    'lu_parent': lu_parent.acronym
+                }
             )
 
 
@@ -200,8 +203,8 @@ def _duplicate_entity_container_year(new_lcy, new_academic_year):
 
 
 def _duplicate_learning_component_year(new_learn_container_year, new_learn_unit_year, old_learn_unit_year):
-    old_learning_unit_components = learning_unit_component.find_by_learning_unit_year(old_learn_unit_year)\
-                                                          .select_related('learning_component_year')
+    old_learning_unit_components = learning_unit_component.find_by_learning_unit_year(old_learn_unit_year) \
+        .select_related('learning_component_year')
     for learn_unit_component in old_learning_unit_components:
         old_component = learn_unit_component.learning_component_year
         new_component = update_related_object(old_component, 'learning_container_year', new_learn_container_year)
