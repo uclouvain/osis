@@ -33,8 +33,8 @@
 {% block breadcrumb %}
 <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
 <li><a href="{% url 'academic_year' %}" id="lnk_academic_year">{% trans 'Academic year' %}</a></li>
-<li><a href="{% url 'academic_calendars' %}" id="lnk_academic_calendars">{% trans 'academic_calendars' %}</a></li>
-<li class="active">{% trans 'academic_calendar' %}</li>
+<li><a href="{% url 'academic_calendars' %}" id="lnk_academic_calendars">{% trans 'Academic calendars' %}</a></li>
+<li class="active">{% trans 'Academic calendar' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
@@ -93,7 +93,7 @@
             <br>
             <div class="row">
               <div class="col-md-3">
-                  <label for="slt_reference">{% trans 'academic_calendar_type'%}</label>
+                  <label for="slt_reference">{% trans 'Type of event'%}</label>
                   <br>
                   {{ form.reference }}
               </div>

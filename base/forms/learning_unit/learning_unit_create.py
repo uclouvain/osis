@@ -101,7 +101,7 @@ class LearningUnitYearModelForm(forms.ModelForm):
         if subtype == learning_unit_year_subtypes.PARTIM:
             self.fields['acronym'] = PartimAcronymField()
             self.fields['specific_title'].label = _('Title proper to the partim')
-            self.fields['specific_title_english'].label = _('official_english_title_proper_to_partim')
+            self.fields['specific_title_english'].label = _('English title proper to the partim')
 
         # Disabled fields when it's an update
         if self.instance.pk:

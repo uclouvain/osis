@@ -28,7 +28,7 @@
 
 {% block breadcrumb %}
 <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
-<li><a href="{% url 'Offers' %}" id="lnk_offers">{% trans 'offers' %}</a></li>
+<li><a href="{% url 'Offers' %}" id="lnk_offers">{% trans 'Offers' %}</a></li>
 <li class="active">{% trans 'Calendar of the annual program' %}</li>
 {% endblock %}
 {% block content %}
@@ -39,7 +39,7 @@
     <div class="panel-body">
         <div class="row">
             <div class="col-md-8">
-                <label>{% trans 'academic_calendar'%}</label><br>
+                <label>{% trans 'Academic calendar'%}</label><br>
                 {{ offer_year_calendar.academic_calendar }}
             </div>
             <div class="col-md-2">

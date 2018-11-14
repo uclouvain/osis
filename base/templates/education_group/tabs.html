@@ -42,7 +42,7 @@
     {% if education_group_year.education_group_type.category == "TRAINING" %}
     <li role="presentation" {% if request.path == url_diplomas_tab %} class="active" {% endif %}>
         <a id="link_diploma" href="{% url 'education_group_diplomas' root.pk education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
-            {% trans 'diplomas_certificates' %}
+            {% trans 'Diplomas /  Certificates' %}
         </a>
     </li>
     {% endif %}

@@ -166,7 +166,7 @@ class EducationGroupYear(models.Model):
         max_length=1,
         blank=True,
         default="",
-        verbose_name=_('cud_funding_direction')
+        verbose_name=_('Funding international cooperation CCD/CUD direction')
     )
 
     academic_type = models.CharField(
@@ -174,7 +174,7 @@ class EducationGroupYear(models.Model):
         choices=academic_type.ACADEMIC_TYPES,
         blank=True,
         null=True,
-        verbose_name=_('academic_type')
+        verbose_name=_('Academic type')
     )
 
     university_certificate = models.BooleanField(

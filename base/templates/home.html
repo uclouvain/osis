@@ -105,7 +105,7 @@
 {% if request.user.is_authenticated %}
   {% if academic_calendar|length > 0%}
   <div class="panel panel-default">
-      <div class="panel-heading"><h3 class="panel-title">{% trans 'academic_calendar'%}</h3></div>
+      <div class="panel-heading"><h3 class="panel-title">{% trans 'Academic calendar'%}</h3></div>
       <div class="panel-body">
         <dl>
           {% for academic_event in academic_calendar %}

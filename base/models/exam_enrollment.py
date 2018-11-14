@@ -39,7 +39,7 @@ from base.models.exceptions import JustificationValueException
 from base.models.utils.admin_extentions import remove_delete_action
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
-JUSTIFICATION_ABSENT_FOR_TUTOR = _('absent')
+JUSTIFICATION_ABSENT_FOR_TUTOR = _('Absent')
 
 
 class ExamEnrollmentAdmin(OsisModelAdmin):
@@ -215,7 +215,7 @@ def calculate_exam_enrollment_progress(enrollments):
 
 
 def justification_label_authorized():
-    return "%s, %s" % (_('absent_pdf_legend'),
+    return "%s, %s" % (_('A=Absent'),
                        _('T=Cheating'))
 
 
