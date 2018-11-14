@@ -70,7 +70,7 @@ def generate_exam_enrollments(year, with_different_offer=False):
                                                    end_date=datetime.datetime.today() + datetime.timedelta(days=20),
                                                    reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
     session_exam_calendar = SessionExamCalendarFactory(number_session=number_session.ONE,
-                                                        academic_calendar=an_academic_calendar)
+                                                       academic_calendar=an_academic_calendar)
 
     learning_unit_year = LearningUnitYearFakerFactory(academic_year=academic_year,
                                                       learning_container_year__academic_year=academic_year,
@@ -91,7 +91,7 @@ def generate_exam_enrollments(year, with_different_offer=False):
         student = StudentFactory()
         offer_enrollment = OfferEnrollmentFactory(offer_year=offer_years[i], student=student)
         learning_unit_enrollment = LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year,
-                                                                   offer_enrollment=offer_enrollment)
+                                                                 offer_enrollment=offer_enrollment)
         exam_enrollments.append(ExamEnrollmentFactory(session_exam=session_exams[i],
                                                       learning_unit_enrollment=learning_unit_enrollment))
     return locals()
@@ -242,7 +242,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('error', "%s : %s %s" % (_('Scores must be between 0 and 20'), _('Row'), INCORRECT_LINE)),
+            self.assertIn(('error', "%s : %s %s" % (_("Scores must be between 0 and 20"), _('Row'), INCORRECT_LINE)),
                           messages_tag_and_content)
             self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
                           messages_tag_and_content)

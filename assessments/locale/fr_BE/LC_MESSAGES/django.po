@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-14 09:01+0100\n"
+"POT-Creation-Date: 2018-11-14 11:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -350,6 +350,11 @@ msgstr "Valeur de justification invalide"
 msgid "Justification"
 msgstr "Justification"
 
+#: business/score_encoding_sheet.py:110
+#, python-format
+msgid "Justification legend: %s"
+msgstr "Légende pour le champ 'Justification': %s"
+
 #: templates/online_double_encoding_form.html:171
 #: templates/online_double_encoding_validation.html:280
 #: templates/online_encoding_form.html:204
@@ -372,7 +377,7 @@ msgstr "Dernière synchronisation"
 #, fuzzy
 #| msgid "lastname"
 msgid "Lastname"
-msgstr "Nom de famille"
+msgstr "Nom"
 
 #: templates/scores_encoding.html:102 templates/scores_encoding.html:154
 #: templates/scores_encoding.html:197
@@ -455,7 +460,7 @@ msgstr "Aucun résultat!"
 
 #: tests/views/test_upload_xls_utils.py:183
 msgid "No score injected"
-msgstr "Aucune note encodée"
+msgstr "Aucune note injectée"
 
 #: views/upload_xls_utils.py:206
 msgid "No scores injected"
@@ -470,6 +475,10 @@ msgstr "Aucun étudiant à encoder par excel"
 #: templates/online_encoding.html:67 templates/online_encoding_form.html:66
 msgid "None"
 msgstr "Aucun"
+
+#: business/score_encoding_sheet.py:167
+msgid "Not passed"
+msgstr "Non communiquée"
 
 #: templates/online_double_encoding_form.html:93
 #: templates/online_double_encoding_validation.html:93
@@ -970,25 +979,13 @@ msgstr "%d%m%Y"
 msgid "is already program manager for"
 msgstr "est déjà gestionnaire de programme pour"
 
-#: business/score_encoding_sheet.py:110
-msgid "justification_legend"
-msgstr ""
-
 #: templates/scores_encoding_by_learning_unit.html:121
 msgid "learning units in"
 msgstr "unités d'enseignement dans"
 
-#: business/score_encoding_sheet.py:109
-msgid "link_to_RGEE"
-msgstr ""
-
-#: business/score_encoding_sheet.py:167
-msgid "not_passed"
-msgstr ""
-
 #: templates/admin/pgm_manager.html:112
 msgid "of"
-msgstr ""
+msgstr "sur"
 
 #: templates/scores_encoding_by_learning_unit.html:123
 msgid "program(s)"
@@ -1001,7 +998,3 @@ msgstr "note sauvée"
 #: views/score_encoding.py:316
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
-
-#: business/score_encoding_sheet.py:108
-msgid "ucl_denom_location"
-msgstr ""

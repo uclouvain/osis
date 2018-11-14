@@ -185,8 +185,8 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
         try:
             _check_intergity_data(row,
                                   offer_acronyms_managed=offer_acronyms_managed_by_user,
-                                  learn_unit_acronyms_managed = learn_unit_acronyms_managed_by_user,
-                                  registration_ids_managed = registration_ids_managed_by_user,
+                                  learn_unit_acronyms_managed=learn_unit_acronyms_managed_by_user,
+                                  registration_ids_managed=registration_ids_managed_by_user,
                                   learning_unit_year=learning_unit_year)
             _check_consistency_data(row)
             updated_row = _update_row(request.user, row, enrollments_grouped, is_program_manager)
@@ -198,7 +198,7 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
     _show_error_messages(request, errors_list)
 
     if new_scores_number:
-        messages.add_message(request, messages.SUCCESS, '%s %s' % (str(new_scores_number), _('score saved')))
+        messages.add_message(request, messages.SUCCESS, '%s %s' % (str(new_scores_number), _('Score saved')))
         if not is_program_manager:
             __warn_that_score_responsibles_must_submit_scores(request, learning_unit_year)
         return True

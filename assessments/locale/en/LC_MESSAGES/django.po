@@ -310,6 +310,11 @@ msgstr ""
 msgid "Justification"
 msgstr ""
 
+#: business/score_encoding_sheet.py:110
+#, python-format
+msgid "Justification legend: %s"
+msgstr ""
+
 #: templates/online_double_encoding_form.html:171
 #: templates/online_double_encoding_validation.html:280
 #: templates/online_encoding_form.html:204
@@ -423,6 +428,10 @@ msgstr ""
 #: templates/online_double_encoding_validation.html:67
 #: templates/online_encoding.html:67 templates/online_encoding_form.html:66
 msgid "None"
+msgstr ""
+
+#: business/score_encoding_sheet.py:167
+msgid "Not passed"
 msgstr ""
 
 #: templates/online_double_encoding_form.html:93
@@ -903,20 +912,8 @@ msgstr ""
 msgid "is already program manager for"
 msgstr ""
 
-#: business/score_encoding_sheet.py:110
-msgid "justification_legend"
-msgstr ""
-
 #: templates/scores_encoding_by_learning_unit.html:121
 msgid "learning units in"
-msgstr ""
-
-#: business/score_encoding_sheet.py:109
-msgid "link_to_RGEE"
-msgstr ""
-
-#: business/score_encoding_sheet.py:167
-msgid "not_passed"
 msgstr ""
 
 #: templates/admin/pgm_manager.html:112
@@ -933,8 +930,4 @@ msgstr ""
 
 #: views/score_encoding.py:316
 msgid "score(s) saved"
-msgstr ""
-
-#: business/score_encoding_sheet.py:108
-msgid "ucl_denom_location"
 msgstr ""

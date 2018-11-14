@@ -58,14 +58,14 @@ class ExamEnrollment(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     score_draft = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
-                                      validators=[MinValueValidator(0, message="scores_must_be_between_0_and_20"),
-                                                  MaxValueValidator(20, message="scores_must_be_between_0_and_20")])
+                                      validators=[MinValueValidator(0, message=_("Scores must be between 0 and 20")),
+                                                  MaxValueValidator(20, message=_("Scores must be between 0 and 20"))])
     score_reencoded = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
-                                          validators=[MinValueValidator(0, message="scores_must_be_between_0_and_20"),
-                                                      MaxValueValidator(20, message="scores_must_be_between_0_and_20")])
+                                          validators=[MinValueValidator(0, message=_("Scores must be between 0 and 20")),
+                                                      MaxValueValidator(20, message=_("Scores must be between 0 and 20"))])
     score_final = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
-                                      validators=[MinValueValidator(0, message="scores_must_be_between_0_and_20"),
-                                                  MaxValueValidator(20, message="scores_must_be_between_0_and_20")])
+                                      validators=[MinValueValidator(0, message=_("Scores must be between 0 and 20")),
+                                                  MaxValueValidator(20, message=_("Scores must be between 0 and 20"))])
     justification_draft = models.CharField(max_length=20, blank=True, null=True,
                                            choices=justification_types.JUSTIFICATION_TYPES)
     justification_reencoded = models.CharField(max_length=20, blank=True, null=True,

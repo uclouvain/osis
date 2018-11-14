@@ -35,5 +35,6 @@ class ScoreFileForm(forms.Form):
         content_type = file.content_type.split('/')[1]
         valid_content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet' in content_type
         if ".xlsx" not in file.name or not valid_content_type:
-            self.add_error('file', forms.ValidationError(_("The file must be a valid 'XLSX' excel file"), code='invalid'))
+            self.add_error('file', forms.ValidationError(_("The file must be a valid 'XLSX' excel file"),
+                                                         code='invalid'))
         return file
