@@ -79,12 +79,14 @@ def outside_period(request):
     if latest_session_exam:
         session_number = latest_session_exam.number_session
         str_date = latest_session_exam.academic_calendar.end_date.strftime(date_format)
-        messages.add_message(request, messages.WARNING, _("The period of scores' encoding %s is closed since %s") % (session_number,str_date))
+        messages.add_message(request, messages.WARNING,
+                             _("The period of scores' encoding %s is closed since %s") % (session_number, str_date))
 
     if closest_new_session_exam:
         session_number = closest_new_session_exam.number_session
         str_date = closest_new_session_exam.academic_calendar.start_date.strftime(date_format)
-        messages.add_message(request, messages.WARNING, _("The period of scores' encoding %s will be open %s") % (session_number,str_date))
+        messages.add_message(request, messages.WARNING,
+                             _("The period of scores' encoding %s will be open %s") % (session_number, str_date))
 
     if not messages.get_messages(request):
         messages.add_message(request, messages.WARNING, _("The period of scores' encoding is not opened"))
@@ -120,8 +122,9 @@ def scores_encoding(request):
         # Manage filter
         learning_unit_year_ids = None
         if learning_unit_year_acronym:
-            learning_unit_year_acronym = learning_unit_year_acronym.strip() if isinstance(learning_unit_year_acronym, str)\
-                                         else learning_unit_year_acronym
+            learning_unit_year_acronym = learning_unit_year_acronym.strip() \
+                if isinstance(learning_unit_year_acronym, str)\
+                else learning_unit_year_acronym
             learning_unit_year_ids = list(mdl.learning_unit_year.search(academic_year_id=academic_yr.id,
                                                                         acronym=learning_unit_year_acronym) \
                                                                 .values_list('id', flat=True))
@@ -167,17 +170,20 @@ def scores_encoding(request):
 
     elif mdl.tutor.is_tutor(request.user):
         tutor = mdl.tutor.find_by_user(request.user)
-        score_encoding_progress_list = score_encoding_progress.get_scores_encoding_progress(user=request.user,
-                                                                                            offer_year_id=None,
-                                                                                            number_session=number_session,
-                                                                                            academic_year=academic_yr)
+        score_encoding_progress_list = score_encoding_progress.get_scores_encoding_progress(
+            user=request.user,
+            offer_year_id=None,
+            number_session=number_session,
+            academic_year=academic_yr
+        )
         all_offers = score_encoding_progress.find_related_offer_years(score_encoding_progress_list)
 
         context.update({'tutor': tutor,
                         'offer_year_list': all_offers,
                         'offer_year_id': offer_year_id})
     if score_encoding_progress_list:
-        filtered_list = [score_encoding for score_encoding in score_encoding_progress_list if score_encoding.offer_year_id == offer_year_id]
+        filtered_list = [score_encoding for score_encoding in score_encoding_progress_list
+                         if score_encoding.offer_year_id == offer_year_id]
     else:
         filtered_list = []
     context.update({
@@ -523,7 +529,9 @@ def online_double_encoding_get_form(request, data=None, learning_unit_year_id=No
 def _get_common_encoding_context(request, learning_unit_year_id):
     scores_list = score_encoding_list.get_scores_encoding_list(user=request.user,
                                                                learning_unit_year_id=learning_unit_year_id)
-    score_responsibles = mdl_attr.attribution.find_all_responsibles_by_learning_unit_year(scores_list.learning_unit_year)
+    score_responsibles = mdl_attr.attribution.find_all_responsibles_by_learning_unit_year(
+        scores_list.learning_unit_year
+    )
     tutors = mdl.tutor.find_by_learning_unit(scores_list.learning_unit_year) \
                       .exclude(id__in=[score_responsible.id for score_responsible in score_responsibles])
     is_coordinator = mdl_attr.attribution.is_score_responsible(request.user, scores_list.learning_unit_year)
@@ -631,7 +639,9 @@ def get_json_data_scores_sheets(tutor_global_id):
 
             return {}
     except (PsycopOperationalError, PsycopInterfaceError, DjangoOperationalError, DjangoInterfaceError):
-        queue_exception_logger.error('Postgres Error during get_json_data_scores_sheets on global_id {} => retried'.format(tutor_global_id))
+        queue_exception_logger.error(
+            'Postgres Error during get_json_data_scores_sheets on global_id {} => retried'.format(tutor_global_id)
+        )
         trace = traceback.format_exc()
         queue_exception_logger.error(trace)
         return get_json_data_scores_sheets(tutor_global_id)

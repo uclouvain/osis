@@ -61,8 +61,10 @@ class ExamEnrollment(models.Model):
                                       validators=[MinValueValidator(0, message=_("Scores must be between 0 and 20")),
                                                   MaxValueValidator(20, message=_("Scores must be between 0 and 20"))])
     score_reencoded = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
-                                          validators=[MinValueValidator(0, message=_("Scores must be between 0 and 20")),
-                                                      MaxValueValidator(20, message=_("Scores must be between 0 and 20"))])
+                                          validators=[MinValueValidator(0,
+                                                                        message=_("Scores must be between 0 and 20")),
+                                                      MaxValueValidator(20,
+                                                                        message=_("Scores must be between 0 and 20"))])
     score_final = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
                                       validators=[MinValueValidator(0, message=_("Scores must be between 0 and 20")),
                                                   MaxValueValidator(20, message=_("Scores must be between 0 and 20"))])
