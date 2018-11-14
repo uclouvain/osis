@@ -284,7 +284,7 @@ def _check_intergity_data(row, **kwargs):
             # ... if it is because the user haven't access rights to the offerYear
             raise UploadValueError(
                 "'%s' %s" % (xls_offer_year_acronym,
-                _("You don't have access rights for this offer or it doesn't exist in our database")),
+                             _("You don't have access rights for this offer or it doesn't exist in our database")),
                 messages.ERROR)
         else:
             # ... if it's beacause the registration id doesn't exist
