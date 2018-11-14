@@ -92,7 +92,7 @@
                                             <td>{{dissertation_submission.session3.start_date| default_if_none:'-'|date:"d/m/Y"}}</td>
                                         </tr>
                                         <tr>
-                                            <td><label>{% trans 'DELIBERATION' %}</label></td>
+                                            <td><label>{% trans 'Deliberation' %}</label></td>
                                             <td>
                                                 {% if deliberation.session1 and deliberation.session1.start_date %}
                                                     {{ deliberation.session1.start_date| default_if_none:''|date:"d/m/Y"}} <label>{% trans 'at' %}</label> {{ deliberation.session1.start_date | default_if_none:'-'|date:"H:i"}}

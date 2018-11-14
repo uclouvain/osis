@@ -652,7 +652,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         with self.assertRaises(IntegrityError) as e:
             self._edit_lu(learning_unit_full_annual, excepted_end_year)
 
-        self.assertEqual(str(e.exception), _('Entity_not_exist') % {
+        self.assertEqual(str(e.exception), _('The entity %(entity_acronym)s does not exist for '
+                                             'the selected academic year %(academic_year)s') % {
             'entity_acronym': self.entity_version.acronym,
             'academic_year': academic_year.find_academic_year_by_year(end_year_full + 1)
         })

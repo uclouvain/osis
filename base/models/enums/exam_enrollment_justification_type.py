@@ -40,4 +40,4 @@ SCORE_MISSING = "SCORE_MISSING"
 JUSTIFICATION_TYPES = (
     (ABSENCE_UNJUSTIFIED, _('Absence unjustified')),  # A -> S
     (ABSENCE_JUSTIFIED, _('Absence justified')),      # M
-    (CHEATING, _('CHEATING')))                        # T
+    (CHEATING, _('Cheating')))                        # T

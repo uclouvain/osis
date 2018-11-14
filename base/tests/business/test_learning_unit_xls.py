@@ -165,7 +165,7 @@ class TestLearningUnitXls(TestCase):
                          "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
                              'SMITH, Aaron',
                              _('Function'),
-                             _('CO_HOLDER'),
+                             _('Co-holder'),
                              _('Substitute'),
                              '',
                              _('Beg. of attribution'),

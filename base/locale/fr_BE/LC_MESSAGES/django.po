@@ -28,12 +28,6 @@ msgstr "\"%(child)s\" a été détaché de \"%(parent)s\""
 msgid "%(access_value)s is not an accepted value"
 msgstr "%(access_value)s n'est pas une valeur acceptée"
 
-#: models/group_element_year.py:163
-#: tests/views/education_groups/group_element_year/test_read.py:110
-#, python-format
-msgid "%(acronym)s %(title)s [%(volumes)s] (%(credits)s credits)"
-msgstr "%(acronym)s %(title)s [%(volumes)s] (%(credits)s crédits)"
-
 #: business/education_groups/postponement.py:166
 #, python-format
 msgid "%(col_name)s has been already modified."
@@ -91,8 +85,6 @@ msgid "%(max)s must be greater or equals than %(min)s"
 msgstr "%(max)s doit être plus grand ou égal à %(min)s"
 
 #: business/education_groups/automatic_postponement.py:44
-#, fuzzy, python-format
-#| msgid "this education group is not editable during this period."
 msgid ""
 "%(number_extended)s education group(s) extended and %(number_error)s error(s)"
 msgstr ""
@@ -100,8 +92,6 @@ msgstr ""
 "%(number_error)s erreur(s)"
 
 #: business/learning_units/automatic_postponement.py:42
-#, fuzzy, python-format
-#| msgid "The following learning units ended with error"
 msgid ""
 "%(number_extended)s learning unit(s) extended and %(number_error)s error(s)"
 msgstr ""
@@ -109,12 +99,8 @@ msgstr ""
 "erreur(s)"
 
 #: business/utils/postponement.py:50
-#, fuzzy, python-format
-#| msgid "this education group is not editable during this period."
 msgid "%(number_extended)s object(s) extended and %(number_error)s error(s)"
-msgstr ""
-"%(number_extended)s organisation(s) de formation reportée(s) et "
-"%(number_error)s erreur(s)"
+msgstr "%(number_extended)s objet(s)  reporté(s) et %(number_error)s erreur(s)"
 
 #: templates/blocks/notifications_inner.html:8
 #, python-format
@@ -153,17 +139,9 @@ msgstr ""
 "%(subtype)s %(acronym)s est repris dans le groupement %(group)s l’année "
 "%(year)s"
 
-#: models/education_group_year.py:470 models/group_element_year.py:153
-#: tests/models/test_education_group_year.py:92
-#: tests/views/education_groups/group_element_year/test_read.py:99
-#, fuzzy, python-format
-#| msgid "%(acronym)s %(title)s [%(volumes)s] (%(credits)s credits)"
-msgid "%(title)s (%(credits)s credits)"
-msgstr "%(acronym)s %(title)s [%(volumes)s] (%(credits)s crédits)"
-
 #: templates/education_group/pdf_content.html:109
-msgid "(optional)"
-msgstr "(optionnel)"
+msgid "optional"
+msgstr "optionnel"
 
 #: business/learning_unit.py:75 business/learning_unit.py:79
 msgid "1st quadri"
@@ -218,8 +196,6 @@ msgid "Actions"
 msgstr "Actions"
 
 #: business/learning_unit_proposal.py:53
-#, fuzzy
-#| msgid "active"
 msgid "Active"
 msgstr "Actif"
 
@@ -358,13 +334,13 @@ msgstr "L'élément sélectionné a été attaché à \"%(acronym)s\""
 #: tests/business/test_learning_unit_xls.py:175
 #: tests/business/test_learning_unit_xls.py:387
 msgid "Attrib. vol1"
-msgstr ""
+msgstr "Attrib. vol1"
 
 #: business/learning_unit_xls.py:243
 #: tests/business/test_learning_unit_xls.py:177
 #: tests/business/test_learning_unit_xls.py:389
 msgid "Attrib. vol2"
-msgstr ""
+msgstr "Attrib. vol2"
 
 #: views/learning_units/attribution.py:174
 #, python-format
@@ -402,13 +378,11 @@ msgid "Beg. of attribution"
 msgstr "Déb. attribution"
 
 #: models/enums/exam_enrollment_justification_type.py:43
-#, fuzzy
-#| msgid "CREATION"
-msgid "CHEATING"
-msgstr "Création"
+msgid "Cheating"
+msgstr "Triche"
 
 #: tests/business/test_learning_unit_xls.py:168
-msgid "CO_HOLDER"
+msgid "Co-holder"
 msgstr "Co-titulaire"
 
 #: templates/offer_year_calendar.html:32
@@ -483,7 +457,7 @@ msgstr "Créd. rel./abs."
 
 #: forms/education_groups_administrative_data.py:83
 #: templates/education_group/tab_administrative_data.html:95
-msgid "DELIBERATION"
+msgid "Deliberation"
 msgstr "Délibération"
 
 #: business/proposal_xls.py:39 models/learning_container_year.py:59
@@ -537,11 +511,11 @@ msgid "Do you want to export the following informations"
 msgstr "Désirez-vous exporter les informations suivantes"
 
 #: models/enums/exam_enrollment_state.py:34
-msgid "ENROLLED"
-msgstr ""
+msgid "Enrolled"
+msgstr "Inscrit"
 
 #: forms/education_groups_administrative_data.py:70
-msgid "EXAM_ENROLLMENTS"
+msgid "Exam enrollments"
 msgstr "Inscription aux examens"
 
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:99
@@ -598,24 +572,20 @@ msgstr "Inscrits à la formation"
 #: forms/learning_unit/learning_unit_create.py:130
 #: tests/forms/test_learning_unit_create_2.py:456
 #: tests/forms/test_learning_unit_create_2.py:468
-#, fuzzy, python-brace-format
-#| msgid "Ensure this value is less than %(limit_value)s."
-msgid "Ensure this value is less than or equal to {max_value}."
-msgstr "Assurez-vous que cette valeur est inférieure à %(limit_value)s."
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Assurez-vous que cette valeur est inférieure ou égale à %(limit_value)s."
 
 #: forms/education_group/training.py:137
 msgid "Enter text to search"
 msgstr "Entrez le texte à rechercher"
 
 #: templates/entity/breadcrumb.html:29
-#, fuzzy
-#| msgid "entities"
 msgid "Entities"
 msgstr "Entités"
 
 #: business/learning_units/edition.py:200
 #: tests/business/test_learning_unit_edition.py:655
-msgid "Entity_not_exist"
+msgid "The entity %(entity_acronym)s does not exist for the selected academic year %(academic_year)s"
 msgstr ""
 "L'entité %(entity_acronym)s n'existe pas pour l'année académique "
 "sélectionnée %(academic_year)s"
@@ -631,7 +601,7 @@ msgid "Export"
 msgstr "Exporter"
 
 #: tests/business/learning_units/test_comparison.py:70
-msgid "FULL"
+msgid "Full"
 msgstr "Complet"
 
 #: utils/send_mail.py:250
@@ -639,7 +609,7 @@ msgid "Failure"
 msgstr "Echec"
 
 #: templates/education_group/pdf_content.html:158
-msgid "For approval"
+msgid "For approval,"
 msgstr "Pour accord,"
 
 #: templates/education_group/tab_admission_conditions.html:93

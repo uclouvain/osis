@@ -125,10 +125,12 @@ class LearningUnitYearModelForm(forms.ModelForm):
         error_messages = {
             'credits': {
                 # Override unwanted DecimalField standard error messages
-                'max_digits': _('Ensure this value is less than or equal to {max_value}.').format(
-                    max_value=MAXIMUM_CREDITS),
-                'max_whole_digits': _('Ensure this value is less than or equal to {max_value}.').format(
-                    max_value=MAXIMUM_CREDITS)
+                'max_digits': _('Ensure this value is less than or equal to %(limit_value)s.') % {
+                    'limit_value': MAXIMUM_CREDITS
+                },
+                'max_whole_digits': _('Ensure this value is less than or equal to %(limit_value)s.') % {
+                    'limit_value': MAXIMUM_CREDITS
+                }
             }
         }
         widgets = {

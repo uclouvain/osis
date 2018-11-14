@@ -197,7 +197,7 @@ def _duplicate_entity_container_year(new_lcy, new_academic_year):
         entity_versions = EntityVersion.objects.entity(entity_container_y.entity)
         if not entity_versions.current(new_academic_year.end_date).exists():
             raise IntegrityError(
-                _('Entity_not_exist') % {
+                _('The entity %(entity_acronym)s does not exist for the selected academic year %(academic_year)s') % {
                     'entity_acronym': entity_versions.last().acronym,
                     'academic_year': new_academic_year
                 })

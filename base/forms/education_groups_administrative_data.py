@@ -67,7 +67,7 @@ class CourseEnrollmentForm(BootstrapForm):
 
 
 class AdministrativeDataSessionForm(BootstrapForm):
-    exam_enrollment_range = DateRangeField(label=_('EXAM_ENROLLMENTS'), required=False)
+    exam_enrollment_range = DateRangeField(label=_('Exam enrollments'), required=False)
 
     scores_exam_submission = forms.DateField(widget=DatePickerInput(format=DATE_FORMAT),
                                              input_formats=[DATE_FORMAT, ],
@@ -80,7 +80,7 @@ class AdministrativeDataSessionForm(BootstrapForm):
                                               required=False)
 
     deliberation = forms.SplitDateTimeField(widget=DateTimePickerInput(),
-                                            label=_('DELIBERATION'), required=False)
+                                            label=_('Deliberation'), required=False)
 
     scores_exam_diffusion = forms.SplitDateTimeField(widget=DateTimePickerInput(),
                                                      label=_("Scores diffusion"),

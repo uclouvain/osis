@@ -106,7 +106,7 @@
                 <tr>
                     <td>{% trans "Registration ID" %}</td>
                     <td style="width:170px;"> .....</td>
-                    <td>{% trans "(optional)" %}</td>
+                    <td>({% trans "(optional)" %})</td>
                 </tr>
                 </tbody>
             </table>
@@ -155,7 +155,7 @@
             </div>&emsp; &emsp;
             {% if root.is_minor %}
                 <div style="display: inline;margin-left: 110px;">
-                    {% trans 'For approval' %}
+                    {% trans 'For approval,' %}
                 </div>
             {% endif %}
             <br>&emsp;
