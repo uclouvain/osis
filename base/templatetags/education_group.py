@@ -401,7 +401,7 @@ def link_detach_education_group(context, url):
             title += _("The user has not permission to change education groups.")
         if context['group_to_parent'] == '0':
             title += " " + _("It is not possible to %(action)s the root element.") % {
-                "action": str.lower(action)
+                "action": str.lower(_(action))
             }
 
         a_attributes = """ title="{title}" """.format(title=title)

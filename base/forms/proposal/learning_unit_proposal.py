@@ -31,7 +31,6 @@ from base import models as mdl
 from base.business.learning_unit_year_with_context import append_latest_entities
 from base.forms.common import get_clean_data, TooManyResultsException
 from base.forms.learning_unit.search_form import LearningUnitSearchForm
-from base.models.enums import proposal_type, proposal_state
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import ProposalLearningUnit

@@ -215,7 +215,7 @@ class PermsTestCase(TestCase):
         self.assertTrue(perms.is_eligible_to_edit_proposal(a_proposal, a_person))
 
         for tag in ProposalType.choices():
-            a_proposal.type = tag.name
+            a_proposal.type = tag[0]
             a_proposal.save()
             if a_proposal.type != ProposalType.MODIFICATION:
                 self.assertTrue(perms.is_eligible_to_edit_proposal(a_proposal, a_person))

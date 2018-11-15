@@ -29,7 +29,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.models import entity_version
 from base.models.entity import Entity
-from base.models.enums import proposal_type
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.utils.utils import get_object_or_none
