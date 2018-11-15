@@ -162,7 +162,8 @@ def __display_warning_about_students_deliberated(ws, row_number):
 def __display_legends(ws):
     ws.append([
         str(_('Justification')),
-        str(_("Accepted value: %(justification_label_authorized)s ") % mdl.exam_enrollment.justification_label_authorized())
+        str(_("Accepted value: %(justification_label_authorized)s ")
+            % mdl.exam_enrollment.justification_label_authorized())
     ])
     ws.append([
         str(''),

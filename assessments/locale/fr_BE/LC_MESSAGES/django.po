@@ -819,7 +819,7 @@ msgid ""
 "dated %(printing_date)s and are likely to evolve"
 msgstr ""
 "Les données présentes sur ce document correspondent à l'état du système en "
-"date du %s et sont susceptibles d'évoluer"
+"date du %(printing_date)s et sont susceptibles d'évoluer"
 
 #: views/upload_xls_utils.py:316
 #, python-format
@@ -967,7 +967,7 @@ msgid ""
 "excel file provided (button '%(button_value)s')"
 msgstr ""
 "Votre fichier excel n'est pas bien structuré. Veuillez suivre la structure "
-"du ficheir excel à fournir (bouton '{}')"
+"du ficheir excel à fournir (bouton '%(button_value)s')"
 
 #: business/score_encoding_export.py:147 business/score_encoding_export.py:183
 #: business/score_encoding_sheet.py:103 tests/views/test_score_encoding.py:354
