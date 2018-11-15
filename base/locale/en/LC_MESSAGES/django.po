@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-14 22:30+0100\n"
+"POT-Creation-Date: 2018-11-15 09:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -262,6 +262,10 @@ msgstr ""
 msgid "Academic year"
 msgstr ""
 
+#: models/enums/proposal_state.py:35
+msgid "Accepted"
+msgstr ""
+
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:38
 #: templates/education_group/tab_admission_conditions.html:84
 #: templates/education_group/tab_admission_conditions.html:110
@@ -289,7 +293,7 @@ msgstr ""
 #: templates/education_group/search.html:148 templates/entities.html:65
 #: templates/entity/identification.html:51
 #: templates/entity/identification.html:100 templates/entity/versions.html:43
-#: templates/learning_unit/by_proposal.html:53
+#: templates/learning_unit/by_proposal.html:54
 #: templates/offer/tab_identification.html:50 templates/offers.html:57
 #: templates/offers.html:58 templates/offers.html:78
 #: templates/organization/organizations.html:61
@@ -676,6 +680,10 @@ msgstr ""
 msgid "Category"
 msgstr ""
 
+#: models/enums/proposal_state.py:33
+msgid "Central"
+msgstr ""
+
 #: models/enums/rate_code.py:48
 msgid "Certificate medicine competence"
 msgstr ""
@@ -789,7 +797,7 @@ msgstr ""
 msgid "Consistency error in %(academic_year)s : %(error)s"
 msgstr ""
 
-#: templates/learning_unit/by_proposal.html:44
+#: templates/learning_unit/by_proposal.html:45
 msgid "Consolidate"
 msgstr ""
 
@@ -1239,7 +1247,7 @@ msgstr ""
 msgid "Execute selected action"
 msgstr ""
 
-#: models/learning_unit_year.py:317
+#: models/learning_unit_year.py:318
 msgid "Existing acronym"
 msgstr ""
 
@@ -1266,7 +1274,8 @@ msgstr ""
 msgid "FGS"
 msgstr ""
 
-#: models/enums/entity_type.py:40 models/enums/structure_type.py:41
+#: models/enums/entity_type.py:40 models/enums/proposal_state.py:32
+#: models/enums/structure_type.py:41
 msgid "Faculty"
 msgstr ""
 
@@ -1305,15 +1314,15 @@ msgstr ""
 
 #: templates/learning_unit/blocks/panel/proposal.html:14
 #: templates/learning_unit/blocks/proposal_folder.html:4
-#: templates/learning_unit/by_proposal.html:52
+#: templates/learning_unit/by_proposal.html:53
 msgid "Folder"
 msgstr ""
 
-#: forms/proposal/learning_unit_proposal.py:53
+#: forms/proposal/learning_unit_proposal.py:54
 msgid "Folder entity"
 msgstr ""
 
-#: business/proposal_xls.py:38 forms/proposal/learning_unit_proposal.py:60
+#: business/proposal_xls.py:38 forms/proposal/learning_unit_proposal.py:61
 msgid "Folder num."
 msgstr ""
 
@@ -1444,7 +1453,7 @@ msgstr ""
 msgid "Generate pdf"
 msgstr ""
 
-#: templates/learning_unit/by_proposal.html:40
+#: templates/learning_unit/by_proposal.html:41
 msgid "Get back to initial data"
 msgstr ""
 
@@ -1598,7 +1607,7 @@ msgstr ""
 msgid "Invalid action"
 msgstr ""
 
-#: models/learning_unit_year.py:319
+#: models/learning_unit_year.py:320
 #: tests/views/learning_units/proposals/test_creation.py:186
 msgid "Invalid code"
 msgstr ""
@@ -1607,7 +1616,7 @@ msgstr ""
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 
-#: models/learning_unit_year.py:353
+#: models/learning_unit_year.py:354
 msgid "It is necessary to indicate the internship subtype."
 msgstr ""
 
@@ -1641,7 +1650,6 @@ msgid "Keywords"
 msgstr ""
 
 #: templates/learning_unit/component_edit.html:40
-#: templates/learning_unit/components_identification.html:59
 msgid "LECTURING"
 msgstr ""
 
@@ -1743,6 +1751,7 @@ msgstr ""
 
 #: models/enums/component_type.py:32
 #: models/enums/learning_component_year_type.py:32
+#: templates/learning_unit/components_identification.html:57
 msgid "Lecturing"
 msgstr ""
 
@@ -2373,7 +2382,7 @@ msgid "Please Select or Move an item before Attach it"
 msgstr ""
 
 #: forms/learning_unit/search_form.py:400
-#: forms/proposal/learning_unit_proposal.py:76
+#: forms/proposal/learning_unit_proposal.py:77
 #: tests/forms/test_external_learning_unit.py:245
 #: tests/views/test_learning_unit_proposal.py:554
 msgid "Please choose at least one criteria!"
@@ -2565,14 +2574,14 @@ msgid "Proposal of creation"
 msgstr ""
 
 #: business/learning_unit.py:65 business/learning_unit_xls.py:77
-#: business/proposal_xls.py:38 forms/proposal/learning_unit_proposal.py:69
-#: templates/learning_unit/by_proposal.html:59 utils/send_mail.py:231
+#: business/proposal_xls.py:38 forms/proposal/learning_unit_proposal.py:70
+#: templates/learning_unit/by_proposal.html:60 utils/send_mail.py:231
 msgid "Proposal status"
 msgstr ""
 
 #: business/learning_unit.py:64 business/learning_unit_xls.py:76
-#: business/proposal_xls.py:38 forms/proposal/learning_unit_proposal.py:63
-#: templates/learning_unit/by_proposal.html:58
+#: business/proposal_xls.py:38 forms/proposal/learning_unit_proposal.py:64
+#: templates/learning_unit/by_proposal.html:59
 msgid "Proposal type"
 msgstr ""
 
@@ -2669,6 +2678,10 @@ msgstr ""
 msgid "Reference institution"
 msgstr ""
 
+#: models/enums/proposal_state.py:36
+msgid "Refused"
+msgstr ""
+
 #: templates/education_group/pdf_content.html:107
 #: templates/student/students.html:43 templates/student/students.html:72
 msgid "Registration ID"
@@ -2717,7 +2730,7 @@ msgstr ""
 #: business/learning_units/xls_generator.py:43 business/proposal_xls.py:37
 #: forms/learning_unit/search_form.py:73
 #: templates/learning_unit/by_activity.html:99
-#: templates/learning_unit/by_proposal.html:57
+#: templates/learning_unit/by_proposal.html:58
 #: tests/forms/learning_unit/test_search_form.py:63
 #: tests/views/test_learning_unit_pedagogy.py:193
 msgid "Req. Entity"
@@ -2952,7 +2965,7 @@ msgstr ""
 msgid "Starting year"
 msgstr ""
 
-#: models/proposal_learning_unit.py:53
+#: models/proposal_learning_unit.py:57
 #: templates/learning_unit/blocks/panel/proposal.html:21
 msgid "State"
 msgstr ""
@@ -3046,6 +3059,10 @@ msgstr ""
 #: business/learning_unit_xls.py:199
 #: tests/business/test_learning_unit_xls.py:210
 msgid "Suppression proposal"
+msgstr ""
+
+#: models/enums/proposal_state.py:34
+msgid "Suspended"
 msgstr ""
 
 #: models/exam_enrollment.py:219
@@ -3155,7 +3172,7 @@ msgstr ""
 msgid "The coorganization modifications has been saved"
 msgstr ""
 
-#: models/learning_unit_year.py:344
+#: models/learning_unit_year.py:345
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:232
 #, python-format
 msgid ""
@@ -3163,7 +3180,7 @@ msgid ""
 "credits value of the parent learning unit."
 msgstr ""
 
-#: models/learning_unit_year.py:339 tests/models/test_learning_unit_year.py:598
+#: models/learning_unit_year.py:340 tests/models/test_learning_unit_year.py:598
 msgid "The credits value should be an integer"
 msgstr ""
 
@@ -3313,14 +3330,14 @@ msgstr ""
 msgid "The messages sent by the application to you"
 msgstr ""
 
-#: models/learning_unit_year.py:376 tests/models/test_learning_unit_year.py:560
+#: models/learning_unit_year.py:377 tests/models/test_learning_unit_year.py:560
 #, python-format
 msgid ""
 "The parent is %(parent_periodicty)s and there is at least one partim which "
 "is not %(parent_periodicty)s"
 msgstr ""
 
-#: models/learning_unit_year.py:363
+#: models/learning_unit_year.py:364
 msgid "The parent is inactive and there is at least one partim active"
 msgstr ""
 
@@ -3476,13 +3493,13 @@ msgstr ""
 msgid "This label %s does not exist"
 msgstr ""
 
-#: models/learning_unit_year.py:370 tests/models/test_learning_unit_year.py:576
+#: models/learning_unit_year.py:371 tests/models/test_learning_unit_year.py:576
 #, python-format
 msgid ""
 "This partim is %(partim_periodicity)s and the parent is %(parent_periodicty)s"
 msgstr ""
 
-#: models/learning_unit_year.py:360
+#: models/learning_unit_year.py:361
 msgid "This partim is active and the parent is inactive"
 msgstr ""
 
@@ -3515,7 +3532,7 @@ msgstr ""
 #: templates/entity/identification.html:101 templates/entity/versions.html:44
 #: templates/learning_unit/by_activity.html:96
 #: templates/learning_unit/by_external.html:47
-#: templates/learning_unit/by_proposal.html:55
+#: templates/learning_unit/by_proposal.html:56
 #: templates/learning_unit/formations.html:44
 #: templates/learning_unit/summary_list.html:78
 #: templates/offer/tab_academic_calendar.html:48 templates/offers.html:79
@@ -3541,7 +3558,7 @@ msgstr ""
 msgid "Title proper to the partim"
 msgstr ""
 
-#: models/learning_unit_year.py:254
+#: models/learning_unit_year.py:256
 msgid "To complete"
 msgstr ""
 
@@ -3598,8 +3615,9 @@ msgstr ""
 msgid "Tutors"
 msgstr ""
 
+#: models/proposal_learning_unit.py:52
 #: templates/learning_unit/by_activity.html:97
-#: templates/learning_unit/identification.html:68
+#: templates/learning_unit/by_proposal.html:57
 msgid "Type"
 msgstr ""
 
@@ -3699,6 +3717,10 @@ msgstr ""
 
 #: models/enums/vacant_declaration_type.py:40
 msgid "Vacant not publish"
+msgstr ""
+
+#: templates/learning_unit/by_proposal.html:55
+msgid "Validity"
 msgstr ""
 
 #: templatetags/learning_unit.py:66 tests/templatetags/test_learning_unit.py:38
@@ -4495,12 +4517,11 @@ msgstr ""
 #: business/learning_unit_xls.py:73 business/learning_units/edition.py:449
 #: business/learning_units/xls_comparison.py:55 forms/education_groups.py:81
 #: forms/entity.py:38 forms/learning_unit/search_form.py:158
-#: models/learning_container_year.py:51 models/proposal_learning_unit.py:51
+#: models/learning_container_year.py:51
 #: templates/education_group/search.html:150 templates/entities.html:67
 #: templates/entity/identification.html:63
 #: templates/entity/identification.html:102 templates/entity/versions.html:45
 #: templates/learning_unit/blocks/panel/proposal.html:17
-#: templates/learning_unit/by_proposal.html:56
 #: templates/learning_unit/summary_list.html:79
 #: templates/organization/organization.html:70
 #: templates/organization/organizations.html:63
@@ -4537,7 +4558,6 @@ msgid "validation rule"
 msgstr ""
 
 #: models/education_group_year.py:116
-#: templates/learning_unit/by_proposal.html:54
 msgid "validity"
 msgstr ""
 
@@ -4574,16 +4594,3 @@ msgstr ""
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr ""
-
-#~ msgid "academic_calendar_offer_year_calendar_end_date_error"
-#~ msgstr ""
-#~ "The closure's date of '%s' of the academic calendar can't be lower than "
-#~ "%s (end date of '%s' of the program '%s')"
-
-#, fuzzy
-#~| msgid "acronym_rules"
-#~ msgid "acronym"
-#~ msgstr ""
-#~ "Site with one letter\n"
-#~ "Acronym with min 2 et max 4 letters\n"
-#~ "Number Code with 4 digit"

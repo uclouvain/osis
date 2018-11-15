@@ -26,14 +26,12 @@
 from enum import Enum
 from django.utils.translation import ugettext_lazy as _
 
-
-class ProposalType(Enum):
-    CREATION = "CREATION"
-    MODIFICATION = "MODIFICATION"
-    TRANSFORMATION = "TRANSFORMATION"
-    TRANSFORMATION_AND_MODIFICATION = "TRANSFORMATION_AND_MODIFICATION"
-    SUPPRESSION = "SUPPRESSION"
+from base.models.utils.utils import ChoiceEnum
 
 
-# FIXME impossible to use correctly gettext with this constructor
-CHOICES = tuple((name, _(name)) for name, member in ProposalType.__members__.items())
+class ProposalType(ChoiceEnum):
+    CREATION = _("Creation")
+    MODIFICATION = _("Modification")
+    TRANSFORMATION = _("Transformation")
+    TRANSFORMATION_AND_MODIFICATION = _("Transformation and modification")
+    SUPPRESSION = _("Suppression")

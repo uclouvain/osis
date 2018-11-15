@@ -65,7 +65,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-3">
-                                    {% dl_tooltip learning_unit_year.learning_container_year 'container_type' label_text=_('Type') inherited=learning_unit_year.subtype value=learning_unit_year.container_type_verbose %}
+                                    {% dl_tooltip learning_unit_year.learning_container_year 'container_type' inherited=learning_unit_year.subtype value=learning_unit_year.container_type_verbose %}
                                 </div>
                                 <div class="col-md-3">
                                     {% dl_tooltip learning_unit_year 'internship_subtype' value=learning_unit_year.internship_subtype_verbose %}
@@ -90,7 +90,7 @@
                                     {% dl_tooltip learning_unit_year 'periodicity' %}
                                 </div>
                                 <div class="col-md-3">
-                                    {% dl_tooltip learning_unit_year 'status' label_text='status' value=learning_unit_year.status_verbose.title %}
+                                    {% dl_tooltip learning_unit_year 'status' label_text='status' value=learning_unit_year.status_verbose %}
                                 </div>
                                 <div class="col-md-3">
                                     {% dl_tooltip learning_unit_year 'language' %}
@@ -168,7 +168,7 @@
                                         <label>{% trans 'Decision' %}</label><br>
                                         <p id="id_type_declaration_vacant">
                                             {% if learning_unit_year.learning_container_year.type_declaration_vacant %}
-                                                {% trans learning_unit_year.learning_container_year.type_declaration_vacant %}
+                                                {{ learning_unit_year.learning_container_year.get_type_declaration_vacant_display  }}
                                             {% endif %}
                                         </p>
                                     </div>
@@ -176,7 +176,7 @@
                                         <label>{% trans 'Procedure' %}</label><br>
                                         <p id="id_attribution_procedure">
                                             {% if learning_unit_year.attribution_procedure %}
-                                                {% trans learning_unit_year.attribution_procedure %}
+                                                {{ learning_unit_year.get_attribution_procedure_display }}
                                             {% endif %}
                                         </p>
                                     </div>

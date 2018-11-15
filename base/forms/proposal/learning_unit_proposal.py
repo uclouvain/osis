@@ -32,6 +32,8 @@ from base.business.learning_unit_year_with_context import append_latest_entities
 from base.forms.common import get_clean_data, TooManyResultsException
 from base.forms.learning_unit.search_form import LearningUnitSearchForm
 from base.models.enums import proposal_type, proposal_state
+from base.models.enums.proposal_state import ProposalState
+from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import ProposalLearningUnit
 
 
@@ -61,13 +63,13 @@ class LearningUnitProposalForm(LearningUnitSearchForm):
 
     proposal_type = forms.ChoiceField(
         label=_('Proposal type'),
-        choices=_get_sorted_choices(proposal_type.CHOICES),
+        choices=_get_sorted_choices(ProposalType.choices()),
         required=False
     )
 
     proposal_state = forms.ChoiceField(
         label=_('Proposal status'),
-        choices=_get_sorted_choices(proposal_state.CHOICES),
+        choices=_get_sorted_choices(ProposalState.choices()),
         required=False
     )
 

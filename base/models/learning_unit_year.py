@@ -238,10 +238,10 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def container_type_verbose(self):
         container_type = ''
         if self.learning_container_year:
-            container_type = _(self.learning_container_year.container_type)
+            container_type = _(self.learning_container_year.get_container_type_display())
 
             if self.learning_container_year.container_type in (COURSE, INTERNSHIP):
-                container_type += " ({subtype})".format(subtype=_(self.subtype))
+                container_type += " ({subtype})".format(subtype=self.get_subtype_display())
 
         return container_type
 
@@ -251,9 +251,10 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     @property
     def internship_subtype_verbose(self):
-        return _('To complete') if self.learning_container_year and \
-                                   self.learning_container_year.container_type == INTERNSHIP and \
-                                   not self.internship_subtype else self.internship_subtype
+        if self.learning_container_year and self.learning_container_year.container_type == INTERNSHIP and \
+                not self.internship_subtype:
+            return _('To complete')
+        return self.get_internship_subtype_display()
 
     @property
     def get_previous_acronym(self):
