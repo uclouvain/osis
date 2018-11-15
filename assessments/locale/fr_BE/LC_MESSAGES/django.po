@@ -315,7 +315,7 @@ msgid ""
 "fill in the form."
 msgstr ""
 "Si vous personnalisez l'un des champs ci-dessous, cela ne changera que "
-"l'adresse affichée sur les pages d'encodage de notes pour le programme %%s. "
+"l'adresse affichée sur les pages d'encodage de notes pour le programme %(program)s. "
 "Cela ne changera jamais l'adresse d'une structure. La liste ci-dessous vous "
 "aidera à pré-remplir le formulaire."
 
@@ -958,7 +958,7 @@ msgid ""
 "You will submit %(draft_scores_not_submitted)s notes to faculty(ies). Warning : submitted scores "
 "<b>can't be modified anymore.</b>"
 msgstr ""
-"Vous soumettrez %%s notes au(x) faculté(s). Attention : les notes soumises "
+"Vous soumettrez %(draft_scores_not_submitted)s notes au(x) faculté(s). Attention : les notes soumises "
 "<b>ne peuvent plus être modifiées.</b>"
 
 #: views/upload_xls_utils.py:80
