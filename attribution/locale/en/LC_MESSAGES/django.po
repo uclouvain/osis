@@ -213,3 +213,9 @@ msgstr ""
 #: templates/summary_responsible_edit.html:71
 msgid "Cancel"
 msgstr ""
+
+msgid "Educational information opening"
+msgstr ""
+
+msgid "Educational information ending"
+msgstr ""

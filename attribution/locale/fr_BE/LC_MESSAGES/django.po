@@ -223,3 +223,9 @@ msgstr "Enregistrer"
 #: templates/summary_responsible_edit.html:71
 msgid "Cancel"
 msgstr "Annuler"
+
+msgid "Educational information opening"
+msgstr "Ouverture informations pédagoqiques"
+
+msgid "Educational information ending"
+msgstr "Fermeture informations pédagoqiques"
