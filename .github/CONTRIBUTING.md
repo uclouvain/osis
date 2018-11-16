@@ -12,8 +12,8 @@
 - Documenter les fonctions (paramètres, fonctionnement, ce qu'elle renvoie)
 - Ne pas hésiter à laisser une ligne de commentaire dans le code, décrivant brièvement le fonctionnement d'algorithme plus compliqué/plus longs
 
-### Clés de traduction :
-- Toutes les variables et msgid (traduction) sont écrites en minuscules avec un '_' (underscore) comme séparateur 
+### Traductions :
+- Voir https://github.com/uclouvain/osis/blob/dev/doc/technical-manual.adoc#internationalization
 
 ### Réutilisation du code :
 - Ne pas créer de fonctions qui renvoient plus d'un seul paramètre (perte de contrôle sur ce que fait la fonction et perte de réutilisation du code)
