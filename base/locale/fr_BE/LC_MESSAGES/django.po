@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-16 11:06+0100\n"
+"POT-Creation-Date: 2018-11-16 12:01+0100\n"
 "PO-Revision-Date: 2018-11-16 11:07+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2354,10 +2354,6 @@ msgstr "Composants propres"
 msgid "P.C."
 msgstr "C.P."
 
-#: business/learning_unit.py:77 business/learning_unit.py:81
-msgid "PLANNED_CLASSES"
-msgstr "Classes prévues"
-
 #: templates/page_not_found.html:34
 msgid "Page not found."
 msgstr "Page inexistante."
@@ -2406,6 +2402,7 @@ msgstr "Accès personnalisé"
 msgid "Ph.D"
 msgstr "Ph.D"
 
+#: business/learning_unit.py:77 business/learning_unit.py:81
 #: business/learning_units/xls_comparison.py:81
 #: business/learning_units/xls_comparison.py:91
 #: forms/learning_unit/edition_volume.py:80
@@ -4726,15 +4723,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr "oui,non"
-
-#, fuzzy
-#~| msgid "It is not possible to %(action)s the root element."
-#~ msgid "Il n'est pas possible de %(action)s l'élément racine."
-#~ msgstr "Il n'est pas possible de %(action)s l'élément racine."
-
-#~ msgid ""
-#~ "The closure's date of '%s' of the academic calendar can't be lower than "
-#~ "%s."
-#~ msgstr ""
-#~ "La date de fermeture de ‘%s’ du calendrier académique ne peut être "
-#~ "inférieure à %s."

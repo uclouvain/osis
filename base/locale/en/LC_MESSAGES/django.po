@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-16 11:06+0100\n"
+"POT-Creation-Date: 2018-11-16 12:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -193,10 +193,8 @@ msgid "Ac yr."
 msgstr ""
 
 #: models/enums/academic_type.py:36
-#, fuzzy
-#| msgid "academic_calendars"
 msgid "Academic"
-msgstr "Academic calendars"
+msgstr ""
 
 #: templates/academic_actors.html:31 templates/academic_actors.html:35
 #: templates/institution.html:59 templates/layout.html:183
@@ -229,10 +227,8 @@ msgid "Academic end year"
 msgstr ""
 
 #: models/enums/organization_type.py:37
-#, fuzzy
-#| msgid "academic_calendars"
 msgid "Academic partner"
-msgstr "Academic calendars"
+msgstr ""
 
 #: templates/learning_unit/proposal/create_suppression.html:6
 #: templates/learning_unit/proposal/update_suppression.html:6
@@ -2322,10 +2318,6 @@ msgstr ""
 msgid "P.C."
 msgstr ""
 
-#: business/learning_unit.py:77 business/learning_unit.py:81
-msgid "PLANNED_CLASSES"
-msgstr ""
-
 #: templates/page_not_found.html:34
 msgid "Page not found."
 msgstr ""
@@ -2374,6 +2366,7 @@ msgstr ""
 msgid "Ph.D"
 msgstr ""
 
+#: business/learning_unit.py:77 business/learning_unit.py:81
 #: business/learning_units/xls_comparison.py:81
 #: business/learning_units/xls_comparison.py:91
 #: forms/learning_unit/edition_volume.py:80
@@ -2382,10 +2375,8 @@ msgid "Planned classes"
 msgstr ""
 
 #: models/enums/entity_type.py:45
-#, fuzzy
-#| msgid "date_format"
 msgid "Platform"
-msgstr "%m/%d/%Y"
+msgstr ""
 
 #: tests/views/education_groups/test_update.py:573
 #: views/education_groups/group_element_year/update.py:151
@@ -3987,6 +3978,7 @@ msgstr ""
 msgid "academic events"
 msgstr ""
 
+# TODO
 #: templates/learning_unit/blocks/form/form_external.html:17
 #: templates/learning_unit/blocks/form/form_external.html:19
 #: templates/learning_unit/simple/creation.html:69
