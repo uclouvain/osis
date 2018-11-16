@@ -76,7 +76,9 @@ def education_group_edit_administrative_data(request, root_id, education_group_y
         academic_calendar_reference=academic_calendar_type.COURSE_ENROLLMENT
     ).first()
 
-    course_enrollment = CourseEnrollmentForm(request.POST or None, instance=offer_year_calendar)
+    course_enrollment = CourseEnrollmentForm(request.POST or None,
+                                             instance=offer_year_calendar,
+                                             education_group_yr=education_group_year)
 
     course_enrollment_validity = course_enrollment.is_valid()
     formset_session_validity = formset_session.is_valid()
