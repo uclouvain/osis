@@ -23,8 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 #############################################################################
-from django.db import models
+import itertools
 
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
+from base.models.enums.prerequisite_operator import OR, AND
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -70,3 +74,31 @@ def find_by_learning_unit_year_having_prerequisite(learning_unit_year):
 
 def find_by_learning_unit_being_prerequisite(learning_unit):
     return PrerequisiteItem.objects.filter(learning_unit=learning_unit)
+
+
+def get_related_learning_unit_acronym(prerequisite_item):
+    return prerequisite_item.learning_unit.acronym
+
+
+def get_prerequisite_string_representation(prerequisite):
+    main_operator = prerequisite.main_operator
+    secondary_operator = OR if main_operator == AND else AND
+    prerequisite_items = find_by_prerequisite(prerequisite).order_by('group_number', 'position')
+    prerequisites_fragments = []
+
+    for num_group, records_in_group in itertools.groupby(prerequisite_items, lambda rec: rec.group_number):
+        list_records = list(records_in_group)
+        predicate_format = "({})" if len(list_records) > 1 else "{}"
+        join_secondary_operator = " {} ".format(_(secondary_operator))
+        predicate = predicate_format.format(
+            join_secondary_operator.join(
+                map(
+                    get_related_learning_unit_acronym,
+                    list_records
+                )
+            )
+        )
+        prerequisites_fragments.append(predicate)
+
+    join_main_operator = " {} ".format(_(main_operator))
+    return join_main_operator.join(prerequisites_fragments)

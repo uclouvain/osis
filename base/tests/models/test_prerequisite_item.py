@@ -25,6 +25,7 @@
 ##############################################################################
 
 from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
 
 from base.models import prerequisite_item
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -82,3 +83,63 @@ class TestPrerequisiteItem(TestCase):
                 self.prerequisite_item
             ]
         )
+
+
+class TestPrerequisiteString(TestCase):
+    def setUp(self):
+        self.prerequisite = PrerequisiteFactory()
+
+    def test_get_prerequisite_string_representation_no_item(self):
+        self.assertEqual(
+            prerequisite_item.get_prerequisite_string_representation(self.prerequisite),
+            ""
+        )
+
+    def test_get_prerequisite_string_representation_2_groupq_2_items(self):
+        self.prerequisite_items_group_1 = _build_group_of_prerequisite_items(
+            prerequisite=self.prerequisite,
+            group=1,
+            positions=1
+        )
+        self.prerequisite_items_group_2 = _build_group_of_prerequisite_items(
+            prerequisite=self.prerequisite,
+            group=2,
+            positions=1
+        )
+
+        self.assertEqual(
+            prerequisite_item.get_prerequisite_string_representation(self.prerequisite),
+            "LDROI1111 {AND} LDROI1121".format(AND=_('AND'))
+        )
+
+    def test_get_prerequisite_string_representation_two_groups(self):
+        self.prerequisite_items_group_1 = _build_group_of_prerequisite_items(
+            prerequisite=self.prerequisite,
+            group=1,
+            positions=3
+        )
+        self.prerequisite_items_group_2 = _build_group_of_prerequisite_items(
+            prerequisite=self.prerequisite,
+            group=2,
+            positions=3
+        )
+
+        self.assertEqual(
+            prerequisite_item.get_prerequisite_string_representation(self.prerequisite),
+            "(LDROI1111 {OR} LDROI1112 {OR} LDROI1113) {AND} (LDROI1121 {OR} LDROI1122 {OR} LDROI1123)".format(
+                OR=_('OR'),
+                AND=_('AND')
+            )
+        )
+
+
+def _build_group_of_prerequisite_items(prerequisite, group, positions):
+    return [
+        PrerequisiteItemFactory(
+            prerequisite=prerequisite,
+            learning_unit=LearningUnitYearFactory(acronym='LDROI11{}{}'.format(group, i)).learning_unit,
+            group_number=group,
+            position=i
+        )
+        for i in range(1, 1 + positions)
+    ]

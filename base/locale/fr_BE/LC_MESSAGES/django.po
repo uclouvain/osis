@@ -2142,10 +2142,10 @@ msgid "PRIMARY_LANGUAGE"
 msgstr "Langue principale"
 
 msgid "OR"
-msgstr "Ou"
+msgstr "OU"
 
 msgid "AND"
-msgstr "Et"
+msgstr "ET"
 
 msgid "language_association"
 msgstr "Opérateur langues principales"

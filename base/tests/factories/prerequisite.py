@@ -28,11 +28,9 @@ import string
 
 import factory.fuzzy
 
-from base.tests.factories.education_group import EducationGroupFactory
+from base.models.enums import prerequisite_operator
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
-from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 
 
 class PrerequisiteFactory(factory.django.DjangoModelFactory):
@@ -44,4 +42,5 @@ class PrerequisiteFactory(factory.django.DjangoModelFactory):
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     learning_unit_year = factory.SubFactory(LearningUnitYearFakerFactory)
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
+    main_operator = prerequisite_operator.AND
     prerequisite = "LSINF1111 ET LBIR1203"

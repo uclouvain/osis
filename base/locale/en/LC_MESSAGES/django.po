@@ -2137,10 +2137,10 @@ msgid "PRIMARY_LANGUAGE"
 msgstr "Primary anguage"
 
 msgid "OR"
-msgstr "Or"
+msgstr "OR"
 
 msgid "AND"
-msgstr "And"
+msgstr "AND"
 
 msgid "language_association"
 msgstr "Primary language operator"
