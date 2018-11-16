@@ -98,17 +98,19 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
     def test_post_data(self):
         form_data = {
-            "prerequisite": "LSINF1111"
+            "prerequisite_string": "LSINF1111"
         }
         response = self.client.post(self.url, data=form_data)
 
-        redirect_url = reverse("learning_unit_prerequisite",
-                               args=[self.education_group_year_parents[0].id, self.learning_unit_year_child.id])
+        redirect_url = reverse(
+            "learning_unit_prerequisite",
+            args=[self.education_group_year_parents[0].id, self.learning_unit_year_child.id]
+        )
         self.assertRedirects(response, redirect_url)
 
-        self.assertTrue(
-            Prerequisite.objects.get(learning_unit_year=self.learning_unit_year_child.id,
-                                     education_group_year=self.education_group_year_parents[0].id,
-                                     prerequisite="LSINF1111")
+        prerequisite = Prerequisite.objects.get(
+            learning_unit_year=self.learning_unit_year_child.id,
+            education_group_year=self.education_group_year_parents[0].id,
         )
 
+        self.assertTrue(prerequisite)

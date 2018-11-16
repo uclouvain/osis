@@ -26,14 +26,24 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from base.models.prerequisite import Prerequisite
+from base.models.prerequisite import Prerequisite, prerequisite_syntax_validator
 
 
 class LearningUnitPrerequisiteForm(forms.ModelForm):
+    prerequisite_string = forms.CharField(
+        label=_("Prerequisite"),
+        validators=[prerequisite_syntax_validator],
+        help_text=_("prerequisites_syntax_rules"),
+    )
 
     class Meta:
         model = Prerequisite
-        fields = ('prerequisite', )
-        help_texts = {
-            'prerequisite': _("prerequisites_syntax_rules"),
-        }
+        fields = ()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['prerequisite_string'].initial = self.instance.prerequisite_string
+
+    def save(self, commit=True):
+        print(self.cleaned_data['prerequisite_string'])
+        return super(LearningUnitPrerequisiteForm, self).save(commit=commit)
