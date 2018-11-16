@@ -34,6 +34,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView
 
 from base.business.education_groups import perms
+from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 from base.business.education_groups.learning_units.prerequisite import \
     get_prerequisite_acronyms_which_are_outside_of_education_group
 from base.models import group_element_year
@@ -44,7 +45,6 @@ from base.models.person import Person
 from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
 from base.views.common import display_warning_messages
-from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 
 
 @method_decorator(login_required, name='dispatch')
@@ -103,11 +103,15 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
 
-        context["prerequisite"] = get_object_or_none(Prerequisite,
-                                                     learning_unit_year=context["learning_unit_year"],
-                                                     education_group_year=context["root"])
-        context["can_modify_prerequisite"] = perms.is_eligible_to_change_education_group(context['person'],
-                                                                                         context["root"])
+        context["prerequisite"] = get_object_or_none(
+            Prerequisite,
+            learning_unit_year=context["learning_unit_year"],
+            education_group_year=context["root"]
+        )
+        context["can_modify_prerequisite"] = perms.is_eligible_to_change_education_group(
+            context['person'],
+            context["root"]
+        )
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -124,7 +128,8 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
             display_warning_messages(
                 self.request,
                 _("The prerequisites %s for the learning unit %s are not inside the selected formation %s") %
-                (", ".join(learning_unit_inconsistent), learning_unit_year, root))
+                (", ".join(learning_unit_inconsistent), learning_unit_year, root)
+            )
 
 
 class LearningUnitPrerequisiteGroup(LearningUnitGenericDetailView):
@@ -134,12 +139,17 @@ class LearningUnitPrerequisiteGroup(LearningUnitGenericDetailView):
         context = super().get_context_data()
 
         learning_unit_year = context["learning_unit_year"]
-        formations_id = group_element_year.find_learning_unit_formations([learning_unit_year]).\
-            get(learning_unit_year.id, [])
+        formations_id = group_element_year.find_learning_unit_formations(
+            [learning_unit_year]
+        ).get(
+            learning_unit_year.id, []
+        )
         qs = EducationGroupYear.objects.filter(id__in=formations_id)
-        prefetch_prerequisites = Prefetch("prerequisite_set",
-                                          Prerequisite.objects.filter(learning_unit_year=learning_unit_year),
-                                          to_attr="prerequisites")
+        prefetch_prerequisites = Prefetch(
+            "prerequisite_set",
+            Prerequisite.objects.filter(learning_unit_year=learning_unit_year),
+            to_attr="prerequisites"
+        )
 
         context["formations"] = qs.prefetch_related(prefetch_prerequisites)
 

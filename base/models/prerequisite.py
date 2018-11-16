@@ -31,6 +31,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.models import learning_unit
 from base.models.enums import prerequisite_operator
+from base.models.prerequisite_item import get_prerequisite_string_representation
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 AND_OPERATOR = "ET"
@@ -63,11 +64,12 @@ prerequisite_syntax_validator = validators.RegexValidator(regex=PREREQUISITE_SYN
 
 
 class PrerequisiteAdmin(OsisModelAdmin):
-    list_display = ('learning_unit_year', 'education_group_year', 'prerequisite')
+    list_display = ('learning_unit_year', 'education_group_year')
     raw_id_fields = ('learning_unit_year', 'education_group_year')
     list_filter = ('education_group_year__academic_year',)
     search_fields = ['learning_unit_year__acronym', 'education_group_year__acronym',
                      'education_group_year__partial_acronym']
+    readonly_fields = ('prerequisite_string',)
 
 
 class Prerequisite(models.Model):
@@ -105,7 +107,11 @@ class Prerequisite(models.Model):
         unique_together = ('learning_unit_year', 'education_group_year')
 
     def __str__(self):
-        return "{}{} : {}".format(self.education_group_year, self.learning_unit_year, self.prerequisite)
+        return "{} / {}".format(self.education_group_year, self.learning_unit_year)
+
+    @property
+    def prerequisite_string(self):
+        return get_prerequisite_string_representation(self)
 
 
 def get_by_learning_unit_year_and_education_group_year(learning_unit_year, education_group_year):
