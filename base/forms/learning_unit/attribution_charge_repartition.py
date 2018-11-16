@@ -25,6 +25,7 @@
 ##############################################################################
 from dal import autocomplete
 from django import forms
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
@@ -101,7 +102,7 @@ class AttributionChargeForm(forms.ModelForm):
     def save(self, commit=True, **kwargs):
         attribution_new_obj = kwargs.pop("attribution")
         luy_obj = kwargs.pop("learning_unit_year")
-        learning_component_year = LearningComponentYear.objects.get(type__in=(self.component_type, None),
+        learning_component_year = LearningComponentYear.objects.get(Q(type=self.component_type) | Q(type__isnull=True),
                                                                     learningunitcomponent__learning_unit_year=luy_obj)
 
         attribution_charge_obj = super().save(commit=False)
