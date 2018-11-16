@@ -132,7 +132,7 @@ msgstr "Bachelier"
 msgid "back"
 msgstr "Retour"
 
-msgid "begin_date_lt_end_date"
+msgid "The start date must be equals or lower than the end date"
 msgstr "La date de début doit être égale ou inférieure à la date de fin"
 
 msgid "birth_date"

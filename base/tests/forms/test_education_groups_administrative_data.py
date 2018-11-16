@@ -274,5 +274,5 @@ class TestCourseEnrollmentForm(TestCase):
                                     instance=None, education_group_yr=education_group_yr)
         form.is_valid()
         self.assertEqual(form.errors["range_date"][0],
-                         _('begin_date_lt_end_date'))
+                         _('The start date must be equals or lower than the end date'))
 
