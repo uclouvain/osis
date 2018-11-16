@@ -79,8 +79,7 @@ def upload_scores_file(request, learning_unit_year_id=None):
                 messages.add_message(request, messages.ERROR,
                                      _("Your excel file isn't well structured. "
                                        "Please follow the structure of the excel file provided "
-                                       "(button '%(button_value)s')")
-                                     .format(_("Via Excel"), _('Get Excel file')))
+                                       "(button '%(button_value)s')") % {'button_value':  _('Get Excel file')})
     else:
         for error_msg in [error_msg for error_msgs in form.errors.values() for error_msg in error_msgs]:
             messages.add_message(request, messages.ERROR, "{}".format(error_msg))

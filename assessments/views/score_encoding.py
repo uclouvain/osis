@@ -81,14 +81,14 @@ def outside_period(request):
         str_date = latest_session_exam.academic_calendar.end_date.strftime(date_format)
         messages.add_message(request, messages.WARNING,
                              _("The period of scores' encoding %(session_number)s is closed since %(str_date)s")
-                             % (session_number, str_date))
+                             % {'session_number': session_number, 'str_date': str_date})
 
     if closest_new_session_exam:
         session_number = closest_new_session_exam.number_session
         str_date = closest_new_session_exam.academic_calendar.start_date.strftime(date_format)
         messages.add_message(request, messages.WARNING,
                              _("The period of scores' encoding %(session_number)s will be open %(str_date)s")
-                             % (session_number, str_date))
+                             % {'session_number': session_number, 'str_date': str_date})
 
     if not messages.get_messages(request):
         messages.add_message(request, messages.WARNING, _("The period of scores' encoding is not opened"))
@@ -160,7 +160,7 @@ def scores_encoding(request):
         all_offers = mdl.offer_year.find_by_user(request.user, academic_yr=academic_yr)
 
         if not score_encoding_progress_list:
-            messages.add_message(request, messages.WARNING, "%s" % _('No result!'))
+            messages.add_message(request, messages.WARNING, _('No result!'))
 
         context.update({'offer_list': all_offers,
                         'tutor_list': all_tutors,
@@ -346,7 +346,7 @@ def online_double_encoding_form(request, learning_unit_year_id=None):
             context = _preserve_encoded_values(request, context)
             return online_double_encoding_get_form(request, context, learning_unit_year_id)
         elif not scores_list:
-            messages.add_message(request, messages.WARNING, "%s" % _("No double score encoded ; nothing to compare."))
+            messages.add_message(request, messages.WARNING, _("No double score encoded ; nothing to compare."))
             return online_encoding(request, learning_unit_year_id=learning_unit_year_id)
         else:
             context = _get_double_encoding_context(request, learning_unit_year_id)
@@ -524,7 +524,7 @@ def online_double_encoding_get_form(request, data=None, learning_unit_year_id=No
         return layout.render(request, "online_double_encoding_form.html", data)
     else:
         messages.add_message(request, messages.WARNING,
-                             "%s" % _("No new scores encoded. The double encoding needs new scores."))
+                             _("No new scores encoded. The double encoding needs new scores."))
         return online_encoding(request, learning_unit_year_id=learning_unit_year_id)
 
 
@@ -579,7 +579,7 @@ def _get_specific_criteria_context(request):
     if request.method == 'POST':
         # Make a search
         if not registration_id and not last_name and not first_name and not justification and not offer_year_id:
-            messages.add_message(request, messages.WARNING, "%s" % _("Please choose at least one criteria!"))
+            messages.add_message(request, messages.WARNING, _("Please choose at least one criteria!"))
         else:
             _append_search_to_specific_criteria_context(request, context)
     return context

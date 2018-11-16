@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-14 11:16+0100\n"
+"POT-Creation-Date: 2018-11-16 13:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: views/upload_xls_utils.py:375
+#: templates/online_encoding.html:290
+#, fuzzy, python-format
+msgid ""
+"\n"
+"                        You will submit %(draft_scores_not_submitted)s notes "
+"to faculty(ies). Warning : submitted scores <b>can't be modified anymore.</"
+"b>\n"
+"                    "
+msgstr ""
+"Vous soumettrez %(draft_scores_not_submitted)s notes au(x) faculté(s). "
+"Attention : les notes soumises <b>ne peuvent plus être modifiées.</b>"
+
+#: views/upload_xls_utils.py:377
 msgid "Absence justified cannot be remplaced by absence unjustified"
 msgstr ""
 "Une absence justifiée ne peut être remplacée par une absence injustifiée"
@@ -130,7 +142,7 @@ msgstr "Par critère spécifique"
 #: templates/online_double_encoding_form.html:114
 #: templates/online_double_encoding_form.html:187
 #: templates/online_double_encoding_validation.html:251
-#: templates/online_encoding.html:272 templates/online_encoding.html:295
+#: templates/online_encoding.html:272 templates/online_encoding.html:299
 #: templates/online_encoding_form.html:115
 #: templates/online_encoding_form.html:240
 #: templates/scores_responsible_edit.html:71
@@ -192,7 +204,7 @@ msgstr "Tri descendant de la table de données"
 #: templates/online_encoding_form.html:145
 #: templates/online_encoding_form.html:147
 #: templates/scores_encoding_by_specific_criteria.html:113
-#: views/upload_xls_utils.py:321
+#: views/upload_xls_utils.py:323
 msgid "Deadline reached"
 msgstr "Date d'échéance atteinte"
 
@@ -210,7 +222,7 @@ msgstr ""
 msgid "Decimal values in scores are accepted."
 msgstr "Les valeurs décimales dans les notes sont acceptées."
 
-#: templates/online_encoding.html:154 templates/online_encoding.html:294
+#: templates/online_encoding.html:154 templates/online_encoding.html:298
 msgid "Definitive submission (Submit to faculty)"
 msgstr "Soumission définitive (Soumettre à la faculté)"
 
@@ -307,17 +319,22 @@ msgid "Get Excel file"
 msgstr "Récupérer le fichier Excel"
 
 #: templates/offer/score_sheet_address_tab.html:51
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "If you customize one of the field below, it only change the address "
+#| "displayed on the score encodings sheets for the program %(program)s. It "
+#| "will never change the address of any structure. The list below will help "
+#| "you to pre-fill in the form."
 msgid ""
 "If you customize one of the field below, it only change the address "
-"displayed on the score encodings sheets for the program %(program)s. It will never "
-"change the address of any structure. The list below will help you to pre-"
-"fill in the form."
+"displayed on the score encodings sheets for the program %%(program)s. It "
+"will never change the address of any structure. The list below will help you "
+"to pre-fill in the form."
 msgstr ""
 "Si vous personnalisez l'un des champs ci-dessous, cela ne changera que "
-"l'adresse affichée sur les pages d'encodage de notes pour le programme %(program)s. "
-"Cela ne changera jamais l'adresse d'une structure. La liste ci-dessous vous "
-"aidera à pré-remplir le formulaire."
+"l'adresse affichée sur les pages d'encodage de notes pour le programme "
+"%(program)s. Cela ne changera jamais l'adresse d'une structure. La liste ci-"
+"dessous vous aidera à pré-remplir le formulaire."
 
 #: templates/scores_encoding_by_learning_unit.html:97
 msgid "Incomplete"
@@ -336,7 +353,7 @@ msgstr "Injecter le fichier XLS"
 msgid "Institution"
 msgstr "Institution"
 
-#: tests/views/test_upload_xls_utils.py:192 views/upload_xls_utils.py:368
+#: tests/views/test_upload_xls_utils.py:192 views/upload_xls_utils.py:370
 msgid "Invalid justification value"
 msgstr "Valeur de justification invalide"
 
@@ -350,10 +367,11 @@ msgstr "Valeur de justification invalide"
 msgid "Justification"
 msgstr "Justification"
 
-#: business/score_encoding_sheet.py:110
+#: business/score_encoding_sheet.py:111
 #, python-format
 msgid "Justification legend: %(justification_label_authorized)s"
-msgstr "Légende pour le champ 'Justification': %(justification_label_authorized)s"
+msgstr ""
+"Légende pour le champ 'Justification': %(justification_label_authorized)s"
 
 #: templates/online_double_encoding_form.html:171
 #: templates/online_double_encoding_validation.html:280
@@ -393,7 +411,7 @@ msgstr "Unité d'apprentissage"
 msgid "Learning unit title"
 msgstr "Titre de l'unité d'apprentissage"
 
-#: views/upload_xls_utils.py:383
+#: views/upload_xls_utils.py:385
 msgid "Line"
 msgstr "Ligne"
 
@@ -401,7 +419,7 @@ msgstr "Ligne"
 msgid "Location"
 msgstr "Location"
 
-#: business/score_encoding_export.py:179
+#: business/score_encoding_export.py:180
 msgid "M=Justified Absence"
 msgstr "M=Absence Justifiée"
 
@@ -437,7 +455,7 @@ msgstr "Aucune adresse trouvée pour l'entité sélectionnée."
 msgid "No data for this academic year"
 msgstr "Aucune donnée pour cette année académique"
 
-#: views/score_encoding.py:341
+#: views/score_encoding.py:349
 msgid "No double score encoded ; nothing to compare."
 msgstr "Pas de note encodée en double ; rien à comparer."
 
@@ -445,7 +463,7 @@ msgstr "Pas de note encodée en double ; rien à comparer."
 msgid "No entity associated to your profile"
 msgstr "Aucune entité associée à votre profile"
 
-#: views/score_encoding.py:519
+#: views/score_encoding.py:527
 msgid "No new scores encoded. The double encoding needs new scores."
 msgstr ""
 "Aucune nouvelles notes encodées. L'encodage double nécessite de nouvelle "
@@ -454,7 +472,7 @@ msgstr ""
 #: templates/admin/modal/add_manager.html:42
 #: templates/admin/modal/add_manager.html:44
 #: templates/admin/pgm_manager.html:105 templates/scores_responsible.html:80
-#: views/score_encoding.py:158 views/score_encoding.py:589
+#: views/score_encoding.py:163 views/score_encoding.py:599
 msgid "No result!"
 msgstr "Aucun résultat!"
 
@@ -466,7 +484,7 @@ msgstr "Aucune note injectée"
 msgid "No scores injected"
 msgstr "Aucune note injectée"
 
-#: views/score_encoding.py:396
+#: views/score_encoding.py:404
 msgid "No students to encode by excel"
 msgstr "Aucun étudiant à encoder par excel"
 
@@ -476,7 +494,7 @@ msgstr "Aucun étudiant à encoder par excel"
 msgid "None"
 msgstr "Aucun"
 
-#: business/score_encoding_sheet.py:167
+#: business/score_encoding_sheet.py:169
 msgid "Not passed"
 msgstr "Non communiquée"
 
@@ -486,7 +504,7 @@ msgstr "Non communiquée"
 msgid "Number of enrollments"
 msgstr "Nombre d'inscriptions"
 
-#: business/score_encoding_export.py:172
+#: business/score_encoding_export.py:173
 msgid "Numbered scores"
 msgstr "Nombre de notes"
 
@@ -527,7 +545,7 @@ msgstr "Encodage en ligne des notes"
 msgid "Other tutors"
 msgstr "Autre tuteurs"
 
-#: business/score_encoding_export.py:169
+#: business/score_encoding_export.py:170
 #, python-format
 msgid "Other values: %(justification_other_values)s "
 msgstr "Autre valeurs: %(justification_other_values)s "
@@ -540,7 +558,7 @@ msgstr "Recherche de personne"
 msgid "Phone"
 msgstr "Téléphone"
 
-#: views/score_encoding.py:572
+#: views/score_encoding.py:582
 msgid "Please choose at least one criteria!"
 msgstr "Veuillez choisir au moins un critère!"
 
@@ -652,7 +670,7 @@ msgstr ""
 msgid "Row"
 msgstr "Ligne"
 
-#: business/score_encoding_export.py:178
+#: business/score_encoding_export.py:179
 msgid "S=Unjustified Absence"
 msgstr "S=Absence Injustifiée"
 
@@ -675,11 +693,11 @@ msgstr "Enregistrer"
 msgid "Score"
 msgstr "Note"
 
-#: views/upload_xls_utils.py:324
+#: views/upload_xls_utils.py:326
 msgid "Score already submitted"
 msgstr "Note déjà soumise"
 
-#: business/score_encoding_export.py:173
+#: business/score_encoding_export.py:174
 #, python-format
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr "Note légende: %(score_legend)s (0=Note de présence)"
@@ -688,7 +706,7 @@ msgstr "Note légende: %(score_legend)s (0=Note de présence)"
 #: tests/views/test_upload_xls_utils.py:229
 #: tests/views/test_upload_xls_utils.py:247
 #: tests/views/test_upload_xls_utils.py:274
-#: tests/views/test_upload_xls_utils.py:291
+#: tests/views/test_upload_xls_utils.py:291 views/upload_xls_utils.py:201
 msgid "Score saved"
 msgstr "Note sauvée"
 
@@ -718,7 +736,7 @@ msgid "Scores injection"
 msgstr "Injection de notes"
 
 #: tests/views/test_upload_xls_utils.py:202
-#: tests/views/test_upload_xls_utils.py:245 views/upload_xls_utils.py:404
+#: tests/views/test_upload_xls_utils.py:245 views/upload_xls_utils.py:406
 msgid "Scores must be between 0 and 20"
 msgstr "Les notes doivent être comprises entre 0 et 20"
 
@@ -798,7 +816,7 @@ msgid "Studies"
 msgstr "Etudes"
 
 #: templates/online_encoding.html:155 templates/online_encoding.html:286
-#: templates/online_encoding.html:294
+#: templates/online_encoding.html:298
 msgid "Submission"
 msgstr "Soumission"
 
@@ -821,9 +839,10 @@ msgstr ""
 "Les données présentes sur ce document correspondent à l'état du système en "
 "date du %(printing_date)s et sont susceptibles d'évoluer"
 
-#: views/upload_xls_utils.py:316
+#: views/upload_xls_utils.py:317
 #, python-format
-msgid "The enrollment to the activity %(xls_learning_unit_acronym)s doesn't exist"
+msgid ""
+"The enrollment to the activity %(xls_learning_unit_acronym)s doesn't exist"
 msgstr "L'inscription à l'activité %(xls_learning_unit_acronym)s n'existe pas"
 
 #: forms/score_file.py:38 tests/views/test_upload_xls_utils.py:174
@@ -835,21 +854,27 @@ msgstr "Le fichier dois être un fichier excel valide"
 msgid "The manager will keep the following programs : "
 msgstr "Le gestionnaire devra conserver les programmes suivant : "
 
-#: tests/views/test_score_encoding.py:377 views/score_encoding.py:82
+#: tests/views/test_score_encoding.py:378 views/score_encoding.py:83
 #, python-format
-msgid "The period of scores' encoding %(session_number)s is closed since %(str_date)s"
-msgstr "La période d'encodage de notre %(session_number)s est fermée depuis %(str_date)s"
+msgid ""
+"The period of scores' encoding %(session_number)s is closed since "
+"%(str_date)s"
+msgstr ""
+"La période d'encodage de notre %(session_number)s est fermée depuis "
+"%(str_date)s"
 
-#: tests/views/test_score_encoding.py:380 views/score_encoding.py:87
+#: tests/views/test_score_encoding.py:383 views/score_encoding.py:90
 #, python-format
-msgid "The period of scores' encoding %(session_number)s will be open %(str_date)s"
-msgstr "La période d'encodage de notes %(session_number)s va ouvrir %(str_date)s"
+msgid ""
+"The period of scores' encoding %(session_number)s will be open %(str_date)s"
+msgstr ""
+"La période d'encodage de notes %(session_number)s va ouvrir %(str_date)s"
 
-#: tests/views/test_score_encoding.py:351 views/score_encoding.py:90
+#: tests/views/test_score_encoding.py:351 views/score_encoding.py:94
 msgid "The period of scores' encoding is not opened"
 msgstr "La période d'encodage de notes n'est pas ouverte"
 
-#: views/upload_xls_utils.py:357
+#: views/upload_xls_utils.py:359
 msgid "The scores responsible must still submit the scores"
 msgstr "Le resonsable de notes doit tout de même soumettre les notes"
 
@@ -890,10 +915,6 @@ msgstr "Absence injustifiée"
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
-#: views/upload_xls_utils.py:82
-msgid "Via Excel"
-msgstr "Via Excel"
-
 #: templates/scores_encoding.html:93
 #: templates/scores_encoding_by_learning_unit.html:137
 msgid "Via excel"
@@ -914,7 +935,7 @@ msgstr ""
 msgid "Without attribution"
 msgstr "Sans attribution"
 
-#: views/upload_xls_utils.py:327
+#: views/upload_xls_utils.py:329
 msgid "You can't encode a 'score' and a 'justification' together"
 msgstr "Vous ne pouvez pas encoder une note et une justification ensemble"
 
@@ -952,16 +973,8 @@ msgstr "Vous avez sélectionné un fichier à téléversé"
 msgid "You haven't any score to encode."
 msgstr "Vous n'avez pas aucune note à encoder"
 
-#: templates/online_encoding.html:289
-#, python-format
-msgid ""
-"You will submit %(draft_scores_not_submitted)s notes to faculty(ies). Warning : submitted scores "
-"<b>can't be modified anymore.</b>"
-msgstr ""
-"Vous soumettrez %(draft_scores_not_submitted)s notes au(x) faculté(s). Attention : les notes soumises "
-"<b>ne peuvent plus être modifiées.</b>"
-
 #: views/upload_xls_utils.py:80
+#, python-format
 msgid ""
 "Your excel file isn't well structured. Please follow the structure of the "
 "excel file provided (button '%(button_value)s')"
@@ -969,7 +982,7 @@ msgstr ""
 "Votre fichier excel n'est pas bien structuré. Veuillez suivre la structure "
 "du ficheir excel à fournir (bouton '%(button_value)s')"
 
-#: business/score_encoding_export.py:147 business/score_encoding_export.py:183
+#: business/score_encoding_export.py:147 business/score_encoding_export.py:184
 #: business/score_encoding_sheet.py:103 tests/views/test_score_encoding.py:354
 #: views/score_encoding.py:75
 msgid "date_format"
@@ -991,10 +1004,6 @@ msgstr "sur"
 msgid "program(s)"
 msgstr "programme(s)"
 
-#: views/upload_xls_utils.py:201
-msgid "score saved"
-msgstr "note sauvée"
-
-#: views/score_encoding.py:316
+#: views/score_encoding.py:324
 msgid "score(s) saved"
 msgstr "note(s) sauvées"

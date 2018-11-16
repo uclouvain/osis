@@ -1,4 +1,14 @@
-#: views/upload_xls_utils.py:375
+#: templates/online_encoding.html:290
+#, python-format
+msgid ""
+"\n"
+"                        You will submit %(draft_scores_not_submitted)s notes "
+"to faculty(ies). Warning : submitted scores <b>can't be modified anymore.</"
+"b>\n"
+"                    "
+msgstr ""
+
+#: views/upload_xls_utils.py:377
 msgid "Absence justified cannot be remplaced by absence unjustified"
 msgstr ""
 
@@ -100,7 +110,7 @@ msgstr ""
 #: templates/online_double_encoding_form.html:114
 #: templates/online_double_encoding_form.html:187
 #: templates/online_double_encoding_validation.html:251
-#: templates/online_encoding.html:272 templates/online_encoding.html:295
+#: templates/online_encoding.html:272 templates/online_encoding.html:299
 #: templates/online_encoding_form.html:115
 #: templates/online_encoding_form.html:240
 #: templates/scores_responsible_edit.html:71
@@ -162,7 +172,7 @@ msgstr ""
 #: templates/online_encoding_form.html:145
 #: templates/online_encoding_form.html:147
 #: templates/scores_encoding_by_specific_criteria.html:113
-#: views/upload_xls_utils.py:321
+#: views/upload_xls_utils.py:323
 msgid "Deadline reached"
 msgstr ""
 
@@ -178,7 +188,7 @@ msgstr ""
 msgid "Decimal values in scores are accepted."
 msgstr ""
 
-#: templates/online_encoding.html:154 templates/online_encoding.html:294
+#: templates/online_encoding.html:154 templates/online_encoding.html:298
 msgid "Definitive submission (Submit to faculty)"
 msgstr ""
 
@@ -274,9 +284,9 @@ msgstr ""
 #, python-format
 msgid ""
 "If you customize one of the field below, it only change the address "
-"displayed on the score encodings sheets for the program %(program)s. It will never "
-"change the address of any structure. The list below will help you to pre-"
-"fill in the form."
+"displayed on the score encodings sheets for the program %%(program)s. It "
+"will never change the address of any structure. The list below will help you "
+"to pre-fill in the form."
 msgstr ""
 
 #: templates/scores_encoding_by_learning_unit.html:97
@@ -296,7 +306,7 @@ msgstr ""
 msgid "Institution"
 msgstr ""
 
-#: tests/views/test_upload_xls_utils.py:192 views/upload_xls_utils.py:368
+#: tests/views/test_upload_xls_utils.py:192 views/upload_xls_utils.py:370
 msgid "Invalid justification value"
 msgstr ""
 
@@ -310,9 +320,9 @@ msgstr ""
 msgid "Justification"
 msgstr ""
 
-#: business/score_encoding_sheet.py:110
+#: business/score_encoding_sheet.py:111
 #, python-format
-msgid "%(justification_label_authorized)s"
+msgid "Justification legend: %(justification_label_authorized)s"
 msgstr ""
 
 #: templates/online_double_encoding_form.html:171
@@ -351,7 +361,7 @@ msgstr ""
 msgid "Learning unit title"
 msgstr ""
 
-#: views/upload_xls_utils.py:383
+#: views/upload_xls_utils.py:385
 msgid "Line"
 msgstr ""
 
@@ -359,7 +369,7 @@ msgstr ""
 msgid "Location"
 msgstr ""
 
-#: business/score_encoding_export.py:179
+#: business/score_encoding_export.py:180
 msgid "M=Justified Absence"
 msgstr ""
 
@@ -393,7 +403,7 @@ msgstr ""
 msgid "No data for this academic year"
 msgstr ""
 
-#: views/score_encoding.py:341
+#: views/score_encoding.py:349
 msgid "No double score encoded ; nothing to compare."
 msgstr ""
 
@@ -401,14 +411,14 @@ msgstr ""
 msgid "No entity associated to your profile"
 msgstr ""
 
-#: views/score_encoding.py:519
+#: views/score_encoding.py:527
 msgid "No new scores encoded. The double encoding needs new scores."
 msgstr ""
 
 #: templates/admin/modal/add_manager.html:42
 #: templates/admin/modal/add_manager.html:44
 #: templates/admin/pgm_manager.html:105 templates/scores_responsible.html:80
-#: views/score_encoding.py:158 views/score_encoding.py:589
+#: views/score_encoding.py:163 views/score_encoding.py:599
 msgid "No result!"
 msgstr ""
 
@@ -420,7 +430,7 @@ msgstr ""
 msgid "No scores injected"
 msgstr ""
 
-#: views/score_encoding.py:396
+#: views/score_encoding.py:404
 msgid "No students to encode by excel"
 msgstr ""
 
@@ -430,7 +440,7 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-#: business/score_encoding_sheet.py:167
+#: business/score_encoding_sheet.py:169
 msgid "Not passed"
 msgstr ""
 
@@ -440,7 +450,7 @@ msgstr ""
 msgid "Number of enrollments"
 msgstr ""
 
-#: business/score_encoding_export.py:172
+#: business/score_encoding_export.py:173
 msgid "Numbered scores"
 msgstr ""
 
@@ -481,7 +491,7 @@ msgstr ""
 msgid "Other tutors"
 msgstr ""
 
-#: business/score_encoding_export.py:169
+#: business/score_encoding_export.py:170
 #, python-format
 msgid "Other values: %(justification_other_values)s "
 msgstr ""
@@ -494,7 +504,7 @@ msgstr ""
 msgid "Phone"
 msgstr ""
 
-#: views/score_encoding.py:572
+#: views/score_encoding.py:582
 msgid "Please choose at least one criteria!"
 msgstr ""
 
@@ -601,7 +611,7 @@ msgstr ""
 msgid "Row"
 msgstr ""
 
-#: business/score_encoding_export.py:178
+#: business/score_encoding_export.py:179
 msgid "S=Unjustified Absence"
 msgstr ""
 
@@ -624,11 +634,11 @@ msgstr ""
 msgid "Score"
 msgstr ""
 
-#: views/upload_xls_utils.py:324
+#: views/upload_xls_utils.py:326
 msgid "Score already submitted"
 msgstr ""
 
-#: business/score_encoding_export.py:173
+#: business/score_encoding_export.py:174
 #, python-format
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr ""
@@ -637,7 +647,7 @@ msgstr ""
 #: tests/views/test_upload_xls_utils.py:229
 #: tests/views/test_upload_xls_utils.py:247
 #: tests/views/test_upload_xls_utils.py:274
-#: tests/views/test_upload_xls_utils.py:291
+#: tests/views/test_upload_xls_utils.py:291 views/upload_xls_utils.py:201
 msgid "Score saved"
 msgstr ""
 
@@ -667,7 +677,7 @@ msgid "Scores injection"
 msgstr ""
 
 #: tests/views/test_upload_xls_utils.py:202
-#: tests/views/test_upload_xls_utils.py:245 views/upload_xls_utils.py:404
+#: tests/views/test_upload_xls_utils.py:245 views/upload_xls_utils.py:406
 msgid "Scores must be between 0 and 20"
 msgstr ""
 
@@ -747,7 +757,7 @@ msgid "Studies"
 msgstr ""
 
 #: templates/online_encoding.html:155 templates/online_encoding.html:286
-#: templates/online_encoding.html:294
+#: templates/online_encoding.html:298
 msgid "Submission"
 msgstr ""
 
@@ -768,9 +778,10 @@ msgid ""
 "dated %(printing_date)s and are likely to evolve"
 msgstr ""
 
-#: views/upload_xls_utils.py:316
+#: views/upload_xls_utils.py:317
 #, python-format
-msgid "The enrollment to the activity %(xls_learning_unit_acronym)s doesn't exist"
+msgid ""
+"The enrollment to the activity %(xls_learning_unit_acronym)s doesn't exist"
 msgstr ""
 
 #: forms/score_file.py:38 tests/views/test_upload_xls_utils.py:174
@@ -782,21 +793,24 @@ msgstr ""
 msgid "The manager will keep the following programs : "
 msgstr ""
 
-#: tests/views/test_score_encoding.py:377 views/score_encoding.py:82
+#: tests/views/test_score_encoding.py:378 views/score_encoding.py:83
 #, python-format
-msgid "The period of scores' encoding %(session_number)s is closed since %(str_date)s"
+msgid ""
+"The period of scores' encoding %(session_number)s is closed since "
+"%(str_date)s"
 msgstr ""
 
-#: tests/views/test_score_encoding.py:380 views/score_encoding.py:87
+#: tests/views/test_score_encoding.py:383 views/score_encoding.py:90
 #, python-format
-msgid "The period of scores' encoding %(session_number)s will be open %(str_date)s"
+msgid ""
+"The period of scores' encoding %(session_number)s will be open %(str_date)s"
 msgstr ""
 
-#: tests/views/test_score_encoding.py:351 views/score_encoding.py:90
+#: tests/views/test_score_encoding.py:351 views/score_encoding.py:94
 msgid "The period of scores' encoding is not opened"
 msgstr ""
 
-#: views/upload_xls_utils.py:357
+#: views/upload_xls_utils.py:359
 msgid "The scores responsible must still submit the scores"
 msgstr ""
 
@@ -835,10 +849,6 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
-#: views/upload_xls_utils.py:82
-msgid "Via Excel"
-msgstr ""
-
 #: templates/scores_encoding.html:93
 #: templates/scores_encoding_by_learning_unit.html:137
 msgid "Via excel"
@@ -858,7 +868,7 @@ msgstr ""
 msgid "Without attribution"
 msgstr ""
 
-#: views/upload_xls_utils.py:327
+#: views/upload_xls_utils.py:329
 msgid "You can't encode a 'score' and a 'justification' together"
 msgstr ""
 
@@ -889,20 +899,14 @@ msgstr ""
 msgid "You haven't any score to encode."
 msgstr ""
 
-#: templates/online_encoding.html:289
-#, python-format
-msgid ""
-"You will submit %(draft_scores_not_submitted)s notes to faculty(ies). Warning : submitted scores "
-"<b>can't be modified anymore.</b>"
-msgstr ""
-
 #: views/upload_xls_utils.py:80
+#, python-format
 msgid ""
 "Your excel file isn't well structured. Please follow the structure of the "
 "excel file provided (button '%(button_value)s')"
 msgstr ""
 
-#: business/score_encoding_export.py:147 business/score_encoding_export.py:183
+#: business/score_encoding_export.py:147 business/score_encoding_export.py:184
 #: business/score_encoding_sheet.py:103 tests/views/test_score_encoding.py:354
 #: views/score_encoding.py:75
 msgid "date_format"
@@ -924,10 +928,6 @@ msgstr ""
 msgid "program(s)"
 msgstr ""
 
-#: views/upload_xls_utils.py:201
-msgid "score saved"
-msgstr ""
-
-#: views/score_encoding.py:316
+#: views/score_encoding.py:324
 msgid "score(s) saved"
 msgstr ""
