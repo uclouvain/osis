@@ -227,7 +227,7 @@ def _get_attribution_line(an_attribution):
     return "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
         an_attribution.get('person'),
         _('Function'),
-        Functions[an_attribution['function']] if 'function' in an_attribution else '',
+        Functions[an_attribution['function']].value if 'function' in an_attribution else '',
         _('Substitute'),
         an_attribution.get('substitute') if an_attribution.get('substitute') else '',
         _('Beg. of attribution'),

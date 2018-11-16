@@ -27,6 +27,7 @@ import datetime
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
+from attribution.models.enums.function import Functions
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.person import PersonFactory
@@ -361,10 +362,14 @@ class TestLearningUnitXls(TestCase):
             ''
         ]
         self.assertEqual(_get_data_part2(luy, False), expected_common)
-        self.assertEqual(_get_data_part2(luy, True),
-                         expected_attribution_data(attribution_charge_new_lecturing, attribution_charge_new_practical,
-                                                   expected_common,
-                                                   luy))
+        self.assertEqual(
+            _get_data_part2(luy, True),
+            expected_attribution_data(
+                attribution_charge_new_lecturing, attribution_charge_new_practical,
+                expected_common,
+                luy
+            )
+        )
 
 
 def expected_attribution_data(attribution_charge_new_lecturing, attribution_charge_new_practical, expected, luy):
@@ -374,7 +379,7 @@ def expected_attribution_data(attribution_charge_new_lecturing, attribution_char
     expected_attribution = "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
         expected_attribution.get('person'),
         _('Function'),
-        _(expected_attribution.get('function')),
+        Functions[expected_attribution['function']].value,
         _('Substitute'),
         '',
         _('Beg. of attribution'),
