@@ -115,14 +115,7 @@ msgstr "Entité resp. cahier des charges"
 #: templates/manage_my_courses/blocks/submission_dates.html:29
 #, fuzzy
 #| msgid "manage_educational_information"
-msgid "Educational information opening"
-msgstr "Gérer les informations pédagogiques"
-
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:12
-#: templates/manage_my_courses/blocks/submission_dates.html:34
-#, fuzzy
-#| msgid "manage_educational_information"
-msgid "Educational information ending"
+msgid "Manage educational information"
 msgstr "Gérer les informations pédagogiques"
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:13
@@ -150,7 +143,7 @@ msgid "Manage educational information"
 msgstr "Gérer les informations pédagogiques"
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:48
-msgid "There is no course for which you can edit educational information."
+msgid "There is no course for which you can edit educational information"
 msgstr ""
 "Il n'existe aucun cours dont vous pouvez modifier les informations "
 "pédagogiques."
@@ -197,7 +190,7 @@ msgstr "Recherche"
 
 #: templates/summary_responsible.html:80
 msgid "No result"
-msgstr ""
+msgstr "Pas de résultat"
 
 #: templates/summary_responsible.html:86
 msgid "Entity"
@@ -226,12 +219,6 @@ msgstr "Modifier"
 #: templates/summary_responsible_edit.html:69
 msgid "Save"
 msgstr "Enregistrer"
-
-#: templates/summary_responsible_edit.html:71
-#, fuzzy
-#| msgid "Cancel"
-msgid "cancel"
-msgstr "Annuler"
 
 #: templates/summary_responsible_edit.html:71
 msgid "Cancel"

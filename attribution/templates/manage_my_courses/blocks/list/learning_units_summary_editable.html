@@ -8,8 +8,8 @@
                 <th>{% trans 'Courses' %}</th>
                 <th>{% trans 'Title' %}</th>
                 <th>{% trans 'Requirement entity' %}</th>
-                <th>{% trans 'Educational information opening' %}</th>
-                <th>{% trans 'Educational information ending' %}</th>
+                <th>{% trans 'Manage educational information' %}</th>
+                <th>{% trans 'Manage educational information' %}</th>
                 <th>{% trans 'Summary responsible' %}</th>
                 <th>{% trans 'Editable' %}</th>
             </tr>
@@ -45,6 +45,6 @@
     </table>
 {% else %}
     <div id="no_attribution_warning_message" class="alert alert-warning" role="alert">
-        {% trans 'There is no course for which you can edit educational information.' %}
+        {% trans 'There is no course for which you can edit educational information' %}
     </div>
 {% endif %}

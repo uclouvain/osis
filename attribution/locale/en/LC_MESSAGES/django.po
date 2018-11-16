@@ -113,15 +113,8 @@ msgstr ""
 #: templates/manage_my_courses/blocks/submission_dates.html:29
 #, fuzzy
 #| msgid "manage_educational_information"
-msgid "Educational information opening"
-msgstr "Manage educational information"
-
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:12
-#: templates/manage_my_courses/blocks/submission_dates.html:34
-#, fuzzy
-#| msgid "manage_educational_information"
-msgid "Educational information ending"
-msgstr "Manage educational information"
+msgid "Manage educational information"
+msgstr ""
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:13
 #: templates/summary_responsible.html:69
@@ -144,8 +137,8 @@ msgid "Manage educational information"
 msgstr ""
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:48
-msgid "There is no course for which you can edit educational information."
-msgstr "There is no course for which you can edit educational information."
+msgid "There is no course for which you can edit educational information"
+msgstr ""
 
 #: templates/manage_my_courses/educational_information.html:32
 msgid "Educational information"
@@ -215,10 +208,6 @@ msgstr ""
 
 #: templates/summary_responsible_edit.html:69
 msgid "Save"
-msgstr ""
-
-#: templates/summary_responsible_edit.html:71
-msgid "cancel"
 msgstr ""
 
 #: templates/summary_responsible_edit.html:71
