@@ -132,16 +132,6 @@ msgstr "Responsable des infos pédagogiques"
 msgid "Editable"
 msgstr "Modifiable"
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:23
-#: templates/manage_my_courses/blocks/tabs.html:32
-#: templates/manage_my_courses/educational_information.html:30
-#: templates/manage_my_courses/list_my_courses_summary_editable.html:31
-#: templates/manage_my_courses/list_my_courses_summary_editable.html:36
-#, fuzzy
-#| msgid "manage_educational_information"
-msgid "Manage educational information"
-msgstr "Gérer les informations pédagogiques"
-
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:48
 msgid "There is no course for which you can edit educational information"
 msgstr ""
