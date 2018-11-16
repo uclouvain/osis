@@ -27,8 +27,12 @@ ZERO = "0"
 ONE = "1"
 MANY = "MANY"
 
-COUNT_CONSTRAINTS = (
-    (ZERO, ZERO),
+MAX_COUNT_CONSTRAINTS = (
     (ONE, ONE),
     (MANY, MANY),
+)
+
+MIN_COUNT_CONSTRAINTS = (
+    (ZERO, ZERO),
+    (ONE, ONE),
 )
