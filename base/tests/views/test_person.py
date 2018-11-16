@@ -36,13 +36,16 @@ from base.views.person import EmployeeAutocomplete
 class TestPersonAutoComplete(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.jean = PersonFactory(first_name="Jean", last_name="Dupont", middle_name=None, employee=True)
-        cls.henry = PersonFactory(first_name="Henry", last_name="Arkin", middle_name="De", employee=True)
-        cls.student = PersonFactory(first_name="Henry", last_name="Dioup", middle_name=None, employee=False)
+        cls.jean = PersonFactory(first_name="Jean", last_name="Dupont", middle_name=None, global_id="01456",
+                                 employee=True)
+        cls.henry = PersonFactory(first_name="Henry", last_name="Arkin", middle_name="De", global_id="025875",
+                                  employee=True)
+        cls.student = PersonFactory(first_name="Henry", last_name="Dioup", middle_name=None, global_id="488513",
+                                    employee=False)
 
-    def test_get_queryset(self):
+    def test_get_queryset_with_name(self):
         autocomplete_instance = EmployeeAutocomplete()
-        autocomplete_instance.q = "Henry"
+        autocomplete_instance.q = self.henry.last_name
 
         self.assertQuerysetEqual(
             autocomplete_instance.get_queryset(),
@@ -50,10 +53,19 @@ class TestPersonAutoComplete(TestCase):
             transform=lambda obj: obj
         )
 
-        autocomplete_instance.q = "Dupont"
+        autocomplete_instance.q = self.jean.last_name
         self.assertQuerysetEqual(
             autocomplete_instance.get_queryset(),
             [self.jean],
+            transform=lambda obj: obj
+        )
+
+    def test_get_queryset_with_global_id(self):
+        autocomplete_instance = EmployeeAutocomplete()
+        autocomplete_instance.q = self.henry.global_id
+        self.assertQuerysetEqual(
+            autocomplete_instance.get_queryset(),
+            [self.henry],
             transform=lambda obj: obj
         )
 

@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,31 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
-import operator
+import datetime
+import string
 
-from dal import autocomplete
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.postgres.search import SearchQuery, SearchVector, TrigramSimilarity
-from django.db.models import Q, Value
-from django.db.models.functions import Concat
+import factory.fuzzy
 
-from base.models.person import Person
+from base.tests.factories.learning_unit import LearningUnitFakerFactory
+from base.tests.factories.prerequisite import PrerequisiteFactory
 
 
-class EmployeeAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        qs = Person.employees.all()
-        if self.q:
-            qs = qs.filter(
-                Q(last_name__icontains=self.q) |
-                Q(first_name__icontains=self.q) |
-                Q(middle_name__icontains=self.q) |
-                Q(global_id=self.q)
-            )
-        return qs.order_by("last_name", "first_name")
+class PrerequisiteItemFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "base.PrerequisiteItem"
+        django_get_or_create = ('learning_unit', 'prerequisite')
 
-    def get_result_label(self, result):
-        return "{last_name} {first_name} ({age})".format(last_name=result.last_name,
-                                                         first_name=result.first_name,
-                                                         age=result.age)
+    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
+    learning_unit = factory.SubFactory(LearningUnitFakerFactory)
+    prerequisite = factory.SubFactory(PrerequisiteFactory)
+    group_number = factory.Sequence(lambda n: n)
+    position = factory.Sequence(lambda n: n)
