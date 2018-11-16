@@ -203,7 +203,7 @@ def extract_xls_data_from_learning_unit(learning_unit_yr, new_line, first_data):
 
 def _translate_status(value):
     if value:
-        return _('Active').title()
+        return _('Active')
     else:
         return _('Inactive')
 
