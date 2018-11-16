@@ -106,3 +106,10 @@ class Prerequisite(models.Model):
 
     def __str__(self):
         return "{}{} : {}".format(self.education_group_year, self.learning_unit_year, self.prerequisite)
+
+
+def get_by_learning_unit_year_and_education_group_year(learning_unit_year, education_group_year):
+    return Prerequisite.objects.get(
+        learning_unit_year=learning_unit_year,
+        education_group_year=education_group_year
+    )
