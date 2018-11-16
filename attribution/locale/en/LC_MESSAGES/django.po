@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-16 09:28+0100\n"
+"POT-Creation-Date: 2018-11-16 09:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,7 +94,7 @@ msgstr ""
 msgid "Entity"
 msgstr ""
 
-#: business/xls_build.py:38
+#: business/xls_build.py:38 models/attribution_new.py:57
 msgid "Function"
 msgstr ""
 
@@ -211,8 +211,4 @@ msgstr ""
 
 #: templates/summary_responsible.html:123
 msgid "Without attribution"
-msgstr ""
-
-#: models/attribution_new.py:57
-msgid "function"
 msgstr ""
