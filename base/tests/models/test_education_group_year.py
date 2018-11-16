@@ -90,7 +90,7 @@ class EducationGroupYearTest(TestCase):
 
     def test_verbose_credit(self):
         verbose__waiting = "{} ({} {})".format(
-            self.education_group_year_1.title.child.title, self.education_group_year_1.credits, _("credits")
+            self.education_group_year_1.title, self.education_group_year_1.credits, _("credits")
         )
         self.assertEqual(self.education_group_year_1.verbose_credit, verbose__waiting)
 

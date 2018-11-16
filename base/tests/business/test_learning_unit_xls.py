@@ -109,7 +109,7 @@ class TestLearningUnitXls(TestCase):
                 entity_type=entity_type.FACULTY,
                 entity__organization__type=organization_type.MAIN
             ) for _ in range(4)
-            ]
+        ]
         self.learning_unit_year_with_entities.entities = {'REQUIREMENT_ENTITY': entities[0],
                                                           'ALLOCATION_ENTITY': entities[1]}
         self.proposal_creation_3 = ProposalLearningUnitFactory(
@@ -161,22 +161,18 @@ class TestLearningUnitXls(TestCase):
             'function': 'CO_HOLDER',
             'start_year': 2017
         }
-        self.assertEqual(_get_attribution_line(attribution_dict),
-                         "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
-                             'SMITH, Aaron',
-                             _('Function'),
-                             _('Co-holder'),
-                             _('Substitute'),
-                             '',
-                             _('Beg. of attribution'),
-                             2017,
-                             _('Attribution duration'),
-                             3,
-                             _('Attrib. vol1'),
-                             10,
-                             _('Attrib. vol2'),
-                             15, )
-                         )
+        self.assertEqual(
+            _get_attribution_line(attribution_dict),
+            "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
+                'SMITH, Aaron', _('Function'),
+                _('Co-holder'), _('Substitute'),
+                '', _('Beg. of attribution'),
+                2017, _('Attribution duration'),
+                3, _('Attrib. vol1'),
+                10, _('Attrib. vol2'),
+                15,
+            )
+        )
 
     def test_get_significant_volume(self):
         self.assertEqual(_get_significant_volume(10), 10)
@@ -346,7 +342,8 @@ class TestLearningUnitXls(TestCase):
                                                                        attribution=an_attribution,
                                                                        allocation_charge=5.0)
 
-        luy.attribution_charge_news = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(luy)
+        luy.attribution_charge_news = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
+            luy)
         expected_common = [
             xls_build.translate(luy.periodicity),
             xls_build.translate(luy.status),
