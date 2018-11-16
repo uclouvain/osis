@@ -60,6 +60,10 @@ class PrerequisiteItem(models.Model):
         )
 
 
+def find_by_prerequisite(prerequisite):
+    return PrerequisiteItem.objects.filter(prerequisite=prerequisite)
+
+
 def find_by_learning_unit_year_having_prerequisite(learning_unit_year):
     return PrerequisiteItem.objects.filter(prerequisite__learning_unit_year=learning_unit_year)
 
