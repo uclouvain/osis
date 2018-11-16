@@ -76,12 +76,8 @@ class TestPrerequisiteItem(TestCase):
 
     def test_find_by_prerequisite(self):
         self.assertEqual(
-            list(
-                prerequisite_item.find_by_prerequisite(self.prerequisite)
-            ),
-            [
-                self.prerequisite_item
-            ]
+            list(prerequisite_item.find_by_prerequisite(self.prerequisite)),
+            [self.prerequisite_item]
         )
 
 
