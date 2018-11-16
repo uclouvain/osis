@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-13 15:27+0100\n"
+"POT-Creation-Date: 2018-11-16 09:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -113,10 +113,13 @@ msgstr "Entité resp. cahier des charges"
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:11
 #: templates/manage_my_courses/blocks/submission_dates.html:29
-#, fuzzy
-#| msgid "manage_educational_information"
-msgid "Manage educational information"
-msgstr "Gérer les informations pédagogiques"
+msgid "Educational information opening"
+msgstr "Ouverture informations pédagoqiques"
+
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:12
+#: templates/manage_my_courses/blocks/submission_dates.html:34
+msgid "Educational information ending"
+msgstr "Fermeture informations pédagoqiques"
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:13
 #: templates/summary_responsible.html:69
@@ -131,6 +134,16 @@ msgstr "Responsable des infos pédagogiques"
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:39
 msgid "Editable"
 msgstr "Modifiable"
+
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:23
+#: templates/manage_my_courses/blocks/tabs.html:32
+#: templates/manage_my_courses/educational_information.html:30
+#: templates/manage_my_courses/list_my_courses_summary_editable.html:31
+#: templates/manage_my_courses/list_my_courses_summary_editable.html:36
+#, fuzzy
+#| msgid "manage_educational_information"
+msgid "Manage educational information"
+msgstr "Gérer les informations pédagogiques"
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:48
 msgid "There is no course for which you can edit educational information"
@@ -213,9 +226,3 @@ msgstr "Enregistrer"
 #: templates/summary_responsible_edit.html:71
 msgid "Cancel"
 msgstr "Annuler"
-
-msgid "Educational information opening"
-msgstr "Ouverture informations pédagoqiques"
-
-msgid "Educational information ending"
-msgstr "Fermeture informations pédagoqiques"

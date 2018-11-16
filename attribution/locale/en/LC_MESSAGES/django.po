@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-13 15:27+0100\n"
+"POT-Creation-Date: 2018-11-16 09:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -111,9 +111,12 @@ msgstr ""
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:11
 #: templates/manage_my_courses/blocks/submission_dates.html:29
-#, fuzzy
-#| msgid "manage_educational_information"
-msgid "Manage educational information"
+msgid "Educational information opening"
+msgstr ""
+
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:12
+#: templates/manage_my_courses/blocks/submission_dates.html:34
+msgid "Educational information ending"
 msgstr ""
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:13
@@ -126,6 +129,14 @@ msgstr ""
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:14
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:39
 msgid "Editable"
+msgstr ""
+
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:23
+#: templates/manage_my_courses/blocks/tabs.html:32
+#: templates/manage_my_courses/educational_information.html:30
+#: templates/manage_my_courses/list_my_courses_summary_editable.html:31
+#: templates/manage_my_courses/list_my_courses_summary_editable.html:36
+msgid "Manage educational information"
 msgstr ""
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:48
@@ -204,10 +215,4 @@ msgstr ""
 
 #: templates/summary_responsible_edit.html:71
 msgid "Cancel"
-msgstr ""
-
-msgid "Educational information opening"
-msgstr ""
-
-msgid "Educational information ending"
 msgstr ""
