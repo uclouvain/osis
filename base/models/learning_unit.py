@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import ValidationError
 from django.db import models, IntegrityError
 from django.db.models import Max
 from django.utils.translation import ugettext_lazy as _

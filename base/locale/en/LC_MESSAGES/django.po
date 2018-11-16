@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-16 14:28+0100\n"
+"POT-Creation-Date: 2018-11-16 15:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -161,6 +161,11 @@ msgstr ""
 
 #: models/enums/rate_code.py:42
 msgid "AESS CAPAES"
+msgstr ""
+
+#: tests/models/test_prerequisite_item.py:108
+#: tests/models/test_prerequisite_item.py:127
+msgid "AND"
 msgstr ""
 
 #: models/enums/exam_enrollment_justification_type.py:42
@@ -2200,6 +2205,10 @@ msgstr ""
 
 #: models/enums/constraint_type.py:33
 msgid "Number of elements"
+msgstr ""
+
+#: tests/models/test_prerequisite_item.py:126
+msgid "OR"
 msgstr ""
 
 #: templates/catalog.html:42 templates/layout.html:126
