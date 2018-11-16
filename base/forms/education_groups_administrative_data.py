@@ -79,7 +79,6 @@ class CourseEnrollmentForm(BootstrapForm):
 
 
 def _build_new_course_enrollment_offer_yr_calendar(education_group_yr):
-
     cal = get_by_reference_and_academic_year(academic_calendar_type.COURSE_ENROLLMENT,
                                              education_group_yr.academic_year)
     if cal:
@@ -164,6 +163,7 @@ class AdministrativeDataSessionForm(BootstrapForm):
                 self.add_error(name, e)
 
 
+# FIXME: Function receive tuple datetime or datetime.
 def _set_values_in_offer_year_calendar(oyc, value):
     if oyc:
         if isinstance(value, tuple) and len(value) == 2:
@@ -203,7 +203,7 @@ class AdministrativeDataFormSet(forms.BaseFormSet):
             return kwargs
 
         q = offer_year_calendar.find_by_education_group_year(education_group_year)
-        q = q.filter(academic_calendar__sessionexamcalendar__number_session=index+1,
+        q = q.filter(academic_calendar__sessionexamcalendar__number_session=index + 1,
                      academic_calendar__academic_year=education_group_year.academic_year)
         kwargs['list_offer_year_calendar'] = q.select_related('academic_calendar')
 
