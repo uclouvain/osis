@@ -93,7 +93,7 @@ def get_prerequisite_string_representation(prerequisite):
         predicate = predicate_format.format(
             join_secondary_operator.join(
                 map(
-                    get_related_learning_unit_acronym,
+                    lambda rec: rec.learning_unit.acronym,
                     list_records
                 )
             )
