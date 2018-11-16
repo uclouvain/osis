@@ -592,6 +592,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
                                               learning_unit_instance=instance_luy_base_form.learning_unit_instance,
                                               data=instance_luy_base_form.data)
+
         self.assertTrue(form.is_valid(), form.errors)
         result = form.consistency_errors
         self.assertEqual(result, expected_result)
@@ -603,7 +604,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         expected_result = OrderedDict({
             next_academic_year: [
                 _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
-                    'col_name': _(LECTURING) + ' (' + _('hourly volume total annual') + ')',
+                    'col_name': _("Lecturing") + ' (' + _('hourly volume total annual') + ')',
                     'current_value': '-',
                     'new_value': '12.00'
                 }

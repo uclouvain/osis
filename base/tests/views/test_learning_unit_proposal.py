@@ -55,8 +55,8 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.person import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories import academic_year as academic_year_factory, campus as campus_factory, \
     organization as organization_factory
-from base.tests.factories.academic_year import AcademicYearFakerFactory, create_current_academic_year, get_current_year, \
-    AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFakerFactory, create_current_academic_year, \
+    get_current_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
@@ -501,9 +501,12 @@ class TestLearningUnitSuppressionProposal(TestCase):
         self.assertEqual(a_proposal_learning_unit.author, self.person)
 
         messages = [str(message) for message in get_messages(response.wsgi_request)]
-        self.assertIn(_("You proposed a modification of type {} for the learning unit {}.").format(_(proposal_type.ProposalType.SUPPRESSION.name),
-                                                                self.learning_unit_year.acronym),
-                      list(messages))
+        self.assertIn(
+            _("You proposed a modification of type {} for the learning unit {}.").format(
+                _(proposal_type.ProposalType.SUPPRESSION.name),
+                self.learning_unit_year.acronym),
+            list(messages)
+        )
 
         self.learning_unit.refresh_from_db()
         self.assertEqual(self.learning_unit.end_year, self.next_academic_year.year)
@@ -937,7 +940,7 @@ class TestEditProposal(TestCase):
         self.assertEqual(len(msg), 1)
 
         self.proposal.refresh_from_db()
-        self.assertEqual(self.proposal.state, ProposalState.FACULTY.value)
+        self.assertEqual(self.proposal.state, 'FACULTY')
 
     @mock.patch('base.views.layout.render')
     def test_edit_proposal_post_wrong_data(self, mock_render):
