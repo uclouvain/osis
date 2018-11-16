@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-ZERO = "ZERO"
-ONE = "ONE"
+ZERO = "0"
+ONE = "1"
 MANY = "MANY"
 
 COUNT_CONSTRAINTS = (
-    (ZERO,0),
-    (ONE, 1),
-    (MANY,'many'),
+    (ZERO, ZERO),
+    (ONE, ONE),
+    (MANY, MANY),
 )
