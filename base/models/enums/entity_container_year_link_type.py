@@ -25,6 +25,8 @@
 ##############################################################################
 from django.utils.translation import ugettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
+
 REQUIREMENT_ENTITY = "REQUIREMENT_ENTITY"
 ALLOCATION_ENTITY = "ALLOCATION_ENTITY"
 ADDITIONAL_REQUIREMENT_ENTITY_1 = "ADDITIONAL_REQUIREMENT_ENTITY_1"
@@ -37,12 +39,13 @@ ENTITY_TYPE_LIST = [
     ADDITIONAL_REQUIREMENT_ENTITY_2
 ]
 
-ENTITY_CONTAINER_YEAR_LINK_TYPES = (
-    (REQUIREMENT_ENTITY, _("Requirement entity")),
-    (ALLOCATION_ENTITY, _("Allocation entity")),
-    (ADDITIONAL_REQUIREMENT_ENTITY_1, _("Additional requirement entity 1")),
-    (ADDITIONAL_REQUIREMENT_ENTITY_2, _("Additional requirement entity 2")),
-)
+
+class EntityContainerYearLinkTypes(ChoiceEnum):
+    REQUIREMENT_ENTITY = _("Requirement entity")
+    ALLOCATION_ENTITY = _("Allocation entity")
+    ADDITIONAL_REQUIREMENT_ENTITY_1 = _("Additional requirement entity 1")
+    ADDITIONAL_REQUIREMENT_ENTITY_2 = _("Additional requirement entity 2")
+
 
 REQUIREMENT_ENTITIES = [
     REQUIREMENT_ENTITY,

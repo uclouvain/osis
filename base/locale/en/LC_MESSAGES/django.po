@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 20:59+0100\n"
+"POT-Creation-Date: 2018-11-16 09:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,13 +32,13 @@ msgid "%(col_name)s has been already modified."
 msgstr ""
 
 #: forms/learning_unit/learning_unit_postponement.py:339
-#: tests/forms/test_learning_unit_postponement.py:516
-#: tests/forms/test_learning_unit_postponement.py:530
-#: tests/forms/test_learning_unit_postponement.py:554
-#: tests/forms/test_learning_unit_postponement.py:561
-#: tests/forms/test_learning_unit_postponement.py:584
-#: tests/forms/test_learning_unit_postponement.py:605
-#: tests/forms/test_learning_unit_postponement.py:688
+#: tests/forms/test_learning_unit_postponement.py:522
+#: tests/forms/test_learning_unit_postponement.py:536
+#: tests/forms/test_learning_unit_postponement.py:560
+#: tests/forms/test_learning_unit_postponement.py:567
+#: tests/forms/test_learning_unit_postponement.py:590
+#: tests/forms/test_learning_unit_postponement.py:612
+#: tests/forms/test_learning_unit_postponement.py:695
 #, python-format
 msgid ""
 "%(col_name)s has been already modified. ({%(new_value)s} instead of "
@@ -325,7 +325,7 @@ msgstr ""
 #: models/learning_unit_year.py:250
 #: templates/learning_unit/by_activity.html:125
 #: templates/learning_unit/by_external.html:68
-#: tests/forms/test_learning_unit_postponement.py:531
+#: tests/forms/test_learning_unit_postponement.py:537
 msgid "Active"
 msgstr ""
 
@@ -396,7 +396,7 @@ msgstr ""
 
 #: models/enums/entity_container_year_link_type.py:44
 #: templates/learning_unit/identification.html:208
-#: tests/forms/test_learning_unit_postponement.py:689
+#: tests/forms/test_learning_unit_postponement.py:696
 msgid "Additional requirement entity 2"
 msgstr ""
 
@@ -1159,7 +1159,7 @@ msgstr ""
 #: business/learning_units/xls_comparison.py:67
 #: models/learning_unit_year.py:119 models/learning_unit_year.py:121
 #: tests/business/learning_units/test_edition.py:161
-#: tests/forms/test_learning_unit_postponement.py:517
+#: tests/forms/test_learning_unit_postponement.py:523
 msgid "English title proper"
 msgstr ""
 
@@ -1616,6 +1616,7 @@ msgstr ""
 msgid "Introduced by"
 msgstr ""
 
+#: tests/views/education_groups/achievement/test_update.py:100
 #: views/education_groups/achievement/update.py:52
 msgid "Invalid action"
 msgstr ""
@@ -1764,6 +1765,7 @@ msgstr ""
 #: models/enums/component_type.py:32
 #: models/enums/learning_component_year_type.py:32
 #: templates/learning_unit/components_identification.html:57
+#: tests/forms/test_learning_unit_postponement.py:613
 msgid "Lecturing"
 msgstr ""
 
@@ -2139,7 +2141,7 @@ msgstr ""
 msgid "No print"
 msgstr ""
 
-#: tests/views/test_learning_unit_proposal.py:574
+#: tests/views/test_learning_unit_proposal.py:577
 #: views/learning_units/search.py:182
 msgid "No proposals was selected."
 msgstr ""
@@ -2397,7 +2399,7 @@ msgstr ""
 #: forms/learning_unit/search_form.py:400
 #: forms/proposal/learning_unit_proposal.py:77
 #: tests/forms/test_external_learning_unit.py:245
-#: tests/views/test_learning_unit_proposal.py:554
+#: tests/views/test_learning_unit_proposal.py:557
 msgid "Please choose at least one criteria!"
 msgstr ""
 
@@ -2553,7 +2555,7 @@ msgstr ""
 msgid "Proposal"
 msgstr ""
 
-#: tests/views/test_learning_unit_proposal.py:696
+#: tests/views/test_learning_unit_proposal.py:699
 #, python-format
 msgid "Proposal %(acronym)s (%(academic_year)s) successfully canceled."
 msgstr ""
@@ -2762,7 +2764,7 @@ msgstr ""
 
 #: models/enums/entity_container_year_link_type.py:41
 #: templates/learning_unit/identification.html:205
-#: tests/forms/test_learning_unit_postponement.py:585
+#: tests/forms/test_learning_unit_postponement.py:591
 msgid "Requirement entity"
 msgstr ""
 
@@ -2965,12 +2967,12 @@ msgstr ""
 msgid "Start date"
 msgstr ""
 
-#: forms/academic_calendar.py:107 models/academic_calendar.py:101
+#: forms/academic_calendar.py:110 models/academic_calendar.py:101
 #: tests/forms/test_academic_calendar.py:50
 msgid "Start date and end date are mandatory"
 msgstr ""
 
-#: forms/academic_calendar.py:95 tests/forms/test_academic_calendar.py:61
+#: forms/academic_calendar.py:98 tests/forms/test_academic_calendar.py:61
 msgid "Start date must be lower than end date"
 msgstr ""
 
@@ -3114,6 +3116,7 @@ msgid "Termination"
 msgstr ""
 
 #: models/enums/academic_calendar_type.py:64
+#: tests/models/test_academic_calendar.py:147
 msgid "Testing"
 msgstr ""
 
@@ -3149,17 +3152,11 @@ msgstr ""
 msgid "The class %(acronym)s has been deleted for the year %(year)s"
 msgstr ""
 
-#: tests/forms/test_academic_calendar.py:79
+#: forms/academic_calendar.py:86 tests/forms/test_academic_calendar.py:80
 #, python-format
 msgid ""
 "The closure's date of '%s' of the academic calendar can't be lower than %s "
 "(end date of '%s' of the program '%s')"
-msgstr ""
-
-#: forms/academic_calendar.py:87
-#, python-format
-msgid ""
-"The closure's date of '%s' of the academic calendar can't be lower than %s."
 msgstr ""
 
 #: views/education_groups/group_element_year/update.py:225
@@ -3289,7 +3286,7 @@ msgstr ""
 #: business/learning_units/edition.py:484
 #: forms/learning_unit/learning_unit_postponement.py:296
 #: tests/business/test_learning_unit_edition.py:957
-#: tests/forms/test_learning_unit_postponement.py:659
+#: tests/forms/test_learning_unit_postponement.py:666
 #, python-format
 msgid ""
 "The learning unit %(luy)s is in proposal, can not save the change from the "
@@ -3386,7 +3383,7 @@ msgid "The registration form is available at the Secretariat of"
 msgstr ""
 
 #: forms/learning_unit/learning_unit_postponement.py:329
-#: tests/forms/test_learning_unit_postponement.py:631
+#: tests/forms/test_learning_unit_postponement.py:638
 #, python-format
 msgid ""
 "The repartition volume of %(col_name)s has been already modified. "
@@ -3965,7 +3962,7 @@ msgid "You must either set the common title or the specific title"
 msgstr ""
 
 #: tests/views/test_learning_unit_proposal.py:254
-#: tests/views/test_learning_unit_proposal.py:504
+#: tests/views/test_learning_unit_proposal.py:505
 #: views/learning_units/proposal/update.py:83
 #: views/learning_units/proposal/update.py:112
 msgid "You proposed a modification of type {} for the learning unit {}."
@@ -4280,7 +4277,7 @@ msgid "hourly volume partial q2"
 msgstr ""
 
 #: models/learning_component_year.py:52
-#: tests/forms/test_learning_unit_postponement.py:606
+#: tests/forms/test_learning_unit_postponement.py:613
 msgid "hourly volume total annual"
 msgstr ""
 
@@ -4339,8 +4336,8 @@ msgstr ""
 #: tests/business/learning_units/test_edition.py:188
 #: tests/business/test_education_group.py:353 tests/business/test_xls.py:40
 #: tests/business/test_xls.py:42
-#: tests/forms/test_learning_unit_postponement.py:532
-#: tests/forms/test_learning_unit_postponement.py:533
+#: tests/forms/test_learning_unit_postponement.py:538
+#: tests/forms/test_learning_unit_postponement.py:539
 msgid "no"
 msgstr ""
 
@@ -4611,8 +4608,8 @@ msgstr ""
 #: templates/learning_unit/blocks/modal/modal_warning_state_modification.html:37
 #: tests/business/learning_units/test_edition.py:186
 #: tests/business/test_education_group.py:352 tests/business/test_xls.py:41
-#: tests/forms/test_learning_unit_postponement.py:532
-#: tests/forms/test_learning_unit_postponement.py:533
+#: tests/forms/test_learning_unit_postponement.py:538
+#: tests/forms/test_learning_unit_postponement.py:539
 msgid "yes"
 msgstr ""
 
