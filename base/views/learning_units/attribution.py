@@ -61,7 +61,7 @@ class AttributionBaseViewMixin(RulesRequiredMixin):
     @cached_property
     def attribution(self):
         lecturing_charges = AttributionChargeNew.objects \
-            .filter(learning_component_year__type=learning_component_year_type.LECTURING)
+            .filter(learning_component_year__type__in=(learning_component_year_type.LECTURING, None))
         prefetch_lecturing_charges = Prefetch("attributionchargenew_set", queryset=lecturing_charges,
                                               to_attr="lecturing_charges")
 
@@ -149,25 +149,16 @@ class AddAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSucc
 
     def forms_valid(self, forms):
         attribution_form = forms["attribution_form"]
-        lecturing_charge_form = forms["lecturing_charge_form"]
-        practical_charge_form = forms["practical_charge_form"]
-
         attribution_form.save(learning_unit_year=self.luy)
-        lecturing_charge_form.save(attribution=attribution_form.instance, learning_unit_year=self.luy)
-        practical_charge_form.save(attribution=attribution_form.instance, learning_unit_year=self.luy)
-        success_message = self.get_success_message(forms)
-        if success_message:
-            messages.success(self.request, success_message)
-        return HttpResponseRedirect(self.get_success_url())
-
-    def attribution_form_valid(self, attribution_form):
-        attribution_form.save(learning_unit_year=self.luy)
+        super().forms_valid(forms)
 
     def lecturing_charge_form_valid(self, lecturing_charge_form):
-        pass
+        attribution_form = self.instantiated_forms["attribution_form"]
+        lecturing_charge_form.save(attribution=attribution_form.instance, learning_unit_year=self.luy)
 
     def practical_charge_form_valid(self, practical_charge_form):
-        pass
+        attribution_form = self.instantiated_forms["attribution_form"]
+        practical_charge_form.save(attribution=attribution_form.instance, learning_unit_year=self.luy)
 
     def get_success_message(self, forms):
         attribution = forms["attribution_form"].instance

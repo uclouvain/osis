@@ -153,13 +153,15 @@ class MultiFormMixin(ContextMixin):
     initial = {}
     prefix = None
     success_url = None
+    instantiated_forms = {}
 
     def get_form_classes(self):
         return self.form_classes
 
     def get_forms(self, form_classes):
-        return dict([(key, self._create_form(key, class_name))
-                     for key, class_name in form_classes.items()])
+        self.instantiated_forms = dict([(key, self._create_form(key, class_name))
+                                        for key, class_name in form_classes.items()])
+        return self.instantiated_forms
 
     def get_all_forms(self):
         return self.get_forms(self.form_classes)

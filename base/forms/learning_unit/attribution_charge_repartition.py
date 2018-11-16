@@ -101,7 +101,7 @@ class AttributionChargeForm(forms.ModelForm):
     def save(self, commit=True, **kwargs):
         attribution_new_obj = kwargs.pop("attribution")
         luy_obj = kwargs.pop("learning_unit_year")
-        learning_component_year = LearningComponentYear.objects.get(type=self.component_type,
+        learning_component_year = LearningComponentYear.objects.get(type__in=(self.component_type, None),
                                                                     learningunitcomponent__learning_unit_year=luy_obj)
 
         attribution_charge_obj = super().save(commit=False)
