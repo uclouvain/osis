@@ -45,7 +45,7 @@ class TutorApplicationAdmin(admin.ModelAdmin):
         from attribution.business import application_json
         global_ids = list(queryset.values_list('tutor__person__global_id', flat=True))
         return application_json.publish_to_portal(global_ids)
-    publish_application_to_portal.short_description = _("publish_application_to_portal")
+    publish_application_to_portal.short_description = _("Publish application to portal")
 
 
 class TutorApplication(models.Model):
