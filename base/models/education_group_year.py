@@ -458,6 +458,10 @@ class EducationGroupYear(models.Model):
         return self.education_group_type.name == DEEPENING
 
     @property
+    def is_common(self):
+        return self.acronym.startswith('common-')
+
+    @property
     def verbose(self):
         return "{} - {}".format(self.partial_acronym or "", self.acronym)
 
