@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-16 12:01+0100\n"
+"POT-Creation-Date: 2018-11-16 14:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -155,7 +155,7 @@ msgstr ""
 msgid "A server error occured."
 msgstr ""
 
-#: models/exam_enrollment.py:218
+#: models/exam_enrollment.py:221
 msgid "A=Absent"
 msgstr ""
 
@@ -832,7 +832,7 @@ msgstr ""
 msgid "Course"
 msgstr ""
 
-#: forms/education_groups_administrative_data.py:42
+#: forms/education_groups_administrative_data.py:44
 #: models/enums/academic_calendar_type.py:57
 #: templates/education_group/tab_administrative_data.html:49
 msgid "Course enrollment"
@@ -917,7 +917,7 @@ msgstr ""
 msgid "Delete selected messages"
 msgstr ""
 
-#: forms/education_groups_administrative_data.py:83
+#: forms/education_groups_administrative_data.py:104
 #: models/enums/academic_calendar_type.py:51
 #: templates/education_group/tab_administrative_data.html:95
 msgid "Deliberation"
@@ -978,7 +978,7 @@ msgstr ""
 msgid "Dissertation"
 msgstr ""
 
-#: forms/education_groups_administrative_data.py:79
+#: forms/education_groups_administrative_data.py:100
 #: models/enums/academic_calendar_type.py:52
 #: templates/education_group/tab_administrative_data.html:89
 msgid "Dissertation submission"
@@ -1229,7 +1229,7 @@ msgstr ""
 msgid "Event"
 msgstr ""
 
-#: forms/education_groups_administrative_data.py:70
+#: forms/education_groups_administrative_data.py:91
 #: models/enums/academic_calendar_type.py:53
 msgid "Exam enrollments"
 msgstr ""
@@ -1926,7 +1926,7 @@ msgstr ""
 msgid "Mark selected messages as read"
 msgstr ""
 
-#: forms/education_groups_administrative_data.py:74
+#: forms/education_groups_administrative_data.py:95
 #: templates/education_group/tab_administrative_data.html:83
 msgid "Marks presentation"
 msgstr ""
@@ -2798,7 +2798,7 @@ msgstr ""
 msgid "School"
 msgstr ""
 
-#: forms/education_groups_administrative_data.py:86
+#: forms/education_groups_administrative_data.py:107
 #: templates/education_group/tab_administrative_data.html:113
 msgid "Scores diffusion"
 msgstr ""
@@ -2813,6 +2813,10 @@ msgstr ""
 
 #: models/enums/academic_calendar_type.py:55
 msgid "Scores exam submission"
+msgstr ""
+
+#: models/exam_enrollment.py:43
+msgid "Scores must be between 0 and 20"
 msgstr ""
 
 #: templates/academic_actors.html:49
@@ -3071,7 +3075,7 @@ msgstr ""
 msgid "Suspended"
 msgstr ""
 
-#: models/exam_enrollment.py:219
+#: models/exam_enrollment.py:222
 msgid "T=Cheating"
 msgstr ""
 
@@ -3124,7 +3128,7 @@ msgstr ""
 msgid "The acronym <b>already exists</b>."
 msgstr ""
 
-#: views/education_group.py:89
+#: views/education_group.py:91
 msgid "The administrative data has been successfully modified"
 msgstr ""
 
@@ -3388,6 +3392,11 @@ msgstr ""
 msgid ""
 "The selected end year (%(partim_end_year)s) is greater than the end year of "
 "the parent %(lu_parent)s"
+msgstr ""
+
+#: forms/utils/datefield.py:150
+#: tests/forms/test_education_groups_administrative_data.py:277
+msgid "The start date must be equals or lower than the end date"
 msgstr ""
 
 #: templatetags/education_group.py:401
@@ -4071,7 +4080,7 @@ msgstr ""
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:45
 #: templates/education_group/organization_edit_inner.html:51
 #: templates/education_group/protect_delete_inner.html:24
-#: templates/education_group/tab_edit_administrative_data.html:82
+#: templates/education_group/tab_edit_administrative_data.html:85
 #: templates/learning_unit/achievement_edit.html:53
 #: templates/learning_unit/add_charge_repartition_inner.html:57
 #: templates/learning_unit/attribution_inner.html:62

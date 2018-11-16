@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-16 12:01+0100\n"
-"PO-Revision-Date: 2018-11-16 11:07+0100\n"
+"POT-Creation-Date: 2018-11-16 14:28+0100\n"
+"PO-Revision-Date: 2018-11-16 14:28+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_BE\n"
@@ -167,7 +167,7 @@ msgstr "Un rapport a été envoyé."
 msgid "A server error occured."
 msgstr "Une erreur innatendue s'est produite."
 
-#: models/exam_enrollment.py:218
+#: models/exam_enrollment.py:221
 msgid "A=Absent"
 msgstr "A=Absent"
 
@@ -848,7 +848,7 @@ msgstr "Pays"
 msgid "Course"
 msgstr "Cours"
 
-#: forms/education_groups_administrative_data.py:42
+#: forms/education_groups_administrative_data.py:44
 #: models/enums/academic_calendar_type.py:57
 #: templates/education_group/tab_administrative_data.html:49
 msgid "Course enrollment"
@@ -933,7 +933,7 @@ msgstr "Supprimer le message"
 msgid "Delete selected messages"
 msgstr "Supprimer les messages sélectionnés"
 
-#: forms/education_groups_administrative_data.py:83
+#: forms/education_groups_administrative_data.py:104
 #: models/enums/academic_calendar_type.py:51
 #: templates/education_group/tab_administrative_data.html:95
 msgid "Deliberation"
@@ -994,7 +994,7 @@ msgstr "Désactivé"
 msgid "Dissertation"
 msgstr "Dissertation"
 
-#: forms/education_groups_administrative_data.py:79
+#: forms/education_groups_administrative_data.py:100
 #: models/enums/academic_calendar_type.py:52
 #: templates/education_group/tab_administrative_data.html:89
 msgid "Dissertation submission"
@@ -1247,7 +1247,7 @@ msgstr "Évaluations"
 msgid "Event"
 msgstr "Événement"
 
-#: forms/education_groups_administrative_data.py:70
+#: forms/education_groups_administrative_data.py:91
 #: models/enums/academic_calendar_type.py:53
 msgid "Exam enrollments"
 msgstr "Inscription aux examens"
@@ -1958,7 +1958,7 @@ msgstr "Obligatoire"
 msgid "Mark selected messages as read"
 msgstr "Marquer les messages sélectionnés comme lus"
 
-#: forms/education_groups_administrative_data.py:74
+#: forms/education_groups_administrative_data.py:95
 #: templates/education_group/tab_administrative_data.html:83
 msgid "Marks presentation"
 msgstr "Remise des notes"
@@ -2840,7 +2840,7 @@ msgstr "Type horaire"
 msgid "School"
 msgstr "École"
 
-#: forms/education_groups_administrative_data.py:86
+#: forms/education_groups_administrative_data.py:107
 #: templates/education_group/tab_administrative_data.html:113
 msgid "Scores diffusion"
 msgstr "Diffusion des notes"
@@ -2856,6 +2856,10 @@ msgstr "Diffusion des feuilles de note"
 #: models/enums/academic_calendar_type.py:55
 msgid "Scores exam submission"
 msgstr "Soumission des feuilles de note"
+
+#: models/exam_enrollment.py:43
+msgid "Scores must be between 0 and 20"
+msgstr "Les scores doivent être compris entre 0 et 20"
 
 #: templates/academic_actors.html:49
 msgid "Scores responsibles"
@@ -3114,7 +3118,7 @@ msgstr "Proposition de suppression"
 msgid "Suspended"
 msgstr "Suspendu"
 
-#: models/exam_enrollment.py:219
+#: models/exam_enrollment.py:222
 msgid "T=Cheating"
 msgstr "T=Tricherie"
 
@@ -3167,7 +3171,7 @@ msgstr "%(acronym)s a été déplacé"
 msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
 
-#: views/education_group.py:89
+#: views/education_group.py:91
 msgid "The administrative data has been successfully modified"
 msgstr "Les données administratives ont été sauvées avec succès"
 
@@ -3463,6 +3467,11 @@ msgid ""
 msgstr ""
 "L'année de fin selectionnée (%(partim_end_year)s) est plus grande que "
 "l'année de fin du parent %(lu_parent)s"
+
+#: forms/utils/datefield.py:150
+#: tests/forms/test_education_groups_administrative_data.py:277
+msgid "The start date must be equals or lower than the end date"
+msgstr "La date de début doit être égale ou inférieure à la date de fin"
 
 #: templatetags/education_group.py:401
 #: tests/templatetags/test_education_group.py:229
@@ -4179,7 +4188,7 @@ msgstr "mise-à-jour bloquée pour l'enseignant"
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:45
 #: templates/education_group/organization_edit_inner.html:51
 #: templates/education_group/protect_delete_inner.html:24
-#: templates/education_group/tab_edit_administrative_data.html:82
+#: templates/education_group/tab_edit_administrative_data.html:85
 #: templates/learning_unit/achievement_edit.html:53
 #: templates/learning_unit/add_charge_repartition_inner.html:57
 #: templates/learning_unit/attribution_inner.html:62
