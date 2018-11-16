@@ -238,7 +238,7 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         expected_result = CUSTOM_LI_TEMPLATE.format(
             li_attributes=""" class="disabled" """,
             a_attributes=""" title=" {}" """.format(
-                _("Il n'est pas possible de %(action)s l'élément racine.") % {"action": _("Detach").lower()}),
+                _("It is not possible to %(action)s the root element.") % {"action": _("Detach").lower()}),
             text=_('Detach'),
         )
         self.assertHTMLEqual(result, expected_result)
