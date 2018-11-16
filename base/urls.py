@@ -37,6 +37,8 @@ import base.views.learning_units.proposal.consolidate
 import base.views.learning_units.proposal.delete
 import base.views.learning_units.search
 import base.views.learning_units.update
+import continuing_education.urls_api_v1
+
 from attribution.views import attribution, tutor_application
 from base.views import learning_achievement, search, education_groups
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
@@ -92,6 +94,8 @@ urlpatterns = [
         url(r'^tutor_application/recompute_portal$', tutor_application.recompute_portal,
             name='recompute_tutor_application_portal'),
         url(r'^attribution/recompute_portal$', attribution.recompute_portal, name='recompute_attribution_portal'),
+        url(r'^continuing_education/',
+            include(continuing_education.urls_api_v1.urlpatterns, namespace='continuing_education_api_v1')),
     ])),
 
     url(r'^catalog/$', common.catalog, name='catalog'),
