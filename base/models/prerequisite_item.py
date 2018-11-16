@@ -76,10 +76,6 @@ def find_by_learning_unit_being_prerequisite(learning_unit):
     return PrerequisiteItem.objects.filter(learning_unit=learning_unit)
 
 
-def get_related_learning_unit_acronym(prerequisite_item):
-    return prerequisite_item.learning_unit.acronym
-
-
 def get_prerequisite_string_representation(prerequisite):
     main_operator = prerequisite.main_operator
     secondary_operator = OR if main_operator == AND else AND
