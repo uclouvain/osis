@@ -62,7 +62,7 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td><label>{% trans 'exams_enrollments' %}</label>{{ exam_enrollments.session1.id }}</td>
+                                            <td><label>{% trans 'exams_enrollments' %}</label></td>
                                             <td>
                                                 {% if exam_enrollments.session1 and exam_enrollments.session1.start_date %}
                                                     <label>{% trans 'from' %}</label> {{exam_enrollments.session1.start_date| default_if_none:'-'|date:"d/m/Y"}} <label>{% trans 'to' %}</label> {{ exam_enrollments.session1.end_date| default_if_none:'-'|date:"d/m/Y" }}
