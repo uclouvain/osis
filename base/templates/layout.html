@@ -194,19 +194,23 @@
                                   <span
                                     class="caret"></span></a>
                               <ul class="dropdown-menu">
-                                <li><a href="{% url 'partnerships:list' %}"
-                                       id="lnk_dropdown_partnerships">{% trans 'partnerships' %}</a></li>
                                 {% if perms.partnership.change_uclmanagemententity %}
                                   <li><a href="{% url 'partnerships:ucl_management_entities:list' %}"
                                          id="lnk_dropdown_uclmanagemententities">{% trans 'ucl_management_entities' %}</a></li>
                                 {% endif %}
                                 <li><a href="{% url 'partnerships:partners:list' %}"
                                        id="lnk_dropdown_partners">{% trans 'partners' %}</a></li>
-                                <li><a href="{% url 'partnerships:list' %}?agreeements=1"
+                                <li><a href="{% url 'partnerships:list' %}"
+                                       id="lnk_dropdown_partnerships">{% trans 'partnerships' %}</a></li>
+                                <li><a href="{% url 'partnerships:list' %}?agreements=1"
                                        id="lnk_dropdown_agreements">{% trans 'agreements' %}</a></li>
                                 {% if perms.partnership.change_partnershipconfiguration %}
                                   <li><a href="{% url 'partnerships:configuration_update' %}"
-                                         id="lnk_dropdown_general_conf">{% trans 'general_configuration' %}</a></li>
+                                         id="lnk_dropdown_partnerships_general_conf">{% trans 'partnerships_general_configuration' %}</a></li>
+                                {% endif %}
+                                {% if perms.partnership.change_financing %}
+                                  <li><a href="{% url 'partnerships:financings:list' %}"
+                                         id="lnk_dropdown_partnerships_financing_conf">{% trans 'partnerships_financing_configuration' %}</a></li>
                                 {% endif %}
                               </ul>
                             </li>
