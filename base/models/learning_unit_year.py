@@ -506,6 +506,7 @@ def find_lt_year_acronym(academic_yr, acronym):
 def check_if_acronym_regex_is_valid(acronym):
     return isinstance(acronym, str) and \
            not acronym.startswith('*') and \
+           not acronym.startswith('+') and \
            re.fullmatch(REGEX_ACRONYM_CHARSET, acronym.upper()) is not None
 
 
