@@ -23,32 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
-
-from base.models.enums.count_constraint import MIN_COUNT_CONSTRAINTS, MAX_COUNT_CONSTRAINTS, ZERO, MANY
-from base.models.education_group_type import EducationGroupType
-from osis_common.models.osis_model_admin import OsisModelAdmin
+from django.utils.translation import ugettext_lazy as _
 
 
-class AuthorizedRelationshipAdmin(OsisModelAdmin):
-    list_display = ('parent_type', 'child_type', 'changed')
-    search_fields = ['parent_type__name', 'child_type__name']
+ZERO = "0"
+ONE = "1"
+MANY = "MANY"
 
+MAX_COUNT_CONSTRAINTS = (
+    (ONE, _("One")),
+    (MANY, _("Many")),
+)
 
-class AuthorizedRelationship(models.Model):
-    parent_type = models.ForeignKey(EducationGroupType, related_name='authorized_parent_type')
-    child_type = models.ForeignKey(EducationGroupType, related_name='authorized_child_type')
-    changed = models.DateTimeField(auto_now=True)
-
-    min_count_authorized = models.CharField(max_length=5, choices=MIN_COUNT_CONSTRAINTS, default=ZERO)
-    max_count_authorized = models.CharField(max_length=5, choices=MAX_COUNT_CONSTRAINTS, default=MANY)
-
-    def __str__(self):
-        return '{} - {}'.format(self.parent_type, self.child_type)
-
-
-def find_by_parent_and_child_types(parent_type, child_type):
-    return AuthorizedRelationship.objects.filter(
-        parent_type=parent_type,
-        child_type=child_type,
-    )
+MIN_COUNT_CONSTRAINTS = (
+    (ZERO, _("Zero")),
+    (ONE, _("One")),
+)
