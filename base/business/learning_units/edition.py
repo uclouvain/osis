@@ -107,7 +107,7 @@ def extend_learning_unit(learning_unit_to_edit, new_academic_year):
     with transaction.atomic():
         for ac_year in get_next_academic_years(learning_unit_to_edit, new_academic_year.year):
             new_luy = duplicate_learning_unit_year(last_learning_unit_year, ac_year)
-            result.append(create_learning_unit_year_creation_message(new_luy, 'learning_unit_successfuly_created'))
+            result.append(create_learning_unit_year_creation_message(new_luy))
 
     return result
 
