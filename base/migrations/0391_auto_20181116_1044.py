@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='authorizedrelationship',
             name='max_count_authorized',
-            field=models.CharField(choices=[('1', '1'), ('MANY', 'MANY')], default='MANY', max_length=5),
+            field=models.CharField(choices=[('1', 'One'), ('MANY', 'Many')], default='MANY', max_length=5),
         ),
         migrations.AddField(
             model_name='authorizedrelationship',
             name='min_count_authorized',
-            field=models.CharField(choices=[('0', '0'), ('1', '1')], default='0', max_length=5),
+            field=models.CharField(choices=[('0', 'Zero'), ('1', 'One')], default='0', max_length=5),
         ),
     ]
