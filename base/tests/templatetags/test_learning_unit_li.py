@@ -33,7 +33,7 @@ from base.business.learning_units.perms import MSG_EXISTING_PROPOSAL_IN_EPC, MSG
     MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY, \
     MSG_NOT_PROPOSAL_STATE_FACULTY, MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL, \
     MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE, MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY, MSG_NOT_GOOD_RANGE_OF_YEARS, \
-    YEAR_LIMIT_LUE_MODIFICATION, is_eligible_to_consolidate_proposal, MSG_NO_RIGHTS_TO_CONSOLIDATE, \
+    is_eligible_to_consolidate_proposal, MSG_NO_RIGHTS_TO_CONSOLIDATE, \
     MSG_NOT_ELIGIBLE_TO_CONSOLIDATE_PROPOSAL, MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES, \
     MSG_NOT_ELIGIBLE_TO_DELETE_LU, MSG_CAN_DELETE_ACCORDING_TO_TYPE
 from base.templatetags.learning_unit_li import li_edit_lu, li_edit_date_lu, li_modification_proposal, is_valid_proposal, \
@@ -53,6 +53,7 @@ from base.tests.factories.entity_container_year import EntityContainerYearFactor
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_container_year_types
 from base.models.enums.proposal_state import ProposalState
+from django.conf import settings
 
 ID_LINK_EDIT_LU = "link_edit_lu"
 ID_LINK_EDIT_DATE_LU = "link_edit_date_lu"
@@ -123,8 +124,12 @@ class LearningUnitTagLiEditTest(TestCase):
             "proposal": self.proposal
         }
 
-    def test_li_edit_lu_year_non_editable(self):
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
+    def test_li_edit_lu_year_non_editable_for_faculty_manager(self):
+        faculty_manager = FacultyManagerFactory()
+
         self.context["learning_unit_year"] = self.previous_learning_unit_year
+        self.context["user"] = faculty_manager.user
 
         result = li_edit_lu(self.context, self.url_edit, "")
 
@@ -133,24 +138,14 @@ class LearningUnitTagLiEditTest(TestCase):
                 'load_modal': False,
                 'id_li': ID_LINK_EDIT_LU,
                 'url': "#",
-                'title': "You can't modify learning unit under year : %(year)d" % {"year": YEAR_LIMIT_LUE_MODIFICATION},
+                'title': "{}.  {}".format ("You can't modify learning unit under year : %(year)d" %
+                         {"year": settings.YEAR_LIMIT_LUE_MODIFICATION},
+                                         "Modifications should be made in EPC for year %(year)d" %
+                                         {"year": self.previous_learning_unit_year.academic_year.year}),
                 'class_li': DISABLED,
                 'text': "",
                 'data_target': ""
             })
-        result = li_edit_date_lu(self.context, self.url_edit, "")
-
-        self.assertEqual(
-            result, {
-                'load_modal': False,
-                'id_li': ID_LINK_EDIT_DATE_LU,
-                'url': "#",
-                'title': "You can't modify learning unit under year : %(year)d" % {"year": YEAR_LIMIT_LUE_MODIFICATION},
-                'class_li': DISABLED,
-                'text': "",
-                'data_target': ''
-            }
-        )
 
     def test_li_edit_lu_year_is_editable_but_existing_proposal_in_epc(self):
         self.learning_unit.existing_proposal_in_epc = True

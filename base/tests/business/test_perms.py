@@ -131,12 +131,13 @@ class PermsTestCase(TestCase):
                 FACULTY_MANAGER_GROUP)))
 
     def test_when_existing_proposal_in_epc(self):
+        a_person = self.create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP)
         luy = LearningUnitYearFactory(academic_year=self.academic_yr, learning_unit__existing_proposal_in_epc=True)
-        self.assertFalse(perms.is_eligible_for_modification(luy, None))
-        self.assertFalse(perms.is_eligible_for_modification_end_date(luy, None))
-        self.assertFalse(perms.is_eligible_to_create_partim(luy, None))
-        self.assertFalse(perms.is_eligible_to_create_modification_proposal(luy, None))
-        self.assertFalse(perms.is_eligible_to_delete_learning_unit_year(luy, None))
+        self.assertFalse(perms.is_eligible_for_modification(luy, a_person))
+        self.assertFalse(perms.is_eligible_for_modification_end_date(luy, a_person))
+        self.assertFalse(perms.is_eligible_to_create_partim(luy, a_person))
+        self.assertFalse(perms.is_eligible_to_create_modification_proposal(luy, a_person))
+        self.assertFalse(perms.is_eligible_to_delete_learning_unit_year(luy, a_person))
 
     def test_cannot_faculty_manager_modify_end_date_no_container(self):
         luy = LearningUnitYearFactory(academic_year=self.academic_yr,

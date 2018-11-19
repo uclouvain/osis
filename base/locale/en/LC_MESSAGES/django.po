@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-19 12:08+0100\n"
+"POT-Creation-Date: 2018-11-19 14:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2019,6 +2019,11 @@ msgstr ""
 msgid "Modification made"
 msgstr ""
 
+#: business/learning_units/perms.py:495
+#, python-format
+msgid "Modifications should be made in EPC for year %(year)d"
+msgstr ""
+
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:90
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:93
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:75
@@ -3544,7 +3549,7 @@ msgstr ""
 msgid "This label %s does not exist"
 msgstr ""
 
-#: business/learning_units/perms.py:522
+#: business/learning_units/perms.py:527
 msgid "This learning unit is not eligible for proposal creation/modification"
 msgstr ""
 
@@ -4028,7 +4033,7 @@ msgstr ""
 msgid "You can't modify learning unit of a previous year"
 msgstr ""
 
-#: business/learning_units/perms.py:494
+#: business/learning_units/perms.py:493
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""

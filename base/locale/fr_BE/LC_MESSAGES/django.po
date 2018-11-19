@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-19 12:08+0100\n"
+"POT-Creation-Date: 2018-11-19 14:29+0100\n"
 "PO-Revision-Date: 2018-11-16 14:28+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2053,6 +2053,11 @@ msgstr "Modification"
 msgid "Modification made"
 msgstr "Modification apportée"
 
+#: business/learning_units/perms.py:495
+#, python-format
+msgid "Modifications should be made in EPC for year %(year)d"
+msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
+
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:90
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:93
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:75
@@ -3635,7 +3640,7 @@ msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
 
-#: business/learning_units/perms.py:522
+#: business/learning_units/perms.py:527
 msgid "This learning unit is not eligible for proposal creation/modification"
 msgstr ""
 "Cette unité d'enseignement n'est pas éligible pour une création/modification "
@@ -4142,7 +4147,7 @@ msgstr ""
 msgid "You can't modify learning unit of a previous year"
 msgstr "Vous ne pouvez pas modifier la date de fin pour une année précédente"
 
-#: business/learning_units/perms.py:494
+#: business/learning_units/perms.py:493
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
@@ -4171,7 +4176,9 @@ msgstr ""
 "\"%(parent)s\" (de type \"%(parent_type)s\")"
 
 #: business/learning_units/perms.py:71
-msgid "You dont' have the rights to consolidate"
+#, fuzzy
+#| msgid "You dont' have the rights to consolidate"
+msgid "You don't have the rights to consolidate"
 msgstr "Vous n'avez pas le droit de consolider"
 
 #: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:16
