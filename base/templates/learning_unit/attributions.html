@@ -42,36 +42,36 @@
             </tr>
             </thead>
             <tbody>
-            {% for key,value in attribution_charge_news.items %}
+            {% for attribution in attributions %}
                 <tr>
-                    <td>{{ value.person }}</td>
-                    <td>{{ value.get_function_display }}</td>
-                    <td>{{ value.start_year | default_if_none:'' }}</td>
-                    <td>{{ value.duration | default_if_none:'' }}</td>
-                    <td>{{ value.LECTURING | floatformat:2 }}</td>
-                    <td>{{ value.PRACTICAL_EXERCISES | floatformat:2 }}</td>
-                    <td>{{ value.substitute | default_if_none:'' }}</td>
+                    <td>{{ attribution.tutor.person }}</td>
+                    <td>{% trans attribution.function %}</td>
+                    <td>{{ attribution.start_year | default_if_none:'' }}</td>
+                    <td>{{ attribution.duration | default_if_none:'' }}</td>
+                    <td>{{ attribution.lecturing_charges.0.allocation_charge | floatformat:2 }}</td>
+                    <td>{{ attribution.practical_charges.0.allocation_charge| floatformat:2 }}</td>
+                    <td>{{ attribution.substitute | default_if_none:'' }}</td>
                     <td>
                         {% if can_manage_attribution %}
                             <a class="trigger_modal"
-                               data-url="{% url "update_attribution" learning_unit_year.id key %}"
+                               data-url="{% url "update_attribution" learning_unit_year.id attribution.pk %}"
                                data-modal_class="modal-lg">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </a>
                             <a class="trigger_modal"
-                               data-url="{% url "remove_attribution" learning_unit_year.id key %}">
+                               data-url="{% url "remove_attribution" learning_unit_year.id attribution.pk %}">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </a>
                         {% endif %}
                         {% if can_manage_charge_repartition %}
                             <a class="trigger_modal"
-                               data-url="{% url "edit_charge_repartition" learning_unit_year.id key %}"
+                               data-url="{% url "edit_charge_repartition" learning_unit_year.id attribution.pk %}"
                                data-modal_class="modal-lg">
                                             <span class="glyphicon glyphicon-edit">
 
                                             </span> </a>
                             <a class="trigger_modal"
-                               data-url="{% url "remove_attribution" learning_unit_year.id key %}">
+                               data-url="{% url "remove_attribution" learning_unit_year.id attribution.pk %}">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </a>
                         {% endif %}
