@@ -87,6 +87,28 @@ class TestPrerequisiteItem(TestCase):
             0
         )
 
+    def test_create_item(self):
+        prerequisite = PrerequisiteFactory()
+        learning_unit = LearningUnitFactory()
+        group_number = 1
+        position = 1
+
+        prerequisite_item.create_item(
+            prerequisite=prerequisite,
+            learning_unit=learning_unit,
+            group_number=group_number,
+            position=position
+        )
+
+        self.assertTrue(
+            prerequisite_item.PrerequisiteItem.objects.get(
+                prerequisite=prerequisite,
+                learning_unit=learning_unit,
+                group_number=group_number,
+                position=position
+            )
+        )
+
 
 class TestPrerequisiteString(TestCase):
     def setUp(self):

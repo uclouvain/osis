@@ -102,3 +102,13 @@ def get_prerequisite_string_representation(prerequisite):
 
 def delete_items_by_related_prerequisite(prerequisite):
     PrerequisiteItem.objects.filter(prerequisite=prerequisite).delete()
+
+
+def create_item(prerequisite, learning_unit, group_number, position):
+    prerequisite_item = PrerequisiteItem(
+        prerequisite=prerequisite,
+        learning_unit=learning_unit,
+        group_number=group_number,
+        position=position,
+    )
+    prerequisite_item.save()
