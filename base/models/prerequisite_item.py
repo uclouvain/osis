@@ -98,3 +98,7 @@ def get_prerequisite_string_representation(prerequisite):
 
     join_main_operator = " {} ".format(_(main_operator))
     return join_main_operator.join(prerequisites_fragments)
+
+
+def delete_items_by_related_prerequisite(prerequisite):
+    PrerequisiteItem.objects.filter(prerequisite=prerequisite).delete()
