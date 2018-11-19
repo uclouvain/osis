@@ -32,9 +32,9 @@ from base.views.person import EmployeeAutocomplete
 class TestPersonAutoComplete(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.jean = PersonFactory(first_name="Jean", last_name="Dupont", middle_name=None, global_id="01456",
+        cls.jean = PersonFactory(first_name="Jean", last_name="Dupont", middle_name=None, global_id="001456",
                                  employee=True)
-        cls.henry = PersonFactory(first_name="Henry", last_name="Arkin", middle_name="De", global_id="025875",
+        cls.henry = PersonFactory(first_name="Henry", last_name="Arkin", middle_name="De", global_id="002587500",
                                   employee=True)
         cls.student = PersonFactory(first_name="Henry", last_name="Dioup", middle_name=None, global_id="488513",
                                     employee=False)
@@ -59,6 +59,13 @@ class TestPersonAutoComplete(TestCase):
     def test_get_queryset_with_global_id(self):
         autocomplete_instance = EmployeeAutocomplete()
         autocomplete_instance.q = self.henry.global_id
+        self.assertQuerysetEqual(
+            autocomplete_instance.get_queryset(),
+            [self.henry],
+            transform=lambda obj: obj
+        )
+
+        autocomplete_instance.q = self.henry.global_id.strip("0")
         self.assertQuerysetEqual(
             autocomplete_instance.get_queryset(),
             [self.henry],
