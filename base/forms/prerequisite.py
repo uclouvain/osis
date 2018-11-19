@@ -118,7 +118,7 @@ def _delete_related_items(prerequisite):
 def _create_prerequisite_items(grouped_items, prerequisite):
     for group_number, group in enumerate(grouped_items, 1):
         for position, learning_unit in enumerate(group, 1):
-            prerequisite_item.create_item(
+            prerequisite_item.PrerequisiteItem.objects.create(
                 prerequisite=prerequisite,
                 learning_unit=learning_unit,
                 group_number=group_number,
