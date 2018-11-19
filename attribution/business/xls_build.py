@@ -35,19 +35,19 @@ WORKSHEET_TITLE = 'learning_units'
 XLS_FILENAME = 'learning_units_and_attributions_filename'
 XLS_DESCRIPTION = "attribution_list"
 
-ATTRIBUTION_TITLES = [str(_('tutor')), str(_('function')), str(_('substitute')), str(_('LECTURING')),
-                      str(_('PRACTICAL_EXERCISES')), str(_('start_year')), str(_('duration'))]
+ATTRIBUTION_TITLES = [str(_('Tutor')), str(_('Function')), str(_('Substitute')), str(_('LECTURING')),
+                      str(_('PRACTICAL_EXERCISES')), str(_('Start year')), str(_('Duration'))]
 
 LEARNING_UNIT_TITLES = [
-    str(_('academic_year_small')),
-    str(_('code')),
-    str(_('title')),
-    str(_('type')),
-    str(_('subtype')),
-    str(_('requirement_entity_small')),
-    str(_('allocation_entity_small')),
-    str(_('credits')),
-    str(_('active_title'))
+    str(_('Ac yr.')),
+    str(_('Code')),
+    str(_('Title')),
+    str(_('Type')),
+    str(_('Subtype')),
+    str(_('Req. Entity')),
+    str(_('Alloc. Ent.')),
+    str(_('Credits')),
+    str(_('Active'))
 ]
 
 

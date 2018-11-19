@@ -25,17 +25,19 @@
 ##############################################################################
 from dal import autocomplete
 from django import forms
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.models.enums import learning_component_year_type
 from base.models.learning_component_year import LearningComponentYear
+from base.models.person import Person
 from base.models.tutor import Tutor
 
 
 class AttributionForm(forms.ModelForm):
-    duration = forms.IntegerField(min_value=1, required=True, label=_("duration"))
+    duration = forms.IntegerField(min_value=1, required=True, label=_("Duration"))
 
     class Meta:
         model = AttributionNew
@@ -43,6 +45,7 @@ class AttributionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["start_year"].required = True
         if self.instance:
             self.fields["duration"].initial = self.instance.duration
 
@@ -55,23 +58,23 @@ class AttributionForm(forms.ModelForm):
 
 
 class AttributionCreationForm(AttributionForm):
-    tutor = forms.ModelChoiceField(
-        queryset=Tutor.objects.all().select_related("person").order_by("person__last_name", "person__first_name"),
+    person = forms.ModelChoiceField(
+        queryset=Person.employees.all(),
         required=True,
         widget=autocomplete.ModelSelect2(
-            url='tutor_autocomplete',
+            url='employee_autocomplete',
             attrs={
                 'data-theme': 'bootstrap',
                 'data-width': 'null',
                 'data-placeholder': _('Indicate the name or the FGS')
             }
         ),
-        label=_('tutor'),
+        label=_('Tutor'),
     )
 
     class Meta:
         model = AttributionNew
-        fields = ["tutor", "function", "start_year"]
+        fields = ["person", "function", "start_year"]
 
     class Media:
         css = {
@@ -82,6 +85,8 @@ class AttributionCreationForm(AttributionForm):
         luy = kwargs.pop("learning_unit_year")
         instance = super().save(commit=False)
         instance.learning_container_year = luy.learning_container_year
+        tutor, create = Tutor.objects.get_or_create(person=self.cleaned_data["person"])
+        instance.tutor = tutor
         if commit:
             instance.save()
         return instance
@@ -94,10 +99,10 @@ class AttributionChargeForm(forms.ModelForm):
         model = AttributionChargeNew
         fields = ["allocation_charge"]
 
-    def save(self, commit=True,  **kwargs):
+    def save(self, commit=True, **kwargs):
         attribution_new_obj = kwargs.pop("attribution")
         luy_obj = kwargs.pop("learning_unit_year")
-        learning_component_year = LearningComponentYear.objects.get(type=self.component_type,
+        learning_component_year = LearningComponentYear.objects.get(Q(type=self.component_type) | Q(type__isnull=True),
                                                                     learningunitcomponent__learning_unit_year=luy_obj)
 
         attribution_charge_obj = super().save(commit=False)

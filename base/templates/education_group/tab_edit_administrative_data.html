@@ -30,7 +30,7 @@
 
 {% block breadcrumb %}
     {{ block.super }}
-    <li>{% trans "MODIFICATION" %}</li>
+    <li>{% trans "Modification" %}</li>
 {% endblock %}
 
 
@@ -53,9 +53,9 @@
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th><label>{% trans 'session_title' %} 1</label></th>
-                                    <th><label>{% trans 'session_title' %} 2</label></th>
-                                    <th><label>{% trans 'session_title' %} 3</label></th>
+                                    <th><label>{% trans 'Session derogation' %} 1</label></th>
+                                    <th><label>{% trans 'Session derogation' %} 2</label></th>
+                                    <th><label>{% trans 'Session derogation' %} 3</label></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -79,7 +79,11 @@
                 </div>
                 <div class="pull-right">
                     {% bootstrap_button _("Save") button_type="submit" button_class="btn-primary" icon="glyphicon glyphicon-floppy-save" %}
-                    {% bootstrap_button _("cancel") button_type="reset"  %}
+                    <a id="link_administrative" href="{% url 'education_group_administrative' root_id education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"
+                       role="tab"
+                            class="btn btn-default">
+                        {% trans 'cancel' %}
+                    </a>
                 </div>
             </form>
         </div>

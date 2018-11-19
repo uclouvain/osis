@@ -37,14 +37,16 @@ import base.views.learning_units.proposal.consolidate
 import base.views.learning_units.proposal.delete
 import base.views.learning_units.search
 import base.views.learning_units.update
+import continuing_education.urls_api_v1
+
 from attribution.views import attribution, tutor_application
 from base.views import learning_achievement, search, education_groups
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, notifications
 from base.views import teaching_material
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
-from base.views.learning_units.attribution import DeleteAttribution, EditAttributionView, AddAttribution, \
-    TutorAutocomplete
+from base.views.learning_units.attribution import DeleteAttribution, EditAttributionView, AddAttribution
+from base.views.person import EmployeeAutocomplete
 from base.views.learning_units.charge_repartition import AddChargeRepartition, \
     EditChargeRepartition, SelectAttributionView
 from base.views.learning_units.detail import learning_unit_identification
@@ -53,7 +55,7 @@ from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
-from base.views.organization import OrganizationAutocomplete
+from base.views.organization import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -61,8 +63,12 @@ urlpatterns = [
         name='entity_autocomplete'),
     url(r'^organization-autocomplete/$', OrganizationAutocomplete.as_view(),
         name='organization_autocomplete'),
-    url(r'^tutor-autocomplete/$', TutorAutocomplete.as_view(),
-        name='tutor_autocomplete'),
+    url(r'^country-autocomplete/$', CountryAutocomplete.as_view(),
+        name='country-autocomplete'),
+    url(r'^campus-autocomplete/$', CampusAutocomplete.as_view(),
+        name='campus-autocomplete'),
+    url(r'^employee-autocomplete/$', EmployeeAutocomplete.as_view(),
+        name='employee_autocomplete'),
     url(r'^academic_actors/$', institution.academic_actors, name='academic_actors'),
 
     url(r'^academic_calendars/', include([
@@ -88,6 +94,8 @@ urlpatterns = [
         url(r'^tutor_application/recompute_portal$', tutor_application.recompute_portal,
             name='recompute_tutor_application_portal'),
         url(r'^attribution/recompute_portal$', attribution.recompute_portal, name='recompute_attribution_portal'),
+        url(r'^continuing_education/',
+            include(continuing_education.urls_api_v1.urlpatterns, namespace='continuing_education_api_v1')),
     ])),
 
     url(r'^catalog/$', common.catalog, name='catalog'),

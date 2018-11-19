@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from base.business.education_groups.postponement import duplicate_education_group_year
 from base.business.utils.postponement import AutomaticPostponement
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_categories import GROUP
+from base.models.enums.education_group_categories import TRAINING
+from base.models.enums.education_group_types import MINITRAINING_TO_POSTONE
 from base.utils.send_mail import send_mail_before_annual_procedure_of_automatic_postponement_of_egy, \
     send_mail_after_annual_procedure_of_automatic_postponement_of_egy
 
@@ -39,10 +41,14 @@ class EducationGroupAutomaticPostponement(AutomaticPostponement):
     send_before = send_mail_before_annual_procedure_of_automatic_postponement_of_egy
     send_after = send_mail_after_annual_procedure_of_automatic_postponement_of_egy
     extend_method = duplicate_education_group_year
-    msg_result = _("%s education group(s) extended and %s error(s)")
+    msg_result = _("%(number_extended)s education group(s) extended and %(number_error)s error(s)")
 
     def get_queryset(self, queryset=None):
-        return super().get_queryset(queryset).exclude(education_group_type__category=GROUP)
+        # We need to postpone only trainings and some mini trainings
+        return super().get_queryset(queryset).filter(
+            Q(education_group_type__category=TRAINING) |
+            Q(education_group_type__name__in=MINITRAINING_TO_POSTONE)
+        )
 
     def get_already_duplicated(self):
         return self.queryset.filter(education_group__educationgroupyear__academic_year=self.last_academic_year)

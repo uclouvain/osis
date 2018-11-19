@@ -39,7 +39,7 @@ from base.models.entity import Entity
 from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums import person_source_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
 
 CENTRAL_MANAGER_GROUP = "central_managers"
 FACULTY_MANAGER_GROUP = "faculty_managers"
@@ -52,11 +52,19 @@ class PersonAdmin(SerializableModelAdmin):
     list_filter = ('gender', 'language')
 
 
+class EmployeeManager(SerializableModelManager):
+    def get_queryset(self):
+        return super().get_queryset().filter(employee=True).order_by("last_name", "first_name")
+
+
 class Person(SerializableModel):
     GENDER_CHOICES = (
-        ('F', _('female')),
-        ('M', _('male')),
+        ('F', _('Female')),
+        ('M', _('Male')),
         ('U', _('unknown')))
+
+    objects = SerializableModelManager()
+    employees = EmployeeManager()
 
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
@@ -119,14 +127,6 @@ class Person(SerializableModel):
             first_name or "",
             middle_name or ""
         ]).strip()
-
-    @property
-    def age(self):
-        if not self.birth_date:
-            return None
-        today = date.today()
-        return today.year - self.birth_date.year - \
-            ((today.month, today.day) < (self.birth_date.month, self.birth_date.day))
 
     @cached_property
     def linked_entities(self):

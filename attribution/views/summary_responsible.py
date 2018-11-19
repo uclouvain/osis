@@ -33,12 +33,12 @@ from attribution.business.attribution import get_attributions_list, _set_summary
 from attribution.business.entity_manager import _append_entity_version
 from attribution.business.summary_responsible import search_attributions, get_attributions_data
 from base import models as mdl_base
-from base.models.entity_manager import is_entity_manager
+from base.models.entity_manager import is_entity_manager, has_perm_entity_manager
 from base.views import layout
 
 
 @login_required
-@user_passes_test(is_entity_manager)
+@user_passes_test(has_perm_entity_manager)
 def search(request):
     entities_manager = mdl_base.entity_manager.find_by_user(request.user)
     # The academic year for summary responsible is the next of current academic year

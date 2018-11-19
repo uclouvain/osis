@@ -40,6 +40,7 @@ from base.business.education_groups.perms import is_eligible_to_delete_education
     is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_change_achievement, \
     is_eligible_to_delete_achievement, is_eligible_to_postpone_education_group
+from base.models.academic_year import AcademicYear
 from base.models.enums.learning_unit_year_periodicity import BIENNIAL_EVEN, BIENNIAL_ODD, ANNUAL
 
 OPTIONAL_PNG = base.STATIC_URL + 'img/education_group_year/optional.png'
@@ -152,7 +153,21 @@ def li_with_create_perm_group(context, url, message, url_id="link_create_group")
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
-def li_with_postpone_perm_training(context, url, message, url_id="link_postpone_training"):
+def li_with_postpone_perm_training(context, url_id="link_postpone_training"):
+    root = context['root']
+    education_group_year = context['education_group_year']
+    url = reverse('postpone_education_group', args=[root.pk, education_group_year.pk])
+
+    try:
+        last_academic_year = education_group_year.academic_year.past()
+    except AcademicYear.DoesNotExist:
+        last_academic_year = "last year"
+
+    message = _('Copy the content from %(previous_anac)s to %(current_anac)s') % {
+        'previous_anac':  str(last_academic_year),
+        'current_anac':  str(education_group_year.academic_year)
+
+    }
     return li_with_permission(context, is_eligible_to_postpone_education_group, url, message, url_id, True)
 
 
@@ -192,7 +207,7 @@ def _get_permission(context, permission):
     return permission_denied_message, "" if result else "disabled", root
 
 
-@register.inclusion_tag('blocks/button/button_with_perm.html', takes_context=True)
+@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def button_edit_administrative_data(context):
     education_group_year = context.get('education_group_year')
 
@@ -204,7 +219,7 @@ def button_edit_administrative_data(context):
     return {
         'is_disabled': is_disabled,
         'message': permission_denied_message,
-        'text': _('edit'),
+        'text': _('Edit'),
         'url': reverse('education_group_edit_administrative', args=[root.pk, education_group_year.pk])
     }
 
@@ -385,7 +400,9 @@ def link_detach_education_group(context, url):
         if not context['can_change_education_group']:
             title += _("The user has not permission to change education groups.")
         if context['group_to_parent'] == '0':
-            title += " " + _("It is not possible to {action} the root element.".format(action=str.lower(action)))
+            title += " " + _("It is not possible to %(action)s the root element.") % {
+                "action": str.lower(_(action))
+            }
 
         a_attributes = """ title="{title}" """.format(title=title)
     text = _(action)
@@ -419,7 +436,7 @@ def link_pdf_content_education_group(url):
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=True)
-def dl_with_parent(context, dl_title, key=None, class_dl="", default_value=None):
+def dl_with_parent(context, dl_title, key, class_dl="", default_value=None):
     """
     Tag to render <dl> for details of education_group.
     If the fetched value does not exist for the current education_group_year,
@@ -433,10 +450,6 @@ def dl_with_parent(context, dl_title, key=None, class_dl="", default_value=None)
     :param default_value: display a default value in <dd> if no value was found.
     :return: dict
     """
-
-    if not key:
-        key = dl_title
-
     education_group_year = context.get('education_group_year')
     value = _fetch_value_with_attrgetter(education_group_year, key)
 

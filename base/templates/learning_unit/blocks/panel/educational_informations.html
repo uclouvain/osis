@@ -31,7 +31,7 @@
     <div class="row well">
         <div class="col-md-6">
             <label>{% trans 'Summary responsible(s)' %} : </label>
-            {%  if summary_responsibles %}
+            {% if summary_responsibles %}
                 <ul>
                     {% for summary_responsible in summary_responsibles %}
                         <li>{{ summary_responsible }}</li>
@@ -64,24 +64,25 @@
 
     <table class="table" style="border-bottom: 1px solid #ddd">
         <thead>
-            <tr>
-                <th class="col-md-2" style="padding: 20px;">{% trans 'language' %}</th>
-                <th class="col-md-5" style="padding: 20px;">{{ form_french.language.1 }}</th>
-                <th class="col-md-5" style="padding: 20px;">{{ form_english.language.1 }}</th>
-            </tr>
+        <tr>
+            <th class="col-md-2" style="padding: 20px;">{% trans 'Language' %}</th>
+            <th class="col-md-5" style="padding: 20px;">{{ form_french.language.1 }}</th>
+            <th class="col-md-5" style="padding: 20px;">{{ form_english.language.1 }}</th>
+        </tr>
         </thead>
         <tbody>
         {% for label_key, label_translated in cms_labels_translated.items %}
             {% if label_key != "mobility" %}
                 <tr>
                     <td style="padding: 20px;">
-                        <label> {{ label_translated }} </label>
+                        <label>{{ label_translated }}</label>
                     </td>
                     <td style="padding: 20px;" {% if label_key in cms_label_pedagogy_fr_only %}colspan="2"{% endif %}>
                         {% if can_edit_information %}
-                            <a class="pedagogy-edit-btn pull-right" href="#"
-                               data-form="{{post_url}}?language={{ form_french.language.0 }}&label={{ label_key }}"
-                               title="{% trans 'edit' %}">
+                            <a class="trigger_modal pull-right"
+                               data-url="{{ post_url }}?language={{ form_french.language.0 }}&label={{ label_key }}"
+                               data-modal_class="modal-lg"
+                               title="{% trans 'Edit' %}">
                                 <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                             </a>
                         {% endif %}
@@ -89,14 +90,15 @@
                     </td>
                     {% if label_key not in cms_label_pedagogy_fr_only %}
                         <td style="padding: 20px;">
-                                {% if can_edit_information %}
-                                    <a class="pedagogy-edit-btn pull-right" href="#"
-                                       data-form="{{ post_url }}?language={{ form_english.language.0 }}&label={{ label_key }}"
-                                       title="{% trans 'edit' %}">
-                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                                    </a>
-                                {% endif %}
-                                {{ form_english|getattr:label_key }}
+                            {% if can_edit_information %}
+                                <a class="trigger_modal pull-right"
+                                   data-url="{{ post_url }}?language={{ form_english.language.0 }}&label={{ label_key }}"
+                                   data-modal_class="modal-lg"
+                                   title="{% trans 'Edit' %}">
+                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                </a>
+                            {% endif %}
+                            {{ form_english|getattr:label_key }}
                         </td>
                     {% endif %}
                 </tr>
@@ -105,23 +107,76 @@
         </tbody>
     </table>
 
-    {% include "learning_unit/blocks/panel/teaching_material.html" %}
-    {% include "learning_unit/blocks/panel/mobility.html" with form_value=form_french|getattr:"mobility" %}
+    <div class="panel" style="border-bottom: 1px solid #ddd;box-shadow: none;">
+        <div class="panel-heading"><label>{% trans 'Teaching material' %}</label></div>
 
+        <div class="panel-body" style="padding-top:0px;">
+            <ul class="list-group list-group-flush">
+                {% for teaching_material in teaching_materials %}
+                    <li class="list-group-item">
+                <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"
+                      style="color:green;margin-right:10px;
+                              {% if not teaching_material.mandatory %}visibility: hidden; {% endif %}"
+                      data-toggle="tooltip" title="{% trans 'Required' %}"></span>
+                        {{ teaching_material.title }}
+
+                        {% if can_edit_information %}
+                            <a class="trigger_modal pull-right" style="margin-left:10px;"
+                               data-url="{% url "teaching_material_delete" learning_unit_year_id=learning_unit_year.pk teaching_material_id=teaching_material.pk %}">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            </a>
+                            <a class="trigger_modal pull-right"
+                               data-url="{% url "teaching_material_edit" learning_unit_year_id=learning_unit_year.pk teaching_material_id=teaching_material.pk %}">
+                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                            </a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+            {% if can_edit_information %}
+                <div class="pull-right">
+                    <a class="btn btn-primary trigger_modal"
+                       data-url="{% url "teaching_material_create" learning_unit_year_id=learning_unit_year.pk %}">
+                        {% trans 'Add' %}
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+
+    <div class="panel">
+        <div class="panel-heading">
+            <label>{% trans "Mobility" %}</label>
+            {% if can_edit_information %}
+                <a class="trigger_modal pull-right"
+                   data-url="{{ post_url }}?language={{ form_french.language.0 }}&label=mobility"
+                   data-modal_class="modal-lg">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12">
+                    {{ form_french|getattr:"mobility" }}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<script src="{% static 'js/pedagogy_modal.js' %}"></script>
 
 {% if perms.base.can_edit_learningunit_pedagogy %}
     <script src="{% url 'javascript-catalog' %}"></script>
     <script src="{% static 'js/jquery.formset.js' %}"></script>
     <script>
-    $('.link-formset').formset({
-        addText: gettext('Add another'),
-        deleteText: gettext('remove'),
-        addCssClass: 'btn btn-info btn-sm',
-        deleteCssClass: 'btn btn-warning btn-sm',
-        prefix: 'teachingmaterial_set'
-    });
+        $('.link-formset').formset({
+            addText: gettext('Add another'),
+            deleteText: gettext('remove'),
+            addCssClass: 'btn btn-info btn-sm',
+            deleteCssClass: 'btn btn-warning btn-sm',
+            prefix: 'teachingmaterial_set'
+        });
     </script>
 {% endif %}

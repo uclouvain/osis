@@ -28,7 +28,7 @@ from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.external_learning_unit import ExternalLearningUnitBaseForm, \
-    LearningContainerYearExternalModelForm, ExternalLearningUnitModelForm
+    LearningContainerYearExternalModelForm, ExternalLearningUnitModelForm, LearningUnitYearForExternalModelForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm
 from base.forms.learning_unit.search_form import ExternalLearningUnitYearForm
@@ -42,7 +42,7 @@ from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory
@@ -145,6 +145,24 @@ class TestExternalLearningUnitForm(TestCase):
         self.assertEqual(luy.learning_unit.start_year, self.academic_year.year)
 
 
+class TestLearningUnitYearForExternalModelForm(TestCase):
+    def setUp(self):
+        self.person = PersonFactory()
+        self.academic_year = create_current_academic_year()
+        self.language = LanguageFactory(code='FR')
+
+    def test_init(self):
+        campus = CampusFactory()
+        address = OrganizationAddressFactory(is_main=True, organization=campus.organization)
+
+        luy = LearningUnitYearFullFactory(campus=campus)
+
+        form = LearningUnitYearForExternalModelForm(
+            person=self.person, data=None,
+            subtype=FULL, instance=luy, initial={})
+        self.assertEqual(form.initial["country"], address.country.pk)
+
+
 class TestExternalLearningUnitSearchForm(TestCase):
     def setUp(self):
         self.academic_year = create_current_academic_year()
@@ -224,4 +242,4 @@ class TestExternalLearningUnitSearchForm(TestCase):
     def test_has_no_criteria(self):
         form = ExternalLearningUnitYearForm({})
         self.assertFalse(form.is_valid())
-        self.assertIn(_("minimum_one_criteria"), form.errors['__all__'])
+        self.assertIn(_("Please choose at least one criteria!"), form.errors['__all__'])

@@ -184,10 +184,7 @@ class LearningUnitTagLiEditTest(TestCase):
         result = li_modification_proposal(self.context, self.url_edit, "")
 
         self.assertEqual(
-            result, self._get_result_data_expected_for_proposal("link_proposal_modification",
-                                                                MSG_EXISTING_PROPOSAL_IN_EPC,
-                                                                DISABLED
-                                                                )
+            result, self._get_result_data_expected("link_proposal_modification", MSG_EXISTING_PROPOSAL_IN_EPC,)
         )
 
     def test_li_edit_lu_year_is_learning_unit_year_not_in_range_to_be_modified(self):

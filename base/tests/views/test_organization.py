@@ -34,6 +34,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.models import organization_address
 from base.models.organization_address import OrganizationAddress
+from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -121,7 +122,7 @@ class OrganizationViewTestCase(TestCase):
         setattr(request, '_messages', FallbackStorage(request))
 
         organization_address_new(request)
-        self.assertEqual(str(request._messages._queued_messages[0]), _("organization_address_save_error"))
+        self.assertEqual(str(request._messages._queued_messages[0]), _("Impossible to save the organization address"))
 
     def test_organizations_search(self):
         response = self.client.get(reverse('organizations_search'), data={
@@ -160,7 +161,7 @@ class TestOrganizationAutocomplete(TestCase):
         expected_results = [{'text': self.organization.name, 'id': str(self.organization.pk)}]
 
         self.assertEqual(response.status_code, 200)
-        results = self._get_results_from_autocomplete_response(response)
+        results = _get_results_from_autocomplete_response(response)
         self.assertListEqual(results, expected_results)
 
     def test_when_filter_without_country_data_forwarded_no_result_found(self):
@@ -168,7 +169,7 @@ class TestOrganizationAutocomplete(TestCase):
         response = self.client.get(self.url, data={'q': 'Grace'})
 
         self.assertEqual(response.status_code, 200)
-        results = self._get_results_from_autocomplete_response(response)
+        results = _get_results_from_autocomplete_response(response)
         self.assertListEqual(results, [])
 
     def test_when_filter_with_country_data_forwarded_result_found(self):
@@ -180,7 +181,7 @@ class TestOrganizationAutocomplete(TestCase):
         expected_results = [{'text': self.organization.name, 'id': str(self.organization.pk)}]
 
         self.assertEqual(response.status_code, 200)
-        results = self._get_results_from_autocomplete_response(response)
+        results = _get_results_from_autocomplete_response(response)
         self.assertListEqual(results, expected_results)
 
     def test_when_filter_with_country_data_forwarded_no_result_found(self):
@@ -193,7 +194,7 @@ class TestOrganizationAutocomplete(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        results = self._get_results_from_autocomplete_response(response)
+        results = _get_results_from_autocomplete_response(response)
         self.assertListEqual(results, [])
 
     def test_when_filter_with_country_data_forwarded_no_result_found_case_not_main(self):
@@ -207,9 +208,87 @@ class TestOrganizationAutocomplete(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        results = self._get_results_from_autocomplete_response(response)
+        results = _get_results_from_autocomplete_response(response)
         self.assertListEqual(results, [])
 
-    def _get_results_from_autocomplete_response(self, response):
-        json_response = str(response.content, encoding='utf8')
-        return json.loads(json_response)['results']
+
+class TestCountryAutocomplete(TestCase):
+    def setUp(self):
+        self.super_user = SuperUserFactory()
+        self.url = reverse("country-autocomplete")
+        self.country = CountryFactory(name="Narnia")
+        OrganizationAddressFactory(country=self.country)
+
+    def test_when_filter(self):
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(self.url, data={'q': 'nar'})
+
+        self.assertEqual(response.status_code, 200)
+        results = _get_results_from_autocomplete_response(response)
+
+        expected_results = [{'text': self.country.name, 'id': str(self.country.pk)}]
+
+        self.assertListEqual(results, expected_results)
+
+
+class TestCampusAutocomplete(TestCase):
+    def setUp(self):
+        self.super_user = SuperUserFactory()
+        self.url = reverse("campus-autocomplete")
+
+        self.organization = OrganizationFactory(name="Université de Louvain")
+        self.organization_address = OrganizationAddressFactory(
+            organization=self.organization,
+            country__iso_code='BE',
+            is_main=True
+        )
+        self.campus = CampusFactory(organization=self.organization)
+
+    def test_when_filter_without_country_data_forwarded_result_found(self):
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(self.url, data={'q': 'univ'})
+
+        expected_results = [{'text': "{} ({})".format(self.organization.name, self.campus.name),
+                             'id': str(self.campus.pk)}]
+
+        self.assertEqual(response.status_code, 200)
+        results = _get_results_from_autocomplete_response(response)
+        self.assertListEqual(results, expected_results)
+
+    def test_when_filter_without_country_data_forwarded_no_result_found(self):
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(self.url, data={'q': 'Grace'})
+
+        self.assertEqual(response.status_code, 200)
+        results = _get_results_from_autocomplete_response(response)
+        self.assertListEqual(results, [])
+
+    def test_when_filter_with_country_data_forwarded_result_found(self):
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(
+            self.url,
+            data={'forward': '{"country": "%s"}' % self.organization_address.country.pk}
+        )
+        expected_results = [{'text': "{} ({})".format(self.organization.name, self.campus.name),
+                             'id': str(self.campus.pk)}]
+        self.assertEqual(response.status_code, 200)
+        results = _get_results_from_autocomplete_response(response)
+        self.assertListEqual(results, expected_results)
+
+    def test_when_filter_with_country_data_forwarded_no_result_found(self):
+        country = CountryFactory(iso_code='FR')
+
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(
+            self.url,
+            data={'forward': '{"country": "%s"}' % country.pk}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        results = _get_results_from_autocomplete_response(response)
+        self.assertListEqual(results, [])
+
+
+def _get_results_from_autocomplete_response(response):
+    json_response = str(response.content, encoding='utf8')
+    return json.loads(json_response)['results']

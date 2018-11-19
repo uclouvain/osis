@@ -46,15 +46,14 @@
         <div class="col-md-4">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    {% bootstrap_field learning_container_year_form.country %}
-                    {% bootstrap_field learning_container_year_form.city %}
+                    {% bootstrap_field learning_unit_year_form.country %}
                     {% bootstrap_field learning_unit_year_form.campus %}
                     {% bootstrap_field learning_unit_year_form.academic_year %}
                 </div>
             </div>
             <div class="panel panel-default">
                 <div class="panel-body">
-                    {% trans 'introduced_by' %}
+                    {% trans 'Introduced by' %}
                     {% if learning_unit_year %}
                         {{ learning_unit_year.externallearningunityear.author }}
                     {% else %}
@@ -62,7 +61,7 @@
                     {% endif %}
                     <br><br>
 
-                    {% trans 'the' %}
+                    {% trans 'The' %}
                     {% if learning_unit_year %}
                         {{ learning_unit_year.externallearningunityear.date| date:"SHORT_DATE_FORMAT" }}
                     {% else %}
@@ -74,13 +73,16 @@
         </div>
     </div>
 </form>
-<script src="{% static 'js/select_ajax_filtering.js' %}"></script>
+{{ learning_unit_year_form.media }}
+
 <script>
-    let country_node = $("select#id_country");
-    let city_node = $("select#id_city");
-    let campus_node = $("select#id_campus");
-
-    country_node.filterCityByCountry(city_node, campus_node, "{% url "filter_cities_by_country" %}");
-    city_node.filterCampusByCity(campus_node, "{% url "filter_campus_by_city" %}");
-
+    $(document).ready(function () {
+        // Bind on continent field change
+        $(':input[name$=country]').on('change', function () {
+            // Get the field prefix, ie. if this comes from a formset form
+            var prefix = $(this).getFormPrefix();
+            // Clear the autocomplete with the same prefix
+            $(':input[name=' + prefix + 'campus]').val(null).trigger('change');
+        });
+    });
 </script>

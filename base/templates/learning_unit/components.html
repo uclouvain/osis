@@ -1,8 +1,6 @@
-{% extends "layout.html" %}
-{% load staticfiles %}
-{% load i18n %}
+{% extends "learning_unit/layout_detail.html" %}
+{% load staticfiles bootstrap3 i18n %}
 {% load components_classes %}
-{% load bootstrap3 %}
 {% load waffle_tags %}
 
 {% comment "License" %}
@@ -29,161 +27,133 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block breadcrumb %}
-    {% include "learning_unit/breadcrumb.html" %}
+{% block action_top %}
+    {% include "learning_unit/blocks/manage_volumes_button.html" with form_type="full" %}
 {% endblock %}
 
-{% block content %}
+{% block action_bottom %}
+    {% include "learning_unit/blocks/manage_volumes_button.html" with form_type="full" %}
+{% endblock %}
 
-{% include "learning_unit/blocks/header.html" %}
-<div class="panel panel-default">
-    <div class="panel-heading text-right">
-        {% include "learning_unit/blocks/manage_volumes_button.html" with form_type="full"%}
-    </div>
-    <div class="panel-body" id="tabs">
-        {% include "learning_unit/blocks/tabs.html" %}
-        <br>
-        <div class="tab-content" id="tab_content">
-            <div role="tabpanel" class="tab-pane active" id="components">
-                <table class="table volumes_read">
-                    <thead class="components">
-                        <tr>
-                            <th></th>
-                            <th>{% trans 'LU' %}</th>
-                            <th>{% trans 'components' %}</th>
-                            <th>{% trans 'code' %}</th>
-                            <th>{% trans 'volume_partial' %}</th>
-                            <th>{% trans 'volume_remaining' %}</th>
-                            <th>
-                                <abbr title="{% trans 'The annual volume must be equal to the sum of the volumes Q1 and Q2'%}">
-                                    {% trans 'Vol. annual' %}
-                                </abbr>
-                            </th>
-                            <th>
-                                <abbr title="{% trans 'real_on_planned_classrooms'%}">{% trans 'Classes' %}</abbr>
-                            </th>
-                            <th>
-                                <abbr title="{% trans 'The global volume corresponding to the product of the annual volume and the number of planned classes must be equal to the sum of the volumes for each entity'%}">
-                                    {% trans 'Vol. global' %}
-                                </abbr>
-                            </th>
-                            {% block additional_entities_titles %}
-                                {% include "learning_unit/blocks/additional_entities_titles.html" %}
-                            {% endblock %}
-                            <th></th>
+{% block content_tab %}
+    <div role="tabpanel" class="tab-pane active" id="components">
+
+        <table class="table volumes_read">
+            <thead class="components">
+            <tr>
+                <th></th>
+                <th>{% trans 'LU' %}</th>
+                <th>{% trans 'components' %}</th>
+                <th>{% trans 'code' %}</th>
+                <th>{% trans 'Vol. Q1' %}</th>
+                <th>{% trans 'Vol. Q2' %}</th>
+                <th>
+                    <abbr title="{% trans 'The annual volume must be equal to the sum of the volumes Q1 and Q2' %}">
+                        {% trans 'Vol. annual' %}
+                    </abbr>
+                </th>
+                <th>
+                    <abbr title="{% trans 'Real/Planned classrooms' %}">{% trans 'Classes' %}</abbr>
+                </th>
+                <th>
+                    <abbr title="{% trans 'The global volume corresponding to the product of the annual volume and the number of planned classes must be equal to the sum of the volumes for each entity' %}">
+                        {% trans 'Vol. global' %}
+                    </abbr>
+                </th>
+                {% block additional_entities_titles %}
+                    {% include "learning_unit/blocks/additional_entities_titles.html" %}
+                {% endblock %}
+                <th></th>
+            </tr>
+            </thead>
+            {% for component in components %}
+                {% ifchanged component.learning_unit_usage %}
+                    {% if forloop.counter > 1 %}
+                        <tr style="height: 1px;font-size: 1px;">
+                            <td colspan="11">&nbsp;</td>
                         </tr>
-                    </thead>
-                    {% for component in components %}
-                        {% ifchanged component.learning_unit_usage %}
-                            {% if forloop.counter > 1 %}
-                                <tr style="height: 1px;font-size: 1px;"><td colspan="11">&nbsp;</td></tr>
-                            {% endif %}
-                        {% endifchanged %}
-                        {% if component.used_by_learning_unit %}
-                            <tbody class="used_component">
-                        {% else %}
-                            <tbody class="unused_component">
-                        {% endif %}
-                        <tr>
-                            <td>
-                                {% if component.learning_component_year.classes %}
-                                    <a role="button" data-toggle="collapse" href=".collapse_classes{{ forloop.counter0 }}"
-                                        aria-expanded="false" aria-controls="collapse_classes{{ forloop.counter0 }}" style="border:0;padding:0;"
-                                        onclick="changeOrientation(expandButton{{ forloop.counter0 }})">
-                                        <span id="expandButton{{ forloop.counter0 }}" class="glyphicon glyphicon-expand" aria-hidden="true"></span>
-                                    </a>
-                                {% endif %}
-                            </td>
-                            <td>{{ component.learning_unit_usage }}</td>
-                            <td>{% if component.learning_component_year.type %}
-                                    {% trans component.learning_component_year.type %}
-                                {% endif %}
-                            </td>
-                            <td>/
-                                {# FIXME :: Temporary solution - waiting for business clarification about "components" concept (untyped, ...)#}
-                                {% if component.learning_component_year.acronym == 'NT' %}PM{% else %}{{ component.learning_component_year.acronym  | default_if_none:'' }}{% endif %}</td>
-                            <td>{{ component.volumes.VOLUME_Q1|floatformat | default_if_none:'' }}</td>
-                            <td>{{ component.volumes.VOLUME_Q2|floatformat | default_if_none:'' }}</td>
-                            <td>{{ component.volumes.VOLUME_TOTAL|floatformat | default_if_none:''}}</td>
-                            <td>
+                    {% endif %}
+                {% endifchanged %}
+                {% if component.used_by_learning_unit %}
+                    <tbody class="used_component">
+                    {% else %}
+                    <tbody class="unused_component">
+                {% endif %}
+            <tr>
+                <td>
+                    {% if component.learning_component_year.classes %}
+                        <a role="button" data-toggle="collapse"
+                           href=".collapse_classes{{ forloop.counter0 }}"
+                           aria-expanded="false" aria-controls="collapse_classes{{ forloop.counter0 }}"
+                           style="border:0;padding:0;"
+                           onclick="changeOrientation(expandButton{{ forloop.counter0 }})">
+                                        <span id="expandButton{{ forloop.counter0 }}" class="glyphicon glyphicon-expand"
+                                              aria-hidden="true"></span>
+                        </a>
+                    {% endif %}
+                </td>
+                <td>{{ component.learning_unit_usage }}</td>
+                <td>{% if component.learning_component_year.type %}
+                    {% trans component.learning_component_year.type %}
+                {% endif %}
+                </td>
+                <td>/
+                    {# FIXME :: Temporary solution - waiting for business clarification about "components" concept (untyped, ...)#}
+                    {% if component.learning_component_year.acronym == 'NT' %}PM{% else %}
+                        {{ component.learning_component_year.acronym  | default_if_none:'' }}{% endif %}</td>
+                <td>{{ component.volumes.VOLUME_Q1|floatformat | default_if_none:'' }}</td>
+                <td>{{ component.volumes.VOLUME_Q2|floatformat | default_if_none:'' }}</td>
+                <td>{{ component.volumes.VOLUME_TOTAL|floatformat | default_if_none:'' }}</td>
+                <td>
                                 <span class="badge fixed_width {{ component.learning_component_year.planned_classes |get_css_class:component.learning_component_year.real_classes }}">
                                     {{ component.learning_component_year.real_classes| default_if_none:'0' }} /
                                         {{ component.learning_component_year.planned_classes| default_if_none:'0' }}
                                 </span>
-                            </td>
-                            <td>{{ component.volumes.VOLUME_GLOBAL|floatformat | default_if_none:''}}</td>
-                            {% block additional_requirement_entity_volumes %}
-                                {% include "learning_unit/blocks/additional_requirement_entity_volumes.html" %}
-                            {% endblock %}
-                            <td></td>
-                        </tr>
-                        {% with component_number=forloop.counter0 classes_count=component.learning_component_year.classes|length|add:"1" %}
-                                <tr class="class_year class_year_head collapse collapse_classes{{ component_number }}">
-                                    <td rowspan="{{ classes_count }}"></td>
-                                    <td rowspan="{{ classes_count }}">{% trans 'classes' %}</td>
-                                    <td colspan="1">{% trans 'LU' %}</td>
-                                    <td colspan="2">{% trans 'code' %}</td>
-                                    <td colspan="6">{% trans 'description' %}</td>
-                                </tr>
-                            {% for learning_class_year in component.learning_component_year.classes|dictsort:"acronym" %}
-                                <tr class="class_year collapse collapse_classes{{ component_number }}">
-                                    <td colspan="1">{{ learning_class_year.used_by_learning_units_year }}</td>
-                                    <td colspan="2">
-                                        /{% if component.learning_component_year.type_letter_acronym %}
-                                            {{ component.learning_component_year.type_letter_acronym }}
-                                         {% endif %}
-                                         - {{ learning_class_year.acronym }}
-                                    </td>
-                                    <td colspan="6">
-                                        {{ learning_class_year.description|default_if_none:'' }}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        {% endwith %}
-                    </tbody>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
+                </td>
+                <td>{{ component.volumes.VOLUME_GLOBAL|floatformat | default_if_none:'' }}</td>
+                {% block additional_requirement_entity_volumes %}
+                    {% include "learning_unit/blocks/additional_requirement_entity_volumes.html" %}
+                {% endblock %}
+                <td></td>
+            </tr>
+            {% with component_number=forloop.counter0 classes_count=component.learning_component_year.classes|length|add:"1" %}
+                <tr class="class_year class_year_head collapse collapse_classes{{ component_number }}">
+                    <td rowspan="{{ classes_count }}"></td>
+                    <td rowspan="{{ classes_count }}">{% trans 'Classes' %}</td>
+                    <td colspan="1">{% trans 'LU' %}</td>
+                    <td colspan="2">{% trans 'code' %}</td>
+                    <td colspan="6">{% trans 'Description' %}</td>
+                </tr>
+                {% for learning_class_year in component.learning_component_year.classes|dictsort:"acronym" %}
+                    <tr class="class_year collapse collapse_classes{{ component_number }}">
+                        <td colspan="1">{{ learning_class_year.used_by_learning_units_year }}</td>
+                        <td colspan="2">
+                            /{% if component.learning_component_year.type_letter_acronym %}
+                            {{ component.learning_component_year.type_letter_acronym }}
+                        {% endif %}
+                            - {{ learning_class_year.acronym }}
+                        </td>
+                        <td colspan="6">
+                            {{ learning_class_year.description|default_if_none:'' }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endwith %}
+            </tbody>
+            {% endfor %}
+        </table>
     </div>
-    <div class="panel-footer text-right">
-        {% include "learning_unit/blocks/manage_volumes_button.html" with form_type="full" %}
-    </div>
-</div>
-<div class="modal fade" id="component_edit" role="dialog" data-backdrop="static"></div>
-<div class="modal fade" id="class_edit" role="dialog" data-backdrop="static"></div>
 {% endblock %}
 
 {% block script %}
-<script>
-    $(".component-edit-btn").click(function(ev) {
-        ev.preventDefault();
-        var url = $(this).data("form"); // get the contact form url
-        var edit_modal = $("#component_edit");
-        edit_modal.load(url, function() { // load the url into the modal
-            $(this).modal('show');
-        });
-        return false;
-    });
-
-    $(".class-edit-btn").click(function(ev) {
-        ev.preventDefault();
-        var url = $(this).data("form"); // get the contact form url
-        var edit_modal = $("#class_edit");
-        edit_modal.load(url, function() { // load the url into the modal
-            $(this).modal('show');
-        });
-        return false;
-    });
-
-    function changeOrientation(button) {
-        if (button.className == "glyphicon glyphicon-collapse-down"){
-            button.className = "glyphicon glyphicon-expand"
+    <script>
+        function changeOrientation(button) {
+            if (button.className == "glyphicon glyphicon-collapse-down") {
+                button.className = "glyphicon glyphicon-expand"
+            }
+            else if (button.className == "glyphicon glyphicon-expand") {
+                button.className = "glyphicon glyphicon-collapse-down"
+            }
         }
-        else if (button.className == "glyphicon glyphicon-expand"){
-            button.className = "glyphicon glyphicon-collapse-down"
-        }
-    }
-
-</script>
+    </script>
 {% endblock %}
