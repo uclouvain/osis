@@ -23,8 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models import Q, Prefetch
 
 from attribution.models import attribution_charge_new
+from attribution.models.attribution_charge_new import AttributionChargeNew
+from attribution.models.attribution_new import AttributionNew
+from base.models.enums import learning_component_year_type
+from base.models.learning_unit_component import LearningUnitComponent
 
 
 def find_attribution_charge_new(learning_unit_year):
@@ -49,4 +54,27 @@ def create_attributions_dictionary(attribution_charges):
                             "substitute": attribution_charge.attribution.substitute}
         attributions.setdefault(key, attribution_dict) \
             .update({attribution_charge.learning_component_year.type: attribution_charge.allocation_charge})
+    return attributions
+
+
+# FIXME Refactor code to work with base.views.learning_units.charge_repartition.SelectAttributionView#attributions
+def find_attributions_with_charges(learning_unit_year):
+    lecturing_charges = AttributionChargeNew.objects \
+        .filter(Q(learning_component_year__type=learning_component_year_type.LECTURING)
+                | Q(learning_component_year__type__isnull=True))
+    prefetch_lecturing_charges = Prefetch("attributionchargenew_set", queryset=lecturing_charges,
+                                          to_attr="lecturing_charges")
+
+    practical_charges = AttributionChargeNew.objects \
+        .filter(learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES)
+    prefetch_practical_charges = Prefetch("attributionchargenew_set", queryset=practical_charges,
+                                          to_attr="practical_charges")
+
+    learning_unit_components = LearningUnitComponent.objects.filter(learning_unit_year=learning_unit_year)
+    attributions = AttributionNew.objects \
+        .filter(attributionchargenew__learning_component_year__learningunitcomponent__in=learning_unit_components) \
+        .distinct("id") \
+        .prefetch_related(prefetch_lecturing_charges) \
+        .prefetch_related(prefetch_practical_charges) \
+        .select_related("tutor__person")
     return attributions

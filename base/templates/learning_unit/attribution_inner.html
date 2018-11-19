@@ -32,7 +32,9 @@
         {% csrf_token %}
         {% bootstrap_form_errors attribution_form %}
         {% bootstrap_form_errors lecturing_charge_form %}
-        {% bootstrap_form_errors practical_charge_form %}
+        {% if practical_charge_form %}
+            {% bootstrap_form_errors practical_charge_form %}
+        {% endif %}
         <div class="row">
             {% if attribution %}
                 <div class="col-md-6">
@@ -52,7 +54,9 @@
         <br>
         <div class="row">
             {% bootstrap_field lecturing_charge_form.allocation_charge form_group_class="col-md-6" %}
-            {% bootstrap_field practical_charge_form.allocation_charge form_group_class="col-md-6" %}
+            {% if practical_charge_form %}
+                {% bootstrap_field practical_charge_form.allocation_charge form_group_class="col-md-6" %}
+            {% endif %}
         </div>
     </form>
     {{ attribution_form.media }}
