@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-16 14:28+0100\n"
+"POT-Creation-Date: 2018-11-16 15:25+0100\n"
 "PO-Revision-Date: 2018-11-16 14:28+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -174,6 +174,11 @@ msgstr "A=Absent"
 #: models/enums/rate_code.py:42
 msgid "AESS CAPAES"
 msgstr "AESS CAPAES"
+
+#: tests/models/test_prerequisite_item.py:108
+#: tests/models/test_prerequisite_item.py:127
+msgid "AND"
+msgstr "ET"
 
 #: models/enums/exam_enrollment_justification_type.py:42
 msgid "Absence justified"
@@ -2235,6 +2240,10 @@ msgstr "Matricule"
 #: models/enums/constraint_type.py:33
 msgid "Number of elements"
 msgstr "Nombre d'éléments"
+
+#: tests/models/test_prerequisite_item.py:126
+msgid "OR"
+msgstr "OU"
 
 #: templates/catalog.html:42 templates/layout.html:126
 #: templates/offer/breadcrumb.html:28 templates/offer_year_calendar.html:31

@@ -94,13 +94,11 @@ class TestDetail(TestCase):
                          [self.group_element_year_2])
 
 
-
-
 class TestLearningUnitPrerequisite(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory()
-        cls.education_group_year_parents = [TrainingFactory(academic_year=cls.academic_year) for _ in range(0,2)]
+        cls.education_group_year_parents = [TrainingFactory(academic_year=cls.academic_year) for _ in range(0, 2)]
         cls.learning_unit_year_child = LearningUnitYearFakerFactory(
             learning_container_year__academic_year=cls.academic_year
         )
@@ -112,8 +110,8 @@ class TestLearningUnitPrerequisite(TestCase):
         ]
 
         cls.prerequisite = PrerequisiteFactory(
-            learning_unit_year = cls.learning_unit_year_child,
-            education_group_year = cls.education_group_year_parents[0]
+            learning_unit_year=cls.learning_unit_year_child,
+            education_group_year=cls.education_group_year_parents[0]
         )
         cls.person = PersonWithPermissionsFactory("can_access_education_group")
         cls.url = reverse("learning_unit_prerequisite",
