@@ -29,7 +29,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import PermissionDenied
 
 from base.models.person import find_by_user
-from base.business.learning_units.perms import is_year_editable, YEAR_LIMIT_LUE_MODIFICATION
+from base.business.learning_units.perms import is_year_editable
 from base.business.learning_units.perms import is_eligible_for_modification, is_eligible_for_modification_end_date, \
     is_eligible_to_create_modification_proposal, is_eligible_to_edit_proposal, is_eligible_for_cancel_of_proposal, \
     is_eligible_to_consolidate_proposal, is_eligible_to_delete_learning_unit_year
