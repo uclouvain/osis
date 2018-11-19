@@ -682,6 +682,11 @@ msgstr "Calendrier des programmes"
 msgid "Campus"
 msgstr "Campus"
 
+#: business/learning_units/perms.py:73
+msgid "Can delete according to the type of the learning unit"
+msgstr ""
+"Vous ne pouvez pas supprimer cette unité d'enseignement en raison de son type"
+
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:105
 msgid "Cancel the proposal"
 msgstr "Annuler la proposition"
@@ -1279,6 +1284,10 @@ msgstr "Exécuter l'action sélectionnée"
 msgid "Existing acronym"
 msgstr "Sigle déjà existant"
 
+#: business/learning_units/perms.py:56
+msgid "Existing proposal in epc"
+msgstr "Il existe des propositions dans EPC"
+
 #: templates/education_group/search.html:116
 #: templates/learning_unit/by_activity.html:45
 #: templates/learning_unit/summary_list.html:52
@@ -1639,6 +1648,10 @@ msgstr "Action invalide"
 #: tests/views/learning_units/proposals/test_creation.py:186
 msgid "Invalid code"
 msgstr "Code non valide"
+
+#: templatetags/learning_unit_li.py:39
+msgid "Isn't a proposal"
+msgstr "Ce n'est pas un proposition"
 
 #: tests/views/education_groups/test_update.py:484
 msgid "It is forbidden to attach an element to one of its included elements."
@@ -2043,6 +2056,11 @@ msgstr "Modification"
 msgid "Modification made"
 msgstr "Modification apportée"
 
+#: business/learning_units/perms.py:495
+#, python-format
+msgid "Modifications should be made in EPC for year %(year)d"
+msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
+
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:90
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:93
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:75
@@ -2225,6 +2243,10 @@ msgstr "Aucun"
 msgid "Not concerned"
 msgstr "Non concerné"
 
+#: business/learning_units/perms.py:74
+msgid "Not eligible to delete learning units"
+msgstr "Vous ne pouvez pas supprimer cette unité d'enseignement"
+
 #: models/enums/exam_enrollment_state.py:35
 msgid "Not enrolled"
 msgstr "Pas inscrit"
@@ -2232,6 +2254,12 @@ msgstr "Pas inscrit"
 #: business/learning_units/perms.py:455 business/learning_units/perms.py:461
 msgid "Not in period to edit educational information."
 msgstr "Vous n'êtes pas en période d'édition des informations pédagogiques."
+
+#: business/learning_units/perms.py:69
+msgid "Not in range of years which can be edited by you"
+msgstr ""
+"L'unité d'enseignement n'est pas dans la fourchette d'années que vous pouvez "
+"modifier"
 
 #: models/enums/field_status.py:38
 msgid "Not required"
@@ -2410,6 +2438,10 @@ msgstr "En attente"
 #: business/proposal_xls.py:39 models/learning_unit_year.py:154
 msgid "Periodicity"
 msgstr "Périodicité"
+
+#: business/learning_units/perms.py:63
+msgid "Person not in accordance with proposal state"
+msgstr "Personne qui ne peut pas travailler avec une proposition dans cet état"
 
 #: templates/education_group/tab_admission_conditions.html:125
 msgid "Personalized access"
@@ -2621,10 +2653,18 @@ msgstr "Proposition de modification"
 msgid "Proposal is neither accepted nor refused."
 msgstr "La proposition n'est ni acceptée ni refusée."
 
+#: templatetags/learning_unit_li.py:40
+msgid "Proposal isn't on current learning unit year"
+msgstr "La proposition n'est pas sur l'année en cours"
+
 #: templates/learning_unit/blocks/form/update_proposal.html:6
 #: templates/learning_unit/proposal/creation.html:9
 msgid "Proposal management"
 msgstr "Gestion de la proposition"
+
+#: business/learning_units/perms.py:72
+msgid "Proposal not in eligible state for consolidation"
+msgstr "La proposition n'est pas dans un état éligible à la consolidation"
 
 #: business/learning_unit_xls.py:193
 #: templates/blocks/button/learning_units_action_button.html:57
@@ -3605,6 +3645,16 @@ msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
 
+#: business/learning_units/perms.py:527
+msgid "This learning unit is not eligible for proposal creation/modification"
+msgstr ""
+"Cette unité d'enseignement n'est pas éligible pour une création/modification "
+"de proposition"
+
+#: business/learning_units/perms.py:77
+msgid "This learning unit isn't eligible for modification because of it's type"
+msgstr "Cette unité d'enseignement n'est pas éligible en raison de son type"
+
 #: models/learning_unit_year.py:371 tests/models/test_learning_unit_year.py:576
 #, python-format
 msgid ""
@@ -4013,6 +4063,14 @@ msgstr "OUI,NON"
 msgid "Yes, I confirm."
 msgstr "Oui, je confirme."
 
+#: business/learning_units/perms.py:64
+msgid ""
+"You are faculty manager and the proposal state is not 'Faculty', so you "
+"can't edit"
+msgstr ""
+"Vous êtes gestionnaire facultaire et le proposition n'est pas en état "
+"'faculté' donc vous ne pouvez pas éditer"
+
 #: business/group_element_years/postponement.py:51
 #: business/group_element_years/postponement.py:68
 #: tests/business/education_groups/test_postponement.py:196
@@ -4031,6 +4089,41 @@ msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le futur."
 msgid "You are not allowed to postpone this training in the past."
 msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le passé."
 
+#: business/learning_units/perms.py:67
+msgid ""
+"You are not attached to initial or current requirement entity, so you can't "
+"edit proposal"
+msgstr ""
+"Vous n'êtes pas rattaché à l'entity de charges (initiale ou courante), donc "
+"vous ne pouvez pas éditer la proposition"
+
+#: business/learning_units/perms.py:65
+msgid "You are not eligible to cancel proposal"
+msgstr "Vous ne pouvez pas consolider les propositions"
+
+#: business/learning_units/perms.py:70
+msgid "You are not eligible to consolidate proposal"
+msgstr "Vous ne pouvez pas consolider les propositions"
+
+#: business/learning_units/perms.py:75
+msgid "You are not eligible to create/modify proposal"
+msgstr "Vous ne pouvez pas créer/modifier les propositions"
+
+#: business/learning_units/perms.py:66
+msgid "You are not eligible to edit proposal"
+msgstr "Vous ne pouvez pas modifier les propositions"
+
+#: business/learning_units/perms.py:57
+msgid ""
+"You are not eligible to modify the end date of this learning unit. You "
+"should be central manager or the learning unit has to be a partim or the "
+"learning unit as to be a course/dissertation/internship"
+msgstr ""
+"Vous ne pouvez pas modifier la date de fin de cette unité d'enseignement. "
+"Vous devriez être gestionnaire central ou l'unité d'enseignement devrait "
+"être un partim ou encore l'unité d'enseignement devrait être un cours/"
+"mémoire/stage"
+
 #: business/learning_units/perms.py:443
 msgid "You are not summary responsible for this learning unit."
 msgstr ""
@@ -4046,6 +4139,29 @@ msgid "You can not delete this object because some dependencies are protected"
 msgstr ""
 "Vous ne pouvez pas supprimer cet objet car certaines dépendances sont "
 "protégées"
+
+#: business/learning_units/perms.py:61
+msgid ""
+"You can only modify a learning unit when your are linked to its requirement "
+"entity"
+msgstr ""
+"Vous ne pouvez modifier une unité d'enseignement qui si vous êtes attaché à "
+"son entité responsable du cahier des charges"
+
+#: business/learning_units/perms.py:60
+msgid "You can't modify learning unit of a previous year"
+msgstr "Vous ne pouvez pas modifier la date de fin pour une année précédente"
+
+#: business/learning_units/perms.py:493
+#, python-format
+msgid "You can't modify learning unit under year : %(year)d"
+msgstr ""
+"Vous ne pouvez pas modifier une unité d'enseignement dont l'année est "
+"inférieure à %(year)d"
+
+#: business/learning_units/perms.py:76
+msgid "You can't modify proposal which is on an other year"
+msgstr "Vous ne pouvez pas modifier les propositions liées à une autre année"
 
 #: templatetags/learning_unit_li.py:193
 msgid ""
@@ -4063,6 +4179,10 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas attacher \"%(child)s\" (de type \"%(child_type)s\") à "
 "\"%(parent)s\" (de type \"%(parent_type)s\")"
+
+#: business/learning_units/perms.py:71
+msgid "You don't have the rights to consolidate"
+msgstr "Vous n'avez pas le droit de consolider"
 
 #: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:16
 msgid "You have the choice between"
@@ -4497,6 +4617,16 @@ msgstr "optionnel"
 #: utils/send_mail.py:271
 msgid "parameters"
 msgstr "paramètres"
+
+#: templates/layout.html:204
+#, fuzzy
+#| msgid "Partnerships"
+msgid "partnerships"
+msgstr "Partenariats"
+
+#: templates/layout.html:213
+msgid "partnerships_financing_configuration"
+msgstr ""
 
 #: templates/offer/tab_program_managers.html:47
 msgid "person"

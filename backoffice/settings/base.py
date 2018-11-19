@@ -432,3 +432,5 @@ REQUESTS_TIMEOUT = 20
 URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/prog-{anac}{type}-{code}")
 REFRESH_PARAM = os.environ.get("REFRESH_PARAM", "")
 GET_SECTION_PARAM = os.environ.get("GET_SECTION_PARAM", "")
+
+YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 2018))
