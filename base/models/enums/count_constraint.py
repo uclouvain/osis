@@ -23,16 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import ugettext_lazy as _
+
+
 ZERO = "0"
 ONE = "1"
 MANY = "MANY"
 
 MAX_COUNT_CONSTRAINTS = (
-    (ONE, ONE),
-    (MANY, MANY),
+    (ONE, _("One")),
+    (MANY, _("Many")),
 )
 
 MIN_COUNT_CONSTRAINTS = (
-    (ZERO, ZERO),
-    (ONE, ONE),
+    (ZERO, _("Zero")),
+    (ONE, _("One")),
 )
