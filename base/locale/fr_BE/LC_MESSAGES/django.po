@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-19 14:29+0100\n"
+"POT-Creation-Date: 2018-11-19 09:14+0100\n"
 "PO-Revision-Date: 2018-11-16 14:28+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -683,7 +683,6 @@ msgid "Campus"
 msgstr "Campus"
 
 #: business/learning_units/perms.py:73
-#, fuzzy
 msgid "Can delete according to the type of the learning unit"
 msgstr ""
 "Vous ne pouvez pas supprimer cette unité d'enseignement en raison de son type"
@@ -1973,6 +1972,10 @@ msgstr "Mandates"
 msgid "Mandatory"
 msgstr "Obligatoire"
 
+#: models/authorized_relationship.py:45 models/enums/count_constraint.py:35
+msgid "Many"
+msgstr "Plusieurs"
+
 #: forms/my_message.py:39 templates/my_osis/my_messages.html:46
 msgid "Mark selected messages as read"
 msgstr "Marquer les messages sélectionnés comme lus"
@@ -2241,10 +2244,8 @@ msgid "Not concerned"
 msgstr "Non concerné"
 
 #: business/learning_units/perms.py:74
-#, fuzzy
-#| msgid "No enrollment for this learning unit"
 msgid "Not eligible to delete learning units"
-msgstr "Il n'y a aucune inscription pour cette unité d'enseignement"
+msgstr "Vous ne pouvez pas supprimer cette unité d'enseignement"
 
 #: models/enums/exam_enrollment_state.py:35
 msgid "Not enrolled"
@@ -2289,6 +2290,10 @@ msgstr "Inscriptions aux formations"
 #: models/admission_condition.py:77
 msgid "On the file: direct access or access with additional training"
 msgstr "Sur dossier: accès direct ou moyennant compléments de formation"
+
+#: models/enums/count_constraint.py:34 models/enums/count_constraint.py:40
+msgid "One"
+msgstr "Un"
 
 #: forms/learning_unit/edition_volume.py:136
 #: forms/learning_unit/edition_volume.py:137
@@ -4176,8 +4181,6 @@ msgstr ""
 "\"%(parent)s\" (de type \"%(parent_type)s\")"
 
 #: business/learning_units/perms.py:71
-#, fuzzy
-#| msgid "You dont' have the rights to consolidate"
 msgid "You don't have the rights to consolidate"
 msgstr "Vous n'avez pas le droit de consolider"
 
@@ -4222,6 +4225,10 @@ msgid "Your username and password didn't match. Please try again."
 msgstr ""
 "La combinaison login/mot de passe entrée n'est pas valide. Veuillez "
 "réessayer."
+
+#: models/authorized_relationship.py:44 models/enums/count_constraint.py:39
+msgid "Zero"
+msgstr "Zéro"
 
 #: forms/academic_calendar.py:47
 #: templates/academic_calendar/academic_calendars.html:64
