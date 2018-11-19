@@ -485,7 +485,7 @@ def _check_postponement_learning_unit_year_proposal_state(nex_luy):
                   " can not save the change from the year %(academic_year)s") % {
                     'luy': nex_luy.acronym,
                     'academic_year': nex_luy.academic_year
-    }
+                }
     return [error_msg] if is_learning_unit_year_in_proposal(nex_luy) else []
 
 
@@ -645,7 +645,15 @@ class ConsistencyError(Error):
         super().__init__(*args, **kwargs)
 
 
-def create_learning_unit_year_creation_message(learning_unit_year_created, translation_key):
+def create_learning_unit_year_creation_message(learning_unit_year_created):
     link = reverse("learning_unit", kwargs={'learning_unit_year_id': learning_unit_year_created.id})
-    return _(translation_key) % {'link': link, 'acronym': learning_unit_year_created.acronym,
-                                 'academic_year': learning_unit_year_created.academic_year}
+    return _('learning unit successfuly created') % {'link': link, 'acronym': learning_unit_year_created.acronym,
+                                                     'academic_year': learning_unit_year_created.academic_year}
+
+
+def create_proposal_learning_unit_year_creation_message(learning_unit_year_created):
+    link = reverse("learning_unit", kwargs={'learning_unit_year_id': learning_unit_year_created.id})
+    return _('proposal learning unit successfuly created') % {'link': link,
+                                                              'acronym': learning_unit_year_created.acronym,
+                                                              'academic_year': learning_unit_year_created.academic_year
+                                                              }

@@ -113,7 +113,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     learning_unit = models.ForeignKey('LearningUnit')
     learning_container_year = models.ForeignKey('LearningContainerYear', null=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('code'),
+    acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('Code'),
                                validators=[RegexValidator(LEARNING_UNIT_ACRONYM_REGEX_ALL)])
     specific_title = models.CharField(max_length=255, blank=True, null=True,
                                       verbose_name=_('English title proper'))
@@ -123,7 +123,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
                                default=learning_unit_year_subtypes.FULL)
     credits = models.DecimalField(null=True, max_digits=5, decimal_places=2,
                                   validators=[MinValueValidator(MINIMUM_CREDITS), MaxValueValidator(MAXIMUM_CREDITS)],
-                                  verbose_name=_('credits'))
+                                  verbose_name=_('Credits'))
     decimal_scores = models.BooleanField(default=False)
     structure = models.ForeignKey('Structure', blank=True, null=True)
     internship_subtype = models.CharField(max_length=250, blank=True, null=True,
