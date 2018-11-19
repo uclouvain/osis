@@ -1932,6 +1932,10 @@ msgstr ""
 msgid "Mandatory"
 msgstr ""
 
+#: models/authorized_relationship.py:45 models/enums/count_constraint.py:35
+msgid "Many"
+msgstr ""
+
 #: forms/my_message.py:39 templates/my_osis/my_messages.html:46
 msgid "Mark selected messages as read"
 msgstr ""
@@ -2228,6 +2232,10 @@ msgstr ""
 
 #: models/admission_condition.py:77
 msgid "On the file: direct access or access with additional training"
+msgstr ""
+
+#: models/enums/count_constraint.py:34 models/enums/count_constraint.py:40
+msgid "One"
 msgstr ""
 
 #: forms/learning_unit/edition_volume.py:136
@@ -3995,6 +4003,10 @@ msgstr ""
 
 #: templates/registration/login.html:32
 msgid "Your username and password didn't match. Please try again."
+msgstr ""
+
+#: models/authorized_relationship.py:44 models/enums/count_constraint.py:39
+msgid "Zero"
 msgstr ""
 
 #: forms/academic_calendar.py:47

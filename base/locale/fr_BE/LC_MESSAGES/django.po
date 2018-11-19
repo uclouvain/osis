@@ -1964,6 +1964,10 @@ msgstr "Mandates"
 msgid "Mandatory"
 msgstr "Obligatoire"
 
+#: models/authorized_relationship.py:45 models/enums/count_constraint.py:35
+msgid "Many"
+msgstr "Plusieurs"
+
 #: forms/my_message.py:39 templates/my_osis/my_messages.html:46
 msgid "Mark selected messages as read"
 msgstr "Marquer les messages sélectionnés comme lus"
@@ -2263,6 +2267,10 @@ msgstr "Inscriptions aux formations"
 #: models/admission_condition.py:77
 msgid "On the file: direct access or access with additional training"
 msgstr "Sur dossier: accès direct ou moyennant compléments de formation"
+
+#: models/enums/count_constraint.py:34 models/enums/count_constraint.py:40
+msgid "One"
+msgstr "Un"
 
 #: forms/learning_unit/edition_volume.py:136
 #: forms/learning_unit/edition_volume.py:137
@@ -4103,6 +4111,10 @@ msgid "Your username and password didn't match. Please try again."
 msgstr ""
 "La combinaison login/mot de passe entrée n'est pas valide. Veuillez "
 "réessayer."
+
+#: models/authorized_relationship.py:44 models/enums/count_constraint.py:39
+msgid "Zero"
+msgstr "Zéro"
 
 #: forms/academic_calendar.py:47
 #: templates/academic_calendar/academic_calendars.html:64
