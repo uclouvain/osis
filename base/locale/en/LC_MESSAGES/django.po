@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-19 11:11+0100\n"
+"POT-Creation-Date: 2018-11-19 12:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1630,6 +1630,10 @@ msgstr ""
 msgid "Invalid code"
 msgstr ""
 
+#: templatetags/learning_unit_li.py:39
+msgid "Isn't a proposal"
+msgstr ""
+
 #: tests/views/education_groups/test_update.py:484
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
@@ -2589,6 +2593,10 @@ msgstr ""
 #: business/learning_unit_proposal.py:309
 #: tests/business/test_learning_unit_proposal.py:258
 msgid "Proposal is neither accepted nor refused."
+msgstr ""
+
+#: templatetags/learning_unit_li.py:40
+msgid "Proposal isn't on current learning unit year"
 msgstr ""
 
 #: templates/learning_unit/blocks/form/update_proposal.html:6
@@ -4020,6 +4028,11 @@ msgstr ""
 msgid "You can't modify learning unit of a previous year"
 msgstr ""
 
+#: business/learning_units/perms.py:494
+#, python-format
+msgid "You can't modify learning unit under year : %(year)d"
+msgstr ""
+
 #: business/learning_units/perms.py:76
 msgid "You can't modify proposal which is on an other year"
 msgstr ""
@@ -4038,7 +4051,7 @@ msgid ""
 msgstr ""
 
 #: business/learning_units/perms.py:71
-msgid "You dont' have the rights to consolidate"
+msgid "You don't have the rights to consolidate"
 msgstr ""
 
 #: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:16
@@ -4458,6 +4471,14 @@ msgstr ""
 
 #: utils/send_mail.py:271
 msgid "parameters"
+msgstr ""
+
+#: templates/layout.html:204
+msgid "partnerships"
+msgstr ""
+
+#: templates/layout.html:213
+msgid "partnerships_financing_configuration"
 msgstr ""
 
 #: templates/offer/tab_program_managers.html:47

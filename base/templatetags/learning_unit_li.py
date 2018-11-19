@@ -36,8 +36,8 @@ from base.business.learning_units.perms import is_eligible_for_modification, is_
 
 register = template.Library()
 
-MSG_IS_NOT_A_PROPOSAL = "Isn't a proposal"
-MSG_PROPOSAL_NOT_ON_CURRENT_LU = "Proposal isn't on current learning unit year"
+MSG_IS_NOT_A_PROPOSAL = _("Isn't a proposal")
+MSG_PROPOSAL_NOT_ON_CURRENT_LU = _("Proposal isn't on current learning unit year")
 DISABLED = "disabled"
 
 
