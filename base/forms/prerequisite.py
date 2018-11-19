@@ -41,7 +41,15 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
     prerequisite_string = forms.CharField(
         label=_("Prerequisite"),
         validators=[prerequisite_syntax_validator],
-        help_text=_("prerequisites_syntax_rules"),
+        help_text=_(
+            "<b>Syntax rules</b>:<ul><li>No double parentheses.</li><li>Valid operators are OU or ET.</li><li>The "
+            "operator must be the same inside all parentheses (groups).</li><li>The operator that linked groups must "
+            "be different than the one that linked LU inside groups (parentheses).</li><li>The LU code cannot include "
+            "spaces (ex: LDROI1001 and not LDROI&nbsp;1001).</li></ul></p><p><b>Examples</b>:<ul><li>A OU B OU C: "
+            "valid</li><li>A ET B ET C : valid</li><li>A ET (B OU C) ET (D OU E): valid</li><li>A ET (B OU C) OU (D OU "
+            "E): not valid</li><li>A ET (B ET C) ET (D ET E): not valid</li><li>A ET (B OU C) ET (D ET E): not valid"
+            "</li></ul>"
+        ),
     )
 
     class Meta:

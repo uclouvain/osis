@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-19 15:13+0100\n"
+"POT-Creation-Date: 2018-11-19 16:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -136,6 +136,19 @@ msgstr ""
 
 #: business/learning_unit.py:76 business/learning_unit.py:80
 msgid "2nd quadri"
+msgstr ""
+
+#: forms/prerequisite.py:45
+msgid ""
+"<b>Syntax rules</b>:<ul><li>No double parentheses.</li><li>Valid operators "
+"are OU or ET.</li><li>The operator must be the same inside all parentheses "
+"(groups).</li><li>The operator that linked groups must be different than the "
+"one that linked LU inside groups (parentheses).</li><li>The LU code cannot "
+"include spaces (ex: LDROI1001 and not LDROI&nbsp;1001).</li></ul></"
+"p><p><b>Examples</b>:<ul><li>A OU B OU C: valid</li><li>A ET B ET C : valid</"
+"li><li>A ET (B OU C) ET (D OU E): valid</li><li>A ET (B OU C) OU (D OU E): "
+"not valid</li><li>A ET (B ET C) ET (D ET E): not valid</li><li>A ET (B OU C) "
+"ET (D ET E): not valid</li></ul>"
 msgstr ""
 
 #: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:19
@@ -2138,7 +2151,7 @@ msgstr ""
 msgid "No enrollment for this learning unit"
 msgstr ""
 
-#: forms/prerequisite.py:101
+#: forms/prerequisite.py:109
 #: tests/views/education_groups/learning_unit/test_update.py:204
 #: tests/views/education_groups/learning_unit/test_update.py:208
 #, python-format
@@ -4422,19 +4435,6 @@ msgid "please_enable_javascript"
 msgstr ""
 "Please <a href='http://enable-javascript.com' target='_blank'>enable "
 "JavaScript</a> to use this application."
-
-#: forms/prerequisite.py:44
-msgid "prerequisites_syntax_rules"
-msgstr ""
-"<b>Syntax rules</b>:<ul><li>No double parentheses.</li><li>Valid operators "
-"are OU or ET.</li><li>The operator must be the same inside all parentheses "
-"(groups).</li><li>The operator that linked groups must be different than the "
-"one that linked LU inside groups (parentheses).</li><li>The LU code cannot "
-"include spaces (ex: LDROI1001 and not LDROI&nbsp;1001).</li></ul></"
-"p><p><b>Examples</b>:<ul><li>A OU B OU C: valid</li><li>A ET B ET C : valid</"
-"li><li>A ET (B OU C) ET (D OU E): valid</li><li>A ET (B OU C) OU (D OU E): "
-"not valid</li><li>A ET (B ET C) ET (D ET E): not valid</li><li>A ET (B OU C) "
-"ET (D ET E): not valid</li></ul>"
 
 #: models/learning_unit_year.py:147
 msgid "professional integration"
