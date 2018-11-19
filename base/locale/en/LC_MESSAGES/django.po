@@ -4387,14 +4387,6 @@ msgstr ""
 msgid "parameters"
 msgstr ""
 
-#: templates/layout.html:204
-msgid "partnerships"
-msgstr ""
-
-#: templates/layout.html:213
-msgid "partnerships_financing_configuration"
-msgstr ""
-
 #: templates/offer/tab_program_managers.html:47
 msgid "person"
 msgstr ""
