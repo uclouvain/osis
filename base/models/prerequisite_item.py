@@ -59,7 +59,6 @@ class PrerequisiteItem(models.Model):
 
     class Meta:
         unique_together = (
-            ('prerequisite', 'learning_unit',),
             ('prerequisite', 'group_number', 'position',),
         )
 
