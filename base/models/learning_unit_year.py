@@ -410,6 +410,10 @@ def find_by_acronym(acronym):
     return LearningUnitYear.objects.filter(acronym=acronym).select_related('learning_container_year')
 
 
+def get_by_acronym_with_highest_academic_year(acronym):
+    return LearningUnitYear.objects.filter(acronym=acronym).order_by('academic_year__year').last()
+
+
 def _is_regex(acronym):
     return set(AUTHORIZED_REGEX_CHARS).intersection(set(acronym))
 
