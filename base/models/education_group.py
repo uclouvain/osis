@@ -28,15 +28,15 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_groups import shorten
-from osis_common.models.osis_model_admin import OsisModelAdmin
+from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
 
-class EducationGroupAdmin(OsisModelAdmin):
+class EducationGroupAdmin(SerializableModelAdmin):
     list_display = ('most_recent_acronym', 'start_year', 'end_year', 'changed')
     search_fields = ('educationgroupyear__acronym',)
 
 
-class EducationGroup(models.Model):
+class EducationGroup(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
