@@ -23,13 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 #############################################################################
-import re
 
-from base.models import prerequisite as mdl_prerequisite, group_element_year as mdl_group_element_year
+from base.models import group_element_year as mdl_group_element_year
+from base.models.learning_unit import LearningUnit
 
 
-def extract_learning_units_acronym_from_prerequisite(prerequisite_string):
-    return re.findall(mdl_prerequisite.ACRONYM_REGEX, prerequisite_string)
+def extract_learning_units_acronym_from_prerequisite(prerequisite):
+    learning_units = LearningUnit.objects.filter(prerequisiteitem__prerequisite=prerequisite)
+    return [lu.acronym for lu in learning_units]
 
 
 def get_learning_acronyms_inside_education_groups(education_group_years_id):
@@ -48,6 +49,7 @@ def get_learning_units_which_are_outside_of_education_group(education_group_year
 
 
 def get_prerequisite_acronyms_which_are_outside_of_education_group(education_group_year_root, prerequisite_obj):
-    list_prerequisites_acronyms = extract_learning_units_acronym_from_prerequisite(prerequisite_obj.prerequisite)
+    list_prerequisites_acronyms = extract_learning_units_acronym_from_prerequisite(prerequisite_obj)
+    
     return get_learning_units_which_are_outside_of_education_group(education_group_year_root,
                                                                    list_prerequisites_acronyms)
