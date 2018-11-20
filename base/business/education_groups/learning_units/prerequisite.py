@@ -50,6 +50,5 @@ def get_learning_units_which_are_outside_of_education_group(education_group_year
 
 def get_prerequisite_acronyms_which_are_outside_of_education_group(education_group_year_root, prerequisite_obj):
     list_prerequisites_acronyms = extract_learning_units_acronym_from_prerequisite(prerequisite_obj)
-    
     return get_learning_units_which_are_outside_of_education_group(education_group_year_root,
                                                                    list_prerequisites_acronyms)
