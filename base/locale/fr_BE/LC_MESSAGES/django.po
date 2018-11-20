@@ -807,7 +807,7 @@ msgstr "Composant"
 #: templates/learning_unit/blocks/tabs.html:57
 #: templates/learning_unit/proposal/tabs.html:50
 msgid "Components"
-msgstr "Composant"
+msgstr "Composants"
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:44
 #: templates/education_group/tab_admission_conditions.html:83
