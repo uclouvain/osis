@@ -331,7 +331,7 @@ def publish(request, education_group_year_id, root_id):
     else:
         url_to_display = url.split("?")[0]
         message = _("The program are published. Click on the link to display it : ") + \
-                  "<a href=" + url_to_display + ">" + education_group_year.acronym + "</a>"
+            "<a href=" + url_to_display + ">" + education_group_year.acronym + "</a>"
         display_success_messages(request, message, extra_tags='safe')
 
     return redirect(reverse('education_group_general_informations',
