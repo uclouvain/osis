@@ -42,7 +42,7 @@ from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import find_max_credits_of_related_partims, check_if_acronym_regex_is_valid, \
     find_learning_unit_years_by_academic_year_tutor_attributions
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
@@ -650,21 +650,3 @@ class LearningUnitYearWarningsTest(TestCase):
             self.luy_full._check_learning_component_year_warnings(),
             [excepted_error])
         self.assertIn(excepted_error, self.luy_full._check_learning_component_year_warnings())
-
-
-class LearningUnitYearGetByAcronymWithLatestAcademicYearTest(TestCase):
-    def setUp(self):
-        self.learning_unit_year_2009 = LearningUnitYearFactory(
-            academic_year=AcademicYearFactory(year=2009),
-            acronym='LDROI1200'
-        )
-        self.learning_unit_year_2017 = LearningUnitYearFactory(
-            academic_year=AcademicYearFactory(year=2017),
-            acronym='LDROI1200'
-        )
-
-    def test_get_by_acronym_with_highest_academic_year(self):
-        self.assertEqual(
-            learning_unit_year.get_by_acronym_with_highest_academic_year(acronym='LDROI1200'),
-            self.learning_unit_year_2017
-        )

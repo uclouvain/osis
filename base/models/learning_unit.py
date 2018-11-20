@@ -146,3 +146,11 @@ def find_by_id(learning_unit_id):
 
 def find_by_ids(learning_unit_ids):
     return LearningUnit.objects.filter(pk__in=learning_unit_ids)
+
+
+def get_by_acronym_with_highest_academic_year(acronym):
+    return LearningUnit.objects.filter(
+        learningunityear__acronym=acronym
+    ).order_by(
+        'learningunityear__academic_year__year'
+    ).last()

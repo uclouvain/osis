@@ -28,7 +28,7 @@ import re
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from base.models import learning_unit_year
+from base.models import learning_unit
 from base.models import prerequisite_item
 from base.models.enums.prerequisite_operator import OR, AND
 from base.models.prerequisite import Prerequisite, prerequisite_syntax_validator, MULTIPLE_PREREQUISITES_REGEX_OR, \
@@ -99,10 +99,10 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
         group_of_learning_units = []
 
         for item in group:
-            luy = learning_unit_year.get_by_acronym_with_highest_academic_year(item)
-            if luy:
-                # TODO :: Check that luy is present in the education_group_year's tree
-                group_of_learning_units.append(luy.learning_unit)
+            lu = learning_unit.get_by_acronym_with_highest_academic_year(acronym=item)
+            if lu:
+                # TODO :: Check that lu has a luy which is present in the education_group_year's tree
+                group_of_learning_units.append(lu)
             else:
                 self.add_error(
                     'prerequisite_string',
