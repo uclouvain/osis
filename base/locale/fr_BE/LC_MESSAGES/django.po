@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-19 16:04+0100\n"
+"POT-Creation-Date: 2018-11-20 09:51+0100\n"
 "PO-Revision-Date: 2018-11-16 14:28+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -198,8 +198,8 @@ msgstr "A=Absent"
 msgid "AESS CAPAES"
 msgstr "AESS CAPAES"
 
-#: tests/models/test_prerequisite_item.py:137
-#: tests/models/test_prerequisite_item.py:156
+#: tests/models/test_prerequisite_item.py:115
+#: tests/models/test_prerequisite_item.py:134
 msgid "AND"
 msgstr "ET"
 
@@ -488,8 +488,9 @@ msgstr "Message d'alerte"
 #: forms/education_groups.py:67 forms/education_groups.py:72
 #: forms/education_groups.py:80 forms/learning_unit/search_form.py:62
 #: forms/learning_unit/search_form.py:68 forms/utils/choice_field.py:30
-msgid "All label"
-msgstr "Tous les labels"
+msgctxt "plural"
+msgid "All"
+msgstr "Tous"
 
 #: utils/send_mail.py:68
 msgid "All the scores are encoded."
@@ -783,7 +784,9 @@ msgstr "Fermer"
 msgid "Co-holder"
 msgstr "Co-titulaire"
 
+#: forms/learning_unit/search_form.py:78 models/learning_unit_year.py:116
 #: templates/learning_unit/by_activity.html:95
+#: templates/learning_unit/by_external.html:46
 #: templates/learning_unit/external/read.html:8
 #: templates/learning_unit/identification.html:47
 msgid "Code"
@@ -823,6 +826,11 @@ msgstr "Liste comparative d'unités d'enseignement"
 #: templates/learning_unit/components_comparison.html:29
 msgid "Component"
 msgstr "Composant"
+
+#: templates/learning_unit/blocks/tabs.html:57
+#: templates/learning_unit/proposal/tabs.html:50
+msgid "Components"
+msgstr "Composants"
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:44
 #: templates/education_group/tab_admission_conditions.html:83
@@ -905,8 +913,10 @@ msgstr "Création"
 msgid "Cred. rel./abs."
 msgstr "Créd. rel./abs."
 
+#: models/learning_unit_year.py:126
 #: templates/education_group/blocks/informations.html:40
 #: templates/learning_unit/by_activity.html:101
+#: templates/learning_unit/by_external.html:49
 #: templates/learning_unit/identification.html:84
 msgid "Credits"
 msgstr "Crédits"
@@ -1752,6 +1762,15 @@ msgstr "Examen de langue"
 msgid "Lastname"
 msgstr "Nom"
 
+#: business/learning_units/edition.py:650
+#, python-format
+msgid ""
+"Learning Unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfuly created."
+msgstr ""
+"Unité d'enseignement <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
+"a> créée avec succès."
+
 #: templates/learning_unit/achievement_edit.html:42
 #: templates/learning_unit/specifications.html:81
 msgid "Learning achievements"
@@ -2079,7 +2098,7 @@ msgstr "Modification"
 msgid "Modification made"
 msgstr "Modification apportée"
 
-#: business/learning_units/perms.py:495
+#: business/learning_units/perms.py:496
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
@@ -2305,7 +2324,7 @@ msgstr "Matricule"
 msgid "Number of elements"
 msgstr "Nombre d'éléments"
 
-#: tests/models/test_prerequisite_item.py:155
+#: tests/models/test_prerequisite_item.py:133
 msgid "OR"
 msgstr "OU"
 
@@ -2689,6 +2708,15 @@ msgstr "La proposition n'est ni acceptée ni refusée."
 #: templatetags/learning_unit_li.py:40
 msgid "Proposal isn't on current learning unit year"
 msgstr "La proposition n'est pas sur l'année en cours"
+
+#: business/learning_units/edition.py:657
+#, python-format
+msgid ""
+"Proposal learning unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
+"a> successfuly created."
+msgstr ""
+"Proposition d'unité d'enseignement <a href='%(link)s'> %(acronym)s "
+"(%(academic_year)s) </a> créée avec succès."
 
 #: templates/learning_unit/blocks/form/update_proposal.html:6
 #: templates/learning_unit/proposal/creation.html:9
@@ -3678,7 +3706,7 @@ msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
 
-#: business/learning_units/perms.py:527
+#: business/learning_units/perms.py:529
 msgid "This learning unit is not eligible for proposal creation/modification"
 msgstr ""
 "Cette unité d'enseignement n'est pas éligible pour une création/modification "
@@ -3822,9 +3850,11 @@ msgstr "Enseignant·e"
 msgid "Tutors"
 msgstr "Enseignant·e·s"
 
+#: forms/learning_unit/search_form.py:158 models/learning_container_year.py:51
 #: models/proposal_learning_unit.py:55
 #: templates/learning_unit/by_activity.html:97
 #: templates/learning_unit/by_proposal.html:57
+#: tests/forms/learning_unit/test_search_form.py:77
 msgid "Type"
 msgstr "Type"
 
@@ -4185,7 +4215,7 @@ msgstr ""
 msgid "You can't modify learning unit of a previous year"
 msgstr "Vous ne pouvez pas modifier la date de fin pour une année précédente"
 
-#: business/learning_units/perms.py:493
+#: business/learning_units/perms.py:494
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
@@ -4411,14 +4441,12 @@ msgstr "attendus du diplôme"
 #: business/learning_units/xls_comparison.py:76
 #: business/learning_units/xls_comparison.py:86
 #: business/learning_units/xls_generator.py:41 business/proposal_xls.py:37
-#: forms/education_groups.py:87 forms/learning_unit/search_form.py:78
-#: models/abstracts/abstract_achievement.py:44
+#: forms/education_groups.py:87 models/abstracts/abstract_achievement.py:44
 #: models/abstracts/abstract_education_group_achievement.py:44
-#: models/education_group_year.py:325 models/learning_unit_year.py:116
+#: models/education_group_year.py:325
 #: templates/education_group/blocks/informations.html:31
 #: templates/education_group/blocks/table_utilizations.html:29
 #: templates/education_group/search.html:152
-#: templates/learning_unit/by_external.html:46
 #: templates/learning_unit/components.html:47
 #: templates/learning_unit/components.html:124
 #: templates/learning_unit/components_identification.html:32
@@ -4440,9 +4468,7 @@ msgid "comment (internal)"
 msgstr "commentaire (interne)"
 
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:34
-#: templates/learning_unit/blocks/tabs.html:57
 #: templates/learning_unit/components.html:46
-#: templates/learning_unit/proposal/tabs.html:50
 msgid "components"
 msgstr "composants"
 
@@ -4457,8 +4483,7 @@ msgstr "confirmer"
 #: business/learning_units/xls_comparison.py:59 business/proposal_xls.py:39
 #: models/education_group_year.py:332 models/education_group_year.py:473
 #: models/enums/constraint_type.py:32 models/group_element_year.py:154
-#: models/group_element_year.py:170 models/learning_unit_year.py:126
-#: templates/learning_unit/by_external.html:49
+#: models/group_element_year.py:170
 #: tests/models/test_education_group_year.py:93
 #: tests/views/education_groups/group_element_year/test_read.py:100
 #: tests/views/education_groups/group_element_year/test_read.py:114
@@ -4652,8 +4677,6 @@ msgid "parameters"
 msgstr "paramètres"
 
 #: templates/layout.html:204
-#, fuzzy
-#| msgid "Partnerships"
 msgid "partnerships"
 msgstr "Partenariats"
 
@@ -4823,16 +4846,13 @@ msgstr "formation"
 #: business/education_group.py:48 business/learning_unit.py:61
 #: business/learning_unit_xls.py:75 business/learning_units/edition.py:449
 #: business/learning_units/xls_comparison.py:55 forms/education_groups.py:81
-#: forms/entity.py:38 forms/learning_unit/search_form.py:158
-#: models/learning_container_year.py:51
-#: templates/education_group/search.html:150 templates/entities.html:67
-#: templates/entity/identification.html:63
+#: forms/entity.py:38 templates/education_group/search.html:150
+#: templates/entities.html:67 templates/entity/identification.html:63
 #: templates/entity/identification.html:102 templates/entity/versions.html:45
 #: templates/learning_unit/blocks/panel/proposal.html:17
 #: templates/learning_unit/summary_list.html:79
 #: templates/organization/organization.html:70
-#: templates/organization/organizations.html:63
-#: tests/forms/learning_unit/test_search_form.py:77 utils/send_mail.py:230
+#: templates/organization/organizations.html:63 utils/send_mail.py:230
 msgid "type"
 msgstr "type"
 

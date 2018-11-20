@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-19 16:04+0100\n"
+"POT-Creation-Date: 2018-11-20 09:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -176,8 +176,8 @@ msgstr ""
 msgid "AESS CAPAES"
 msgstr ""
 
-#: tests/models/test_prerequisite_item.py:137
-#: tests/models/test_prerequisite_item.py:156
+#: tests/models/test_prerequisite_item.py:115
+#: tests/models/test_prerequisite_item.py:134
 msgid "AND"
 msgstr ""
 
@@ -466,7 +466,8 @@ msgstr ""
 #: forms/education_groups.py:67 forms/education_groups.py:72
 #: forms/education_groups.py:80 forms/learning_unit/search_form.py:62
 #: forms/learning_unit/search_form.py:68 forms/utils/choice_field.py:30
-msgid "All label"
+msgctxt "plural"
+msgid "All"
 msgstr ""
 
 #: utils/send_mail.py:68
@@ -679,6 +680,10 @@ msgstr ""
 msgid "Campus"
 msgstr ""
 
+#: business/learning_units/perms.py:73
+msgid "Can delete according to the type of the learning unit"
+msgstr ""
+
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:105
 msgid "Cancel the proposal"
 msgstr ""
@@ -752,7 +757,9 @@ msgstr ""
 msgid "Co-holder"
 msgstr ""
 
+#: forms/learning_unit/search_form.py:78 models/learning_unit_year.py:116
 #: templates/learning_unit/by_activity.html:95
+#: templates/learning_unit/by_external.html:46
 #: templates/learning_unit/external/read.html:8
 #: templates/learning_unit/identification.html:47
 msgid "Code"
@@ -791,6 +798,11 @@ msgstr ""
 #: templates/learning_unit/component_edit.html:34
 #: templates/learning_unit/components_comparison.html:29
 msgid "Component"
+msgstr ""
+
+#: templates/learning_unit/blocks/tabs.html:57
+#: templates/learning_unit/proposal/tabs.html:50
+msgid "Components"
 msgstr ""
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:44
@@ -874,8 +886,10 @@ msgstr ""
 msgid "Cred. rel./abs."
 msgstr ""
 
+#: models/learning_unit_year.py:126
 #: templates/education_group/blocks/informations.html:40
 #: templates/learning_unit/by_activity.html:101
+#: templates/learning_unit/by_external.html:49
 #: templates/learning_unit/identification.html:84
 msgid "Credits"
 msgstr ""
@@ -1274,6 +1288,10 @@ msgstr ""
 msgid "Existing acronym"
 msgstr ""
 
+#: business/learning_units/perms.py:56
+msgid "Existing proposal in epc"
+msgstr ""
+
 #: templates/education_group/search.html:116
 #: templates/learning_unit/by_activity.html:45
 #: templates/learning_unit/summary_list.html:52
@@ -1635,6 +1653,10 @@ msgstr ""
 msgid "Invalid code"
 msgstr ""
 
+#: templatetags/learning_unit_li.py:39
+msgid "Isn't a proposal"
+msgstr ""
+
 #: tests/views/education_groups/test_update.py:484
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
@@ -1706,6 +1728,13 @@ msgstr ""
 
 #: templates/my_osis/profile.html:79 templates/search/search.html:44
 msgid "Lastname"
+msgstr ""
+
+#: business/learning_units/edition.py:650
+#, python-format
+msgid ""
+"Learning Unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfuly created."
 msgstr ""
 
 #: templates/learning_unit/achievement_edit.html:42
@@ -2024,6 +2053,11 @@ msgstr ""
 msgid "Modification made"
 msgstr ""
 
+#: business/learning_units/perms.py:496
+#, python-format
+msgid "Modifications should be made in EPC for year %(year)d"
+msgstr ""
+
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:90
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:93
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:75
@@ -2211,12 +2245,20 @@ msgstr ""
 msgid "Not concerned"
 msgstr ""
 
+#: business/learning_units/perms.py:74
+msgid "Not eligible to delete learning units"
+msgstr ""
+
 #: models/enums/exam_enrollment_state.py:35
 msgid "Not enrolled"
 msgstr ""
 
 #: business/learning_units/perms.py:455 business/learning_units/perms.py:461
 msgid "Not in period to edit educational information."
+msgstr ""
+
+#: business/learning_units/perms.py:69
+msgid "Not in range of years which can be edited by you"
 msgstr ""
 
 #: models/enums/field_status.py:38
@@ -2231,7 +2273,7 @@ msgstr ""
 msgid "Number of elements"
 msgstr ""
 
-#: tests/models/test_prerequisite_item.py:155
+#: tests/models/test_prerequisite_item.py:133
 msgid "OR"
 msgstr ""
 
@@ -2393,6 +2435,10 @@ msgstr ""
 #: business/learning_unit.py:72 business/learning_units/xls_comparison.py:61
 #: business/proposal_xls.py:39 models/learning_unit_year.py:154
 msgid "Periodicity"
+msgstr ""
+
+#: business/learning_units/perms.py:63
+msgid "Person not in accordance with proposal state"
 msgstr ""
 
 #: templates/education_group/tab_admission_conditions.html:125
@@ -2600,9 +2646,24 @@ msgstr ""
 msgid "Proposal is neither accepted nor refused."
 msgstr ""
 
+#: templatetags/learning_unit_li.py:40
+msgid "Proposal isn't on current learning unit year"
+msgstr ""
+
+#: business/learning_units/edition.py:657
+#, python-format
+msgid ""
+"Proposal learning unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
+"a> successfuly created."
+msgstr ""
+
 #: templates/learning_unit/blocks/form/update_proposal.html:6
 #: templates/learning_unit/proposal/creation.html:9
 msgid "Proposal management"
+msgstr ""
+
+#: business/learning_units/perms.py:72
+msgid "Proposal not in eligible state for consolidation"
 msgstr ""
 
 #: business/learning_unit_xls.py:193
@@ -3541,6 +3602,14 @@ msgstr ""
 msgid "This label %s does not exist"
 msgstr ""
 
+#: business/learning_units/perms.py:529
+msgid "This learning unit is not eligible for proposal creation/modification"
+msgstr ""
+
+#: business/learning_units/perms.py:77
+msgid "This learning unit isn't eligible for modification because of it's type"
+msgstr ""
+
 #: models/learning_unit_year.py:371 tests/models/test_learning_unit_year.py:576
 #, python-format
 msgid ""
@@ -3671,9 +3740,11 @@ msgstr ""
 msgid "Tutors"
 msgstr ""
 
+#: forms/learning_unit/search_form.py:158 models/learning_container_year.py:51
 #: models/proposal_learning_unit.py:55
 #: templates/learning_unit/by_activity.html:97
 #: templates/learning_unit/by_proposal.html:57
+#: tests/forms/learning_unit/test_search_form.py:77
 msgid "Type"
 msgstr ""
 
@@ -3944,6 +4015,12 @@ msgstr ""
 msgid "Yes, I confirm."
 msgstr ""
 
+#: business/learning_units/perms.py:64
+msgid ""
+"You are faculty manager and the proposal state is not 'Faculty', so you "
+"can't edit"
+msgstr ""
+
 #: business/group_element_years/postponement.py:51
 #: business/group_element_years/postponement.py:68
 #: tests/business/education_groups/test_postponement.py:196
@@ -3960,6 +4037,35 @@ msgstr ""
 msgid "You are not allowed to postpone this training in the past."
 msgstr ""
 
+#: business/learning_units/perms.py:67
+msgid ""
+"You are not attached to initial or current requirement entity, so you can't "
+"edit proposal"
+msgstr ""
+
+#: business/learning_units/perms.py:65
+msgid "You are not eligible to cancel proposal"
+msgstr ""
+
+#: business/learning_units/perms.py:70
+msgid "You are not eligible to consolidate proposal"
+msgstr ""
+
+#: business/learning_units/perms.py:75
+msgid "You are not eligible to create/modify proposal"
+msgstr ""
+
+#: business/learning_units/perms.py:66
+msgid "You are not eligible to edit proposal"
+msgstr ""
+
+#: business/learning_units/perms.py:57
+msgid ""
+"You are not eligible to modify the end date of this learning unit. You "
+"should be central manager or the learning unit has to be a partim or the "
+"learning unit as to be a course/dissertation/internship"
+msgstr ""
+
 #: business/learning_units/perms.py:443
 msgid "You are not summary responsible for this learning unit."
 msgstr ""
@@ -3970,6 +4076,25 @@ msgstr ""
 
 #: templates/education_group/protect_delete_inner.html:9
 msgid "You can not delete this object because some dependencies are protected"
+msgstr ""
+
+#: business/learning_units/perms.py:61
+msgid ""
+"You can only modify a learning unit when your are linked to its requirement "
+"entity"
+msgstr ""
+
+#: business/learning_units/perms.py:60
+msgid "You can't modify learning unit of a previous year"
+msgstr ""
+
+#: business/learning_units/perms.py:494
+#, python-format
+msgid "You can't modify learning unit under year : %(year)d"
+msgstr ""
+
+#: business/learning_units/perms.py:76
+msgid "You can't modify proposal which is on an other year"
 msgstr ""
 
 #: templatetags/learning_unit_li.py:193
@@ -3983,6 +4108,10 @@ msgstr ""
 msgid ""
 "You cannot attach \"%(child)s\" (type \"%(child_type)s\") to \"%(parent)s"
 "\" (type \"%(parent_type)s\")"
+msgstr ""
+
+#: business/learning_units/perms.py:71
+msgid "You don't have the rights to consolidate"
 msgstr ""
 
 #: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:16
@@ -4171,14 +4300,12 @@ msgstr ""
 #: business/learning_units/xls_comparison.py:76
 #: business/learning_units/xls_comparison.py:86
 #: business/learning_units/xls_generator.py:41 business/proposal_xls.py:37
-#: forms/education_groups.py:87 forms/learning_unit/search_form.py:78
-#: models/abstracts/abstract_achievement.py:44
+#: forms/education_groups.py:87 models/abstracts/abstract_achievement.py:44
 #: models/abstracts/abstract_education_group_achievement.py:44
-#: models/education_group_year.py:325 models/learning_unit_year.py:116
+#: models/education_group_year.py:325
 #: templates/education_group/blocks/informations.html:31
 #: templates/education_group/blocks/table_utilizations.html:29
 #: templates/education_group/search.html:152
-#: templates/learning_unit/by_external.html:46
 #: templates/learning_unit/components.html:47
 #: templates/learning_unit/components.html:124
 #: templates/learning_unit/components_identification.html:32
@@ -4200,9 +4327,7 @@ msgid "comment (internal)"
 msgstr ""
 
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:34
-#: templates/learning_unit/blocks/tabs.html:57
 #: templates/learning_unit/components.html:46
-#: templates/learning_unit/proposal/tabs.html:50
 msgid "components"
 msgstr ""
 
@@ -4217,8 +4342,7 @@ msgstr ""
 #: business/learning_units/xls_comparison.py:59 business/proposal_xls.py:39
 #: models/education_group_year.py:332 models/education_group_year.py:473
 #: models/enums/constraint_type.py:32 models/group_element_year.py:154
-#: models/group_element_year.py:170 models/learning_unit_year.py:126
-#: templates/learning_unit/by_external.html:49
+#: models/group_element_year.py:170
 #: tests/models/test_education_group_year.py:93
 #: tests/views/education_groups/group_element_year/test_read.py:100
 #: tests/views/education_groups/group_element_year/test_read.py:114
@@ -4574,16 +4698,13 @@ msgstr ""
 #: business/education_group.py:48 business/learning_unit.py:61
 #: business/learning_unit_xls.py:75 business/learning_units/edition.py:449
 #: business/learning_units/xls_comparison.py:55 forms/education_groups.py:81
-#: forms/entity.py:38 forms/learning_unit/search_form.py:158
-#: models/learning_container_year.py:51
-#: templates/education_group/search.html:150 templates/entities.html:67
-#: templates/entity/identification.html:63
+#: forms/entity.py:38 templates/education_group/search.html:150
+#: templates/entities.html:67 templates/entity/identification.html:63
 #: templates/entity/identification.html:102 templates/entity/versions.html:45
 #: templates/learning_unit/blocks/panel/proposal.html:17
 #: templates/learning_unit/summary_list.html:79
 #: templates/organization/organization.html:70
-#: templates/organization/organizations.html:63
-#: tests/forms/learning_unit/test_search_form.py:77 utils/send_mail.py:230
+#: templates/organization/organizations.html:63 utils/send_mail.py:230
 msgid "type"
 msgstr ""
 

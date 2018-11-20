@@ -107,7 +107,7 @@ def extend_learning_unit(learning_unit_to_edit, new_academic_year):
     with transaction.atomic():
         for ac_year in get_next_academic_years(learning_unit_to_edit, new_academic_year.year):
             new_luy = duplicate_learning_unit_year(last_learning_unit_year, ac_year)
-            result.append(create_learning_unit_year_creation_message(new_luy, 'learning_unit_successfuly_created'))
+            result.append(create_learning_unit_year_creation_message(new_luy))
 
     return result
 
@@ -485,7 +485,7 @@ def _check_postponement_learning_unit_year_proposal_state(nex_luy):
                   " can not save the change from the year %(academic_year)s") % {
                     'luy': nex_luy.acronym,
                     'academic_year': nex_luy.academic_year
-    }
+                }
     return [error_msg] if is_learning_unit_year_in_proposal(nex_luy) else []
 
 
@@ -645,7 +645,17 @@ class ConsistencyError(Error):
         super().__init__(*args, **kwargs)
 
 
-def create_learning_unit_year_creation_message(learning_unit_year_created, translation_key):
+def create_learning_unit_year_creation_message(learning_unit_year_created):
     link = reverse("learning_unit", kwargs={'learning_unit_year_id': learning_unit_year_created.id})
-    return _(translation_key) % {'link': link, 'acronym': learning_unit_year_created.acronym,
-                                 'academic_year': learning_unit_year_created.academic_year}
+    return _("Learning Unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+             "successfuly created.") % {'link': link, 'acronym': learning_unit_year_created.acronym,
+                                        'academic_year': learning_unit_year_created.academic_year}
+
+
+def create_proposal_learning_unit_year_creation_message(learning_unit_year_created):
+    link = reverse("learning_unit", kwargs={'learning_unit_year_id': learning_unit_year_created.id})
+    return _("Proposal learning unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
+             "a> successfuly created.") % {'link': link,
+                                           'acronym': learning_unit_year_created.acronym,
+                                           'academic_year': learning_unit_year_created.academic_year
+                                           }

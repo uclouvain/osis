@@ -29,7 +29,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import OuterRef, Subquery, Exists
 from django.db.models.fields import BLANK_CHOICE_DASH
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, pgettext
 
 from base import models as mdl
 from base.business.entity import get_entities_ids, build_entity_container_prefetch
@@ -59,13 +59,13 @@ MAX_RECORDS = 1000
 
 class LearningUnitSearchForm(BaseSearchForm):
     MAX_RECORDS = 1000
-    ALL_LABEL = (None, _('All label'))
+    ALL_LABEL = (None, pgettext("plural", "All"))
     ALL_CHOICES = (ALL_LABEL,)
 
     academic_year_id = forms.ModelChoiceField(
         label=_('Ac yr.'),
         queryset=AcademicYear.objects.all(),
-        empty_label=_('All label'),
+        empty_label=pgettext("plural", "All"),
     )
 
     requirement_entity_acronym = forms.CharField(
@@ -75,7 +75,7 @@ class LearningUnitSearchForm(BaseSearchForm):
 
     acronym = forms.CharField(
         max_length=15,
-        label=_('code')
+        label=_('Code')
     )
 
     tutor = forms.CharField(
@@ -155,7 +155,7 @@ class LearningUnitSearchForm(BaseSearchForm):
 
 class LearningUnitYearForm(LearningUnitSearchForm):
     container_type = forms.ChoiceField(
-        label=_('type'),
+        label=_('Type'),
         choices=LearningUnitSearchForm.ALL_CHOICES + learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES,
     )
 

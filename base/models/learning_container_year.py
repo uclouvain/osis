@@ -48,7 +48,7 @@ class LearningContainerYear(SerializableModel):
     learning_container = models.ForeignKey('LearningContainer')
 
     container_type = models.CharField(
-        max_length=20, verbose_name=_('type'),
+        max_length=20, verbose_name=_('Type'),
         choices=learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES
     )
 
