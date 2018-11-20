@@ -47,7 +47,13 @@ from base.business.education_groups import perms
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 from base.business.education_groups.perms import is_eligible_to_edit_general_information
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
+from base.models.education_group import EducationGroup
+from base.models.education_group_achievement import EducationGroupAchievement
+from base.models.education_group_certificate_aim import EducationGroupCertificateAim
+from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year import EducationGroupYear
+from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type, education_group_types
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import PGRM_MASTER_120, PGRM_MASTER_180_240
@@ -143,9 +149,10 @@ class EducationGroupRead(EducationGroupGenericDetailView):
             education_group_language.language.name for education_group_language in
             mdl.education_group_language.find_by_education_group_year(self.object)
         ]
+
         context["show_coorganization"] = self.show_coorganization()
 
-        context["versions"] = Version.objects.get_for_object(self.object)
+        context["versions"] = self.get_related_versions()
 
         return context
 
@@ -156,6 +163,28 @@ class EducationGroupRead(EducationGroupGenericDetailView):
         """Co-organization doesn't have sense for 2M (120/180-240) """
         return self.object.education_group_type.category == TRAINING and \
             self.object.education_group_type.name not in [PGRM_MASTER_120, PGRM_MASTER_180_240]
+
+    def get_related_versions(self):
+        versions = Version.objects.get_for_object(self.object)
+
+        related_models = [
+            EducationGroup,
+            EducationGroupOrganization,
+            EducationGroupAchievement,
+            EducationGroupDetailedAchievement,
+            EducationGroupYearDomain,
+            EducationGroupCertificateAim
+        ]
+
+        subversion = Version.objects.none()
+        for model in related_models:
+            subversion |= Version.objects.get_for_model(model)
+
+        versions |= subversion.filter(
+            serialized_data__contains="\"education_group_year\": {}".format(self.object.pk)
+        )
+
+        return versions.order_by('-revision__date_created').distinct('revision__date_created')
 
 
 class EducationGroupDiplomas(EducationGroupGenericDetailView):
@@ -302,7 +331,7 @@ def publish(request, education_group_year_id, root_id):
     else:
         url_to_display = url.split("?")[0]
         message = _("The program are published. Click on the link to display it : ") + \
-            "<a href=" + url_to_display + ">" + education_group_year.acronym + "</a>"
+                  "<a href=" + url_to_display + ">" + education_group_year.acronym + "</a>"
         display_success_messages(request, message, extra_tags='safe')
 
     return redirect(reverse('education_group_general_informations',
