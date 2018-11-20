@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-20 09:51+0100\n"
+"POT-Creation-Date: 2018-11-20 11:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -789,6 +789,10 @@ msgstr ""
 #: models/learning_container_year.py:55
 #: tests/business/learning_units/test_edition.py:247
 msgid "Common title"
+msgstr ""
+
+#: views/learning_unit.py:289
+msgid "Comparison impossible! No learning unit to compare to"
 msgstr ""
 
 #: business/learning_units/xls_comparison.py:50
@@ -1748,7 +1752,7 @@ msgstr ""
 #: templates/education_group/identification_mini_training_details.html:40
 #: templates/education_group/identification_training_details.html:97
 #: templates/learning_unit/external/read.html:58
-#: templates/learning_unit/identification.html:198 views/learning_unit.py:289
+#: templates/learning_unit/identification.html:198 views/learning_unit.py:305
 msgid "Learning location"
 msgstr ""
 
