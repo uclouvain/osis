@@ -122,3 +122,21 @@ class LearningUnitTest(TestCase):
         a_learning_unit_year = LearningUnitYearFactory(learning_unit=a_learning_unit)
         self.assertEqual(a_learning_unit.title, a_learning_unit_year.specific_title)
         self.assertEqual(a_learning_unit.acronym, a_learning_unit_year.acronym)
+
+
+class LearningUnitGetByAcronymWithLatestAcademicYearTest(TestCase):
+    def setUp(self):
+        self.learning_unit_year_2009 = LearningUnitYearFactory(
+            academic_year=AcademicYearFactory(year=2009),
+            acronym='LDROI1200'
+        )
+        self.learning_unit_year_2017 = LearningUnitYearFactory(
+            academic_year=AcademicYearFactory(year=2017),
+            acronym='LDROI1200'
+        )
+
+    def test_get_by_acronym_with_highest_academic_year(self):
+        self.assertEqual(
+            learning_unit.get_by_acronym_with_highest_academic_year(acronym='LDROI1200'),
+            self.learning_unit_year_2017.learning_unit
+        )

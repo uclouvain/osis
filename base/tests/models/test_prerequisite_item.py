@@ -80,6 +80,13 @@ class TestPrerequisiteItem(TestCase):
             [self.prerequisite_item]
         )
 
+    def test_delete_items_by_related_prerequisite(self):
+        prerequisite_item.delete_items_by_related_prerequisite(self.prerequisite)
+        self.assertEqual(
+            len(prerequisite_item.PrerequisiteItem.objects.filter(prerequisite=self.prerequisite)),
+            0
+        )
+
 
 class TestPrerequisiteString(TestCase):
     def setUp(self):

@@ -100,7 +100,6 @@ class Prerequisite(models.Model):
         blank=True,
         max_length=240,
         default="",
-        validators=[prerequisite_syntax_validator]
     )
 
     class Meta:
