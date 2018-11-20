@@ -492,9 +492,9 @@ def is_year_editable(learning_unit_year, person, raise_exception):
         result = learning_unit_year.academic_year.year >= settings.YEAR_LIMIT_LUE_MODIFICATION
         msg = "{}.  {}".format(
             _("You can't modify learning unit under year : %(year)d") %
-              {"year": settings.YEAR_LIMIT_LUE_MODIFICATION},
+            {"year": settings.YEAR_LIMIT_LUE_MODIFICATION},
             _("Modifications should be made in EPC for year %(year)d") %
-              {"year": learning_unit_year.academic_year.year},
+            {"year": learning_unit_year.academic_year.year},
         )
         can_raise_exception(raise_exception,
                             result,
