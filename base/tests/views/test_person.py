@@ -23,12 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
-from unittest.mock import PropertyMock
-
 from django.test import TestCase
 
-from base.models.person import Person
 from base.tests.factories.person import PersonFactory
 from base.views.person import EmployeeAutocomplete
 
@@ -36,13 +32,16 @@ from base.views.person import EmployeeAutocomplete
 class TestPersonAutoComplete(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.jean = PersonFactory(first_name="Jean", last_name="Dupont", middle_name=None, employee=True)
-        cls.henry = PersonFactory(first_name="Henry", last_name="Arkin", middle_name="De", employee=True)
-        cls.student = PersonFactory(first_name="Henry", last_name="Dioup", middle_name=None, employee=False)
+        cls.jean = PersonFactory(first_name="Jean", last_name="Dupont", middle_name=None, global_id="001456",
+                                 employee=True)
+        cls.henry = PersonFactory(first_name="Henry", last_name="Arkin", middle_name="De", global_id="002587500",
+                                  employee=True)
+        cls.student = PersonFactory(first_name="Henry", last_name="Dioup", middle_name=None, global_id="488513",
+                                    employee=False)
 
-    def test_get_queryset(self):
+    def test_get_queryset_with_name(self):
         autocomplete_instance = EmployeeAutocomplete()
-        autocomplete_instance.q = "Henry"
+        autocomplete_instance.q = self.henry.last_name
 
         self.assertQuerysetEqual(
             autocomplete_instance.get_queryset(),
@@ -50,21 +49,36 @@ class TestPersonAutoComplete(TestCase):
             transform=lambda obj: obj
         )
 
-        autocomplete_instance.q = "Dupont Jane"
+        autocomplete_instance.q = self.jean.last_name
         self.assertQuerysetEqual(
             autocomplete_instance.get_queryset(),
             [self.jean],
             transform=lambda obj: obj
         )
 
-    def test_get_result_label(self):
-        with mock.patch.object(Person, "age", new_callable=PropertyMock, return_value=5):
-            self.assertEqual(
-                EmployeeAutocomplete().get_result_label(self.jean),
-                "Dupont Jean (5)"
-            )
+    def test_get_queryset_with_global_id(self):
+        autocomplete_instance = EmployeeAutocomplete()
+        autocomplete_instance.q = self.henry.global_id
+        self.assertQuerysetEqual(
+            autocomplete_instance.get_queryset(),
+            [self.henry],
+            transform=lambda obj: obj
+        )
 
-            self.assertEqual(
-                EmployeeAutocomplete().get_result_label(self.henry),
-                "Arkin Henry (5)"
-            )
+        autocomplete_instance.q = self.henry.global_id.strip("0")
+        self.assertQuerysetEqual(
+            autocomplete_instance.get_queryset(),
+            [self.henry],
+            transform=lambda obj: obj
+        )
+
+    def test_get_result_label(self):
+        self.assertEqual(
+            EmployeeAutocomplete().get_result_label(self.jean),
+            "Dupont Jean"
+        )
+
+        self.assertEqual(
+            EmployeeAutocomplete().get_result_label(self.henry),
+            "Arkin Henry"
+        )

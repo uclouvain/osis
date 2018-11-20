@@ -29,22 +29,22 @@ from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.business.education_groups import shorten
-from osis_common.models.osis_model_admin import OsisModelAdmin
+from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
 
-class EducationGroupAdmin(VersionAdmin, OsisModelAdmin):
+class EducationGroupAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('most_recent_acronym', 'start_year', 'end_year', 'changed')
     search_fields = ('educationgroupyear__acronym',)
 
 
-class EducationGroup(models.Model):
+class EducationGroup(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
     start_year = models.PositiveIntegerField(
         blank=True,
         null=True,
-        verbose_name=_('start')
+        verbose_name=_('Start')
     )
 
     end_year = models.PositiveIntegerField(
@@ -75,7 +75,7 @@ class EducationGroup(models.Model):
                 raise ValidationError({
                     'end_year': _("%(max)s must be greater or equals than %(min)s") % {
                         "max": _("end").title(),
-                        "min": _("start").title(),
+                        "min": _("Start"),
                     }
                 })
         # Check if end_year could be set according to protected data

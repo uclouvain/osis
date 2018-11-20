@@ -32,14 +32,14 @@ from rest_framework.renderers import JSONRenderer
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 import json
-from base.models.entity_manager import is_entity_manager
-
+from base.models.entity_manager import is_entity_manager, has_perm_entity_manager
 
 ALL_OPTION_VALUE = "-"
 ALL_OPTION_VALUE_ENTITY = "all_"
 
 
 @login_required
+@user_passes_test(has_perm_entity_manager)
 def pgm_manager_administration(request):
     administrator_entities = get_administrator_entities(request.user)
     current_academic_yr = mdl.academic_year.current_academic_year()
@@ -225,7 +225,7 @@ def add_program_managers(offers, person):
     error_messages = []
     for offer_yr in offers:
         if not add_offer_program_manager(offer_yr, person):
-            error_messages.append("{0} {1} {2}".format(person, _('already_program_mgr'), offer_yr.acronym))
+            error_messages.append("{0} {1} {2}".format(person, _('is already program manager for'), offer_yr.acronym))
     return error_messages
 
 

@@ -32,8 +32,8 @@ from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.views.decorators.http import require_http_methods
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.http import require_http_methods
 
 from attribution.business import attribution_charge_new
 from attribution.models.attribution_charge_new import AttributionChargeNew
@@ -41,6 +41,7 @@ from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, find_language_in_settings, \
     CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language
+from base.business.learning_unit import get_learning_unit_comparison_context
 from base.business.learning_units import perms as business_perms
 from base.business.learning_units.comparison import get_keys, compare_learning_unit_years, \
     compare_learning_container_years, get_components_changes, get_partims_as_str
@@ -55,7 +56,6 @@ from base.views.common import display_warning_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models import text_label
 from . import layout
-from base.business.learning_unit import get_learning_unit_comparison_context
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
                      'ADDITIONAL_REQUIREMENT_ENTITY_1', 'ADDITIONAL_REQUIREMENT_ENTITY_2',
@@ -105,9 +105,7 @@ def learning_unit_attributions(request, learning_unit_year_id):
     person = get_object_or_404(Person, user=request.user)
     context = get_common_context_learning_unit_year(learning_unit_year_id,
                                                     person)
-    context['attribution_charge_news'] = \
-        attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
-            learning_unit_year=learning_unit_year_id)
+    context['attributions'] = attribution_charge_new.find_attributions_with_charges(learning_unit_year_id)
     context["can_manage_charge_repartition"] = \
         business_perms.is_eligible_to_manage_charge_repartition(context["learning_unit_year"], person)
     context["can_manage_attribution"] = \
@@ -288,7 +286,7 @@ def _get_changed_organization(context, context_prev, context_next):
     data = {}
     for key_value in ORGANIZATION_KEYS:
         if _has_changed(context, context_next, context_prev, key_value):
-            translated_key = _('learning_location') if key_value == "campus" else _(key_value.lower())
+            translated_key = _('Learning location') if key_value == "campus" else _(key_value.lower())
             data.update({translated_key: {'prev': context_prev.get(key_value),
                                           'current': context.get(key_value),
                                           'next': context_next.get(key_value)}

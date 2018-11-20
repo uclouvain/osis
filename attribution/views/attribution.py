@@ -37,7 +37,7 @@ class RecomputePortalSerializer(serializers.Serializer):
 
 @api_view(['POST'])
 def recompute_portal(request):
-    serializer = RecomputePortalSerializer(data=request.POST)
+    serializer = RecomputePortalSerializer(data=request.data)
     if serializer.is_valid():
         global_ids = serializer.data['global_ids'] if serializer.data['global_ids'] else None
         result = attribution_json.publish_to_portal(global_ids)

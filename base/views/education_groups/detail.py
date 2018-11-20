@@ -255,23 +255,13 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
     def get_appropriate_sections(self):
         education_group_year = self.object
-        minor = education_group_year.is_minor
-        deep = education_group_year.is_deepening
-        special = minor or deep
-        if special:
-            code = education_group_year.partial_acronym
-            if minor:
-                type_education_group_year = "-min"
-            elif deep:
-                type_education_group_year = "-app"
-        else:
-            code = education_group_year.acronym
-            type_education_group_year = ""
-        url = settings.URL_TO_GET_SECTIONS.format(
+        code, type_education_group_year = _get_code_and_type(education_group_year)
+        url = settings.URL_TO_PORTAL_UCL.format(
             type=type_education_group_year,
             anac=education_group_year.academic_year.year,
             code=code
         )
+        url += "?" + settings.GET_SECTION_PARAM
         try:
             sections_request = requests.get(url, timeout=settings.REQUESTS_TIMEOUT).json()
         except (json.JSONDecodeError, TimeoutError, requests.exceptions.ConnectionError):
@@ -280,13 +270,32 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         return sections_request['sections']
 
 
+def _get_code_and_type(education_group_year):
+    minor = education_group_year.is_minor
+    deep = education_group_year.is_deepening
+    special = minor or deep
+    if special:
+        code = education_group_year.partial_acronym
+        if minor:
+            type_education_group_year = "-min"
+        elif deep:
+            type_education_group_year = "-app"
+    else:
+        code = education_group_year.acronym
+        type_education_group_year = ""
+    return code, type_education_group_year
+
+
 @login_required
 def publish(request, education_group_year_id, root_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    url = settings.URL_TO_PUBLISH.format(
+    code, type_education_group_year = _get_code_and_type(education_group_year)
+    url = settings.URL_TO_PORTAL_UCL.format(
+        type=type_education_group_year,
         anac=education_group_year.academic_year.year,
-        code=education_group_year.acronym
+        code=code
     )
+    url += "?" + settings.REFRESH_PARAM
     publish_request = requests.get(url, timeout=settings.REQUESTS_TIMEOUT)
     if publish_request.status_code == HttpResponseNotFound.status_code:
         display_error_messages(request, _("This program has no page to publish on it"))

@@ -27,7 +27,7 @@ import json
 import logging
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -38,6 +38,7 @@ from base.business.institution import can_user_edit_educational_information_subm
 from base.forms.entity import EntitySearchForm
 from base.forms.entity_calendar import EntityCalendarEducationalInformationForm
 from base.models import entity_version as entity_version_mdl
+from base.models.entity_manager import is_entity_manager, has_perm_entity_manager
 from base.models.entity_version import EntityVersion
 from base.views.common import display_success_messages, paginate_queryset
 from . import layout
@@ -58,6 +59,7 @@ def mandates(request):
 
 
 @login_required
+@user_passes_test(has_perm_entity_manager)
 def academic_actors(request):
     return layout.render(request, "academic_actors.html", {})
 
