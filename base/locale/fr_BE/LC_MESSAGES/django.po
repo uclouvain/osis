@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-19 16:36+0100\n"
+"POT-Creation-Date: 2018-11-20 09:51+0100\n"
 "PO-Revision-Date: 2018-11-16 14:28+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -150,6 +150,29 @@ msgstr "1er quadri"
 msgid "2nd quadri"
 msgstr "2ieme quadri"
 
+#: forms/prerequisite.py:45
+msgid ""
+"<b>Syntax rules</b>:<ul><li>No double parentheses.</li><li>Valid operators "
+"are OU or ET.</li><li>The operator must be the same inside all parentheses "
+"(groups).</li><li>The operator that linked groups must be different than the "
+"one that linked LU inside groups (parentheses).</li><li>The LU code cannot "
+"include spaces (ex: LDROI1001 and not LDROI&nbsp;1001).</li></ul></"
+"p><p><b>Examples</b>:<ul><li>A OU B OU C: valid</li><li>A ET B ET C : valid</"
+"li><li>A ET (B OU C) ET (D OU E): valid</li><li>A ET (B OU C) OU (D OU E): "
+"not valid</li><li>A ET (B ET C) ET (D ET E): not valid</li><li>A ET (B OU C) "
+"ET (D ET E): not valid</li></ul>"
+msgstr ""
+"<b>Règles de syntaxe:</b><ul><li>Pas de doubles parenthèses.</li><li>Les "
+"opérateurs valides sont OU et ET.</li><li>L'opérateur doit être le même à "
+"l'intérieur de toutes les parenthèses (groupes).</li><li>L'opérateur qui "
+"unit les groupes doit être différent de celui qui unit les UEs dans un "
+"groupe (parenthèses).</li><li>Le code de l'UE ne peut pas comporté d'espaces "
+"(ex: LDROI1001 et non LDROI&nbsp;1001).</li></ul></p><p><b>Exemples</b>:"
+"<ul><li>A OU B OU C: valide</li><li>A ET B ET C : valide</li><li>A ET (B OU "
+"C) ET (D OU E): valide</li><li>A ET (B OU C) OU (D OU E): non valide</"
+"li><li>A ET (B ET C) ET (D ET E): non valide</li><li>A ET (B OU C) ET (D ET "
+"E): non valide</li></ul>"
+
 #: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:19
 msgid "<b>create</b> a new learning unit using that acronym"
 msgstr "<b>Créer</b> une nouvelle unité d’enseignement utilisant cet acronyme"
@@ -175,8 +198,8 @@ msgstr "A=Absent"
 msgid "AESS CAPAES"
 msgstr "AESS CAPAES"
 
-#: tests/models/test_prerequisite_item.py:108
-#: tests/models/test_prerequisite_item.py:127
+#: tests/models/test_prerequisite_item.py:115
+#: tests/models/test_prerequisite_item.py:134
 msgid "AND"
 msgstr "ET"
 
@@ -2207,6 +2230,15 @@ msgstr "Aucune différence"
 msgid "No enrollment for this learning unit"
 msgstr "Il n'y a aucune inscription pour cette unité d'enseignement"
 
+#: forms/prerequisite.py:109
+#: tests/views/education_groups/learning_unit/test_update.py:204
+#: tests/views/education_groups/learning_unit/test_update.py:208
+#, python-format
+msgid "No match has been found for this learning unit :  %(acronym)s"
+msgstr ""
+"Aucune correspondance n'a été trouvée pour cette unité d'enseignement : "
+"%(acronym)s"
+
 #: models/enums/diploma_printing_orientation.py:33
 msgid "No print"
 msgstr "Pas d’impression"
@@ -2292,7 +2324,7 @@ msgstr "Matricule"
 msgid "Number of elements"
 msgstr "Nombre d'éléments"
 
-#: tests/models/test_prerequisite_item.py:126
+#: tests/models/test_prerequisite_item.py:133
 msgid "OR"
 msgstr "OU"
 
@@ -2528,6 +2560,7 @@ msgstr "Exercices pratiques incomplets"
 msgid "Preferences"
 msgstr "Préférences"
 
+#: forms/prerequisite.py:42
 #: templates/education_group/learning_unit/tab_prerequisite_group.html:39
 #: templates/education_group/learning_unit/tabs.html:40
 msgid "Prerequisite"
@@ -4674,21 +4707,6 @@ msgid "please_enable_javascript"
 msgstr ""
 "Veuillez <a href='http://enable-javascript.com/fr/' target='_blank'>activer "
 "le JavaScript</a> pour utiliser l'application."
-
-# TODO impossible to create a key from that msgstr.
-#: forms/prerequisite.py:38
-msgid "prerequisites_syntax_rules"
-msgstr ""
-"<b>Règles de syntaxe:</b><ul><li>Pas de doubles parenthèses.</li><li>Les "
-"opérateurs valides sont OU et ET.</li><li>L'opérateur doit être le même à "
-"l'intérieur de toutes les parenthèses (groupes).</li><li>L'opérateur qui "
-"unit les groupes doit être différent de celui qui unit les UEs dans un "
-"groupe (parenthèses).</li><li>Le code de l'UE ne peut pas comporté d'espaces "
-"(ex: LDROI1001 et non LDROI&nbsp;1001).</li></ul></p><p><b>Exemples</b>:"
-"<ul><li>A OU B OU C: valide</li><li>A ET B ET C : valide</li><li>A ET (B OU "
-"C) ET (D OU E): valide</li><li>A ET (B OU C) OU (D OU E): non valide</"
-"li><li>A ET (B ET C) ET (D ET E): non valide</li><li>A ET (B OU C) ET (D ET "
-"E): non valide</li></ul>"
 
 #: models/learning_unit_year.py:147
 msgid "professional integration"
