@@ -28,7 +28,7 @@ from django.forms import formset_factory, MultiWidget
 from django.test import TestCase
 
 from base.forms.education_groups_administrative_data import AdministrativeDataSessionForm, AdministrativeDataFormSet, \
-    DATE_FORMAT, _build_new_course_enrollment_offer_yr_calendar, CourseEnrollmentForm
+    DATE_FORMAT, _build_new_course_enrollment_offer_yr_calendar, CourseEnrollmentForm, AdditionalInfoForm
 from base.forms.utils.datefield import DATETIME_FORMAT
 from base.models.enums import academic_calendar_type
 from base.models.academic_calendar import AcademicCalendar
@@ -40,6 +40,7 @@ from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from django.test.utils import override_settings
 from django.utils.translation import ugettext_lazy as _
+from base.models.education_group_year import EducationGroupYear
 
 
 class TestAdministrativeDataForm(TestCase):
@@ -275,4 +276,25 @@ class TestCourseEnrollmentForm(TestCase):
         form.is_valid()
         self.assertEqual(form.errors["range_date"][0],
                          _('The start date must be equals or lower than the end date'))
+
+
+class TestAdditionalInfoForm(TestCase):
+
+    def test_get_new_course_enrollment_calendar(self):
+        academic_year = AcademicYearFactory(year=2017)
+        education_group_yr = EducationGroupYearFactory(
+            academic_year=academic_year,
+            weighting=True,
+            default_learning_unit_enrollment=False,
+        )
+        form = AdditionalInfoForm(
+            {
+                "weighting": False,
+                "default_learning_unit_enrollment": True,
+            },
+            instance=education_group_yr)
+        form.save()
+        updated_education_group_yr = EducationGroupYear.objects.get(pk=education_group_yr.pk)
+        self.assertFalse(updated_education_group_yr.weighting)
+        self.assertTrue(updated_education_group_yr.default_learning_unit_enrollment)
 
