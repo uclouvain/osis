@@ -433,7 +433,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         )
 
         self.assertEqual(result["is_disabled"], "disabled")
-        self.assertEqual(result["text"], _("Edit"))
+        self.assertEqual(result["text"], _("Modify"))
 
 
 class TestEducationGroupDlWithParent(TestCase):

@@ -581,6 +581,7 @@ class EducationGroupViewTestCase(TestCase):
         self.assertEqual(context['education_group_year'], education_group_year)
         self.assertEqual(context['course_enrollment_validity'], False)
         self.assertEqual(context['formset_session_validity'], False)
+        self.assertIn('additional_info_form', context)
 
     def test_education_content(self):
         an_education_group = EducationGroupYearFactory()

@@ -37,6 +37,7 @@ from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.entity import EntityFactory
+from base.models.enums.constraint_type import CREDITS
 
 
 def generate_title(education_group_year):
@@ -68,6 +69,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     default_learning_unit_enrollment = False
     duration_unit = factory.Iterator(DURATION_UNIT, getter=operator.itemgetter(0))
     duration = factory.fuzzy.FuzzyInteger(1, 5)
+    constraint_type = CREDITS
 
 
 class MiniTrainingFactory(EducationGroupYearFactory):
