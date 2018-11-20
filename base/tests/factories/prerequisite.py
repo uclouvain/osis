@@ -43,4 +43,3 @@ class PrerequisiteFactory(factory.django.DjangoModelFactory):
     learning_unit_year = factory.SubFactory(LearningUnitYearFakerFactory)
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
     main_operator = prerequisite_operator.AND
-    prerequisite = "LSINF1111 ET LBIR1203"
