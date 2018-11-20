@@ -30,6 +30,7 @@ from http import HTTPStatus
 from unittest import mock
 
 import bs4
+import reversion
 from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
@@ -44,6 +45,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.certificate_aim import CertificateAimFactory
 from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
 from base.tests.factories.education_group_language import EducationGroupLanguageFactory
+from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -163,6 +165,22 @@ class EducationGroupRead(TestCase):
         self.assertEqual(context["enums"], education_group_categories)
         self.assertEqual(context["parent"], self.education_group_parent)
 
+    def test_versions(self):
+        response = self.client.get(self.url)
+        self.assertEqual(len(response.context["versions"]), 0)
+
+        with reversion.create_revision():
+            self.education_group_child_1.acronym = "Snape"
+            self.education_group_child_1.save()
+
+        response = self.client.get(self.url)
+        self.assertEqual(len(response.context["versions"]), 1)
+
+        with reversion.create_revision():
+            EducationGroupOrganizationFactory(education_group_year=self.education_group_child_1)
+
+        response = self.client.get(self.url)
+        self.assertEqual(len(response.context["versions"]), 2)
 
 class EducationGroupDiplomas(TestCase):
     @classmethod
