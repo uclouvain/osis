@@ -100,7 +100,7 @@ MIDDLEWARE = (
     'base.middlewares.extra_http_responses_midleware.ExtraHttpResponsesMiddleware',
     'waffle.middleware.WaffleMiddleware',
     'base.middlewares.notification_middleware.NotificationMiddleware',
-    'reversion.middleware.RevisionMiddleware'
+    'base.middlewares.reversion_middleware.BaseRevisionMiddleware'
 )
 
 INTERNAL_IPS = ()
