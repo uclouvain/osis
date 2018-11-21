@@ -27,6 +27,7 @@ import datetime
 from unittest import mock
 
 import factory.fuzzy
+import reversion
 from django.contrib.auth.models import Permission, Group
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.exceptions import ObjectDoesNotExist
@@ -91,7 +92,6 @@ from base.views.learning_unit import learning_unit_components, learning_class_ye
     learning_unit_formations, get_charge_repartition_warning_messages, CHARGE_REPARTITION_WARNING_MESSAGE, \
     learning_unit_attributions
 from base.views.learning_units.create import create_partim_form
-from base.views.learning_units.detail import learning_unit_identification
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.search import learning_units
 from base.views.learning_units.search import learning_units_service_course
@@ -600,6 +600,27 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/identification.html')
         self.assertEqual(response.context['learning_unit_year'], learning_unit_year)
 
+    def test_learning_unit_read_versions(self):
+        learning_unit_year = LearningUnitYearFullFactory(
+            academic_year=self.current_academic_year,
+        )
+        LearningUnitComponentFactory(learning_unit_year=learning_unit_year)
+
+        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
+        self.assertEqual(len(response.context['versions']), 0)
+
+        with reversion.create_revision():
+            learning_unit_year.learning_container_year.save()
+
+        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
+        self.assertEqual(len(response.context['versions']), 1)
+
+        with reversion.create_revision():
+            learning_unit_year.learning_component_years.first().save()
+
+        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
+        self.assertEqual(len(response.context['versions']), 2)
+
     def test_external_learning_unit_read(self):
         external_learning_unit_year = ExternalLearningUnitYearFactory(
             learning_unit_year__subtype=learning_unit_year_subtypes.FULL,
@@ -623,25 +644,25 @@ class LearningUnitViewTestCase(TestCase):
         client = Client()
         client.force_login(a_user_without_perms)
 
-        response = client.get(reverse(learning_unit_identification, args=[learning_unit_year.id]))
+        response = client.get(reverse("learning_unit", args=[learning_unit_year.id]))
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self.assertTemplateUsed(response, "access_denied.html")
 
         a_user_without_perms.user_permissions.add(
             Permission.objects.get(codename='can_access_externallearningunityear'))
 
-        response = client.get(reverse(learning_unit_identification, args=[learning_unit_year.id]))
+        response = client.get(reverse("learning_unit", args=[learning_unit_year.id]))
         self.assertEqual(response.status_code, 200)
 
     def test_warnings_learning_unit_read(self):
         learning_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year,
                                                                container_type=learning_container_year_types.INTERNSHIP)
         LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                         learning_container_year=learning_container_year,
-                                         internship_subtype=internship_subtypes.TEACHING_INTERNSHIP,
-                                         subtype=learning_unit_year_subtypes.FULL,
-                                         periodicity=learning_unit_year_periodicity.BIENNIAL_ODD,
-                                         status=False)
+                                learning_container_year=learning_container_year,
+                                internship_subtype=internship_subtypes.TEACHING_INTERNSHIP,
+                                subtype=learning_unit_year_subtypes.FULL,
+                                periodicity=learning_unit_year_periodicity.BIENNIAL_ODD,
+                                status=False)
         partim_without_internship = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                             learning_container_year=learning_container_year,
                                                             internship_subtype=None,
@@ -1334,7 +1355,8 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(response.context['previous_academic_yr'], previous_academic_yr)
         self.assertEqual(response.context['next_academic_yr'], next_academic_yr)
         self.assertEqual(response.context['fields'], ['specific_title'])
-        self.assertEqual(response.context['previous_values'], {'specific_title': previous_learning_unit_year.specific_title})
+        self.assertEqual(response.context['previous_values'],
+                         {'specific_title': previous_learning_unit_year.specific_title})
         self.assertEqual(response.context['next_values'], {'specific_title': next_learning_unit_year.specific_title})
 
     @mock.patch('base.models.program_manager.is_program_manager')
