@@ -443,6 +443,8 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         acronym = self.object.acronym.lower()
         is_common = acronym.startswith('common-')
         is_specific = not is_common
+        is_minor = self.object.is_minor
+        is_deepening = self.object.is_deepening
 
         is_master = acronym.endswith(('2m', '2m1'))
         use_standard_text = acronym.endswith(('2a', '2mc'))
@@ -457,7 +459,6 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         for section in SECTIONS_WITH_TEXT:
             record[section] = AdmissionConditionLine.objects.filter(admission_condition=admission_condition,
                                                                     section=section)
-
         context.update({
             'admission_condition_form': admission_condition_form,
             'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object']),
@@ -467,7 +468,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
                 'is_bachelor': is_common and self.object.education_group_type.name == education_group_types.BACHELOR,
                 'is_master': is_master,
                 'show_components_for_agreg_and_mc': is_common and use_standard_text,
-                'show_free_text': is_specific and (is_master or use_standard_text),
+                'show_free_text': (is_specific and (is_master or use_standard_text)) or is_minor or is_deepening,
             },
             'admission_condition': admission_condition,
             'record': record,
