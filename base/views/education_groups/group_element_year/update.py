@@ -26,7 +26,7 @@
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError, PermissionDenied
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -39,7 +39,7 @@ from waffle.decorators import waffle_flag
 
 from base.business import group_element_years
 from base.business.group_element_years.management import SELECT_CACHE_KEY, select_education_group_year, \
-    select_learning_unit_year
+    select_learning_unit_year, luy_has_or_is_prerequisite
 from base.forms.education_group.group_element_year import UpdateGroupElementYearForm
 from base.models.education_group_year import EducationGroupYear
 from base.models.exceptions import IncompatiblesTypesException
@@ -233,8 +233,12 @@ class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView)
     template_name = "education_group/group_element_year/confirm_detach.html"
 
     def delete(self, request, *args, **kwargs):
+        child = self.get_object().child
+        if luy_has_or_is_prerequisite(child):
+            raise PermissionDenied(_('You cannot detach a learning unit which has or is a prerequisite'))
+
         success_msg = _("\"%(child)s\" has been detached from \"%(parent)s\"") % {
-            'child': self.get_object().child,
+            'child': child,
             'parent': self.get_object().parent,
         }
         display_success_messages(request, success_msg)

@@ -30,6 +30,8 @@ from base.models import group_element_year, authorized_relationship
 from base.models.education_group_year import EducationGroupYear
 from base.models.exceptions import IncompatiblesTypesException
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.prerequisite_item import find_by_learning_unit_being_prerequisite, \
+    find_by_learning_unit_year_having_prerequisite
 from base.utils.cache import cache
 
 LEARNING_UNIT_YEAR = 'learningunityear'
@@ -86,3 +88,10 @@ def _types_are_compatible(parent, child):
             parent_type=parent.education_group_type,
             child_type=child.education_group_type,
         ).exists()
+
+
+def luy_has_or_is_prerequisite(luy):
+    if isinstance(luy, LearningUnitYear):
+        return find_by_learning_unit_being_prerequisite(luy.learning_unit) or\
+           find_by_learning_unit_year_having_prerequisite(luy)
+    return False
