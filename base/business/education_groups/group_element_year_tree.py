@@ -127,11 +127,11 @@ class NodeLeafJsTree(NodeBranchJsTree):
 
     def _get_icon(self):
         if self.group_element_year.has_prerequisite and self.group_element_year.is_prerequisite:
-            return "glyphicon glyphicon-resize-horizontal"
+            return "fa fa-exchange"
         elif self.group_element_year.has_prerequisite:
-            return "glyphicon glyphicon-arrow-right"
+            return "fa fa-arrow-right"
         elif self.group_element_year.is_prerequisite:
-            return "glyphicon glyphicon-arrow-left"
+            return "fa fa-arrow-left"
         return "jstree-file"
 
     def get_url(self):
