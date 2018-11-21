@@ -456,7 +456,7 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def is_deepening(self):
-        return self.education_group_type.name == TrainingType.DEEPENING.name
+        return self.education_group_type.name == MiniTrainingType.DEEPENING.name
 
     @property
     def is_common(self):
