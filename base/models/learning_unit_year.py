@@ -41,6 +41,7 @@ from base.models.enums import learning_unit_year_subtypes, internship_subtypes, 
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
 from base.models.enums.learning_container_year_types import COURSE, INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, ANNUAL, BIENNIAL_EVEN, BIENNIAL_ODD
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_ALL, REGEX_BY_SUBTYPE
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -112,7 +113,15 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
                                       validators=[academic_year_validator])
     learning_unit = models.ForeignKey('LearningUnit')
+
     learning_container_year = models.ForeignKey('LearningContainerYear', null=True)
+
+    learning_component_years = models.ManyToManyField(
+        LearningComponentYear,
+        through="base.LearningUnitComponent",
+        verbose_name=_("Components"),
+    )
+
     changed = models.DateTimeField(null=True, auto_now=True)
     acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('Code'),
                                validators=[RegexValidator(LEARNING_UNIT_ACRONYM_REGEX_ALL)])

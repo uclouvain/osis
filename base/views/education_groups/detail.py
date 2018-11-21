@@ -169,7 +169,6 @@ class EducationGroupRead(EducationGroupGenericDetailView):
         versions = Version.objects.get_for_object(self.object)
 
         related_models = [
-            EducationGroup,
             EducationGroupOrganization,
             EducationGroupAchievement,
             EducationGroupDetailedAchievement,
