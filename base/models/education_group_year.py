@@ -31,6 +31,7 @@ from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, ngettext
+from reversion.admin import VersionAdmin
 
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin
 
@@ -47,7 +48,7 @@ from base.models.exceptions import MaximumOneParentAllowedException
 from base.models.prerequisite import Prerequisite
 
 
-class EducationGroupYearAdmin(SerializableModelAdmin):
+class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('acronym', 'title', 'academic_year', 'education_group_type', 'changed')
     list_filter = ('academic_year', 'education_group_type')
     raw_id_fields = (
