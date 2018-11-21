@@ -379,12 +379,12 @@
         $('#CollapseWarnings').collapse('toggle');
 
         $("#CollapseWarnings").on("hide.bs.collapse", function(){
-            $(".btn").html('<span id="expandButton" class="glyphicon glyphicon-collapse-down" style="color:#8a6d3b"></span>');
+            $("#btn_expandButton").html('<span id="expandButton" class="glyphicon glyphicon-collapse-down" style="color:#8a6d3b"></span>');
             $("#btn_expandButton").attr("title", gettext("Open"));
         });
 
         $("#CollapseWarnings").on("show.bs.collapse", function(){
-            $(".btn").html('<span id="expandButton"  class="glyphicon glyphicon-collapse-up" style="color:#8a6d3b"></span>');
+            $("#btn_expandButton").html('<span id="expandButton"  class="glyphicon glyphicon-collapse-up" style="color:#8a6d3b"></span>');
             $("#btn_expandButton").attr("title", gettext("Collapse"));
         });
     });
