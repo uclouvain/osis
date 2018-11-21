@@ -102,5 +102,6 @@ class EducationGroupYearCommonMasterFactory(EducationGroupYearFactory):
         name=PGRM_MASTER_120
     )
 
+
 class EducationGroupYearMasterFactory(EducationGroupYearCommonMasterFactory):
     acronym = 'actu2m'
