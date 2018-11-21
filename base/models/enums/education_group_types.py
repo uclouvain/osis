@@ -76,7 +76,7 @@ class MiniTrainingType(ChoiceEnum):
 
     @classmethod
     def to_postpone(cls):
-        return cls.minors().append(cls.DEEPENING.name)
+        return cls.minors() + [cls.DEEPENING.name]
 
 
 class GroupType(ChoiceEnum):
