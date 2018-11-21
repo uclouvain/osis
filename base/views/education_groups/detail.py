@@ -54,9 +54,9 @@ from base.models.education_group_detailed_achievement import EducationGroupDetai
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year import EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
-from base.models.enums import education_group_categories, academic_calendar_type, education_group_types
+from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import PGRM_MASTER_120, PGRM_MASTER_180_240
+from base.models.enums.education_group_types import TrainingType
 from base.models.person import Person
 from base.views.common import display_error_messages, display_success_messages
 from cms import models as mdl_cms
@@ -162,7 +162,8 @@ class EducationGroupRead(EducationGroupGenericDetailView):
     def show_coorganization(self):
         """Co-organization doesn't have sense for 2M (120/180-240) """
         return self.object.education_group_type.category == TRAINING and \
-            self.object.education_group_type.name not in [PGRM_MASTER_120, PGRM_MASTER_180_240]
+            self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
+                                                          TrainingType.PGRM_MASTER_180_240.name]
 
     def get_related_versions(self):
         versions = Version.objects.get_for_object(self.object)
@@ -465,7 +466,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
             'info': {
                 'is_specific': is_specific,
                 'is_common': is_common,
-                'is_bachelor': is_common and self.object.education_group_type.name == education_group_types.BACHELOR,
+                'is_bachelor': is_common and self.object.education_group_type.name is TrainingType.BACHELOR.name,
                 'is_master': is_master,
                 'show_components_for_agreg_and_mc': is_common and use_standard_text,
                 'show_free_text': (is_specific and (is_master or use_standard_text)) or is_minor or is_deepening,
