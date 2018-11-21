@@ -39,7 +39,8 @@ from waffle.decorators import waffle_flag
 
 from base.business import group_element_years
 from base.business.group_element_years.management import SELECT_CACHE_KEY, select_education_group_year, \
-    select_learning_unit_year, luy_has_or_is_prerequisite
+    select_learning_unit_year
+from base.business.learning_units.prerequisite import luy_has_or_is_prerequisite
 from base.forms.education_group.group_element_year import UpdateGroupElementYearForm
 from base.models.education_group_year import EducationGroupYear
 from base.models.exceptions import IncompatiblesTypesException

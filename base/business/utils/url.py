@@ -26,6 +26,6 @@
 from urllib import parse
 
 
-def _get_parameter_from_url_querystring(url, parameter):
+def get_parameter_from_url_querystring(url, parameter):
     parsed_url = parse.urlparse(url)
     return parse.parse_qs(parsed_url.query).get(parameter)[0]
