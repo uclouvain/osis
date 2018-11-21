@@ -300,8 +300,8 @@ class EducationGroupGeneralInformations(TestCase):
         academic_year = AcademicYearFactory()
         cls.current_academic_year = AcademicYearFactory(year=datetime.datetime.now().year)
         cls.type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
-        cls.type_minor = EducationGroupTypeFactory(name="Access minor")
-        cls.type_deepening = EducationGroupTypeFactory(name="Deepening")
+        cls.type_minor = EducationGroupTypeFactory(name="ACCESS_MINOR")
+        cls.type_deepening = EducationGroupTypeFactory(name="DEEPENING")
         cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=academic_year,
                                                                education_group_type=cls.type_training)
         cls.education_group_child = EducationGroupYearFactory(acronym="Child_1", academic_year=academic_year,

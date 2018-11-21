@@ -56,7 +56,7 @@ COMMON_FIELDS = (
 )
 
 OFFERS = [
-    {'name': TrainingType.AGREGATION.name, 'category': TRAINING, 'code': '2A'},
+    {'name': TrainingType.AGGREGATION.name, 'category': TRAINING, 'code': '2A'},
     {'name': TrainingType.CERTIFICATE_OF_PARTICIPATION.name, 'category': TRAINING, 'code': '8FC'},
     {'name': TrainingType.CERTIFICATE_OF_SUCCESS.name, 'category': TRAINING, 'code': '7FC'},
     {'name': TrainingType.CERTIFICATE_OF_HOLDING_CREDITS.name, 'category': TRAINING, 'code': '9FC'},
@@ -69,7 +69,7 @@ OFFERS = [
     {'name': TrainingType.PGRM_MASTER_120.name, 'category': TRAINING, 'code': '2M'},
     {'name': TrainingType.MASTER_M1.name, 'category': TRAINING, 'code': '2M1'},
     {'name': TrainingType.MASTER_MC.name, 'category': TRAINING, 'code': '2MC'},
-    {'name': TrainingType.STAGIAIRE.name, 'category': TRAINING, 'code': 'ST'},
+    {'name': TrainingType.INTERNSHIP.name, 'category': TRAINING, 'code': 'ST'},
 ]
 
 

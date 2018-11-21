@@ -8,7 +8,6 @@ from base.models.admission_condition import AdmissionCondition, AdmissionConditi
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_types, education_group_categories
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
