@@ -29,8 +29,9 @@ import factory.fuzzy
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, active_status, schedule_type
+from base.models.enums.constraint_type import CREDITS
 from base.models.enums.duration_unit import DURATION_UNIT
-from base.models.enums.education_group_types import BACHELOR, PGRM_MASTER_120
+from base.models.enums.education_group_types import TrainingType
 from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
@@ -68,6 +69,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     default_learning_unit_enrollment = False
     duration_unit = factory.Iterator(DURATION_UNIT, getter=operator.itemgetter(0))
     duration = factory.fuzzy.FuzzyInteger(1, 5)
+    constraint_type = CREDITS
 
 
 class MiniTrainingFactory(EducationGroupYearFactory):
@@ -89,7 +91,7 @@ class EducationGroupYearCommonBachelorFactory(EducationGroupYearFactory):
     acronym = 'common-1ba'
     education_group_type = factory.SubFactory(
         'base.tests.factories.education_group_type.ExistingEducationGroupTypeFactory',
-        name=BACHELOR
+        name=TrainingType.BACHELOR.name
     )
 
 
@@ -97,8 +99,9 @@ class EducationGroupYearCommonMasterFactory(EducationGroupYearFactory):
     acronym = 'common-2m'
     education_group_type = factory.SubFactory(
         'base.tests.factories.education_group_type.ExistingEducationGroupTypeFactory',
-        name=PGRM_MASTER_120
+        name=TrainingType.PGRM_MASTER_120.name
     )
+
 
 class EducationGroupYearMasterFactory(EducationGroupYearCommonMasterFactory):
     acronym = 'actu2m'

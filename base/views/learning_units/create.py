@@ -84,5 +84,5 @@ def create_partim_form(request, learning_unit_year_id):
 def _save_and_redirect(postponement_form, request):
     new_luys = postponement_form.save()
     for luy in new_luys:
-        show_success_learning_unit_year_creation_message(request, luy, 'learning_unit_successfuly_created')
+        show_success_learning_unit_year_creation_message(request, luy)
     return redirect('learning_unit', learning_unit_year_id=new_luys[0].pk)

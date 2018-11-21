@@ -96,13 +96,6 @@ class Prerequisite(models.Model):
         default=prerequisite_operator.AND
     )
 
-    prerequisite = models.CharField(
-        blank=True,
-        max_length=240,
-        default="",
-        validators=[prerequisite_syntax_validator]
-    )
-
     class Meta:
         unique_together = ('learning_unit_year', 'education_group_year')
 

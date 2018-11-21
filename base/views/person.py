@@ -43,7 +43,7 @@ class EmployeeAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView)
                 Q(last_name__icontains=self.q) |
                 Q(first_name__icontains=self.q) |
                 Q(middle_name__icontains=self.q) |
-                Q(global_id=self.q)
+                Q(global_id__icontains=self.q)
             )
         return qs.order_by("last_name", "first_name")
 

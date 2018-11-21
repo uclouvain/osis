@@ -27,7 +27,7 @@ from django.db.models import OuterRef, Exists
 from django.urls import reverse
 
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
-from base.models.prerequisite import Prerequisite
+from base.models.prerequisite_item import PrerequisiteItem
 
 
 class NodeBranchJsTree:
@@ -50,10 +50,10 @@ class NodeBranchJsTree:
         return result
 
     def get_queryset(self):
-        has_prerequisite = Prerequisite.objects.filter(
-            education_group_year__id=self.root.id,
-            learning_unit_year__id=OuterRef("child_leaf__id"),
-        ).exclude(prerequisite__exact='')
+        has_prerequisite = PrerequisiteItem.objects.filter(
+            prerequisite__education_group_year__id=self.root.id,
+            prerequisite__learning_unit_year__id=OuterRef("child_leaf__id"),
+        )
 
         return self.education_group_year.groupelementyear_set.all() \
             .annotate(has_prerequisites=Exists(has_prerequisite)) \

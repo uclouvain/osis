@@ -33,7 +33,7 @@ from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.education_group_year import EducationGroupYear
 
 EDUCATION_GROUP_MAX_POSTPONE_YEARS = 6
-FIELD_TO_EXCLUDE = ['id', 'external_id', 'academic_year']
+FIELD_TO_EXCLUDE = ['id', 'uuid', 'external_id', 'academic_year']
 
 
 class ConsistencyError(Error):

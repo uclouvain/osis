@@ -31,6 +31,7 @@ from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, ngettext
+from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import entity_version
@@ -40,13 +41,13 @@ from base.models.enums import academic_type, internship_presence, schedule_type,
 from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
 from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
-from base.models.enums.education_group_types import MINOR, DEEPENING
+from base.models.enums.education_group_types import MiniTrainingType
 from base.models.exceptions import MaximumOneParentAllowedException
 from base.models.prerequisite import Prerequisite
-from osis_common.models.osis_model_admin import OsisModelAdmin
+from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin
 
 
-class EducationGroupYearAdmin(OsisModelAdmin):
+class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('acronym', 'title', 'academic_year', 'education_group_type', 'changed')
     list_filter = ('academic_year', 'education_group_type')
     raw_id_fields = (
@@ -83,12 +84,12 @@ class EducationGroupYearAdmin(OsisModelAdmin):
     apply_education_group_year_postponement.short_description = _("Apply postponement on education group year")
 
 
-class EducationGroupYearManager(models.Manager):
+class EducationGroupYearManager(SerializableModelManager):
     def look_for_common(self, **kwargs):
         return self.filter(acronym__startswith='common-', **kwargs)
 
 
-class EducationGroupYear(models.Model):
+class EducationGroupYear(SerializableModel):
     objects = EducationGroupYearManager()
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
@@ -451,11 +452,11 @@ class EducationGroupYear(models.Model):
 
     @property
     def is_minor(self):
-        return self.education_group_type.name in MINOR
+        return self.education_group_type.name in MiniTrainingType.minors()
 
     @property
     def is_deepening(self):
-        return self.education_group_type.name == DEEPENING
+        return self.education_group_type.name == MiniTrainingType.DEEPENING.name
 
     @property
     def is_common(self):
