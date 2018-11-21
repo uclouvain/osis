@@ -36,7 +36,10 @@ from base.views.learning_units.common import get_learning_unit_identification_co
 
 class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
     permission_required = 'base.can_access_learningunit'
+    raise_exception = True
+
     template_name = "learning_unit/identification.html"
+
 
     pk_url_kwarg = "learning_unit_year_id"
     context_object_name = "learning_unit_year"
