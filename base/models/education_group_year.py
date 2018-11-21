@@ -33,8 +33,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, ngettext
 from reversion.admin import VersionAdmin
 
-from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin
-
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import entity_version
 from base.models.entity import Entity
@@ -43,9 +41,10 @@ from base.models.enums import academic_type, internship_presence, schedule_type,
 from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
 from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
-from base.models.enums.education_group_types import MINOR, DEEPENING
+from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.exceptions import MaximumOneParentAllowedException
 from base.models.prerequisite import Prerequisite
+from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin
 
 
 class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
@@ -453,11 +452,11 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def is_minor(self):
-        return self.education_group_type.name in MINOR
+        return self.education_group_type.name in MiniTrainingType.minors()
 
     @property
     def is_deepening(self):
-        return self.education_group_type.name == DEEPENING
+        return self.education_group_type.name == TrainingType.DEEPENING.name
 
     @property
     def is_common(self):
