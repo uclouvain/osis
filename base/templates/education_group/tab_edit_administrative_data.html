@@ -77,6 +77,17 @@
                         </table>
                     </div>
                 </div>
+
+
+                <div class="panel panel-default">
+                    <div class="panel-heading"><label>{% trans 'Additional info' %}</label></div>
+                    <div class="panel-body">
+                        <div class="row">
+                            {% bootstrap_field additional_info_form.weighting form_group_class="col-md-6" %}
+                            {% bootstrap_field additional_info_form.default_learning_unit_enrollment form_group_class="col-md-6" %}
+                        </div>
+                    </div>
+                </div>
                 <div class="pull-right">
                     {% bootstrap_button _("Save") button_type="submit" button_class="btn-primary" icon="glyphicon glyphicon-floppy-save" %}
                     <a id="link_administrative" href="{% url 'education_group_administrative' root_id education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"

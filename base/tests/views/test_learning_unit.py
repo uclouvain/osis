@@ -101,6 +101,8 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory
+from django.contrib import messages
+from django.contrib.messages.api import get_messages
 
 
 @override_flag('learning_unit_create', active=True)
@@ -1356,6 +1358,23 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(response.context['previous_values'],
                          {'specific_title': previous_learning_unit_year.specific_title})
         self.assertEqual(response.context['next_values'], {'specific_title': next_learning_unit_year.specific_title})
+
+    @mock.patch('base.models.program_manager.is_program_manager')
+    def test_learning_unit_no_comparison_possible(self, mock_program_manager):
+        mock_program_manager.return_value = True
+        learning_unit_year_1 = create_learning_unit_year(self.current_academic_year,
+                                                         'title', LearningUnitFactory())
+        AcademicYearFactory(year=self.current_academic_year.year - 1)
+        AcademicYearFactory(year=self.current_academic_year.year + 1)
+
+        response = self.client.get(reverse(learning_unit_comparison, args=[learning_unit_year_1.pk]))
+
+        msg_level = [m.level for m in get_messages(response.wsgi_request)]
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(len(msg), 1)
+        self.assertIn(messages.ERROR, msg_level)
+
+        self.assertIn(_('Comparison impossible! No learning unit to compare to'), msg)
 
 
 class TestCreateXls(TestCase):

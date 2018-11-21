@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-20 17:19+0100\n"
+"POT-Creation-Date: 2018-11-21 09:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -138,7 +138,7 @@ msgstr ""
 msgid "2nd quadri"
 msgstr ""
 
-#: forms/prerequisite.py:45
+#: forms/prerequisite.py:46
 msgid ""
 "<b>Syntax rules</b>:<ul><li>No double parentheses.</li><li>Valid operators "
 "are OU or ET.</li><li>The operator must be the same inside all parentheses "
@@ -400,6 +400,7 @@ msgid "Add/Modify a line"
 msgstr ""
 
 #: templates/education_group/tab_administrative_data.html:135
+#: templates/education_group/tab_edit_administrative_data.html:83
 msgid "Additional info"
 msgstr ""
 
@@ -791,6 +792,10 @@ msgstr ""
 msgid "Common title"
 msgstr ""
 
+#: tests/views/test_learning_unit.py:1355 views/learning_unit.py:290
+msgid "Comparison impossible! No learning unit to compare to"
+msgstr ""
+
 #: business/learning_units/xls_comparison.py:50
 msgid "Comparison of learning units"
 msgstr ""
@@ -862,7 +867,7 @@ msgstr ""
 msgid "Course"
 msgstr ""
 
-#: forms/education_groups_administrative_data.py:44
+#: forms/education_groups_administrative_data.py:45
 #: models/enums/academic_calendar_type.py:57
 #: templates/education_group/tab_administrative_data.html:49
 msgid "Course enrollment"
@@ -953,7 +958,7 @@ msgstr ""
 msgid "Delete selected messages"
 msgstr ""
 
-#: forms/education_groups_administrative_data.py:104
+#: forms/education_groups_administrative_data.py:105
 #: models/enums/academic_calendar_type.py:51
 #: templates/education_group/tab_administrative_data.html:95
 msgid "Deliberation"
@@ -1014,7 +1019,7 @@ msgstr ""
 msgid "Dissertation"
 msgstr ""
 
-#: forms/education_groups_administrative_data.py:100
+#: forms/education_groups_administrative_data.py:101
 #: models/enums/academic_calendar_type.py:52
 #: templates/education_group/tab_administrative_data.html:89
 msgid "Dissertation submission"
@@ -1092,8 +1097,6 @@ msgstr ""
 #: templates/learning_unit/specifications.html:168
 #: templates/organization/organization_address.html:68
 #: templates/organization/organization_address.html:70
-#: templatetags/education_group.py:222
-#: tests/templatetags/test_education_group.py:436
 msgid "Edit"
 msgstr ""
 
@@ -1265,7 +1268,7 @@ msgstr ""
 msgid "Event"
 msgstr ""
 
-#: forms/education_groups_administrative_data.py:91
+#: forms/education_groups_administrative_data.py:92
 #: models/enums/academic_calendar_type.py:53
 msgid "Exam enrollments"
 msgstr ""
@@ -1707,7 +1710,7 @@ msgstr ""
 msgid "LU"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:201 tests/views/test_learning_unit.py:460
+#: forms/learning_unit/search_form.py:201 tests/views/test_learning_unit.py:462
 msgid "LU_ERRORS_INVALID_REGEX_SYNTAX"
 msgstr ""
 
@@ -1756,7 +1759,7 @@ msgstr ""
 #: templates/education_group/identification_mini_training_details.html:40
 #: templates/education_group/identification_training_details.html:97
 #: templates/learning_unit/external/read.html:58
-#: templates/learning_unit/identification.html:198 views/learning_unit.py:289
+#: templates/learning_unit/identification.html:198 views/learning_unit.py:306
 msgid "Learning location"
 msgstr ""
 
@@ -1985,7 +1988,7 @@ msgstr ""
 msgid "Mark selected messages as read"
 msgstr ""
 
-#: forms/education_groups_administrative_data.py:95
+#: forms/education_groups_administrative_data.py:96
 #: templates/education_group/tab_administrative_data.html:83
 msgid "Marks presentation"
 msgstr ""
@@ -2061,7 +2064,7 @@ msgstr ""
 msgid "Modification made"
 msgstr ""
 
-#: business/learning_units/perms.py:496
+#: business/learning_units/perms.py:494
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr ""
@@ -2069,6 +2072,8 @@ msgstr ""
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:90
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:93
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:75
+#: templatetags/education_group.py:222
+#: tests/templatetags/test_education_group.py:436
 msgid "Modify"
 msgstr ""
 
@@ -2193,7 +2198,7 @@ msgstr ""
 msgid "No enrollment for this learning unit"
 msgstr ""
 
-#: forms/prerequisite.py:109
+#: forms/prerequisite.py:110
 #: tests/views/education_groups/learning_unit/test_update.py:204
 #: tests/views/education_groups/learning_unit/test_update.py:208
 #, python-format
@@ -2314,7 +2319,7 @@ msgid "One of the partial volumes must have a value to 0."
 msgstr ""
 
 #: templatetags/education_group.py:216
-#: tests/templatetags/test_education_group.py:432 views/education_group.py:66
+#: tests/templatetags/test_education_group.py:432 views/education_group.py:67
 msgid ""
 "Only program managers of the education group OR central manager linked to "
 "entity can edit."
@@ -2891,7 +2896,7 @@ msgid "SQL command"
 msgstr ""
 
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:41
-#: templates/education_group/tab_edit_administrative_data.html:81
+#: templates/education_group/tab_edit_administrative_data.html:92
 #: templates/entity/blocks/educational_summary_calendar_widget.html:39
 msgid "Save"
 msgstr ""
@@ -2905,7 +2910,7 @@ msgstr ""
 msgid "School"
 msgstr ""
 
-#: forms/education_groups_administrative_data.py:107
+#: forms/education_groups_administrative_data.py:108
 #: templates/education_group/tab_administrative_data.html:113
 msgid "Scores diffusion"
 msgstr ""
@@ -3235,7 +3240,7 @@ msgstr ""
 msgid "The acronym <b>already exists</b>."
 msgstr ""
 
-#: views/education_group.py:91
+#: views/education_group.py:96
 msgid "The administrative data has been successfully modified"
 msgstr ""
 
@@ -3502,7 +3507,7 @@ msgid ""
 msgstr ""
 
 #: forms/utils/datefield.py:150
-#: tests/forms/test_education_groups_administrative_data.py:277
+#: tests/forms/test_education_groups_administrative_data.py:278
 msgid "The start date must be equals or lower than the end date"
 msgstr ""
 
@@ -3610,7 +3615,7 @@ msgstr ""
 msgid "This label %s does not exist"
 msgstr ""
 
-#: business/learning_units/perms.py:529
+#: business/learning_units/perms.py:526
 msgid "This learning unit is not eligible for proposal creation/modification"
 msgstr ""
 
@@ -3687,7 +3692,7 @@ msgstr ""
 msgid "To complete"
 msgstr ""
 
-#: tests/views/test_learning_unit.py:1215 views/learning_units/search.py:80
+#: tests/views/test_learning_unit.py:1217 views/learning_units/search.py:80
 msgid "Too many results! Please be more specific."
 msgstr ""
 
@@ -4097,7 +4102,7 @@ msgstr ""
 msgid "You can't modify learning unit of a previous year"
 msgstr ""
 
-#: business/learning_units/perms.py:494
+#: business/learning_units/perms.py:492
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
@@ -4260,7 +4265,7 @@ msgstr ""
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:45
 #: templates/education_group/organization_edit_inner.html:51
 #: templates/education_group/protect_delete_inner.html:24
-#: templates/education_group/tab_edit_administrative_data.html:85
+#: templates/education_group/tab_edit_administrative_data.html:96
 #: templates/learning_unit/achievement_edit.html:53
 #: templates/learning_unit/add_charge_repartition_inner.html:57
 #: templates/learning_unit/attribution_inner.html:66
