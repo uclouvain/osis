@@ -40,7 +40,6 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
 
     template_name = "learning_unit/identification.html"
 
-
     pk_url_kwarg = "learning_unit_year_id"
     context_object_name = "learning_unit_year"
 
