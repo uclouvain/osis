@@ -437,7 +437,7 @@ def link_pdf_content_education_group(url):
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=True)
-def dl_with_parent(context, key, obj=None, parent=None,  dl_title=None, class_dl="", default_value=None):
+def dl_with_parent(context, key, obj=None, parent=None,  dl_title="", class_dl="", default_value=None):
     """
     Tag to render <dl> for details of education_group.
     If the fetched value does not exist for the current education_group_year,
