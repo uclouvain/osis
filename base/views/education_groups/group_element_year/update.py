@@ -233,12 +233,12 @@ class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView)
     template_name = "education_group/group_element_year/confirm_detach.html"
 
     def delete(self, request, *args, **kwargs):
-        child = self.get_object().child
-        if luy_has_or_is_prerequisite(child):
-            raise PermissionDenied(_('You cannot detach a learning unit which has or is a prerequisite'))
+        child_leaf = self.get_object().child_leaf
+        if child_leaf and luy_has_or_is_prerequisite(child_leaf):
+            raise PermissionDenied
 
         success_msg = _("\"%(child)s\" has been detached from \"%(parent)s\"") % {
-            'child': child,
+            'child': self.get_object().child,
             'parent': self.get_object().parent,
         }
         display_success_messages(request, success_msg)

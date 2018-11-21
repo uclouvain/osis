@@ -107,10 +107,9 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
             child_branch=None,
             child_leaf=luy,
         )
-        url_detach = "{}?element_id={}&group_element_year_id={}".format(
+        url_detach = "{}?group_element_year_id={}".format(
             reverse('education_groups_management'),
-            luy.pk,
-            group_element_year.pk
+            group_element_year.pk,
         )
         result = button_with_permission(self.context, "title", "detach", url_detach)
         self.assertDictEqual(
