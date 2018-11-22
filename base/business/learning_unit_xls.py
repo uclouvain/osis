@@ -69,15 +69,15 @@ WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
 
 LEARNING_UNIT_TITLES_PART1 = [
-    str(_('code')),
+    str(_('Code')),
     str(_('Ac yr.')),
     str(_('Title')),
-    str(_('type')),
+    str(_('Type')),
     str(_('Subtype')),
     "{} ({})".format(_('Req. Entity'), _('fac. level')),
     str(_('Proposal type')),
     str(_('Proposal status')),
-    str(_('credits')),
+    str(_('Credits')),
     str(_('Alloc. Ent.')),
     str(_('Title in English')),
 ]
