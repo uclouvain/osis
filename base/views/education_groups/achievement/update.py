@@ -40,7 +40,7 @@ from base.views.common import display_error_messages
 from base.views.education_groups.achievement.common import EducationGroupAchievementMixin, \
     EducationGroupDetailedAchievementMixin
 from base.views.education_groups.achievement.detail import CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
-from base.views.mixins import AjaxTemplateMixin
+from base.views.mixins import AjaxTemplateMixin, RulesRequiredMixin
 from cms.enums import entity_name
 from cms.models import translated_text, text_label
 
@@ -76,10 +76,17 @@ class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementM
     pass
 
 
-class EducationGroupAchievementCMS(SuccessMessageMixin, AjaxTemplateMixin, FormView):
+class EducationGroupAchievementCMS(RulesRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, FormView):
     cms_text_label = None
     template_name = "education_group/blocks/modal/modal_pedagogy_edit.html"
+
+    # RulesRequiredMixin
+    raise_exception = True
     rules = [is_eligible_to_change_achievement]
+
+    def _call_rule(self, rule):
+        """ Rules will be call with the person and the education_group_year"""
+        return rule(self.request.user.person, self.education_group_year)
 
     @cached_property
     def education_group_year(self):
