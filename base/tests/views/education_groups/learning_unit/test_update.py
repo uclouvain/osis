@@ -213,7 +213,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.learning_unit_year_child.save()
 
         form_data = {
-            "prerequisite_string": self.learning_unit_year_child.acronym
+            "prerequisite_string": 'LDROI1200'
         }
         response = self.client.post(self.url, data=form_data)
         errors_prerequisite_string = response.context_data.get('form').errors.get('prerequisite_string')
