@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from html.parser import HTMLParser
+
+import html as HTML
 
 from bs4 import BeautifulSoup
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import html
-import html as HTML
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_unit import XLS_DESCRIPTION, XLS_FILENAME
