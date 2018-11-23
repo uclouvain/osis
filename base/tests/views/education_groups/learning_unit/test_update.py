@@ -207,3 +207,21 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
             str(errors_prerequisite_string[1]),
             _("No match has been found for this learning unit :  %(acronym)s") % {'acronym': 'LZZZ6789'}
         )
+
+    def test_post_data_prerequisite_to_itself_error(self):
+        self.learning_unit_year_child.acronym = 'LDROI1200'
+        self.learning_unit_year_child.save()
+
+        form_data = {
+            "prerequisite_string": 'LDROI1200'
+        }
+        response = self.client.post(self.url, data=form_data)
+        errors_prerequisite_string = response.context_data.get('form').errors.get('prerequisite_string')
+        self.assertEqual(
+            len(errors_prerequisite_string),
+            1
+        )
+        self.assertEqual(
+            str(errors_prerequisite_string[0]),
+            _("A learning unit cannot be prerequisite to itself : %(acronym)s") % {'acronym': 'LDROI1200'}
+        )
