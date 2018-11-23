@@ -2658,10 +2658,9 @@ msgstr "Ph.D"
 msgid "Planned classes"
 msgstr "Classes prévues"
 
-# TODO
 #: models/enums/entity_type.py:45
 msgid "Platform"
-msgstr "%d/%m/%Y"
+msgstr "Plateforme"
 
 #: tests/views/education_groups/test_update.py:573
 #: views/education_groups/group_element_year/update.py:152

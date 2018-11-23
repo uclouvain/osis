@@ -23,20 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import django_filters
-from django.forms import TextInput
-from django.utils.translation import ugettext_lazy as _
-
-from base.models.entity_version import EntityVersion
+from rest_framework.pagination import LimitOffsetPagination
 
 
-class EntityVersionFilter(django_filters.FilterSet):
-    acronym = django_filters.CharFilter(
-        lookup_expr='icontains', label=_("Acronym"),
-        widget=TextInput(attrs={'style': "text-transform:uppercase"})
-    )
-    title = django_filters.CharFilter(lookup_expr='icontains', label=_("Title"), )
-
-    class Meta:
-        model = EntityVersion
-        fields = ["entity_type"]
+class LimitOffsetPaginationWithUpperBound(LimitOffsetPagination):
+    max_limit = 100
