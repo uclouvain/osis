@@ -41,7 +41,7 @@ class OfferYearCalendarAdmin(OsisModelAdmin):
 
 
 class OfferYearCalendar(AbstractCalendar):
-    offer_year = models.ForeignKey('OfferYear')
+    offer_year = models.ForeignKey('OfferYear', blank=True, null=True)
     education_group_year = models.ForeignKey('EducationGroupYear', blank=True, null=True)
 
     class Meta:
@@ -130,3 +130,8 @@ def search(**kwargs):
         queryset = queryset.filter(offer_year=kwargs['offer_year'])
 
     return queryset
+
+
+def create_offer_year_calendar(education_group_yr, academic_calendar):
+    return OfferYearCalendar(education_group_year=education_group_yr,
+                             academic_calendar=academic_calendar)

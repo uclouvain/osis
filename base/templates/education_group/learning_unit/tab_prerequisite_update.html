@@ -36,7 +36,7 @@
 
             <form method="post" id="UpdatePrerequisite">
                 {% csrf_token %}
-                {% bootstrap_field form.prerequisite form_group_class="col-md-6" show_label=False %}
+                {% bootstrap_field form.prerequisite_string form_group_class="col-md-6" show_label=False %}
 
                 {% trans 'Save' as text_btn_submit %}
                 {% bootstrap_button text_btn_submit button_type="submit" button_class="btn-primary" %}

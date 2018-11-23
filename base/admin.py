@@ -175,6 +175,9 @@ admin.site.register(person_entity.PersonEntity,
 admin.site.register(prerequisite.Prerequisite,
                     prerequisite.PrerequisiteAdmin)
 
+admin.site.register(prerequisite_item.PrerequisiteItem,
+                    prerequisite_item.PrerequisiteItemAdmin)
+
 admin.site.register(program_manager.ProgramManager,
                     program_manager.ProgramManagerAdmin)
 
