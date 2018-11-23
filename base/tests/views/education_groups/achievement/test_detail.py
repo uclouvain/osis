@@ -32,7 +32,7 @@ from base.tests.factories.education_group_achievement import EducationGroupAchie
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
-from base.views.education_groups.achievement.detail import CMS_LABEL_CERTIFICAT_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
+from base.views.education_groups.achievement.detail import CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
 from cms.enums import entity_name
 from cms.tests.factories.translated_text import TranslatedTextFactory
 
@@ -68,13 +68,13 @@ class TestEducationGroupSkillsAchievements(TestCase):
         certificate_aim_french = TranslatedTextFactory(
             entity=entity_name.OFFER_YEAR,
             reference=self.education_group_year.id,
-            text_label__label=CMS_LABEL_CERTIFICAT_AIM,
+            text_label__label=CMS_LABEL_PROGRAM_AIM,
             language=settings.LANGUAGE_CODE_FR,
         )
         certificate_aim_english = TranslatedTextFactory(
             entity=entity_name.OFFER_YEAR,
             reference=self.education_group_year.id,
-            text_label__label=CMS_LABEL_CERTIFICAT_AIM,
+            text_label__label=CMS_LABEL_PROGRAM_AIM,
             language=settings.LANGUAGE_CODE_EN,
         )
         response = self._call_url_as_http_get()
