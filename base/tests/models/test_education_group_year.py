@@ -89,8 +89,9 @@ class EducationGroupYearTest(TestCase):
                                                             child_branch=self.education_group_year_1)
 
     def test_verbose_credit(self):
-        verbose__waiting = _("%(title)s (%(credits)s credits)") % {"title": self.education_group_year_1.title,
-                                                                   "credits": self.education_group_year_1.credits}
+        verbose__waiting = "{} ({} {})".format(
+            self.education_group_year_1.title, self.education_group_year_1.credits, _("credits")
+        )
         self.assertEqual(self.education_group_year_1.verbose_credit, verbose__waiting)
 
     def test_find_by_id(self):
@@ -194,13 +195,20 @@ class EducationGroupYearTest(TestCase):
 
 
 class EducationGroupYearCleanTest(TestCase):
-    def test_clean_constraint(self):
-
+    def test_clean_constraint_both_value_set_case_no_errors(self):
         e = EducationGroupYearFactory(min_constraint=12, max_constraint=20, constraint_type=CREDITS)
         try:
             e.clean()
         except ValidationError:
             self.fail()
+
+    def test_clean_constraint_only_one_value_set_case_no_errors(self):
+        e = EducationGroupYearFactory(min_constraint=12, max_constraint=None, constraint_type=CREDITS)
+        e.clean()
+
+        e.min_constraint = None
+        e.max_constraint = 12
+        e.clean()
 
     def test_clean_no_constraint_type(self):
         e = EducationGroupYearFactory(min_constraint=12, max_constraint=20, constraint_type=None)

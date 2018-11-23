@@ -26,12 +26,13 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from ordered_model.models import OrderedModel
+from reversion.admin import VersionAdmin
 
 from base.models.abstracts.abstract_education_group_achievement import AbstractEducationGroupAchievement, \
     AbstractEducationGroupAchievementAdmin
 
 
-class EducationGroupDetailedAchievementAdmin(AbstractEducationGroupAchievementAdmin):
+class EducationGroupDetailedAchievementAdmin(VersionAdmin, AbstractEducationGroupAchievementAdmin):
     raw_id_fields = ('education_group_achievement',)
 
     def get_list_display(self, request):
@@ -44,14 +45,14 @@ class EducationGroupDetailedAchievementAdmin(AbstractEducationGroupAchievementAd
 class EducationGroupDetailedAchievement(AbstractEducationGroupAchievement):
     education_group_achievement = models.ForeignKey(
         'EducationGroupAchievement',
-        verbose_name=_("education group achievement"),
+        verbose_name=_("Education group achievement"),
         on_delete=models.CASCADE,
     )
     order_with_respect_to = ('education_group_achievement',)
 
     class Meta(OrderedModel.Meta):
         unique_together = ("code_name", "education_group_achievement")
-        verbose_name = _("education group detailed achievement")
+        verbose_name = _("Education group detailed achievement")
 
     def __str__(self):
         return u'{} - {} (order {})'.format(self.education_group_achievement, self.code_name, self.order)

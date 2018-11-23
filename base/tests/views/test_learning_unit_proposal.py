@@ -55,8 +55,8 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.person import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories import academic_year as academic_year_factory, campus as campus_factory, \
     organization as organization_factory
-from base.tests.factories.academic_year import AcademicYearFakerFactory, create_current_academic_year, get_current_year, \
-    AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFakerFactory, create_current_academic_year, \
+    get_current_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
@@ -73,7 +73,6 @@ from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
-from base.views.learning_units.detail import learning_unit_identification
 from base.views.learning_units.proposal.update import update_learning_unit_proposal, \
     learning_unit_modification_proposal, \
     learning_unit_suppression_proposal
@@ -81,7 +80,7 @@ from base.views.learning_units.search import PROPOSAL_SEARCH, learning_units_pro
     ACTION_BACK_TO_INITIAL, ACTION_FORCE_STATE
 from reference.tests.factories.language import LanguageFactory
 
-LABEL_VALUE_BEFORE_PROPOSAL = _('value_before_proposal')
+LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
 
 
 @override_flag('learning_unit_proposal_update', active=True)
@@ -242,7 +241,7 @@ class TestLearningUnitModificationProposal(TestCase):
     def test_post_request(self):
         response = self.client.post(self.url, data=self.form_data)
 
-        redirected_url = reverse(learning_unit_identification, args=[self.learning_unit_year.id])
+        redirected_url = reverse("learning_unit", args=[self.learning_unit_year.id])
         self.assertRedirects(response, redirected_url, fetch_redirect_response=False)
 
         a_proposal_learning_unit = proposal_learning_unit.find_by_learning_unit_year(self.learning_unit_year)
@@ -251,7 +250,7 @@ class TestLearningUnitModificationProposal(TestCase):
 
         messages_list = [str(message) for message in get_messages(response.wsgi_request)]
         self.assertIn(
-            _("success_modification_proposal").format(
+            _("You proposed a modification of type {} for the learning unit {}.").format(
                 _(proposal_type.ProposalType.MODIFICATION.name),
                 self.learning_unit_year.acronym),
             list(messages_list))
@@ -493,7 +492,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
     def test_post_request(self):
         response = self.client.post(self.url, data=self.form_data)
 
-        redirected_url = reverse(learning_unit_identification, args=[self.learning_unit_year.id])
+        redirected_url = reverse("learning_unit", args=[self.learning_unit_year.id])
         self.assertRedirects(response, redirected_url, fetch_redirect_response=False)
 
         a_proposal_learning_unit = proposal_learning_unit.find_by_learning_unit_year(self.learning_unit_year)
@@ -501,9 +500,12 @@ class TestLearningUnitSuppressionProposal(TestCase):
         self.assertEqual(a_proposal_learning_unit.author, self.person)
 
         messages = [str(message) for message in get_messages(response.wsgi_request)]
-        self.assertIn(_("success_modification_proposal").format(_(proposal_type.ProposalType.SUPPRESSION.name),
-                                                                self.learning_unit_year.acronym),
-                      list(messages))
+        self.assertIn(
+            _("You proposed a modification of type {} for the learning unit {}.").format(
+                _(proposal_type.ProposalType.SUPPRESSION.name),
+                self.learning_unit_year.acronym),
+            list(messages)
+        )
 
         self.learning_unit.refresh_from_db()
         self.assertEqual(self.learning_unit.end_year, self.next_academic_year.year)
@@ -551,7 +553,7 @@ class TestLearningUnitProposalSearch(TestCase):
     def test_has_mininum_of_one_criteria(self):
         form = LearningUnitProposalForm({"non_existing_field": 'nothing_interestings'})
         self.assertFalse(form.is_valid(), form.errors)
-        self.assertIn(_("minimum_one_criteria"), form.errors['__all__'])
+        self.assertIn(_("Please choose at least one criteria!"), form.errors['__all__'])
 
 
 class TestGroupActionsOnProposals(TestCase):
@@ -937,7 +939,7 @@ class TestEditProposal(TestCase):
         self.assertEqual(len(msg), 1)
 
         self.proposal.refresh_from_db()
-        self.assertEqual(self.proposal.state, ProposalState.FACULTY.value)
+        self.assertEqual(self.proposal.state, 'FACULTY')
 
     @mock.patch('base.views.layout.render')
     def test_edit_proposal_post_wrong_data(self, mock_render):

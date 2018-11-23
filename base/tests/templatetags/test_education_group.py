@@ -25,6 +25,7 @@
 ##############################################################################
 from datetime import timedelta
 
+from django.core.exceptions import FieldDoesNotExist
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.utils import timezone
@@ -46,18 +47,6 @@ from base.tests.factories.person_entity import PersonEntityFactory
 DELETE_MSG = _("delete education group")
 PERMISSION_DENIED_MSG = _("The education group edition period is not open.")
 UNAUTHORIZED_TYPE_MSG = "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
-
-DISABLED_LI = """
-<li class="disabled" id="{}">
-    <a href="#" data-toggle="tooltip" title="{}">{}</a>
-</li>
-"""
-
-ENABLED_LI = """
-<li class="" id="{}">
-    <a href="{}" data-toggle="tooltip" title="">{}</a>
-</li>
-"""
 
 CUSTOM_LI_TEMPLATE = """
     <li {li_attributes}>
@@ -249,7 +238,8 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         result = link_detach_education_group(self.context, "#")
         expected_result = CUSTOM_LI_TEMPLATE.format(
             li_attributes=""" class="disabled" """,
-            a_attributes=""" title=" {}" """.format(_("It is not possible to detach the root element.")),
+            a_attributes=""" title=" {}" """.format(
+                _("It is not possible to %(action)s the root element.") % {"action": _("Detach").lower()}),
             text=_('Detach'),
         )
         self.assertHTMLEqual(result, expected_result)
@@ -266,6 +256,7 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
             ),
             text=_('Detach'),
         )
+        self.maxDiff = None
         self.assertHTMLEqual(result, expected_result)
 
     def test_tag_link_pdf_content_education_group_not_permitted(self):
@@ -274,7 +265,7 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
             li_attributes=""" id="btn_operation_pdf_content" """,
             a_attributes=""" href="#" title="{}" {} """.format(
                 _("Generate pdf"),
-                _(""), ),
+                "", ),
             text=_('Generate pdf'),
         )
         self.assertEqual(
@@ -443,7 +434,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         )
 
         self.assertEqual(result["is_disabled"], "disabled")
-        self.assertEqual(result["text"], _("edit"))
+        self.assertEqual(result["text"], _("Modify"))
 
 
 class TestEducationGroupDlWithParent(TestCase):
@@ -458,14 +449,14 @@ class TestEducationGroupDlWithParent(TestCase):
     def test_dl_value_in_education_group(self):
         response = dl_with_parent(self.context, "acronym")
         self.assertEqual(response["value"], self.education_group_year.acronym)
-        self.assertEqual(response["label"], _("acronym"))
+        self.assertEqual(response["label"], _("Acronym"))
         self.assertEqual(response["parent_value"], None)
 
     def test_dl_value_in_parent(self):
         self.education_group_year.acronym = ""
         response = dl_with_parent(self.context, "acronym")
         self.assertEqual(response["value"], "")
-        self.assertEqual(response["label"], _("acronym"))
+        self.assertEqual(response["label"], _("Acronym"))
         self.assertEqual(response["parent_value"], self.parent.acronym)
 
     def test_dl_default_value(self):
@@ -474,7 +465,7 @@ class TestEducationGroupDlWithParent(TestCase):
         response = dl_with_parent(self.context, "acronym", default_value="avada kedavra")
 
         self.assertEqual(response["value"], "")
-        self.assertEqual(response["label"], _("acronym"))
+        self.assertEqual(response["label"], _("Acronym"))
         self.assertEqual(response["parent_value"], "")
         self.assertEqual(response["default_value"], "avada kedavra")
 
@@ -497,6 +488,5 @@ class TestEducationGroupDlWithParent(TestCase):
 
     def test_dl_invalid_key(self):
         self.education_group_year.partial_deliberation = False
-        response = dl_with_parent(self.context, "partial_deliberation", "not_a_real_attr")
-        self.assertEqual(response["value"], None)
-        self.assertEqual(response["parent_value"], None)
+        with self.assertRaises(FieldDoesNotExist):
+            response = dl_with_parent(self.context, "not_a_real_attr")

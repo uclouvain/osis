@@ -25,6 +25,7 @@
 ##############################################################################
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from attribution.models.attribution_new import AttributionNew
 from base.business.learning_container_year import get_learning_container_year_warnings
@@ -36,7 +37,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 FIELDS_FOR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant']
 
 
-class LearningContainerYearAdmin(SerializableModelAdmin):
+class LearningContainerYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('learning_container', 'academic_year', 'container_type', 'acronym', 'common_title')
     search_fields = ['acronym']
     list_filter = ('academic_year', 'in_charge', 'is_vacant',)
@@ -46,17 +47,21 @@ class LearningContainerYear(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey('AcademicYear')
     learning_container = models.ForeignKey('LearningContainer')
-    container_type = models.CharField(max_length=20, verbose_name=_('type'),
-                                      choices=learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES)
-    common_title = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('common_title'))
+
+    container_type = models.CharField(
+        max_length=20, verbose_name=_('Type'),
+        choices=learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES
+    )
+
+    common_title = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('Common title'))
     common_title_english = models.CharField(max_length=250, blank=True, null=True,
-                                            verbose_name=_('common_english_title'))
+                                            verbose_name=_('Common English title'))
     acronym = models.CharField(max_length=10)
     changed = models.DateTimeField(null=True, auto_now=True)
-    team = models.BooleanField(default=False, verbose_name=_('team_management'))
-    is_vacant = models.BooleanField(default=False,  verbose_name=_('vacant'))
+    team = models.BooleanField(default=False, verbose_name=_('Team management'))
+    is_vacant = models.BooleanField(default=False,  verbose_name=_('Vacant'))
     type_declaration_vacant = models.CharField(max_length=100, blank=True, null=True,
-                                               verbose_name=_('type_declaration_vacant'),
+                                               verbose_name=_('Decision'),
                                                choices=vacant_declaration_type.DECLARATION_TYPE)
     in_charge = models.BooleanField(default=False)
 

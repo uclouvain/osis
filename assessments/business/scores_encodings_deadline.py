@@ -115,7 +115,8 @@ def _find_by_reference(off_year_calendar, reference):
         result = _get_oyc_by_reference(off_year_calendar, reference)
     if not result:
         msg = "No OfferYearCalendar '{}' found for offerYear = {}"
-        logger.warning(msg.format(ac_type.DELIBERATION, off_year_calendar.offer_year.acronym))
+        if off_year_calendar.offer_year:
+            logger.warning(msg.format(ac_type.DELIBERATION, off_year_calendar.offer_year.acronym))
     return result
 
 

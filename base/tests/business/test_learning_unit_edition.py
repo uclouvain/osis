@@ -423,7 +423,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
             edit_learning_unit_end_date(learning_unit_full_annual, academic_year_of_new_end_date)
 
         self.assertEqual(str(context.exception),
-                         _('partim_greater_than_parent') % {
+                         _('The learning unit %(learning_unit)s has a partim %(partim)s with'
+                           ' an end year greater than %(year)s') % {
                              'learning_unit': learning_unit_full_annual.acronym,
                              'partim': list_partims[1].acronym,
                              'year': academic_year_of_new_end_date}
@@ -452,7 +453,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
             edit_learning_unit_end_date(learning_unit_full_annual, academic_year_of_new_end_date)
 
         self.assertEqual(str(context.exception),
-                         _('partim_greater_than_parent') % {
+                         _('The learning unit %(learning_unit)s has a partim %(partim)s with'
+                           ' an end year greater than %(year)s') % {
                              'learning_unit': learning_unit_full_annual.acronym,
                              'partim': list_partims[1].acronym,
                              'year': academic_year_of_new_end_date}
@@ -481,7 +483,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
             edit_learning_unit_end_date(learning_unit_full_annual, academic_year_of_new_end_date)
 
         self.assertEqual(str(context.exception),
-                         _('partim_greater_than_parent') % {
+                         _('The learning unit %(learning_unit)s has a partim %(partim)s '
+                           'with an end year greater than %(year)s') % {
                              'learning_unit': learning_unit_full_annual.acronym,
                              'partim': list_partims[1].acronym,
                              'year': academic_year_of_new_end_date}
@@ -528,7 +531,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
             edit_learning_unit_end_date(learning_unit_partim_annual, None)
 
         self.assertEqual(str(context.exception),
-                         _('parent_greater_than_partim') % {
+                         _('The selected end year (%(partim_end_year)s) is greater '
+                           'than the end year of the parent %(lu_parent)s') % {
                              'partim_end_year': academic_year.find_academic_year_by_year(max_end_year + 1),
                              'lu_parent': learning_unit_full_annual.acronym
                          })
@@ -648,7 +652,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         with self.assertRaises(IntegrityError) as e:
             self._edit_lu(learning_unit_full_annual, excepted_end_year)
 
-        self.assertEqual(str(e.exception), _('Entity_not_exist') % {
+        self.assertEqual(str(e.exception), _('The entity %(entity_acronym)s does not exist for '
+                                             'the selected academic year %(academic_year)s') % {
             'entity_acronym': self.entity_version.acronym,
             'academic_year': academic_year.find_academic_year_by_year(end_year_full + 1)
         })
@@ -823,16 +828,17 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
         self.other_campus = CampusFactory()
 
     def test_with_no_fields_to_update(self):
-        old_luy_values = model_to_dict(self.learning_unit_year)
+        old_luy_values = model_to_dict(self.learning_unit_year, exclude="learning_component_years")
         old_lc_values = model_to_dict(self.learning_container_year)
 
         update_learning_unit_year_with_report(self.learning_unit_year, {}, {})
 
         self.learning_unit_year.refresh_from_db()
         self.learning_container_year.refresh_from_db()
-        new_luy_values = model_to_dict(self.learning_unit_year)
+        new_luy_values = model_to_dict(self.learning_unit_year, exclude="learning_component_years")
         new_lc_values = model_to_dict(self.learning_container_year)
 
+        self.maxDiff = None
         self.assertDictEqual(old_luy_values, new_luy_values)
         self.assertDictEqual(old_lc_values, new_lc_values)
 
@@ -906,7 +912,7 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
         update_learning_unit_year_with_report(learning_unit_years[1], fields_to_update, {},
                                               override_postponement_consistency=True)
 
-        self.assert_fields_not_updated(learning_unit_years[0])
+        self.assert_fields_not_updated(learning_unit_years[0], exclude="learning_component_years")
         self.assert_fields_not_updated(learning_unit_years[0].learning_container_year)
 
         for index, luy in enumerate(learning_unit_years[1:]):
@@ -949,7 +955,8 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
         fields_to_update.update(learning_unit_year_fields_to_update)
         fields_to_update.update(learning_container_year_fields_to_update)
 
-        error_msg = _('learning_unit_in_proposal_cannot_save') % {
+        error_msg = _("The learning unit %(luy)s is in proposal, can not"
+                      " save the change from the year %(academic_year)s") % {
             'luy': luy_in_proposal.acronym,
             'academic_year': luy_in_proposal.academic_year
         }
@@ -994,7 +1001,7 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
                                    learning_container_year_fields_to_update)
 
         for luy in learning_unit_years[1:]:
-            self.assert_fields_not_updated(luy)
+            self.assert_fields_not_updated(luy, exclude="learning_component_years")
             self.assert_fields_not_updated(luy.learning_container_year)
 
     def assert_fields_updated(self, instance, fields_value, exclude=None):
@@ -1006,11 +1013,14 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
         fields_value_without_excluded = {field: value for field, value in fields_value.items() if field not in exclude}
         self.assertDictEqual(fields_value_without_excluded, instance_values)
 
-    def assert_fields_not_updated(self, instance, fields=None):
-        past_instance_values = model_to_dict(instance, fields=fields)
+    def assert_fields_not_updated(self, instance, fields=None, exclude=None):
+
+        past_instance_values = model_to_dict(instance, fields, exclude)
 
         instance.refresh_from_db()
-        new_instance_values = model_to_dict(instance, fields=fields)
+        new_instance_values = model_to_dict(instance, fields, exclude)
+        self.maxDiff = None
+
         self.assertDictEqual(past_instance_values, new_instance_values)
 
 

@@ -44,6 +44,7 @@ from base.models.person import is_person_linked_to_entity_in_charge_of_learning_
 from osis_common.utils.datetime import get_tzinfo, convert_date_to_datetime
 from osis_common.utils.perms import conjunction, disjunction, negation, BasePerm
 from django.core.exceptions import PermissionDenied
+from django.conf import settings
 
 FACULTY_UPDATABLE_CONTAINER_TYPES = (learning_container_year_types.COURSE,
                                      learning_container_year_types.DISSERTATION,
@@ -51,31 +52,30 @@ FACULTY_UPDATABLE_CONTAINER_TYPES = (learning_container_year_types.COURSE,
 
 PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name,
                                           ProposalState.REFUSED.name)
-YEAR_LIMIT_LUE_MODIFICATION = 2018
 
-MSG_EXISTING_PROPOSAL_IN_EPC = "Existing proposal in epc"
-MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE = "You are not eligible to modify the end date of this learning unit. You should " \
-                                     "be central manager or the learning unit has to be a partim or the learning unit" \
-                                     " as to be a course/dissertation/internship"
-MSG_CANNOT_MODIFY_ON_PREVIOUS_ACADEMIC_YR = "You can't modify learning unit of a previous year"
-MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY = "You can only modify a learning unit when your are linked to its requirement " \
-                                      "entity"
-MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE = "Person not in accordance with proposal state"
-MSG_NOT_PROPOSAL_STATE_FACULTY = "You are faculty manager and the proposal state is not 'Faculty', so you can't edit"
-MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL = "You are not eligible to cancel proposal"
-MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL = "You are not eligible to edit proposal"
-MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY = "You are not attached to initial or current requirement entity, so you " \
-                                          "can't edit proposal"
-MSG_NOT_GOOD_RANGE_OF_YEARS = "Not in range of years which can be edited by you"
-MSG_NOT_ELIGIBLE_TO_CONSOLIDATE_PROPOSAL = "You are not eligible to consolidate proposal"
-MSG_NO_RIGHTS_TO_CONSOLIDATE = "You dont' have the rights to consolidate"
-MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES = "Proposal not in eligible state for consolidation"
-MSG_CAN_DELETE_ACCORDING_TO_TYPE = "Can delete according to the type of the learning unit"
-MSG_NOT_ELIGIBLE_TO_DELETE_LU = "Not eligible to delete learning units"
-MSG_NOT_ELIGIBLE_TO_CREATE_MODIFY_PROPOSAL = "You are not eligible to create/modify proposal"
-MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR = "You can't modify proposal which is on an other year"
-MSG_NOT_ELIGIBLE_FOR_MODIFICATION_BECAUSE_OF_TYPE = "This learning unit isn't eligible for modification because of " \
-                                                    "it's type"
+MSG_EXISTING_PROPOSAL_IN_EPC = _("Existing proposal in epc")
+MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE = _("You are not eligible to modify the end date of this learning unit. You should "
+                                       "be central manager or the learning unit has to be a partim or the learning unit"
+                                       " as to be a course/dissertation/internship")
+MSG_CANNOT_MODIFY_ON_PREVIOUS_ACADEMIC_YR = _("You can't modify learning unit of a previous year")
+MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY = _("You can only modify a learning unit when your are linked to its requirement "
+                                        "entity")
+MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE = _("Person not in accordance with proposal state")
+MSG_NOT_PROPOSAL_STATE_FACULTY = _("You are faculty manager and the proposal state is not 'Faculty', so you can't edit")
+MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL = _("You are not eligible to cancel proposal")
+MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL = _("You are not eligible to edit proposal")
+MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY = _("You are not attached to initial or current requirement entity, so you "
+                                            "can't edit proposal")
+MSG_NOT_GOOD_RANGE_OF_YEARS = _("Not in range of years which can be edited by you")
+MSG_NOT_ELIGIBLE_TO_CONSOLIDATE_PROPOSAL = _("You are not eligible to consolidate proposal")
+MSG_NO_RIGHTS_TO_CONSOLIDATE = _("You don't have the rights to consolidate")
+MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES = _("Proposal not in eligible state for consolidation")
+MSG_CAN_DELETE_ACCORDING_TO_TYPE = _("Can delete according to the type of the learning unit")
+MSG_NOT_ELIGIBLE_TO_DELETE_LU = _("Not eligible to delete learning units")
+MSG_NOT_ELIGIBLE_TO_CREATE_MODIFY_PROPOSAL = _("You are not eligible to create/modify proposal")
+MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR = _("You can't modify proposal which is on an other year")
+MSG_NOT_ELIGIBLE_FOR_MODIFICATION_BECAUSE_OF_TYPE = _("This learning unit isn't eligible for modification because of "
+                                                      "it's type")
 
 
 def _any_existing_proposal_in_epc(learning_unit_year, _, raise_exception=False):
@@ -487,16 +487,22 @@ class can_learning_unit_year_educational_information_be_udpated(BasePerm):
 
 
 def is_year_editable(learning_unit_year, person, raise_exception):
-    result = learning_unit_year.academic_year.year >= YEAR_LIMIT_LUE_MODIFICATION
+    result = learning_unit_year.academic_year.year >= settings.YEAR_LIMIT_LUE_MODIFICATION
+    msg = "{}.  {}".format(
+        _("You can't modify learning unit under year : %(year)d") %
+        {"year": settings.YEAR_LIMIT_LUE_MODIFICATION},
+        _("Modifications should be made in EPC for year %(year)d") %
+        {"year": learning_unit_year.academic_year.year},
+    )
     can_raise_exception(raise_exception,
                         result,
-                        "You can't modify learning unit under year : %(year)d" % {"year": YEAR_LIMIT_LUE_MODIFICATION})
+                        msg)
     return result
 
 
 def can_raise_exception(raise_exception, result, msg):
     if raise_exception and not result:
-        raise PermissionDenied(_(msg))
+        raise PermissionDenied(msg)
 
 
 def is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise_exception=False):
@@ -517,7 +523,7 @@ def is_not_container_type_course_dissertation_or_internship(learning_unit_year, 
     can_raise_exception(
         raise_exception,
         result,
-        "This learning unit is not eligible for proposal creation/modification"
+        _("This learning unit is not eligible for proposal creation/modification")
     )
     return result
 

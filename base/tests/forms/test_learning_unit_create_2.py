@@ -45,12 +45,10 @@ from base.models.enums import learning_unit_year_subtypes, learning_container_ye
     learning_unit_year_periodicity
 from base.models.enums.entity_container_year_link_type import ADDITIONAL_REQUIREMENT_ENTITY_1, \
     ADDITIONAL_REQUIREMENT_ENTITY_2
-from base.models.enums.entity_type import FACULTY
 from base.models.enums.internship_subtypes import TEACHING_INTERNSHIP
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
-from base.models.enums.learning_container_year_types import MASTER_THESIS, INTERNSHIP
+from base.models.enums.learning_container_year_types import INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import ANNUAL
-from base.models.enums.organization_type import MAIN
 from base.models.enums.person_source_type import DISSERTATION
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container import LearningContainer
@@ -453,7 +451,9 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
         self.assertFalse(form.is_valid(), form.errors)
         self.assertEqual(
             form.errors[0]['credits'],
-            [_('Ensure this value is less than or equal to {max_value}.').format(max_value=MAXIMUM_CREDITS)]
+            [_('Ensure this value is less than or equal to %(limit_value)s.') % {
+                'limit_value': MAXIMUM_CREDITS
+            }]
         )
 
     def test_update_case_credits_too_high_4_digits(self):
@@ -465,7 +465,9 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
         self.assertFalse(form.is_valid(), form.errors)
         self.assertEqual(
             form.errors[0]['credits'],
-            [_('Ensure this value is less than or equal to {max_value}.').format(max_value=MAXIMUM_CREDITS)]
+            [_('Ensure this value is less than or equal to %(limit_value)s.') % {
+                'limit_value': MAXIMUM_CREDITS
+            }]
         )
 
 

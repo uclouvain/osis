@@ -28,12 +28,14 @@ import json
 from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from base.models.prerequisite import Prerequisite
+from base.models.prerequisite_item import get_prerequisite_string_representation
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 
@@ -96,19 +98,112 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
             self.education_group_year_parents[0].verbose
         )
 
-    def test_post_data(self):
+    def test_post_data_simple_prerequisite(self):
+        LearningUnitYearFactory(acronym='LSINF1111')
+
         form_data = {
-            "prerequisite": "LSINF1111"
+            "prerequisite_string": "LSINF1111"
         }
         response = self.client.post(self.url, data=form_data)
 
-        redirect_url = reverse("learning_unit_prerequisite",
-                               args=[self.education_group_year_parents[0].id, self.learning_unit_year_child.id])
+        redirect_url = reverse(
+            "learning_unit_prerequisite",
+            args=[self.education_group_year_parents[0].id, self.learning_unit_year_child.id]
+        )
         self.assertRedirects(response, redirect_url)
 
-        self.assertTrue(
-            Prerequisite.objects.get(learning_unit_year=self.learning_unit_year_child.id,
-                                     education_group_year=self.education_group_year_parents[0].id,
-                                     prerequisite="LSINF1111")
+        prerequisite = Prerequisite.objects.get(
+            learning_unit_year=self.learning_unit_year_child.id,
+            education_group_year=self.education_group_year_parents[0].id,
         )
 
+        self.assertTrue(prerequisite)
+        self.assertEqual(
+            get_prerequisite_string_representation(prerequisite),
+            'LSINF1111'
+        )
+
+    def test_post_data_complex_prerequisite_AND(self):
+        LearningUnitYearFactory(acronym='LSINF1111')
+        LearningUnitYearFactory(acronym='LDROI1200')
+        LearningUnitYearFactory(acronym='LEDPH1200')
+
+        form_data = {
+            "prerequisite_string": "LSINF1111 ET (LDROI1200 OU LEDPH1200)"
+        }
+        self.client.post(self.url, data=form_data)
+
+        prerequisite = Prerequisite.objects.get(
+            learning_unit_year=self.learning_unit_year_child.id,
+            education_group_year=self.education_group_year_parents[0].id,
+        )
+
+        self.assertTrue(prerequisite)
+        self.assertEqual(
+            get_prerequisite_string_representation(prerequisite),
+            'LSINF1111 ET (LDROI1200 OU LEDPH1200)'
+        )
+
+    def test_post_data_complex_prerequisite_OR(self):
+        LearningUnitYearFactory(acronym='LSINF1111')
+        LearningUnitYearFactory(acronym='LDROI1200')
+        LearningUnitYearFactory(acronym='LEDPH1200')
+
+        form_data = {
+            "prerequisite_string": "(LSINF1111 ET LDROI1200) OU LEDPH1200"
+        }
+        self.client.post(self.url, data=form_data)
+
+        prerequisite = Prerequisite.objects.get(
+            learning_unit_year=self.learning_unit_year_child.id,
+            education_group_year=self.education_group_year_parents[0].id,
+        )
+
+        self.assertTrue(prerequisite)
+        self.assertEqual(
+            get_prerequisite_string_representation(prerequisite),
+            '(LSINF1111 ET LDROI1200) OU LEDPH1200'
+        )
+
+    def test_post_data_prerequisite_accept_duplicates(self):
+        LearningUnitYearFactory(acronym='LDROI1200')
+        LearningUnitYearFactory(acronym='LEDPH1200')
+
+        form_data = {
+            "prerequisite_string": "(LDROI1200 ET LEDPH1200) OU LDROI1200"
+        }
+        self.client.post(self.url, data=form_data)
+
+        prerequisite = Prerequisite.objects.get(
+            learning_unit_year=self.learning_unit_year_child.id,
+            education_group_year=self.education_group_year_parents[0].id,
+        )
+
+        self.assertTrue(prerequisite)
+        self.assertEqual(
+            get_prerequisite_string_representation(prerequisite),
+            '(LDROI1200 ET LEDPH1200) OU LDROI1200'
+        )
+
+    def test_post_data_prerequisite_learning_units_not_found(self):
+        LearningUnitYearFactory(acronym='LDROI1200')
+        LearningUnitYearFactory(acronym='LEDPH1200')
+        LearningUnitYearFactory(acronym='LSINF1111')
+
+        form_data = {
+            "prerequisite_string": "(LDROI1200 ET LEDPH1200) OU LZZZ9876 OU (LZZZ6789 ET LSINF1111)"
+        }
+        response = self.client.post(self.url, data=form_data)
+        errors_prerequisite_string = response.context_data.get('form').errors.get('prerequisite_string')
+        self.assertEqual(
+            len(errors_prerequisite_string),
+            2
+        )
+        self.assertEqual(
+            str(errors_prerequisite_string[0]),
+            _("No match has been found for this learning unit :  %(acronym)s") % {'acronym': 'LZZZ9876'}
+        )
+        self.assertEqual(
+            str(errors_prerequisite_string[1]),
+            _("No match has been found for this learning unit :  %(acronym)s") % {'acronym': 'LZZZ6789'}
+        )
