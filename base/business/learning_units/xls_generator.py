@@ -23,7 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from html.parser import HTMLParser
+
+from bs4 import BeautifulSoup
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import html
+import html as HTML
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_unit import XLS_DESCRIPTION, XLS_FILENAME
@@ -82,12 +87,24 @@ def _filter_required_teaching_material(learning_units):
             learning_unit.complete_title,
             learning_unit.requirement_entity,
             # Let a white space, the empty string is converted in None.
-            getattr(bibliography, "text", " "),
+            html.strip_tags(HTML.unescape(getattr(bibliography, "text", " "))),
             ", ".join(learning_unit.teachingmaterial_set.filter(mandatory=True).values_list('title', flat=True)),
-            getattr(online_resources, "text", " "),
+            _hyperlink_resources_to_string(HTML.unescape(getattr(online_resources, "text", " ")))
         ))
 
     if not result:
         raise ObjectDoesNotExist
 
     return result
+
+
+def _hyperlink_resources_to_string(resources):
+    """ Extract all hyperlinks and append them to a string using a 'title - [url]' format """
+    converted_resources = ""
+    soup = BeautifulSoup(resources, "html5lib")
+    for link in soup.findAll('a'):
+        converted_resources += "{} - [{}] \n".format(link.text, link.get('href'))
+    # strip tags when no html hyperlink has been found
+    if(converted_resources == ""):
+        return html.strip_tags(resources)
+    return converted_resources
