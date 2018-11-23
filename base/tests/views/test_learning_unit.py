@@ -1423,7 +1423,10 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(response.context['previous_academic_yr'], previous_academic_yr)
         self.assertEqual(response.context['next_academic_yr'], next_academic_yr)
         self.assertEqual(response.context['fields'], ['specific_title'])
-        self.assertEqual(response.context['previous_values'], {'specific_title': previous_learning_unit_year.specific_title})
+        self.assertEqual(
+            response.context['previous_values'],
+            {'specific_title': previous_learning_unit_year.specific_title}
+        )
 
         msgs = list(response.context['messages'])
         self.assertEqual(len(msgs), 1)
