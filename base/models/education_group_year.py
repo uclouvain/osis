@@ -625,18 +625,15 @@ class EducationGroupYear(SerializableModel):
             raise ValidationError({'constraint_type': _("This field is required.")})
 
     def clean_min_max(self):
-        # If constraint_type has been set, min and max are required
-        error_dict = {}
-        if self.min_constraint is None:
-            error_dict['min_constraint'] = ValidationError(_("This field is required."), code='required')
+        # If constraint_type has been set, min OR max are required
+        if self.min_constraint is None and self.max_constraint is None:
+            raise ValidationError({
+                'min_constraint': _("You should precise at least minimum or maximum constraint"),
+                'max_constraint': '',
+            })
 
-        if self.max_constraint is None:
-            error_dict['max_constraint'] = ValidationError(_("This field is required."), code='required')
-
-        if error_dict:
-            raise ValidationError(error_dict)
-
-        if self.min_constraint > self.max_constraint:
+        if self.min_constraint is not None and self.max_constraint is not None and \
+                self.min_constraint > self.max_constraint:
             raise ValidationError({
                 'max_constraint': _("%(max)s must be greater or equals than %(min)s") % {
                     "max": _("maximum constraint").title(),
