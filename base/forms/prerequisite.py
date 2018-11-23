@@ -104,7 +104,7 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
             if lu and lu == self.instance.learning_unit_year.learning_unit:
                 self.add_error(
                     'prerequisite_string',
-                    _("A learning unit cannot be prerequisite to itself :  %(acronym)s") % {'acronym': item}
+                    _("A learning unit cannot be prerequisite to itself : %(acronym)s") % {'acronym': item}
                 )
             elif lu:
                 # TODO :: Check that lu has a luy which is present in the education_group_year's tree
