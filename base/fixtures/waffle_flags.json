@@ -338,5 +338,25 @@
         "groups": [],
         "users": []
     }
+},
+{
+    "model": "waffle.flag",
+    "pk": 19,
+    "fields": {
+        "name": "update_learning_achievement",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-11-23T16:28:45Z",
+        "modified": "2018-11-23T16:29:39.033Z",
+        "groups": [],
+        "users": []
+    }
 }
 ]
