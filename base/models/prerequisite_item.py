@@ -25,7 +25,7 @@
 #############################################################################
 import itertools
 
-from django.db import models
+from django.db import models, IntegrityError
 from django.utils.translation import ugettext_lazy as _
 
 from base.models.enums.prerequisite_operator import OR, AND
@@ -61,6 +61,11 @@ class PrerequisiteItem(models.Model):
         unique_together = (
             ('prerequisite', 'group_number', 'position',),
         )
+
+    def save(self, *args, **kwargs):
+        if self.learning_unit == self.prerequisite.learning_unit_year.learning_unit:
+            raise IntegrityError("A learning unit cannot be prerequisite to itself")
+        super(PrerequisiteItem, self).save(*args, **kwargs)
 
 
 def find_by_prerequisite(prerequisite):

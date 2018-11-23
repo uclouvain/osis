@@ -42,7 +42,7 @@
                 {% bootstrap_button text_btn_submit button_type="submit" button_class="btn-primary" %}
 
                 {% url 'learning_unit_prerequisite' root.pk learning_unit_year.pk as url_prerequisite %}
-                {% trans 'cancel' as text_btn_cancel %}
+                {% trans 'Cancel' as text_btn_cancel %}
                 {% bootstrap_button text_btn_cancel button_type="link" button_class="btn-default" href=url_prerequisite %}
             </form>
 
