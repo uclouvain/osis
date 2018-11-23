@@ -300,8 +300,8 @@ class EducationGroupGeneralInformations(TestCase):
         academic_year = AcademicYearFactory()
         cls.current_academic_year = AcademicYearFactory(year=datetime.datetime.now().year)
         cls.type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
-        cls.type_minor = EducationGroupTypeFactory(name="Access minor")
-        cls.type_deepening = EducationGroupTypeFactory(name="Deepening")
+        cls.type_minor = EducationGroupTypeFactory(name="ACCESS_MINOR")
+        cls.type_deepening = EducationGroupTypeFactory(name="DEEPENING")
         cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=academic_year,
                                                                education_group_type=cls.type_training)
         cls.education_group_child = EducationGroupYearFactory(acronym="Child_1", academic_year=academic_year,
@@ -831,11 +831,44 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
         cls.user.user_permissions.add(Permission.objects.get(codename="can_edit_educationgroup_pedagogy"))
-        cls.url = reverse("education_group_general_informations",
+        cls.url = reverse("education_group_year_admission_condition_edit",
                           args=[cls.education_group_parent.pk, cls.education_group_child.id])
 
     def setUp(self):
         self.client.force_login(self.user)
+
+    def test_when_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+    def test_user_without_permission(self):
+        an_other_user = UserFactory()
+        self.client.force_login(an_other_user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    @mock.patch('base.views.education_groups.detail.is_eligible_to_edit_general_information', side_effect=lambda p, o: True)
+    def test_user_has_link_to_edit_conditions(self, mock_is_eligible):
+        self.user.user_permissions.add(Permission.objects.get(codename='can_edit_educationgroup_pedagogy'))
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
+
+        soup = bs4.BeautifulSoup(response.content, 'html.parser')
+        self.assertGreater(len(soup.select('a.btn-publish')), 0)
+
+    def test_user_has_not_link_to_edit_conditions(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
+
+        soup = bs4.BeautifulSoup(response.content, 'html.parser')
+        self.assertEqual(len(soup.select('a.btn-publish')), 0)
 
     @mock.patch('django.contrib.auth.decorators')
     def test_education_group_year_admission_condition_remove_line_not_found(self, mock_decorators):

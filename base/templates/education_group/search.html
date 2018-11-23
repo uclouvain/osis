@@ -162,7 +162,7 @@
                                 <td>{{ education_group_year.title }}</td>
                                 <td>
                                     {% if education_group_year.education_group_type %}
-                                        {% trans education_group_year.education_group_type.name %}
+                                        {% trans education_group_year.education_group_type.get_name_display %}
                                     {% endif %}
                                 </td>
                                 <td>{{ education_group_year.management_entity_version.acronym }}</td>
