@@ -3565,6 +3565,12 @@ msgid ""
 "year %(academic_year)s"
 msgstr ""
 
+#: tests/views/test_learning_unit.py:1405
+#: tests/views/test_learning_unit.py:1433 views/learning_unit.py:310
+#, python-format
+msgid "The learning unit does not exist for the academic year %(anac)s"
+msgstr ""
+
 #: forms/learning_unit/learning_unit_postponement.py:281
 #: views/learning_units/update.py:185
 #, python-format

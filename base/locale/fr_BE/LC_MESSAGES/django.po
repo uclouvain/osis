@@ -3646,6 +3646,11 @@ msgstr ""
 "L'unité d'enseignement %(luy)s est en proposition, impossible de sauvegarder "
 "le changement à partir de l'année %(academic_year)s"
 
+#: tests/views/test_learning_unit.py:1405
+#: tests/views/test_learning_unit.py:1433 views/learning_unit.py:310
+msgid "The learning unit does not exist for the academic year %(anac)s"
+msgstr "L'unité d'enseignement n'existe pas pour l'année académique %(anac)s"
+
 #: forms/learning_unit/learning_unit_postponement.py:281
 #: views/learning_units/update.py:185
 #, python-format
