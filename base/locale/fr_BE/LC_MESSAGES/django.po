@@ -1176,10 +1176,6 @@ msgstr "Éditer"
 msgid "Edit the proposal"
 msgstr "Editer la proposition"
 
-#: models/enums/academic_calendar_type.py:60
-msgid "Edition of general information"
-msgstr "Edition d'informations généraless"
-
 #: models/education_group_achievement.py:55
 #: models/education_group_detailed_achievement.py:48
 msgid "Education group achievement"
