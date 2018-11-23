@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,17 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
-
-from base.business.utils import url
+from base.models import prerequisite_item
 
 
-class UrlUtilsTestCase(TestCase):
-    def test_get_element_id_from_url(self):
-        self.assertEqual(
-            url.get_parameter_from_url_querystring(
-                "https://www.test.be/?bar=1&foo=2&test=3",
-                'foo'
-            ),
-            '2'
-        )
+def luy_has_or_is_prerequisite(luy):
+    return prerequisite_item.find_by_learning_unit_being_prerequisite(luy.learning_unit).exists() or \
+           prerequisite_item.find_by_learning_unit_year_having_prerequisite(luy).exists()
