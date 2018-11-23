@@ -80,7 +80,7 @@ class EducationGroupType(SerializableModel):
     )
 
     def __str__(self):
-        return u"%s" % self.name
+        return self.get_name_display()
 
     def natural_key(self):
         return (self.external_id,)
