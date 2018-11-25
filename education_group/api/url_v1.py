@@ -23,21 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url, include
+from django.conf.urls import url
 
-import continuing_education.urls_api_v1
-import education_group.api.url_v1
-from webservices.views import ws_catalog_offer
 
+from education_group.api.views.schema import schema_view
+from education_group.api.views.training import TrainingList, TrainingDetail
 
 urlpatterns = [
-    url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/(?P<acronym>[a-zA-Z0-9]+)$',
-        ws_catalog_offer,
-        name='v0.1-ws_catalog_offer'),
-    url(r'^v1/', include([
-        url(r'^continuing_education/',
-            include(continuing_education.urls_api_v1.urlpatterns, namespace='continuing_education_api_v1')),
-        url(r'^education_group/',
-            include(education_group.api.url_v1, namespace='education_group_api_v1')),
-    ])),
+    url(r"^$", schema_view),
+
+    url(r'^trainings/$', TrainingList.as_view(), name=TrainingList.name),
+    url(r'^trainings/(?P<uuid>[0-9a-f-]+)$', TrainingDetail.as_view(), name=TrainingDetail.name),
 ]

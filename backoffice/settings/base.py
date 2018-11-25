@@ -70,6 +70,7 @@ INSTALLED_APPS = (
     'reference',
     'rules_management',
     'base',
+    'education_group',
     'statici18n',
     'rest_framework',
     'rest_framework.authtoken',

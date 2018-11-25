@@ -23,21 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url, include
+from rest_framework import schemas
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import OpenAPIRenderer
+from rest_framework.response import Response
 
-import continuing_education.urls_api_v1
-import education_group.api.url_v1
-from webservices.views import ws_catalog_offer
 
-
-urlpatterns = [
-    url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/(?P<acronym>[a-zA-Z0-9]+)$',
-        ws_catalog_offer,
-        name='v0.1-ws_catalog_offer'),
-    url(r'^v1/', include([
-        url(r'^continuing_education/',
-            include(continuing_education.urls_api_v1.urlpatterns, namespace='continuing_education_api_v1')),
-        url(r'^education_group/',
-            include(education_group.api.url_v1, namespace='education_group_api_v1')),
-    ])),
-]
+@api_view()
+@renderer_classes([OpenAPIRenderer])
+def schema_view(request):
+    generator = schemas.SchemaGenerator(
+        title='Education Group API',
+        # url='https://www.{environment}.osis.uclouvain.be/api/v1/education_group',
+        urlconf='education_group.api.url_v1',
+    )
+    return Response(generator.get_schema(request=request))
