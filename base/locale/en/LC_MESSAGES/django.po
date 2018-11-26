@@ -1147,10 +1147,6 @@ msgstr ""
 msgid "Edit the proposal"
 msgstr ""
 
-#: models/enums/academic_calendar_type.py:60
-msgid "Edition of general information"
-msgstr ""
-
 #: models/education_group_achievement.py:55
 #: models/education_group_detailed_achievement.py:48
 msgid "Education group achievement"
@@ -3544,6 +3540,12 @@ msgstr ""
 msgid ""
 "The learning unit %(luy)s is in proposal, can not save the change from the "
 "year %(academic_year)s"
+msgstr ""
+
+#: tests/views/test_learning_unit.py:1405
+#: tests/views/test_learning_unit.py:1433 views/learning_unit.py:310
+#, python-format
+msgid "The learning unit does not exist for the academic year %(anac)s"
 msgstr ""
 
 #: forms/learning_unit/learning_unit_postponement.py:281
