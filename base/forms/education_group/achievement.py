@@ -31,8 +31,10 @@ from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.business.learning_units.achievement import UP, DOWN
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.education_group_year import EducationGroupYear
 from cms.enums import entity_name
 from cms.models import translated_text
+from cms.models.text_label import TextLabel
 
 ACTION_CHOICES = [
     (UP, UP),
@@ -85,7 +87,11 @@ class EducationGroupAchievementCMSForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.education_group_year = kwargs.pop('education_group_year')
+        if not isinstance(self.education_group_year, EducationGroupYear):
+            raise AttributeError('education_group_year parms must be an instance of EducationGroupYear')
         self.cms_text_label = kwargs.pop('cms_text_label')
+        if not isinstance(self.cms_text_label, TextLabel):
+            raise AttributeError('cms_text_label parms must be an instance of TextLabel')
         super().__init__(*args, **kwargs)
 
     def save(self):

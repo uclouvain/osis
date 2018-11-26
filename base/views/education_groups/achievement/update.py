@@ -134,7 +134,7 @@ class EducationGroupAchievementProgramAim(EducationGroupAchievementCMS):
 
     @cached_property
     def cms_text_label(self):
-        return text_label.get_by_label_or_none(CMS_LABEL_PROGRAM_AIM)
+        return text_label.get_by_name(CMS_LABEL_PROGRAM_AIM)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -151,7 +151,7 @@ class EducationGroupAchievementAdditionalInformation(EducationGroupAchievementCM
 
     @cached_property
     def cms_text_label(self):
-        return text_label.get_by_label_or_none(CMS_LABEL_ADDITIONAL_INFORMATION)
+        return text_label.get_by_name(CMS_LABEL_ADDITIONAL_INFORMATION)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
