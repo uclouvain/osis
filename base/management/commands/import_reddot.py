@@ -144,21 +144,6 @@ def import_offer_and_items(item, education_group_year, mapping_label_text_label,
 
 
 def _import_skills_and_achievements(skills_achievements, education_group_year, context):
-    """
-    This function will import skills and achievements data. The json data have the structure as above:
-     {
-        "skills_and_achievements_introduction": str  [CMS DATA]
-        "achievements" : [
-            {
-                "code_name": str,
-                "text": str ,                 [EducationGroupAchievement]
-                "detailed": [ {"code_name": str, "text": str }, {...} ]  [EducationGroupDetailedAchievement]
-            },
-            { .... }
-        ]
-        "skills_and_achievements_additional_text": str  [CMS DATA]
-    }
-    """
     for label, data in skills_achievements.items():
         if label in SKILLS_AND_ACHIEVEMENTS_CMS_DATA:
             text_label = get_text_label(context.entity, label)
