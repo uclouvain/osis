@@ -24,12 +24,12 @@
 #
 ##############################################################################
 
-import html as HTML
+import html
 
 from bs4 import BeautifulSoup
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils import html
 from django.utils.translation import ugettext_lazy as _
+from openpyxl.styles import Style, Alignment
 
 from base.business.learning_unit import XLS_DESCRIPTION, XLS_FILENAME
 from base.business.xls import get_name_or_username
@@ -37,6 +37,8 @@ from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from osis_common.document import xls_build
 from osis_common.document.xls_build import prepare_xls_parameters_list
+
+WRAP_TEXT_COLUMNS = ['D', 'F']
 
 
 def generate_xls_teaching_material(user, learning_units):
@@ -57,6 +59,9 @@ def generate_xls_teaching_material(user, learning_units):
         xls_build.USER: get_name_or_username(user),
         xls_build.HEADER_TITLES: titles,
         xls_build.WS_TITLE: _("Teaching material"),
+        xls_build.STYLED_CELLS: {
+            Style(alignment=Alignment(wrap_text=True)): _get_text_wrapped_cells(len(learning_units)),
+        }
     }
 
     working_sheets_data = _filter_required_teaching_material(learning_units)
@@ -87,9 +92,9 @@ def _filter_required_teaching_material(learning_units):
             learning_unit.complete_title,
             learning_unit.requirement_entity,
             # Let a white space, the empty string is converted in None.
-            html.strip_tags(HTML.unescape(getattr(bibliography, "text", " "))),
+            _html_list_to_string((html.unescape(getattr(bibliography, "text", " ")))),
             ", ".join(learning_unit.teachingmaterial_set.filter(mandatory=True).values_list('title', flat=True)),
-            _hyperlink_resources_to_string(HTML.unescape(getattr(online_resources, "text", " ")))
+            _hyperlinks_to_string(html.unescape(getattr(online_resources, "text", " ")))
         ))
 
     if not result:
@@ -98,13 +103,40 @@ def _filter_required_teaching_material(learning_units):
     return result
 
 
-def _hyperlink_resources_to_string(resources):
+def _hyperlinks_to_string(text):
     """ Extract all hyperlinks and append them to a string using a 'title - [url]' format """
     converted_resources = ""
-    soup = BeautifulSoup(resources, "html5lib")
-    for link in soup.findAll('a'):
-        converted_resources += "{} - [{}] \n".format(link.text, link.get('href'))
+    soup = BeautifulSoup(text, "html5lib")
+    for element in soup.find_all('a','p'):
+        if element.name in 'p' and converted_resources != "":
+            converted_resources += "\n"
+        else:
+            converted_resources += "{} - [{}] \n".format(element.text, element.get('href'))
     # strip tags when no html hyperlink has been found
-    if(converted_resources == ""):
-        return html.strip_tags(resources)
+    if converted_resources == "":
+        return _strip_tags(text)
     return converted_resources
+
+
+def _html_list_to_string(text):
+    """ Extract lists and append them to a string keeping the structure """
+    converted_text = ""
+    soup = BeautifulSoup(text, "html5lib")
+    for element in soup.find_all(['ul', 'ol', 'li', 'p']):
+        if element.name in ['ul', 'ol', 'p']:
+            converted_text += "\n" if converted_text != "" else ""
+        else:
+            converted_text += "{}\n".format(element.get_text())
+    # strip tags when no list has been found
+    if converted_text == "":
+        return _strip_tags(text)
+    return converted_text
+
+
+def _strip_tags(text):
+    soup = BeautifulSoup(text, "html5lib")
+    return soup.get_text()
+
+
+def _get_text_wrapped_cells(count):
+    return ['{}{}'.format(col, row) for col in WRAP_TEXT_COLUMNS for row in range(2, count+2)]
