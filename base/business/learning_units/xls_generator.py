@@ -76,25 +76,43 @@ def _filter_required_teaching_material(learning_units):
         if not learning_unit.teachingmaterial_set.filter(mandatory=True):
             continue
 
-        # Fetch data in CMS
-        bibliography = TranslatedText.objects.filter(
-            text_label__label='bibliography',
-            entity=LEARNING_UNIT_YEAR,
-            reference=learning_unit.pk).first()
+        # Fetch data in CMS and convert
+        bibliography = _html_list_to_string(
+            html.unescape(
+                getattr(
+                    TranslatedText.objects.filter(
+                        text_label__label='bibliography',
+                        entity=LEARNING_UNIT_YEAR,
+                        reference=learning_unit.pk
+                    ).first(),
+                    "text",
+                    " "
+                )
+            )
+        )
 
-        online_resources = TranslatedText.objects.filter(
-            text_label__label='online_resources',
-            entity=LEARNING_UNIT_YEAR,
-            reference=learning_unit.pk).first()
+        online_resources = _hyperlinks_to_string(
+            html.unescape(
+                getattr(
+                    TranslatedText.objects.filter(
+                        text_label__label='online_resources',
+                        entity=LEARNING_UNIT_YEAR,
+                        reference=learning_unit.pk
+                    ).first(),
+                    "text",
+                    " "
+                )
+            )
+        )
 
         result.append((
             learning_unit.acronym,
             learning_unit.complete_title,
             learning_unit.requirement_entity,
             # Let a white space, the empty string is converted in None.
-            _html_list_to_string((html.unescape(getattr(bibliography, "text", " ")))),
+            bibliography if bibliography != "" else " ",
             ", ".join(learning_unit.teachingmaterial_set.filter(mandatory=True).values_list('title', flat=True)),
-            _hyperlinks_to_string(html.unescape(getattr(online_resources, "text", " "))),
+            online_resources if online_resources != "" else " ",
         ))
 
     if not result:
