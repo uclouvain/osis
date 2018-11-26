@@ -10,8 +10,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:19:36.016Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -40,8 +40,8 @@
             "osis.education_group_type_mobilitypartnershiplistchoice"
         ],
         "changed": "2018-08-09T13:20:30.656Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -55,8 +55,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:21:06.073Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -70,8 +70,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:21:46.211Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -85,8 +85,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:22:05.892Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -100,8 +100,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:23:22.662Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -115,8 +115,8 @@
             "osis.education_group_type_minorlistchoice"
         ],
         "changed": "2018-08-09T13:23:43.118Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -131,7 +131,7 @@
         ],
         "changed": "2018-08-09T13:23:58.050Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -146,7 +146,7 @@
         ],
         "changed": "2018-08-09T13:24:27.937Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -160,8 +160,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:24:53.744Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -175,8 +175,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:25:26.887Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -190,8 +190,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:25:48.063Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -205,8 +205,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:26:13.735Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -220,8 +220,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:26:31.828Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -235,8 +235,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:26:58.065Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -250,8 +250,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:27:15.816Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -265,8 +265,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:27:37.753Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -280,8 +280,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:27:50.370Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -295,8 +295,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:28:01.574Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -310,8 +310,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:28:47.468Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -325,8 +325,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:29:31.797Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -340,8 +340,8 @@
             "osis.education_group_type_optionlistchoice"
         ],
         "changed": "2018-08-09T13:29:51.514Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -355,8 +355,8 @@
             "osis.education_group_type_finality120listchoice"
         ],
         "changed": "2018-08-09T13:30:11.603Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -371,7 +371,7 @@
         ],
         "changed": "2018-08-09T13:30:31.185Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -386,7 +386,7 @@
         ],
         "changed": "2018-08-09T13:31:06.514Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -400,8 +400,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:31:32.433Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -416,8 +416,8 @@
         ],
         "changed": "2018-08-09T13:32:02.943Z"
     ,
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -432,7 +432,7 @@
         ],
         "changed": "2018-08-09T13:32:33.006Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -446,8 +446,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:33:06.115Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -461,8 +461,8 @@
             "osis.education_group_type_optionlistchoice"
         ],
         "changed": "2018-08-09T13:33:22.602Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -477,7 +477,7 @@
         ],
         "changed": "2018-08-09T13:33:38.614Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -491,8 +491,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:34:18.852Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -506,8 +506,8 @@
             "osis.education_group_type_optionlistchoice"
         ],
         "changed": "2018-08-09T13:34:33.715Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -522,7 +522,7 @@
         ],
         "changed": "2018-08-09T13:34:45.425Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -536,8 +536,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:35:27.430Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -551,8 +551,8 @@
             "osis.education_group_type_optionlistchoice"
         ],
         "changed": "2018-08-09T13:42:32.726Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -566,8 +566,8 @@
             "osis.education_group_type_finality180listchoice"
         ],
         "changed": "2018-08-09T13:42:54.365Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -582,7 +582,7 @@
         ],
         "changed": "2018-08-09T13:43:15.846Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -597,7 +597,7 @@
         ],
         "changed": "2018-08-09T13:43:35.468Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -611,8 +611,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:43:57.914Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -626,8 +626,8 @@
             "osis.education_group_type_optionlistchoice"
         ],
         "changed": "2018-08-09T13:44:16.555Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -642,7 +642,7 @@
         ],
         "changed": "2018-08-09T13:44:37.821Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -656,8 +656,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:45:08Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -671,8 +671,8 @@
             "osis.education_group_type_optionlistchoice"
         ],
         "changed": "2018-08-09T13:45:25.854Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -687,7 +687,7 @@
         ],
         "changed": "2018-08-09T13:45:58.461Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -701,8 +701,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:49:27.632Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -716,8 +716,8 @@
             "osis.education_group_type_optionlistchoice"
         ],
         "changed": "2018-08-09T13:49:43.158Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -732,7 +732,7 @@
         ],
         "changed": "2018-08-09T13:49:54.236Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -746,8 +746,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:50:15.266Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -761,8 +761,8 @@
             "osis.education_group_type_optionlistchoice"
         ],
         "changed": "2018-08-09T13:50:31.824Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -777,7 +777,7 @@
         ],
         "changed": "2018-08-09T13:50:48.976Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -792,7 +792,7 @@
         ],
         "changed": "2018-08-09T13:51:10.851Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -806,8 +806,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:51:34.086Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -821,8 +821,8 @@
             "osis.education_group_type_optionlistchoice"
         ],
         "changed": "2018-08-09T13:51:48.978Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -837,7 +837,7 @@
         ],
         "changed": "2018-08-09T13:52:01.477Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -852,7 +852,7 @@
         ],
         "changed": "2018-08-09T13:52:21.426Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -866,8 +866,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:52:42.012Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -881,8 +881,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:52:58.856Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -896,8 +896,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:53:19.286Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -911,8 +911,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:53:34.284Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -926,8 +926,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:53:47.019Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -941,8 +941,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:54:01.445Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -956,8 +956,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:54:38.672Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -971,8 +971,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:54:52.819Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -986,8 +986,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:55:04.463Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -1016,8 +1016,8 @@
             "osis.education_group_type_commoncore"
         ],
         "changed": "2018-08-09T13:56:10.130Z",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
@@ -1035,6 +1035,21 @@
         "max_count_authorized": "MANY"
     }
 },
+    {
+        "model": "base.authorizedrelationship",
+        "pk": 174,
+        "fields": {
+            "parent_type": [
+                "osis.education_group_type_minorlistchoice"
+            ],
+            "child_type": [
+                "osis.education_group_type_minorlistchoice"
+            ],
+            "changed": "2018-08-09T13:56:50.589Z",
+            "min_count_authorized": "0",
+            "max_count_authorized": "MANY"
+        }
+    },
 {
     "model": "base.authorizedrelationship",
     "pk": 156,
@@ -1137,7 +1152,7 @@
         ],
         "changed": "2018-08-09T13:59:50.548Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -1152,7 +1167,7 @@
         ],
         "changed": "2018-08-09T14:00:03.255Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -1170,6 +1185,21 @@
         "max_count_authorized": "MANY"
     }
 },
+    {
+        "model": "base.authorizedrelationship",
+        "pk": 171,
+        "fields": {
+            "parent_type": [
+                "osis.education_group_type_finality120listchoice"
+            ],
+            "child_type": [
+                "osis.education_group_type_finality120listchoice"
+            ],
+            "changed": "2018-08-09T14:00:19.195Z",
+            "min_count_authorized": "0",
+            "max_count_authorized": "MANY"
+        }
+    },
 {
     "model": "base.authorizedrelationship",
     "pk": 165,
@@ -1182,7 +1212,7 @@
         ],
         "changed": "2018-08-09T14:00:43.345Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -1197,7 +1227,7 @@
         ],
         "changed": "2018-08-09T14:01:05.540Z",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY"
+        "max_count_authorized": "1"
     }
 },
 {
@@ -1215,6 +1245,21 @@
         "max_count_authorized": "MANY"
     }
 },
+    {
+        "model": "base.authorizedrelationship",
+        "pk": 172,
+        "fields": {
+            "parent_type": [
+                "osis.education_group_type_finality180listchoice"
+            ],
+            "child_type": [
+                "osis.education_group_type_finality180listchoice"
+            ],
+            "changed": "2018-08-09T14:10:58.042Z",
+            "min_count_authorized": "0",
+            "max_count_authorized": "MANY"
+        }
+    },
 {
     "model": "base.authorizedrelationship",
     "pk": 168,
@@ -1230,6 +1275,21 @@
         "max_count_authorized": "MANY"
     }
 },
+    {
+        "model": "base.authorizedrelationship",
+        "pk": 173,
+        "fields": {
+            "parent_type": [
+                "osis.education_group_type_mobilitypartnershiplistchoice"
+            ],
+            "child_type": [
+                "osis.education_group_type_mobilitypartnershiplistchoice"
+            ],
+            "changed": "2018-08-09T14:11:40.888Z",
+            "min_count_authorized": "0",
+            "max_count_authorized": "MANY"
+        }
+    },
 {
     "model": "base.authorizedrelationship",
     "pk": 169,
