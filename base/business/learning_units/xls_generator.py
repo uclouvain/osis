@@ -53,6 +53,8 @@ def generate_xls_teaching_material(user, learning_units):
         str(_('online resources')).title(),
     ]
 
+    rows = [lu for lu in learning_units if lu.teachingmaterial_set.filter(mandatory=True)]
+
     file_parameters = {
         xls_build.DESCRIPTION: XLS_DESCRIPTION,
         xls_build.FILENAME: XLS_FILENAME,
@@ -60,7 +62,7 @@ def generate_xls_teaching_material(user, learning_units):
         xls_build.HEADER_TITLES: titles,
         xls_build.WS_TITLE: _("Teaching material"),
         xls_build.STYLED_CELLS: {
-            Style(alignment=Alignment(wrap_text=True)): _get_text_wrapped_cells(len(learning_units)),
+            Style(alignment=Alignment(wrap_text=True)): _get_text_wrapped_cells(len(rows)),
         }
     }
 
