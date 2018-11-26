@@ -94,7 +94,7 @@ def _filter_required_teaching_material(learning_units):
             # Let a white space, the empty string is converted in None.
             _html_list_to_string((html.unescape(getattr(bibliography, "text", " ")))),
             ", ".join(learning_unit.teachingmaterial_set.filter(mandatory=True).values_list('title', flat=True)),
-            _hyperlinks_to_string(html.unescape(getattr(online_resources, "text", " ")))
+            _hyperlinks_to_string(html.unescape(getattr(online_resources, "text", " "))),
         ))
 
     if not result:
