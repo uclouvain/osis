@@ -1,5 +1,7 @@
-{% extends "education_group/learning_unit/layout_detail.html" %}
+{% extends "blocks/panel/panel_cms_collapse.html" %}
+{% load staticfiles %}
 {% load i18n bootstrap3 %}
+
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -24,28 +26,29 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block tab_content %}
-    <div class="panel panel-default">
-        <div class="panel-body">
-            {% bootstrap_form_errors form %}
-            <p>
-                <a href="{% url "learning_unit" learning_unit_year_id=learning_unit_year.id %}"><ins>{{ learning_unit_year.acronym }}</ins></a>
-                {% trans "has the following prerequisites" %}:
-            </p>
+{% block title_0 %}
+    {% language LANGUAGE_CODE_FR %}
+        {% trans 'the program aims'|capfirst %} :
+    {% endlanguage %}
+{% endblock %}
+{% block title_1 %}
+    {% language LANGUAGE_CODE_EN %}
+        {% trans 'the program aims'|capfirst %} :
+    {% endlanguage %}
+{% endblock %}
 
-
-            <form method="post" id="UpdatePrerequisite">
-                {% csrf_token %}
-                {% bootstrap_field form.prerequisite_string form_group_class="col-md-6" show_label=False %}
-
-                {% trans 'Save' as text_btn_submit %}
-                {% bootstrap_button text_btn_submit button_type="submit" button_class="btn-primary" %}
-
-                {% url 'learning_unit_prerequisite' root.pk learning_unit_year.pk as url_prerequisite %}
-                {% trans 'Cancel' as text_btn_cancel %}
-                {% bootstrap_button text_btn_cancel button_type="link" button_class="btn-default" href=url_prerequisite %}
-            </form>
-
+{% block panel_body %}
+    <div class="row">
+         <div class="col-md-11">
+             <div class="row">
+                 {% include "education_group/blocks/row_translatedtext_side_by_side.html" with label=skills_and_achievements_introduction only%}
+             </div>
+         </div>
+         <div class="col-md-1">
+            {% url 'education_group_achievement_program_aim' root_id=root.pk education_group_year_id=education_group_year.pk as update_url %}
+            <a class="trigger_modal pull-right" data-url="{{ update_url }}" data-modal_class="modal-lg" title={% trans 'Edit' %}>
+                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+            </a>
         </div>
     </div>
 {% endblock %}

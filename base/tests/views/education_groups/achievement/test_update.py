@@ -30,11 +30,17 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
+from base.views.education_groups.achievement.detail import CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
+from cms.enums import entity_name
+from cms.models.translated_text import TranslatedText
+from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.translated_text import TranslatedTextFactory
 
 
 class TestEducationGroupAchievementAction(TestCase):
@@ -193,3 +199,123 @@ class TestDeleteEducationGroupAchievement(TestCase):
         )
 
         self.assertEqual(response.status_code, 403)
+
+
+class TestEducationGroupAchievementCMSSetup(TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.person = PersonFactory(user=self.user)
+        self.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        self.user.user_permissions.add(Permission.objects.get(codename="change_educationgroupachievement"))
+        self.education_group_year = EducationGroupYearFactory()
+        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
+        self.client.force_login(self.user)
+
+
+class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementCMSSetup):
+    def setUp(self):
+        super().setUp()
+
+        self.url = reverse(
+            "education_group_achievement_program_aim",
+            args=[
+                self.education_group_year.pk,
+                self.education_group_year.pk,
+            ]
+        )
+        self.text_label = TextLabelFactory(label=CMS_LABEL_PROGRAM_AIM, entity=entity_name.OFFER_YEAR)
+        self.program_aim_french = TranslatedTextFactory(
+            text_label=self.text_label,
+            language=LANGUAGE_CODE_FR,
+            entity=entity_name.OFFER_YEAR,
+            reference=self.education_group_year.pk,
+            text="dummy text"
+        )
+
+    def test_update_achievement_program_aim(self):
+        """This test ensure that the french version is updated and the english version is created"""
+        data = {
+            "text_french": 'dummy text in french',
+            "text_english": 'dummy text in english'
+        }
+
+        response = self.client.post(self.url, data=data)
+
+        self.assertEqual(response.status_code, 302)
+        self.program_aim_french.refresh_from_db()
+        # Update french version
+        self.assertEqual(self.program_aim_french.text, data['text_french'])
+        # Create english version
+        self.assertTrue(TranslatedText.objects.filter(
+            text_label=self.text_label,
+            reference=self.education_group_year.pk,
+            language=LANGUAGE_CODE_EN,
+            entity=entity_name.OFFER_YEAR,
+            text=data['text_english']
+        ).exists())
+
+    def test_update_without_permission(self):
+        self.user.user_permissions.remove(Permission.objects.get(codename="change_educationgroupachievement"))
+        response = self.client.post(self.url, data={'french_text': 'Evil hacker'})
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_when_user_not_logged(self):
+        self.client.logout()
+        response = self.client.post(self.url, data={'french_text': 'Evil hacker'})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+
+class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupAchievementCMSSetup):
+    def setUp(self):
+        super().setUp()
+
+        self.url = reverse(
+            "education_group_achievement_additional_information",
+            args=[
+                self.education_group_year.pk,
+                self.education_group_year.pk,
+            ]
+        )
+
+        self.text_label = TextLabelFactory(label=CMS_LABEL_ADDITIONAL_INFORMATION, entity=entity_name.OFFER_YEAR)
+        self.program_aim_french = TranslatedTextFactory(
+            text_label=self.text_label,
+            language=LANGUAGE_CODE_FR,
+            entity=entity_name.OFFER_YEAR,
+            reference=self.education_group_year.pk,
+            text="dummy text"
+        )
+
+    def test_update_achievement_program_aim(self):
+        """This test ensure that the french version is updated and the english version is created"""
+        data = {
+            "text_french": 'dummy text in french',
+            "text_english": 'dummy text in english'
+        }
+
+        response = self.client.post(self.url, data=data)
+
+        self.assertEqual(response.status_code, 302)
+        self.program_aim_french.refresh_from_db()
+        # Update french version
+        self.assertEqual(self.program_aim_french.text, data['text_french'])
+        # Create english version
+        self.assertTrue(TranslatedText.objects.filter(
+            text_label=self.text_label,
+            reference=self.education_group_year.pk,
+            language=LANGUAGE_CODE_EN,
+            entity=entity_name.OFFER_YEAR,
+            text=data['text_english']
+        ).exists())
+
+    def test_update_without_permission(self):
+        self.user.user_permissions.remove(Permission.objects.get(codename="change_educationgroupachievement"))
+        response = self.client.post(self.url, data={'french_text': 'Evil hacker'})
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_when_user_not_logged(self):
+        self.client.logout()
+        response = self.client.post(self.url, data={'french_text': 'Evil hacker'})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, "/login/?next={}".format(self.url))

@@ -27,6 +27,7 @@ import collections
 import itertools
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
@@ -270,25 +271,44 @@ def learning_unit_comparison(request, learning_unit_year_id):
         )
 
         context.update(
-            {'previous_values': previous_values,
-             'previous_academic_yr': previous_academic_yr,
-             'next_academic_yr': next_academic_yr,
-             'next_values': next_values,
-             'fields': get_keys(list(previous_values.keys()), list(next_values.keys())),
-             'entity_changes': _get_changed_organization(context,
-                                                         previous_context,
-                                                         next_context),
-             'fields_lcy': get_keys(list(previous_lcy_values.keys()), list(next_lcy_values.keys())),
-             'previous_lcy_values': previous_lcy_values,
-             'next_lcy_values': next_lcy_values,
-             'components_comparison': get_components_changes(previous_context.get('components', {}),
-                                                             context.get('components', {}),
-                                                             next_context.get('components', {}))
-             })
+            {
+                'previous_values': previous_values,
+                'previous_academic_yr': previous_academic_yr,
+                'next_academic_yr': next_academic_yr,
+                'next_values': next_values,
+                'fields': get_keys(list(previous_values.keys()), list(next_values.keys())),
+                'entity_changes': _get_changed_organization(
+                    context,
+                    previous_context,
+                    next_context
+                ),
+                'fields_lcy': get_keys(list(previous_lcy_values.keys()), list(next_lcy_values.keys())),
+                'previous_lcy_values': previous_lcy_values,
+                'next_lcy_values': next_lcy_values,
+                'components_comparison': get_components_changes(
+                    previous_context.get('components', {}),
+                    context.get('components', {}),
+                    next_context.get('components', {})
+                ),
+                'previous_lu': previous_lu,
+                'next_lu': next_lu,
+             }
+        )
+        _add_warnings_for_inexisting_luy(request, next_academic_yr, next_lu)
+        _add_warnings_for_inexisting_luy(request, previous_academic_yr, previous_lu)
         return layout.render(request, "learning_unit/comparison.html", context)
     else:
         display_error_messages(request, _('Comparison impossible! No learning unit to compare to'))
         return HttpResponseRedirect(reverse('learning_unit', args=[learning_unit_year_id]))
+
+
+def _add_warnings_for_inexisting_luy(request, academic_yr, luy):
+    if not luy:
+        messages.add_message(
+            request,
+            messages.INFO,
+            _('The learning unit does not exist for the academic year %(anac)s') % {'anac': academic_yr}
+        )
 
 
 def _get_learning_unit_year(academic_yr, learning_unit_yr):
