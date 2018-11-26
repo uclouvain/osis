@@ -79,10 +79,10 @@ class TestEducationGroupSkillsAchievements(TestCase):
         )
         response = self._call_url_as_http_get()
         self.assertEqual(
-            response.context["certificate_aim"][0], certificate_aim_french
+            response.context[CMS_LABEL_PROGRAM_AIM][settings.LANGUAGE_CODE_FR], certificate_aim_french
         )
         self.assertEqual(
-            response.context["certificate_aim"][1], certificate_aim_english
+            response.context[CMS_LABEL_PROGRAM_AIM][settings.LANGUAGE_CODE_EN], certificate_aim_english
         )
 
     def test_get__additional_informations(self):
@@ -100,8 +100,10 @@ class TestEducationGroupSkillsAchievements(TestCase):
         )
         response = self._call_url_as_http_get()
         self.assertEqual(
-            response.context["additional_informations"][0], additional_infos_french
+            response.context[CMS_LABEL_ADDITIONAL_INFORMATION][settings.LANGUAGE_CODE_FR],
+            additional_infos_french
         )
         self.assertEqual(
-            response.context["additional_informations"][1], additional_infos_english
+            response.context[CMS_LABEL_ADDITIONAL_INFORMATION][settings.LANGUAGE_CODE_EN],
+            additional_infos_english
         )
