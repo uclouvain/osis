@@ -29,38 +29,108 @@ from django.test import TestCase
 
 from base.business.education_groups.learning_units.prerequisite import extract_learning_units_acronym_from_prerequisite, \
     get_learning_units_which_are_outside_of_education_group
+from base.models.enums.prerequisite_operator import AND, OR
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearFactory
+from base.tests.factories.prerequisite import PrerequisiteFactory
+from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 
 class TestLearningUnitsAcronymsFromPrerequisite(TestCase):
+    def setUp(self):
+        self.prerequisite = PrerequisiteFactory()
+
     def test_empty_prerequisite_should_return_empty_list(self):
-        self.assertEqual(extract_learning_units_acronym_from_prerequisite(""),
+        self.assertEqual(extract_learning_units_acronym_from_prerequisite(self.prerequisite),
                          [])
 
     def test_when_prerequisite_consits_of_one_learning_unit(self):
-        self.assertEqual(extract_learning_units_acronym_from_prerequisite("LSINF1121"),
-                         ["LSINF1121"])
-
-    def test_when_prerequisites_multiple_learning_units_but_no_parentheses(self):
-        self.assertEqual(extract_learning_units_acronym_from_prerequisite("LSINF1121 ET LBIR1245A ET LDROI4578"),
-                         ["LSINF1121", "LBIR1245A", "LDROI4578"])
-
-        self.assertEqual(extract_learning_units_acronym_from_prerequisite("LSINF1121 OU LBIR1245A OU LDROI4578"),
-                         ["LSINF1121", "LBIR1245A", "LDROI4578"])
-
-    def test_when_prerequisites_multiple_learning_units_with_parentheses(self):
-        self.assertEqual(extract_learning_units_acronym_from_prerequisite("LSINF1121 ET (LBIR1245A OU LDROI4578)"),
-                         ["LSINF1121", "LBIR1245A", "LDROI4578"])
-
-        self.assertEqual(extract_learning_units_acronym_from_prerequisite("(LSINF1121 ET LBIR1245A) OU LDROI4578"),
-                         ["LSINF1121", "LBIR1245A", "LDROI4578"])
+        learning_unit_year = LearningUnitYearFactory(acronym="LSINF1121")
+        PrerequisiteItemFactory(
+            learning_unit=learning_unit_year.learning_unit,
+            prerequisite=self.prerequisite
+        )
 
         self.assertEqual(
-            extract_learning_units_acronym_from_prerequisite("(LSINF1121 ET LBIR1245A ET LMED1547) OU LDROI4578"),
-            ["LSINF1121", "LBIR1245A", "LMED1547", "LDROI4578"])
+            extract_learning_units_acronym_from_prerequisite(self.prerequisite),
+            ["LSINF1121"]
+        )
+
+    def test_when_prerequisites_multiple_learning_units_but_no_parentheses(self):
+        learning_unit_year = LearningUnitYearFactory(acronym="LSINF1121")
+        PrerequisiteItemFactory(
+            learning_unit=learning_unit_year.learning_unit,
+            prerequisite=self.prerequisite,
+            group_number=1,
+            position=1,
+        )
+        learning_unit_year = LearningUnitYearFactory(acronym="LBIR1245A")
+        PrerequisiteItemFactory(
+            learning_unit=learning_unit_year.learning_unit,
+            prerequisite=self.prerequisite,
+            group_number=2,
+            position=1,
+        )
+        learning_unit_year = LearningUnitYearFactory(acronym="LDROI4578")
+        PrerequisiteItemFactory(
+            learning_unit=learning_unit_year.learning_unit,
+            prerequisite=self.prerequisite,
+            group_number=3,
+            position=1,
+        )
+
+        self.prerequisite.main_operator = AND
+        self.prerequisite.save()
+        self.assertCountEqual(
+            extract_learning_units_acronym_from_prerequisite(self.prerequisite),
+            ["LSINF1121", "LBIR1245A", "LDROI4578"]
+        )
+
+        self.prerequisite.main_operator = OR
+        self.prerequisite.save()
+        self.assertCountEqual(
+            extract_learning_units_acronym_from_prerequisite(self.prerequisite),
+            ["LSINF1121", "LBIR1245A", "LDROI4578"]
+        )
+
+    def test_when_prerequisites_multiple_learning_units_with_parentheses(self):
+        learning_unit_year = LearningUnitYearFactory(acronym="LSINF1121")
+        PrerequisiteItemFactory(
+            learning_unit=learning_unit_year.learning_unit,
+            prerequisite=self.prerequisite,
+            group_number=1,
+            position=1,
+        )
+        learning_unit_year = LearningUnitYearFactory(acronym="LBIR1245A")
+        PrerequisiteItemFactory(
+            learning_unit=learning_unit_year.learning_unit,
+            prerequisite=self.prerequisite,
+            group_number=1,
+            position=2,
+        )
+        learning_unit_year = LearningUnitYearFactory(acronym="LDROI4578")
+        PrerequisiteItemFactory(
+            learning_unit=learning_unit_year.learning_unit,
+            prerequisite=self.prerequisite,
+            group_number=2,
+            position=1,
+        )
+
+        self.prerequisite.main_operator = AND
+        self.prerequisite.save()
+        self.assertCountEqual(
+            extract_learning_units_acronym_from_prerequisite(self.prerequisite),
+            ["LSINF1121", "LBIR1245A", "LDROI4578"]
+        )
+
+        self.prerequisite.main_operator = OR
+        self.prerequisite.save()
+        self.assertCountEqual(
+            extract_learning_units_acronym_from_prerequisite(self.prerequisite),
+            ["LSINF1121", "LBIR1245A", "LDROI4578"]
+        )
 
 
 class TestGetLearningUnitsWhichAreNotInsideTraining(TestCase):

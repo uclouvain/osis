@@ -26,14 +26,14 @@
  * see http://www.gnu.org/licenses/.
 {% endcomment %}
 {% block breadcrumb %}
-<li id="lnk_institution">{% trans 'institution' %}</li>
-<li id="lnk_studies"><a href="{% url 'academic_actors' %}">{% trans 'academic_actors' %}</a></li>
-<li><a href="{% url 'summary_responsible' %}" id="lnk_summary_responsible">{% trans 'summary_responsible' %}</a></li>
+<li id="lnk_institution">{% trans 'Institution' %}</li>
+<li id="lnk_studies"><a href="{% url 'academic_actors' %}">{% trans 'Academic actors' %}</a></li>
+<li><a href="{% url 'summary_responsible' %}" id="lnk_summary_responsible">{% trans 'Summary responsible' %}</a></li>
 <li class="active">{{ learning_unit_year.acronym }}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'tutors_of_course' %} <label>{{ learning_unit_year.acronym }}</label> ({{ academic_year }})</h2>
+    <h2>{% trans 'Tutors of the course' %} <label>{{ learning_unit_year.acronym }}</label> ({{ academic_year }})</h2>
 </div>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -42,9 +42,9 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>{% trans 'tutor' %}</th>
-                        <th>{% trans 'status' %}</th>
-                        <th>{% trans 'summary_responsible' %}</th>
+                        <th>{% trans 'Tutor' %}</th>
+                        <th>{% trans 'Status' %}</th>
+                        <th>{% trans 'Summary responsible' %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -66,9 +66,9 @@
             </table>
             <div class="panel-body">
                 <button type="submit" id="summary_responsible_update" class="btn btn-primary" name="action" value="update" role="button"
-                        title="{% trans 'update' %}">{% trans 'save' %}</button>
+                        title="{% trans 'Update' %}">{% trans 'Save' %}</button>
                 <button type="submit" id="summary_responsible_cancel" class="btn btn-default" role="button"
-                        title="{% trans 'cancel' %}">{% trans 'cancel' %}</button>
+                        title="{% trans 'Cancel' %}">{% trans 'Cancel' %}</button>
             </div>
             <input type="hidden" id="hdn_course_code" name="course_code" value="{{ request.GET.course_code }}">
             <input type="hidden" id="hdn_learning_unit_title" name="learning_unit_title" value="{{ request.GET.learning_unit_title }}">

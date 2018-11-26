@@ -48,8 +48,13 @@ def education_groups(request):
     person = get_object_or_404(Person, user=request.user)
     current_academic_year = mdl.academic_year.current_academic_year()
 
-    form = EducationGroupFilter(request.GET or None, initial={'academic_year': current_academic_year,
-                                                              'category': education_group_categories.TRAINING})
+    form = EducationGroupFilter(
+        request.GET or None,
+        initial={
+            'academic_year': current_academic_year,
+            'category': education_group_categories.TRAINING
+        }
+    )
 
     object_list = _get_object_list(form, request) if form.is_valid() else []
 
@@ -86,7 +91,7 @@ def _get_object_list(form, request):
 
 def _check_if_display_message(request, an_education_groups):
     if not an_education_groups:
-        messages.add_message(request, messages.WARNING, _('no_result'))
+        messages.add_message(request, messages.WARNING, _('No result!'))
 
         return False
     return True

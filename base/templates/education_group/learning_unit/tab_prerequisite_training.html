@@ -34,7 +34,7 @@
 
             <div class="row">
                 <div class="col-md-7">
-                    <p>{{ prerequisite.prerequisite|default:"-"}}</p>
+                    <p>{{ prerequisite.prerequisite_string|default:"-"}}</p>
                 </div>
                 <div class="col-md-5">
                     {% if can_modify_prerequisite %}

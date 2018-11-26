@@ -35,19 +35,19 @@ WORKSHEET_TITLE = 'learning_units'
 XLS_FILENAME = 'learning_units_and_attributions_filename'
 XLS_DESCRIPTION = "attribution_list"
 
-ATTRIBUTION_TITLES = [str(_('tutor')), str(_('function')), str(_('substitute')), str(_('LECTURING')),
-                      str(_('PRACTICAL_EXERCISES')), str(_('start_year')), str(_('duration'))]
+ATTRIBUTION_TITLES = [str(_('Tutor')), str(_('Function')), str(_('Substitute')), str(_('LECTURING')),
+                      str(_('PRACTICAL_EXERCISES')), str(_('Start year')), str(_('Duration'))]
 
 LEARNING_UNIT_TITLES = [
-    str(_('academic_year_small')),
-    str(_('code')),
-    str(_('title')),
-    str(_('type')),
-    str(_('subtype')),
-    str(_('requirement_entity_small')),
-    str(_('allocation_entity_small')),
-    str(_('credits')),
-    str(_('active_title'))
+    str(_('Ac yr.')),
+    str(_('Code')),
+    str(_('Title')),
+    str(_('Type')),
+    str(_('Subtype')),
+    str(_('Req. Entity')),
+    str(_('Alloc. Ent.')),
+    str(_('Credits')),
+    str(_('Active'))
 ]
 
 
@@ -84,15 +84,6 @@ def _prepare_titles():
     for title in ATTRIBUTION_TITLES:
         titles.append(title)
     return titles
-
-
-def create_xls_attribution(user, found_learning_units, filters):
-    for learning_unit_yr in found_learning_units:
-        learning_unit_yr.attribution_charge_news = attribution_charge_new\
-            .find_attribution_charge_new_by_learning_unit_year_as_dict(learning_unit_year=learning_unit_yr)
-
-    working_sheets_data = prepare_xls_content(found_learning_units)
-    return xls_build.generate_xls(prepare_xls_parameters_list(user, working_sheets_data), filters)
 
 
 def extract_xls_data_from_learning_unit(learning_unit_yr):

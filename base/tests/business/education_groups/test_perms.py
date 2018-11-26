@@ -25,10 +25,11 @@
 ##############################################################################
 import datetime
 
+from django.contrib.auth.models import Permission
 from django.test import TestCase
 
 from base.business.education_groups.perms import is_academic_calendar_opened, check_permission, \
-    check_authorized_type
+    check_authorized_type, is_eligible_to_edit_general_information
 from base.models.enums import academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
@@ -124,7 +125,7 @@ class TestPerms(TestCase):
             start_date=today + datetime.timedelta(days=1),
             end_date=today + datetime.timedelta(days=3),
             academic_year=current_ac,
-            reference=academic_calendar_type.EDITION_OF_GENERAL_INFORMATION,
+            reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
         )
 
         next_ac = AcademicYearFactory(year=current_ac.year + 1)
@@ -133,7 +134,7 @@ class TestPerms(TestCase):
         self.assertFalse(
             is_academic_calendar_opened(
                 education_group,
-                academic_calendar_type.EDITION_OF_GENERAL_INFORMATION
+                academic_calendar_type.EDUCATION_GROUP_EDITION
             )
         )
 
@@ -145,7 +146,7 @@ class TestPerms(TestCase):
         self.assertFalse(
             is_academic_calendar_opened(
                 education_group,
-                academic_calendar_type.EDITION_OF_GENERAL_INFORMATION
+                academic_calendar_type.EDUCATION_GROUP_EDITION
             )
         )
 
@@ -155,7 +156,13 @@ class TestPerms(TestCase):
         self.assertTrue(
             is_academic_calendar_opened(
                 education_group,
-                academic_calendar_type.EDITION_OF_GENERAL_INFORMATION,
+                academic_calendar_type.EDUCATION_GROUP_EDITION,
                 raise_exception=True
             )
         )
+
+    def test_is_eligible_to_edit_common_offer_as_central_manager(self):
+        person = CentralManagerFactory()
+        person.user.user_permissions.add(Permission.objects.get(codename="can_edit_educationgroup_pedagogy"))
+        education_group = EducationGroupYearFactory(acronym="common-1ba")
+        self.assertTrue(is_eligible_to_edit_general_information(person, education_group))
