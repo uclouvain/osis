@@ -127,9 +127,9 @@ def _hyperlinks_to_string(text):
     """ Extract all hyperlinks and append them to a string using a 'title - [url]' format """
     converted_resources = ""
     soup = BeautifulSoup(text, "html5lib")
-    for element in soup.find_all('a', 'p'):
-        if element.name in 'p' and converted_resources != "":
-            converted_resources += "\n"
+    for element in soup.find_all(['a', 'p']):
+        if element.name in ['p']:
+            converted_resources += "\n" if converted_resources != "" else ""
         else:
             converted_resources += "{} - [{}] \n".format(element.text, element.get('href'))
     # strip tags when no html hyperlink has been found
