@@ -266,15 +266,19 @@ def _add_training_data(learning_unit_yr):
 
 
 def _concatenate_training_data(formations_by_educ_group_year, group_element_year):
-    training_string = "{} {} {}".format(
-        group_element_year.parent.partial_acronym if group_element_year.parent.partial_acronym else '',
-        "({})".format(
-            '{0:.2f}'.format(group_element_year.child_leaf.credits) if group_element_year.child_leaf.credits else '-'),
-        " - ".join(
-            ["{} - {}".format(training.acronym, training.title) for training in
-             formations_by_educ_group_year.get(group_element_year.parent_id)])
-    )
-    return training_string
+    ch = ''
+    for training in formations_by_educ_group_year.get(group_element_year.parent_id):
+        training_string = "{} {} {}".format(
+            group_element_year.parent.partial_acronym if group_element_year.parent.partial_acronym else '',
+            "({}) {}".format(
+                '{0:.2f}'.format(
+                    group_element_year.child_leaf.credits) if group_element_year.child_leaf.credits else '-',
+                '-' if len(formations_by_educ_group_year.get(group_element_year.parent_id)) > 0 else ''),
+
+            "{} - {}".format(training.acronym, training.title)
+        )
+        ch = "{} {}\n".format(ch, training_string)
+    return ch
 
 
 def _get_data_part2(learning_unit_yr, with_attributions):
@@ -288,8 +292,8 @@ def _get_data_part2(learning_unit_yr, with_attributions):
     volume_lecturing = volumes.get(learning_component_year_type.LECTURING)
     volumes_practical = volumes.get(learning_component_year_type.PRACTICAL_EXERCISES)
     lu_data_part2.extend([
-        xls_build.translate(learning_unit_yr.periodicity),
-        xls_build.translate(learning_unit_yr.status),
+        str(_(learning_unit_yr.periodicity.title())),
+        str(_('Yes')) if learning_unit_yr.status else str(_('No')),
         _get_significant_volume(volume_lecturing.get('VOLUME_TOTAL')),
         _get_significant_volume(volume_lecturing.get('VOLUME_Q1')),
         _get_significant_volume(volume_lecturing.get('VOLUME_Q2')),
@@ -298,8 +302,8 @@ def _get_data_part2(learning_unit_yr, with_attributions):
         _get_significant_volume(volumes_practical.get('VOLUME_Q1')),
         _get_significant_volume(volumes_practical.get('VOLUME_Q2')),
         _get_significant_volume(volumes_practical.get('PLANNED_CLASSES')),
-        xls_build.translate(learning_unit_yr.quadrimester),
-        xls_build.translate(learning_unit_yr.session),
+        str(_(learning_unit_yr.quadrimester.title())),
+        str(_(learning_unit_yr.session.title())),
         learning_unit_yr.language if learning_unit_yr.language else "",
         _get_absolute_credits(learning_unit_yr),
     ])
@@ -312,14 +316,14 @@ def _get_data_part1(learning_unit_yr):
         learning_unit_yr.acronym,
         learning_unit_yr.academic_year.name,
         learning_unit_yr.complete_title,
-        xls_build.translate(learning_unit_yr.learning_container_year.container_type)
+        str(_(learning_unit_yr.learning_container_year.container_type.title()))
         # FIXME Condition to remove when the LearningUnitYear.learning_continer_year_id will be null=false
         if learning_unit_yr.learning_container_year else "",
-        xls_build.translate(learning_unit_yr.subtype),
+        str(_(learning_unit_yr.subtype.title())),
         _get_entity_faculty_acronym(learning_unit_yr.entities.get('REQUIREMENT_ENTITY'),
                                     learning_unit_yr.academic_year),
-        xls_build.translate(proposal.type) if proposal else '',
-        xls_build.translate(proposal.state) if proposal else '',
+        str(_(proposal.type.title())) if proposal else '',
+        str(_(proposal.state.title())) if proposal else '',
         learning_unit_yr.credits,
         get_entity_acronym(learning_unit_yr.entities.get('ALLOCATION_ENTITY')),
         learning_unit_yr.complete_title_english,
