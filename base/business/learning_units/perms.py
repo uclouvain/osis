@@ -184,7 +184,9 @@ def can_edit_summary_locked_field(learning_unit_year, person):
 
 
 def can_update_learning_achievement(learning_unit_year, person):
-    return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+    flag = Flag.get('learning_achievement_update')
+    return flag.is_active_for_user(person.user) and \
+        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 
 def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_exception=False):

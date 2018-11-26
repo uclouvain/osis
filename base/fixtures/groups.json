@@ -3161,11 +3161,6 @@
                 "educationgroupachievement"
             ],
             [
-                "is_entity_manager",
-                "base",
-                "entitymanager"
-            ],
-            [
                 "change_learningclassyear",
                 "base",
                 "learningclassyear"
