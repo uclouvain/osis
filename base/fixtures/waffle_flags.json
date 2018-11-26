@@ -343,7 +343,7 @@
     "model": "waffle.flag",
     "pk": 19,
     "fields": {
-        "name": "update_learning_achievement",
+        "name": "learning_achievement_update",
         "everyone": null,
         "percent": null,
         "testing": false,
