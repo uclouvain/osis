@@ -36,6 +36,8 @@ from django.db.transaction import atomic
 
 from base.models.academic_year import AcademicYear
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
+from base.models.education_group_achievement import EducationGroupAchievement
+from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import TRAINING
@@ -44,6 +46,11 @@ from base.tests.factories.education_group import EducationGroupFactory
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+
+SKILLS_AND_ACHIEVEMENTS_KEY = 'comp_acquis'
+SKILLS_AND_ACHIEVEMENTS_CMS_DATA = ('skills_and_achievements_introduction', 'skills_and_achievements_additional_text', )
+SKILLS_AND_ACHIEVEMENTS_AA_DATA = 'achievements'
+
 
 BACHELOR_FIELDS = (
     'alert_message', 'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres', 'ca_bacs_examen_langue',
@@ -121,23 +128,78 @@ def import_offer_and_items(item, education_group_year, mapping_label_text_label,
         if not value:
             continue
 
-        translated_text, created = TranslatedText.objects.get_or_create(
-            entity=context.entity,
-            reference=education_group_year.id,
-            text_label=mapping_label_text_label[label],
-            language=context.language,
+        if label == SKILLS_AND_ACHIEVEMENTS_KEY:
+            _import_skills_and_achievements(value, education_group_year, context)
+        else:
+            # General CMS data
+            TranslatedText.objects.update_or_create(
+                entity=context.entity,
+                reference=education_group_year.id,
+                text_label=mapping_label_text_label[label],
+                language=context.language,
+                defaults={
+                    'text': value
+                }
+            )
+
+
+def _import_skills_and_achievements(skills_achievements, education_group_year, context):
+    for label, data in skills_achievements.items():
+        if label in SKILLS_AND_ACHIEVEMENTS_CMS_DATA:
+            text_label = get_text_label(context.entity, label)
+            TranslatedText.objects.update_or_create(
+                entity=context.entity,
+                reference=education_group_year.id,
+                text_label=text_label,
+                language=context.language,
+                defaults={'text': data}
+            )
+        elif label == SKILLS_AND_ACHIEVEMENTS_AA_DATA:
+            _import_general_achievements(
+                skills_achievements[SKILLS_AND_ACHIEVEMENTS_AA_DATA],
+                education_group_year,
+                context,
+            )
+
+
+def _import_general_achievements(achievements, education_group_year, context):
+    for idx, achievement in enumerate(achievements):
+        field_to_update = _get_field_achievement_according_to_language(context.language)
+        education_group_achievement, created = EducationGroupAchievement.objects.update_or_create(
+            education_group_year_id=education_group_year.id,
+            order=idx,
             defaults={
-                'text': value
+                'code_name': achievement['code_name'],
+                field_to_update: achievement['text']
             }
         )
 
-        if not created:
-            translated_text.text = value
-            translated_text.save()
+        if achievement['detailed']:
+            _import_detailled_achievements(achievement['detailed'], education_group_achievement, context)
+
+
+def _import_detailled_achievements(detailled_achievements, education_group_achievement, context):
+    for idx, detailled_achievement in enumerate(detailled_achievements):
+        field_to_update = _get_field_achievement_according_to_language(context.language)
+        EducationGroupDetailedAchievement.objects.update_or_create(
+            education_group_achievement=education_group_achievement,
+            order=idx,
+            defaults={
+                'code_name': detailled_achievement['code_name'],
+                field_to_update: detailled_achievement['text'],
+            }
+        )
+
+
+def _get_field_achievement_according_to_language(language):
+    if language == settings.LANGUAGE_CODE_FR:
+        return 'french_text'
+    elif language == settings.LANGUAGE_CODE_EN:
+        return 'english_text'
+    raise AttributeError('Language not supported {}'.format(language))
 
 
 LABEL_TEXTUALS = [
-    (settings.LANGUAGE_CODE_FR, 'comp_acquis', 'Compétences et Acquis'),
     (settings.LANGUAGE_CODE_FR, 'pedagogie', 'Pédagogie'),
     (settings.LANGUAGE_CODE_FR, 'contacts', 'Contacts'),
     (settings.LANGUAGE_CODE_FR, 'mobilite', 'Mobilité'),
@@ -160,7 +222,6 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_FR, 'majeures', 'Majeures'),
     (settings.LANGUAGE_CODE_FR, 'finalites', 'Finalités'),
     (settings.LANGUAGE_CODE_FR, 'finalites_didactiques', 'Finalités Didactique'),
-    (settings.LANGUAGE_CODE_EN, 'comp_acquis', 'Learning Outcomes'),
     (settings.LANGUAGE_CODE_EN, 'pedagogie', 'Pedagogy'),
     (settings.LANGUAGE_CODE_EN, 'contacts', 'Contacts'),
     (settings.LANGUAGE_CODE_EN, 'mobilite', 'Mobility'),
