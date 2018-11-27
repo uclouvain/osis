@@ -266,7 +266,7 @@ def _add_training_data(learning_unit_yr):
 
 
 def _concatenate_training_data(formations_by_educ_group_year, group_element_year):
-    ch = ''
+    concatened_string = ''
     for training in formations_by_educ_group_year.get(group_element_year.parent_id):
         training_string = "{} {} {}".format(
             group_element_year.parent.partial_acronym if group_element_year.parent.partial_acronym else '',
@@ -277,8 +277,8 @@ def _concatenate_training_data(formations_by_educ_group_year, group_element_year
 
             "{} - {}".format(training.acronym, training.title)
         )
-        ch = "{} {}\n".format(ch, training_string)
-    return ch
+        concatened_string = "{} {}\n".format(concatened_string, training_string)
+    return concatened_string
 
 
 def _get_data_part2(learning_unit_yr, with_attributions):
@@ -302,8 +302,8 @@ def _get_data_part2(learning_unit_yr, with_attributions):
         _get_significant_volume(volumes_practical.get('VOLUME_Q1')),
         _get_significant_volume(volumes_practical.get('VOLUME_Q2')),
         _get_significant_volume(volumes_practical.get('PLANNED_CLASSES')),
-        str(_(learning_unit_yr.quadrimester.title())),
-        str(_(learning_unit_yr.session.title())),
+        str(_(learning_unit_yr.quadrimester.title())) if learning_unit_yr.quadrimester else '',
+        str(_(learning_unit_yr.session.title())) if learning_unit_yr.session else '',
         learning_unit_yr.language if learning_unit_yr.language else "",
         _get_absolute_credits(learning_unit_yr),
     ])
