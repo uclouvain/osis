@@ -49,7 +49,7 @@ from base.utils import send_mail
 from base.views import layout
 from osis_common.document import paper_sheet
 from osis_common.queue.queue_sender import send_message
-
+from base.models.enums import exam_enrollment_state as enrollment_states
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 queue_exception_logger = logging.getLogger(settings.QUEUE_EXCEPTION_LOGGER)
 
@@ -99,6 +99,7 @@ def outside_period(request):
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 @user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
 def scores_encoding(request):
+    print('ici')
     template_name = "scores_encoding.html"
     academic_yr = mdl.academic_year.current_academic_year()
     number_session = mdl.session_exam_calendar.find_session_exam_number()
@@ -210,6 +211,7 @@ def online_encoding(request, learning_unit_year_id=None):
 @user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
 @transaction.non_atomic_requests
 def online_encoding_form(request, learning_unit_year_id=None):
+    print('online_encoding_form')
     template_name = "online_encoding_form.html"
     if request.method == 'POST':
         updated_enrollments = None
@@ -329,6 +331,7 @@ def specific_criteria_submission(request):
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 @user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
 def online_double_encoding_form(request, learning_unit_year_id=None):
+    print('online_double_encoding_form')
     if request.method == 'GET':
         context = _get_double_encoding_context(request, learning_unit_year_id)
         return online_double_encoding_get_form(request, context, learning_unit_year_id)
@@ -529,6 +532,7 @@ def online_double_encoding_get_form(request, data=None, learning_unit_year_id=No
 
 
 def _get_common_encoding_context(request, learning_unit_year_id):
+    print('_get_common_encoding_context')
     scores_list = score_encoding_list.get_scores_encoding_list(user=request.user,
                                                                learning_unit_year_id=learning_unit_year_id)
     score_responsibles = mdl_attr.attribution.find_all_responsibles_by_learning_unit_year(
@@ -547,7 +551,7 @@ def _get_common_encoding_context(request, learning_unit_year_id):
         'is_coordinator': is_coordinator,
         'draft_scores_not_submitted': len(scores_list.enrollment_draft_not_submitted),
         'exam_enrollments_encoded': len(scores_list.enrollment_encoded),
-        'total_exam_enrollments': len(scores_list.enrollments),
+        'total_exam_enrollments': _get_count_still_enrolled(scores_list.enrollments),
         'progress': scores_list.progress,
         'progress_int': scores_list.progress_int
     }
@@ -671,3 +675,11 @@ def send_json_scores_sheets_to_response_queue(global_id):
         send_message(queue_name, data, connect, channel)
     except (RuntimeError, pika.exceptions.ConnectionClosed, pika.exceptions.ChannelClosed, pika.exceptions.AMQPError):
         logger.exception('Could not send back scores_sheets json in response queue for global_id {}'.format(global_id))
+
+
+def _get_count_still_enrolled(enrollments):
+    nb_enrolled = 0
+    for enrollment in enrollments:
+        if enrollment.enrollment_state == enrollment_states.ENROLLED:
+            nb_enrolled += 1
+    return nb_enrolled

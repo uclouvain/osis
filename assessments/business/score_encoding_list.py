@@ -258,6 +258,8 @@ class ScoresEncodingList:
 
     @property
     def progress(self):
+        print('coucou')
+        print(self.progress_int)
         return "{0:.0f}".format(self.progress_int)
 
     @property
