@@ -236,7 +236,7 @@
                     data-toggle="tooltip" data-placement="left" title="{% trans 'Temporary save (not submitted to the faculty yet)' %}"
                 {% endif %}>
                 <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}</button>
-            <a class="btn btn-default" href="{% url 'Online encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" role="button" id="lnk_cancel_online_encoding_down">
+            <a class="btn btn-default" href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" role="button" id="lnk_cancel_online_encoding_down">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'Cancel' %}</a>
         </form>
     </div>
