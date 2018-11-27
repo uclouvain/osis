@@ -261,8 +261,8 @@ def _get_trainings_by_educ_group_year(learning_unit_yr):
 
 def _add_training_data(learning_unit_yr):
     formations_by_educ_group_year = _get_trainings_by_educ_group_year(learning_unit_yr)
-    return " \n".join(["{}".format(_concatenate_training_data(formations_by_educ_group_year, group_element_year)) for
-                       group_element_year in learning_unit_yr.group_elements_years])
+    return "\n".join(["{}".format(_concatenate_training_data(formations_by_educ_group_year, group_element_year)) for
+                      group_element_year in learning_unit_yr.group_elements_years])
 
 
 def _concatenate_training_data(formations_by_educ_group_year, group_element_year):
