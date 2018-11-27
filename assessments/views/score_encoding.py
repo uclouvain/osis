@@ -99,7 +99,6 @@ def outside_period(request):
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 @user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
 def scores_encoding(request):
-    print('ici')
     template_name = "scores_encoding.html"
     academic_yr = mdl.academic_year.current_academic_year()
     number_session = mdl.session_exam_calendar.find_session_exam_number()
@@ -211,7 +210,6 @@ def online_encoding(request, learning_unit_year_id=None):
 @user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
 @transaction.non_atomic_requests
 def online_encoding_form(request, learning_unit_year_id=None):
-    print('online_encoding_form')
     template_name = "online_encoding_form.html"
     if request.method == 'POST':
         updated_enrollments = None
@@ -331,7 +329,6 @@ def specific_criteria_submission(request):
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 @user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
 def online_double_encoding_form(request, learning_unit_year_id=None):
-    print('online_double_encoding_form')
     if request.method == 'GET':
         context = _get_double_encoding_context(request, learning_unit_year_id)
         return online_double_encoding_get_form(request, context, learning_unit_year_id)
@@ -532,7 +529,6 @@ def online_double_encoding_get_form(request, data=None, learning_unit_year_id=No
 
 
 def _get_common_encoding_context(request, learning_unit_year_id):
-    print('_get_common_encoding_context')
     scores_list = score_encoding_list.get_scores_encoding_list(user=request.user,
                                                                learning_unit_year_id=learning_unit_year_id)
     score_responsibles = mdl_attr.attribution.find_all_responsibles_by_learning_unit_year(

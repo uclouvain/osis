@@ -34,8 +34,7 @@ register = template.Library()
 def get_line_color(enrollment):
     if enrollment.enrollment_state == enrollment_states.ENROLLED:
         current_session = mdl.session_exam_calendar.current_session_exam()
-        print(current_session.academic_calendar.start_date)
-        if enrollment.date_enrollment > current_session.academic_calendar.start_date:
+        if enrollment.date_enrollment and enrollment.date_enrollment > current_session.academic_calendar.start_date:
             return '#01DF74'
         return None
     else:
