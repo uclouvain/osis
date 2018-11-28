@@ -2363,10 +2363,8 @@ msgstr "Suivant"
 
 #: business/learning_unit_xls.py:296
 #: tests/business/test_learning_unit_xls.py:345
-#, fuzzy
-#| msgid "None"
 msgid "No"
-msgstr "Aucun"
+msgstr "Non"
 
 #: views/my_osis.py:56
 msgid "No Messages"
@@ -3487,10 +3485,8 @@ msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
 
 #: views/education_groups/achievement/update.py:163
-#, fuzzy
-#| msgid "The coorganization modifications has been saved"
 msgid "The additional informations has been updated"
-msgstr "Les données de la coorganisation ont été sauvegardées"
+msgstr "Les information supplémentaires ont été sauvegardées avec succès"
 
 #: views/education_group.py:96
 msgid "The administrative data has been successfully modified"
@@ -3760,10 +3756,8 @@ msgstr ""
 "%(learning_unit)s ne sont pas dans la formation sélectionnée %(root)s"
 
 #: views/education_groups/achievement/update.py:146
-#, fuzzy
-#| msgid "The learning unit has been updated."
 msgid "The program aim has been updated"
-msgstr "L'unité d'enseignement a été modifiée."
+msgstr ""
 
 #: views/education_groups/detail.py:333
 msgid "The program are published. Click on the link to display it : "
@@ -4339,10 +4333,8 @@ msgstr "OUI,NON"
 
 #: business/learning_unit_xls.py:296
 #: tests/business/test_learning_unit_xls.py:345
-#, fuzzy
-#| msgid "yes"
 msgid "Yes"
-msgstr "oui"
+msgstr "Oui"
 
 #: templates/education_group/blocks/form/education_group_type_inner.html:35
 #: templates/education_group/blocks/form/education_group_type_inner.html:43
