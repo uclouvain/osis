@@ -25,11 +25,49 @@
 ##############################################################################
 import re
 
+from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums import count_constraint
+from base.models.group_element_year import GroupElementYear
+from base.models.validation_rule import ValidationRule
 
 REGEX_TRAINING_PARTIAL_ACRONYM = r"^(?P<sigle_ele>[A-Z]{3,5})\d{3}[A-Z]$"
 REGEX_GROUP_PARTIAL_ACRONYM_INITIAL_VALUE = r"^(?P<cnum>\d{3})(?P<subdivision>[A-Z])$"
+
+
+def create_children(parent_egy):
+    auth_rels = AuthorizedRelationship.objects.filter(
+        parent_type=parent_egy.education_group_type,
+        min_count_authorized=count_constraint.ONE
+    )
+    children = []
+    for relationship in auth_rels:
+        child_education_group_type = relationship.child_type
+        egy_title_reference = field_reference("title", EducationGroupYear, child_education_group_type)
+        egy_partial_acronym_reference = field_reference("partial_acronym", EducationGroupYear,
+                                                        child_education_group_type)
+        validation_rule_title = ValidationRule.objects.get(pk=egy_title_reference)
+        validation_rule_partial_acronym = ValidationRule.objects.get(pk=egy_partial_acronym_reference)
+        child = create_child(parent_egy, child_education_group_type, validation_rule_title,
+                             validation_rule_partial_acronym)
+        grp_ele = _append_child_to_parent(parent_egy, child)
+        children.append(grp_ele)
+    return children
+
+
+def _append_child_to_parent(parent_egy, child_egy):
+    grp_ele = GroupElementYear(
+        parent=parent_egy,
+        child_branch=child_egy
+    )
+    grp_ele.save()
+    return grp_ele
+
+
+# FIXME Generalized method
+def field_reference(name, model, education_group_type):
+    return '.'.join([model._meta.db_table, name]) + '.' + education_group_type.external_id
 
 
 def create_child(parent_egy, child_education_group_type, validation_rule_title, validation_rule_partial_acronym):
@@ -49,10 +87,7 @@ def create_child(parent_egy, child_education_group_type, validation_rule_title, 
 
 
 def _create_child_education_group(year):
-    eg = EducationGroup(
-        start_year=year,
-        end_year=year
-    )
+    eg = EducationGroup(start_year=year, end_year=year)
     eg.save()
     return eg
 
