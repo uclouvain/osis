@@ -25,7 +25,6 @@
 ##############################################################################
 from django import forms
 from django.http import QueryDict
-from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.utils.model import merge_two_dicts
@@ -37,10 +36,10 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelF
 from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
 from base.forms.utils.acronym_field import split_acronym
 from base.forms.utils.choice_field import add_blank
-from base.models import learning_unit_year
 from base.models.academic_year import current_academic_year, LEARNING_UNIT_CREATION_SPAN_YEARS
 from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LearningUnit
 
@@ -61,7 +60,7 @@ class YearChoiceField(forms.ChoiceField):
         if not end_year:
             end_year = start_year + LEARNING_UNIT_CREATION_SPAN_YEARS
 
-        self.choices = [(year, self.academic_year_str(year)) for year in range(start_year, end_year+1)]
+        self.choices = [(year, self.academic_year_str(year)) for year in range(start_year, end_year + 1)]
         self.choices = add_blank(self.choices)
 
     @staticmethod
@@ -115,6 +114,11 @@ class PartimForm(LearningUnitBaseForm):
         self.learning_unit_full_instance = learning_unit_full_instance
         self.learning_unit_instance = learning_unit_instance
 
+        self.learning_unit_year_full = self.learning_unit_full_instance.learningunityear_set.filter(
+            academic_year=self.academic_year,
+            subtype=FULL,
+        ).get()
+
         # Inherit values cannot be changed by user
         inherit_luy_values = self._get_inherit_learning_unit_year_full_value()
         instances_data = self._build_instance_data(data, inherit_luy_values)
@@ -125,12 +129,6 @@ class PartimForm(LearningUnitBaseForm):
     @property
     def learning_unit_form(self):
         return self.forms[LearningUnitPartimModelForm]
-
-    @cached_property
-    def learning_unit_year_full(self):
-        return learning_unit_year.search(academic_year_id=self.academic_year.id,
-                                         learning_unit=self.learning_unit_full_instance.id,
-                                         subtype=learning_unit_year_subtypes.FULL).get()
 
     def _build_instance_data(self, data, inherit_luy_values):
         return {
@@ -205,7 +203,7 @@ class PartimForm(LearningUnitBaseForm):
 
     def save(self, commit=True):
         start_year = self.instance.learning_unit.start_year if self.instance else \
-                        self.learning_unit_full_instance.start_year
+            self.learning_unit_full_instance.start_year
 
         lcy = self.learning_unit_year_full.learning_container_year
         # Save learning unit
