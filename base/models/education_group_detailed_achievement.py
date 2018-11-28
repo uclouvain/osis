@@ -51,7 +51,6 @@ class EducationGroupDetailedAchievement(AbstractEducationGroupAchievement):
     order_with_respect_to = ('education_group_achievement',)
 
     class Meta(OrderedModel.Meta):
-        unique_together = ("code_name", "education_group_achievement")
         verbose_name = _("Education group detailed achievement")
 
     def __str__(self):
