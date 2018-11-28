@@ -28,14 +28,16 @@ import functools
 import re
 
 from django.core.exceptions import SuspiciousOperation
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from django.http import Http404
+from django.template import loader
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
+from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.text_label import TextLabel
@@ -113,6 +115,7 @@ def ws_catalog_offer(request, year, language, acronym):
 
     context.description['sections'] = convert_sections_to_list_of_dict(sections)
     context.description['sections'].append(get_conditions_admissions(context))
+    context.description['sections'].append(get_skills_and_achievements(education_group_year))
     return Response(context.description, content_type='application/json')
 
 
@@ -383,3 +386,24 @@ def get_conditions_admissions(context):
         "content": build_content_response(context, admission_condition, admission_condition_common, full_suffix)
     }
     return result
+
+
+def get_skills_and_achievements(education_group_year):
+    comp_acquis_template = loader.get_template('comp_acquis.html')
+    achievements = EducationGroupAchievement.objects.filter(
+        education_group_year=education_group_year
+    ).prefetch_related(
+        Prefetch('educationgroupdetailedachievement_set', to_attr='detailed_achievements'),
+    )
+
+    context = {
+        'skills_and_achievements_introduction': '',
+        'achievements': achievements,
+        'skills_and_achievements_additional_text': ''
+    }
+
+    return {
+        'id': 'comp_acquis',
+        'label': 'comp_acquis',
+        'content': comp_acquis_template.render(context)
+    }
