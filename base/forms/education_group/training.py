@@ -32,6 +32,7 @@ from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_groups import shorten
+from base.business.education_groups.create import create_children
 from base.business.education_groups.postponement import PostponementEducationGroupYearMixin
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, \
     MainEntitiesVersionChoiceField, EducationGroupYearModelForm
@@ -146,8 +147,11 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
                                                     .order_by('-decree__name', 'name')
 
     def save(self, commit=True):
+        is_creation = self.instance.id is None
         education_group_year = super().save(commit=False)
         education_group_year.save()
+        if is_creation:
+            create_children(education_group_year)
         if not self.fields['secondary_domains'].disabled:
             self.save_secondary_domains()
         self.save_certificate_aims()

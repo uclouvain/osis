@@ -76,7 +76,7 @@ def create_child(parent_egy, child_education_group_type, validation_rule_title, 
         main_teaching_campus=parent_egy.main_teaching_campus,
         management_entity=parent_egy.management_entity,
         education_group_type=child_education_group_type,
-        title=validation_rule_title.initial_value,
+        title=_compose_child_title(validation_rule_title.initial_value, parent_egy.acronym),
         partial_acronym=_compose_child_partial_acronym(parent_egy.partial_acronym,
                                                        validation_rule_partial_acronym.initial_value),
         acronym=_compose_child_acronym(parent_egy.acronym, validation_rule_title.initial_value),
@@ -84,6 +84,13 @@ def create_child(parent_egy, child_education_group_type, validation_rule_title, 
     )
     child_egy.save()
     return child_egy
+
+
+def _compose_child_title(child_title_initial_value, parent_acronym):
+    return "{child_title} {parent_acronym}".format(
+        child_title=child_title_initial_value,
+        parent_acronym=parent_acronym
+    )
 
 
 def _create_child_education_group(year):

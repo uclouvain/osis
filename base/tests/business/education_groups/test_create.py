@@ -97,11 +97,12 @@ class TestCreateChild(TestCase):
             self.finality_type
         )
 
-    def test_should_have_title_equal_to_initial_value_of_validation_rule(self):
+    def test_should_have_title_equal_to_initial_value_of_validation_rule_plus_parent_acronym(self):
         child_egy = create_children(self.egy)[0].child_branch
+        expected_title = "{} {}".format(self.validation_rule_title.initial_value, self.egy.acronym)
         self.assertEqual(
             child_egy.title,
-            self.validation_rule_title.initial_value
+            expected_title
         )
 
     def test_should_format_the_partial_acronym_based_on_parent_and_validation_rule(self):
