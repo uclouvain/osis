@@ -184,7 +184,7 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
         egy_deleted = []
         if education_group_instance.end_year:
             egy_deleted = shorten.start(education_group_instance, education_group_instance.end_year)
-
+        # TODO create childs
         return {
             'object_list_deleted': egy_deleted,
         }
