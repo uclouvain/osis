@@ -24,17 +24,17 @@
 #
 ##############################################################################
 from rest_framework import schemas
-from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.decorators import api_view, renderer_classes, schema
 from rest_framework.renderers import OpenAPIRenderer
 from rest_framework.response import Response
 
 
 @api_view()
 @renderer_classes([OpenAPIRenderer])
+@schema(None)
 def schema_view(request):
     generator = schemas.SchemaGenerator(
         title='Education Group API',
-        # url='https://www.{environment}.osis.uclouvain.be/api/v1/education_group',
         urlconf='education_group.api.url_v1',
     )
     return Response(generator.get_schema(request=request))
