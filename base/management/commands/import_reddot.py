@@ -476,10 +476,6 @@ class Command(BaseCommand):
         for key, value in self.json_content.items():
             offer_type, text_label = key.split('.')
 
-            if offer_type == '9ce':
-                # 9ce is a certificate
-                offer_type = 'ce'
-
             education_group_year = EducationGroupYear.objects.get(
                 academic_year=academic_year,
                 acronym='common-{}'.format(offer_type)
