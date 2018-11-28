@@ -44,30 +44,19 @@ def create_children(parent_egy):
     children = []
     for relationship in auth_rels:
         child_education_group_type = relationship.child_type
+
         egy_title_reference = field_reference("title", EducationGroupYear, child_education_group_type)
         egy_partial_acronym_reference = field_reference("partial_acronym", EducationGroupYear,
                                                         child_education_group_type)
+
         validation_rule_title = ValidationRule.objects.get(pk=egy_title_reference)
         validation_rule_partial_acronym = ValidationRule.objects.get(pk=egy_partial_acronym_reference)
+
         child = create_child(parent_egy, child_education_group_type, validation_rule_title,
                              validation_rule_partial_acronym)
         grp_ele = _append_child_to_parent(parent_egy, child)
         children.append(grp_ele)
     return children
-
-
-def _append_child_to_parent(parent_egy, child_egy):
-    grp_ele = GroupElementYear(
-        parent=parent_egy,
-        child_branch=child_egy
-    )
-    grp_ele.save()
-    return grp_ele
-
-
-# FIXME Generalized method
-def field_reference(name, model, education_group_type):
-    return '.'.join([model._meta.db_table, name]) + '.' + education_group_type.external_id
 
 
 def create_child(parent_egy, child_education_group_type, validation_rule_title, validation_rule_partial_acronym):
@@ -86,17 +75,31 @@ def create_child(parent_egy, child_education_group_type, validation_rule_title, 
     return child_egy
 
 
-def _compose_child_title(child_title_initial_value, parent_acronym):
-    return "{child_title} {parent_acronym}".format(
-        child_title=child_title_initial_value,
-        parent_acronym=parent_acronym
-    )
+# FIXME Generalize method
+def field_reference(name, model, education_group_type):
+    return '.'.join([model._meta.db_table, name]) + '.' + education_group_type.external_id
 
 
 def _create_child_education_group(year):
     eg = EducationGroup(start_year=year, end_year=year)
     eg.save()
     return eg
+
+
+def _append_child_to_parent(parent_egy, child_egy):
+    grp_ele = GroupElementYear(
+        parent=parent_egy,
+        child_branch=child_egy
+    )
+    grp_ele.save()
+    return grp_ele
+
+
+def _compose_child_title(child_title_initial_value, parent_acronym):
+    return "{child_title} {parent_acronym}".format(
+        child_title=child_title_initial_value,
+        parent_acronym=parent_acronym
+    )
 
 
 def _compose_child_acronym(parent_acronym, child_title_initial_value):
@@ -122,4 +125,3 @@ def _compose_child_partial_acronym(parent_partial_acronym, child_initial_value):
         partial_acronym = "{}{}{}".format(sigle_ele, cnum, subdivision)
 
     return partial_acronym
-
