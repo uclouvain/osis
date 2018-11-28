@@ -34,7 +34,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
-    LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm, DEFAULT_ACRONYM_COMPONENT
+    LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm
+from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.forms.learning_unit.learning_unit_create_2 import FullForm, FACULTY_OPEN_FIELDS, ID_FIELD, \
     FULL_READ_ONLY_FIELDS
 from base.models.academic_year import AcademicYear

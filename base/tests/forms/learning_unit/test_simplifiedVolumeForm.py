@@ -26,7 +26,7 @@
 from django.test import TestCase
 from django.utils.translation import gettext
 
-from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm, SimplifiedVolumeForm
+from base.forms.learning_unit.simplified_volume import SimplifiedVolumeForm, SimplifiedVolumeManagementForm
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.learning_component_year import LearningComponentYear
 from base.tests.factories.academic_year import get_current_year
