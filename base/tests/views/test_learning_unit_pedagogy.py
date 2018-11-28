@@ -66,6 +66,7 @@ from base.views.learning_units.educational_information import learning_units_sum
 from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit
 from base.views.learning_units.search import SUMMARY_LIST
 from cms.enums import entity_name
+from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from reference.tests.factories.country import CountryFactory
@@ -169,6 +170,18 @@ class LearningUnitPedagogyTestCase(TestCase):
 
         luy_without_mandatory_teaching_material = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1101")
         TeachingMaterialFactory(learning_unit_year=luy_without_mandatory_teaching_material, title="cauldron", mandatory=False)
+        bibliography = TranslatedTextFactory(
+            text_label=TextLabelFactory(label='bibliography'),
+            entity=LEARNING_UNIT_YEAR,
+            text="<ul><li>Test</li></ul>",
+            reference=luy.pk
+        )
+        online_resources = TranslatedTextFactory(
+            text_label=TextLabelFactory(label='online_resources'),
+            entity=LEARNING_UNIT_YEAR,
+            text="<a href='test_url'>TestURL</a>",
+            reference=luy.pk
+        )
 
         # Test the view
         self.client.force_login(self.faculty_user)
@@ -200,7 +213,10 @@ class LearningUnitPedagogyTestCase(TestCase):
         first_luy = next(data)
         first_luy_values = list(t.value for t in first_luy)
         self.assertEqual(first_luy_values, [
-            luy.acronym, luy.complete_title, str(luy.requirement_entity), " ", "Magic wand", " "
+            luy.acronym,
+            luy.complete_title,
+            str(luy.requirement_entity),
+            "Test\n", "Magic wand", "TestURL - [test_url] \n"
         ])
 
         # The second luy has no mandatory teaching material
