@@ -250,7 +250,7 @@ class EducationGroupYear(SerializableModel):
         verbose_name=_('Professionnal title')
     )
 
-    joint_diploma = models.BooleanField(default=False, verbose_name=_('University certificate'))
+    joint_diploma = models.BooleanField(default=False, verbose_name=_('Joint diploma'))
 
     diploma_printing_orientation = models.CharField(
         max_length=30,
