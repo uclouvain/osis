@@ -14,6 +14,7 @@
 
 ### Traductions :
 - Voir https://github.com/uclouvain/osis/blob/dev/doc/technical-manual.adoc#internationalization
+- Les "Fuzzy" doivent être supprimés si la traduction du développeur diffère de la traduction proposée (le "fuzzy" signifiant que GetText a tenté de traduire la clé en retrouvant une similitude dans une autre clé).
 
 ### Réutilisation du code :
 - Ne pas créer de fonctions qui renvoient plus d'un seul paramètre (perte de contrôle sur ce que fait la fonction et perte de réutilisation du code)
