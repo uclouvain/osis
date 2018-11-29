@@ -32,4 +32,7 @@ register = template.Library()
 
 @register.filter
 def get_line_color(enrollment):
-    return enrollment_state.get_line_color(enrollment)
+    enrollment_color = enrollment_state.get_line_color(enrollment)
+    if enrollment_color:
+        return "#{}".format(enrollment_color)
+    return None
