@@ -94,12 +94,19 @@ class TestPerms(TestCase):
             )
         )
 
-    def is_person_central_manager(self):
+    def test_is_person_central_manager(self):
         person = PersonFactory()
         self.assertFalse(person.is_central_manager())
 
         central_manager = CentralManagerFactory()
         self.assertTrue(central_manager.is_central_manager())
+
+    def test_is_person_sic(self):
+        person = PersonFactory()
+        self.assertFalse(person.is_sic())
+
+        sic = SICFactory()
+        self.assertTrue(sic.is_sic())
 
     def test_check_unauthorized_type(self):
         education_group = EducationGroupYearFactory()
