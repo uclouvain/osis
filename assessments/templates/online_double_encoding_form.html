@@ -127,20 +127,7 @@
                 </thead>
                 <tbody>
                 {% for enrollment in enrollments %}
-                    <tr style="background-color:
-                            {% with enrollement_status_color=enrollment|get_line_color %}
-                            {% if enrollement_status_color %}
-                                {{ enrollement_status_color }}
-                            {% else %}
-                                {% ifchanged enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym %}
-                                         {% cycle "white" "#E5F2FF" as rowcolors %}
-                                      {% else %}
-                                         {{ rowcolors }}
-                                      {% endifchanged %}
-                            {% endif %}
-                            {% endwith %}
-                            ">
-
+                    <tr style="background-color:{% include 'blocks/row_color.html' %}">
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>
