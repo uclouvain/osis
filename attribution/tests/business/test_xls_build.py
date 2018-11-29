@@ -24,19 +24,18 @@
 #
 ##############################################################################
 import datetime
-from unittest import mock
 
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
-from base.models.enums import entity_container_year_link_type
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
-from attribution.business import xls_build as xls_build_attribution
-from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.business import attribution_charge_new
+from attribution.business import xls_build as xls_build_attribution
+from attribution.business.xls_build import LEARNING_UNIT_TITLES
+from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from base.models.enums import entity_container_year_link_type
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.entity_version import EntityVersionFactory
-from attribution.business.xls_build import LEARNING_UNIT_TITLES
+from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.user import UserFactory
 from osis_common.document import xls_build
 
@@ -73,21 +72,6 @@ class TestXlsBuild(TestCase):
     def test_prepare_titles(self):
         self.assertCountEqual(xls_build_attribution._prepare_titles(),
                               LEARNING_UNIT_TITLES + xls_build_attribution.ATTRIBUTION_TITLES)
-
-    @mock.patch("osis_common.document.xls_build.generate_xls")
-    def test_generate_xls_data_with_no_data(self, mock_generate_xls):
-        xls_build_attribution.create_xls_attribution(self.user, [], None)
-        expected_argument = _generate_xls_build_parameter([], self.user)
-        mock_generate_xls.assert_called_with(expected_argument, None)
-
-    @mock.patch("osis_common.document.xls_build.generate_xls")
-    def test_generate_xls_data_with_a_learning_unit(self, mock_generate_xls):
-        xls_build_attribution.create_xls_attribution(self.user, [self.learning_unit_yr_1], None)
-        an_attribution = self.learning_unit_yr_1.attribution_charge_news.get(self.attribution_1.attribution.id)
-        xls_data = [self.get_xls_data(an_attribution, self.learning_unit_yr_1)]
-
-        expected_argument = _generate_xls_build_parameter(xls_data, self.user)
-        mock_generate_xls.assert_called_with(expected_argument, None)
 
     def get_xls_data(self, an_attribution, learning_unit_yr):
         return [learning_unit_yr.academic_year.name,

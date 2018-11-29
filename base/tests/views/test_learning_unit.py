@@ -28,7 +28,9 @@ from unittest import mock
 
 import factory.fuzzy
 import reversion
+from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
+from django.contrib.messages.api import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -101,8 +103,6 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory
-from django.contrib import messages
-from django.contrib.messages.api import get_messages
 
 
 @override_flag('learning_unit_create', active=True)
@@ -220,15 +220,15 @@ class LearningUnitViewCreateFullTestCase(TestCase):
             "other_remark": "other remark",
 
             # Learning component year data model form
-            'form-TOTAL_FORMS': '2',
-            'form-INITIAL_FORMS': '0',
-            'form-MAX_NUM_FORMS': '2',
-            'form-0-hourly_volume_total_annual': 20,
-            'form-0-hourly_volume_partial_q1': 10,
-            'form-0-hourly_volume_partial_q2': 10,
-            'form-1-hourly_volume_total_annual': 20,
-            'form-1-hourly_volume_partial_q1': 10,
-            'form-1-hourly_volume_partial_q2': 10,
+            'component-TOTAL_FORMS': '2',
+            'component-INITIAL_FORMS': '0',
+            'component-MAX_NUM_FORMS': '2',
+            'component-0-hourly_volume_total_annual': 20,
+            'component-0-hourly_volume_partial_q1': 10,
+            'component-0-hourly_volume_partial_q2': 10,
+            'component-1-hourly_volume_total_annual': 20,
+            'component-1-hourly_volume_partial_q1': 10,
+            'component-1-hourly_volume_partial_q2': 10,
         }
 
         response = self.client.post(self.url, data=form_data)
@@ -1375,6 +1375,67 @@ class LearningUnitViewTestCase(TestCase):
         self.assertIn(messages.ERROR, msg_level)
 
         self.assertIn(_('Comparison impossible! No learning unit to compare to'), msg)
+
+    @mock.patch('base.models.program_manager.is_program_manager')
+    def test_learning_unit_comparison_no_previous_luy(self, mock_program_manager):
+        mock_program_manager.return_value = True
+        learning_unit = LearningUnitFactory()
+        learning_unit_year_1 = create_learning_unit_year(self.current_academic_year,
+                                                         'title', learning_unit)
+        previous_academic_yr = AcademicYearFactory(year=self.current_academic_year.year - 1)
+
+        next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year + 1)
+        next_learning_unit_year = create_learning_unit_year(next_academic_yr,
+                                                            'next title',
+                                                            learning_unit)
+
+        response = self.client.get(reverse(learning_unit_comparison, args=[learning_unit_year_1.pk]))
+
+        self.assertTemplateUsed(response, 'learning_unit/comparison.html')
+        self.assertEqual(response.context['previous_academic_yr'], previous_academic_yr)
+        self.assertEqual(response.context['next_academic_yr'], next_academic_yr)
+        self.assertEqual(response.context['fields'], ['specific_title'])
+        self.assertEqual(response.context['next_values'], {'specific_title': next_learning_unit_year.specific_title})
+
+        msgs = list(response.context['messages'])
+        self.assertEqual(len(msgs), 1)
+        msg = msgs[0]
+        self.assertEqual(
+            str(msg),
+            _("The learning unit does not exist for the academic year %(anac)s") % {'anac': str(previous_academic_yr)}
+        )
+        self.assertEqual(msg.level, messages.INFO)
+
+    @mock.patch('base.models.program_manager.is_program_manager')
+    def test_learning_unit_comparison_no_next_luy(self, mock_program_manager):
+        mock_program_manager.return_value = True
+        learning_unit = LearningUnitFactory()
+        learning_unit_year_1 = create_learning_unit_year(self.current_academic_year,
+                                                         'title', learning_unit)
+        previous_academic_yr = AcademicYearFactory(year=self.current_academic_year.year - 1)
+        previous_learning_unit_year = create_learning_unit_year(previous_academic_yr, 'previous title', learning_unit)
+
+        next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year + 1)
+
+        response = self.client.get(reverse(learning_unit_comparison, args=[learning_unit_year_1.pk]))
+
+        self.assertTemplateUsed(response, 'learning_unit/comparison.html')
+        self.assertEqual(response.context['previous_academic_yr'], previous_academic_yr)
+        self.assertEqual(response.context['next_academic_yr'], next_academic_yr)
+        self.assertEqual(response.context['fields'], ['specific_title'])
+        self.assertEqual(
+            response.context['previous_values'],
+            {'specific_title': previous_learning_unit_year.specific_title}
+        )
+
+        msgs = list(response.context['messages'])
+        self.assertEqual(len(msgs), 1)
+        msg = msgs[0]
+        self.assertEqual(
+            str(msg),
+            _("The learning unit does not exist for the academic year %(anac)s") % {'anac': str(next_academic_yr)}
+        )
+        self.assertEqual(msg.level, messages.INFO)
 
 
 class TestCreateXls(TestCase):

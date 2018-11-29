@@ -27,9 +27,13 @@
     {% for component in components_comparison %}
         <tr class="table_header" style="border-top: groove">
             <td class="table_header">{% trans 'Component' %} : {{ component|get_item:'type' }}</td>
-            <th>{{ previous_academic_yr }}</th>
+            {% if previous_lu %}
+                <th>{{ previous_academic_yr }}</th>
+            {% endif %}
             <th>{{ learning_unit_year.academic_year }}</th>
-            <th>{{ next_academic_yr }}</th>
+            {% if next_lu %}
+                <th>{{ next_academic_yr }}</th>
+            {% endif %}
         </tr>
         {% for key, values in component.items %}
             {% if key != 'type' %}
@@ -51,9 +55,13 @@
 
 
                     </td>
-                    <td>{% changed_label values.0 other1=values.1 %}</td>
+                    {% if previous_lu %}
+                        <td>{% changed_label values.0 other1=values.1 %}</td>
+                    {% endif %}
                     <td>{{ values.1 | default_if_none:'-' }}</td>
-                    <td>{% changed_label values.2 other1=values.1 %}</td>
+                    {% if next_lu %}
+                        <td>{% changed_label values.2 other1=values.1 %}</td>
+                    {% endif %}
                 </tr>
             {% endif %}
         {% endfor %}

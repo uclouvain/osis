@@ -49,7 +49,7 @@ from base.utils import send_mail
 from base.views import layout
 from osis_common.document import paper_sheet
 from osis_common.queue.queue_sender import send_message
-
+from base.models.enums import exam_enrollment_state as enrollment_states
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 queue_exception_logger = logging.getLogger(settings.QUEUE_EXCEPTION_LOGGER)
 
@@ -547,7 +547,7 @@ def _get_common_encoding_context(request, learning_unit_year_id):
         'is_coordinator': is_coordinator,
         'draft_scores_not_submitted': len(scores_list.enrollment_draft_not_submitted),
         'exam_enrollments_encoded': len(scores_list.enrollment_encoded),
-        'total_exam_enrollments': len(scores_list.enrollments),
+        'total_exam_enrollments': _get_count_still_enrolled(scores_list.enrollments),
         'progress': scores_list.progress,
         'progress_int': scores_list.progress_int
     }
@@ -671,3 +671,11 @@ def send_json_scores_sheets_to_response_queue(global_id):
         send_message(queue_name, data, connect, channel)
     except (RuntimeError, pika.exceptions.ConnectionClosed, pika.exceptions.ChannelClosed, pika.exceptions.AMQPError):
         logger.exception('Could not send back scores_sheets json in response queue for global_id {}'.format(global_id))
+
+
+def _get_count_still_enrolled(enrollments):
+    nb_enrolled = 0
+    for enrollment in enrollments:
+        if enrollment.enrollment_state == enrollment_states.ENROLLED:
+            nb_enrolled += 1
+    return nb_enrolled

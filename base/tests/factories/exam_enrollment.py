@@ -51,3 +51,4 @@ class ExamEnrollmentFactory(factory.DjangoModelFactory):
     session_exam = factory.SubFactory(SessionExamFactory)
     learning_unit_enrollment = factory.SubFactory(LearningUnitEnrollmentFactory)
     enrollment_state = exam_enrollment_state.ENROLLED
+    date_enrollment = None

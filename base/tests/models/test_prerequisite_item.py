@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.db import IntegrityError
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
@@ -86,6 +86,13 @@ class TestPrerequisiteItem(TestCase):
             len(prerequisite_item.PrerequisiteItem.objects.filter(prerequisite=self.prerequisite)),
             0
         )
+
+    def test_learning_unit_prerequisite_to_itself_forbidden(self):
+        with self.assertRaisesMessage(IntegrityError, "A learning unit cannot be prerequisite to itself"):
+            PrerequisiteItemFactory(
+                prerequisite=self.prerequisite,
+                learning_unit=self.learning_unit_year_with_prerequisite.learning_unit
+            )
 
 
 class TestPrerequisiteString(TestCase):

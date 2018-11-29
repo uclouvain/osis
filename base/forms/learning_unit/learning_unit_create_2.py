@@ -58,6 +58,12 @@ FACULTY_OPEN_FIELDS = {
     'specific_title_english',
     "status",
     "professional_integration",
+    "component-0-id",
+    "component-0-hourly_volume_partial_q1",
+    "component-0-hourly_volume_partial_q2",
+    "component-1-id",
+    "component-1-hourly_volume_partial_q1",
+    "component-1-hourly_volume_partial_q2",
     ID_FIELD  # THIS IS A FIX, BUT A BETTER SOLUTION SHOULD BE FIND
 }
 
@@ -204,7 +210,6 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
 
 
 class FullForm(LearningUnitBaseForm):
-
     subtype = learning_unit_year_subtypes.FULL
 
     def __init__(self, person, academic_year, learning_unit_instance=None, data=None, start_year=None, proposal=False,
@@ -247,6 +252,7 @@ class FullForm(LearningUnitBaseForm):
         if self.proposal:
             # ID FIELD CAN NOT BE DEACTIVATED WITH FACULTY MANAGER
             # TODO: THIS IS A FIX, BUT A BETTER SOLUTION SHOULD BE FIND
+            # Fix to save proposal
             self.disable_fields(FACULTY_OPEN_FIELDS - set([ID_FIELD]))
         elif self.instance.learning_container_year and \
                 self.instance.learning_container_year.container_type not in faculty_type_not_restricted:

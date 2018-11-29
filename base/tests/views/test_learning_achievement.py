@@ -30,6 +30,8 @@ from django.contrib.auth.models import Permission
 from django.core.urlresolvers import reverse
 from django.test import TestCase, RequestFactory
 from django.core.exceptions import PermissionDenied
+from waffle.models import Flag
+from waffle.testutils import override_flag
 
 from base.models.enums import learning_unit_year_subtypes, entity_container_year_link_type
 from base.models.learning_achievement import LearningAchievement
@@ -48,6 +50,7 @@ from reference.models.language import FR_CODE_LANGUAGE
 from base.tests.factories.user import SuperUserFactory
 
 
+@override_flag('learning_achievement_update', active=True)
 class TestLearningAchievementView(TestCase):
     def setUp(self):
         self.academic_year = create_current_academic_year()
@@ -70,6 +73,8 @@ class TestLearningAchievementView(TestCase):
                                                          learning_unit_year=self.learning_unit_year,
                                                          order=0)
         self.reverse_learning_unit_yr = reverse('learning_unit', args=[self.learning_unit_year.id])
+        flag, created = Flag.objects.get_or_create(name='learning_achievement_update')
+        flag.users.add(self.user)
 
     def test_operation_method_not_allowed(self):
         request_factory = RequestFactory()
