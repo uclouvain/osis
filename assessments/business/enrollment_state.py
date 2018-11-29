@@ -39,4 +39,3 @@ def get_line_color(enrollment):
         return None
     else:
         return NOT_ENROLLED_COLOR
-

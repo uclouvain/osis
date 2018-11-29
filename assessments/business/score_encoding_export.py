@@ -223,7 +223,7 @@ def __coloring_enrollment_state(ws, row_number, exam_enroll):
 
 
 def __color_legend(ws):
-    __apply_style_to_cells(ws, ENROLLED_LATE_COLOR, FIRST_ROW_LEGEND_ENROLLMENT_STATUS )
+    __apply_style_to_cells(ws, ENROLLED_LATE_COLOR, FIRST_ROW_LEGEND_ENROLLMENT_STATUS)
     __apply_style_to_cells(ws, NOT_ENROLLED_COLOR, FIRST_ROW_LEGEND_ENROLLMENT_STATUS + 1)
 
 
