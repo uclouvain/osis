@@ -46,29 +46,12 @@ class TestPrerequisiteItem(TestCase):
             learning_unit=self.learning_unit_is_prerequisite
         )
 
-    def test_find_by_learning_unit_year_having_prerequisite(self):
+    def test_has_or_is_prerequisite(self):
         self.assertTrue(
             self.learning_unit_year_with_prerequisite.has_or_is_prerequisite(self.prerequisite.education_group_year)
         )
         self.assertFalse(
-            self.learning_unit_year_with_prerequisite.has_or_is_prerequisite(self.prerequisite.education_group_year)
-        )
-
-    def test_find_by_learning_unit_being_prerequisite(self):
-        self.assertEqual(
-            list(
-                prerequisite_item.find_by_learning_unit_being_prerequisite(
-                    self.learning_unit_is_prerequisite
-                )
-            ),
-            [self.prerequisite_item]
-        )
-        self.assertFalse(
-            list(
-                prerequisite_item.find_by_learning_unit_being_prerequisite(
-                    self.learning_unit_not_prerequisite
-                )
-            )
+            self.learning_unit_year_without_prerequisite.has_or_is_prerequisite(self.prerequisite.education_group_year)
         )
 
     def test_find_by_prerequisite(self):
@@ -98,7 +81,7 @@ class TestPrerequisiteString(TestCase):
 
     def test_get_prerequisite_string_representation_no_item(self):
         self.assertEqual(
-            prerequisite_item.get_prerequisite_string_representation(self.prerequisite),
+            self.prerequisite.prerequisite_string,
             ""
         )
 
@@ -115,7 +98,7 @@ class TestPrerequisiteString(TestCase):
         )
 
         self.assertEqual(
-            prerequisite_item.get_prerequisite_string_representation(self.prerequisite),
+            self.prerequisite.prerequisite_string,
             "LDROI1111 {AND} LDROI1121".format(AND=_('AND'))
         )
 
@@ -132,7 +115,7 @@ class TestPrerequisiteString(TestCase):
         )
 
         self.assertEqual(
-            prerequisite_item.get_prerequisite_string_representation(self.prerequisite),
+            self.prerequisite.prerequisite_string,
             "(LDROI1111 {OR} LDROI1112 {OR} LDROI1113) {AND} (LDROI1121 {OR} LDROI1122 {OR} LDROI1123)".format(
                 OR=_('OR'),
                 AND=_('AND')
