@@ -33,34 +33,6 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 
 
-class TestPrerequisite(TestCase):
-    def setUp(self):
-        academic_year = AcademicYearFactory()
-        self.learning_unit_year_with_prerequisite = LearningUnitYearFactory()
-        self.learning_unit_year_without_prerequisite = LearningUnitYearFactory()
-        self.education_group_year = EducationGroupYearFactory(academic_year=academic_year)
-        self.prerequisite = PrerequisiteFactory(
-            learning_unit_year=self.learning_unit_year_with_prerequisite,
-            education_group_year=self.education_group_year
-        )
-
-    def test_get_by_learning_unit_year_and_education_group_year_1_result(self):
-        self.assertEqual(
-            prerequisite.get_by_learning_unit_year_and_education_group_year(
-                learning_unit_year=self.learning_unit_year_with_prerequisite,
-                education_group_year=self.education_group_year
-            ),
-            self.prerequisite
-        )
-
-    def test_get_by_learning_unit_year_and_education_group_year_no_result(self):
-        with self.assertRaises(prerequisite.Prerequisite.DoesNotExist):
-            prerequisite.get_by_learning_unit_year_and_education_group_year(
-                learning_unit_year=self.learning_unit_year_without_prerequisite,
-                education_group_year=self.education_group_year
-            )
-
-
 class TestPrerequisiteSyntaxValidator(TestCase):
     def test_empty_string(self):
         self.assertIsNone(prerequisite.prerequisite_syntax_validator(""))
