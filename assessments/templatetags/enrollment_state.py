@@ -24,18 +24,15 @@
 #
 ##############################################################################
 from django import template
-from base.models.enums import exam_enrollment_state as enrollment_states
-from base import models as mdl
+
+from assessments.business import enrollment_state
+
+ENROLLED_LATE_COLOR = '#dff0d8'
+NOT_ENROLLED_COLOR = '#f2dede'
 
 register = template.Library()
 
 
 @register.filter
 def get_line_color(enrollment):
-    if enrollment.enrollment_state == enrollment_states.ENROLLED:
-        current_session = mdl.session_exam_calendar.current_session_exam()
-        if enrollment.date_enrollment and enrollment.date_enrollment > current_session.academic_calendar.start_date:
-            return '#01DF74'
-        return None
-    else:
-        return '#FE2E2E'
+    return enrollment_state.get_line_color(enrollment)
