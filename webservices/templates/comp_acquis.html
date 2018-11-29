@@ -40,7 +40,7 @@
         <div class="clear"></div>
 
         <div id="cmp_{{ forloop.counter }}" class="composant-info" style="display:none;">
-             {% for detailed_achievement in achievements.detailed_achievements %}
+             {% for detailed_achievement in achievement.detailed_achievements %}
                 <p>
                    {# This is an fix until the data is corrected. The dot only means that user has not extract code_name from rich text #}
                    {% if detailed_achievement.code_name != '.' %}
