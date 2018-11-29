@@ -96,7 +96,7 @@ def generate_exam_enrollments(year, with_different_offer=False):
         exam_enrollments.append(ExamEnrollmentFactory(session_exam=session_exams[i],
                                                       learning_unit_enrollment=learning_unit_enrollment,
                                                       enrollment_state=exam_enrollment_state.ENROLLED,
-                                                      date_enrollment=an_academic_calendar.start_date.date()))
+                                                      date_enrollment=an_academic_calendar.start_date))
     return locals()
 
 
