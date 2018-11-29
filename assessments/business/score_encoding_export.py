@@ -150,7 +150,7 @@ def __display_creation_date_with_message_about_state(ws, row_number):
 
     ws.cell(row=row_number, column=1).value = str(
         '%s' % (_("The data presented on this document correspond to the state of the system dated %(printing_date)s "
-                  "and are likely to evolve") % printing_date))
+                  "and are likely to evolve") % {'printing_date': printing_date}))
     ws.cell(row=row_number, column=1).font = Font(color=colors.RED)
 
 
@@ -163,15 +163,23 @@ def __display_legends(ws):
     ws.append([
         str(_('Justification')),
         str(_("Accepted value: %(justification_label_authorized)s ")
-            % mdl.exam_enrollment.justification_label_authorized())
+            % {"justification_label_authorized": mdl.exam_enrollment.justification_label_authorized()}),
+        str(''),
+        str(''),
+        str(''),
+        str(_('Enrolled after session starts')),
     ])
     ws.append([
         str(''),
-        str(_("Other values: %(justification_other_values)s ") % justification_other_values())
+        str(_("Other values: %(justification_other_values)s ") % {'justification_other_values': justification_other_values()}),
+        str(''),
+        str(''),
+        str(''),
+        str(_('Not enrolled')),
     ])
     ws.append([
         str(_('Numbered scores')),
-        str(_('Score legend: %(score_legend)s (0=Score of presence)') % "0 - 20")
+        str(_('Score legend: %(score_legend)s (0=Score of presence)') % {"score_legend": "0 - 20"}),
     ])
 
 
