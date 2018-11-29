@@ -23,3 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import factory.fuzzy
+
+from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
+
+
+class EducationGroupDetailedAchievementFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "base.EducationGroupDetailedAchievement"
+
+    code_name = factory.Sequence(lambda n: 'AA %02d' % n)
+    french_text = factory.fuzzy.FuzzyText('label_', 20)
+    english_text = factory.fuzzy.FuzzyText('label_', 20)
+    education_group_achievement = factory.SubFactory(EducationGroupAchievementFactory)

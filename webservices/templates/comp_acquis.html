@@ -18,15 +18,19 @@
         }
     </script>
 
-    <strong>{% trans 'on successful completion of this program, each student is able to'|capfirst %} :</strong><br>
-
+    <strong>
+        {% language language_code %}
+            {% trans 'on successful completion of this program, each student is able to'|capfirst %} :
+        {% endlanguage %}
+    </strong>
+    <br/>
     {% for achievement in achievements %}
         <div id="achievement_{{ forloop.counter }}" class="reddot_teaser">
             {# This is an fix until the data is corrected. The dot only means that user has not extract code_name from rich text #}
             {% if achievement.code_name != '.' %}
                 {{ achievement.code_name  }}&nbsp;
             {% endif %}
-            {{ achievement.french_text  }}
+            {{ achievement.text  }}
         </div>
         <div class="link_action_showHide" style="text-indent:25px">
             <a id="action_{{ forloop.counter }}" href="javascript:showorHide('{{ forloop.counter }}')" name="action_{{ forloop.counter }}">More</a>

@@ -28,7 +28,7 @@ import functools
 import re
 
 from django.core.exceptions import SuspiciousOperation
-from django.db.models import Q, Prefetch
+from django.db.models import Q
 from django.http import Http404
 from django.template import loader
 from rest_framework.decorators import api_view, renderer_classes
@@ -37,12 +37,12 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
-from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from webservices import business
 from webservices.utils import convert_sections_to_list_of_dict
 
 LANGUAGES = {'fr': 'fr-be', 'en': 'en'}
@@ -115,7 +115,6 @@ def ws_catalog_offer(request, year, language, acronym):
 
     context.description['sections'] = convert_sections_to_list_of_dict(sections)
     context.description['sections'].append(get_conditions_admissions(context))
-    context.description['sections'].append(get_skills_and_achievements(education_group_year))
     return Response(context.description, content_type='application/json')
 
 
@@ -153,6 +152,8 @@ def process_section(context, education_group_year, item):
             label=m_common.group('section_name')
         ).first()
         return insert_section_if_checked(context, egy, text_label)
+    elif item == business.SKILLS_AND_ACHIEVEMENTS_KEY:
+        return get_skills_and_achievements(education_group_year, context.language)
     else:
         text_label = TextLabel.objects.filter(entity=OFFER_YEAR, label=item).first()
         if text_label:
@@ -388,22 +389,17 @@ def get_conditions_admissions(context):
     return result
 
 
-def get_skills_and_achievements(education_group_year):
-    comp_acquis_template = loader.get_template('comp_acquis.html')
-    achievements = EducationGroupAchievement.objects.filter(
-        education_group_year=education_group_year
-    ).prefetch_related(
-        Prefetch('educationgroupdetailedachievement_set', to_attr='detailed_achievements'),
-    )
-
+def get_skills_and_achievements(education_group_year, language_code):
     context = {
-        'skills_and_achievements_introduction': '',
-        'achievements': achievements,
-        'skills_and_achievements_additional_text': ''
+        'achievements': business.get_achievements(education_group_year, language_code),
+        'language_code': language_code
     }
+    context.update(business.get_intro_extra_content_achievements(education_group_year, language_code))
 
+    comp_acquis_template = loader.get_template('comp_acquis.html')
+    content_rendered = comp_acquis_template.render(context)
     return {
-        'id': 'comp_acquis',
-        'label': 'comp_acquis',
-        'content': comp_acquis_template.render(context)
+        'id': business.SKILLS_AND_ACHIEVEMENTS_KEY,
+        'label': business.SKILLS_AND_ACHIEVEMENTS_KEY,
+        'content': content_rendered
     }

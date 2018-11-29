@@ -46,11 +46,8 @@ from base.tests.factories.education_group import EducationGroupFactory
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-
-SKILLS_AND_ACHIEVEMENTS_KEY = 'comp_acquis'
-SKILLS_AND_ACHIEVEMENTS_CMS_DATA = ('skills_and_achievements_introduction', 'skills_and_achievements_additional_text', )
-SKILLS_AND_ACHIEVEMENTS_AA_DATA = 'achievements'
-
+from webservices.business import SKILLS_AND_ACHIEVEMENTS_CMS_DATA, SKILLS_AND_ACHIEVEMENTS_KEY, \
+    SKILLS_AND_ACHIEVEMENTS_AA_DATA
 
 BACHELOR_FIELDS = (
     'alert_message', 'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres', 'ca_bacs_examen_langue',
