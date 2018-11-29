@@ -33,4 +33,8 @@ COMPONENT_TYPES = (
     (PRACTICAL_EXERCISES, _("Practical exercises"))
 )
 
-
+DEFAULT_ACRONYM_COMPONENT = {
+    LECTURING: "PM",
+    PRACTICAL_EXERCISES: "PP",
+    None: "NT"
+}
