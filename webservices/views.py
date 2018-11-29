@@ -134,7 +134,6 @@ def process_section(context, education_group_year, item):
 
     m_intro = re.match(INTRO_PATTERN, item)
     m_common = re.match(COMMON_PATTERN, item)
-
     if m_intro:
         egy = EducationGroupYear.objects.filter(partial_acronym__iexact=m_intro.group('acronym'),
                                                 academic_year__year=context.year).first()
@@ -154,6 +153,8 @@ def process_section(context, education_group_year, item):
         return insert_section_if_checked(context, egy, text_label)
     elif item == business.SKILLS_AND_ACHIEVEMENTS_KEY:
         return get_skills_and_achievements(education_group_year, context.language)
+    elif item == business.EVALUATION_KEY:
+        return get_evaluation(education_group_year, context.language)
     else:
         text_label = TextLabel.objects.filter(entity=OFFER_YEAR, label=item).first()
         if text_label:
@@ -387,6 +388,23 @@ def get_conditions_admissions(context):
         "content": build_content_response(context, admission_condition, admission_condition_common, full_suffix)
     }
     return result
+
+
+def get_evaluation(education_group_year, language_code):
+    text_label = TextLabel.objects.filter(entity=OFFER_YEAR, label=business.EVALUATION_KEY).first()
+    translated_text_label = TranslatedTextLabel.objects.filter(text_label=text_label,
+                                                               language=language_code).first()
+    translated_text = TranslatedText.objects.filter(text_label=text_label,
+                                                    language=language_code,
+                                                    entity=text_label.entity,
+                                                    reference=education_group_year.id).first()
+    return {
+        'id': business.EVALUATION_KEY,
+        'label': translated_text_label.label,
+        'content': translated_text.text,
+        'free_text': ''
+
+    }
 
 
 def get_skills_and_achievements(education_group_year, language_code):

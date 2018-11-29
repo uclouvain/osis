@@ -35,6 +35,8 @@ SKILLS_AND_ACHIEVEMENTS_KEY = 'comp_acquis'
 SKILLS_AND_ACHIEVEMENTS_AA_DATA = 'achievements'
 SKILLS_AND_ACHIEVEMENTS_CMS_DATA = ('skills_and_achievements_introduction', 'skills_and_achievements_additional_text', )
 
+EVALUATION_KEY = 'evaluation'
+
 
 def get_achievements(education_group_year, language_code):
     if language_code in [settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_EN]:
