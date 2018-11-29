@@ -252,7 +252,8 @@ def button_with_permission(context, title, value, url):
         group_element_year = get_group_element_year_by_id(
             int(get_parameter_from_url_querystring(url, 'group_element_year_id'))
         )
-        if group_element_year.child_leaf and luy_has_or_is_prerequisite(group_element_year.child_leaf):
+        if group_element_year.child_leaf and luy_has_or_is_prerequisite(group_element_year.parent,
+                                                                        group_element_year.child_leaf):
             disabled = "disabled"
             load_modal = False
 
