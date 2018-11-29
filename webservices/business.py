@@ -29,7 +29,9 @@ from django.db.models import Prefetch
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from cms.enums import entity_name
+from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
+from cms.models.translated_text_label import TranslatedTextLabel
 
 SKILLS_AND_ACHIEVEMENTS_KEY = 'comp_acquis'
 SKILLS_AND_ACHIEVEMENTS_AA_DATA = 'achievements'
@@ -60,3 +62,18 @@ def get_intro_extra_content_achievements(education_group_year, language_code):
         text_label__label__in=SKILLS_AND_ACHIEVEMENTS_CMS_DATA
     ).select_related('text_label')
     return {cms_data.text_label.label: cms_data.text for cms_data in qs}
+
+
+def get_evaluation_text(education_group_year, language_code):
+    translated_text_label = TranslatedTextLabel.objects.get(text_label__entity=OFFER_YEAR,
+                                                            text_label__label=EVALUATION_KEY,
+                                                            language=language_code)
+    translated_text = TranslatedText.objects.get(
+        text_label__entity=OFFER_YEAR,
+        text_label__label=EVALUATION_KEY,
+        language=language_code,
+        entity=OFFER_YEAR,
+        reference=education_group_year.id
+    )
+    return translated_text_label.label, translated_text.text
+
