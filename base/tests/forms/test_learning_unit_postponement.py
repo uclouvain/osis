@@ -250,12 +250,12 @@ class TestLearningUnitPostponementFormSave(LearningUnitPostponementFormContextMi
 
         instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_partim, self.person)
         instance_luy_base_form.data['end_year'] = self.learning_unit_year_full.academic_year.year + 2
-        instance_luy_base_form.data['form-TOTAL_FORMS'] = 2
-        instance_luy_base_form.data['form-INITIAL_FORMS'] = 0
-        instance_luy_base_form.data['form-MAX_NUM_FORMS'] = 2
-        instance_luy_base_form.data['form-0-hourly_volume_total_annual'] = 20
-        instance_luy_base_form.data['form-0-hourly_volume_partial_q1'] = 10
-        instance_luy_base_form.data['form-0-hourly_volume_partial_q2'] = 10
+        instance_luy_base_form.data['component-TOTAL_FORMS'] = 2
+        instance_luy_base_form.data['component-INITIAL_FORMS'] = 0
+        instance_luy_base_form.data['component-MAX_NUM_FORMS'] = 2
+        instance_luy_base_form.data['component-0-hourly_volume_total_annual'] = 20
+        instance_luy_base_form.data['component-0-hourly_volume_partial_q1'] = 10
+        instance_luy_base_form.data['component-0-hourly_volume_partial_q2'] = 10
 
         form = LearningUnitPostponementForm(self.person, self.learning_unit_year_full.academic_year,
                                             learning_unit_full_instance=self.learning_unit_year_full.learning_unit,
@@ -725,15 +725,15 @@ def _instantiate_base_learning_unit_form(learning_unit_year_instance, person):
         'learning_unit_instance': learning_unit_instance,
         'data': {
             # Learning component year data model form
-            'form-TOTAL_FORMS': '2',
-            'form-INITIAL_FORMS': '0',
-            'form-MAX_NUM_FORMS': '2',
-            'form-0-hourly_volume_total_annual': 20,
-            'form-0-hourly_volume_partial_q1': 10,
-            'form-0-hourly_volume_partial_q2': 10,
-            'form-1-hourly_volume_total_annual': 20,
-            'form-1-hourly_volume_partial_q1': 10,
-            'form-1-hourly_volume_partial_q2': 10,
+            'component-TOTAL_FORMS': '2',
+            'component-INITIAL_FORMS': '0',
+            'component-MAX_NUM_FORMS': '2',
+            'component-0-hourly_volume_total_annual': 20,
+            'component-0-hourly_volume_partial_q1': 10,
+            'component-0-hourly_volume_partial_q2': 10,
+            'component-1-hourly_volume_total_annual': 20,
+            'component-1-hourly_volume_partial_q1': 10,
+            'component-1-hourly_volume_partial_q2': 10,
 
             'acronym': learning_unit_year_instance.acronym,
             'acronym_0': learning_unit_year_instance.acronym[0],

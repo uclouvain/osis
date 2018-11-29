@@ -29,7 +29,6 @@ import factory
 import factory.fuzzy
 from django.forms import model_to_dict
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
 from base.forms.learning_unit.entity_form import EntityContainerBaseForm
@@ -430,15 +429,15 @@ def get_valid_form_data(learning_unit_year_partim):
         'other_remark': learning_unit_year_partim.learning_unit.other_remark,
 
         # Learning component year data model form
-        'form-TOTAL_FORMS': '2',
-        'form-INITIAL_FORMS': '0',
-        'form-MAX_NUM_FORMS': '2',
-        'form-0-hourly_volume_total_annual': 20,
-        'form-0-hourly_volume_partial_q1': 10,
-        'form-0-hourly_volume_partial_q2': 10,
-        'form-1-hourly_volume_total_annual': 20,
-        'form-1-hourly_volume_partial_q1': 10,
-        'form-1-hourly_volume_partial_q2': 10,
+        'component-TOTAL_FORMS': '2',
+        'component-INITIAL_FORMS': '0',
+        'component-MAX_NUM_FORMS': '2',
+        'component-0-hourly_volume_total_annual': 20,
+        'component-0-hourly_volume_partial_q1': 10,
+        'component-0-hourly_volume_partial_q2': 10,
+        'component-1-hourly_volume_total_annual': 20,
+        'component-1-hourly_volume_partial_q1': 10,
+        'component-1-hourly_volume_partial_q2': 10,
     }
 
 
