@@ -28,7 +28,7 @@ from django.test import TestCase
 
 from base.business.learning_unit_proposal import compute_proposal_state
 from base.models.enums import proposal_state
-from base.models.person import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.person import PersonFactory
 
 
