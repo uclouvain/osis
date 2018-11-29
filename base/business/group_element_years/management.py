@@ -28,7 +28,9 @@ from django.utils.translation import ugettext as _
 
 from base.models import group_element_year, authorized_relationship
 from base.models.education_group_year import EducationGroupYear
-from base.models.exceptions import IncompatiblesTypesException
+from base.models.enums import count_constraint
+from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException
+from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import cache
 
@@ -70,6 +72,14 @@ def attach_from_cache(parent):
                         'parent_type': parent.education_group_type,
                     }
                 )
+            if _is_max_child_reached(parent, egy):
+                raise MaxChildrenReachedException(
+                    errors=_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
+                             "has already reached the limit.") % {
+                        'child_type': egy.education_group_type,
+                        'parent': parent
+                    }
+                )
             kwargs['child_branch'] = egy
         new_gey = group_element_year.get_or_create_group_element_year(**kwargs)
         _clear_cache()
@@ -82,7 +92,35 @@ def _clear_cache():
 
 
 def _types_are_compatible(parent, child):
-    return authorized_relationship.find_by_parent_and_child_types(
-            parent_type=parent.education_group_type,
-            child_type=child.education_group_type,
-        ).exists()
+    return authorized_relationship.AuthorizedRelationship.objects.filter(
+        parent_type=parent.education_group_type,
+        child_type=child.education_group_type,
+    ).exists()
+
+
+def _is_max_child_reached(parent, child):
+    child_education_type = child.education_group_type
+    number_children_of_same_type = GroupElementYear.objects.filter(
+        parent=parent,
+        child_branch__education_group_type=child_education_type
+    ).count()
+    auth_rel = authorized_relationship.AuthorizedRelationship.objects.get(
+        parent_type=parent.education_group_type,
+        child_type=child.education_group_type,
+    )
+    max_count = auth_rel.max_count_authorized
+    return number_children_of_same_type > 0 and max_count == count_constraint.ONE
+
+
+def _is_min_child_reached(parent, child):
+    child_education_type = child.education_group_type
+    number_children_of_same_type = GroupElementYear.objects.filter(
+        parent=parent,
+        child_branch__education_group_type=child_education_type
+    ).count()
+    auth_rel = authorized_relationship.AuthorizedRelationship.objects.get(
+        parent_type=parent.education_group_type,
+        child_type=child.education_group_type,
+    )
+    min_count = auth_rel.min_count_authorized
+    return number_children_of_same_type <= 1 and min_count == count_constraint.ONE

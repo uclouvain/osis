@@ -43,7 +43,7 @@ from base.business.group_element_years.management import SELECT_CACHE_KEY, selec
 from base.business.learning_units.prerequisite import luy_has_or_is_prerequisite
 from base.forms.education_group.group_element_year import UpdateGroupElementYearForm
 from base.models.education_group_year import EducationGroupYear
-from base.models.exceptions import IncompatiblesTypesException
+from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.utils.utils import get_object_or_none
@@ -154,6 +154,9 @@ def _attach(request, group_element_year, *args, **kwargs):
     except IncompatiblesTypesException as e:
         warning_msg = e.errors
         display_warning_messages(request, warning_msg)
+    except MaxChildrenReachedException as e:
+        warning_msg = e.errors
+        display_warning_messages(request, warning_msg)
     except IntegrityError as e:
         warning_msg = _(str(e))
         display_warning_messages(request, warning_msg)
@@ -235,7 +238,9 @@ class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView)
 
     def delete(self, request, *args, **kwargs):
         child_leaf = self.get_object().child_leaf
-        if child_leaf and luy_has_or_is_prerequisite(child_leaf):
+        parent = self.get_object().parent
+        if child_leaf and luy_has_or_is_prerequisite(child_leaf) \
+                and management._is_min_child_reached(parent, child_leaf):
             raise PermissionDenied
 
         success_msg = _("\"%(child)s\" has been detached from \"%(parent)s\"") % {
