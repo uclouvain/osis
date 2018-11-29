@@ -1938,7 +1938,7 @@ msgstr "Inscription aux unités d'enseignement"
 
 #: business/learning_unit.py:54 business/learning_unit.py:56
 msgid "Learning units list"
-msgstr "Liste des unités d'enseignement"
+msgstr "Liste des UEs"
 
 #: business/learning_unit.py:55
 msgid "LearningUnitsList"
