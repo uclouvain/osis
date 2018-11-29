@@ -26,6 +26,11 @@
 from base.models import prerequisite_item
 
 
-def luy_has_or_is_prerequisite(luy):
+def luy_has_or_is_prerequisite(education_group_year, luy):
     return prerequisite_item.find_by_learning_unit_being_prerequisite(luy.learning_unit).exists() or \
-           prerequisite_item.find_by_learning_unit_year_having_prerequisite(luy).exists()
+           prerequisite_item.find_by_learning_unit_year_having_prerequisite(education_group_year, luy).exists()
+
+
+def check_is_prerequisite(luy):
+    return prerequisite_item.find_by_learning_unit_being_prerequisite(luy.learning_unit).exists() or \
+           prerequisite_item.find_by_learning_unit_year_being_prerequisite(luy).exists()

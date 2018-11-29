@@ -72,12 +72,17 @@ def find_by_prerequisite(prerequisite):
     return PrerequisiteItem.objects.filter(prerequisite=prerequisite)
 
 
-def find_by_learning_unit_year_having_prerequisite(learning_unit_year):
-    return PrerequisiteItem.objects.filter(prerequisite__learning_unit_year=learning_unit_year)
+def find_by_learning_unit_year_having_prerequisite(education_group_year, learning_unit_year):
+    return PrerequisiteItem.objects.filter(prerequisite__learning_unit_year=learning_unit_year,
+                                           prerequisite__education_group_year=education_group_year)
 
 
 def find_by_learning_unit_being_prerequisite(learning_unit):
     return PrerequisiteItem.objects.filter(learning_unit=learning_unit)
+
+
+def find_by_learning_unit_year_being_prerequisite(learning_unit_year):
+    return PrerequisiteItem.objects.filter(prerequisite__learning_unit_year=learning_unit_year)
 
 
 def get_prerequisite_string_representation(prerequisite):

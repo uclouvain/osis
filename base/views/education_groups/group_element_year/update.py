@@ -235,7 +235,8 @@ class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView)
 
     def delete(self, request, *args, **kwargs):
         child_leaf = self.get_object().child_leaf
-        if child_leaf and luy_has_or_is_prerequisite(child_leaf):
+        parent = self.get_object().parent
+        if child_leaf and luy_has_or_is_prerequisite(parent, child_leaf):
             raise PermissionDenied
 
         success_msg = _("\"%(child)s\" has been detached from \"%(parent)s\"") % {
