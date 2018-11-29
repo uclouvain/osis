@@ -31,6 +31,6 @@ def luy_has_or_is_prerequisite(education_group_year, luy):
            prerequisite_item.find_by_learning_unit_year_having_prerequisite(education_group_year, luy).exists()
 
 
-def check_have_prerequisite(luy):
+def check_is_prerequisite(luy):
     return prerequisite_item.find_by_learning_unit_being_prerequisite(luy.learning_unit).exists() or \
            prerequisite_item.find_by_learning_unit_year_being_prerequisite(luy).exists()
