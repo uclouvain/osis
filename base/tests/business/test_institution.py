@@ -33,7 +33,7 @@ from django.test import TestCase
 from base.business.institution import find_summary_course_submission_dates_for_entity_version, \
     can_user_edit_educational_information_submission_dates_for_entity
 from base.models.enums import academic_calendar_type
-from base.models.person import FACULTY_MANAGER_GROUP
+from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory

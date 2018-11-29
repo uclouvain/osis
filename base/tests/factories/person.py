@@ -32,7 +32,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 
 from base import models as mdl
-from base.models.person import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP, SIC_GROUP
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP
 from base.tests.factories.user import UserFactory
 
 
