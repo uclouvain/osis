@@ -191,18 +191,7 @@
                                {% elif enrollment.deadline_reached %}
                                     #D3D3D3
                                {% else %}
-                                    {% with enrollement_status_color=enrollment|get_line_color %}
-                                    {% if enrollement_status_color %}
-                                        {{ enrollement_status_color }}
-                                    {% else %}
-
-                                        {% ifchanged enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym %}
-                                            {% cycle 'white' '#E5F2FF' as rowcolors %}
-                                        {% else %}
-                                            {{ rowcolors }}
-                                        {% endifchanged %}
-                                    {% endif %}
-                                {% endwith %}
+                                    {% include 'blocks/row_color.html' %}
                             {% endif %}">
                         <td style="text-align:center;" id="enrollment_status_{{ enrollment.id }}">
                             {% if enrollment.deadline_reached %}

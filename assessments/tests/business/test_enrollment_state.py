@@ -31,7 +31,8 @@ from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.session_examen import SessionExamFactory
 from base.models.enums import number_session, academic_calendar_type
-from assessments.templatetags.enrollment_state import NOT_ENROLLED_COLOR, ENROLLED_LATE_COLOR, get_line_color
+from assessments.templatetags.enrollment_state import get_line_color
+from assessments.business.enrollment_state import ENROLLED_LATE_COLOR, NOT_ENROLLED_COLOR
 from base.models.enums import exam_enrollment_state as enrollment_states
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory

@@ -27,9 +27,6 @@ from django import template
 
 from assessments.business import enrollment_state
 
-ENROLLED_LATE_COLOR = '#dff0d8'
-NOT_ENROLLED_COLOR = '#f2dede'
-
 register = template.Library()
 
 
