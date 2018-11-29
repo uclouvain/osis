@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% load format %}
 {% load i18n %}
-{% load score_display %}
+{% load score_display enrollment_state %}
 {% load messages %}
 
 {% comment "License" %}
@@ -154,6 +154,7 @@
                     title="{% trans 'Definitive submission (Submit to faculty)' %}"
                     id="bt_score_submission_modal" {%if draft_scores_not_submitted == 0 or not is_coordinator %} disabled{%endif%}><span class="glyphicon glyphicon-send" aria-hidden="true"></span> {% trans 'Submission' %}</button>
         {% endif %}
+        {% include 'blocks/legend.html' %}
         <br><br>
         {% if not is_program_manager and draft_scores_not_submitted > 0 %}
             <div class="col-md-12">
@@ -190,12 +191,8 @@
                                {% elif enrollment.deadline_reached %}
                                     #D3D3D3
                                {% else %}
-                                    {% ifchanged enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym %}
-                                        {% cycle 'white' '#E5F2FF' as rowcolors %}
-                                    {% else %}
-                                        {{ rowcolors }}
-                                    {% endifchanged %}
-                               {% endif %}">
+                                    {% include 'blocks/row_color.html' %}
+                            {% endif %}">
                         <td style="text-align:center;" id="enrollment_status_{{ enrollment.id }}">
                             {% if enrollment.deadline_reached %}
                                 <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>

@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,32 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from faker import Faker
-import factory
-import factory.fuzzy
-import string
+from django import template
 
-from base.tests.factories.session_examen import SessionExamFactory
-from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
-from base.models.enums import exam_enrollment_state
-from osis_common.utils.datetime import get_tzinfo
+from assessments.business import enrollment_state
+
+register = template.Library()
 
 
-fake = Faker()
-
-
-class ExamEnrollmentFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = 'base.ExamEnrollment'
-
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
-    score_draft = None
-    score_reencoded = None
-    score_final = None
-    justification_reencoded = None
-    justification_final = None
-    session_exam = factory.SubFactory(SessionExamFactory)
-    learning_unit_enrollment = factory.SubFactory(LearningUnitEnrollmentFactory)
-    enrollment_state = exam_enrollment_state.ENROLLED
-    date_enrollment = None
+@register.filter
+def get_line_color(enrollment):
+    return enrollment_state.get_line_color(enrollment)

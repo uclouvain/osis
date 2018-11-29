@@ -2,7 +2,7 @@
 {% load l10n %}
 {% load i18n %}
 {% load sum %}
-{% load score_display %}
+{% load score_display enrollment_state %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -113,6 +113,7 @@
                 <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}</button>
             <a class="btn btn-default" href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" role="button" id="lnk_cancel_online_encoding_up">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'Cancel' %}</a>
+            {% include 'blocks/legend.html' %}
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -128,17 +129,14 @@
                 </thead>
                 <tbody>
                 {% for enrollment in enrollments %}
+
                     <tr style="background-color:
                                {% if not is_program_manager and enrollment.deadline_tutor_reached %}
                                     #D3D3D3
                                {% elif enrollment.deadline_reached %}
                                     #D3D3D3
                                {% else %}
-                                    {% ifchanged enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym %}
-                                        {% cycle 'white' '#E5F2FF' as rowcolors %}
-                                    {% else %}
-                                        {{ rowcolors }}
-                                    {% endifchanged %}
+                                   {% include 'blocks/row_color.html' %}
                                {% endif %}">
                         <td style="text-align:center;">
                             {% if enrollment.deadline_reached %}
@@ -236,7 +234,7 @@
                     data-toggle="tooltip" data-placement="left" title="{% trans 'Temporary save (not submitted to the faculty yet)' %}"
                 {% endif %}>
                 <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}</button>
-            <a class="btn btn-default" href="{% url 'Online encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" role="button" id="lnk_cancel_online_encoding_down">
+            <a class="btn btn-default" href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" role="button" id="lnk_cancel_online_encoding_down">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'Cancel' %}</a>
         </form>
     </div>
