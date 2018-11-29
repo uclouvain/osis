@@ -51,9 +51,9 @@ from osis_common.utils.datetime import convert_date_to_datetime
 from base.models.enums import entity_container_year_link_type
 # List of key that a user can modify
 
-WORKSHEET_TITLE = _('Activities list')
-XLS_FILENAME = _('ActivitiesList')
-XLS_DESCRIPTION = _('Activities list')
+WORKSHEET_TITLE = _('Learning units list')
+XLS_FILENAME = _('LearningUnitsList')
+XLS_DESCRIPTION = _('Learning units list')
 LEARNING_UNIT_TITLES_PART1 = [
     str(_('Code')),
     str(_('Ac yr.')),
