@@ -35,7 +35,7 @@ from base.models.enums.education_group_categories import TRAINING
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonBachelorFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, SICFactory
 from base.tests.factories.person_entity import PersonEntityFactory
@@ -176,8 +176,7 @@ class TestPerms(TestCase):
         entity = entity_version.entity
         person.user.user_permissions.add(Permission.objects.get(codename="can_edit_educationgroup_pedagogy"))
         personEntity = PersonEntityFactory(person=person, entity=entity)
-        education_group = EducationGroupYearFactory(
-            acronym="common-1ba",
+        education_group = EducationGroupYearCommonBachelorFactory(
             management_entity=entity,
             administration_entity=entity
         )
@@ -187,5 +186,5 @@ class TestPerms(TestCase):
         person = SICFactory()
         person.user.user_permissions.add(Permission.objects.get(codename="can_edit_educationgroup_pedagogy"))
         person.user.user_permissions.add(Permission.objects.get(codename="can_edit_common_education_group"))
-        education_group = EducationGroupYearFactory(acronym="common-1ba")
+        education_group = EducationGroupYearCommonBachelorFactory()
         self.assertTrue(is_eligible_to_edit_general_information(person, education_group))
