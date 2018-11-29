@@ -401,8 +401,8 @@ def get_evaluation(education_group_year, language_code):
     return {
         'id': business.EVALUATION_KEY,
         'label': translated_text_label.label,
-        'content': translated_text.text,
-        'free_text': ''
+        'content': '',
+        'free_text': translated_text.text
 
     }
 
