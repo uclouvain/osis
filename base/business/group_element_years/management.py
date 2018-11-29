@@ -72,7 +72,7 @@ def attach_from_cache(parent):
                         'parent_type': parent.education_group_type,
                     }
                 )
-            if _is_max_child_reached(parent, egy):
+            if is_max_child_reached(parent, egy):
                 raise MaxChildrenReachedException(
                     errors=_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
                              "has already reached the limit.") % {
@@ -98,29 +98,35 @@ def _types_are_compatible(parent, child):
     ).exists()
 
 
-def _is_max_child_reached(parent, child):
+def is_max_child_reached(parent, child):
     child_education_type = child.education_group_type
     number_children_of_same_type = GroupElementYear.objects.filter(
         parent=parent,
         child_branch__education_group_type=child_education_type
     ).count()
-    auth_rel = authorized_relationship.AuthorizedRelationship.objects.get(
-        parent_type=parent.education_group_type,
-        child_type=child.education_group_type,
-    )
+    try:
+        auth_rel = authorized_relationship.AuthorizedRelationship.objects.get(
+            parent_type=parent.education_group_type,
+            child_type=child.education_group_type,
+        )
+    except authorized_relationship.AuthorizedRelationship.DoesNotExist:
+        return True
     max_count = auth_rel.max_count_authorized
     return number_children_of_same_type > 0 and max_count == count_constraint.ONE
 
 
-def _is_min_child_reached(parent, child):
+def is_min_child_reached(parent, child):
     child_education_type = child.education_group_type
     number_children_of_same_type = GroupElementYear.objects.filter(
         parent=parent,
         child_branch__education_group_type=child_education_type
     ).count()
-    auth_rel = authorized_relationship.AuthorizedRelationship.objects.get(
-        parent_type=parent.education_group_type,
-        child_type=child.education_group_type,
-    )
+    try:
+        auth_rel = authorized_relationship.AuthorizedRelationship.objects.get(
+            parent_type=parent.education_group_type,
+            child_type=child.education_group_type,
+        )
+    except authorized_relationship.AuthorizedRelationship.DoesNotExist:
+        return True
     min_count = auth_rel.min_count_authorized
-    return number_children_of_same_type <= 1 and min_count == count_constraint.ONE
+    return min_count == count_constraint.ONE and number_children_of_same_type < 2
