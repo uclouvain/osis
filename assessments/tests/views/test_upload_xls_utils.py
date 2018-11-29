@@ -46,6 +46,7 @@ from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 
 from base.models.enums import number_session, academic_calendar_type, exam_enrollment_justification_type
 from base.tests.mixin.academic_year import AcademicYearMockMixin
+from base.models.enums import exam_enrollment_state
 
 OFFER_ACRONYM = "OSIS2MA"
 LEARNING_UNIT_ACRONYM = "LOSIS1211"
@@ -93,7 +94,9 @@ def generate_exam_enrollments(year, with_different_offer=False):
         learning_unit_enrollment = LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year,
                                                                  offer_enrollment=offer_enrollment)
         exam_enrollments.append(ExamEnrollmentFactory(session_exam=session_exams[i],
-                                                      learning_unit_enrollment=learning_unit_enrollment))
+                                                      learning_unit_enrollment=learning_unit_enrollment,
+                                                      enrollment_state=exam_enrollment_state.ENROLLED,
+                                                      date_enrollment=an_academic_calendar.start_date))
     return locals()
 
 
