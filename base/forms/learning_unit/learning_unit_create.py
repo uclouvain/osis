@@ -31,28 +31,13 @@ from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, spl
 from base.forms.utils.choice_field import add_blank
 from base.models.campus import find_main_campuses
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
-from base.models.enums.learning_container_year_types import CONTAINER_TYPE_WITH_DEFAULT_COMPONENT, \
-    LEARNING_CONTAINER_YEAR_TYPES_WITHOUT_EXTERNAL, INTERNSHIP
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY
+from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_WITHOUT_EXTERNAL, INTERNSHIP
 from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
 from reference.models.language import find_all_languages
-
-DEFAULT_ACRONYM_COMPONENT = {
-    LECTURING: "PM",
-    PRACTICAL_EXERCISES: "PP",
-    None: "NT"
-}
-
-
-def _get_default_components_type(container_type):
-    """This function will return the default components type to create/update according to container type"""
-    if container_type in CONTAINER_TYPE_WITH_DEFAULT_COMPONENT:
-        return [LECTURING, PRACTICAL_EXERCISES]
-    return [None]
 
 
 def _create_learning_container_year_type_list():

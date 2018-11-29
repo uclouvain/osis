@@ -148,7 +148,7 @@ msgstr "1er quadri"
 
 #: business/learning_unit.py:76 business/learning_unit.py:80
 msgid "2nd quadri"
-msgstr "2ieme quadri"
+msgstr "2e quadri"
 
 #: forms/prerequisite.py:46
 msgid ""

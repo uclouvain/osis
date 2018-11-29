@@ -1,4 +1,4 @@
-##############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,19 +22,21 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from django.utils.translation import ugettext_lazy as _
+############################################################################
 
-LECTURING = "LECTURING"
-PRACTICAL_EXERCISES = "PRACTICAL_EXERCISES"
+from django.core.management import call_command
+from django.test import TestCase
 
-COMPONENT_TYPES = (
-    (LECTURING, _("Lecturing")),
-    (PRACTICAL_EXERCISES, _("Practical exercises"))
-)
+from reference.models.country import Country
+from reference.tests.factories.country import CountryFactory
 
-DEFAULT_ACRONYM_COMPONENT = {
-    LECTURING: "PM",
-    PRACTICAL_EXERCISES: "PP",
-    None: "NT"
-}
+
+class CommandsTestCase(TestCase):
+
+    def test_load_countries_and_continent(self):
+        CountryFactory(iso_code='BE', name='Belgium')
+        args = []
+        opts = {}
+        call_command('load_countries_continent', *args, **opts)
+        self.assertTrue(Country.objects.filter(iso_code='BE').get().continent)
+        self.assertEqual(Country.objects.all().count(), 1)  # assert doesn't create any Country
