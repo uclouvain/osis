@@ -36,7 +36,7 @@ from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
-from base.forms.learning_unit.learning_unit_create_2 import FullForm, FACULTY_OPEN_FIELDS, ID_FIELD, \
+from base.forms.learning_unit.learning_unit_create_2 import FullForm, FACULTY_OPEN_FIELDS, \
     FULL_READ_ONLY_FIELDS
 from base.models.academic_year import AcademicYear
 from base.models.entity_component_year import EntityComponentYear
@@ -57,7 +57,7 @@ from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_component import LearningUnitComponent
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
-from base.models.person import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -217,7 +217,7 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
             proposal=True
         )
 
-        for elem in FACULTY_OPEN_FIELDS - set([ID_FIELD]):
+        for elem in FACULTY_OPEN_FIELDS:
             self.assertEqual(form.fields[elem].disabled, True)
             self.assertEqual(form.fields['academic_year'].disabled, True)
 
