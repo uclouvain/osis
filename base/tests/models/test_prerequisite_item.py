@@ -47,14 +47,11 @@ class TestPrerequisiteItem(TestCase):
         )
 
     def test_find_by_learning_unit_year_having_prerequisite(self):
-        self.assertEqual(
-            list(prerequisite_item.find_by_learning_unit_year_having_prerequisite(
-                self.prerequisite.education_group_year, self.learning_unit_year_with_prerequisite)),
-            [self.prerequisite_item]
+        self.assertTrue(
+            self.learning_unit_year_with_prerequisite.has_or_is_prerequisite(self.prerequisite.education_group_year)
         )
         self.assertFalse(
-            list(prerequisite_item.find_by_learning_unit_year_having_prerequisite(
-                self.prerequisite.education_group_year, self.learning_unit_year_without_prerequisite))
+            self.learning_unit_year_with_prerequisite.has_or_is_prerequisite(self.prerequisite.education_group_year)
         )
 
     def test_find_by_learning_unit_being_prerequisite(self):
@@ -76,7 +73,7 @@ class TestPrerequisiteItem(TestCase):
 
     def test_find_by_prerequisite(self):
         self.assertEqual(
-            list(prerequisite_item.find_by_prerequisite(self.prerequisite)),
+            list(self.prerequisite.prerequisiteitem_set.all()),
             [self.prerequisite_item]
         )
 

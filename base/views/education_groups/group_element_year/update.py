@@ -40,7 +40,6 @@ from waffle.decorators import waffle_flag
 from base.business import group_element_years
 from base.business.group_element_years.management import SELECT_CACHE_KEY, select_education_group_year, \
     select_learning_unit_year
-from base.business.learning_units.prerequisite import luy_has_or_is_prerequisite
 from base.forms.education_group.group_element_year import UpdateGroupElementYearForm
 from base.models.education_group_year import EducationGroupYear
 from base.models.exceptions import IncompatiblesTypesException
@@ -236,7 +235,7 @@ class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView)
     def delete(self, request, *args, **kwargs):
         child_leaf = self.get_object().child_leaf
         parent = self.get_object().parent
-        if child_leaf and luy_has_or_is_prerequisite(parent, child_leaf):
+        if child_leaf and child_leaf.has_or_is_prerequisite(parent):
             raise PermissionDenied
 
         success_msg = _("\"%(child)s\" has been detached from \"%(parent)s\"") % {

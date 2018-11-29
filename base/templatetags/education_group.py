@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import operator
 
 from django import template
 from django.core.exceptions import PermissionDenied
@@ -40,7 +39,6 @@ from base.business.education_groups.perms import is_eligible_to_delete_education
     is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_change_achievement, \
     is_eligible_to_delete_achievement, is_eligible_to_postpone_education_group
-from base.business.learning_units.prerequisite import luy_has_or_is_prerequisite
 from base.business.utils.url import get_parameter_from_url_querystring
 from base.models.academic_year import AcademicYear
 from base.models.enums.learning_unit_year_periodicity import BIENNIAL_EVEN, BIENNIAL_ODD, ANNUAL
@@ -252,8 +250,8 @@ def button_with_permission(context, title, value, url):
         group_element_year = get_group_element_year_by_id(
             int(get_parameter_from_url_querystring(url, 'group_element_year_id'))
         )
-        if group_element_year.child_leaf and luy_has_or_is_prerequisite(group_element_year.parent,
-                                                                        group_element_year.child_leaf):
+        child_leaf = group_element_year.child_leaf
+        if child_leaf and child_leaf.has_or_is_prerequisite(group_element_year.parent):
             disabled = "disabled"
             load_modal = False
 
