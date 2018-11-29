@@ -5,8 +5,9 @@ from django.conf import settings
 from django.test import TestCase
 
 from base.management.commands import import_reddot
-from base.management.commands.import_reddot import _import_skills_and_achievements, SKILLS_AND_ACHIEVEMENTS_CMS_DATA, \
+from base.management.commands.import_reddot import _import_skills_and_achievements, \
     _get_field_achievement_according_to_language
+from webservices.business import SKILLS_AND_ACHIEVEMENTS_CMS_DATA
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.education_group import EducationGroup
 from base.models.education_group_achievement import EducationGroupAchievement
