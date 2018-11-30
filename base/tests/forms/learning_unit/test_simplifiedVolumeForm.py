@@ -153,7 +153,9 @@ class TestSimplifiedVolumeManagementForm(TestCase):
 
 class TestSimplifiedVolumeForm(TestCase):
     def setUp(self):
-        self.instance = LearningComponentYearFactory()
+        self.instance = LearningComponentYearFactory(hourly_volume_total_annual=10,
+                                                     hourly_volume_partial_q1=5,
+                                                     hourly_volume_partial_q2=5)
 
     def test_clean(self):
         self.instance.hourly_volume_partial_q1 = 0
