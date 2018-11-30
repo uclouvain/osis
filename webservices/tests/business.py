@@ -54,34 +54,46 @@ class GetAchievementsTestCase(TestCase):
         )
 
     def test_get_achievements_case_get_english_version(self):
-        qs = business.get_achievements(self.education_group_year, settings.LANGUAGE_CODE_EN)
+        achievements_list = business.get_achievements(self.education_group_year, settings.LANGUAGE_CODE_EN)
 
-        self.assertIsInstance(qs, QuerySet)
-        self.assertEqual(qs.count(), 1)
+        self.assertIsInstance(achievements_list, list)
+        self.assertEqual(len(achievements_list), 1)
 
-        achievement = qs.first()
-        self.assertEqual(achievement.text, self.education_group_achievement.english_text)
+        achievement = achievements_list[0]
+        self.assertEqual(achievement['teaser'], self.education_group_achievement.english_text)
         self.assertTrue(len(achievement.detailed_achievements), 1)
 
-        detailed_achievement = achievement.detailed_achievements[0]
-        self.assertEqual(detailed_achievement.text, self.education_group_detailed_achievement.english_text)
+        detailed_achievement = achievement['detailed_achievements'][0]
+        self.assertEqual(detailed_achievement['text'], self.education_group_detailed_achievement.english_text)
+        self.assertEqual(detailed_achievement['code_name'], self.education_group_detailed_achievement.code_name)
 
     def test_get_achievements_case_get_french_version(self):
-        qs = business.get_achievements(self.education_group_year, settings.LANGUAGE_CODE_FR)
+        achievements_list = business.get_achievements(self.education_group_year, settings.LANGUAGE_CODE_FR)
 
-        self.assertIsInstance(qs, QuerySet)
-        self.assertEqual(qs.count(), 1)
+        self.assertIsInstance(achievements_list, list)
+        self.assertEqual(len(achievements_list), 1)
 
-        achievement = qs.first()
-        self.assertEqual(achievement.text, self.education_group_achievement.french_text)
+        achievement = achievements_list[0]
+        self.assertEqual(achievement['teaser'], self.education_group_achievement.french_text)
 
-        self.assertTrue(len(achievement.detailed_achievements), 1)
-        detailed_achievement = achievement.detailed_achievements[0]
-        self.assertEqual(detailed_achievement.text, self.education_group_detailed_achievement.french_text)
+        self.assertTrue(len(achievement['detailed_achievements']), 1)
+        detailed_achievement = achievement['detailed_achievements'][0]
+        self.assertEqual(detailed_achievement['text'], self.education_group_detailed_achievement.french_text)
+        self.assertEqual(detailed_achievement['code_name'], self.education_group_detailed_achievement.code_name)
 
     def test_get_achievements_case_language_code_not_supported(self):
         with self.assertRaises(AttributeError):
             business.get_achievements(self.education_group_year, 'dummy-language')
+
+    def test_get_achievements_case_no_detailed_achievement(self):
+        self.education_group_detailed_achievement.delete()
+
+        achievements_list = business.get_achievements(self.education_group_year, settings.LANGUAGE_CODE_FR)
+        self.assertIsInstance(achievements_list, list)
+        self.assertEqual(len(achievements_list), 1)
+
+        achievement = achievements_list[0]
+        self.assertIsNone(achievement['detailed_achievements'])
 
 
 class GetIntroExtraContentAchievementsTestCase(TestCase):
