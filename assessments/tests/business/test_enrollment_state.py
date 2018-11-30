@@ -53,14 +53,14 @@ class EnrollmentStateTests(TestCase):
     def test_get_line_color_not_enrolled(self):
         exam_enrollment = ExamEnrollmentFactory(session_exam=self.session_exam,
                                                 enrollment_state=enrollment_states.NOT_ENROLLED)
-        self.assertEqual(get_line_color(exam_enrollment), "#{}".format(NOT_ENROLLED_COLOR))
+        self.assertEqual(get_line_color(exam_enrollment), NOT_ENROLLED_COLOR)
 
     def test_get_line_color_enrolled_late(self):
         exam_enrollment = ExamEnrollmentFactory(session_exam=self.session_exam,
                                                 enrollment_state=enrollment_states.ENROLLED,
                                                 date_enrollment=self.academic_calendar.start_date + datetime.timedelta(
                                                     days=1))
-        self.assertEqual(get_line_color(exam_enrollment), "#{}".format(ENROLLED_LATE_COLOR))
+        self.assertEqual(get_line_color(exam_enrollment), ENROLLED_LATE_COLOR)
 
     def test_get_line_color_enrolled(self):
         exam_enrollment = ExamEnrollmentFactory(session_exam=self.session_exam,
