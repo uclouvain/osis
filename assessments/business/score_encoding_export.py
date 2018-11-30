@@ -214,7 +214,7 @@ def _coloring_enrollment_state(ws, row_number, exam_enroll):
     enrollment_state_color = get_line_color(exam_enroll)
     if enrollment_state_color:
         pattern_fill_enrollment_state = PatternFill(patternType='solid',
-                                                    fgColor=Color(enrollment_state_color))
+                                                    fgColor=Color(enrollment_state_color.lstrip("#")))
         style_enrollment_state = Style(fill=pattern_fill_enrollment_state)
         column_number = 1
         while column_number < 12:
@@ -229,6 +229,6 @@ def _color_legend(ws):
 
 def __apply_style_to_cells(ws, color_style, row):
     style_enrollment_state = Style(fill=PatternFill(patternType='solid',
-                                                    fgColor=Color(color_style)))
+                                                    fgColor=Color(color_style.lstrip("#"))))
     ws.cell(row=row, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).style = style_enrollment_state
     ws.cell(row=row, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS+1).style = style_enrollment_state
