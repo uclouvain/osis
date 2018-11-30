@@ -367,18 +367,14 @@ def find_for_score_encodings(session_exam_number,
     """
     if not academic_year:
         academic_year = academic_yr.current_academic_year()
+
+    queryset = ExamEnrollment.objects.filter(
+        session_exam__number_session=session_exam_number,
+        learning_unit_enrollment__learning_unit_year__academic_year=academic_year
+    )
     if only_enrolled:
-        queryset = ExamEnrollment.objects.filter(
-            session_exam__number_session=session_exam_number,
-            learning_unit_enrollment__learning_unit_year__academic_year=academic_year,
-            enrollment_state=enrollment_states.ENROLLED
-        )
-    else:
-        queryset = ExamEnrollment.objects.filter(
-            session_exam__number_session=session_exam_number,
-            learning_unit_enrollment__learning_unit_year__academic_year=academic_year,
-            enrollment_state__in=(enrollment_states.ENROLLED, enrollment_states.NOT_ENROLLED)
-        )
+        queryset = queryset.filter(enrollment_state=enrollment_states.ENROLLED)
+
     if learning_unit_year_id:
         queryset = queryset.filter(learning_unit_enrollment__learning_unit_year_id=learning_unit_year_id)
     elif learning_unit_year_ids is not None:
@@ -443,9 +439,5 @@ def find_by_student(a_student):
 
 def _get_enrolled_enrollments(enrollments):
     if enrollments:
-        enrollment_enrolled = []
-        for enrollment in enrollments:
-            if enrollment.enrollment_state == enrollment_states.ENROLLED:
-                enrollment_enrolled.append(enrollment)
-        return enrollment_enrolled
+        return list(filter(lambda enrollment: enrollment.enrollment_state == enrollment_states.ENROLLED, enrollments))
     return None
