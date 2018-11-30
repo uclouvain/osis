@@ -74,8 +74,19 @@
                                 {% endif %}
                                 {% if info.is_specific and info.is_master %}
                                     <div id="university_bachelors">
-                                        {% include 'education_group/blocks/admission_condition_text.html' with section_name="university_bachelors" text=_("University Bachelors") field=admission_condition.text_university_bachelors field_en=admission_condition.text_university_bachelors_en %}
-
+                                        <div class="dropdown pull-right" style="margin-right: 20px; margin-bottom: 10px;">
+                                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                                                {{ language.tab_lang }}
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                {% for lang in language.list %}
+                                                    {% if lang != language.tab_lang %}
+                                                        <li><a href="{% url 'tab_lang_edit' root.pk education_group_year.pk lang %}">{{ lang }}</a></li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
                                         <table class="table table-bordered">
                                             <thead>
                                             <tr>
@@ -102,6 +113,21 @@
                                 {% if info.is_specific and info.is_master %}
                                     <div id="holders_second_university_degree">
                                         <h3>{% trans 'Holders of a 2nd cycle University degree' %}</h3>
+                                        <div class="dropdown pull-right" style="margin-right: 20px; margin-bottom: 10px;">
+                                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                                                {{ language.tab_lang }}
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                {% for lang in language.list %}
+                                                    {% if lang != language.tab_lang %}
+                                                        <li><a href="{% url 'tab_lang_edit' root.pk education_group_year.pk lang %}">
+                                                            {{ lang }}
+                                                        </a></li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
                                         <table class="table table-bordered">
                                             <thead>
                                             <tr>
