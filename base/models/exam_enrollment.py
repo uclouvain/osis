@@ -287,7 +287,8 @@ def get_progress_by_learning_unit_years_and_offer_years(user,
                                                         learning_unit_year_id=None,
                                                         learning_unit_year_ids=None,
                                                         offer_year_id=None,
-                                                        academic_year=None):
+                                                        academic_year=None,
+                                                        only_enrolled=False):
     if offer_year_id:
         offer_year_ids = [offer_year_id]
     else:
@@ -303,7 +304,8 @@ def get_progress_by_learning_unit_years_and_offer_years(user,
                                         offers_year=offer_year_ids,
                                         tutor=tutor_user,
                                         academic_year=academic_year,
-                                        with_session_exam_deadline=False)
+                                        with_session_exam_deadline=False,
+                                        only_enrolled=only_enrolled)
 
     return queryset.values('session_exam', 'learning_unit_enrollment__learning_unit_year',
                            'learning_unit_enrollment__offer_enrollment__offer_year') \
@@ -345,7 +347,8 @@ def find_for_score_encodings(session_exam_number,
                              student_first_name=None,
                              justification=None,
                              academic_year=None,
-                             with_session_exam_deadline=True):
+                             with_session_exam_deadline=True,
+                             only_enrolled=False):
     """
     :param session_exam_number: Integer represents the number_session of the Session_exam (1,2,3,4 or 5). It's
                                 a mandatory field to not confuse exam scores from different sessions.
@@ -362,12 +365,18 @@ def find_for_score_encodings(session_exam_number,
     """
     if not academic_year:
         academic_year = academic_yr.current_academic_year()
-
-    queryset = ExamEnrollment.objects.filter(
-        session_exam__number_session=session_exam_number,
-        learning_unit_enrollment__learning_unit_year__academic_year=academic_year,
-        enrollment_state__in=(enrollment_states.ENROLLED, enrollment_states.NOT_ENROLLED)
-    )
+    if only_enrolled:
+        queryset = ExamEnrollment.objects.filter(
+            session_exam__number_session=session_exam_number,
+            learning_unit_enrollment__learning_unit_year__academic_year=academic_year,
+            enrollment_state=enrollment_states.ENROLLED
+        )
+    else:
+        queryset = ExamEnrollment.objects.filter(
+            session_exam__number_session=session_exam_number,
+            learning_unit_enrollment__learning_unit_year__academic_year=academic_year,
+            enrollment_state__in=(enrollment_states.ENROLLED, enrollment_states.NOT_ENROLLED)
+        )
     if learning_unit_year_id:
         queryset = queryset.filter(learning_unit_enrollment__learning_unit_year_id=learning_unit_year_id)
     elif learning_unit_year_ids is not None:
