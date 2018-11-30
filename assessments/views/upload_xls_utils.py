@@ -43,12 +43,12 @@ from base.models.enums import exam_enrollment_justification_type as justificatio
 
 
 col_academic_year = HEADER.index('academic_year')
-col_session = HEADER.index('session_title')
-col_learning_unit = HEADER.index('learning_unit')
+col_session = HEADER.index('Session derogation')
+col_learning_unit = HEADER.index('Learning unit')
 col_offer = HEADER.index('program')
 col_registration_id = HEADER.index('registration_number')
 col_email = HEADER.index('email')
-col_score = HEADER.index('numbered_score')
+col_score = HEADER.index('Numbered scores')
 col_justification = HEADER.index('justification')
 
 REGISTRATION_ID_LENGTH = 8

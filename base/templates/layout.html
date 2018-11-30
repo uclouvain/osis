@@ -105,6 +105,7 @@
 <body {% if environment == 'DEV' %} class="devmode"
 {% elif environment == 'LOCAL' %} class="localmode"
 {% elif environment == 'QA' %} class="qamode"
+{% elif environment == 'TEST' %} class="testmode"
 {% endif %}>
 {% hijack_notification %}
 {% analytical_body_top %}
@@ -292,6 +293,8 @@
     <div class="localred">LOCAL</div>
 {% elif environment == 'QA' %}
     <div class="qagreen">QA</div>
+{% elif environment == 'TEST' %}
+    <div class="testblue">TEST</div>
 {% endif %}
 <div id="alert_wrong_version" class="container">
     <div class="alert alert-warning">
