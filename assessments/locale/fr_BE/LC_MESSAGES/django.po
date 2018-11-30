@@ -499,10 +499,8 @@ msgid "None"
 msgstr "Aucun"
 
 #: templates/blocks/legend.html:33
-#, fuzzy
-#| msgid "Number of enrollments"
 msgid "Not enrolled"
-msgstr "Nombre d'inscriptions"
+msgstr "Pas inscrit"
 
 #: business/score_encoding_sheet.py:169
 msgid "Not passed"

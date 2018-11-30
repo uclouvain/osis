@@ -107,7 +107,9 @@
                 {% for enrollment in enrollments %}
                     <tr style="{% if enrollment.deadline_reached %}
                                     background-color:#D3D3D3;
-                               {% endif %}">
+                        {% else %}
+                            background-color:{% include 'blocks/row_color.html' %}
+                           {% endif %}">
                         <td style="text-align:center;">
                             {% if enrollment.deadline_reached %}
                                 <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
