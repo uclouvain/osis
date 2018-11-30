@@ -43,10 +43,8 @@ def get_scores_encoding_list(user, **kwargs):
     tutor_id = kwargs.get('tutor_id')
     enrollments_ids = kwargs.get('enrollments_ids')
     justification = kwargs.get('justification')
-    only_enrolled = False
 
-    if justification == 'SCORE_MISSING':
-        only_enrolled = True
+    only_enrolled = True if justification == 'SCORE_MISSING' else False
 
     if is_program_manager:
         professor = tutor.find_by_id(tutor_id) if tutor_id else None
