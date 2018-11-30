@@ -1217,3 +1217,8 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         admission_condition_line_2.refresh_from_db()
 
         self.assertLess(admission_condition_line_1.order, admission_condition_line_2.order)
+
+    def test_education_group_year_admission_condition_change_lang_tab(self):
+        url = reverse('tab_lang_edit', args=(self.education_group_parent.id, self.education_group_child.id, 'fr'))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
