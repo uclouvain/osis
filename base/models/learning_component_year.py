@@ -36,7 +36,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class LearningComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('learning_container_year', 'learning_unit_year',  'acronym', 'type', 'comment', 'changed')
+    list_display = ('learning_container_year', 'learning_unit_year', 'acronym', 'type', 'comment', 'changed')
     search_fields = ['acronym', 'learning_container_year__acronym']
     list_filter = ('learning_container_year__academic_year',)
 
@@ -141,7 +141,7 @@ class LearningComponentYear(SerializableModel):
             vol_total_annual = self.hourly_volume_total_annual or 0
             vol_q1 = self.hourly_volume_partial_q1 or 0
             vol_q2 = self.hourly_volume_partial_q2 or 0
-            if vol_total_annual!= vol_q1+vol_q2:
+            if vol_total_annual != vol_q1 + vol_q2:
                 raise ValidationError({'hourly_volume_total_annual': _('Vol_tot is not equal to vol_q1 + vol_q2')})
 
 
