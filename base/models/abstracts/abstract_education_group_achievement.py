@@ -23,7 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.db import models
+from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 
 from ckeditor.fields import RichTextField
@@ -38,6 +40,13 @@ class AbstractEducationGroupAchievementAdmin(OrderedModelAdmin):
     search_fields = ['code_name', 'order']
 
 
+class AbstractEducationGroupAchievementQuerySet(models.QuerySet):
+    def annotate_text(self, language_code):
+        return self.annotate(
+            text=F('french_text') if language_code == settings.LANGUAGE_CODE_FR else F('english_text')
+        )
+
+
 class AbstractEducationGroupAchievement(OrderedModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
@@ -48,3 +57,5 @@ class AbstractEducationGroupAchievement(OrderedModel):
 
     class Meta:
         abstract = True
+
+    objects = AbstractEducationGroupAchievementQuerySet.as_manager()

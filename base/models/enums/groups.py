@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,9 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import prerequisite_item
 
-
-def luy_has_or_is_prerequisite(luy):
-    return prerequisite_item.find_by_learning_unit_being_prerequisite(luy.learning_unit).exists() or \
-           prerequisite_item.find_by_learning_unit_year_having_prerequisite(luy).exists()
+CENTRAL_MANAGER_GROUP = "central_managers"
+FACULTY_MANAGER_GROUP = "faculty_managers"
+SIC_GROUP = "sic"

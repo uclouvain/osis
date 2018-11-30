@@ -149,7 +149,7 @@ class TestDetachLearningUnitPrerequisite(TestCase):
     def test_detach_case_learning_unit_having_prerequisite(self, mock_permission, mock_delete):
         mock_permission.return_value = True
 
-        prerequisite = PrerequisiteFactory(learning_unit_year=self.luy)
+        prerequisite = PrerequisiteFactory(learning_unit_year=self.luy, education_group_year=self.education_group_year)
         PrerequisiteItemFactory(prerequisite=prerequisite)
 
         http_referer = reverse('education_group_read', args=[

@@ -24,8 +24,10 @@
 #
 ##############################################################################
 import datetime
+from unittest import mock
 
 import django
+from django.conf import settings
 from django.test import TestCase
 
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
@@ -39,9 +41,10 @@ from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextRandomFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
+from webservices import business
 from webservices.tests.helper import Helper
 from webservices.utils import convert_sections_list_of_dict_to_dict
-from webservices.views import new_context
+from webservices.views import new_context, get_skills_and_achievements
 
 
 def remove_conditions_admission(sections):
@@ -827,3 +830,13 @@ class ProcessSectionTestCase(TestCase):
         self.assertEqual(translated_text_label.text_label, text_label)
         self.assertEqual(section['label'], translated_text_label.label)
         self.assertEqual(section['content'], tt.text)
+
+
+class GetSkillsAndAchievementsTestCase(TestCase):
+    def test_get_skills_and_achievements(self):
+        education_group_year = EducationGroupYearFactory()
+        context = get_skills_and_achievements(education_group_year,  settings.LANGUAGE_CODE_EN)
+
+        self.assertEqual(context['id'], business.SKILLS_AND_ACHIEVEMENTS_KEY)
+        self.assertEqual(context['label'], business.SKILLS_AND_ACHIEVEMENTS_KEY)
+        self.assertTrue('content' in context)
