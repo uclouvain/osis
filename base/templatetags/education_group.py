@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import operator
 
 from django import template
 from django.core.exceptions import PermissionDenied
@@ -40,8 +39,11 @@ from base.business.education_groups.perms import is_eligible_to_delete_education
     is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_change_achievement, \
     is_eligible_to_delete_achievement, is_eligible_to_postpone_education_group
+from base.business.utils.url import get_parameter_from_url_querystring
 from base.models.academic_year import AcademicYear
 from base.models.enums.learning_unit_year_periodicity import BIENNIAL_EVEN, BIENNIAL_ODD, ANNUAL
+from base.models.group_element_year import get_group_element_year_by_id
+from base.models.utils.utils import get_verbose_field_value
 
 OPTIONAL_PNG = base.STATIC_URL + 'img/education_group_year/optional.png'
 MANDATORY_PNG = base.STATIC_URL + 'img/education_group_year/mandatory.png'
@@ -164,8 +166,8 @@ def li_with_postpone_perm_training(context, url_id="link_postpone_training"):
         last_academic_year = "last year"
 
     message = _('Copy the content from %(previous_anac)s to %(current_anac)s') % {
-        'previous_anac':  str(last_academic_year),
-        'current_anac':  str(education_group_year.academic_year)
+        'previous_anac': str(last_academic_year),
+        'current_anac': str(education_group_year.academic_year)
 
     }
     return li_with_permission(context, is_eligible_to_postpone_education_group, url, message, url_id, True)
@@ -219,7 +221,7 @@ def button_edit_administrative_data(context):
     return {
         'is_disabled': is_disabled,
         'message': permission_denied_message,
-        'text': _('Edit'),
+        'text': _('Modify'),
         'url': reverse('education_group_edit_administrative', args=[root.pk, education_group_year.pk])
     }
 
@@ -243,12 +245,21 @@ def button_order_with_permission(context, title, id_button, value):
 @register.inclusion_tag("blocks/button/button_template.html", takes_context=True)
 def button_with_permission(context, title, value, url):
     permission_denied_message, disabled, root = _get_permission(context, is_eligible_to_change_education_group)
+    load_modal = True
+    if value == 'detach':
+        group_element_year = get_group_element_year_by_id(
+            int(get_parameter_from_url_querystring(url, 'group_element_year_id'))
+        )
+        child_leaf = group_element_year.child_leaf
+        if child_leaf and child_leaf.has_or_is_prerequisite(group_element_year.parent):
+            disabled = "disabled"
+            load_modal = False
 
     if disabled:
         title = permission_denied_message
 
     return {
-        'load_modal': True,
+        'load_modal': load_modal,
         'title': title,
         'class_button': "btn-default btn-sm " + disabled,
         'icon': ICONS[value],
@@ -436,26 +447,25 @@ def link_pdf_content_education_group(url):
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=True)
-def dl_with_parent(context, dl_title, key, class_dl="", default_value=None):
+def dl_with_parent(context, key, obj=None, parent=None,  dl_title="", class_dl="", default_value=None):
     """
     Tag to render <dl> for details of education_group.
     If the fetched value does not exist for the current education_group_year,
     the method will try to fetch the parent's value and display it in another style
     (strong, blue).
-
-    :param context: context of the page given by django inclusion tag
-    :param dl_title: text to display in <dt>
-    :param key: attr to fetch value from education_group_year (can be a property)
-    :param class_dl: additional html class
-    :param default_value: display a default value in <dd> if no value was found.
-    :return: dict
     """
-    education_group_year = context.get('education_group_year')
-    value = _fetch_value_with_attrgetter(education_group_year, key)
+    if not obj:
+        obj = context["education_group_year"]
+    if not parent:
+        parent = context["parent"]
+
+    value = get_verbose_field_value(obj, key)
+
+    if not dl_title:
+        dl_title = obj._meta.get_field(key).verbose_name.capitalize()
 
     if value is None or value == "":
-        parent = context.get("parent")
-        parent_value = _fetch_value_with_attrgetter(parent, key)
+        parent_value = get_verbose_field_value(parent, key)
     else:
         parent, parent_value = None, None
 
@@ -477,14 +487,6 @@ def _bool_to_string(value):
         return "yes" if value else "no"
 
     return str(value)
-
-
-def _fetch_value_with_attrgetter(obj, attrs):
-    """ Use attrgetter to support attrs with '.' """
-    try:
-        return obj and operator.attrgetter(attrs)(obj)
-    except AttributeError:
-        return None
 
 
 @register.simple_tag(takes_context=True)

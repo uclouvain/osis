@@ -30,6 +30,7 @@ import re
 from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
 from django.http import Http404
+from django.template import loader
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.renderers import JSONRenderer
@@ -41,6 +42,7 @@ from cms.enums.entity_name import OFFER_YEAR
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from webservices import business
 from webservices.utils import convert_sections_to_list_of_dict
 
 LANGUAGES = {'fr': 'fr-be', 'en': 'en'}
@@ -83,6 +85,7 @@ def validate_json_request(request, year, acronym):
         raise SuspiciousOperation('Invalid JSON')
 
     request_json = request.data
+
     if 'anac' not in request_json or 'code_offre' not in request_json or 'sections' not in request_json:
         raise SuspiciousOperation('Invalid JSON')
 
@@ -149,6 +152,8 @@ def process_section(context, education_group_year, item):
             label=m_common.group('section_name')
         ).first()
         return insert_section_if_checked(context, egy, text_label)
+    elif item == business.SKILLS_AND_ACHIEVEMENTS_KEY:
+        return get_skills_and_achievements(education_group_year, context.language)
     else:
         text_label = TextLabel.objects.filter(entity=OFFER_YEAR, label=item).first()
         if text_label:
@@ -231,7 +236,7 @@ def admission_condition_line_to_dict(context, admission_condition_line):
         for field in fields
     }
 
-    result['access'] = admission_condition_line.access
+    result['access'] = admission_condition_line.get_access_display()
     return result
 
 
@@ -382,3 +387,19 @@ def get_conditions_admissions(context):
         "content": build_content_response(context, admission_condition, admission_condition_common, full_suffix)
     }
     return result
+
+
+def get_skills_and_achievements(education_group_year, language_code):
+    context = {
+        'achievements': business.get_achievements(education_group_year, language_code),
+        'language_code': language_code
+    }
+    context.update(business.get_intro_extra_content_achievements(education_group_year, language_code))
+
+    comp_acquis_template = loader.get_template('comp_acquis.html')
+    content_rendered = comp_acquis_template.render(context)
+    return {
+        'id': business.SKILLS_AND_ACHIEVEMENTS_KEY,
+        'label': business.SKILLS_AND_ACHIEVEMENTS_KEY,
+        'content': content_rendered
+    }

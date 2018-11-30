@@ -74,7 +74,7 @@ class TestSearchForm(TestCase):
         form = LearningUnitYearForm(data)
         self.assertTrue(form.is_valid())
         expected_research_criteria = [(_('Ac yr.'), self.academic_years[0]),
-                                      (_('type'), _("Course"))]
+                                      (_('Type'), _("Course"))]
         actual_research_criteria = get_research_criteria(form)
         self.assertListEqual(expected_research_criteria, actual_research_criteria)
 

@@ -84,6 +84,7 @@ INSTALLED_APPS = (
     'hijack',
     'compat',
     'hijack_admin',
+    'reversion',
 )
 
 MIDDLEWARE = (
@@ -99,6 +100,7 @@ MIDDLEWARE = (
     'base.middlewares.extra_http_responses_midleware.ExtraHttpResponsesMiddleware',
     'waffle.middleware.WaffleMiddleware',
     'base.middlewares.notification_middleware.NotificationMiddleware',
+    'base.middlewares.reversion_middleware.BaseRevisionMiddleware'
 )
 
 INTERNAL_IPS = ()
@@ -369,7 +371,14 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'TEST_REQUEST_DEFAULT_FORMAT': 'json'
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'DEFAULT_PAGINATION_CLASS': 'backoffice.settings.rest_framework.pagination.LimitOffsetPaginationWithUpperBound',
+    'PAGE_SIZE': 25,
+    'DEFAULT_FILTER_BACKENDS':	(
+        'django_filters.rest_framework.DjangoFilterBackend',  # Allow advanced searching
+        'rest_framework.filters.OrderingFilter',  # Allow ordering collections
+        'rest_framework.filters.SearchFilter',   # Search based on admin
+    ),
 }
 
 # ESB Configuration

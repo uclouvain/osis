@@ -39,10 +39,8 @@ from base.models.entity import Entity
 from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums import person_source_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
-
-CENTRAL_MANAGER_GROUP = "central_managers"
-FACULTY_MANAGER_GROUP = "faculty_managers"
 
 
 class PersonAdmin(SerializableModelAdmin):
@@ -112,6 +110,9 @@ class Person(SerializableModel):
 
     def is_faculty_manager(self):
         return self.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists()
+
+    def is_sic(self):
+        return self.user.groups.filter(name=SIC_GROUP).exists()
 
     @property
     def full_name(self):

@@ -31,6 +31,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, ngettext
+from reversion.admin import VersionAdmin
 
 from base.models import entity_container_year as mdl_entity_container_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
@@ -40,7 +41,9 @@ from base.models.enums import learning_unit_year_subtypes, internship_subtypes, 
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
 from base.models.enums.learning_container_year_types import COURSE, INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, ANNUAL, BIENNIAL_EVEN, BIENNIAL_ODD
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_ALL, REGEX_BY_SUBTYPE
+from base.models.prerequisite_item import PrerequisiteItem
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 AUTHORIZED_REGEX_CHARS = "$*+.^"
@@ -60,7 +63,7 @@ def academic_year_validator(value):
         )
 
 
-class LearningUnitYearAdmin(SerializableModelAdmin):
+class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('external_id', 'acronym', 'specific_title', 'academic_year', 'credits', 'changed', 'structure',
                     'status')
     list_filter = ('academic_year', 'decimal_scores', 'summary_locked')
@@ -111,9 +114,17 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
                                       validators=[academic_year_validator])
     learning_unit = models.ForeignKey('LearningUnit')
+
     learning_container_year = models.ForeignKey('LearningContainerYear', null=True)
+
+    learning_component_years = models.ManyToManyField(
+        LearningComponentYear,
+        through="base.LearningUnitComponent",
+        verbose_name=_("Components"),
+    )
+
     changed = models.DateTimeField(null=True, auto_now=True)
-    acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('code'),
+    acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('Code'),
                                validators=[RegexValidator(LEARNING_UNIT_ACRONYM_REGEX_ALL)])
     specific_title = models.CharField(max_length=255, blank=True, null=True,
                                       verbose_name=_('English title proper'))
@@ -123,7 +134,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
                                default=learning_unit_year_subtypes.FULL)
     credits = models.DecimalField(null=True, max_digits=5, decimal_places=2,
                                   validators=[MinValueValidator(MINIMUM_CREDITS), MaxValueValidator(MAXIMUM_CREDITS)],
-                                  verbose_name=_('credits'))
+                                  verbose_name=_('Credits'))
     decimal_scores = models.BooleanField(default=False)
     structure = models.ForeignKey('Structure', blank=True, null=True)
     internship_subtype = models.CharField(max_length=250, blank=True, null=True,
@@ -400,14 +411,21 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def is_external(self):
         return hasattr(self, "externallearningunityear")
 
+    def is_prerequisite(self):
+        return PrerequisiteItem.objects.filter(
+            Q(learning_unit=self.learning_unit) | Q(prerequisite__learning_unit_year=self)
+        ).exists()
+
+    def has_or_is_prerequisite(self, education_group_year):
+        return PrerequisiteItem.objects.filter(
+            Q(learning_unit=self.learning_unit) |
+            Q(prerequisite__learning_unit_year=self, prerequisite__education_group_year=education_group_year)
+        ).exists()
+
 
 def get_by_id(learning_unit_year_id):
     return LearningUnitYear.objects.select_related('learning_container_year__learning_container') \
         .get(pk=learning_unit_year_id)
-
-
-def find_by_acronym(acronym):
-    return LearningUnitYear.objects.filter(acronym=acronym).select_related('learning_container_year')
 
 
 def _is_regex(acronym):

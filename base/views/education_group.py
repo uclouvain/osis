@@ -41,7 +41,8 @@ from base.business import education_group as education_group_business
 from base.business.education_group import assert_category_of_education_group_year
 from base.forms.education_group_admission import UpdateLineForm, UpdateTextForm
 from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
-from base.forms.education_groups_administrative_data import CourseEnrollmentForm, AdministrativeDataFormset
+from base.forms.education_groups_administrative_data import CourseEnrollmentForm, AdministrativeDataFormset, \
+    AdditionalInfoForm
 from base.models.admission_condition import AdmissionConditionLine, AdmissionCondition
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
@@ -84,10 +85,14 @@ def education_group_edit_administrative_data(request, root_id, education_group_y
     formset_session_validity = formset_session.is_valid()
 
     group_to_parent = request.GET.get("group_to_parent")
-
+    additional_info_form = AdditionalInfoForm(
+        request.POST or None,
+        instance=education_group_year
+    )
     if course_enrollment_validity and formset_session_validity:
         formset_session.save()
         course_enrollment.save()
+        additional_info_form.save()
         messages.add_message(request, messages.SUCCESS, _('The administrative data has been successfully modified'))
         return HttpResponseRedirect(reverse('education_group_administrative', args=[root_id, education_group_year_id]))
 

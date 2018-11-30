@@ -221,15 +221,10 @@ class TestLearningUnitXls(TestCase):
 
     def test_add_training_data(self):
         formations = _add_training_data(self.learning_unit_yr_1)
-
-        expected = "{} {} {}".format(
-            self.an_education_group_parent.partial_acronym,
-            "({})".format(
-                '{0:.2f}'.format(self.learning_unit_yr_1.credits)
-            ),
-            "{} - {}".format(PARENT_ACRONYM, PARENT_TITLE)
-        )
-
+        expected = " {} ({}) - {} - {}\n".format(self.an_education_group_parent.partial_acronym,
+                                                 "{0:.2f}".format(self.learning_unit_yr_1.credits),
+                                                 PARENT_ACRONYM,
+                                                 PARENT_TITLE)
         self.assertEqual(formations, expected)
 
     def test_get_data_part1(self):
@@ -238,8 +233,8 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(data[0], luy.acronym)
         self.assertEqual(data[1], luy.academic_year.name)
         self.assertEqual(data[2], luy.complete_title)
-        self.assertEqual(data[6], _(self.proposal_creation_1.type))
-        self.assertEqual(data[7], _(self.proposal_creation_1.state))
+        self.assertEqual(data[6], _(self.proposal_creation_1.type.title()))
+        self.assertEqual(data[7], _(self.proposal_creation_1.state.title()))
 
     def test_get_parameters_configurable_list(self):
         user_name = 'Ducon'
@@ -346,8 +341,8 @@ class TestLearningUnitXls(TestCase):
         luy.attribution_charge_news = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
             luy)
         expected_common = [
-            xls_build.translate(luy.periodicity),
-            xls_build.translate(luy.status),
+            str(_(luy.periodicity.title())),
+            str(_('Yes')) if luy.status else str(_('No')),
             component_lecturing.hourly_volume_total_annual,
             component_lecturing.hourly_volume_partial_q1,
             component_lecturing.hourly_volume_partial_q2,
@@ -356,8 +351,8 @@ class TestLearningUnitXls(TestCase):
             component_practical.hourly_volume_partial_q1,
             component_practical.hourly_volume_partial_q2,
             component_practical.planned_classes,
-            xls_build.translate(luy.quadrimester),
-            xls_build.translate(luy.session),
+            str(_(luy.quadrimester.title()))if luy.quadrimester else '',
+            str(_(luy.session.title())) if luy.session else '',
             "",
             ''
         ]

@@ -81,6 +81,7 @@ class ExamEnrollment(models.Model):
                                         default=enrollment_states.ENROLLED,
                                         choices=enrollment_states.STATES,
                                         db_index=True)
+    date_enrollment = models.DateField(null=True, verbose_name=_("Enrollment date"))
 
     def student(self):
         return self.learning_unit_enrollment.student
@@ -362,9 +363,11 @@ def find_for_score_encodings(session_exam_number,
     if not academic_year:
         academic_year = academic_yr.current_academic_year()
 
-    queryset = ExamEnrollment.objects.filter(session_exam__number_session=session_exam_number,
-                                             learning_unit_enrollment__learning_unit_year__academic_year=academic_year,
-                                             enrollment_state=enrollment_states.ENROLLED)
+    queryset = ExamEnrollment.objects.filter(
+        session_exam__number_session=session_exam_number,
+        learning_unit_enrollment__learning_unit_year__academic_year=academic_year,
+        enrollment_state__in=(enrollment_states.ENROLLED, enrollment_states.NOT_ENROLLED)
+    )
     if learning_unit_year_id:
         queryset = queryset.filter(learning_unit_enrollment__learning_unit_year_id=learning_unit_year_id)
     elif learning_unit_year_ids is not None:

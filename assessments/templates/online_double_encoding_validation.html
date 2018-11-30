@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% load l10n %}
 {% load i18n %}
-{% load score_display %}
+{% load score_display enrollment_state %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -95,6 +95,7 @@
                 </div>
             </div>
         </div>
+        {% include 'blocks/legend.html' %}
         <hr>
         <form class="form-inline" method="POST"
               action="{% url 'online_double_encoding_validation' learning_unit_year.id %}?{{ request.GET.urlencode }}"
@@ -123,7 +124,7 @@
                 </thead>
                 <tbody>
                 {% for enrollment in enrollments %}
-                    <tr style="background-color: {% ifchanged enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym %}{% cycle 'white' '#E5F2FF' as rowcolors %}{% else %}{{ rowcolors }}{% endifchanged %}">
+                    <tr style="background-color:{% include 'blocks/row_color.html' %}">
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>

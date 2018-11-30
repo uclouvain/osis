@@ -26,7 +26,7 @@
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError, PermissionDenied
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -233,6 +233,11 @@ class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView)
     template_name = "education_group/group_element_year/confirm_detach.html"
 
     def delete(self, request, *args, **kwargs):
+        child_leaf = self.get_object().child_leaf
+        parent = self.get_object().parent
+        if child_leaf and child_leaf.has_or_is_prerequisite(parent):
+            raise PermissionDenied
+
         success_msg = _("\"%(child)s\" has been detached from \"%(parent)s\"") % {
             'child': self.get_object().child,
             'parent': self.get_object().parent,

@@ -41,6 +41,7 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
     prerequisite_string = forms.CharField(
         label=_("Prerequisite"),
         validators=[prerequisite_syntax_validator],
+        required=False,
         help_text=_(
             "<b>Syntax rules</b>:<ul><li>No double parentheses.</li><li>Valid operators are OU or ET.</li><li>The "
             "operator must be the same inside all parentheses (groups).</li><li>The operator that linked groups must "
@@ -67,7 +68,7 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
         return self.get_grouped_items_from_string(
             prerequisite_string=prerequisite_string,
             main_operator=self.main_operator
-        )
+        ) if prerequisite_string else []
 
     def save(self, commit=True):
         grouped_items = self.cleaned_data['prerequisite_string']
@@ -100,7 +101,12 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
 
         for item in group:
             lu = learning_unit.get_by_acronym_with_highest_academic_year(acronym=item)
-            if lu:
+            if lu and lu == self.instance.learning_unit_year.learning_unit:
+                self.add_error(
+                    'prerequisite_string',
+                    _("A learning unit cannot be prerequisite to itself : %(acronym)s") % {'acronym': item}
+                )
+            elif lu:
                 # TODO :: Check that lu has a luy which is present in the education_group_year's tree
                 group_of_learning_units.append(lu)
             else:

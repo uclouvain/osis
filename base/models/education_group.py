@@ -26,12 +26,13 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.business.education_groups import shorten
 from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
 
-class EducationGroupAdmin(SerializableModelAdmin):
+class EducationGroupAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('most_recent_acronym', 'start_year', 'end_year', 'changed')
     search_fields = ('educationgroupyear__acronym',)
 
@@ -64,7 +65,8 @@ class EducationGroup(SerializableModel):
     class Meta:
         permissions = (
             ("can_access_education_group", "Can access education_group"),
-            ("can_edit_educationgroup_pedagogy", "Can edit education group pedagogy")
+            ("can_edit_educationgroup_pedagogy", "Can edit education group pedagogy"),
+            ("can_edit_common_education_group", "Can edit common education group")
         )
 
     def clean(self):

@@ -51,19 +51,19 @@ from osis_common.utils.datetime import convert_date_to_datetime
 from base.models.enums import entity_container_year_link_type
 # List of key that a user can modify
 
-WORKSHEET_TITLE = 'learning_units'
-XLS_FILENAME = 'learning_units_filename'
-XLS_DESCRIPTION = "List_activities"
+WORKSHEET_TITLE = _('Learning units list')
+XLS_FILENAME = _('LearningUnitsList')
+XLS_DESCRIPTION = _('Learning units list')
 LEARNING_UNIT_TITLES_PART1 = [
-    str(_('code')),
+    str(_('Code')),
     str(_('Ac yr.')),
     str(_('Title')),
-    str(_('type')),
+    str(_('Type')),
     str(_('Subtype')),
     str(_('Req. Entity')),
     str(_('Proposal type')),
     str(_('Proposal status')),
-    str(_('credits')),
+    str(_('Credits')),
     str(_('Alloc. Ent.')),
     str(_('Title in English')),
 ]
@@ -71,14 +71,14 @@ LEARNING_UNIT_TITLES_PART1 = [
 LEARNING_UNIT_TITLES_PART2 = [
     str(_('Periodicity')),
     str(_('Active')),
-    "{} 1 - {}".format(_('Hourly vol.'), _('Annual')),
-    "{} 1 - {}".format(_('Hourly vol.'), _('1st quadri')),
-    "{} 1 - {}".format(_('Hourly vol.'), _('2nd quadri')),
-    "{} 1".format(_('Planned classes')),
-    "{} 2 - {}".format(_('Hourly vol.'), _('Annual')),
-    "{} 2 - {}".format(_('Hourly vol.'), _('1st quadri')),
-    "{} 2 - {}".format(_('Hourly vol.'), _('2nd quadri')),
-    "{} 2".format(_('Planned classes')),
+    "{} - {}".format(_('Lecturing vol.'), _('Annual')),
+    "{} - {}".format(_('Lecturing vol.'), _('1st quadri')),
+    "{} - {}".format(_('Lecturing vol.'), _('2nd quadri')),
+    "{}".format(_('Lecturing planned classes')),
+    "{} - {}".format(_('Practical vol.'), _('Annual')),
+    "{} - {}".format(_('Practical vol.'), _('1st quadri')),
+    "{} - {}".format(_('Practical vol.'), _('2nd quadri')),
+    "{}".format(_('Practical planned classes')),
     str(_('Quadrimester')),
     str(_('Session derogation')),
     str(_('Language')),

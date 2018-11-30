@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-16 09:36+0100\n"
+"POT-Creation-Date: 2018-11-19 15:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,8 +47,16 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#: models/enums/function.py:45
+msgid "Co-holder"
+msgstr ""
+
 #: business/xls_build.py:43
 msgid "Code"
+msgstr ""
+
+#: models/enums/function.py:43
+msgid "Coordinator"
 msgstr ""
 
 #: templates/summary_responsible.html:54 templates/summary_responsible.html:87
@@ -61,6 +69,22 @@ msgstr ""
 
 #: business/xls_build.py:49
 msgid "Credits"
+msgstr ""
+
+#: models/enums/function.py:46
+msgid "Deputy"
+msgstr ""
+
+#: models/enums/function.py:47
+msgid "Deputy authority"
+msgstr ""
+
+#: models/enums/function.py:48
+msgid "Deputy sabbatical"
+msgstr ""
+
+#: models/enums/function.py:49
+msgid "Deputy temporary"
 msgstr ""
 
 #: templates/summary_responsible.html:109
@@ -98,9 +122,21 @@ msgstr ""
 msgid "Function"
 msgstr ""
 
+#: models/enums/function.py:44
+msgid "Holder"
+msgstr ""
+
 #: templates/summary_responsible.html:30
 #: templates/summary_responsible_edit.html:29
 msgid "Institution"
+msgstr ""
+
+#: models/enums/function.py:52
+msgid "Internship co-supervisor"
+msgstr ""
+
+#: models/enums/function.py:51
+msgid "Internship supervisor"
 msgstr ""
 
 #: business/xls_build.py:38
@@ -125,6 +161,10 @@ msgstr ""
 
 #: business/xls_build.py:39
 msgid "PRACTICAL_EXERCISES"
+msgstr ""
+
+#: models/enums/function.py:50
+msgid "Professor"
 msgstr ""
 
 #: models/tutor_application.py:48

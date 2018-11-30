@@ -25,6 +25,7 @@
 ##############################################################################
 from datetime import timedelta
 
+from django.core.exceptions import FieldDoesNotExist
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.utils import timezone
@@ -40,8 +41,11 @@ from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory, EducationGroupYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 DELETE_MSG = _("delete education group")
 PERMISSION_DENIED_MSG = _("The education group edition period is not open.")
@@ -93,6 +97,29 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
                 'load_modal': True,
                 'url': '#',
                 'icon': 'fa-edit'
+            }
+        )
+
+    def test_button_with_permission_learning_unit_is_prerequisite(self):
+        luy = LearningUnitYearFactory()
+        PrerequisiteItemFactory(learning_unit=luy.learning_unit)
+        group_element_year = GroupElementYearFactory(
+            parent=self.education_group_year,
+            child_branch=None,
+            child_leaf=luy,
+        )
+        url_detach = "{}?group_element_year_id={}".format(
+            reverse('education_groups_management'),
+            group_element_year.pk,
+        )
+        result = button_with_permission(self.context, "title", "detach", url_detach)
+        self.assertDictEqual(
+            result, {
+                'title': '',
+                'class_button': 'btn-default btn-sm disabled',
+                'load_modal': False,
+                'url': url_detach,
+                'icon': 'fa-close'
             }
         )
 
@@ -433,7 +460,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         )
 
         self.assertEqual(result["is_disabled"], "disabled")
-        self.assertEqual(result["text"], _("Edit"))
+        self.assertEqual(result["text"], _("Modify"))
 
 
 class TestEducationGroupDlWithParent(TestCase):
@@ -446,14 +473,14 @@ class TestEducationGroupDlWithParent(TestCase):
         }
 
     def test_dl_value_in_education_group(self):
-        response = dl_with_parent(self.context, _("Acronym"), "acronym")
+        response = dl_with_parent(self.context, "acronym")
         self.assertEqual(response["value"], self.education_group_year.acronym)
         self.assertEqual(response["label"], _("Acronym"))
         self.assertEqual(response["parent_value"], None)
 
     def test_dl_value_in_parent(self):
         self.education_group_year.acronym = ""
-        response = dl_with_parent(self.context, _("Acronym"), "acronym")
+        response = dl_with_parent(self.context, "acronym")
         self.assertEqual(response["value"], "")
         self.assertEqual(response["label"], _("Acronym"))
         self.assertEqual(response["parent_value"], self.parent.acronym)
@@ -461,7 +488,7 @@ class TestEducationGroupDlWithParent(TestCase):
     def test_dl_default_value(self):
         self.education_group_year.acronym = ""
         self.parent.acronym = ""
-        response = dl_with_parent(self.context, _("Acronym"), "acronym", default_value="avada kedavra")
+        response = dl_with_parent(self.context, "acronym", default_value="avada kedavra")
 
         self.assertEqual(response["value"], "")
         self.assertEqual(response["label"], _("Acronym"))
@@ -470,23 +497,22 @@ class TestEducationGroupDlWithParent(TestCase):
 
     def test_dl_with_bool(self):
         self.education_group_year.partial_deliberation = False
-        response = dl_with_parent(self.context, "partial_deliberation", "partial_deliberation")
+        response = dl_with_parent(self.context, "partial_deliberation")
         self.assertEqual(response["value"], "no")
         self.assertEqual(response["parent_value"], None)
 
         self.education_group_year.partial_deliberation = True
-        response = dl_with_parent(self.context, "partial_deliberation", "partial_deliberation")
+        response = dl_with_parent(self.context, "partial_deliberation")
         self.assertEqual(response["value"], "yes")
         self.assertEqual(response["parent_value"], None)
 
         self.education_group_year.partial_deliberation = None
         self.parent.partial_deliberation = True
-        response = dl_with_parent(self.context, "partial_deliberation", "partial_deliberation")
+        response = dl_with_parent(self.context, "partial_deliberation")
         self.assertEqual(response["value"], None)
         self.assertEqual(response["parent_value"], "yes")
 
     def test_dl_invalid_key(self):
         self.education_group_year.partial_deliberation = False
-        response = dl_with_parent(self.context, "partial_deliberation", "not_a_real_attr")
-        self.assertEqual(response["value"], None)
-        self.assertEqual(response["parent_value"], None)
+        with self.assertRaises(FieldDoesNotExist):
+            response = dl_with_parent(self.context, "not_a_real_attr")

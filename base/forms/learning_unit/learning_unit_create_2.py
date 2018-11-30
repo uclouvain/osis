@@ -43,8 +43,6 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from reference.models import language
 
-ID_FIELD = "id"
-
 FULL_READ_ONLY_FIELDS = {"acronym", "academic_year", "container_type"}
 FULL_PROPOSAL_READ_ONLY_FIELDS = {"academic_year", "container_type", "professional_integration"}
 
@@ -58,7 +56,16 @@ FACULTY_OPEN_FIELDS = {
     'specific_title_english',
     "status",
     "professional_integration",
-    ID_FIELD  # THIS IS A FIX, BUT A BETTER SOLUTION SHOULD BE FIND
+    "component-0-hourly_volume_partial_q1",
+    "component-0-hourly_volume_partial_q2",
+    "component-1-hourly_volume_partial_q1",
+    "component-1-hourly_volume_partial_q2",
+}
+
+# This fields can not be disabled.
+PROTECTED_FIELDS = {
+    "component-0-id",
+    "component-1-id",
 }
 
 
@@ -147,6 +154,7 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
         return [form.changed_data for form in self.forms.values()]
 
     def disable_fields(self, fields_to_disable):
+        fields_to_disable -= PROTECTED_FIELDS
         for key, value in self.fields.items():
             if key in fields_to_disable:
                 self._disable_field(value)
@@ -204,7 +212,6 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
 
 
 class FullForm(LearningUnitBaseForm):
-
     subtype = learning_unit_year_subtypes.FULL
 
     def __init__(self, person, academic_year, learning_unit_instance=None, data=None, start_year=None, proposal=False,
@@ -245,9 +252,7 @@ class FullForm(LearningUnitBaseForm):
     def _disable_fields_as_faculty_manager(self):
         faculty_type_not_restricted = [t[0] for t in LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY]
         if self.proposal:
-            # ID FIELD CAN NOT BE DEACTIVATED WITH FACULTY MANAGER
-            # TODO: THIS IS A FIX, BUT A BETTER SOLUTION SHOULD BE FIND
-            self.disable_fields(FACULTY_OPEN_FIELDS - set([ID_FIELD]))
+            self.disable_fields(FACULTY_OPEN_FIELDS)
         elif self.instance.learning_container_year and \
                 self.instance.learning_container_year.container_type not in faculty_type_not_restricted:
             self.disable_fields(self.fields.keys() - set(FACULTY_OPEN_FIELDS))
