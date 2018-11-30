@@ -136,7 +136,7 @@ def process_section(context, education_group_year, item):
     m_intro = re.match(INTRO_PATTERN, item)
     m_common = re.match(COMMON_PATTERN, item)
     if m_intro or m_common:
-        return intro_or_common_section(context, education_group_year, m_intro, m_common)
+        return get_intro_or_common_section(context, education_group_year, m_intro, m_common)
     elif item == business.SKILLS_AND_ACHIEVEMENTS_KEY:
         return get_skills_and_achievements(education_group_year, context.language)
     elif item == business.EVALUATION_KEY:
@@ -148,7 +148,7 @@ def process_section(context, education_group_year, item):
     return None
 
 
-def intro_or_common_section(context, education_group_year, m_intro, m_common):
+def get_intro_or_common_section(context, education_group_year, m_intro, m_common):
     if m_intro:
         egy = EducationGroupYear.objects.filter(partial_acronym__iexact=m_intro.group('acronym'),
                                                 academic_year__year=context.year).first()
