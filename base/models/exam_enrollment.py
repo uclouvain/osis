@@ -211,10 +211,7 @@ def is_absence_justification(justification):
 
 
 def calculate_exam_enrollment_progress(enrollments):
-    enrollment_enrolled = []
-    for enrollment in enrollments:
-        if enrollment.enrollment_state == enrollment_states.ENROLLED:
-            enrollment_enrolled.append(enrollment)
+    enrollment_enrolled = _get_enrolled_enrollments(enrollments)
     if enrollment_enrolled:
         progress = len([e for e in enrollment_enrolled if e.score_final is not None or e.justification_final]) / len(
             enrollment_enrolled)
@@ -442,3 +439,13 @@ def find_by_student(a_student):
         .order_by('-learning_unit_enrollment__learning_unit_year__academic_year__year',
                   'session_exam__number_session',
                   'learning_unit_enrollment__learning_unit_year__acronym')
+
+
+def _get_enrolled_enrollments(enrollments):
+    if enrollments:
+        enrollment_enrolled = []
+        for enrollment in enrollments:
+            if enrollment.enrollment_state == enrollment_states.ENROLLED:
+                enrollment_enrolled.append(enrollment)
+        return enrollment_enrolled
+    return None
