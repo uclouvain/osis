@@ -64,24 +64,29 @@ def get_intro_extra_content_achievements(education_group_year, language_code):
 
 
 def get_evaluation_text(education_group_year, language_code):
-    translated_text = TranslatedText.objects.all().prefetch_related(
-        Prefetch(
-            'text_label__translatedtextlabel_set',
-            to_attr="translated_text_labels"
+    try:
+        translated_text = TranslatedText.objects.all().prefetch_related(
+            Prefetch(
+                'text_label__translatedtextlabel_set',
+                to_attr="translated_text_labels"
+            )
+        ).get(
+            text_label__entity=OFFER_YEAR,
+            text_label__label=EVALUATION_KEY,
+            language=language_code,
+            entity=OFFER_YEAR,
+            reference=education_group_year.id
         )
-    ).get(
-        text_label__entity=OFFER_YEAR,
-        text_label__label=EVALUATION_KEY,
-        language=language_code,
-        entity=OFFER_YEAR,
-        reference=education_group_year.id
-    )
+        translated_text_label = next(
+            (
+                text_label.label for text_label in translated_text.text_label.translated_text_labels
+                if text_label.language == language_code
+            ),
+            EVALUATION_KEY
+        )
+    except TranslatedText.DoesNotExist:
+        translated_text = TranslatedText
+        translated_text.text = ''
+        translated_text_label = ''
 
-    translated_text_label = next(
-        (
-            text_label.label for text_label in translated_text.text_label.translated_text_labels
-            if text_label.language == language_code
-        ),
-        EVALUATION_KEY
-    )
     return translated_text_label, translated_text.text

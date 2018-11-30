@@ -42,6 +42,9 @@ class EnsureKeyTestCase(TestCase):
     def test_skills_and_achievement_data(self):
         self.assertEqual(business.SKILLS_AND_ACHIEVEMENTS_AA_DATA, 'achievements')
 
+    def test_evaluation_key(self):
+        self.assertEqual(business.EVALUATION_KEY, 'evaluation')
+
 
 class GetAchievementsTestCase(TestCase):
     def setUp(self):
@@ -111,3 +114,25 @@ class GetIntroExtraContentAchievementsTestCase(TestCase):
         )
         self.assertIsInstance(intro_extra_content, dict)
         self.assertDictEqual(intro_extra_content, {})
+
+
+class GetEvaluationTestCase(TestCase):
+    def setUp(self):
+        self.education_group_year = EducationGroupYearFactory()
+        self.cms_label_name = 'evaluation'
+        self.evaluation = TranslatedTextFactory(
+            entity=entity_name.OFFER_YEAR,
+            reference=self.education_group_year.pk,
+            language=settings.LANGUAGE_CODE_FR,
+            text_label__label=self.cms_label_name,
+            text_label__entity=entity_name.OFFER_YEAR
+        )
+
+    def test_get_evaluation_french_version(self):
+        label, text = business.get_evaluation_text(self.education_group_year, settings.LANGUAGE_CODE_FR)
+        self.assertEqual(text, self.evaluation.text)
+
+    def test_get_evaluation_no_english_version(self):
+        label, text = business.get_evaluation_text(self.education_group_year, settings.LANGUAGE_CODE_EN)
+        self.assertEqual(text, '')
+        self.assertEqual(label, '')
