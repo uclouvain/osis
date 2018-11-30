@@ -58,7 +58,7 @@ def export_xls(exam_enrollments):
     __display_warning_about_students_deliberated(worksheet, row_number=5)
     worksheet.append([str('')])
     __display_legends(worksheet)
-    __color_legend(worksheet)
+    _color_legend(worksheet)
     worksheet.append([str('')])
     __columns_resizing(worksheet)
     header_translate_list = [str(_(elem)) for elem in HEADER]
@@ -94,7 +94,7 @@ def export_xls(exam_enrollments):
 
         row_number += 1
         __coloring_non_editable(worksheet, row_number, score, exam_enroll.justification_final)
-        __coloring_enrollment_state(worksheet, row_number, exam_enroll)
+        _coloring_enrollment_state(worksheet, row_number, exam_enroll)
 
     lst_exam_enrollments = list(exam_enrollments)
     number_session = lst_exam_enrollments[0].session_exam.number_session
@@ -207,7 +207,7 @@ def __get_session_exam_deadline(exam_enroll):
     return deadline.strftime(date_format) if deadline else "-"
 
 
-def __coloring_enrollment_state(ws, row_number, exam_enroll):
+def _coloring_enrollment_state(ws, row_number, exam_enroll):
     """
     Coloring of the non-editable columns
     """
@@ -222,7 +222,7 @@ def __coloring_enrollment_state(ws, row_number, exam_enroll):
             column_number += 1
 
 
-def __color_legend(ws):
+def _color_legend(ws):
     __apply_style_to_cells(ws, ENROLLED_LATE_COLOR, FIRST_ROW_LEGEND_ENROLLMENT_STATUS)
     __apply_style_to_cells(ws, NOT_ENROLLED_COLOR, FIRST_ROW_LEGEND_ENROLLMENT_STATUS + 1)
 
