@@ -61,7 +61,7 @@ class GetAchievementsTestCase(TestCase):
 
         achievement = achievements_list[0]
         self.assertEqual(achievement['teaser'], self.education_group_achievement.english_text)
-        self.assertTrue(len(achievement.detailed_achievements), 1)
+        self.assertTrue(len(achievement['detailed_achievements']), 1)
 
         detailed_achievement = achievement['detailed_achievements'][0]
         self.assertEqual(detailed_achievement['text'], self.education_group_detailed_achievement.english_text)
