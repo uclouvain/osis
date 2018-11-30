@@ -87,6 +87,6 @@ def get_evaluation_text(education_group_year, language_code):
     except TranslatedText.DoesNotExist:
         translated_text = TranslatedText
         translated_text.text = ''
-        translated_text_label = ''
+        translated_text_label = EVALUATION_KEY
 
     return translated_text_label, translated_text.text

@@ -135,4 +135,4 @@ class GetEvaluationTestCase(TestCase):
     def test_get_evaluation_no_english_version(self):
         label, text = business.get_evaluation_text(self.education_group_year, settings.LANGUAGE_CODE_EN)
         self.assertEqual(text, '')
-        self.assertEqual(label, '')
+        self.assertEqual(label, self.cms_label_name)

@@ -44,7 +44,7 @@ from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from webservices import business
 from webservices.tests.helper import Helper
 from webservices.utils import convert_sections_list_of_dict_to_dict
-from webservices.views import new_context, get_skills_and_achievements
+from webservices.views import new_context, get_skills_and_achievements, get_evaluation
 
 
 def remove_conditions_admission(sections):
@@ -840,3 +840,13 @@ class GetSkillsAndAchievementsTestCase(TestCase):
         self.assertEqual(context['id'], business.SKILLS_AND_ACHIEVEMENTS_KEY)
         self.assertEqual(context['label'], business.SKILLS_AND_ACHIEVEMENTS_KEY)
         self.assertTrue('content' in context)
+
+
+class GetEvaluationTestCase(TestCase):
+    def test_get_evaluation(self):
+        education_group_year = EducationGroupYearFactory()
+        context = get_evaluation(education_group_year,  settings.LANGUAGE_CODE_FR)
+        self.assertEqual(context['id'], business.EVALUATION_KEY)
+        self.assertEqual(context['label'], business.EVALUATION_KEY)
+        self.assertTrue('content' in context)
+        self.assertTrue('free_text' in context)
