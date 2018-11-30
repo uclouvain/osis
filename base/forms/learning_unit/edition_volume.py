@@ -133,6 +133,10 @@ class VolumeEditionForm(forms.Form):
         """
         cleaned_data = super().clean()
 
+        if self.cleaned_data.get("volume_total") != self.cleaned_data.get("volume_q1") + self.cleaned_data.get(
+                "volume_q2"):
+            self.add_error("volume_total", _('Vol_tot is not equal to vol_q1 + vol_q2'))
+
         if self.is_faculty_manager:
 
             if 0 in [self.initial.get("volume_q1"), self.initial.get("volume_q2")]:
