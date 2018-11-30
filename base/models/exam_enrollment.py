@@ -38,6 +38,7 @@ from base.models.enums import exam_enrollment_state as enrollment_states, \
 from base.models.exceptions import JustificationValueException
 from base.models.utils.admin_extentions import remove_delete_action
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from base.models.enums import exam_enrollment_state as enrollment_states
 
 JUSTIFICATION_ABSENT_FOR_TUTOR = _('Absent')
 SCORE_BETWEEN_0_AND_20 = _("Scores must be between 0 and 20")
@@ -210,9 +211,13 @@ def is_absence_justification(justification):
 
 
 def calculate_exam_enrollment_progress(enrollments):
-    if enrollments:
-        progress = len([e for e in enrollments if e.score_final is not None or e.justification_final]) / len(
-            enrollments)
+    enrollment_enrolled = []
+    for enrollment in enrollments:
+        if enrollment.enrollment_state == enrollment_states.ENROLLED:
+            enrollment_enrolled.append(enrollment)
+    if enrollment_enrolled:
+        progress = len([e for e in enrollment_enrolled if e.score_final is not None or e.justification_final]) / len(
+            enrollment_enrolled)
     else:
         progress = 0
     return progress * 100
