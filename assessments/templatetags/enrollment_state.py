@@ -26,6 +26,7 @@
 from django import template
 
 from assessments.business import enrollment_state
+from base.models.enums import exam_enrollment_state as enrollment_states
 
 register = template.Library()
 
@@ -33,3 +34,11 @@ register = template.Library()
 @register.filter
 def get_line_color(enrollment):
     return enrollment_state.get_line_color(enrollment)
+
+
+@register.filter
+def enrolled_exists(enrollments):
+    for enrollment in enrollments:
+        if enrollment.enrollment_state == enrollment_states.ENROLLED:
+            return True
+    return False

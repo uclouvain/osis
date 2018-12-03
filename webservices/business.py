@@ -41,7 +41,7 @@ EVALUATION_KEY = 'evaluation'
 
 def get_achievements(education_group_year, language_code):
     if language_code in [settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_EN]:
-        return EducationGroupAchievement.objects.filter(
+        qs = EducationGroupAchievement.objects.filter(
             education_group_year=education_group_year
         ).prefetch_related(
             Prefetch(
@@ -49,8 +49,34 @@ def get_achievements(education_group_year, language_code):
                 queryset=EducationGroupDetailedAchievement.objects.all().annotate_text(language_code),
                 to_attr='detailed_achievements',
             ),
-        ).annotate_text(language_code)
+        ).annotate_text(language_code)\
+
+
+        achievement_list = []
+        for education_group_achievement in qs:
+            row = {
+                'teaser': education_group_achievement.text,
+                'detailed_achievements':
+                    _get_detailed_achievements(education_group_achievement.detailed_achievements) or None,
+                'code_name': _clean_code_name(education_group_achievement.code_name)
+            }
+            achievement_list.append(row)
+        return achievement_list
     raise AttributeError('Language code not supported {}'.format(language_code))
+
+
+def _get_detailed_achievements(education_group_detailed_achievements):
+    return [
+        {'code_name': _clean_code_name(detailed_achievement.code_name), 'text': detailed_achievement.text}
+        for detailed_achievement in education_group_detailed_achievements
+    ]
+
+
+# FIX ME: remove this line when user have clean DB
+def _clean_code_name(code_name):
+    if code_name == '.':
+        return None
+    return code_name
 
 
 def get_intro_extra_content_achievements(education_group_year, language_code):

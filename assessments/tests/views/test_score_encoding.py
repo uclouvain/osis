@@ -492,8 +492,9 @@ class UploadXLSTest(TestCase):
 
     def test_header_not_changed(self):
         from assessments.business.score_encoding_export import HEADER
-        header_expected_list = ['academic_year', 'session_title', 'learning_unit', 'program', 'registration_number',
-                              'lastname', 'firstname', 'email', 'numbered_score', 'justification', 'end_date']
+        header_expected_list = ['academic_year', 'Session derogation', 'Learning unit', 'program',
+                                'registration_number', 'lastname', 'firstname', 'email', 'Numbered scores',
+                                'justification', 'End date']
         self.assertListEqual(HEADER, header_expected_list)
 
 

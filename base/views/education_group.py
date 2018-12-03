@@ -244,6 +244,7 @@ def save_form_to_admission_condition_line(education_group_year_id, creation_mode
 def education_group_year_admission_condition_update_line_get(request):
     section = request.GET['section']
     language = request.GET['language']
+
     lang = '' if language == 'fr' else '_en'
 
     initial_values = {
@@ -343,3 +344,11 @@ def education_group_year_admission_condition_line_order(request, root_id, educat
             'education_group_year_id': education_group_year_id
         })
     })
+
+
+@login_required
+@permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
+def education_group_year_admission_condition_tab_lang_edit(request, root_id, education_group_year_id, language):
+    request.session['tab_lang'] = language
+    return redirect(reverse('education_group_year_admission_condition_edit',
+                            kwargs={'root_id': root_id, 'education_group_year_id': education_group_year_id}))

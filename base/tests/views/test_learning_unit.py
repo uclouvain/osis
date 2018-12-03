@@ -63,7 +63,8 @@ from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_unit_year_subtypes import FULL
-from base.models.person import FACULTY_MANAGER_GROUP, Person
+from base.models.person import Person
+from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory

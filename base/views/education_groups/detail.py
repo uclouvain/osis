@@ -450,6 +450,11 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        tab_lang = 'fr'
+
+        if self.request.session.get('tab_lang'):
+            tab_lang = self.request.session.get('tab_lang')
+
         acronym = self.object.acronym.lower()
         is_common = acronym.startswith('common-')
         is_specific = not is_common
@@ -482,6 +487,10 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
             },
             'admission_condition': admission_condition,
             'record': record,
+            'language': {
+                'list': ["fr", "en"],
+                'tab_lang': tab_lang
+            }
         })
 
         return context

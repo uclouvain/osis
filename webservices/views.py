@@ -409,16 +409,15 @@ def get_evaluation(education_group_year, language_code):
 
 
 def get_skills_and_achievements(education_group_year, language_code):
-    context = {
-        'achievements': business.get_achievements(education_group_year, language_code),
-        'language_code': language_code
-    }
-    context.update(business.get_intro_extra_content_achievements(education_group_year, language_code))
+    intro_extra_content = business.get_intro_extra_content_achievements(education_group_year, language_code)
+    achievements = business.get_achievements(education_group_year, language_code)
 
-    comp_acquis_template = loader.get_template('comp_acquis.html')
-    content_rendered = comp_acquis_template.render(context)
     return {
         'id': business.SKILLS_AND_ACHIEVEMENTS_KEY,
         'label': business.SKILLS_AND_ACHIEVEMENTS_KEY,
-        'content': content_rendered
+        'content': {
+            'intro': intro_extra_content.get('skills_and_achievements_introduction') or None,
+            'blocs': achievements,
+            'extra': intro_extra_content.get('skills_and_achievements_additional_text') or None
+        }
     }
