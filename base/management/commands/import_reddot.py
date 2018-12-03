@@ -45,7 +45,6 @@ from base.models.entity import Entity
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.organization_type import MAIN
-from base.tests.factories.education_group import EducationGroupFactory
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
