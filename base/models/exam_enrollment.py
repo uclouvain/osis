@@ -82,7 +82,7 @@ class ExamEnrollment(models.Model):
                                         default=enrollment_states.ENROLLED,
                                         choices=enrollment_states.STATES,
                                         db_index=True)
-    date_enrollment = models.DateField(null=True, verbose_name=_("Enrollment date"))
+    date_enrollment = models.DateField(null=True, blank=True, verbose_name=_("Enrollment date"))
 
     def student(self):
         return self.learning_unit_enrollment.student
