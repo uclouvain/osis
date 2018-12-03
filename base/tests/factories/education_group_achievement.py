@@ -23,12 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
 import factory.fuzzy
 
-from base.models.education_group_year import EducationGroupYear
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from reference.tests.factories.language import LanguageFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 
 
 class EducationGroupAchievementFactory(factory.django.DjangoModelFactory):
@@ -38,4 +35,4 @@ class EducationGroupAchievementFactory(factory.django.DjangoModelFactory):
     code_name = factory.Sequence(lambda n: 'AA %02d' % n)
     french_text = factory.fuzzy.FuzzyText('label_', 20)
     english_text = factory.fuzzy.FuzzyText('label_', 20)
-    education_group_year = factory.SubFactory(EducationGroupYear)
+    education_group_year = factory.SubFactory(EducationGroupYearFactory)

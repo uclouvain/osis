@@ -33,6 +33,7 @@ from assessments.models import score_sheet_address
 from assessments.models.enums.score_sheet_address_choices import *
 from base.business import entity_version as entity_version_business
 from base.models.enums.person_address_type import PersonAddressType
+from assessments.business.enrollment_state import get_line_color
 
 
 def get_score_sheet_address(off_year):
@@ -192,7 +193,8 @@ def scores_sheet_data(exam_enrollments, tutor=None):
                     "first_name": student.person.first_name,
                     "score": score,
                     "justification": _(exam_enrol.justification_final) if exam_enrol.justification_final else '',
-                    "deadline": deadline if deadline else ''
+                    "deadline": deadline if deadline else '',
+                    "enrollment_state_color": get_line_color(exam_enrol),
                 })
             program['enrollments'] = enrollments
             programs.append(program)

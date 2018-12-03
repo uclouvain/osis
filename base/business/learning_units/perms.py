@@ -31,7 +31,6 @@ from django.utils.translation import ugettext_lazy as _
 from waffle.models import Flag
 
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
-from base.business.learning_units.prerequisite import luy_has_or_is_prerequisite
 from base.models import proposal_learning_unit, tutor
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, \
     starting_academic_year
@@ -186,7 +185,9 @@ def can_edit_summary_locked_field(learning_unit_year, person):
 
 
 def can_update_learning_achievement(learning_unit_year, person):
-    return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+    flag = Flag.get('learning_achievement_update')
+    return flag.is_active_for_user(person.user) and \
+        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 
 def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_exception=False):
@@ -198,7 +199,7 @@ def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_e
         msg = MSG_NOT_ELIGIBLE_TO_DELETE_LU
     elif not person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year):
         msg = MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY
-    elif luy_has_or_is_prerequisite(learning_unit_year):
+    elif learning_unit_year.is_prerequisite():
         msg = MSG_LEARNING_UNIT_IS_OR_HAS_PREREQUISITE
 
     result = False if msg else True

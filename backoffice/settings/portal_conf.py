@@ -23,7 +23,6 @@ SECTION_LIST = [
             ]),
     Section(title=_('Teaching profile'),
             labels=[
-                ('comp_acquis', 'specific'),
                 ('structure', 'specific')
             ]),
     Section(title=_('Detailed programme'),

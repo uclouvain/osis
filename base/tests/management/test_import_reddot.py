@@ -5,8 +5,9 @@ from django.conf import settings
 from django.test import TestCase
 
 from base.management.commands import import_reddot
-from base.management.commands.import_reddot import _import_skills_and_achievements, SKILLS_AND_ACHIEVEMENTS_CMS_DATA, \
+from base.management.commands.import_reddot import _import_skills_and_achievements, \
     _get_field_achievement_according_to_language
+from webservices.business import SKILLS_AND_ACHIEVEMENTS_CMS_DATA
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.education_group import EducationGroup
 from base.models.education_group_achievement import EducationGroupAchievement
@@ -15,6 +16,7 @@ from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType
+from base.models.enums.organization_type import MAIN
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import (
@@ -22,6 +24,8 @@ from base.tests.factories.education_group_year import (
     EducationGroupYearCommonMasterFactory,
     EducationGroupYearCommonBachelorFactory
 )
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 
@@ -274,6 +278,8 @@ class CreateCommonOfferForAcademicYearTest(TestCase):
         academic_year = AcademicYearFactory()
         self.assertEqual(EducationGroup.objects.count(), 0)
 
+        entity = EntityFactory(organization__type=MAIN)
+        entity_version = EntityVersionFactory(acronym='UCL', entity=entity)
         from base.management.commands.import_reddot import OFFERS
         for offer in OFFERS:
             EducationGroupType.objects.create(name=offer['name'], category=offer['category'])
@@ -287,6 +293,8 @@ class CreateCommonOfferForAcademicYearTest(TestCase):
         academic_year = AcademicYearFactory()
         self.assertEqual(EducationGroup.objects.count(), 0)
 
+        entity = EntityFactory(organization__type=MAIN)
+        entity_version = EntityVersionFactory(acronym='UCL', entity=entity)
         from base.management.commands.import_reddot import OFFERS
         for offer in OFFERS:
             EducationGroupType.objects.create(name=offer['name'], category=offer['category'])

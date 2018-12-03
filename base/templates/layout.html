@@ -39,8 +39,23 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-    <link rel="shortcut icon" href="
-            {% if environment == 'LOCAL' %}{% static 'img/favicon_blue.ico' %}{% else %}{% static 'img/favicon.ico' %}{% endif %}"/>
+
+    {% if environment == 'LOCAL' %}
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static "img/favicon/local/apple-touch-icon.png" %}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static "img/favicon/local/favicon-32x32.png" %}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{% static "img/favicon/local/favicon-16x16.png" %}">
+        <link rel="manifest" href="{% static "img/favicon/local/site.webmanifest" %}">
+        <link rel="mask-icon" href="{% static "img/favicon/local/safari-pinned-tab.svg" %}" color="#5bbad5">
+    {% else %}
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static "img/favicon/apple-touch-icon.png" %}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static "img/favicon/favicon-32x32.png" %}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{% static "img/favicon/favicon-16x16.png" %}">
+        <link rel="manifest" href="{% static "img/favicon/site.webmanifest" %}">
+        <link rel="mask-icon" href="{% static "img/favicon/safari-pinned-tab.svg" %}" color="#5bbad5">
+    {% endif %}
+    <meta name="msapplication-TileColor" content="#2d89ef">
+    <meta name="theme-color" content="#ffffff">
+
     <link rel="stylesheet" href="{% static 'css/armata.css' %}" type='text/css'>
     <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
@@ -90,6 +105,7 @@
 <body {% if environment == 'DEV' %} class="devmode"
 {% elif environment == 'LOCAL' %} class="localmode"
 {% elif environment == 'QA' %} class="qamode"
+{% elif environment == 'TEST' %} class="testmode"
 {% endif %}>
 {% hijack_notification %}
 {% analytical_body_top %}
@@ -277,6 +293,8 @@
     <div class="localred">LOCAL</div>
 {% elif environment == 'QA' %}
     <div class="qagreen">QA</div>
+{% elif environment == 'TEST' %}
+    <div class="testblue">TEST</div>
 {% endif %}
 <div id="alert_wrong_version" class="container">
     <div class="alert alert-warning">

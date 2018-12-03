@@ -1,4 +1,4 @@
-#: templates/online_encoding.html:290
+#: templates/online_encoding.html:298
 #, python-format
 msgid ""
 "\n"
@@ -12,10 +12,10 @@ msgstr ""
 msgid "Absence justified cannot be remplaced by absence unjustified"
 msgstr ""
 
-#: templates/online_double_encoding_form.html:173
-#: templates/online_double_encoding_validation.html:272
-#: templates/online_double_encoding_validation.html:278
-#: templates/online_encoding_form.html:211
+#: templates/online_double_encoding_form.html:182
+#: templates/online_double_encoding_validation.html:285
+#: templates/online_double_encoding_validation.html:291
+#: templates/online_encoding_form.html:219
 msgid "Absent"
 msgstr ""
 
@@ -108,24 +108,24 @@ msgstr ""
 #: templates/admin/modal/add_manager.html:62
 #: templates/admin/modal/remove_manager_confirm.html:29
 #: templates/online_double_encoding_form.html:114
-#: templates/online_double_encoding_form.html:187
-#: templates/online_double_encoding_validation.html:251
-#: templates/online_encoding.html:272 templates/online_encoding.html:299
+#: templates/online_double_encoding_form.html:196
+#: templates/online_double_encoding_validation.html:264
+#: templates/online_encoding.html:280 templates/online_encoding.html:307
 #: templates/online_encoding_form.html:115
-#: templates/online_encoding_form.html:240
+#: templates/online_encoding_form.html:248
 #: templates/scores_responsible_edit.html:71
 msgid "Cancel"
 msgstr ""
 
-#: templates/online_double_encoding_form.html:175
-#: templates/online_double_encoding_validation.html:283
-#: templates/online_encoding_form.html:221
+#: templates/online_double_encoding_form.html:184
+#: templates/online_double_encoding_validation.html:296
+#: templates/online_encoding_form.html:229
 #: templates/scores_encoding_by_specific_criteria.html:65
 #: templates/scores_encoding_by_specific_criteria.html:150
 msgid "Cheating"
 msgstr ""
 
-#: templates/online_encoding.html:266
+#: templates/online_encoding.html:274
 msgid "Choose file"
 msgstr ""
 
@@ -138,7 +138,7 @@ msgid "Code"
 msgstr ""
 
 #: templates/online_double_encoding_form.html:112
-#: templates/online_double_encoding_form.html:185
+#: templates/online_double_encoding_form.html:194
 msgid "Compare"
 msgstr ""
 
@@ -168,9 +168,9 @@ msgstr ""
 msgid "Datatable sort descending"
 msgstr ""
 
-#: templates/online_encoding.html:201 templates/online_encoding.html:203
-#: templates/online_encoding_form.html:145
-#: templates/online_encoding_form.html:147
+#: templates/online_encoding.html:209 templates/online_encoding.html:211
+#: templates/online_encoding_form.html:153
+#: templates/online_encoding_form.html:155
 #: templates/scores_encoding_by_specific_criteria.html:113
 #: views/upload_xls_utils.py:323
 msgid "Deadline reached"
@@ -188,7 +188,7 @@ msgstr ""
 msgid "Decimal values in scores are accepted."
 msgstr ""
 
-#: templates/online_encoding.html:154 templates/online_encoding.html:298
+#: templates/online_encoding.html:154 templates/online_encoding.html:306
 msgid "Definitive submission (Submit to faculty)"
 msgstr ""
 
@@ -208,7 +208,7 @@ msgstr ""
 msgid "Double encode scores"
 msgstr ""
 
-#: templates/online_double_encoding_validation.html:108
+#: templates/online_double_encoding_validation.html:109
 #: templates/online_encoding.html:128
 msgid "Double encoding"
 msgstr ""
@@ -233,8 +233,12 @@ msgstr ""
 msgid "Encode scores"
 msgstr ""
 
-#: templates/online_double_encoding_validation.html:107
+#: templates/online_double_encoding_validation.html:108
 msgid "Encoding"
+msgstr ""
+
+#: templates/blocks/legend.html:29
+msgid "Enrolled after session starts"
 msgstr ""
 
 #: views/score_sheet.py:111
@@ -260,14 +264,14 @@ msgstr ""
 msgid "Fax"
 msgstr ""
 
-#: templates/online_double_encoding_validation.html:109
+#: templates/online_double_encoding_validation.html:110
 msgid "Final"
 msgstr ""
 
 #: templates/admin/modal/add_manager.html:49
-#: templates/online_double_encoding_form.html:121
-#: templates/online_double_encoding_validation.html:115
-#: templates/online_encoding.html:179 templates/online_encoding_form.html:123
+#: templates/online_double_encoding_form.html:122
+#: templates/online_double_encoding_validation.html:116
+#: templates/online_encoding.html:180 templates/online_encoding_form.html:124
 #: templates/scores_encoding_by_specific_criteria.html:56
 #: templates/scores_encoding_by_specific_criteria.html:57
 #: templates/scores_encoding_by_specific_criteria.html:101
@@ -293,7 +297,7 @@ msgstr ""
 msgid "Incomplete"
 msgstr ""
 
-#: templates/online_encoding.html:273
+#: templates/online_encoding.html:281
 msgid "Inject"
 msgstr ""
 
@@ -311,11 +315,11 @@ msgid "Invalid justification value"
 msgstr ""
 
 #: business/score_encoding_export.py:164
-#: templates/online_double_encoding_form.html:123
-#: templates/online_double_encoding_validation.html:117
-#: templates/online_double_encoding_validation.html:119
-#: templates/online_double_encoding_validation.html:121
-#: templates/online_encoding.html:181 templates/online_encoding_form.html:125
+#: templates/online_double_encoding_form.html:124
+#: templates/online_double_encoding_validation.html:118
+#: templates/online_double_encoding_validation.html:120
+#: templates/online_double_encoding_validation.html:122
+#: templates/online_encoding.html:182 templates/online_encoding_form.html:126
 #: templates/scores_encoding_by_specific_criteria.html:103
 msgid "Justification"
 msgstr ""
@@ -325,9 +329,9 @@ msgstr ""
 msgid "Justification legend: %(justification_label_authorized)s"
 msgstr ""
 
-#: templates/online_double_encoding_form.html:171
-#: templates/online_double_encoding_validation.html:280
-#: templates/online_encoding_form.html:204
+#: templates/online_double_encoding_form.html:180
+#: templates/online_double_encoding_validation.html:293
+#: templates/online_encoding_form.html:212
 #: templates/scores_encoding_by_specific_criteria.html:64
 #: templates/scores_encoding_by_specific_criteria.html:149
 msgid "Justified absence"
@@ -338,9 +342,9 @@ msgid "Last synchronization"
 msgstr ""
 
 #: templates/admin/modal/add_manager.html:48
-#: templates/online_double_encoding_form.html:120
-#: templates/online_double_encoding_validation.html:114
-#: templates/online_encoding.html:178 templates/online_encoding_form.html:122
+#: templates/online_double_encoding_form.html:121
+#: templates/online_double_encoding_validation.html:115
+#: templates/online_encoding.html:179 templates/online_encoding_form.html:123
 #: templates/scores_encoding_by_specific_criteria.html:52
 #: templates/scores_encoding_by_specific_criteria.html:53
 #: templates/scores_encoding_by_specific_criteria.html:100
@@ -403,7 +407,7 @@ msgstr ""
 msgid "No data for this academic year"
 msgstr ""
 
-#: views/score_encoding.py:349
+#: views/score_encoding.py:352
 msgid "No double score encoded ; nothing to compare."
 msgstr ""
 
@@ -411,14 +415,14 @@ msgstr ""
 msgid "No entity associated to your profile"
 msgstr ""
 
-#: views/score_encoding.py:527
+#: views/score_encoding.py:530
 msgid "No new scores encoded. The double encoding needs new scores."
 msgstr ""
 
 #: templates/admin/modal/add_manager.html:42
 #: templates/admin/modal/add_manager.html:44
 #: templates/admin/pgm_manager.html:105 templates/scores_responsible.html:80
-#: views/score_encoding.py:163 views/score_encoding.py:599
+#: views/score_encoding.py:164 views/score_encoding.py:603
 msgid "No result!"
 msgstr ""
 
@@ -430,7 +434,7 @@ msgstr ""
 msgid "No scores injected"
 msgstr ""
 
-#: views/score_encoding.py:404
+#: views/score_encoding.py:407
 msgid "No students to encode by excel"
 msgstr ""
 
@@ -438,6 +442,10 @@ msgstr ""
 #: templates/online_double_encoding_validation.html:67
 #: templates/online_encoding.html:67 templates/online_encoding_form.html:66
 msgid "None"
+msgstr ""
+
+#: templates/blocks/legend.html:33
+msgid "Not enrolled"
 msgstr ""
 
 #: business/score_encoding_sheet.py:169
@@ -454,9 +462,9 @@ msgstr ""
 msgid "Numbered scores"
 msgstr ""
 
-#: templates/online_double_encoding_form.html:118
-#: templates/online_double_encoding_validation.html:112
-#: templates/online_encoding_form.html:120 templates/scores_encoding.html:64
+#: templates/online_double_encoding_form.html:119
+#: templates/online_double_encoding_validation.html:113
+#: templates/online_encoding_form.html:121 templates/scores_encoding.html:64
 #: templates/scores_encoding_by_learning_unit.html:61
 #: templates/scores_encoding_by_specific_criteria.html:70
 #: templates/scores_encoding_by_specific_criteria.html:97
@@ -504,7 +512,7 @@ msgstr ""
 msgid "Phone"
 msgstr ""
 
-#: views/score_encoding.py:582
+#: views/score_encoding.py:586
 msgid "Please choose at least one criteria!"
 msgstr ""
 
@@ -512,7 +520,7 @@ msgstr ""
 msgid "Please enter a lastname, and optionnally a firstname"
 msgstr ""
 
-#: templates/online_encoding.html:269
+#: templates/online_encoding.html:277
 msgid "Please select an XLS file for injection"
 msgstr ""
 
@@ -539,7 +547,7 @@ msgstr ""
 msgid "Print the scores"
 msgstr ""
 
-#: templates/admin/pgm_manager.html:116 templates/online_encoding.html:176
+#: templates/admin/pgm_manager.html:116 templates/online_encoding.html:177
 msgid "Program"
 msgstr ""
 
@@ -578,9 +586,9 @@ msgstr ""
 msgid "Registration ID does not match email"
 msgstr ""
 
-#: templates/online_double_encoding_form.html:119
-#: templates/online_double_encoding_validation.html:113
-#: templates/online_encoding.html:177 templates/online_encoding_form.html:121
+#: templates/online_double_encoding_form.html:120
+#: templates/online_double_encoding_validation.html:114
+#: templates/online_encoding.html:178 templates/online_encoding_form.html:122
 msgid "Registration number"
 msgstr ""
 
@@ -616,20 +624,20 @@ msgid "S=Unjustified Absence"
 msgstr ""
 
 #: templates/offer/score_sheet_address_tab.html:126
-#: templates/online_double_encoding_validation.html:250
+#: templates/online_double_encoding_validation.html:263
 #: templates/online_encoding_form.html:113
-#: templates/online_encoding_form.html:238
+#: templates/online_encoding_form.html:246
 #: templates/scores_encoding_by_specific_criteria.html:92
 #: templates/scores_encoding_by_specific_criteria.html:159
 #: templates/scores_responsible_edit.html:69
 msgid "Save"
 msgstr ""
 
-#: templates/online_double_encoding_form.html:122
-#: templates/online_double_encoding_validation.html:116
-#: templates/online_double_encoding_validation.html:118
-#: templates/online_double_encoding_validation.html:120
-#: templates/online_encoding.html:180 templates/online_encoding_form.html:124
+#: templates/online_double_encoding_form.html:123
+#: templates/online_double_encoding_validation.html:117
+#: templates/online_double_encoding_validation.html:119
+#: templates/online_double_encoding_validation.html:121
+#: templates/online_encoding.html:181 templates/online_encoding_form.html:125
 #: templates/scores_encoding_by_specific_criteria.html:102
 msgid "Score"
 msgstr ""
@@ -655,7 +663,7 @@ msgstr ""
 msgid "Score sheet address was successfully saved."
 msgstr ""
 
-#: templates/online_encoding.html:206 templates/online_encoding_form.html:151
+#: templates/online_encoding.html:214 templates/online_encoding_form.html:159
 #: templates/scores_encoding_by_specific_criteria.html:116
 msgid "Score submitted"
 msgstr ""
@@ -672,7 +680,7 @@ msgstr ""
 msgid "Scores encoding"
 msgstr ""
 
-#: templates/online_encoding.html:263
+#: templates/online_encoding.html:271
 msgid "Scores injection"
 msgstr ""
 
@@ -737,7 +745,7 @@ msgstr ""
 msgid "State"
 msgstr ""
 
-#: templates/online_encoding.html:175 templates/online_encoding_form.html:119
+#: templates/online_encoding.html:176 templates/online_encoding_form.html:120
 #: templates/scores_encoding_by_specific_criteria.html:96
 #: templates/scores_responsible_edit.html:46
 msgid "Status"
@@ -756,18 +764,18 @@ msgstr ""
 msgid "Studies"
 msgstr ""
 
-#: templates/online_encoding.html:155 templates/online_encoding.html:286
-#: templates/online_encoding.html:298
+#: templates/online_encoding.html:155 templates/online_encoding.html:294
+#: templates/online_encoding.html:306
 msgid "Submission"
 msgstr ""
 
-#: templates/online_double_encoding_form.html:124
-#: templates/online_encoding.html:182 templates/online_encoding_form.html:126
+#: templates/online_double_encoding_form.html:125
+#: templates/online_encoding.html:183 templates/online_encoding_form.html:127
 msgid "Teacher deadline"
 msgstr ""
 
 #: templates/online_encoding_form.html:111
-#: templates/online_encoding_form.html:236
+#: templates/online_encoding_form.html:244
 msgid "Temporary save (not submitted to the faculty yet)"
 msgstr ""
 
@@ -837,9 +845,9 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: templates/online_double_encoding_form.html:170
-#: templates/online_double_encoding_validation.html:274
-#: templates/online_encoding_form.html:198
+#: templates/online_double_encoding_form.html:179
+#: templates/online_double_encoding_validation.html:287
+#: templates/online_encoding_form.html:206
 #: templates/scores_encoding_by_specific_criteria.html:63
 #: templates/scores_encoding_by_specific_criteria.html:148
 msgid "Unjustified absence"
@@ -859,7 +867,7 @@ msgstr ""
 msgid "Via paper"
 msgstr ""
 
-#: templates/online_encoding.html:166
+#: templates/online_encoding.html:167
 msgid "Warning : some registered scores have not been submitted yet!"
 msgstr ""
 
@@ -928,6 +936,6 @@ msgstr ""
 msgid "program(s)"
 msgstr ""
 
-#: views/score_encoding.py:324
+#: views/score_encoding.py:326
 msgid "score(s) saved"
 msgstr ""

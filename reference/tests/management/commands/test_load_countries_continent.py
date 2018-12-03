@@ -1,4 +1,4 @@
-##############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -22,10 +22,21 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from base.models import prerequisite_item
+############################################################################
+
+from django.core.management import call_command
+from django.test import TestCase
+
+from reference.models.country import Country
+from reference.tests.factories.country import CountryFactory
 
 
-def luy_has_or_is_prerequisite(luy):
-    return prerequisite_item.find_by_learning_unit_being_prerequisite(luy.learning_unit).exists() or \
-           prerequisite_item.find_by_learning_unit_year_having_prerequisite(luy).exists()
+class CommandsTestCase(TestCase):
+
+    def test_load_countries_and_continent(self):
+        CountryFactory(iso_code='BE', name='Belgium')
+        args = []
+        opts = {}
+        call_command('load_countries_continent', *args, **opts)
+        self.assertTrue(Country.objects.filter(iso_code='BE').get().continent)
+        self.assertEqual(Country.objects.all().count(), 1)  # assert doesn't create any Country

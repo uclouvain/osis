@@ -185,9 +185,9 @@ class LearningUnitPostponementForm:
             learningunitcomponent__learning_unit_year=luy_to_update)
         for learning_component_year in learning_component_years:
             if learning_component_year.type == LECTURING:
-                data_to_postpone['form-0-id'] = learning_component_year.id
+                data_to_postpone['component-0-id'] = learning_component_year.id
             else:
-                data_to_postpone['form-1-id'] = learning_component_year.id
+                data_to_postpone['component-1-id'] = learning_component_year.id
 
     def _instantiate_base_form_as_insert(self, ac_year, data):
         return self._get_learning_unit_base_form(ac_year, data=data, start_year=self.start_postponement.year)

@@ -40,17 +40,16 @@ from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
+from base.models.entity import Entity
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType
+from base.models.enums.organization_type import MAIN
 from base.tests.factories.education_group import EducationGroupFactory
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-
-SKILLS_AND_ACHIEVEMENTS_KEY = 'comp_acquis'
-SKILLS_AND_ACHIEVEMENTS_CMS_DATA = ('skills_and_achievements_introduction', 'skills_and_achievements_additional_text', )
-SKILLS_AND_ACHIEVEMENTS_AA_DATA = 'achievements'
-
+from webservices.business import SKILLS_AND_ACHIEVEMENTS_CMS_DATA, SKILLS_AND_ACHIEVEMENTS_KEY, \
+    SKILLS_AND_ACHIEVEMENTS_AA_DATA
 
 BACHELOR_FIELDS = (
     'alert_message', 'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres', 'ca_bacs_examen_langue',
@@ -77,38 +76,49 @@ OFFERS = [
     {'name': TrainingType.MASTER_M1.name, 'category': TRAINING, 'code': '2M1'},
     {'name': TrainingType.MASTER_MC.name, 'category': TRAINING, 'code': '2MC'},
     {'name': TrainingType.INTERNSHIP.name, 'category': TRAINING, 'code': 'ST'},
+    {'name': TrainingType.CERTIFICATE.name, 'category': TRAINING, 'code': '9CE'}
 ]
+
+COMMON_OFFER = ['1BA', '2A', '2CE', '2FC', '2M', '2M1', '2MC', '3CE', '9CE']
 
 
 def create_common_offer_for_academic_year(year):
     academic_year = AcademicYear.objects.get(year=year)
     for offer in OFFERS:
-        education_group = EducationGroupFactory(start_year=academic_year.year, end_year=academic_year.year + 1)
-        education_group_type = EducationGroupType.objects.get(
-            name=offer['name'],
-            category=offer['category']
-        )
-
         code = offer['code'].lower()
-
         acronym = 'common-{}'.format(code)
         education_group_year = EducationGroupYear.objects.filter(academic_year=academic_year,
-                                                                 acronym=acronym).first()
-        if not education_group_year:
+                                                                 acronym=acronym)
+        entity_ucl = Entity.objects.get(entityversion__acronym='UCL', organization__type=MAIN)
 
-            EducationGroupYear.objects.create(
-                academic_year=academic_year,
-                education_group=education_group,
-                acronym=acronym,
-                title=acronym,
-                education_group_type=education_group_type,
-                title_english=acronym
+        if offer['code'] in COMMON_OFFER:
+            education_group = EducationGroupFactory(start_year=academic_year.year, end_year=academic_year.year + 1)
+            education_group_type = EducationGroupType.objects.get(
+                name=offer['name'],
+                category=offer['category']
             )
+            education_group_year = education_group_year.first()
+            if not education_group_year:
+
+                EducationGroupYear.objects.create(
+                    academic_year=academic_year,
+                    education_group=education_group,
+                    acronym=acronym,
+                    title=acronym,
+                    education_group_type=education_group_type,
+                    title_english=acronym,
+                    management_entity=entity_ucl,
+                    administration_entity=entity_ucl
+                )
+            else:
+                education_group_year.title = acronym
+                education_group_year.title_english = acronym
+                education_group_year.education_group_type = education_group_type
+                education_group_year.management_entity = entity_ucl
+                education_group_year.administration_entity = entity_ucl
+                education_group_year.save()
         else:
-            education_group_year.title = acronym
-            education_group_year.title_english = acronym
-            education_group_year.education_group_type = education_group_type
-            education_group_year.save()
+            education_group_year.delete()
 
 
 def get_text_label(entity, label):
@@ -127,7 +137,6 @@ def import_offer_and_items(item, education_group_year, mapping_label_text_label,
     for label, value in item['info'].items():
         if not value:
             continue
-
         if label == SKILLS_AND_ACHIEVEMENTS_KEY:
             _import_skills_and_achievements(value, education_group_year, context)
         else:
@@ -471,10 +480,6 @@ class Command(BaseCommand):
 
         for key, value in self.json_content.items():
             offer_type, text_label = key.split('.')
-
-            if offer_type == '9ce':
-                # 9ce is a certificate
-                offer_type = 'ce'
 
             education_group_year = EducationGroupYear.objects.get(
                 academic_year=academic_year,

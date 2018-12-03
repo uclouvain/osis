@@ -120,7 +120,8 @@ def _split_attribution_by_learning_unit_year(attribution):
                     'end_year': attribution.end_year,
                     'function': attribution.function,
                     'year': lunit_year.academic_year.year,
-                    'weight': str(lunit_year.credits) if lunit_year.credits else ''
+                    'weight': str(lunit_year.credits) if lunit_year.credits else '',
+                    'is_substitute': bool(attribution.substitute)
             }).update({
                 allocation_charge_key: str(attrib_charge.allocation_charge)
             })
