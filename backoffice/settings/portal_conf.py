@@ -46,7 +46,7 @@ SECTION_LIST = [
     Section(title=_('Benefits and organization'),
             labels=[
                 ('pedagogie', 'specific'),
-                ('evaluation', 'specific'),
+                ('evaluation', 'specific,common'),
                 ('mobilite', 'specific'),
                 ('formations_accessibles', 'specific'),
                 ('certificats', 'specific'),
