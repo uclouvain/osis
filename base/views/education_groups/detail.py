@@ -263,7 +263,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
             elif selector == 'common' and 'specific' not in selectors.split(','):
                 translations = self.get_content_translations_for_label(
-                    self.object, label, user_language, 'common')
+                    self.object, label, user_language, 'specific')
                 records.append(translations)
 
         return records
