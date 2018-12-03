@@ -182,7 +182,7 @@ def __display_legends(ws):
         str(''),
         str(''),
         str(''),
-        str(_('Not enrolled')),
+        str(_('Unsubscribed after the opening of the session')),
     ])
     ws.append([
         str(_('Numbered scores')),
