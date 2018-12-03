@@ -82,6 +82,12 @@ QUADRIMESTER_DEROGATION = "quadrimester_derogation"
 LINK_TYPE = "link_type"
 NUMBER_SESSIONS = 3
 
+COMMON_PARAGRAPH = (
+    'agregation',
+    'finalites_didactiques',
+    'prerequis'
+)
+
 
 @method_decorator(login_required, name='dispatch')
 class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
@@ -247,20 +253,22 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
     def get_selectors(self, common_education_group_year, label, selectors, user_language):
         records = []
+
         for selector in selectors.split(','):
             if selector == 'specific':
                 translations = self.get_content_translations_for_label(
                     self.object, label, user_language, 'specific')
                 records.append(translations)
 
-            if selector == 'common' and common_education_group_year is not None:
-                translations = self.get_content_translations_for_label(
-                    common_education_group_year, label, user_language, 'common')
-                records.append(translations)
-        if selectors == 'common' and common_education_group_year is None:
-            translations = self.get_content_translations_for_label(
-                self.object, label, user_language, 'specific')
-            records.append(translations)
+            if selector == 'common':
+                if common_education_group_year is not None:
+                    translations = self.get_content_translations_for_label(
+                        common_education_group_year, label, user_language, 'common')
+                elif label in COMMON_PARAGRAPH:
+                    translations = self.get_content_translations_for_label(
+                        self.object, label, user_language, 'specific')
+                if translations not in records:
+                    records.append(translations)
 
         return records
 
