@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 #############################################################################
+import itertools
+
 from django.core import validators
 from django.db import models
 from django.utils.functional import lazy
@@ -31,7 +33,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.models import learning_unit
 from base.models.enums import prerequisite_operator
-from base.models.prerequisite_item import get_prerequisite_string_representation
+from base.models.enums.prerequisite_operator import OR, AND
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 AND_OPERATOR = "ET"
@@ -104,11 +106,24 @@ class Prerequisite(models.Model):
 
     @property
     def prerequisite_string(self):
-        return get_prerequisite_string_representation(self)
+        main_operator = self.main_operator
+        secondary_operator = OR if main_operator == AND else AND
+        prerequisite_items = self.prerequisiteitem_set.all().order_by('group_number', 'position')
+        prerequisites_fragments = []
 
+        for num_group, records_in_group in itertools.groupby(prerequisite_items, lambda rec: rec.group_number):
+            list_records = list(records_in_group)
+            predicate_format = "({})" if len(list_records) > 1 else "{}"
+            join_secondary_operator = " {} ".format(_(secondary_operator))
+            predicate = predicate_format.format(
+                join_secondary_operator.join(
+                    map(
+                        lambda rec: rec.learning_unit.acronym,
+                        list_records
+                    )
+                )
+            )
+            prerequisites_fragments.append(predicate)
 
-def get_by_learning_unit_year_and_education_group_year(learning_unit_year, education_group_year):
-    return Prerequisite.objects.get(
-        learning_unit_year=learning_unit_year,
-        education_group_year=education_group_year
-    )
+        join_main_operator = " {} ".format(_(main_operator))
+        return join_main_operator.join(prerequisites_fragments)

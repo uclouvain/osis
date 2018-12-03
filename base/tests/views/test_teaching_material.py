@@ -34,7 +34,7 @@ from django.urls import reverse
 
 from base.forms.learning_unit_pedagogy import TeachingMaterialModelForm
 from base.models.enums.learning_unit_year_subtypes import FULL
-from base.models.person import CENTRAL_MANAGER_GROUP
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory, PersonWithPermissionsFactory

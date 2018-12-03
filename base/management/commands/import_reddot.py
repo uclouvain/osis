@@ -40,8 +40,10 @@ from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
+from base.models.entity import Entity
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType
+from base.models.enums.organization_type import MAIN
 from base.tests.factories.education_group import EducationGroupFactory
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
@@ -87,6 +89,8 @@ def create_common_offer_for_academic_year(year):
         acronym = 'common-{}'.format(code)
         education_group_year = EducationGroupYear.objects.filter(academic_year=academic_year,
                                                                  acronym=acronym)
+        entity_ucl = Entity.objects.get(entityversion__acronym='UCL', organization__type=MAIN)
+
         if offer['code'] in COMMON_OFFER:
             education_group = EducationGroupFactory(start_year=academic_year.year, end_year=academic_year.year + 1)
             education_group_type = EducationGroupType.objects.get(
@@ -102,12 +106,16 @@ def create_common_offer_for_academic_year(year):
                     acronym=acronym,
                     title=acronym,
                     education_group_type=education_group_type,
-                    title_english=acronym
+                    title_english=acronym,
+                    management_entity=entity_ucl,
+                    administration_entity=entity_ucl
                 )
             else:
                 education_group_year.title = acronym
                 education_group_year.title_english = acronym
                 education_group_year.education_group_type = education_group_type
+                education_group_year.management_entity = entity_ucl
+                education_group_year.administration_entity = entity_ucl
                 education_group_year.save()
         else:
             education_group_year.delete()

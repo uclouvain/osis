@@ -203,13 +203,20 @@ def is_eligible_to_edit_general_information(person, education_group, raise_excep
 
 
 def _is_eligible_to_edit_general_information(person, education_group, raise_exception):
-    return (person.is_central_manager() and education_group.is_common) or \
+    return _is_common_educationgroup_and_can_edit(education_group, person, raise_exception) or \
            check_link_to_management_entity(education_group, person, raise_exception) and \
-           (
-                   person.is_central_manager() or
-                   is_academic_calendar_opened(
-                        education_group,
-                        academic_calendar_type.EDUCATION_GROUP_EDITION,
-                        raise_exception
-                   )
+           _is_central_or_academic_calendar_opened(education_group, person, raise_exception)
+
+
+def _is_central_or_academic_calendar_opened(education_group, person, raise_exception):
+    return person.is_central_manager() or \
+           is_academic_calendar_opened(
+                education_group,
+                academic_calendar_type.EDUCATION_GROUP_EDITION,
+                raise_exception
            )
+
+
+def _is_common_educationgroup_and_can_edit(education_group, person, raise_exception):
+    return education_group.is_common and \
+           check_permission(person, 'base.can_edit_common_education_group', raise_exception)

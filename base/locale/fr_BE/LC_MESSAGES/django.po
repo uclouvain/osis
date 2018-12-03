@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-28 15:34+0100\n"
+"POT-Creation-Date: 2018-11-29 16:13+0100\n"
 "PO-Revision-Date: 2018-11-21 14:40+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -79,7 +79,7 @@ msgstr[1] "%(count_enrollment)d étudiants sont inscrits à l'offre."
 msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
 msgstr "%(date)s doit être comprise entre %(start_date)s et %(end_date)s"
 
-#: models/education_group.py:76 models/education_group_year.py:638
+#: models/education_group.py:77 models/education_group_year.py:638
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr "%(max)s doit être plus grand ou égal à %(min)s"
@@ -197,7 +197,7 @@ msgstr "Un rapport a été envoyé."
 msgid "A server error occured."
 msgstr "Une erreur inattendue s'est produite."
 
-#: models/exam_enrollment.py:221
+#: models/exam_enrollment.py:222
 msgid "A=Absent"
 msgstr "A=Absent"
 
@@ -244,7 +244,7 @@ msgid "Academic"
 msgstr "Académique"
 
 #: templates/academic_actors.html:31 templates/academic_actors.html:35
-#: templates/institution.html:59 templates/layout.html:182
+#: templates/institution.html:59 templates/layout.html:197
 msgid "Academic actors"
 msgstr "Acteurs académiques"
 
@@ -296,7 +296,7 @@ msgstr "Nature"
 #: templates/academic_calendar/academic_calendars.html:51
 #: templates/academic_year.html:31 templates/academic_year.html:35
 #: templates/catalog.html:59 templates/education_group/pdf_content.html:17
-#: templates/layout.html:137
+#: templates/layout.html:152
 #: templates/learning_unit/blocks/panel/proposal.html:10
 #: templates/learning_unit/identification.html:212
 #: templates/offer/tab_identification.html:46 templates/offers.html:43
@@ -451,12 +451,11 @@ msgstr "Adresses"
 #: templates/admin/data.html:29 templates/admin/data_maintenance.html:29
 #: templates/admin/storage.html:30
 #: templates/education_group/tab_administrative_data.html:185
-#: templates/layout.html:227
+#: templates/layout.html:242
 msgid "Administration"
 msgstr "Administration"
 
-#: models/education_group_year.py:394
-#: models/enums/offer_year_entity_type.py:32
+#: models/education_group_year.py:394 models/enums/offer_year_entity_type.py:32
 #: templates/education_group/identification_training_details.html:94
 msgid "Administration entity"
 msgstr "Entité d'administration"
@@ -506,8 +505,7 @@ msgstr "Toutes les notes ont été soumises."
 
 #: business/learning_unit.py:67 business/learning_unit_xls.py:81
 #: business/learning_units/xls_comparison.py:69 business/proposal_xls.py:40
-#: forms/learning_unit/search_form.py:93
-#: forms/learning_unit/search_form.py:179
+#: forms/learning_unit/search_form.py:93 forms/learning_unit/search_form.py:179
 #: templates/learning_unit/by_activity.html:86
 msgid "Alloc. Ent."
 msgstr "Ent. attrib."
@@ -861,7 +859,7 @@ msgstr "Partie de base (Tronc commun)"
 msgid "Common title"
 msgstr "Intitulé commun"
 
-#: tests/views/test_learning_unit.py:1377 views/learning_unit.py:301
+#: tests/views/test_learning_unit.py:1378 views/learning_unit.py:301
 msgid "Comparison impossible! No learning unit to compare to"
 msgstr ""
 "Comparaison impossible, il n'y a aucune unité d'enseignement antérieure, ni "
@@ -881,6 +879,7 @@ msgid "Component"
 msgstr "Composant"
 
 #: models/learning_unit_year.py:122
+#: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:34
 #: templates/learning_unit/blocks/tabs.html:57
 #: templates/learning_unit/proposal/tabs.html:50
 msgid "Components"
@@ -968,8 +967,7 @@ msgid "Cred. rel./abs."
 msgstr "Créd. rel./abs."
 
 #: business/learning_unit.py:66 business/learning_unit_xls.py:80
-#: models/learning_unit_year.py:136
-#: templates/learning_unit/by_activity.html:87
+#: models/learning_unit_year.py:136 templates/learning_unit/by_activity.html:87
 #: templates/learning_unit/by_external.html:49
 #: templates/learning_unit/identification.html:84
 msgid "Credits"
@@ -1148,7 +1146,7 @@ msgstr "Voulez-vous envoyer un email de rappel?"
 msgid "Doctoral commission"
 msgstr "Commission doctorale"
 
-#: templates/layout.html:358
+#: templates/layout.html:373
 msgid "Documentation"
 msgstr "Documentation"
 
@@ -1300,8 +1298,8 @@ msgstr "Anglais"
 msgid "English title proper"
 msgstr "Intitulé propre en anglais"
 
-#: forms/learning_unit/learning_unit_create.py:104
-#: forms/learning_unit/learning_unit_create.py:162
+#: forms/learning_unit/learning_unit_create.py:89
+#: forms/learning_unit/learning_unit_create.py:147
 #: templates/learning_unit/identification.html:112
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:78
 msgid "English title proper to the partim"
@@ -1336,10 +1334,10 @@ msgstr "Inscriptions à l'UE"
 msgid "Enrollments to training"
 msgstr "Inscrits à la formation"
 
-#: forms/learning_unit/learning_unit_create.py:128
-#: forms/learning_unit/learning_unit_create.py:131
-#: tests/forms/test_learning_unit_create_2.py:454
-#: tests/forms/test_learning_unit_create_2.py:468
+#: forms/learning_unit/learning_unit_create.py:113
+#: forms/learning_unit/learning_unit_create.py:116
+#: tests/forms/test_learning_unit_create_2.py:455
+#: tests/forms/test_learning_unit_create_2.py:469
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
@@ -1351,7 +1349,7 @@ msgstr "Entrez le texte à rechercher"
 
 #: templates/entities.html:31 templates/entities.html:35
 #: templates/entity/breadcrumb.html:29 templates/institution.html:49
-#: templates/layout.html:178
+#: templates/layout.html:193
 msgid "Entities"
 msgstr "Entités"
 
@@ -1361,7 +1359,7 @@ msgstr "Entités"
 msgid "Entity"
 msgstr "Entité"
 
-#: templates/layout.html:151 templates/studies.html:43
+#: templates/layout.html:166 templates/studies.html:43
 msgid "Evaluations"
 msgstr "Évaluations"
 
@@ -1444,7 +1442,7 @@ msgstr "Remarque de faculté"
 msgid "Failure"
 msgstr "Echec"
 
-#: models/person.py:62
+#: models/person.py:60
 msgid "Female"
 msgstr "Féminin"
 
@@ -1514,7 +1512,7 @@ msgstr "Formation doctorale"
 #: templates/academic_year.html:30 templates/catalog.html:30
 #: templates/catalog.html:34 templates/education_group/layout.html:6
 #: templates/education_group/search.html:32 templates/home.html:73
-#: templates/layout.html:120 templates/learning_unit/breadcrumb.html:28
+#: templates/layout.html:135 templates/learning_unit/breadcrumb.html:28
 #: templates/learning_unit/comparison.html:27
 #: templates/learning_unit/external/create.html:28
 #: templates/learning_unit/learning_unit_layout.html:10
@@ -1600,7 +1598,7 @@ msgstr "Genre"
 msgid "General Conditions"
 msgstr "Conditions Générales"
 
-#: templates/layout.html:208
+#: templates/layout.html:223
 msgid "General configuration"
 msgstr "Configuration générale"
 
@@ -1618,8 +1616,7 @@ msgstr "Générer le pdf"
 msgid "Get back to initial data"
 msgstr "Retour à l'état initial"
 
-#: templates/academic_calendar/academic_calendar.html:74
-#: templates/home.html:50
+#: templates/academic_calendar/academic_calendar.html:74 templates/home.html:50
 msgid "Go"
 msgstr "Continuer"
 
@@ -1635,7 +1632,7 @@ msgstr "Diplômés"
 msgid "Group"
 msgstr "Groupe"
 
-#: templates/layout.html:218
+#: templates/layout.html:233
 msgid "Help"
 msgstr "Aide"
 
@@ -1716,7 +1713,7 @@ msgstr "Institut"
 #: templates/education_group/blocks/coorganization.html:35
 #: templates/entities.html:30 templates/entity/breadcrumb.html:28
 #: templates/home.html:91 templates/institution.html:29
-#: templates/institution.html:33 templates/layout.html:168
+#: templates/institution.html:33 templates/layout.html:183
 #: templates/learning_unit/blocks/institution.html:7
 #: templates/learning_unit/by_external.html:48
 #: templates/learning_unit/external/read.html:59
@@ -1748,7 +1745,7 @@ msgstr "Stage"
 msgid "Internship subtype"
 msgstr "Sous-type de stage"
 
-#: templates/layout.html:159 templates/studies.html:55
+#: templates/layout.html:174 templates/studies.html:55
 msgid "Internships"
 msgstr "Stages"
 
@@ -1833,8 +1830,7 @@ msgstr "Partie magistrale"
 msgid "LU"
 msgstr "UE"
 
-#: forms/learning_unit/search_form.py:201
-#: tests/views/test_learning_unit.py:462
+#: forms/learning_unit/search_form.py:201 tests/views/test_learning_unit.py:463
 msgid "LU_ERRORS_INVALID_REGEX_SYNTAX"
 msgstr "Expression régulière incorrecte!"
 
@@ -1845,8 +1841,7 @@ msgstr "Label"
 
 #: business/learning_unit.py:84 business/learning_units/edition.py:442
 #: business/learning_units/xls_comparison.py:60
-#: models/abstracts/abstract_achievement.py:48
-#: models/learning_unit_year.py:161
+#: models/abstracts/abstract_achievement.py:48 models/learning_unit_year.py:161
 #: templates/learning_unit/blocks/panel/educational_informations.html:68
 #: templates/learning_unit/specifications.html:33
 #: templates/my_osis/profile.html:102
@@ -1916,7 +1911,7 @@ msgstr "Unité d'enseignement %(acronym)s mise à jour avec succès."
 msgid "Learning unit search"
 msgstr "Recherche d'unités d'enseignement"
 
-#: templates/catalog.html:49 templates/layout.html:133
+#: templates/catalog.html:49 templates/layout.html:148
 #: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:42
 #: templates/learning_unit/breadcrumb.html:29
 #: templates/learning_unit/by_external.html:39
@@ -1940,6 +1935,14 @@ msgstr "Fiche comparative"
 #: templates/student/student.html:75
 msgid "Learning units enrollments"
 msgstr "Inscription aux unités d'enseignement"
+
+#: business/learning_unit.py:54 business/learning_unit.py:56
+msgid "Learning units list"
+msgstr "Liste des UEs"
+
+#: business/learning_unit.py:55
+msgid "LearningUnitsList"
+msgstr "Liste-UEs"
 
 #: models/enums/component_type.py:32
 #: models/enums/learning_component_year_type.py:32
@@ -2005,7 +2008,7 @@ msgstr "Localité"
 msgid "Lock"
 msgstr "Bloquer"
 
-#: templates/layout.html:265 templates/registration/login.html:29
+#: templates/layout.html:280 templates/registration/login.html:29
 msgid "Login"
 msgstr "Login"
 
@@ -2017,7 +2020,7 @@ msgstr "Logistique"
 msgid "Logistics entity"
 msgstr "Entité logistique"
 
-#: templates/layout.html:257 templates/logged_out.html:31
+#: templates/layout.html:272 templates/logged_out.html:31
 msgid "Logout"
 msgstr "Logout"
 
@@ -2041,7 +2044,7 @@ msgstr "La maintenance de données avec la langage SQL"
 msgid "Major list choice"
 msgstr "Liste au choix Majeures"
 
-#: models/person.py:63
+#: models/person.py:61
 msgid "Male"
 msgstr "Masculin"
 
@@ -2057,11 +2060,10 @@ msgstr "Gérer les volumes"
 msgid "Managed programs"
 msgstr "Programmes gérés"
 
-#: models/education_group_year.py:387
-#: models/enums/offer_year_entity_type.py:33
+#: models/education_group_year.py:387 models/enums/offer_year_entity_type.py:33
 #: templates/education_group/identification_group_details.html:37
 #: templates/education_group/identification_training_details.html:93
-#: templates/layout.html:198
+#: templates/layout.html:213
 msgid "Management entity"
 msgstr "Entité de gestion"
 
@@ -2260,7 +2262,7 @@ msgstr "Modification"
 msgid "Modification made"
 msgstr "Modification apportée"
 
-#: business/learning_units/perms.py:498
+#: business/learning_units/perms.py:500
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
@@ -2294,7 +2296,7 @@ msgstr "Mois"
 msgid "My Messages"
 msgstr "Mes messages"
 
-#: templates/home.html:98 templates/layout.html:253
+#: templates/home.html:98 templates/layout.html:268
 #: templates/my_osis/home.html:30 templates/my_osis/home.html:34
 #: templates/my_osis/my_message.html:30 templates/my_osis/my_messages.html:30
 #: templates/my_osis/profile.html:30
@@ -2471,7 +2473,7 @@ msgstr "Vous ne pouvez pas supprimer cette unité d'enseignement"
 msgid "Not enrolled"
 msgstr "Pas inscrit"
 
-#: business/learning_units/perms.py:459 business/learning_units/perms.py:465
+#: business/learning_units/perms.py:461 business/learning_units/perms.py:467
 msgid "Not in period to edit educational information."
 msgstr "Vous n'êtes pas en période d'édition des informations pédagogiques."
 
@@ -2497,7 +2499,7 @@ msgstr "Nombre d'éléments"
 msgid "OR"
 msgstr "OU"
 
-#: templates/catalog.html:42 templates/layout.html:125
+#: templates/catalog.html:42 templates/layout.html:140
 #: templates/offer/breadcrumb.html:28 templates/offer_year_calendar.html:31
 #: templates/offers.html:31 templates/offers.html:36
 msgid "Offers"
@@ -2515,12 +2517,12 @@ msgstr "Sur dossier: accès direct ou moyennant compléments de formation"
 msgid "One"
 msgstr "Un"
 
-#: forms/learning_unit/edition_volume.py:136
-#: forms/learning_unit/edition_volume.py:137
+#: forms/learning_unit/edition_volume.py:140
+#: forms/learning_unit/edition_volume.py:141
+#: forms/learning_unit/edition_volume.py:330
 #: forms/learning_unit/edition_volume.py:331
-#: forms/learning_unit/edition_volume.py:332
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:165
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:167
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:169
 #: tests/forms/test_edition_form.py:319 tests/forms/test_edition_form.py:320
 msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
@@ -2583,7 +2585,7 @@ msgstr "Organisation des formations"
 msgid "Organizational chart"
 msgstr "Organigramme"
 
-#: templates/institution.html:42 templates/layout.html:174
+#: templates/institution.html:42 templates/layout.html:189
 #: templates/organization/organization.html:30
 #: templates/organization/organization_address.html:31
 #: templates/organization/organization_address_form.html:32
@@ -2627,7 +2629,7 @@ msgstr "Commentaire propre"
 msgid "Own components"
 msgstr "Composants propres"
 
-#: forms/learning_unit/edition_volume.py:80
+#: forms/learning_unit/edition_volume.py:84
 msgid "P.C."
 msgstr "C.P."
 
@@ -2649,11 +2651,11 @@ msgstr "Partim"
 msgid "Partims"
 msgstr "Partims"
 
-#: templates/layout.html:201
+#: templates/layout.html:216
 msgid "Partners"
 msgstr "Partenaires"
 
-#: templates/layout.html:192
+#: templates/layout.html:207
 msgid "Partnerships"
 msgstr "Partenariats"
 
@@ -2684,8 +2686,8 @@ msgstr "Ph.D"
 
 #: business/learning_units/xls_comparison.py:81
 #: business/learning_units/xls_comparison.py:91
-#: forms/learning_unit/edition_volume.py:80
-#: forms/learning_unit/edition_volume.py:100
+#: forms/learning_unit/edition_volume.py:84
+#: forms/learning_unit/edition_volume.py:104
 msgid "Planned classes"
 msgstr "Classes prévues"
 
@@ -2961,7 +2963,7 @@ msgstr "Mettre en proposition"
 msgid "Put in suppression proposal"
 msgstr "Mettre en proposition de suppression"
 
-#: forms/learning_unit/edition_volume.py:61
+#: forms/learning_unit/edition_volume.py:65
 msgid "Q1"
 msgstr "Q1"
 
@@ -2973,7 +2975,7 @@ msgstr "Q1 et Q2"
 msgid "Q1 or Q2"
 msgstr "Q1 ou Q2"
 
-#: forms/learning_unit/edition_volume.py:67
+#: forms/learning_unit/edition_volume.py:71
 msgid "Q2"
 msgstr "Q2"
 
@@ -3276,7 +3278,7 @@ msgstr "Qualification du signataire"
 msgid "Society minor"
 msgstr "Mineure de société"
 
-#: templates/layout.html:362
+#: templates/layout.html:377
 msgid "Source code"
 msgstr "Code source"
 
@@ -3293,7 +3295,7 @@ msgstr "Conditions Spécifiques"
 msgid "Specifications"
 msgstr "Cahier des charges"
 
-#: models/education_group.py:47 models/education_group.py:78
+#: models/education_group.py:47 models/education_group.py:79
 #: templates/education_group/identification_mini_training_details.html:38
 #: templates/education_group/identification_training_details.html:95
 #: templates/learning_unit/add_charge_repartition_inner.html:35
@@ -3351,7 +3353,7 @@ msgstr "Structure"
 msgid "Student"
 msgstr "Etudiant"
 
-#: templates/home.html:80 templates/layout.html:146
+#: templates/home.html:80 templates/layout.html:161
 #: templates/student/student.html:30 templates/student/students.html:30
 #: templates/studies.html:30 templates/studies.html:34
 msgid "Student path"
@@ -3369,7 +3371,7 @@ msgstr "Coordonnées de l'étudiant.e"
 msgid "Student's signature"
 msgstr "Signature de l'étudiant.e"
 
-#: templates/layout.html:155 templates/student/student.html:31
+#: templates/layout.html:170 templates/student/student.html:31
 #: templates/student/students.html:31 templates/student/students.html:36
 msgid "Students"
 msgstr "Etudiants"
@@ -3431,7 +3433,7 @@ msgstr "Proposition de suppression"
 msgid "Suspended"
 msgstr "Suspendu"
 
-#: models/exam_enrollment.py:222
+#: models/exam_enrollment.py:223
 msgid "T=Cheating"
 msgstr "T=Tricherie"
 
@@ -3492,7 +3494,7 @@ msgstr "Les information supplémentaires ont été sauvegardées avec succès"
 msgid "The administrative data has been successfully modified"
 msgstr "Les données administratives ont été sauvées avec succès"
 
-#: forms/learning_unit/edition_volume.py:74
+#: forms/learning_unit/edition_volume.py:78
 #: templates/learning_unit/components.html:51
 #: templates/learning_unit/components_identification.html:36
 msgid "The annual volume must be equal to the sum of the volumes Q1 and Q2"
@@ -3549,8 +3551,7 @@ msgstr ""
 "Le nombre de crédits du partim %(acronym)s est supérieur ou égal à celui de "
 "l'unité d'enseignement parent."
 
-#: models/learning_unit_year.py:350
-#: tests/models/test_learning_unit_year.py:598
+#: models/learning_unit_year.py:350 tests/models/test_learning_unit_year.py:598
 msgid "The credits value should be an integer"
 msgstr "La valeur du champs crédits doit être un entier"
 
@@ -3661,8 +3662,8 @@ msgstr ""
 "L'unité d'enseignement %(luy)s est en proposition, impossible de sauvegarder "
 "le changement à partir de l'année %(academic_year)s"
 
-#: tests/views/test_learning_unit.py:1405
-#: tests/views/test_learning_unit.py:1436 views/learning_unit.py:310
+#: tests/views/test_learning_unit.py:1406
+#: tests/views/test_learning_unit.py:1437 views/learning_unit.py:310
 #, python-format
 msgid "The learning unit does not exist for the academic year %(anac)s"
 msgstr "L'unité d'enseignement n'existe pas pour l'année académique %(anac)s"
@@ -3677,7 +3678,7 @@ msgstr "L'unité d'enseignement a été modifiée jusqu'en %(year)s."
 msgid "The learning unit has been updated."
 msgstr "L'unité d'enseignement a été modifiée."
 
-#: business/learning_units/perms.py:453
+#: business/learning_units/perms.py:455
 msgid "The learning unit is not summary editable."
 msgstr ""
 "La mise-à-jour des informations pédagogiques est bloqué pour cette unité "
@@ -3720,8 +3721,7 @@ msgstr "Le message à bien été réenvoyé."
 msgid "The messages sent by the application to you"
 msgstr "La liste des messages qui vous ont été envoyés par l'application"
 
-#: models/learning_unit_year.py:387
-#: tests/models/test_learning_unit_year.py:560
+#: models/learning_unit_year.py:387 tests/models/test_learning_unit_year.py:560
 #, python-format
 msgid ""
 "The parent is %(parent_periodicty)s and there is at least one partim which "
@@ -3832,11 +3832,11 @@ msgstr ""
 "La valeur du champ '%(field)s' différe entre l'année %(year)s - %(value)s et "
 "l'année %(next_year)s - %(next_value)s"
 
-#: forms/learning_unit/edition_volume.py:141
-#: forms/learning_unit/edition_volume.py:143
-#: forms/learning_unit/edition_volume.py:336
-#: forms/learning_unit/edition_volume.py:338
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:176
+#: forms/learning_unit/edition_volume.py:145
+#: forms/learning_unit/edition_volume.py:147
+#: forms/learning_unit/edition_volume.py:335
+#: forms/learning_unit/edition_volume.py:337
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:179
 #: tests/forms/test_edition_form.py:330 tests/forms/test_edition_form.py:340
 msgid "The volume can not be set to 0."
 msgstr "Le volume ne peut pas être mis à 0."
@@ -3876,11 +3876,11 @@ msgstr ""
 msgid "There is not the learning unit %(acronym)s - %(next_year)s"
 msgstr "Il n'existe pas d'unité d'enseigmenent %(acronym)s - %(next_year)s"
 
-#: templates/layout.html:311
+#: templates/layout.html:326
 msgid "This feature is in testing phase"
 msgstr "Cette fonctionnalité est en phase expérimentale"
 
-#: forms/learning_unit/learning_unit_create.py:144
+#: forms/learning_unit/learning_unit_create.py:129
 msgid "This field cannot be set"
 msgstr "Ce champ ne peut pas être défini"
 
@@ -3911,7 +3911,7 @@ msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
 
-#: business/learning_units/perms.py:530
+#: business/learning_units/perms.py:532
 msgid "This learning unit is not eligible for proposal creation/modification"
 msgstr ""
 "Cette unité d'enseignement n'est pas éligible pour une création/modification "
@@ -3921,8 +3921,7 @@ msgstr ""
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr "Cette unité d'enseignement n'est pas éligible en raison de son type"
 
-#: models/learning_unit_year.py:381
-#: tests/models/test_learning_unit_year.py:576
+#: models/learning_unit_year.py:381 tests/models/test_learning_unit_year.py:576
 #, python-format
 msgid ""
 "This partim is %(partim_periodicity)s and the parent is %(parent_periodicty)s"
@@ -3951,9 +3950,8 @@ msgid "This training has no content to postpone."
 msgstr "La formation n'a pas de contenu à reporter."
 
 #: business/education_group.py:48 business/learning_unit.py:60
-#: business/learning_unit_xls.py:74
-#: business/learning_units/xls_generator.py:49 business/proposal_xls.py:37
-#: forms/education_groups.py:85 forms/entity.py:38
+#: business/learning_unit_xls.py:74 business/learning_units/xls_generator.py:49
+#: business/proposal_xls.py:37 forms/education_groups.py:85 forms/entity.py:38
 #: forms/learning_unit/search_form.py:174
 #: templates/academic_calendar/academic_calendar.html:48
 #: templates/academic_calendar/academic_calendar_form.html:65
@@ -3983,8 +3981,8 @@ msgstr "Intitulé en anglais"
 msgid "Title in French"
 msgstr "Intitulé en français"
 
-#: forms/learning_unit/learning_unit_create.py:103
-#: forms/learning_unit/learning_unit_create.py:161
+#: forms/learning_unit/learning_unit_create.py:88
+#: forms/learning_unit/learning_unit_create.py:146
 #: templates/learning_unit/identification.html:110
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:77
 msgid "Title proper to the partim"
@@ -3994,7 +3992,7 @@ msgstr "Intitulé propre au partim"
 msgid "To complete"
 msgstr "A compléter"
 
-#: tests/views/test_learning_unit.py:1238 views/learning_units/search.py:80
+#: tests/views/test_learning_unit.py:1239 views/learning_units/search.py:80
 msgid "Too many results! Please be more specific."
 msgstr ""
 "Votre recherche renvoie trop de résultats, veuillez affiner vos critères de "
@@ -4011,7 +4009,7 @@ msgstr "Type d'OF"
 
 #: templates/catalog.html:67 templates/education_group/layout.html:7
 #: templates/education_group/learning_unit/tab_prerequisite_group.html:38
-#: templates/layout.html:129 templates/learning_unit/blocks/tabs.html:44
+#: templates/layout.html:144 templates/learning_unit/blocks/tabs.html:44
 #: templates/learning_unit/blocks/tabs.html:72
 #: templates/learning_unit/formations.html:47
 #: templates/learning_unit/proposal/tabs.html:45
@@ -4183,8 +4181,7 @@ msgstr "Vacant pas publier"
 msgid "Validity"
 msgstr "Validité"
 
-#: templatetags/learning_unit.py:67
-#: tests/templatetags/test_learning_unit.py:38
+#: templatetags/learning_unit.py:67 tests/templatetags/test_learning_unit.py:38
 #: tests/views/test_learning_unit_proposal.py:83
 msgid "Value before proposal"
 msgstr "Valeur avant proposition"
@@ -4211,7 +4208,7 @@ msgstr "Vol. Q2"
 
 #: business/learning_units/xls_comparison.py:79
 #: business/learning_units/xls_comparison.py:89
-#: forms/learning_unit/edition_volume.py:73
+#: forms/learning_unit/edition_volume.py:77
 #: templates/learning_unit/components.html:52
 #: templates/learning_unit/components_identification.html:37
 msgid "Vol. annual"
@@ -4252,18 +4249,18 @@ msgstr "Volume 1"
 msgid "Volume 2"
 msgstr "Volume 2"
 
-#: forms/learning_unit/edition_volume.py:62
-#: forms/learning_unit/edition_volume.py:77
+#: forms/learning_unit/edition_volume.py:66
+#: forms/learning_unit/edition_volume.py:81
 msgid "Volume Q1"
 msgstr "Volume Q1"
 
-#: forms/learning_unit/edition_volume.py:68
-#: forms/learning_unit/edition_volume.py:77
+#: forms/learning_unit/edition_volume.py:72
+#: forms/learning_unit/edition_volume.py:81
 msgid "Volume Q2"
 msgstr "Volume Q2"
 
-#: forms/learning_unit/edition_volume.py:77
-#: forms/learning_unit/edition_volume.py:99
+#: forms/learning_unit/edition_volume.py:81
+#: forms/learning_unit/edition_volume.py:103
 msgid "Volume total annual"
 msgstr "Volume total annuel"
 
@@ -4288,7 +4285,7 @@ msgstr "Gestion des volumes"
 msgid "Volumes of {} are inconsistent"
 msgstr "Les volumes de {} sont incohérents"
 
-#: templates/layout.html:320
+#: templates/layout.html:335
 msgid "We detected inconsistencies in the following data :"
 msgstr "Nous avons détecté des incohérences dans les données suivantes :"
 
@@ -4296,7 +4293,7 @@ msgstr "Nous avons détecté des incohérences dans les données suivantes :"
 msgid "We will fix this as soon as possible"
 msgstr "Nous mettons tout en oeuvre pour résoudre ce problème"
 
-#: templates/layout.html:360 templates/organization/organization.html:66
+#: templates/layout.html:375 templates/organization/organization.html:66
 msgid "Website"
 msgstr "Site internet"
 
@@ -4415,7 +4412,7 @@ msgstr ""
 "être un partim ou encore l'unité d'enseignement devrait être un cours/"
 "mémoire/stage"
 
-#: business/learning_units/perms.py:447
+#: business/learning_units/perms.py:449
 msgid "You are not summary responsible for this learning unit."
 msgstr ""
 "Vous n'êtes pas responsable des informations pédagogiques pour cette unité "
@@ -4443,7 +4440,7 @@ msgstr ""
 msgid "You can't modify learning unit of a previous year"
 msgstr "Vous ne pouvez pas modifier la date de fin pour une année précédente"
 
-#: business/learning_units/perms.py:496
+#: business/learning_units/perms.py:498
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
@@ -4487,8 +4484,8 @@ msgstr "Vous n'avez pas le droit de consolider"
 msgid "You have the choice between"
 msgstr "Vous avez le choix entre"
 
-#: forms/learning_unit/learning_unit_create.py:199
-#: forms/learning_unit/learning_unit_create_2.py:173
+#: forms/learning_unit/learning_unit_create.py:184
+#: forms/learning_unit/learning_unit_create_2.py:181
 #: tests/views/learning_units/proposals/test_creation.py:196
 msgid "You must either set the common title or the specific title"
 msgstr "L'intitulé propre ou l'intitulé commun est requis"
@@ -4511,7 +4508,7 @@ msgstr "Vous devez préciser au moins la contrainte minimum ou maximum"
 msgid "You will definitely delete the following learning units."
 msgstr "Vous êtes sur le point de supprimer définitivement les UE suivantes."
 
-#: templates/layout.html:284
+#: templates/layout.html:299
 msgid "Your browser is out of date. This can lead to unknown behaviour."
 msgstr ""
 "Votre navigateur n'est pas à jour. Certaines fonctionnalités peuvent ne pas "
@@ -4575,7 +4572,7 @@ msgstr "événements ad hoc"
 msgid "additional informations"
 msgstr "informations supplémentaires"
 
-#: templates/layout.html:205
+#: templates/layout.html:220
 msgid "agreements"
 msgstr "accords"
 
@@ -4680,7 +4677,7 @@ msgstr "attendus du diplôme"
 #: business/learning_units/xls_comparison.py:86
 #: business/learning_units/xls_generator.py:48 business/proposal_xls.py:37
 #: models/abstracts/abstract_achievement.py:44
-#: models/abstracts/abstract_education_group_achievement.py:44
+#: models/abstracts/abstract_education_group_achievement.py:53
 #: models/education_group_year.py:325
 #: templates/education_group/blocks/table_utilizations.html:29
 #: templates/learning_unit/components.html:47
@@ -4702,7 +4699,6 @@ msgstr "commentaire"
 msgid "comment (internal)"
 msgstr "commentaire (interne)"
 
-#: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:34
 #: templates/learning_unit/components.html:46
 msgid "components"
 msgstr "composants"
@@ -4772,7 +4768,7 @@ msgstr "type durée"
 msgid "email"
 msgstr "email"
 
-#: models/education_group.py:53 models/education_group.py:77
+#: models/education_group.py:53 models/education_group.py:78
 msgid "end"
 msgstr "fin"
 
@@ -4872,7 +4868,7 @@ msgstr "contrainte minimum"
 #: templates/education_group/tab_administrative_data.html:151
 #: templates/learning_unit/blocks/modal/modal_modification_ask_to_report.html:35
 #: tests/business/learning_units/test_edition.py:188
-#: tests/business/test_education_group.py:353 tests/business/test_xls.py:40
+#: tests/business/test_education_group.py:354 tests/business/test_xls.py:40
 #: tests/business/test_xls.py:42
 #: tests/forms/test_learning_unit_postponement.py:538
 #: tests/forms/test_learning_unit_postponement.py:539
@@ -4907,11 +4903,11 @@ msgstr "optionnel"
 msgid "parameters"
 msgstr "paramètres"
 
-#: templates/layout.html:203
+#: templates/layout.html:218
 msgid "partnerships"
 msgstr "partenariats"
 
-#: templates/layout.html:212
+#: templates/layout.html:227
 msgid "partnerships_financing_configuration"
 msgstr ""
 
@@ -5038,11 +5034,11 @@ msgstr "supports de cours"
 msgid "text"
 msgstr "texte"
 
-#: models/abstracts/abstract_education_group_achievement.py:46
+#: models/abstracts/abstract_education_group_achievement.py:55
 msgid "text in English"
 msgstr "texte en anglais"
 
-#: models/abstracts/abstract_education_group_achievement.py:47
+#: models/abstracts/abstract_education_group_achievement.py:56
 msgid "text in French"
 msgstr "texte en français"
 
@@ -5088,7 +5084,7 @@ msgstr "type"
 msgid "type of constraint"
 msgstr "type de contrainte"
 
-#: models/person.py:64
+#: models/person.py:62
 msgid "unknown"
 msgstr "indéfini"
 
@@ -5119,7 +5115,7 @@ msgstr "validité"
 msgid "volume declared vacant"
 msgstr "volume déclaré vacant"
 
-#: forms/learning_unit/edition_volume.py:98
+#: forms/learning_unit/edition_volume.py:102
 msgid "volume total global"
 msgstr "volume total global"
 
@@ -5137,7 +5133,7 @@ msgstr "volume total global"
 #: templates/learning_unit/blocks/modal/modal_modification_ask_to_report.html:37
 #: templates/learning_unit/blocks/modal/modal_warning_state_modification.html:37
 #: tests/business/learning_units/test_edition.py:186
-#: tests/business/test_education_group.py:352 tests/business/test_xls.py:41
+#: tests/business/test_education_group.py:353 tests/business/test_xls.py:41
 #: tests/forms/test_learning_unit_postponement.py:538
 #: tests/forms/test_learning_unit_postponement.py:539
 msgid "yes"
@@ -5148,14 +5144,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Produce xls with a list of learning units"
-#~ msgstr "Produire un fichier Excel avec la liste des unités d'enseignement"
-
-#~ msgid "Produce xls with a list of learning units and attributions"
-#~ msgstr ""
-#~ "Produire un fichier Excel avec la liste des unités d'enseignement et les "
-#~ "attributions"
-
-#~ msgid "The learning units and attributions"
-#~ msgstr "Les unités d'enseignement et les attributions"
