@@ -36,6 +36,7 @@ from django.db.transaction import atomic
 
 from base.models.academic_year import AcademicYear
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
+from base.models.education_group import EducationGroup
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_type import EducationGroupType
@@ -92,14 +93,16 @@ def create_common_offer_for_academic_year(year):
         entity_ucl = Entity.objects.get(entityversion__acronym='UCL', organization__type=MAIN)
 
         if offer['code'] in COMMON_OFFER:
-            education_group = EducationGroupFactory(start_year=academic_year.year, end_year=academic_year.year + 1)
             education_group_type = EducationGroupType.objects.get(
                 name=offer['name'],
                 category=offer['category']
             )
             education_group_year = education_group_year.first()
             if not education_group_year:
-
+                education_group = EducationGroup.objects.create(
+                    start_year=academic_year.year,
+                    end_year=academic_year.year + 1
+                )
                 EducationGroupYear.objects.create(
                     academic_year=academic_year,
                     education_group=education_group,
