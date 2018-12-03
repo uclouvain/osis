@@ -1,4 +1,4 @@
-#: templates/online_encoding.html:298
+#: templates/online_encoding.html:287
 #, python-format
 msgid ""
 "\n"
@@ -12,10 +12,10 @@ msgstr ""
 msgid "Absence justified cannot be remplaced by absence unjustified"
 msgstr ""
 
-#: templates/online_double_encoding_form.html:182
-#: templates/online_double_encoding_validation.html:285
-#: templates/online_double_encoding_validation.html:291
-#: templates/online_encoding_form.html:219
+#: templates/online_double_encoding_form.html:177
+#: templates/online_double_encoding_validation.html:273
+#: templates/online_double_encoding_validation.html:279
+#: templates/online_encoding_form.html:213
 msgid "Absent"
 msgstr ""
 
@@ -40,7 +40,7 @@ msgstr ""
 msgid "Academic year"
 msgstr ""
 
-#: business/score_encoding_export.py:165
+#: business/score_encoding_export.py:171
 #, python-format
 msgid "Accepted value: %(justification_label_authorized)s "
 msgstr ""
@@ -66,8 +66,8 @@ msgstr ""
 #: templates/scores_encoding.html:66
 #: templates/scores_encoding_by_learning_unit.html:63
 #: templates/scores_encoding_by_learning_unit.html:73
-#: templates/scores_encoding_by_specific_criteria.html:62
-#: templates/scores_encoding_by_specific_criteria.html:72
+#: templates/scores_encoding_by_specific_criteria.html:63
+#: templates/scores_encoding_by_specific_criteria.html:73
 msgid "All"
 msgstr ""
 
@@ -96,36 +96,36 @@ msgid "Are you sure you want to remove the following manager ?"
 msgstr ""
 
 #: templates/scores_encoding_by_learning_unit.html:32
-#: templates/scores_encoding_by_specific_criteria.html:36
+#: templates/scores_encoding_by_specific_criteria.html:37
 msgid "By learning unit"
 msgstr ""
 
 #: templates/scores_encoding_by_learning_unit.html:33
-#: templates/scores_encoding_by_specific_criteria.html:37
+#: templates/scores_encoding_by_specific_criteria.html:38
 msgid "By specific criteria"
 msgstr ""
 
 #: templates/admin/modal/add_manager.html:62
 #: templates/admin/modal/remove_manager_confirm.html:29
 #: templates/online_double_encoding_form.html:114
-#: templates/online_double_encoding_form.html:196
-#: templates/online_double_encoding_validation.html:264
-#: templates/online_encoding.html:280 templates/online_encoding.html:307
+#: templates/online_double_encoding_form.html:191
+#: templates/online_double_encoding_validation.html:252
+#: templates/online_encoding.html:269 templates/online_encoding.html:296
 #: templates/online_encoding_form.html:115
-#: templates/online_encoding_form.html:248
+#: templates/online_encoding_form.html:242
 #: templates/scores_responsible_edit.html:71
 msgid "Cancel"
 msgstr ""
 
-#: templates/online_double_encoding_form.html:184
-#: templates/online_double_encoding_validation.html:296
-#: templates/online_encoding_form.html:229
-#: templates/scores_encoding_by_specific_criteria.html:65
-#: templates/scores_encoding_by_specific_criteria.html:150
+#: templates/online_double_encoding_form.html:179
+#: templates/online_double_encoding_validation.html:284
+#: templates/online_encoding_form.html:223
+#: templates/scores_encoding_by_specific_criteria.html:66
+#: templates/scores_encoding_by_specific_criteria.html:158
 msgid "Cheating"
 msgstr ""
 
-#: templates/online_encoding.html:274
+#: templates/online_encoding.html:263
 msgid "Choose file"
 msgstr ""
 
@@ -138,7 +138,7 @@ msgid "Code"
 msgstr ""
 
 #: templates/online_double_encoding_form.html:112
-#: templates/online_double_encoding_form.html:194
+#: templates/online_double_encoding_form.html:189
 msgid "Compare"
 msgstr ""
 
@@ -168,10 +168,10 @@ msgstr ""
 msgid "Datatable sort descending"
 msgstr ""
 
-#: templates/online_encoding.html:209 templates/online_encoding.html:211
-#: templates/online_encoding_form.html:153
-#: templates/online_encoding_form.html:155
-#: templates/scores_encoding_by_specific_criteria.html:113
+#: templates/online_encoding.html:198 templates/online_encoding.html:200
+#: templates/online_encoding_form.html:143
+#: templates/online_encoding_form.html:145
+#: templates/scores_encoding_by_specific_criteria.html:121
 #: views/upload_xls_utils.py:323
 msgid "Deadline reached"
 msgstr ""
@@ -188,7 +188,7 @@ msgstr ""
 msgid "Decimal values in scores are accepted."
 msgstr ""
 
-#: templates/online_encoding.html:154 templates/online_encoding.html:306
+#: templates/online_encoding.html:154 templates/online_encoding.html:295
 msgid "Definitive submission (Submit to faculty)"
 msgstr ""
 
@@ -237,7 +237,7 @@ msgstr ""
 msgid "Encoding"
 msgstr ""
 
-#: templates/blocks/legend.html:29
+#: business/score_encoding_export.py:176 templates/blocks/legend.html:30
 msgid "Enrolled after session starts"
 msgstr ""
 
@@ -272,9 +272,9 @@ msgstr ""
 #: templates/online_double_encoding_form.html:122
 #: templates/online_double_encoding_validation.html:116
 #: templates/online_encoding.html:180 templates/online_encoding_form.html:124
-#: templates/scores_encoding_by_specific_criteria.html:56
 #: templates/scores_encoding_by_specific_criteria.html:57
-#: templates/scores_encoding_by_specific_criteria.html:101
+#: templates/scores_encoding_by_specific_criteria.html:58
+#: templates/scores_encoding_by_specific_criteria.html:107
 msgid "Firstname"
 msgstr ""
 
@@ -297,7 +297,7 @@ msgstr ""
 msgid "Incomplete"
 msgstr ""
 
-#: templates/online_encoding.html:281
+#: templates/online_encoding.html:270
 msgid "Inject"
 msgstr ""
 
@@ -310,30 +310,30 @@ msgstr ""
 msgid "Institution"
 msgstr ""
 
-#: tests/views/test_upload_xls_utils.py:192 views/upload_xls_utils.py:370
+#: tests/views/test_upload_xls_utils.py:195 views/upload_xls_utils.py:370
 msgid "Invalid justification value"
 msgstr ""
 
-#: business/score_encoding_export.py:164
+#: business/score_encoding_export.py:170
 #: templates/online_double_encoding_form.html:124
 #: templates/online_double_encoding_validation.html:118
 #: templates/online_double_encoding_validation.html:120
 #: templates/online_double_encoding_validation.html:122
 #: templates/online_encoding.html:182 templates/online_encoding_form.html:126
-#: templates/scores_encoding_by_specific_criteria.html:103
+#: templates/scores_encoding_by_specific_criteria.html:109
 msgid "Justification"
 msgstr ""
 
-#: business/score_encoding_sheet.py:111
+#: business/score_encoding_sheet.py:112
 #, python-format
 msgid "Justification legend: %(justification_label_authorized)s"
 msgstr ""
 
-#: templates/online_double_encoding_form.html:180
-#: templates/online_double_encoding_validation.html:293
-#: templates/online_encoding_form.html:212
-#: templates/scores_encoding_by_specific_criteria.html:64
-#: templates/scores_encoding_by_specific_criteria.html:149
+#: templates/online_double_encoding_form.html:175
+#: templates/online_double_encoding_validation.html:281
+#: templates/online_encoding_form.html:206
+#: templates/scores_encoding_by_specific_criteria.html:65
+#: templates/scores_encoding_by_specific_criteria.html:157
 msgid "Justified absence"
 msgstr ""
 
@@ -345,9 +345,9 @@ msgstr ""
 #: templates/online_double_encoding_form.html:121
 #: templates/online_double_encoding_validation.html:115
 #: templates/online_encoding.html:179 templates/online_encoding_form.html:123
-#: templates/scores_encoding_by_specific_criteria.html:52
 #: templates/scores_encoding_by_specific_criteria.html:53
-#: templates/scores_encoding_by_specific_criteria.html:100
+#: templates/scores_encoding_by_specific_criteria.html:54
+#: templates/scores_encoding_by_specific_criteria.html:106
 msgid "Lastname"
 msgstr ""
 
@@ -357,7 +357,7 @@ msgstr ""
 #: templates/scores_encoding_by_learning_unit.html:152
 #: templates/scores_encoding_by_learning_unit.html:227
 #: templates/scores_encoding_by_learning_unit.html:314
-#: templates/scores_encoding_by_specific_criteria.html:98
+#: templates/scores_encoding_by_specific_criteria.html:104
 msgid "Learning unit"
 msgstr ""
 
@@ -373,7 +373,7 @@ msgstr ""
 msgid "Location"
 msgstr ""
 
-#: business/score_encoding_export.py:180
+#: business/score_encoding_export.py:195
 msgid "M=Justified Absence"
 msgstr ""
 
@@ -389,7 +389,7 @@ msgstr ""
 msgid "Middlename"
 msgstr ""
 
-#: templates/scores_encoding_by_specific_criteria.html:66
+#: templates/scores_encoding_by_specific_criteria.html:67
 msgid "Missing score"
 msgstr ""
 
@@ -407,7 +407,7 @@ msgstr ""
 msgid "No data for this academic year"
 msgstr ""
 
-#: views/score_encoding.py:352
+#: views/score_encoding.py:349
 msgid "No double score encoded ; nothing to compare."
 msgstr ""
 
@@ -415,18 +415,18 @@ msgstr ""
 msgid "No entity associated to your profile"
 msgstr ""
 
-#: views/score_encoding.py:530
+#: views/score_encoding.py:527
 msgid "No new scores encoded. The double encoding needs new scores."
 msgstr ""
 
 #: templates/admin/modal/add_manager.html:42
 #: templates/admin/modal/add_manager.html:44
 #: templates/admin/pgm_manager.html:105 templates/scores_responsible.html:80
-#: views/score_encoding.py:164 views/score_encoding.py:603
+#: views/score_encoding.py:163 views/score_encoding.py:599
 msgid "No result!"
 msgstr ""
 
-#: tests/views/test_upload_xls_utils.py:183
+#: tests/views/test_upload_xls_utils.py:186
 msgid "No score injected"
 msgstr ""
 
@@ -434,7 +434,7 @@ msgstr ""
 msgid "No scores injected"
 msgstr ""
 
-#: views/score_encoding.py:407
+#: views/score_encoding.py:404
 msgid "No students to encode by excel"
 msgstr ""
 
@@ -444,11 +444,11 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-#: templates/blocks/legend.html:33
+#: business/score_encoding_export.py:185
 msgid "Not enrolled"
 msgstr ""
 
-#: business/score_encoding_sheet.py:169
+#: business/score_encoding_sheet.py:170
 msgid "Not passed"
 msgstr ""
 
@@ -458,7 +458,7 @@ msgstr ""
 msgid "Number of enrollments"
 msgstr ""
 
-#: business/score_encoding_export.py:173
+#: business/score_encoding_export.py:188
 msgid "Numbered scores"
 msgstr ""
 
@@ -466,8 +466,8 @@ msgstr ""
 #: templates/online_double_encoding_validation.html:113
 #: templates/online_encoding_form.html:121 templates/scores_encoding.html:64
 #: templates/scores_encoding_by_learning_unit.html:61
-#: templates/scores_encoding_by_specific_criteria.html:70
-#: templates/scores_encoding_by_specific_criteria.html:97
+#: templates/scores_encoding_by_specific_criteria.html:71
+#: templates/scores_encoding_by_specific_criteria.html:103
 msgid "Offer"
 msgstr ""
 
@@ -499,7 +499,7 @@ msgstr ""
 msgid "Other tutors"
 msgstr ""
 
-#: business/score_encoding_export.py:170
+#: business/score_encoding_export.py:180
 #, python-format
 msgid "Other values: %(justification_other_values)s "
 msgstr ""
@@ -512,7 +512,7 @@ msgstr ""
 msgid "Phone"
 msgstr ""
 
-#: views/score_encoding.py:586
+#: views/score_encoding.py:582
 msgid "Please choose at least one criteria!"
 msgstr ""
 
@@ -520,7 +520,7 @@ msgstr ""
 msgid "Please enter a lastname, and optionnally a firstname"
 msgstr ""
 
-#: templates/online_encoding.html:277
+#: templates/online_encoding.html:266
 msgid "Please select an XLS file for injection"
 msgstr ""
 
@@ -576,13 +576,13 @@ msgstr ""
 msgid "Refresh list"
 msgstr ""
 
-#: templates/scores_encoding_by_specific_criteria.html:48
 #: templates/scores_encoding_by_specific_criteria.html:49
-#: templates/scores_encoding_by_specific_criteria.html:99
+#: templates/scores_encoding_by_specific_criteria.html:50
+#: templates/scores_encoding_by_specific_criteria.html:105
 msgid "Registration ID"
 msgstr ""
 
-#: tests/views/test_upload_xls_utils.py:262 views/upload_xls_utils.py:298
+#: tests/views/test_upload_xls_utils.py:265 views/upload_xls_utils.py:298
 msgid "Registration ID does not match email"
 msgstr ""
 
@@ -612,23 +612,23 @@ msgid ""
 "address for the papersheet."
 msgstr ""
 
-#: tests/views/test_upload_xls_utils.py:192
-#: tests/views/test_upload_xls_utils.py:202
-#: tests/views/test_upload_xls_utils.py:245
-#: tests/views/test_upload_xls_utils.py:263
+#: tests/views/test_upload_xls_utils.py:195
+#: tests/views/test_upload_xls_utils.py:205
+#: tests/views/test_upload_xls_utils.py:248
+#: tests/views/test_upload_xls_utils.py:266
 msgid "Row"
 msgstr ""
 
-#: business/score_encoding_export.py:179
+#: business/score_encoding_export.py:194
 msgid "S=Unjustified Absence"
 msgstr ""
 
 #: templates/offer/score_sheet_address_tab.html:126
-#: templates/online_double_encoding_validation.html:263
+#: templates/online_double_encoding_validation.html:251
 #: templates/online_encoding_form.html:113
-#: templates/online_encoding_form.html:246
-#: templates/scores_encoding_by_specific_criteria.html:92
-#: templates/scores_encoding_by_specific_criteria.html:159
+#: templates/online_encoding_form.html:240
+#: templates/scores_encoding_by_specific_criteria.html:96
+#: templates/scores_encoding_by_specific_criteria.html:169
 #: templates/scores_responsible_edit.html:69
 msgid "Save"
 msgstr ""
@@ -638,7 +638,7 @@ msgstr ""
 #: templates/online_double_encoding_validation.html:119
 #: templates/online_double_encoding_validation.html:121
 #: templates/online_encoding.html:181 templates/online_encoding_form.html:125
-#: templates/scores_encoding_by_specific_criteria.html:102
+#: templates/scores_encoding_by_specific_criteria.html:108
 msgid "Score"
 msgstr ""
 
@@ -646,16 +646,16 @@ msgstr ""
 msgid "Score already submitted"
 msgstr ""
 
-#: business/score_encoding_export.py:174
+#: business/score_encoding_export.py:189
 #, python-format
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr ""
 
-#: tests/views/test_upload_xls_utils.py:214
-#: tests/views/test_upload_xls_utils.py:229
-#: tests/views/test_upload_xls_utils.py:247
-#: tests/views/test_upload_xls_utils.py:274
-#: tests/views/test_upload_xls_utils.py:291 views/upload_xls_utils.py:201
+#: tests/views/test_upload_xls_utils.py:217
+#: tests/views/test_upload_xls_utils.py:232
+#: tests/views/test_upload_xls_utils.py:250
+#: tests/views/test_upload_xls_utils.py:277
+#: tests/views/test_upload_xls_utils.py:294 views/upload_xls_utils.py:201
 msgid "Score saved"
 msgstr ""
 
@@ -663,8 +663,8 @@ msgstr ""
 msgid "Score sheet address was successfully saved."
 msgstr ""
 
-#: templates/online_encoding.html:214 templates/online_encoding_form.html:159
-#: templates/scores_encoding_by_specific_criteria.html:116
+#: templates/online_encoding.html:203 templates/online_encoding_form.html:149
+#: templates/scores_encoding_by_specific_criteria.html:124
 msgid "Score submitted"
 msgstr ""
 
@@ -680,12 +680,12 @@ msgstr ""
 msgid "Scores encoding"
 msgstr ""
 
-#: templates/online_encoding.html:271
+#: templates/online_encoding.html:260
 msgid "Scores injection"
 msgstr ""
 
-#: tests/views/test_upload_xls_utils.py:202
-#: tests/views/test_upload_xls_utils.py:245 views/upload_xls_utils.py:406
+#: tests/views/test_upload_xls_utils.py:205
+#: tests/views/test_upload_xls_utils.py:248 views/upload_xls_utils.py:406
 msgid "Scores must be between 0 and 20"
 msgstr ""
 
@@ -712,7 +712,7 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: templates/scores_encoding_by_specific_criteria.html:81
+#: templates/scores_encoding_by_specific_criteria.html:82
 msgid "Search of annual programs"
 msgstr ""
 
@@ -741,12 +741,12 @@ msgstr ""
 msgid "Session number"
 msgstr ""
 
-#: templates/scores_encoding_by_specific_criteria.html:60
+#: templates/scores_encoding_by_specific_criteria.html:61
 msgid "State"
 msgstr ""
 
 #: templates/online_encoding.html:176 templates/online_encoding_form.html:120
-#: templates/scores_encoding_by_specific_criteria.html:96
+#: templates/scores_encoding_by_specific_criteria.html:102
 #: templates/scores_responsible_edit.html:46
 msgid "Status"
 msgstr ""
@@ -755,7 +755,7 @@ msgstr ""
 msgid "Student not registered for exam"
 msgstr ""
 
-#: business/score_encoding_export.py:158
+#: business/score_encoding_export.py:164
 msgid "Students deliberated are not shown"
 msgstr ""
 
@@ -764,8 +764,8 @@ msgstr ""
 msgid "Studies"
 msgstr ""
 
-#: templates/online_encoding.html:155 templates/online_encoding.html:294
-#: templates/online_encoding.html:306
+#: templates/online_encoding.html:155 templates/online_encoding.html:283
+#: templates/online_encoding.html:295
 msgid "Submission"
 msgstr ""
 
@@ -775,11 +775,11 @@ msgid "Teacher deadline"
 msgstr ""
 
 #: templates/online_encoding_form.html:111
-#: templates/online_encoding_form.html:244
+#: templates/online_encoding_form.html:238
 msgid "Temporary save (not submitted to the faculty yet)"
 msgstr ""
 
-#: business/score_encoding_export.py:152
+#: business/score_encoding_export.py:158
 #, python-format
 msgid ""
 "The data presented on this document correspond to the state of the system "
@@ -792,7 +792,7 @@ msgid ""
 "The enrollment to the activity %(xls_learning_unit_acronym)s doesn't exist"
 msgstr ""
 
-#: forms/score_file.py:38 tests/views/test_upload_xls_utils.py:174
+#: forms/score_file.py:38 tests/views/test_upload_xls_utils.py:177
 #: views/upload_xls_utils.py:144
 msgid "The file must be a valid 'XLSX' excel file"
 msgstr ""
@@ -845,12 +845,16 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: templates/online_double_encoding_form.html:179
-#: templates/online_double_encoding_validation.html:287
-#: templates/online_encoding_form.html:206
-#: templates/scores_encoding_by_specific_criteria.html:63
-#: templates/scores_encoding_by_specific_criteria.html:148
+#: templates/online_double_encoding_form.html:174
+#: templates/online_double_encoding_validation.html:275
+#: templates/online_encoding_form.html:200
+#: templates/scores_encoding_by_specific_criteria.html:64
+#: templates/scores_encoding_by_specific_criteria.html:156
 msgid "Unjustified absence"
+msgstr ""
+
+#: templates/blocks/legend.html:35
+msgid "Unsubscribed after the opening of the session"
 msgstr ""
 
 #: templates/admin/modal/add_manager.html:52
@@ -898,7 +902,7 @@ msgid ""
 "'Learning unit').Please make one excel file by learning unit."
 msgstr ""
 
-#: forms/score_file.py:31 tests/views/test_upload_xls_utils.py:165
+#: forms/score_file.py:31 tests/views/test_upload_xls_utils.py:168
 msgid "You have to select a file to upload."
 msgstr ""
 
@@ -914,8 +918,8 @@ msgid ""
 "excel file provided (button '%(button_value)s')"
 msgstr ""
 
-#: business/score_encoding_export.py:147 business/score_encoding_export.py:184
-#: business/score_encoding_sheet.py:103 tests/views/test_score_encoding.py:354
+#: business/score_encoding_export.py:153 business/score_encoding_export.py:199
+#: business/score_encoding_sheet.py:104 tests/views/test_score_encoding.py:354
 #: views/score_encoding.py:75
 msgid "date_format"
 msgstr ""
@@ -936,6 +940,6 @@ msgstr ""
 msgid "program(s)"
 msgstr ""
 
-#: views/score_encoding.py:326
+#: views/score_encoding.py:324
 msgid "score(s) saved"
 msgstr ""
