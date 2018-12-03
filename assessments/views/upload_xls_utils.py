@@ -165,7 +165,8 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
 
     score_list = score_encoding_list.get_scores_encoding_list(
         user=request.user,
-        learning_unit_year_id=learning_unit_year_id
+        learning_unit_year_id=learning_unit_year_id,
+        only_enrolled=True
     )
 
     offer_acronyms_managed_by_user = {offer_year.acronym for offer_year
