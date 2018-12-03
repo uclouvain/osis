@@ -239,10 +239,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_translated_labels_and_content(self, section, user_language, common_education_group_year, sections_list):
         records = []
         for label, selectors in section.labels:
-            final_char = label[-1:]
-            label = label[:-1]
             if not sections_list or any(label in section for section in sections_list):
-                label = label + final_char
                 records.extend(
                     self.get_selectors(common_education_group_year, label, selectors, user_language)
                 )
@@ -260,11 +257,10 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
                 translations = self.get_content_translations_for_label(
                     common_education_group_year, label, user_language, 'common')
                 records.append(translations)
-
-            elif selector == 'common' and 'specific' not in selectors.split(','):
-                translations = self.get_content_translations_for_label(
-                    self.object, label, user_language, 'specific')
-                records.append(translations)
+        if selectors == 'common' and common_education_group_year is None:
+            translations = self.get_content_translations_for_label(
+                self.object, label, user_language, 'specific')
+            records.append(translations)
 
         return records
 

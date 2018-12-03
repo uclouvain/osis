@@ -130,6 +130,7 @@ def get_text_label(entity, label):
         label=label,
         published=True
     )
+
     return text_label
 
 
@@ -253,8 +254,8 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_EN, 'majeures', 'Majors'),
     (settings.LANGUAGE_CODE_EN, 'finalites', 'Focuses'),
     (settings.LANGUAGE_CODE_EN, 'finalites_didactiques', 'Teaching Focuses'),
-    (settings.LANGUAGE_CODE_EN, 'agregations', 'Agregations'),
-    (settings.LANGUAGE_CODE_FR, 'agregations', 'Agrégations'),
+    (settings.LANGUAGE_CODE_EN, 'agregation', 'Agregation'),
+    (settings.LANGUAGE_CODE_FR, 'agregation', 'Agrégation'),
     (settings.LANGUAGE_CODE_EN, 'prerequis', 'Prerequis'),
     (settings.LANGUAGE_CODE_FR, 'prerequis', 'Prérequis'),
 

@@ -34,7 +34,7 @@ SECTION_LIST = [
                 ('options', 'specific'),
                 ('finalites_didactiques', 'common'),
                 ('caap', 'specific,common'),
-                ('agregations', 'common'),
+                ('agregation', 'common'),
                 ('prerequis', 'common'),
             ]),
     Section(title=_('Admission'),
