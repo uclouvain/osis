@@ -226,6 +226,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         user_language = mdl.person.get_user_interface_language(self.request.user)
         sections_with_translated_labels = []
         sections_list = self.get_appropriate_sections()
+
         for section in settings.SECTION_LIST:
             translated_labels = self.get_translated_labels_and_content(section,
                                                                        user_language,
