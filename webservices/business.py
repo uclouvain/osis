@@ -28,6 +28,7 @@ from django.db.models import Prefetch
 
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.education_group_year import EducationGroupYear
 from cms.enums import entity_name
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
@@ -116,3 +117,23 @@ def get_evaluation_text(education_group_year, language_code):
         translated_text_label = EVALUATION_KEY
 
     return translated_text_label, translated_text.text
+
+
+def get_common_evaluation_text(education_group_year, language_code):
+    common_education_group_year = EducationGroupYear.objects.look_for_common(
+        education_group_type=education_group_year.education_group_type,
+        academic_year=education_group_year.academic_year,
+    ).first()
+
+    try:
+        translated_text = TranslatedText.objects.get(
+            text_label__entity=OFFER_YEAR,
+            text_label__label=EVALUATION_KEY,
+            language=language_code,
+            entity=OFFER_YEAR,
+            reference=common_education_group_year.id
+        )
+    except (TranslatedText.DoesNotExist, AttributeError):
+        translated_text = TranslatedText
+        translated_text.text = ''
+    return translated_text.text

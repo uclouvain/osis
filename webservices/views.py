@@ -43,7 +43,7 @@ from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from webservices import business
-from webservices.business import get_evaluation_text
+from webservices.business import get_evaluation_text, get_common_evaluation_text
 from webservices.utils import convert_sections_to_list_of_dict
 
 LANGUAGES = {'fr': 'fr-be', 'en': 'en'}
@@ -399,12 +399,12 @@ def get_conditions_admissions(context):
 def get_evaluation(education_group_year, language_code):
 
     label, text = get_evaluation_text(education_group_year, language_code)
+    common_text = get_common_evaluation_text(education_group_year, language_code)
     return {
         'id': business.EVALUATION_KEY,
         'label': label,
-        'content': '',
+        'content': common_text,
         'free_text': text
-
     }
 
 
