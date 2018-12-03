@@ -664,8 +664,24 @@ class TestHasOrIsPrerequisite(TestCase):
             child_branch=None,
             child_leaf=LearningUnitYearFactory()
         )
+        cls.second_grp_ele_leaf = GroupElementYearFactory(
+            parent=cls.grp_ele_leaf.parent,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory()
+
+        )
         cls.grp_ele_root = GroupElementYearFactory(
             child_branch=cls.grp_ele_leaf.parent
+        )
+
+        cls.other_grp_ele_root = GroupElementYearFactory(
+            child_branch=cls.grp_ele_leaf.parent
+        )
+        cls.other_grp_ele_leaf = GroupElementYearFactory(
+            parent=cls.other_grp_ele_root.parent,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory()
+
         )
 
     def test_should_return_false_when_luy_has_no_prerequisite_nor_is_prerequisite(self):
@@ -705,15 +721,9 @@ class TestHasOrIsPrerequisite(TestCase):
         )
 
     def test_should_return_true_if_luy_is_prerequisite(self):
-        other_grp_ele_leaf = GroupElementYearFactory(
-            parent=self.grp_ele_leaf.parent,
-            child_branch=None,
-            child_leaf=LearningUnitYearFactory()
-
-        )
         PrerequisiteItemFactory(
             prerequisite__education_group_year=self.grp_ele_root.parent,
-            prerequisite__learning_unit_year=other_grp_ele_leaf.child_leaf,
+            prerequisite__learning_unit_year=self.second_grp_ele_leaf.child_leaf,
             learning_unit=self.grp_ele_leaf.child_leaf.learning_unit,
             group_number=1,
             position=1,
@@ -723,11 +733,8 @@ class TestHasOrIsPrerequisite(TestCase):
         )
 
     def test_should_return_true_if_luy_has_prerequisite_in_other_root_but_same_group(self):
-        other_grp_ele_root = GroupElementYearFactory(
-            child_branch=self.grp_ele_leaf.parent
-        )
         PrerequisiteItemFactory(
-            prerequisite__education_group_year=other_grp_ele_root.parent,
+            prerequisite__education_group_year=self.other_grp_ele_root.parent,
             prerequisite__learning_unit_year=self.grp_ele_leaf.child_leaf,
             group_number=1,
             position=1,
@@ -737,18 +744,9 @@ class TestHasOrIsPrerequisite(TestCase):
         )
 
     def test_should_return_true_if_luy_is_prerequisite_in_other_root_but_same_group(self):
-        other_grp_ele_root = GroupElementYearFactory(
-            child_branch=self.grp_ele_leaf.parent
-        )
-        other_grp_ele_leaf = GroupElementYearFactory(
-            parent=other_grp_ele_root.parent,
-            child_branch=None,
-            child_leaf=LearningUnitYearFactory()
-
-        )
         PrerequisiteItemFactory(
-            prerequisite__education_group_year=other_grp_ele_root.parent,
-            prerequisite__learning_unit_year=other_grp_ele_leaf.child_leaf,
+            prerequisite__education_group_year=self.other_grp_ele_root.parent,
+            prerequisite__learning_unit_year=self.other_grp_ele_leaf.child_leaf,
             learning_unit=self.grp_ele_leaf.child_leaf.learning_unit,
             group_number=1,
             position=1,
