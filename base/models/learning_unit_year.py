@@ -33,7 +33,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, ngettext
 from reversion.admin import VersionAdmin
 
-from base.models import entity_container_year as mdl_entity_container_year
+from base.models import entity_container_year as mdl_entity_container_year, group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
 from base.models.enums import active_status, learning_container_year_types
@@ -417,9 +417,10 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         ).exists()
 
     def has_or_is_prerequisite(self, education_group_year):
+        formations = group_element_year.find_learning_unit_formations([education_group_year])[education_group_year.id]
         return PrerequisiteItem.objects.filter(
-            Q(learning_unit=self.learning_unit) |
-            Q(prerequisite__learning_unit_year=self, prerequisite__education_group_year=education_group_year)
+            Q(prerequisite__learning_unit_year=self, prerequisite__education_group_year__in=formations) |
+            Q(prerequisite__education_group_year__in=formations, learning_unit=self.learning_unit)
         ).exists()
 
 
