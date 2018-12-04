@@ -24,24 +24,22 @@
 #
 ##############################################################################
 from django import forms
-from django.core.exceptions import ObjectDoesNotExist, ValidationError, NON_FIELD_ERRORS
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms import formset_factory
+from django.utils.translation import ugettext_lazy as _
 
-from base.forms.bootstrap import BootstrapForm
 from base.forms.utils.datefield import DateRangeField, DatePickerInput, DATE_FORMAT, DateTimePickerInput
 from base.models import offer_year_calendar
-from base.models.offer_year_calendar import create_offer_year_calendar
 from base.models.academic_calendar import AcademicCalendar, get_by_reference_and_academic_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
-from django.utils.translation import ugettext_lazy as _
-
+from base.models.offer_year_calendar import create_offer_year_calendar
 from osis_common.utils.datetime import convert_datetime_to_date, convert_date_to_datetime
 
 NUMBER_SESSIONS = 3
 
 
-class CourseEnrollmentForm(BootstrapForm):
+class CourseEnrollmentForm(forms.Form):
     range_date = DateRangeField(required=False, label=_("Course enrollment"))
 
     def __init__(self, *args, **kwargs):
@@ -88,7 +86,7 @@ def _build_new_course_enrollment_offer_yr_calendar(education_group_yr):
     return None
 
 
-class AdministrativeDataSessionForm(BootstrapForm):
+class AdministrativeDataSessionForm(forms.Form):
     exam_enrollment_range = DateRangeField(label=_('Exam enrollments'), required=False)
 
     scores_exam_submission = forms.DateField(widget=DatePickerInput(format=DATE_FORMAT),

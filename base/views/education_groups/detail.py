@@ -57,6 +57,8 @@ from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType
 from base.models.person import Person
+from base.utils.cache import cache
+from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
 from cms import models as mdl_cms
 from cms.enums import entity_name
@@ -97,7 +99,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
     with_tree = True
 
     def get_person(self):
-        return get_object_or_404(Person, user=self.request.user)
+        return get_object_or_404(Person.objects.select_related('user'), user=self.request.user)
 
     def get_root(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
@@ -143,14 +145,9 @@ class EducationGroupRead(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # TODO Use value_list
-        context["education_group_languages"] = [
-            education_group_language.language.name for education_group_language in
-            mdl.education_group_language.find_by_education_group_year(self.object)
-        ]
-
+        context["education_group_languages"] = self.object.educationgrouplanguage_set.order_by('order').values_list(
+            'language__name', flat=True)
         context["show_coorganization"] = self.show_coorganization()
-
         context["versions"] = self.get_related_versions()
 
         return context
@@ -165,7 +162,7 @@ class EducationGroupRead(EducationGroupGenericDetailView):
                                                           TrainingType.PGRM_MASTER_180_240.name]
 
     def get_related_versions(self):
-        versions = Version.objects.get_for_object(self.object)
+        versions = Version.objects.get_for_object(self.object).select_related('revision__user__person')
 
         related_models = [
             EducationGroupOrganization,
@@ -177,13 +174,21 @@ class EducationGroupRead(EducationGroupGenericDetailView):
 
         subversion = Version.objects.none()
         for model in related_models:
-            subversion |= Version.objects.get_for_model(model)
+            subversion |= Version.objects.get_for_model(model).select_related('revision__user__person')
 
         versions |= subversion.filter(
             serialized_data__contains="\"education_group_year\": {}".format(self.object.pk)
         )
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created')
+
+    def get_queryset(self):
+        """ Optimization """
+        return super().get_queryset().select_related(
+            'enrollment_campus', 'education_group_type', 'primary_language',
+            'main_teaching_campus', 'administration_entity', 'management_entity',
+            'academic_year'
+        )
 
 
 class EducationGroupDiplomas(EducationGroupGenericDetailView):
@@ -457,10 +462,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        tab_lang = 'fr'
-
-        if self.request.session.get('tab_lang'):
-            tab_lang = self.request.session.get('tab_lang')
+        tab_lang = cache.get(get_tab_lang_keys(self.request.user)) or settings.LANGUAGE_CODE_FR
 
         acronym = self.object.acronym.lower()
         is_common = acronym.startswith('common-')
@@ -479,8 +481,11 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
 
         record = {}
         for section in SECTIONS_WITH_TEXT:
-            record[section] = AdmissionConditionLine.objects.filter(admission_condition=admission_condition,
-                                                                    section=section)
+            record[section] = AdmissionConditionLine.objects.filter(
+                admission_condition=admission_condition,
+                section=section
+            ).annotate_text(tab_lang)
+
         context.update({
             'admission_condition_form': admission_condition_form,
             'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object']),
@@ -495,7 +500,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
             'admission_condition': admission_condition,
             'record': record,
             'language': {
-                'list': ["fr", "en"],
+                'list': ["fr-be", "en"],
                 'tab_lang': tab_lang
             }
         })

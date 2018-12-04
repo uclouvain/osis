@@ -163,7 +163,7 @@ class LearningContainerYearModelForm(forms.ModelForm):
         self.fields['container_type'].widget.attrs = {'onchange': 'showInternshipSubtype()'}
 
         # Limit types for faculty_manager only if simple creation of learning_unit
-        if self.person.is_faculty_manager() and not self.proposal and self.is_create_form:
+        if self.person.is_faculty_manager and not self.proposal and self.is_create_form:
             self.fields["container_type"].choices = _create_faculty_learning_container_type_list()
         else:
             self.fields["container_type"].choices = _create_learning_container_year_type_list()

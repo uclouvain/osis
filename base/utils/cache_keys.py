@@ -23,24 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
 
-from base.models.enums import education_group_language
-from osis_common.models.osis_model_admin import OsisModelAdmin
+CACHE_TIMEOUT = None
 
 
-class EducationGroupLanguageAdmin(OsisModelAdmin):
-    list_display = ('type', 'order', 'education_group_year', 'language')
-    raw_id_fields = ('education_group_year', 'language')
-
-
-class EducationGroupLanguage(models.Model):
-    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    changed = models.DateTimeField(null=True, auto_now=True)
-    type = models.CharField(max_length=255, choices=education_group_language.EducationGroupLanguages.choices())
-    order = models.IntegerField()
-    education_group_year = models.ForeignKey('base.EducationGroupYear')
-    language = models.ForeignKey('reference.Language')
-
-    def __str__(self):
-        return "{} - {}".format(self.education_group_year, self.language)
+def get_tab_lang_keys(user):
+    return str(user.id) + "_education_group_tab_lang"

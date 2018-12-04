@@ -41,4 +41,4 @@ def find_summary_course_submission_dates_for_entity_version(entity_version):
 
 def can_user_edit_educational_information_submission_dates_for_entity(a_user, an_entity):
     person = get_object_or_404(Person, user=a_user)
-    return person.is_faculty_manager() and person.is_attached_entities(Entity.objects.filter(pk=an_entity.pk))
+    return person.is_faculty_manager and person.is_attached_entities(Entity.objects.filter(pk=an_entity.pk))

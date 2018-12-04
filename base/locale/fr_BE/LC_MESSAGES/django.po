@@ -618,7 +618,7 @@ msgstr "Entités attachées"
 msgid "Attached to"
 msgstr "Attachée à"
 
-#: views/education_groups/group_element_year/update.py:149
+#: views/education_groups/group_element_year/update.py:148
 #, python-format
 msgid "Attached to \"%(acronym)s\""
 msgstr "L'élément sélectionné a été attaché à \"%(acronym)s\""
@@ -2705,7 +2705,7 @@ msgid "Platform"
 msgstr "Plateforme"
 
 #: tests/views/education_groups/test_update.py:635
-#: views/education_groups/group_element_year/update.py:152
+#: views/education_groups/group_element_year/update.py:151
 msgid "Please Select or Move an item before Attach it"
 msgstr "Veuillez Sélectionner ou Déplacer un élément avant d'Attacher"
 
@@ -3478,6 +3478,12 @@ msgstr "Terminaison"
 msgid "Testing"
 msgstr "Essai"
 
+#: forms/learning_achievement.py:36
+#, fuzzy
+#| msgid "Free Text"
+msgid "Text"
+msgstr "Zone libre"
+
 #: templates/learning_unit/blocks/form/form_external.html:64
 #: templates/learning_unit/blocks/panel/proposal.html:28
 #: templates/learning_unit/blocks/proposal_user.html:16
@@ -3485,8 +3491,8 @@ msgstr "Essai"
 msgid "The"
 msgstr "Le"
 
-#: views/education_groups/group_element_year/update.py:122
-#: views/education_groups/group_element_year/update.py:129
+#: views/education_groups/group_element_year/update.py:121
+#: views/education_groups/group_element_year/update.py:128
 #, python-format
 msgid "The %(acronym)s has been moved"
 msgstr "%(acronym)s a été déplacé"
@@ -3523,7 +3529,7 @@ msgstr ""
 "La date de fermeture de '%s' du calendrier académique ne peut pas être "
 "inférieure au %s (date de fin de '%s' du programme '%s')"
 
-#: views/education_groups/group_element_year/update.py:226
+#: views/education_groups/group_element_year/update.py:225
 #, python-format
 msgid "The comments of %(acronym)s has been updated"
 msgstr "Les commentaires de %(acronym)s ont été mis à jour"

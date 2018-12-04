@@ -96,10 +96,10 @@ class TestPerms(TestCase):
 
     def test_is_person_central_manager(self):
         person = PersonFactory()
-        self.assertFalse(person.is_central_manager())
+        self.assertFalse(person.is_central_manager)
 
         central_manager = CentralManagerFactory()
-        self.assertTrue(central_manager.is_central_manager())
+        self.assertTrue(central_manager.is_central_manager)
 
     def test_is_person_sic(self):
         person = PersonFactory()
