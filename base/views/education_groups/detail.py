@@ -261,7 +261,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
                     self.object, label, user_language, 'specific')
 
             elif selector == 'common':
-                translations = self._get_common_selector(common_education_group_year, label,user_language)
+                translations = self._get_common_selector(common_education_group_year, label, user_language)
 
             if translations:
                 records.append(translations)
@@ -270,12 +270,12 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
     def _get_common_selector(self, common_education_group_year, label, user_language):
         translations = None
-        #common_education_group_year is None if education_group_year is common
-        #if not common, translation must be non-editable in non common offer
+        # common_education_group_year is None if education_group_year is common
+        # if not common, translation must be non-editable in non common offer
         if common_education_group_year is not None:
             translations = self.get_content_translations_for_label(
                 common_education_group_year, label, user_language, 'common')
-        #if is common and a label in COMMON_PARAGRAPH, must be editable in common offer
+        # if is common and a label in COMMON_PARAGRAPH, must be editable in common offer
         elif label in COMMON_PARAGRAPH:
             translations = self.get_content_translations_for_label(
                 self.object, label, user_language, 'specific')
