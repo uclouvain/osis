@@ -44,6 +44,7 @@ from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
 from base.models.enums.education_group_types import MiniTrainingType
 from base.models.exceptions import MaximumOneParentAllowedException
 from base.models.prerequisite import Prerequisite
+from base.models.utils.utils import get_object_or_none
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin
 
 
@@ -526,7 +527,6 @@ class EducationGroupYear(SerializableModel):
             self.management_entity, self.academic_year
         )
 
-    @property
     def parent_by_training(self):
         parents = [parent for parent in self.parents_by_group_element_year
                    if parent.is_training()]
@@ -658,13 +658,6 @@ class EducationGroupYear(SerializableModel):
             return self.education_group.educationgroupyear_set.get(academic_year__year=(self.academic_year.year - 1))
         except EducationGroupYear.DoesNotExist:
             return None
-
-
-def find_by_id(an_id):
-    try:
-        return EducationGroupYear.objects.get(pk=an_id)
-    except EducationGroupYear.DoesNotExist:
-        return None
 
 
 def search(**kwargs):
