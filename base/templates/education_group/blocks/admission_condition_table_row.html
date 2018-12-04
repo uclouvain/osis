@@ -36,33 +36,20 @@
 </tr>
 {% for record in records %}
 <tr id="{{ section_name }}_{{ record.id }}">
-    {% if language.tab_lang == 'fr' %}
+
         <td id="{{ section_name }}_{{ record.id }}_diploma">
-            {{ record.diploma|linebreaksbr }}
+            {{ record.diploma_text|linebreaksbr }}
         </td>
-        <td id="{{ section_name }}_{{ record.id }}_conditions">
-            {{record.conditions|linebreaksbr|safe }}
+        <td id="{{ section_name_text }}_{{ record.id }}_conditions">
+            {{record.conditions_text|linebreaksbr|safe }}
         </td>
         <td id="{{ section_name }}_{{ record.id }}_access" class="text-right">
             {{ record.get_access_display|linebreaksbr|safe }}
         </td>
         <td id="{{ section_name }}_{{ record.id }}_remarks">
-            {{ record.remarks|linebreaksbr|safe }}
+            {{ record.remarks_text|linebreaksbr|safe }}
         </td>
-    {% elif language.tab_lang == 'en' %}
-        <td id="{{ section_name }}_{{ record.id }}_diploma">
-            {{ record.diploma_en|linebreaksbr }}
-        </td>
-        <td id="{{ section_name }}_{{ record.id }}_conditions">
-            {{record.conditions_en|linebreaksbr|safe }}
-        </td>
-        <td id="{{ section_name }}_{{ record.id }}_access" class="text-right">
-            {{ record.get_access_en_display|linebreaksbr|safe }}
-        </td>
-        <td id="{{ section_name }}_{{ record.id }}_remarks">
-            {{ record.remarks_en|linebreaksbr|safe }}
-        </td>
-    {% endif %}
+
     {% if can_edit_information %}
     <td class="text-right">
         <a href="{% url 'education_group_year_admission_condition_remove_line' root.pk education_group_year.pk %}?id={{ record.id }}"

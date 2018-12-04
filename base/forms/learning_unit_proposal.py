@@ -56,7 +56,7 @@ class ProposalLearningUnitForm(forms.ModelForm):
             self.initial['entity'] = get_last_version(self.instance.entity)
 
         self.person = person
-        if self.person.is_central_manager():
+        if self.person.is_central_manager:
             self.enable_field('state')
         else:
             self.disable_field('state')
