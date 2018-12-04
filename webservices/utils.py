@@ -26,11 +26,17 @@
 
 
 def convert_sections_to_list_of_dict(sections):
-    return [{
-        'id': key,
-        'label': value['label'],
-        'content': value['content']
-    } for key, value in sections.items()]
+    list_of_dict = []
+    for key, value in sections.items():
+        dico = {
+            'id': key,
+            'label': value['label'],
+            'content': value['content']
+        }
+        if 'free_text' in value:
+            dico.update({'free_text': value['free_text']})
+        list_of_dict.append(dico)
+    return list_of_dict
 
 
 def convert_sections_list_of_dict_to_dict(sections):
