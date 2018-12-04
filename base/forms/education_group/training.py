@@ -215,6 +215,3 @@ class UniversityDomainsLookup(LookupChannel):
 
     def format_match(self, item):
         return "{}:{} {}".format(item.decree.name, item.code, item.name)
-
-
-

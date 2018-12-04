@@ -37,4 +37,3 @@ def education_group_type_text(education_group_type):
     if education_group_type:
         return _(dict(education_group_types.ALL_TYPES)[education_group_type.name])
     return ""
-
