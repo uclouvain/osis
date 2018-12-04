@@ -43,7 +43,7 @@ def get_scores_encoding_list(user, **kwargs):
     tutor_id = kwargs.get('tutor_id')
     enrollments_ids = kwargs.get('enrollments_ids')
     justification = kwargs.get('justification')
-    only_enrolled = _set_only_enrolled(justification, kwargs)
+    only_enrolled = _need_to_filter_students_enrolled_to_exam(justification, kwargs)
 
     if is_program_manager:
         professor = tutor.find_by_id(tutor_id) if tutor_id else None
@@ -311,7 +311,7 @@ def _normalize_string(string):
     return ''.join((c for c in unicodedata.normalize('NFD', string) if unicodedata.category(c) != 'Mn'))
 
 
-def _set_only_enrolled(justification, kwargs):
+def _need_to_filter_students_enrolled_to_exam(justification, kwargs):
     only_enrolled = kwargs.get('only_enrolled')
     if justification and justification == exam_enrollment_justification_type.SCORE_MISSING:
         only_enrolled = True

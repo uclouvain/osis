@@ -33,7 +33,6 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.student import StudentFactory
@@ -43,10 +42,11 @@ from base.tests.factories.session_examen import SessionExamFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
-
 from base.models.enums import number_session, academic_calendar_type, exam_enrollment_justification_type
 from base.tests.mixin.academic_year import AcademicYearMockMixin
 from base.models.enums import exam_enrollment_state
+from assessments.views.upload_xls_utils import _get_score_list_filtered_by_enrolled_state
+from base.models.exam_enrollment import ExamEnrollment
 
 OFFER_ACRONYM = "OSIS2MA"
 LEARNING_UNIT_ACRONYM = "LOSIS1211"
@@ -67,8 +67,10 @@ def generate_exam_enrollments(year, with_different_offer=False):
     academic_year = AcademicYearFactory(year=year)
 
     an_academic_calendar = AcademicCalendarFactory(academic_year=academic_year,
-                                                   start_date=(datetime.datetime.today() - datetime.timedelta(days=20)).date(),
-                                                   end_date=(datetime.datetime.today() + datetime.timedelta(days=20)).date(),
+                                                   start_date=(
+                                                   datetime.datetime.today() - datetime.timedelta(days=20)).date(),
+                                                   end_date=(
+                                                   datetime.datetime.today() + datetime.timedelta(days=20)).date(),
                                                    reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
     session_exam_calendar = SessionExamCalendarFactory(number_session=number_session.ONE,
                                                        academic_calendar=an_academic_calendar)
@@ -127,7 +129,8 @@ class MixinTestUploadScoresFile(AcademicYearMockMixin):
             student.person.save()
 
         self.client = Client()
-        self.client.force_login(user=self.attribution.tutor.person.user)
+        self.a_user = self.attribution.tutor.person.user
+        self.client.force_login(user=self.a_user)
         self.url = reverse('upload_encoding', kwargs={'learning_unit_year_id': self.learning_unit_year.id})
 
         # Mock academic_year in order to be decouple from system time
@@ -298,3 +301,16 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
                 self.exam_enrollments,
                 [("score_draft", 16), ("justification_draft", exam_enrollment_justification_type.ABSENCE_UNJUSTIFIED)]
             )
+
+    def test_get_score_list_filtered_by_enrolled_state(self):
+        enrolled_exam_enrollment = ExamEnrollment.objects.all()
+        nb_enrolled_student = len(enrolled_exam_enrollment)
+        self._unsubscribe_one_student(enrolled_exam_enrollment[0])
+        exam_enrollments = _get_score_list_filtered_by_enrolled_state(
+            self.learning_unit_year.id,
+            self.a_user)
+        self.assertEqual(len(exam_enrollments.enrollments), nb_enrolled_student - 1)
+
+    def _unsubscribe_one_student(self, exam):
+        exam.enrollment_state = exam_enrollment_state.NOT_ENROLLED
+        exam.save()
