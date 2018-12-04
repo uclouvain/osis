@@ -1,4 +1,4 @@
-{% load staticfiles bootstrap3 %}
+{% load staticfiles bootstrap3 education_group_type%}
 {% load i18n %}
 
 {% comment "License" %}
@@ -37,10 +37,14 @@
                 <div class="row">
                     <div class="col-md-6">
                         <label>{% trans 'Category' %}</label><br>
-                        <input value="{% trans form_education_group_year.category %}"
+                        <input value="{% trans form_education_group_year.category_text %}"
                                disabled class="form-control" >
                     </div>
-                    {% bootstrap_field form_education_group_year.education_group_type form_group_class="col-md-6" %}
+                    <div class="col-md-6">
+                        <label>{% trans 'Type of training' %}</label><br>
+                        <input value="{{ education_group_year.education_group_type|education_group_type_text }}"
+                               disabled class="form-control" >
+                    </div>
                 </div>
                 <br>
                 <div class="row">

@@ -44,6 +44,7 @@ from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY
     MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT, GROUP_PGRM_ENCODING_PERIOD, \
     GROUP_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
+from base.models.enums.education_group_types import ALL_TYPES
 
 
 class MainCampusChoiceField(forms.ModelChoiceField):
@@ -60,7 +61,7 @@ class MainEntitiesVersionChoiceField(EntitiesVersionChoiceField):
 
 class EducationGroupTypeModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-        return _(obj.name)
+        return _(dict(ALL_TYPES)[obj.name])
 
 
 class ValidationRuleEducationGroupTypeMixin(ValidationRuleMixin):
@@ -319,7 +320,8 @@ class EducationGroupTypeForm(forms.Form):
             parents=parent
         )
 
-        self.fields["name"].label = _("Which type of %(category)s do you want to create ?") % {"category": _(category)}
+        self.fields["name"].label = _("Which type of %(category)s do you want to create ?") % \
+                                    {"category": _(dict(education_group_categories.CATEGORIES)[category])}
 
 
 class SelectLanguage(forms.Form):
