@@ -42,7 +42,7 @@ from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import find_max_credits_of_related_partims, check_if_acronym_regex_is_valid, \
     find_learning_unit_years_by_academic_year_tutor_attributions
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
@@ -659,29 +659,32 @@ class LearningUnitYearWarningsTest(TestCase):
 class TestHasOrIsPrerequisite(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
         cls.grp_ele_leaf = GroupElementYearFactory(
             parent__education_group_type=GroupEducationGroupTypeFactory(),
+            parent__academic_year=cls.academic_year,
             child_branch=None,
-            child_leaf=LearningUnitYearFactory()
+            child_leaf=LearningUnitYearFactory(academic_year=cls.academic_year)
         )
         cls.second_grp_ele_leaf = GroupElementYearFactory(
             parent=cls.grp_ele_leaf.parent,
             child_branch=None,
-            child_leaf=LearningUnitYearFactory()
+            child_leaf=LearningUnitYearFactory(academic_year=cls.academic_year)
 
         )
         cls.grp_ele_root = GroupElementYearFactory(
-            child_branch=cls.grp_ele_leaf.parent
+            child_branch=cls.grp_ele_leaf.parent,
+            parent__academic_year=cls.academic_year,
         )
 
         cls.other_grp_ele_root = GroupElementYearFactory(
-            child_branch=cls.grp_ele_leaf.parent
+            parent__academic_year=cls.academic_year,
+            child_branch__education_group_type=GroupEducationGroupTypeFactory(),
+            child_branch__academic_year=cls.academic_year
         )
-        cls.other_grp_ele_leaf = GroupElementYearFactory(
-            parent=cls.other_grp_ele_root.parent,
-            child_branch=None,
-            child_leaf=LearningUnitYearFactory()
-
+        cls.other_grp_ele_intermediary = GroupElementYearFactory(
+            parent=cls.other_grp_ele_root.child_branch,
+            child_branch=cls.grp_ele_root.child_branch
         )
 
     def test_should_return_false_when_luy_has_no_prerequisite_nor_is_prerequisite(self):
@@ -746,7 +749,7 @@ class TestHasOrIsPrerequisite(TestCase):
     def test_should_return_true_if_luy_is_prerequisite_in_other_root_but_same_group(self):
         PrerequisiteItemFactory(
             prerequisite__education_group_year=self.other_grp_ele_root.parent,
-            prerequisite__learning_unit_year=self.other_grp_ele_leaf.child_leaf,
+            prerequisite__learning_unit_year=self.second_grp_ele_leaf.child_leaf,
             learning_unit=self.grp_ele_leaf.child_leaf.learning_unit,
             group_number=1,
             position=1,
