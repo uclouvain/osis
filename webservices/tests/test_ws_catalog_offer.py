@@ -82,8 +82,9 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
     def test_first_based_on_the_original_message(self):
         education_group_year = EducationGroupYearFactory(acronym='ACTU2M')
 
-        common_education_group_year = EducationGroupYearFactory(
-            acronym='common',
+        common_education_group_year = EducationGroupYearCommonMasterFactory(
+            acronym='common-2m',
+            education_group_type=education_group_year.education_group_type,
             academic_year=education_group_year.academic_year
         )
 
@@ -134,6 +135,19 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                                     entity=text_label.entity)
 
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='prerequis')
+        TranslatedTextLabelFactory(text_label=text_label,
+                                   language=iso_language)
+        TranslatedTextRandomFactory(text_label=text_label,
+                                    language=iso_language,
+                                    reference=education_group_year.id,
+                                    entity=text_label.entity)
+
+        TranslatedTextRandomFactory(text_label=text_label,
+                                    language=iso_language,
+                                    reference=common_education_group_year.id,
+                                    entity=text_label.entity)
+
+        text_label = TextLabelFactory(entity=OFFER_YEAR, label='evaluation')
         TranslatedTextLabelFactory(text_label=text_label,
                                    language=iso_language)
         TranslatedTextRandomFactory(text_label=text_label,
@@ -847,6 +861,24 @@ class GetSkillsAndAchievementsTestCase(TestCase):
 class GetEvaluationTestCase(TestCase):
     def test_get_evaluation(self):
         education_group_year = EducationGroupYearFactory()
+        common_education_group_year = EducationGroupYearCommonMasterFactory(
+            acronym='common-2m',
+            education_group_type=education_group_year.education_group_type,
+            academic_year=education_group_year.academic_year
+        )
+        text_label = TextLabelFactory(entity=OFFER_YEAR, label='evaluation')
+        TranslatedTextLabelFactory(text_label=text_label, language='fr-be', label='evaluation')
+
+        TranslatedTextRandomFactory(text_label=text_label,
+                                    language='fr-be',
+                                    reference=education_group_year.id,
+                                    entity=text_label.entity,
+                                    text='<tag>{section}</tag>'.format(section='evaluation'))
+        TranslatedTextRandomFactory(text_label=text_label,
+                                    language='fr-be',
+                                    reference=common_education_group_year.id,
+                                    entity=text_label.entity,
+                                    text='<tag>{section}-commun</tag>'.format(section='evaluation'))
         context = get_evaluation(education_group_year,  settings.LANGUAGE_CODE_FR)
         self.assertEqual(context['id'], business.EVALUATION_KEY)
         self.assertEqual(context['label'], business.EVALUATION_KEY)

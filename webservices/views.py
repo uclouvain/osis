@@ -400,6 +400,7 @@ def get_evaluation(education_group_year, language_code):
 
     label, text = get_evaluation_text(education_group_year, language_code)
     common_text = get_common_evaluation_text(education_group_year, language_code)
+
     return {
         'id': business.EVALUATION_KEY,
         'label': label,
