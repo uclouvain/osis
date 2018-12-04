@@ -124,8 +124,6 @@ class EducationGroupYear(SerializableModel):
 
     education_group_type = models.ForeignKey(
         'EducationGroupType',
-        blank=False,
-        null=True,
         verbose_name=_("Type of training")
     )
 
