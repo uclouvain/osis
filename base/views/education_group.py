@@ -224,7 +224,7 @@ def education_group_year_admission_condition_update_line_post(request, root_id, 
 def save_form_to_admission_condition_line(education_group_year_id, creation_mode, form):
     admission_condition_line_id = form.cleaned_data['admission_condition_line']
     language = form.cleaned_data['language']
-    lang = '' if language == 'fr' else '_en'
+    lang = '' if language == 'fr-be' else '_en'
     if not creation_mode:
         admission_condition_line = get_object_or_404(AdmissionConditionLine,
                                                      pk=admission_condition_line_id)
@@ -247,7 +247,7 @@ def education_group_year_admission_condition_update_line_get(request):
     section = request.GET['section']
     language = request.GET['language']
 
-    lang = '' if language == 'fr' else '_en'
+    lang = '' if language == 'fr-be' else '_en'
 
     initial_values = {
         'language': language,
