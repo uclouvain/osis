@@ -47,7 +47,6 @@ from base.business.education_groups import perms
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 from base.business.education_groups.perms import is_eligible_to_edit_general_information
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
-from base.models.education_group import EducationGroup
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
@@ -73,13 +72,6 @@ SECTIONS_WITH_TEXT = (
     'masters'
 )
 
-CODE_SCS = 'code_scs'
-TITLE = 'title'
-CREDITS_MIN = "credits_min"
-CREDITS_MAX = "credits_max"
-BLOCK = "block"
-QUADRIMESTER_DEROGATION = "quadrimester_derogation"
-LINK_TYPE = "link_type"
 NUMBER_SESSIONS = 3
 
 COMMON_PARAGRAPH = (
@@ -117,10 +109,11 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context['person'] = self.get_person()
 
         self.root = self.get_root()
-        # TODO same param
+        # FIXME same param
         context['root'] = self.root
         context['root_id'] = self.root.pk
         context['parent'] = self.root
+        context['parent_training'] = self.object.parent_by_training()
 
         if self.with_tree:
             context['tree'] = json.dumps(NodeBranchJsTree(self.root).to_json())
