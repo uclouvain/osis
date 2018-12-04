@@ -466,10 +466,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        tab_lang = cache.get(get_tab_lang_keys(self.request.user))
-
-        if not tab_lang:
-            tab_lang = 'fr'
+        tab_lang = cache.get(get_tab_lang_keys(self.request.user)) or settings.LANGUAGE_CODE_FR
 
         acronym = self.object.acronym.lower()
         is_common = acronym.startswith('common-')
@@ -488,8 +485,11 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
 
         record = {}
         for section in SECTIONS_WITH_TEXT:
-            record[section] = AdmissionConditionLine.objects.filter(admission_condition=admission_condition,
-                                                                    section=section)
+            record[section] = AdmissionConditionLine.objects.filter(
+                admission_condition=admission_condition,
+                section=section
+            ).annotate_text(tab_lang)
+
         context.update({
             'admission_condition_form': admission_condition_form,
             'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object']),
@@ -504,7 +504,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
             'admission_condition': admission_condition,
             'record': record,
             'language': {
-                'list': ["fr", "en"],
+                'list': ["fr-be", "en"],
                 'tab_lang': tab_lang
             }
         })
