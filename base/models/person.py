@@ -105,9 +105,11 @@ class Person(SerializableModel):
         else:
             return "-"
 
+    @cached_property
     def is_central_manager(self):
         return self.user.groups.filter(name=CENTRAL_MANAGER_GROUP).exists()
 
+    @cached_property
     def is_faculty_manager(self):
         return self.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists()
 
