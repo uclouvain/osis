@@ -29,9 +29,13 @@ from django.test import TestCase
 
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_detailed_achievement import EducationGroupDetailedAchievementFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonMasterFactory
 from cms.enums import entity_name
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.enums.entity_name import OFFER_YEAR
+from cms.models.translated_text import TranslatedText
+from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
+from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from webservices import business
 
 
@@ -130,21 +134,40 @@ class GetIntroExtraContentAchievementsTestCase(TestCase):
         
 class GetEvaluationTestCase(TestCase):
     def setUp(self):
-        self.education_group_year = EducationGroupYearFactory()
-        self.cms_label_name = 'evaluation'
-        self.evaluation = TranslatedTextFactory(
-            entity=entity_name.OFFER_YEAR,
-            reference=self.education_group_year.pk,
-            language=settings.LANGUAGE_CODE_FR,
-            text_label__label=self.cms_label_name,
-            text_label__entity=entity_name.OFFER_YEAR
+        self.education_group_year = EducationGroupYearFactory(acronym='ACTU2M')
+
+        common_education_group_year = EducationGroupYearCommonMasterFactory(
+            acronym='common-2m',
+            education_group_type=self.education_group_year.education_group_type,
+            academic_year=self.education_group_year.academic_year
         )
+        self.cms_label_name = 'evaluation'
+
+        text_label = TextLabelFactory(entity=OFFER_YEAR, label='evaluation')
+        TranslatedTextLabelFactory(text_label=text_label,
+                                   language='fr-be')
+        self.evaluation = TranslatedTextRandomFactory(text_label=text_label,
+                                                      language='fr-be',
+                                                      reference=self.education_group_year.id,
+                                                      entity=text_label.entity)
+
+        self.common = TranslatedTextRandomFactory(text_label=text_label,
+                                    language='fr-be',
+                                    reference=common_education_group_year.id,
+                                    entity=text_label.entity)
 
     def test_get_evaluation_french_version(self):
         label, text = business.get_evaluation_text(self.education_group_year, settings.LANGUAGE_CODE_FR)
         self.assertEqual(text, self.evaluation.text)
 
     def test_get_evaluation_no_english_version(self):
-        label, text = business.get_evaluation_text(self.education_group_year, settings.LANGUAGE_CODE_EN)
-        self.assertEqual(text, '')
-        self.assertEqual(label, self.cms_label_name)
+        with self.assertRaises(TranslatedText.DoesNotExist):
+            business.get_evaluation_text(self.education_group_year, settings.LANGUAGE_CODE_EN)
+
+    def test_get_common_evaluation_french_version(self):
+        text = business.get_common_evaluation_text(self.education_group_year, settings.LANGUAGE_CODE_FR)
+        self.assertEqual(text, self.common.text)
+
+    def test_get__common_evaluation_no_english_version(self):
+        with self.assertRaises(TranslatedText.DoesNotExist):
+            business.get_common_evaluation_text(self.education_group_year, settings.LANGUAGE_CODE_EN)
