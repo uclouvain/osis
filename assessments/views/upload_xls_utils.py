@@ -163,10 +163,7 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
                              '%s (%s).' % (_("No data for this academic year"), data_xls['academic_year']))
         return False
 
-    score_list = score_encoding_list.get_scores_encoding_list(
-        user=request.user,
-        learning_unit_year_id=learning_unit_year_id
-    )
+    score_list = _get_score_list_filtered_by_enrolled_state(learning_unit_year_id, request.user)
 
     offer_acronyms_managed_by_user = {offer_year.acronym for offer_year
                                       in score_encoding_list.find_related_offer_years(score_list)}
@@ -411,6 +408,15 @@ def _extract_level_error(error):
     if isinstance(error, UploadValueError):
         return error.message
     return messages.ERROR
+
+
+def _get_score_list_filtered_by_enrolled_state(learning_unit_year_id, a_user):
+    score_list = score_encoding_list.get_scores_encoding_list(
+        user=a_user,
+        learning_unit_year_id=learning_unit_year_id,
+        only_enrolled=True
+    )
+    return score_list
 
 
 class UploadValueError(ValueError):

@@ -363,6 +363,10 @@ class LearningUnitYearDeletion(TestCase):
         self.assertTrue(
             base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(learning_unit_year, person))
 
+        # Invalidate cache_property
+        del person.is_central_manager
+        del person.is_faculty_manager
+
         # With both role, greatest is taken
         add_to_group(person.user, CENTRAL_MANAGER_GROUP)
         learning_unit_year.subtype = learning_unit_year_subtypes.FULL

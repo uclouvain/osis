@@ -102,11 +102,17 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
 
     def test_button_with_permission_learning_unit_is_prerequisite(self):
         luy = LearningUnitYearFactory()
-        PrerequisiteItemFactory(learning_unit=luy.learning_unit)
+        group_element_year_root = GroupElementYearFactory(
+            child_branch=self.education_group_year,
+        )
         group_element_year = GroupElementYearFactory(
             parent=self.education_group_year,
             child_branch=None,
             child_leaf=luy,
+        )
+        PrerequisiteItemFactory(
+            prerequisite__education_group_year=group_element_year_root.parent,
+            learning_unit=luy.learning_unit
         )
         url_detach = "{}?group_element_year_id={}".format(
             reverse('education_groups_management'),

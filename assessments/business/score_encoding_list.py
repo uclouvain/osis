@@ -42,6 +42,8 @@ def get_scores_encoding_list(user, **kwargs):
     offer_year_id = kwargs.get('offer_year_id')
     tutor_id = kwargs.get('tutor_id')
     enrollments_ids = kwargs.get('enrollments_ids')
+    justification = kwargs.get('justification')
+    only_enrolled = _need_to_filter_students_enrolled_to_exam(justification, kwargs)
 
     if is_program_manager:
         professor = tutor.find_by_id(tutor_id) if tutor_id else None
@@ -57,7 +59,8 @@ def get_scores_encoding_list(user, **kwargs):
             registration_id=kwargs.get('registration_id'),
             student_last_name=kwargs.get('student_last_name'),
             student_first_name=kwargs.get('student_first_name'),
-            justification=kwargs.get('justification')
+            justification=justification,
+            only_enrolled=only_enrolled,
         )
     else:
         professor = tutor.find_by_user(user)
@@ -65,7 +68,9 @@ def get_scores_encoding_list(user, **kwargs):
             academic_year=current_academic_year,
             session_exam_number=current_number_session,
             learning_unit_year_id=learning_unit_year_id,
-            tutor=professor)
+            tutor=professor,
+            only_enrolled=only_enrolled
+        )
 
     # Want a subset of exam enrollment list
     if enrollments_ids:
@@ -304,3 +309,10 @@ def _normalize_string(string):
     """
     string = string.replace(" ", "")
     return ''.join((c for c in unicodedata.normalize('NFD', string) if unicodedata.category(c) != 'Mn'))
+
+
+def _need_to_filter_students_enrolled_to_exam(justification, kwargs):
+    only_enrolled = kwargs.get('only_enrolled')
+    if justification and justification == exam_enrollment_justification_type.SCORE_MISSING:
+        only_enrolled = True
+    return only_enrolled

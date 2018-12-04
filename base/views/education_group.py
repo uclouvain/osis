@@ -48,6 +48,8 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
 from base.models.person import get_user_interface_language
+from base.utils.cache import cache
+from base.utils.cache_keys import get_tab_lang_keys, CACHE_TIMEOUT
 from cms.enums import entity_name
 from cms.models import translated_text_label
 from cms.models.text_label import TextLabel
@@ -222,7 +224,7 @@ def education_group_year_admission_condition_update_line_post(request, root_id, 
 def save_form_to_admission_condition_line(education_group_year_id, creation_mode, form):
     admission_condition_line_id = form.cleaned_data['admission_condition_line']
     language = form.cleaned_data['language']
-    lang = '' if language == 'fr' else '_en'
+    lang = '' if language == 'fr-be' else '_en'
     if not creation_mode:
         admission_condition_line = get_object_or_404(AdmissionConditionLine,
                                                      pk=admission_condition_line_id)
@@ -245,7 +247,7 @@ def education_group_year_admission_condition_update_line_get(request):
     section = request.GET['section']
     language = request.GET['language']
 
-    lang = '' if language == 'fr' else '_en'
+    lang = '' if language == 'fr-be' else '_en'
 
     initial_values = {
         'language': language,
@@ -349,6 +351,7 @@ def education_group_year_admission_condition_line_order(request, root_id, educat
 @login_required
 @permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
 def education_group_year_admission_condition_tab_lang_edit(request, root_id, education_group_year_id, language):
-    request.session['tab_lang'] = language
+    cache.set(get_tab_lang_keys(request.user), language, timeout=CACHE_TIMEOUT)
+
     return redirect(reverse('education_group_year_admission_condition_edit',
                             kwargs={'root_id': root_id, 'education_group_year_id': education_group_year_id}))
