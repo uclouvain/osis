@@ -219,4 +219,4 @@ def _is_central_or_academic_calendar_opened(education_group, person, raise_excep
 
 def _is_common_educationgroup_and_can_edit(education_group, person):
     return education_group.is_common and \
-           person.is_sic()
+           person.is_sic
