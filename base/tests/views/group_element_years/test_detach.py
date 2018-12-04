@@ -110,6 +110,9 @@ class TestDetachLearningUnitPrerequisite(TestCase):
     def setUpTestData(cls):
         cls.education_group_year = EducationGroupYearFactory()
         cls.luy = LearningUnitYearFactory()
+        cls.group_element_year_root = GroupElementYearFactory(
+            child_branch=cls.education_group_year
+        )
         cls.group_element_year = GroupElementYearFactory(
             parent=cls.education_group_year,
             child_branch=None,
@@ -133,7 +136,10 @@ class TestDetachLearningUnitPrerequisite(TestCase):
     def test_detach_case_learning_unit_being_prerequisite(self, mock_permission, mock_delete):
         mock_permission.return_value = True
 
-        PrerequisiteItemFactory(learning_unit=self.luy.learning_unit)
+        PrerequisiteItemFactory(
+            prerequisite__education_group_year=self.group_element_year_root.parent,
+            learning_unit=self.luy.learning_unit
+        )
 
         http_referer = reverse('education_group_read', args=[
             self.education_group_year.id,
@@ -149,8 +155,10 @@ class TestDetachLearningUnitPrerequisite(TestCase):
     def test_detach_case_learning_unit_having_prerequisite(self, mock_permission, mock_delete):
         mock_permission.return_value = True
 
-        prerequisite = PrerequisiteFactory(learning_unit_year=self.luy, education_group_year=self.education_group_year)
-        PrerequisiteItemFactory(prerequisite=prerequisite)
+        PrerequisiteItemFactory(
+            prerequisite__learning_unit_year=self.luy,
+            prerequisite__education_group_year=self.group_element_year_root.parent
+        )
 
         http_referer = reverse('education_group_read', args=[
             self.education_group_year.id,

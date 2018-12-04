@@ -46,14 +46,6 @@ class TestPrerequisiteItem(TestCase):
             learning_unit=self.learning_unit_is_prerequisite
         )
 
-    def test_has_or_is_prerequisite(self):
-        self.assertTrue(
-            self.learning_unit_year_with_prerequisite.has_or_is_prerequisite(self.prerequisite.education_group_year)
-        )
-        self.assertFalse(
-            self.learning_unit_year_without_prerequisite.has_or_is_prerequisite(self.prerequisite.education_group_year)
-        )
-
     def test_find_by_prerequisite(self):
         self.assertEqual(
             list(self.prerequisite.prerequisiteitem_set.all()),

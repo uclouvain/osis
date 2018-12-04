@@ -8,7 +8,7 @@ msgid ""
 "                    "
 msgstr ""
 
-#: views/upload_xls_utils.py:378
+#: views/upload_xls_utils.py:374
 msgid "Absence justified cannot be remplaced by absence unjustified"
 msgstr ""
 
@@ -172,7 +172,7 @@ msgstr ""
 #: templates/online_encoding_form.html:143
 #: templates/online_encoding_form.html:145
 #: templates/scores_encoding_by_specific_criteria.html:121
-#: views/upload_xls_utils.py:324
+#: views/upload_xls_utils.py:320
 msgid "Deadline reached"
 msgstr ""
 
@@ -310,7 +310,7 @@ msgstr ""
 msgid "Institution"
 msgstr ""
 
-#: tests/views/test_upload_xls_utils.py:195 views/upload_xls_utils.py:371
+#: tests/views/test_upload_xls_utils.py:198 views/upload_xls_utils.py:367
 msgid "Invalid justification value"
 msgstr ""
 
@@ -365,7 +365,7 @@ msgstr ""
 msgid "Learning unit title"
 msgstr ""
 
-#: views/upload_xls_utils.py:386
+#: views/upload_xls_utils.py:382
 msgid "Line"
 msgstr ""
 
@@ -426,11 +426,11 @@ msgstr ""
 msgid "No result!"
 msgstr ""
 
-#: tests/views/test_upload_xls_utils.py:186
+#: tests/views/test_upload_xls_utils.py:189
 msgid "No score injected"
 msgstr ""
 
-#: views/upload_xls_utils.py:207
+#: views/upload_xls_utils.py:203
 msgid "No scores injected"
 msgstr ""
 
@@ -442,10 +442,6 @@ msgstr ""
 #: templates/online_double_encoding_validation.html:67
 #: templates/online_encoding.html:67 templates/online_encoding_form.html:66
 msgid "None"
-msgstr ""
-
-#: business/score_encoding_export.py:185 templates/blocks/legend.html:35
-msgid "Not enrolled"
 msgstr ""
 
 #: business/score_encoding_sheet.py:170
@@ -582,7 +578,7 @@ msgstr ""
 msgid "Registration ID"
 msgstr ""
 
-#: tests/views/test_upload_xls_utils.py:265 views/upload_xls_utils.py:299
+#: tests/views/test_upload_xls_utils.py:268 views/upload_xls_utils.py:295
 msgid "Registration ID does not match email"
 msgstr ""
 
@@ -612,10 +608,10 @@ msgid ""
 "address for the papersheet."
 msgstr ""
 
-#: tests/views/test_upload_xls_utils.py:195
-#: tests/views/test_upload_xls_utils.py:205
-#: tests/views/test_upload_xls_utils.py:248
-#: tests/views/test_upload_xls_utils.py:266
+#: tests/views/test_upload_xls_utils.py:198
+#: tests/views/test_upload_xls_utils.py:208
+#: tests/views/test_upload_xls_utils.py:251
+#: tests/views/test_upload_xls_utils.py:269
 msgid "Row"
 msgstr ""
 
@@ -642,7 +638,7 @@ msgstr ""
 msgid "Score"
 msgstr ""
 
-#: views/upload_xls_utils.py:327
+#: views/upload_xls_utils.py:323
 msgid "Score already submitted"
 msgstr ""
 
@@ -651,11 +647,11 @@ msgstr ""
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr ""
 
-#: tests/views/test_upload_xls_utils.py:217
-#: tests/views/test_upload_xls_utils.py:232
-#: tests/views/test_upload_xls_utils.py:250
-#: tests/views/test_upload_xls_utils.py:277
-#: tests/views/test_upload_xls_utils.py:294 views/upload_xls_utils.py:202
+#: tests/views/test_upload_xls_utils.py:220
+#: tests/views/test_upload_xls_utils.py:235
+#: tests/views/test_upload_xls_utils.py:253
+#: tests/views/test_upload_xls_utils.py:280
+#: tests/views/test_upload_xls_utils.py:297 views/upload_xls_utils.py:198
 msgid "Score saved"
 msgstr ""
 
@@ -684,8 +680,8 @@ msgstr ""
 msgid "Scores injection"
 msgstr ""
 
-#: tests/views/test_upload_xls_utils.py:205
-#: tests/views/test_upload_xls_utils.py:248 views/upload_xls_utils.py:407
+#: tests/views/test_upload_xls_utils.py:208
+#: tests/views/test_upload_xls_utils.py:251 views/upload_xls_utils.py:403
 msgid "Scores must be between 0 and 20"
 msgstr ""
 
@@ -751,7 +747,7 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: views/upload_xls_utils.py:292
+#: views/upload_xls_utils.py:288
 msgid "Student not registered for exam"
 msgstr ""
 
@@ -786,13 +782,13 @@ msgid ""
 "dated %(printing_date)s and are likely to evolve"
 msgstr ""
 
-#: views/upload_xls_utils.py:318
+#: views/upload_xls_utils.py:314
 #, python-format
 msgid ""
 "The enrollment to the activity %(xls_learning_unit_acronym)s doesn't exist"
 msgstr ""
 
-#: forms/score_file.py:38 tests/views/test_upload_xls_utils.py:177
+#: forms/score_file.py:38 tests/views/test_upload_xls_utils.py:180
 #: views/upload_xls_utils.py:144
 msgid "The file must be a valid 'XLSX' excel file"
 msgstr ""
@@ -818,7 +814,7 @@ msgstr ""
 msgid "The period of scores' encoding is not opened"
 msgstr ""
 
-#: views/upload_xls_utils.py:360
+#: views/upload_xls_utils.py:356
 msgid "The scores responsible must still submit the scores"
 msgstr ""
 
@@ -853,6 +849,10 @@ msgstr ""
 msgid "Unjustified absence"
 msgstr ""
 
+#: business/score_encoding_export.py:185 templates/blocks/legend.html:35
+msgid "Unsubscribed after the opening of the session"
+msgstr ""
+
 #: templates/admin/modal/add_manager.html:52
 msgid "Username"
 msgstr ""
@@ -876,29 +876,29 @@ msgstr ""
 msgid "Without attribution"
 msgstr ""
 
-#: views/upload_xls_utils.py:330
+#: views/upload_xls_utils.py:326
 msgid "You can't encode a 'score' and a 'justification' together"
 msgstr ""
 
-#: views/upload_xls_utils.py:276
+#: views/upload_xls_utils.py:272
 msgid ""
 "You don't have access rights for this learning unit or it doesn't exist in "
 "our database"
 msgstr ""
 
-#: views/upload_xls_utils.py:288
+#: views/upload_xls_utils.py:284
 msgid ""
 "You don't have access rights for this offer or it doesn't exist in our "
 "database"
 msgstr ""
 
-#: views/upload_xls_utils.py:282
+#: views/upload_xls_utils.py:278
 msgid ""
 "You encoded scores for more than 1 learning unit in your excel file (column "
 "'Learning unit').Please make one excel file by learning unit."
 msgstr ""
 
-#: forms/score_file.py:31 tests/views/test_upload_xls_utils.py:168
+#: forms/score_file.py:31 tests/views/test_upload_xls_utils.py:171
 msgid "You have to select a file to upload."
 msgstr ""
 
