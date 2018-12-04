@@ -342,8 +342,9 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
     def test_global(self):
         education_group_year = EducationGroupYearFactory(acronym='ACTU2M')
 
-        common_education_group_year = EducationGroupYearFactory(
-            acronym='common',
+        common_education_group_year = EducationGroupYearCommonMasterFactory(
+            acronym='common-2m',
+            education_group_type=education_group_year.education_group_type,
             academic_year=education_group_year.academic_year
         )
 
@@ -358,6 +359,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
             "infos_pratiques",
             "caap",
             "caap-commun",
+            "evaluation-commun",
             "contacts",
             "structure",
             "acces_professions",
@@ -390,7 +392,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                 common_sections_set.add(section)
             sections_set.add(section)
 
-        self.assertEqual(len(common_sections_set), 3)
+        self.assertEqual(len(common_sections_set), 4)
         self.assertEqual(len(intro_set), 4)
 
         for section in sections_set:
