@@ -160,17 +160,19 @@ class PersonTest(PersonTestCase):
 
     def test_is_central_manager(self):
         a_person = PersonFactory()
-        self.assertFalse(a_person.is_central_manager())
+        self.assertFalse(a_person.is_central_manager)
 
+        del a_person.is_central_manager
         a_person.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
-        self.assertTrue(a_person.is_central_manager())
+        self.assertTrue(a_person.is_central_manager)
 
     def test_is_faculty_manager(self):
         a_person = PersonFactory()
-        self.assertFalse(a_person.is_faculty_manager())
+        self.assertFalse(a_person.is_faculty_manager)
 
+        del a_person.is_faculty_manager
         a_person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
-        self.assertTrue(a_person.is_faculty_manager())
+        self.assertTrue(a_person.is_faculty_manager)
 
     def test_show_username_from_person_with_user(self):
         self.assertEqual(self.person_with_user.username(), "user_with_person")

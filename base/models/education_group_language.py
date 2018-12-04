@@ -44,7 +44,3 @@ class EducationGroupLanguage(models.Model):
 
     def __str__(self):
         return "{} - {}".format(self.education_group_year, self.language)
-
-
-def find_by_education_group_year(education_group_year):
-    return EducationGroupLanguage.objects.filter(education_group_year=education_group_year).order_by('order')

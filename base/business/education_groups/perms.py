@@ -120,7 +120,7 @@ def is_academic_calendar_opened(education_group, type_academic_calendar, raise_e
 
 def _is_eligible_education_group(person, education_group, raise_exception):
     return (check_link_to_management_entity(education_group, person, raise_exception) and
-            (person.is_central_manager() or
+            (person.is_central_manager or
              is_academic_calendar_opened(
                  education_group,
                  academic_calendar_type.EDUCATION_GROUP_EDITION,
@@ -132,7 +132,7 @@ def _is_eligible_education_group(person, education_group, raise_exception):
 
 def _is_eligible_to_add_education_group_with_category(person, category, raise_exception):
     # TRAINING/MINI_TRAINING can only be added by central managers | Faculty manager must make a proposition of creation
-    result = person.is_central_manager() or (person.is_faculty_manager() and category == GROUP)
+    result = person.is_central_manager or (person.is_faculty_manager and category == GROUP)
     msg = _("The user has not permission to create a %(category)s.") % {"category": _(category)}
     can_raise_exception(raise_exception, result, msg)
     return result
@@ -209,7 +209,7 @@ def _is_eligible_to_edit_general_information(person, education_group, raise_exce
 
 
 def _is_central_or_academic_calendar_opened(education_group, person, raise_exception):
-    return person.is_central_manager() or \
+    return person.is_central_manager or \
            is_academic_calendar_opened(
                 education_group,
                 academic_calendar_type.EDUCATION_GROUP_EDITION,
