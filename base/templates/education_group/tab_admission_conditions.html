@@ -87,23 +87,25 @@
                                                 {% endfor %}
                                             </ul>
                                         </div>
-                                        <table class="table table-bordered">
-                                            <thead>
-                                            <tr>
-                                                <th width="30%">{% trans 'Diploma' %}</th>
-                                                <th width="20%">{% trans 'Conditions' %}</th>
-                                                <th width="150px">{% trans 'Access' %}</th>
-                                                <th>{% trans 'Remarks' %}</th>
-                                                {% if can_edit_information %}<th width="10%">{% trans 'Actions' %}</th>{% endif %}
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="ucl_bachelors" header_text=_("UCL Bachelors") records=record.ucl_bachelors %}
-                                            {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="others_bachelors_french" header_text=_("Others Bachelors of the French speaking Community of Belgium") records=record.others_bachelors_french %}
-                                            {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="bachelors_dutch" header_text=_("Bachelors of the Dutch speaking Community of Belgium") records=record.bachelors_dutch %}
-                                            {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="foreign_bachelors" header_text=_("Foreign Bachelors") records=record.foreign_bachelors %}
-                                            </tbody>
-                                        </table>
+                                        {% language language.tab_lang %}
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                <tr>
+                                                    <th width="30%">{% trans 'Diploma' %}</th>
+                                                    <th width="20%">{% trans 'Conditions' %}</th>
+                                                    <th width="150px">{% trans 'Access' %}</th>
+                                                    <th>{% trans 'Remarks' %}</th>
+                                                    {% if can_edit_information %}<th width="10%">{% trans 'Actions' %}</th>{% endif %}
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="ucl_bachelors" header_text=_("UCL Bachelors") records=record.ucl_bachelors %}
+                                                {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="others_bachelors_french" header_text=_("Others Bachelors of the French speaking Community of Belgium") records=record.others_bachelors_french %}
+                                                {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="bachelors_dutch" header_text=_("Bachelors of the Dutch speaking Community of Belgium") records=record.bachelors_dutch %}
+                                                {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="foreign_bachelors" header_text=_("Foreign Bachelors") records=record.foreign_bachelors %}
+                                                </tbody>
+                                            </table>
+                                        {% endlanguage %}
                                         <hr/>
                                     </div>
                                 {% endif %}
@@ -128,21 +130,23 @@
                                                 {% endfor %}
                                             </ul>
                                         </div>
-                                        <table class="table table-bordered">
-                                            <thead>
-                                            <tr>
-                                                <th width="30%">{% trans 'Diploma' %}</th>
-                                                <th width="20%">{% trans 'Conditions' %}</th>
-                                                <th width="150px">{% trans 'Access' %}</th>
-                                                <th>{% trans 'Remarks' %}</th>
-                                                {% if can_edit_information %}<th width="10%">{% trans 'Actions' %}</th>{% endif %}
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="graduates" header_text=_("Graduates") records=record.graduates %}
-                                            {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="masters" header_text=_("Masters") records=record.masters %}
-                                            </tbody>
-                                        </table>
+                                        {% language language.tab_lang %}
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                <tr>
+                                                    <th width="30%">{% trans 'Diploma' %}</th>
+                                                    <th width="20%">{% trans 'Conditions' %}</th>
+                                                    <th width="150px">{% trans 'Access' %}</th>
+                                                    <th>{% trans 'Remarks' %}</th>
+                                                    {% if can_edit_information %}<th width="10%">{% trans 'Actions' %}</th>{% endif %}
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="graduates" header_text=_("Graduates") records=record.graduates %}
+                                                {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="masters" header_text=_("Masters") records=record.masters %}
+                                                </tbody>
+                                            </table>
+                                        {% endlanguage %}
                                     </div>
                                     {% include 'education_group/blocks/admission_condition_text.html' with section_name="holders_non_university_second_degree" text=_("Holders of a non-University 2nd cycle degree") field=admission_condition.text_holders_non_university_second_degree field_en=admission_condition.text_holders_non_university_second_degree_en %}
                                 {% endif %}
