@@ -58,6 +58,8 @@ from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType
 from base.models.person import Person
+from base.utils.cache import cache
+from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
 from cms import models as mdl_cms
 from cms.enums import entity_name
@@ -464,10 +466,10 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        tab_lang = 'fr'
+        tab_lang = cache.get(get_tab_lang_keys(self.request.user))
 
-        if self.request.session.get('tab_lang'):
-            tab_lang = self.request.session.get('tab_lang')
+        if not tab_lang:
+            tab_lang = 'fr'
 
         acronym = self.object.acronym.lower()
         is_common = acronym.startswith('common-')
