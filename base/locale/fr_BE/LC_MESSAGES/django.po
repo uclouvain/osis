@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-04 10:48+0100\n"
+"POT-Creation-Date: 2018-12-04 15:08+0100\n"
 "PO-Revision-Date: 2018-11-21 14:40+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 2.2\n"
 
-#: views/education_groups/group_element_year/update.py:241
+#: views/education_groups/group_element_year/update.py:245
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" a été détaché de \"%(parent)s\""
@@ -734,6 +734,15 @@ msgstr "Annuler"
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:105
 msgid "Cancel the proposal"
 msgstr "Annuler la proposition"
+
+#: views/education_groups/group_element_year/update.py:241
+#, python-format
+msgid ""
+"Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a "
+"prerequisite."
+msgstr ""
+"L'unité d'enseignement %(acronym)s dispose de prérequis ou est prerequis et "
+"ne peut pas être détacher."
 
 #: business/education_groups/shorten.py:60
 #: tests/business/education_groups/test_shorten.py:155
