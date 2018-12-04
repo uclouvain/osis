@@ -953,7 +953,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         info = {
             'section': section,
-            'language': 'fr',
+            'language': 'fr-be',
             'id': admission_condition_line.id,
         }
         request = RequestFactory().get('/?{}'.format(urllib.parse.urlencode(info)))

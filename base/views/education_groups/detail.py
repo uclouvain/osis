@@ -57,6 +57,8 @@ from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType
 from base.models.person import Person
+from base.utils.cache import cache
+from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
 from cms import models as mdl_cms
 from cms.enums import entity_name
@@ -457,10 +459,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        tab_lang = 'fr'
-
-        if self.request.session.get('tab_lang'):
-            tab_lang = self.request.session.get('tab_lang')
+        tab_lang = cache.get(get_tab_lang_keys(self.request.user)) or settings.LANGUAGE_CODE_FR
 
         acronym = self.object.acronym.lower()
         is_common = acronym.startswith('common-')
@@ -479,8 +478,11 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
 
         record = {}
         for section in SECTIONS_WITH_TEXT:
-            record[section] = AdmissionConditionLine.objects.filter(admission_condition=admission_condition,
-                                                                    section=section)
+            record[section] = AdmissionConditionLine.objects.filter(
+                admission_condition=admission_condition,
+                section=section
+            ).annotate_text(tab_lang)
+
         context.update({
             'admission_condition_form': admission_condition_form,
             'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object']),
@@ -495,7 +497,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
             'admission_condition': admission_condition,
             'record': record,
             'language': {
-                'list': ["fr", "en"],
+                'list': ["fr-be", "en"],
                 'tab_lang': tab_lang
             }
         })
