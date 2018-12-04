@@ -528,18 +528,21 @@ class EducationGroupYear(SerializableModel):
         )
 
     def parent_by_training(self):
-        parents = [parent for parent in self.parents_by_group_element_year
-                   if parent.is_training()]
-        if len(parents) > 1:
-            raise MaximumOneParentAllowedException('Only one training parent is allowed')
-        elif len(parents) == 1:
-            return parents[0]
+        """
+        Return the parent, only if the education group and its parent are a training.
 
-    @property
-    def parents_by_group_element_year(self):
-        group_elements_year = self.child_branch.filter(child_branch=self).select_related('parent')
-        return [group_element_year.parent for group_element_year in group_elements_year
-                if group_element_year.parent]
+        In our structure, it is forbidden to have 2 training parents for a training.
+        """
+
+        if self.is_training():
+            try:
+                return get_object_or_none(
+                    EducationGroupYear,
+                    groupelementyear__child_branch=self,
+                    education_group_type__category=education_group_categories.TRAINING
+                )
+            except EducationGroupYear.MultipleObjectsReturned:
+                raise MaximumOneParentAllowedException('Only one training parent is allowed')
 
     @cached_property
     def children_without_leaf(self):
