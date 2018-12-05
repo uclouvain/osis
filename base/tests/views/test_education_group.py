@@ -862,7 +862,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    @mock.patch('base.views.education_groups.detail.is_eligible_to_edit_general_information',
+    @mock.patch('base.views.education_groups.detail.is_eligible_to_edit_admission_condition',
                 side_effect=lambda p, o: True)
     def test_user_has_link_to_edit_conditions(self, mock_is_eligible):
         self.user.user_permissions.add(Permission.objects.get(codename='can_edit_educationgroup_pedagogy'))
