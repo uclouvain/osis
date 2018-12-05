@@ -203,7 +203,7 @@ def is_eligible_to_edit_general_information(person, education_group, raise_excep
 
 
 def is_eligible_to_edit_admission_condition(person, education_group, raise_exception=False):
-    return check_permission(person, 'base.can_edit_educationgroup_pedagogy', raise_exception) and \
+    return is_eligible_to_edit_general_information(person, education_group, raise_exception) or \
            check_permission(person, 'base.can_edit_common_education_group') and \
            _is_common_educationgroup_and_can_edit(education_group, person)
 
