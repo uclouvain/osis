@@ -56,10 +56,10 @@ class AutomaticPostponement(ABC):
         self.penultimate_academic_year = self.last_academic_year.past()
 
         self.queryset = self.get_queryset(queryset)
+
         self.already_duplicated = self.get_already_duplicated()
         self.to_not_duplicate = self.get_to_not_duplicated()
         self.to_duplicate = self.queryset.difference(self.already_duplicated, self.to_not_duplicate)
-
         self.result = []
         self.errors = []
 
