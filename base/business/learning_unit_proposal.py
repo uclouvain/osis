@@ -369,7 +369,7 @@ def _consolidate_modification_proposal_accepted(proposal):
 
 
 def compute_proposal_state(a_person):
-    return proposal_state.ProposalState.CENTRAL.name if a_person.is_central_manager() \
+    return proposal_state.ProposalState.CENTRAL.name if a_person.is_central_manager \
         else proposal_state.ProposalState.FACULTY.name
 
 
