@@ -57,6 +57,7 @@ class NodeBranchJsTree:
 
         is_prerequisite = PrerequisiteItem.objects.filter(
             learning_unit__learningunityear__id=OuterRef("child_leaf__id"),
+            prerequisite__education_group_year=self.root.id,
         )
 
         return self.education_group_year.groupelementyear_set.all() \
