@@ -29,7 +29,7 @@ from django.contrib.auth.models import Permission
 from django.test import TestCase
 
 from base.business.education_groups.perms import is_academic_calendar_opened, check_permission, \
-    check_authorized_type, is_eligible_to_edit_general_information
+    check_authorized_type, is_eligible_to_edit_general_information, is_eligible_to_edit_admission_condition
 from base.models.enums import academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
@@ -187,4 +187,4 @@ class TestPerms(TestCase):
         person.user.user_permissions.add(Permission.objects.get(codename="can_edit_educationgroup_pedagogy"))
         person.user.user_permissions.add(Permission.objects.get(codename="can_edit_common_education_group"))
         education_group = EducationGroupYearCommonBachelorFactory()
-        self.assertTrue(is_eligible_to_edit_general_information(person, education_group))
+        self.assertTrue(is_eligible_to_edit_admission_condition(person, education_group))
