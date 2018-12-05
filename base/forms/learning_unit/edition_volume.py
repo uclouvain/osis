@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from _decimal import Decimal
 from collections import OrderedDict
 
 from django import forms
@@ -339,6 +340,13 @@ class SimplifiedVolumeForm(forms.ModelForm):
                     self.add_error("hourly_volume_partial_q1", _("The volume can not be set to 0."))
                 if self.cleaned_data.get("hourly_volume_partial_q2") == 0:
                     self.add_error("hourly_volume_partial_q2", _("The volume can not be set to 0."))
+
+        volume_q1 = self.cleaned_data.get("hourly_volume_partial_q1") or 0
+        volume_q2 = self.cleaned_data.get("hourly_volume_partial_q2") or 0
+        volume_total = self.cleaned_data.get("hourly_volume_total_annual") or 0
+
+        if volume_q1+volume_q2 != volume_total:
+            self.add_error("hourly_volume_total_annual", _('Vol_tot is not equal to vol_q1 + vol_q2'))
 
         return cleaned_data
 

@@ -133,17 +133,6 @@ class LearningComponentYear(SerializableModel):
                 _('planned classes cannot be greather than 0 while volume is equal to 0')))
         return _warnings
 
-    def clean(self):
-        self.clean_vol_total_annual()
-
-    def clean_vol_total_annual(self):
-        if self.id:
-            vol_total_annual = self.hourly_volume_total_annual or 0
-            vol_q1 = self.hourly_volume_partial_q1 or 0
-            vol_q2 = self.hourly_volume_partial_q2 or 0
-            if vol_total_annual != vol_q1 + vol_q2:
-                raise ValidationError({'hourly_volume_total_annual': _('Vol_tot is not equal to vol_q1 + vol_q2')})
-
 
 def volume_total_verbose(learning_component_years):
     q1 = next((component['total'] for component in learning_component_years

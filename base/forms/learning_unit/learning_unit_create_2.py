@@ -355,7 +355,7 @@ class FullForm(LearningUnitBaseForm):
             learning_container_year=learning_unit_yr.learning_container_year
         )
 
-        self.simplified_volume_management_form.save_all_forms(
+        test = self.simplified_volume_management_form.save_all_forms(
             learning_unit_yr,
             entity_container_years,
             commit=commit
