@@ -139,7 +139,7 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_luy(
         'luys_postponed': len(luys_postponed),
         'luys_already_existing': len(luys_already_existing),
         'luys_ending_this_year': len(luys_ending_this_year),
-        'luys_with_errors': len(luys_with_errors)
+        'luys_with_errors': luys_with_errors
     }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
