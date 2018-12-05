@@ -1,0 +1,96 @@
+openapi: 3.0.0
+servers:
+ - url: https://{environment}.osis.uclouvain.be:18000/api/v1/education_group/
+   variables:
+     environment:
+       default: api.dev
+       enum:
+         - api  # Production server
+         - api.dev # Development server
+         - api.qa # Staging server
+         - api.test # Test server
+info:
+  version: '1'
+  title: Education Group Service
+  description: |-
+    A set of API endpoints that allow you to get, update, delete an education group.
+paths:
+  /trainings/:
+    get:
+      description: Return a list of all the training with optional filtering.
+      operationId: trainings_list
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          description: Number of results to return per page.
+          type: integer
+      - in: query
+        name: offset
+        schema:
+          description: The initial index from which to return the results.
+          type: integer
+      - in: query
+        name: acronym
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: partial_acronym
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: title
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: title_english
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: ordering
+        schema:
+          description: Which field to use when ordering the results.
+          type: string
+      - in: query
+        name: search
+        schema:
+          description: A search term.
+          type: string
+      tags:
+      - trainings
+  /trainings/{uuid}:
+    get:
+      description: Return the detail of the training
+      operationId: trainings_read
+      parameters:
+      - in: path
+        name: uuid
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: ordering
+        schema:
+          description: Which field to use when ordering the results.
+          type: string
+      - in: query
+        name: search
+        schema:
+          description: A search term.
+          type: string
+      tags:
+      - trainings
+components:
+  securitySchemes:
+    Token:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Enter your token in the format **Token &lt;token>**
+security:
+  - Token: []
