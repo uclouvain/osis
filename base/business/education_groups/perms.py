@@ -202,9 +202,14 @@ def is_eligible_to_edit_general_information(person, education_group, raise_excep
            _is_eligible_to_edit_general_information(person, education_group, raise_exception)
 
 
+def is_eligible_to_edit_admission_condition(person, education_group, raise_exception=False):
+    return is_eligible_to_edit_general_information(person, education_group, raise_exception) or \
+           check_permission(person, 'base.can_edit_common_education_group') and \
+           _is_common_educationgroup_and_can_edit(education_group, person)
+
+
 def _is_eligible_to_edit_general_information(person, education_group, raise_exception):
-    return _is_common_educationgroup_and_can_edit(education_group, person) or \
-           check_link_to_management_entity(education_group, person, raise_exception) and \
+    return check_link_to_management_entity(education_group, person, raise_exception) and \
            _is_central_or_academic_calendar_opened(education_group, person, raise_exception)
 
 
