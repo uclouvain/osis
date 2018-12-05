@@ -40,6 +40,11 @@ class EducationGroupTypeFactory(DjangoModelFactory):
     name = factory.Iterator(education_group_types.TrainingType.choices(), getter=operator.itemgetter(0))
 
 
+class GroupEducationGroupTypeFactory(EducationGroupTypeFactory):
+    category = education_group_categories.GROUP
+    name = factory.Iterator(education_group_types.GroupType.choices(), getter=operator.itemgetter(0))
+
+
 class ExistingEducationGroupTypeFactory(EducationGroupTypeFactory):
     class Meta:
         model = 'base.EducationGroupType'

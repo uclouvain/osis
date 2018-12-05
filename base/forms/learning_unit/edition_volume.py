@@ -245,7 +245,7 @@ class VolumeEditionFormsetContainer:
         self.postponement = int(request.POST.get('postponement', 1))
         self.request = request
 
-        self.is_faculty_manager = person.is_faculty_manager() and not person.is_central_manager()
+        self.is_faculty_manager = person.is_faculty_manager and not person.is_central_manager
 
         for learning_unit in learning_units:
             volume_edition_formset = formset_factory(
@@ -391,7 +391,7 @@ class SimplifiedVolumeForm(forms.ModelForm):
 
 class SimplifiedVolumeFormset(forms.BaseModelFormSet):
     def __init__(self, data, person, *args, **kwargs):
-        self.is_faculty_manager = person.is_faculty_manager() and not person.is_central_manager()
+        self.is_faculty_manager = person.is_faculty_manager and not person.is_central_manager
         super().__init__(data, *args, prefix="component", **kwargs)
 
     def get_form_kwargs(self, index):

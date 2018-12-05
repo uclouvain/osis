@@ -28,12 +28,16 @@ from django.db.models import Prefetch
 
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.education_group_year import EducationGroupYear
 from cms.enums import entity_name
+from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 
 SKILLS_AND_ACHIEVEMENTS_KEY = 'comp_acquis'
 SKILLS_AND_ACHIEVEMENTS_AA_DATA = 'achievements'
-SKILLS_AND_ACHIEVEMENTS_CMS_DATA = ('skills_and_achievements_introduction', 'skills_and_achievements_additional_text', )
+SKILLS_AND_ACHIEVEMENTS_CMS_DATA = ('skills_and_achievements_introduction', 'skills_and_achievements_additional_text',)
+
+EVALUATION_KEY = 'evaluation'
 
 
 def get_achievements(education_group_year, language_code):
@@ -84,3 +88,46 @@ def get_intro_extra_content_achievements(education_group_year, language_code):
         text_label__label__in=SKILLS_AND_ACHIEVEMENTS_CMS_DATA
     ).select_related('text_label')
     return {cms_data.text_label.label: cms_data.text for cms_data in qs}
+
+
+def get_evaluation_text(education_group_year, language_code):
+
+    translated_text = TranslatedText.objects.all().prefetch_related(
+        Prefetch(
+            'text_label__translatedtextlabel_set',
+            to_attr="translated_text_labels"
+        )
+    ).get(
+        text_label__entity=OFFER_YEAR,
+        text_label__label=EVALUATION_KEY,
+        language=language_code,
+        entity=OFFER_YEAR,
+        reference=education_group_year.id
+    )
+    translated_text_label = next(
+        (
+            text_label.label for text_label in translated_text.text_label.translated_text_labels
+            if text_label.language == language_code
+        ),
+        EVALUATION_KEY
+    )
+
+    return translated_text_label, translated_text.text
+
+
+def get_common_evaluation_text(education_group_year, language_code):
+
+    common_education_group_year = EducationGroupYear.objects.look_for_common(
+        education_group_type=education_group_year.education_group_type,
+        academic_year=education_group_year.academic_year,
+    ).get()
+
+    translated_text = TranslatedText.objects.get(
+        text_label__entity=OFFER_YEAR,
+        text_label__label=EVALUATION_KEY,
+        language=language_code,
+        entity=OFFER_YEAR,
+        reference=common_education_group_year.id
+    )
+
+    return translated_text.text
