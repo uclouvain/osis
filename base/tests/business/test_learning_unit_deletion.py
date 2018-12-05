@@ -45,7 +45,7 @@ from base.models.learning_class_year import LearningClassYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_component import LearningUnitComponent
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.person import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -362,6 +362,10 @@ class LearningUnitYearDeletion(TestCase):
         learning_unit_year.save()
         self.assertTrue(
             base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(learning_unit_year, person))
+
+        # Invalidate cache_property
+        del person.is_central_manager
+        del person.is_faculty_manager
 
         # With both role, greatest is taken
         add_to_group(person.user, CENTRAL_MANAGER_GROUP)

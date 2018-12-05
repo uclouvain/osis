@@ -44,6 +44,7 @@ from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
 from base.models.enums.education_group_types import MiniTrainingType
 from base.models.exceptions import MaximumOneParentAllowedException
 from base.models.prerequisite import Prerequisite
+from base.models.utils.utils import get_object_or_none
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin
 
 
@@ -124,8 +125,6 @@ class EducationGroupYear(SerializableModel):
 
     education_group_type = models.ForeignKey(
         'EducationGroupType',
-        blank=False,
-        null=True,
         verbose_name=_("Type of training")
     )
 
@@ -250,7 +249,7 @@ class EducationGroupYear(SerializableModel):
         verbose_name=_('Professionnal title')
     )
 
-    joint_diploma = models.BooleanField(default=False, verbose_name=_('University certificate'))
+    joint_diploma = models.BooleanField(default=False, verbose_name=_('Joint diploma'))
 
     diploma_printing_orientation = models.CharField(
         max_length=30,
@@ -526,20 +525,22 @@ class EducationGroupYear(SerializableModel):
             self.management_entity, self.academic_year
         )
 
-    @property
     def parent_by_training(self):
-        parents = [parent for parent in self.parents_by_group_element_year
-                   if parent.is_training()]
-        if len(parents) > 1:
-            raise MaximumOneParentAllowedException('Only one training parent is allowed')
-        elif len(parents) == 1:
-            return parents[0]
+        """
+        Return the parent, only if the education group and its parent are a training.
 
-    @property
-    def parents_by_group_element_year(self):
-        group_elements_year = self.child_branch.filter(child_branch=self).select_related('parent')
-        return [group_element_year.parent for group_element_year in group_elements_year
-                if group_element_year.parent]
+        In our structure, it is forbidden to have 2 training parents for a training.
+        """
+
+        if self.is_training():
+            try:
+                return get_object_or_none(
+                    EducationGroupYear,
+                    groupelementyear__child_branch=self,
+                    education_group_type__category=education_group_categories.TRAINING
+                )
+            except EducationGroupYear.MultipleObjectsReturned:
+                raise MaximumOneParentAllowedException('Only one training parent is allowed')
 
     @cached_property
     def children_without_leaf(self):
@@ -658,13 +659,6 @@ class EducationGroupYear(SerializableModel):
             return self.education_group.educationgroupyear_set.get(academic_year__year=(self.academic_year.year - 1))
         except EducationGroupYear.DoesNotExist:
             return None
-
-
-def find_by_id(an_id):
-    try:
-        return EducationGroupYear.objects.get(pk=an_id)
-    except EducationGroupYear.DoesNotExist:
-        return None
 
 
 def search(**kwargs):

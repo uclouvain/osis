@@ -101,7 +101,12 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
 
         for item in group:
             lu = learning_unit.get_by_acronym_with_highest_academic_year(acronym=item)
-            if lu:
+            if lu and lu == self.instance.learning_unit_year.learning_unit:
+                self.add_error(
+                    'prerequisite_string',
+                    _("A learning unit cannot be prerequisite to itself : %(acronym)s") % {'acronym': item}
+                )
+            elif lu:
                 # TODO :: Check that lu has a luy which is present in the education_group_year's tree
                 group_of_learning_units.append(lu)
             else:

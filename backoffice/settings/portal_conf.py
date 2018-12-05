@@ -23,7 +23,6 @@ SECTION_LIST = [
             ]),
     Section(title=_('Teaching profile'),
             labels=[
-                ('comp_acquis', 'specific'),
                 ('structure', 'specific')
             ]),
     Section(title=_('Detailed programme'),
@@ -35,6 +34,8 @@ SECTION_LIST = [
                 ('options', 'specific'),
                 ('finalites_didactiques', 'common'),
                 ('caap', 'specific,common'),
+                ('agregation', 'common'),
+                ('prerequis', 'common'),
             ]),
     Section(title=_('Admission'),
             labels=[
@@ -45,7 +46,7 @@ SECTION_LIST = [
     Section(title=_('Benefits and organization'),
             labels=[
                 ('pedagogie', 'specific'),
-                ('evaluation', 'specific'),
+                ('evaluation', 'specific,common'),
                 ('mobilite', 'specific'),
                 ('formations_accessibles', 'specific'),
                 ('certificats', 'specific'),

@@ -25,8 +25,9 @@
 ##############################################################################
 import datetime
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.utils.translation import ugettext_lazy as _, pgettext
+from django.utils.translation import ugettext_lazy as _
 from waffle.models import Flag
 
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
@@ -43,8 +44,6 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import is_person_linked_to_entity_in_charge_of_learning_unit
 from osis_common.utils.datetime import get_tzinfo, convert_date_to_datetime
 from osis_common.utils.perms import conjunction, disjunction, negation, BasePerm
-from django.core.exceptions import PermissionDenied
-from django.conf import settings
 
 FACULTY_UPDATABLE_CONTAINER_TYPES = (learning_container_year_types.COURSE,
                                      learning_container_year_types.DISSERTATION,
@@ -60,6 +59,8 @@ MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE = _("You are not eligible to modify the end d
 MSG_CANNOT_MODIFY_ON_PREVIOUS_ACADEMIC_YR = _("You can't modify learning unit of a previous year")
 MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY = _("You can only modify a learning unit when your are linked to its requirement "
                                         "entity")
+MSG_LEARNING_UNIT_IS_OR_HAS_PREREQUISITE = _("You cannot delete a learning unit which is prerequisite or has "
+                                             "prerequisite(s)")
 MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE = _("Person not in accordance with proposal state")
 MSG_NOT_PROPOSAL_STATE_FACULTY = _("You are faculty manager and the proposal state is not 'Faculty', so you can't edit")
 MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL = _("You are not eligible to cancel proposal")
@@ -179,12 +180,14 @@ def is_eligible_to_consolidate_proposal(proposal, person, raise_exception=False)
 def can_edit_summary_locked_field(learning_unit_year, person):
     flag = Flag.get('educational_information_block_action')
     return flag.is_active_for_user(person.user) and \
-        person.is_faculty_manager() and \
+        person.is_faculty_manager and \
         person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 
 def can_update_learning_achievement(learning_unit_year, person):
-    return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+    flag = Flag.get('learning_achievement_update')
+    return flag.is_active_for_user(person.user) and \
+        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 
 def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_exception=False):
@@ -196,6 +199,8 @@ def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_e
         msg = MSG_NOT_ELIGIBLE_TO_DELETE_LU
     elif not person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year):
         msg = MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY
+    elif learning_unit_year.is_prerequisite():
+        msg = MSG_LEARNING_UNIT_IS_OR_HAS_PREREQUISITE
 
     result = False if msg else True
     can_raise_exception(
@@ -208,7 +213,7 @@ def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_e
 
 
 def _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_exception=False):
-    if person.is_central_manager():
+    if person.is_central_manager:
         return True
     if proposal.state != ProposalState.FACULTY.name:
         can_raise_exception(
@@ -258,7 +263,7 @@ def is_eligible_to_manage_attributions(learning_unit_year, person):
 
 
 def _is_person_central_manager(_, person, raise_exception):
-    return person.is_central_manager()
+    return person.is_central_manager
 
 
 def _is_learning_unit_year_a_partim(learning_unit_year, _, raise_exception=False):
@@ -266,7 +271,7 @@ def _is_learning_unit_year_a_partim(learning_unit_year, _, raise_exception=False
 
 
 def _is_person_in_accordance_with_proposal_state(proposal, person, raise_exception=False):
-    result = (person.is_central_manager()) or proposal.state == ProposalState.FACULTY.name
+    result = person.is_central_manager or proposal.state == ProposalState.FACULTY.name
     can_raise_exception(
         raise_exception, result,
         MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE
@@ -315,13 +320,13 @@ def is_learning_unit_year_in_proposal(learning_unit_year, _, raise_exception=Fal
 def is_academic_year_in_range_to_create_partim(learning_unit_year, person, raise_exception=False):
     current_acy = starting_academic_year()
     luy_acy = learning_unit_year.academic_year
-    max_range = MAX_ACADEMIC_YEAR_FACULTY if person.is_faculty_manager() else MAX_ACADEMIC_YEAR_CENTRAL
+    max_range = MAX_ACADEMIC_YEAR_FACULTY if person.is_faculty_manager else MAX_ACADEMIC_YEAR_CENTRAL
 
     return current_acy.year <= luy_acy.year <= current_acy.year + max_range
 
 
 def _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception):
-    result = person.is_central_manager() or learning_unit_year.can_update_by_faculty_manager()
+    result = person.is_central_manager or learning_unit_year.can_update_by_faculty_manager()
     can_raise_exception(
         raise_exception,
         result,
@@ -335,7 +340,7 @@ def _is_proposal_in_state_to_be_consolidated(proposal, _):
 
 
 def _can_delete_learning_unit_year_according_type(learning_unit_year, person, raise_exception=False):
-    if not person.is_central_manager() and person.is_faculty_manager():
+    if not person.is_central_manager and person.is_faculty_manager:
         container_type = learning_unit_year.learning_container_year.container_type
         result = not (
             container_type == learning_container_year_types.COURSE and learning_unit_year.is_full()
@@ -425,7 +430,7 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
         return False
 
     # Case faculty/central: We need to check if user is linked to entity
-    if person.is_faculty_manager() or person.is_central_manager():
+    if person.is_faculty_manager or person.is_central_manager:
         return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
     # Case Tutor: We need to check if today is between submission date

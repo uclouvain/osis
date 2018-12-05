@@ -113,8 +113,10 @@ class EducationGroupRead(TestCase):
 
         context = response.context
         self.assertEqual(context["education_group_year"], self.education_group_child_1)
-        self.assertListEqual(context["education_group_languages"],
-                             [self.education_group_language_child_1.language.name])
+        self.assertListEqual(
+            list(context["education_group_languages"]),
+            [self.education_group_language_child_1.language.name]
+        )
         self.assertEqual(context["enums"], education_group_categories)
         self.assertEqual(context["parent"], self.education_group_parent)
 
@@ -125,8 +127,10 @@ class EducationGroupRead(TestCase):
 
         context = response.context
         self.assertEqual(context["education_group_year"], self.education_group_child_1)
-        self.assertListEqual(context["education_group_languages"],
-                             [self.education_group_language_child_1.language.name])
+        self.assertListEqual(
+            list(context["education_group_languages"]),
+            [self.education_group_language_child_1.language.name]
+        )
         self.assertEqual(context["enums"], education_group_categories)
         self.assertEqual(context["parent"], self.education_group_parent)
 
@@ -148,8 +152,10 @@ class EducationGroupRead(TestCase):
 
         context = response.context
         self.assertEqual(context["education_group_year"], self.education_group_child_1)
-        self.assertListEqual(context["education_group_languages"],
-                             [self.education_group_language_child_1.language.name])
+        self.assertListEqual(
+            list(context["education_group_languages"]),
+            [self.education_group_language_child_1.language.name]
+        )
         self.assertEqual(context["enums"], education_group_categories)
         self.assertEqual(context["parent"], self.education_group_parent)
 
@@ -161,7 +167,10 @@ class EducationGroupRead(TestCase):
 
         context = response.context
         self.assertEqual(context["education_group_year"], self.education_group_child_2)
-        self.assertListEqual(context["education_group_languages"], [])
+        self.assertListEqual(
+            list(context["education_group_languages"]),
+            []
+        )
         self.assertEqual(context["enums"], education_group_categories)
         self.assertEqual(context["parent"], self.education_group_parent)
 
@@ -181,6 +190,7 @@ class EducationGroupRead(TestCase):
 
         response = self.client.get(self.url)
         self.assertEqual(len(response.context["versions"]), 2)
+
 
 class EducationGroupDiplomas(TestCase):
     @classmethod
@@ -287,7 +297,7 @@ class EducationGroupDiplomas(TestCase):
         # Numbers below are used only to ensure records are saved in wrong order (there's no other meaning)
         for section in range(4, 2, -1):
             code_range = section * 11
-            for code in range(code_range, code_range-2, -1):
+            for code in range(code_range, code_range - 2, -1):
                 EducationGroupCertificateAimFactory(
                     education_group_year=self.education_group_child,
                     certificate_aim=CertificateAimFactory(code=code, section=section),
@@ -363,7 +373,8 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertEqual(context["parent"], self.education_group_parent)
         self.assertEqual(context["education_group_year"], self.education_group_child)
 
-    @mock.patch('base.views.education_groups.detail.is_eligible_to_edit_general_information', side_effect=lambda p, o: True)
+    @mock.patch('base.views.education_groups.detail.is_eligible_to_edit_general_information',
+                side_effect=lambda p, o: True)
     def test_user_has_link_to_edit_pedagogy(self, mock_is_eligible):
         self.user.user_permissions.add(Permission.objects.get(codename='can_edit_educationgroup_pedagogy'))
         response = self.client.get(self.url)
@@ -851,7 +862,8 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    @mock.patch('base.views.education_groups.detail.is_eligible_to_edit_general_information', side_effect=lambda p, o: True)
+    @mock.patch('base.views.education_groups.detail.is_eligible_to_edit_admission_condition',
+                side_effect=lambda p, o: True)
     def test_user_has_link_to_edit_conditions(self, mock_is_eligible):
         self.user.user_permissions.add(Permission.objects.get(codename='can_edit_educationgroup_pedagogy'))
         response = self.client.get(self.url)
@@ -953,7 +965,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         info = {
             'section': section,
-            'language': 'fr',
+            'language': 'fr-be',
             'id': admission_condition_line.id,
         }
         request = RequestFactory().get('/?{}'.format(urllib.parse.urlencode(info)))
@@ -1217,3 +1229,8 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         admission_condition_line_2.refresh_from_db()
 
         self.assertLess(admission_condition_line_1.order, admission_condition_line_2.order)
+
+    def test_education_group_year_admission_condition_change_lang_tab(self):
+        url = reverse('tab_lang_edit', args=(self.education_group_parent.id, self.education_group_child.id, 'fr'))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)

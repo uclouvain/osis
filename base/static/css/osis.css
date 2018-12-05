@@ -35,7 +35,7 @@
 
 .qamode
 {
-    background-image:url("../img/qamode.png");
+    background-image:url("../img/qamode.svg");
     background-repeat: repeat;
     background-position:center;
 }
@@ -56,9 +56,33 @@
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
 }
 
+.testmode
+{
+    background-image:url("../img/testmode.svg");
+    background-repeat: repeat;
+    background-position:center;
+}
+
+
+.testblue {
+    background: #5079b9;
+    width: 50px;
+    height: 100%;
+    line-height: 25px;
+    text-align: center;
+    color: #fff;
+    font-size: 12px;
+    font-style: italic;
+    margin-right: 20px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    -webkit-clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
+    clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
+}
+
 .devmode
 {
-    background-image:url("../img/devmode.png");
+    background-image:url("../img/devmode.svg");
     background-repeat: repeat;
     background-position:center;
 }
@@ -81,7 +105,7 @@
 
 .localmode
 {
-    background-image:url("../img/localmode.png");
+    background-image:url("../img/localmode.svg");
     background-repeat: repeat;
     background-position:center;
 }

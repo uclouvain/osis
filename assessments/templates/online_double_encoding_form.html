@@ -2,7 +2,7 @@
 {% load l10n %}
 {% load i18n %}
 {% load sum %}
-{% load score_display %}
+{% load score_display enrollment_state %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -91,7 +91,7 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label>{% trans 'Number of enrollments' %}</label><br>
-                    {{ count_total_enrollments }}
+                    {{ total_exam_enrollments }}
                 </div>
             </div>
         </div>
@@ -112,6 +112,7 @@
                 <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> {% trans 'Compare' %}</button>
             <a class="btn btn-default" href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" role="button" id="bt_cancel_online_double_encoding_up">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'Cancel' %}</a>
+            {% include 'blocks/legend.html' %}
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -126,12 +127,7 @@
                 </thead>
                 <tbody>
                 {% for enrollment in enrollments %}
-                    <tr style="background-color:
-                                  {% ifchanged enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym %}
-                                     {% cycle "white" "#E5F2FF" as rowcolors %}
-                                  {% else %}
-                                     {{ rowcolors }}
-                                  {% endifchanged %}">
+                    <tr style="background-color:{% include 'blocks/row_color.html' %}">
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>
@@ -146,10 +142,14 @@
                             {% endif %}
                             <input type="text" min="0" max="20" name="score_{{enrollment.id}}" id="num_double_score_{{ enrollment.id }}"
                                    tabindex="{{ forloop.counter }}" class="form-control" value="{{enrollment.post_score_encoded|default_if_none:''}}"
-                                   {% if not is_program_manager %}
-                                     {% if enrollment.score_final != None or enrollment.justification_final %}
-                                       disabled
-                                     {% endif %}
+                                   {% if enrollment.enrollment_state != 'ENROLLED' %}
+                                        disabled
+                                   {% else %}
+                                       {% if not is_program_manager %}
+                                         {% if enrollment.score_final != None or enrollment.justification_final %}
+                                           disabled
+                                         {% endif %}
+                                       {% endif %}
                                    {% endif %}>
                         </td>
                         <td>
@@ -160,9 +160,13 @@
                             {% endif %}
                             <select class="form-control" name="justification_{{ enrollment.id }}" id="slt_double_justification_score_{{ enrollment.id }}"
                                    tabindex="{{ enrollments|length|sum:forloop.counter }}"
-                                   {% if not is_program_manager %}
-                                     {% if enrollment.score_final != None or enrollment.justification_final %}
+                                    {% if enrollment.enrollment_state != 'ENROLLED' %}
                                         disabled
+                                    {% else %}
+                                        {% if not is_program_manager %}
+                                         {% if enrollment.score_final != None or enrollment.justification_final %}
+                                            disabled
+                                        {% endif %}
                                     {% endif %}
                                    {% endif %}>
                                 <option value=""></option>

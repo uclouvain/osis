@@ -23,33 +23,33 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import collections
 import itertools
 
-import collections
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.messages import WARNING
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
-from attribution.business.xls_build import create_xls_attribution
-from base.utils.cache import cache_filter
+
+from base.business import learning_unit_proposal as proposal_business
 from base.business.learning_unit import create_xls
 from base.business.learning_unit_xls import create_xls_with_parameters, WITH_ATTRIBUTIONS, WITH_GRP
+from base.business.learning_units.xls_comparison import create_xls_comparison, get_academic_year_of_reference
 from base.business.proposal_xls import create_xls_proposal
 from base.forms.common import TooManyResultsException
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search_form import LearningUnitYearForm, ExternalLearningUnitYearForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm, ProposalStateModelForm
+from base.forms.search.search_form import get_research_criteria
 from base.models.academic_year import current_academic_year, get_last_academic_years, starting_academic_year
 from base.models.enums import learning_container_year_types, learning_unit_year_subtypes
 from base.models.person import Person, find_by_user
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from base.utils.cache import cache_filter
 from base.views import layout
 from base.views.common import check_if_display_message, display_error_messages, display_messages_by_level
-from base.business import learning_unit_proposal as proposal_business
-from base.forms.search.search_form import get_research_criteria
-from base.business.learning_units.xls_comparison import create_xls_comparison, get_academic_year_of_reference
 
 SIMPLE_SEARCH = 1
 SERVICE_COURSES_SEARCH = 2
@@ -81,8 +81,6 @@ def learning_units_search(request, search_type):
 
     if request.POST.get('xls_status') == "xls":
         return create_xls(request.user, found_learning_units, _get_filter(form, search_type))
-    if request.POST.get('xls_status') == "xls_attribution":
-        return create_xls_attribution(request.user, found_learning_units, _get_filter(form, search_type))
     if request.POST.get('xls_status') == "xls_comparison":
         return create_xls_comparison(
             request.user,
@@ -109,7 +107,7 @@ def learning_units_search(request, search_type):
         'current_academic_year': starting_academic_year(),
         'experimental_phase': True,
         'search_type': search_type,
-        'is_faculty_manager': a_person.is_faculty_manager(),
+        'is_faculty_manager': a_person.is_faculty_manager,
         'form_comparison': form_comparison
     }
 
@@ -171,7 +169,7 @@ def learning_units_proposal_search(request):
         'experimental_phase': True,
         'search_type': PROPOSAL_SEARCH,
         'proposals': proposals,
-        'is_faculty_manager': user_person.is_faculty_manager(),
+        'is_faculty_manager': user_person.is_faculty_manager,
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(proposals)),
     }
     return layout.render(request, "learning_units.html", context)
@@ -234,7 +232,7 @@ def learning_units_external_search(request):
         'experimental_phase': True,
         'search_type': EXTERNAL_SEARCH,
         'learning_units': external_learning_units,
-        'is_faculty_manager': user_person.is_faculty_manager(),
+        'is_faculty_manager': user_person.is_faculty_manager,
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(external_learning_units)),
     }
     return layout.render(request, "learning_units.html", context)

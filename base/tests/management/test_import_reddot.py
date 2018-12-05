@@ -1,15 +1,22 @@
-import unittest
+import collections
 from unittest import mock
 
+from django.conf import settings
 from django.test import TestCase
 
 from base.management.commands import import_reddot
+from base.management.commands.import_reddot import _import_skills_and_achievements, \
+    _get_field_achievement_according_to_language
+from webservices.business import SKILLS_AND_ACHIEVEMENTS_CMS_DATA
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.education_group import EducationGroup
+from base.models.education_group_achievement import EducationGroupAchievement
+from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType
+from base.models.enums.organization_type import MAIN
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import (
@@ -17,6 +24,10 @@ from base.tests.factories.education_group_year import (
     EducationGroupYearCommonMasterFactory,
     EducationGroupYearCommonBachelorFactory
 )
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_version import EntityVersionFactory
+from cms.enums import entity_name
+from cms.models.translated_text import TranslatedText
 
 OFFERS = [
     {'name': TrainingType.BACHELOR.name, 'category': TRAINING, 'code': '1BA'},
@@ -267,6 +278,8 @@ class CreateCommonOfferForAcademicYearTest(TestCase):
         academic_year = AcademicYearFactory()
         self.assertEqual(EducationGroup.objects.count(), 0)
 
+        entity = EntityFactory(organization__type=MAIN)
+        entity_version = EntityVersionFactory(acronym='UCL', entity=entity)
         from base.management.commands.import_reddot import OFFERS
         for offer in OFFERS:
             EducationGroupType.objects.create(name=offer['name'], category=offer['category'])
@@ -280,6 +293,8 @@ class CreateCommonOfferForAcademicYearTest(TestCase):
         academic_year = AcademicYearFactory()
         self.assertEqual(EducationGroup.objects.count(), 0)
 
+        entity = EntityFactory(organization__type=MAIN)
+        entity_version = EntityVersionFactory(acronym='UCL', entity=entity)
         from base.management.commands.import_reddot import OFFERS
         for offer in OFFERS:
             EducationGroupType.objects.create(name=offer['name'], category=offer['category'])
@@ -293,7 +308,7 @@ class CreateCommonOfferForAcademicYearTest(TestCase):
         self.assertEqual(EducationGroupYear.objects.count(), 2)
 
 
-class CreateOffersTest(unittest.TestCase):
+class CreateOffersTest(TestCase):
     @mock.patch('base.management.commands.import_reddot.import_common_offer')
     def test_import_common_offer(self, mock_import_offer):
         context, offers = None, [{'type': 'common'}]
@@ -307,3 +322,60 @@ class CreateOffersTest(unittest.TestCase):
         from base.management.commands.import_reddot import create_offers
         create_offers(context, offers, None)
         mock_import_offer.assert_called_with(None, offers[0], None)
+
+
+class ImportSkillsAndAchievementsTest(TestCase):
+    def setUp(self):
+        self.achivements_json = {
+            "skills_and_achievements_introduction": 'Text skills_and_achievements_introduction',
+            "achievements": [
+                {
+                    "code_name": 1,
+                    "text": 'General Education Group Achievement',
+                    "detailed": [
+                        {"code_name": 1, "text": 'Detailed Education Group Achievement n°1'},
+                        {"code_name": 2, "text": 'Detailed Education Group Achievement n°2'},
+                    ]
+                }
+            ],
+            "skills_and_achievements_additional_text": "Text skills_and_achievements_additional_text",
+        }
+        self.education_group_year = EducationGroupYearFactory()
+
+        Context = collections.namedtuple('Context', 'entity language')
+        self.context = Context(entity='offer_year', language='en')
+
+    def test_import_skills_and_achievements(self):
+        _import_skills_and_achievements(self.achivements_json, self.education_group_year, self.context)
+
+        # Ensure that data is correctly imported [CMS]
+        for label_name in SKILLS_AND_ACHIEVEMENTS_CMS_DATA:
+            self.assertTrue(
+                TranslatedText.objects.filter(
+                    text_label__label=label_name,
+                    entity=entity_name.OFFER_YEAR,
+                    reference=self.education_group_year.pk,
+                    text=self.achivements_json[label_name],
+                    language=self.context.language
+                ).exists()
+            )
+
+        # AA Education group year
+        qs_achievements = EducationGroupAchievement.objects.filter(education_group_year=self.education_group_year)
+        self.assertEqual(qs_achievements.count(), 1)
+        achievement = qs_achievements.first()
+        self.assertEqual(achievement.english_text, self.achivements_json["achievements"][0]['text'])
+        self.assertIsNone(achievement.french_text)
+
+        self.assertEqual(
+            EducationGroupDetailedAchievement.objects.filter(education_group_achievement=achievement).count(),
+            2
+        )
+
+    def test_get_field_achievement_according_to_language(self):
+        self.assertEqual(_get_field_achievement_according_to_language(settings.LANGUAGE_CODE_FR), 'french_text')
+        self.assertEqual(_get_field_achievement_according_to_language(settings.LANGUAGE_CODE_EN), 'english_text')
+
+        # Language not supported
+        with self.assertRaises(AttributeError):
+            _get_field_achievement_according_to_language('es')

@@ -1,0 +1,13 @@
+{% load enrollment_state %}
+
+{% with enrollement_status_color=enrollment|get_line_color %}
+{% if enrollement_status_color %}
+{{ enrollement_status_color }}
+{% else %}
+{% ifchanged enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym %}
+{% cycle 'white' '#E5F2FF' as rowcolors %}
+{% else %}
+{{ rowcolors }}
+{% endifchanged %}
+{% endif %}
+{% endwith %}

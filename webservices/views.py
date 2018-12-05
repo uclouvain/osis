@@ -30,6 +30,7 @@ import re
 from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
 from django.http import Http404
+from django.template import loader
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.renderers import JSONRenderer
@@ -41,6 +42,8 @@ from cms.enums.entity_name import OFFER_YEAR
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from webservices import business
+from webservices.business import get_evaluation_text, get_common_evaluation_text
 from webservices.utils import convert_sections_to_list_of_dict
 
 LANGUAGES = {'fr': 'fr-be', 'en': 'en'}
@@ -132,7 +135,20 @@ def process_section(context, education_group_year, item):
 
     m_intro = re.match(INTRO_PATTERN, item)
     m_common = re.match(COMMON_PATTERN, item)
+    if m_intro or m_common:
+        return get_intro_or_common_section(context, education_group_year, m_intro, m_common)
+    elif item == business.SKILLS_AND_ACHIEVEMENTS_KEY:
+        return get_skills_and_achievements(education_group_year, context.language)
+    elif item == business.EVALUATION_KEY:
+        return get_evaluation(education_group_year, context.language)
+    else:
+        text_label = TextLabel.objects.filter(entity=OFFER_YEAR, label=item).first()
+        if text_label:
+            return insert_section(context, education_group_year, text_label)
+    return None
 
+
+def get_intro_or_common_section(context, education_group_year, m_intro, m_common):
     if m_intro:
         egy = EducationGroupYear.objects.filter(partial_acronym__iexact=m_intro.group('acronym'),
                                                 academic_year__year=context.year).first()
@@ -150,11 +166,6 @@ def process_section(context, education_group_year, item):
             label=m_common.group('section_name')
         ).first()
         return insert_section_if_checked(context, egy, text_label)
-    else:
-        text_label = TextLabel.objects.filter(entity=OFFER_YEAR, label=item).first()
-        if text_label:
-            return insert_section(context, education_group_year, text_label)
-    return None
 
 
 def new_context(education_group_year, iso_language, language, original_acronym):
@@ -383,3 +394,31 @@ def get_conditions_admissions(context):
         "content": build_content_response(context, admission_condition, admission_condition_common, full_suffix)
     }
     return result
+
+
+def get_evaluation(education_group_year, language_code):
+
+    label, text = get_evaluation_text(education_group_year, language_code)
+    common_text = get_common_evaluation_text(education_group_year, language_code)
+
+    return {
+        'id': business.EVALUATION_KEY,
+        'label': label,
+        'content': common_text,
+        'free_text': text
+    }
+
+
+def get_skills_and_achievements(education_group_year, language_code):
+    intro_extra_content = business.get_intro_extra_content_achievements(education_group_year, language_code)
+    achievements = business.get_achievements(education_group_year, language_code)
+
+    return {
+        'id': business.SKILLS_AND_ACHIEVEMENTS_KEY,
+        'label': business.SKILLS_AND_ACHIEVEMENTS_KEY,
+        'content': {
+            'intro': intro_extra_content.get('skills_and_achievements_introduction') or None,
+            'blocs': achievements,
+            'extra': intro_extra_content.get('skills_and_achievements_additional_text') or None
+        }
+    }

@@ -27,9 +27,14 @@ from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
+from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.business.learning_units.achievement import UP, DOWN
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.education_group_year import EducationGroupYear
+from cms.enums import entity_name
+from cms.models import translated_text
+from cms.models.text_label import TextLabel
 
 ACTION_CHOICES = [
     (UP, UP),
@@ -62,3 +67,49 @@ class EducationGroupDetailedAchievementForm(EducationGroupAchievementForm):
 
 class ActionForm(forms.Form):
     action = forms.ChoiceField(choices=ACTION_CHOICES, required=True)
+
+
+class EducationGroupAchievementCMSForm(forms.Form):
+    education_group_year = None
+    cms_text_label = None
+
+    text_french = forms.CharField(
+        widget=CKEditorWidget(config_name='minimal'),
+        required=False,
+        label=_('French')
+    )
+
+    text_english = forms.CharField(
+        widget=CKEditorWidget(config_name='minimal'),
+        required=False,
+        label=_('English')
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.education_group_year = kwargs.pop('education_group_year')
+        if not isinstance(self.education_group_year, EducationGroupYear):
+            raise AttributeError('education_group_year parms must be an instance of EducationGroupYear')
+        self.cms_text_label = kwargs.pop('cms_text_label')
+        if not isinstance(self.cms_text_label, TextLabel):
+            raise AttributeError('cms_text_label parms must be an instance of TextLabel')
+        super().__init__(*args, **kwargs)
+
+    def save(self):
+        translated_text_upserted = []
+        for language in [LANGUAGE_CODE_FR, LANGUAGE_CODE_EN]:
+            upsert_result = translated_text.update_or_create(
+                entity=entity_name.OFFER_YEAR,
+                reference=self.education_group_year.pk,
+                text_label=self.cms_text_label,
+                language=language,
+                defaults={'text': self._get_related_text(language)}
+            )
+            translated_text_upserted.append(upsert_result)
+        return translated_text_upserted
+
+    def _get_related_text(self, language):
+        if language == LANGUAGE_CODE_FR:
+            return self.cleaned_data['text_french']
+        elif language == LANGUAGE_CODE_EN:
+            return self.cleaned_data['text_english']
+        raise AttributeError('Unsupported language {}'.format(language))

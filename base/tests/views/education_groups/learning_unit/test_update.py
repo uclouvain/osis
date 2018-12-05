@@ -31,7 +31,6 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from base.models.prerequisite import Prerequisite
-from base.models.prerequisite_item import get_prerequisite_string_representation
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -74,7 +73,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
     def test_permission_denied_when_learning_unit_not_contained_in_training(self):
         other_education_group_year = TrainingFactory(academic_year=self.academic_year)
         url = reverse("learning_unit_prerequisite_update",
-                          args=[other_education_group_year.id, self.learning_unit_year_child.id])
+                      args=[other_education_group_year.id, self.learning_unit_year_child.id])
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
@@ -119,7 +118,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
         self.assertTrue(prerequisite)
         self.assertEqual(
-            get_prerequisite_string_representation(prerequisite),
+            prerequisite.prerequisite_string,
             'LSINF1111'
         )
 
@@ -140,7 +139,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
         self.assertTrue(prerequisite)
         self.assertEqual(
-            get_prerequisite_string_representation(prerequisite),
+            prerequisite.prerequisite_string,
             'LSINF1111 ET (LDROI1200 OU LEDPH1200)'
         )
 
@@ -161,7 +160,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
         self.assertTrue(prerequisite)
         self.assertEqual(
-            get_prerequisite_string_representation(prerequisite),
+            prerequisite.prerequisite_string,
             '(LSINF1111 ET LDROI1200) OU LEDPH1200'
         )
 
@@ -181,7 +180,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
         self.assertTrue(prerequisite)
         self.assertEqual(
-            get_prerequisite_string_representation(prerequisite),
+            prerequisite.prerequisite_string,
             '(LDROI1200 ET LEDPH1200) OU LDROI1200'
         )
 
@@ -206,4 +205,22 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertEqual(
             str(errors_prerequisite_string[1]),
             _("No match has been found for this learning unit :  %(acronym)s") % {'acronym': 'LZZZ6789'}
+        )
+
+    def test_post_data_prerequisite_to_itself_error(self):
+        self.learning_unit_year_child.acronym = 'LDROI1200'
+        self.learning_unit_year_child.save()
+
+        form_data = {
+            "prerequisite_string": 'LDROI1200'
+        }
+        response = self.client.post(self.url, data=form_data)
+        errors_prerequisite_string = response.context_data.get('form').errors.get('prerequisite_string')
+        self.assertEqual(
+            len(errors_prerequisite_string),
+            1
+        )
+        self.assertEqual(
+            str(errors_prerequisite_string[0]),
+            _("A learning unit cannot be prerequisite to itself : %(acronym)s") % {'acronym': 'LDROI1200'}
         )

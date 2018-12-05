@@ -1,6 +1,5 @@
 {% load staticfiles %}
 {% load i18n %}
-{% load bootstrap3 %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -24,14 +23,19 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-
-<div class="row">
-    <div class="col-md-3">
-        <label>{{ form.start_date.label }}</label>
-        {{ form.start_date.initial|date:"d/m/Y"|default:"-" }}
+{% with french_label=label|get_item:'fr-be' english_label=label|get_item:'en' %}
+    <div class="col-md-6">
+         {% if french_label and french_label.text %}
+             <span>{{ french_label.text|truncatewords_html:40|safe }}</span>
+         {% else %}
+            <span class="italic">{% trans 'Add the French content of this paragraph' %}</span>
+         {% endif %}
     </div>
-    <div class="col-md-3">
-        <label>{{ form.end_date.label }}</label>
-        {{ form.end_date.initial|date:"d/m/Y"|default:"-" }}
+    <div class="col-md-6">
+         {% if english_label and english_label.text %}
+            <span>{{ english_label.text|truncatewords_html:40|safe }}</span>
+         {% else %}
+            <span class="italic">{% trans 'Add the English content of this paragraph' %}</span>
+         {% endif %}
     </div>
-</div>
+{% endwith %}
