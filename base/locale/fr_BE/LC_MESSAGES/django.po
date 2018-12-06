@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-04 15:08+0100\n"
+"POT-Creation-Date: 2018-12-06 13:42+0100\n"
 "PO-Revision-Date: 2018-11-21 14:40+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -514,11 +514,6 @@ msgstr "Toutes les notes ont été soumises."
 msgid "Alloc. Ent."
 msgstr "Ent. attrib."
 
-#: models/enums/entity_container_year_link_type.py:45
-#: templates/learning_unit/identification.html:206
-msgid "Allocation entity"
-msgstr "Entité d'attribution"
-
 #: business/learning_units/edition.py:350
 msgid "An error occured when updating the learning unit."
 msgstr "Erreur lors de la modification de l'unité d'enseignement."
@@ -649,6 +644,11 @@ msgstr "Attribution ajoutée pour %(tutor)s (%(function)s)"
 #: tests/business/test_learning_unit_xls.py:382
 msgid "Attribution duration"
 msgstr "Durée attribution"
+
+#: models/enums/entity_container_year_link_type.py:45
+#: templates/learning_unit/identification.html:206
+msgid "Attribution entity"
+msgstr "Entité d'attribution"
 
 #: views/learning_units/attribution.py:140
 #, python-format
@@ -3215,7 +3215,7 @@ msgstr "Secteur"
 msgid "Select"
 msgstr "Sélectionner"
 
-#: forms/education_group/common.py:334
+#: forms/education_group/common.py:330
 msgid "Select a language"
 msgstr "Sélectionnez une langue"
 
@@ -4084,7 +4084,7 @@ msgstr "Type de contrainte"
 msgid "Type of event"
 msgstr "Type d'événement"
 
-#: forms/education_group/common.py:317 models/education_group_type.py:79
+#: forms/education_group/common.py:312 models/education_group_type.py:79
 #: models/education_group_year.py:127
 #: templates/education_group/blocks/form/training_tab_identification.html:44
 msgid "Type of training"
@@ -4311,7 +4311,7 @@ msgstr "Semaine"
 msgid "Weighting"
 msgstr "Pondération par crédit"
 
-#: forms/education_group/common.py:328
+#: forms/education_group/common.py:323
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
 msgstr "Quel type de %(category)s voulez-vous créer ?"
@@ -5145,9 +5145,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Joint diploma"
-#~ msgstr "Diplôme conjoint"
-
-#~ msgid "University Bachelors"
-#~ msgstr "Bacheliers universitaires"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-04 15:08+0100\n"
+"POT-Creation-Date: 2018-12-06 13:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -491,11 +491,6 @@ msgstr ""
 msgid "Alloc. Ent."
 msgstr ""
 
-#: models/enums/entity_container_year_link_type.py:45
-#: templates/learning_unit/identification.html:206
-msgid "Allocation entity"
-msgstr ""
-
 #: business/learning_units/edition.py:350
 msgid "An error occured when updating the learning unit."
 msgstr ""
@@ -621,6 +616,11 @@ msgstr ""
 #: tests/business/test_learning_unit_xls.py:171
 #: tests/business/test_learning_unit_xls.py:382
 msgid "Attribution duration"
+msgstr ""
+
+#: models/enums/entity_container_year_link_type.py:45
+#: templates/learning_unit/identification.html:206
+msgid "Attribution entity"
 msgstr ""
 
 #: views/learning_units/attribution.py:140
@@ -3150,7 +3150,7 @@ msgstr ""
 msgid "Select"
 msgstr ""
 
-#: forms/education_group/common.py:334
+#: forms/education_group/common.py:330
 msgid "Select a language"
 msgstr ""
 
@@ -3970,7 +3970,7 @@ msgstr ""
 msgid "Type of event"
 msgstr ""
 
-#: forms/education_group/common.py:317 models/education_group_type.py:79
+#: forms/education_group/common.py:312 models/education_group_type.py:79
 #: models/education_group_year.py:127
 #: templates/education_group/blocks/form/training_tab_identification.html:44
 msgid "Type of training"
@@ -4196,7 +4196,7 @@ msgstr ""
 msgid "Weighting"
 msgstr ""
 
-#: forms/education_group/common.py:328
+#: forms/education_group/common.py:323
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
 msgstr ""
