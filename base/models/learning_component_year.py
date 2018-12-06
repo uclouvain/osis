@@ -25,6 +25,7 @@
 ##############################################################################
 from django.db import models
 from django.db.models import Sum
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
@@ -82,17 +83,15 @@ class LearningComponentYear(SerializableModel):
 
     @property
     def complete_acronym(self):
-        queryset = self.learningunitcomponent_set
-        learning_unit_acronym = queryset.all().values_list('learning_unit_year__acronym', flat=True).get()
         # FIXME :: Temporary solution - waiting for business clarification about "components" concept (untyped, ...)
         if self.acronym == 'NT':
-            return '{}/PM'.format(learning_unit_acronym)
+            return '{}/PM'.format(self.learning_unit_year.acronym)
         else:
-            return '{}/{}'.format(learning_unit_acronym, self.acronym)
+            return '{}/{}'.format(self.learning_unit_year.acronym, self.acronym)
 
-    @property
+    @cached_property
     def learning_unit_year(self):
-        return self.learningunitcomponent_set.all().select_related('learning_unit_year').get().learning_unit_year
+        return self.learningunityear_set.get()
 
     @property
     def real_classes(self):
