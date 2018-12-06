@@ -1,6 +1,6 @@
 openapi: 3.0.0
 servers:
- - url: https://{environment}.osis.uclouvain.be:18000/api/v1/education_group/
+ - url: https://{environment}.osis.uclouvain.be/v1/education_group/
    variables:
      environment:
        default: api.dev
@@ -73,16 +73,19 @@ paths:
         schema:
           description: ''
           type: string
-      - in: query
-        name: ordering
-        schema:
-          description: Which field to use when ordering the results.
-          type: string
-      - in: query
-        name: search
-        schema:
-          description: A search term.
-          type: string
+      response:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Training'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
       tags:
       - trainings
 components:
@@ -92,5 +95,103 @@ components:
       in: header
       name: Authorization
       description: Enter your token in the format **Token &lt;token>**
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    ArrayOfTraining:
+      type: array
+        items:
+          type: '#/components/schemas/Training'
+    Training:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        acronym:
+          type: string
+        education_group_type:
+          type: string
+          schema:
+            $ref: '#/components/schemas/TrainingTypeEnum'
+        education_group_type_text:
+          type: string
+        partial_acronym:
+          type: string
+        title:
+          type: string
+        title_english:
+          type: string
+        academic_year:
+          type: number
+        active:
+          type: string
+          schema:
+            $ref: '#/components/schemas/ActiveEnum'
+        active_text:
+          type: string
+    ActiveEnum:
+      type: string
+      enum:
+       - ACTIVE
+       - INACTIVE
+       - RE_REGISTRATION
+    TrainingTypeEnum:
+      type: string
+      enum:
+        - AGGREGATION
+        - CERTIFICATE_OF_PARTICIPATION
+        - CERTIFICATE_OF_SUCCESS
+        - CERTIFICATE_OF_HOLDING_CREDITS
+        - BACHELOR
+        - CERTIFICATE
+        - CAPAES
+        - RESEARCH_CERTIFICATE
+        - UNIVERSITY_FIRST_CYCLE_CERTIFICATE
+        - UNIVERSITY_SECOND_CYCLE_CERTIFICATE
+        - ACCESS_CONTEST
+        - LANGUAGE_CLASS
+        - ISOLATED_CLASS
+        - PHD
+        - FORMATION_PHD
+        - JUNIOR_YEAR
+        - PGRM_MASTER_120
+        - MASTER_MA_120
+        - MASTER_MD_120
+        - MASTER_MS_120
+        - PGRM_MASTER_180_240
+        - MASTER_MA_180_240
+        - MASTER_MD_180_240
+        - MASTER_MS_180_240
+        - MASTER_M1
+        - MASTER_MC
+        - INTERNSHIP
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
 security:
   - Token: []

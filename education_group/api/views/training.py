@@ -71,3 +71,5 @@ class TrainingDetail(generics.RetrieveAPIView):
                                          .select_related('education_group_type', 'academic_year')
     serializer_class = TrainingSerializer
     lookup_field = 'uuid'
+    pagination_class = None
+    filter_backends = ()
