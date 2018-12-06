@@ -25,7 +25,9 @@
 ##############################################################################
 from unittest import mock
 
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Permission
+from django.contrib.messages import get_messages
 from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseNotFound
@@ -110,6 +112,9 @@ class TestDetachLearningUnitPrerequisite(TestCase):
     def setUpTestData(cls):
         cls.education_group_year = EducationGroupYearFactory()
         cls.luy = LearningUnitYearFactory()
+        cls.group_element_year_root = GroupElementYearFactory(
+            child_branch=cls.education_group_year
+        )
         cls.group_element_year = GroupElementYearFactory(
             parent=cls.education_group_year,
             child_branch=None,
@@ -133,7 +138,10 @@ class TestDetachLearningUnitPrerequisite(TestCase):
     def test_detach_case_learning_unit_being_prerequisite(self, mock_permission, mock_delete):
         mock_permission.return_value = True
 
-        PrerequisiteItemFactory(learning_unit=self.luy.learning_unit)
+        PrerequisiteItemFactory(
+            prerequisite__education_group_year=self.group_element_year_root.parent,
+            learning_unit=self.luy.learning_unit
+        )
 
         http_referer = reverse('education_group_read', args=[
             self.education_group_year.id,
@@ -141,7 +149,13 @@ class TestDetachLearningUnitPrerequisite(TestCase):
         ])
 
         response = self.client.post(self.url, data=self.post_valid_data, follow=True, HTTP_REFERER=http_referer)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(
+            messages[0],
+            _(_("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
+                "acronym": self.luy.acronym})
+        )
         self.assertFalse(mock_delete.called)
 
     @mock.patch("base.models.group_element_year.GroupElementYear.delete")
@@ -149,8 +163,10 @@ class TestDetachLearningUnitPrerequisite(TestCase):
     def test_detach_case_learning_unit_having_prerequisite(self, mock_permission, mock_delete):
         mock_permission.return_value = True
 
-        prerequisite = PrerequisiteFactory(learning_unit_year=self.luy)
-        PrerequisiteItemFactory(prerequisite=prerequisite)
+        PrerequisiteItemFactory(
+            prerequisite__learning_unit_year=self.luy,
+            prerequisite__education_group_year=self.group_element_year_root.parent
+        )
 
         http_referer = reverse('education_group_read', args=[
             self.education_group_year.id,
@@ -158,6 +174,12 @@ class TestDetachLearningUnitPrerequisite(TestCase):
         ])
 
         response = self.client.post(self.url, data=self.post_valid_data, follow=True, HTTP_REFERER=http_referer)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(
+            messages[0],
+            _(_("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
+                "acronym": self.luy.acronym})
+        )
         self.assertFalse(mock_delete.called)
 

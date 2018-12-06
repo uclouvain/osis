@@ -4,6 +4,7 @@
 {% load dictionnary %}
 {% load sum %}
 {% load score_display %}
+{% load enrollment_state %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -86,78 +87,90 @@
             <br>
 
             {% include "template_messages.html" %}
-            
             {% if enrollments %}
+                {% include 'blocks/legend.html' %}
+            {% endif %}
+            {% with on_enrolled_exists=enrollments|enrolled_exists %}
+            {% if on_enrolled_exists %}
             <button type="submit" class="btn btn-primary" id="bt_save_online_encoding_up" name="action" value="save">
                 <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}</button>
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>{% trans 'Status' %}</th>
-                        <th>{% trans 'Offer' %}</th>
-                        <th>{% trans 'Learning unit' %}</th>
-                        <th>{% trans 'Registration ID' %}</th>
-                        <th>{% trans 'Lastname' %}</th>
-                        <th>{% trans 'Firstname' %}</th>
-                        <th>{% trans 'Score' %}</th>
-                        <th>{% trans 'Justification' %}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for enrollment in enrollments %}
-                    <tr style="{% if enrollment.deadline_reached %}
-                                    background-color:#D3D3D3;
-                               {% endif %}">
-                        <td style="text-align:center;">
-                            {% if enrollment.deadline_reached %}
-                                <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
-                            {% endif %}
-                            {% if enrollment.score_final != None or enrollment.justification_final %}
-                                <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'Score submitted' %}"></span>
-                            {% endif %}
-                        </td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
-                        <td data-container="body" data-toggle="tooltip" title="{{ enrollment.learning_unit_enrollment.learning_unit_year.complete_title}}" >
-                            {{ enrollment.learning_unit_enrollment.learning_unit_year.acronym |add:" - " |add:enrollment.learning_unit_enrollment.learning_unit_year.complete_title| truncatechars:22}}
-                        </td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name|default_if_none:"" }}</td>
-                        <td>
-                            <input class="form-control col-sm" type="text" name="score_{{ enrollment.id }}"
-                                id="num_score_{{ enrollment.id }}" tabindex="{{ forloop.counter }}"
-                                value="{{ enrollment.score_final | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}"
-                                 {% if enrollment.deadline_reached %}
-                                    disabled
-                                 {% endif %}>
-
-                            <!-- Input hidden for allow decimal score -->
-                            <input id="score_{{ enrollment.id }}_can_be_decimal" type="hidden" value="{% if enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores %}true{% else %}false{% endif %}">
-                            {% if not enrollment.deadline_reached %}
-                                <!-- Input hidden for checking if score have changed -->
-                                <input type="hidden" id="hdn_score_changed_{{ enrollment.id }}" name="score_changed_{{ enrollment.id }}" value="false">
-                            {% endif %}
-                        </td>
-                        <td>
-                            <select class="form-control" name="justification_{{ enrollment.id }}" id="slt_justification_score_{{ enrollment.id }}"
-                                   tabindex="{{ enrollments|length|sum:forloop.counter }}"
-                                    {% if enrollment.deadline_reached %}
-                                    disabled
-                                 {% endif %}>
-                                <option value=""></option>
-                                <option {% if enrollment.justification_final == "ABSENCE_UNJUSTIFIED" %} selected {% endif %} value="ABSENCE_UNJUSTIFIED">{% trans 'Unjustified absence' %}</option>
-                                <option {% if enrollment.justification_final == "ABSENCE_JUSTIFIED" %} selected {% endif %} value="ABSENCE_JUSTIFIED">{% trans 'Justified absence' %}</option>
-                                <option {% if enrollment.justification_final == "CHEATING" %} selected {% endif %} value="CHEATING">{% trans 'Cheating' %}</option>
-                            </select>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            <br>
-            <button type="submit" class="btn btn-primary" id="bt_save_online_encoding_down" name="action" value="save">
-                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}</button>
             {% endif %}
+            {% if enrollments %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>{% trans 'Status' %}</th>
+                            <th>{% trans 'Offer' %}</th>
+                            <th>{% trans 'Learning unit' %}</th>
+                            <th>{% trans 'Registration ID' %}</th>
+                            <th>{% trans 'Lastname' %}</th>
+                            <th>{% trans 'Firstname' %}</th>
+                            <th>{% trans 'Score' %}</th>
+                            <th>{% trans 'Justification' %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for enrollment in enrollments %}
+                        <tr style="{% if enrollment.deadline_reached %}
+                                        background-color:#D3D3D3;
+                            {% else %}
+                                background-color:{% include 'blocks/row_color.html' %}
+                               {% endif %}">
+                            <td style="text-align:center;">
+                                {% if enrollment.deadline_reached %}
+                                    <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
+                                {% endif %}
+                                {% if enrollment.score_final != None or enrollment.justification_final %}
+                                    <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'Score submitted' %}"></span>
+                                {% endif %}
+                            </td>
+                            <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
+                            <td data-container="body" data-toggle="tooltip" title="{{ enrollment.learning_unit_enrollment.learning_unit_year.complete_title}}" >
+                                {{ enrollment.learning_unit_enrollment.learning_unit_year.acronym |add:" - " |add:enrollment.learning_unit_enrollment.learning_unit_year.complete_title| truncatechars:22}}
+                            </td>
+                            <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
+                            <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>
+                            <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name|default_if_none:"" }}</td>
+                            <td>
+                                <input class="form-control col-sm" type="text" name="score_{{ enrollment.id }}"
+                                    id="num_score_{{ enrollment.id }}" tabindex="{{ forloop.counter }}"
+                                    value="{{ enrollment.score_final | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}"
+                                     {% if enrollment.deadline_reached or enrollment.enrollment_state != 'ENROLLED' %}
+                                        disabled
+                                     {% endif %}>
+
+                                <!-- Input hidden for allow decimal score -->
+                                <input id="score_{{ enrollment.id }}_can_be_decimal" type="hidden" value="{% if enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores %}true{% else %}false{% endif %}">
+                                {% if not enrollment.deadline_reached %}
+                                    <!-- Input hidden for checking if score have changed -->
+                                    <input type="hidden" id="hdn_score_changed_{{ enrollment.id }}" name="score_changed_{{ enrollment.id }}" value="false">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <select class="form-control" name="justification_{{ enrollment.id }}" id="slt_justification_score_{{ enrollment.id }}"
+                                       tabindex="{{ enrollments|length|sum:forloop.counter }}"
+                                        {% if enrollment.deadline_reached or enrollment.enrollment_state != 'ENROLLED' %}
+                                        disabled
+                                     {% endif %}>
+                                    <option value=""></option>
+                                    <option {% if enrollment.justification_final == "ABSENCE_UNJUSTIFIED" %} selected {% endif %} value="ABSENCE_UNJUSTIFIED">{% trans 'Unjustified absence' %}</option>
+                                    <option {% if enrollment.justification_final == "ABSENCE_JUSTIFIED" %} selected {% endif %} value="ABSENCE_JUSTIFIED">{% trans 'Justified absence' %}</option>
+                                    <option {% if enrollment.justification_final == "CHEATING" %} selected {% endif %} value="CHEATING">{% trans 'Cheating' %}</option>
+                                </select>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+            {% if on_enrolled_exists %}
+                <br>
+                <button type="submit" class="btn btn-primary" id="bt_save_online_encoding_down" name="action" value="save">
+                    <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}</button>
+            {% endif %}
+            {% endwith %}
+
+
         </form>
     </div>
 </div>

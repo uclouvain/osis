@@ -107,7 +107,7 @@ def learning_units_search(request, search_type):
         'current_academic_year': starting_academic_year(),
         'experimental_phase': True,
         'search_type': search_type,
-        'is_faculty_manager': a_person.is_faculty_manager(),
+        'is_faculty_manager': a_person.is_faculty_manager,
         'form_comparison': form_comparison
     }
 
@@ -169,7 +169,7 @@ def learning_units_proposal_search(request):
         'experimental_phase': True,
         'search_type': PROPOSAL_SEARCH,
         'proposals': proposals,
-        'is_faculty_manager': user_person.is_faculty_manager(),
+        'is_faculty_manager': user_person.is_faculty_manager,
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(proposals)),
     }
     return layout.render(request, "learning_units.html", context)
@@ -232,7 +232,7 @@ def learning_units_external_search(request):
         'experimental_phase': True,
         'search_type': EXTERNAL_SEARCH,
         'learning_units': external_learning_units,
-        'is_faculty_manager': user_person.is_faculty_manager(),
+        'is_faculty_manager': user_person.is_faculty_manager,
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(external_learning_units)),
     }
     return layout.render(request, "learning_units.html", context)

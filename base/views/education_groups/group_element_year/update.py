@@ -28,6 +28,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ObjectDoesNotExist, ValidationError, PermissionDenied
 from django.db import IntegrityError
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -40,14 +41,13 @@ from waffle.decorators import waffle_flag
 from base.business import group_element_years
 from base.business.group_element_years.management import SELECT_CACHE_KEY, select_education_group_year, \
     select_learning_unit_year
-from base.business.learning_units.prerequisite import luy_has_or_is_prerequisite
 from base.forms.education_group.group_element_year import UpdateGroupElementYearForm
 from base.models.education_group_year import EducationGroupYear
 from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.utils.utils import get_object_or_none
-from base.views.common import display_success_messages, display_warning_messages
+from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.education_groups.select import build_success_message, build_success_json_response
 from base.views.mixins import AjaxTemplateMixin, FlagMixin, RulesRequiredMixin
@@ -239,9 +239,14 @@ class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView)
     def delete(self, request, *args, **kwargs):
         child_leaf = self.get_object().child_leaf
         parent = self.get_object().parent
-        if child_leaf and luy_has_or_is_prerequisite(child_leaf) \
-                and management._is_min_child_reached(parent, child_leaf):
-            raise PermissionDenied
+        if child_leaf and child_leaf.has_or_is_prerequisite(parent):
+            # FIXME Method should be in permission to view and display message in page
+            error_msg = \
+                _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
+                    "acronym": child_leaf.acronym
+                }
+            display_error_messages(request, error_msg)
+            return JsonResponse({"error": True, "success_url": self.get_success_url()})
 
         success_msg = _("\"%(child)s\" has been detached from \"%(parent)s\"") % {
             'child': self.get_object().child,

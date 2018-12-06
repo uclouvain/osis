@@ -3161,11 +3161,6 @@
                 "educationgroupachievement"
             ],
             [
-                "is_entity_manager",
-                "base",
-                "entitymanager"
-            ],
-            [
                 "change_learningclassyear",
                 "base",
                 "learningclassyear"
@@ -3373,5 +3368,33 @@
             ]
         ]
     }
-}
+},
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "sic",
+            "permissions": [
+                [
+                    "can_edit_common_education_group",
+                    "base",
+                    "educationgroup"
+                ],
+                [
+                    "can_edit_educationgroup_pedagogy",
+                    "base",
+                    "educationgroup"
+                ],
+                [
+                    "can_access_education_group",
+                    "base",
+                    "educationgroup"
+                ],
+                [
+                    "can_access_catalog",
+                    "base",
+                    "offer"
+                ]
+            ]
+        }
+    }
 ]

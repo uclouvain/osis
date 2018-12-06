@@ -29,14 +29,16 @@ from django.contrib.auth.models import Permission
 from django.test import TestCase
 
 from base.business.education_groups.perms import is_academic_calendar_opened, check_permission, \
-    check_authorized_type, is_eligible_to_edit_general_information
+    check_authorized_type, is_eligible_to_edit_general_information, is_eligible_to_edit_admission_condition
 from base.models.enums import academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonBachelorFactory
+from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, SICFactory
+from base.tests.factories.person_entity import PersonEntityFactory
 
 
 class TestPerms(TestCase):
@@ -92,12 +94,19 @@ class TestPerms(TestCase):
             )
         )
 
-    def is_person_central_manager(self):
+    def test_is_person_central_manager(self):
         person = PersonFactory()
-        self.assertFalse(person.is_central_manager())
+        self.assertFalse(person.is_central_manager)
 
         central_manager = CentralManagerFactory()
-        self.assertTrue(central_manager.is_central_manager())
+        self.assertTrue(central_manager.is_central_manager)
+
+    def test_is_person_sic(self):
+        person = PersonFactory()
+        self.assertFalse(person.is_sic())
+
+        sic = SICFactory()
+        self.assertTrue(sic.is_sic())
 
     def test_check_unauthorized_type(self):
         education_group = EducationGroupYearFactory()
@@ -163,6 +172,19 @@ class TestPerms(TestCase):
 
     def test_is_eligible_to_edit_common_offer_as_central_manager(self):
         person = CentralManagerFactory()
+        entity_version = EntityVersionFactory(acronym='UCL')
+        entity = entity_version.entity
         person.user.user_permissions.add(Permission.objects.get(codename="can_edit_educationgroup_pedagogy"))
-        education_group = EducationGroupYearFactory(acronym="common-1ba")
+        personEntity = PersonEntityFactory(person=person, entity=entity)
+        education_group = EducationGroupYearCommonBachelorFactory(
+            management_entity=entity,
+            administration_entity=entity
+        )
         self.assertTrue(is_eligible_to_edit_general_information(person, education_group))
+
+    def test_is_eligible_to_edit_common_offer_as_sic(self):
+        person = SICFactory()
+        person.user.user_permissions.add(Permission.objects.get(codename="can_edit_educationgroup_pedagogy"))
+        person.user.user_permissions.add(Permission.objects.get(codename="can_edit_common_education_group"))
+        education_group = EducationGroupYearCommonBachelorFactory()
+        self.assertTrue(is_eligible_to_edit_admission_condition(person, education_group))

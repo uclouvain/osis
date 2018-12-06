@@ -26,7 +26,8 @@
 from django.test import TestCase
 from django.utils.translation import gettext
 
-from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm, SimplifiedVolumeForm
+from base.forms.learning_unit.edition_volume import SimplifiedVolumeForm, SimplifiedVolumeManagementForm
+from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.learning_component_year import LearningComponentYear
 from base.tests.factories.academic_year import get_current_year
@@ -38,15 +39,15 @@ from base.tests.factories.person import PersonFactory
 class TestSimplifiedVolumeManagementForm(TestCase):
     def setUp(self):
         self.data = {
-            'form-TOTAL_FORMS': '2',
-            'form-INITIAL_FORMS': '0',
-            'form-MAX_NUM_FORMS': '2',
-            'form-0-hourly_volume_total_annual': 20,
-            'form-0-hourly_volume_partial_q1': 10,
-            'form-0-hourly_volume_partial_q2': 10,
-            'form-1-hourly_volume_total_annual': 20,
-            'form-1-hourly_volume_partial_q1': 10,
-            'form-1-hourly_volume_partial_q2': 10,
+            'component-TOTAL_FORMS': '2',
+            'component-INITIAL_FORMS': '0',
+            'component-MAX_NUM_FORMS': '2',
+            'component-0-hourly_volume_total_annual': 20,
+            'component-0-hourly_volume_partial_q1': 10,
+            'component-0-hourly_volume_partial_q2': 10,
+            'component-1-hourly_volume_total_annual': 20,
+            'component-1-hourly_volume_partial_q1': 10,
+            'component-1-hourly_volume_partial_q2': 10,
         }
         generator = GenerateContainer(get_current_year(), get_current_year())
         self.learning_unit_year = generator[0].learning_unit_year_full
@@ -124,15 +125,15 @@ class TestSimplifiedVolumeManagementForm(TestCase):
 
     def test_save_correct_planned_classes(self):
         strange_data = {
-            'form-TOTAL_FORMS': '2',
-            'form-INITIAL_FORMS': '0',
-            'form-MAX_NUM_FORMS': '2',
-            'form-0-hourly_volume_total_annual': 0,
-            'form-0-hourly_volume_partial_q1': 0,
-            'form-0-hourly_volume_partial_q2': 0,
-            'form-1-hourly_volume_total_annual': 20,
-            'form-1-hourly_volume_partial_q1': 10,
-            'form-1-hourly_volume_partial_q2': 10,
+            'component-TOTAL_FORMS': '2',
+            'component-INITIAL_FORMS': '0',
+            'component-MAX_NUM_FORMS': '2',
+            'component-0-hourly_volume_total_annual': 0,
+            'component-0-hourly_volume_partial_q1': 0,
+            'component-0-hourly_volume_partial_q2': 0,
+            'component-1-hourly_volume_total_annual': 20,
+            'component-1-hourly_volume_partial_q1': 10,
+            'component-1-hourly_volume_partial_q2': 10,
         }
 
         formset = SimplifiedVolumeManagementForm(
@@ -158,7 +159,8 @@ class TestSimplifiedVolumeForm(TestCase):
         self.instance.hourly_volume_partial_q1 = 0
         form = SimplifiedVolumeForm(
             data={"hourly_volume_partial_q1": 12}, is_faculty_manager=True, instance=self.instance,
-            component_type=self.instance.type
+            index=0,
+            component_type=COMPONENT_TYPES[0]
         )
         form.is_valid()
         self.assertEqual(form.errors["hourly_volume_partial_q1"][0],
@@ -169,7 +171,8 @@ class TestSimplifiedVolumeForm(TestCase):
         self.instance.hourly_volume_partial_q1 = 12
         form = SimplifiedVolumeForm(
             data={"hourly_volume_partial_q1": 0}, is_faculty_manager=True, instance=self.instance,
-            component_type=self.instance.type
+            component_type=COMPONENT_TYPES[0],
+            index=0
         )
         form.is_valid()
         self.assertEqual(form.errors["hourly_volume_partial_q1"][0],

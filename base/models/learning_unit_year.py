@@ -33,7 +33,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, ngettext
 from reversion.admin import VersionAdmin
 
-from base.models import entity_container_year as mdl_entity_container_year
+from base.models import entity_container_year as mdl_entity_container_year, group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
 from base.models.enums import active_status, learning_container_year_types
@@ -43,6 +43,7 @@ from base.models.enums.learning_container_year_types import COURSE, INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, ANNUAL, BIENNIAL_EVEN, BIENNIAL_ODD
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_ALL, REGEX_BY_SUBTYPE
+from base.models.prerequisite_item import PrerequisiteItem
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 AUTHORIZED_REGEX_CHARS = "$*+.^"
@@ -410,14 +411,22 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def is_external(self):
         return hasattr(self, "externallearningunityear")
 
+    def is_prerequisite(self):
+        return PrerequisiteItem.objects.filter(
+            Q(learning_unit=self.learning_unit) | Q(prerequisite__learning_unit_year=self)
+        ).exists()
+
+    def has_or_is_prerequisite(self, education_group_year):
+        formations = group_element_year.find_learning_unit_formations([education_group_year])[education_group_year.id]
+        return PrerequisiteItem.objects.filter(
+            Q(prerequisite__learning_unit_year=self, prerequisite__education_group_year__in=formations) |
+            Q(prerequisite__education_group_year__in=formations, learning_unit=self.learning_unit)
+        ).exists()
+
 
 def get_by_id(learning_unit_year_id):
     return LearningUnitYear.objects.select_related('learning_container_year__learning_container') \
         .get(pk=learning_unit_year_id)
-
-
-def find_by_acronym(acronym):
-    return LearningUnitYear.objects.filter(acronym=acronym).select_related('learning_container_year')
 
 
 def _is_regex(acronym):

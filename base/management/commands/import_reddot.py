@@ -36,21 +36,20 @@ from django.db.transaction import atomic
 
 from base.models.academic_year import AcademicYear
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
+from base.models.education_group import EducationGroup
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
+from base.models.entity import Entity
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType
-from base.tests.factories.education_group import EducationGroupFactory
+from base.models.enums.organization_type import MAIN
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-
-SKILLS_AND_ACHIEVEMENTS_KEY = 'comp_acquis'
-SKILLS_AND_ACHIEVEMENTS_CMS_DATA = ('skills_and_achievements_introduction', 'skills_and_achievements_additional_text', )
-SKILLS_AND_ACHIEVEMENTS_AA_DATA = 'achievements'
-
+from webservices.business import SKILLS_AND_ACHIEVEMENTS_CMS_DATA, SKILLS_AND_ACHIEVEMENTS_KEY, \
+    SKILLS_AND_ACHIEVEMENTS_AA_DATA
 
 BACHELOR_FIELDS = (
     'alert_message', 'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres', 'ca_bacs_examen_langue',
@@ -90,27 +89,35 @@ def create_common_offer_for_academic_year(year):
         acronym = 'common-{}'.format(code)
         education_group_year = EducationGroupYear.objects.filter(academic_year=academic_year,
                                                                  acronym=acronym)
+        entity_ucl = Entity.objects.get(entityversion__acronym='UCL', organization__type=MAIN)
+
         if offer['code'] in COMMON_OFFER:
-            education_group = EducationGroupFactory(start_year=academic_year.year, end_year=academic_year.year + 1)
             education_group_type = EducationGroupType.objects.get(
                 name=offer['name'],
                 category=offer['category']
             )
             education_group_year = education_group_year.first()
             if not education_group_year:
-
+                education_group = EducationGroup.objects.create(
+                    start_year=academic_year.year,
+                    end_year=academic_year.year + 1
+                )
                 EducationGroupYear.objects.create(
                     academic_year=academic_year,
                     education_group=education_group,
                     acronym=acronym,
                     title=acronym,
                     education_group_type=education_group_type,
-                    title_english=acronym
+                    title_english=acronym,
+                    management_entity=entity_ucl,
+                    administration_entity=entity_ucl
                 )
             else:
                 education_group_year.title = acronym
                 education_group_year.title_english = acronym
                 education_group_year.education_group_type = education_group_type
+                education_group_year.management_entity = entity_ucl
+                education_group_year.administration_entity = entity_ucl
                 education_group_year.save()
         else:
             education_group_year.delete()
@@ -125,6 +132,7 @@ def get_text_label(entity, label):
         label=label,
         published=True
     )
+
     return text_label
 
 
@@ -248,6 +256,11 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_EN, 'majeures', 'Majors'),
     (settings.LANGUAGE_CODE_EN, 'finalites', 'Focuses'),
     (settings.LANGUAGE_CODE_EN, 'finalites_didactiques', 'Teaching Focuses'),
+    (settings.LANGUAGE_CODE_EN, 'agregation', 'Agregation'),
+    (settings.LANGUAGE_CODE_FR, 'agregation', 'Agrégation'),
+    (settings.LANGUAGE_CODE_EN, 'prerequis', 'Prerequis'),
+    (settings.LANGUAGE_CODE_FR, 'prerequis', 'Prérequis'),
+
 
 ]
 
@@ -268,7 +281,6 @@ def get_mapping_label_texts(context, labels):
     mapping_label_text_label = {}
     for label in labels:
         text_label = get_text_label(context.entity, label)
-
         TranslatedTextLabel.objects.update_or_create(
             text_label=text_label,
             language=context.language,
