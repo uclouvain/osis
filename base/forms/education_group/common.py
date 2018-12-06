@@ -61,7 +61,7 @@ class MainEntitiesVersionChoiceField(EntitiesVersionChoiceField):
 
 class EducationGroupTypeModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-        return _(dict(ALL_TYPES)[obj.name])
+        return obj.get_name_display()
 
 
 class ValidationRuleEducationGroupTypeMixin(ValidationRuleMixin):
