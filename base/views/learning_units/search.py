@@ -26,10 +26,9 @@
 import collections
 import itertools
 
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.messages import WARNING
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -49,7 +48,8 @@ from base.models.person import Person, find_by_user
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils.cache import cache_filter
 from base.views import layout
-from base.views.common import check_if_display_message, display_error_messages, display_messages_by_level
+from base.views.common import check_if_display_message, display_error_messages, display_messages_by_level, \
+    paginate_queryset
 
 SIMPLE_SEARCH = 1
 SERVICE_COURSES_SEARCH = 2
@@ -67,17 +67,17 @@ def learning_units_search(request, search_type):
     service_course_search = search_type == SERVICE_COURSES_SEARCH
     borrowed_course_search = search_type == BORROWED_COURSE
 
-    form = LearningUnitYearForm(request.GET or None,
-                                service_course_search=service_course_search,
-                                borrowed_course_search=borrowed_course_search,
-                                initial={'academic_year_id': starting_academic_year()})
+    form = LearningUnitYearForm(
+        request.GET or None,
+        service_course_search=service_course_search,
+        borrowed_course_search=borrowed_course_search,
+        initial={'academic_year_id': starting_academic_year()}
+    )
     found_learning_units = []
-    try:
-        if form.is_valid():
-            found_learning_units = form.get_activity_learning_units()
-            check_if_display_message(request, found_learning_units)
-    except TooManyResultsException:
-        messages.add_message(request, messages.ERROR, _('Too many results! Please be more specific.'))
+
+    if form.is_valid():
+        found_learning_units = form.get_activity_learning_units()
+        check_if_display_message(request, found_learning_units)
 
     if request.POST.get('xls_status') == "xls":
         return create_xls(request.user, found_learning_units, _get_filter(form, search_type))
@@ -90,14 +90,14 @@ def learning_units_search(request, search_type):
         )
 
     if request.POST.get('xls_status') == "xls_with_parameters":
-        return create_xls_with_parameters(request.user,
-                                          found_learning_units,
-                                          _get_filter(form, search_type),
-                                          {WITH_GRP: request.POST.get('with_grp') == 'true',
-                                           WITH_ATTRIBUTIONS: request.POST.get('with_attributions') == 'true'})
+        create_xls_with_parameters(request.user,
+                                   found_learning_units,
+                                   _get_filter(form, search_type),
+                                   {WITH_GRP: request.POST.get('with_grp') == 'true',
+                                    WITH_ATTRIBUTIONS: request.POST.get('with_attributions') == 'true'})
 
-    a_person = find_by_user(request.user)
     form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
+
     context = {
         'form': form,
         'academic_years': get_last_academic_years(),
@@ -107,11 +107,12 @@ def learning_units_search(request, search_type):
         'current_academic_year': starting_academic_year(),
         'experimental_phase': True,
         'search_type': search_type,
-        'is_faculty_manager': a_person.is_faculty_manager,
-        'form_comparison': form_comparison
+        'is_faculty_manager': request.user.person.is_faculty_manager,
+        'form_comparison': form_comparison,
+        'page_obj': paginate_queryset(found_learning_units, request.GET),
     }
 
-    return layout.render(request, "learning_units.html", context)
+    return render(request, "learning_units.html", context)
 
 
 @login_required

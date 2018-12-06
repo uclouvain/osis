@@ -27,13 +27,13 @@ from collections import OrderedDict
 from operator import itemgetter
 
 from django.conf import settings
+from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
 
 from attribution.models import attribution
 from attribution.models.attribution import find_all_tutors_by_learning_unit_year
 from base import models as mdl_base
 from base.business.entity import get_entity_calendar
-
 from base.business.learning_unit_year_with_context import volume_learning_component_year
 from base.business.learning_units.comparison import get_entity_by_type
 from base.business.xls import get_name_or_username
@@ -41,6 +41,7 @@ from base.models import entity_container_year, academic_calendar
 from base.models import learning_achievement
 from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import academic_calendar_type
+from base.models.enums import entity_container_year_link_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from cms import models as mdl_cms
 from cms.enums import entity_name
@@ -48,7 +49,7 @@ from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models import translated_text
 from osis_common.document import xls_build
 from osis_common.utils.datetime import convert_date_to_datetime
-from base.models.enums import entity_container_year_link_type
+
 # List of key that a user can modify
 
 WORKSHEET_TITLE = _('Learning units list')
@@ -82,7 +83,6 @@ LEARNING_UNIT_TITLES_PART2 = [
     str(_('Quadrimester')),
     str(_('Session derogation')),
     str(_('Language')),
-    str(_('Absolute credits')),
 ]
 CMS_LABEL_SPECIFICATIONS = ['themes_discussed', 'prerequisite']
 
@@ -96,11 +96,15 @@ CMS_LABEL_SUMMARY = ['resume']
 COLORED = 'COLORED_ROW'
 
 
-def get_same_container_year_components(learning_unit_year, with_classes=False):
+def get_same_container_year_components(learning_unit_year):
     learning_container_year = learning_unit_year.learning_container_year
     components = []
-    learning_components_year = mdl_base.learning_component_year.find_by_learning_container_year(learning_container_year,
-                                                                                                with_classes)
+
+    learning_components_year = learning_container_year.learningcomponentyear_set.prefetch_related(
+        Prefetch('learningclassyear_set', to_attr="classes"),
+        'learningunityear_set'
+    ).order_by('type', 'acronym').annotate()
+
     additionnal_entities = {}
 
     for indx, learning_component_year in enumerate(learning_components_year):
@@ -112,16 +116,18 @@ def get_same_container_year_components(learning_unit_year, with_classes=False):
 
         used_by_learning_unit = mdl_base.learning_unit_component.search(learning_component_year, learning_unit_year)
 
-        entity_components_yr = EntityComponentYear.objects.filter(learning_component_year=learning_component_year)
+        entity_components_yr = learning_component_year.entitycomponentyear_set.all()
         if indx == 0:
             additionnal_entities = _get_entities(entity_components_yr)
 
-        components.append({'learning_component_year': learning_component_year,
-                           'volumes': volume_learning_component_year(learning_component_year, entity_components_yr),
-                           'learning_unit_usage': _learning_unit_usage(learning_component_year),
-                           'used_by_learning_unit': used_by_learning_unit
-                           })
-
+        components.append(
+            {
+                'learning_component_year': learning_component_year,
+                'volumes': volume_learning_component_year(learning_component_year, entity_components_yr),
+                'learning_unit_usage': _learning_unit_usage(learning_component_year),
+                'used_by_learning_unit': used_by_learning_unit
+            }
+        )
     components = sorted(components, key=itemgetter('learning_unit_usage'))
     return _compose_components_dict(components, additionnal_entities)
 
@@ -168,7 +174,7 @@ def _learning_unit_usage(a_learning_component_year):
 
 
 def _learning_unit_usage_by_class(a_learning_class_year):
-    queryset = mdl_base.learning_unit_component_class.find_by_learning_class_year(a_learning_class_year) \
+    queryset = a_learning_class_year.learningunitcomponentclass_set \
         .order_by('learning_unit_component__learning_unit_year__acronym') \
         .values_list('learning_unit_component__learning_unit_year__acronym', flat=True)
     return ", ".join(list(queryset))
@@ -241,7 +247,7 @@ def create_xls(user, found_learning_units, filters):
 
 def is_summary_submission_opened():
     current_academic_year = mdl_base.academic_year.current_academic_year()
-    return mdl_base.academic_calendar.\
+    return mdl_base.academic_calendar. \
         is_academic_calendar_opened_for_specific_academic_year(current_academic_year,
                                                                academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
 

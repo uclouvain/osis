@@ -541,14 +541,6 @@ def find_partims_with_different_periodicity(a_learning_unit_year):
     return a_learning_unit_year.get_partims_related().exclude(periodicity=a_learning_unit_year.periodicity)
 
 
-def find_by_learning_unit(a_learning_unit):
-    return search(learning_unit=a_learning_unit)
-
-
-def find_by_entities(entities):
-    return LearningUnitYear.objects.filter(learning_container_year__entitycontaineryear__entity__in=entities)
-
-
 def find_latest_by_learning_unit(a_learning_unit):
     return search(learning_unit=a_learning_unit).order_by('academic_year').last()
 

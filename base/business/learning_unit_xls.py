@@ -23,21 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import defaultdict
 
+from django.template.defaultfilters import yesno
 from django.utils.translation import ugettext_lazy as _
+from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
+from openpyxl.utils import get_column_letter
 
+from attribution.business import attribution_charge_new
 from attribution.models.enums.function import Functions
 from base import models as mdl_base
 from base.business.learning_unit import LEARNING_UNIT_TITLES_PART2, XLS_DESCRIPTION, XLS_FILENAME, \
-    WORKSHEET_TITLE, get_same_container_year_components, get_entity_acronym
+    WORKSHEET_TITLE, get_entity_acronym
 from base.business.xls import get_name_or_username
-from osis_common.document import xls_build
-from attribution.business import attribution_charge_new
-from base.models.enums import learning_component_year_type
-from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.proposal_type import ProposalType
-from openpyxl.utils import get_column_letter
-from collections import defaultdict
+from osis_common.document import xls_build
 
 # List of key that a user can modify
 VOLUMES_INITIALIZED = {'VOLUME_TOTAL': 0, 'PLANNED_CLASSES': 0, 'VOLUME_Q1': 0, 'VOLUME_Q2': 0}
@@ -145,41 +146,6 @@ def _get_parameters_configurable_list(learning_units, titles, user):
     return parameters
 
 
-def _get_absolute_credits(learning_unit_yr):
-    group_elements_years = mdl_base.group_element_year.search(child_leaf=learning_unit_yr) \
-        .select_related("child_leaf", "parent__education_group_type").order_by('parent__partial_acronym')
-    if group_elements_years:
-        return group_elements_years.first().child_leaf.credits \
-            if group_elements_years.first().child_leaf.credits else ''
-    return ''
-
-
-def _get_volumes(learning_unit_yr):
-    volumes = {
-        learning_component_year_type.LECTURING: VOLUMES_INITIALIZED,
-        learning_component_year_type.PRACTICAL_EXERCISES: VOLUMES_INITIALIZED
-    }
-    data_components = get_same_container_year_components(learning_unit_yr, True)
-    for component in data_components.get('components'):
-        if component.get('learning_component_year').type in (learning_component_year_type.LECTURING,
-                                                             learning_component_year_type.PRACTICAL_EXERCISES):
-            volumes = _update_volumes_data(component, volumes)
-
-    return volumes
-
-
-def _update_volumes_data(component, volumes_param):
-    volumes = volumes_param.copy()
-    vol_to_update = volumes.get(component.get('learning_component_year').type).copy()
-    key_of_value_to_update = ['VOLUME_TOTAL', 'VOLUME_Q1', 'VOLUME_Q2', 'PLANNED_CLASSES']
-    for key in key_of_value_to_update:
-        if component.get('volumes').get(key):
-            vol_to_update[key] = vol_to_update.get(key) + component.get('volumes').get(key)
-
-    volumes[component.get('learning_component_year').type] = vol_to_update
-    return volumes
-
-
 def _get_significant_volume(volume):
     if volume and volume > 0:
         return volume
@@ -217,9 +183,8 @@ def _get_wrapped_cells(learning_units, teachers_col_letter, programs_col_letter)
 def _get_colored_rows(learning_units):
     colored_cells = defaultdict(list)
     for idx, luy in enumerate(learning_units, start=1):
-        proposal = mdl_base.proposal_learning_unit.find_by_learning_unit_year(luy)
-        if proposal:
-            colored_cells[PROPOSAL_LINE_STYLES.get(proposal.type)].append(idx)
+        if getattr(luy, "proposallearningunit", None):
+            colored_cells[PROPOSAL_LINE_STYLES.get(luy.proposallearningunit.type)].append(idx)
     return colored_cells
 
 
@@ -282,48 +247,48 @@ def _concatenate_training_data(formations_by_educ_group_year, group_element_year
 
 
 def _get_data_part2(learning_unit_yr, with_attributions):
-    volumes = _get_volumes(learning_unit_yr)
     lu_data_part2 = []
     if with_attributions:
         lu_data_part2.append(
             " \n".join([_get_attribution_line(value) for value in learning_unit_yr.attribution_charge_news.values()])
         )
 
-    volume_lecturing = volumes.get(learning_component_year_type.LECTURING)
-    volumes_practical = volumes.get(learning_component_year_type.PRACTICAL_EXERCISES)
+    components = learning_unit_yr.learning_component_years
+    volume_lecturing = components.get(type=LECTURING)
+    volumes_practical = components.get(type=PRACTICAL_EXERCISES)
+
     lu_data_part2.extend([
-        str(_(learning_unit_yr.periodicity.title())),
-        str(_('Yes')) if learning_unit_yr.status else str(_('No')),
-        _get_significant_volume(volume_lecturing.get('VOLUME_TOTAL')),
-        _get_significant_volume(volume_lecturing.get('VOLUME_Q1')),
-        _get_significant_volume(volume_lecturing.get('VOLUME_Q2')),
-        _get_significant_volume(volume_lecturing.get('PLANNED_CLASSES')),
-        _get_significant_volume(volumes_practical.get('VOLUME_TOTAL')),
-        _get_significant_volume(volumes_practical.get('VOLUME_Q1')),
-        _get_significant_volume(volumes_practical.get('VOLUME_Q2')),
-        _get_significant_volume(volumes_practical.get('PLANNED_CLASSES')),
-        str(_(learning_unit_yr.quadrimester.title())) if learning_unit_yr.quadrimester else '',
-        str(_(learning_unit_yr.session.title())) if learning_unit_yr.session else '',
-        learning_unit_yr.language if learning_unit_yr.language else "",
-        _get_absolute_credits(learning_unit_yr),
+        learning_unit_yr.get_periodicity_display(),
+        yesno(learning_unit_yr.status),
+        _get_significant_volume(volume_lecturing.hourly_volume_total_annual or 0),
+        _get_significant_volume(volume_lecturing.hourly_volume_partial_q1 or 0),
+        _get_significant_volume(volume_lecturing.hourly_volume_partial_q2 or 0),
+        volume_lecturing.planned_classes or 0,
+        _get_significant_volume(volumes_practical.hourly_volume_total_annual or 0),
+        _get_significant_volume(volumes_practical.hourly_volume_partial_q1 or 0),
+        _get_significant_volume(volumes_practical.hourly_volume_partial_q2 or 0),
+        volumes_practical.planned_classes or 0,
+        learning_unit_yr.get_quadrimester_display() or '',
+        learning_unit_yr.get_session_display() or '',
+        learning_unit_yr.language or "",
     ])
     return lu_data_part2
 
 
 def _get_data_part1(learning_unit_yr):
-    proposal = mdl_base.proposal_learning_unit.find_by_learning_unit_year(learning_unit_yr)
+    proposal = getattr(learning_unit_yr, "proposallearningunit", None)
     lu_data_part1 = [
         learning_unit_yr.acronym,
         learning_unit_yr.academic_year.name,
         learning_unit_yr.complete_title,
-        str(_(learning_unit_yr.learning_container_year.container_type.title()))
+        learning_unit_yr.learning_container_year.get_container_type_display()
         # FIXME Condition to remove when the LearningUnitYear.learning_continer_year_id will be null=false
         if learning_unit_yr.learning_container_year else "",
-        str(_(learning_unit_yr.subtype.title())),
+        learning_unit_yr.get_subtype_display(),
         _get_entity_faculty_acronym(learning_unit_yr.entities.get('REQUIREMENT_ENTITY'),
                                     learning_unit_yr.academic_year),
-        str(_(proposal.type.title())) if proposal else '',
-        str(_(proposal.state.title())) if proposal else '',
+        proposal.get_type_display() if proposal else '',
+        proposal.get_state_display() if proposal else '',
         learning_unit_yr.credits,
         get_entity_acronym(learning_unit_yr.entities.get('ALLOCATION_ENTITY')),
         learning_unit_yr.complete_title_english,

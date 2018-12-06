@@ -32,7 +32,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
@@ -89,7 +89,7 @@ def learning_unit_components(request, learning_unit_year_id):
     context = get_common_context_learning_unit_year(learning_unit_year_id, person)
     learning_unit_year = context['learning_unit_year']
     context['warnings'] = learning_unit_year.warnings
-    data_components = get_same_container_year_components(context['learning_unit_year'], True)
+    data_components = get_same_container_year_components(context['learning_unit_year'])
     context['components'] = data_components.get('components')
     context['REQUIREMENT_ENTITY'] = data_components.get('REQUIREMENT_ENTITY')
     context['ADDITIONAL_REQUIREMENT_ENTITY_1'] = data_components.get('ADDITIONAL_REQUIREMENT_ENTITY_1')

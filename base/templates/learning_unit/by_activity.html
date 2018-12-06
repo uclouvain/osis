@@ -88,7 +88,7 @@
                         <th>{% trans 'Status' %}</th>
                     </tr>
                     </thead>
-                    {% for learning_unit in learning_units %}
+                    {% for learning_unit in page_obj %}
                         <tr data-id="{{ learning_unit.id }}" data-value="{{ learning_unit.acronym }}">
                             <td>{{ learning_unit.academic_year.name }}</td>
                             <td>
@@ -123,6 +123,9 @@
                         </tr>
                     {% endfor %}
                 </table>
+                <div class="text-center">
+                    {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+                </div>
             {% endif %}
         </div>
     </div>

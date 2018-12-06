@@ -35,7 +35,7 @@ from base import models as mdl
 from base.business.entity import get_entities_ids, build_entity_container_prefetch
 from base.business.entity_version import SERVICE_COURSE
 from base.business.learning_unit_year_with_context import append_latest_entities
-from base.forms.common import get_clean_data, treat_empty_or_str_none_as_none, TooManyResultsException
+from base.forms.common import get_clean_data, treat_empty_or_str_none_as_none
 from base.forms.search.search_form import BaseSearchForm
 from base.forms.utils.choice_field import add_blank
 from base.forms.utils.dynamic_field import DynamicChoiceField
@@ -54,11 +54,8 @@ from base.models.organization_address import find_distinct_by_country
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from reference.models.country import Country
 
-MAX_RECORDS = 1000
-
 
 class LearningUnitSearchForm(BaseSearchForm):
-    MAX_RECORDS = 1000
     ALL_LABEL = (None, pgettext("plural", "All"))
     ALL_CHOICES = (ALL_LABEL,)
 
@@ -111,13 +108,14 @@ class LearningUnitSearchForm(BaseSearchForm):
         learning_units = self.get_filter_learning_container_ids(learning_units)
 
         learning_units = learning_units.select_related(
-            'academic_year', 'learning_container_year__academic_year') \
-            .prefetch_related(
-                build_entity_container_prefetch([
-                    entity_container_year_link_type.ALLOCATION_ENTITY,
-                    entity_container_year_link_type.REQUIREMENT_ENTITY
-                ])
-            ).order_by('academic_year__year', 'acronym').annotate(has_proposal=Exists(has_proposal))
+            'academic_year', 'learning_container_year__academic_year',
+            'language', 'proposallearningunit'
+        ).prefetch_related(
+            build_entity_container_prefetch([
+                entity_container_year_link_type.ALLOCATION_ENTITY,
+                entity_container_year_link_type.REQUIREMENT_ENTITY
+            ]),
+        ).order_by('academic_year__year', 'acronym').annotate(has_proposal=Exists(has_proposal))
 
         learning_units = self.get_filter_learning_container_ids(learning_units)
 
@@ -226,15 +224,14 @@ class LearningUnitYearForm(LearningUnitSearchForm):
 
         learning_units = self.get_queryset()
 
-        if not service_course_search and self.cleaned_data and learning_units.count() > self.MAX_RECORDS:
-            raise TooManyResultsException
-
         if self.borrowed_course_search:
             # TODO must return a queryset
             learning_units = self._filter_borrowed_learning_units(learning_units)
 
-        # FIXME We must keep a queryset
-        return [append_latest_entities(learning_unit, service_course_search) for learning_unit in learning_units]
+        for learning_unit in learning_units:
+            append_latest_entities(learning_unit, service_course_search)
+
+        return learning_units
 
     def _set_status(self, luy_status):
         return convert_status_bool(luy_status) if luy_status else self.cleaned_data['status']
@@ -246,7 +243,7 @@ class LearningUnitYearForm(LearningUnitSearchForm):
 
         if faculty_borrowing_acronym:
             try:
-                faculty_borrowing_id = EntityVersion.objects.current(academic_year.start_date).\
+                faculty_borrowing_id = EntityVersion.objects.current(academic_year.start_date). \
                     get(acronym=faculty_borrowing_acronym).entity.id
             except EntityVersion.DoesNotExist:
                 return []
@@ -294,10 +291,10 @@ def __search_faculty_for_entity(entity_id, entities):
 
 
 def map_learning_unit_year_with_requirement_entity(learning_unit_year_qs):
-    entity_container_years = EntityContainerYear.objects.\
+    entity_container_years = EntityContainerYear.objects. \
         filter(learning_container_year__pk=OuterRef("learning_container_year__pk"),
                type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-    learning_unit_years_with_entity = learning_unit_year_qs.values_list("id").\
+    learning_unit_years_with_entity = learning_unit_year_qs.values_list("id"). \
         annotate(entity=Subquery(entity_container_years.values("entity")))
     return {luy_id: entity_id for luy_id, entity_id in learning_unit_years_with_entity}
 
@@ -305,7 +302,7 @@ def map_learning_unit_year_with_requirement_entity(learning_unit_year_qs):
 def map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_qs):
     formations = group_element_year.find_learning_unit_formations(learning_unit_year_qs, parents_as_instances=False)
     education_group_ids = list(itertools.chain.from_iterable(formations.values()))
-    offer_year_entity = OfferYearEntity.objects.filter(education_group_year__in=education_group_ids).\
+    offer_year_entity = OfferYearEntity.objects.filter(education_group_year__in=education_group_ids). \
         values_list("education_group_year", "entity")
     dict_entity_of_education_group = {education_group_year_id: entity_id for education_group_year_id, entity_id
                                       in offer_year_entity}

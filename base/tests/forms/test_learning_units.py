@@ -187,16 +187,6 @@ class TestLearningUnitForm(TestCase):
             "acronym": "LDROI1001"
         }
 
-    def test_case_maximum_results_reached(self):
-        LearningUnitYearFactory(acronym="LDROI1001", academic_year=self.academic_yr)
-
-        form = search_form.LearningUnitYearForm(data=self.get_valid_data())
-        form.MAX_RECORDS = 0
-        form.is_valid()
-
-        with self.assertRaises(TooManyResultsException):
-            form.get_activity_learning_units()
-
     def test_get_service_courses_by_empty_requirement_and_allocation_entity(self):
         form_data = {}
 
@@ -260,4 +250,4 @@ class TestLearningUnitForm(TestCase):
 
         form = search_form.LearningUnitYearForm(form_data)
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.get_activity_learning_units(), [self.list_learning_unit_year[0]])
+        self.assertEqual(list(form.get_activity_learning_units()), [self.list_learning_unit_year[0]])

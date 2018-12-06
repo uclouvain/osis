@@ -132,26 +132,25 @@ def create_xls_comparison(user, learning_unit_years, filters, academic_yr_compar
 
 
 def _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison, learning_unit_years):
-    learning_unit_years = \
-        LearningUnitYear.objects.filter(
-            learning_unit__in=(_get_learning_units(learning_unit_years)),
-            academic_year__year__in=(
-                learning_unit_years[0].academic_year.year,
-                academic_yr_comparison)
-        ).select_related(
-            'academic_year',
-            'learning_container_year',
-            'learning_container_year__academic_year'
-        ).prefetch_related(
-            get_learning_component_prefetch()
-        ).prefetch_related(
-            build_entity_container_prefetch([
-                entity_types.ALLOCATION_ENTITY,
-                entity_types.REQUIREMENT_ENTITY,
-                entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
-            ])
-        ).order_by('learning_unit', 'academic_year__year')
+    learning_unit_years = LearningUnitYear.objects.filter(
+        learning_unit__in=(_get_learning_units(learning_unit_years)),
+        academic_year__year__in=(
+            learning_unit_years[0].academic_year.year,
+            academic_yr_comparison)
+    ).select_related(
+        'academic_year',
+        'learning_container_year',
+        'learning_container_year__academic_year'
+    ).prefetch_related(
+        get_learning_component_prefetch()
+    ).prefetch_related(
+        build_entity_container_prefetch([
+            entity_types.ALLOCATION_ENTITY,
+            entity_types.REQUIREMENT_ENTITY,
+            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
+            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
+        ])
+    ).order_by('learning_unit', 'academic_year__year')
     [append_latest_entities(learning_unit, False) for learning_unit in learning_unit_years]
     [append_components(learning_unit) for learning_unit in learning_unit_years]
     return learning_unit_years
@@ -181,9 +180,10 @@ def prepare_xls_content(learning_unit_yrs):
         luy_data = extract_xls_data_from_learning_unit(l_u_yr, new_line, first_data)
         if new_line:
             first_data = luy_data
-            top_border.extend(get_border_columns(line_index+1))
+            top_border.extend(get_border_columns(line_index + 1))
         else:
-            modified_cells_no_border.extend(_check_changes_other_than_code_and_year(first_data, luy_data, line_index+1))
+            modified_cells_no_border.extend(
+                _check_changes_other_than_code_and_year(first_data, luy_data, line_index + 1))
             first_data = None
         data.append(luy_data)
 
@@ -299,10 +299,10 @@ def _check_changes_other_than_code_and_year(first_data, second_data, line_index)
     modifications = []
     for col_index, obj in enumerate(first_data):
         if col_index == ACRONYM_COL_NUMBER and second_data[ACRONYM_COL_NUMBER] != EMPTY_VALUE:
-            modifications.append('{}{}'.format(get_column_letter(col_index+1), line_index))
+            modifications.append('{}{}'.format(get_column_letter(col_index + 1), line_index))
         else:
             if obj != second_data[col_index] and col_index != ACADEMIC_COL_NUMBER:
-                modifications.append('{}{}'.format(get_column_letter(col_index+1), line_index))
+                modifications.append('{}{}'.format(get_column_letter(col_index + 1), line_index))
 
     return modifications
 
