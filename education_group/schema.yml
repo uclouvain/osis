@@ -1,14 +1,15 @@
 openapi: 3.0.0
 servers:
- - url: https://{environment}.osis.uclouvain.be/v1/education_group/
+ - url: https://{environment}.osis.uclouvain.be/api/v1/education_group/
    variables:
      environment:
-       default: api.dev
+       default: dev
        enum:
-         - api  # Production server
-         - api.dev # Development server
-         - api.qa # Staging server
-         - api.test # Test server
+         - dev # Development server
+         - qa # Staging server
+         - test # Test server
+ - url: https://osis.uclouvain.be/api/v1/education_group/
+   description: Production server
 info:
   version: '1'
   title: Education Group Service

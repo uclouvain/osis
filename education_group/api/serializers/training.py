@@ -28,7 +28,8 @@ from rest_framework import serializers
 from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories
+from base.models.entity import Entity
+from base.models.enums import education_group_categories, organization_type
 
 
 class TrainingSerializer(serializers.HyperlinkedModelSerializer):
@@ -37,6 +38,14 @@ class TrainingSerializer(serializers.HyperlinkedModelSerializer):
     education_group_type = serializers.SlugRelatedField(
         slug_field='name',
         queryset=EducationGroupType.objects.filter(category=education_group_categories.TRAINING),
+    )
+    administration_entity = serializers.SlugRelatedField(
+        slug_field='most_recent_acronym',
+        queryset=Entity.objects.filter(organization__type=organization_type.MAIN),
+    )
+    management_entity = serializers.SlugRelatedField(
+        slug_field='most_recent_acronym',
+        queryset=Entity.objects.filter(organization__type=organization_type.MAIN),
     )
 
     # Display human readable value
@@ -56,4 +65,6 @@ class TrainingSerializer(serializers.HyperlinkedModelSerializer):
             'academic_year',
             'active',
             'active_text',
+            'administration_entity',
+            'management_entity'
         )

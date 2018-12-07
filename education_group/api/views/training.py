@@ -36,7 +36,11 @@ class TrainingList(generics.ListAPIView):
     """
     name = 'training-list'
     queryset = EducationGroupYear.objects.filter(education_group_type__category=education_group_categories.TRAINING)\
-                                         .select_related('education_group_type', 'academic_year')
+                                         .select_related('education_group_type', 'academic_year')\
+                                         .prefetch_related(
+                                                'administration_entity__entityversion_set',
+                                                'management_entity__entityversion_set'
+                                         )
     serializer_class = TrainingSerializer
     filter_fields = (
         'acronym',
@@ -68,7 +72,11 @@ class TrainingDetail(generics.RetrieveAPIView):
     """
     name = 'training-detail'
     queryset = EducationGroupYear.objects.filter(education_group_type__category=education_group_categories.TRAINING)\
-                                         .select_related('education_group_type', 'academic_year')
+                                         .select_related('education_group_type', 'academic_year') \
+                                         .prefetch_related(
+                                            'administration_entity__entityversion_set',
+                                            'management_entity__entityversion_set'
+                                         )
     serializer_class = TrainingSerializer
     lookup_field = 'uuid'
     pagination_class = None
