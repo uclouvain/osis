@@ -488,22 +488,24 @@ class Command(BaseCommand):
         for key, value in self.json_content.items():
             offer_type, text_label = key.split('.')
 
-            education_group_year = EducationGroupYear.objects.get(
-                academic_year=academic_year,
-                acronym='common-{}'.format(offer_type)
-            )
+            if offer_type in COMMON_OFFER:
 
-            admission_condition, created = AdmissionCondition.objects.get_or_create(
-                education_group_year=education_group_year)
+                education_group_year = EducationGroupYear.objects.get(
+                    academic_year=academic_year,
+                    acronym='common-{}'.format(offer_type)
+                )
 
-            if text_label in COMMON_FIELDS:
-                self.set_admission_condition_value(admission_condition, text_label, value)
-            elif text_label == 'introduction':
-                self.set_admission_condition_value(admission_condition, 'standard', value)
-            else:
-                raise Exception('This case is not handled %s' % text_label)
+                admission_condition, created = AdmissionCondition.objects.get_or_create(
+                    education_group_year=education_group_year)
 
-            admission_condition.save()
+                if text_label in COMMON_FIELDS:
+                    self.set_admission_condition_value(admission_condition, text_label, value)
+                elif text_label == 'introduction':
+                    self.set_admission_condition_value(admission_condition, 'standard', value)
+                else:
+                    raise Exception('This case is not handled %s' % text_label)
+
+                admission_condition.save()
 
     def set_admission_condition_value(self, admission_condition, field, value):
         setattr(admission_condition, 'text_' + field + self.suffix_language, value)
