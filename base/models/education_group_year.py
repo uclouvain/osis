@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Count, OuterRef, Exists
 from django.urls import reverse
@@ -436,6 +436,50 @@ class EducationGroupYear(SerializableModel):
         through="EducationGroupCertificateAim",
         related_name="education_group_years",
         blank=True,
+    )
+
+    co_graduation = models.CharField(
+        max_length=8,
+        db_index=True,
+        verbose_name=_("Co-graduation"),
+        blank=True,
+        null=True,
+    )
+
+    co_graduation_coefficient = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name=_('Co-graduation coefficient'),
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(1), MaxValueValidator(9999)],
+    )
+
+    ARES_study = models.IntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_('ARES study code'),
+        validators=[MinValueValidator(1), MaxValueValidator(9999)],
+    )
+
+    ARES_GRACA = models.IntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_('ARES-GRACA'),
+        validators=[MinValueValidator(1), MaxValueValidator(9999)],
+    )
+
+    ARES_ability = models.IntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_('ARES ability'),
+        validators=[MinValueValidator(1), MaxValueValidator(9999)],
+
+    )
+
+    web_re_registration = models.BooleanField(
+        default=True,
+        verbose_name=_('Web re-registration'),
     )
 
     class Meta:
