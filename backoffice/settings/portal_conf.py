@@ -51,9 +51,5 @@ SECTION_LIST = [
                 ('formations_accessibles', 'specific'),
                 ('certificats', 'specific'),
                 ('infos_pratiques', 'specific'),
-            ]),
-    Section(title=_('In practice'),
-            labels=[
-                ('contacts', 'specific')
-            ]),
+            ])
 ]
