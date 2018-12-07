@@ -180,3 +180,16 @@ class TestSimplifiedVolumeForm(TestCase):
         self.assertEqual(form.errors["hourly_volume_partial_q1"][0],
                          gettext("The volume can not be set to 0."))
         self.assertFalse(form.errors.get("hourly_volume_partial_q2"))
+
+    def test_with_incorrect_volume_total(self):
+        form = SimplifiedVolumeForm(
+            data={"hourly_volume_partial_q1": 5, "hourly_volume_partial_q2": 7,
+                  'hourly_volume_total_annual': 10}, is_faculty_manager=True, instance=self.instance,
+            index=0,
+            component_type=COMPONENT_TYPES[0]
+        )
+        form.is_valid()
+        self.assertEqual(form.errors["hourly_volume_partial_q1"][0], gettext(""))
+        self.assertEqual(form.errors["hourly_volume_partial_q2"][0], gettext(""))
+        self.assertEqual(form.errors["hourly_volume_total_annual"][0],
+                         gettext('Vol_tot is not equal to vol_q1 + vol_q2'))

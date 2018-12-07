@@ -339,18 +339,6 @@ class TestVolumeEditionFormsetContainer(TestCase):
         form.is_valid()
         self.assertEqual(form.errors['volume_q2'], [gettext('The volume can not be set to 0.')])
 
-    def test_volume_edition_with_incorrect_volume_total(self):
-        component = LearningComponentYearFactory()
-        form = VolumeEditionForm(
-            data={'volume_q1': 6, 'volume_q2': 6, 'volume_total': 11},
-            component=component,
-            learning_unit_year=self.learning_unit_year_full,
-            is_faculty_manager=True, initial={'volume_q1': 0, 'volume_q2': 12, 'volume_total': 11}
-        )
-
-        form.is_valid()
-        self.assertEqual(form.errors['volume_total'], [gettext('Vol_tot is not equal to vol_q1 + vol_q2')])
-
 
 def get_valid_formset_data(prefix, is_partim=False):
     form_data = {}
