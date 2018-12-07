@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-03 13:29+0100\n"
+"POT-Creation-Date: 2018-12-04 10:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr ""
 "Vous soumettrez %(draft_scores_not_submitted)s notes au(x) faculté(s). "
 "Attention : les notes soumises <b>ne peuvent plus être modifiées.</b>"
 
-#: views/upload_xls_utils.py:377
+#: views/upload_xls_utils.py:374
 msgid "Absence justified cannot be remplaced by absence unjustified"
 msgstr ""
 "Une absence justifiée ne peut être remplacée par une absence injustifiée"
@@ -204,7 +204,7 @@ msgstr "Tri descendant de la table de données"
 #: templates/online_encoding_form.html:143
 #: templates/online_encoding_form.html:145
 #: templates/scores_encoding_by_specific_criteria.html:121
-#: views/upload_xls_utils.py:323
+#: views/upload_xls_utils.py:320
 msgid "Deadline reached"
 msgstr "Date d'échéance atteinte"
 
@@ -357,7 +357,7 @@ msgstr "Injecter le fichier XLS"
 msgid "Institution"
 msgstr "Institution"
 
-#: tests/views/test_upload_xls_utils.py:195 views/upload_xls_utils.py:370
+#: tests/views/test_upload_xls_utils.py:198 views/upload_xls_utils.py:367
 msgid "Invalid justification value"
 msgstr "Valeur de justification invalide"
 
@@ -415,7 +415,7 @@ msgstr "Unité d'apprentissage"
 msgid "Learning unit title"
 msgstr "Titre de l'unité d'apprentissage"
 
-#: views/upload_xls_utils.py:385
+#: views/upload_xls_utils.py:382
 msgid "Line"
 msgstr "Ligne"
 
@@ -480,11 +480,11 @@ msgstr ""
 msgid "No result!"
 msgstr "Aucun résultat!"
 
-#: tests/views/test_upload_xls_utils.py:186
+#: tests/views/test_upload_xls_utils.py:189
 msgid "No score injected"
 msgstr "Aucune note injectée"
 
-#: views/upload_xls_utils.py:206
+#: views/upload_xls_utils.py:203
 msgid "No scores injected"
 msgstr "Aucune note injectée"
 
@@ -497,10 +497,6 @@ msgstr "Aucun étudiant à encoder par excel"
 #: templates/online_encoding.html:67 templates/online_encoding_form.html:66
 msgid "None"
 msgstr "Aucun"
-
-#: business/score_encoding_export.py:185
-msgid "Not enrolled"
-msgstr "Pas inscrit"
 
 #: business/score_encoding_sheet.py:170
 msgid "Not passed"
@@ -636,7 +632,7 @@ msgstr "rafraîchir la liste"
 msgid "Registration ID"
 msgstr "Noma"
 
-#: tests/views/test_upload_xls_utils.py:265 views/upload_xls_utils.py:298
+#: tests/views/test_upload_xls_utils.py:268 views/upload_xls_utils.py:295
 msgid "Registration ID does not match email"
 msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 
@@ -671,10 +667,10 @@ msgstr ""
 "Ré-utilisez l'adresse d'une entité liée au programme ou informez l'adresse "
 "postale pour la feuille papier."
 
-#: tests/views/test_upload_xls_utils.py:195
-#: tests/views/test_upload_xls_utils.py:205
-#: tests/views/test_upload_xls_utils.py:248
-#: tests/views/test_upload_xls_utils.py:266
+#: tests/views/test_upload_xls_utils.py:198
+#: tests/views/test_upload_xls_utils.py:208
+#: tests/views/test_upload_xls_utils.py:251
+#: tests/views/test_upload_xls_utils.py:269
 msgid "Row"
 msgstr "Ligne"
 
@@ -701,7 +697,7 @@ msgstr "Enregistrer"
 msgid "Score"
 msgstr "Note"
 
-#: views/upload_xls_utils.py:326
+#: views/upload_xls_utils.py:323
 msgid "Score already submitted"
 msgstr "Note déjà soumise"
 
@@ -710,11 +706,11 @@ msgstr "Note déjà soumise"
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr "Note légende: %(score_legend)s (0=Note de présence)"
 
-#: tests/views/test_upload_xls_utils.py:217
-#: tests/views/test_upload_xls_utils.py:232
-#: tests/views/test_upload_xls_utils.py:250
-#: tests/views/test_upload_xls_utils.py:277
-#: tests/views/test_upload_xls_utils.py:294 views/upload_xls_utils.py:201
+#: tests/views/test_upload_xls_utils.py:220
+#: tests/views/test_upload_xls_utils.py:235
+#: tests/views/test_upload_xls_utils.py:253
+#: tests/views/test_upload_xls_utils.py:280
+#: tests/views/test_upload_xls_utils.py:297 views/upload_xls_utils.py:198
 msgid "Score saved"
 msgstr "Note sauvée"
 
@@ -743,8 +739,8 @@ msgstr "Encodage de notes"
 msgid "Scores injection"
 msgstr "Injection de notes"
 
-#: tests/views/test_upload_xls_utils.py:205
-#: tests/views/test_upload_xls_utils.py:248 views/upload_xls_utils.py:406
+#: tests/views/test_upload_xls_utils.py:208
+#: tests/views/test_upload_xls_utils.py:251 views/upload_xls_utils.py:403
 msgid "Scores must be between 0 and 20"
 msgstr "Les notes doivent être comprises entre 0 et 20"
 
@@ -810,7 +806,7 @@ msgstr "Etat"
 msgid "Status"
 msgstr "Status"
 
-#: views/upload_xls_utils.py:291
+#: views/upload_xls_utils.py:288
 msgid "Student not registered for exam"
 msgstr "Etudiant non enregistré pour examen"
 
@@ -847,13 +843,13 @@ msgstr ""
 "Les données présentes sur ce document correspondent à l'état du système en "
 "date du %(printing_date)s et sont susceptibles d'évoluer"
 
-#: views/upload_xls_utils.py:317
+#: views/upload_xls_utils.py:314
 #, python-format
 msgid ""
 "The enrollment to the activity %(xls_learning_unit_acronym)s doesn't exist"
 msgstr "L'inscription à l'activité %(xls_learning_unit_acronym)s n'existe pas"
 
-#: forms/score_file.py:38 tests/views/test_upload_xls_utils.py:177
+#: forms/score_file.py:38 tests/views/test_upload_xls_utils.py:180
 #: views/upload_xls_utils.py:144
 msgid "The file must be a valid 'XLSX' excel file"
 msgstr "Le fichier dois être un fichier excel valide"
@@ -882,7 +878,7 @@ msgstr ""
 msgid "The period of scores' encoding is not opened"
 msgstr "La période d'encodage de notes n'est pas ouverte"
 
-#: views/upload_xls_utils.py:359
+#: views/upload_xls_utils.py:356
 msgid "The scores responsible must still submit the scores"
 msgstr "Le resonsable de notes doit tout de même soumettre les notes"
 
@@ -919,7 +915,7 @@ msgstr "Type"
 msgid "Unjustified absence"
 msgstr "Absence injustifiée"
 
-#: templates/blocks/legend.html:35
+#: business/score_encoding_export.py:185 templates/blocks/legend.html:35
 msgid "Unsubscribed after the opening of the session"
 msgstr "Désinscrit après l'ouverture de la session"
 
@@ -947,11 +943,11 @@ msgstr ""
 msgid "Without attribution"
 msgstr "Sans attribution"
 
-#: views/upload_xls_utils.py:329
+#: views/upload_xls_utils.py:326
 msgid "You can't encode a 'score' and a 'justification' together"
 msgstr "Vous ne pouvez pas encoder une note et une justification ensemble"
 
-#: views/upload_xls_utils.py:275
+#: views/upload_xls_utils.py:272
 msgid ""
 "You don't have access rights for this learning unit or it doesn't exist in "
 "our database"
@@ -959,7 +955,7 @@ msgstr ""
 "Vous n'avez pas les droits d'accès pour cette unité d'enseignement ou elle "
 "n'existe pas dans notre base de donénes"
 
-#: views/upload_xls_utils.py:287
+#: views/upload_xls_utils.py:284
 msgid ""
 "You don't have access rights for this offer or it doesn't exist in our "
 "database"
@@ -967,7 +963,7 @@ msgstr ""
 "Vous n'avez pas les droits d'accès pour cette offre ou elle n'existe pas "
 "dans notre base de données"
 
-#: views/upload_xls_utils.py:281
+#: views/upload_xls_utils.py:278
 msgid ""
 "You encoded scores for more than 1 learning unit in your excel file (column "
 "'Learning unit').Please make one excel file by learning unit."
@@ -976,7 +972,7 @@ msgstr ""
 "fichier excel (column 'Unité d'enseignement'). Veuillez constituer un "
 "fichier excel par unité d'enseignement."
 
-#: forms/score_file.py:31 tests/views/test_upload_xls_utils.py:168
+#: forms/score_file.py:31 tests/views/test_upload_xls_utils.py:171
 msgid "You have to select a file to upload."
 msgstr "Vous avez sélectionné un fichier à téléversé"
 
@@ -1019,3 +1015,6 @@ msgstr "programme(s)"
 #: views/score_encoding.py:324
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
+
+#~ msgid "Not enrolled"
+#~ msgstr "Pas inscrit"

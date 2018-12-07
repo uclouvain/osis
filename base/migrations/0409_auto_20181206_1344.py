@@ -8,10 +8,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0408_auto_20181204_1509'),
+        ('base', '0408_educationgrouppublicationcontact'),
     ]
 
     operations = [
+        migrations.AlterField(
+            model_name='educationgroupyear',
+            name='joint_diploma',
+            field=models.BooleanField(default=False, verbose_name='Leads to diploma/certificate'),
+        ),
+        migrations.AlterField(
+            model_name='educationgroupyear',
+            name='other_campus_activities',
+            field=models.CharField(blank=True, choices=[('YES', 'yes'), ('NO', 'no'), ('OPTIONAL', 'optional')],
+                                   max_length=20, null=True, verbose_name='Activities on other campus'),
+        ),
         migrations.AlterField(
             model_name='entitycontaineryear',
             name='type',

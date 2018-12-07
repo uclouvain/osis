@@ -23,24 +23,34 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import ugettext_lazy as _
+
 from django.db import models
+from ordered_model.admin import OrderedModelAdmin
+from ordered_model.models import OrderedModel
 
-from base.models.enums import education_group_language
-from osis_common.models.osis_model_admin import OsisModelAdmin
-
-
-class EducationGroupLanguageAdmin(OsisModelAdmin):
-    list_display = ('type', 'order', 'education_group_year', 'language')
-    raw_id_fields = ('education_group_year', 'language')
+from base.models.enums.publication_contact_type import PublicationContactType
 
 
-class EducationGroupLanguage(models.Model):
-    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    changed = models.DateTimeField(null=True, auto_now=True)
-    type = models.CharField(max_length=255, choices=education_group_language.EducationGroupLanguages.choices())
-    order = models.IntegerField()
-    education_group_year = models.ForeignKey('base.EducationGroupYear')
-    language = models.ForeignKey('reference.Language')
+class EducationGroupPublicationContactAdmin(OrderedModelAdmin):
+    list_display = ('education_group_year', 'type', 'role', 'email', 'order', 'move_up_down_links',)
+    readonly_fields = ['order']
+    search_fields = ['education_group_year__acronym', 'role', 'email']
 
-    def __str__(self):
-        return "{} - {}".format(self.education_group_year, self.language)
+
+class EducationGroupPublicationContact(OrderedModel):
+    role = models.CharField(max_length=100, default='', blank=True)
+    email = models.EmailField(
+        verbose_name=_('email'),
+    )
+    type = models.CharField(
+        max_length=100,
+        choices=PublicationContactType.choices(),
+        default=PublicationContactType.OTHER_CONTACT.name,
+        verbose_name=_('type'),
+    )
+    education_group_year = models.ForeignKey('EducationGroupYear')
+    order_with_respect_to = ('education_group_year', 'type', )
+
+    class Meta:
+        ordering = ('education_group_year', 'type', 'order',)

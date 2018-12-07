@@ -25,7 +25,9 @@
 ##############################################################################
 from unittest import mock
 
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Permission
+from django.contrib.messages import get_messages
 from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseNotFound
@@ -147,7 +149,13 @@ class TestDetachLearningUnitPrerequisite(TestCase):
         ])
 
         response = self.client.post(self.url, data=self.post_valid_data, follow=True, HTTP_REFERER=http_referer)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(
+            messages[0],
+            _(_("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
+                "acronym": self.luy.acronym})
+        )
         self.assertFalse(mock_delete.called)
 
     @mock.patch("base.models.group_element_year.GroupElementYear.delete")
@@ -166,6 +174,12 @@ class TestDetachLearningUnitPrerequisite(TestCase):
         ])
 
         response = self.client.post(self.url, data=self.post_valid_data, follow=True, HTTP_REFERER=http_referer)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(
+            messages[0],
+            _(_("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
+                "acronym": self.luy.acronym})
+        )
         self.assertFalse(mock_delete.called)
 

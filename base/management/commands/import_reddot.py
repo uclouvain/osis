@@ -132,6 +132,7 @@ def get_text_label(entity, label):
         label=label,
         published=True
     )
+
     return text_label
 
 
@@ -255,6 +256,11 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_EN, 'majeures', 'Majors'),
     (settings.LANGUAGE_CODE_EN, 'finalites', 'Focuses'),
     (settings.LANGUAGE_CODE_EN, 'finalites_didactiques', 'Teaching Focuses'),
+    (settings.LANGUAGE_CODE_EN, 'agregation', 'Agregation'),
+    (settings.LANGUAGE_CODE_FR, 'agregation', 'Agrégation'),
+    (settings.LANGUAGE_CODE_EN, 'prerequis', 'Prerequis'),
+    (settings.LANGUAGE_CODE_FR, 'prerequis', 'Prérequis'),
+
 
 ]
 
@@ -275,7 +281,6 @@ def get_mapping_label_texts(context, labels):
     mapping_label_text_label = {}
     for label in labels:
         text_label = get_text_label(context.entity, label)
-
         TranslatedTextLabel.objects.update_or_create(
             text_label=text_label,
             language=context.language,
