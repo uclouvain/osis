@@ -97,8 +97,8 @@
 {% else %}
     {% include 'learning_unit/by_activity.html' %}
 {% endif %}
-{% include "learning_unit/blocks/modal/modal_comparison.html" %}
-{% include "learning_unit/blocks/modal/modal_xls_with_parameters.html" %}
+{#{% include "learning_unit/blocks/modal/modal_comparison.html" %}#}
+{#{% include "learning_unit/blocks/modal/modal_xls_with_parameters.html" %}#}
 {% endblock %}
 
 {% block script %}
@@ -159,7 +159,7 @@
     }
 
     $("#id_check_all").click(function(){
-        $('input:checkbox').not(this).prop('checked', this.checked);
+        $('input:checkbox.selected_object').not(this).prop('checked', this.checked);
     });
 
 </script>

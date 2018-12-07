@@ -33,9 +33,9 @@
 
         <div style="margin-top:10px;">
 
-            {% if learning_units %}
+            {% if page_obj %}
                 <strong style="margin-left:10px;color:grey;">
-                    {{ learning_units|length }} {% trans 'learning units' %}
+                    {{ learning_units_count }} {% trans 'learning units' %}
                 </strong>
 
                 <div class="dropdown {{ dropdirection }} text-right">

@@ -392,10 +392,6 @@ class ExternalLearningUnitYearForm(LearningUnitYearForm):
     def clean_campus(self):
         return _get_value(self.cleaned_data.get('campus'))
 
-    def clean(self):
-        if not self._has_criteria():
-            self.add_error(None, _('Please choose at least one criteria!'))
-
 
 def _get_value(data_cleaned):
     if data_cleaned == BLANK_CHOICE_DASH[0][1]:

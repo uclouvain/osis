@@ -306,15 +306,11 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         return self.subtype == learning_unit_year_subtypes.PARTIM
 
     def get_entity(self, entity_type):
-        entity = None
         # @TODO: Remove this condition when classes will be removed from learning unit year
         if self.learning_container_year:
-            entity_container_yr = mdl_entity_container_year.search(
-                link_type=entity_type,
-                learning_container_year=self.learning_container_year,
-            ).get()
-            entity = entity_container_yr.entity if entity_container_yr else None
-        return entity
+            entity_container_yr = self.learning_container_year.entitycontaineryear_set.filter(
+                type=entity_type).select_related('entity__entityversion').first()
+            return entity_container_yr.entity if entity_container_yr else None
 
     def clean(self):
         learning_unit_years = find_gte_year_acronym(self.academic_year, self.acronym)

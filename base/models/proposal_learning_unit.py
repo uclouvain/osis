@@ -113,10 +113,6 @@ def filter_proposal_fields(queryset, **kwargs):
     return queryset
 
 
-def find_distinct_folder_entities():
-    return Entity.objects.filter(proposallearningunit__isnull=False).distinct()
-
-
 def is_learning_unit_year_in_proposal(luy):
     return ProposalLearningUnit.objects.filter(learning_unit_year=luy).exists()
 

@@ -104,6 +104,7 @@ def learning_units_search(request, search_type):
         'container_types': learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES,
         'types': learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
         'learning_units': found_learning_units,
+        'learning_units_count': found_learning_units.count(),
         'current_academic_year': starting_academic_year(),
         'experimental_phase': True,
         'search_type': search_type,
@@ -142,18 +143,17 @@ def learning_units_borrowed_course(request):
 def learning_units_proposal_search(request):
     search_form = LearningUnitProposalForm(request.GET or None, initial={'academic_year_id': current_academic_year()})
     user_person = get_object_or_404(Person, user=request.user)
-    proposals = []
+    learning_units = LearningUnitYear.objects.none()
+
     research_criteria = []
-    try:
-        if search_form.is_valid():
-            research_criteria = get_research_criteria(search_form)
-            proposals = search_form.get_proposal_learning_units()
-            check_if_display_message(request, proposals)
-    except TooManyResultsException:
-        display_error_messages(request, 'too_many_results')
+
+    if search_form.is_valid():
+        research_criteria = get_research_criteria(search_form)
+        learning_units = search_form.get_proposal_learning_units()
+        check_if_display_message(request, learning_units)
 
     if request.GET.get('xls_status') == "xls":
-        return create_xls_proposal(request.user, proposals, _get_filter(search_form, PROPOSAL_SEARCH))
+        return create_xls_proposal(request.user, learning_units, _get_filter(search_form, PROPOSAL_SEARCH))
 
     if request.POST:
         selected_proposals_id = request.POST.getlist("selected_action", default=[])
@@ -169,11 +169,12 @@ def learning_units_proposal_search(request):
         'current_academic_year': current_academic_year(),
         'experimental_phase': True,
         'search_type': PROPOSAL_SEARCH,
-        'proposals': proposals,
+        'learning_units': learning_units,
         'is_faculty_manager': user_person.is_faculty_manager,
-        'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(proposals)),
+        'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(learning_units)),
+        'page_obj': paginate_queryset(learning_units, request.GET),
     }
-    return layout.render(request, "learning_units.html", context)
+    return render(request, "learning_units.html", context)
 
 
 def apply_action_on_proposals(proposals, author, post_data, research_criteria):
@@ -235,5 +236,6 @@ def learning_units_external_search(request):
         'learning_units': external_learning_units,
         'is_faculty_manager': user_person.is_faculty_manager,
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(external_learning_units)),
+        'page_obj': paginate_queryset(external_learning_units, request.GET),
     }
     return layout.render(request, "learning_units.html", context)
