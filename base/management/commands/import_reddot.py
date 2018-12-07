@@ -488,8 +488,7 @@ class Command(BaseCommand):
         for key, value in self.json_content.items():
             offer_type, text_label = key.split('.')
 
-            if offer_type in COMMON_OFFER:
-
+            if offer_type.upper() in COMMON_OFFER:
                 education_group_year = EducationGroupYear.objects.get(
                     academic_year=academic_year,
                     acronym='common-{}'.format(offer_type)
