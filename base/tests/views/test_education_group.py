@@ -47,7 +47,7 @@ from base.tests.factories.education_group_certificate_aim import EducationGroupC
 from base.tests.factories.education_group_language import EducationGroupLanguageFactory
 from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupCommonFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
@@ -312,6 +312,9 @@ class EducationGroupGeneralInformations(TestCase):
         cls.type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
         cls.type_minor = EducationGroupTypeFactory(name="ACCESS_MINOR")
         cls.type_deepening = EducationGroupTypeFactory(name="DEEPENING")
+        EducationGroupCommonFactory(
+            academic_year=academic_year
+        )
         cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=academic_year,
                                                                education_group_type=cls.type_training)
         cls.education_group_child = EducationGroupYearFactory(acronym="Child_1", academic_year=academic_year,
