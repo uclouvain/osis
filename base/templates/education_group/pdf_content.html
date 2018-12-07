@@ -13,20 +13,20 @@
             size: A4 portrait;
             margin: 2cm 1cm 2cm 1cm;
 
-            @top-left {
+            @top-right {
                 content: "{% trans 'Academic year' %} {{ root.academic_year }} \A {{ root.verbose_title|safe }}";
                 white-space: pre-line;
                 font-size: 11px;
             }
 
-            @top-right {
+            @top-left {
                 background: url("{% static 'img/logo_uclouvain.png' %}") no-repeat;
                 display: inline-block;
                 width: 92mm;
                 padding-top: 65px;
                 font-size: 9px;
                 text-align: center;
-                content: "Université catholique de Louvain";
+                content: "";
             }
 
             @bottom-left {
