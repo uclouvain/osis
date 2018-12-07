@@ -85,7 +85,6 @@ COMMON_OFFER = ['1BA', '2A', '2CE', '2FC', '2M', '2M1', '2MC', '3CE', '9CE', '']
 
 def create_common_offer_for_academic_year(year):
     academic_year = AcademicYear.objects.get(year=year)
-    entity_ucl = Entity.objects.get(entityversion__acronym='UCL', organization__type=MAIN)
     for offer in OFFERS:
         code = offer['code'].lower()
         if offer['category'] == TRAINING:
@@ -94,21 +93,25 @@ def create_common_offer_for_academic_year(year):
             acronym = 'common'
         education_group_year = EducationGroupYear.objects.filter(academic_year=academic_year,
                                                                  acronym=acronym)
-        entity_ucl = Entity.objects.get(entityversion__acronym='UCL', organization__type=MAIN)
 
         if offer['code'] in COMMON_OFFER:
-            education_group_type = EducationGroupType.objects.get(
-                name=offer['name'],
-                category=offer['category']
+            _update_or_create_common_offer(
+                academic_year,
+                acronym,
+                education_group_year,
+                offer
             )
-            education_group_year = education_group_year.first()
-            _update_or_create_common_offer(academic_year, acronym, education_group_type, education_group_year,
-                                           entity_ucl)
         else:
             education_group_year.delete()
 
 
-def _update_or_create_common_offer(academic_year, acronym, education_group_type, education_group_year, entity_ucl):
+def _update_or_create_common_offer(academic_year, acronym, education_group_year, offer):
+    entity_ucl = Entity.objects.get(entityversion__acronym='UCL', organization__type=MAIN)
+    education_group_type = EducationGroupType.objects.get(
+        name=offer['name'],
+        category=offer['category']
+    )
+    education_group_year = education_group_year.first()
     if not education_group_year:
         education_group = EducationGroup.objects.create(
             start_year=academic_year.year,
