@@ -39,17 +39,19 @@ from base.models.admission_condition import AdmissionCondition, AdmissionConditi
 from base.models.education_group import EducationGroup
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity import Entity
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.organization_type import MAIN
+from base.models.enums.publication_contact_type import PublicationContactType
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_CMS_DATA, SKILLS_AND_ACHIEVEMENTS_KEY, \
-    SKILLS_AND_ACHIEVEMENTS_AA_DATA
+    SKILLS_AND_ACHIEVEMENTS_AA_DATA, CONTACTS_KEY
 
 BACHELOR_FIELDS = (
     'alert_message', 'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres', 'ca_bacs_examen_langue',
@@ -142,6 +144,8 @@ def import_offer_and_items(item, education_group_year, mapping_label_text_label,
             continue
         if label == SKILLS_AND_ACHIEVEMENTS_KEY:
             _import_skills_and_achievements(value, education_group_year, context)
+        elif label == CONTACTS_KEY:
+            _import_contacts(value, education_group_year, context)
         else:
             # General CMS data
             TranslatedText.objects.update_or_create(
@@ -211,9 +215,29 @@ def _get_field_achievement_according_to_language(language):
     raise AttributeError('Language not supported {}'.format(language))
 
 
+def _import_contacts(contacts_grouped_by_types, education_group_year, context):
+    if context.language == settings.LANGUAGE_CODE_EN:
+        return
+
+    for type, contacts in contacts_grouped_by_types.items():
+        _import_single_contacts_type(type, contacts, education_group_year)
+
+
+def _import_single_contacts_type(type, contacts, education_group_year):
+    for idx, contact in enumerate(contacts):
+        EducationGroupPublicationContact.objects.update_or_create(
+             education_group_year=education_group_year,
+             order=idx,
+             type=type,
+             defaults={
+                 'role': contact.get('title', ''),
+                 'email': contact['email'],
+             }
+         )
+
+
 LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_FR, 'pedagogie', 'Pédagogie'),
-    (settings.LANGUAGE_CODE_FR, 'contacts', 'Contacts'),
     (settings.LANGUAGE_CODE_FR, 'mobilite', 'Mobilité'),
     (settings.LANGUAGE_CODE_FR, 'formations_accessibles', 'Formations Accessibles'),
     (settings.LANGUAGE_CODE_FR, 'certificats', 'Certificats'),
@@ -235,7 +259,6 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_FR, 'finalites', 'Finalités'),
     (settings.LANGUAGE_CODE_FR, 'finalites_didactiques', 'Finalités Didactique'),
     (settings.LANGUAGE_CODE_EN, 'pedagogie', 'Pedagogy'),
-    (settings.LANGUAGE_CODE_EN, 'contacts', 'Contacts'),
     (settings.LANGUAGE_CODE_EN, 'mobilite', 'Mobility'),
     (settings.LANGUAGE_CODE_EN, 'formations_accessibles', 'Possible Trainings'),
     (settings.LANGUAGE_CODE_EN, 'certificats', 'Certificates'),

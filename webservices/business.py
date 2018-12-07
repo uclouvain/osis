@@ -38,6 +38,7 @@ SKILLS_AND_ACHIEVEMENTS_AA_DATA = 'achievements'
 SKILLS_AND_ACHIEVEMENTS_CMS_DATA = ('skills_and_achievements_introduction', 'skills_and_achievements_additional_text',)
 
 EVALUATION_KEY = 'evaluation'
+CONTACTS_KEY = 'contacts'
 
 
 def get_achievements(education_group_year, language_code):
