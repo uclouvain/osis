@@ -103,19 +103,26 @@ class LearningUnitSearchForm(BaseSearchForm):
         has_proposal = ProposalLearningUnit.objects.filter(
             learning_unit_year=OuterRef('pk'),
         )
+        entity_requirement = EntityVersion.objects.filter(
+            entity__entitycontaineryear__learning_container_year__learningunityear=OuterRef('pk'),
+            entity__entitycontaineryear__type=REQUIREMENT_ENTITY
+        ).order_by('-start_date').values('acronym')[:1]
+
+        entity_allocation = EntityVersion.objects.filter(
+            entity__entitycontaineryear__learning_container_year__learningunityear=OuterRef('pk'),
+            entity__entitycontaineryear__type=ALLOCATION_ENTITY
+        ).order_by('-start_date').values('acronym')[:1]
 
         learning_units = mdl.learning_unit_year.search(**self.cleaned_data)
-        learning_units = self.get_filter_learning_container_ids(learning_units)
 
         learning_units = learning_units.select_related(
             'academic_year', 'learning_container_year__academic_year',
             'language', 'proposallearningunit'
-        ).prefetch_related(
-            build_entity_container_prefetch([
-                entity_container_year_link_type.ALLOCATION_ENTITY,
-                entity_container_year_link_type.REQUIREMENT_ENTITY
-            ]),
-        ).order_by('academic_year__year', 'acronym').annotate(has_proposal=Exists(has_proposal))
+        ).order_by('academic_year__year', 'acronym').annotate(
+            has_proposal=Exists(has_proposal),
+            entity_requirement=Subquery(entity_requirement),
+            entity_allocation=Subquery(entity_allocation),
+        )
 
         learning_units = self.get_filter_learning_container_ids(learning_units)
 
@@ -209,7 +216,13 @@ class LearningUnitYearForm(LearningUnitSearchForm):
         return get_clean_data(self.cleaned_data)
 
     def get_activity_learning_units(self):
-        return self._get_service_course_learning_units() if self.service_course_search else self.get_learning_units()
+        if self.service_course_search:
+            return self._get_service_course_learning_units()
+        elif self.borrowed_course_search:
+            return self.get_learning_units()
+        else:
+            # Simple search
+            return self.get_queryset()
 
     def _get_service_course_learning_units(self):
         learning_units = self.get_learning_units(service_course_search=True)
@@ -222,7 +235,12 @@ class LearningUnitYearForm(LearningUnitSearchForm):
         if requirement_entities:
             self.cleaned_data['requirement_entities'] = requirement_entities
 
-        learning_units = self.get_queryset()
+        learning_units = self.get_queryset().prefetch_related(
+            build_entity_container_prefetch([
+                entity_container_year_link_type.ALLOCATION_ENTITY,
+                entity_container_year_link_type.REQUIREMENT_ENTITY
+            ])
+        )
 
         if self.borrowed_course_search:
             # TODO must return a queryset

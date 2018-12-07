@@ -102,8 +102,8 @@
                             <td>
                                 {{ learning_unit.get_subtype_display |default_if_none:'-' }}
                             </td>
-                            <td>{{ learning_unit.entities.REQUIREMENT_ENTITY.acronym|default_if_none:'-' }}</td>
-                            <td>{{ learning_unit.entities.ALLOCATION_ENTITY.acronym|default_if_none:'-' }}</td>
+                            <td>{{ learning_unit.entity_requirement|default_if_none:'-' }}</td>
+                            <td>{{ learning_unit.entity_allocation|default_if_none:'-' }}</td>
                             <td>{% if learning_unit.credits %}{{ learning_unit.credits }}{% endif %}</td>
                             <td>
                                 {% if learning_unit.status %}

@@ -44,7 +44,8 @@ from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm,
 from base.forms.search.search_form import get_research_criteria
 from base.models.academic_year import current_academic_year, get_last_academic_years, starting_academic_year
 from base.models.enums import learning_container_year_types, learning_unit_year_subtypes
-from base.models.person import Person, find_by_user
+from base.models.learning_unit_year import LearningUnitYear
+from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils.cache import cache_filter
 from base.views import layout
@@ -73,7 +74,7 @@ def learning_units_search(request, search_type):
         borrowed_course_search=borrowed_course_search,
         initial={'academic_year_id': starting_academic_year()}
     )
-    found_learning_units = []
+    found_learning_units = LearningUnitYear.objects.none()
 
     if form.is_valid():
         found_learning_units = form.get_activity_learning_units()
@@ -103,7 +104,6 @@ def learning_units_search(request, search_type):
         'academic_years': get_last_academic_years(),
         'container_types': learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES,
         'types': learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
-        'learning_units': found_learning_units,
         'learning_units_count': found_learning_units.count(),
         'current_academic_year': starting_academic_year(),
         'experimental_phase': True,
