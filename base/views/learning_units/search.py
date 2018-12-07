@@ -91,7 +91,7 @@ def learning_units_search(request, search_type):
         )
 
     if request.POST.get('xls_status') == "xls_with_parameters":
-        create_xls_with_parameters(request.user,
+        return create_xls_with_parameters(request.user,
                                    found_learning_units,
                                    _get_filter(form, search_type),
                                    {WITH_GRP: request.POST.get('with_grp') == 'true',

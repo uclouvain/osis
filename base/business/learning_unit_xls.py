@@ -25,6 +25,7 @@
 ##############################################################################
 from collections import defaultdict
 
+from django.db.models import Subquery, OuterRef
 from django.template.defaultfilters import yesno
 from django.utils.translation import ugettext_lazy as _
 from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
@@ -38,10 +39,8 @@ from base.business.learning_unit import LEARNING_UNIT_TITLES_PART2, XLS_DESCRIPT
 from base.business.xls import get_name_or_username
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.proposal_type import ProposalType
+from base.models.learning_component_year import LearningComponentYear
 from osis_common.document import xls_build
-
-# List of key that a user can modify
-VOLUMES_INITIALIZED = {'VOLUME_TOTAL': 0, 'PLANNED_CLASSES': 0, 'VOLUME_Q1': 0, 'VOLUME_Q2': 0}
 
 TRANSFORMATION_AND_MODIFICATION_COLOR = Color('808000')
 TRANSFORMATION_COLOR = Color('ff6600')
@@ -84,9 +83,59 @@ LEARNING_UNIT_TITLES_PART1 = [
 ]
 
 
-def prepare_xls_content(learning_units, with_grp=False, with_attributions=False):
+def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=False):
+    qs = learning_unit_years.annotate(
+        pm_vol_q1=Subquery(
+            LearningComponentYear.objects.filter(
+                learningunityear__in=OuterRef('pk'),
+                type=LECTURING
+            ).values('hourly_volume_partial_q1')[:1]
+        ),
+        pm_vol_q2=Subquery(
+            LearningComponentYear.objects.filter(
+                learningunityear__in=OuterRef('pk'),
+                type=LECTURING
+            ).values('hourly_volume_partial_q2')[:1]
+        ),
+        pm_vol_tot=Subquery(
+            LearningComponentYear.objects.filter(
+                learningunityear__in=OuterRef('pk'),
+                type=LECTURING
+            ).values('hourly_volume_total_annual')[:1]
+        ),        
+        pm_classes=Subquery(
+            LearningComponentYear.objects.filter(
+                learningunityear__in=OuterRef('pk'),
+                type=LECTURING
+            ).values('planned_classes')[:1]
+        ),
+        pp_vol_q1=Subquery(
+            LearningComponentYear.objects.filter(
+                learningunityear__in=OuterRef('pk'),
+                type=PRACTICAL_EXERCISES
+            ).values('hourly_volume_partial_q1')[:1]
+        ),
+        pp_vol_q2=Subquery(
+            LearningComponentYear.objects.filter(
+                learningunityear__in=OuterRef('pk'),
+                type=PRACTICAL_EXERCISES
+            ).values('hourly_volume_partial_q2')[:1]
+        ),
+        pp_vol_tot=Subquery(
+            LearningComponentYear.objects.filter(
+                learningunityear__in=OuterRef('pk'),
+                type=PRACTICAL_EXERCISES
+            ).values('hourly_volume_total_annual')[:1]
+        ),
+        pp_classes=Subquery(
+            LearningComponentYear.objects.filter(
+                learningunityear__in=OuterRef('pk'),
+                type=PRACTICAL_EXERCISES
+            ).values('planned_classes')[:1]
+        )
+    )
     return [
-        extract_xls_data_from_learning_unit(lu, with_grp, with_attributions) for lu in learning_units
+        extract_xls_data_from_learning_unit(lu, with_grp, with_attributions) for lu in qs
     ]
 
 
@@ -253,21 +302,17 @@ def _get_data_part2(learning_unit_yr, with_attributions):
             " \n".join([_get_attribution_line(value) for value in learning_unit_yr.attribution_charge_news.values()])
         )
 
-    components = learning_unit_yr.learning_component_years
-    volume_lecturing = components.get(type=LECTURING)
-    volumes_practical = components.get(type=PRACTICAL_EXERCISES)
-
     lu_data_part2.extend([
         learning_unit_yr.get_periodicity_display(),
         yesno(learning_unit_yr.status),
-        _get_significant_volume(volume_lecturing.hourly_volume_total_annual or 0),
-        _get_significant_volume(volume_lecturing.hourly_volume_partial_q1 or 0),
-        _get_significant_volume(volume_lecturing.hourly_volume_partial_q2 or 0),
-        volume_lecturing.planned_classes or 0,
-        _get_significant_volume(volumes_practical.hourly_volume_total_annual or 0),
-        _get_significant_volume(volumes_practical.hourly_volume_partial_q1 or 0),
-        _get_significant_volume(volumes_practical.hourly_volume_partial_q2 or 0),
-        volumes_practical.planned_classes or 0,
+        _get_significant_volume(learning_unit_yr.pm_vol_tot or 0),
+        _get_significant_volume(learning_unit_yr.pm_vol_q1 or 0),
+        _get_significant_volume(learning_unit_yr.pm_vol_q2 or 0),
+        learning_unit_yr.pm_classes or 0,
+        _get_significant_volume(learning_unit_yr.pp_vol_tot or 0),
+        _get_significant_volume(learning_unit_yr.pp_vol_q1 or 0),
+        _get_significant_volume(learning_unit_yr.pp_vol_q2 or 0),
+        learning_unit_yr.pp_classes or 0,
         learning_unit_yr.get_quadrimester_display() or '',
         learning_unit_yr.get_session_display() or '',
         learning_unit_yr.language or "",
@@ -285,19 +330,11 @@ def _get_data_part1(learning_unit_yr):
         # FIXME Condition to remove when the LearningUnitYear.learning_continer_year_id will be null=false
         if learning_unit_yr.learning_container_year else "",
         learning_unit_yr.get_subtype_display(),
-        _get_entity_faculty_acronym(learning_unit_yr.entities.get('REQUIREMENT_ENTITY'),
-                                    learning_unit_yr.academic_year),
+        learning_unit_yr.entity_requirement,
         proposal.get_type_display() if proposal else '',
         proposal.get_state_display() if proposal else '',
         learning_unit_yr.credits,
-        get_entity_acronym(learning_unit_yr.entities.get('ALLOCATION_ENTITY')),
+        learning_unit_yr.entity_allocation,
         learning_unit_yr.complete_title_english,
     ]
     return lu_data_part1
-
-
-def _get_entity_faculty_acronym(an_entity, academic_yr):
-    if an_entity:
-        faculty_entity = an_entity.find_faculty_version(academic_yr)
-        return faculty_entity.acronym if faculty_entity else None
-    return None
