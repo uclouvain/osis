@@ -42,7 +42,7 @@ ENTITY_TYPE_LIST = [
 
 class EntityContainerYearLinkTypes(ChoiceEnum):
     REQUIREMENT_ENTITY = _("Requirement entity")
-    ALLOCATION_ENTITY = _("Allocation entity")
+    ALLOCATION_ENTITY = _("Attribution entity")
     ADDITIONAL_REQUIREMENT_ENTITY_1 = _("Additional requirement entity 1")
     ADDITIONAL_REQUIREMENT_ENTITY_2 = _("Additional requirement entity 2")
 

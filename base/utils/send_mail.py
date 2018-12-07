@@ -38,7 +38,6 @@ from openpyxl.writer.excel import save_virtual_workbook
 
 from assessments.business import score_encoding_sheet
 from base.models import person as person_mdl
-from base.models.academic_year import current_academic_year
 from base.models.person import Person
 from osis_common.document import paper_sheet, xls_build
 from osis_common.document.xls_build import _adjust_column_width
@@ -110,12 +109,14 @@ def send_mail_before_annual_procedure_of_automatic_postponement_of_luy(
         .distinct()
 
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    template_base_data = {'academic_year': current_academic_year().year,
-                          'end_academic_year': end_academic_year.year,
-                          'luys_to_postpone': luys_to_postpone.count(),
-                          'luys_already_existing': luys_already_existing.count(),
-                          'luys_ending_this_year': luys_ending_this_year.count(),
-                          }
+    template_base_data = {
+        'academic_year': end_academic_year.past().year,
+        'end_academic_year': end_academic_year.year,
+        # Use len instead of count() (it's buggy when a queryset is built with a difference())
+        'luys_to_postpone': len(luys_to_postpone),
+        'luys_already_existing': len(luys_already_existing),
+        'luys_ending_this_year': len(luys_ending_this_year),
+    }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
     return message_service.send_messages(message_content)
@@ -131,13 +132,15 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_luy(
         .distinct()
 
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    template_base_data = {'academic_year': current_academic_year().year,
-                          'end_academic_year': end_academic_year.year,
-                          'luys_postponed': len(luys_postponed),
-                          'luys_already_existing': luys_already_existing.count(),
-                          'luys_ending_this_year': luys_ending_this_year.count(),
-                          'luys_with_errors': luys_with_errors
-                          }
+    template_base_data = {
+        'academic_year': end_academic_year.past().year,
+        'end_academic_year': end_academic_year.year,
+        # Use len instead of count() (it's buggy when a queryset is built with a difference())
+        'luys_postponed': len(luys_postponed),
+        'luys_already_existing': len(luys_already_existing),
+        'luys_ending_this_year': len(luys_ending_this_year),
+        'luys_with_errors': luys_with_errors
+    }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
     return message_service.send_messages(message_content)
@@ -153,12 +156,13 @@ def send_mail_before_annual_procedure_of_automatic_postponement_of_egy(
         .distinct()
 
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    template_base_data = {'academic_year': current_academic_year().year,
-                          'end_academic_year': end_academic_year.year,
-                          'egys_to_postpone': egys_to_postpone.count(),
-                          'egys_already_existing': egys_already_existing.count(),
-                          'egys_ending_this_year': egys_ending_this_year.count(),
-                          }
+    template_base_data = {
+        'academic_year': end_academic_year.past().year,
+        'end_academic_year': end_academic_year.year,
+        'egys_to_postpone': len(egys_to_postpone),
+        'egys_already_existing': len(egys_already_existing),
+        'egys_ending_this_year': len(egys_ending_this_year),
+    }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
     return message_service.send_messages(message_content)
@@ -174,11 +178,11 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
         .distinct()
 
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    template_base_data = {'academic_year': current_academic_year().year,
+    template_base_data = {'academic_year': end_academic_year.past().year,
                           'end_academic_year': end_academic_year.year,
                           'egys_postponed': len(egys_postponed),
-                          'egys_already_existing': egys_already_existing.count(),
-                          'egys_ending_this_year': egys_ending_this_year.count(),
+                          'egys_already_existing': len(egys_already_existing),
+                          'egys_ending_this_year': len(egys_ending_this_year),
                           'egys_with_errors': egys_with_errors
                           }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
