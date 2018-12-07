@@ -499,7 +499,7 @@ class EducationGroupYear(SerializableModel):
     @property
     def verbose_duration(self):
         if self.duration and self.duration_unit:
-            return "{} {}".format(self.duration, _(self.duration_unit))
+            return "{} {}".format(self.duration, self.get_duration_unit_display())
         return ""
 
     def get_absolute_url(self):
