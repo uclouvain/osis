@@ -79,59 +79,23 @@ class TestCreateChild(TestCase):
             initial_value="200K",
         )
 
-    def test_should_inherit_attributes_from_parent_egy(self):
+    def test_education_group_year_children_attribute(self):
         attributes_to_inherit = ("academic_year", "main_teaching_campus", "management_entity")
-        child_egy = create_children(self.egy)[0].child_branch
-
-        for field in attributes_to_inherit:
-            with self.subTest(field=field):
-                self.assertEqual(
-                    getattr(child_egy, field),
-                    getattr(self.egy, field)
-                )
-
-    def test_should_have_education_group_type_equal_to_argument(self):
-        child_egy = create_children(self.egy)[0].child_branch
-        self.assertEqual(
-            child_egy.education_group_type,
-            self.finality_type
-        )
-
-    def test_should_have_title_equal_to_initial_value_of_validation_rule_plus_parent_acronym(self):
-        child_egy = create_children(self.egy)[0].child_branch
         expected_title = "{} {}".format(self.validation_rule_title.initial_value, self.egy.acronym)
-        self.assertEqual(
-            child_egy.title,
-            expected_title
-        )
-
-    def test_should_format_the_partial_acronym_based_on_parent_and_validation_rule(self):
-        child_egy = create_children(self.egy)[0].child_branch
-        self.assertEqual(
-            child_egy.partial_acronym,
-            "LTEST400G"
-        )
-
-    def test_should_increment_cnum_of_child_partial_acronym_to_avoid_conflicted_acronyms(self):
-        EducationGroupYearFactory(partial_acronym="LTEST400G")
-        EducationGroupYearFactory(partial_acronym="LTEST401G")
-        child_egy = create_children(self.egy)[0].child_branch
-        self.assertEqual(
-            child_egy.partial_acronym,
-            "LTEST402G"
-        )
-
-    def test_should_format_acronym_based_on_education_group_type_and_parent_acronym(self):
-        child_egy = create_children(self.egy)[0].child_branch
         expected_acronym = "{}{}".format(
             self.validation_rule_title.initial_value.replace(" ", "").upper(),
             self.egy.acronym
         )
 
-        self.assertEqual(
-            child_egy.acronym,
-            expected_acronym
-        )
+        child_egy = create_children(self.egy)[0].child_branch
+
+        for field in attributes_to_inherit:
+            self.assertEqual(getattr(child_egy, field), getattr(self.egy, field))
+        self.assertEqual(child_egy.education_group_type, self.finality_type)
+        self.assertEqual(child_egy.title, expected_title)
+        self.assertEqual(child_egy.partial_acronym, "LTEST400G")
+        self.assertEqual(child_egy.acronym, expected_acronym)
+        self.assertTrue(child_egy.id)
 
     def test_should_create_education_group_with_start_and_year_equal_to_parent_academic_year(self):
         child_egy = create_children(self.egy)[0].child_branch
@@ -144,9 +108,14 @@ class TestCreateChild(TestCase):
             self.egy.academic_year.year
         )
 
-    def test_should_save_child(self):
+    def test_should_increment_cnum_of_child_partial_acronym_to_avoid_conflicted_acronyms(self):
+        EducationGroupYearFactory(partial_acronym="LTEST400G")
+        EducationGroupYearFactory(partial_acronym="LTEST401G")
         child_egy = create_children(self.egy)[0].child_branch
-        self.assertTrue(child_egy.id)
+        self.assertEqual(
+            child_egy.partial_acronym,
+            "LTEST402G"
+        )
 
     def test_should_create_children_equal_to_number_of_authorized_relationships(self):
         AuthorizedRelationshipFactory(
