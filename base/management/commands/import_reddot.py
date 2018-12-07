@@ -102,32 +102,37 @@ def create_common_offer_for_academic_year(year):
                 category=offer['category']
             )
             education_group_year = education_group_year.first()
-            if not education_group_year:
-                education_group = EducationGroup.objects.create(
-                    start_year=academic_year.year,
-                    end_year=academic_year.year + 1
-                )
-                EducationGroupYear.objects.create(
-                    academic_year=academic_year,
-                    education_group=education_group,
-                    acronym=acronym,
-                    title=acronym,
-                    education_group_type=education_group_type,
-                    title_english=acronym,
-                    management_entity=entity_ucl,
-                    administration_entity=entity_ucl,
-                    partial_acronym=acronym
-                )
-            else:
-                education_group_year.title = acronym
-                education_group_year.title_english = acronym
-                education_group_year.education_group_type = education_group_type
-                education_group_year.management_entity = entity_ucl
-                education_group_year.administration_entity = entity_ucl
-                education_group_year.partial_acronym = acronym
-                education_group_year.save()
+            _update_or_create_common_offer(academic_year, acronym, education_group_type, education_group_year,
+                                           entity_ucl)
         else:
             education_group_year.delete()
+
+
+def _update_or_create_common_offer(academic_year, acronym, education_group_type, education_group_year, entity_ucl):
+    if not education_group_year:
+        education_group = EducationGroup.objects.create(
+            start_year=academic_year.year,
+            end_year=academic_year.year + 1
+        )
+        EducationGroupYear.objects.create(
+            academic_year=academic_year,
+            education_group=education_group,
+            acronym=acronym,
+            title=acronym,
+            education_group_type=education_group_type,
+            title_english=acronym,
+            management_entity=entity_ucl,
+            administration_entity=entity_ucl,
+            partial_acronym=acronym
+        )
+    else:
+        education_group_year.title = acronym
+        education_group_year.title_english = acronym
+        education_group_year.education_group_type = education_group_type
+        education_group_year.management_entity = entity_ucl
+        education_group_year.administration_entity = entity_ucl
+        education_group_year.partial_acronym = acronym
+        education_group_year.save()
 
 
 def get_text_label(entity, label):
