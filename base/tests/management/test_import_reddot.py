@@ -8,6 +8,8 @@ from base.management.commands import import_reddot
 from base.management.commands.import_reddot import _import_skills_and_achievements, \
     _get_field_achievement_according_to_language
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from cms.models.text_label import TextLabel
+from cms.models.translated_text_label import TranslatedTextLabel
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_CMS_DATA
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.education_group import EducationGroup
@@ -42,6 +44,42 @@ class ImportReddotTestCase(TestCase):
         self.command = import_reddot.Command()
         lang = 'fr-be'
         self.command.suffix_language = '' if lang == 'fr-be' else '_en'
+        self.command.iso_language = 'fr-be'
+
+    @mock.patch('base.management.commands.import_reddot.get_mapping_label_texts')
+    def test_load_offers_call_get_mapping(self, mock_get_mapping):
+        item = [
+                {
+                    "type": "common",
+                    "acronym": "common",
+                    "year": 2018,
+                    "info": {
+                        "caap": "TEST",
+                        "evaluation": "TESTBIS"
+                    }
+                },
+            ]
+
+        self.command.json_content = item
+        self.command.load_offers()
+        labels = {'evaluation', 'caap'}
+        Context = collections.namedtuple('Context', 'entity language')
+        context = Context(entity='offer_year', language=self.command.iso_language)
+        mock_get_mapping.assert_called_with(context, labels)
+
+    def test_get_mapping_text_labels(self):
+        labels = {'evaluation'}
+        Context = collections.namedtuple('Context', 'entity language')
+        context = Context(entity='offer_year', language=self.command.iso_language)
+        from base.management.commands.import_reddot import get_mapping_label_texts
+        result = get_mapping_label_texts(context, labels)
+        text_label = TextLabel.objects.get(
+            entity='offer_year',
+            label='evaluation',
+            published=True
+        )
+
+        self.assertEqual(result['evaluation'], text_label)
 
     def test_load_admission_conditions_for_bachelor(self):
         education_group_year_common = EducationGroupYearCommonBachelorFactory()

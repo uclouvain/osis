@@ -373,7 +373,6 @@ class Command(BaseCommand):
 
     def load_offers(self):
         labels = set(chain.from_iterable(o.get('info', {}).keys() for o in self.json_content))
-
         Context = collections.namedtuple('Context', 'entity language')
         context = Context(entity='offer_year', language=self.iso_language)
 
