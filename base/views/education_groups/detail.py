@@ -207,7 +207,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        is_common_education_group_year = self.object.acronym.startswith('common-')
+        is_common_education_group_year = self.object.acronym.startswith('common')
 
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
@@ -221,10 +221,10 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         # Load the info from the common education group year
         common_education_group_year = None
         if not is_common_education_group_year:
-            common_education_group_year = EducationGroupYear.objects.look_for_common(
-                education_group_type=self.object.education_group_type,
+            common_education_group_year = EducationGroupYear.objects.get(
+                acronym='common',
                 academic_year=self.object.academic_year,
-            ).first()
+            )
 
         # Load the labels
         Section = namedtuple('Section', 'title labels')

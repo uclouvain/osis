@@ -42,8 +42,8 @@ from base.models.education_group_detailed_achievement import EducationGroupDetai
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity import Entity
-from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import TrainingType
+from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.enums.organization_type import MAIN
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
@@ -76,17 +76,22 @@ OFFERS = [
     {'name': TrainingType.MASTER_M1.name, 'category': TRAINING, 'code': '2M1'},
     {'name': TrainingType.MASTER_MC.name, 'category': TRAINING, 'code': '2MC'},
     {'name': TrainingType.INTERNSHIP.name, 'category': TRAINING, 'code': 'ST'},
-    {'name': TrainingType.CERTIFICATE.name, 'category': TRAINING, 'code': '9CE'}
+    {'name': TrainingType.CERTIFICATE.name, 'category': TRAINING, 'code': '9CE'},
+    {'name': MiniTrainingType.DEEPENING.name, 'category': MINI_TRAINING, 'code': ''}
 ]
 
-COMMON_OFFER = ['1BA', '2A', '2CE', '2FC', '2M', '2M1', '2MC', '3CE', '9CE']
+COMMON_OFFER = ['1BA', '2A', '2CE', '2FC', '2M', '2M1', '2MC', '3CE', '9CE', '']
 
 
 def create_common_offer_for_academic_year(year):
     academic_year = AcademicYear.objects.get(year=year)
+    entity_ucl = Entity.objects.get(entityversion__acronym='UCL', organization__type=MAIN)
     for offer in OFFERS:
         code = offer['code'].lower()
-        acronym = 'common-{}'.format(code)
+        if offer['category'] == TRAINING:
+            acronym = 'common-{}'.format(code)
+        else:
+            acronym = 'common'
         education_group_year = EducationGroupYear.objects.filter(academic_year=academic_year,
                                                                  acronym=acronym)
         entity_ucl = Entity.objects.get(entityversion__acronym='UCL', organization__type=MAIN)
@@ -110,7 +115,8 @@ def create_common_offer_for_academic_year(year):
                     education_group_type=education_group_type,
                     title_english=acronym,
                     management_entity=entity_ucl,
-                    administration_entity=entity_ucl
+                    administration_entity=entity_ucl,
+                    partial_acronym=acronym
                 )
             else:
                 education_group_year.title = acronym
@@ -118,6 +124,7 @@ def create_common_offer_for_academic_year(year):
                 education_group_year.education_group_type = education_group_type
                 education_group_year.management_entity = entity_ucl
                 education_group_year.administration_entity = entity_ucl
+                education_group_year.partial_acronym = acronym
                 education_group_year.save()
         else:
             education_group_year.delete()

@@ -116,11 +116,10 @@ def get_evaluation_text(education_group_year, language_code):
 
 
 def get_common_evaluation_text(education_group_year, language_code):
-
-    common_education_group_year = EducationGroupYear.objects.look_for_common(
-        education_group_type=education_group_year.education_group_type,
+    common_education_group_year = EducationGroupYear.objects.get(
+        acronym='common',
         academic_year=education_group_year.academic_year,
-    ).get()
+    )
 
     translated_text = TranslatedText.objects.get(
         text_label__entity=OFFER_YEAR,
