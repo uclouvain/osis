@@ -79,7 +79,7 @@ OFFERS = [
     {'name': TrainingType.CERTIFICATE.name, 'category': TRAINING, 'code': '9CE'}
 ]
 
-COMMON_OFFER = ['1BA', '2A', '2CE', '2FC', '2M', '2M1', '2MC', '3CE', '9CE']
+COMMON_OFFER = ['1BA', '2A', '2M', '2MC']
 
 
 def create_common_offer_for_academic_year(year):
