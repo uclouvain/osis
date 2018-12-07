@@ -239,7 +239,7 @@ class EducationGroupYear(SerializableModel):
         choices=activity_presence.ACTIVITY_PRESENCES,
         blank=True,
         null=True,
-        verbose_name=_('Other languages activities')
+        verbose_name=_('Activities on other campus')
     )
 
     professional_title = models.CharField(
@@ -249,7 +249,7 @@ class EducationGroupYear(SerializableModel):
         verbose_name=_('Professionnal title')
     )
 
-    joint_diploma = models.BooleanField(default=False, verbose_name=_('Joint diploma'))
+    joint_diploma = models.BooleanField(default=False, verbose_name=_('Leads to diploma/certificate'))
 
     diploma_printing_orientation = models.CharField(
         max_length=30,
@@ -543,7 +543,7 @@ class EducationGroupYear(SerializableModel):
     @property
     def verbose_duration(self):
         if self.duration and self.duration_unit:
-            return "{} {}".format(self.duration, _(self.duration_unit))
+            return "{} {}".format(self.duration, self.get_duration_unit_display())
         return ""
 
     def get_absolute_url(self):
