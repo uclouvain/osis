@@ -371,9 +371,13 @@ msgstr "Actions"
 msgid "Active"
 msgstr "Actif"
 
+#: models/education_group_year.py:241
+msgid "Activities on other campus"
+msgstr "Activités sur d'autres sites"
+
 #: models/enums/schedule_type.py:35
 msgid "Adapted"
-msgstr "Adapté"
+msgstr "Horaire adapté"
 
 #: templates/blocks/forms/create_cancel_buttons.html:31
 #: templates/blocks/forms/create_cancel_buttons_modal.html:29
@@ -510,11 +514,6 @@ msgstr "Toutes les notes ont été soumises."
 msgid "Alloc. Ent."
 msgstr "Ent. attrib."
 
-#: models/enums/entity_container_year_link_type.py:45
-#: templates/learning_unit/identification.html:206
-msgid "Allocation entity"
-msgstr "Entité d'allocation"
-
 #: business/learning_units/edition.py:350
 msgid "An error occured when updating the learning unit."
 msgstr "Erreur lors de la modification de l'unité d'enseignement."
@@ -646,6 +645,11 @@ msgstr "Attribution ajoutée pour %(tutor)s (%(function)s)"
 msgid "Attribution duration"
 msgstr "Durée attribution"
 
+#: models/enums/entity_container_year_link_type.py:45
+#: templates/learning_unit/identification.html:206
+msgid "Attribution entity"
+msgstr "Entité d'attribution"
+
 #: views/learning_units/attribution.py:140
 #, python-format
 msgid "Attribution modified for %(tutor)s (%(function)s)"
@@ -726,6 +730,9 @@ msgid "Can delete according to the type of the learning unit"
 msgstr ""
 "Vous ne pouvez pas supprimer cette unité d'enseignement en raison de son type"
 
+#: templates/blocks/forms/create_cancel_buttons.html:29
+#: templates/education_group/blocks/form/education_group_type_inner.html:46
+#: templates/education_group/delete_inner.html:45
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:45
 #: templates/learning_unit/blocks/modal/modal_xls_with_parameters.html:42
 msgid "Cancel"
@@ -984,7 +991,7 @@ msgstr "Crédits"
 
 #: models/enums/schedule_type.py:33
 msgid "Daily"
-msgstr "Journalier"
+msgstr "Horaire de jour"
 
 #: templates/admin/data.html:30 templates/admin/data.html:34
 #: templates/admin/data_maintenance.html:30 templates/admin/storage.html:31
@@ -1107,7 +1114,7 @@ msgstr "Mineure complément disciplinaire"
 #: models/enums/learning_container_year_types.py:40
 #: models/enums/person_source_type.py:33
 msgid "Dissertation"
-msgstr "Dissertation"
+msgstr "Mémoire"
 
 #: forms/education_groups_administrative_data.py:101
 #: models/enums/academic_calendar_type.py:51
@@ -1352,7 +1359,7 @@ msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 "Assurez-vous que cette valeur est inférieure ou égale à %(limit_value)s."
 
-#: forms/education_group/training.py:137
+#: forms/education_group/training.py:138
 msgid "Enter text to search"
 msgstr "Entrez le texte à rechercher"
 
@@ -1813,10 +1820,6 @@ msgstr ""
 "JavaScript est désactivé dans votre navigateur, mais OSIS ne fonctionne pas "
 "sans JavaScript."
 
-#: models/education_group_year.py:251
-msgid "Joint diploma"
-msgstr "Diplôme conjoint"
-
 #: models/enums/education_group_types.py:47
 msgid "Junior year"
 msgstr "Junior year"
@@ -1873,6 +1876,11 @@ msgstr "Dernières modifications"
 #: templates/my_osis/profile.html:79 templates/search/search.html:44
 msgid "Lastname"
 msgstr "Nom"
+
+#: models/education_group_year.py:251
+#: templates/education_group/tab_diplomas.html:50
+msgid "Leads to diploma/certificate"
+msgstr "Mène à diplôme/certificat"
 
 #: business/learning_units/edition.py:650
 #, python-format
@@ -2614,7 +2622,7 @@ msgstr "Autre collectif"
 msgid "Other individual"
 msgstr "Autre individuel"
 
-#: models/education_group_year.py:233 models/education_group_year.py:241
+#: models/education_group_year.py:233
 msgid "Other languages activities"
 msgstr "Activité dans d'autres langues"
 
@@ -3143,6 +3151,7 @@ msgstr "Responsable"
 msgid "SQL command"
 msgstr "Commande SQL"
 
+#: templates/blocks/forms/create_cancel_buttons.html:32
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:41
 #: templates/education_group/tab_edit_administrative_data.html:92
 #: templates/entity/blocks/educational_summary_calendar_widget.html:39
@@ -3198,7 +3207,7 @@ msgstr "Recherche des programmes annualisés"
 msgid "Search type"
 msgstr "Type de recherche"
 
-#: forms/education_group/training.py:128
+#: forms/education_group/training.py:129
 msgid "Search..."
 msgstr "Recherche..."
 
@@ -3215,7 +3224,7 @@ msgstr "Secteur"
 msgid "Select"
 msgstr "Sélectionner"
 
-#: forms/education_group/common.py:328
+#: forms/education_group/common.py:330
 msgid "Select a language"
 msgstr "Sélectionnez une langue"
 
@@ -3265,7 +3274,7 @@ msgstr "Session dérogation"
 
 #: models/enums/schedule_type.py:34
 msgid "Shifted"
-msgstr "Déplacé"
+msgstr "Horaire décalé"
 
 #: templates/offer/tab_identification.html:64
 msgid "Short title"
@@ -4090,8 +4099,9 @@ msgstr "Type de contrainte"
 msgid "Type of event"
 msgstr "Type d'événement"
 
-#: forms/education_group/common.py:311 models/education_group_type.py:79
+#: forms/education_group/common.py:312 models/education_group_type.py:79
 #: models/education_group_year.py:127
+#: templates/education_group/blocks/form/training_tab_identification.html:44
 msgid "Type of training"
 msgstr "Type de formation"
 
@@ -4121,8 +4131,11 @@ msgstr "Indéfini"
 msgid "Unique"
 msgstr "Unique"
 
-#: models/education_group_year.py:181 models/enums/rate_code.py:44
-#: templates/education_group/tab_diplomas.html:50
+#: templates/education_group/tab_admission_conditions.html:77
+msgid "University Bachelors"
+msgstr "Bacheliers universitaires"
+
+#: models/education_group_year.py:183 models/enums/rate_code.py:44
 msgid "University certificate"
 msgstr "Certificat universitaire"
 
@@ -4317,7 +4330,7 @@ msgstr "Semaine"
 msgid "Weighting"
 msgstr "Pondération par crédit"
 
-#: forms/education_group/common.py:322
+#: forms/education_group/common.py:323
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
 msgstr "Quel type de %(category)s voulez-vous créer ?"
@@ -4344,8 +4357,8 @@ msgstr "OUI,NON"
 msgid "Yes"
 msgstr "Oui"
 
-#: templates/education_group/blocks/form/education_group_type_inner.html:35
-#: templates/education_group/blocks/form/education_group_type_inner.html:43
+#: templates/education_group/blocks/form/education_group_type_inner.html:39
+#: templates/education_group/blocks/form/education_group_type_inner.html:47
 #: templates/education_group/blocks/form/update_achievement_inner.html:52
 #: templates/education_group/delete_inner.html:38
 #: templates/education_group/delete_inner.html:46
@@ -4627,15 +4640,12 @@ msgstr "mise-à-jour bloquée pour l'enseignant"
 
 #: templates/academic_calendar/academic_calendar_form.html:130
 #: templates/academic_calendar/blocks/modal/modal_confirm_delete.html:36
-#: templates/blocks/forms/create_cancel_buttons.html:29
 #: templates/blocks/forms/create_cancel_buttons_modal.html:27
-#: templates/education_group/blocks/form/education_group_type_inner.html:42
 #: templates/education_group/blocks/form/update_achievement_inner.html:58
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:64
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:53
 #: templates/education_group/blocks/modal/modal_organization_confirm_delete_inner.html:14
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:50
-#: templates/education_group/delete_inner.html:45
 #: templates/education_group/group_element_year/confirm_detach_inner.html:46
 #: templates/education_group/group_element_year/confirm_postpone_content_inner.html:10
 #: templates/education_group/organization_edit_inner.html:51
@@ -4986,7 +4996,6 @@ msgstr "résultat"
 
 #: templates/academic_calendar/academic_calendar_form.html:126
 #: templates/academic_calendar/academic_calendar_form.html:127
-#: templates/blocks/forms/create_cancel_buttons.html:32
 #: templates/blocks/forms/create_cancel_buttons_modal.html:31
 #: templates/education_group/blocks/form/update_achievement_inner.html:59
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:63
@@ -5022,7 +5031,7 @@ msgstr "note(s) enregistrée(s)"
 msgid "search"
 msgstr "recherche"
 
-#: forms/education_group/training.py:61 models/education_group_year.py:379
+#: forms/education_group/training.py:62 models/education_group_year.py:379
 #: templates/education_group/identification_training_details.html:76
 msgid "secondary domains"
 msgstr "domaines secondaires"
@@ -5155,6 +5164,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "University Bachelors"
-#~ msgstr "Bacheliers universitaires"
