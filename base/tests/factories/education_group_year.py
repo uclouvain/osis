@@ -105,3 +105,7 @@ class EducationGroupYearCommonMasterFactory(EducationGroupYearFactory):
 
 class EducationGroupYearMasterFactory(EducationGroupYearCommonMasterFactory):
     acronym = 'actu2m'
+
+
+class EducationGroupCommonFactory(EducationGroupYearFactory):
+    acronym = 'common'
