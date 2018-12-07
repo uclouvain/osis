@@ -742,7 +742,7 @@ msgid ""
 "prerequisite."
 msgstr ""
 "L'unité d'enseignement %(acronym)s dispose de prérequis ou est prerequis et "
-"ne peut pas être détacher."
+"ne peut pas être détachée."
 
 #: business/education_groups/shorten.py:60
 #: tests/business/education_groups/test_shorten.py:155
