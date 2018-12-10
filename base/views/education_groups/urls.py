@@ -30,6 +30,8 @@ from base.views.education_groups.coorganization import CreateEducationGroupOrgan
     UpdateEducationGroupOrganizationView, CoorganizationDeleteView
 from base.views.education_groups.group_element_year.read import pdf_content
 from base.views.education_groups.learning_unit import detail as learning_unit_detail, update as learning_unit_update
+from base.views.education_groups.publication_contact import CreateEducationGroupPublicationContactView, \
+    UpdateEducationGroupPublicationContactView, EducationGroupPublicationContactDeleteView
 from base.views.education_groups.select import education_group_select, learning_unit_select
 from base.views.education_groups.update import CertificateAimAutocomplete, PostponeGroupElementYearView
 from . import search, create, detail, update, delete, group_element_year
@@ -137,6 +139,18 @@ urlpatterns = [
             url(r'^delete/(?P<coorganization_id>[0-9]+)$',
                 CoorganizationDeleteView.as_view(),
                 name="coorganization_delete"),
+        ])),
+
+        url(r'^publication_contact/', include([
+            url(r'^create/$',
+                CreateEducationGroupPublicationContactView.as_view(),
+                name="publication_contact_create"),
+            url(r'^edit/(?P<publication_contact_id>[0-9]+)/$',
+                UpdateEducationGroupPublicationContactView.as_view(),
+                name="publication_contact_edit"),
+            url(r'^delete/(?P<publication_contact_id>[0-9]+)$',
+                EducationGroupPublicationContactDeleteView.as_view(),
+                name="publication_contact_delete"),
         ])),
     ])),
     url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([
