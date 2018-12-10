@@ -35,7 +35,7 @@ from attribution.business import attribution_charge_new
 from attribution.models.enums.function import Functions
 from base import models as mdl_base
 from base.business.learning_unit import LEARNING_UNIT_TITLES_PART2, XLS_DESCRIPTION, XLS_FILENAME, \
-    WORKSHEET_TITLE, get_entity_acronym
+    WORKSHEET_TITLE
 from base.business.xls import get_name_or_username
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.proposal_type import ProposalType
@@ -102,7 +102,7 @@ def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=F
                 learningunityear__in=OuterRef('pk'),
                 type=LECTURING
             ).values('hourly_volume_total_annual')[:1]
-        ),        
+        ),
         pm_classes=Subquery(
             LearningComponentYear.objects.filter(
                 learningunityear__in=OuterRef('pk'),
@@ -134,6 +134,7 @@ def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=F
             ).values('planned_classes')[:1]
         )
     )
+
     return [
         extract_xls_data_from_learning_unit(lu, with_grp, with_attributions) for lu in qs
     ]
@@ -160,9 +161,6 @@ def create_xls_with_parameters(user, learning_units, filters, extra_configuratio
 
     if with_attributions:
         titles_part1.append(str(HEADER_TEACHERS))
-        for learning_unit_yr in learning_units:
-            learning_unit_yr.attribution_charge_news = attribution_charge_new \
-                .find_attribution_charge_new_by_learning_unit_year_as_dict(learning_unit_year=learning_unit_yr)
 
     working_sheets_data = prepare_xls_content(learning_units, with_grp, with_attributions)
 
@@ -299,7 +297,13 @@ def _get_data_part2(learning_unit_yr, with_attributions):
     lu_data_part2 = []
     if with_attributions:
         lu_data_part2.append(
-            " \n".join([_get_attribution_line(value) for value in learning_unit_yr.attribution_charge_news.values()])
+            " \n".join(
+                [_get_attribution_line(value)
+                 for value in attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
+                    learning_unit_yr
+                ).values()
+                 ]
+            )
         )
 
     lu_data_part2.extend([
