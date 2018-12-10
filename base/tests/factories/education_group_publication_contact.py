@@ -35,5 +35,7 @@ class EducationGroupPublicationContactFactory(factory.django.DjangoModelFactory)
 
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
     type = factory.Iterator(PublicationContactType.choices())
-    role = factory.fuzzy.FuzzyText('role_', 20)
+    role_fr = factory.fuzzy.FuzzyText('rolefr_', 20)
+    role_en = factory.fuzzy.FuzzyText('roleen_', 20)
     email = factory.Sequence(lambda n: 'person{0}@example.com'.format(n))
+    description = factory.fuzzy.FuzzyText('description_', 20)

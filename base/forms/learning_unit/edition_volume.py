@@ -31,7 +31,6 @@ from django.db.models import Prefetch
 from django.forms import formset_factory, modelformset_factory
 from django.utils.translation import ugettext_lazy as _
 
-from base.business.learning_unit_year_with_context import ENTITY_TYPES_VOLUME
 from base.business.learning_units import edition
 from base.business.learning_units.edition import check_postponement_conflict_report_errors
 from base.forms.common import STEP_HALF_INTEGER
@@ -39,6 +38,7 @@ from base.forms.utils.emptyfield import EmptyField
 from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT, COMPONENT_TYPES
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY, \
     CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
 from base.models.learning_component_year import LearningComponentYear
@@ -104,7 +104,7 @@ class VolumeEditionForm(forms.Form):
                                                    _('Planned classes'))
 
         # Append dynamic fields
-        entities_to_add = [entity for entity in ENTITY_TYPES_VOLUME if entity in self.entities]
+        entities_to_add = [entity for entity in REQUIREMENT_ENTITIES if entity in self.entities]
         for i, key in enumerate(entities_to_add):
             entity = self.entities[key]
             self.fields["volume_" + key.lower()] = VolumeField(
