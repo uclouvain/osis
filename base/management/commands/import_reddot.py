@@ -229,7 +229,7 @@ def _import_single_contacts_type(type, contacts, education_group_year, language)
              type=type,
              defaults={
                  role_field: contact.get('title', ''),
-                 'email': contact['email'],
+                 'email': contact.get('email', ''),
                  'description': contact.get('description', '')
              }
          )

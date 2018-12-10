@@ -23,7 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 
 from django.db import models
@@ -37,6 +39,13 @@ ROLE_REQUIRED_FOR_TYPES = (
     PublicationContactType.JURY_MEMBER.name,
     PublicationContactType.OTHER_CONTACT.name,
 )
+
+
+class EducationGroupPublicationQuerySet(models.QuerySet):
+    def annotate_text(self, language_code):
+        return self.annotate(
+            role_text=F('role_fr') if language_code == settings.LANGUAGE_CODE_FR else F('role_en'),
+        )
 
 
 class EducationGroupPublicationContactAdmin(OrderedModelAdmin):
@@ -76,6 +85,8 @@ class EducationGroupPublicationContact(OrderedModel):
     )
     education_group_year = models.ForeignKey('EducationGroupYear')
     order_with_respect_to = ('education_group_year', 'type', )
+
+    objects = EducationGroupPublicationQuerySet.as_manager()
 
     class Meta:
         ordering = ('education_group_year', 'type', 'order',)
