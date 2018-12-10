@@ -48,7 +48,7 @@ from base.models.entity_version import EntityVersion, build_current_entity_versi
 from base.models.enums import entity_container_year_link_type, learning_container_year_types, \
     learning_unit_year_subtypes, active_status, entity_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY
-from base.models.learning_unit_year import convert_status_bool
+from base.models.learning_unit_year import convert_status_bool, LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
 from base.models.organization_address import find_distinct_by_country
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -393,33 +393,9 @@ class ExternalLearningUnitYearForm(LearningUnitYearForm):
         self.fields['city'].choices = add_blank(cities_choice_list)
 
     def get_learning_units(self):
-        clean_data = self.cleaned_data
-        learning_units = mdl.external_learning_unit_year.search(
-            academic_year_id=clean_data['academic_year_id'],
-            acronym=clean_data['acronym'],
-            title=clean_data['title'],
-            country=clean_data['country'],
-            city=clean_data['city'],
-            campus=clean_data['campus']
+        learning_units = self.get_queryset().filter(
+            externallearningunityear__isnull=False
         ).select_related(
-            'learning_unit_year__academic_year',
-            'learning_unit_year__learning_container_year',
-            'learning_unit_year__campus__organization'
-        ).order_by('learning_unit_year__academic_year__year', 'learning_unit_year__acronym')
-
+            'campus__organization'
+        )
         return learning_units
-
-    def clean_city(self):
-        return _get_value(self.cleaned_data.get('city'))
-
-    def clean_country(self):
-        return _get_value(self.cleaned_data.get('country'))
-
-    def clean_campus(self):
-        return _get_value(self.cleaned_data.get('campus'))
-
-
-def _get_value(data_cleaned):
-    if data_cleaned == BLANK_CHOICE_DASH[0][1]:
-        return None
-    return data_cleaned

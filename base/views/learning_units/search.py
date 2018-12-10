@@ -123,28 +123,28 @@ def learning_units_search(request, search_type):
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
-@cache_filter()
+# @cache_filter()
 def learning_units(request):
     return learning_units_search(request, SIMPLE_SEARCH)
 
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
-@cache_filter()
+# @cache_filter()
 def learning_units_service_course(request):
     return learning_units_search(request, SERVICE_COURSES_SEARCH)
 
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
-@cache_filter()
+# @cache_filter()
 def learning_units_borrowed_course(request):
     return learning_units_search(request, BORROWED_COURSE)
 
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
-@cache_filter()
+# @cache_filter()
 def learning_units_proposal_search(request):
     search_form = LearningUnitProposalForm(
         request.GET or None,
@@ -218,16 +218,18 @@ def _get_search_type_label(search_type):
 
 @login_required
 @permission_required('base.can_access_externallearningunityear', raise_exception=True)
-@cache_filter()
+# @cache_filter()
 def learning_units_external_search(request):
-    search_form = ExternalLearningUnitYearForm(request.GET or None,
-                                               initial={'academic_year_id': current_academic_year()})
+    search_form = ExternalLearningUnitYearForm(
+        request.GET or None,
+        initial={'academic_year_id': current_academic_year()}
+    )
     user_person = get_object_or_404(Person, user=request.user)
-    external_learning_units = []
+    found_learning_units = LearningUnitYear.objects.none()
     try:
         if search_form.is_valid():
-            external_learning_units = search_form.get_learning_units()
-            check_if_display_message(request, external_learning_units)
+            found_learning_units = search_form.get_learning_units()
+            check_if_display_message(request, found_learning_units)
     except TooManyResultsException:
         display_error_messages(request, 'too_many_results')
 
@@ -240,9 +242,10 @@ def learning_units_external_search(request):
         'current_academic_year': current_academic_year(),
         'experimental_phase': True,
         'search_type': EXTERNAL_SEARCH,
-        'learning_units': external_learning_units,
+        'learning_units_count': found_learning_units.count(),
+        'learning_units': found_learning_units,
         'is_faculty_manager': user_person.is_faculty_manager,
-        'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(external_learning_units)),
-        'page_obj': paginate_queryset(external_learning_units, request.GET),
+        'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
+        'page_obj': paginate_queryset(found_learning_units, request.GET),
     }
-    return layout.render(request, "learning_units.html", context)
+    return render(request, "learning_units.html", context)

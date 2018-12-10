@@ -482,6 +482,17 @@ def search(academic_year_id=None, acronym=None, learning_container_year_id=None,
     if summary_responsible:
         queryset = find_summary_responsible_by_name(queryset, summary_responsible)
 
+    campus = kwargs.get('campus')
+    city = kwargs.get('city')
+    country = kwargs.get('country')
+
+    if campus:
+        queryset = queryset.filter(campus=campus)
+    elif city:
+        queryset = queryset.filter(campus__organization__organizationaddress__city=city)
+    elif country:
+        queryset = queryset.filter(campus__organization__organizationaddress__country=country)
+
     return queryset.select_related('learning_container_year', 'academic_year')
 
 
