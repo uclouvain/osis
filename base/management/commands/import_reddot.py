@@ -216,9 +216,6 @@ def _get_field_achievement_according_to_language(language):
 
 
 def _import_contacts(contacts_grouped_by_types, education_group_year, context):
-    if context.language == settings.LANGUAGE_CODE_EN:
-        return
-
     for type, contacts in contacts_grouped_by_types.items():
         _import_single_contacts_type(type, contacts, education_group_year, context.language)
 
