@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-07 15:20+0100\n"
+"POT-Creation-Date: 2018-12-07 16:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -268,6 +268,10 @@ msgstr ""
 
 #: models/enums/publication_contact_type.py:32
 msgid "Academic responsible"
+msgstr ""
+
+#: templates/education_group/blocks/contacts_general_informations.html:48
+msgid "Academic responsibles"
 msgstr ""
 
 #: templates/learning_unit/proposal/create_suppression.html:6
@@ -543,6 +547,10 @@ msgstr ""
 #: templates/education_group/delete_inner.html:33
 #, python-format
 msgid "Are you sure you want to delete %(education_group_year)s?"
+msgstr ""
+
+#: templates/education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html:8
+msgid "Are you sure you want to delete the contact ?"
 msgstr ""
 
 #: templates/education_group/blocks/modal/modal_organization_confirm_delete_inner.html:8
@@ -924,6 +932,10 @@ msgstr ""
 msgid "Consolidate the proposal"
 msgstr ""
 
+#: templates/education_group/blocks/contacts_general_informations.html:35
+msgid "Contacts"
+msgstr ""
+
 #: templates/education_group/tabs.html:74
 msgid "Content"
 msgstr ""
@@ -958,6 +970,7 @@ msgstr ""
 msgid "Course enrollment"
 msgstr ""
 
+#: templates/education_group/blocks/contacts_general_informations.html:38
 #: templates/education_group/blocks/coorganization.html:156
 #: templates/education_group/blocks/panel/panel_achievements.html:89
 #: templates/education_group/blocks/panel/panel_achievements.html:101
@@ -965,6 +978,10 @@ msgstr ""
 #: templates/learning_unit/specifications.html:86
 #: templates/learning_unit/specifications.html:183
 msgid "Create"
+msgstr ""
+
+#: forms/education_group/publication_contact.py:51
+msgid "Create contact"
 msgstr ""
 
 #: models/enums/proposal_type.py:33
@@ -1032,6 +1049,7 @@ msgstr ""
 msgid "Default learning unit enrollment"
 msgstr ""
 
+#: templates/education_group/blocks/contacts_general_informations_ul.html:44
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:99
 #: templates/organization/organization_address.html:72
 #: templates/organization/organization_address.html:74
@@ -1176,6 +1194,7 @@ msgstr ""
 
 #: templates/academic_calendar/academic_calendar.html:83
 #: templates/academic_calendar/academic_calendar.html:85
+#: templates/education_group/blocks/contacts_general_informations_ul.html:47
 #: templates/education_group/blocks/content_actions.html:46
 #: templates/education_group/blocks/coorganization.html:79
 #: templates/education_group/blocks/coorganization.html:130
@@ -1686,6 +1705,10 @@ msgstr ""
 msgid "In heading 2 of diploma"
 msgstr ""
 
+#: templates/education_group/blocks/contacts_general_informations.html:30
+msgid "In practice"
+msgstr ""
+
 #: templates/learning_unit/by_activity.html:120
 msgid "In proposal"
 msgstr ""
@@ -1815,6 +1838,10 @@ msgstr ""
 
 #: models/enums/publication_contact_type.py:34
 msgid "Jury member"
+msgstr ""
+
+#: templates/education_group/blocks/contacts_general_informations.html:62
+msgid "Jury members"
 msgstr ""
 
 #: models/education_group_year.py:295
@@ -2584,6 +2611,10 @@ msgstr ""
 msgid "Other academic responsible"
 msgstr ""
 
+#: templates/education_group/blocks/contacts_general_informations.html:55
+msgid "Other academic responsibles"
+msgstr ""
+
 #: models/enums/learning_container_year_types.py:41
 #: models/enums/learning_container_year_types.py:48
 msgid "Other collective"
@@ -2591,6 +2622,10 @@ msgstr ""
 
 #: models/enums/publication_contact_type.py:35
 msgid "Other contact"
+msgstr ""
+
+#: templates/education_group/blocks/contacts_general_informations.html:69
+msgid "Other contacts"
 msgstr ""
 
 #: models/enums/learning_container_year_types.py:42
@@ -3513,6 +3548,14 @@ msgstr ""
 msgid "The configuration of you user profile"
 msgstr ""
 
+#: views/education_groups/publication_contact.py:74
+msgid "The contact has been created"
+msgstr ""
+
+#: views/education_groups/publication_contact.py:88
+msgid "The contacts modifications has been saved"
+msgstr ""
+
 #: business/group_element_years/postponement.py:91
 #: tests/business/education_groups/test_postponement.py:177
 msgid "The content has already been postponed."
@@ -3724,7 +3767,7 @@ msgstr ""
 msgid "The program aim has been updated"
 msgstr ""
 
-#: views/education_groups/detail.py:355
+#: views/education_groups/detail.py:367
 msgid "The program are published. Click on the link to display it : "
 msgstr ""
 
@@ -3836,8 +3879,9 @@ msgstr ""
 msgid "This field cannot be set"
 msgstr ""
 
-#: forms/common.py:80 models/education_group_year.py:670
-#: models/education_group_year.py:691 models/education_group_year.py:693
+#: forms/common.py:80 models/education_group_publication_contact.py:70
+#: models/education_group_year.py:670 models/education_group_year.py:691
+#: models/education_group_year.py:693
 #: tests/views/learning_units/proposals/test_creation.py:186
 #: tests/views/learning_units/proposals/test_creation.py:187
 #: tests/views/learning_units/proposals/test_creation.py:188
@@ -3856,7 +3900,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
-#: views/education_groups/detail.py:302
+#: views/education_groups/detail.py:308
 #, python-format
 msgid "This label %s does not exist"
 msgstr ""
@@ -3887,7 +3931,7 @@ msgstr ""
 msgid "This process helps tutors while scores encoding."
 msgstr ""
 
-#: views/education_groups/detail.py:352
+#: views/education_groups/detail.py:364
 msgid "This program has no page to publish on it"
 msgstr ""
 
@@ -4038,7 +4082,7 @@ msgstr ""
 msgid "URL of the learning unit"
 msgstr ""
 
-#: views/education_groups/detail.py:319
+#: views/education_groups/detail.py:325
 msgid "Unable to retrieve appropriate sections for this programs"
 msgstr ""
 
@@ -4078,6 +4122,10 @@ msgstr ""
 
 #: templates/education_group/blocks/form/achievement_action_bar.html:8
 msgid "Update"
+msgstr ""
+
+#: forms/education_group/publication_contact.py:50
+msgid "Update contact"
 msgstr ""
 
 #: templates/learning_unit/blocks/summary_locked.html:22
@@ -4544,6 +4592,8 @@ msgstr ""
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:53
 #: templates/education_group/blocks/modal/modal_organization_confirm_delete_inner.html:14
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:50
+#: templates/education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html:14
+#: templates/education_group/blocks/modal/modal_publication_contact_edit_inner.html:40
 #: templates/education_group/group_element_year/confirm_detach_inner.html:46
 #: templates/education_group/group_element_year/confirm_postpone_content_inner.html:10
 #: templates/education_group/organization_edit_inner.html:51
@@ -4661,6 +4711,7 @@ msgstr ""
 #: templates/education_group/blocks/coorganization.html:142
 #: templates/education_group/blocks/form/achievement_action_bar.html:25
 #: templates/education_group/blocks/modal/modal_organization_confirm_delete_inner.html:17
+#: templates/education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html:17
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:114
 #: templates/learning_unit/remove_charge_repartition_confirmation_inner.html:31
 #: templates/learning_unit/specifications.html:126
@@ -4680,7 +4731,7 @@ msgstr ""
 msgid "duration unit"
 msgstr ""
 
-#: models/education_group_publication_contact.py:44
+#: models/education_group_publication_contact.py:52
 #: templates/education_group/pdf_content.html:97
 #: templates/my_osis/profile.html:90
 msgid "email"
@@ -4893,6 +4944,7 @@ msgstr ""
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:63
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:52
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:49
+#: templates/education_group/blocks/modal/modal_publication_contact_edit_inner.html:39
 #: templates/education_group/organization_edit_inner.html:43
 #: templates/education_group/organization_edit_inner.html:52
 #: templates/learning_unit/achievement_edit.html:51
@@ -4984,7 +5036,7 @@ msgstr ""
 
 #: business/education_group.py:48 business/learning_units/edition.py:449
 #: business/learning_units/xls_comparison.py:55
-#: models/education_group_publication_contact.py:50
+#: models/education_group_publication_contact.py:58
 #: templates/entity/versions.html:45
 #: templates/learning_unit/blocks/panel/proposal.html:17
 #: templates/learning_unit/summary_list.html:79

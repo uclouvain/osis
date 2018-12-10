@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from django.db import models
@@ -32,10 +33,17 @@ from ordered_model.models import OrderedModel
 from base.models.enums.publication_contact_type import PublicationContactType
 
 
+ROLE_REQUIRED_FOR_TYPES = (
+    PublicationContactType.JURY_MEMBER.name,
+    PublicationContactType.OTHER_CONTACT.name,
+)
+
+
 class EducationGroupPublicationContactAdmin(OrderedModelAdmin):
     list_display = ('education_group_year', 'type', 'role', 'email', 'order', 'move_up_down_links',)
     readonly_fields = ['order']
     search_fields = ['education_group_year__acronym', 'role', 'email']
+    raw_id_fields = ('education_group_year', )
 
 
 class EducationGroupPublicationContact(OrderedModel):
@@ -54,3 +62,11 @@ class EducationGroupPublicationContact(OrderedModel):
 
     class Meta:
         ordering = ('education_group_year', 'type', 'order',)
+
+    def clean(self):
+        super().clean()
+
+        if self.type in ROLE_REQUIRED_FOR_TYPES and not self.role:
+            raise ValidationError({'role': _("This field is required.")})
+        elif self.type not in ROLE_REQUIRED_FOR_TYPES:
+            self.role = ''
