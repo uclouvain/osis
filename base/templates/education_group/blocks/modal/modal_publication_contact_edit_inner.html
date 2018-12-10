@@ -1,7 +1,6 @@
-{% extends "education_group/tab_identification.html" %}
+{% load staticfiles %}
 {% load i18n %}
-{% load format %}
-{% load staticfiles education_group %}
+{% load bootstrap3 %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -25,25 +24,20 @@
     * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
-{% block details %}
-    {% with  parent=parent_training %}
-        <div class="row">
-            <div class="col-md-7" style="margin-top: 10px">
-                {% include 'education_group/blocks/informations.html' %}
 
-                {% include 'education_group/blocks/academic_offer_info.html' %}
-            </div>
-            <div class="col-md-5" style="margin-top: 10px">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        {% dl_with_parent "acronym" education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") %}
-                        {% dl_with_parent "main_teaching_campus" %}
-                    </div>
-                </div>
-                {% include "blocks/panel/reversion.html" %}
-
-
-            </div>
+<div id="form-modal-body" class="modal-body">
+    <form class="form" role="form" method="POST" action="{{ request.path }}">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h4>{{ form.title | capfirst }}</h4>
         </div>
-    {% endwith %}
-{% endblock %}
+        <div class="modal-body">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="submit">{% trans 'save' %}</button>
+            <button type="submit" class="btn" data-dismiss="modal">{% trans 'cancel' %}</button>
+        </div>
+    </form>
+</div>

@@ -298,7 +298,7 @@ class EducationGroupYearVerboseTest(TestCase):
         self.education_group_year.duration = 1
         self.education_group_year.duration_unit = duration_unit.QUADRIMESTER
 
-        expected = '{} {}'.format(1, _(duration_unit.QUADRIMESTER))
+        expected = '{} {}'.format(1, _(dict(duration_unit.DURATION_UNIT).get(duration_unit.QUADRIMESTER)))
         self.assertEqual(self.education_group_year.verbose_duration, expected)
 
     def test_verbose_duration_case_no_duration(self):

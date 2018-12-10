@@ -222,3 +222,6 @@ admin.site.register(education_group_achievement.EducationGroupAchievement,
 
 admin.site.register(education_group_detailed_achievement.EducationGroupDetailedAchievement,
                     education_group_detailed_achievement.EducationGroupDetailedAchievementAdmin)
+
+admin.site.register(education_group_publication_contact.EducationGroupPublicationContact,
+                    education_group_publication_contact.EducationGroupPublicationContactAdmin)

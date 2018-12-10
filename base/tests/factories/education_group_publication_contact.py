@@ -23,28 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
-from reversion.admin import VersionAdmin
+import factory.fuzzy
 
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
-
-
-class EntityComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('entity_container_year', 'learning_component_year', 'repartition_volume',)
-    search_fields = ['entity_container_year__learning_container_year__acronym']
-    raw_id_fields = ('entity_container_year', 'learning_component_year')
-    list_filter = ('entity_container_year__learning_container_year__academic_year',)
+from base.models.enums.publication_contact_type import PublicationContactType
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 
 
-class EntityComponentYear(SerializableModel):
-    external_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
-    changed = models.DateTimeField(null=True, auto_now=True)
-    entity_container_year = models.ForeignKey('EntityContainerYear')
-    learning_component_year = models.ForeignKey('LearningComponentYear')
-    repartition_volume = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-
-    def __str__(self):
-        return u"%s - %s" % (self.entity_container_year, self.learning_component_year)
-
+class EducationGroupPublicationContactFactory(factory.django.DjangoModelFactory):
     class Meta:
-        unique_together = ('entity_container_year', 'learning_component_year', )
+        model = "base.EducationGroupPublicationContact"
+
+    education_group_year = factory.SubFactory(EducationGroupYearFactory)
+    type = factory.Iterator(PublicationContactType.choices())
+    role_fr = factory.fuzzy.FuzzyText('rolefr_', 20)
+    role_en = factory.fuzzy.FuzzyText('roleen_', 20)
+    email = factory.Sequence(lambda n: 'person{0}@example.com'.format(n))
+    description = factory.fuzzy.FuzzyText('description_', 20)
