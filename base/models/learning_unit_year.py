@@ -78,7 +78,7 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
         from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponement
         from base.views.common import display_success_messages, display_error_messages
 
-        result, errors = LearningUnitAutomaticPostponement(queryset.filter(learning_container_year__isnull=False))
+        result, errors = LearningUnitAutomaticPostponement(queryset).postpone()
         count = len(result)
         display_success_messages(
             request, ngettext(

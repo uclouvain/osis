@@ -23,32 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
+import factory.fuzzy
 
-from base.models.utils.utils import ChoiceEnum
-
-REQUIREMENT_ENTITY = "REQUIREMENT_ENTITY"
-ALLOCATION_ENTITY = "ALLOCATION_ENTITY"
-ADDITIONAL_REQUIREMENT_ENTITY_1 = "ADDITIONAL_REQUIREMENT_ENTITY_1"
-ADDITIONAL_REQUIREMENT_ENTITY_2 = "ADDITIONAL_REQUIREMENT_ENTITY_2"
-
-ENTITY_TYPE_LIST = [
-    REQUIREMENT_ENTITY,
-    ALLOCATION_ENTITY,
-    ADDITIONAL_REQUIREMENT_ENTITY_1,
-    ADDITIONAL_REQUIREMENT_ENTITY_2
-]
+from base.models.enums.publication_contact_type import PublicationContactType
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 
 
-class EntityContainerYearLinkTypes(ChoiceEnum):
-    REQUIREMENT_ENTITY = _("Requirement entity")
-    ALLOCATION_ENTITY = _("Attribution entity")
-    ADDITIONAL_REQUIREMENT_ENTITY_1 = _("Additional requirement entity 1")
-    ADDITIONAL_REQUIREMENT_ENTITY_2 = _("Additional requirement entity 2")
+class EducationGroupPublicationContactFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "base.EducationGroupPublicationContact"
 
-
-REQUIREMENT_ENTITIES = [
-    REQUIREMENT_ENTITY,
-    ADDITIONAL_REQUIREMENT_ENTITY_1,
-    ADDITIONAL_REQUIREMENT_ENTITY_2
-]
+    education_group_year = factory.SubFactory(EducationGroupYearFactory)
+    type = factory.Iterator(PublicationContactType.choices())
+    role = factory.fuzzy.FuzzyText('role_', 20)
+    email = factory.Sequence(lambda n: 'person{0}@example.com'.format(n))

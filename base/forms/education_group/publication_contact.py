@@ -24,31 +24,35 @@
 #
 ##############################################################################
 from django.utils.translation import ugettext_lazy as _
+from django import forms
+from django.core.exceptions import ImproperlyConfigured
 
-from base.models.utils.utils import ChoiceEnum
-
-REQUIREMENT_ENTITY = "REQUIREMENT_ENTITY"
-ALLOCATION_ENTITY = "ALLOCATION_ENTITY"
-ADDITIONAL_REQUIREMENT_ENTITY_1 = "ADDITIONAL_REQUIREMENT_ENTITY_1"
-ADDITIONAL_REQUIREMENT_ENTITY_2 = "ADDITIONAL_REQUIREMENT_ENTITY_2"
-
-ENTITY_TYPE_LIST = [
-    REQUIREMENT_ENTITY,
-    ALLOCATION_ENTITY,
-    ADDITIONAL_REQUIREMENT_ENTITY_1,
-    ADDITIONAL_REQUIREMENT_ENTITY_2
-]
+from base.models.education_group_publication_contact import EducationGroupPublicationContact, ROLE_REQUIRED_FOR_TYPES
 
 
-class EntityContainerYearLinkTypes(ChoiceEnum):
-    REQUIREMENT_ENTITY = _("Requirement entity")
-    ALLOCATION_ENTITY = _("Attribution entity")
-    ADDITIONAL_REQUIREMENT_ENTITY_1 = _("Additional requirement entity 1")
-    ADDITIONAL_REQUIREMENT_ENTITY_2 = _("Additional requirement entity 2")
+class EducationGroupPublicationContactForm(forms.ModelForm):
+    class Meta:
+        model = EducationGroupPublicationContact
+        fields = ["type", "email", "role"]
 
+    def __init__(self, education_group_year=None, *args, **kwargs):
+        if not education_group_year and not kwargs.get('instance'):
+            raise ImproperlyConfigured("Provide an education_group_year or an instance")
 
-REQUIREMENT_ENTITIES = [
-    REQUIREMENT_ENTITY,
-    ADDITIONAL_REQUIREMENT_ENTITY_1,
-    ADDITIONAL_REQUIREMENT_ENTITY_2
-]
+        super().__init__(*args, **kwargs)
+        if not kwargs.get('instance'):
+            self.instance.education_group_year = education_group_year
+        self._disable_fields()
+
+    @property
+    def title(self):
+        if self.instance.pk:
+            return _('Update contact')
+        return _('Create contact')
+
+    def _disable_fields(self):
+        if self.instance.type not in ROLE_REQUIRED_FOR_TYPES:
+            self.fields['role'].disabled = True
+
+        if self.instance.pk:
+            self.fields['type'].disabled = True
