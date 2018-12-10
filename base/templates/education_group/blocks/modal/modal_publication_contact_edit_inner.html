@@ -1,4 +1,6 @@
-{% load bootstrap3 i18n %}
+{% load staticfiles %}
+{% load i18n %}
+{% load bootstrap3 %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -22,30 +24,20 @@
     * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
-{% if request.is_ajax %}
-    <div class="modal-content" id="form-modal-content">
 
-    <div id="form-modal-body" class="modal-body">
-{% endif %}
-
-<form method="post" id="form_education_group_type" action="{{ request.path }}">
-    {% csrf_token %}
-
-
-    {% bootstrap_field form.name %}
-
-
-    {% if not request.is_ajax %}
-        <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-primary"/>
-    {% endif %}
-</form>
+<div id="form-modal-body" class="modal-body">
+    <form class="form" role="form" method="POST" action="{{ request.path }}">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h4>{{ form.title | capfirst }}</h4>
+        </div>
+        <div class="modal-body">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="submit">{% trans 'save' %}</button>
+            <button type="submit" class="btn" data-dismiss="modal">{% trans 'cancel' %}</button>
+        </div>
+    </form>
 </div>
-
-{% if request.is_ajax %}
-    <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-        <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-primary"
-               onclick="$('#form_education_group_type').submit();"/>
-    </div>
-    </div>
-{% endif %}
