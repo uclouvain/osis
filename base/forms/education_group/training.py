@@ -154,7 +154,8 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
                                                     .order_by('-decree__name', 'name')
 
     def save(self, commit=True):
-        education_group_year = super().save(commit=True)
+        education_group_year = super().save(commit=False)
+        education_group_year.save()
         if not self.fields['secondary_domains'].disabled:
             self.save_secondary_domains()
         self.save_certificate_aims()
@@ -191,11 +192,16 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
         egy_deleted = []
         if education_group_instance.end_year:
             egy_deleted = shorten.start(education_group_instance, education_group_instance.end_year)
-        create_initial_group_element_year_structure([self.forms[EducationGroupYearModelForm].instance,
-                                                     *self.education_group_year_postponed])
+
         return {
             'object_list_deleted': egy_deleted,
         }
+
+    def save(self):
+        egy_instance = super().save()
+        create_initial_group_element_year_structure([egy_instance,
+                                                     *self.education_group_year_postponed])
+        return egy_instance
 
 
 @register('university_domains')

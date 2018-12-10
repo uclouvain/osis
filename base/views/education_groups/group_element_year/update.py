@@ -238,12 +238,22 @@ class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView)
 
     def delete(self, request, *args, **kwargs):
         child_leaf = self.get_object().child_leaf
+        child_branch = self.get_object().child_branch
         parent = self.get_object().parent
         if child_leaf and child_leaf.has_or_is_prerequisite(parent):
             # FIXME Method should be in permission to view and display message in page
             error_msg = \
                 _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
                     "acronym": child_leaf.acronym
+                }
+            display_error_messages(request, error_msg)
+            return JsonResponse({"error": True, "success_url": self.get_success_url()})
+        if child_branch and group_element_years.management.is_min_child_reached(parent, child_branch):
+            error_msg = \
+                _("Cannot detach child \"%(child)s\". "
+                  "The parent must have at least one child of type \"%(type)s\".") % {
+                    "child": child_branch,
+                    "type": parent.education_group_type
                 }
             display_error_messages(request, error_msg)
             return JsonResponse({"error": True, "success_url": self.get_success_url()})

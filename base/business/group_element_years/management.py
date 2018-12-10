@@ -65,7 +65,7 @@ def attach_from_cache(parent):
                     errors=_("You cannot attach \"%(child)s\" (type \"%(child_type)s\") "
                              "to \"%(parent)s\" (type \"%(parent_type)s\")") % {
                                'child': luy,
-                               'child_type': "learning unit",
+                               'child_type': _("Learning unit"),
                                'parent': parent,
                                'parent_type': parent.education_group_type,
                            }

@@ -126,7 +126,7 @@ def _compose_child_partial_acronym(parent, child_initial_value, child_type):
     try:
         previous_children = GroupElementYear.objects.get(
             parent__education_group=parent.education_group,
-            parent__academic_year__year=parent.academic_year.year - 1,
+            parent__academic_year__year__in=[parent.academic_year.year - 1, parent.academic_year.year],
             child_branch__education_group_type=child_type
         )
     except GroupElementYear.DoesNotExist:
