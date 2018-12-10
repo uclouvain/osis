@@ -220,20 +220,30 @@ def _import_contacts(contacts_grouped_by_types, education_group_year, context):
         return
 
     for type, contacts in contacts_grouped_by_types.items():
-        _import_single_contacts_type(type, contacts, education_group_year)
+        _import_single_contacts_type(type, contacts, education_group_year, context.language)
 
 
-def _import_single_contacts_type(type, contacts, education_group_year):
+def _import_single_contacts_type(type, contacts, education_group_year, language):
+    role_field = _get_role_field_publication_contact_according_to_language(language)
     for idx, contact in enumerate(contacts):
         EducationGroupPublicationContact.objects.update_or_create(
              education_group_year=education_group_year,
              order=idx,
              type=type,
              defaults={
-                 'role': contact.get('title', ''),
+                 role_field: contact.get('title', ''),
                  'email': contact['email'],
+                 'description': contact.get('description', '')
              }
          )
+
+
+def _get_role_field_publication_contact_according_to_language(language):
+    if language == settings.LANGUAGE_CODE_FR:
+        return 'role_fr'
+    elif language == settings.LANGUAGE_CODE_EN:
+        return 'role_en'
+    raise AttributeError('Language not supported {}'.format(language))
 
 
 LABEL_TEXTUALS = [

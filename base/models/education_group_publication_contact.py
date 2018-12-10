@@ -40,16 +40,33 @@ ROLE_REQUIRED_FOR_TYPES = (
 
 
 class EducationGroupPublicationContactAdmin(OrderedModelAdmin):
-    list_display = ('education_group_year', 'type', 'role', 'email', 'order', 'move_up_down_links',)
+    list_display = ('education_group_year', 'type', 'role_fr', 'role_en', 'email', 'order', 'move_up_down_links',)
     readonly_fields = ['order']
-    search_fields = ['education_group_year__acronym', 'role', 'email']
+    search_fields = ['education_group_year__acronym', 'role_fr', 'role_en', 'email']
     raw_id_fields = ('education_group_year', )
 
 
 class EducationGroupPublicationContact(OrderedModel):
-    role = models.CharField(max_length=100, default='', blank=True)
+    role_fr = models.CharField(
+        max_length=255,
+        default='',
+        blank=True,
+        verbose_name=_('role in french')
+    )
+    role_en = models.CharField(
+        max_length=255,
+        default='',
+        blank=True,
+        verbose_name=_('role in english')
+    )
     email = models.EmailField(
         verbose_name=_('email'),
+    )
+    description = models.CharField(
+        max_length=255,
+        default='',
+        blank=True,
+        verbose_name=_('description')
     )
     type = models.CharField(
         max_length=100,
@@ -66,7 +83,10 @@ class EducationGroupPublicationContact(OrderedModel):
     def clean(self):
         super().clean()
 
-        if self.type in ROLE_REQUIRED_FOR_TYPES and not self.role:
-            raise ValidationError({'role': _("This field is required.")})
+        if self.type in ROLE_REQUIRED_FOR_TYPES and not all([self.role_fr, self.role_en]):
+            raise ValidationError({
+                'role_fr': _("This field is required."),
+                'role_en': _("This field is required.")
+            })
         elif self.type not in ROLE_REQUIRED_FOR_TYPES:
-            self.role = ''
+            self.role_fr = self.role_en = ''
