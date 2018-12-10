@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
 import re
 from collections import defaultdict
 
@@ -39,7 +40,7 @@ MAX_CNUM = 999
 WIDTH_CNUM = 3
 
 
-def create_children(parent_egys):
+def create_initial_group_element_year_structure(parent_egys):
     children_dict = defaultdict(list)
     if not parent_egys:
         return children_dict
@@ -47,7 +48,7 @@ def create_children(parent_egys):
     auth_rels = AuthorizedRelationship.objects.filter(
         parent_type=parent_egys[0].education_group_type,
         min_count_authorized=count_constraint.ONE
-    )
+    ).only('child_type').select_related('child_type')
     for relationship in auth_rels:
         child_education_group_type = relationship.child_type
 
@@ -59,15 +60,17 @@ def create_children(parent_egys):
         partial_acronym = _compose_child_partial_acronym(parent_egys[0].partial_acronym,
                                                          validation_rule_partial_acronym.initial_value,
                                                          parent_egys[0], child_education_group_type)
+        child_factory = functools.partial(create_child,
+                                          child_education_group_type,
+                                          validation_rule_title.initial_value,
+                                          partial_acronym)
         for parent_egy in parent_egys:
-            title = _compose_child_title(validation_rule_title.initial_value, parent_egy.acronym)
-            acronym = _compose_child_acronym(parent_egy.acronym, validation_rule_title.initial_value)
-            grp_ele = create_child(parent_egy, child_education_group_type, title, partial_acronym, acronym)
+            grp_ele = child_factory(parent_egy)
             children_dict[parent_egy.id].append(grp_ele)
     return children_dict
 
 
-def create_child(parent_egy, child_education_group_type, title, partial_acronym, acronym):
+def create_child(child_education_group_type, title_initial_value, partial_acronym, parent_egy):
     try:
         existing_children = GroupElementYear.objects.get(
             parent=parent_egy,
@@ -78,18 +81,23 @@ def create_child(parent_egy, child_education_group_type, title, partial_acronym,
     else:
         return existing_children
 
+    year = parent_egy.academic_year.year
+    child_eg = EducationGroup(start_year=year, end_year=year)
+    child_eg.save()
+
     child_egy = EducationGroupYear(
         academic_year=parent_egy.academic_year,
         main_teaching_campus=parent_egy.main_teaching_campus,
         management_entity=parent_egy.management_entity,
         education_group_type=child_education_group_type,
-        title=title,
+        title=_compose_child_title(title_initial_value, parent_egy.acronym),
         partial_acronym=partial_acronym,
-        acronym=acronym,
-        education_group=_create_child_education_group(parent_egy.academic_year.year)
+        acronym=_compose_child_acronym(title_initial_value, parent_egy.acronym),
+        education_group=child_eg
     )
     child_egy.save()
-    grp_ele = _append_child_to_parent(parent_egy, child_egy)
+    grp_ele = GroupElementYear(parent=parent_egy, child_branch=child_egy)
+    grp_ele.save()
     return grp_ele
 
 
@@ -98,29 +106,11 @@ def field_reference(name, model, education_group_type):
     return '.'.join([model._meta.db_table, name]) + '.' + education_group_type.external_id
 
 
-def _create_child_education_group(year):
-    eg = EducationGroup(start_year=year, end_year=year)
-    eg.save()
-    return eg
-
-
-def _append_child_to_parent(parent_egy, child_egy):
-    grp_ele = GroupElementYear(
-        parent=parent_egy,
-        child_branch=child_egy
-    )
-    grp_ele.save()
-    return grp_ele
-
-
 def _compose_child_title(child_title_initial_value, parent_acronym):
-    return "{child_title} {parent_acronym}".format(
-        child_title=child_title_initial_value,
-        parent_acronym=parent_acronym
-    )
+    return "{child_title} {parent_acronym}".format(child_title=child_title_initial_value, parent_acronym=parent_acronym)
 
 
-def _compose_child_acronym(parent_acronym, child_title_initial_value):
+def _compose_child_acronym(child_title_initial_value, parent_acronym):
     return "{child_title}{parent_acronym}".format(
         child_title=child_title_initial_value.replace(" ", "").upper(),
         parent_acronym=parent_acronym

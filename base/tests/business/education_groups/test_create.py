@@ -23,11 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import uuid
 
 from django.test import TestCase
 
-from base.business.education_groups.create import create_children
+from base.business.education_groups.create import create_initial_group_element_year_structure
 from base.models.enums import education_group_types, education_group_categories, count_constraint
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
@@ -37,7 +36,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.validation_rule import ValidationRuleFactory
 
 
-class TestCreateChild(TestCase):
+class TestCreateInitialGroupElementYearStructure(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.master_type = EducationGroupTypeFactory(
@@ -94,7 +93,7 @@ class TestCreateChild(TestCase):
         )
 
     def test_should_return_empty_result_when_no_education_group_years_parent(self):
-        children = create_children([])
+        children = create_initial_group_element_year_structure([])
         self.assertDictEqual(
             children,
             {}
@@ -108,7 +107,7 @@ class TestCreateChild(TestCase):
             self.egy.acronym
         )
 
-        child_egy = create_children([self.egy])[self.egy.id][0].child_branch
+        child_egy = create_initial_group_element_year_structure([self.egy])[self.egy.id][0].child_branch
 
         for field in attributes_to_inherit:
             self.assertEqual(getattr(child_egy, field), getattr(self.egy, field))
@@ -119,7 +118,7 @@ class TestCreateChild(TestCase):
         self.assertTrue(child_egy.id)
 
     def test_should_create_education_group_with_start_and_year_equal_to_parent_academic_year(self):
-        child_egy = create_children([self.egy])[self.egy.id][0].child_branch
+        child_egy = create_initial_group_element_year_structure([self.egy])[self.egy.id][0].child_branch
         self.assertEqual(
             child_egy.education_group.start_year,
             self.egy.academic_year.year
@@ -132,7 +131,7 @@ class TestCreateChild(TestCase):
     def test_should_increment_cnum_of_child_partial_acronym_to_avoid_conflicted_acronyms(self):
         EducationGroupYearFactory(partial_acronym="LTEST400G")
         EducationGroupYearFactory(partial_acronym="LTEST401G")
-        child_egy = create_children([self.egy])[self.egy.id][0].child_branch
+        child_egy = create_initial_group_element_year_structure([self.egy])[self.egy.id][0].child_branch
         self.assertEqual(
             child_egy.partial_acronym,
             "LTEST402G"
@@ -144,17 +143,17 @@ class TestCreateChild(TestCase):
             child_type=self.major_type,
             min_count_authorized=count_constraint.ONE,
         )
-        children_egy = create_children([self.egy])[self.egy.id]
+        children_egy = create_initial_group_element_year_structure([self.egy])[self.egy.id]
         self.assertEqual(len(children_egy), 2)
 
     def test_should_create_children_for_each_education_group_year(self):
-        children_egys = create_children([self.egy, self.egy_next_year])
+        children_egys = create_initial_group_element_year_structure([self.egy, self.egy_next_year])
         self.assertEqual(len(children_egys), 2)
         self.assertEqual(len(children_egys[self.egy.id]), 1)
         self.assertEqual(len(children_egys[self.egy_next_year.id]), 1)
 
     def test_should_keep_partial_acronym_between_years(self):
-        children_egys = create_children([self.egy, self.egy_next_year])
+        children_egys = create_initial_group_element_year_structure([self.egy, self.egy_next_year])
         partial_acronym = children_egys[self.egy.id][0].child_branch.partial_acronym
         partial_acronym_next_year = children_egys[self.egy_next_year.id][0].child_branch.partial_acronym
         self.assertTrue(
@@ -179,7 +178,7 @@ class TestCreateChild(TestCase):
             parent=previous_egy,
             child_branch=previous_child
         )
-        children_egys = create_children([self.egy])
+        children_egys = create_initial_group_element_year_structure([self.egy])
 
         self.assertEqual(
             previous_child.partial_acronym,
@@ -196,11 +195,8 @@ class TestCreateChild(TestCase):
             parent=self.egy,
             child_branch=child
         )
-        children_egys = create_children([self.egy])
+        children_egys = create_initial_group_element_year_structure([self.egy])
         self.assertEqual(
             grp_ele.id,
             children_egys[self.egy.id][0].id
         )
-
-
-
