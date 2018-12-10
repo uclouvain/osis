@@ -35,7 +35,7 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>{% trans 'formations' %}</th>
+                        <th>{% trans 'Trainings' %}</th>
                         <th>{% blocktrans count counter=2 %}Prerequisite{% plural %}Prerequisites{% endblocktrans %}</th>
                     </tr>
                 </thead>
@@ -43,7 +43,7 @@
                     {% for education_group_year in formations %}
                         <tr>
                             <td>{{ education_group_year.acronym }}</td>
-                            <td>{{ education_group_year.prerequisites.0.prerequisite|default:"-"}}</td>
+                            <td>{{ education_group_year.prerequisites.0.prerequisite_string|default:"-"}}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

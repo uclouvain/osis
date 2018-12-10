@@ -35,15 +35,19 @@ from base.business.learning_unit_year_with_context import ENTITY_TYPES_VOLUME
 from base.business.learning_units import edition
 from base.business.learning_units.edition import check_postponement_conflict_report_errors
 from base.forms.common import STEP_HALF_INTEGER
-from base.forms.learning_unit.learning_unit_create import DEFAULT_ACRONYM_COMPONENT
 from base.forms.utils.emptyfield import EmptyField
 from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import entity_container_year_link_type as entity_types
-from base.models.enums.component_type import PRACTICAL_EXERCISES, LECTURING
-from base.models.enums.learning_container_year_types import CONTAINER_TYPE_WITH_DEFAULT_COMPONENT, \
-    LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY
+from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT, COMPONENT_TYPES
+from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY, \
+    CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_component import LearningUnitComponent
+
+
+class StepHalfIntegerWidget(forms.NumberInput):
+    def __init__(self):
+        super().__init__(attrs={'step': STEP_HALF_INTEGER})
 
 
 class VolumeField(forms.DecimalField):
@@ -58,26 +62,26 @@ class VolumeEditionForm(forms.Form):
 
     opening_parenthesis_field = EmptyField(label='(')
     volume_q1 = VolumeField(
-        label=_('partial_volume_1Q'),
-        help_text=_('partial_volume_1'),
-        widget=forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
+        label=_('Q1'),
+        help_text=_('Volume Q1'),
+        widget=StepHalfIntegerWidget(),
     )
     add_field = EmptyField(label='+')
     volume_q2 = VolumeField(
-        label=_('partial_volume_2Q'),
-        help_text=_('partial_volume_2'),
-        widget=forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
+        label=_('Q2'),
+        help_text=_('Volume Q2'),
+        widget=StepHalfIntegerWidget(),
     )
     equal_field_1 = EmptyField(label='=')
     volume_total = VolumeField(
         label=_('Vol. annual'),
         help_text=_('The annual volume must be equal to the sum of the volumes Q1 and Q2'),
-        widget=forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
+        widget=StepHalfIntegerWidget(),
     )
-    help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('partial_volume_1'), _('partial_volume_2'))
+    help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('Volume Q1'), _('Volume Q2'))
     closing_parenthesis_field = EmptyField(label=')')
     mult_field = EmptyField(label='*')
-    planned_classes = forms.IntegerField(label=_('planned_classes_pc'), help_text=_('planned_classes'), min_value=0)
+    planned_classes = forms.IntegerField(label=_('P.C.'), help_text=_('Planned classes'), min_value=0)
     equal_field_2 = EmptyField(label='=')
 
     _post_errors = []
@@ -95,7 +99,9 @@ class VolumeEditionForm(forms.Form):
         self.title_help += self.component.acronym
 
         super().__init__(*args, **kwargs)
-        help_volume_global = "{} = {} * {}".format(_('volume_global'), _('Volume total annual'), _('planned_classes'))
+        help_volume_global = "{} = {} * {}".format(_('volume total global'),
+                                                   _('Volume total annual'),
+                                                   _('Planned classes'))
 
         # Append dynamic fields
         entities_to_add = [entity for entity in ENTITY_TYPES_VOLUME if entity in self.entities]
@@ -104,7 +110,7 @@ class VolumeEditionForm(forms.Form):
             self.fields["volume_" + key.lower()] = VolumeField(
                 label=entity.acronym,
                 help_text=entity.title,
-                widget=forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
+                widget=StepHalfIntegerWidget(),
             )
             if i != len(entities_to_add) - 1:
                 self.fields["add" + key.lower()] = EmptyField(label='+')
@@ -222,9 +228,6 @@ class VolumeEditionBaseFormset(forms.BaseFormSet):
         # Field's name must be in lowercase
         return {k.lower(): v for k, v in component_dict.items()}
 
-    def get_form_by_type(self, component_type):
-        return next(form for form in self.forms if form.component.type == component_type)
-
     def save(self, postponement):
         for form in self.forms:
             form.save(postponement)
@@ -242,7 +245,7 @@ class VolumeEditionFormsetContainer:
         self.postponement = int(request.POST.get('postponement', 1))
         self.request = request
 
-        self.is_faculty_manager = person.is_faculty_manager() and not person.is_central_manager()
+        self.is_faculty_manager = person.is_faculty_manager and not person.is_central_manager
 
         for learning_unit in learning_units:
             volume_edition_formset = formset_factory(
@@ -291,27 +294,26 @@ class SimplifiedVolumeForm(forms.ModelForm):
     add_field = EmptyField(label="+")
     equal_field = EmptyField(label='=')
 
-    def __init__(self, *args, **kwargs):
-        self.component_type = kwargs.pop('component_type')
-        self.is_faculty_manager = kwargs.pop('is_faculty_manager', False)
-
+    def __init__(self, component_type, index, *args, is_faculty_manager=False, **kwargs):
+        component_type = component_type
+        self.is_faculty_manager = is_faculty_manager
+        self.index = index
         super().__init__(*args, **kwargs)
-        self.instance.type = self.component_type
-        self.instance.acronym = DEFAULT_ACRONYM_COMPONENT[self.component_type]
+        self.label = component_type[1]
+        self.instance.type = component_type[0]
+        self.instance.acronym = DEFAULT_ACRONYM_COMPONENT[self.instance.type]
 
     class Meta:
         model = LearningComponentYear
         fields = (
-            'planned_classes',
             'hourly_volume_total_annual',
             'hourly_volume_partial_q1',
             'hourly_volume_partial_q2'
         )
         widgets = {
-            'hourly_volume_total_annual': forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
-            'hourly_volume_partial_q1': forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
-            'hourly_volume_partial_q2': forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
-            'volume_declared_vacant': forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
+            'hourly_volume_total_annual': StepHalfIntegerWidget,
+            'hourly_volume_partial_q1': StepHalfIntegerWidget,
+            'hourly_volume_partial_q2': StepHalfIntegerWidget,
         }
 
     def clean(self):
@@ -321,7 +323,6 @@ class SimplifiedVolumeForm(forms.ModelForm):
         # FIXME Refactor this method with the clean of VolumeEditionForm
         """
         cleaned_data = super().clean()
-
         if self.is_faculty_manager:
             if 0 in [self.instance.hourly_volume_partial_q1, self.instance.hourly_volume_partial_q2]:
                 if 0 not in [self.cleaned_data.get("hourly_volume_partial_q1"),
@@ -342,16 +343,13 @@ class SimplifiedVolumeForm(forms.ModelForm):
             self.instance.acronym = DEFAULT_ACRONYM_COMPONENT[None]
             self.instance.type = None
             # In case of untyped component, we just need to create only 1 component (not more)
-            if not self.is_first_form_in_formset():
+            if self.index != 0:
                 return None
         return self._create_structure_components(commit)
 
     def need_to_create_untyped_component(self):
         container_type = self._learning_unit_year.learning_container_year.container_type
         return container_type not in CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
-
-    def is_first_form_in_formset(self):
-        return self.prefix == "form-0"
 
     def _create_structure_components(self, commit):
         self.instance.learning_container_year = self._learning_unit_year.learning_container_year
@@ -361,31 +359,27 @@ class SimplifiedVolumeForm(forms.ModelForm):
         else:
             self.instance.planned_classes = 1
         instance = super().save(commit)
+
         LearningUnitComponent.objects.update_or_create(
             learning_unit_year=self._learning_unit_year,
             learning_component_year=instance
         )
+
         requirement_entity_containers = self._get_requirement_entity_container()
         for requirement_entity_container in requirement_entity_containers:
-            if not self.instance.hourly_volume_total_annual and self.initial:
-                self._get_initial_volume_data()
             learning_unit_components = LearningUnitComponent.objects.filter(
-                learning_unit_year__learning_container_year=self._learning_unit_year.learning_container_year)
+                learning_unit_year__learning_container_year=self._learning_unit_year.learning_container_year
+            )
             self._create_entity_component_years(learning_unit_components, requirement_entity_container)
         return instance
 
-    def _create_entity_component_years(self, learning_unit_components, requirement_entity_container):
+    @staticmethod
+    def _create_entity_component_years(learning_unit_components, requirement_entity_container):
         for learning_unit_component in learning_unit_components:
             EntityComponentYear.objects.update_or_create(
                 entity_container_year=requirement_entity_container,
                 learning_component_year=learning_unit_component.learning_component_year
             )
-
-    def _get_initial_volume_data(self):
-        self.instance.hourly_volume_total_annual = self.initial.get('hourly_volume_total_annual')
-        self.instance.hourly_volume_partial_q1 = self.initial.get('hourly_volume_partial_q1')
-        self.instance.hourly_volume_partial_q2 = self.initial.get('hourly_volume_partial_q2')
-        self.instance.save()
 
     def _get_requirement_entity_container(self):
         requirement_entity_containers = []
@@ -397,20 +391,21 @@ class SimplifiedVolumeForm(forms.ModelForm):
 
 class SimplifiedVolumeFormset(forms.BaseModelFormSet):
     def __init__(self, data, person, *args, **kwargs):
-        super().__init__(data, *args, **kwargs)
-        self.is_faculty_manager = person.is_faculty_manager() and not person.is_central_manager()
+        self.is_faculty_manager = person.is_faculty_manager and not person.is_central_manager
+        super().__init__(data, *args, prefix="component", **kwargs)
 
     def get_form_kwargs(self, index):
         kwargs = super().get_form_kwargs(index)
-        kwargs['component_type'] = [LECTURING, PRACTICAL_EXERCISES][index]
+        kwargs['component_type'] = COMPONENT_TYPES[index]
         kwargs['is_faculty_manager'] = self.is_faculty_manager
+        kwargs['index'] = index
         return kwargs
 
     @property
     def fields(self):
         fields = OrderedDict()
         for form_instance in self.forms:
-            fields.update(form_instance.fields)
+            fields.update({form_instance.add_prefix(name): field for name, field in form_instance.fields.items()})
         return fields
 
     @property
@@ -437,7 +432,6 @@ class SimplifiedVolumeFormset(forms.BaseModelFormSet):
         for form in self.forms:
             form._learning_unit_year = learning_unit_year
             form._entity_containers = entity_container_years
-            form.save()
         return super().save(commit)
 
 

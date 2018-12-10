@@ -27,13 +27,13 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
-from base.models.education_group_year import find_by_id, search, find_with_enrollments_count
+from base.models.education_group_year import search, find_with_enrollments_count
 from base.models.enums import education_group_categories, duration_unit
 from base.models.enums.constraint_type import CREDITS
 from base.models.exceptions import MaximumOneParentAllowedException
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory
 from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -89,16 +89,10 @@ class EducationGroupYearTest(TestCase):
                                                             child_branch=self.education_group_year_1)
 
     def test_verbose_credit(self):
-        verbose__waiting = _("%(title)s (%(credits)s credits)") % {"title": self.education_group_year_1.title,
-                                                                   "credits": self.education_group_year_1.credits}
+        verbose__waiting = "{} ({} {})".format(
+            self.education_group_year_1.title, self.education_group_year_1.credits, _("credits")
+        )
         self.assertEqual(self.education_group_year_1.verbose_credit, verbose__waiting)
-
-    def test_find_by_id(self):
-        education_group_year = find_by_id(self.education_group_year_1.id)
-        self.assertEqual(education_group_year, self.education_group_year_1)
-
-        education_group_year = find_by_id(-1)
-        self.assertIsNone(education_group_year)
 
     def test_search(self):
         result = search(id=[self.education_group_year_1.id, self.education_group_year_2.id])
@@ -127,15 +121,19 @@ class EducationGroupYearTest(TestCase):
     def test_management_entity_version_property(self):
         self.assertEqual(self.education_group_year_3.management_entity_version, self.entity_version_management)
 
-    def test_parent_by_training_property(self):
+    def test_parent_by_training(self):
         parent_by_training = self.education_group_year_3.is_training()
         self.assertTrue(parent_by_training)
 
-        parent_by_training = self.education_group_year_2.parent_by_training
+        parent_by_training = self.education_group_year_2.parent_by_training()
         self.assertIsNone(parent_by_training)
 
         with self.assertRaises(MaximumOneParentAllowedException):
-            parent_by_training = self.education_group_year_1.parent_by_training
+            self.education_group_year_1.parent_by_training()
+
+        group = GroupFactory()
+        GroupElementYearFactory(child_branch=group, parent=self.education_group_year_2)
+        self.assertIsNone(group.parent_by_training())
 
     def test_children_group_element_years_property(self):
         children_group_element_years = self.education_group_year_1.children_group_element_years
@@ -194,13 +192,20 @@ class EducationGroupYearTest(TestCase):
 
 
 class EducationGroupYearCleanTest(TestCase):
-    def test_clean_constraint(self):
-
+    def test_clean_constraint_both_value_set_case_no_errors(self):
         e = EducationGroupYearFactory(min_constraint=12, max_constraint=20, constraint_type=CREDITS)
         try:
             e.clean()
         except ValidationError:
             self.fail()
+
+    def test_clean_constraint_only_one_value_set_case_no_errors(self):
+        e = EducationGroupYearFactory(min_constraint=12, max_constraint=None, constraint_type=CREDITS)
+        e.clean()
+
+        e.min_constraint = None
+        e.max_constraint = 12
+        e.clean()
 
     def test_clean_no_constraint_type(self):
         e = EducationGroupYearFactory(min_constraint=12, max_constraint=20, constraint_type=None)

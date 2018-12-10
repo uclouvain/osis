@@ -120,7 +120,7 @@ def is_academic_calendar_opened(education_group, type_academic_calendar, raise_e
 
 def _is_eligible_education_group(person, education_group, raise_exception):
     return (check_link_to_management_entity(education_group, person, raise_exception) and
-            (person.is_central_manager() or
+            (person.is_central_manager or
              is_academic_calendar_opened(
                  education_group,
                  academic_calendar_type.EDUCATION_GROUP_EDITION,
@@ -132,7 +132,7 @@ def _is_eligible_education_group(person, education_group, raise_exception):
 
 def _is_eligible_to_add_education_group_with_category(person, category, raise_exception):
     # TRAINING/MINI_TRAINING can only be added by central managers | Faculty manager must make a proposition of creation
-    result = person.is_central_manager() or (person.is_faculty_manager() and category == GROUP)
+    result = person.is_central_manager or (person.is_faculty_manager and category == GROUP)
     msg = _("The user has not permission to create a %(category)s.") % {"category": _(category)}
     can_raise_exception(raise_exception, result, msg)
     return result
@@ -202,13 +202,26 @@ def is_eligible_to_edit_general_information(person, education_group, raise_excep
            _is_eligible_to_edit_general_information(person, education_group, raise_exception)
 
 
+def is_eligible_to_edit_admission_condition(person, education_group, raise_exception=False):
+    return is_eligible_to_edit_general_information(person, education_group, raise_exception) or \
+           check_permission(person, 'base.can_edit_common_education_group') and \
+           _is_common_educationgroup_and_can_edit(education_group, person)
+
+
 def _is_eligible_to_edit_general_information(person, education_group, raise_exception):
-    return (check_link_to_management_entity(education_group, person, raise_exception) and
-            (person.is_central_manager() or
-             is_academic_calendar_opened(
-                 education_group,
-                 academic_calendar_type.EDITION_OF_GENERAL_INFORMATION,
-                 raise_exception
-             )
-             )
-            )
+    return check_link_to_management_entity(education_group, person, raise_exception) and \
+           _is_central_or_academic_calendar_opened(education_group, person, raise_exception)
+
+
+def _is_central_or_academic_calendar_opened(education_group, person, raise_exception):
+    return person.is_central_manager or \
+           is_academic_calendar_opened(
+                education_group,
+                academic_calendar_type.EDUCATION_GROUP_EDITION,
+                raise_exception
+           )
+
+
+def _is_common_educationgroup_and_can_edit(education_group, person):
+    return education_group.is_common and \
+           person.is_sic

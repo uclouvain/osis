@@ -26,23 +26,26 @@
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms import formset_factory
-
-from base.forms.bootstrap import BootstrapForm
-from base.forms.utils.datefield import DateRangeField, DatePickerInput, DATE_FORMAT, DateTimePickerInput
-from base.models import offer_year_calendar
-from base.models.enums import academic_calendar_type
 from django.utils.translation import ugettext_lazy as _
 
+from base.forms.utils.datefield import DateRangeField, DatePickerInput, DATE_FORMAT, DateTimePickerInput
+from base.models import offer_year_calendar
+from base.models.academic_calendar import AcademicCalendar, get_by_reference_and_academic_year
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums import academic_calendar_type
+from base.models.offer_year_calendar import create_offer_year_calendar
 from osis_common.utils.datetime import convert_datetime_to_date, convert_date_to_datetime
 
 NUMBER_SESSIONS = 3
 
 
-class CourseEnrollmentForm(BootstrapForm):
-    range_date = DateRangeField(required=False, label=_("course_enrollment"))
+class CourseEnrollmentForm(forms.Form):
+    range_date = DateRangeField(required=False, label=_("Course enrollment"))
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.pop('instance')
+        self.education_group_year = kwargs.pop('education_group_yr')
+
         super().__init__(*args, **kwargs)
         if self.instance:
             self.fields['range_date'].initial = (
@@ -53,37 +56,54 @@ class CourseEnrollmentForm(BootstrapForm):
 
     def clean_range_date(self):
         range_date = self.cleaned_data["range_date"]
-        _set_values_in_offer_year_calendar(self.instance, range_date)
+        if not self.instance:
+            self.instance = _build_new_course_enrollment_offer_yr_calendar(self.education_group_year)
+        _set_values_in_offer_year_calendar(self.instance,
+                                           range_date)
+
         return range_date
 
     def clean(self):
-        try:
-            self.instance.clean()
-        except ValidationError as e:
-            self.add_error('range_date', e)
+        if not self.instance and self.cleaned_data.get("range_date"):
+            self.instance = _build_new_course_enrollment_offer_yr_calendar(self.education_group_year)
+
+        if self.instance:
+            try:
+                self.instance.clean()
+            except ValidationError as e:
+                self.add_error('range_date', e)
 
     def save(self):
         self.instance.save()
 
 
-class AdministrativeDataSessionForm(BootstrapForm):
-    exam_enrollment_range = DateRangeField(label=_('EXAM_ENROLLMENTS'), required=False)
+def _build_new_course_enrollment_offer_yr_calendar(education_group_yr):
+    cal = get_by_reference_and_academic_year(academic_calendar_type.COURSE_ENROLLMENT,
+                                             education_group_yr.academic_year)
+    if cal:
+        return create_offer_year_calendar(education_group_yr, cal)
+
+    return None
+
+
+class AdministrativeDataSessionForm(forms.Form):
+    exam_enrollment_range = DateRangeField(label=_('Exam enrollments'), required=False)
 
     scores_exam_submission = forms.DateField(widget=DatePickerInput(format=DATE_FORMAT),
                                              input_formats=[DATE_FORMAT, ],
-                                             label=_('marks_presentation'),
+                                             label=_('Marks presentation'),
                                              required=False)
 
     dissertation_submission = forms.DateField(widget=DatePickerInput(format=DATE_FORMAT),
                                               input_formats=[DATE_FORMAT, ],
-                                              label=_('dissertation_presentation'),
+                                              label=_('Dissertation submission'),
                                               required=False)
 
     deliberation = forms.SplitDateTimeField(widget=DateTimePickerInput(),
-                                            label=_('DELIBERATION'), required=False)
+                                            label=_('Deliberation'), required=False)
 
     scores_exam_diffusion = forms.SplitDateTimeField(widget=DateTimePickerInput(),
-                                                     label=_("scores_diffusion"),
+                                                     label=_("Scores diffusion"),
                                                      required=False)
 
     def __init__(self, *args, **kwargs):
@@ -92,15 +112,18 @@ class AdministrativeDataSessionForm(BootstrapForm):
         self.list_offer_year_calendar = kwargs.pop('list_offer_year_calendar')
         super().__init__(*args, **kwargs)
 
-        if self.list_offer_year_calendar:
-            self._init_fields()
-        else:
-            raise ObjectDoesNotExist('There is no OfferYearCalendar for the education_group_year {}'
-                                     .format(self.education_group_year))
+        self._init_fields()
 
     def _get_offer_year_calendar(self, field_name):
         ac_type = _get_academic_calendar_type(field_name)
-        return self.list_offer_year_calendar.get(academic_calendar__reference=ac_type)
+        try:
+            return self.list_offer_year_calendar.get(academic_calendar__reference=ac_type)
+        except ObjectDoesNotExist:
+            academic_calendar = AcademicCalendar.objects.get(sessionexamcalendar__number_session=self.session,
+                                                             academic_year=self.education_group_year.academic_year,
+                                                             reference=ac_type)
+            return create_offer_year_calendar(self.education_group_year,
+                                              academic_calendar)
 
     def _init_fields(self):
         for name, field in self.fields.items():
@@ -122,15 +145,16 @@ class AdministrativeDataSessionForm(BootstrapForm):
 
     def save(self):
         for name, value in self.cleaned_data.items():
-            oyc = self._get_offer_year_calendar(name)
-            _set_values_in_offer_year_calendar(oyc, value)
-
-            oyc.save()
+            oyc = _set_values_in_offer_year_calendar(self._get_offer_year_calendar(name), value)
+            if oyc.id:
+                oyc.save()
+            else:
+                if oyc.start_date or oyc.end_date:
+                    oyc.save()
 
     def clean(self):
         for name, value in list(self.cleaned_data.items()):
-            oyc = self._get_offer_year_calendar(name)
-            _set_values_in_offer_year_calendar(oyc, value)
+            oyc = _set_values_in_offer_year_calendar(self._get_offer_year_calendar(name), value)
 
             try:
                 oyc.clean()
@@ -138,13 +162,16 @@ class AdministrativeDataSessionForm(BootstrapForm):
                 self.add_error(name, e)
 
 
+# FIXME: Function receive tuple datetime or datetime.
 def _set_values_in_offer_year_calendar(oyc, value):
-    if isinstance(value, tuple) and len(value) == 2:
-        oyc.start_date = convert_date_to_datetime(value[0])
-        oyc.end_date = convert_date_to_datetime(value[1])
-    else:
-        oyc.start_date = convert_date_to_datetime(value)
-        oyc.end_date = convert_date_to_datetime(value)
+    if oyc:
+        if isinstance(value, tuple) and len(value) == 2:
+            oyc.start_date = convert_date_to_datetime(value[0])
+            oyc.end_date = convert_date_to_datetime(value[1])
+        else:
+            oyc.start_date = convert_date_to_datetime(value)
+            oyc.end_date = convert_date_to_datetime(value)
+    return oyc
 
 
 def _get_academic_calendar_type(name):
@@ -175,7 +202,7 @@ class AdministrativeDataFormSet(forms.BaseFormSet):
             return kwargs
 
         q = offer_year_calendar.find_by_education_group_year(education_group_year)
-        q = q.filter(academic_calendar__sessionexamcalendar__number_session=index+1,
+        q = q.filter(academic_calendar__sessionexamcalendar__number_session=index + 1,
                      academic_calendar__academic_year=education_group_year.academic_year)
         kwargs['list_offer_year_calendar'] = q.select_related('academic_calendar')
 
@@ -189,3 +216,10 @@ class AdministrativeDataFormSet(forms.BaseFormSet):
 AdministrativeDataFormset = formset_factory(form=AdministrativeDataSessionForm,
                                             formset=AdministrativeDataFormSet,
                                             extra=NUMBER_SESSIONS)
+
+
+class AdditionalInfoForm(forms.ModelForm):
+
+    class Meta:
+        model = EducationGroupYear
+        fields = ["weighting", "default_learning_unit_enrollment"]

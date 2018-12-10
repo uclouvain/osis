@@ -27,7 +27,7 @@ from django.db.models import OuterRef, Exists
 from django.urls import reverse
 
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
-from base.models.prerequisite import Prerequisite
+from base.models.prerequisite_item import PrerequisiteItem
 
 
 class NodeBranchJsTree:
@@ -50,13 +50,19 @@ class NodeBranchJsTree:
         return result
 
     def get_queryset(self):
-        has_prerequisite = Prerequisite.objects.filter(
-            education_group_year__id=self.root.id,
-            learning_unit_year__id=OuterRef("child_leaf__id"),
-        ).exclude(prerequisite__exact='')
+        has_prerequisite = PrerequisiteItem.objects.filter(
+            prerequisite__education_group_year__id=self.root.id,
+            prerequisite__learning_unit_year__id=OuterRef("child_leaf__id"),
+        )
+
+        is_prerequisite = PrerequisiteItem.objects.filter(
+            learning_unit__learningunityear__id=OuterRef("child_leaf__id"),
+            prerequisite__education_group_year=self.root.id,
+        )
 
         return self.education_group_year.groupelementyear_set.all() \
-            .annotate(has_prerequisites=Exists(has_prerequisite)) \
+            .annotate(has_prerequisite=Exists(has_prerequisite)) \
+            .annotate(is_prerequisite=Exists(is_prerequisite)) \
             .select_related('child_branch__academic_year',
                             'child_leaf__academic_year',
                             'child_leaf__learning_container_year')
@@ -106,7 +112,7 @@ class NodeLeafJsTree(NodeBranchJsTree):
         group_element_year_pk = self.group_element_year.pk if self.group_element_year else '#'
         return {
             'text': self.learning_unit_year.acronym,
-            'icon': "glyphicon glyphicon-leaf" if self.group_element_year.has_prerequisites else "jstree-file",
+            'icon': self._get_icon(),
             'a_attr': {
                 'href': self.get_url(),
                 'root': self.root.pk,
@@ -114,9 +120,20 @@ class NodeLeafJsTree(NodeBranchJsTree):
                 'element_id': self.learning_unit_year.pk,
                 'element_type': self.element_type,
                 'title': self.learning_unit_year.complete_title,
+                'has_prerequisite': self.group_element_year.has_prerequisite,
+                'is_prerequisite': self.group_element_year.is_prerequisite,
             },
             'id': 'id_{}_{}'.format(self.learning_unit_year.pk, group_element_year_pk),
         }
+
+    def _get_icon(self):
+        if self.group_element_year.has_prerequisite and self.group_element_year.is_prerequisite:
+            return "fa fa-exchange"
+        elif self.group_element_year.has_prerequisite:
+            return "fa fa-arrow-right"
+        elif self.group_element_year.is_prerequisite:
+            return "fa fa-arrow-left"
+        return "jstree-file"
 
     def get_url(self):
         url = reverse('learning_unit_utilization', args=[self.root.pk, self.learning_unit_year.pk])

@@ -24,10 +24,9 @@
 #
 ##############################################################################
 import json
-
-import requests
 from collections import OrderedDict, namedtuple
 
+import requests
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.conf import settings
@@ -36,22 +35,31 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import F, Case, When
 from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView
-from django.urls import reverse
+from reversion.models import Version
 
 from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
 from base.business.education_groups import perms
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
-from base.business.education_groups.perms import is_eligible_to_edit_general_information
+from base.business.education_groups.perms import is_eligible_to_edit_general_information, \
+    is_eligible_to_edit_admission_condition
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
+from base.models.education_group_achievement import EducationGroupAchievement
+from base.models.education_group_certificate_aim import EducationGroupCertificateAim
+from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories, academic_calendar_type, education_group_types
+from base.models.education_group_year_domain import EducationGroupYearDomain
+from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import PGRM_MASTER_120, PGRM_MASTER_180_240
+from base.models.enums.education_group_types import TrainingType
 from base.models.person import Person
+from base.utils.cache import cache
+from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
 from cms import models as mdl_cms
 from cms.enums import entity_name
@@ -67,14 +75,13 @@ SECTIONS_WITH_TEXT = (
     'masters'
 )
 
-CODE_SCS = 'code_scs'
-TITLE = 'title'
-CREDITS_MIN = "credits_min"
-CREDITS_MAX = "credits_max"
-BLOCK = "block"
-QUADRIMESTER_DEROGATION = "quadrimester_derogation"
-LINK_TYPE = "link_type"
 NUMBER_SESSIONS = 3
+
+COMMON_PARAGRAPH = (
+    'agregation',
+    'finalites_didactiques',
+    'prerequis'
+)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -93,7 +100,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
     with_tree = True
 
     def get_person(self):
-        return get_object_or_404(Person, user=self.request.user)
+        return get_object_or_404(Person.objects.select_related('user'), user=self.request.user)
 
     def get_root(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
@@ -105,10 +112,11 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context['person'] = self.get_person()
 
         self.root = self.get_root()
-        # TODO same param
+        # FIXME same param
         context['root'] = self.root
         context['root_id'] = self.root.pk
         context['parent'] = self.root
+        context['parent_training'] = self.object.parent_by_training()
 
         if self.with_tree:
             context['tree'] = json.dumps(NodeBranchJsTree(self.root).to_json())
@@ -138,12 +146,10 @@ class EducationGroupRead(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # TODO Use value_list
-        context["education_group_languages"] = [
-            education_group_language.language.name for education_group_language in
-            mdl.education_group_language.find_by_education_group_year(self.object)
-        ]
+        context["education_group_languages"] = self.object.educationgrouplanguage_set.order_by('order').values_list(
+            'language__name', flat=True)
         context["show_coorganization"] = self.show_coorganization()
+        context["versions"] = self.get_related_versions()
 
         return context
 
@@ -153,7 +159,37 @@ class EducationGroupRead(EducationGroupGenericDetailView):
     def show_coorganization(self):
         """Co-organization doesn't have sense for 2M (120/180-240) """
         return self.object.education_group_type.category == TRAINING and \
-            self.object.education_group_type.name not in [PGRM_MASTER_120, PGRM_MASTER_180_240]
+            self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
+                                                          TrainingType.PGRM_MASTER_180_240.name]
+
+    def get_related_versions(self):
+        versions = Version.objects.get_for_object(self.object).select_related('revision__user__person')
+
+        related_models = [
+            EducationGroupOrganization,
+            EducationGroupAchievement,
+            EducationGroupDetailedAchievement,
+            EducationGroupYearDomain,
+            EducationGroupCertificateAim
+        ]
+
+        subversion = Version.objects.none()
+        for model in related_models:
+            subversion |= Version.objects.get_for_model(model).select_related('revision__user__person')
+
+        versions |= subversion.filter(
+            serialized_data__contains="\"education_group_year\": {}".format(self.object.pk)
+        )
+
+        return versions.order_by('-revision__date_created').distinct('revision__date_created')
+
+    def get_queryset(self):
+        """ Optimization """
+        return super().get_queryset().select_related(
+            'enrollment_campus', 'education_group_type', 'primary_language',
+            'main_teaching_campus', 'administration_entity', 'management_entity',
+            'academic_year'
+        )
 
 
 class EducationGroupDiplomas(EducationGroupGenericDetailView):
@@ -195,6 +231,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         user_language = mdl.person.get_user_interface_language(self.request.user)
         sections_with_translated_labels = []
         sections_list = self.get_appropriate_sections()
+
         for section in settings.SECTION_LIST:
             translated_labels = self.get_translated_labels_and_content(section,
                                                                        user_language,
@@ -207,7 +244,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_translated_labels_and_content(self, section, user_language, common_education_group_year, sections_list):
         records = []
         for label, selectors in section.labels:
-            if not sections_list or label in sections_list:
+            if not sections_list or any(label in section for section in sections_list):
                 records.extend(
                     self.get_selectors(common_education_group_year, label, selectors, user_language)
                 )
@@ -215,17 +252,33 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
     def get_selectors(self, common_education_group_year, label, selectors, user_language):
         records = []
+
         for selector in selectors.split(','):
+            translations = None
             if selector == 'specific':
                 translations = self.get_content_translations_for_label(
                     self.object, label, user_language, 'specific')
+
+            elif selector == 'common':
+                translations = self._get_common_selector(common_education_group_year, label, user_language)
+
+            if translations:
                 records.append(translations)
 
-            if selector == 'common' and common_education_group_year is not None:
-                translations = self.get_content_translations_for_label(
-                    common_education_group_year, label, user_language, 'common')
-                records.append(translations)
         return records
+
+    def _get_common_selector(self, common_education_group_year, label, user_language):
+        translations = None
+        # common_education_group_year is None if education_group_year is common
+        # if not common, translation must be non-editable in non common offer
+        if common_education_group_year is not None:
+            translations = self.get_content_translations_for_label(
+                common_education_group_year, label, user_language, 'common')
+        # if is common and a label in COMMON_PARAGRAPH, must be editable in common offer
+        elif label in COMMON_PARAGRAPH:
+            translations = self.get_content_translations_for_label(
+                self.object, label, user_language, 'specific')
+        return translations
 
     def get_content_translations_for_label(self, education_group_year, label, user_language, type):
         # fetch the translation for the current user
@@ -253,23 +306,13 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
     def get_appropriate_sections(self):
         education_group_year = self.object
-        minor = education_group_year.is_minor
-        deep = education_group_year.is_deepening
-        special = minor or deep
-        if special:
-            code = education_group_year.partial_acronym
-            if minor:
-                type_education_group_year = "-min"
-            elif deep:
-                type_education_group_year = "-app"
-        else:
-            code = education_group_year.acronym
-            type_education_group_year = ""
-        url = settings.URL_TO_GET_SECTIONS.format(
+        code, type_education_group_year = _get_code_and_type(education_group_year)
+        url = settings.URL_TO_PORTAL_UCL.format(
             type=type_education_group_year,
             anac=education_group_year.academic_year.year,
             code=code
         )
+        url += "?" + settings.GET_SECTION_PARAM
         try:
             sections_request = requests.get(url, timeout=settings.REQUESTS_TIMEOUT).json()
         except (json.JSONDecodeError, TimeoutError, requests.exceptions.ConnectionError):
@@ -278,13 +321,32 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         return sections_request['sections']
 
 
+def _get_code_and_type(education_group_year):
+    minor = education_group_year.is_minor
+    deep = education_group_year.is_deepening
+    special = minor or deep
+    if special:
+        code = education_group_year.partial_acronym
+        if minor:
+            type_education_group_year = "-min"
+        elif deep:
+            type_education_group_year = "-app"
+    else:
+        code = education_group_year.acronym
+        type_education_group_year = ""
+    return code, type_education_group_year
+
+
 @login_required
 def publish(request, education_group_year_id, root_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    url = settings.URL_TO_PUBLISH.format(
+    code, type_education_group_year = _get_code_and_type(education_group_year)
+    url = settings.URL_TO_PORTAL_UCL.format(
+        type=type_education_group_year,
         anac=education_group_year.academic_year.year,
-        code=education_group_year.acronym
+        code=code
     )
+    url += "?" + settings.REFRESH_PARAM
     publish_request = requests.get(url, timeout=settings.REQUESTS_TIMEOUT)
     if publish_request.status_code == HttpResponseNotFound.status_code:
         display_error_messages(request, _("This program has no page to publish on it"))
@@ -401,9 +463,13 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        tab_lang = cache.get(get_tab_lang_keys(self.request.user)) or settings.LANGUAGE_CODE_FR
+
         acronym = self.object.acronym.lower()
         is_common = acronym.startswith('common-')
         is_specific = not is_common
+        is_minor = self.object.is_minor
+        is_deepening = self.object.is_deepening
 
         is_master = acronym.endswith(('2m', '2m1'))
         use_standard_text = acronym.endswith(('2a', '2mc'))
@@ -416,22 +482,28 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
 
         record = {}
         for section in SECTIONS_WITH_TEXT:
-            record[section] = AdmissionConditionLine.objects.filter(admission_condition=admission_condition,
-                                                                    section=section)
+            record[section] = AdmissionConditionLine.objects.filter(
+                admission_condition=admission_condition,
+                section=section
+            ).annotate_text(tab_lang)
 
         context.update({
             'admission_condition_form': admission_condition_form,
-            'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object']),
+            'can_edit_information': is_eligible_to_edit_admission_condition(context['person'], context['object']),
             'info': {
                 'is_specific': is_specific,
                 'is_common': is_common,
-                'is_bachelor': is_common and self.object.education_group_type.name == education_group_types.BACHELOR,
+                'is_bachelor': is_common and self.object.education_group_type.name is TrainingType.BACHELOR.name,
                 'is_master': is_master,
                 'show_components_for_agreg_and_mc': is_common and use_standard_text,
-                'show_free_text': is_specific and (is_master or use_standard_text),
+                'show_free_text': (is_specific and (is_master or use_standard_text)) or is_minor or is_deepening,
             },
             'admission_condition': admission_condition,
             'record': record,
+            'language': {
+                'list': ["fr-be", "en"],
+                'tab_lang': tab_lang
+            }
         })
 
         return context

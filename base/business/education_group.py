@@ -45,8 +45,8 @@ DESC = "desc"
 WORKSHEET_TITLE = 'education_groups'
 XLS_FILENAME = 'education_groups_filename'
 XLS_DESCRIPTION = "list_education_groups"
-EDUCATION_GROUP_TITLES = [str(_('academic_year_small')), str(_('code')), str(_('title')), str(_('type')),
-                          str(_('entity')), str(_('code'))]
+EDUCATION_GROUP_TITLES = [str(_('Ac yr.')), str(_('code')), str(_('Title')), str(_('type')),
+                          str(_('Entity')), str(_('code'))]
 ORDER_COL = 'order_col'
 ORDER_DIRECTION = 'order_direction'
 #
@@ -124,7 +124,7 @@ def can_user_edit_administrative_data(a_user, an_education_group_year, raise_exc
     if not check_permission(person, "base.can_edit_education_group_administrative_data", raise_exception):
         return False
 
-    if person.is_central_manager() and _is_management_entity_linked_to_user(person, an_education_group_year):
+    if person.is_central_manager and _is_management_entity_linked_to_user(person, an_education_group_year):
         return True
 
     return is_program_manager(a_user, education_group=an_education_group_year.education_group)

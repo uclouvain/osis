@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import ValidationError
 from django.db import models, IntegrityError
 from django.db.models import Max
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models.academic_year import current_academic_year, AcademicYear
 from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
-from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
+from osis_common.models.serializable_model import SerializableModel, \
+    SerializableModelAdmin
 
 LEARNING_UNIT_ACRONYM_REGEX_BASE = "^[BLMWX][A-Z]{2,4}\d{4}"
 LETTER_OR_DIGIT = "[A-Z0-9]"
@@ -46,7 +47,7 @@ REGEX_BY_SUBTYPE = {
 }
 
 
-class LearningUnitAdmin(SerializableModelAdmin):
+class LearningUnitAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('learning_container', 'acronym', 'title', 'start_year', 'end_year', 'changed')
     search_fields = ['learningunityear__acronym', 'learningunityear__specific_title', 'learning_container__external_id']
     list_filter = ('start_year',)
@@ -57,13 +58,18 @@ class LearningUnit(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     learning_container = models.ForeignKey('LearningContainer', blank=True, null=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    start_year = models.IntegerField(_('start_year'))
-    end_year = models.IntegerField(blank=True, null=True, verbose_name=_('end_year_title'))
+    start_year = models.IntegerField(_('Starting year'))
+    end_year = models.IntegerField(blank=True, null=True, verbose_name=_('End year'))
     # TODO is it useful?
     progress = None
 
-    faculty_remark = models.TextField(blank=True, null=True, verbose_name=_('faculty_remark'))
-    other_remark = models.TextField(blank=True, null=True, verbose_name=_('other_remark'))
+    faculty_remark = models.TextField(blank=True, null=True, verbose_name=_('Faculty remark'))
+
+    other_remark = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_('Other remark')
+    )
 
     def __str__(self):
         return "{}".format(self.id)
@@ -142,3 +148,11 @@ def find_by_id(learning_unit_id):
 
 def find_by_ids(learning_unit_ids):
     return LearningUnit.objects.filter(pk__in=learning_unit_ids)
+
+
+def get_by_acronym_with_highest_academic_year(acronym):
+    return LearningUnit.objects.filter(
+        learningunityear__acronym=acronym
+    ).order_by(
+        'learningunityear__academic_year__year'
+    ).last()

@@ -25,6 +25,7 @@
 ##############################################################################
 from django.db import models
 
+from base.models.enums.count_constraint import MIN_COUNT_CONSTRAINTS, MAX_COUNT_CONSTRAINTS, ZERO, MANY
 from base.models.education_group_type import EducationGroupType
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
@@ -38,6 +39,9 @@ class AuthorizedRelationship(models.Model):
     parent_type = models.ForeignKey(EducationGroupType, related_name='authorized_parent_type')
     child_type = models.ForeignKey(EducationGroupType, related_name='authorized_child_type')
     changed = models.DateTimeField(auto_now=True)
+
+    min_count_authorized = models.CharField(max_length=5, choices=MIN_COUNT_CONSTRAINTS, default=ZERO)
+    max_count_authorized = models.CharField(max_length=5, choices=MAX_COUNT_CONSTRAINTS, default=MANY)
 
     def __str__(self):
         return '{} - {}'.format(self.parent_type, self.child_type)

@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
 from django.contrib import admin
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from attribution.models.enums import function
+from attribution.models.enums.function import Functions
 
 
 class AttributionNewAdmin(admin.ModelAdmin):
@@ -46,7 +46,7 @@ class AttributionNewAdmin(admin.ModelAdmin):
         from attribution.business import attribution_json
         global_ids = list(queryset.values_list('tutor__person__global_id', flat=True))
         return attribution_json.publish_to_portal(global_ids)
-    publish_attribution_to_portal.short_description = _("publish_attribution_to_portal")
+    publish_attribution_to_portal.short_description = _("Publish attribution to portal")
 
 
 class AttributionNew(models.Model):
@@ -54,10 +54,10 @@ class AttributionNew(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     learning_container_year = models.ForeignKey('base.LearningContainerYear')
     tutor = models.ForeignKey('base.Tutor')
-    function = models.CharField(max_length=35, choices=function.FUNCTIONS, db_index=True, verbose_name=_("function"))
+    function = models.CharField(max_length=35, choices=Functions.choices(), db_index=True, verbose_name=_("Function"))
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
-    start_year = models.IntegerField(blank=True, null=True, verbose_name=_("start"))
+    start_year = models.IntegerField(blank=True, null=True, verbose_name=_("Start"))
     end_year = models.IntegerField(blank=True, null=True)
     score_responsible = models.BooleanField(default=False)
     substitute = models.ForeignKey('base.Person', blank=True, null=True)

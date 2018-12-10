@@ -30,20 +30,20 @@
 {% endfor %}
 <table class="table volumes_read ignore-js-validator">
     <thead>
-        <tr>
-            <th>{% trans 'components' %}&nbsp;&nbsp;</th>
-            <th style="text-align: center">{% trans 'volume' %}</th>
-            <th style="text-align: center"></th>
-            <th style="text-align: center">{% trans 'volume_partial'%}</th>
-            <th style="text-align: center"></th>
-            <th style="text-align: center">{% trans 'volume_remaining'%}</th>
-        </tr>
+    <tr>
+        <th>{% trans 'Components' %}&nbsp;&nbsp;</th>
+        <th class="text-center">{% trans 'Volume' %}</th>
+        <th></th>
+        <th class="text-center">{% trans 'Vol. Q1' %}</th>
+        <th></th>
+        <th class="text-center">{% trans 'Vol. Q2' %}</th>
+    </tr>
     </thead>
     <tbody>
-        {% for form in simplified_volume_management_form %}
+    {% for form in simplified_volume_management_form %}
         <tr>
             <td>
-                <label class="inline-group"> {% trans form.component_type %}</label>
+                <label class="inline-group">{{ form.label }}</label>
             </td>
             <td>{% bootstrap_field form.hourly_volume_total_annual show_label=False %}</td>
             <td>{{ form.equal_field.label }}</td>
@@ -51,6 +51,6 @@
             <td>{{ form.add_field.label }}</td>
             <td>{% bootstrap_field form.hourly_volume_partial_q2 show_label=False %}</td>
         </tr>
-        {% endfor %}
+    {% endfor %}
     </tbody>
 </table>

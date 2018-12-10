@@ -29,15 +29,15 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import PermissionDenied
 
 from base.models.person import find_by_user
-from base.business.learning_units.perms import is_year_editable, YEAR_LIMIT_LUE_MODIFICATION
+from base.business.learning_units.perms import is_year_editable
 from base.business.learning_units.perms import is_eligible_for_modification, is_eligible_for_modification_end_date, \
     is_eligible_to_create_modification_proposal, is_eligible_to_edit_proposal, is_eligible_for_cancel_of_proposal, \
     is_eligible_to_consolidate_proposal, is_eligible_to_delete_learning_unit_year
 
 register = template.Library()
 
-MSG_IS_NOT_A_PROPOSAL = "Isn't a proposal"
-MSG_PROPOSAL_NOT_ON_CURRENT_LU = "Proposal isn't on current learning unit year"
+MSG_IS_NOT_A_PROPOSAL = _("Isn't a proposal")
+MSG_PROPOSAL_NOT_ON_CURRENT_LU = _("Proposal isn't on current learning unit year")
 DISABLED = "disabled"
 
 
@@ -113,9 +113,7 @@ def li_delete_all_lu(context, url, message, data_target, url_id="link_delete_lus
     data['permission'] = is_eligible_to_delete_learning_unit_year
     data['load_modal'] = True
     data['data_target'] = data_target
-    data = li_with_permission(data)
-
-    return data
+    return li_with_permission(data)
 
 
 def _get_common_data(context, message, url, url_id):
@@ -125,7 +123,6 @@ def _get_common_data(context, message, url, url_id):
 
 
 def li_with_permission(data):
-
     context = data['context']
     permission = data['permission']
     url = data['url']
@@ -171,6 +168,7 @@ def _get_permission_result(learning_unit_year, permission, person):
     return permission_denied_message, "" if result else DISABLED
 
 
+# TODO data should be a kwargs
 def li_with_permission_for_proposal(data):
     context = data['context']
     permission = data['permission_function']
@@ -189,7 +187,7 @@ def li_with_permission_for_proposal(data):
     if not disabled:
         if not is_year_editable(proposal.learning_unit_year, person, raise_exception=False):
             disabled = "disabled"
-            permission_denied_message = "{}"\
+            permission_denied_message = "{}" \
                 .format(_("You can't modify proposition which are related to a learning unit year under"))
         else:
             permission_denied_message, disabled = _get_permission_proposal(context, permission, obj)
@@ -219,7 +217,6 @@ def _get_permission_proposal(context, permission, object):
 
 
 def is_valid_proposal(context):
-
     current_learning_unit_year = context.get('learning_unit_year')
     proposal = context.get('proposal')
     if not proposal:
@@ -227,6 +224,5 @@ def is_valid_proposal(context):
     else:
 
         if proposal.learning_unit_year != current_learning_unit_year:
-
             return _(MSG_PROPOSAL_NOT_ON_CURRENT_LU), "disabled"
     return "", ""

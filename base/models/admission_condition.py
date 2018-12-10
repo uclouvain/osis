@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 from ordered_model.models import OrderedModel
 
@@ -80,6 +82,15 @@ CONDITION_ADMISSION_ACCESSES = [
 ]
 
 
+class AdmissionConditionLineQuerySet(models.QuerySet):
+    def annotate_text(self, language_code):
+        return self.annotate(
+            diploma_text=F('diploma') if language_code == settings.LANGUAGE_CODE_FR else F('diploma_en'),
+            conditions_text=F('conditions') if language_code == settings.LANGUAGE_CODE_FR else F('conditions_en'),
+            remarks_text=F('remarks') if language_code == settings.LANGUAGE_CODE_FR else F('remarks_en')
+        )
+
+
 class AdmissionConditionLine(OrderedModel):
     admission_condition = models.ForeignKey(AdmissionCondition)
 
@@ -108,7 +119,11 @@ class AdmissionConditionLine(OrderedModel):
         super().save(*args, **kwargs)
 
         if self.access not in dict(CONDITION_ADMISSION_ACCESSES):
-            raise ValidationError({'access': _('%s is not an accepted value') % (self.access,)})
+            raise ValidationError({
+                'access': _('%(access_value)s is not an accepted value') % {'access_value': self.access}
+            })
+
+    objects = AdmissionConditionLineQuerySet.as_manager()
 
 
 class AdmissionConditionLineAdmin(osis_model_admin.OsisModelAdmin):

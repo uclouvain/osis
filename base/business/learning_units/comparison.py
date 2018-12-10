@@ -23,13 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext_lazy as _
+
 from base.models import entity_container_year as mdl_entity_container_year
 from base.models.enums import learning_component_year_type
-from base.models.learning_unit_year import LearningUnitYear
-from base.models.learning_component_year import LearningComponentYear
-from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
 FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON = ['acronym', 'subtype', 'internship_subtype', 'credits', 'periodicity',
                                           'status', 'language', 'professional_integration', 'specific_title',
@@ -87,7 +86,7 @@ def _get_boolean_translation(value):
 
 
 def _get_status(value):
-    return _('ACTIVE') if value else _('inactive')
+    return _('Active') if value else _('Inactive')
 
 
 def _decrypt_boolean_value(field_name, value):
@@ -111,9 +110,9 @@ def compare_learning_component_year(obj_ref, obj_prev, obj_next):
 
 
 def compare_volumes(current_data, prev_data, next_data):
-    current_volumes = current_data.get('volumes')
-    prev_volumes = prev_data.get('volumes')
-    next_volumes = next_data.get('volumes')
+    current_volumes = current_data.get('volumes') or {}
+    prev_volumes = prev_data.get('volumes') or {}
+    next_volumes = next_data.get('volumes') or {}
 
     vol = {}
     if current_volumes:

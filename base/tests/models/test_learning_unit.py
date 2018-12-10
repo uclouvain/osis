@@ -88,9 +88,9 @@ class LearningUnitTest(TestCase):
         self.assertEqual(len(all_partims_container_year_2), 0)
 
     def test_academic_years_tags(self):
-        self.assertEqual(academic_years(2017, 2018), _('from').title()+" 2017-18 "+_('to').lower()+" 2018-19")
+        self.assertEqual(academic_years(2017, 2018), _('From').title()+" 2017-18 "+_('to').lower()+" 2018-19")
         self.assertEqual(academic_years(None, 2018), "-")
-        self.assertEqual(academic_years(2017, None), _('from').title()+" 2017-18 ("+_('not_end_year').lower()+")")
+        self.assertEqual(academic_years(2017, None), _('From').title()+" 2017-18 ("+_('no planned end').lower()+")")
         self.assertEqual(academic_years(None, None), "-")
 
     def test_academic_year_tags(self):
@@ -122,3 +122,21 @@ class LearningUnitTest(TestCase):
         a_learning_unit_year = LearningUnitYearFactory(learning_unit=a_learning_unit)
         self.assertEqual(a_learning_unit.title, a_learning_unit_year.specific_title)
         self.assertEqual(a_learning_unit.acronym, a_learning_unit_year.acronym)
+
+
+class LearningUnitGetByAcronymWithLatestAcademicYearTest(TestCase):
+    def setUp(self):
+        self.learning_unit_year_2009 = LearningUnitYearFactory(
+            academic_year=AcademicYearFactory(year=2009),
+            acronym='LDROI1200'
+        )
+        self.learning_unit_year_2017 = LearningUnitYearFactory(
+            academic_year=AcademicYearFactory(year=2017),
+            acronym='LDROI1200'
+        )
+
+    def test_get_by_acronym_with_highest_academic_year(self):
+        self.assertEqual(
+            learning_unit.get_by_acronym_with_highest_academic_year(acronym='LDROI1200'),
+            self.learning_unit_year_2017.learning_unit
+        )

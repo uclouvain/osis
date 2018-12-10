@@ -25,7 +25,7 @@
 ##############################################################################
 
 from django.contrib import messages
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -39,6 +39,7 @@ from base.business.learning_units import perms
 from base.forms.learning_unit.attribution_charge_repartition import AttributionForm, LecturingAttributionChargeForm, \
     PracticalAttributionChargeForm, AttributionCreationForm
 from base.models.enums import learning_component_year_type
+from base.models.learning_unit_component import LearningUnitComponent
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views.mixins import AjaxTemplateMixin, RulesRequiredMixin, MultiFormsView, MultiFormsSuccessMessageMixin
@@ -61,7 +62,8 @@ class AttributionBaseViewMixin(RulesRequiredMixin):
     @cached_property
     def attribution(self):
         lecturing_charges = AttributionChargeNew.objects \
-            .filter(learning_component_year__type=learning_component_year_type.LECTURING)
+            .filter(Q(learning_component_year__type=learning_component_year_type.LECTURING)
+                    | Q(learning_component_year__type__isnull=True))
         prefetch_lecturing_charges = Prefetch("attributionchargenew_set", queryset=lecturing_charges,
                                               to_attr="lecturing_charges")
 
@@ -99,6 +101,12 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
         "lecturing_charge_form": "lecturing_form",
         "practical_charge_form": "practical_form"
     }
+
+    def get_form_classes(self):
+        form_classes = self.form_classes.copy()
+        if LearningUnitComponent.objects.filter(learning_unit_year=self.luy, type=None).exists():
+            del form_classes["practical_charge_form"]
+        return form_classes
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -147,27 +155,24 @@ class AddAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSucc
         "practical_charge_form": "practical_form"
     }
 
+    def get_form_classes(self):
+        form_classes = self.form_classes.copy()
+        if LearningUnitComponent.objects.filter(learning_unit_year=self.luy, type=None).exists():
+            del form_classes["practical_charge_form"]
+        return form_classes
+
     def forms_valid(self, forms):
         attribution_form = forms["attribution_form"]
-        lecturing_charge_form = forms["lecturing_charge_form"]
-        practical_charge_form = forms["practical_charge_form"]
-
         attribution_form.save(learning_unit_year=self.luy)
-        lecturing_charge_form.save(attribution=attribution_form.instance, learning_unit_year=self.luy)
-        practical_charge_form.save(attribution=attribution_form.instance, learning_unit_year=self.luy)
-        success_message = self.get_success_message(forms)
-        if success_message:
-            messages.success(self.request, success_message)
-        return HttpResponseRedirect(self.get_success_url())
-
-    def attribution_form_valid(self, attribution_form):
-        attribution_form.save(learning_unit_year=self.luy)
+        return super().forms_valid(forms)
 
     def lecturing_charge_form_valid(self, lecturing_charge_form):
-        pass
+        attribution_form = self.instantiated_forms["attribution_form"]
+        lecturing_charge_form.save(attribution=attribution_form.instance, learning_unit_year=self.luy)
 
     def practical_charge_form_valid(self, practical_charge_form):
-        pass
+        attribution_form = self.instantiated_forms["attribution_form"]
+        practical_charge_form.save(attribution=attribution_form.instance, learning_unit_year=self.luy)
 
     def get_success_message(self, forms):
         attribution = forms["attribution_form"].instance

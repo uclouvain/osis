@@ -27,6 +27,7 @@ import datetime
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
+from attribution.models.enums.function import Functions
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.person import PersonFactory
@@ -109,7 +110,7 @@ class TestLearningUnitXls(TestCase):
                 entity_type=entity_type.FACULTY,
                 entity__organization__type=organization_type.MAIN
             ) for _ in range(4)
-            ]
+        ]
         self.learning_unit_year_with_entities.entities = {'REQUIREMENT_ENTITY': entities[0],
                                                           'ALLOCATION_ENTITY': entities[1]}
         self.proposal_creation_3 = ProposalLearningUnitFactory(
@@ -161,22 +162,18 @@ class TestLearningUnitXls(TestCase):
             'function': 'CO_HOLDER',
             'start_year': 2017
         }
-        self.assertEqual(_get_attribution_line(attribution_dict),
-                         "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
-                             'SMITH, Aaron',
-                             _('function'),
-                             _('CO_HOLDER'),
-                             _('substitute'),
-                             '',
-                             _('Beg. of attribution'),
-                             2017,
-                             _('Attribution duration'),
-                             3,
-                             _('Attrib. vol1'),
-                             10,
-                             _('Attrib. vol2'),
-                             15, )
-                         )
+        self.assertEqual(
+            _get_attribution_line(attribution_dict),
+            "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
+                'SMITH, Aaron', _('Function'),
+                _('Co-holder'), _('Substitute'),
+                '', _('Beg. of attribution'),
+                2017, _('Attribution duration'),
+                3, _('Attrib. vol1'),
+                10, _('Attrib. vol2'),
+                15,
+            )
+        )
 
     def test_get_significant_volume(self):
         self.assertEqual(_get_significant_volume(10), 10)
@@ -205,7 +202,7 @@ class TestLearningUnitXls(TestCase):
         expected = {
             xls_build.HEADER_TITLES_KEY: [str(_('Legend'))],
             xls_build.CONTENT_KEY: [
-                [SPACES, _('proposal_creation')],
+                [SPACES, _('Proposal of creation')],
                 [SPACES, _('Proposal for modification')],
                 [SPACES, _('Suppression proposal')],
                 [SPACES, _('Transformation proposal')],
@@ -224,15 +221,10 @@ class TestLearningUnitXls(TestCase):
 
     def test_add_training_data(self):
         formations = _add_training_data(self.learning_unit_yr_1)
-
-        expected = "{} {} {}".format(
-            self.an_education_group_parent.partial_acronym,
-            "({})".format(
-                '{0:.2f}'.format(self.learning_unit_yr_1.credits)
-            ),
-            "{} - {}".format(PARENT_ACRONYM, PARENT_TITLE)
-        )
-
+        expected = " {} ({}) - {} - {}\n".format(self.an_education_group_parent.partial_acronym,
+                                                 "{0:.2f}".format(self.learning_unit_yr_1.credits),
+                                                 PARENT_ACRONYM,
+                                                 PARENT_TITLE)
         self.assertEqual(formations, expected)
 
     def test_get_data_part1(self):
@@ -241,8 +233,8 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(data[0], luy.acronym)
         self.assertEqual(data[1], luy.academic_year.name)
         self.assertEqual(data[2], luy.complete_title)
-        self.assertEqual(data[6], _(self.proposal_creation_1.type))
-        self.assertEqual(data[7], _(self.proposal_creation_1.state))
+        self.assertEqual(data[6], _(self.proposal_creation_1.type.title()))
+        self.assertEqual(data[7], _(self.proposal_creation_1.state.title()))
 
     def test_get_parameters_configurable_list(self):
         user_name = 'Ducon'
@@ -346,10 +338,11 @@ class TestLearningUnitXls(TestCase):
                                                                        attribution=an_attribution,
                                                                        allocation_charge=5.0)
 
-        luy.attribution_charge_news = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(luy)
+        luy.attribution_charge_news = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
+            luy)
         expected_common = [
-            xls_build.translate(luy.periodicity),
-            xls_build.translate(luy.status),
+            str(_(luy.periodicity.title())),
+            str(_('Yes')) if luy.status else str(_('No')),
             component_lecturing.hourly_volume_total_annual,
             component_lecturing.hourly_volume_partial_q1,
             component_lecturing.hourly_volume_partial_q2,
@@ -358,16 +351,20 @@ class TestLearningUnitXls(TestCase):
             component_practical.hourly_volume_partial_q1,
             component_practical.hourly_volume_partial_q2,
             component_practical.planned_classes,
-            xls_build.translate(luy.quadrimester),
-            xls_build.translate(luy.session),
+            str(_(luy.quadrimester.title()))if luy.quadrimester else '',
+            str(_(luy.session.title())) if luy.session else '',
             "",
             ''
         ]
         self.assertEqual(_get_data_part2(luy, False), expected_common)
-        self.assertEqual(_get_data_part2(luy, True),
-                         expected_attribution_data(attribution_charge_new_lecturing, attribution_charge_new_practical,
-                                                   expected_common,
-                                                   luy))
+        self.assertEqual(
+            _get_data_part2(luy, True),
+            expected_attribution_data(
+                attribution_charge_new_lecturing, attribution_charge_new_practical,
+                expected_common,
+                luy
+            )
+        )
 
 
 def expected_attribution_data(attribution_charge_new_lecturing, attribution_charge_new_practical, expected, luy):
@@ -376,9 +373,9 @@ def expected_attribution_data(attribution_charge_new_lecturing, attribution_char
         expected_attribution = v
     expected_attribution = "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
         expected_attribution.get('person'),
-        _('function'),
-        _(expected_attribution.get('function')),
-        _('substitute'),
+        _('Function'),
+        Functions[expected_attribution['function']].value,
+        _('Substitute'),
         '',
         _('Beg. of attribution'),
         expected_attribution.get('start_year'),

@@ -33,7 +33,6 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.student import StudentFactory
@@ -43,9 +42,11 @@ from base.tests.factories.session_examen import SessionExamFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
-
 from base.models.enums import number_session, academic_calendar_type, exam_enrollment_justification_type
 from base.tests.mixin.academic_year import AcademicYearMockMixin
+from base.models.enums import exam_enrollment_state
+from assessments.views.upload_xls_utils import _get_score_list_filtered_by_enrolled_state
+from base.models.exam_enrollment import ExamEnrollment
 
 OFFER_ACRONYM = "OSIS2MA"
 LEARNING_UNIT_ACRONYM = "LOSIS1211"
@@ -66,11 +67,13 @@ def generate_exam_enrollments(year, with_different_offer=False):
     academic_year = AcademicYearFactory(year=year)
 
     an_academic_calendar = AcademicCalendarFactory(academic_year=academic_year,
-                                                   start_date=datetime.datetime.today() - datetime.timedelta(days=20),
-                                                   end_date=datetime.datetime.today() + datetime.timedelta(days=20),
+                                                   start_date=(
+                                                   datetime.datetime.today() - datetime.timedelta(days=20)).date(),
+                                                   end_date=(
+                                                   datetime.datetime.today() + datetime.timedelta(days=20)).date(),
                                                    reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
     session_exam_calendar = SessionExamCalendarFactory(number_session=number_session.ONE,
-                                                        academic_calendar=an_academic_calendar)
+                                                       academic_calendar=an_academic_calendar)
 
     learning_unit_year = LearningUnitYearFakerFactory(academic_year=academic_year,
                                                       learning_container_year__academic_year=academic_year,
@@ -91,9 +94,11 @@ def generate_exam_enrollments(year, with_different_offer=False):
         student = StudentFactory()
         offer_enrollment = OfferEnrollmentFactory(offer_year=offer_years[i], student=student)
         learning_unit_enrollment = LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year,
-                                                                   offer_enrollment=offer_enrollment)
+                                                                 offer_enrollment=offer_enrollment)
         exam_enrollments.append(ExamEnrollmentFactory(session_exam=session_exams[i],
-                                                      learning_unit_enrollment=learning_unit_enrollment))
+                                                      learning_unit_enrollment=learning_unit_enrollment,
+                                                      enrollment_state=exam_enrollment_state.ENROLLED,
+                                                      date_enrollment=an_academic_calendar.start_date))
     return locals()
 
 
@@ -124,7 +129,8 @@ class MixinTestUploadScoresFile(AcademicYearMockMixin):
             student.person.save()
 
         self.client = Client()
-        self.client.force_login(user=self.attribution.tutor.person.user)
+        self.a_user = self.attribution.tutor.person.user
+        self.client.force_login(user=self.a_user)
         self.url = reverse('upload_encoding', kwargs={'learning_unit_year_id': self.learning_unit_year.id})
 
         # Mock academic_year in order to be decouple from system time
@@ -162,7 +168,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
 
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].tags, 'error')
-        self.assertEqual(messages[0].message, _('no_file_submitted'))
+        self.assertEqual(messages[0].message, _('You have to select a file to upload.'))
 
     def test_with_incorrect_format_file(self):
         with open("assessments/tests/resources/bad_format.txt", 'rb') as score_sheet:
@@ -171,7 +177,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
 
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].tags, 'error')
-            self.assertEqual(messages[0].message, _('file_must_be_xlsx'))
+            self.assertEqual(messages[0].message, _("The file must be a valid 'XLSX' excel file"))
 
     def test_with_no_scores_encoded(self):
         with open("assessments/tests/resources/empty_scores.xlsx", 'rb') as score_sheet:
@@ -180,7 +186,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
 
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].tags, 'error')
-            self.assertEqual(messages[0].message, _('no_score_injected'))
+            self.assertEqual(messages[0].message, _('No score injected'))
 
     def test_with_incorrect_justification(self):
         INCORRECT_LINES = '13'
@@ -189,7 +195,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('error', "%s : %s %s" % (_('justification_invalid_value'), _('Line'), INCORRECT_LINES)),
+            self.assertIn(('error', "%s : %s %s" % (_('Invalid justification value'), _('Row'), INCORRECT_LINES)),
                           messages_tag_and_content)
 
     def test_with_numbers_outside_scope(self):
@@ -199,7 +205,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('error', "%s : %s %s" % (_('scores_must_be_between_0_and_20'), _('Line'), INCORRECT_LINES)),
+            self.assertIn(('error', "%s : %s %s" % (_("Scores must be between 0 and 20"), _('Row'), INCORRECT_LINES)),
                           messages_tag_and_content)
 
     def test_with_correct_score_sheet(self):
@@ -211,7 +217,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('score_saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(
@@ -226,7 +232,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('success', '%s %s' % (NUMBER_SCORES, _('score_saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_SCORES, _('Score saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(
@@ -242,9 +248,9 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('error', "%s : %s %s" % (_('scores_must_be_between_0_and_20'), _('Line'), INCORRECT_LINE)),
+            self.assertIn(('error', "%s : %s %s" % (_("Scores must be between 0 and 20"), _('Row'), INCORRECT_LINE)),
                           messages_tag_and_content)
-            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('score_saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(
@@ -259,11 +265,10 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('error', "%s : %s %s" % (_('registration_id_does_not_match_email'),
-                                                    _('Line'),
+            self.assertIn(('error', "%s : %s %s" % (_('Registration ID does not match email'),
+                                                    _('Row'),
                                                     INCORRECT_LINES)),
                           messages_tag_and_content)
-
 
     def test_with_correct_score_sheet_white_spaces_around_emails(self):
         NUMBER_CORRECT_SCORES = "2"
@@ -272,7 +277,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('score_saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(
@@ -289,10 +294,23 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('score_saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(
                 self.exam_enrollments,
                 [("score_draft", 16), ("justification_draft", exam_enrollment_justification_type.ABSENCE_UNJUSTIFIED)]
             )
+
+    def test_get_score_list_filtered_by_enrolled_state(self):
+        enrolled_exam_enrollment = ExamEnrollment.objects.all()
+        nb_enrolled_student = len(enrolled_exam_enrollment)
+        self._unsubscribe_one_student(enrolled_exam_enrollment[0])
+        exam_enrollments = _get_score_list_filtered_by_enrolled_state(
+            self.learning_unit_year.id,
+            self.a_user)
+        self.assertEqual(len(exam_enrollments.enrollments), nb_enrolled_student - 1)
+
+    def _unsubscribe_one_student(self, exam):
+        exam.enrollment_state = exam_enrollment_state.NOT_ENROLLED
+        exam.save()

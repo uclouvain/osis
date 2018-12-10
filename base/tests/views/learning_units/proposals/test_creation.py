@@ -38,7 +38,7 @@ from base.forms.learning_unit_proposal import ProposalLearningUnitForm, Creation
 from base.models.enums import learning_unit_year_subtypes, learning_container_year_types, organization_type, \
     entity_type, learning_unit_year_periodicity
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.person import FACULTY_MANAGER_GROUP
+from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.tests.factories import campus as campus_factory, \
     organization as organization_factory, person as factory_person, user as factory_user
@@ -96,15 +96,15 @@ class LearningUnitViewTestCase(TestCase):
             'additional_requirement_entity_1-entity': '',
 
             # Learning component year data model form
-            'form-TOTAL_FORMS': '2',
-            'form-INITIAL_FORMS': '0',
-            'form-MAX_NUM_FORMS': '2',
-            'form-0-hourly_volume_total_annual': 20,
-            'form-0-hourly_volume_partial_q1': 10,
-            'form-0-hourly_volume_partial_q2': 10,
-            'form-1-hourly_volume_total_annual': 20,
-            'form-1-hourly_volume_partial_q1': 10,
-            'form-1-hourly_volume_partial_q2': 10,
+            'component-TOTAL_FORMS': '2',
+            'component-INITIAL_FORMS': '0',
+            'component-MAX_NUM_FORMS': '2',
+            'component-0-hourly_volume_total_annual': 20,
+            'component-0-hourly_volume_partial_q1': 10,
+            'component-0-hourly_volume_partial_q2': 10,
+            'component-1-hourly_volume_total_annual': 20,
+            'component-1-hourly_volume_partial_q1': 10,
+            'component-1-hourly_volume_partial_q2': 10,
         }
 
     def test_get_proposal_learning_unit_creation_form(self):
@@ -183,17 +183,17 @@ class LearningUnitViewTestCase(TestCase):
         luy_errors = learning_unit_form.learning_unit_form_container.forms[LearningUnitYearModelForm].errors
         lcy_errors = learning_unit_form.learning_unit_form_container.forms[LearningContainerYearModelForm].errors
 
-        self.assertEqual(luy_errors['acronym'], [_('field_is_required'), _('invalid_acronym')])
-        self.assertEqual(lcy_errors['container_type'], [_('field_is_required')])
-        self.assertEqual(luy_errors['periodicity'], [_('field_is_required')])
-        self.assertEqual(luy_errors['language'], [_('field_is_required')])
-        self.assertEqual(luy_errors['campus'], [_('field_is_required')])
+        self.assertEqual(luy_errors['acronym'], [_('This field is required.'), _('Invalid code')])
+        self.assertEqual(lcy_errors['container_type'], [_('This field is required.')])
+        self.assertEqual(luy_errors['periodicity'], [_('This field is required.')])
+        self.assertEqual(luy_errors['language'], [_('This field is required.')])
+        self.assertEqual(luy_errors['campus'], [_('This field is required.')])
 
     def test_proposal_learning_unit_form_with_empty_title_fields(self):
         learning_unit_form = CreationProposalBaseForm(self.get_empty_title_fields(), person=self.person)
         self.assertFalse(learning_unit_form.is_valid(), learning_unit_form.errors)
         lcy_errors = learning_unit_form.learning_unit_form_container.forms[LearningContainerYearModelForm].errors
-        self.assertEqual(lcy_errors['common_title'], [_('must_set_common_title_or_specific_title')])
+        self.assertEqual(lcy_errors['common_title'], [_('You must either set the common title or the specific title')])
 
     def test_proposal_learning_unit_add_with_valid_data_for_faculty_manager(self):
         learning_unit_form = CreationProposalBaseForm(self.get_valid_data(), person=self.faculty_person)

@@ -40,7 +40,8 @@ from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.learning_container_year_types import OTHER_COLLECTIVE, OTHER_INDIVIDUAL, MASTER_THESIS, COURSE
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.enums.proposal_type import ProposalType
-from base.models.person import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP, Person
+from base.models.person import Person
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -131,12 +132,13 @@ class PermsTestCase(TestCase):
                 FACULTY_MANAGER_GROUP)))
 
     def test_when_existing_proposal_in_epc(self):
+        a_person = self.create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP)
         luy = LearningUnitYearFactory(academic_year=self.academic_yr, learning_unit__existing_proposal_in_epc=True)
-        self.assertFalse(perms.is_eligible_for_modification(luy, None))
-        self.assertFalse(perms.is_eligible_for_modification_end_date(luy, None))
-        self.assertFalse(perms.is_eligible_to_create_partim(luy, None))
-        self.assertFalse(perms.is_eligible_to_create_modification_proposal(luy, None))
-        self.assertFalse(perms.is_eligible_to_delete_learning_unit_year(luy, None))
+        self.assertFalse(perms.is_eligible_for_modification(luy, a_person))
+        self.assertFalse(perms.is_eligible_for_modification_end_date(luy, a_person))
+        self.assertFalse(perms.is_eligible_to_create_partim(luy, a_person))
+        self.assertFalse(perms.is_eligible_to_create_modification_proposal(luy, a_person))
+        self.assertFalse(perms.is_eligible_to_delete_learning_unit_year(luy, a_person))
 
     def test_cannot_faculty_manager_modify_end_date_no_container(self):
         luy = LearningUnitYearFactory(academic_year=self.academic_yr,
@@ -214,8 +216,8 @@ class PermsTestCase(TestCase):
         a_proposal.save()
         self.assertTrue(perms.is_eligible_to_edit_proposal(a_proposal, a_person))
 
-        for a_type, _ in proposal_type.CHOICES:
-            a_proposal.type = a_type
+        for tag in ProposalType.choices():
+            a_proposal.type = tag[0]
             a_proposal.save()
             if a_proposal.type != ProposalType.MODIFICATION:
                 self.assertTrue(perms.is_eligible_to_edit_proposal(a_proposal, a_person))

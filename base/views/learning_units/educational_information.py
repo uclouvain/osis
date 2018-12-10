@@ -51,7 +51,7 @@ from base.views.common import check_if_display_message, display_warning_messages
 from base.views.common import display_error_messages
 from base.views.learning_units.search import SUMMARY_LIST
 
-SUCCESS_MESSAGE = _('success_mail_reminder')
+SUCCESS_MESSAGE = _('Reminding mails sent')
 
 
 @login_required
@@ -113,7 +113,7 @@ def learning_units_summary_list(request):
         'formset': _get_formset(request, responsible_and_learning_unit_yr_list),
         'learning_units_with_errors': list(zip(learning_units, errors)),
         'search_type': SUMMARY_LIST,
-        'is_faculty_manager': a_user_person.is_faculty_manager(),
+        'is_faculty_manager': a_user_person.is_faculty_manager,
         'form_comparison': form_comparison
     }
 
