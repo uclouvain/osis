@@ -106,11 +106,15 @@ class LearningUnitSearchForm(BaseSearchForm):
         entity_requirement = EntityVersion.objects.filter(
             entity__entitycontaineryear__learning_container_year__learningunityear=OuterRef('pk'),
             entity__entitycontaineryear__type=REQUIREMENT_ENTITY
+        ).current(
+            OuterRef('academic_year__start_date')
         ).order_by('-start_date').values('acronym')[:1]
 
         entity_allocation = EntityVersion.objects.filter(
             entity__entitycontaineryear__learning_container_year__learningunityear=OuterRef('pk'),
             entity__entitycontaineryear__type=ALLOCATION_ENTITY
+        ).current(
+            OuterRef('academic_year__start_date')
         ).order_by('-start_date').values('acronym')[:1]
 
         learning_units = mdl.learning_unit_year.search(**self.cleaned_data)
@@ -352,9 +356,10 @@ def __is_borrowed_learning_unit(luy, map_entity_faculty, map_luy_entity, map_luy
 
 
 class ExternalLearningUnitYearForm(LearningUnitYearForm):
-    country = forms.ModelChoiceField(queryset=Country.objects.filter(organizationaddress__isnull=False)
-                                     .distinct().order_by('name'),
-                                     required=False, label=_("Country"))
+    country = forms.ModelChoiceField(
+        queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
+        required=False, label=_("Country")
+    )
     campus = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("Institution"))
     city = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("City"))
 
@@ -396,8 +401,11 @@ class ExternalLearningUnitYearForm(LearningUnitYearForm):
             country=clean_data['country'],
             city=clean_data['city'],
             campus=clean_data['campus']
-        ).select_related('learning_unit_year__academic_year', ) \
-            .order_by('learning_unit_year__academic_year__year', 'learning_unit_year__acronym')
+        ).select_related(
+            'learning_unit_year__academic_year',
+            'learning_unit_year__learning_container_year',
+            'learning_unit_year__campus__organization'
+        ).order_by('learning_unit_year__academic_year__year', 'learning_unit_year__acronym')
 
         return learning_units
 

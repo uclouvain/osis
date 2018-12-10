@@ -82,6 +82,7 @@ def learning_units_search(request, search_type):
 
     if request.POST.get('xls_status') == "xls":
         return create_xls(request.user, found_learning_units, _get_filter(form, search_type))
+
     if request.POST.get('xls_status') == "xls_comparison":
         return create_xls_comparison(
             request.user,
@@ -91,11 +92,15 @@ def learning_units_search(request, search_type):
         )
 
     if request.POST.get('xls_status') == "xls_with_parameters":
-        return create_xls_with_parameters(request.user,
-                                   found_learning_units,
-                                   _get_filter(form, search_type),
-                                   {WITH_GRP: request.POST.get('with_grp') == 'true',
-                                    WITH_ATTRIBUTIONS: request.POST.get('with_attributions') == 'true'})
+        return create_xls_with_parameters(
+            request.user,
+            found_learning_units,
+            _get_filter(form, search_type),
+            {
+                WITH_GRP: request.POST.get('with_grp') == 'true',
+                WITH_ATTRIBUTIONS: request.POST.get('with_attributions') == 'true'
+            }
+        )
 
     form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
 
@@ -141,21 +146,23 @@ def learning_units_borrowed_course(request):
 @permission_required('base.can_access_learningunit', raise_exception=True)
 @cache_filter()
 def learning_units_proposal_search(request):
-    search_form = LearningUnitProposalForm(request.GET or None, initial={'academic_year_id': current_academic_year()})
+    search_form = LearningUnitProposalForm(
+        request.GET or None,
+        initial={'academic_year_id': current_academic_year()}
+    )
     user_person = get_object_or_404(Person, user=request.user)
-    learning_units = LearningUnitYear.objects.none()
-
-    research_criteria = []
+    found_learning_units = LearningUnitYear.objects.none()
 
     if search_form.is_valid():
-        research_criteria = get_research_criteria(search_form)
-        learning_units = search_form.get_proposal_learning_units()
-        check_if_display_message(request, learning_units)
+        found_learning_units = search_form.get_proposal_learning_units()
+        check_if_display_message(request, found_learning_units)
 
     if request.GET.get('xls_status') == "xls":
-        return create_xls_proposal(request.user, learning_units, _get_filter(search_form, PROPOSAL_SEARCH))
+        return create_xls_proposal(request.user, found_learning_units, _get_filter(search_form, PROPOSAL_SEARCH))
 
     if request.POST:
+        research_criteria = get_research_criteria(search_form)
+
         selected_proposals_id = request.POST.getlist("selected_action", default=[])
         selected_proposals = ProposalLearningUnit.objects.filter(id__in=selected_proposals_id)
         messages_by_level = apply_action_on_proposals(selected_proposals, user_person, request.POST, research_criteria)
@@ -169,10 +176,10 @@ def learning_units_proposal_search(request):
         'current_academic_year': current_academic_year(),
         'experimental_phase': True,
         'search_type': PROPOSAL_SEARCH,
-        'learning_units': learning_units,
+        'learning_units': found_learning_units,
         'is_faculty_manager': user_person.is_faculty_manager,
-        'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(learning_units)),
-        'page_obj': paginate_queryset(learning_units, request.GET),
+        'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
+        'page_obj': paginate_queryset(found_learning_units, request.GET),
     }
     return render(request, "learning_units.html", context)
 

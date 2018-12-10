@@ -28,7 +28,6 @@ from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl
-from base.business.learning_unit_year_with_context import append_latest_entities
 from base.forms.learning_unit.search_form import LearningUnitSearchForm
 from base.models.entity import Entity
 from base.models.enums.proposal_state import ProposalState
@@ -76,10 +75,6 @@ class LearningUnitProposalForm(LearningUnitSearchForm):
         learning_units = self.get_queryset().filter(proposallearningunit__isnull=False)
 
         learning_units = mdl.proposal_learning_unit.filter_proposal_fields(learning_units, **self.cleaned_data)
-
-        for learning_unit in learning_units:
-            # TODO Use an annotate
-            append_latest_entities(learning_unit, None)
 
         return learning_units
 
