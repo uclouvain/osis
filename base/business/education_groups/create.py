@@ -23,10 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
 import re
 from collections import defaultdict
 
+from base.forms.common import ValidationRuleMixin
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
@@ -41,9 +41,9 @@ WIDTH_CNUM = 3
 
 
 def create_initial_group_element_year_structure(parent_egys):
-    children_dict = defaultdict(list)
+    children_created = defaultdict(list)
     if not parent_egys:
-        return children_dict
+        return children_created
 
     auth_rels = AuthorizedRelationship.objects.filter(
         parent_type=parent_egys[0].education_group_type,
@@ -52,22 +52,23 @@ def create_initial_group_element_year_structure(parent_egys):
     for relationship in auth_rels:
         child_education_group_type = relationship.child_type
 
-        egy_title_reference = field_reference("title", EducationGroupYear, child_education_group_type)
-        egy_partial_acronym_reference = field_reference("partial_acronym", EducationGroupYear,
-                                                        child_education_group_type)
-        validation_rule_partial_acronym = ValidationRule.objects.get(pk=egy_partial_acronym_reference)
-        validation_rule_title = ValidationRule.objects.get(pk=egy_title_reference)
-        partial_acronym = _compose_child_partial_acronym(parent_egys[0].partial_acronym,
-                                                         validation_rule_partial_acronym.initial_value,
-                                                         parent_egys[0], child_education_group_type)
-        child_factory = functools.partial(create_child,
-                                          child_education_group_type,
-                                          validation_rule_title.initial_value,
-                                          partial_acronym)
+        validation_rule_title = _get_validation_rule("title", child_education_group_type)
+        validation_rule_partial_acronym = _get_validation_rule("partial_acronym", child_education_group_type)
+
+        common_partial_acronym = _compose_child_partial_acronym(
+            parent_egys[0],
+            validation_rule_partial_acronym.initial_value,
+            child_education_group_type
+        )
         for parent_egy in parent_egys:
-            grp_ele = child_factory(parent_egy)
-            children_dict[parent_egy.id].append(grp_ele)
-    return children_dict
+            grp_ele = create_child(
+                child_education_group_type,
+                validation_rule_title.initial_value,
+                common_partial_acronym,
+                parent_egy
+            )
+            children_created[parent_egy.id].append(grp_ele)
+    return children_created
 
 
 def create_child(child_education_group_type, title_initial_value, partial_acronym, parent_egy):
@@ -101,9 +102,13 @@ def create_child(child_education_group_type, title_initial_value, partial_acrony
     return grp_ele
 
 
-# FIXME Generalize method
-def field_reference(name, model, education_group_type):
-    return '.'.join([model._meta.db_table, name]) + '.' + education_group_type.external_id
+def _get_validation_rule(field_name, education_group_type):
+    egy_title_reference = ValidationRuleMixin._field_reference(
+        EducationGroupYear,
+        field_name,
+        education_group_type.external_id
+    )
+    return ValidationRule.objects.get(pk=egy_title_reference)
 
 
 def _compose_child_title(child_title_initial_value, parent_acronym):
@@ -117,7 +122,7 @@ def _compose_child_acronym(child_title_initial_value, parent_acronym):
     )
 
 
-def _compose_child_partial_acronym(parent_partial_acronym, child_initial_value, parent, child_type):
+def _compose_child_partial_acronym(parent, child_initial_value, child_type):
     try:
         previous_children = GroupElementYear.objects.get(
             parent__education_group=parent.education_group,
@@ -130,7 +135,7 @@ def _compose_child_partial_acronym(parent_partial_acronym, child_initial_value, 
         return previous_children.child_branch.partial_acronym
 
     reg_parent_partial_acronym = re.compile(REGEX_TRAINING_PARTIAL_ACRONYM)
-    match_result = reg_parent_partial_acronym.search(parent_partial_acronym)
+    match_result = reg_parent_partial_acronym.search(parent.partial_acronym)
     sigle_ele = match_result.group("sigle_ele")
 
     reg_child_initial_value = re.compile(REGEX_GROUP_PARTIAL_ACRONYM_INITIAL_VALUE)
@@ -138,9 +143,7 @@ def _compose_child_partial_acronym(parent_partial_acronym, child_initial_value, 
     cnum, subdivision = match_result.group("cnum", "subdivision")
 
     partial_acronym = "{}{}{}".format(sigle_ele, cnum, subdivision)
-    # FIXME can be done in one query
     while EducationGroupYear.objects.filter(partial_acronym=partial_acronym).exists():
-        # FIXME Can cnum surpass 1000
         cnum = "{:0{width}d}".format(
             (int(cnum) + 1) % MAX_CNUM,
             width=WIDTH_CNUM

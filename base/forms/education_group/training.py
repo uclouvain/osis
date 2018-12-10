@@ -186,7 +186,8 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
         egy_deleted = []
         if education_group_instance.end_year:
             egy_deleted = shorten.start(education_group_instance, education_group_instance.end_year)
-        # TODO create childrens
+        create_initial_group_element_year_structure([self.forms[EducationGroupYearModelForm].instance,
+                                                     *self.education_group_year_postponed])
         return {
             'object_list_deleted': egy_deleted,
         }

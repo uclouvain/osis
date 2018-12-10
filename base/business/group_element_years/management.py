@@ -58,7 +58,18 @@ def attach_from_cache(parent):
     if selected_data:
         kwargs = {'parent': parent}
         if selected_data['modelname'] == LEARNING_UNIT_YEAR:
+            # TODO check if can attach learning units
             luy = LearningUnitYear.objects.get(pk=selected_data['id'])
+            if not parent.education_group_type.learning_unit_child_allowed:
+                raise IncompatiblesTypesException(
+                    errors=_("You cannot attach \"%(child)s\" (type \"%(child_type)s\") "
+                             "to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                               'child': luy,
+                               'child_type': "learning unit",
+                               'parent': parent,
+                               'parent_type': parent.education_group_type,
+                           }
+                )
             kwargs['child_leaf'] = luy
         elif selected_data['modelname'] == EDUCATION_GROUP_YEAR:
             egy = EducationGroupYear.objects.get(pk=selected_data['id'])
