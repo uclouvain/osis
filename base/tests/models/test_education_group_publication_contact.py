@@ -45,7 +45,8 @@ class EducationGroupPublicationContactCleanTest(TestCase):
     def test_clean_case_role_not_specified_when_mandatory(self):
         publication_contact = EducationGroupPublicationContactFactory.build(
             type=PublicationContactType.JURY_MEMBER.name,
-            role=''
+            role_fr='',
+            role_en=''
         )
         with self.assertRaises(ValidationError):
             publication_contact.clean()
@@ -53,7 +54,10 @@ class EducationGroupPublicationContactCleanTest(TestCase):
     def test_clean_case_role_specified_when_not_mandatory(self):
         publication_contact = EducationGroupPublicationContactFactory.build(
             type=PublicationContactType.ACADEMIC_RESPONSIBLE.name,
-            role='dummy role'
+            role_fr='dummy role in french',
+            role_en='dummy role in english'
         )
+
         publication_contact.clean()
-        self.assertEqual(publication_contact.role, '')
+        self.assertEqual(publication_contact.role_fr, '')
+        self.assertEqual(publication_contact.role_en, '')
