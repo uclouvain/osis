@@ -193,9 +193,11 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         {% block institution %}
-                            {% url 'organization_read' organization_id=organization.id as url_organization %}
-                            {% dl_tooltip organization 'institution' label_text=_('Institution') value=organization.name url=url_organization %}
-                            {% dl_tooltip campus 'campus' label_text=_('Learning location') value=campus.name %}
+                            {% with organization=learning_unit_year.campus.organization campus=learning_unit_year.campus %}
+                                {% url 'organization_read' organization_id=organization.id as url_organization %}
+                                {% dl_tooltip organization 'institution' label_text=_('Institution') value=organization.name url=url_organization %}
+                                {% dl_tooltip campus 'campus' label_text=_('Learning location') value=campus.name %}
+                            {% endwith %}
 
                             {% url 'entity_read' entity_version_id=requirement_entity.id as url_entity_requirement %}
                             {% url 'entity_read' entity_version_id=allocation_entity.id as url_entity_allocation %}

@@ -31,13 +31,13 @@ from uuid import uuid4
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
-from base.business.learning_unit_year_with_context import ENTITY_TYPES_VOLUME
 from base.business.learning_units import edition as business_edition
 from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_component import LearningUnitComponent
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -95,7 +95,7 @@ class LearningUnitEditionTestCase(TestCase):
         a_learning_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
         LearningComponentYearFactory(acronym="PM", learning_container_year=a_learning_container_year)
         LearningComponentYearFactory(acronym="PP", learning_container_year=a_learning_container_year)
-        link_type = random.choice(ENTITY_TYPES_VOLUME)
+        link_type = random.choice(REQUIREMENT_ENTITIES)
 
         business_edition.update_or_create_entity_container_year_with_components(
             an_entity, a_learning_container_year, link_type

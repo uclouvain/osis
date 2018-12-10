@@ -361,7 +361,7 @@ def get_by_entity_parent(entity_parent):
         return None
 
 
-def get_by_entity_and_date(entity, date):
+def get_by_entity_and_date(entity, date=None):
     if date is None:
         date = timezone.now()
     try:
