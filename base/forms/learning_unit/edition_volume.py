@@ -134,9 +134,9 @@ class VolumeEditionForm(forms.Form):
         """
         cleaned_data = super().clean()
 
-        volume_q1 = self.cleaned_data.get("hourly_volume_partial_q1") or 0
-        volume_q2 = self.cleaned_data.get("hourly_volume_partial_q2") or 0
-        volume_total = self.cleaned_data.get("hourly_volume_total_annual") or 0
+        volume_q1 = self.cleaned_data.get("volume_q1") or 0
+        volume_q2 = self.cleaned_data.get("volume_q2") or 0
+        volume_total = self.cleaned_data.get("volume_total") or 0
 
         if volume_total != volume_q1 + volume_q2:
             self.add_error("volume_total", _('Vol_tot is not equal to vol_q1 + vol_q2'))
