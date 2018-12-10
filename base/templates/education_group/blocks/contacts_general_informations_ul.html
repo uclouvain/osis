@@ -25,19 +25,21 @@
 {% endcomment %}
 
 
-<ul>
+<div class="list-group col-md-12">
     {% for contact in contacts %}
-        <li>
+       <div class="list-group-item" style="border: none;">
            <div class="col-md-8">
-               <span>
-                   {% if contact.role %}
-                       {{ contact.role }} :
-                   {% endif %}
-                   {{ contact.email }}
-               </span>
+               <strong class="list-group-item-heading">
+                  {% if contact.email %} {{ contact.email }} {% else %} {{ contact.description }} {% endif %}
+               </strong>
+               <div class="list-group-item-text">
+                     {% if contact.role_fr %} <div><em>(fr)</em> {{ contact.role_fr }} </div>{% endif %}
+                     {% if contact.role_en %} <div><em>(en)</em> {{ contact.role_en }} </div>{% endif %}
+               </div>
            </div>
-            {% if can_edit_information %}
-                <div class="col-md-4 pull-right">
+
+           {% if can_edit_information %}
+                <div class="pull-right">
                    {% url 'publication_contact_edit' root_id=root.pk education_group_year_id=education_group_year.pk publication_contact_id=contact.pk as update_url %}
                    {% url 'publication_contact_delete' root_id=root.pk education_group_year_id=education_group_year.pk publication_contact_id=contact.pk as delete_url %}
 
@@ -49,6 +51,7 @@
                    </a>
                 </div>
             {% endif %}
-        </li>
+            <div class="clearfix"></div>
+       </div>
     {% endfor %}
-</ul>
+</div>

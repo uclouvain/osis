@@ -98,7 +98,8 @@ class TestPublicationContactCreateView(PublicationContactViewSetupTest):
         data = {
             "type": PublicationContactType.JURY_MEMBER.name,
             "email": "person@gmail.com",
-            "role": "dummy role",
+            "role_fr": "dummy role in french",
+            "role_en": "dummy role in english"
         }
         response = self.client.post(self.url_create, data=data)
 
@@ -109,7 +110,8 @@ class TestPublicationContactCreateView(PublicationContactViewSetupTest):
             education_group_year_id=self.training.id,
             type=data['type'],
             email=data['email'],
-            role=data['role']
+            role_fr=data['role_fr'],
+            role_en=data['role_en'],
         )
 
 

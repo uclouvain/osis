@@ -33,7 +33,7 @@ from base.models.education_group_publication_contact import EducationGroupPublic
 class EducationGroupPublicationContactForm(forms.ModelForm):
     class Meta:
         model = EducationGroupPublicationContact
-        fields = ["type", "email", "role"]
+        fields = ["type", "email", "description", "role_fr", "role_en"]
 
     def __init__(self, education_group_year=None, *args, **kwargs):
         if not education_group_year and not kwargs.get('instance'):
@@ -51,8 +51,9 @@ class EducationGroupPublicationContactForm(forms.ModelForm):
         return _('Create contact')
 
     def _disable_fields(self):
+        self.fields['description'].disabled = True
         if self.instance.type not in ROLE_REQUIRED_FOR_TYPES:
-            self.fields['role'].disabled = True
+            self.fields['role_fr'].disabled = self.fields['role_en'].disabled = True
 
         if self.instance.pk:
             self.fields['type'].disabled = True
