@@ -56,6 +56,7 @@ def _get_section_choices():
 
 class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
     category = education_group_categories.TRAINING
+    category_text = _(dict(education_group_categories.CATEGORIES)[category])
 
     secondary_domains = AutoCompleteSelectMultipleField(
         'university_domains', required=False, help_text="", label=_('secondary domains').title()
@@ -111,6 +112,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             'diploma_printing_title',
             'professional_title',
             'certificate_aims',
+            'web_re_registration'
         ]
 
         field_classes = {

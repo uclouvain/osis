@@ -30,7 +30,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl_base
 from base.business import learning_unit_year_with_context
-from base.business.learning_unit_year_with_context import ENTITY_TYPES_VOLUME
 from base.business.learning_units.simple.deletion import delete_from_given_learning_unit_year, \
     check_learning_unit_year_deletion
 from base.business.utils.model import update_instance_model_from_data, update_related_object
@@ -41,7 +40,7 @@ from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_unit_year_periodicity, learning_unit_year_subtypes
-from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
+from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, REQUIREMENT_ENTITIES
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
@@ -380,7 +379,7 @@ def _update_learning_unit_year_entities(luy, entities_by_type_to_update):
 
 def update_or_create_entity_container_year_with_components(an_entity, learning_container_year, type_entity):
     an_entity_container_year = _update_entity_container_year(an_entity, learning_container_year, type_entity)
-    if type_entity in ENTITY_TYPES_VOLUME:
+    if type_entity in REQUIREMENT_ENTITIES:
         # Only entity with volume can have entity_component_year
         _create_entity_component_year_if_not_exists(an_entity_container_year)
 
