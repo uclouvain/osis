@@ -28,7 +28,7 @@ import re
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, ngettext
 from reversion.admin import VersionAdmin
@@ -392,7 +392,8 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def _check_learning_component_year_warnings(self):
         _warnings = []
         components_queryset = self.learning_container_year.learningcomponentyear_set
-        all_components = components_queryset.all().order_by('learningunitcomponent__learning_unit_year__acronym')
+        all_components = components_queryset.order_by('learningunityear__acronym').prefetch_related(
+            'learningunityear_set').annotate(vol_global=Sum('entitycomponentyear__repartition_volume'))
         for learning_component_year in all_components:
             _warnings.extend(learning_component_year.warnings)
 
