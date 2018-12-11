@@ -87,7 +87,10 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
 
 class EducationGroupYearManager(SerializableModelManager):
     def look_for_common(self, **kwargs):
-        return self.filter(acronym__startswith='common-', **kwargs)
+        return self.filter(acronym__startswith='common', **kwargs)
+
+    def get_common(self, **kwargs):
+        return self.get(acronym='common', **kwargs)
 
 
 class EducationGroupYear(SerializableModel):
@@ -503,7 +506,7 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def is_common(self):
-        return self.acronym.startswith('common-')
+        return self.acronym.startswith('common')
 
     @property
     def verbose(self):

@@ -30,8 +30,8 @@ from django.test import TestCase
 from base.models.enums.publication_contact_type import PublicationContactType
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_detailed_achievement import EducationGroupDetailedAchievementFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonMasterFactory
 from cms.enums import entity_name
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
@@ -138,9 +138,7 @@ class GetEvaluationTestCase(TestCase):
     def setUp(self):
         self.education_group_year = EducationGroupYearFactory(acronym='ACTU2M')
 
-        common_education_group_year = EducationGroupYearCommonMasterFactory(
-            acronym='common-2m',
-            education_group_type=self.education_group_year.education_group_type,
+        common_education_group_year = EducationGroupYearCommonFactory(
             academic_year=self.education_group_year.academic_year
         )
         self.cms_label_name = 'evaluation'
@@ -154,9 +152,9 @@ class GetEvaluationTestCase(TestCase):
                                                       entity=text_label.entity)
 
         self.common = TranslatedTextRandomFactory(text_label=text_label,
-                                    language='fr-be',
-                                    reference=common_education_group_year.id,
-                                    entity=text_label.entity)
+                                                  language='fr-be',
+                                                  reference=common_education_group_year.id,
+                                                  entity=text_label.entity)
 
     def test_get_evaluation_french_version(self):
         label, text = business.get_evaluation_text(self.education_group_year, settings.LANGUAGE_CODE_FR)
