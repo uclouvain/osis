@@ -62,9 +62,9 @@ from base.models.enums import learning_container_year_types, organization_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.person import Person
-from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -352,7 +352,10 @@ class LearningUnitViewTestCase(TestCase):
         super(AcademicYear, self.academic_year_5).save()
         super(AcademicYear, self.academic_year_6).save()
         self.learning_container_yr = LearningContainerYearFactory(academic_year=self.current_academic_year)
-        self.learning_component_yr = LearningComponentYearFactory(learning_container_year=self.learning_container_yr)
+        self.learning_component_yr = LearningComponentYearFactory(learning_container_year=self.learning_container_yr,
+                                                                  hourly_volume_total_annual=10,
+                                                                  hourly_volume_partial_q1=5,
+                                                                  hourly_volume_partial_q2=5)
         self.organization = OrganizationFactory(type=organization_type.MAIN)
         self.country = CountryFactory()
         self.entity = EntityFactory(country=self.country, organization=self.organization)
