@@ -8,6 +8,9 @@ from base.management.commands import import_reddot
 from base.management.commands.import_reddot import _import_skills_and_achievements, \
     _get_field_achievement_according_to_language, _get_role_field_publication_contact_according_to_language, \
     _import_contacts
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from cms.models.text_label import TextLabel
+from cms.models.translated_text_label import TranslatedTextLabel
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.enums.publication_contact_type import PublicationContactType
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_CMS_DATA
@@ -25,8 +28,8 @@ from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import (
     EducationGroupYearFactory,
     EducationGroupYearCommonMasterFactory,
-    EducationGroupYearCommonBachelorFactory
-)
+    EducationGroupYearCommonBachelorFactory,
+    EducationGroupYearMasterFactory)
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from cms.enums import entity_name
@@ -35,6 +38,7 @@ from cms.models.translated_text import TranslatedText
 OFFERS = [
     {'name': TrainingType.BACHELOR.name, 'category': TRAINING, 'code': '1BA'},
     {'name': TrainingType.PGRM_MASTER_120.name, 'category': TRAINING, 'code': '2M'},
+    {'name': TrainingType.MASTER_M1.name, 'category': TRAINING, 'code': '2M1'},
 ]
 
 
@@ -43,6 +47,43 @@ class ImportReddotTestCase(TestCase):
         self.command = import_reddot.Command()
         lang = 'fr-be'
         self.command.suffix_language = '' if lang == 'fr-be' else '_en'
+        self.command.iso_language = 'fr-be'
+
+    @mock.patch('base.management.commands.import_reddot.get_mapping_label_texts')
+    def test_load_offers_call_get_mapping(self, mock_get_mapping):
+        item = [
+                {
+                    "type": "common",
+                    "acronym": "common",
+                    "year": 2018,
+                    "info": {
+                        "caap": "TEST",
+                        "evaluation": "TESTBIS"
+                    }
+                },
+            ]
+
+        self.command.json_content = item
+        self.command.load_offers()
+        labels = {'evaluation', 'caap'}
+        Context = collections.namedtuple('Context', 'entity language')
+        context = Context(entity='offer_year', language=self.command.iso_language)
+        mock_get_mapping.assert_called_with(context, labels)
+
+    def test_get_mapping_text_labels(self):
+        labels = {'evaluation'}
+        Context = collections.namedtuple('Context', 'entity language')
+        context = Context(entity='offer_year', language=self.command.iso_language)
+        from base.management.commands.import_reddot import get_mapping_label_texts
+        result = get_mapping_label_texts(context, labels)
+        text_label = TextLabel.objects.filter(
+            entity='offer_year',
+            label='evaluation',
+            published=True
+        )
+        self.assertTrue(text_label.exists())
+
+        self.assertEqual(result['evaluation'], text_label.first())
 
     def test_load_admission_conditions_for_bachelor(self):
         education_group_year_common = EducationGroupYearCommonBachelorFactory()
@@ -81,10 +122,68 @@ class ImportReddotTestCase(TestCase):
         self.assertEqual(admission_condition.text_ca_bacs_cond_speciales,
                          info['ca_bacs_cond_speciales']['text-common'])
 
+    def test_load_admission_conditions_generic(self):
+        item = {
+            "acronym": "sged2mc",
+            "year": 2018,
+            "type": "offer",
+            "info": {
+                "diplomas": [
+                    {
+                        "external_id": "id",
+                        "section": "university_bachelors",
+                        "title": "ucl_bachelors",
+                        "type": "table",
+                        "diploma": "Bachelier en théologie ou en sciences religieuses",
+                        "conditions": "COND",
+                        "access": "direct_access",
+                        "remarks": "REM"
+                    }
+                ],
+                "texts": {
+                    "alert_message": {},
+                    "introduction": {
+                        "text": "TestText"
+                    },
+                    "ca_cond_generales": {}
+                }
+            }
+        }
+        education_group_year = EducationGroupYearFactory()
+        self.command.load_admission_conditions_generic(
+            education_group_year.acronym,
+            item,
+            education_group_year.academic_year.year
+        )
+
+        edy = EducationGroupYear.objects.filter(
+            academic_year=education_group_year.academic_year,
+            acronym=education_group_year.acronym
+        ).first()
+
+        admission_condition = AdmissionCondition.objects.get(education_group_year=edy)
+        info = item['info']
+        line = AdmissionConditionLine.objects.get(admission_condition=admission_condition)
+        self.assertEqual(admission_condition.text_free,
+                         info['texts']['introduction']['text'])
+        self.assertEqual(line.section,
+                         info['diplomas'][0]['title'])
+        self.assertEqual(line.external_id,
+                         info['diplomas'][0]['external_id'])
+        self.assertEqual(line.access,
+                         info['diplomas'][0]['access'])
+        self.assertEqual(line.diploma,
+                         info['diplomas'][0]['diploma'])
+        self.assertEqual(line.conditions,
+                         info['diplomas'][0]['conditions'])
+        self.assertEqual(line.remarks,
+                         info['diplomas'][0]['remarks'])
+
     def test_load_admission_conditions_common(self):
         item = {
             "year": 2018,
             "2m.alert_message": "Test",
+            "2m.introduction": "IntroTest"
         }
         self.command.json_content = item
         academic_year = AcademicYearFactory(year=2018)
@@ -102,6 +201,21 @@ class ImportReddotTestCase(TestCase):
         admission_condition = AdmissionCondition.objects.get(education_group_year=common)
         self.assertEqual(admission_condition.text_alert_message,
                          item['2m.alert_message'])
+
+    def test_load_admission_conditions_common_label_not_handled(self):
+        item = {
+            "year": 2018,
+            "2m.coucou": "Test"
+        }
+        self.command.json_content = item
+        academic_year = AcademicYearFactory(year=2018)
+        education_group_year_common = EducationGroupYearFactory(
+            academic_year=academic_year,
+            acronym='common-2m'
+        )
+
+        with self.assertRaises(Exception):
+            self.command.load_admission_conditions_common()
 
     def test_save_condition_line_of_row_with_no_admission_condition_line(self):
         education_group_year = EducationGroupYearFactory()
@@ -306,6 +420,30 @@ class CreateCommonOfferForAcademicYearTest(TestCase):
         education_group = EducationGroupFactory(start_year=academic_year.year, end_year=academic_year.year + 1)
         self.assertEqual(EducationGroupYear.objects.count(), 0)
         EducationGroupYearCommonMasterFactory(academic_year=academic_year)
+        self.assertEqual(EducationGroupYear.objects.count(), 1)
+        create_common_offer_for_academic_year(academic_year.year)
+        self.assertEqual(EducationGroupYear.objects.count(), 2)
+
+    def test_with_common_to_remove(self):
+        academic_year = AcademicYearFactory()
+        self.assertEqual(EducationGroup.objects.count(), 0)
+        self.assertEqual(EducationGroupYear.objects.count(), 0)
+        type_m1 = EducationGroupTypeFactory(
+            name=TrainingType.MASTER_M1
+        )
+        EducationGroupYearMasterFactory(
+            acronym='common-2m1',
+            academic_year=academic_year,
+            education_group_type=type_m1,
+            partial_acronym='common-2m1'
+        )
+        entity = EntityFactory(organization__type=MAIN)
+        entity_version = EntityVersionFactory(acronym='UCL', entity=entity)
+        from base.management.commands.import_reddot import OFFERS
+        for offer in OFFERS:
+            EducationGroupType.objects.create(name=offer['name'], category=offer['category'])
+
+        from base.management.commands.import_reddot import create_common_offer_for_academic_year
         self.assertEqual(EducationGroupYear.objects.count(), 1)
         create_common_offer_for_academic_year(academic_year.year)
         self.assertEqual(EducationGroupYear.objects.count(), 2)

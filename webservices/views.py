@@ -382,6 +382,8 @@ def get_conditions_admissions(context):
         return response_for_bachelor(context)
 
     common_acronym = 'common-{}'.format(full_suffix)
+    if common_acronym == 'common-2m1':
+        common_acronym = 'common-2m'
     admission_condition, created = AdmissionCondition.objects.get_or_create(
         education_group_year=context.education_group_year
     )
