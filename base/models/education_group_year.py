@@ -43,6 +43,7 @@ from base.models.enums import education_group_categories
 from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
 from base.models.enums.education_group_types import MiniTrainingType
 from base.models.exceptions import MaximumOneParentAllowedException
+from base.models.hops import Hops
 from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin
