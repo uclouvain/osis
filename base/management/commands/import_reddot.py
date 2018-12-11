@@ -114,7 +114,7 @@ def _update_or_create_common_offer(academic_year, acronym, offer):
     )
 
     education_group = EducationGroup.objects.filter(educationgroupyear__acronym=acronym)
-    if len(education_group) == 0:
+    if education_group.count() == 0:
         education_group = EducationGroup.objects.create(
             start_year=2017,
             end_year=None
