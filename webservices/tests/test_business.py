@@ -30,7 +30,7 @@ from django.test import TestCase
 from base.models.enums.publication_contact_type import PublicationContactType
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_detailed_achievement import EducationGroupDetailedAchievementFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupCommonFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from cms.enums import entity_name
 from cms.enums.entity_name import OFFER_YEAR
@@ -138,7 +138,7 @@ class GetEvaluationTestCase(TestCase):
     def setUp(self):
         self.education_group_year = EducationGroupYearFactory(acronym='ACTU2M')
 
-        common_education_group_year = EducationGroupCommonFactory(
+        common_education_group_year = EducationGroupYearCommonFactory(
             academic_year=self.education_group_year.academic_year
         )
         self.cms_label_name = 'evaluation'

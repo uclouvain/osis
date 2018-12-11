@@ -35,7 +35,7 @@ from base.tests.factories.education_group_year import (
     EducationGroupYearCommonMasterFactory,
     EducationGroupYearMasterFactory,
     EducationGroupYearCommonBachelorFactory,
-    EducationGroupCommonFactory)
+    EducationGroupYearCommonFactory)
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
@@ -82,7 +82,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
     def test_first_based_on_the_original_message(self):
         education_group_year = EducationGroupYearFactory(acronym='ACTU2M')
 
-        common_education_group_year = EducationGroupCommonFactory(
+        common_education_group_year = EducationGroupYearCommonFactory(
             academic_year=education_group_year.academic_year
         )
 
@@ -285,7 +285,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
     def test_with_one_section_with_common(self):
         education_group_year = EducationGroupYearMasterFactory()
 
-        common_education_group_year = EducationGroupCommonFactory(
+        common_education_group_year = EducationGroupYearCommonFactory(
             academic_year=education_group_year.academic_year,
         )
 
@@ -354,7 +354,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
     def test_global(self):
         education_group_year = EducationGroupYearFactory(acronym='ACTU2M')
 
-        common_education_group_year = EducationGroupCommonFactory(
+        common_education_group_year = EducationGroupYearCommonFactory(
             academic_year=education_group_year.academic_year
         )
 
@@ -783,7 +783,7 @@ class ProcessSectionTestCase(TestCase):
     def test_find_common_text(self):
         from webservices.views import process_section
         education_group_year = EducationGroupYearMasterFactory()
-        education_group_year_common = EducationGroupCommonFactory(
+        education_group_year_common = EducationGroupYearCommonFactory(
             academic_year=education_group_year.academic_year
         )
 
@@ -804,7 +804,7 @@ class ProcessSectionTestCase(TestCase):
     def test_raise_with_unknown_common_text(self):
         from webservices.views import process_section
         education_group_year = EducationGroupYearMasterFactory()
-        education_group_year_common = EducationGroupCommonFactory(
+        education_group_year_common = EducationGroupYearCommonFactory(
             academic_year=education_group_year.academic_year
         )
 
@@ -857,7 +857,7 @@ class GetSkillsAndAchievementsTestCase(TestCase):
 class GetEvaluationTestCase(TestCase):
     def test_get_evaluation(self):
         education_group_year = EducationGroupYearFactory()
-        common_education_group_year = EducationGroupCommonFactory(
+        common_education_group_year = EducationGroupYearCommonFactory(
             academic_year=education_group_year.academic_year
         )
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='evaluation')
