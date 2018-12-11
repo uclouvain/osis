@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import re
+import uuid
 from collections import defaultdict
 
 from base.forms.common import ValidationRuleMixin
@@ -60,18 +61,21 @@ def create_initial_group_element_year_structure(parent_egys):
             validation_rule_partial_acronym.initial_value,
             child_education_group_type
         )
+        last_child = None
         for parent_egy in parent_egys:
             grp_ele = create_child(
                 child_education_group_type,
                 validation_rule_title.initial_value,
                 common_partial_acronym,
-                parent_egy
+                parent_egy,
+                last_child
             )
+            last_child = grp_ele.child_branch
             children_created[parent_egy.id].append(grp_ele)
     return children_created
 
 
-def create_child(child_education_group_type, title_initial_value, partial_acronym, parent_egy):
+def create_child(child_education_group_type, title_initial_value, partial_acronym, parent_egy, last_child):
     try:
         existing_children = GroupElementYear.objects.get(
             parent=parent_egy,
@@ -86,16 +90,22 @@ def create_child(child_education_group_type, title_initial_value, partial_acrony
     child_eg = EducationGroup(start_year=year, end_year=year)
     child_eg.save()
 
-    child_egy = EducationGroupYear(
-        academic_year=parent_egy.academic_year,
-        main_teaching_campus=parent_egy.main_teaching_campus,
-        management_entity=parent_egy.management_entity,
-        education_group_type=child_education_group_type,
-        title=_compose_child_title(title_initial_value, parent_egy.acronym),
-        partial_acronym=partial_acronym,
-        acronym=_compose_child_acronym(title_initial_value, parent_egy.acronym),
-        education_group=child_eg
-    )
+    if last_child:
+        child_egy = last_child
+        child_egy.id = None
+        child_egy.uuid = uuid.uuid4()
+        child_egy.education_group = child_eg
+    else:
+        child_egy = EducationGroupYear(
+            academic_year=parent_egy.academic_year,
+            main_teaching_campus=parent_egy.main_teaching_campus,
+            management_entity=parent_egy.management_entity,
+            education_group_type=child_education_group_type,
+            title=_compose_child_title(title_initial_value, parent_egy.acronym),
+            partial_acronym=partial_acronym,
+            acronym=_compose_child_acronym(title_initial_value, parent_egy.acronym),
+            education_group=child_eg
+        )
     child_egy.save()
     grp_ele = GroupElementYear(parent=parent_egy, child_branch=child_egy)
     grp_ele.save()

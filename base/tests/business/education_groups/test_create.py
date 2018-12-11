@@ -54,18 +54,18 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
             external_id="osis.education_group_type_majorlistchoice"
         )
 
-        current_academic_year, next_academic_year = AcademicYearFactory.produce_in_future(quantity=2)
+        cls.current_academic_year, cls.next_academic_year = AcademicYearFactory.produce_in_future(quantity=2)
         cls.egy = EducationGroupYearFactory(
             education_group_type=cls.master_type,
             acronym="TEST2M",
             partial_acronym="LTEST100B",
-            academic_year=current_academic_year
+            academic_year=cls.current_academic_year
         )
         cls.egy_next_year = EducationGroupYearFactory(
             education_group_type=cls.master_type,
             acronym="TEST2M",
             partial_acronym="LTEST100B",
-            academic_year=next_academic_year,
+            academic_year=cls.next_academic_year,
             education_group=cls.egy.education_group
         )
 
@@ -199,4 +199,39 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
         self.assertEqual(
             grp_ele.id,
             children_egys[self.egy.id][0].id
+        )
+
+    def test_should_copy_data_from_previous_year(self):
+        previous_academic_year = AcademicYearFactory(year=self.egy.academic_year.year - 1)
+        previous_egy = EducationGroupYearFactory(
+            education_group_type=self.master_type,
+            acronym="TEST2M",
+            partial_acronym="LTEST100B",
+            academic_year=previous_academic_year,
+            education_group=self.egy.education_group,
+        )
+        previous_child = EducationGroupYearFactory(
+            education_group_type=self.finality_type,
+            partial_acronym="LTEST503G",
+            academic_year=previous_academic_year,
+        )
+        previous_grp_ele = GroupElementYearFactory(
+            parent=previous_egy,
+            child_branch=previous_child
+        )
+
+        current_child = EducationGroupYearFactory(
+            education_group_type=self.finality_type,
+            partial_acronym="LTEST504G",
+            academic_year=self.current_academic_year,
+        )
+        current_grp_ele = GroupElementYearFactory(
+            parent=self.egy,
+            child_branch=current_child
+        )
+        children_egys = create_initial_group_element_year_structure([previous_egy, self.egy, self.egy_next_year])
+
+        self.assertEqual(
+            current_child.partial_acronym,
+            children_egys[self.egy_next_year.id][0].child_branch.partial_acronym
         )
