@@ -539,7 +539,7 @@ class TestLearningUnitProposalSearch(TestCase):
         self.assertEqual(len(response.context['proposals']), 1)
 
     def test_learning_units_proposal_search_by_tutor(self):
-        proposal = _create_proposal_learning_unit("LOSIS1214")
+        proposal = _create_proposal_learning_unit("LOSIS1211")
         tutor = TutorFactory(person=self.person)
         attribution = AttributionNewFactory(tutor=tutor)
         learning_unit_component = LearningUnitComponentFactory(learning_unit_year=proposal.learning_unit_year)
