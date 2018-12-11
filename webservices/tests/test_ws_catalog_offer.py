@@ -28,7 +28,7 @@ from unittest import mock
 
 import django
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.tests.factories.education_group_year import (
@@ -765,6 +765,81 @@ class WebServiceParametersValidationTestCase(TestCase):
             from webservices.views import parameters_validation
             parameters_validation(education_group_year.acronym, 'fr',
                                   datetime.date.today().year + 50)
+
+
+class WebServiceValidateJsonRequestTestCase(TestCase, Helper):
+    URL_NAME = 'v0.1-ws_catalog_offer'
+    def test_raise_suspiciousoperation_with_year(self):
+        from webservices.views import validate_json_request
+        json = {
+            'anac': '2018',
+            'code_offre': 'hist2m',
+            'sections': [
+                'evaluation'
+            ]
+        }
+
+        content_type = 'application/json'
+        request = RequestFactory()
+        request.data = json
+        request.content_type = content_type
+
+        with self.assertRaises(django.core.exceptions.SuspiciousOperation):
+            validate_json_request(request, 2017, 'hist2m')
+
+    def test_raise_suspiciousoperation_with_missing_data(self):
+        from webservices.views import validate_json_request
+        json = {
+            'anac': '2018',
+            'sections': [
+                'evaluation'
+            ]
+        }
+
+        content_type = 'application/json'
+        request = RequestFactory()
+        request.data = json
+        request.content_type = content_type
+
+        with self.assertRaises(django.core.exceptions.SuspiciousOperation):
+            validate_json_request(request, 2018, 'hist2m')
+
+    def test_raise_suspiciousoperation_with_acronym(self):
+        from webservices.views import validate_json_request
+        json = {
+            'anac': '2018',
+            'code_offre': 'hist2m1',
+            'sections': [
+                'evaluation'
+            ]
+        }
+
+        content_type = 'application/json'
+        request = RequestFactory()
+        request.data = json
+        request.content_type = content_type
+
+        with self.assertRaises(django.core.exceptions.SuspiciousOperation):
+            validate_json_request(request, 2018, 'hist2m')
+
+    def test_raise_suspiciousoperation_with_section_not_string(self):
+        from webservices.views import validate_json_request
+        fake_section = dict()
+        json = {
+            'anac': '2018',
+            'code_offre': 'hist2m1',
+            'sections': [
+                fake_section
+            ]
+        }
+
+        content_type = 'application/json'
+        request = RequestFactory()
+        request.data = json
+        request.content_type = content_type
+
+        with self.assertRaises(django.core.exceptions.SuspiciousOperation):
+            validate_json_request(request, 2018, 'hist2m')
 
 
 class WebServiceNewContextTestCase(TestCase):
