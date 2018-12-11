@@ -350,6 +350,8 @@ class SimplifiedVolumeForm(forms.ModelForm):
 
         if volume_q1+volume_q2 != volume_total:
             self.add_error("hourly_volume_total_annual", _('Vol_tot is not equal to vol_q1 + vol_q2'))
+            self.add_error("hourly_volume_partial_q1", "")
+            self.add_error("hourly_volume_partial_q2", "")
 
         return cleaned_data
 

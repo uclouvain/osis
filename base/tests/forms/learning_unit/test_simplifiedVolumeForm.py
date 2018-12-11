@@ -189,5 +189,7 @@ class TestSimplifiedVolumeForm(TestCase):
             component_type=COMPONENT_TYPES[0]
         )
         form.is_valid()
+        self.assertEqual(form.errors["hourly_volume_partial_q1"][0], gettext(""))
+        self.assertEqual(form.errors["hourly_volume_partial_q2"][0], gettext(""))
         self.assertEqual(form.errors["hourly_volume_total_annual"][0],
                          gettext('Vol_tot is not equal to vol_q1 + vol_q2'))
