@@ -31,12 +31,12 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class HopsAdmin(SerializableModelAdmin):
-    list_display = ('ARES_study', 'ARES_GRACA', 'ARES_ability', 'changed')
-    list_filter = ('ARES_study', )
+    list_display = ('ares_study', 'ares_GRACA', 'ares_ability', 'changed')
+    list_filter = ('ares_study', )
     raw_id_fields = (
         'education_group_year'
     )
-    search_fields = ['ARES_study']
+    search_fields = ['ares_study']
 
 
 class Hops(SerializableModel):
@@ -45,21 +45,21 @@ class Hops(SerializableModel):
     changed = models.DateTimeField(null=True, auto_now=True)
     education_group_year = models.OneToOneField('base.EducationGroupYear', on_delete=models.CASCADE)
 
-    ARES_study = models.IntegerField(
+    ares_study = models.IntegerField(
         blank=True,
         null=True,
         verbose_name=_('ARES study code'),
         validators=[MinValueValidator(1), MaxValueValidator(9999)],
     )
 
-    ARES_GRACA = models.IntegerField(
+    ares_GRACA = models.IntegerField(
         blank=True,
         null=True,
         verbose_name=_('ARES-GRACA'),
         validators=[MinValueValidator(1), MaxValueValidator(9999)],
     )
 
-    ARES_ability = models.IntegerField(
+    ares_ability = models.IntegerField(
         blank=True,
         null=True,
         verbose_name=_('ARES ability'),
@@ -68,4 +68,4 @@ class Hops(SerializableModel):
     )
 
     def __str__(self):
-        return str(self.ARES_study) if self.ARES_study else ''
+        return str(self.ares_study) if self.ares_study else ''

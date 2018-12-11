@@ -22,9 +22,9 @@ class Migration(migrations.Migration):
                 ('uuid', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, unique=True)),
                 ('external_id', models.CharField(blank=True, db_index=True, max_length=100, null=True)),
                 ('changed', models.DateTimeField(auto_now=True, null=True)),
-                ('ARES_study', models.IntegerField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(9999)], verbose_name='ARES study code')),
-                ('ARES_GRACA', models.IntegerField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(9999)], verbose_name='ARES-GRACA')),
-                ('ARES_ability', models.IntegerField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(9999)], verbose_name='ARES ability')),
+                ('ares_study', models.IntegerField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(9999)], verbose_name='ARES study code')),
+                ('ares_GRACA', models.IntegerField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(9999)], verbose_name='ARES-GRACA')),
+                ('ares_ability', models.IntegerField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(9999)], verbose_name='ARES ability')),
             ],
             options={
                 'abstract': False,
