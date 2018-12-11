@@ -42,6 +42,7 @@
                             {% dl_with_parent 'verbose_duration' dl_title=_('Duration') class_dl="col-md-6" %}
                             {% dl_with_parent 'internship' class_dl="col-md-6" %}
                             {% dl_with_parent 'enrollment_enabled' class_dl="col-md-6" %}
+                            {% dl_with_parent 'web_re_registration' class_dl="col-md-6" %}
                             {% dl_with_parent 'partial_deliberation' class_dl="col-md-6" %}
                             {% dl_with_parent 'admission_exam' class_dl="col-md-6" %}
                             {% dl_with_parent 'dissertation' class_dl="col-md-6" %}
@@ -111,6 +112,8 @@
             </div>
         </div>
         {% include 'education_group/blocks/remarks.html' %}
+
+        {% include 'education_group/blocks/academic_offer_info.html' %}
 
         {% if show_coorganization %}
             {% include 'education_group/blocks/coorganization.html' %}

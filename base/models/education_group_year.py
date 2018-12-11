@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Count, OuterRef, Exists
 from django.urls import reverse
@@ -242,7 +242,7 @@ class EducationGroupYear(SerializableModel):
         choices=activity_presence.ACTIVITY_PRESENCES,
         blank=True,
         null=True,
-        verbose_name=_('Other languages activities')
+        verbose_name=_('Activities on other campus')
     )
 
     professional_title = models.CharField(
@@ -252,7 +252,7 @@ class EducationGroupYear(SerializableModel):
         verbose_name=_('Professionnal title')
     )
 
-    joint_diploma = models.BooleanField(default=False, verbose_name=_('Joint diploma'))
+    joint_diploma = models.BooleanField(default=False, verbose_name=_('Leads to diploma/certificate'))
 
     diploma_printing_orientation = models.CharField(
         max_length=30,
@@ -441,6 +441,50 @@ class EducationGroupYear(SerializableModel):
         blank=True,
     )
 
+    co_graduation = models.CharField(
+        max_length=8,
+        db_index=True,
+        verbose_name=_("Co-graduation"),
+        blank=True,
+        null=True,
+    )
+
+    co_graduation_coefficient = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name=_('Co-graduation coefficient'),
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(1), MaxValueValidator(9999)],
+    )
+
+    ARES_study = models.IntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_('ARES study code'),
+        validators=[MinValueValidator(1), MaxValueValidator(9999)],
+    )
+
+    ARES_GRACA = models.IntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_('ARES-GRACA'),
+        validators=[MinValueValidator(1), MaxValueValidator(9999)],
+    )
+
+    ARES_ability = models.IntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_('ARES ability'),
+        validators=[MinValueValidator(1), MaxValueValidator(9999)],
+
+    )
+
+    web_re_registration = models.BooleanField(
+        default=True,
+        verbose_name=_('Web re-registration'),
+    )
+
     class Meta:
         verbose_name = _("Education group year")
         unique_together = ('education_group', 'academic_year')
@@ -502,7 +546,7 @@ class EducationGroupYear(SerializableModel):
     @property
     def verbose_duration(self):
         if self.duration and self.duration_unit:
-            return "{} {}".format(self.duration, _(self.duration_unit))
+            return "{} {}".format(self.duration, self.get_duration_unit_display())
         return ""
 
     def get_absolute_url(self):

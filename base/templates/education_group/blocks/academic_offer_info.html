@@ -1,7 +1,5 @@
-{% extends "education_group/tab_identification.html" %}
-{% load i18n %}
-{% load format %}
-{% load staticfiles education_group %}
+{% load staticfiles %}
+{% load i18n education_group %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -25,23 +23,33 @@
     * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
-{% block details %}
-    {% with  parent=parent_training %}
+
+<div class="panel panel-default">
+    <div class="panel-body">
         <div class="row">
-            <div class="col-md-7" style="margin-top: 10px">
-                {% include 'education_group/blocks/informations.html' %}
+            <div class="col-md-4">
+                <label>{% trans 'ARES study code' %}</label><br>
+                {{ education_group_year.ARES_study | default_if_none:'' }}
             </div>
-            <div class="col-md-5" style="margin-top: 10px">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        {% dl_with_parent "acronym" education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") %}
-                        {% dl_with_parent "main_teaching_campus" %}
-                    </div>
-                </div>
-                {% include "blocks/panel/reversion.html" %}
-
-
+            <div class="col-md-4">
+                <label>{% trans 'ARES-GRACA' %}</label><br>
+                {{ education_group_year.ARES_GRACA | default_if_none:'' }}
+            </div>
+            <div class="col-md-4">
+                <label>{% trans 'ARES ability' %}</label><br>
+                {{ education_group_year.ARES_ability | default_if_none:'' }}
             </div>
         </div>
-    {% endwith %}
-{% endblock %}
+        <br>
+        <div class="row">
+            <div class="col-md-4">
+                <label>{% trans 'Co-graduation' %}</label><br>
+                {{ education_group_year.co_graduation | default_if_none:'' }}
+            </div>
+            <div class="col-md-4">
+                <label>{% trans 'Co-graduation coefficient' %}</label><br>
+                {{ education_group_year.co_graduation_coefficient | default_if_none:'' }}
+            </div>
+        </div>
+    </div>
+</div>

@@ -141,6 +141,8 @@ def process_section(context, education_group_year, item):
         return get_skills_and_achievements(education_group_year, context.language)
     elif item == business.EVALUATION_KEY:
         return get_evaluation(education_group_year, context.language)
+    elif item == business.CONTACTS_KEY:
+        return get_contacts(education_group_year, context.language)
     else:
         text_label = TextLabel.objects.filter(entity=OFFER_YEAR, label=item).first()
         if text_label:
@@ -419,5 +421,18 @@ def get_skills_and_achievements(education_group_year, language_code):
             'intro': intro_extra_content.get('skills_and_achievements_introduction') or None,
             'blocs': achievements,
             'extra': intro_extra_content.get('skills_and_achievements_additional_text') or None
+        }
+    }
+
+
+def get_contacts(education_group_year, language_code):
+    contacts = business.get_contacts_group_by_types(education_group_year, language_code)
+
+    return {
+        'id': business.CONTACTS_KEY,
+        'label': business.CONTACTS_KEY,
+        'content': {
+            'entity': None,
+            'contacts': contacts
         }
     }

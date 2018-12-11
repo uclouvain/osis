@@ -27,9 +27,11 @@ from django.conf import settings
 from django.db.models import QuerySet
 from django.test import TestCase
 
+from base.models.enums.publication_contact_type import PublicationContactType
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_detailed_achievement import EducationGroupDetailedAchievementFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupCommonFactory
+from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from cms.enums import entity_name
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
@@ -169,3 +171,69 @@ class GetEvaluationTestCase(TestCase):
     def test_get__common_evaluation_no_english_version(self):
         with self.assertRaises(TranslatedText.DoesNotExist):
             business.get_common_evaluation_text(self.education_group_year, settings.LANGUAGE_CODE_EN)
+
+
+class GetContactsGroupByTypesTestCase(TestCase):
+    def setUp(self):
+        self.education_group_year = EducationGroupYearFactory()
+
+        self.academic_responsible_1 = EducationGroupPublicationContactFactory(
+            type=PublicationContactType.ACADEMIC_RESPONSIBLE.name,
+            education_group_year=self.education_group_year,
+            order=0
+        )
+        self.academic_responsible_2 = EducationGroupPublicationContactFactory(
+            type=PublicationContactType.ACADEMIC_RESPONSIBLE.name,
+            education_group_year=self.education_group_year,
+            order=1
+        )
+
+    def test_get_contacts_group_by_types_no_data(self):
+        education_group_year = EducationGroupYearFactory()
+        self.assertDictEqual(
+            business.get_contacts_group_by_types(education_group_year, settings.LANGUAGE_CODE_FR),
+            {}
+        )
+
+    def test_get_contacts_group_by_types_assert_order(self):
+        results = business.get_contacts_group_by_types(self.education_group_year, settings.LANGUAGE_CODE_FR)
+
+        self.assertIsInstance(results, dict)
+        self.assertTrue(results[PublicationContactType.ACADEMIC_RESPONSIBLE.name.lower()])
+
+        academic_responsibles = results[PublicationContactType.ACADEMIC_RESPONSIBLE.name.lower()]
+        self.assertIsInstance(academic_responsibles, list)
+        self.assertEqual(len(academic_responsibles), 2)
+
+        self.assertEqual(academic_responsibles[0]['email'], self.academic_responsible_1.email)
+        self.assertEqual(academic_responsibles[1]['email'], self.academic_responsible_2.email)
+
+        # Swap result...
+        self.academic_responsible_2.up()
+
+        results = business.get_contacts_group_by_types(self.education_group_year, settings.LANGUAGE_CODE_FR)
+        academic_responsibles = results[PublicationContactType.ACADEMIC_RESPONSIBLE.name.lower()]
+        self.assertEqual(academic_responsibles[0]['email'], self.academic_responsible_2.email)
+        self.assertEqual(academic_responsibles[1]['email'], self.academic_responsible_1.email)
+
+    def test_get_contacts_group_by_types_assert_french_returned(self):
+        results = business.get_contacts_group_by_types(self.education_group_year, settings.LANGUAGE_CODE_FR)
+        academic_responsibles = results[PublicationContactType.ACADEMIC_RESPONSIBLE.name.lower()]
+        self.assertEqual(academic_responsibles[0]['role'], self.academic_responsible_1.role_fr)
+        self.assertEqual(academic_responsibles[1]['role'], self.academic_responsible_2.role_fr)
+
+    def test_get_contacts_group_by_types_assert_english_returned(self):
+        results = business.get_contacts_group_by_types(self.education_group_year, settings.LANGUAGE_CODE_EN)
+        academic_responsibles = results[PublicationContactType.ACADEMIC_RESPONSIBLE.name.lower()]
+        self.assertEqual(academic_responsibles[0]['role'], self.academic_responsible_1.role_en)
+        self.assertEqual(academic_responsibles[1]['role'], self.academic_responsible_2.role_en)
+
+    def test_get_contacts_group_by_types_assert_empty_str_as_null(self):
+        self.academic_responsible_1.role_fr = ''
+        self.academic_responsible_1.description = ''
+        self.academic_responsible_1.save()
+
+        results = business.get_contacts_group_by_types(self.education_group_year, settings.LANGUAGE_CODE_FR)
+        academic_responsibles = results[PublicationContactType.ACADEMIC_RESPONSIBLE.name.lower()]
+        self.assertIsNone(academic_responsibles[0]['role'])
+        self.assertIsNone(academic_responsibles[0]['description'])

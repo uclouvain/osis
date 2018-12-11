@@ -25,10 +25,12 @@
 ##############################################################################
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, EducationGroupYearModelForm
 from base.models.enums import education_group_categories
+from django.utils.translation import ugettext_lazy as _
 
 
 class GroupYearModelForm(EducationGroupYearModelForm):
     category = education_group_categories.GROUP
+    category_text = _(dict(education_group_categories.CATEGORIES)[category])
 
     class Meta(EducationGroupYearModelForm.Meta):
         fields = (

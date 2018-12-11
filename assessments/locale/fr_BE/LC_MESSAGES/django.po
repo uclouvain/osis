@@ -808,7 +808,7 @@ msgstr "Status"
 
 #: views/upload_xls_utils.py:288
 msgid "Student not registered for exam"
-msgstr "Etudiant non enregistré pour examen"
+msgstr "L'étudiant n'est plus inscrit à l'examen"
 
 #: business/score_encoding_export.py:164
 msgid "Students deliberated are not shown"
