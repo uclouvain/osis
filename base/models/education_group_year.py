@@ -455,28 +455,6 @@ class EducationGroupYear(SerializableModel):
         validators=[MinValueValidator(1), MaxValueValidator(9999)],
     )
 
-    ARES_study = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_('ARES study code'),
-        validators=[MinValueValidator(1), MaxValueValidator(9999)],
-    )
-
-    ARES_GRACA = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_('ARES-GRACA'),
-        validators=[MinValueValidator(1), MaxValueValidator(9999)],
-    )
-
-    ARES_ability = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_('ARES ability'),
-        validators=[MinValueValidator(1), MaxValueValidator(9999)],
-
-    )
-
     web_re_registration = models.BooleanField(
         default=True,
         verbose_name=_('Web re-registration'),
