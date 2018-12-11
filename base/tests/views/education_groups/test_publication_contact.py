@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import datetime
 from unittest import mock
 from http import HTTPStatus
 
@@ -32,9 +33,9 @@ from django.http import HttpResponseForbidden
 
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.enums.publication_contact_type import PublicationContactType
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
-from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory
 from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 
@@ -186,7 +187,8 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
             self.training.pk,
             self.training.pk,
         ])
-
+        ac = AcademicYearFactory(year=datetime.today().year)
+        EducationGroupYearCommonFactory(academic_year=ac)
         response = self.client.post(self.url_delete, follow=True)
         self.assertRedirects(response, http_referer)
         with self.assertRaises(EducationGroupPublicationContact.DoesNotExist):
