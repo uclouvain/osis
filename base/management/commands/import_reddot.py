@@ -98,44 +98,41 @@ def create_common_offer_for_academic_year(year):
             _update_or_create_common_offer(
                 academic_year,
                 acronym,
-                education_group_year,
                 offer
             )
         else:
             education_group_year.delete()
 
 
-def _update_or_create_common_offer(academic_year, acronym, education_group_year, offer):
+def _update_or_create_common_offer(academic_year, acronym, offer):
     entity_ucl = Entity.objects.get(entityversion__acronym='UCL', organization__type=MAIN)
     education_group_type = EducationGroupType.objects.get(
         name=offer['name'],
         category=offer['category']
     )
-    education_group_year = education_group_year.first()
-    if not education_group_year:
+
+    education_group = EducationGroup.objects.filter(educationgroupyear__acronym=acronym)
+    if len(education_group) == 0:
         education_group = EducationGroup.objects.create(
-            start_year=academic_year.year,
-            end_year=academic_year.year + 1
-        )
-        EducationGroupYear.objects.create(
-            academic_year=academic_year,
-            education_group=education_group,
-            acronym=acronym,
-            title=acronym,
-            education_group_type=education_group_type,
-            title_english=acronym,
-            management_entity=entity_ucl,
-            administration_entity=entity_ucl,
-            partial_acronym=acronym
+            start_year=2017,
+            end_year=None
         )
     else:
-        education_group_year.title = acronym
-        education_group_year.title_english = acronym
-        education_group_year.education_group_type = education_group_type
-        education_group_year.management_entity = entity_ucl
-        education_group_year.administration_entity = entity_ucl
-        education_group_year.partial_acronym = acronym
-        education_group_year.save()
+        education_group = education_group.first()
+
+    EducationGroupYear.objects.update_or_create(
+        academic_year=academic_year,
+        education_group=education_group,
+        acronym=acronym,
+        education_group_type=education_group_type,
+        defaults={
+            'management_entity': entity_ucl,
+            'administration_entity': entity_ucl,
+            'title': acronym,
+            'title_english': acronym,
+            'partial_acronym': acronym
+        }
+    )
 
 
 def get_text_label(entity, label):
@@ -171,22 +168,7 @@ def import_offer_and_items(item, education_group_year, mapping_label_text_label,
 
 
 def _import_skills_and_achievements(skills_achievements, education_group_year, context):
-    for label, data in skills_achievements.items():
-        if label in SKILLS_AND_ACHIEVEMENTS_CMS_DATA:
-            text_label = get_text_label(context.entity, label)
-            TranslatedText.objects.update_or_create(
-                entity=context.entity,
-                reference=education_group_year.id,
-                text_label=text_label,
-                language=context.language,
-                defaults={'text': data}
-            )
-        elif label == SKILLS_AND_ACHIEVEMENTS_AA_DATA:
-            _import_general_achievements(
-                skills_achievements[SKILLS_AND_ACHIEVEMENTS_AA_DATA],
-                education_group_year,
-                context,
-            )
+    return
 
 
 def _import_general_achievements(achievements, education_group_year, context):
