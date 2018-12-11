@@ -5287,6 +5287,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "University Bachelors"
-#~ msgstr "Bacheliers universitaires"

@@ -5125,12 +5125,3 @@ msgstr ""
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr ""
-
-# TODO
-#, fuzzy
-#~| msgid "acronym_rules"
-#~ msgid "acronym"
-#~ msgstr ""
-#~ "Site with one letter\n"
-#~ "Acronym with min 2 et max 4 letters\n"
-#~ "Number Code with 4 digit"
