@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from _decimal import Decimal
 from collections import OrderedDict
 
 from django import forms
@@ -31,7 +32,6 @@ from django.db.models import Prefetch
 from django.forms import formset_factory, modelformset_factory
 from django.utils.translation import ugettext_lazy as _
 
-from base.business.learning_unit_year_with_context import ENTITY_TYPES_VOLUME
 from base.business.learning_units import edition
 from base.business.learning_units.edition import check_postponement_conflict_report_errors
 from base.forms.common import STEP_HALF_INTEGER
@@ -39,6 +39,7 @@ from base.forms.utils.emptyfield import EmptyField
 from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT, COMPONENT_TYPES
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY, \
     CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
 from base.models.learning_component_year import LearningComponentYear
@@ -104,7 +105,7 @@ class VolumeEditionForm(forms.Form):
                                                    _('Planned classes'))
 
         # Append dynamic fields
-        entities_to_add = [entity for entity in ENTITY_TYPES_VOLUME if entity in self.entities]
+        entities_to_add = [entity for entity in REQUIREMENT_ENTITIES if entity in self.entities]
         for i, key in enumerate(entities_to_add):
             entity = self.entities[key]
             self.fields["volume_" + key.lower()] = VolumeField(
@@ -132,6 +133,13 @@ class VolumeEditionForm(forms.Form):
         Also, prevent the faculty user from putting a volume if its value was 0.
         """
         cleaned_data = super().clean()
+
+        volume_q1 = self.cleaned_data.get("volume_q1") or 0
+        volume_q2 = self.cleaned_data.get("volume_q2") or 0
+        volume_total = self.cleaned_data.get("volume_total") or 0
+
+        if volume_total != volume_q1 + volume_q2:
+            self.add_error("volume_total", _('Vol_tot is not equal to vol_q1 + vol_q2'))
 
         if self.is_faculty_manager:
 
@@ -335,6 +343,15 @@ class SimplifiedVolumeForm(forms.ModelForm):
                     self.add_error("hourly_volume_partial_q1", _("The volume can not be set to 0."))
                 if self.cleaned_data.get("hourly_volume_partial_q2") == 0:
                     self.add_error("hourly_volume_partial_q2", _("The volume can not be set to 0."))
+
+        volume_q1 = self.cleaned_data.get("hourly_volume_partial_q1") or 0
+        volume_q2 = self.cleaned_data.get("hourly_volume_partial_q2") or 0
+        volume_total = self.cleaned_data.get("hourly_volume_total_annual") or 0
+
+        if volume_q1+volume_q2 != volume_total:
+            self.add_error("hourly_volume_total_annual", _('Vol_tot is not equal to vol_q1 + vol_q2'))
+            self.add_error("hourly_volume_partial_q1", "")
+            self.add_error("hourly_volume_partial_q2", "")
 
         return cleaned_data
 

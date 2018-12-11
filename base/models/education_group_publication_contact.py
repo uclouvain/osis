@@ -23,6 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 
 from django.db import models
@@ -32,16 +35,47 @@ from ordered_model.models import OrderedModel
 from base.models.enums.publication_contact_type import PublicationContactType
 
 
+ROLE_REQUIRED_FOR_TYPES = (
+    PublicationContactType.JURY_MEMBER.name,
+    PublicationContactType.OTHER_CONTACT.name,
+)
+
+
+class EducationGroupPublicationQuerySet(models.QuerySet):
+    def annotate_text(self, language_code):
+        return self.annotate(
+            role_text=F('role_fr') if language_code == settings.LANGUAGE_CODE_FR else F('role_en'),
+        )
+
+
 class EducationGroupPublicationContactAdmin(OrderedModelAdmin):
-    list_display = ('education_group_year', 'type', 'role', 'email', 'order', 'move_up_down_links',)
+    list_display = ('education_group_year', 'type', 'role_fr', 'role_en', 'email', 'order', 'move_up_down_links',)
     readonly_fields = ['order']
-    search_fields = ['education_group_year__acronym', 'role', 'email']
+    search_fields = ['education_group_year__acronym', 'role_fr', 'role_en', 'email']
+    raw_id_fields = ('education_group_year', )
 
 
 class EducationGroupPublicationContact(OrderedModel):
-    role = models.CharField(max_length=100, default='', blank=True)
+    role_fr = models.CharField(
+        max_length=255,
+        default='',
+        blank=True,
+        verbose_name=_('role in french')
+    )
+    role_en = models.CharField(
+        max_length=255,
+        default='',
+        blank=True,
+        verbose_name=_('role in english')
+    )
     email = models.EmailField(
         verbose_name=_('email'),
+    )
+    description = models.CharField(
+        max_length=255,
+        default='',
+        blank=True,
+        verbose_name=_('description')
     )
     type = models.CharField(
         max_length=100,
@@ -52,5 +86,18 @@ class EducationGroupPublicationContact(OrderedModel):
     education_group_year = models.ForeignKey('EducationGroupYear')
     order_with_respect_to = ('education_group_year', 'type', )
 
+    objects = EducationGroupPublicationQuerySet.as_manager()
+
     class Meta:
         ordering = ('education_group_year', 'type', 'order',)
+
+    def clean(self):
+        super().clean()
+
+        if self.type in ROLE_REQUIRED_FOR_TYPES and not all([self.role_fr, self.role_en]):
+            raise ValidationError({
+                'role_fr': _("This field is required."),
+                'role_en': _("This field is required.")
+            })
+        elif self.type not in ROLE_REQUIRED_FOR_TYPES:
+            self.role_fr = self.role_en = ''

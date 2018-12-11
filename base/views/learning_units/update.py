@@ -35,7 +35,6 @@ from django.utils.translation import ugettext_lazy as _
 from waffle.decorators import waffle_flag
 
 from base.business import learning_unit_year_with_context
-from base.business.learning_unit_year_with_context import ENTITY_TYPES_VOLUME
 from base.business.learning_units.edition import ConsistencyError
 from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit.edition_volume import VolumeEditionFormsetContainer
@@ -43,6 +42,7 @@ from base.forms.learning_unit.learning_unit_postponement import LearningUnitPost
 from base.models.entity_version import find_pedagogical_entities_version, \
     find_all_current_entities_version
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views import layout
@@ -153,7 +153,7 @@ def learning_unit_volumes_management(request, learning_unit_year_id, form_type):
 
     context['formsets'] = volume_edition_formset_container.formsets
     context['tab_active'] = 'components'
-    context['entity_types_volume'] = ENTITY_TYPES_VOLUME
+    context['entity_types_volume'] = REQUIREMENT_ENTITIES
     context['luy_url'] = 'learning_unit_components' if form_type == "full" else 'learning_unit'
     context['experimental_phase'] = True
     if request.is_ajax():

@@ -6,10 +6,13 @@ from django.test import TestCase
 
 from base.management.commands import import_reddot
 from base.management.commands.import_reddot import _import_skills_and_achievements, \
-    _get_field_achievement_according_to_language
+    _get_field_achievement_according_to_language, _get_role_field_publication_contact_according_to_language, \
+    _import_contacts
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from cms.models.text_label import TextLabel
 from cms.models.translated_text_label import TranslatedTextLabel
+from base.models.education_group_publication_contact import EducationGroupPublicationContact
+from base.models.enums.publication_contact_type import PublicationContactType
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_CMS_DATA
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.education_group import EducationGroup
@@ -443,3 +446,73 @@ class ImportSkillsAndAchievementsTest(TestCase):
         # Language not supported
         with self.assertRaises(AttributeError):
             _get_field_achievement_according_to_language('es')
+
+
+class ImportContactsTest(TestCase):
+    def setUp(self):
+        self.contacts_json = {
+            "ACADEMIC_RESPONSIBLE": [
+                {"email": "academic-responsible-1@osis.com", "description": ""},
+                {"email": "academic-responsible-2@osis.com", "description": ""},
+                {"email": "academic-responsible-3@osis.com", "description": ""},
+            ],
+            "JURY_MEMBER": [
+                {"title": "Président de jury", "email": "president@osis.com", "description": ""},
+                {"title": "Secrétaire", "email": "secretaire@osis.com"},
+            ],
+            "OTHER_CONTACT": [
+                {"title": "Personne de contact de la 1re année de bachelier", "email": "contact-1@osis.com"},
+                {"title": "Personne de contact des 2e et 3e années de bachelier", "email": "contact-2@osis.com"},
+            ],
+            "OTHER_ACADEMIC_RESPONSIBLE": []
+        }
+        self.education_group_year = EducationGroupYearFactory()
+
+        Context = collections.namedtuple('Context', 'entity language')
+        self.context = Context(entity='offer_year', language='fr-be')
+
+    def test_import_contacts_case_academic_responsibles(self):
+        _import_contacts(self.contacts_json, self.education_group_year, self.context)
+
+        for idx, academic_responsible in enumerate(self.contacts_json["ACADEMIC_RESPONSIBLE"]):
+            self.assertTrue(
+                EducationGroupPublicationContact.objects.filter(
+                    education_group_year=self.education_group_year,
+                    type=PublicationContactType.ACADEMIC_RESPONSIBLE.name,
+                    order=idx,
+                    role_fr='',
+                    role_en='',
+                    email=academic_responsible['email'],
+                    description=academic_responsible['description']
+                ).exists()
+            )
+
+    def test_import_contacts_case_jury_members(self):
+        _import_contacts(self.contacts_json, self.education_group_year, self.context)
+
+        for idx, jury_member in enumerate(self.contacts_json["JURY_MEMBER"]):
+            self.assertTrue(
+                EducationGroupPublicationContact.objects.filter(
+                    education_group_year=self.education_group_year,
+                    type=PublicationContactType.JURY_MEMBER.name,
+                    order=idx,
+                    role_fr=jury_member['title'],
+                    role_en='',
+                    email=jury_member['email'],
+                    description=jury_member.get('description', '')
+                ).exists()
+            )
+
+    def test_get_role_field_achievement_according_to_language(self):
+        self.assertEqual(
+            _get_role_field_publication_contact_according_to_language(settings.LANGUAGE_CODE_FR),
+            'role_fr',
+        )
+        self.assertEqual(
+            _get_role_field_publication_contact_according_to_language(settings.LANGUAGE_CODE_EN),
+            'role_en',
+        )
+
+        # Language not supported
+        with self.assertRaises(AttributeError):
+            _get_role_field_publication_contact_according_to_language('es')

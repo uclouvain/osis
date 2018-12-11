@@ -24,10 +24,13 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import Prefetch
+from django.db.models import Prefetch, CharField, Case, When
+from django.db.models.functions import Coalesce, Lower
+from django.forms import model_to_dict
 
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
 from cms.enums import entity_name
 from cms.enums.entity_name import OFFER_YEAR
@@ -38,6 +41,7 @@ SKILLS_AND_ACHIEVEMENTS_AA_DATA = 'achievements'
 SKILLS_AND_ACHIEVEMENTS_CMS_DATA = ('skills_and_achievements_introduction', 'skills_and_achievements_additional_text',)
 
 EVALUATION_KEY = 'evaluation'
+CONTACTS_KEY = 'contacts'
 
 
 def get_achievements(education_group_year, language_code):
@@ -116,7 +120,6 @@ def get_evaluation_text(education_group_year, language_code):
 
 
 def get_common_evaluation_text(education_group_year, language_code):
-
     common_education_group_year = EducationGroupYear.objects.look_for_common(
         education_group_type=education_group_year.education_group_type,
         academic_year=education_group_year.academic_year,
@@ -131,3 +134,38 @@ def get_common_evaluation_text(education_group_year, language_code):
     )
 
     return translated_text.text
+
+
+def get_contacts_group_by_types(education_group_year, language_code):
+    qs = EducationGroupPublicationContact.objects.filter(
+        education_group_year=education_group_year
+    ).annotate_text(language_code)\
+     .annotate(
+        # Business rules: Empty str must be converted to null
+        role_value=Case(
+            When(role_text__exact='', then=None),
+            default='role_text',
+            output_field=CharField()
+        ),
+        email_value=Case(
+            When(email__exact='', then=None),
+            default='email',
+            output_field=CharField()
+        ),
+        description_value=Case(
+            When(description__exact='', then=None),
+            default='description',
+            output_field=CharField()
+        ),
+        type_value=Lower('type')
+     ).values('role_value', 'email_value', 'description_value', 'type_value')
+
+    contacts = {}
+    for contact in qs:
+        row = {
+            'role': contact['role_value'],
+            'email': contact['email_value'],
+            'description': contact['description_value']
+        }
+        contacts.setdefault(contact['type_value'], []).append(row)
+    return contacts

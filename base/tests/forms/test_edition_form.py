@@ -88,7 +88,7 @@ class TestVolumeEditionForm(TestCase):
                 initial=component_values,
                 component=component,
                 entities=self.learning_unit_with_context.entities)
-            self.assertTrue(form.is_valid())  # Accept that vol_q1 + vol_q2 is not equal to vol_tot
+            self.assertFalse(form.is_valid())
 
     def test_post_volume_form_wrong_volume_tot_requirement(self):
         for component, component_values in self.learning_unit_with_context.components.items():
@@ -99,7 +99,7 @@ class TestVolumeEditionForm(TestCase):
                 initial=component_values,
                 component=component,
                 entities=self.learning_unit_with_context.entities)
-            self.assertTrue(form.is_valid())  # Accept that vol_tot * cp is not equal to vol_global
+            self.assertFalse(form.is_valid())
 
     def test_post_volume_form_wrong_vol_req_entity(self):
         for component, component_values in self.learning_unit_with_context.components.items():
