@@ -168,7 +168,22 @@ def import_offer_and_items(item, education_group_year, mapping_label_text_label,
 
 
 def _import_skills_and_achievements(skills_achievements, education_group_year, context):
-    return
+    for label, data in skills_achievements.items():
+        if label in SKILLS_AND_ACHIEVEMENTS_CMS_DATA:
+            text_label = get_text_label(context.entity, label)
+            TranslatedText.objects.update_or_create(
+                entity=context.entity,
+                reference=education_group_year.id,
+                text_label=text_label,
+                language=context.language,
+                defaults={'text': data}
+            )
+        elif label == SKILLS_AND_ACHIEVEMENTS_AA_DATA:
+            _import_general_achievements(
+                skills_achievements[SKILLS_AND_ACHIEVEMENTS_AA_DATA],
+                education_group_year,
+                context,
+            )
 
 
 def _import_general_achievements(achievements, education_group_year, context):

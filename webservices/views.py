@@ -157,9 +157,8 @@ def get_intro_or_common_section(context, education_group_year, m_intro, m_common
 
         return insert_section_if_checked(context, egy, text_label)
     elif m_common:
-        egy = EducationGroupYear.objects.get(
-            academic_year=education_group_year.academic_year,
-            acronym='common'
+        egy = EducationGroupYear.objects.get_common(
+            academic_year=education_group_year.academic_year
         )
         text_label = TextLabel.objects.filter(
             entity=OFFER_YEAR,
