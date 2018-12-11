@@ -82,7 +82,7 @@ OFFERS = [
     {'name': MiniTrainingType.DEEPENING.name, 'category': MINI_TRAINING, 'code': ''}
 ]
 
-COMMON_OFFER = ['1BA', '2A', '2CE', '2FC', '2M', '2M1', '2MC', '3CE', '9CE', '']
+COMMON_OFFER = ['1BA', '2A', '2M', '2MC']
 
 
 def create_common_offer_for_academic_year(year):
@@ -415,7 +415,6 @@ class Command(BaseCommand):
 
     def load_offers(self):
         labels = set(chain.from_iterable(o.get('info', {}).keys() for o in self.json_content))
-
         Context = collections.namedtuple('Context', 'entity language')
         context = Context(entity='offer_year', language=self.iso_language)
 
@@ -530,22 +529,23 @@ class Command(BaseCommand):
         for key, value in self.json_content.items():
             offer_type, text_label = key.split('.')
 
-            education_group_year = EducationGroupYear.objects.get(
-                academic_year=academic_year,
-                acronym='common-{}'.format(offer_type)
-            )
+            if offer_type.upper() in COMMON_OFFER:
+                education_group_year = EducationGroupYear.objects.get(
+                    academic_year=academic_year,
+                    acronym='common-{}'.format(offer_type)
+                )
 
-            admission_condition, created = AdmissionCondition.objects.get_or_create(
-                education_group_year=education_group_year)
+                admission_condition, created = AdmissionCondition.objects.get_or_create(
+                    education_group_year=education_group_year)
 
-            if text_label in COMMON_FIELDS:
-                self.set_admission_condition_value(admission_condition, text_label, value)
-            elif text_label == 'introduction':
-                self.set_admission_condition_value(admission_condition, 'standard', value)
-            else:
-                raise Exception('This case is not handled %s' % text_label)
+                if text_label in COMMON_FIELDS:
+                    self.set_admission_condition_value(admission_condition, text_label, value)
+                elif text_label == 'introduction':
+                    self.set_admission_condition_value(admission_condition, 'standard', value)
+                else:
+                    raise Exception('This case is not handled %s' % text_label)
 
-            admission_condition.save()
+                admission_condition.save()
 
     def set_admission_condition_value(self, admission_condition, field, value):
         setattr(admission_condition, 'text_' + field + self.suffix_language, value)
