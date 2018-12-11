@@ -58,7 +58,6 @@ def attach_from_cache(parent):
     if selected_data:
         kwargs = {'parent': parent}
         if selected_data['modelname'] == LEARNING_UNIT_YEAR:
-            # TODO check if can attach learning units
             luy = LearningUnitYear.objects.get(pk=selected_data['id'])
             if not parent.education_group_type.learning_unit_child_allowed:
                 raise IncompatiblesTypesException(
