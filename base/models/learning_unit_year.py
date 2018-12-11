@@ -127,7 +127,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('Code'),
                                validators=[RegexValidator(LEARNING_UNIT_ACRONYM_REGEX_ALL)])
     specific_title = models.CharField(max_length=255, blank=True, null=True,
-                                      verbose_name=_('English title proper'))
+                                      verbose_name=_('French title proper'))
     specific_title_english = models.CharField(max_length=250, blank=True, null=True,
                                               verbose_name=_('English title proper'))
     subtype = models.CharField(max_length=50, choices=learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
