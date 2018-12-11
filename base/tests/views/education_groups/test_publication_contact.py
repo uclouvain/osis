@@ -50,7 +50,9 @@ CREATE_URL_NAME = "publication_contact_create"
 
 class PublicationContactViewSetupTest(TestCase):
     def setUp(self):
+        # Common offer must exist
         self.academic_year = create_current_academic_year()
+        EducationGroupYearCommonFactory(academic_year=self.academic_year)
 
         self.training = TrainingFactory(academic_year=self.academic_year)
         self.publication_contact = EducationGroupPublicationContactFactory(
@@ -191,8 +193,6 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
             self.training.pk,
             self.training.pk,
         ])
-        ac = AcademicYearFactory(year=datetime.date.today().year)
-        EducationGroupYearCommonFactory(academic_year=ac)
         response = self.client.post(self.url_delete, follow=True)
         self.assertRedirects(response, http_referer)
         with self.assertRaises(EducationGroupPublicationContact.DoesNotExist):
