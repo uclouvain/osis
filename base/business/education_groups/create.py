@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import re
-import uuid
 from collections import defaultdict
 
 from base.business.utils import model
