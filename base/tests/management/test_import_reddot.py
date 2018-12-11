@@ -76,13 +76,14 @@ class ImportReddotTestCase(TestCase):
         context = Context(entity='offer_year', language=self.command.iso_language)
         from base.management.commands.import_reddot import get_mapping_label_texts
         result = get_mapping_label_texts(context, labels)
-        text_label = TextLabel.objects.get(
+        text_label = TextLabel.objects.filter(
             entity='offer_year',
             label='evaluation',
             published=True
         )
+        self.assertTrue(text_label.exists())
 
-        self.assertEqual(result['evaluation'], text_label)
+        self.assertEqual(result['evaluation'], text_label.first())
 
     def test_load_admission_conditions_for_bachelor(self):
         education_group_year_common = EducationGroupYearCommonBachelorFactory()
@@ -120,6 +121,66 @@ class ImportReddotTestCase(TestCase):
                          info['ca_bacs_examen_langue']['text-common'])
         self.assertEqual(admission_condition.text_ca_bacs_cond_speciales,
                          info['ca_bacs_cond_speciales']['text-common'])
+
+    def test_load_admission_conditions_generic(self):
+        item = {
+            "acronym": "sged2mc",
+            "year": 2018,
+            "type": "offer",
+            "info": {
+                "diplomas": [
+                    {
+                        "external_id": "id",
+                        "section": "university_bachelors",
+                        "title": "ucl_bachelors",
+                        "type": "table",
+                        "diploma": "Bachelier en théologie ou en sciences religieuses",
+                        "conditions": "COND",
+                        "access": "direct_access",
+                        "remarks": "REM"
+                    }
+                ],
+                "texts": {
+                    "alert_message": {},
+                    "introduction": {
+                        "text": "TestText"
+                    },
+                    "ca_cond_generales": {}
+                }
+            }
+        }
+        education_group_year = EducationGroupYearFactory()
+        self.command.load_admission_conditions_generic(
+            education_group_year.acronym,
+            item,
+            education_group_year.academic_year.year
+        )
+
+        edy = EducationGroupYear.objects.filter(
+            academic_year=education_group_year.academic_year,
+            acronym=education_group_year.acronym
+        ).first()
+
+        admission_condition = AdmissionCondition.objects.get(education_group_year=edy)
+        info = item['info']
+        line = AdmissionConditionLine.objects.get(admission_condition=admission_condition)
+        print(info)
+        print(vars(admission_condition))
+        print(vars(line))
+        self.assertEqual(admission_condition.text_free,
+                         info['texts']['introduction']['text'])
+        self.assertEqual(line.section,
+                         info['diplomas'][0]['title'])
+        self.assertEqual(line.external_id,
+                         info['diplomas'][0]['external_id'])
+        self.assertEqual(line.access,
+                         info['diplomas'][0]['access'])
+        self.assertEqual(line.diploma,
+                         info['diplomas'][0]['diploma'])
+        self.assertEqual(line.conditions,
+                         info['diplomas'][0]['conditions'])
+        self.assertEqual(line.remarks,
+                         info['diplomas'][0]['remarks'])
 
     def test_load_admission_conditions_common(self):
         item = {
