@@ -69,4 +69,3 @@ class Hops(SerializableModel):
 
     def __str__(self):
         return str(self.ARES_study) if self.ARES_study else ''
-
