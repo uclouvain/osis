@@ -49,6 +49,7 @@ from base.models import external_learning_unit_year
 from base.models import external_learning_unit_year
 from base.models import external_offer
 from base.models import group_element_year
+from base.models import hops
 from base.models import learning_achievement
 from base.models import learning_class_year
 from base.models import learning_component_year
