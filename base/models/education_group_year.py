@@ -89,6 +89,9 @@ class EducationGroupYearManager(SerializableModelManager):
     def look_for_common(self, **kwargs):
         return self.filter(acronym__startswith='common', **kwargs)
 
+    def get_common(self, **kwargs):
+        return self.get(acronym='common', **kwargs)
+
 
 class EducationGroupYear(SerializableModel):
     objects = EducationGroupYearManager()
