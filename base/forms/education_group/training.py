@@ -199,8 +199,9 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
 
     def save(self):
         egy_instance = super().save()
-        create_initial_group_element_year_structure([egy_instance,
-                                                     *self.education_group_year_postponed])
+        self.structure = create_initial_group_element_year_structure(
+            [egy_instance, *self.education_group_year_postponed]
+        )
         return egy_instance
 
 

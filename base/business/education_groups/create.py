@@ -46,67 +46,96 @@ def create_initial_group_element_year_structure(parent_egys):
     if not parent_egys:
         return children_created
 
+    first_parent = parent_egys[0]
+    other_parents = parent_egys[1:]
+
     auth_rels = AuthorizedRelationship.objects.filter(
-        parent_type=parent_egys[0].education_group_type,
+        parent_type=first_parent.education_group_type,
         min_count_authorized=count_constraint.ONE
     ).only('child_type').select_related('child_type')
+
     for relationship in auth_rels:
         child_education_group_type = relationship.child_type
 
         validation_rule_title = _get_validation_rule("title", child_education_group_type)
         validation_rule_partial_acronym = _get_validation_rule("partial_acronym", child_education_group_type)
 
-        common_partial_acronym = _compose_child_partial_acronym(
-            parent_egys[0],
+        grp_ele = _get_or_create_branch(
+            child_education_group_type,
+            validation_rule_title.initial_value,
             validation_rule_partial_acronym.initial_value,
-            child_education_group_type
+            first_parent
         )
-        last_child = None
-        for parent_egy in parent_egys:
-            grp_ele = create_child(
-                child_education_group_type,
-                validation_rule_title.initial_value,
-                common_partial_acronym,
-                parent_egy,
-                last_child
-            )
-            last_child = grp_ele.child_branch
+        children_created[first_parent.id].append(grp_ele)
+        for parent_egy in other_parents:
+            grp_ele = _duplicate_branch(child_education_group_type, parent_egy, grp_ele.child_branch)
             children_created[parent_egy.id].append(grp_ele)
     return children_created
 
 
-def create_child(child_education_group_type, title_initial_value, partial_acronym, parent_egy, last_child):
+def _get_or_create_branch(child_education_group_type, title_initial_value, partial_acronym_initial_value, parent_egy):
     try:
-        existing_children = GroupElementYear.objects.get(
+        existing_grp_ele = GroupElementYear.objects.get(
             parent=parent_egy,
             child_branch__education_group_type=child_education_group_type,
         )
     except GroupElementYear.DoesNotExist:
         pass
     else:
-        return existing_children
+        return existing_grp_ele
 
     year = parent_egy.academic_year.year
     child_eg = EducationGroup(start_year=year, end_year=year)
     child_eg.save()
 
-    if last_child:
-        child_egy = last_child
-        child_egy.id = None
-        child_egy.uuid = uuid.uuid4()
-        child_egy.education_group = child_eg
-    else:
-        child_egy = EducationGroupYear(
-            academic_year=parent_egy.academic_year,
-            main_teaching_campus=parent_egy.main_teaching_campus,
-            management_entity=parent_egy.management_entity,
-            education_group_type=child_education_group_type,
-            title=_compose_child_title(title_initial_value, parent_egy.acronym),
-            partial_acronym=partial_acronym,
-            acronym=_compose_child_acronym(title_initial_value, parent_egy.acronym),
-            education_group=child_eg
-        )
+    child_egy = EducationGroupYear(
+        academic_year=parent_egy.academic_year,
+        main_teaching_campus=parent_egy.main_teaching_campus,
+        management_entity=parent_egy.management_entity,
+        education_group_type=child_education_group_type,
+        title="{child_title} {parent_acronym}".format(
+            child_title=title_initial_value,
+            parent_acronym=parent_egy.acronym
+        ),
+        partial_acronym=_generate_child_partial_acronym(
+            parent_egy,
+            partial_acronym_initial_value,
+            child_education_group_type
+        ),
+        acronym="{child_title}{parent_acronym}".format(
+            child_title=title_initial_value.replace(" ", "").upper(),
+            parent_acronym=parent_egy.acronym
+        ),
+        education_group=child_eg
+    )
     child_egy.save()
+
+    grp_ele = GroupElementYear(parent=parent_egy, child_branch=child_egy)
+    grp_ele.save()
+    return grp_ele
+
+
+def _duplicate_branch(child_education_group_type, parent_egy, last_child):
+    try:
+        existing_grp_ele = GroupElementYear.objects.get(
+            parent=parent_egy,
+            child_branch__education_group_type=child_education_group_type,
+        )
+    except GroupElementYear.DoesNotExist:
+        pass
+    else:
+        return existing_grp_ele
+
+    year = parent_egy.academic_year.year
+    child_eg = EducationGroup(start_year=year, end_year=year)
+    child_eg.save()
+
+    child_egy = last_child
+    child_egy.id = None
+    child_egy.uuid = uuid.uuid4()
+    child_egy.education_group = child_eg
+    child_egy.save()
+
     grp_ele = GroupElementYear(parent=parent_egy, child_branch=child_egy)
     grp_ele.save()
     return grp_ele
@@ -121,20 +150,9 @@ def _get_validation_rule(field_name, education_group_type):
     return ValidationRule.objects.get(pk=egy_title_reference)
 
 
-def _compose_child_title(child_title_initial_value, parent_acronym):
-    return "{child_title} {parent_acronym}".format(child_title=child_title_initial_value, parent_acronym=parent_acronym)
-
-
-def _compose_child_acronym(child_title_initial_value, parent_acronym):
-    return "{child_title}{parent_acronym}".format(
-        child_title=child_title_initial_value.replace(" ", "").upper(),
-        parent_acronym=parent_acronym
-    )
-
-
-def _compose_child_partial_acronym(parent, child_initial_value, child_type):
+def _generate_child_partial_acronym(parent, child_initial_value, child_type):
     try:
-        previous_children = GroupElementYear.objects.get(
+        previous_grp_ele = GroupElementYear.objects.get(
             parent__education_group=parent.education_group,
             parent__academic_year__year__in=[parent.academic_year.year - 1, parent.academic_year.year],
             child_branch__education_group_type=child_type
@@ -142,7 +160,7 @@ def _compose_child_partial_acronym(parent, child_initial_value, child_type):
     except GroupElementYear.DoesNotExist:
         pass
     else:
-        return previous_children.child_branch.partial_acronym
+        return previous_grp_ele.child_branch.partial_acronym
 
     reg_parent_partial_acronym = re.compile(REGEX_TRAINING_PARTIAL_ACRONYM)
     match_result = reg_parent_partial_acronym.search(parent.partial_acronym)
