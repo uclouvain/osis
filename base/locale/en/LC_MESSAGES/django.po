@@ -3,11 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:192
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:193
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-10 16:22+0100\n"
+"POT-Creation-Date: 2018-12-11 11:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +33,7 @@ msgstr ""
 msgid "%(col_name)s has been already modified."
 msgstr ""
 
-#: forms/learning_unit/learning_unit_postponement.py:339
+#: forms/learning_unit/learning_unit_postponement.py:341
 #: tests/forms/test_learning_unit_postponement.py:522
 #: tests/forms/test_learning_unit_postponement.py:536
 #: tests/forms/test_learning_unit_postponement.py:560
@@ -891,7 +893,7 @@ msgstr ""
 msgid "Common title"
 msgstr ""
 
-#: tests/views/test_learning_unit.py:1378 views/learning_unit.py:301
+#: tests/views/test_learning_unit.py:1381 views/learning_unit.py:301
 msgid "Comparison impossible! No learning unit to compare to"
 msgstr ""
 
@@ -931,7 +933,7 @@ msgid "Confirm your action."
 msgstr ""
 
 #: business/education_groups/postponement.py:171
-#: forms/learning_unit/learning_unit_postponement.py:287
+#: forms/learning_unit/learning_unit_postponement.py:289
 #, python-format
 msgid "Consistency error in %(academic_year)s : %(error)s"
 msgstr ""
@@ -1328,7 +1330,7 @@ msgstr ""
 #: business/learning_units/edition.py:433
 #: business/learning_units/xls_comparison.py:65
 #: business/learning_units/xls_comparison.py:67
-#: models/learning_unit_year.py:130 models/learning_unit_year.py:132
+#: models/learning_unit_year.py:132
 #: tests/business/learning_units/test_edition.py:161
 #: tests/forms/test_learning_unit_postponement.py:523
 msgid "English title proper"
@@ -1378,7 +1380,7 @@ msgstr ""
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
-#: forms/education_group/training.py:145
+#: forms/education_group/training.py:144
 msgid "Enter text to search"
 msgstr ""
 
@@ -1579,6 +1581,10 @@ msgstr ""
 
 #: templates/education_group/tab_admission_conditions.html:71
 msgid "French language proficiency examination"
+msgstr ""
+
+#: models/learning_unit_year.py:130
+msgid "French title proper"
 msgstr ""
 
 #: templates/education_group/tab_administrative_data.html:51
@@ -1870,7 +1876,7 @@ msgstr ""
 msgid "LU"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:201 tests/views/test_learning_unit.py:463
+#: forms/learning_unit/search_form.py:201 tests/views/test_learning_unit.py:466
 msgid "LU_ERRORS_INVALID_REGEX_SYNTAX"
 msgstr ""
 
@@ -2544,12 +2550,12 @@ msgstr ""
 msgid "One"
 msgstr ""
 
-#: forms/learning_unit/edition_volume.py:140
-#: forms/learning_unit/edition_volume.py:141
-#: forms/learning_unit/edition_volume.py:330
-#: forms/learning_unit/edition_volume.py:331
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:167
+#: forms/learning_unit/edition_volume.py:148
+#: forms/learning_unit/edition_volume.py:149
+#: forms/learning_unit/edition_volume.py:338
+#: forms/learning_unit/edition_volume.py:339
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:169
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:171
 #: tests/forms/test_edition_form.py:319 tests/forms/test_edition_form.py:320
 msgid "One of the partial volumes must have a value to 0."
 msgstr ""
@@ -2670,7 +2676,7 @@ msgstr ""
 msgid "Own components"
 msgstr ""
 
-#: forms/learning_unit/edition_volume.py:84
+#: forms/learning_unit/edition_volume.py:85
 msgid "P.C."
 msgstr ""
 
@@ -2727,8 +2733,8 @@ msgstr ""
 
 #: business/learning_units/xls_comparison.py:81
 #: business/learning_units/xls_comparison.py:91
-#: forms/learning_unit/edition_volume.py:84
-#: forms/learning_unit/edition_volume.py:104
+#: forms/learning_unit/edition_volume.py:85
+#: forms/learning_unit/edition_volume.py:105
 msgid "Planned classes"
 msgstr ""
 
@@ -2999,7 +3005,7 @@ msgstr ""
 msgid "Put in suppression proposal"
 msgstr ""
 
-#: forms/learning_unit/edition_volume.py:65
+#: forms/learning_unit/edition_volume.py:66
 msgid "Q1"
 msgstr ""
 
@@ -3011,7 +3017,7 @@ msgstr ""
 msgid "Q1 or Q2"
 msgstr ""
 
-#: forms/learning_unit/edition_volume.py:71
+#: forms/learning_unit/edition_volume.py:72
 msgid "Q2"
 msgstr ""
 
@@ -3226,7 +3232,7 @@ msgstr ""
 msgid "Search type"
 msgstr ""
 
-#: forms/education_group/training.py:136
+#: forms/education_group/training.py:135
 msgid "Search..."
 msgstr ""
 
@@ -3534,7 +3540,7 @@ msgstr ""
 msgid "The administrative data has been successfully modified"
 msgstr ""
 
-#: forms/learning_unit/edition_volume.py:78
+#: forms/learning_unit/edition_volume.py:79
 #: templates/learning_unit/components.html:51
 #: templates/learning_unit/components_identification.html:36
 msgid "The annual volume must be equal to the sum of the volumes Q1 and Q2"
@@ -3685,7 +3691,7 @@ msgid ""
 msgstr ""
 
 #: business/learning_units/edition.py:483
-#: forms/learning_unit/learning_unit_postponement.py:296
+#: forms/learning_unit/learning_unit_postponement.py:298
 #: tests/business/test_learning_unit_edition.py:958
 #: tests/forms/test_learning_unit_postponement.py:666
 #, python-format
@@ -3694,13 +3700,13 @@ msgid ""
 "year %(academic_year)s"
 msgstr ""
 
-#: tests/views/test_learning_unit.py:1406
-#: tests/views/test_learning_unit.py:1437 views/learning_unit.py:310
+#: tests/views/test_learning_unit.py:1409
+#: tests/views/test_learning_unit.py:1440 views/learning_unit.py:310
 #, python-format
 msgid "The learning unit does not exist for the academic year %(anac)s"
 msgstr ""
 
-#: forms/learning_unit/learning_unit_postponement.py:281
+#: forms/learning_unit/learning_unit_postponement.py:283
 #: views/learning_units/update.py:185
 #, python-format
 msgid "The learning unit has been updated until %(year)s."
@@ -3795,7 +3801,7 @@ msgstr ""
 msgid "The registration form is available at the Secretariat of"
 msgstr ""
 
-#: forms/learning_unit/learning_unit_postponement.py:329
+#: forms/learning_unit/learning_unit_postponement.py:331
 #: tests/forms/test_learning_unit_postponement.py:638
 #, python-format
 msgid ""
@@ -3851,11 +3857,11 @@ msgid ""
 "%(value)s and year %(next_year)s - %(next_value)s"
 msgstr ""
 
-#: forms/learning_unit/edition_volume.py:145
-#: forms/learning_unit/edition_volume.py:147
-#: forms/learning_unit/edition_volume.py:335
-#: forms/learning_unit/edition_volume.py:337
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:179
+#: forms/learning_unit/edition_volume.py:153
+#: forms/learning_unit/edition_volume.py:155
+#: forms/learning_unit/edition_volume.py:343
+#: forms/learning_unit/edition_volume.py:345
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:181
 #: tests/forms/test_edition_form.py:330 tests/forms/test_edition_form.py:340
 msgid "The volume can not be set to 0."
 msgstr ""
@@ -3899,8 +3905,8 @@ msgstr ""
 msgid "This field cannot be set"
 msgstr ""
 
-#: forms/common.py:80 models/education_group_publication_contact.py:88
-#: models/education_group_publication_contact.py:89
+#: forms/common.py:80 models/education_group_publication_contact.py:99
+#: models/education_group_publication_contact.py:100
 #: models/education_group_year.py:670 models/education_group_year.py:691
 #: models/education_group_year.py:693
 #: tests/views/learning_units/proposals/test_creation.py:186
@@ -4003,7 +4009,7 @@ msgstr ""
 msgid "To complete"
 msgstr ""
 
-#: tests/views/test_learning_unit.py:1239 views/learning_units/search.py:80
+#: tests/views/test_learning_unit.py:1242 views/learning_units/search.py:80
 msgid "Too many results! Please be more specific."
 msgstr ""
 
@@ -4216,7 +4222,7 @@ msgstr ""
 
 #: business/learning_units/xls_comparison.py:79
 #: business/learning_units/xls_comparison.py:89
-#: forms/learning_unit/edition_volume.py:77
+#: forms/learning_unit/edition_volume.py:78
 #: templates/learning_unit/components.html:52
 #: templates/learning_unit/components_identification.html:37
 msgid "Vol. annual"
@@ -4229,7 +4235,7 @@ msgstr ""
 msgid "Vol. global"
 msgstr ""
 
-#: models/learning_component_year.py:128
+#: models/learning_component_year.py:129
 #: tests/models/test_learning_unit_year.py:368
 #: tests/models/test_learning_unit_year.py:385
 msgid "Vol_global is not equal to Vol_tot * planned_classes"
@@ -4237,7 +4243,10 @@ msgstr ""
 "The overall volume must be equal to the annual volume multiplied by the "
 "number of classes"
 
-#: models/learning_component_year.py:124
+#: forms/learning_unit/edition_volume.py:142
+#: forms/learning_unit/edition_volume.py:352
+#: models/learning_component_year.py:125
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:195
 #: tests/models/test_learning_unit_year.py:351
 #: tests/models/test_learning_unit_year.py:391
 msgid "Vol_tot is not equal to vol_q1 + vol_q2"
@@ -4257,18 +4266,18 @@ msgstr ""
 msgid "Volume 2"
 msgstr ""
 
-#: forms/learning_unit/edition_volume.py:66
-#: forms/learning_unit/edition_volume.py:81
+#: forms/learning_unit/edition_volume.py:67
+#: forms/learning_unit/edition_volume.py:82
 msgid "Volume Q1"
 msgstr ""
 
-#: forms/learning_unit/edition_volume.py:72
-#: forms/learning_unit/edition_volume.py:81
+#: forms/learning_unit/edition_volume.py:73
+#: forms/learning_unit/edition_volume.py:82
 msgid "Volume Q2"
 msgstr ""
 
-#: forms/learning_unit/edition_volume.py:81
-#: forms/learning_unit/edition_volume.py:103
+#: forms/learning_unit/edition_volume.py:82
+#: forms/learning_unit/edition_volume.py:104
 msgid "Volume total annual"
 msgstr ""
 
@@ -4283,7 +4292,7 @@ msgstr ""
 msgid "Volumes management"
 msgstr ""
 
-#: models/learning_component_year.py:120
+#: models/learning_component_year.py:121
 #: tests/models/test_learning_unit_year.py:350
 #: tests/models/test_learning_unit_year.py:367
 #: tests/models/test_learning_unit_year.py:384
@@ -4518,17 +4527,6 @@ msgid "academic events"
 msgstr ""
 
 # TODO
-#: tests/views/group_element_years/test_detach.py:157
-#: tests/views/group_element_years/test_detach.py:182
-#, fuzzy
-#| msgid "acronym_rules"
-msgid "acronym"
-msgstr ""
-"Site with one letter\n"
-"Acronym with min 2 et max 4 letters\n"
-"Number Code with 4 digit"
-
-# TODO
 #: templates/learning_unit/blocks/form/form_external.html:17
 #: templates/learning_unit/blocks/form/form_external.html:19
 #: templates/learning_unit/simple/creation.html:69
@@ -4745,7 +4743,7 @@ msgstr ""
 msgid "delete education group"
 msgstr ""
 
-#: models/education_group_publication_contact.py:69
+#: models/education_group_publication_contact.py:78
 msgid "description"
 msgstr ""
 
@@ -4757,7 +4755,7 @@ msgstr ""
 msgid "duration unit"
 msgstr ""
 
-#: models/education_group_publication_contact.py:63
+#: models/education_group_publication_contact.py:72
 #: templates/education_group/pdf_content.html:97
 #: templates/my_osis/profile.html:90
 msgid "email"
@@ -4799,15 +4797,15 @@ msgstr "mm/dd/yyyy"
 msgid "has the following prerequisites"
 msgstr ""
 
-#: models/learning_component_year.py:56
+#: models/learning_component_year.py:57
 msgid "hourly volume partial q1"
 msgstr ""
 
-#: models/learning_component_year.py:58
+#: models/learning_component_year.py:59
 msgid "hourly volume partial q2"
 msgstr ""
 
-#: models/learning_component_year.py:54
+#: models/learning_component_year.py:55
 #: tests/forms/test_learning_unit_postponement.py:613
 msgid "hourly volume total annual"
 msgstr ""
@@ -4855,7 +4853,7 @@ msgstr ""
 
 #: business/learning_units/comparison.py:85
 #: business/learning_units/edition.py:478 business/xls.py:37
-#: forms/learning_unit/learning_unit_postponement.py:361
+#: forms/learning_unit/learning_unit_postponement.py:363
 #: models/enums/activity_presence.py:35 models/enums/internship_presence.py:35
 #: templates/blocks/modal/confirmation_modal.html:18
 #: templates/education_group/tab_administrative_data.html:143
@@ -4909,12 +4907,12 @@ msgstr ""
 msgid "person"
 msgstr ""
 
-#: models/learning_component_year.py:132
+#: models/learning_component_year.py:133
 #: tests/models/test_learning_unit_year.py:634
 msgid "planned classes cannot be 0 while volume is greater than 0"
 msgstr ""
 
-#: models/learning_component_year.py:136
+#: models/learning_component_year.py:137
 #: tests/models/test_learning_unit_year.py:652
 msgid "planned classes cannot be greather than 0 while volume is equal to 0"
 msgstr ""
@@ -4963,11 +4961,11 @@ msgstr ""
 msgid "result"
 msgstr ""
 
-#: models/education_group_publication_contact.py:60
+#: models/education_group_publication_contact.py:69
 msgid "role in english"
 msgstr ""
 
-#: models/education_group_publication_contact.py:54
+#: models/education_group_publication_contact.py:63
 msgid "role in french"
 msgstr ""
 
@@ -5009,7 +5007,7 @@ msgstr ""
 msgid "search"
 msgstr ""
 
-#: forms/education_group/training.py:63 models/education_group_year.py:380
+#: forms/education_group/training.py:62 models/education_group_year.py:380
 #: templates/education_group/identification_training_details.html:77
 msgid "secondary domains"
 msgstr ""
@@ -5070,7 +5068,7 @@ msgstr ""
 
 #: business/education_group.py:48 business/learning_units/edition.py:448
 #: business/learning_units/xls_comparison.py:55
-#: models/education_group_publication_contact.py:75
+#: models/education_group_publication_contact.py:84
 #: templates/entity/versions.html:45
 #: templates/learning_unit/blocks/panel/proposal.html:17
 #: templates/learning_unit/summary_list.html:79
@@ -5110,17 +5108,17 @@ msgstr ""
 msgid "validity"
 msgstr ""
 
-#: models/learning_component_year.py:60
+#: models/learning_component_year.py:61
 msgid "volume declared vacant"
 msgstr ""
 
-#: forms/learning_unit/edition_volume.py:102
+#: forms/learning_unit/edition_volume.py:103
 msgid "volume total global"
 msgstr ""
 
 #: business/learning_units/comparison.py:85
 #: business/learning_units/edition.py:478 business/xls.py:37
-#: forms/learning_unit/learning_unit_postponement.py:361
+#: forms/learning_unit/learning_unit_postponement.py:363
 #: models/enums/activity_presence.py:34 models/enums/internship_presence.py:34
 #: templates/blocks/modal/confirmation_modal.html:19
 #: templates/education_group/tab_administrative_data.html:141

@@ -153,8 +153,8 @@ class TestDetachLearningUnitPrerequisite(TestCase):
         messages = [m.message for m in get_messages(response.wsgi_request)]
         self.assertEqual(
             messages[0],
-            _(_("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
-                "acronym": self.luy.acronym})
+            _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
+                "acronym": self.luy.acronym}
         )
         self.assertFalse(mock_delete.called)
 
@@ -178,8 +178,8 @@ class TestDetachLearningUnitPrerequisite(TestCase):
         messages = [m.message for m in get_messages(response.wsgi_request)]
         self.assertEqual(
             messages[0],
-            _(_("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
-                "acronym": self.luy.acronym})
+            _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
+                "acronym": self.luy.acronym}
         )
         self.assertFalse(mock_delete.called)
 
