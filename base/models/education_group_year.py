@@ -482,6 +482,13 @@ class EducationGroupYear(SerializableModel):
         verbose_name=_('Web re-registration'),
     )
 
+    publication_contact_entity = models.ForeignKey(
+        Entity,
+        verbose_name=_("Publication contact entity"),
+        null=True,
+        blank=True,
+    )
+
     class Meta:
         verbose_name = _("Education group year")
         unique_together = ('education_group', 'academic_year')
@@ -568,6 +575,14 @@ class EducationGroupYear(SerializableModel):
         return entity_version.find_entity_version_according_academic_year(
             self.management_entity, self.academic_year
         )
+
+    @cached_property
+    def publication_contact_entity_version(self):
+        if self.publication_contact_entity:
+            return entity_version.find_entity_version_according_academic_year(
+                self.publication_contact_entity, self.academic_year
+            )
+        return None
 
     def parent_by_training(self):
         """

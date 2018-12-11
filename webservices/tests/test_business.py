@@ -201,9 +201,9 @@ class GetContactsGroupByTypesTestCase(TestCase):
         results = business.get_contacts_group_by_types(self.education_group_year, settings.LANGUAGE_CODE_FR)
 
         self.assertIsInstance(results, dict)
-        self.assertTrue(results[PublicationContactType.ACADEMIC_RESPONSIBLE.name.lower()])
+        self.assertTrue(results['academic_responsibles'])
 
-        academic_responsibles = results[PublicationContactType.ACADEMIC_RESPONSIBLE.name.lower()]
+        academic_responsibles = results['academic_responsibles']
         self.assertIsInstance(academic_responsibles, list)
         self.assertEqual(len(academic_responsibles), 2)
 
@@ -214,19 +214,19 @@ class GetContactsGroupByTypesTestCase(TestCase):
         self.academic_responsible_2.up()
 
         results = business.get_contacts_group_by_types(self.education_group_year, settings.LANGUAGE_CODE_FR)
-        academic_responsibles = results[PublicationContactType.ACADEMIC_RESPONSIBLE.name.lower()]
+        academic_responsibles = results['academic_responsibles']
         self.assertEqual(academic_responsibles[0]['email'], self.academic_responsible_2.email)
         self.assertEqual(academic_responsibles[1]['email'], self.academic_responsible_1.email)
 
     def test_get_contacts_group_by_types_assert_french_returned(self):
         results = business.get_contacts_group_by_types(self.education_group_year, settings.LANGUAGE_CODE_FR)
-        academic_responsibles = results[PublicationContactType.ACADEMIC_RESPONSIBLE.name.lower()]
+        academic_responsibles = results['academic_responsibles']
         self.assertEqual(academic_responsibles[0]['role'], self.academic_responsible_1.role_fr)
         self.assertEqual(academic_responsibles[1]['role'], self.academic_responsible_2.role_fr)
 
     def test_get_contacts_group_by_types_assert_english_returned(self):
         results = business.get_contacts_group_by_types(self.education_group_year, settings.LANGUAGE_CODE_EN)
-        academic_responsibles = results[PublicationContactType.ACADEMIC_RESPONSIBLE.name.lower()]
+        academic_responsibles = results['academic_responsibles']
         self.assertEqual(academic_responsibles[0]['role'], self.academic_responsible_1.role_en)
         self.assertEqual(academic_responsibles[1]['role'], self.academic_responsible_2.role_en)
 
@@ -236,6 +236,38 @@ class GetContactsGroupByTypesTestCase(TestCase):
         self.academic_responsible_1.save()
 
         results = business.get_contacts_group_by_types(self.education_group_year, settings.LANGUAGE_CODE_FR)
-        academic_responsibles = results[PublicationContactType.ACADEMIC_RESPONSIBLE.name.lower()]
+        academic_responsibles = results['academic_responsibles']
         self.assertIsNone(academic_responsibles[0]['role'])
         self.assertIsNone(academic_responsibles[0]['description'])
+
+
+class GetContactsIntroTextTestCase(TestCase):
+    def setUp(self):
+        self.education_group_year = EducationGroupYearFactory()
+        self.cms_label_name = business.CONTACT_INTRO_KEY
+
+        text_label = TextLabelFactory(entity=OFFER_YEAR, label=self.cms_label_name)
+        self.contact_intro_fr = TranslatedTextRandomFactory(
+            text_label=text_label,
+            language=settings.LANGUAGE_CODE_FR,
+            reference=self.education_group_year.id,
+            entity=text_label.entity
+        )
+        self.contact_intro_en = TranslatedTextRandomFactory(
+            text_label=text_label,
+            language=settings.LANGUAGE_CODE_EN,
+            reference=self.education_group_year.id,
+            entity=text_label.entity
+        )
+
+    def test_get_contacts_intro_text_case_no_value(self):
+        education_group_year = EducationGroupYearFactory()
+        self.assertIsNone(business.get_contacts_intro_text(education_group_year, settings.LANGUAGE_CODE_FR))
+
+    def test_get_contacts_intro_text_case_french_version(self):
+        intro_text = business.get_contacts_intro_text(self.education_group_year, settings.LANGUAGE_CODE_FR)
+        self.assertEqual(intro_text, self.contact_intro_fr.text)
+
+    def test_get_contacts_intro_text_case_english_version(self):
+        intro_text = business.get_contacts_intro_text(self.education_group_year, settings.LANGUAGE_CODE_EN)
+        self.assertEqual(intro_text, self.contact_intro_en.text)

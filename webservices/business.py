@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import Prefetch, CharField, Case, When
+from django.db.models import Prefetch, CharField, Case, When, Value
 from django.db.models.functions import Coalesce, Lower
 from django.forms import model_to_dict
 
@@ -32,6 +32,8 @@ from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.publication_contact_type import PublicationContactType
+from base.models.utils.utils import get_object_or_none
 from cms.enums import entity_name
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
@@ -42,6 +44,7 @@ SKILLS_AND_ACHIEVEMENTS_CMS_DATA = ('skills_and_achievements_introduction', 'ski
 
 EVALUATION_KEY = 'evaluation'
 CONTACTS_KEY = 'contacts'
+CONTACT_INTRO_KEY = 'contact_intro'
 
 
 def get_achievements(education_group_year, language_code):
@@ -157,7 +160,26 @@ def get_contacts_group_by_types(education_group_year, language_code):
             default='description',
             output_field=CharField()
         ),
-        type_value=Lower('type')
+        type_value=Case(
+            When(
+                type=PublicationContactType.ACADEMIC_RESPONSIBLE.name,
+                then=Value('academic_responsibles')
+            ),
+            When(
+                type=PublicationContactType.OTHER_ACADEMIC_RESPONSIBLE.name,
+                then=Value('other_academic_responsibles'),
+            ),
+            When(
+                type=PublicationContactType.JURY_MEMBER.name,
+                then=Value('jury_members'),
+            ),
+            When(
+                type=PublicationContactType.OTHER_CONTACT.name,
+                then=Value('other_contacts'),
+            ),
+            default=Lower('type'),
+            output_field=CharField()
+        )
      ).values('role_value', 'email_value', 'description_value', 'type_value')
 
     contacts = {}
@@ -169,3 +191,17 @@ def get_contacts_group_by_types(education_group_year, language_code):
         }
         contacts.setdefault(contact['type_value'], []).append(row)
     return contacts
+
+
+def get_contacts_intro_text(education_group_year, language_code):
+    introduction = get_object_or_none(
+        TranslatedText,
+        text_label__entity=OFFER_YEAR,
+        text_label__label=CONTACT_INTRO_KEY,
+        language=language_code,
+        entity=OFFER_YEAR,
+        reference=education_group_year.id
+    )
+    if introduction:
+        return introduction.text
+    return None

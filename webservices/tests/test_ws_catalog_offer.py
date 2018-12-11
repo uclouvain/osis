@@ -31,12 +31,15 @@ from django.conf import settings
 from django.test import TestCase
 
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
+from base.models.enums import organization_type
 from base.tests.factories.education_group_year import (
     EducationGroupYearCommonMasterFactory,
     EducationGroupYearMasterFactory,
     EducationGroupYearCommonBachelorFactory
 )
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextRandomFactory
@@ -887,13 +890,36 @@ class GetEvaluationTestCase(TestCase):
 
 
 class GetContactsTestCase(TestCase):
+    def setUp(self):
+        today = datetime.date.today()
+
+        self.entity = EntityFactory(organization__type=organization_type.MAIN)
+        self.entity_version = EntityVersionFactory(
+            acronym='DRT',
+            start_date=today.replace(year=1900),
+            end_date=None,
+            entity=self.entity,
+        )
+        self.education_group_year = EducationGroupYearFactory(
+            publication_contact_entity=self.entity
+        )
+
     def test_get_contacts(self):
-        education_group_year = EducationGroupYearFactory()
-        context = get_contacts(education_group_year,  settings.LANGUAGE_CODE_EN)
+        context = get_contacts(self.education_group_year,  settings.LANGUAGE_CODE_EN)
 
         self.assertEqual(context['id'], business.CONTACTS_KEY)
         self.assertEqual(context['label'], business.CONTACTS_KEY)
 
         self.assertTrue('content' in context)
         self.assertTrue('entity' in context['content'])
+        self.assertEqual(context['content']['entity'], self.entity_version.acronym)
         self.assertTrue('contacts' in context['content'])
+        self.assertTrue('text' in context['content'])
+
+    def test_get_contacts_case_entity_none(self):
+        self.education_group_year.publication_contact_entity = None
+        self.education_group_year.save()
+
+        context = get_contacts(self.education_group_year, settings.LANGUAGE_CODE_EN)
+        self.assertTrue('entity' in context['content'])
+        self.assertIsNone(context['content']['entity'])
