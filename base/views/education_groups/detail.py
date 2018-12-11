@@ -52,6 +52,7 @@ from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_organization import EducationGroupOrganization
+from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
@@ -204,6 +205,10 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     template_name = "education_group/tab_general_informations.html"
     limited_by_category = (education_group_categories.TRAINING, education_group_categories.MINI_TRAINING)
 
+    def get_queryset(self):
+        """ Optimization """
+        return super().get_queryset().prefetch_related('educationgrouppublicationcontact_set')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -212,6 +217,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(is_common_education_group_year),
+            'contacts': self.get_publication_contacts_group_by_type(),
             'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object'])
         })
 
@@ -319,6 +325,12 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             display_error_messages(self.request, _("Unable to retrieve appropriate sections for this programs"))
             sections_request = {'sections': []}
         return sections_request['sections']
+
+    def get_publication_contacts_group_by_type(self):
+        contacts_by_type = {}
+        for publication_contact in self.object.educationgrouppublicationcontact_set.all():
+            contacts_by_type.setdefault(publication_contact.type, []).append(publication_contact)
+        return contacts_by_type
 
 
 def _get_code_and_type(education_group_year):
