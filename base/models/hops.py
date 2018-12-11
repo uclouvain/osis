@@ -31,7 +31,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class HopsAdmin(SerializableModelAdmin):
-    list_display = ('ares_study', 'ares_GRACA', 'ares_ability', 'changed')
+    list_display = ('ares_study', 'ares_graca', 'ares_ability', 'changed')
     list_filter = ('ares_study', )
     raw_id_fields = (
         'education_group_year'
