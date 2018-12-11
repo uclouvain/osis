@@ -52,7 +52,7 @@ class Hops(SerializableModel):
         validators=[MinValueValidator(1), MaxValueValidator(9999)],
     )
 
-    ares_GRACA = models.IntegerField(
+    ares_graca = models.IntegerField(
         blank=True,
         null=True,
         verbose_name=_('ARES-GRACA'),
