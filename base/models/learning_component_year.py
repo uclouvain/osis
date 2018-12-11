@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Sum
 from django.utils.functional import cached_property
@@ -36,7 +37,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class LearningComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('learning_container_year', 'learning_unit_year',  'acronym', 'type', 'comment', 'changed')
+    list_display = ('learning_container_year', 'learning_unit_year', 'acronym', 'type', 'comment', 'changed')
     search_fields = ['acronym', 'learning_container_year__acronym']
     list_filter = ('learning_container_year__academic_year',)
 
