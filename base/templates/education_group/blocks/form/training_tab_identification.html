@@ -40,10 +40,7 @@
                         <input value="{{ form_education_group_year.category_text }}"
                                disabled class="form-control" >
                     </div>
-                    <div class="col-md-6">
-                        <label>{% trans 'Type of training' %}</label><br>
-                        {{ form_education_group_year.education_group_type }}
-                    </div>
+                    {% bootstrap_field form_education_group_year.education_group_type form_group_class="col-md-6"%}
                 </div>
                 <br>
                 <div class="row">
