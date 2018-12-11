@@ -164,9 +164,6 @@ class ImportReddotTestCase(TestCase):
         admission_condition = AdmissionCondition.objects.get(education_group_year=edy)
         info = item['info']
         line = AdmissionConditionLine.objects.get(admission_condition=admission_condition)
-        print(info)
-        print(vars(admission_condition))
-        print(vars(line))
         self.assertEqual(admission_condition.text_free,
                          info['texts']['introduction']['text'])
         self.assertEqual(line.section,
@@ -186,6 +183,7 @@ class ImportReddotTestCase(TestCase):
         item = {
             "year": 2018,
             "2m.alert_message": "Test",
+            "2m.introduction": "IntroTest"
         }
         self.command.json_content = item
         academic_year = AcademicYearFactory(year=2018)
@@ -203,6 +201,21 @@ class ImportReddotTestCase(TestCase):
         admission_condition = AdmissionCondition.objects.get(education_group_year=common)
         self.assertEqual(admission_condition.text_alert_message,
                          item['2m.alert_message'])
+
+    def test_load_admission_conditions_common_label_not_handled(self):
+        item = {
+            "year": 2018,
+            "2m.coucou": "Test"
+        }
+        self.command.json_content = item
+        academic_year = AcademicYearFactory(year=2018)
+        education_group_year_common = EducationGroupYearFactory(
+            academic_year=academic_year,
+            acronym='common-2m'
+        )
+
+        with self.assertRaises(Exception):
+            self.command.load_admission_conditions_common()
 
     def test_save_condition_line_of_row_with_no_admission_condition_line(self):
         education_group_year = EducationGroupYearFactory()
