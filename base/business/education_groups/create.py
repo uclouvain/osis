@@ -27,6 +27,7 @@ import re
 import uuid
 from collections import defaultdict
 
+from base.business.utils import model
 from base.forms.common import ValidationRuleMixin
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group import EducationGroup
@@ -130,10 +131,9 @@ def _duplicate_branch(child_education_group_type, parent_egy, last_child):
     child_eg = EducationGroup(start_year=year, end_year=year)
     child_eg.save()
 
-    child_egy = last_child
-    child_egy.id = None
-    child_egy.uuid = uuid.uuid4()
+    child_egy = model.duplicate_object(last_child)
     child_egy.education_group = child_eg
+    child_egy.academic_year = parent_egy.academic_year
     child_egy.save()
 
     grp_ele = GroupElementYear(parent=parent_egy, child_branch=child_egy)

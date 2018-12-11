@@ -253,7 +253,7 @@ class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView)
                 _("Cannot detach child \"%(child)s\". "
                   "The parent must have at least one child of type \"%(type)s\".") % {
                     "child": child_branch,
-                    "type": parent.education_group_type
+                    "type": child_branch.education_group_type
                 }
             display_error_messages(request, error_msg)
             return JsonResponse({"error": True, "success_url": self.get_success_url()})
