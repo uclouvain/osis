@@ -629,7 +629,7 @@ class EducationGroupYear(SerializableModel):
             ascendants += parent.ascendants_of_branch
 
         return list(set(ascendants))
-    
+
     @property
     def hops(self):
         return Hops.objects.get(education_group_year=self)
