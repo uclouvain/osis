@@ -33,6 +33,7 @@ from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import count_constraint
 from base.models.group_element_year import GroupElementYear
+from base.models.utils import utils
 from base.models.validation_rule import ValidationRule
 
 REGEX_TRAINING_PARTIAL_ACRONYM = r"^(?P<sigle_ele>[A-Z]{3,5})\d{3}[A-Z]$"
@@ -74,21 +75,18 @@ def create_initial_group_element_year_structure(parent_egys):
 
 
 def _get_or_create_branch(child_education_group_type, title_initial_value, partial_acronym_initial_value, parent_egy):
-    try:
-        existing_grp_ele = GroupElementYear.objects.get(
-            parent=parent_egy,
-            child_branch__education_group_type=child_education_group_type,
-        )
-    except GroupElementYear.DoesNotExist:
-        pass
-    else:
+    existing_grp_ele = utils.get_object_or_none(
+        GroupElementYear,
+        parent=parent_egy,
+        child_branch__education_group_type=child_education_group_type
+    )
+    if existing_grp_ele:
         return existing_grp_ele
 
     year = parent_egy.academic_year.year
-    child_eg = EducationGroup(start_year=year, end_year=year)
-    child_eg.save()
+    child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
 
-    child_egy = EducationGroupYear(
+    child_egy = EducationGroupYear.objects.create(
         academic_year=parent_egy.academic_year,
         main_teaching_campus=parent_egy.main_teaching_campus,
         management_entity=parent_egy.management_entity,
@@ -108,35 +106,29 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
         ),
         education_group=child_eg
     )
-    child_egy.save()
 
-    grp_ele = GroupElementYear(parent=parent_egy, child_branch=child_egy)
-    grp_ele.save()
+    grp_ele = GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)
     return grp_ele
 
 
 def _duplicate_branch(child_education_group_type, parent_egy, last_child):
-    try:
-        existing_grp_ele = GroupElementYear.objects.get(
-            parent=parent_egy,
-            child_branch__education_group_type=child_education_group_type,
-        )
-    except GroupElementYear.DoesNotExist:
-        pass
-    else:
+    existing_grp_ele = utils.get_object_or_none(
+        GroupElementYear,
+        parent=parent_egy,
+        child_branch__education_group_type=child_education_group_type
+    )
+    if existing_grp_ele:
         return existing_grp_ele
 
     year = parent_egy.academic_year.year
-    child_eg = EducationGroup(start_year=year, end_year=year)
-    child_eg.save()
+    child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
 
     child_egy = model.duplicate_object(last_child)
     child_egy.education_group = child_eg
     child_egy.academic_year = parent_egy.academic_year
     child_egy.save()
 
-    grp_ele = GroupElementYear(parent=parent_egy, child_branch=child_egy)
-    grp_ele.save()
+    grp_ele = GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)
     return grp_ele
 
 
@@ -150,15 +142,13 @@ def _get_validation_rule(field_name, education_group_type):
 
 
 def _generate_child_partial_acronym(parent, child_initial_value, child_type):
-    try:
-        previous_grp_ele = GroupElementYear.objects.get(
-            parent__education_group=parent.education_group,
-            parent__academic_year__year__in=[parent.academic_year.year - 1, parent.academic_year.year],
-            child_branch__education_group_type=child_type
-        )
-    except GroupElementYear.DoesNotExist:
-        pass
-    else:
+    previous_grp_ele = utils.get_object_or_none(
+        GroupElementYear,
+        parent__education_group=parent.education_group,
+        parent__academic_year__year__in=[parent.academic_year.year - 1, parent.academic_year.year],
+        child_branch__education_group_type=child_type
+    )
+    if previous_grp_ele:
         return previous_grp_ele.child_branch.partial_acronym
 
     reg_parent_partial_acronym = re.compile(REGEX_TRAINING_PARTIAL_ACRONYM)
