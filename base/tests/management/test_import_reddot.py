@@ -614,6 +614,12 @@ class ImportContactsEntityTest(TestCase):
         self.education_group_year.refresh_from_db()
         self.assertEqual(self.education_group_year.publication_contact_entity, self.entity)
 
+    def test_import_contacts_entity_case_acronym_not_found(self):
+        _import_contact_entity('DUMMY-ACRONYM', self.education_group_year)
+
+        self.education_group_year.refresh_from_db()
+        self.assertIsNone(self.education_group_year.publication_contact_entity)
+
     def test_import_contacts_entity_case_muliple_acronym_found(self):
         # Create a duplicate entity version [same acronym]
         today = datetime.date.today()
