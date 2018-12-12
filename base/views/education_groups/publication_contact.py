@@ -30,7 +30,8 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import UpdateView, CreateView, DeleteView
 
-from base.forms.education_group.publication_contact import EducationGroupPublicationContactForm
+from base.forms.education_group.publication_contact import EducationGroupPublicationContactForm, \
+    EducationGroupEntityPublicationContactForm
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
 from base.views.education_groups import perms
@@ -91,3 +92,12 @@ class UpdateEducationGroupPublicationContactView(CommonEducationGroupPublication
 class EducationGroupPublicationContactDeleteView(CommonEducationGroupPublicationContactView, DeleteView):
     pk_url_kwarg = "publication_contact_id"
     template_name = "education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html"
+
+
+class UpdateEducationGroupEntityPublicationContactView(CommonEducationGroupPublicationContactView, UpdateView):
+    model = EducationGroupYear
+    context_object_name = "education_group_year"
+
+    form_class = EducationGroupEntityPublicationContactForm
+    pk_url_kwarg = "education_group_year_id"
+    template_name = "education_group/blocks/modal/modal_publication_contact_entity_edit_inner.html"

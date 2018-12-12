@@ -87,7 +87,10 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
 
 class EducationGroupYearManager(SerializableModelManager):
     def look_for_common(self, **kwargs):
-        return self.filter(acronym__startswith='common-', **kwargs)
+        return self.filter(acronym__startswith='common', **kwargs)
+
+    def get_common(self, **kwargs):
+        return self.get(acronym='common', **kwargs)
 
 
 class EducationGroupYear(SerializableModel):
@@ -455,31 +458,16 @@ class EducationGroupYear(SerializableModel):
         validators=[MinValueValidator(1), MaxValueValidator(9999)],
     )
 
-    ARES_study = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_('ARES study code'),
-        validators=[MinValueValidator(1), MaxValueValidator(9999)],
-    )
-
-    ARES_GRACA = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_('ARES-GRACA'),
-        validators=[MinValueValidator(1), MaxValueValidator(9999)],
-    )
-
-    ARES_ability = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_('ARES ability'),
-        validators=[MinValueValidator(1), MaxValueValidator(9999)],
-
-    )
-
     web_re_registration = models.BooleanField(
         default=True,
         verbose_name=_('Web re-registration'),
+    )
+
+    publication_contact_entity = models.ForeignKey(
+        Entity,
+        verbose_name=_("Publication contact entity"),
+        null=True,
+        blank=True,
     )
 
     class Meta:
@@ -503,7 +491,7 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def is_common(self):
-        return self.acronym.startswith('common-')
+        return self.acronym.startswith('common')
 
     @property
     def verbose(self):
@@ -568,6 +556,14 @@ class EducationGroupYear(SerializableModel):
         return entity_version.find_entity_version_according_academic_year(
             self.management_entity, self.academic_year
         )
+
+    @cached_property
+    def publication_contact_entity_version(self):
+        if self.publication_contact_entity:
+            return entity_version.find_entity_version_according_academic_year(
+                self.publication_contact_entity, self.academic_year
+            )
+        return None
 
     def parent_by_training(self):
         """

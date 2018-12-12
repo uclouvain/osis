@@ -159,10 +159,9 @@ def get_intro_or_common_section(context, education_group_year, m_intro, m_common
 
         return insert_section_if_checked(context, egy, text_label)
     elif m_common:
-        egy = EducationGroupYear.objects.look_for_common(
-            education_group_type=education_group_year.education_group_type,
-            academic_year__year=context.year
-        ).first()
+        egy = EducationGroupYear.objects.get_common(
+            academic_year=education_group_year.academic_year
+        )
         text_label = TextLabel.objects.filter(
             entity=OFFER_YEAR,
             label=m_common.group('section_name')
@@ -383,6 +382,8 @@ def get_conditions_admissions(context):
         return response_for_bachelor(context)
 
     common_acronym = 'common-{}'.format(full_suffix)
+    if common_acronym == 'common-2m1':
+        common_acronym = 'common-2m'
     admission_condition, created = AdmissionCondition.objects.get_or_create(
         education_group_year=context.education_group_year
     )
@@ -428,12 +429,15 @@ def get_skills_and_achievements(education_group_year, language_code):
 
 def get_contacts(education_group_year, language_code):
     contacts = business.get_contacts_group_by_types(education_group_year, language_code)
+    intro_content = business.get_contacts_intro_text(education_group_year, language_code)
+    entity_version = education_group_year.publication_contact_entity_version
 
     return {
         'id': business.CONTACTS_KEY,
         'label': business.CONTACTS_KEY,
         'content': {
-            'entity': None,
+            'text': intro_content,
+            'entity': entity_version.acronym if entity_version else None,
             'contacts': contacts
         }
     }

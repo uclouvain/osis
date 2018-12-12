@@ -43,10 +43,9 @@ from base.models.education_group_publication_contact import EducationGroupPublic
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity import Entity
-from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import TrainingType
+from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.enums.organization_type import MAIN
-from base.models.enums.publication_contact_type import PublicationContactType
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
@@ -78,51 +77,64 @@ OFFERS = [
     {'name': TrainingType.MASTER_M1.name, 'category': TRAINING, 'code': '2M1'},
     {'name': TrainingType.MASTER_MC.name, 'category': TRAINING, 'code': '2MC'},
     {'name': TrainingType.INTERNSHIP.name, 'category': TRAINING, 'code': 'ST'},
-    {'name': TrainingType.CERTIFICATE.name, 'category': TRAINING, 'code': '9CE'}
+    {'name': TrainingType.CERTIFICATE.name, 'category': TRAINING, 'code': '9CE'},
+    {'name': MiniTrainingType.DEEPENING.name, 'category': MINI_TRAINING, 'code': ''}
 ]
 
-COMMON_OFFER = ['1BA', '2A', '2CE', '2FC', '2M', '2M1', '2MC', '3CE', '9CE']
+COMMON_OFFER = ['1BA', '2A', '2M', '2MC']
+CONTACTS_ENTITY_KEY = 'contact_entity_code'
 
 
 def create_common_offer_for_academic_year(year):
     academic_year = AcademicYear.objects.get(year=year)
     for offer in OFFERS:
         code = offer['code'].lower()
-        acronym = 'common-{}'.format(code)
+        if offer['category'] == TRAINING:
+            acronym = 'common-{}'.format(code)
+        else:
+            acronym = 'common'
         education_group_year = EducationGroupYear.objects.filter(academic_year=academic_year,
                                                                  acronym=acronym)
-        entity_ucl = Entity.objects.get(entityversion__acronym='UCL', organization__type=MAIN)
 
         if offer['code'] in COMMON_OFFER:
-            education_group_type = EducationGroupType.objects.get(
-                name=offer['name'],
-                category=offer['category']
+            _update_or_create_common_offer(
+                academic_year,
+                acronym,
+                offer
             )
-            education_group_year = education_group_year.first()
-            if not education_group_year:
-                education_group = EducationGroup.objects.create(
-                    start_year=academic_year.year,
-                    end_year=academic_year.year + 1
-                )
-                EducationGroupYear.objects.create(
-                    academic_year=academic_year,
-                    education_group=education_group,
-                    acronym=acronym,
-                    title=acronym,
-                    education_group_type=education_group_type,
-                    title_english=acronym,
-                    management_entity=entity_ucl,
-                    administration_entity=entity_ucl
-                )
-            else:
-                education_group_year.title = acronym
-                education_group_year.title_english = acronym
-                education_group_year.education_group_type = education_group_type
-                education_group_year.management_entity = entity_ucl
-                education_group_year.administration_entity = entity_ucl
-                education_group_year.save()
         else:
             education_group_year.delete()
+
+
+def _update_or_create_common_offer(academic_year, acronym, offer):
+    entity_ucl = Entity.objects.get(entityversion__acronym='UCL', organization__type=MAIN)
+    education_group_type = EducationGroupType.objects.get(
+        name=offer['name'],
+        category=offer['category']
+    )
+
+    education_group = EducationGroup.objects.filter(educationgroupyear__acronym=acronym)
+    if education_group.count() == 0:
+        education_group = EducationGroup.objects.create(
+            start_year=2017,
+            end_year=None
+        )
+    else:
+        education_group = education_group.first()
+
+    EducationGroupYear.objects.update_or_create(
+        academic_year=academic_year,
+        education_group=education_group,
+        acronym=acronym,
+        education_group_type=education_group_type,
+        defaults={
+            'management_entity': entity_ucl,
+            'administration_entity': entity_ucl,
+            'title': acronym,
+            'title_english': acronym,
+            'partial_acronym': acronym
+        }
+    )
 
 
 def get_text_label(entity, label):
@@ -146,6 +158,8 @@ def import_offer_and_items(item, education_group_year, mapping_label_text_label,
             _import_skills_and_achievements(value, education_group_year, context)
         elif label == CONTACTS_KEY:
             _import_contacts(value, education_group_year, context)
+        elif label == CONTACTS_ENTITY_KEY:
+            _import_contact_entity(value, education_group_year)
         else:
             # General CMS data
             TranslatedText.objects.update_or_create(
@@ -243,6 +257,16 @@ def _get_role_field_publication_contact_according_to_language(language):
     raise AttributeError('Language not supported {}'.format(language))
 
 
+def _import_contact_entity(entity_acronym, education_group_year):
+    try:
+        entity = Entity.objects.filter(entityversion__acronym=entity_acronym).distinct().get()
+        education_group_year.publication_contact_entity = entity
+        education_group_year.save()
+    except Entity.DoesNotExist:
+        msg = 'Entity {acronym} not found for program: {program}'
+        print(msg.format(acronym=entity_acronym, program=education_group_year.acronym))
+
+
 LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_FR, 'pedagogie', 'Pédagogie'),
     (settings.LANGUAGE_CODE_FR, 'mobilite', 'Mobilité'),
@@ -265,6 +289,9 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_FR, 'majeures', 'Majeures'),
     (settings.LANGUAGE_CODE_FR, 'finalites', 'Finalités'),
     (settings.LANGUAGE_CODE_FR, 'finalites_didactiques', 'Finalités Didactique'),
+    (settings.LANGUAGE_CODE_FR, 'agregation', 'Agrégation'),
+    (settings.LANGUAGE_CODE_FR, 'prerequis', 'Prérequis'),
+    (settings.LANGUAGE_CODE_FR, 'contact_intro', 'Introduction contact'),
     (settings.LANGUAGE_CODE_EN, 'pedagogie', 'Pedagogy'),
     (settings.LANGUAGE_CODE_EN, 'mobilite', 'Mobility'),
     (settings.LANGUAGE_CODE_EN, 'formations_accessibles', 'Possible Trainings'),
@@ -287,11 +314,8 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_EN, 'finalites', 'Focuses'),
     (settings.LANGUAGE_CODE_EN, 'finalites_didactiques', 'Teaching Focuses'),
     (settings.LANGUAGE_CODE_EN, 'agregation', 'Agregation'),
-    (settings.LANGUAGE_CODE_FR, 'agregation', 'Agrégation'),
     (settings.LANGUAGE_CODE_EN, 'prerequis', 'Prerequis'),
-    (settings.LANGUAGE_CODE_FR, 'prerequis', 'Prérequis'),
-
-
+    (settings.LANGUAGE_CODE_EN, 'contact_intro', 'Contact Introduction'),
 ]
 
 MAPPING_LABEL_TEXTUAL = collections.defaultdict(dict)
@@ -403,7 +427,6 @@ class Command(BaseCommand):
 
     def load_offers(self):
         labels = set(chain.from_iterable(o.get('info', {}).keys() for o in self.json_content))
-
         Context = collections.namedtuple('Context', 'entity language')
         context = Context(entity='offer_year', language=self.iso_language)
 
@@ -518,22 +541,23 @@ class Command(BaseCommand):
         for key, value in self.json_content.items():
             offer_type, text_label = key.split('.')
 
-            education_group_year = EducationGroupYear.objects.get(
-                academic_year=academic_year,
-                acronym='common-{}'.format(offer_type)
-            )
+            if offer_type.upper() in COMMON_OFFER:
+                education_group_year = EducationGroupYear.objects.get(
+                    academic_year=academic_year,
+                    acronym='common-{}'.format(offer_type)
+                )
 
-            admission_condition, created = AdmissionCondition.objects.get_or_create(
-                education_group_year=education_group_year)
+                admission_condition, created = AdmissionCondition.objects.get_or_create(
+                    education_group_year=education_group_year)
 
-            if text_label in COMMON_FIELDS:
-                self.set_admission_condition_value(admission_condition, text_label, value)
-            elif text_label == 'introduction':
-                self.set_admission_condition_value(admission_condition, 'standard', value)
-            else:
-                raise Exception('This case is not handled %s' % text_label)
+                if text_label in COMMON_FIELDS:
+                    self.set_admission_condition_value(admission_condition, text_label, value)
+                elif text_label == 'introduction':
+                    self.set_admission_condition_value(admission_condition, 'standard', value)
+                else:
+                    raise Exception('This case is not handled %s' % text_label)
 
-            admission_condition.save()
+                admission_condition.save()
 
     def set_admission_condition_value(self, admission_condition, field, value):
         setattr(admission_condition, 'text_' + field + self.suffix_language, value)
