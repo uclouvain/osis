@@ -20,7 +20,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 2.2\n"
 
-#: views/education_groups/group_element_year/update.py:248
+#: views/education_groups/group_element_year/update.py:261
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" a été détaché de \"%(parent)s\""
@@ -768,9 +768,18 @@ msgstr "Annuler"
 msgid "Cancel the proposal"
 msgstr "Annuler la proposition"
 
+#: views/education_groups/group_element_year/update.py:253
+#, python-format
+msgid ""
+"Cannot detach child \"%(child)s\". The parent must have at least one child "
+"of type \"%(type)s\"."
+msgstr ""
+"Impossible de détacher l'enfant \"%(child)s\". Le parent doit au moins avoir "
+"un enfant de type \"%(type)s\"."
+
 #: tests/views/group_element_years/test_detach.py:156
 #: tests/views/group_element_years/test_detach.py:181
-#: views/education_groups/group_element_year/update.py:242
+#: views/education_groups/group_element_year/update.py:246
 #, python-format
 msgid ""
 "Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a "
@@ -1966,6 +1975,7 @@ msgstr "Acquis d'apprentissage"
 msgid "Learning location"
 msgstr "Lieu d'enseignement"
 
+#: business/group_element_years/management.py:68
 #: templates/learning_unit/breadcrumb.html:30
 #: templates/learning_unit/comparison.html:29 templates/learning_units.html:63
 #: templates/my_osis/profile.html:131
@@ -3625,7 +3635,7 @@ msgstr ""
 "La date de fermeture de '%s' du calendrier académique ne peut pas être "
 "inférieure au %s (date de fin de '%s' du programme '%s')"
 
-#: views/education_groups/group_element_year/update.py:226
+#: views/education_groups/group_element_year/update.py:229
 #, python-format
 msgid "The comments of %(acronym)s has been updated"
 msgstr "Les commentaires de %(acronym)s ont été mis à jour"
@@ -3840,6 +3850,13 @@ msgstr "Le message à bien été réenvoyé."
 msgid "The messages sent by the application to you"
 msgstr "La liste des messages qui vous ont été envoyés par l'application"
 
+#: business/group_element_years/management.py:88
+#, python-format
+msgid ""
+"The number of children of type \"%(child_type)s\" for \"%(parent)s\" has "
+"already reached the limit."
+msgstr ""
+
 #: models/learning_unit_year.py:388 tests/models/test_learning_unit_year.py:564
 #, python-format
 msgid ""
@@ -4002,6 +4019,7 @@ msgstr "Cette fonctionnalité est en phase expérimentale"
 #: forms/learning_unit/learning_unit_create.py:129
 msgid "This field cannot be set"
 msgstr "Ce champ ne peut pas être défini"
+
 
 #: forms/common.py:80 models/education_group_publication_contact.py:99
 #: models/education_group_publication_contact.py:100
@@ -4581,6 +4599,7 @@ msgstr ""
 "d'enseignement sous"
 
 #: business/group_element_years/management.py:65
+#: business/group_element_years/management.py:78
 #: tests/views/education_groups/test_update.py:492
 #, python-format
 msgid ""
@@ -4943,7 +4962,6 @@ msgstr "volume horaire partiel q1"
 msgid "hourly volume partial q2"
 msgstr "volume horaire partiel q2"
 
-#: models/learning_component_year.py:55
 #: tests/forms/test_learning_unit_postponement.py:613
 msgid "hourly volume total annual"
 msgstr "volume horaire total annuel"
