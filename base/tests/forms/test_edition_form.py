@@ -145,6 +145,8 @@ def _get_wrong_data_empty_field():
 def _get_wrong_data_volume_tot():
     data = _get_valid_data()
     data['volume_total'] = 3
+    data['volume_q1'] = 2
+    data['volume_Q2'] = 2
     return data
 
 
@@ -316,8 +318,8 @@ class TestVolumeEditionFormsetContainer(TestCase):
         )
 
         form.is_valid()
-        self.assertEqual(form.errors['volume_q2'], [gettext('One of the partial volumes must have a value to 0.')])
-        self.assertEqual(form.errors['volume_q1'], [gettext('One of the partial volumes must have a value to 0.')])
+        self.assertEqual(form.errors['volume_q2'][1], [gettext('One of the partial volumes must have a value to 0.')])
+        self.assertEqual(form.errors['volume_q1'][1], [gettext('One of the partial volumes must have a value to 0.')])
 
         form = VolumeEditionForm(
             data={'volume_q1': 0, 'volume_q2': 12},
