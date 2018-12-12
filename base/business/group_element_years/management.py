@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count, Subquery, Q
 from django.utils.translation import ugettext as _
 
 from base.models import group_element_year, authorized_relationship
@@ -109,23 +110,22 @@ def _types_are_compatible(parent, child):
 
 
 def is_max_child_reached(parent, child):
-    child_education_type = child.education_group_type
-    number_children_of_same_type = GroupElementYear.objects.filter(
-        parent=parent,
-        child_branch__education_group_type=child_education_type
-    ).count()
-    try:
-        auth_rel = authorized_relationship.AuthorizedRelationship.objects.get(
-            parent_type=parent.education_group_type,
-            child_type=child.education_group_type,
-        )
-    except authorized_relationship.AuthorizedRelationship.DoesNotExist:
-        return True
-    max_count = auth_rel.max_count_authorized
-    return number_children_of_same_type > 0 and max_count == count_constraint.ONE
+    def _is_max_child_reached(number_children, authorized_relationship):
+        max_count = authorized_relationship.max_count_authorized
+        return number_children > 0 and max_count == count_constraint.ONE
+
+    return _is_limit_child_reached(parent, child, _is_max_child_reached)
 
 
 def is_min_child_reached(parent, child):
+    def _is_min_child_reached(number_children, authorized_relationship):
+        min_count = authorized_relationship.min_count_authorized
+        return min_count == count_constraint.ONE and number_children < 2
+
+    return _is_limit_child_reached(parent, child, _is_min_child_reached)
+
+
+def _is_limit_child_reached(parent, child, boolean_func):
     child_education_type = child.education_group_type
     number_children_of_same_type = GroupElementYear.objects.filter(
         parent=parent,
@@ -138,5 +138,4 @@ def is_min_child_reached(parent, child):
         )
     except authorized_relationship.AuthorizedRelationship.DoesNotExist:
         return True
-    min_count = auth_rel.min_count_authorized
-    return min_count == count_constraint.ONE and number_children_of_same_type < 2
+    return boolean_func(number_children_of_same_type, auth_rel)
