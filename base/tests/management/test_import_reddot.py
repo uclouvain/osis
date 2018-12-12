@@ -9,7 +9,7 @@ from django.test import TestCase
 from base.management.commands import import_reddot
 from base.management.commands.import_reddot import _import_skills_and_achievements, \
     _get_field_achievement_according_to_language, _get_role_field_publication_contact_according_to_language, \
-    _import_contacts, _import_contact_entity
+    _import_contacts, _import_contact_entity, CONTACTS_ENTITY_KEY, import_offer_and_items
 from base.models.enums import organization_type
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from cms.models.text_label import TextLabel
@@ -593,6 +593,20 @@ class ImportContactsTest(TestCase):
         # Language not supported
         with self.assertRaises(AttributeError):
             _get_role_field_publication_contact_according_to_language('es')
+
+
+class ImportOfferAndItems(TestCase):
+    def setUp(self):
+        self.education_group_year = EducationGroupYearFactory()
+        Context = collections.namedtuple('Context', 'entity language')
+        self.context = Context(entity='offer_year', language='fr-be')
+
+    @mock.patch('base.management.commands.import_reddot._import_contact_entity')
+    def test_import_offer_and_items_case_import_contacts_entity(self, mock_import_contact_entity):
+        json_data = {'info': {CONTACTS_ENTITY_KEY: 'AGRO'}}
+
+        import_offer_and_items(json_data, self.education_group_year, {}, self.context)
+        self.assertTrue(mock_import_contact_entity.called)
 
 
 class ImportContactsEntityTest(TestCase):
