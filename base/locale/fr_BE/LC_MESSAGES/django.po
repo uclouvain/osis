@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-11 17:13+0100\n"
+"POT-Creation-Date: 2018-12-12 10:53+0100\n"
 "PO-Revision-Date: 2018-11-21 14:40+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -81,7 +81,7 @@ msgstr[1] "%(count_enrollment)d étudiants sont inscrits à l'offre."
 msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
 msgstr "%(date)s doit être comprise entre %(start_date)s et %(end_date)s"
 
-#: models/education_group.py:77 models/education_group_year.py:664
+#: models/education_group.py:77 models/education_group_year.py:679
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr "%(max)s doit être plus grand ou égal à %(min)s"
@@ -295,7 +295,7 @@ msgstr "Partenaire académique"
 msgid "Academic responsible"
 msgstr "Responsable académique"
 
-#: templates/education_group/blocks/contacts_general_informations.html:48
+#: templates/education_group/blocks/contacts_general_informations.html:67
 msgid "Academic responsibles"
 msgstr "Responsables académique"
 
@@ -968,7 +968,7 @@ msgstr "Consolider"
 msgid "Consolidate the proposal"
 msgstr "Consolider la proposition"
 
-#: templates/education_group/blocks/contacts_general_informations.html:35
+#: templates/education_group/blocks/contacts_general_informations.html:53
 msgid "Contacts"
 msgstr "Contacts"
 
@@ -1006,7 +1006,7 @@ msgstr "Cours"
 msgid "Course enrollment"
 msgstr "Inscription aux cours"
 
-#: templates/education_group/blocks/contacts_general_informations.html:38
+#: templates/education_group/blocks/contacts_general_informations.html:56
 #: templates/education_group/blocks/coorganization.html:156
 #: templates/education_group/blocks/panel/panel_achievements.html:89
 #: templates/education_group/blocks/panel/panel_achievements.html:101
@@ -1016,7 +1016,7 @@ msgstr "Inscription aux cours"
 msgid "Create"
 msgstr "Créer"
 
-#: forms/education_group/publication_contact.py:51
+#: forms/education_group/publication_contact.py:55
 msgid "Create contact"
 msgstr "Créer contact"
 
@@ -1231,6 +1231,7 @@ msgstr "Durée"
 
 #: templates/academic_calendar/academic_calendar.html:83
 #: templates/academic_calendar/academic_calendar.html:85
+#: templates/education_group/blocks/contacts_general_informations.html:33
 #: templates/education_group/blocks/contacts_general_informations_ul.html:49
 #: templates/education_group/blocks/content_actions.html:46
 #: templates/education_group/blocks/coorganization.html:79
@@ -1266,7 +1267,7 @@ msgstr "Acquis d'apprentissage détaillé d'organisation de formation"
 msgid "Education group edition"
 msgstr "Edition d'organisation de formations"
 
-#: models/education_group_achievement.py:48 models/education_group_year.py:467
+#: models/education_group_achievement.py:48 models/education_group_year.py:474
 msgid "Education group year"
 msgstr "Organisation de formations annualisée"
 
@@ -1418,6 +1419,7 @@ msgid "Entities"
 msgstr "Entités"
 
 #: business/education_group.py:49 forms/education_groups.py:86
+#: templates/education_group/blocks/contacts_general_informations.html:30
 #: templates/education_group/search.html:151 templates/offers.html:51
 #: templates/offers.html:52 templates/offers.html:80
 msgid "Entity"
@@ -1751,10 +1753,6 @@ msgstr "Sous forme attendue"
 msgid "In heading 2 of diploma"
 msgstr "Dans la rubrique 2 du diplôme"
 
-#: templates/education_group/blocks/contacts_general_informations.html:30
-msgid "In practice"
-msgstr "En pratique"
-
 #: templates/learning_unit/by_activity.html:120
 msgid "In proposal"
 msgstr "En proposition"
@@ -1889,7 +1887,7 @@ msgstr "Jury"
 msgid "Jury member"
 msgstr "Membre du jury"
 
-#: templates/education_group/blocks/contacts_general_informations.html:62
+#: templates/education_group/blocks/contacts_general_informations.html:81
 msgid "Jury members"
 msgstr "Membres du jury"
 
@@ -2681,7 +2679,7 @@ msgstr "Organisations"
 msgid "Other academic responsible"
 msgstr "Autre responsable académique"
 
-#: templates/education_group/blocks/contacts_general_informations.html:55
+#: templates/education_group/blocks/contacts_general_informations.html:74
 msgid "Other academic responsibles"
 msgstr "Autres responsables académique"
 
@@ -2694,7 +2692,7 @@ msgstr "Autre collectif"
 msgid "Other contact"
 msgstr "Autre contact"
 
-#: templates/education_group/blocks/contacts_general_informations.html:69
+#: templates/education_group/blocks/contacts_general_informations.html:88
 msgid "Other contacts"
 msgstr "Autres contacts"
 
@@ -3047,6 +3045,10 @@ msgstr "Provisoire"
 #: models/enums/organization_type.py:41
 msgid "Public partner"
 msgstr "Partenaire public"
+
+#: models/education_group_year.py:468
+msgid "Publication contact entity"
+msgstr ""
 
 #: templates/education_group/tab_admission_conditions.html:38
 #: templates/education_group/tab_general_informations.html:39
@@ -3598,8 +3600,14 @@ msgid "The administrative data has been successfully modified"
 msgstr "Les données administratives ont été sauvées avec succès"
 
 #: forms/learning_unit/edition_volume.py:79
+#: forms/learning_unit/edition_volume.py:142
+#: forms/learning_unit/edition_volume.py:353
+#: models/learning_component_year.py:125
 #: templates/learning_unit/components.html:51
 #: templates/learning_unit/components_identification.html:36
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:195
+#: tests/models/test_learning_unit_year.py:351
+#: tests/models/test_learning_unit_year.py:391
 msgid "The annual volume must be equal to the sum of the volumes Q1 and Q2"
 msgstr "Le volume annuel doit être égal à la somme des volumes Q1 et Q2"
 
@@ -3626,11 +3634,11 @@ msgstr "Les commentaires de %(acronym)s ont été mis à jour"
 msgid "The configuration of you user profile"
 msgstr "Informations liées à votre profil"
 
-#: views/education_groups/publication_contact.py:74
+#: views/education_groups/publication_contact.py:75
 msgid "The contact has been created"
 msgstr "Le contact a bien été créee"
 
-#: views/education_groups/publication_contact.py:88
+#: views/education_groups/publication_contact.py:89
 msgid "The contacts modifications has been saved"
 msgstr "Les données de contact ont été sauvegardées"
 
@@ -3997,8 +4005,8 @@ msgstr "Ce champ ne peut pas être défini"
 
 #: forms/common.py:80 models/education_group_publication_contact.py:99
 #: models/education_group_publication_contact.py:100
-#: models/education_group_year.py:651 models/education_group_year.py:672
-#: models/education_group_year.py:674
+#: models/education_group_year.py:666 models/education_group_year.py:687
+#: models/education_group_year.py:689
 #: tests/views/learning_units/proposals/test_creation.py:186
 #: tests/views/learning_units/proposals/test_creation.py:187
 #: tests/views/learning_units/proposals/test_creation.py:188
@@ -4249,9 +4257,13 @@ msgstr "Haut"
 msgid "Update"
 msgstr "Mettre à jour"
 
-#: forms/education_group/publication_contact.py:50
+#: forms/education_group/publication_contact.py:54
 msgid "Update contact"
 msgstr "Mise-à-jour contact"
+
+#: forms/education_group/publication_contact.py:90
+msgid "Update entity"
+msgstr "Mise-à-jour entité"
 
 #: templates/learning_unit/blocks/summary_locked.html:22
 msgid "Update for teacher locked"
@@ -4340,15 +4352,6 @@ msgid "Vol_global is not equal to Vol_tot * planned_classes"
 msgstr ""
 "Le volume global doit être égal au volume annuel multiplié par le nombre de "
 "classes"
-
-#: forms/learning_unit/edition_volume.py:142
-#: forms/learning_unit/edition_volume.py:352
-#: models/learning_component_year.py:125
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:195
-#: tests/models/test_learning_unit_year.py:351
-#: tests/models/test_learning_unit_year.py:391
-msgid "Vol_tot is not equal to vol_q1 + vol_q2"
-msgstr "Le volume annuel doit être égal à la somme des volumes de Q1 et de Q2"
 
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:35
 msgid "Volume"
@@ -4618,7 +4621,7 @@ msgstr ""
 "Une proposition de modification de type {} a été faite pour l'unité "
 "d'enseignement {}."
 
-#: models/education_group_year.py:657
+#: models/education_group_year.py:672
 msgid "You should precise at least minimum or maximum constraint"
 msgstr "Vous devez préciser au moins la contrainte minimum ou maximum"
 
@@ -4743,6 +4746,7 @@ msgstr "mise-à-jour bloquée pour l'enseignant"
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:50
 #: templates/education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html:14
 #: templates/education_group/blocks/modal/modal_publication_contact_edit_inner.html:40
+#: templates/education_group/blocks/modal/modal_publication_contact_entity_edit_inner.html:40
 #: templates/education_group/group_element_year/confirm_detach_inner.html:46
 #: templates/education_group/group_element_year/confirm_postpone_content_inner.html:10
 #: templates/education_group/organization_edit_inner.html:51
@@ -4829,7 +4833,7 @@ msgstr "confirmer"
 
 #: business/learning_units/edition.py:435
 #: business/learning_units/xls_comparison.py:59 business/proposal_xls.py:39
-#: models/education_group_year.py:334 models/education_group_year.py:497
+#: models/education_group_year.py:334 models/education_group_year.py:504
 #: models/enums/constraint_type.py:32 models/group_element_year.py:155
 #: models/group_element_year.py:171
 #: tests/models/test_education_group_year.py:93
@@ -4977,11 +4981,11 @@ msgstr "logo"
 msgid "main domain"
 msgstr "domaine principal"
 
-#: models/education_group_year.py:359 models/education_group_year.py:665
+#: models/education_group_year.py:359 models/education_group_year.py:680
 msgid "maximum constraint"
 msgstr "contrainte maximum"
 
-#: models/education_group_year.py:352 models/education_group_year.py:666
+#: models/education_group_year.py:352 models/education_group_year.py:681
 msgid "minimum constraint"
 msgstr "contrainte minimum"
 
@@ -5115,6 +5119,7 @@ msgstr "rôle (français)"
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:52
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:49
 #: templates/education_group/blocks/modal/modal_publication_contact_edit_inner.html:39
+#: templates/education_group/blocks/modal/modal_publication_contact_entity_edit_inner.html:39
 #: templates/education_group/organization_edit_inner.html:43
 #: templates/education_group/organization_edit_inner.html:52
 #: templates/learning_unit/achievement_edit.html:51
