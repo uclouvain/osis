@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import datetime
+import datetime
 from unittest import mock
 from http import HTTPStatus
 
@@ -32,21 +32,27 @@ from django.urls import reverse
 from django.http import HttpResponseForbidden
 
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
+from base.models.enums import organization_type
 from base.models.enums.publication_contact_type import PublicationContactType
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 
 DELETE_URL_NAME = "publication_contact_delete"
 EDIT_URL_NAME = "publication_contact_edit"
+EDIT_ENTITY_URL_NAME = 'publication_contact_entity_edit'
 CREATE_URL_NAME = "publication_contact_create"
 
 
 class PublicationContactViewSetupTest(TestCase):
     def setUp(self):
+        # Common offer must exist
         self.academic_year = create_current_academic_year()
+        EducationGroupYearCommonFactory(academic_year=self.academic_year)
 
         self.training = TrainingFactory(academic_year=self.academic_year)
         self.publication_contact = EducationGroupPublicationContactFactory(
@@ -187,9 +193,60 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
             self.training.pk,
             self.training.pk,
         ])
-        ac = AcademicYearFactory(year=datetime.today().year)
-        EducationGroupYearCommonFactory(academic_year=ac)
         response = self.client.post(self.url_delete, follow=True)
         self.assertRedirects(response, http_referer)
         with self.assertRaises(EducationGroupPublicationContact.DoesNotExist):
             self.publication_contact.refresh_from_db()
+
+
+class TestEntityPublicationContactUpdateView(PublicationContactViewSetupTest):
+    def setUp(self):
+        super().setUp()
+        self.entity = EntityFactory(organization__type=organization_type.MAIN)
+        today = datetime.date.today()
+        self.entity_version = EntityVersionFactory(
+            start_date=today.replace(year=1900),
+            end_date=None,
+            entity=self.entity,
+        )
+
+        self.url_update = reverse(
+            EDIT_ENTITY_URL_NAME,
+            args=[
+                self.training.id,
+                self.training.id,
+            ]
+        )
+
+    def test_when_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url_update)
+        self.assertRedirects(response, "/login/?next={}".format(self.url_update))
+
+    def test_user_without_permission(self):
+        # Remove permission
+        self.person.user.user_permissions.clear()
+
+        response = self.client.get(self.url_update)
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
+    def test_template_used(self, mock_permission):
+        response = self.client.get(self.url_update)
+        self.assertTemplateUsed(
+            response,
+            "education_group/blocks/modal/modal_publication_contact_entity_edit_inner.html",
+        )
+
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
+    def test_update_assert_db(self, mock_permission):
+        response = self.client.post(self.url_update, {
+            'publication_contact_entity': self.entity_version.pk
+        }, follow=True)
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+        # Check into database for created value
+        self.training.refresh_from_db()
+        self.assertEqual(self.training.publication_contact_entity_id, self.entity.pk)

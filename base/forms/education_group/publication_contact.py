@@ -27,7 +27,11 @@ from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 
+from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models.education_group_publication_contact import EducationGroupPublicationContact, ROLE_REQUIRED_FOR_TYPES
+from base.models.education_group_year import EducationGroupYear
+from base.models.entity_version import find_all_current_entities_version
+from base.models.enums.organization_type import MAIN
 
 
 class EducationGroupPublicationContactForm(forms.ModelForm):
@@ -57,3 +61,30 @@ class EducationGroupPublicationContactForm(forms.ModelForm):
 
         if self.instance.pk:
             self.fields['type'].disabled = True
+
+
+class PublicationContactEntityChoiceField(EntitiesVersionChoiceField):
+    def __init__(self, queryset, *args, **kwargs):
+        queryset = find_all_current_entities_version().filter(entity__organization__type=MAIN).order_by('acronym')
+        super(PublicationContactEntityChoiceField, self).__init__(queryset, *args, **kwargs)
+
+    def label_from_instance(self, obj):
+        return obj.acronym
+
+
+class EducationGroupEntityPublicationContactForm(forms.ModelForm):
+    class Meta:
+        model = EducationGroupYear
+        fields = ["publication_contact_entity"]
+        field_classes = {
+           "publication_contact_entity": PublicationContactEntityChoiceField,
+        }
+
+    def __init__(self, *args, **kwargs):
+        if not kwargs.get('instance'):
+            raise ImproperlyConfigured("This form allow update only")
+        super().__init__(*args, **kwargs)
+
+    @property
+    def title(self):
+        return _('Update entity')

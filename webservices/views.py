@@ -429,12 +429,15 @@ def get_skills_and_achievements(education_group_year, language_code):
 
 def get_contacts(education_group_year, language_code):
     contacts = business.get_contacts_group_by_types(education_group_year, language_code)
+    intro_content = business.get_contacts_intro_text(education_group_year, language_code)
+    entity_version = education_group_year.publication_contact_entity_version
 
     return {
         'id': business.CONTACTS_KEY,
         'label': business.CONTACTS_KEY,
         'content': {
-            'entity': None,
+            'text': intro_content,
+            'entity': entity_version.acronym if entity_version else None,
             'contacts': contacts
         }
     }
