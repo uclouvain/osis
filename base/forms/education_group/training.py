@@ -115,10 +115,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             'certificate_aims',
             'web_re_registration',
             'co_graduation',
-            'co_graduation_coefficient',
-            'ARES_study',
-            'ARES_GRACA',
-            'ARES_ability'
+            'co_graduation_coefficient'
         ]
 
         field_classes = {

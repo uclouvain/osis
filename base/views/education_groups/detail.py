@@ -485,7 +485,8 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         is_deepening = self.object.is_deepening
 
         is_master = acronym.endswith(('2m', '2m1'))
-        use_standard_text = acronym.endswith(('2a', '2mc'))
+        is_agregation = acronym.endswith('2a')
+        is_mc = acronym.endswith('2mc')
 
         class AdmissionConditionForm(forms.Form):
             text_field = forms.CharField(widget=CKEditorWidget(config_name='minimal'))
@@ -506,10 +507,11 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
             'info': {
                 'is_specific': is_specific,
                 'is_common': is_common,
-                'is_bachelor': is_common and self.object.education_group_type.name is TrainingType.BACHELOR.name,
+                'is_bachelor': is_common and self.object.education_group_type.name == TrainingType.BACHELOR.name,
                 'is_master': is_master,
-                'show_components_for_agreg_and_mc': is_common and use_standard_text,
-                'show_free_text': (is_specific and (is_master or use_standard_text)) or is_minor or is_deepening,
+                'show_components_for_agreg': is_common and is_agregation,
+                'show_components_for_agreg_and_mc': is_common and is_agregation or is_mc,
+                'show_free_text': (is_specific and (is_master or is_agregation or is_mc)) or is_minor or is_deepening,
             },
             'admission_condition': admission_condition,
             'record': record,
