@@ -89,6 +89,10 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
             academic_year=education_group_year.academic_year
         )
 
+        common_master_education_group_year = EducationGroupYearCommonMasterFactory(
+            academic_year=education_group_year.academic_year
+        )
+
         iso_language, language = 'fr-be', 'fr'
 
         message = {
@@ -186,7 +190,9 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
 
     def test_without_any_sections(self):
         education_group_year = EducationGroupYearFactory(acronym='actu2m')
-
+        common_master_education_group_year = EducationGroupYearCommonMasterFactory(
+            academic_year=education_group_year.academic_year
+        )
         common_education_group_year = EducationGroupYearFactory(
             acronym='common',
             academic_year=education_group_year.academic_year,
@@ -235,7 +241,9 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
 
     def test_with_one_section(self):
         education_group_year = EducationGroupYearFactory(acronym='actu2m')
-
+        common_master_education_group_year = EducationGroupYearCommonMasterFactory(
+            academic_year=education_group_year.academic_year
+        )
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='caap')
 
         for iso_language, language in [('fr-be', 'fr'), ('en', 'en')]:
@@ -287,7 +295,9 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
 
     def test_with_one_section_with_common(self):
         education_group_year = EducationGroupYearMasterFactory()
-
+        common_master_education_group_year = EducationGroupYearCommonMasterFactory(
+            academic_year=education_group_year.academic_year
+        )
         common_education_group_year = EducationGroupYearCommonFactory(
             academic_year=education_group_year.academic_year,
         )
@@ -358,6 +368,10 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         education_group_year = EducationGroupYearFactory(acronym='ACTU2M')
 
         common_education_group_year = EducationGroupYearCommonFactory(
+            academic_year=education_group_year.academic_year
+        )
+
+        common_master_education_group_year = EducationGroupYearCommonMasterFactory(
             academic_year=education_group_year.academic_year
         )
 
@@ -476,7 +490,9 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
 
     def test_no_translation_for_term(self):
         education_group_year = EducationGroupYearMasterFactory()
-
+        common_master_education_group_year = EducationGroupYearCommonMasterFactory(
+            academic_year=education_group_year.academic_year
+        )
         iso_language, language = 'fr-be', 'fr'
 
         text_label = TextLabelFactory(entity=OFFER_YEAR)
@@ -512,6 +528,9 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
 
     def test_no_corresponding_term(self):
         education_group_year = EducationGroupYearMasterFactory()
+        common_master_education_group_year = EducationGroupYearCommonMasterFactory(
+            academic_year=education_group_year.academic_year
+        )
 
         message = {
             'anac': str(education_group_year.academic_year.year),
@@ -789,7 +808,9 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
 
     def test_empty_string_evaluated_as_null(self):
         education_group_year = EducationGroupYearMasterFactory()
-
+        common_master_education_group_year = EducationGroupYearCommonMasterFactory(
+            academic_year=education_group_year.academic_year
+        )
         admission_condition = AdmissionCondition.objects.create(education_group_year=education_group_year)
         acl = AdmissionConditionLine.objects.create(
             admission_condition=admission_condition,
