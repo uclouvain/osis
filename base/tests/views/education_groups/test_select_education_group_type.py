@@ -85,6 +85,22 @@ class TestSelectEducationGroupTypeView(TestCase):
         )
         self.assertTemplateUsed(response, "education_group/blocks/form/education_group_type.html")
 
+    def test_post_when_no_parent(self):
+        response = self.client.post(
+            reverse(
+                "select_education_group_type",
+                args=[self.test_categories[0]]
+            ), data={"name": self.education_group_types[0].pk}
+        )
+
+        self.assertRedirects(
+            response,
+            reverse(
+                "new_education_group",
+                args=[self.test_categories[0], self.education_group_types[0].pk]
+            )
+        )
+
     def test_post(self):
         response = self.client.post(
             reverse(
