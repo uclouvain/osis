@@ -81,7 +81,7 @@ OFFERS = [
     {'name': MiniTrainingType.DEEPENING.name, 'category': MINI_TRAINING, 'code': ''}
 ]
 
-COMMON_OFFER = ['1BA', '2A', '2M', '2MC']
+COMMON_OFFER = ['1BA', '2A', '2M', '2MC', '']
 
 
 def create_common_offer_for_academic_year(year):
