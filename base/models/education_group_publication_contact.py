@@ -60,13 +60,13 @@ class EducationGroupPublicationContact(OrderedModel):
         max_length=255,
         default='',
         blank=True,
-        verbose_name=_('role in french')
+        verbose_name=_('role (french)')
     )
     role_en = models.CharField(
         max_length=255,
         default='',
         blank=True,
-        verbose_name=_('role in english')
+        verbose_name=_('role (english)')
     )
     email = models.EmailField(
         verbose_name=_('email'),
