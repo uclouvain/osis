@@ -101,11 +101,18 @@ def create_education_group(request, category, education_group_type_pk, parent_id
     if form_education_group_year.is_valid():
         return _common_success_redirect(request, form_education_group_year, parent)
 
-    data = {"form_education_group_year": form_education_group_year.forms[forms.ModelForm],
-               "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
-               "parent": parent}
+    data = {
+        "form_education_group_year": form_education_group_year.forms[forms.ModelForm],
+        "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
+        "parent": parent,
+    }
+
     if category == education_group_categories.TRAINING:
-        data.update({"form_hops":form_education_group_year.hops_form})
+        data.update(
+            {
+                "form_hops": form_education_group_year.hops_form,
+            }
+        )
 
     return layout.render(request, TEMPLATES_BY_CATEGORY.get(category), data)
 
