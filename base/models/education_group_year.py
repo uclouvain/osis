@@ -630,10 +630,6 @@ class EducationGroupYear(SerializableModel):
 
         return list(set(ascendants))
 
-    @property
-    def hops(self):
-        return Hops.objects.get(education_group_year=self)
-
     def is_deletable(self):
         """An education group year cannot be deleted if there are enrollment on it"""
         if self.offerenrollment_set.all().exists():
