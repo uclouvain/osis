@@ -104,7 +104,6 @@ class TestCreate(TestCase):
                 self.assertRedirects(response, '/login/?next={}'.format(url))
 
     def test_permission_required(self):
-        i = 0
         for category, url in self.urls_without_parent_by_category.items():
             with self.subTest(url=url):
                 education_group_type = next(eg_type for eg_type in self.education_group_types
@@ -113,7 +112,6 @@ class TestCreate(TestCase):
                 self.mocked_perm.assert_called_with(self.person, None, category,
                                                     education_group_type=str(education_group_type.pk),
                                                     raise_exception=True)
-                i += 1
 
     def test_template_used(self):
         for category in self.test_categories:
