@@ -58,3 +58,9 @@ class MiniTrainingEducationGroupTypeFactory(EducationGroupTypeFactory):
 
 class GroupEducationGroupTypeFactory(EducationGroupTypeFactory):
     category = education_group_categories.GROUP
+
+
+class ExistingEducationGroupTypeFactory(EducationGroupTypeFactory):
+    class Meta:
+        model = 'base.EducationGroupType'
+        django_get_or_create = ('category', 'name')

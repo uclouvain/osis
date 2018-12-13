@@ -54,12 +54,11 @@ def is_eligible_to_add_group(person, education_group, raise_exception=False):
 
 def _is_eligible_to_add_education_group(person, education_group, category, education_group_type=None,
                                         raise_exception=False):
-    is_authorized = not management.is_max_child_reached(education_group, education_group_type) if education_group_type \
-        else check_authorized_type(education_group, category, raise_exception)
     return check_permission(person, "base.add_educationgroup", raise_exception) and \
         _is_eligible_to_add_education_group_with_category(person, category, raise_exception) and \
         _is_eligible_education_group(person, education_group, raise_exception) and \
-        is_authorized
+        (not management.is_max_child_reached(education_group, education_group_type) if education_group_type
+         else check_authorized_type(education_group, category, raise_exception))
 
 
 def is_eligible_to_change_education_group(person, education_group, raise_exception=False):
