@@ -347,6 +347,7 @@ def _get_valid_post_data(category):
         education_group_type=education_group_type,
         education_group__start_year=current_academic_year.year,
         constraint_type=CREDITS,
+        credits=10
     )
     AuthorizedRelationshipFactory(child_type=fake_education_group_year.education_group_type)
     post_data = {
