@@ -79,6 +79,7 @@ class EducationGroupEntityPublicationContactForm(forms.ModelForm):
         field_classes = {
            "publication_contact_entity": PublicationContactEntityChoiceField,
         }
+        labels = {'publication_contact_entity': ''}
 
     def __init__(self, *args, **kwargs):
         if not kwargs.get('instance'):
