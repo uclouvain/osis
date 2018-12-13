@@ -81,7 +81,7 @@ OFFERS = [
     {'name': MiniTrainingType.DEEPENING.name, 'category': MINI_TRAINING, 'code': ''}
 ]
 
-COMMON_OFFER = ['1BA', '2A', '2M', '2MC']
+COMMON_OFFER = ['1BA', '2A', '2M', '2MC', '']
 CONTACTS_ENTITY_KEY = 'contact_entity_code'
 
 
