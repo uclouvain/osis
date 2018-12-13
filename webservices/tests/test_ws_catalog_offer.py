@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import datetime
-from unittest import mock
 
 import django
 from django.conf import settings
@@ -36,7 +35,8 @@ from base.tests.factories.education_group_year import (
     EducationGroupYearCommonMasterFactory,
     EducationGroupYearMasterFactory,
     EducationGroupYearCommonBachelorFactory,
-    EducationGroupYearCommonFactory)
+    EducationGroupYearCommonFactory, EducationGroupYearCommonSpecializedMasterFactory,
+    EducationGroupYearCommonAgregationFactory)
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -701,6 +701,92 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
         sections = condition_admissions_section['content']['sections']
         self.assertEqual(len(sections['university_bachelors']['records']['ucl_bachelors']), 1)
 
+    def test_admission_conditions_for_agregation(self):
+        education_group_year = EducationGroupYearFactory(
+            acronym='BIOL2A'
+        )
+
+        education_group_year_common = EducationGroupYearCommonAgregationFactory(
+            academic_year=education_group_year.academic_year
+        )
+
+        admission_condition_common = AdmissionCondition.objects.create(
+            education_group_year=education_group_year_common,
+            text_free='text_free',
+            text_ca_cond_generales='text_ca_cond_generales',
+            text_ca_ouv_adultes='text_ca_ouv_adultes ',
+            text_ca_allegement='text_ca_allegement',
+            text_ca_maitrise_fr='text_ca_maitrise_fr'
+        )
+
+        iso_language, language = 'fr-be', 'fr'
+
+        data = {
+            'anac': education_group_year.academic_year.year,
+            'code_offre': education_group_year.acronym,
+            'sections': [
+                'conditions_admissions'
+            ]
+        }
+
+        response = self.post(education_group_year.academic_year.year,
+                             language,
+                             education_group_year.acronym,
+                             data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content_type, 'application/json')
+
+        response_json = response.json()
+
+        useless, condition_admissions_section = remove_conditions_admission(response_json['sections'])
+        sections = condition_admissions_section['content']
+        self.assertEqual(sections['ca_cond_generales'],
+                         admission_condition_common.text_ca_cond_generales)
+        self.assertEqual(sections['ca_ouv_adultes'],
+                         admission_condition_common.text_ca_ouv_adultes)
+        self.assertEqual(sections['ca_allegement'],
+                         admission_condition_common.text_ca_allegement)
+        self.assertEqual(sections['ca_maitrise_fr'],
+                         admission_condition_common.text_ca_maitrise_fr)
+
+    def test_admission_conditions_for_specialized_master(self):
+        education_group_year = EducationGroupYearFactory(
+            acronym='DPIM2MC'
+        )
+
+        education_group_year_common = EducationGroupYearCommonSpecializedMasterFactory(
+            academic_year=education_group_year.academic_year
+        )
+
+        admission_condition_common = AdmissionCondition.objects.create(
+            education_group_year=education_group_year_common,
+            text_free='text_free',
+            text_ca_cond_generales='text_ca_cond_generales'
+        )
+
+        iso_language, language = 'fr-be', 'fr'
+
+        data = {
+            'anac': education_group_year.academic_year.year,
+            'code_offre': education_group_year.acronym,
+            'sections': [
+                'conditions_admissions'
+            ]
+        }
+
+        response = self.post(education_group_year.academic_year.year,
+                             language,
+                             education_group_year.acronym,
+                             data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content_type, 'application/json')
+
+        response_json = response.json()
+        useless, condition_admissions_section = remove_conditions_admission(response_json['sections'])
+        sections = condition_admissions_section['content']
+        self.assertEqual(sections['ca_cond_generales'],
+                         admission_condition_common.text_ca_cond_generales)
+
     def test_empty_string_evaluated_as_null(self):
         education_group_year = EducationGroupYearMasterFactory()
 
@@ -768,6 +854,7 @@ class WebServiceParametersValidationTestCase(TestCase):
 
 class WebServiceValidateJsonRequestTestCase(TestCase, Helper):
     URL_NAME = 'v0.1-ws_catalog_offer'
+
     def test_raise_suspiciousoperation_with_year(self):
         from webservices.views import validate_json_request
         json = {
