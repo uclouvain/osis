@@ -3855,7 +3855,7 @@ msgstr "La liste des messages qui vous ont été envoyés par l'application"
 msgid ""
 "The number of children of type \"%(child_type)s\" for \"%(parent)s\" has "
 "already reached the limit."
-msgstr ""
+msgstr "Le nombre d'enfants de type \"%(child_type)s\" pour \"%(parent)s\" a atteint la limite maximum."
 
 #: models/learning_unit_year.py:388 tests/models/test_learning_unit_year.py:564
 #, python-format

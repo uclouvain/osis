@@ -248,7 +248,8 @@ class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView)
                 }
             display_error_messages(request, error_msg)
             return JsonResponse({"error": True, "success_url": self.get_success_url()})
-        if child_branch and group_element_years.management.is_min_child_reached(parent, child_branch):
+        if child_branch and \
+                group_element_years.management.is_min_child_reached(parent, child_branch.education_group_type):
             error_msg = \
                 _("Cannot detach child \"%(child)s\". "
                   "The parent must have at least one child of type \"%(type)s\".") % {
