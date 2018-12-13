@@ -351,8 +351,8 @@ class SimplifiedVolumeForm(forms.ModelForm):
         volume_q2 = self.cleaned_data.get("hourly_volume_partial_q2") or 0
         volume_total = self.cleaned_data.get("hourly_volume_total_annual") or 0
 
-        if self.cleaned_data.get("hourly_volume_partial_q1") and self.cleaned_data.get(
-                "hourly_volume_partial_q2") and volume_total != volume_q1 + volume_q2:
+        if (self.cleaned_data.get("hourly_volume_partial_q1") or self.cleaned_data.get(
+                "hourly_volume_partial_q2")) and volume_total != volume_q1 + volume_q2:
             self.add_error("hourly_volume_total_annual",
                            _('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
             self.add_error("hourly_volume_partial_q1", "")
