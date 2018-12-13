@@ -95,6 +95,22 @@ class EducationGroupYearCommonBachelorFactory(EducationGroupYearFactory):
     )
 
 
+class EducationGroupYearCommonAgregationFactory(EducationGroupYearFactory):
+    acronym = 'common-2a'
+    education_group_type = factory.SubFactory(
+        'base.tests.factories.education_group_type.ExistingEducationGroupTypeFactory',
+        name=TrainingType.AGGREGATION.name
+    )
+
+
+class EducationGroupYearCommonSpecializedMasterFactory(EducationGroupYearFactory):
+    acronym = 'common-mc'
+    education_group_type = factory.SubFactory(
+        'base.tests.factories.education_group_type.ExistingEducationGroupTypeFactory',
+        name=TrainingType.MASTER_MC.name
+    )
+
+
 class EducationGroupYearCommonMasterFactory(EducationGroupYearFactory):
     acronym = 'common-2m'
     education_group_type = factory.SubFactory(
