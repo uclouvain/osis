@@ -56,6 +56,7 @@ class MainDomainChoiceField(forms.ModelChoiceField):
 def _get_section_choices():
     return add_blank(CertificateAim.objects.values_list('section', 'section').distinct().order_by('section'))
 
+
 class HopsEducationGroupYearModelForm(forms.ModelForm):
 
     class Meta:
@@ -68,6 +69,18 @@ class HopsEducationGroupYearModelForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    def save(self, education_group_year=None):
+
+        if self.instance.id:
+            return super().save()
+        else:
+            hops = Hops(ares_study=self.instance.ares_study,
+                        ares_graca=self.instance.ares_graca,
+                        ares_ability=self.instance.ares_ability,
+                        education_group_year=education_group_year)
+
+            return hops.save()
 
 
 class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
@@ -202,8 +215,13 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.hops_form = self.hops_form_class(data=args[0],
-                                              instance=find_by_education_group_year(kwargs.pop('instance')))
+
+        education_group_yr = kwargs.pop('instance', None)
+        if education_group_yr:
+            self.hops_form = self.hops_form_class(data=args[0],
+                                                  instance=find_by_education_group_year(education_group_yr))
+        else:
+            self.hops_form = self.hops_form_class(data=args[0], instance=Hops())
 
     def _post_save(self):
         education_group_instance = self.forms[EducationGroupModelForm].instance
@@ -216,8 +234,9 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
         }
 
     def save(self):
-        self.hops_form.save()
         egy_instance = super().save()
+        if self.hops_form.is_valid():
+            self.hops_form.save(education_group_year=egy_instance)
         self.structure = create_initial_group_element_year_structure(
             [egy_instance, *self.education_group_year_postponed]
         )

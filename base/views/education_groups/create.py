@@ -104,6 +104,7 @@ def create_education_group(request, category, education_group_type_pk, parent_id
     return layout.render(request, TEMPLATES_BY_CATEGORY.get(category), {
         "form_education_group_year": form_education_group_year.forms[forms.ModelForm],
         "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
+        "form_hops": form_education_group_year.hops_form,
         "parent": parent
     })
 
