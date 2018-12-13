@@ -30,7 +30,6 @@ import re
 from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
 from django.http import Http404
-from django.template import loader
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.renderers import JSONRenderer
@@ -285,7 +284,9 @@ def build_content_response(context, admission_condition, admission_condition_com
     }
 
     if acronym_suffix in ('2a', '2mc'):
-        fields = ('alert_message', 'ca_cond_generales', 'ca_maitrise_fr', 'ca_allegement', 'ca_ouv_adultes')
+        fields = ('alert_message', 'ca_cond_generales')
+        if acronym_suffix == '2a':
+            fields += ('ca_maitrise_fr', 'ca_allegement', 'ca_ouv_adultes')
 
         response.update({field: get_value(field=field) for field in fields})
 
