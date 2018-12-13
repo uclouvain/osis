@@ -26,6 +26,7 @@
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext_lazy as _, pgettext
 
+from base.business.group_element_years import management
 from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.models.academic_calendar import AcademicCalendar
 from base.models.education_group_type import find_authorized_types
@@ -40,22 +41,24 @@ ERRORS_MSG = {
 
 
 def is_eligible_to_add_training(person, education_group, raise_exception=False):
-    return _is_eligible_to_add_education_group(person, education_group, TRAINING, raise_exception)
+    return _is_eligible_to_add_education_group(person, education_group, TRAINING, raise_exception=raise_exception)
 
 
 def is_eligible_to_add_mini_training(person, education_group, raise_exception=False):
-    return _is_eligible_to_add_education_group(person, education_group, MINI_TRAINING, raise_exception)
+    return _is_eligible_to_add_education_group(person, education_group, MINI_TRAINING, raise_exception=raise_exception)
 
 
 def is_eligible_to_add_group(person, education_group, raise_exception=False):
-    return _is_eligible_to_add_education_group(person, education_group, GROUP, raise_exception)
+    return _is_eligible_to_add_education_group(person, education_group, GROUP, raise_exception=raise_exception)
 
 
-def _is_eligible_to_add_education_group(person, education_group, category, raise_exception=False):
+def _is_eligible_to_add_education_group(person, education_group, category, education_group_type=None,
+                                        raise_exception=False):
     return check_permission(person, "base.add_educationgroup", raise_exception) and \
-           _is_eligible_to_add_education_group_with_category(person, category, raise_exception) and \
-           _is_eligible_education_group(person, education_group, raise_exception) and \
-           check_authorized_type(education_group, category, raise_exception)
+        _is_eligible_to_add_education_group_with_category(person, category, raise_exception) and \
+        _is_eligible_education_group(person, education_group, raise_exception) and \
+        (not management.is_max_child_reached(education_group, education_group_type) if education_group_type
+         else check_authorized_type(education_group, category, raise_exception))
 
 
 def is_eligible_to_change_education_group(person, education_group, raise_exception=False):
