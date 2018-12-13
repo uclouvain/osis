@@ -152,9 +152,9 @@ class VolumeEditionForm(forms.Form):
                     self.add_error("volume_q2", _("One of the partial volumes must have a value to 0."))
 
             else:
-                if self.cleaned_data.get("volume_q1") == 0:
+                if volume_q1 == 0:
                     self.add_error("volume_q1", _("The volume can not be set to 0."))
-                if self.cleaned_data.get("volume_q2") == 0:
+                if volume_q2 == 0:
                     self.add_error("volume_q2", _("The volume can not be set to 0."))
 
         return cleaned_data
