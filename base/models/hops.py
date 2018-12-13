@@ -40,7 +40,7 @@ class HopsAdmin(SerializableModelAdmin):
 
 
 class Hops(SerializableModel):
-
+    # HOPS means "Habilitations et Offre Programmée de l’enseignement Supérieur".
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     education_group_year = models.OneToOneField('base.EducationGroupYear', on_delete=models.CASCADE)
@@ -69,3 +69,10 @@ class Hops(SerializableModel):
 
     def __str__(self):
         return str(self.ares_study) if self.ares_study else ''
+
+
+def find_by_education_group_year(education_group_year):
+    try:
+        return Hops.objects.get(education_group_year=education_group_year)
+    except Hops.DoesNotExist:
+        return None

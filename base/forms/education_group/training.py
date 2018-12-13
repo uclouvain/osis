@@ -44,6 +44,8 @@ from base.models.entity_version import get_last_version
 from base.models.enums import education_group_categories, rate_code, decree_category
 from reference.models.domain import Domain
 from reference.models.enums import domain_type
+from base.models.hops import Hops, find_by_education_group_year
+from base.models.education_group_year import EducationGroupYear
 
 
 class MainDomainChoiceField(forms.ModelChoiceField):
@@ -53,6 +55,19 @@ class MainDomainChoiceField(forms.ModelChoiceField):
 
 def _get_section_choices():
     return add_blank(CertificateAim.objects.values_list('section', 'section').distinct().order_by('section'))
+
+class HopsEducationGroupYearModelForm(forms.ModelForm):
+
+    class Meta:
+        model = Hops
+        fields = [
+            'ares_study',
+            'ares_graca',
+            'ares_ability',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
 class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
@@ -115,7 +130,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             'certificate_aims',
             'web_re_registration',
             'co_graduation',
-            'co_graduation_coefficient'
+            'co_graduation_coefficient',
         ]
 
         field_classes = {
@@ -183,6 +198,12 @@ class TrainingModelForm(EducationGroupModelForm):
 class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
     education_group_year_form_class = TrainingEducationGroupYearForm
     education_group_form_class = TrainingModelForm
+    hops_form_class = HopsEducationGroupYearModelForm
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.hops_form = self.hops_form_class(data=args[0],
+                                              instance=find_by_education_group_year(kwargs.pop('instance')))
 
     def _post_save(self):
         education_group_instance = self.forms[EducationGroupModelForm].instance
@@ -195,6 +216,7 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
         }
 
     def save(self):
+        self.hops_form.save()
         egy_instance = super().save()
         self.structure = create_initial_group_element_year_structure(
             [egy_instance, *self.education_group_year_postponed]
