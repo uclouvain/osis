@@ -66,6 +66,15 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
     URL_NAME = 'v0.1-ws_catalog_offer'
     maxDiff = None
 
+    def setUp(self):
+        self.education_group_year = EducationGroupYearMasterFactory()
+        common_master_education_group_year = EducationGroupYearCommonMasterFactory(
+            academic_year=self.education_group_year.academic_year
+        )
+        self.common_education_group_year = EducationGroupYearCommonFactory(
+            academic_year=self.education_group_year.academic_year
+        )
+
     def test_year_not_found(self):
         response = self.post(1990, 'fr', 'actu2m', data={})
         self.assertEqual(response.status_code, 404)
@@ -83,17 +92,11 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         self.assertEqual(response.status_code, 404)
 
     def test_first_based_on_the_original_message(self):
-        education_group_year = EducationGroupYearFactory(acronym='ACTU2M')
-
-        common_education_group_year = EducationGroupYearCommonFactory(
-            academic_year=education_group_year.academic_year
-        )
-
         iso_language, language = 'fr-be', 'fr'
 
         message = {
-            'anac': str(education_group_year.academic_year.year),
-            'code_offre': education_group_year.acronym,
+            'anac': str(self.education_group_year.academic_year.year),
+            'code_offre': self.education_group_year.acronym,
             "sections": [
                 "welcome_job",
                 "welcome_profil",
@@ -126,7 +129,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         }
 
         ega = EducationGroupYearFactory(partial_acronym='lactu200t',
-                                        academic_year=education_group_year.academic_year)
+                                        academic_year=self.education_group_year.academic_year)
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='intro')
         TranslatedTextLabelFactory(text_label=text_label,
                                    language=iso_language)
@@ -140,12 +143,12 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                                    language=iso_language)
         TranslatedTextRandomFactory(text_label=text_label,
                                     language=iso_language,
-                                    reference=education_group_year.id,
+                                    reference=self.education_group_year.id,
                                     entity=text_label.entity)
 
         TranslatedTextRandomFactory(text_label=text_label,
                                     language=iso_language,
-                                    reference=common_education_group_year.id,
+                                    reference=self.common_education_group_year.id,
                                     entity=text_label.entity)
 
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='evaluation')
@@ -153,12 +156,12 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                                    language=iso_language)
         TranslatedTextRandomFactory(text_label=text_label,
                                     language=iso_language,
-                                    reference=education_group_year.id,
+                                    reference=self.education_group_year.id,
                                     entity=text_label.entity)
 
         TranslatedTextRandomFactory(text_label=text_label,
                                     language=iso_language,
-                                    reference=common_education_group_year.id,
+                                    reference=self.common_education_group_year.id,
                                     entity=text_label.entity)
 
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='caap')
@@ -166,18 +169,18 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                                    language=iso_language)
         TranslatedTextRandomFactory(text_label=text_label,
                                     language=iso_language,
-                                    reference=education_group_year.id,
+                                    reference=self.education_group_year.id,
                                     entity=text_label.entity)
 
         TranslatedTextRandomFactory(text_label=text_label,
                                     language=iso_language,
-                                    reference=common_education_group_year.id,
+                                    reference=self.common_education_group_year.id,
                                     entity=text_label.entity)
 
         response = self.post(
-            education_group_year.academic_year.year,
+            self.education_group_year.academic_year.year,
             language,
-            education_group_year.acronym,
+            self.education_group_year.acronym,
             data=message,
         )
 
@@ -185,13 +188,6 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         self.assertEqual(response.content_type, 'application/json')
 
     def test_without_any_sections(self):
-        education_group_year = EducationGroupYearFactory(acronym='actu2m')
-
-        common_education_group_year = EducationGroupYearFactory(
-            acronym='common',
-            academic_year=education_group_year.academic_year,
-        )
-
         text_label = TextLabelFactory(entity=OFFER_YEAR)
 
         for iso_language, language in [('fr-be', 'fr'), ('en', 'en')]:
@@ -200,20 +196,20 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                                            language=iso_language)
                 TranslatedTextRandomFactory(text_label=text_label,
                                             language=iso_language,
-                                            reference=common_education_group_year.id,
+                                            reference=self.common_education_group_year.id,
                                             entity=text_label.entity)
                 message = {
-                    'anac': str(education_group_year.academic_year.year),
-                    'code_offre': education_group_year.acronym,
+                    'anac': str(self.education_group_year.academic_year.year),
+                    'code_offre': self.education_group_year.acronym,
                     'sections': [
                         'welcome_job',
                     ]
                 }
 
                 response = self.post(
-                    education_group_year.academic_year.year,
+                    self.education_group_year.academic_year.year,
                     language,
-                    education_group_year.acronym,
+                    self.education_group_year.acronym,
                     data=message
                 )
 
@@ -224,18 +220,16 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                 sections, conditions_admission_section = remove_conditions_admission(response_json['sections'])
                 response_json['sections'] = sections
 
-                title_to_test = education_group_year.title if language == 'fr' else education_group_year.title_english
+                title_to_test = self.education_group_year.title if language == 'fr' else self.education_group_year.title_english
                 self.assertDictEqual(response_json, {
-                    'acronym': education_group_year.acronym.upper(),
+                    'acronym': self.education_group_year.acronym.upper(),
                     'language': language,
                     'title': title_to_test,
                     'sections': [],
-                    'year': education_group_year.academic_year.year,
+                    'year': self.education_group_year.academic_year.year,
                 })
 
     def test_with_one_section(self):
-        education_group_year = EducationGroupYearFactory(acronym='actu2m')
-
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='caap')
 
         for iso_language, language in [('fr-be', 'fr'), ('en', 'en')]:
@@ -244,21 +238,21 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                                                  language=iso_language)
                 tt = TranslatedTextRandomFactory(text_label=text_label,
                                                  language=iso_language,
-                                                 reference=education_group_year.id,
+                                                 reference=self.education_group_year.id,
                                                  entity=text_label.entity)
 
                 message = {
-                    'code_offre': education_group_year.acronym,
-                    'anac': str(education_group_year.academic_year.year),
+                    'code_offre': self.education_group_year.acronym,
+                    'anac': str(self.education_group_year.academic_year.year),
                     'sections': [
                         text_label.label,
                     ]
                 }
 
                 response = self.post(
-                    education_group_year.academic_year.year,
+                    self.education_group_year.academic_year.year,
                     language,
-                    education_group_year.acronym,
+                    self.education_group_year.acronym,
                     data=message
                 )
 
@@ -269,13 +263,13 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                 sections, conditions_admission_section = remove_conditions_admission(response_json['sections'])
                 response_json['sections'] = sections
 
-                title_to_test = education_group_year.title if language == 'fr' else education_group_year.title_english
+                title_to_test = self.education_group_year.title if language == 'fr' else self.education_group_year.title_english
 
                 self.assertDictEqual(response_json, {
-                    'acronym': education_group_year.acronym.upper(),
+                    'acronym': self.education_group_year.acronym.upper(),
                     'language': language,
                     'title': title_to_test,
-                    'year': education_group_year.academic_year.year,
+                    'year': self.education_group_year.academic_year.year,
                     'sections': [
                         {
                             'label': ttl.label,
@@ -286,11 +280,6 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                 })
 
     def test_with_one_section_with_common(self):
-        education_group_year = EducationGroupYearMasterFactory()
-
-        common_education_group_year = EducationGroupYearCommonFactory(
-            academic_year=education_group_year.academic_year,
-        )
 
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='caap')
 
@@ -300,17 +289,17 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                                                  language=iso_language)
                 tt = TranslatedTextRandomFactory(text_label=text_label,
                                                  language=iso_language,
-                                                 reference=education_group_year.id,
+                                                 reference=self.education_group_year.id,
                                                  entity=text_label.entity)
 
                 tt2 = TranslatedTextRandomFactory(text_label=text_label,
                                                   language=iso_language,
-                                                  reference=common_education_group_year.id,
+                                                  reference=self.common_education_group_year.id,
                                                   entity=text_label.entity)
 
                 message = {
-                    'code_offre': education_group_year.acronym,
-                    'anac': str(education_group_year.academic_year.year),
+                    'code_offre': self.education_group_year.acronym,
+                    'anac': str(self.education_group_year.academic_year.year),
                     'sections': [
                         text_label.label,
                         text_label.label + '-commun'
@@ -318,9 +307,9 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                 }
 
                 response = self.post(
-                    education_group_year.academic_year.year,
+                    self.education_group_year.academic_year.year,
                     language,
-                    education_group_year.acronym,
+                    self.education_group_year.acronym,
                     data=message
                 )
 
@@ -329,16 +318,16 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
 
                 response_json = response.json()
 
-                title_to_test = education_group_year.title if language == 'fr' else education_group_year.title_english
+                title_to_test = self.education_group_year.title if language == 'fr' else self.education_group_year.title_english
 
                 sections, conditions_admission_section = remove_conditions_admission(response_json.pop('sections', []))
                 response_sections = convert_sections_list_of_dict_to_dict(sections)
 
                 self.assertDictEqual(response_json, {
-                    'acronym': education_group_year.acronym.upper(),
+                    'acronym': self.education_group_year.acronym.upper(),
                     'language': language,
                     'title': title_to_test,
-                    'year': education_group_year.academic_year.year,
+                    'year': self.education_group_year.academic_year.year,
                 })
 
                 sections = [{
@@ -355,12 +344,6 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                 self.assertDictEqual(response_sections, sections)
 
     def test_global(self):
-        education_group_year = EducationGroupYearFactory(acronym='ACTU2M')
-
-        common_education_group_year = EducationGroupYearCommonFactory(
-            academic_year=education_group_year.academic_year
-        )
-
         iso_language, language = 'fr-be', 'fr'
 
         sections = [
@@ -414,14 +397,14 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
 
             TranslatedTextRandomFactory(text_label=text_label,
                                         language=iso_language,
-                                        reference=education_group_year.id,
+                                        reference=self.education_group_year.id,
                                         entity=text_label.entity,
                                         text='<tag>{section}</tag>'.format(section=section))
 
             if section in common_sections_set:
                 TranslatedTextRandomFactory(text_label=text_label,
                                             language=iso_language,
-                                            reference=common_education_group_year.id,
+                                            reference=self.common_education_group_year.id,
                                             entity=text_label.entity,
                                             text='<tag>{section}-commun</tag>'.format(section=section))
 
@@ -430,7 +413,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                                    language=iso_language)
 
         for section in intro_set:
-            ega = EducationGroupYearFactory(partial_acronym=section, academic_year=education_group_year.academic_year)
+            ega = EducationGroupYearFactory(partial_acronym=section, academic_year=self.education_group_year.academic_year)
             TranslatedTextRandomFactory(text_label=text_label,
                                         language=iso_language,
                                         reference=ega.id,
@@ -438,15 +421,15 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                                         text='<tag>intro-{section}</tag>'.format(section=section))
 
         message = {
-            'anac': str(education_group_year.academic_year.year),
-            'code_offre': education_group_year.acronym,
+            'anac': str(self.education_group_year.academic_year.year),
+            'code_offre': self.education_group_year.acronym,
             "sections": sections,
         }
 
         response = self.post(
-            education_group_year.academic_year.year,
+            self.education_group_year.academic_year.year,
             language,
-            education_group_year.acronym,
+            self.education_group_year.acronym,
             data=message,
         )
 
@@ -475,23 +458,21 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         self.assertEqual(len(response_sections), 0)
 
     def test_no_translation_for_term(self):
-        education_group_year = EducationGroupYearMasterFactory()
-
         iso_language, language = 'fr-be', 'fr'
 
         text_label = TextLabelFactory(entity=OFFER_YEAR)
         translated_text_label = TranslatedTextLabelFactory(text_label=text_label, language=iso_language)
 
         message = {
-            'anac': str(education_group_year.academic_year.year),
-            'code_offre': education_group_year.acronym,
+            'anac': str(self.education_group_year.academic_year.year),
+            'code_offre': self.education_group_year.acronym,
             'sections': [text_label.label]
         }
 
         response = self.post(
-            year=education_group_year.academic_year.year,
+            year=self.education_group_year.academic_year.year,
             language=language,
-            acronym=education_group_year.acronym,
+            acronym=self.education_group_year.acronym,
             data=message
         )
 
@@ -511,18 +492,16 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         self.assertEqual(response_sections, sections)
 
     def test_no_corresponding_term(self):
-        education_group_year = EducationGroupYearMasterFactory()
-
         message = {
-            'anac': str(education_group_year.academic_year.year),
-            'code_offre': education_group_year.acronym,
+            'anac': str(self.education_group_year.academic_year.year),
+            'code_offre': self.education_group_year.acronym,
             'sections': ['demo']
         }
 
         response = self.post(
-            year=education_group_year.academic_year.year,
+            year=self.education_group_year.academic_year.year,
             language='fr',
-            acronym=education_group_year.acronym,
+            acronym=self.education_group_year.acronym,
             data=message
         )
 
@@ -538,6 +517,12 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
 
 class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
     URL_NAME = 'v0.1-ws_catalog_offer'
+
+    def setUp(self):
+        self.education_group_year_master = EducationGroupYearMasterFactory()
+        self.common_master_education_group_year = EducationGroupYearCommonMasterFactory(
+            academic_year=self.education_group_year_master.academic_year
+        )
 
     def test_admission_conditions_for_bachelors_without_common(self):
         education_group_year = EducationGroupYearFactory(acronym='hist1ba')
@@ -615,18 +600,12 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
         })
 
     def test_admission_conditions_for_master(self):
-        education_group_year = EducationGroupYearMasterFactory()
-
-        admission_condition = AdmissionCondition.objects.create(education_group_year=education_group_year)
+        admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_year_master)
         admission_condition.text_university_bachelors = 'text_university_bachelors'
         admission_condition.save()
 
-        education_group_year_common = EducationGroupYearCommonMasterFactory(
-            academic_year=education_group_year.academic_year
-        )
-
         admission_condition_common = AdmissionCondition.objects.create(
-            education_group_year=education_group_year_common
+            education_group_year=self.common_master_education_group_year
         )
         admission_condition_common.text_free = 'text_free'
         admission_condition_common.text_personalized_access = 'text_personalized_access'
@@ -637,16 +616,16 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
         iso_language, language = 'fr-be', 'fr'
 
         message = {
-            'anac': education_group_year.academic_year.year,
-            'code_offre': education_group_year.acronym,
+            'anac': self.education_group_year_master.academic_year.year,
+            'code_offre': self.education_group_year_master.acronym,
             'sections': [
                 'conditions_admissions'
             ]
         }
 
-        response = self.post(education_group_year.academic_year.year,
+        response = self.post(self.education_group_year_master.academic_year.year,
                              language,
-                             education_group_year.acronym,
+                             self.education_group_year_master.acronym,
                              data=message)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, 'application/json')
@@ -664,11 +643,7 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
                          admission_condition_common.text_admission_enrollment_procedures)
 
     def test_admission_conditions_for_master_with_diplomas(self):
-        education_group_year = EducationGroupYearMasterFactory()
-
-        admission_condition = AdmissionCondition.objects.create(education_group_year=education_group_year)
-
-        EducationGroupYearCommonMasterFactory(academic_year=education_group_year.academic_year)
+        admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_year_master)
 
         acl = AdmissionConditionLine.objects.create(admission_condition=admission_condition)
         acl.section = 'ucl_bachelors'
@@ -681,16 +656,16 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
         iso_language, language = 'fr-be', 'fr'
 
         message = {
-            'anac': education_group_year.academic_year.year,
-            'code_offre': education_group_year.acronym,
+            'anac': self.education_group_year_master.academic_year.year,
+            'code_offre': self.education_group_year_master.acronym,
             'sections': [
                 'conditions_admissions'
             ]
         }
 
-        response = self.post(education_group_year.academic_year.year,
+        response = self.post(self.education_group_year_master.academic_year.year,
                              language,
-                             education_group_year.acronym,
+                             self.education_group_year_master.acronym,
                              data=message)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, 'application/json')
@@ -788,9 +763,9 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
                          admission_condition_common.text_ca_cond_generales)
 
     def test_empty_string_evaluated_as_null(self):
-        education_group_year = EducationGroupYearMasterFactory()
-
-        admission_condition = AdmissionCondition.objects.create(education_group_year=education_group_year)
+        admission_condition = AdmissionCondition.objects.create(
+            education_group_year=self.education_group_year_master
+        )
         acl = AdmissionConditionLine.objects.create(
             admission_condition=admission_condition,
             section='ucl_bachelors',
@@ -800,13 +775,17 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
 
         iso_language, language = 'fr-be', 'fr'
         data = {
-            'anac': education_group_year.academic_year.year,
-            'code_offre': education_group_year.acronym,
+            'anac': self.education_group_year_master.academic_year.year,
+            'code_offre': self.education_group_year_master.acronym,
             'sections': [
                 'conditions_admissions'
             ]
         }
-        response = self.post(education_group_year.academic_year.year, language, education_group_year.acronym, data=data)
+        response = self.post(
+            self.education_group_year_master.academic_year.year,
+            language, self.education_group_year_master.acronym,
+            data=data
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, 'application/json')
 
