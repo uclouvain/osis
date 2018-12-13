@@ -226,7 +226,6 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_sections_with_translated_labels(self, is_common_education_group_year=None):
         # Load the info from the common education group year
         common_education_group_year = None
-        print(self.object.academic_year)
         if not is_common_education_group_year:
             common_education_group_year = EducationGroupYear.objects.get(
                 acronym='common',

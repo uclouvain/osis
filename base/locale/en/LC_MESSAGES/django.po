@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: views/education_groups/group_element_year/update.py:248
+#: views/education_groups/group_element_year/update.py:261
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr ""
@@ -740,9 +740,16 @@ msgstr ""
 msgid "Cancel the proposal"
 msgstr ""
 
+#: views/education_groups/group_element_year/update.py:253
+#, python-format
+msgid ""
+"Cannot detach child \"%(child)s\". The parent must have at least one child "
+"of type \"%(type)s\"."
+msgstr ""
+
 #: tests/views/group_element_years/test_detach.py:156
 #: tests/views/group_element_years/test_detach.py:181
-#: views/education_groups/group_element_year/update.py:242
+#: views/education_groups/group_element_year/update.py:246
 #, python-format
 msgid ""
 "Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a "
@@ -1925,6 +1932,7 @@ msgstr ""
 msgid "Learning location"
 msgstr ""
 
+#: business/group_element_years/management.py:68
 #: templates/learning_unit/breadcrumb.html:30
 #: templates/learning_unit/comparison.html:29 templates/learning_units.html:63
 #: templates/my_osis/profile.html:131
@@ -3547,7 +3555,7 @@ msgid ""
 "(end date of '%s' of the program '%s')"
 msgstr ""
 
-#: views/education_groups/group_element_year/update.py:226
+#: views/education_groups/group_element_year/update.py:229
 #, python-format
 msgid "The comments of %(acronym)s has been updated"
 msgstr ""
@@ -3739,6 +3747,13 @@ msgstr ""
 
 #: templates/my_osis/home.html:49
 msgid "The messages sent by the application to you"
+msgstr ""
+
+#: business/group_element_years/management.py:88
+#, python-format
+msgid ""
+"The number of children of type \"%(child_type)s\" for \"%(parent)s\" has "
+"already reached the limit."
 msgstr ""
 
 #: models/learning_unit_year.py:388 tests/models/test_learning_unit_year.py:564
@@ -4441,6 +4456,7 @@ msgid ""
 msgstr ""
 
 #: business/group_element_years/management.py:65
+#: business/group_element_years/management.py:78
 #: tests/views/education_groups/test_update.py:492
 #, python-format
 msgid ""
