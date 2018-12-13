@@ -284,7 +284,9 @@ def build_content_response(context, admission_condition, admission_condition_com
     }
 
     if acronym_suffix in ('2a', '2mc'):
-        fields = ('alert_message', 'ca_cond_generales', 'ca_maitrise_fr', 'ca_allegement', 'ca_ouv_adultes')
+        fields = ('alert_message', 'ca_cond_generales')
+        if acronym_suffix == '2a':
+            fields += ('ca_maitrise_fr', 'ca_allegement', 'ca_ouv_adultes')
 
         response.update({field: get_value(field=field) for field in fields})
 
