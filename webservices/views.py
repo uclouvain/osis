@@ -390,7 +390,9 @@ def get_conditions_admissions(context):
     )
 
     admission_condition_common = AdmissionCondition.objects.filter(
-        education_group_year__acronym__iexact=common_acronym).first()
+        education_group_year__acronym__iexact=common_acronym,
+        education_group_year__academic_year=context.education_group_year.academic_year
+    ).first()
 
     result = {
         'id': 'conditions_admission',
