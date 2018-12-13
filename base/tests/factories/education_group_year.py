@@ -104,7 +104,7 @@ class EducationGroupYearCommonAgregationFactory(EducationGroupYearFactory):
 
 
 class EducationGroupYearCommonSpecializedMasterFactory(EducationGroupYearFactory):
-    acronym = 'common-mc'
+    acronym = 'common-2mc'
     education_group_type = factory.SubFactory(
         'base.tests.factories.education_group_type.ExistingEducationGroupTypeFactory',
         name=TrainingType.MASTER_MC.name

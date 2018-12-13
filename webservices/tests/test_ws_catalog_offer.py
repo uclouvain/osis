@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import datetime
-from unittest import mock
 
 import django
 from django.conf import settings
@@ -36,7 +35,8 @@ from base.tests.factories.education_group_year import (
     EducationGroupYearCommonMasterFactory,
     EducationGroupYearMasterFactory,
     EducationGroupYearCommonBachelorFactory,
-    EducationGroupYearCommonFactory)
+    EducationGroupYearCommonFactory, EducationGroupYearCommonSpecializedMasterFactory,
+    EducationGroupYearCommonAgregationFactory)
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -706,24 +706,22 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
             acronym='BIOL2A'
         )
 
-        education_group_year_common = EducationGroupYearCommonFactory(
-            acronym='common-2a',
+        education_group_year_common = EducationGroupYearCommonAgregationFactory(
             academic_year=education_group_year.academic_year
         )
 
         admission_condition_common = AdmissionCondition.objects.create(
-            education_group_year=education_group_year_common
+            education_group_year=education_group_year_common,
+            text_free='text_free',
+            text_ca_cond_generales='text_ca_cond_generales',
+            text_ca_ouv_adultes='text_ca_ouv_adultes ',
+            text_ca_allegement='text_ca_allegement',
+            text_ca_maitrise_fr='text_ca_maitrise_fr'
         )
-        admission_condition_common.text_free = 'text_free'
-        admission_condition_common.text_ca_cond_generales = 'text_ca_cond_generales'
-        admission_condition_common.text_ca_ouv_adultes = 'text_ca_ouv_adultes '
-        admission_condition_common.text_ca_allegement = 'text_ca_allegement'
-        admission_condition_common.text_ca_maitrise_fr = 'text_ca_maitrise_fr'
-        admission_condition_common.save()
 
         iso_language, language = 'fr-be', 'fr'
 
-        message = {
+        data = {
             'anac': education_group_year.academic_year.year,
             'code_offre': education_group_year.acronym,
             'sections': [
@@ -734,7 +732,7 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
         response = self.post(education_group_year.academic_year.year,
                              language,
                              education_group_year.acronym,
-                             data=message)
+                             data=data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, 'application/json')
 
@@ -756,21 +754,19 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
             acronym='DPIM2MC'
         )
 
-        education_group_year_common = EducationGroupYearCommonFactory(
-            acronym='common-2mc',
+        education_group_year_common = EducationGroupYearCommonSpecializedMasterFactory(
             academic_year=education_group_year.academic_year
         )
 
         admission_condition_common = AdmissionCondition.objects.create(
-            education_group_year=education_group_year_common
+            education_group_year=education_group_year_common,
+            text_free='text_free',
+            text_ca_cond_generales='text_ca_cond_generales'
         )
-        admission_condition_common.text_free = 'text_free'
-        admission_condition_common.text_ca_cond_generales = 'text_ca_cond_generales'
-        admission_condition_common.save()
 
         iso_language, language = 'fr-be', 'fr'
 
-        message = {
+        data = {
             'anac': education_group_year.academic_year.year,
             'code_offre': education_group_year.acronym,
             'sections': [
@@ -781,7 +777,7 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
         response = self.post(education_group_year.academic_year.year,
                              language,
                              education_group_year.acronym,
-                             data=message)
+                             data=data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, 'application/json')
 
