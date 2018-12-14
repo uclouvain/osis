@@ -83,7 +83,7 @@ def attach_from_cache(parent):
                         'parent_type': parent.education_group_type,
                     }
                 )
-            if is_max_child_reached(parent, egy):
+            if is_max_child_reached(parent, egy.education_group_type):
                 raise MaxChildrenReachedException(
                     errors=_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
                              "has already reached the limit.") % {
@@ -109,32 +109,31 @@ def _types_are_compatible(parent, child):
     ).exists()
 
 
-def is_max_child_reached(parent, child):
+def is_max_child_reached(parent, child_education_group_type):
     def _is_max_child_reached(number_children, authorized_relationship):
         max_count = authorized_relationship.max_count_authorized
         return number_children > 0 and max_count == count_constraint.ONE
 
-    return _is_limit_child_reached(parent, child, _is_max_child_reached)
+    return _is_limit_child_reached(parent, child_education_group_type, _is_max_child_reached)
 
 
-def is_min_child_reached(parent, child):
+def is_min_child_reached(parent, child_education_group_type):
     def _is_min_child_reached(number_children, authorized_relationship):
         min_count = authorized_relationship.min_count_authorized
         return min_count == count_constraint.ONE and number_children < 2
 
-    return _is_limit_child_reached(parent, child, _is_min_child_reached)
+    return _is_limit_child_reached(parent, child_education_group_type, _is_min_child_reached)
 
 
-def _is_limit_child_reached(parent, child, boolean_func):
-    child_education_type = child.education_group_type
+def _is_limit_child_reached(parent, child_education_group_type, boolean_func):
     number_children_of_same_type = GroupElementYear.objects.filter(
         parent=parent,
-        child_branch__education_group_type=child_education_type
+        child_branch__education_group_type=child_education_group_type
     ).count()
     try:
         auth_rel = authorized_relationship.AuthorizedRelationship.objects.get(
             parent_type=parent.education_group_type,
-            child_type=child.education_group_type,
+            child_type=child_education_group_type,
         )
     except authorized_relationship.AuthorizedRelationship.DoesNotExist:
         return True
