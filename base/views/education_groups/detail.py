@@ -57,7 +57,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import TrainingType
+from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.person import Person
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys
@@ -460,10 +460,14 @@ class EducationGroupContent(EducationGroupGenericDetailView):
         context = super().get_context_data(**kwargs)
 
         context["group_element_years"] = self.object.groupelementyear_set.annotate(
-                code_scs=Case(
+                acronym=Case(
                         When(child_leaf__isnull=False, then=F("child_leaf__acronym")),
                         When(child_branch__isnull=False, then=F("child_branch__acronym")),
                      ),
+                code=Case(
+                    When(child_branch__isnull=False, then=F("child_branch__partial_acronym")),
+                    default=None
+                ),
                 title=Case(
                         When(child_leaf__isnull=False, then=F("child_leaf__specific_title")),
                         When(child_branch__isnull=False, then=F("child_branch__title")),
@@ -474,7 +478,15 @@ class EducationGroupContent(EducationGroupGenericDetailView):
                 ),
             ).order_by('order')
 
+        context['show_minor_major_option_table'] = self._show_minor_major_option_table()
         return context
+
+    def _show_minor_major_option_table(self):
+        return self.object.education_group_type.name in (
+            GroupType.MAJOR_LIST_CHOICE.name,
+            GroupType.MINOR_LIST_CHOICE.name,
+            GroupType.OPTION_LIST_CHOICE.name
+        )
 
 
 class EducationGroupUsing(EducationGroupGenericDetailView):
