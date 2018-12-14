@@ -38,7 +38,10 @@ def can_create_education_group(view_func):
 
         parent_id = kwargs.get("parent_id")
         parent = get_object_or_404(EducationGroupYear, pk=parent_id) if parent_id else None
-        if not business_perms._is_eligible_to_add_education_group(pers, parent, category, raise_exception=True):
+        education_group_type_pk = kwargs.get("education_group_type_pk")
+        if not business_perms._is_eligible_to_add_education_group(pers, parent, category,
+                                                                  education_group_type=education_group_type_pk,
+                                                                  raise_exception=True):
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
     return f_can_create_education_group

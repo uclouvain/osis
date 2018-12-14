@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-12 15:38+0100\n"
+"POT-Creation-Date: 2018-12-13 14:34+0100\n"
 "PO-Revision-Date: 2018-11-21 14:40+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -213,14 +213,17 @@ msgid "AND"
 msgstr "ET"
 
 #: models/hops.py:65
+#: templates/education_group/blocks/academic_offer_info.html:39
 msgid "ARES ability"
 msgstr "Habilitation ARES"
 
 #: models/hops.py:51
+#: templates/education_group/blocks/academic_offer_info.html:31
 msgid "ARES study code"
 msgstr "Code étude ARES"
 
 #: models/hops.py:58
+#: templates/education_group/blocks/academic_offer_info.html:35
 msgid "ARES-GRACA"
 msgstr "ARES-GRACA"
 
@@ -295,7 +298,7 @@ msgstr "Partenaire académique"
 msgid "Academic responsible"
 msgstr "Responsable académique"
 
-#: templates/education_group/blocks/contacts_general_informations.html:67
+#: templates/education_group/blocks/contacts_general_informations.html:75
 msgid "Academic responsibles"
 msgstr "Responsables académique"
 
@@ -423,14 +426,14 @@ msgid "Add potential courses"
 msgstr "Ajouts de cours éventuels"
 
 #: templates/education_group/blocks/admission_condition_text.html:48
+#: templates/education_group/blocks/row_label_general_informations.html:55
 #: templates/education_group/blocks/row_translatedtext_side_by_side.html:38
-#: templates/education_group/tab_general_informations.html:87
 msgid "Add the English content of this paragraph"
 msgstr "Ajouter le contenu Anglais de ce paragraphe"
 
 #: templates/education_group/blocks/admission_condition_text.html:41
+#: templates/education_group/blocks/row_label_general_informations.html:48
 #: templates/education_group/blocks/row_translatedtext_side_by_side.html:31
-#: templates/education_group/tab_general_informations.html:80
 msgid "Add the French content of this paragraph"
 msgstr "Ajouter le contenu Français de ce paragraphe"
 
@@ -869,12 +872,12 @@ msgid "Close"
 msgstr "Fermer"
 
 #: models/education_group_year.py:447
-#: templates/education_group/blocks/academic_offer_info.html:31
+#: templates/education_group/blocks/academic_offer_info.html:46
 msgid "Co-graduation"
 msgstr "Co-diplomation"
 
 #: models/education_group_year.py:455
-#: templates/education_group/blocks/academic_offer_info.html:35
+#: templates/education_group/blocks/academic_offer_info.html:50
 msgid "Co-graduation coefficient"
 msgstr "Coefficient de co-diplomation"
 
@@ -977,7 +980,7 @@ msgstr "Consolider"
 msgid "Consolidate the proposal"
 msgstr "Consolider la proposition"
 
-#: templates/education_group/blocks/contacts_general_informations.html:53
+#: templates/education_group/blocks/contacts_general_informations.html:62
 msgid "Contacts"
 msgstr "Contacts"
 
@@ -1015,7 +1018,7 @@ msgstr "Cours"
 msgid "Course enrollment"
 msgstr "Inscription aux cours"
 
-#: templates/education_group/blocks/contacts_general_informations.html:56
+#: templates/education_group/blocks/contacts_general_informations.html:65
 #: templates/education_group/blocks/coorganization.html:156
 #: templates/education_group/blocks/panel/panel_achievements.html:89
 #: templates/education_group/blocks/panel/panel_achievements.html:101
@@ -1240,14 +1243,14 @@ msgstr "Durée"
 
 #: templates/academic_calendar/academic_calendar.html:83
 #: templates/academic_calendar/academic_calendar.html:85
-#: templates/education_group/blocks/contacts_general_informations.html:33
+#: templates/education_group/blocks/contacts_general_informations.html:44
 #: templates/education_group/blocks/contacts_general_informations_ul.html:49
 #: templates/education_group/blocks/content_actions.html:46
 #: templates/education_group/blocks/coorganization.html:79
 #: templates/education_group/blocks/coorganization.html:130
 #: templates/education_group/blocks/panel/panel_additional_info_skills.html:49
 #: templates/education_group/blocks/panel/panel_program_aims.html:49
-#: templates/education_group/tab_general_informations.html:68
+#: templates/education_group/blocks/row_label_general_informations.html:36
 #: templates/learning_unit/blocks/panel/educational_informations.html:85
 #: templates/learning_unit/blocks/panel/educational_informations.html:97
 #: templates/learning_unit/specifications.html:53
@@ -1428,7 +1431,7 @@ msgid "Entities"
 msgstr "Entités"
 
 #: business/education_group.py:49 forms/education_groups.py:86
-#: templates/education_group/blocks/contacts_general_informations.html:30
+#: templates/education_group/blocks/contacts_general_informations.html:41
 #: templates/education_group/search.html:151 templates/offers.html:51
 #: templates/offers.html:52 templates/offers.html:80
 msgid "Entity"
@@ -1762,6 +1765,10 @@ msgstr "Sous forme attendue"
 msgid "In heading 2 of diploma"
 msgstr "Dans la rubrique 2 du diplôme"
 
+#: templates/education_group/blocks/contacts_general_informations.html:29
+msgid "In practice"
+msgstr "En pratique"
+
 #: templates/learning_unit/by_activity.html:120
 msgid "In proposal"
 msgstr "En proposition"
@@ -1896,7 +1903,7 @@ msgstr "Jury"
 msgid "Jury member"
 msgstr "Membre du jury"
 
-#: templates/education_group/blocks/contacts_general_informations.html:81
+#: templates/education_group/blocks/contacts_general_informations.html:89
 msgid "Jury members"
 msgstr "Membres du jury"
 
@@ -2689,7 +2696,7 @@ msgstr "Organisations"
 msgid "Other academic responsible"
 msgstr "Autre responsable académique"
 
-#: templates/education_group/blocks/contacts_general_informations.html:74
+#: templates/education_group/blocks/contacts_general_informations.html:82
 msgid "Other academic responsibles"
 msgstr "Autres responsables académique"
 
@@ -2702,7 +2709,7 @@ msgstr "Autre collectif"
 msgid "Other contact"
 msgstr "Autre contact"
 
-#: templates/education_group/blocks/contacts_general_informations.html:88
+#: templates/education_group/blocks/contacts_general_informations.html:96
 msgid "Other contacts"
 msgstr "Autres contacts"
 
@@ -3855,7 +3862,7 @@ msgstr "La liste des messages qui vous ont été envoyés par l'application"
 msgid ""
 "The number of children of type \"%(child_type)s\" for \"%(parent)s\" has "
 "already reached the limit."
-msgstr ""
+msgstr "Le nombre d'enfants de type \"%(child_type)s\" pour \"%(parent)s\" a atteint la limite maximum."
 
 #: models/learning_unit_year.py:388 tests/models/test_learning_unit_year.py:564
 #, python-format
@@ -3895,7 +3902,7 @@ msgstr ""
 msgid "The program aim has been updated"
 msgstr ""
 
-#: views/education_groups/detail.py:368
+#: views/education_groups/detail.py:386
 msgid "The program are published. Click on the link to display it : "
 msgstr "Le programme a été publié. Cliquez sur le lien pour l'afficher : "
 
@@ -4044,7 +4051,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 
-#: views/education_groups/detail.py:309
+#: views/education_groups/detail.py:315
 #, python-format
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
@@ -4079,7 +4086,7 @@ msgstr "Gestion des stages des étudiants."
 msgid "This process helps tutors while scores encoding."
 msgstr "Processus visant à aider les enseignants pour l'encodage des notes."
 
-#: views/education_groups/detail.py:365
+#: views/education_groups/detail.py:383
 msgid "This program has no page to publish on it"
 msgstr "Ce programme n'a pas de page sur laquelle le publier"
 
@@ -4231,7 +4238,7 @@ msgstr "Diplôme avec l'UCL"
 msgid "URL of the learning unit"
 msgstr "URL de l'unité d'enseignement"
 
-#: views/education_groups/detail.py:326
+#: views/education_groups/detail.py:332
 msgid "Unable to retrieve appropriate sections for this programs"
 msgstr ""
 "Impossible de récupérer les sections pertinentes pour le programme consulté"
@@ -4278,7 +4285,7 @@ msgstr "Mettre à jour"
 msgid "Update contact"
 msgstr "Mise-à-jour contact"
 
-#: forms/education_group/publication_contact.py:90
+#: forms/education_group/publication_contact.py:95
 msgid "Update entity"
 msgstr "Mise-à-jour entité"
 

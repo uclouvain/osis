@@ -138,8 +138,8 @@ class VolumeEditionForm(forms.Form):
         volume_q2 = self.cleaned_data.get("volume_q2") or 0
         volume_total = self.cleaned_data.get("volume_total") or 0
 
-        if self.cleaned_data.get("volume_q1") and self.cleaned_data.get(
-                "volume_q2") and volume_total != volume_q1 + volume_q2:
+        if (self.cleaned_data.get("volume_q1") is not None or self.cleaned_data.get(
+                "volume_q2") is not None) and volume_total != volume_q1 + volume_q2:
             self.add_error("volume_total", _('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
             self.add_error("volume_q1", "")
             self.add_error("volume_q2", "")
@@ -152,9 +152,9 @@ class VolumeEditionForm(forms.Form):
                     self.add_error("volume_q2", _("One of the partial volumes must have a value to 0."))
 
             else:
-                if self.cleaned_data.get("volume_q1") == 0:
+                if volume_q1 == 0:
                     self.add_error("volume_q1", _("The volume can not be set to 0."))
-                if self.cleaned_data.get("volume_q2") == 0:
+                if volume_q2 == 0:
                     self.add_error("volume_q2", _("The volume can not be set to 0."))
 
         return cleaned_data
@@ -351,8 +351,8 @@ class SimplifiedVolumeForm(forms.ModelForm):
         volume_q2 = self.cleaned_data.get("hourly_volume_partial_q2") or 0
         volume_total = self.cleaned_data.get("hourly_volume_total_annual") or 0
 
-        if self.cleaned_data.get("hourly_volume_partial_q1") and self.cleaned_data.get(
-                "hourly_volume_partial_q2") and volume_total != volume_q1 + volume_q2:
+        if (self.cleaned_data.get("hourly_volume_partial_q1") is not None or self.cleaned_data.get(
+                "hourly_volume_partial_q2") is not None) and volume_total != volume_q1 + volume_q2:
             self.add_error("hourly_volume_total_annual",
                            _('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
             self.add_error("hourly_volume_partial_q1", "")
