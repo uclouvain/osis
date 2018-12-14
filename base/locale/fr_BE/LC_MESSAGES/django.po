@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-14 09:56+0100\n"
+"POT-Creation-Date: 2018-12-14 12:04+0100\n"
 "PO-Revision-Date: 2018-11-21 14:40+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -338,6 +338,10 @@ msgstr "Accepté"
 #: templates/education_group/tab_admission_conditions.html:141
 msgid "Access"
 msgstr "Accès"
+
+#: templates/education_group/blocks/content_minor_major_option_table.html:33
+msgid "Access condition"
+msgstr "Condition d'accès"
 
 #: models/enums/education_group_types.py:42 models/enums/rate_code.py:46
 msgid "Access contest"
@@ -726,8 +730,8 @@ msgid "Birth Date"
 msgstr "Date de naissance"
 
 #: models/group_element_year.py:118
+#: templates/education_group/blocks/content_default_table.html:36
 #: templates/education_group/blocks/table_utilizations.html:36
-#: templates/education_group/tab_content.html:57
 #: templates/learning_unit/formations.html:46
 msgid "Block"
 msgstr "Bloc"
@@ -887,7 +891,9 @@ msgstr "Co-titulaire"
 
 #: business/learning_unit.py:59 business/learning_unit_xls.py:72
 #: forms/education_groups.py:87 forms/learning_unit/search_form.py:78
-#: models/learning_unit_year.py:127 templates/education_group/search.html:152
+#: models/learning_unit_year.py:127
+#: templates/education_group/blocks/content_minor_major_option_table.html:30
+#: templates/education_group/search.html:152
 #: templates/learning_unit/by_activity.html:81
 #: templates/learning_unit/by_external.html:46
 #: templates/learning_unit/external/read.html:8
@@ -895,11 +901,11 @@ msgstr "Co-titulaire"
 msgid "Code"
 msgstr "Code"
 
-#: templates/education_group/tab_content.html:51
+#: templates/education_group/blocks/content_default_table.html:30
 msgid "Code SCS"
 msgstr "Code SCS"
 
-#: templates/education_group/tab_content.html:92
+#: templates/education_group/blocks/content_default_table.html:71
 #: templates/learning_unit/blocks/comment.html:6
 msgid "Comment"
 msgstr "Commentaire"
@@ -1036,8 +1042,8 @@ msgstr "Créer contact"
 msgid "Creation"
 msgstr "Création"
 
+#: templates/education_group/blocks/content_default_table.html:32
 #: templates/education_group/blocks/table_utilizations.html:32
-#: templates/education_group/tab_content.html:53
 msgid "Cred. rel./abs."
 msgstr "Créd. rel./abs."
 
@@ -1601,7 +1607,7 @@ msgstr "Formation doctorale"
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
-#: templates/education_group/tab_content.html:52
+#: templates/education_group/blocks/content_default_table.html:31
 msgid "Formation's code"
 msgstr "Code OF"
 
@@ -2071,8 +2077,8 @@ msgstr "Vol. PM"
 msgid "Legend"
 msgstr "Légende"
 
-#: models/group_element_year.py:142
-#: templates/education_group/tab_content.html:59
+#: models/group_element_year.py:145
+#: templates/education_group/blocks/content_default_table.html:38
 msgid "Link type"
 msgstr "Type de lien"
 
@@ -2226,8 +2232,8 @@ msgid "Mandates"
 msgstr "Mandates"
 
 #: models/group_element_year.py:111
+#: templates/education_group/blocks/content_default_table.html:35
 #: templates/education_group/blocks/table_utilizations.html:35
-#: templates/education_group/tab_content.html:56
 msgid "Mandatory"
 msgstr "Obligatoire"
 
@@ -2290,9 +2296,9 @@ msgid "Masters"
 msgstr "Masters"
 
 #: models/group_element_year.py:106
+#: templates/education_group/blocks/content_default_table.html:34
 #: templates/education_group/blocks/table_utilizations.html:34
 #: templates/education_group/group_element_year_comment_inner.html:41
-#: templates/education_group/tab_content.html:55
 msgid "Max. credits"
 msgstr "Créd. max."
 
@@ -2310,9 +2316,9 @@ msgid "Method not allowed"
 msgstr "Methode non autorisée"
 
 #: models/group_element_year.py:100
+#: templates/education_group/blocks/content_default_table.html:33
 #: templates/education_group/blocks/table_utilizations.html:33
 #: templates/education_group/group_element_year_comment_inner.html:40
-#: templates/education_group/tab_content.html:54
 msgid "Min. credits"
 msgstr "Créd. min."
 
@@ -2734,7 +2740,7 @@ msgstr "Autre(s) enseignant(s)"
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr "Autres bacheliers de la Communauté française de Belgique"
 
-#: templates/education_group/tab_content.html:83
+#: templates/education_group/blocks/content_default_table.html:62
 msgid "Own comment"
 msgstr "Commentaire propre"
 
@@ -3096,7 +3102,7 @@ msgstr "Q1 ou Q2"
 msgid "Q2"
 msgstr "Q2"
 
-#: templates/education_group/tab_content.html:58
+#: templates/education_group/blocks/content_default_table.html:37
 msgid "Quad. derog."
 msgstr "Quad. dérog."
 
@@ -3383,6 +3389,10 @@ msgstr "Titre abrégé"
 #: templates/my_osis/my_messages.html:80
 msgid "Show message"
 msgstr "Lire le message"
+
+#: templates/education_group/blocks/content_minor_major_option_table.html:31
+msgid "Sigle"
+msgstr ""
 
 #: models/enums/mandate_type.py:36
 msgid "Signatory"
@@ -4102,9 +4112,10 @@ msgstr "La formation n'a pas de contenu à reporter."
 #: forms/learning_unit/search_form.py:174
 #: templates/academic_calendar/academic_calendar.html:48
 #: templates/academic_calendar/academic_calendar_form.html:65
+#: templates/education_group/blocks/content_default_table.html:31
+#: templates/education_group/blocks/content_minor_major_option_table.html:32
 #: templates/education_group/blocks/table_utilizations.html:31
-#: templates/education_group/search.html:149
-#: templates/education_group/tab_content.html:52 templates/entities.html:67
+#: templates/education_group/search.html:149 templates/entities.html:67
 #: templates/entity/identification.html:55
 #: templates/entity/identification.html:116 templates/entity/versions.html:44
 #: templates/learning_unit/by_activity.html:82
@@ -4933,8 +4944,8 @@ msgstr "email"
 msgid "end"
 msgstr "fin"
 
-#: models/group_element_year.py:131
-#: templates/education_group/tab_content.html:102
+#: models/group_element_year.py:134
+#: templates/education_group/blocks/content_default_table.html:81
 msgid "english comment"
 msgstr "commentaire anglais"
 
@@ -5310,6 +5321,7 @@ msgstr "volume total global"
 msgid "yes"
 msgstr "oui"
 
+#: templates/education_group/blocks/content_minor_major_option_table.html:43
 #: templates/education_group/blocks/table_utilizations.html:52
 #: templates/learning_unit/identification.html:161
 #: templates/learning_unit/identification.html:165

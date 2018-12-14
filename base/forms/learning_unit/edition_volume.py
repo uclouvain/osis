@@ -66,18 +66,21 @@ class VolumeEditionForm(forms.Form):
         label=_('Q1'),
         help_text=_('Volume Q1'),
         widget=StepHalfIntegerWidget(),
+        required=False,
     )
     add_field = EmptyField(label='+')
     volume_q2 = VolumeField(
         label=_('Q2'),
         help_text=_('Volume Q2'),
         widget=StepHalfIntegerWidget(),
+        required=False,
     )
     equal_field_1 = EmptyField(label='=')
     volume_total = VolumeField(
         label=_('Vol. annual'),
         help_text=_('The annual volume must be equal to the sum of the volumes Q1 and Q2'),
         widget=StepHalfIntegerWidget(),
+        required=False,
     )
     help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('Volume Q1'), _('Volume Q2'))
     closing_parenthesis_field = EmptyField(label=')')
