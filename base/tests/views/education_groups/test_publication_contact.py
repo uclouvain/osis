@@ -24,17 +24,17 @@
 #
 ##############################################################################
 import datetime
-from unittest import mock
 from http import HTTPStatus
+from unittest import mock
 
+from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
-from django.http import HttpResponseForbidden
 
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.enums import organization_type
 from base.models.enums.publication_contact_type import PublicationContactType
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory
 from base.tests.factories.entity import EntityFactory
@@ -187,8 +187,10 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
             "education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html",
         )
 
+    @mock.patch("base.views.education_groups.detail.EducationGroupGeneralInformation.get_appropriate_sections",
+                return_value=[])
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
-    def test_delete_assert_redirection(self, mock_permissions):
+    def test_delete_assert_redirection(self, mock_permissions, mock_get_appropriate_sections):
         http_referer = reverse('education_group_general_informations', args=[
             self.training.pk,
             self.training.pk,
@@ -239,8 +241,10 @@ class TestEntityPublicationContactUpdateView(PublicationContactViewSetupTest):
             "education_group/blocks/modal/modal_publication_contact_entity_edit_inner.html",
         )
 
+    @mock.patch("base.views.education_groups.detail.EducationGroupGeneralInformation.get_appropriate_sections",
+                return_value=[])
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
-    def test_update_assert_db(self, mock_permission):
+    def test_update_assert_db(self, mock_permission, mock_get_appropriate_sections):
         response = self.client.post(self.url_update, {
             'publication_contact_entity': self.entity_version.pk
         }, follow=True)

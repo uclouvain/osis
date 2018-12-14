@@ -54,7 +54,7 @@ class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
         'parent__acronym',
         'parent__partial_acronym'
     ]
-    list_filter = ('is_mandatory', 'minor_access', 'quadrimester_derogation', 'parent__academic_year')
+    list_filter = ('is_mandatory', 'access_condition', 'quadrimester_derogation', 'parent__academic_year')
 
 
 class GroupElementYearManager(models.Manager):
@@ -118,7 +118,10 @@ class GroupElementYear(OrderedModel):
         verbose_name=_("Block")
     )
 
-    minor_access = models.BooleanField(default=False)
+    access_condition = models.BooleanField(
+        default=False,
+        verbose_name=_('access condition')
+    )
 
     comment = models.TextField(
         max_length=500,
