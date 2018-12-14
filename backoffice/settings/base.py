@@ -30,7 +30,6 @@ from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 # Used in base.views.education_groups.detail.EducationGroupGeneralInformation#get_sections_with_translated_labels
-from .portal_conf import SECTION_LIST
 
 BASE_DIR = os.path.dirname((os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 

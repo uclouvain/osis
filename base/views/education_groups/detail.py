@@ -138,8 +138,11 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         )
         context['enums'] = mdl.enums.education_group_categories
 
-        if self.object.education_group_type.name in INTRO_OFFER:
-            context['intro'] = True
+        self.is_intro_offer = self.object.education_group_type.name in INTRO_OFFER
+        if self.is_intro_offer:
+            context['show_extra_info'] = False
+        else:
+            context['show_extra_info'] = True
 
         return context
 
@@ -222,10 +225,9 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         is_common_education_group_year = self.object.acronym.startswith('common')
         sections_to_display = self.get_appropriate_sections()
-        show_contacts = not sections_to_display or CONTACTS_KEY in sections_to_display
+        show_contacts = (not sections_to_display or CONTACTS_KEY in sections_to_display) and not self.is_intro_offer
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(
@@ -253,8 +255,11 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         # Load the labels
         Section = namedtuple('Section', 'title labels')
         sections_with_translated_labels = []
-
-        for section in settings.SECTION_LIST:
+        if self.is_intro_offer:
+            sections_list = settings.SECTION_INTRO
+        else:
+            sections_list = settings.SECTION_LIST
+        for section in sections_list:
             translated_labels = self.get_translated_labels_and_content(section,
                                                                        self.user_language_code,
                                                                        common_education_group_year,
