@@ -141,6 +141,13 @@ def get_text_label(entity, label):
     """
     Essaie de recuperer un label d'une entité ou simplement la crée si celle-ci n'existe pas.
     """
+    if label == 'intro':
+        TextLabel.objects.filter(
+            entity=entity,
+            label=label,
+            published=True
+        ).delete()
+        label = 'welcome_introduction'
     text_label, created = TextLabel.objects.get_or_create(
         entity=entity,
         label=label,
