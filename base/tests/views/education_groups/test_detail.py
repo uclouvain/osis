@@ -28,7 +28,9 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import TrainingType
+from base.models.enums.education_group_types import TrainingType, GroupType
+from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory, \
+    MiniTrainingEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, GroupFactory, \
     MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -222,3 +224,25 @@ class TestContent(TestCase):
         self.assertIn(self.group_element_year_2, geys)
         self.assertIn(self.group_element_year_3, geys)
         self.assertNotIn(self.group_element_year_without_container, geys)
+
+    def test_show_minor_major_option_table_case_right_type(self):
+        minor_major_option_types = [
+            GroupType.MINOR_LIST_CHOICE.name,
+            GroupType.MAJOR_LIST_CHOICE.name,
+            GroupType.OPTION_LIST_CHOICE.name,
+        ]
+
+        for group_type_name in minor_major_option_types:
+            education_group_type = GroupEducationGroupTypeFactory(name=group_type_name)
+            self.education_group_year_1.education_group_type = education_group_type
+            self.education_group_year_1.save()
+
+            response = self.client.get(self.url)
+            self.assertTrue(response.context["show_minor_major_option_table"])
+
+    def test_show_minor_major_option_table_case_not_right_type(self):
+        self.education_group_year_1.education_group_type = MiniTrainingEducationGroupTypeFactory()
+        self.education_group_year_1.save()
+
+        response = self.client.get(self.url)
+        self.assertFalse(response.context["show_minor_major_option_table"])

@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Count, OuterRef, Exists
 from django.urls import reverse
@@ -87,7 +87,10 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
 
 class EducationGroupYearManager(SerializableModelManager):
     def look_for_common(self, **kwargs):
-        return self.filter(acronym__startswith='common-', **kwargs)
+        return self.filter(acronym__startswith='common', **kwargs)
+
+    def get_common(self, **kwargs):
+        return self.get(acronym='common', **kwargs)
 
 
 class EducationGroupYear(SerializableModel):
@@ -239,7 +242,7 @@ class EducationGroupYear(SerializableModel):
         choices=activity_presence.ACTIVITY_PRESENCES,
         blank=True,
         null=True,
-        verbose_name=_('Other languages activities')
+        verbose_name=_('Activities on other campus')
     )
 
     professional_title = models.CharField(
@@ -249,7 +252,7 @@ class EducationGroupYear(SerializableModel):
         verbose_name=_('Professionnal title')
     )
 
-    joint_diploma = models.BooleanField(default=False, verbose_name=_('Joint diploma'))
+    joint_diploma = models.BooleanField(default=False, verbose_name=_('Leads to diploma/certificate'))
 
     diploma_printing_orientation = models.CharField(
         max_length=30,
@@ -438,6 +441,35 @@ class EducationGroupYear(SerializableModel):
         blank=True,
     )
 
+    co_graduation = models.CharField(
+        max_length=8,
+        db_index=True,
+        verbose_name=_("Co-graduation"),
+        blank=True,
+        null=True,
+    )
+
+    co_graduation_coefficient = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name=_('Co-graduation coefficient'),
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(1), MaxValueValidator(9999)],
+    )
+
+    web_re_registration = models.BooleanField(
+        default=True,
+        verbose_name=_('Web re-registration'),
+    )
+
+    publication_contact_entity = models.ForeignKey(
+        Entity,
+        verbose_name=_("Publication contact entity"),
+        null=True,
+        blank=True,
+    )
+
     class Meta:
         verbose_name = _("Education group year")
         unique_together = ('education_group', 'academic_year')
@@ -459,7 +491,7 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def is_common(self):
-        return self.acronym.startswith('common-')
+        return self.acronym.startswith('common')
 
     @property
     def verbose(self):
@@ -499,7 +531,7 @@ class EducationGroupYear(SerializableModel):
     @property
     def verbose_duration(self):
         if self.duration and self.duration_unit:
-            return "{} {}".format(self.duration, _(self.duration_unit))
+            return "{} {}".format(self.duration, self.get_duration_unit_display())
         return ""
 
     def get_absolute_url(self):
@@ -524,6 +556,14 @@ class EducationGroupYear(SerializableModel):
         return entity_version.find_entity_version_according_academic_year(
             self.management_entity, self.academic_year
         )
+
+    @cached_property
+    def publication_contact_entity_version(self):
+        if self.publication_contact_entity:
+            return entity_version.find_entity_version_according_academic_year(
+                self.publication_contact_entity, self.academic_year
+            )
+        return None
 
     def parent_by_training(self):
         """

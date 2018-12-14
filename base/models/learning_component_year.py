@@ -23,8 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Sum
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
@@ -35,7 +37,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class LearningComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('learning_container_year', 'learning_unit_year',  'acronym', 'type', 'comment', 'changed')
+    list_display = ('learning_container_year', 'learning_unit_year', 'acronym', 'type', 'comment', 'changed')
     search_fields = ['acronym', 'learning_container_year__acronym']
     list_filter = ('learning_container_year__academic_year',)
 
@@ -82,17 +84,17 @@ class LearningComponentYear(SerializableModel):
 
     @property
     def complete_acronym(self):
-        queryset = self.learningunitcomponent_set
-        learning_unit_acronym = queryset.all().values_list('learning_unit_year__acronym', flat=True).get()
+        learning_unit_acronym = self.learning_unit_year.acronym
+
         # FIXME :: Temporary solution - waiting for business clarification about "components" concept (untyped, ...)
         if self.acronym == 'NT':
             return '{}/PM'.format(learning_unit_acronym)
         else:
             return '{}/{}'.format(learning_unit_acronym, self.acronym)
 
-    @property
+    @cached_property
     def learning_unit_year(self):
-        return self.learningunitcomponent_set.all().select_related('learning_unit_year').get().learning_unit_year
+        return self.learningunityear_set.get()
 
     @property
     def real_classes(self):
@@ -107,28 +109,31 @@ class LearningComponentYear(SerializableModel):
     def _check_volumes_consistency(self):
         _warnings = []
 
-        vol_global = self.entitycomponentyear_set.aggregate(Sum('repartition_volume'))['repartition_volume__sum'] or 0
+        if not hasattr(self, 'vol_global'):
+            self.vol_global = self.entitycomponentyear_set.aggregate(
+                Sum('repartition_volume')
+            )['repartition_volume__sum'] or 0
         vol_total_annual = self.hourly_volume_total_annual or 0
         vol_q1 = self.hourly_volume_partial_q1 or 0
         vol_q2 = self.hourly_volume_partial_q2 or 0
         planned_classes = self.planned_classes or 0
 
-        inconsitent_msg = _('Volumes of {} are inconsistent').format(self.complete_acronym)
+        inconsistent_msg = _('Volumes of {} are inconsistent').format(self.complete_acronym)
         if vol_q1 + vol_q2 != vol_total_annual:
             _warnings.append("{} ({})".format(
-                inconsitent_msg,
-                _('Vol_tot is not equal to vol_q1 + vol_q2')))
-        if vol_total_annual * planned_classes != vol_global:
+                inconsistent_msg,
+                _('The annual volume must be equal to the sum of the volumes Q1 and Q2')))
+        if vol_total_annual * planned_classes != self.vol_global:
             _warnings.append("{} ({})".format(
-                inconsitent_msg,
+                inconsistent_msg,
                 _('Vol_global is not equal to Vol_tot * planned_classes')))
         if planned_classes == 0 and vol_total_annual > 0:
             _warnings.append("{} ({})".format(
-                inconsitent_msg,
+                inconsistent_msg,
                 _('planned classes cannot be 0 while volume is greater than 0')))
         if planned_classes > 0 and vol_total_annual == 0:
             _warnings.append("{} ({})".format(
-                inconsitent_msg,
+                inconsistent_msg,
                 _('planned classes cannot be greather than 0 while volume is equal to 0')))
         return _warnings
 

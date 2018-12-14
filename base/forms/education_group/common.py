@@ -29,6 +29,7 @@ from django.core.exceptions import PermissionDenied, ImproperlyConfigured, Valid
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 
+from base.business.group_element_years import management
 from base.forms.common import ValidationRuleMixin
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models import campus, group_element_year
@@ -44,6 +45,7 @@ from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY
     MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT, GROUP_PGRM_ENCODING_PERIOD, \
     GROUP_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
+from base.models.enums.education_group_types import ALL_TYPES
 
 
 class MainCampusChoiceField(forms.ModelChoiceField):
@@ -60,7 +62,7 @@ class MainEntitiesVersionChoiceField(EntitiesVersionChoiceField):
 
 class EducationGroupTypeModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-        return _(obj.name)
+        return obj.get_name_display()
 
 
 class ValidationRuleEducationGroupTypeMixin(ValidationRuleMixin):
@@ -314,12 +316,25 @@ class EducationGroupTypeForm(forms.Form):
 
     def __init__(self, parent, category, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.parent = parent
         self.fields["name"].queryset = find_authorized_types(
             category=category,
-            parents=parent
+            parents=self.parent
         )
 
-        self.fields["name"].label = _("Which type of %(category)s do you want to create ?") % {"category": _(category)}
+        self.fields["name"].label = _("Which type of %(category)s do you want to create ?") % {
+            "category": _(dict(education_group_categories.CATEGORIES)[category])}
+
+    def clean_name(self):
+        education_group_type = self.cleaned_data["name"]
+        if self.parent and management.is_max_child_reached(self.parent, education_group_type):
+            raise ValidationError(
+                _("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
+                  "has already reached the limit.") % {
+                    'child_type': education_group_type,
+                    'parent': self.parent}
+            )
+        return education_group_type
 
 
 class SelectLanguage(forms.Form):

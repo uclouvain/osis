@@ -49,6 +49,7 @@ class TestSendMessage(TestCase):
         self.person_3 = PersonWithPermissionsFactory("can_receive_emails_about_automatic_postponement")
 
         self.academic_year = test_academic_year.create_academic_year()
+        test_academic_year.create_academic_year(year=self.academic_year.year - 1)
         self.learning_unit_year = LearningUnitYearFactory(acronym="TEST",
                                                           specific_title="Cours de test",
                                                           academic_year=self.academic_year)
@@ -64,13 +65,13 @@ class TestSendMessage(TestCase):
                                                                                           self.learning_unit_year)
 
         self.msg_list = [
-            'The partim TEST_A has been deleted for the year '+str(self.academic_year.year),
-            'The partim TEST_B has been deleted for the year '+str(self.academic_year.year),
-            'The class TEST_C has been deleted for the year '+str(self.academic_year.year),
-            'The class TEST_A_C1 has been deleted for the year '+str(self.academic_year.year),
-            'The class TEST_A_C2 has been deleted for the year '+str(self.academic_year.year),
-            'The class TEST_B_C1 has been deleted for the year '+str(self.academic_year.year),
-            'The class TEST_B_C2 has been deleted for the year '+str(self.academic_year.year),
+            'The partim TEST_A has been deleted for the year ' + str(self.academic_year.year),
+            'The partim TEST_B has been deleted for the year ' + str(self.academic_year.year),
+            'The class TEST_C has been deleted for the year ' + str(self.academic_year.year),
+            'The class TEST_A_C1 has been deleted for the year ' + str(self.academic_year.year),
+            'The class TEST_A_C2 has been deleted for the year ' + str(self.academic_year.year),
+            'The class TEST_B_C1 has been deleted for the year ' + str(self.academic_year.year),
+            'The class TEST_B_C2 has been deleted for the year ' + str(self.academic_year.year),
             'The learning unit TEST has been successfully deleted for all years'
         ]
 
@@ -89,10 +90,12 @@ class TestSendMessage(TestCase):
     def test_send_mail_after_the_learning_unit_year_deletion(self, mock_class):
         mock_class.send.return_value = None
         self.assertIsInstance(mock_class, EmailMultiAlternatives)
-        send_mail.send_mail_after_the_learning_unit_year_deletion(self.persons,
-                                                                  self.learning_unit_year.acronym,
-                                                                  self.academic_year,
-                                                                  self.msg_list)
+        send_mail.send_mail_after_the_learning_unit_year_deletion(
+            self.persons,
+            self.learning_unit_year.acronym,
+            self.academic_year,
+            self.msg_list
+        )
         call_args = mock_class.call_args
         subject = call_args[0][0]
         recipients = call_args[0][3]
@@ -106,9 +109,9 @@ class TestSendMessage(TestCase):
         mock_class.send.return_value = None
         self.assertIsInstance(mock_class, EmailMultiAlternatives)
         send_mail.send_mail_before_annual_procedure_of_automatic_postponement_of_luy(self.academic_year,
-                                                                              self.luys_to_postpone,
-                                                                              self.luys_already_existing,
-                                                                              self.luys_ending_this_year)
+                                                                                     self.luys_to_postpone,
+                                                                                     self.luys_already_existing,
+                                                                                     self.luys_ending_this_year)
         call_args = mock_class.call_args
         recipients = call_args[0][3]
         attachments = call_args[1]
@@ -120,10 +123,10 @@ class TestSendMessage(TestCase):
         mock_class.send.return_value = None
         self.assertIsInstance(mock_class, EmailMultiAlternatives)
         send_mail.send_mail_after_annual_procedure_of_automatic_postponement_of_luy(self.academic_year,
-                                                                             self.luys_to_postpone,
-                                                                             self.luys_already_existing,
-                                                                             self.luys_ending_this_year,
-                                                                             self.msg_list)
+                                                                                    self.luys_to_postpone,
+                                                                                    self.luys_already_existing,
+                                                                                    self.luys_ending_this_year,
+                                                                                    self.msg_list)
         call_args = mock_class.call_args
         recipients = call_args[0][3]
         attachments = call_args[1]

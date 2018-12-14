@@ -1,4 +1,4 @@
-##############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,27 +15,22 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from django.test import TestCase
-
-from base.models import learning_container_year
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from django.utils import timezone
+############################################################################
+from django.conf import settings
 
 
-class LearningContainerYearTest(TestCase):
-    def test_find_by_id_with_id(self):
-        l_container_year = LearningContainerYearFactory()
-        self.assertEqual(l_container_year, learning_container_year.find_by_id(l_container_year.id))
+def show_toolbar(_):
+    """
+    Override the default toolbar function to determine whether to show the toolbar on a given page.
 
-    def test_find_by_id_with_wrong_value(self):
-        with self.assertRaises(ValueError):
-            learning_container_year.find_by_id("BAD VALUE")
+    Initially, the middleware allows only INTERNAL_IPS.
+
+    """
+    return bool(settings.DEBUG)

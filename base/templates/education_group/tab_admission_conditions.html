@@ -68,7 +68,9 @@
 
                                 {% if info.show_components_for_agreg_and_mc %}
                                     {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_cond_generales" text=_("General Conditions") field=admission_condition.text_ca_cond_generales field_en=admission_condition.text_ca_cond_generales_en %}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_maitrise_fr" text=_("French language proficiency examination") field=admission_condition.text_ca_maitrise field_en=admission_condition.text_ca_maitrise_en %}
+                                {% endif %}
+                                {% if info.show_components_for_agreg %}
+                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_maitrise_fr" text=_("French language proficiency examination") field=admission_condition.text_ca_maitrise_fr field_en=admission_condition.text_ca_maitrise_en %}
                                     {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_allegement" text=_("Reduction") field=admission_condition.text_ca_allegement field_en=admission_condition.text_ca_allegement_en %}
                                     {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_ouv_adultes" text=_("Opening to Adults") field=admission_condition.text_ca_ouv_adultes field_en=admission_condition.text_ca_ouv_adultes_en %}
                                 {% endif %}
