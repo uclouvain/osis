@@ -86,7 +86,7 @@ class ImportReddotTestCase(TestCase):
         )
         intro_text_label = TextLabel.objects.filter(
             entity='offer_year',
-            label='welcome_introduction',
+            label='intro',
             published=True
         )
         self.assertTrue(text_label.exists())
