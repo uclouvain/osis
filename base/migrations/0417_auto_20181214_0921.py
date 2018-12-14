@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0411_auto_20181210_1029'),
+        ('base', '0416_educationgrouptype_learning_unit_child_allowed'),
     ]
 
     operations = [
