@@ -57,7 +57,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import TrainingType
+from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.person import Person
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys
@@ -83,6 +83,14 @@ COMMON_PARAGRAPH = (
     'agregation',
     'finalites_didactiques',
     'prerequis'
+)
+
+INTRO_OFFER = (
+    TrainingType.MASTER_MS_120.name,
+    TrainingType.MASTER_MS_180_240.name,
+    GroupType.COMMON_CORE.name,
+    GroupType.SUB_GROUP.name,
+    MiniTrainingType.OPTION.name
 )
 
 
@@ -129,6 +137,9 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
             education_group=context['object'],
         )
         context['enums'] = mdl.enums.education_group_categories
+
+        if self.object.education_group_type.name in INTRO_OFFER:
+            context['intro'] = True
 
         return context
 
@@ -204,7 +215,6 @@ class EducationGroupDiplomas(EducationGroupGenericDetailView):
 
 class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     template_name = "education_group/tab_general_informations.html"
-    limited_by_category = (education_group_categories.TRAINING, education_group_categories.MINI_TRAINING)
 
     def get_queryset(self):
         """ Optimization """
