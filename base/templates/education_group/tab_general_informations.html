@@ -51,21 +51,25 @@
                         {% include "education_group/tabs.html" %}
                         <br>
                         {% for section_name, labels in sections_with_translated_labels %}
-                            <div class="section row">
-                                <div class="col-md-12 text-center">
-                                    <h3>{{ section_name }}</h3>
+                            {% if forloop.first or not intro  %}
+                                <div class="section row">
+                                    <div class="col-md-12 text-center">
+                                        <h3>{{ section_name }}</h3>
+                                    </div>
                                 </div>
-                            </div>
-                            {% for label in labels %}
-                                {% include  "education_group/blocks/row_label_general_informations.html" %}
-                                {% if not forloop.last %}
+                                {% for label in labels %}
+                                    {% if label.label == 'welcome_introduction' or not intro %}
+                                        {% include  "education_group/blocks/row_label_general_informations.html" %}
+                                        {% if not forloop.last and not intro %}
+                                        <hr/>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
                                 <hr/>
-                                {% endif %}
-                            {% endfor %}
-                            <hr/>
+                            {% endif %}
                         {% endfor %}
 
-                        {% if show_contacts %}
+                        {% if show_contacts and not intro %}
                             <div class="row">
                                 {% include  "education_group/blocks/contacts_general_informations.html" %}
                             </div>
