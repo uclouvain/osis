@@ -44,7 +44,7 @@ from base.models.entity_version import get_last_version
 from base.models.enums import education_group_categories, rate_code, decree_category
 from reference.models.domain import Domain
 from reference.models.enums import domain_type
-from base.models.hops import Hops, find_by_education_group_year
+from base.models.hops import Hops
 from base.models.education_group_year import EducationGroupYear
 
 
@@ -217,11 +217,7 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
         super().__init__(*args, **kwargs)
 
         education_group_yr = kwargs.pop('instance', None)
-        if education_group_yr:
-            self.hops_form = self.hops_form_class(data=args[0],
-                                                  instance=find_by_education_group_year(education_group_yr))
-        else:
-            self.hops_form = self.hops_form_class(data=args[0], instance=Hops())
+        self.init_hops_form_class(args, education_group_yr)
 
     def _post_save(self):
         education_group_instance = self.forms[EducationGroupModelForm].instance
@@ -241,6 +237,15 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
             [egy_instance, *self.education_group_year_postponed]
         )
         return egy_instance
+
+    def init_hops_form_class(self, args, education_group_yr):
+        try:
+            education_group_yr_hops = education_group_yr.hops
+        except AttributeError:
+            education_group_yr_hops = Hops()
+
+        self.hops_form = self.hops_form_class(data=args[0],
+                                              instance=education_group_yr_hops)
 
 
 @register('university_domains')

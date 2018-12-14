@@ -69,10 +69,3 @@ class Hops(SerializableModel):
 
     def __str__(self):
         return str(self.ares_study) if self.ares_study else ''
-
-
-def find_by_education_group_year(education_group_year):
-    try:
-        return Hops.objects.get(education_group_year=education_group_year)
-    except Hops.DoesNotExist:
-        return None
