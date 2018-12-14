@@ -31,6 +31,7 @@ from unittest import mock
 
 import bs4
 import reversion
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
@@ -52,6 +53,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory
+from base.views.education_groups.detail import _get_code_and_type
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
@@ -473,7 +475,8 @@ class EducationGroupGeneralInformations(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
-    def test_education_group_year_pedagogy_publish_not_found(self):
+    @mock.patch("requests.get", return_value=HttpResponseNotFound)
+    def test_education_group_year_pedagogy_publish_not_found(self, mock_get):
         url = reverse('education_group_publish', args=(self.education_group_child.id, self.education_group_parent.id))
         response = self.client.get(url)
         msg = [m.message for m in get_messages(response.wsgi_request)]
@@ -481,8 +484,17 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertEqual(len(msg), 1)
         self.assertIn(messages.ERROR, msg_level)
         self.assertEqual(response.status_code, 302)
+        code, type_education_group_year = _get_code_and_type(self.education_group_parent)
+        url = settings.URL_TO_PORTAL_UCL.format(
+            type=type_education_group_year,
+            anac=self.education_group_parent.academic_year.year,
+            code=code
+        )
+        url += "?" + settings.REFRESH_PARAM
+        mock_get.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
 
-    def test_education_group_year_pedagogy_publish_found(self):
+    @mock.patch("requests.get", return_value=HttpResponse)
+    def test_education_group_year_pedagogy_publish_found(self, mock_get):
         education_group_real = EducationGroupYearFactory(acronym="SINF1BA", academic_year=self.current_academic_year,
                                                          education_group_type=self.type_training)
         url = reverse('education_group_publish', args=(self.education_group_parent.id, education_group_real.id))
@@ -492,13 +504,22 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertEqual(len(msg), 1)
         self.assertIn(messages.SUCCESS, msg_level)
         self.assertEqual(response.status_code, 302)
+        code, type_education_group_year = _get_code_and_type(education_group_real)
+        url = settings.URL_TO_PORTAL_UCL.format(
+            type=type_education_group_year,
+            anac=education_group_real.academic_year.year,
+            code=code
+        )
+        url += "?" + settings.REFRESH_PARAM
+        mock_get.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
 
     def test_education_group_year_pedagogy_publish_when_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
         self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
-    def test_education_group_year_pedagogy_publish_minor(self):
+    @mock.patch("requests.get", return_value=HttpResponse)
+    def test_education_group_year_pedagogy_publish_minor(self, mock_get):
         education_group_minor = EducationGroupYearFactory(partial_acronym="LALLE100I",
                                                           academic_year=self.current_academic_year,
                                                           education_group_type=self.type_minor)
@@ -509,8 +530,17 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertEqual(len(msg), 1)
         self.assertIn(messages.SUCCESS, msg_level)
         self.assertEqual(response.status_code, 302)
+        code, type_education_group_year = _get_code_and_type(education_group_minor)
+        url = settings.URL_TO_PORTAL_UCL.format(
+            type=type_education_group_year,
+            anac=education_group_minor.academic_year.year,
+            code=code
+        )
+        url += "?" + settings.REFRESH_PARAM
+        mock_get.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
 
-    def test_education_group_year_pedagogy_publish_deepening(self):
+    @mock.patch("requests.get", return_value=HttpResponse)
+    def test_education_group_year_pedagogy_publish_deepening(self, mock_get):
         education_group_deep = EducationGroupYearFactory(partial_acronym="LDRT100P",
                                                          academic_year=self.current_academic_year,
                                                          education_group_type=self.type_deepening)
@@ -521,6 +551,14 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertEqual(len(msg), 1)
         self.assertIn(messages.SUCCESS, msg_level)
         self.assertEqual(response.status_code, 302)
+        code, type_education_group_year = _get_code_and_type(education_group_deep)
+        url = settings.URL_TO_PORTAL_UCL.format(
+            type=type_education_group_year,
+            anac=education_group_deep.academic_year.year,
+            code=code
+        )
+        url += "?" + settings.REFRESH_PARAM
+        mock_get.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
 
 
 @override_flag('education_group_update', active=True)
