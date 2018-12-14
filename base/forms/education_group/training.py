@@ -67,20 +67,9 @@ class HopsEducationGroupYearModelForm(forms.ModelForm):
             'ares_ability',
         ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def save(self, education_group_year=None):
-
-        if self.instance.id:
-            return super().save()
-        else:
-            hops = Hops(ares_study=self.instance.ares_study,
-                        ares_graca=self.instance.ares_graca,
-                        ares_ability=self.instance.ares_ability,
-                        education_group_year=education_group_year)
-
-            return hops.save()
+    def save(self, education_group_year):
+        self.instance.education_group_year = education_group_year
+        return super().save()
 
 
 class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
