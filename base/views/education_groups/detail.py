@@ -246,8 +246,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         # Load the info from the common education group year
         common_education_group_year = None
         if not is_common_education_group_year:
-            common_education_group_year = EducationGroupYear.objects.get(
-                acronym='common',
+            common_education_group_year = EducationGroupYear.objects.get_common(
                 academic_year=self.object.academic_year,
             )
 
