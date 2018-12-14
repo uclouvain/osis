@@ -10,24 +10,21 @@ from base.management.commands import import_reddot
 from base.management.commands.import_reddot import _import_skills_and_achievements, \
     _get_field_achievement_according_to_language, _get_role_field_publication_contact_according_to_language, \
     _import_contacts, _import_contact_entity, CONTACTS_ENTITY_KEY, import_offer_and_items
-from base.models.enums import organization_type
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from cms.models.text_label import TextLabel
-from cms.models.translated_text_label import TranslatedTextLabel
-from base.models.education_group_publication_contact import EducationGroupPublicationContact
-from base.models.enums.publication_contact_type import PublicationContactType
-from webservices.business import SKILLS_AND_ACHIEVEMENTS_CMS_DATA
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.education_group import EducationGroup
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums import organization_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.organization_type import MAIN
+from base.models.enums.publication_contact_type import PublicationContactType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import (
     EducationGroupYearFactory,
     EducationGroupYearCommonMasterFactory,
@@ -36,7 +33,9 @@ from base.tests.factories.education_group_year import (
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from cms.enums import entity_name
+from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
+from webservices.business import SKILLS_AND_ACHIEVEMENTS_CMS_DATA
 
 OFFERS = [
     {'name': TrainingType.BACHELOR.name, 'category': TRAINING, 'code': '1BA'},
@@ -61,20 +60,21 @@ class ImportReddotTestCase(TestCase):
                     "year": 2018,
                     "info": {
                         "caap": "TEST",
-                        "evaluation": "TESTBIS"
+                        "evaluation": "TESTBIS",
+                        "intro": "INTROTEST"
                     }
                 },
             ]
 
         self.command.json_content = item
         self.command.load_offers()
-        labels = {'evaluation', 'caap'}
+        labels = {'evaluation', 'caap', 'intro'}
         Context = collections.namedtuple('Context', 'entity language')
         context = Context(entity='offer_year', language=self.command.iso_language)
         mock_get_mapping.assert_called_with(context, labels)
 
     def test_get_mapping_text_labels(self):
-        labels = {'evaluation'}
+        labels = {'evaluation', 'intro'}
         Context = collections.namedtuple('Context', 'entity language')
         context = Context(entity='offer_year', language=self.command.iso_language)
         from base.management.commands.import_reddot import get_mapping_label_texts
@@ -84,9 +84,16 @@ class ImportReddotTestCase(TestCase):
             label='evaluation',
             published=True
         )
+        intro_text_label = TextLabel.objects.filter(
+            entity='offer_year',
+            label='welcome_introduction',
+            published=True
+        )
         self.assertTrue(text_label.exists())
-
         self.assertEqual(result['evaluation'], text_label.first())
+
+        self.assertTrue(intro_text_label.exists())
+        self.assertEqual(result['intro'], intro_text_label.first())
 
     def test_load_admission_conditions_for_bachelor(self):
         education_group_year_common = EducationGroupYearCommonBachelorFactory()
