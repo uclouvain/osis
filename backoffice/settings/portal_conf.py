@@ -51,5 +51,5 @@ SECTION_LIST = [
                 ('formations_accessibles', 'specific'),
                 ('certificats', 'specific'),
                 ('infos_pratiques', 'specific'),
-            ])
+            ]),
 ]

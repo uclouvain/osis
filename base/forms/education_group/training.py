@@ -32,6 +32,7 @@ from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_groups import shorten
+from base.business.education_groups.create import create_initial_group_element_year_structure
 from base.business.education_groups.postponement import PostponementEducationGroupYearMixin
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, \
     MainEntitiesVersionChoiceField, EducationGroupYearModelForm
@@ -114,10 +115,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             'certificate_aims',
             'web_re_registration',
             'co_graduation',
-            'co_graduation_coefficient',
-            'ARES_study',
-            'ARES_GRACA',
-            'ARES_ability'
+            'co_graduation_coefficient'
         ]
 
         field_classes = {
@@ -195,6 +193,13 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
         return {
             'object_list_deleted': egy_deleted,
         }
+
+    def save(self):
+        egy_instance = super().save()
+        self.structure = create_initial_group_element_year_structure(
+            [egy_instance, *self.education_group_year_postponed]
+        )
+        return egy_instance
 
 
 @register('university_domains')

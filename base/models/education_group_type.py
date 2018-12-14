@@ -80,6 +80,8 @@ class EducationGroupType(SerializableModel):
         unique=True,
     )
 
+    learning_unit_child_allowed = models.BooleanField(default=False)
+
     def __str__(self):
         return self.get_name_display()
 

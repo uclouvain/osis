@@ -153,7 +153,9 @@ class TestSimplifiedVolumeManagementForm(TestCase):
 
 class TestSimplifiedVolumeForm(TestCase):
     def setUp(self):
-        self.instance = LearningComponentYearFactory()
+        self.instance = LearningComponentYearFactory(hourly_volume_total_annual=10,
+                                                     hourly_volume_partial_q1=5,
+                                                     hourly_volume_partial_q2=5)
 
     def test_clean(self):
         self.instance.hourly_volume_partial_q1 = 0
@@ -178,3 +180,16 @@ class TestSimplifiedVolumeForm(TestCase):
         self.assertEqual(form.errors["hourly_volume_partial_q1"][0],
                          gettext("The volume can not be set to 0."))
         self.assertFalse(form.errors.get("hourly_volume_partial_q2"))
+
+    def test_with_incorrect_volume_total(self):
+        form = SimplifiedVolumeForm(
+            data={"hourly_volume_partial_q1": 5, "hourly_volume_partial_q2": 7,
+                  'hourly_volume_total_annual': 10}, is_faculty_manager=True, instance=self.instance,
+            index=0,
+            component_type=COMPONENT_TYPES[0]
+        )
+        form.is_valid()
+        self.assertEqual(form.errors["hourly_volume_partial_q1"][0], gettext(""))
+        self.assertEqual(form.errors["hourly_volume_partial_q2"][0], gettext(""))
+        self.assertEqual(form.errors["hourly_volume_total_annual"][0],
+                         gettext('The annual volume must be equal to the sum of the volumes Q1 and Q2'))

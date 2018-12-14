@@ -37,6 +37,7 @@ from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView
 from reversion.models import Version
@@ -52,7 +53,6 @@ from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_organization import EducationGroupOrganization
-from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
@@ -66,6 +66,7 @@ from cms import models as mdl_cms
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from webservices.business import CONTACTS_KEY, CONTACT_INTRO_KEY
 
 SECTIONS_WITH_TEXT = (
     'ucl_bachelors',
@@ -212,37 +213,43 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        is_common_education_group_year = self.object.acronym.startswith('common-')
-
+        is_common_education_group_year = self.object.acronym.startswith('common')
+        sections_to_display = self.get_appropriate_sections()
+        show_contacts = not sections_to_display or CONTACTS_KEY in sections_to_display
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
-            'sections_with_translated_labels': self.get_sections_with_translated_labels(is_common_education_group_year),
-            'contacts': self.get_publication_contacts_group_by_type(),
+            'sections_with_translated_labels': self.get_sections_with_translated_labels(
+                sections_to_display,
+                is_common_education_group_year,
+            ),
+            'contacts': self.get_contacts_section(),
+            'show_contacts': show_contacts,
             'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object'])
         })
-
         return context
 
-    def get_sections_with_translated_labels(self, is_common_education_group_year=None):
+    @cached_property
+    def user_language_code(self):
+        return mdl.person.get_user_interface_language(self.request.user)
+
+    def get_sections_with_translated_labels(self, sections_to_display, is_common_education_group_year=None):
         # Load the info from the common education group year
         common_education_group_year = None
         if not is_common_education_group_year:
-            common_education_group_year = EducationGroupYear.objects.look_for_common(
-                education_group_type=self.object.education_group_type,
+            common_education_group_year = EducationGroupYear.objects.get(
+                acronym='common',
                 academic_year=self.object.academic_year,
-            ).first()
+            )
 
         # Load the labels
         Section = namedtuple('Section', 'title labels')
-        user_language = mdl.person.get_user_interface_language(self.request.user)
         sections_with_translated_labels = []
-        sections_list = self.get_appropriate_sections()
 
         for section in settings.SECTION_LIST:
             translated_labels = self.get_translated_labels_and_content(section,
-                                                                       user_language,
+                                                                       self.user_language_code,
                                                                        common_education_group_year,
-                                                                       sections_list)
+                                                                       sections_to_display)
 
             sections_with_translated_labels.append(Section(section.title, translated_labels))
         return sections_with_translated_labels
@@ -326,7 +333,19 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             sections_request = {'sections': []}
         return sections_request['sections']
 
-    def get_publication_contacts_group_by_type(self):
+    def get_contacts_section(self):
+        introduction = self.get_content_translations_for_label(
+            self.object,
+            CONTACT_INTRO_KEY,
+            self.user_language_code,
+            'specific'
+        )
+        return {
+            'contact_intro': introduction,
+            'contacts_grouped': self._get_publication_contacts_group_by_type()
+        }
+
+    def _get_publication_contacts_group_by_type(self):
         contacts_by_type = {}
         for publication_contact in self.object.educationgrouppublicationcontact_set.all():
             contacts_by_type.setdefault(publication_contact.type, []).append(publication_contact)
@@ -484,7 +503,8 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         is_deepening = self.object.is_deepening
 
         is_master = acronym.endswith(('2m', '2m1'))
-        use_standard_text = acronym.endswith(('2a', '2mc'))
+        is_agregation = acronym.endswith('2a')
+        is_mc = acronym.endswith('2mc')
 
         class AdmissionConditionForm(forms.Form):
             text_field = forms.CharField(widget=CKEditorWidget(config_name='minimal'))
@@ -505,10 +525,11 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
             'info': {
                 'is_specific': is_specific,
                 'is_common': is_common,
-                'is_bachelor': is_common and self.object.education_group_type.name is TrainingType.BACHELOR.name,
+                'is_bachelor': is_common and self.object.education_group_type.name == TrainingType.BACHELOR.name,
                 'is_master': is_master,
-                'show_components_for_agreg_and_mc': is_common and use_standard_text,
-                'show_free_text': (is_specific and (is_master or use_standard_text)) or is_minor or is_deepening,
+                'show_components_for_agreg': is_common and is_agregation,
+                'show_components_for_agreg_and_mc': is_common and is_agregation or is_mc,
+                'show_free_text': (is_specific and (is_master or is_agregation or is_mc)) or is_minor or is_deepening,
             },
             'admission_condition': admission_condition,
             'record': record,

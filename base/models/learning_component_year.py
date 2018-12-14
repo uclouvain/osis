@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Sum
 from django.utils.functional import cached_property
@@ -36,7 +37,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class LearningComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('learning_container_year', 'learning_unit_year',  'acronym', 'type', 'comment', 'changed')
+    list_display = ('learning_container_year', 'learning_unit_year', 'acronym', 'type', 'comment', 'changed')
     search_fields = ['acronym', 'learning_container_year__acronym']
     list_filter = ('learning_container_year__academic_year',)
 
@@ -121,7 +122,7 @@ class LearningComponentYear(SerializableModel):
         if vol_q1 + vol_q2 != vol_total_annual:
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
-                _('Vol_tot is not equal to vol_q1 + vol_q2')))
+                _('The annual volume must be equal to the sum of the volumes Q1 and Q2')))
         if vol_total_annual * planned_classes != self.vol_global:
             _warnings.append("{} ({})".format(
                 inconsistent_msg,

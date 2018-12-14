@@ -31,7 +31,8 @@ from base.views.education_groups.coorganization import CreateEducationGroupOrgan
 from base.views.education_groups.group_element_year.read import pdf_content
 from base.views.education_groups.learning_unit import detail as learning_unit_detail, update as learning_unit_update
 from base.views.education_groups.publication_contact import CreateEducationGroupPublicationContactView, \
-    UpdateEducationGroupPublicationContactView, EducationGroupPublicationContactDeleteView
+    UpdateEducationGroupPublicationContactView, EducationGroupPublicationContactDeleteView, \
+    UpdateEducationGroupEntityPublicationContactView
 from base.views.education_groups.select import education_group_select, learning_unit_select
 from base.views.education_groups.update import CertificateAimAutocomplete, PostponeGroupElementYearView
 from . import search, create, detail, update, delete, group_element_year
@@ -142,6 +143,9 @@ urlpatterns = [
         ])),
 
         url(r'^publication_contact/', include([
+            url(r'^edit_entity/$',
+                UpdateEducationGroupEntityPublicationContactView.as_view(),
+                name='publication_contact_entity_edit'),
             url(r'^create/$',
                 CreateEducationGroupPublicationContactView.as_view(),
                 name="publication_contact_create"),

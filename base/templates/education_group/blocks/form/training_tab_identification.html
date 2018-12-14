@@ -40,10 +40,7 @@
                         <input value="{{ form_education_group_year.category_text }}"
                                disabled class="form-control" >
                     </div>
-                    <div class="col-md-6">
-                        <label>{% trans 'Type of training' %}</label><br>
-                        {{ form_education_group_year.education_group_type }}
-                    </div>
+                    {% bootstrap_field form_education_group_year.education_group_type form_group_class="col-md-6"%}
                 </div>
                 <br>
                 <div class="row">
@@ -137,12 +134,6 @@
 
 <div class="panel panel-default">
     <div class="panel-body">
-        <div class="row">
-            {% bootstrap_field form_education_group_year.ARES_study form_group_class="col-md-4" %}
-            {% bootstrap_field form_education_group_year.ARES_GRACA form_group_class="col-md-4" %}
-            {% bootstrap_field form_education_group_year.ARES_ability form_group_class="col-md-4" %}
-        </div>
-        <br>
         <div class="row">
             {% bootstrap_field form_education_group_year.co_graduation form_group_class="col-md-4" %}
             {% bootstrap_field form_education_group_year.co_graduation_coefficient form_group_class="col-md-4" %}

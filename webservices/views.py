@@ -30,7 +30,6 @@ import re
 from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
 from django.http import Http404
-from django.template import loader
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.renderers import JSONRenderer
@@ -141,6 +140,8 @@ def process_section(context, education_group_year, item):
         return get_skills_and_achievements(education_group_year, context.language)
     elif item == business.EVALUATION_KEY:
         return get_evaluation(education_group_year, context.language)
+    elif item == business.CONTACTS_KEY:
+        return get_contacts(education_group_year, context.language)
     else:
         text_label = TextLabel.objects.filter(entity=OFFER_YEAR, label=item).first()
         if text_label:
@@ -157,10 +158,9 @@ def get_intro_or_common_section(context, education_group_year, m_intro, m_common
 
         return insert_section_if_checked(context, egy, text_label)
     elif m_common:
-        egy = EducationGroupYear.objects.look_for_common(
-            education_group_type=education_group_year.education_group_type,
-            academic_year__year=context.year
-        ).first()
+        egy = EducationGroupYear.objects.get_common(
+            academic_year=education_group_year.academic_year
+        )
         text_label = TextLabel.objects.filter(
             entity=OFFER_YEAR,
             label=m_common.group('section_name')
@@ -284,7 +284,9 @@ def build_content_response(context, admission_condition, admission_condition_com
     }
 
     if acronym_suffix in ('2a', '2mc'):
-        fields = ('alert_message', 'ca_cond_generales', 'ca_maitrise_fr', 'ca_allegement', 'ca_ouv_adultes')
+        fields = ('alert_message', 'ca_cond_generales')
+        if acronym_suffix == '2a':
+            fields += ('ca_maitrise_fr', 'ca_allegement', 'ca_ouv_adultes')
 
         response.update({field: get_value(field=field) for field in fields})
 
@@ -381,12 +383,19 @@ def get_conditions_admissions(context):
         return response_for_bachelor(context)
 
     common_acronym = 'common-{}'.format(full_suffix)
+    if common_acronym == 'common-2m1':
+        common_acronym = 'common-2m'
     admission_condition, created = AdmissionCondition.objects.get_or_create(
         education_group_year=context.education_group_year
     )
 
+    common_education_group_year = EducationGroupYear.objects.get(
+        acronym=common_acronym,
+        academic_year=context.education_group_year.academic_year
+    )
     admission_condition_common = AdmissionCondition.objects.filter(
-        education_group_year__acronym__iexact=common_acronym).first()
+        education_group_year=common_education_group_year
+    ).first()
 
     result = {
         'id': 'conditions_admission',
@@ -420,5 +429,21 @@ def get_skills_and_achievements(education_group_year, language_code):
             'intro': intro_extra_content.get('skills_and_achievements_introduction') or None,
             'blocs': achievements,
             'extra': intro_extra_content.get('skills_and_achievements_additional_text') or None
+        }
+    }
+
+
+def get_contacts(education_group_year, language_code):
+    contacts = business.get_contacts_group_by_types(education_group_year, language_code)
+    intro_content = business.get_contacts_intro_text(education_group_year, language_code)
+    entity_version = education_group_year.publication_contact_entity_version
+
+    return {
+        'id': business.CONTACTS_KEY,
+        'label': business.CONTACTS_KEY,
+        'content': {
+            'text': intro_content,
+            'entity': entity_version.acronym if entity_version else None,
+            'contacts': contacts
         }
     }

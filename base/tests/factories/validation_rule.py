@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,30 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from .base import *
+import factory
 
-OPTIONAL_APPS = (
-    'attribution',
-    'assistant',
-    'continuing_education',
-    'dissertation',
-    'internship',
-    'assessments',
-    'cms',
-    'webservices',
-)
-OPTIONAL_MIDDLEWARES = ()
-OPTIONAL_INTERNAL_IPS = ()
+from base.models.enums import field_status
 
-if os.environ.get("ENABLE_DEBUG_TOOLBAR", "False").lower() == "true":
-    OPTIONAL_APPS += ('debug_toolbar',)
-    OPTIONAL_MIDDLEWARES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
-    OPTIONAL_INTERNAL_IPS += ('127.0.0.1',)
-    DEBUG_TOOLBAR_CONFIG = {
-        'SHOW_TOOLBAR_CALLBACK': 'base.middlewares.toolbar.show_toolbar',
-    }
 
-INSTALLED_APPS += OPTIONAL_APPS
-APPS_TO_TEST += OPTIONAL_APPS
-MIDDLEWARE += OPTIONAL_MIDDLEWARES
-INTERNAL_IPS += OPTIONAL_INTERNAL_IPS
+class ValidationRuleFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = 'base.ValidationRule'
+        django_get_or_create = ('field_reference', )
+
+    field_reference = "base.validationrule,base_educationgroupyear.title." \
+                      "osis.education_group_type_finality120listchoice"
+    status_field = field_status.REQUIRED
+    initial_value = None
+    regex_rule = ""
+    regex_error_message = ""

@@ -23,7 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 
 from django.db import models
@@ -39,6 +41,13 @@ ROLE_REQUIRED_FOR_TYPES = (
 )
 
 
+class EducationGroupPublicationQuerySet(models.QuerySet):
+    def annotate_text(self, language_code):
+        return self.annotate(
+            role_text=F('role_fr') if language_code == settings.LANGUAGE_CODE_FR else F('role_en'),
+        )
+
+
 class EducationGroupPublicationContactAdmin(OrderedModelAdmin):
     list_display = ('education_group_year', 'type', 'role_fr', 'role_en', 'email', 'order', 'move_up_down_links',)
     readonly_fields = ['order']
@@ -51,13 +60,13 @@ class EducationGroupPublicationContact(OrderedModel):
         max_length=255,
         default='',
         blank=True,
-        verbose_name=_('role in french')
+        verbose_name=_('role (french)')
     )
     role_en = models.CharField(
         max_length=255,
         default='',
         blank=True,
-        verbose_name=_('role in english')
+        verbose_name=_('role (english)')
     )
     email = models.EmailField(
         verbose_name=_('email'),
@@ -76,6 +85,8 @@ class EducationGroupPublicationContact(OrderedModel):
     )
     education_group_year = models.ForeignKey('EducationGroupYear')
     order_with_respect_to = ('education_group_year', 'type', )
+
+    objects = EducationGroupPublicationQuerySet.as_manager()
 
     class Meta:
         ordering = ('education_group_year', 'type', 'order',)
