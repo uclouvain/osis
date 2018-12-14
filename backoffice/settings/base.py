@@ -262,7 +262,6 @@ CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
     'reddot': {
         "removePlugins": "stylesheetparser",
-        'allowedContent': True,
         'extraAllowedContent': 'div(reddot_*,contacts_*)',
         'extraPlugins': ','.join(['reddot', 'pastefromword']),
         'stylesSet': REDDOT_STYLES,
