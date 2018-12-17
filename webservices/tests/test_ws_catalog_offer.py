@@ -413,12 +413,16 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                                    language=iso_language)
 
         for section in intro_set:
-            ega = EducationGroupYearFactory(partial_acronym=section, academic_year=self.education_group_year.academic_year)
+            ega = EducationGroupYearFactory(partial_acronym=section,
+                                            academic_year=self.education_group_year.academic_year,
+                                            education_group_type=self.education_group_year.education_group_type
+                                            )
             TranslatedTextRandomFactory(text_label=text_label,
                                         language=iso_language,
                                         reference=ega.id,
                                         entity=text_label.entity,
-                                        text='<tag>intro-{section}</tag>'.format(section=section))
+                                        text='<tag>intro-{section}</tag>'.format(section=section)
+                                        )
 
         message = {
             'anac': str(self.education_group_year.academic_year.year),
@@ -991,7 +995,7 @@ class ProcessSectionTestCase(TestCase):
 class GetSkillsAndAchievementsTestCase(TestCase):
     def test_get_skills_and_achievements(self):
         education_group_year = EducationGroupYearFactory()
-        context = get_skills_and_achievements(education_group_year,  settings.LANGUAGE_CODE_EN)
+        context = get_skills_and_achievements(education_group_year, settings.LANGUAGE_CODE_EN)
 
         self.assertEqual(context['id'], business.SKILLS_AND_ACHIEVEMENTS_KEY)
         self.assertEqual(context['label'], business.SKILLS_AND_ACHIEVEMENTS_KEY)
@@ -1017,7 +1021,7 @@ class GetEvaluationTestCase(TestCase):
                                     reference=common_education_group_year.id,
                                     entity=text_label.entity,
                                     text='<tag>{section}-commun</tag>'.format(section='evaluation'))
-        context = get_evaluation(education_group_year,  settings.LANGUAGE_CODE_FR)
+        context = get_evaluation(education_group_year, settings.LANGUAGE_CODE_FR)
         self.assertEqual(context['id'], business.EVALUATION_KEY)
         self.assertEqual(context['label'], business.EVALUATION_KEY)
         self.assertTrue('content' in context)
@@ -1040,7 +1044,7 @@ class GetContactsTestCase(TestCase):
         )
 
     def test_get_contacts(self):
-        context = get_contacts(self.education_group_year,  settings.LANGUAGE_CODE_EN)
+        context = get_contacts(self.education_group_year, settings.LANGUAGE_CODE_EN)
 
         self.assertEqual(context['id'], business.CONTACTS_KEY)
         self.assertEqual(context['label'], business.CONTACTS_KEY)
