@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from _decimal import Decimal
 from collections import OrderedDict
 
 from django import forms
@@ -31,7 +32,6 @@ from django.db.models import Prefetch
 from django.forms import formset_factory, modelformset_factory
 from django.utils.translation import ugettext_lazy as _
 
-from base.business.learning_unit_year_with_context import ENTITY_TYPES_VOLUME
 from base.business.learning_units import edition
 from base.business.learning_units.edition import check_postponement_conflict_report_errors
 from base.forms.common import STEP_HALF_INTEGER
@@ -39,6 +39,7 @@ from base.forms.utils.emptyfield import EmptyField
 from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT, COMPONENT_TYPES
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY, \
     CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
 from base.models.learning_component_year import LearningComponentYear
@@ -65,18 +66,21 @@ class VolumeEditionForm(forms.Form):
         label=_('Q1'),
         help_text=_('Volume Q1'),
         widget=StepHalfIntegerWidget(),
+        required=False,
     )
     add_field = EmptyField(label='+')
     volume_q2 = VolumeField(
         label=_('Q2'),
         help_text=_('Volume Q2'),
         widget=StepHalfIntegerWidget(),
+        required=False,
     )
     equal_field_1 = EmptyField(label='=')
     volume_total = VolumeField(
         label=_('Vol. annual'),
         help_text=_('The annual volume must be equal to the sum of the volumes Q1 and Q2'),
         widget=StepHalfIntegerWidget(),
+        required=False,
     )
     help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('Volume Q1'), _('Volume Q2'))
     closing_parenthesis_field = EmptyField(label=')')
@@ -104,7 +108,7 @@ class VolumeEditionForm(forms.Form):
                                                    _('Planned classes'))
 
         # Append dynamic fields
-        entities_to_add = [entity for entity in ENTITY_TYPES_VOLUME if entity in self.entities]
+        entities_to_add = [entity for entity in REQUIREMENT_ENTITIES if entity in self.entities]
         for i, key in enumerate(entities_to_add):
             entity = self.entities[key]
             self.fields["volume_" + key.lower()] = VolumeField(
@@ -133,6 +137,16 @@ class VolumeEditionForm(forms.Form):
         """
         cleaned_data = super().clean()
 
+        volume_q1 = self.cleaned_data.get("volume_q1") or 0
+        volume_q2 = self.cleaned_data.get("volume_q2") or 0
+        volume_total = self.cleaned_data.get("volume_total") or 0
+
+        if (self.cleaned_data.get("volume_q1") is not None or self.cleaned_data.get(
+                "volume_q2") is not None) and volume_total != volume_q1 + volume_q2:
+            self.add_error("volume_total", _('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
+            self.add_error("volume_q1", "")
+            self.add_error("volume_q2", "")
+
         if self.is_faculty_manager:
 
             if 0 in [self.initial.get("volume_q1"), self.initial.get("volume_q2")]:
@@ -141,9 +155,9 @@ class VolumeEditionForm(forms.Form):
                     self.add_error("volume_q2", _("One of the partial volumes must have a value to 0."))
 
             else:
-                if self.cleaned_data.get("volume_q1") == 0:
+                if volume_q1 == 0:
                     self.add_error("volume_q1", _("The volume can not be set to 0."))
-                if self.cleaned_data.get("volume_q2") == 0:
+                if volume_q2 == 0:
                     self.add_error("volume_q2", _("The volume can not be set to 0."))
 
         return cleaned_data
@@ -335,6 +349,17 @@ class SimplifiedVolumeForm(forms.ModelForm):
                     self.add_error("hourly_volume_partial_q1", _("The volume can not be set to 0."))
                 if self.cleaned_data.get("hourly_volume_partial_q2") == 0:
                     self.add_error("hourly_volume_partial_q2", _("The volume can not be set to 0."))
+
+        volume_q1 = self.cleaned_data.get("hourly_volume_partial_q1") or 0
+        volume_q2 = self.cleaned_data.get("hourly_volume_partial_q2") or 0
+        volume_total = self.cleaned_data.get("hourly_volume_total_annual") or 0
+
+        if (self.cleaned_data.get("hourly_volume_partial_q1") is not None or self.cleaned_data.get(
+                "hourly_volume_partial_q2") is not None) and volume_total != volume_q1 + volume_q2:
+            self.add_error("hourly_volume_total_annual",
+                           _('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
+            self.add_error("hourly_volume_partial_q1", "")
+            self.add_error("hourly_volume_partial_q2", "")
 
         return cleaned_data
 

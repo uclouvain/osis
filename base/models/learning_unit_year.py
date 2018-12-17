@@ -28,7 +28,7 @@ import re
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, ngettext
 from reversion.admin import VersionAdmin
@@ -78,7 +78,7 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
         from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponement
         from base.views.common import display_success_messages, display_error_messages
 
-        result, errors = LearningUnitAutomaticPostponement(queryset.filter(learning_container_year__isnull=False))
+        result, errors = LearningUnitAutomaticPostponement(queryset).postpone()
         count = len(result)
         display_success_messages(
             request, ngettext(
@@ -127,7 +127,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('Code'),
                                validators=[RegexValidator(LEARNING_UNIT_ACRONYM_REGEX_ALL)])
     specific_title = models.CharField(max_length=255, blank=True, null=True,
-                                      verbose_name=_('English title proper'))
+                                      verbose_name=_('French title proper'))
     specific_title_english = models.CharField(max_length=250, blank=True, null=True,
                                               verbose_name=_('English title proper'))
     subtype = models.CharField(max_length=50, choices=learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
@@ -388,7 +388,8 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def _check_learning_component_year_warnings(self):
         _warnings = []
         components_queryset = self.learning_container_year.learningcomponentyear_set
-        all_components = components_queryset.all().order_by('learningunitcomponent__learning_unit_year__acronym')
+        all_components = components_queryset.order_by('learningunityear__acronym').prefetch_related(
+            'learningunityear_set').annotate(vol_global=Sum('entitycomponentyear__repartition_volume'))
         for learning_component_year in all_components:
             _warnings.extend(learning_component_year.warnings)
 

@@ -33,7 +33,7 @@ from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
 
 
 class LearningAchievementEditForm(forms.ModelForm):
-    text = forms.CharField(widget=CKEditorWidget(config_name='minimal'), required=False, label=_('Text'))
+    text = forms.CharField(widget=CKEditorWidget(config_name='minimal_plus_headers'), required=False, label=_('Text'))
 
     class Meta:
         model = LearningAchievement

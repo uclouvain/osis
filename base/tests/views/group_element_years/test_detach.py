@@ -92,10 +92,12 @@ class TestDetach(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "education_group/group_element_year/confirm_detach_inner.html")
 
+    @mock.patch("base.business.group_element_years.management.is_min_child_reached")
     @mock.patch("base.models.group_element_year.GroupElementYear.delete")
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
-    def test_detach_case_post_success(self, mock_permission, mock_delete):
+    def test_detach_case_post_success(self, mock_permission, mock_delete, mock_is_min_child_reached):
         mock_permission.return_value = True
+        mock_is_min_child_reached.return_value = False
         http_referer = reverse('education_group_read', args=[
             self.education_group_year.id,
             self.education_group_year.id
@@ -153,8 +155,8 @@ class TestDetachLearningUnitPrerequisite(TestCase):
         messages = [m.message for m in get_messages(response.wsgi_request)]
         self.assertEqual(
             messages[0],
-            _(_("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
-                "acronym": self.luy.acronym})
+            _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
+                "acronym": self.luy.acronym}
         )
         self.assertFalse(mock_delete.called)
 
@@ -178,8 +180,8 @@ class TestDetachLearningUnitPrerequisite(TestCase):
         messages = [m.message for m in get_messages(response.wsgi_request)]
         self.assertEqual(
             messages[0],
-            _(_("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
-                "acronym": self.luy.acronym})
+            _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
+                "acronym": self.luy.acronym}
         )
         self.assertFalse(mock_delete.called)
 

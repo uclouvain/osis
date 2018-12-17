@@ -351,7 +351,10 @@ class LearningUnitViewTestCase(TestCase):
         super(AcademicYear, self.academic_year_5).save()
         super(AcademicYear, self.academic_year_6).save()
         self.learning_container_yr = LearningContainerYearFactory(academic_year=self.current_academic_year)
-        self.learning_component_yr = LearningComponentYearFactory(learning_container_year=self.learning_container_yr)
+        self.learning_component_yr = LearningComponentYearFactory(learning_container_year=self.learning_container_yr,
+                                                                  hourly_volume_total_annual=10,
+                                                                  hourly_volume_partial_q1=5,
+                                                                  hourly_volume_partial_q2=5)
         self.organization = OrganizationFactory(type=organization_type.MAIN)
         self.country = CountryFactory()
         self.entity = EntityFactory(country=self.country, organization=self.organization)

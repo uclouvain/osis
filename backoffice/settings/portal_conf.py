@@ -52,8 +52,11 @@ SECTION_LIST = [
                 ('certificats', 'specific'),
                 ('infos_pratiques', 'specific'),
             ]),
-    Section(title=_('In practice'),
+]
+
+SECTION_INTRO = [
+    Section(title=_('Welcome'),
             labels=[
-                ('contacts', 'specific')
-            ]),
+                ('intro', 'specific'),
+            ])
 ]

@@ -38,7 +38,6 @@ from base.business.xls import get_name_or_username
 from base.models import entity_container_year
 from base.models import learning_achievement
 from base.models.academic_calendar import AcademicCalendar
-from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import academic_calendar_type
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
@@ -180,27 +179,31 @@ def _learning_unit_usage_by_class(a_learning_class_year):
 
 
 def get_components_identification(learning_unit_yr):
-    a_learning_container_yr = learning_unit_yr.learning_container_year
     components = []
-    additionnal_entities = {}
+    additional_entities = {}
 
-    if a_learning_container_yr:
-        learning_component_year_list = mdl_base.learning_component_year.find_by_learning_container_year(
-            a_learning_container_yr)
+    learning_component_year_list_from_luy = learning_unit_yr.learning_component_years.filter(
+        learning_container_year=learning_unit_yr.learning_container_year
+    ).order_by('type', 'acronym').prefetch_related('entitycomponentyear_set')
 
-        for learning_component_year in learning_component_year_list:
-            if mdl_base.learning_unit_component.search(learning_component_year, learning_unit_yr).exists():
-                entity_components_yr = EntityComponentYear.objects.filter(
-                    learning_component_year=learning_component_year)
-                if not additionnal_entities:
-                    additionnal_entities = _get_entities(entity_components_yr)
+    for learning_component_year in learning_component_year_list_from_luy:
+        entity_components_yr = learning_component_year.entitycomponentyear_set.all()
 
-                components.append({'learning_component_year': learning_component_year,
-                                   'entity_component_yr': entity_components_yr.first(),
-                                   'volumes': volume_learning_component_year(learning_component_year,
-                                                                             entity_components_yr)})
+        if not additional_entities:
+            additional_entities = _get_entities(entity_components_yr)
 
-    return _compose_components_dict(components, additionnal_entities)
+        components.append(
+            {
+                'learning_component_year': learning_component_year,
+                'entity_component_yr': entity_components_yr.first(),
+                'volumes': volume_learning_component_year(
+                    learning_component_year,
+                    entity_components_yr
+                )
+            }
+        )
+
+    return _compose_components_dict(components, additional_entities)
 
 
 def _is_used_by_full_learning_unit_year(a_learning_class_year):
@@ -258,9 +261,11 @@ def _compose_components_dict(components, additional_entities):
 
 
 def _get_entities(entity_components_yr):
-    return {e.entity_container_year.type: e.entity_container_year.entity.most_recent_acronym
-            for e in entity_components_yr
-            if e.entity_container_year.type in REQUIREMENT_ENTITIES}
+    return {
+        e.entity_container_year.type: e.entity_container_year.entity.most_recent_acronym
+        for e in entity_components_yr
+        if e.entity_container_year.type in REQUIREMENT_ENTITIES
+    }
 
 
 def _get_summary_status(a_calendar, cms_list, lu):

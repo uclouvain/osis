@@ -143,6 +143,8 @@ class LearningUnitPostponementForm:
                             data_to_insert["container_type"] = \
                                 existing_learn_unit_years[0].learning_container_year.container_type
                             data_to_insert["academic_year"] = str(ac_year.id)
+                            # FIXME: component-initial_forms must be 0 for the insert in DB
+                            data_to_insert["component-INITIAL_FORMS"] = 0
                             to_insert.append(self._instantiate_base_form_as_insert(ac_year, data_to_insert))
                         else:
                             to_insert.append(self._instantiate_base_form_as_insert(ac_year, data))

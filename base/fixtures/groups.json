@@ -3383,6 +3383,34 @@
                     "can_edit_educationgroup_pedagogy",
                     "base",
                     "educationgroup"
+                ],
+                [
+                    "can_access_education_group",
+                    "base",
+                    "educationgroup"
+                ],
+                [
+                    "can_access_catalog",
+                    "base",
+                    "offer"
+                ]
+            ]
+        }
+    },
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "continuing_education_managers",
+            "permissions": [
+                [
+                    "can_access_admission",
+                    "continuing_education",
+                    "admission"
+                ],
+                [
+                    "change_admission",
+                    "continuing_education",
+                    "admission"
                 ]
             ]
         }

@@ -2,7 +2,7 @@
 <svg xmlns="http://www.w3.org/2000/svg"
      width="100px" height="30px" viewBox="0 0 1000 300">
 
-  <text x="500" y="210"
+  <text x="500" y="150"
         alignment-baseline="central"
         text-anchor="middle"
         font-family="Verdana"

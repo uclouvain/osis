@@ -30,7 +30,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 # Used in base.views.education_groups.detail.EducationGroupGeneralInformation#get_sections_with_translated_labels
-from .portal_conf import SECTION_LIST
+from .portal_conf import SECTION_LIST, SECTION_INTRO
 
 BASE_DIR = os.path.dirname((os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -262,7 +262,6 @@ CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
     'reddot': {
         "removePlugins": "stylesheetparser",
-        'allowedContent': True,
         'extraAllowedContent': 'div(reddot_*,contacts_*)',
         'extraPlugins': ','.join(['reddot', 'pastefromword']),
         'stylesSet': REDDOT_STYLES,

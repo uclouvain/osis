@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,19 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
 
-from base.models import learning_container_year
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from django.utils import timezone
+from base.models.utils.utils import ChoiceEnum
 
 
-class LearningContainerYearTest(TestCase):
-    def test_find_by_id_with_id(self):
-        l_container_year = LearningContainerYearFactory()
-        self.assertEqual(l_container_year, learning_container_year.find_by_id(l_container_year.id))
-
-    def test_find_by_id_with_wrong_value(self):
-        with self.assertRaises(ValueError):
-            learning_container_year.find_by_id("BAD VALUE")
+class PublicationContactType(ChoiceEnum):
+    ACADEMIC_RESPONSIBLE = _("Academic responsible")
+    OTHER_ACADEMIC_RESPONSIBLE = _("Other academic responsible")
+    JURY_MEMBER = _("Jury member")
+    OTHER_CONTACT = _("Other contact")
