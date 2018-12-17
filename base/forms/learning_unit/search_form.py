@@ -49,7 +49,7 @@ from base.models.entity_version import EntityVersion, build_current_entity_versi
 from base.models.enums import entity_container_year_link_type, learning_container_year_types, \
     learning_unit_year_subtypes, active_status, entity_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY
-from base.models.learning_unit_year import convert_status_bool
+from base.models.learning_unit_year import convert_status_bool, LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
 from base.models.organization_address import find_distinct_by_country
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -221,7 +221,10 @@ class LearningUnitYearForm(LearningUnitSearchForm):
 
     def _get_service_course_learning_units(self):
         learning_units = self.get_learning_units(service_course_search=True)
-        return [lu for lu in learning_units if lu.entities.get(SERVICE_COURSE)]
+        # FIXME Ugly method to keep a queryset, we must simplify the db structure to easily fetch the service course
+        return learning_units.filter(pk__in=[
+            lu.pk for lu in learning_units if lu.entities.get(SERVICE_COURSE)
+        ])
 
     def get_learning_units(self, service_course_search=None):
         service_course_search = service_course_search or self.service_course_search

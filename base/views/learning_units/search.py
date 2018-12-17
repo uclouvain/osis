@@ -111,7 +111,9 @@ def learning_units_search(request, search_type):
         'academic_years': get_last_academic_years(),
         'container_types': learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES,
         'types': learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
-        # 'learning_units_count': found_learning_units.count(),
+        'learning_units_count': len(found_learning_units)
+        if isinstance(found_learning_units, list) else
+        found_learning_units.count(),
         'current_academic_year': starting_academic_year(),
         'experimental_phase': True,
         'search_type': search_type,
