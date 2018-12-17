@@ -27,13 +27,12 @@
 
 
 {% block content %}
-
 <div class="panel panel-default">
     <div class="panel-heading">
         <div class="row">
             {% include "education_group/blocks/hamburger_button.html" %}
             <div class="pull-right" style="margin-right: 15px;">
-                    {% include "education_group/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown"%}
+                {% include "education_group/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown"%}
             </div>
         </div>
     </div>
@@ -45,74 +44,19 @@
                     <div id="panel-data" class="col-md-12" style="height: 100%;">
                         {% include "education_group/tabs.html" %}
                         <br>
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>{% trans 'Code SCS'%}</th>
-                                    <th>{% trans "Title" %} / {% trans "Formation's code" %}</th>
-                                    <th>{% trans 'Cred. rel./abs.' %}</th>
-                                    <th>{% trans 'Min. credits' %}</th>
-                                    <th>{% trans 'Max. credits' %}</th>
-                                    <th>{% trans 'Mandatory' %}</th>
-                                    <th>{% trans 'Block' %}</th>
-                                    <th>{% trans 'Quad. derog.' %}</th>
-                                    <th>{% trans 'Link type' %}</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for group in group_element_years %}
-                                    <tr>
-                                        <td width="10%">{{ group.code_scs }}</td>
-                                        <td width="20%">{{ group.title }}</td>
-                                        <td width="12%">{{ group.relative_credits | default_if_none:'-' }} / {% if group.child %}{{ group.child.credits|floatformat | default_if_none:'-' }}{% else %}-{% endif %}</td>
-                                        <td width="6%">{{ group.min_credits | default_if_none:'-' }}</td>
-                                        <td width="6%">{{ group.max_credits | default_if_none:'-' }}</td>
-                                        <td width="6%">{{  group.is_mandatory | yesno }}</td>
-                                        <td width="6%">{{ group.block | default_if_none:'-' }}</td>
-                                        <td width="5%">{% if group.quadrimester_derogation %} {% trans group.quadrimester_derogation %} {% else %} - {% endif %} </td>
-                                        <td width="14%">{% if group.link_type %}{% trans group.link_type %}{% else %}-{% endif %}</td>
-                                        <td width="15%">
-                                            {% include "education_group/blocks/content_actions.html" %}
-                                        </td>
-                                    </tr>
-                                    {% with nb_col_spanned=10 %}
-                                    <tr>
-                                        <td colspan="{{ nb_col_spanned }}" style="border-top: none;border-bottom: none;">
-                                            {% if group.own_comment %}
-                                                <label>{% trans 'Own comment' %}</label> :&nbsp;
-                                                {{ group.own_comment }}
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    {% if group.comment %}
-                                        <tr style="border-spacing: 100px">
-                                            <td colspan="{{ nb_col_spanned }}" style="border-top: none; border-bottom: none;">
-                                                {% if group.comment %}
-                                                    <label>{% trans 'Comment' %}</label> :&nbsp;
-                                                    {{ group.comment }}
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    {% endif %}
-                                    {% if group.comment_english %}
-                                        <tr>
-                                            <td colspan="{{ nb_col_spanned }}" style="border-top: none; border-bottom: none;">
-                                                {% if group.comment_english %}
-                                                    <label>{% trans 'english comment'|capfirst %}</label> :&nbsp;
-                                                    {{ group.comment_english }}
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    {% endif %}
-                                    {% endwith %}
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                        {% if show_minor_major_option_table %}
+                            {% include "education_group/blocks/content_minor_major_option_table.html" %}
+                        {% else %}
+                            {% include "education_group/blocks/content_default_table.html" %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'js/education_group/tab_content.js' %}"></script>
 {% endblock %}
