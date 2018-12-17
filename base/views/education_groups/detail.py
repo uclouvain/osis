@@ -88,6 +88,10 @@ COMMON_PARAGRAPH = (
 INTRO_OFFER = (
     TrainingType.MASTER_MS_120.name,
     TrainingType.MASTER_MS_180_240.name,
+    TrainingType.MASTER_MD_120.name,
+    TrainingType.MASTER_MD_180_240.name,
+    TrainingType.MASTER_MA_120.name,
+    TrainingType.MASTER_MA_180_240.name,
     GroupType.COMMON_CORE.name,
     GroupType.SUB_GROUP.name,
     MiniTrainingType.OPTION.name
