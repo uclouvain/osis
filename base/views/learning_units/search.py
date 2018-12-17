@@ -48,9 +48,8 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils.cache import cache_filter
-from base.views import layout
-from base.views.common import check_if_display_message, display_error_messages, display_messages_by_level, \
-    paginate_queryset
+from base.views.common import check_if_display_message, display_messages_by_level, \
+    paginate_queryset, display_error_messages
 
 SIMPLE_SEARCH = 1
 SERVICE_COURSES_SEARCH = 2
@@ -75,10 +74,13 @@ def learning_units_search(request, search_type):
         initial={'academic_year_id': starting_academic_year()}
     )
     found_learning_units = LearningUnitYear.objects.none()
+    try:
+        if form.is_valid():
+            found_learning_units = form.get_activity_learning_units()
+            check_if_display_message(request, found_learning_units)
 
-    if form.is_valid():
-        found_learning_units = form.get_activity_learning_units()
-        check_if_display_message(request, found_learning_units)
+    except TooManyResultsException:
+        display_error_messages(request, 'too_many_results')
 
     if request.POST.get('xls_status') == "xls":
         return create_xls(request.user, found_learning_units, _get_filter(form, search_type))
@@ -109,7 +111,7 @@ def learning_units_search(request, search_type):
         'academic_years': get_last_academic_years(),
         'container_types': learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES,
         'types': learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
-        'learning_units_count': found_learning_units.count(),
+        # 'learning_units_count': found_learning_units.count(),
         'current_academic_year': starting_academic_year(),
         'experimental_phase': True,
         'search_type': search_type,
@@ -123,28 +125,28 @@ def learning_units_search(request, search_type):
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
-# @cache_filter()
+@cache_filter()
 def learning_units(request):
     return learning_units_search(request, SIMPLE_SEARCH)
 
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
-# @cache_filter()
+@cache_filter()
 def learning_units_service_course(request):
     return learning_units_search(request, SERVICE_COURSES_SEARCH)
 
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
-# @cache_filter()
+@cache_filter()
 def learning_units_borrowed_course(request):
     return learning_units_search(request, BORROWED_COURSE)
 
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
-# @cache_filter()
+@cache_filter()
 def learning_units_proposal_search(request):
     search_form = LearningUnitProposalForm(
         request.GET or None,
@@ -152,10 +154,12 @@ def learning_units_proposal_search(request):
     )
     user_person = get_object_or_404(Person, user=request.user)
     found_learning_units = LearningUnitYear.objects.none()
-
-    if search_form.is_valid():
-        found_learning_units = search_form.get_proposal_learning_units()
-        check_if_display_message(request, found_learning_units)
+    try:
+        if search_form.is_valid():
+            found_learning_units = search_form.get_proposal_learning_units()
+            check_if_display_message(request, found_learning_units)
+    except TooManyResultsException:
+        display_error_messages(request, 'too_many_results')
 
     if request.GET.get('xls_status') == "xls":
         return create_xls_proposal(request.user, found_learning_units, _get_filter(search_form, PROPOSAL_SEARCH))
@@ -218,7 +222,7 @@ def _get_search_type_label(search_type):
 
 @login_required
 @permission_required('base.can_access_externallearningunityear', raise_exception=True)
-# @cache_filter()
+@cache_filter()
 def learning_units_external_search(request):
     search_form = ExternalLearningUnitYearForm(
         request.GET or None,
@@ -226,15 +230,10 @@ def learning_units_external_search(request):
     )
     user_person = get_object_or_404(Person, user=request.user)
     found_learning_units = LearningUnitYear.objects.none()
-    try:
-        if search_form.is_valid():
-            found_learning_units = search_form.get_learning_units()
-            check_if_display_message(request, found_learning_units)
-    except TooManyResultsException:
-        display_error_messages(request, 'too_many_results')
 
-    if request.POST:
-        return redirect(reverse("learning_unit_proposal_search") + "?{}".format(request.GET.urlencode()))
+    if search_form.is_valid():
+        found_learning_units = search_form.get_queryset()
+        check_if_display_message(request, found_learning_units)
 
     context = {
         'form': search_form,
@@ -243,7 +242,6 @@ def learning_units_external_search(request):
         'experimental_phase': True,
         'search_type': EXTERNAL_SEARCH,
         'learning_units_count': found_learning_units.count(),
-        'learning_units': found_learning_units,
         'is_faculty_manager': user_person.is_faculty_manager,
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
         'page_obj': paginate_queryset(found_learning_units, request.GET),

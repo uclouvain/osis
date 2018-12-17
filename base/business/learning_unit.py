@@ -26,7 +26,6 @@
 from collections import OrderedDict
 from operator import itemgetter
 
-from django.conf import settings
 from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
 
@@ -37,16 +36,19 @@ from base.business.entity import get_entity_calendar
 from base.business.learning_unit_year_with_context import volume_learning_component_year
 from base.business.learning_units.comparison import get_entity_by_type
 from base.business.xls import get_name_or_username
-from base.models import entity_container_year, academic_calendar
+from base.models import entity_container_year
 from base.models import learning_achievement
+from base.models.academic_calendar import AcademicCalendar
 from base.models.entity_component_year import EntityComponentYear
+from base.models.entity_version import EntityVersion
 from base.models.enums import academic_calendar_type
 from base.models.enums import entity_container_year_link_type
+from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
+from base.models.learning_unit_year import LearningUnitYear
+from base.models.utils.utils import get_object_or_none
 from cms import models as mdl_cms
 from cms.enums import entity_name
-from cms.enums.entity_name import LEARNING_UNIT_YEAR
-from cms.models import translated_text
 from osis_common.document import xls_build
 from osis_common.utils.datetime import convert_date_to_datetime
 
@@ -252,10 +254,6 @@ def is_summary_submission_opened():
                                                                academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
 
 
-def find_language_in_settings(language_code):
-    return next((lang for lang in settings.LANGUAGES if lang[0] == language_code), None)
-
-
 def _compose_components_dict(components, additional_entities):
     data_components = {'components': components}
     data_components.update(additional_entities)
@@ -277,34 +275,17 @@ def _get_summary_status(a_calendar, cms_list, lu):
 
 
 def _get_calendar(academic_yr, an_entity_version):
-    a_calendar = get_entity_calendar(an_entity_version, academic_yr)
+    """ Try to fetch the academic calendar for the entity. If it is not found, return the academic calendar. """
+    a_calendar = get_entity_calendar(an_entity_version, academic_yr)  # TODO slow method...
     if a_calendar is None:
-        a_calendar = academic_calendar.get_by_reference_and_academic_year(
-            academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
-            academic_yr
+        a_calendar = get_object_or_none(
+            AcademicCalendar, reference=SUMMARY_COURSE_SUBMISSION, academic_year=academic_yr
         )
     return a_calendar
 
 
-def _get_summary_detail(a_calendar, cms_list, entity_learning_unit_yr_list_param):
-    entity_learning_unit_yr_list = entity_learning_unit_yr_list_param
-    for lu in entity_learning_unit_yr_list:
-        lu.summary_responsibles = attribution.search(summary_responsible=True,
-                                                     learning_unit_year=lu)
-        lu.summary_status = _get_summary_status(a_calendar, cms_list, lu)
-    return entity_learning_unit_yr_list
-
-
 def _changed_in_period(start_date, changed_date):
     return convert_date_to_datetime(start_date) <= changed_date
-
-
-def get_learning_units_and_summary_status(learning_unit_years):
-    learning_units_found = []
-    cms_list = translated_text.find_with_changed(LEARNING_UNIT_YEAR, CMS_LABEL_PEDAGOGY)
-    for learning_unit_yr in learning_unit_years:
-        learning_units_found.extend(_get_learning_unit_by_luy_entity(cms_list, learning_unit_yr))
-    return learning_units_found
 
 
 def _get_learning_unit_by_luy_entity(cms_list, learning_unit_yr):
@@ -312,8 +293,7 @@ def _get_learning_unit_by_luy_entity(cms_list, learning_unit_yr):
     if requirement_entity:
         a_calendar = _get_calendar(learning_unit_yr.academic_year.past(), requirement_entity)
         if a_calendar:
-            return _get_summary_detail(a_calendar, cms_list, [learning_unit_yr])
-    return []
+            learning_unit_yr.summary_status = _get_summary_status(a_calendar, cms_list, learning_unit_yr)
 
 
 def get_achievements_group_by_language(learning_unit_year):

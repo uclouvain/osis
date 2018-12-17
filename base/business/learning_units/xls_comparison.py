@@ -151,7 +151,7 @@ def _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison, learning
             entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
         ])
     ).order_by('learning_unit', 'academic_year__year')
-    [append_latest_entities(learning_unit, False) for learning_unit in learning_unit_years]
+    [append_latest_entities(learning_unit) for learning_unit in learning_unit_years]
     [append_components(learning_unit) for learning_unit in learning_unit_years]
     return learning_unit_years
 

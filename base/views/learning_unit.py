@@ -40,8 +40,8 @@ from attribution.business import attribution_charge_new
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
-    get_same_container_year_components, find_language_in_settings, \
-    CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language
+    get_same_container_year_components, CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language
+from reference.models.language import find_language_in_settings
 from base.business.learning_unit import get_learning_unit_comparison_context
 from base.business.learning_units import perms as business_perms
 from base.business.learning_units.comparison import get_keys, compare_learning_unit_years, \

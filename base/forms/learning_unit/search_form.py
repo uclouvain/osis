@@ -27,19 +27,20 @@ import itertools
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import OuterRef, Subquery, Exists
+from django.db.models import OuterRef, Subquery, Exists, Prefetch
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.utils.translation import ugettext_lazy as _, pgettext
 
+from attribution.models.attribution import Attribution
 from base import models as mdl
 from base.business.entity import get_entities_ids, build_entity_container_prefetch
 from base.business.entity_version import SERVICE_COURSE
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, _get_learning_unit_by_luy_entity
 from base.business.learning_unit_year_with_context import append_latest_entities
-from base.forms.common import get_clean_data, treat_empty_or_str_none_as_none
+from base.forms.common import get_clean_data, treat_empty_or_str_none_as_none, TooManyResultsException
 from base.forms.search.search_form import BaseSearchForm
 from base.forms.utils.choice_field import add_blank
 from base.forms.utils.dynamic_field import DynamicChoiceField
-from base.forms.utils.uppercase import convert_to_uppercase
 from base.models import learning_unit_year, group_element_year
 from base.models.academic_year import AcademicYear
 from base.models.campus import Campus
@@ -48,10 +49,12 @@ from base.models.entity_version import EntityVersion, build_current_entity_versi
 from base.models.enums import entity_container_year_link_type, learning_container_year_types, \
     learning_unit_year_subtypes, active_status, entity_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY
-from base.models.learning_unit_year import convert_status_bool, LearningUnitYear
+from base.models.learning_unit_year import convert_status_bool
 from base.models.offer_year_entity import OfferYearEntity
 from base.models.organization_address import find_distinct_by_country
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from cms.enums.entity_name import LEARNING_UNIT_YEAR
+from cms.models.translated_text import TranslatedText
 from reference.models.country import Country
 
 
@@ -92,12 +95,6 @@ class LearningUnitSearchForm(BaseSearchForm):
 
     with_entity_subordinated = forms.BooleanField(label=_('With subord. ent.'))
 
-    def clean_requirement_entity_acronym(self):
-        return convert_to_uppercase(self.cleaned_data.get('requirement_entity_acronym'))
-
-    def clean_allocation_entity_acronym(self):
-        return convert_to_uppercase(self.cleaned_data.get('allocation_entity_acronym'))
-
     def get_queryset(self):
         """ Filter a LearningUnitYearQueryset """
         has_proposal = ProposalLearningUnit.objects.filter(
@@ -108,14 +105,14 @@ class LearningUnitSearchForm(BaseSearchForm):
             entity__entitycontaineryear__type=REQUIREMENT_ENTITY
         ).current(
             OuterRef('academic_year__start_date')
-        ).order_by('-start_date').values('acronym')[:1]
+        ).values('acronym')[:1]
 
         entity_allocation = EntityVersion.objects.filter(
             entity__entitycontaineryear__learning_container_year__learningunityear=OuterRef('pk'),
             entity__entitycontaineryear__type=ALLOCATION_ENTITY
         ).current(
             OuterRef('academic_year__start_date')
-        ).order_by('-start_date').values('acronym')[:1]
+        ).values('acronym')[:1]
 
         learning_units = mdl.learning_unit_year.search(**self.cleaned_data)
 
@@ -127,7 +124,6 @@ class LearningUnitSearchForm(BaseSearchForm):
             entity_requirement=Subquery(entity_requirement),
             entity_allocation=Subquery(entity_allocation),
         )
-
         learning_units = self.get_filter_learning_container_ids(learning_units)
 
         return learning_units
@@ -163,6 +159,7 @@ class LearningUnitSearchForm(BaseSearchForm):
 
 
 class LearningUnitYearForm(LearningUnitSearchForm):
+    MAX_RECORDS = 1000
     container_type = forms.ChoiceField(
         label=_('Type'),
         choices=LearningUnitSearchForm.ALL_CHOICES + learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES,
@@ -210,12 +207,6 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             raise ValidationError(_('LU_ERRORS_INVALID_REGEX_SYNTAX'))
         return acronym
 
-    def clean_allocation_entity_acronym(self):
-        return convert_to_uppercase(self.cleaned_data.get('allocation_entity_acronym'))
-
-    def clean_faculty_borrowing_acronym(self):
-        return convert_to_uppercase(self.cleaned_data.get('faculty_borrowing_acronym'))
-
     def clean(self):
         return get_clean_data(self.cleaned_data)
 
@@ -232,14 +223,14 @@ class LearningUnitYearForm(LearningUnitSearchForm):
         learning_units = self.get_learning_units(service_course_search=True)
         return [lu for lu in learning_units if lu.entities.get(SERVICE_COURSE)]
 
-    def get_learning_units(self, service_course_search=None, requirement_entities=None, luy_status=None):
+    def get_learning_units(self, service_course_search=None):
         service_course_search = service_course_search or self.service_course_search
-        self.cleaned_data['status'] = self._set_status(luy_status)
 
-        if requirement_entities:
-            self.cleaned_data['requirement_entities'] = requirement_entities
+        learning_units = self.get_queryset()
+        if not service_course_search and self.cleaned_data and learning_units.count() > self.MAX_RECORDS:
+            raise TooManyResultsException
 
-        learning_units = self.get_queryset().prefetch_related(
+        learning_units = learning_units.prefetch_related(
             build_entity_container_prefetch([
                 entity_container_year_link_type.ALLOCATION_ENTITY,
                 entity_container_year_link_type.REQUIREMENT_ENTITY
@@ -248,12 +239,44 @@ class LearningUnitYearForm(LearningUnitSearchForm):
 
         if self.borrowed_course_search:
             # TODO must return a queryset
-            learning_units = self._filter_borrowed_learning_units(learning_units)
+            learning_units = list(self._filter_borrowed_learning_units(learning_units))
 
         for learning_unit in learning_units:
             append_latest_entities(learning_unit, service_course_search)
 
         return learning_units
+
+    def get_learning_units_and_summary_status(self, requirement_entities=None, luy_status=None):
+        self.cleaned_data['status'] = self._set_status(luy_status)
+
+        if requirement_entities:
+            self.cleaned_data['requirement_entities'] = requirement_entities
+
+        queryset = self.get_queryset()
+
+        queryset = queryset.prefetch_related(
+            build_entity_container_prefetch([
+                entity_container_year_link_type.ALLOCATION_ENTITY,
+                entity_container_year_link_type.REQUIREMENT_ENTITY
+            ]),
+            Prefetch(
+                'attribution_set',
+                queryset=Attribution.objects.filter(summary_responsible=True),
+                to_attr='summary_responsibles'
+            )
+        )
+
+        cms_list = TranslatedText.objects.filter(
+            entity=LEARNING_UNIT_YEAR,
+            text_label__label__in=CMS_LABEL_PEDAGOGY,
+            changed__isnull=False
+        ).select_related('text_label')
+
+        for learning_unit_yr in queryset:
+            append_latest_entities(learning_unit_yr)
+            _get_learning_unit_by_luy_entity(cms_list, learning_unit_yr)
+
+        return queryset
 
     def _set_status(self, luy_status):
         return convert_status_bool(luy_status) if luy_status else self.cleaned_data['status']
@@ -392,8 +415,8 @@ class ExternalLearningUnitYearForm(LearningUnitYearForm):
 
         self.fields['city'].choices = add_blank(cities_choice_list)
 
-    def get_learning_units(self):
-        learning_units = self.get_queryset().filter(
+    def get_queryset(self):
+        learning_units = super().get_queryset().filter(
             externallearningunityear__isnull=False
         ).select_related(
             'campus__organization'

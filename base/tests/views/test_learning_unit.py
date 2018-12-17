@@ -43,6 +43,7 @@ from waffle.testutils import override_flag
 
 import base.business.learning_unit
 import base.business.xls
+import reference.models.language
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit as learning_unit_business
@@ -1183,12 +1184,12 @@ class LearningUnitViewTestCase(TestCase):
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ])
     def test_find_inexisting_language_in_settings(self):
         wrong_language_code = 'pt'
-        self.assertIsNone(learning_unit_business.find_language_in_settings(wrong_language_code))
+        self.assertIsNone(reference.models.language.find_language_in_settings(wrong_language_code))
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ])
     def test_find_language_in_settings(self):
         existing_language_code = 'en'
-        self.assertEqual(learning_unit_business.find_language_in_settings(existing_language_code), ('en', 'English'))
+        self.assertEqual(reference.models.language.find_language_in_settings(existing_language_code), ('en', 'English'))
 
     def test_learning_unit_pedagogy(self):
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,

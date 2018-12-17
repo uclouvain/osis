@@ -158,6 +158,7 @@ def is_service_course(academic_year, requirement_entity_version, allocation_enti
     requirement_parent_faculty = requirement_entity_version.find_faculty_version(academic_year)
     if not requirement_parent_faculty:
         return False
+
     allocation_parent_faculty = allocation_entity_version.find_faculty_version(academic_year)
     if not allocation_parent_faculty:
         return False
