@@ -35,7 +35,7 @@ from attribution.business import attribution_charge_new
 from attribution.models.enums.function import Functions
 from base import models as mdl_base
 from base.business.learning_unit import LEARNING_UNIT_TITLES_PART2, XLS_DESCRIPTION, XLS_FILENAME, \
-    WORKSHEET_TITLE
+    WORKSHEET_TITLE, get_entity_acronym
 from base.business.xls import get_name_or_username
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.proposal_type import ProposalType
@@ -84,6 +84,15 @@ LEARNING_UNIT_TITLES_PART1 = [
 
 
 def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=False):
+    qs = annotate_qs(learning_unit_years)
+
+    return [
+        extract_xls_data_from_learning_unit(lu, with_grp, with_attributions) for lu in qs
+    ]
+
+
+def annotate_qs(learning_unit_years):
+    """ Fetch directly in the queryset all volumes data."""
     qs = learning_unit_years.annotate(
         pm_vol_q1=Subquery(
             LearningComponentYear.objects.filter(
@@ -134,10 +143,7 @@ def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=F
             ).values('planned_classes')[:1]
         )
     )
-
-    return [
-        extract_xls_data_from_learning_unit(lu, with_grp, with_attributions) for lu in qs
-    ]
+    return qs
 
 
 def extract_xls_data_from_learning_unit(learning_unit_yr, with_grp, with_attributions):
@@ -334,11 +340,22 @@ def _get_data_part1(learning_unit_yr):
         # FIXME Condition to remove when the LearningUnitYear.learning_continer_year_id will be null=false
         if learning_unit_yr.learning_container_year else "",
         learning_unit_yr.get_subtype_display(),
-        learning_unit_yr.entity_requirement,
+        getattr(learning_unit_yr, 'entity_requirement',
+                _get_entity_faculty_acronym(
+                learning_unit_yr.entities.get('REQUIREMENT_ENTITY'),
+                learning_unit_yr.academic_year)),
         proposal.get_type_display() if proposal else '',
         proposal.get_state_display() if proposal else '',
         learning_unit_yr.credits,
-        learning_unit_yr.entity_allocation,
+        getattr(learning_unit_yr, 'entity_allocation',
+                get_entity_acronym(learning_unit_yr.entities.get('ALLOCATION_ENTITY'))),
         learning_unit_yr.complete_title_english,
     ]
     return lu_data_part1
+
+
+def _get_entity_faculty_acronym(an_entity, academic_yr):
+    if an_entity:
+        faculty_entity = an_entity.find_faculty_version(academic_yr)
+        return faculty_entity.acronym if faculty_entity else None
+    return None

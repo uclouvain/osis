@@ -96,7 +96,6 @@ from base.views.learning_unit import learning_unit_components, learning_class_ye
     learning_unit_attributions
 from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
-from base.views.learning_units.search import learning_units
 from base.views.learning_units.search import learning_units_service_course
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
@@ -394,7 +393,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(len(context['container_types']),
                          len(learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES))
         self.assertTrue(context['experimental_phase'])
-        self.assertEqual(context['learning_units'], [])
+        self.assertEqual(context['learning_units_count'], 0)
 
     def test_learning_units_search_with_acronym_filtering(self):
         self._prepare_context_learning_units_search()
@@ -407,7 +406,7 @@ class LearningUnitViewTestCase(TestCase):
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
         self.assertTemplateUsed(response, 'learning_units.html')
-        self.assertEqual(len(response.context['learning_units']), 3)
+        self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_learning_units_search_by_acronym_with_valid_regex(self):
         self._prepare_context_learning_units_search()
@@ -418,7 +417,7 @@ class LearningUnitViewTestCase(TestCase):
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
         self.assertTemplateUsed(response, 'learning_units.html')
-        self.assertEqual(len(response.context['learning_units']), 1)
+        self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_learning_units_search_by_acronym_with_invalid_regex(self):
         self._prepare_context_learning_units_search()
@@ -443,7 +442,7 @@ class LearningUnitViewTestCase(TestCase):
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
         self.assertTemplateUsed(response, 'learning_units.html')
-        self.assertEqual(len(response.context['learning_units']), 1)
+        self.assertEqual(response.context['learning_units_count'], 1)
 
     def test_learning_units_search_with_requirement_entity_and_subord(self):
         self._prepare_context_learning_units_search()
@@ -455,7 +454,7 @@ class LearningUnitViewTestCase(TestCase):
         response = self.client.get(reverse('learning_units'), data=filter_data)
         self.assertTemplateUsed(response, 'learning_units.html')
 
-        self.assertEqual(len(response.context['learning_units']), 6)
+        self.assertEqual(response.context['learning_units_count'], 6)
 
     def test_learning_units_search_with_allocation_entity(self):
         self._prepare_context_learning_units_search()
@@ -467,7 +466,7 @@ class LearningUnitViewTestCase(TestCase):
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
         self.assertTemplateUsed(response, 'learning_units.html')
-        self.assertEqual(len(response.context['learning_units']), 1)
+        self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_learning_units_search_with_requirement_and_allocation_entity(self):
         self._prepare_context_learning_units_search()
@@ -479,7 +478,7 @@ class LearningUnitViewTestCase(TestCase):
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
         self.assertTemplateUsed(response, 'learning_units.html')
-        self.assertEqual(len(response.context['learning_units']), 1)
+        self.assertEqual(response.context['learning_units_count'], 1)
 
     def test_learning_units_search_with_service_course_no_result(self):
         filter_data = {
@@ -524,7 +523,7 @@ class LearningUnitViewTestCase(TestCase):
         response = self.client.get(reverse(learning_units_service_course), data=filter_data)
 
         self.assertTemplateUsed(response, 'learning_units.html')
-        self.assertEqual(len(response.context['learning_units']), number_of_results)
+        self.assertEqual(response.context['learning_units_count'], number_of_results)
 
     def test_learning_unit_read(self):
         learning_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year)

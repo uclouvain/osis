@@ -264,10 +264,6 @@ class LearningUnitYearGetEntityTest(TestCase):
         result = self.learning_unit_year.get_entity(entity_type=entity_container_year_link_type.REQUIREMENT_ENTITY)
         self.assertEqual(result, self.requirement_entity.entity)
 
-    def test_get_entity_case_not_found_entity_type(self):
-        with self.assertRaises(EntityContainerYear.DoesNotExist):
-            self.learning_unit_year.get_entity(entity_type=entity_container_year_link_type.ALLOCATION_ENTITY)
-
     def test_get_entity_case_no_learning_container_year(self):
         self.learning_unit_year.learning_container_year = None
         self.learning_unit_year.save()

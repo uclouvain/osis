@@ -49,7 +49,7 @@ from base.models.entity_version import EntityVersion, build_current_entity_versi
 from base.models.enums import entity_container_year_link_type, learning_container_year_types, \
     learning_unit_year_subtypes, active_status, entity_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY
-from base.models.learning_unit_year import convert_status_bool, LearningUnitYear
+from base.models.learning_unit_year import convert_status_bool
 from base.models.offer_year_entity import OfferYearEntity
 from base.models.organization_address import find_distinct_by_country
 from base.models.proposal_learning_unit import ProposalLearningUnit

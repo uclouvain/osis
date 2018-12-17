@@ -536,7 +536,7 @@ class TestLearningUnitProposalSearch(TestCase):
 
         self.assertIsInstance(response.context['form'], LearningUnitProposalForm)
         self.assertEqual(response.context['search_type'], PROPOSAL_SEARCH)
-        self.assertEqual(len(response.context['proposals']), 1)
+        self.assertEqual(response.context['learning_units_count'], 1)
 
     def test_learning_units_proposal_search_by_tutor(self):
         proposal = _create_proposal_learning_unit("LOSIS1211")
@@ -547,13 +547,7 @@ class TestLearningUnitProposalSearch(TestCase):
                                     learning_component_year=learning_unit_component.learning_component_year)
         url = reverse(learning_units_proposal_search)
         response = self.client.get(url, data={'tutor': self.person.first_name})
-        proposals = response.context['proposals']
-        self.assertEqual(len(proposals), 1)
-
-    def test_has_mininum_of_one_criteria(self):
-        form = LearningUnitProposalForm({"non_existing_field": 'nothing_interestings'})
-        self.assertFalse(form.is_valid(), form.errors)
-        self.assertIn(_("Please choose at least one criteria!"), form.errors['__all__'])
+        self.assertEqual(response.context['learning_units_count'], 1)
 
 
 class TestGroupActionsOnProposals(TestCase):

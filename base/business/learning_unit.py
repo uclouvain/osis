@@ -29,7 +29,6 @@ from operator import itemgetter
 from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
 
-from attribution.models import attribution
 from attribution.models.attribution import find_all_tutors_by_learning_unit_year
 from base import models as mdl_base
 from base.business.entity import get_entity_calendar
@@ -40,12 +39,10 @@ from base.models import entity_container_year
 from base.models import learning_achievement
 from base.models.academic_calendar import AcademicCalendar
 from base.models.entity_component_year import EntityComponentYear
-from base.models.entity_version import EntityVersion
 from base.models.enums import academic_calendar_type
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
-from base.models.learning_unit_year import LearningUnitYear
 from base.models.utils.utils import get_object_or_none
 from cms import models as mdl_cms
 from cms.enums import entity_name
@@ -225,8 +222,8 @@ def extract_xls_data_from_learning_unit(learning_unit_yr):
         # FIXME Condition to remove when the LearningUnitYear.learning_continer_year_id will be null=false
         if learning_unit_yr.learning_container_year else "",
         xls_build.translate(learning_unit_yr.subtype),
-        get_entity_acronym(learning_unit_yr.entities.get('REQUIREMENT_ENTITY')),
-        get_entity_acronym(learning_unit_yr.entities.get('ALLOCATION_ENTITY')),
+        learning_unit_yr.entity_allocation,
+        learning_unit_yr.entity_requirement,
         learning_unit_yr.credits, xls_build.translate(learning_unit_yr.status)
     ]
 

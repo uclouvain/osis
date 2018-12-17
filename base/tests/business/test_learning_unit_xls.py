@@ -36,12 +36,13 @@ from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPO
     _get_significant_volume, _prepare_legend_ws_data, _get_wrapped_cells, \
     _get_colored_rows, _get_attribution_line, _get_col_letter, _get_trainings_by_educ_group_year, _add_training_data, \
     _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
-    _get_data_part2
+    _get_data_part2, prepare_xls_content, annotate_qs
 from base.models.enums import education_group_categories
 from base.models.enums import entity_type, organization_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import proposal_type, proposal_state
+from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -277,8 +278,14 @@ class TestLearningUnitXls(TestCase):
                                                                        attribution=an_attribution,
                                                                        allocation_charge=5.0)
 
+        # Simulate annotate
+        luy = annotate_qs(LearningUnitYear.objects.filter(pk=luy.pk)).first()
+        luy.entity_requirement = EntityVersionFactory()
+
         luy.attribution_charge_news = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
             luy)
+
+
         expected_common = [
             str(_(luy.periodicity.title())),
             str(_('yes')) if luy.status else str(_('no')),

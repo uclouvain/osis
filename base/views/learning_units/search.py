@@ -156,18 +156,16 @@ def learning_units_proposal_search(request):
     )
     user_person = get_object_or_404(Person, user=request.user)
     found_learning_units = LearningUnitYear.objects.none()
-    try:
-        if search_form.is_valid():
-            found_learning_units = search_form.get_proposal_learning_units()
-            check_if_display_message(request, found_learning_units)
-    except TooManyResultsException:
-        display_error_messages(request, 'too_many_results')
+
+    if search_form.is_valid():
+        found_learning_units = search_form.get_proposal_learning_units()
+        check_if_display_message(request, found_learning_units)
 
     if request.GET.get('xls_status') == "xls":
         return create_xls_proposal(request.user, found_learning_units, _get_filter(search_form, PROPOSAL_SEARCH))
 
     if request.POST:
-        research_criteria = get_research_criteria(search_form)
+        research_criteria = get_research_criteria(search_form) if search_form.is_valid() else []
 
         selected_proposals_id = request.POST.getlist("selected_action", default=[])
         selected_proposals = ProposalLearningUnit.objects.filter(id__in=selected_proposals_id)
@@ -182,7 +180,7 @@ def learning_units_proposal_search(request):
         'current_academic_year': current_academic_year(),
         'experimental_phase': True,
         'search_type': PROPOSAL_SEARCH,
-        'learning_units': found_learning_units,
+        'learning_units_count': found_learning_units.count(),
         'is_faculty_manager': user_person.is_faculty_manager,
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
         'page_obj': paginate_queryset(found_learning_units, request.GET),
