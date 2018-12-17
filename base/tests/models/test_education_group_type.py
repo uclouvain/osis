@@ -86,8 +86,9 @@ class TestAuthorizedTypes(TestCase):
     def _get_dump_content(self):
         sysout = sys.stdout
         sys.stdout = open('dump.json', 'w')
-        call_command('dumpdata', 'base.authorizedrelationship', use_natural_foreign_keys=True,
-                     use_natural_primary_keys=True)
+        call_command('dumpdata',
+                     'base.authorizedrelationship',
+                     use_natural_foreign_keys=True)
         sys.stdout = sysout
         handle = open('dump.json', 'r+')
         var = handle.read()
