@@ -93,57 +93,27 @@ def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=F
 
 def annotate_qs(learning_unit_years):
     """ Fetch directly in the queryset all volumes data."""
-    qs = learning_unit_years.annotate(
-        pm_vol_q1=Subquery(
-            LearningComponentYear.objects.filter(
-                learningunityear__in=OuterRef('pk'),
-                type=LECTURING
-            ).values('hourly_volume_partial_q1')[:1]
-        ),
-        pm_vol_q2=Subquery(
-            LearningComponentYear.objects.filter(
-                learningunityear__in=OuterRef('pk'),
-                type=LECTURING
-            ).values('hourly_volume_partial_q2')[:1]
-        ),
-        pm_vol_tot=Subquery(
-            LearningComponentYear.objects.filter(
-                learningunityear__in=OuterRef('pk'),
-                type=LECTURING
-            ).values('hourly_volume_total_annual')[:1]
-        ),
-        pm_classes=Subquery(
-            LearningComponentYear.objects.filter(
-                learningunityear__in=OuterRef('pk'),
-                type=LECTURING
-            ).values('planned_classes')[:1]
-        ),
-        pp_vol_q1=Subquery(
-            LearningComponentYear.objects.filter(
-                learningunityear__in=OuterRef('pk'),
-                type=PRACTICAL_EXERCISES
-            ).values('hourly_volume_partial_q1')[:1]
-        ),
-        pp_vol_q2=Subquery(
-            LearningComponentYear.objects.filter(
-                learningunityear__in=OuterRef('pk'),
-                type=PRACTICAL_EXERCISES
-            ).values('hourly_volume_partial_q2')[:1]
-        ),
-        pp_vol_tot=Subquery(
-            LearningComponentYear.objects.filter(
-                learningunityear__in=OuterRef('pk'),
-                type=PRACTICAL_EXERCISES
-            ).values('hourly_volume_total_annual')[:1]
-        ),
-        pp_classes=Subquery(
-            LearningComponentYear.objects.filter(
-                learningunityear__in=OuterRef('pk'),
-                type=PRACTICAL_EXERCISES
-            ).values('planned_classes')[:1]
-        )
+
+    subquery_component = LearningComponentYear.objects.filter(
+        learningunityear__in=OuterRef('pk')
     )
-    return qs
+    subquery_component_pm = subquery_component.filter(
+        type=LECTURING
+    )
+    subquery_component_pp = subquery_component.filter(
+        type=PRACTICAL_EXERCISES
+    )
+
+    return learning_unit_years.annotate(
+        pm_vol_q1=Subquery(subquery_component_pm.values('hourly_volume_partial_q1')[:1]),
+        pm_vol_q2=Subquery(subquery_component_pm.values('hourly_volume_partial_q2')[:1]),
+        pm_vol_tot=Subquery(subquery_component_pm.values('hourly_volume_total_annual')[:1]),
+        pm_classes=Subquery(subquery_component_pm.values('planned_classes')[:1]),
+        pp_vol_q1=Subquery(subquery_component_pp.values('hourly_volume_partial_q1')[:1]),
+        pp_vol_q2=Subquery(subquery_component_pp.values('hourly_volume_partial_q2')[:1]),
+        pp_vol_tot=Subquery(subquery_component_pp.values('hourly_volume_total_annual')[:1]),
+        pp_classes=Subquery(subquery_component_pp.values('planned_classes')[:1])
+    )
 
 
 def extract_xls_data_from_learning_unit(learning_unit_yr, with_grp, with_attributions):
@@ -342,8 +312,9 @@ def _get_data_part1(learning_unit_yr):
         learning_unit_yr.get_subtype_display(),
         getattr(learning_unit_yr, 'entity_requirement',
                 _get_entity_faculty_acronym(
-                learning_unit_yr.entities.get('REQUIREMENT_ENTITY'),
-                learning_unit_yr.academic_year)),
+                    learning_unit_yr.entities.get('REQUIREMENT_ENTITY'),
+                    learning_unit_yr.academic_year)
+                ),
         proposal.get_type_display() if proposal else '',
         proposal.get_state_display() if proposal else '',
         learning_unit_yr.credits,
