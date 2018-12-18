@@ -24,17 +24,17 @@
 #
 ##############################################################################
 import datetime
-from unittest import mock
 from http import HTTPStatus
+from unittest import mock
 
+from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
-from django.http import HttpResponseForbidden
 
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.enums import organization_type
 from base.models.enums.publication_contact_type import PublicationContactType
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory
 from base.tests.factories.entity import EntityFactory
