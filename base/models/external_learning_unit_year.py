@@ -106,22 +106,9 @@ def search(academic_year_id=None, acronym=None, title=None, country=None, city=N
 
     if campus:
         queryset = queryset.filter(learning_unit_year__campus=campus)
-    else:
-        organization_ids = None
-        if city:
-            organization_ids = _get_organization_ids(OrganizationAddress.objects.filter(city=city))
-        else:
-            if country:
-                organization_ids = _get_organization_ids(OrganizationAddress.objects.filter(country=country))
-        if organization_ids:
-            queryset = queryset.filter(learning_unit_year__campus__organization__id__in=organization_ids)
+    elif city:
+        queryset = queryset.filter(learning_unit_year__campus__organization__organizationaddress__city=city)
+    elif country:
+        queryset = queryset.filter(learning_unit_year__campus__organization__organizationaddress__country=country)
 
     return queryset
-
-
-def _get_organization_ids(organization_addresses):
-    organizations = []
-    for organization_adr in organization_addresses:
-        if organization_adr.organization not in organizations:
-            organizations.append(organization_adr.organization.id)
-    return organizations

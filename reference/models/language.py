@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
@@ -89,3 +90,7 @@ def serialize_list(list_languages):
 def find_all_languages():
     languages = Language.objects.all().order_by('name')
     return languages
+
+
+def find_language_in_settings(language_code):
+    return next((lang for lang in settings.LANGUAGES if lang[0] == language_code), None)

@@ -27,28 +27,26 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import formset_factory
 from django.http import JsonResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from waffle.decorators import waffle_flag
 
-from base.business.learning_unit import get_learning_units_and_summary_status
 from base.business.learning_units.educational_information import get_responsible_and_learning_unit_yr_list
 from base.business.learning_units.perms import can_learning_unit_year_educational_information_be_udpated
 from base.business.learning_units.xls_comparison import get_academic_year_of_reference
 from base.business.learning_units.xls_generator import generate_xls_teaching_material
-from base.forms.common import TooManyResultsException
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.educational_information.mail_reminder import MailReminderRow, MailReminderFormset
 from base.forms.learning_unit.search_form import LearningUnitYearForm
 from base.models import academic_calendar
 from base.models.academic_year import current_academic_year
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
-from base.models.person import Person, find_by_user
+from base.models.learning_unit_year import LearningUnitYear
+from base.models.person import Person
+from base.utils.cache import cache_filter
 from base.utils.send_mail import send_mail_for_educational_information_update
-from base.views import layout
-from base.views.common import check_if_display_message, display_warning_messages
-from base.views.common import display_error_messages
+from base.views.common import check_if_display_message, display_warning_messages, paginate_queryset
 from base.views.learning_units.search import SUMMARY_LIST
 
 SUCCESS_MESSAGE = _('Reminding mails sent')
@@ -73,51 +71,48 @@ def send_email_educational_information_needs_update(request):
 
 
 @login_required
-# @cache_filter(exclude_params=["xls_status"])
+@cache_filter(exclude_params=["xls_status"])
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def learning_units_summary_list(request):
-    a_user_person = find_by_user(request.user)
-    learning_units_found = []
+    a_user_person = request.user.person
+    found_learning_units = LearningUnitYear.objects.none()
 
     initial_academic_year = current_academic_year()
     if academic_calendar.is_academic_calendar_has_started(initial_academic_year, SUMMARY_COURSE_SUBMISSION):
         initial_academic_year = initial_academic_year.next()
 
     search_form = LearningUnitYearForm(request.GET or None, initial={'academic_year_id': initial_academic_year})
-    try:
-        if search_form.is_valid():
-            learning_units_found_search = search_form.get_learning_units(
-                requirement_entities=a_user_person.find_main_entities_version,
-                luy_status=True
-            )
+    if search_form.is_valid():
+        found_learning_units = search_form.get_learning_units_and_summary_status(
+            requirement_entities=a_user_person.find_main_entities_version,
+            luy_status=True
+        )
+        check_if_display_message(request, found_learning_units)
 
-            # TODO refactoring : too many queries
-            learning_units_found = get_learning_units_and_summary_status(learning_units_found_search)
-            check_if_display_message(request, learning_units_found_search)
-    except TooManyResultsException:
-        display_error_messages(request, 'too_many_results')
-    responsible_and_learning_unit_yr_list = get_responsible_and_learning_unit_yr_list(learning_units_found)
-    learning_units = sorted(learning_units_found, key=lambda learning_yr: learning_yr.acronym)
-    errors = [can_learning_unit_year_educational_information_be_udpated(learning_unit_year_id=luy.id)
-              for luy in learning_units]
+    responsible_and_learning_unit_yr_list = get_responsible_and_learning_unit_yr_list(found_learning_units)
+
+    for luy in found_learning_units:
+        luy.errors = can_learning_unit_year_educational_information_be_udpated(learning_unit_year_id=luy)
 
     if request.GET.get('xls_status') == "xls_teaching_material":
         try:
-            return generate_xls_teaching_material(request.user, learning_units_found)
+            return generate_xls_teaching_material(request.user, found_learning_units)
         except ObjectDoesNotExist:
             display_warning_messages(request, _("the list to generate is empty.").capitalize())
 
-    form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(learning_units_found))
+    form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
+    print(found_learning_units)
     context = {
         'form': search_form,
         'formset': _get_formset(request, responsible_and_learning_unit_yr_list),
-        'learning_units_with_errors': list(zip(learning_units, errors)),
+        'learning_units_count': found_learning_units.count(),
         'search_type': SUMMARY_LIST,
         'is_faculty_manager': a_user_person.is_faculty_manager,
-        'form_comparison': form_comparison
+        'form_comparison': form_comparison,
+        'page_obj': paginate_queryset(found_learning_units, request.GET),
     }
 
-    return layout.render(request, "learning_units.html", context)
+    return render(request, "learning_units.html", context)
 
 
 def _send_email_to_responsibles(responsible_person_ids):

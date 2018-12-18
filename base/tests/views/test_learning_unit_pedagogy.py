@@ -25,7 +25,6 @@
 ##############################################################################
 import datetime
 from io import BytesIO
-from unittest import mock
 from unittest.mock import patch
 
 from django.contrib.auth.models import Group
@@ -98,38 +97,24 @@ class LearningUnitPedagogyTestCase(TestCase):
         with self.assertRaises(PermissionDenied):
             learning_units_summary_list(request)
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_summary_list_no_entity_calendar(self, mock_render):
-
-        request_factory = RequestFactory()
-
+    def test_learning_units_summary_list_no_entity_calendar(self):
         EntityVersionFactory(entity=self.an_entity)
 
-        request = request_factory.get(self.url)
-        request.user = self.faculty_user
         self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1100")
         self.client.force_login(self.faculty_user)
+        response = self.client.get(self.url)
 
-        learning_units_summary_list(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_units.html')
-        self.assertEqual(context['search_type'], SUMMARY_LIST)
-        self.assertEqual(len(context['learning_units_with_errors']), 0)
+        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertEqual(response.context['search_type'], SUMMARY_LIST)
+        self.assertEqual(response.context['learning_units_count'], 0)
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_summary_list(self, mock_render):
-        request_factory = RequestFactory()
-
+    def test_learning_units_summary_list(self):
         now = datetime.datetime.now()
 
         EntityVersionFactory(entity=self.an_entity,
                              start_date=now,
                              end_date=datetime.datetime(now.year+1, 9, 15),
                              entity_type='INSTITUTE')
-
-        request = request_factory.get(self.url, data={'academic_year_id': starting_academic_year().id})
-        request.user = self.faculty_user
 
         lu = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1100")
         person_lu = PersonFactory()
@@ -138,13 +123,11 @@ class LearningUnitPedagogyTestCase(TestCase):
         self._create_entity_calendar(self.an_entity)
         self.client.force_login(self.faculty_user)
 
-        learning_units_summary_list(request)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_units.html')
+        response = self.client.get(self.url, data={'academic_year_id': starting_academic_year().id})
+        self.assertTemplateUsed(response, 'learning_units.html')
+        context = response.context
         self.assertEqual(context['search_type'], SUMMARY_LIST)
-        self.assertEqual(len(context['learning_units_with_errors']), 1)
+        self.assertEqual(context['learning_units_count'], 1)
         self.assertTrue(context['is_faculty_manager'])
 
     def test_learning_units_summary_list_by_client(self):

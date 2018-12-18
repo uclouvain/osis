@@ -449,7 +449,11 @@ def _is_tutor_summary_responsible_of_learning_unit_year(*, user, learning_unit_y
 
 
 def _is_learning_unit_year_summary_editable(*, learning_unit_year_id, **kwargs):
-    value = LearningUnitYear.objects.filter(pk=learning_unit_year_id, summary_locked=False).exists()
+    if isinstance(learning_unit_year_id, LearningUnitYear):
+        value = True
+    else:
+        value = LearningUnitYear.objects.filter(pk=learning_unit_year_id, summary_locked=False).exists()
+
     if not value:
         raise PermissionDenied(_("The learning unit is not summary editable."))
 

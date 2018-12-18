@@ -306,15 +306,11 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         return self.subtype == learning_unit_year_subtypes.PARTIM
 
     def get_entity(self, entity_type):
-        entity = None
         # @TODO: Remove this condition when classes will be removed from learning unit year
         if self.learning_container_year:
-            entity_container_yr = mdl_entity_container_year.search(
-                link_type=entity_type,
-                learning_container_year=self.learning_container_year,
-            ).get()
-            entity = entity_container_yr.entity if entity_container_yr else None
-        return entity
+            entity_container_yr = self.learning_container_year.entitycontaineryear_set.filter(
+                type=entity_type).prefetch_related('entity__entityversion_set').first()
+            return entity_container_yr.entity if entity_container_yr else None
 
     def clean(self):
         learning_unit_years = find_gte_year_acronym(self.academic_year, self.acronym)
@@ -487,6 +483,17 @@ def search(academic_year_id=None, acronym=None, learning_container_year_id=None,
     if summary_responsible:
         queryset = find_summary_responsible_by_name(queryset, summary_responsible)
 
+    campus = kwargs.get('campus')
+    city = kwargs.get('city')
+    country = kwargs.get('country')
+
+    if campus:
+        queryset = queryset.filter(campus=campus)
+    elif city:
+        queryset = queryset.filter(campus__organization__organizationaddress__city=city)
+    elif country:
+        queryset = queryset.filter(campus__organization__organizationaddress__country=country)
+
     return queryset.select_related('learning_container_year', 'academic_year')
 
 
@@ -540,14 +547,6 @@ def find_partims_with_active_status(a_learning_unit_year):
 
 def find_partims_with_different_periodicity(a_learning_unit_year):
     return a_learning_unit_year.get_partims_related().exclude(periodicity=a_learning_unit_year.periodicity)
-
-
-def find_by_learning_unit(a_learning_unit):
-    return search(learning_unit=a_learning_unit)
-
-
-def find_by_entities(entities):
-    return LearningUnitYear.objects.filter(learning_container_year__entitycontaineryear__entity__in=entities)
 
 
 def find_latest_by_learning_unit(a_learning_unit):

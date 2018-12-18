@@ -38,16 +38,9 @@ class BaseSearchForm(forms.Form):
     def search(self):
         pass
 
-    def _has_criteria(self):
-        criteria_present = False
-        for name in self.fields:
-            if self.cleaned_data[name]:
-                criteria_present = True
-                break
-        return criteria_present
-
 
 def get_research_criteria(search_form):
+    # TODO : find what is it and what is it use
     tuples_label_value = []
     for field_name, field in search_form.fields.items():
         if not search_form.cleaned_data[field_name]:

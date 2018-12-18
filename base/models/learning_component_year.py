@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Sum
 from django.utils.functional import cached_property
@@ -84,13 +83,11 @@ class LearningComponentYear(SerializableModel):
 
     @property
     def complete_acronym(self):
-        learning_unit_acronym = self.learning_unit_year.acronym
-
         # FIXME :: Temporary solution - waiting for business clarification about "components" concept (untyped, ...)
         if self.acronym == 'NT':
-            return '{}/PM'.format(learning_unit_acronym)
+            return '{}/PM'.format(self.learning_unit_year.acronym)
         else:
-            return '{}/{}'.format(learning_unit_acronym, self.acronym)
+            return '{}/{}'.format(self.learning_unit_year.acronym, self.acronym)
 
     @cached_property
     def learning_unit_year(self):
