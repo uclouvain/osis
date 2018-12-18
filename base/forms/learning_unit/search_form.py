@@ -35,7 +35,7 @@ from attribution.models.attribution import Attribution
 from base import models as mdl
 from base.business.entity import get_entities_ids, build_entity_container_prefetch
 from base.business.entity_version import SERVICE_COURSE
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, _get_learning_unit_by_luy_entity
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, _set_summary_status_on_luy
 from base.business.learning_unit_year_with_context import append_latest_entities
 from base.forms.common import get_clean_data, treat_empty_or_str_none_as_none, TooManyResultsException
 from base.forms.search.search_form import BaseSearchForm
@@ -277,7 +277,7 @@ class LearningUnitYearForm(LearningUnitSearchForm):
 
         for learning_unit_yr in queryset:
             append_latest_entities(learning_unit_yr)
-            _get_learning_unit_by_luy_entity(cms_list, learning_unit_yr)
+            _set_summary_status_on_luy(cms_list, learning_unit_yr)
 
         return queryset
 

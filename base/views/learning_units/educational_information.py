@@ -101,10 +101,11 @@ def learning_units_summary_list(request):
             display_warning_messages(request, _("the list to generate is empty.").capitalize())
 
     form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
+    print(found_learning_units)
     context = {
         'form': search_form,
         'formset': _get_formset(request, responsible_and_learning_unit_yr_list),
-        'learning_units_count': len(found_learning_units),
+        'learning_units_count': found_learning_units.count(),
         'search_type': SUMMARY_LIST,
         'is_faculty_manager': a_user_person.is_faculty_manager,
         'form_comparison': form_comparison,

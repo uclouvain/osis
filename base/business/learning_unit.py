@@ -101,7 +101,7 @@ def get_same_container_year_components(learning_unit_year):
     learning_components_year = learning_container_year.learningcomponentyear_set.prefetch_related(
         Prefetch('learningclassyear_set', to_attr="classes"),
         'learningunityear_set'
-    ).order_by('type', 'acronym').annotate()
+    ).order_by('type', 'acronym')
 
     additionnal_entities = {}
 
@@ -290,7 +290,7 @@ def _changed_in_period(start_date, changed_date):
     return convert_date_to_datetime(start_date) <= changed_date
 
 
-def _get_learning_unit_by_luy_entity(cms_list, learning_unit_yr):
+def _set_summary_status_on_luy(cms_list, learning_unit_yr):
     requirement_entity = learning_unit_yr.entities.get('REQUIREMENT_ENTITY', None)
     if requirement_entity:
         a_calendar = _get_calendar(learning_unit_yr.academic_year.past(), requirement_entity)
