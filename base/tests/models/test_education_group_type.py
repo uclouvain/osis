@@ -26,7 +26,7 @@
 import json
 
 from django.test import TestCase
-from django.core.management import call_command
+from django.core import serializers
 
 from base.models.education_group_type import find_authorized_types
 from base.models.enums import education_group_categories
@@ -34,7 +34,6 @@ from base.tests.factories.authorized_relationship import AuthorizedRelationshipF
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.models.enums import education_group_types
-import sys
 
 
 class TestAuthorizedTypes(TestCase):
@@ -77,20 +76,16 @@ class TestAuthorizedTypes(TestCase):
             parent_type=EducationGroupTypeFactory(name=education_group_types.TrainingType.AGGREGATION.name),
             child_type=EducationGroupTypeFactory(name=education_group_types.TrainingType.CERTIFICATE.name)
         )
-        dump_content = self._get_dump_content()
-        self.assertEqual(dump_content[0].get('fields').get('parent_type'),
-                         [an_authorized_relation_ship.parent_type.name])
-        self.assertEqual(dump_content[0].get('fields').get('child_type'),
-                         [an_authorized_relation_ship.child_type.name])
+        dump_data_alike = serializers.serialize(
+            'json',
+            [
+                an_authorized_relation_ship,
+            ],
+            use_natural_foreign_keys=True
+        )
+        dump_data = json.loads(dump_data_alike)
 
-    def _get_dump_content(self):
-        sysout = sys.stdout
-        sys.stdout = open('dump.json', 'w')
-        call_command('dumpdata',
-                     'base.authorizedrelationship',
-                     use_natural_foreign_keys=True)
-        sys.stdout = sysout
-        handle = open('dump.json', 'r+')
-        var = handle.read()
-        dump_content = json.loads(var)
-        return dump_content
+        self.assertEqual(dump_data[0].get('fields').get('parent_type'),
+                         [an_authorized_relation_ship.parent_type.name])
+        self.assertEqual(dump_data[0].get('fields').get('child_type'),
+                         [an_authorized_relation_ship.child_type.name])
