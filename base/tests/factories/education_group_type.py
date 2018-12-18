@@ -34,6 +34,7 @@ from base.models.enums import education_group_categories, education_group_types
 class EducationGroupTypeFactory(DjangoModelFactory):
     class Meta:
         model = "base.EducationGroupType"
+        django_get_or_create = ('category', 'name')
 
     external_id = factory.Sequence(lambda n: '10000000%02d' % n)
     category = education_group_categories.TRAINING
@@ -58,9 +59,3 @@ class MiniTrainingEducationGroupTypeFactory(EducationGroupTypeFactory):
 
 class GroupEducationGroupTypeFactory(EducationGroupTypeFactory):
     category = education_group_categories.GROUP
-
-
-class ExistingEducationGroupTypeFactory(EducationGroupTypeFactory):
-    class Meta:
-        model = 'base.EducationGroupType'
-        django_get_or_create = ('category', 'name')

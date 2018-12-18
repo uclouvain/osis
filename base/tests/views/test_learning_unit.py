@@ -31,7 +31,6 @@ import reversion
 from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
 from django.contrib.messages.api import get_messages
-from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden
@@ -44,12 +43,13 @@ from waffle.testutils import override_flag
 
 import base.business.learning_unit
 import base.business.xls
+import reference.models.language
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit as learning_unit_business
 from base.business.learning_unit import LEARNING_UNIT_TITLES_PART1, LEARNING_UNIT_TITLES_PART2
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
-from base.forms.learning_unit.search_form import LearningUnitYearForm, LearningUnitSearchForm
+from base.forms.learning_unit.search_form import LearningUnitYearForm
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models import learning_unit_component
@@ -96,7 +96,6 @@ from base.views.learning_unit import learning_unit_components, learning_class_ye
     learning_unit_attributions
 from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
-from base.views.learning_units.search import learning_units
 from base.views.learning_units.search import learning_units_service_course
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
@@ -385,19 +384,11 @@ class LearningUnitViewTestCase(TestCase):
         PersonEntityFactory(person=self.person, entity=self.entity_3)
         self.client.force_login(self.a_superuser)
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_search(self, mock_render):
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse('learning_units'))
-        request.user = self.a_superuser
+    def test_learning_units_search(self):
+        response = self.client.get(reverse('learning_units'))
 
-        learning_units(request)
-
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_units.html')
+        context = response.context
+        self.assertTemplateUsed(response, 'learning_units.html')
         self.assertEqual(context['academic_years'].count(), 7)
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
         self.assertEqual(len(context['types']),
@@ -405,161 +396,112 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(len(context['container_types']),
                          len(learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES))
         self.assertTrue(context['experimental_phase'])
-        self.assertEqual(context['learning_units'], [])
+        self.assertEqual(context['learning_units_count'], 0)
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_search_with_acronym_filtering(self, mock_render):
+    def test_learning_units_search_with_acronym_filtering(self):
         self._prepare_context_learning_units_search()
-        request_factory = RequestFactory()
 
         filter_data = {
             'academic_year_id': self.current_academic_year.id,
             'acronym': 'LBIR',
             'status': active_status.ACTIVE
         }
+        response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        request = request_factory.get(reverse('learning_units'), data=filter_data)
-        request.user = self.a_superuser
+        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertEqual(len(response.context['page_obj']), 3)
 
-        learning_units(request)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_units.html')
-        self.assertEqual(len(context['learning_units']), 3)
-
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_search_by_acronym_with_valid_regex(self, mock_render):
+    def test_learning_units_search_by_acronym_with_valid_regex(self):
         self._prepare_context_learning_units_search()
-        request_factory = RequestFactory()
         filter_data = {
             'academic_year_id': self.current_academic_year.id,
             'acronym': '^DRT.+A'
         }
-        request = request_factory.get(reverse('learning_units'), data=filter_data)
-        request.user = self.a_superuser
+        response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        from base.views.learning_units.search import learning_units
-        learning_units(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_units.html')
-        self.assertEqual(len(context['learning_units']), 1)
+        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertEqual(len(response.context['page_obj']), 1)
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_search_by_acronym_with_invalid_regex(self, mock_render):
+    def test_learning_units_search_by_acronym_with_invalid_regex(self):
         self._prepare_context_learning_units_search()
-        request_factory = RequestFactory()
+
         filter_data = {
             'academic_year_id': self.current_academic_year.id,
             'acronym': '^LB(+)2+',
             'status': active_status.ACTIVE
         }
-        request = request_factory.get(reverse('learning_units'), data=filter_data)
-        request.user = self.a_superuser
+        response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        from base.views.learning_units.search import learning_units
-        learning_units(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_units.html')
-        self.assertEqual(context['form'].errors['acronym'], [_('LU_ERRORS_INVALID_REGEX_SYNTAX')])
+        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertEqual(response.context['form'].errors['acronym'], [_('LU_ERRORS_INVALID_REGEX_SYNTAX')])
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_search_with_requirement_entity(self, mock_render):
+    def test_learning_units_search_with_requirement_entity(self):
         self._prepare_context_learning_units_search()
-        request_factory = RequestFactory()
+
         filter_data = {
             'academic_year_id': self.current_academic_year.id,
             'requirement_entity_acronym': 'ENVI'
         }
-        request = request_factory.get(reverse('learning_units'), data=filter_data)
-        request.user = self.a_superuser
+        response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        from base.views.learning_units.search import learning_units
-        learning_units(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_units.html')
-        self.assertEqual(len(context['learning_units']), 1)
+        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertEqual(response.context['learning_units_count'], 1)
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_search_with_requirement_entity_and_subord(self, mock_render):
+    def test_learning_units_search_with_requirement_entity_and_subord(self):
         self._prepare_context_learning_units_search()
-        request_factory = RequestFactory()
         filter_data = {
             'academic_year_id': self.current_academic_year.id,
             'requirement_entity_acronym': 'AGRO',
             'with_entity_subordinated': True
         }
-        request = request_factory.get(reverse('learning_units'), data=filter_data)
-        request.user = self.a_superuser
+        response = self.client.get(reverse('learning_units'), data=filter_data)
+        self.assertTemplateUsed(response, 'learning_units.html')
 
-        learning_units(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_units.html')
-        self.assertEqual(len(context['learning_units']), 6)
+        self.assertEqual(response.context['learning_units_count'], 6)
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_search_with_allocation_entity(self, mock_render):
+    def test_learning_units_search_with_allocation_entity(self):
         self._prepare_context_learning_units_search()
         request_factory = RequestFactory()
         filter_data = {
             'academic_year_id': self.current_academic_year.id,
             'allocation_entity_acronym': 'AGES'
         }
-        request = request_factory.get(reverse('learning_units'), data=filter_data)
-        request.user = self.a_superuser
+        response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        from base.views.learning_units.search import learning_units
-        learning_units(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_units.html')
-        self.assertEqual(len(context['learning_units']), 1)
+        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertEqual(len(response.context['page_obj']), 1)
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_search_with_requirement_and_allocation_entity(self, mock_render):
+    def test_learning_units_search_with_requirement_and_allocation_entity(self):
         self._prepare_context_learning_units_search()
-        request_factory = RequestFactory()
         filter_data = {
             'academic_year_id': self.current_academic_year.id,
             'requirement_entity_acronym': 'ENVI',
             'allocation_entity_acronym': 'AGES'
         }
-        request = request_factory.get(reverse('learning_units'), data=filter_data)
-        request.user = self.a_superuser
+        response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        from base.views.learning_units.search import learning_units
-        learning_units(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_units.html')
-        self.assertEqual(len(context['learning_units']), 1)
+        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertEqual(response.context['learning_units_count'], 1)
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_search_with_service_course_no_result(self, mock_render):
+    def test_learning_units_search_with_service_course_no_result(self):
         filter_data = {
             'academic_year_id': self.current_academic_year.id,
             'requirement_entity_acronym': 'AGRO',
             'with_entity_subordinated': True
         }
         number_of_results = 0
-        self.service_course_search(filter_data, mock_render, number_of_results)
+        self.service_course_search(filter_data, number_of_results)
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_search_with_service_course_without_entity_subordinated(self, mock_render):
+    def test_learning_units_search_with_service_course_without_entity_subordinated(self):
         filter_data = {
             'academic_year_id': self.current_academic_year.id,
             'requirement_entity_acronym': 'ELOG',
             'with_entity_subordinated': False
         }
         number_of_results = 1
-        self.service_course_search(filter_data, mock_render, number_of_results)
+        self.service_course_search(filter_data, number_of_results)
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_search_with_service_course_with_entity_subordinated(self, mock_render):
+    def test_learning_units_search_with_service_course_with_entity_subordinated(self):
         filter_data = {
             'academic_year_id': self.current_academic_year.id,
             'requirement_entity_acronym': 'PSP',
@@ -567,10 +509,9 @@ class LearningUnitViewTestCase(TestCase):
         }
 
         number_of_results = 1
-        self.service_course_search(filter_data, mock_render, number_of_results)
+        self.service_course_search(filter_data, number_of_results)
 
-    @mock.patch('base.views.layout.render')
-    def test_lu_search_with_service_course_with_entity_subordinated_requirement_and_wrong_allocation(self, mock_render):
+    def test_lu_search_with_service_course_with_entity_subordinated_requirement_and_wrong_allocation(self):
         filter_data = {
             'academic_year_id': self.current_academic_year.id,
             'requirement_entity_acronym': 'PSP',
@@ -578,20 +519,14 @@ class LearningUnitViewTestCase(TestCase):
             'with_entity_subordinated': True
         }
         number_of_results = 0
-        self.service_course_search(filter_data, mock_render, number_of_results)
+        self.service_course_search(filter_data, number_of_results)
 
-    def service_course_search(self, filter_data, mock_render, number_of_results):
+    def service_course_search(self, filter_data, number_of_results):
         self._prepare_context_learning_units_search()
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse(learning_units_service_course), data=filter_data)
-        request.user = self.a_superuser
-        setattr(request, 'session', 'session')
-        setattr(request, '_messages', FallbackStorage(request))
-        learning_units_service_course(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_units.html')
-        self.assertEqual(len(context['learning_units']), number_of_results)
+        response = self.client.get(reverse(learning_units_service_course), data=filter_data)
+
+        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertEqual(response.context['learning_units_count'], number_of_results)
 
     def test_learning_unit_read(self):
         learning_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year)
@@ -748,7 +683,7 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_get_components_no_learning_container_yr(self):
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year)
-        components_dict = learning_unit_business.get_same_container_year_components(learning_unit_year, False)
+        components_dict = learning_unit_business.get_same_container_year_components(learning_unit_year)
         self.assertEqual(len(components_dict.get('components')), 0)
 
     def test_get_components_with_classes(self):
@@ -761,7 +696,7 @@ class LearningUnitViewTestCase(TestCase):
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=l_container_year)
 
-        components_dict = learning_unit_business.get_same_container_year_components(learning_unit_year, True)
+        components_dict = learning_unit_business.get_same_container_year_components(learning_unit_year)
         self.assertEqual(len(components_dict.get('components')), 1)
         self.assertEqual(len(components_dict.get('components')[0]['learning_component_year'].classes), 2)
 
@@ -1232,18 +1167,6 @@ class LearningUnitViewTestCase(TestCase):
             'PLANNED_CLASSES_{}_{}'.format(learning_unit_year.id, learning_component_year.id): [2]
         }
 
-    def test_error_message_case_too_many_results_to_show(self):
-        LearningUnitYearFactory(academic_year=self.academic_year_1)
-        tmpmaxrecors = LearningUnitSearchForm.MAX_RECORDS
-        LearningUnitSearchForm.MAX_RECORDS = 0
-
-        response = self.client.get(reverse('learning_units'), {'academic_year_id': self.academic_year_1.id})
-        messages = list(response.context['messages'])
-        self.assertEqual(messages[0].message, _('Too many results! Please be more specific.'))
-
-        # Restore max_record
-        LearningUnitSearchForm.MAX_RECORDS = tmpmaxrecors
-
     def test_get_username_with_no_person(self):
         a_username = 'dupontm'
         a_user = UserFactory(username=a_username)
@@ -1263,12 +1186,12 @@ class LearningUnitViewTestCase(TestCase):
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ])
     def test_find_inexisting_language_in_settings(self):
         wrong_language_code = 'pt'
-        self.assertIsNone(learning_unit_business.find_language_in_settings(wrong_language_code))
+        self.assertIsNone(reference.models.language.find_language_in_settings(wrong_language_code))
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ])
     def test_find_language_in_settings(self):
         existing_language_code = 'en'
-        self.assertEqual(learning_unit_business.find_language_in_settings(existing_language_code), ('en', 'English'))
+        self.assertEqual(reference.models.language.find_language_in_settings(existing_language_code), ('en', 'English'))
 
     def test_learning_unit_pedagogy(self):
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,

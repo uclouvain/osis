@@ -24,38 +24,40 @@
 #
 ##############################################################################
 import datetime
+
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
+from attribution.business import attribution_charge_new
 from attribution.models.enums.function import Functions
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from base.tests.factories.person import PersonFactory
-from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPOSAL_LINE_STYLES, _update_volumes_data, \
-    _get_significant_volume, VOLUMES_INITIALIZED, _prepare_legend_ws_data, _get_wrapped_cells, \
+from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory
+from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPOSAL_LINE_STYLES, \
+    _get_significant_volume, _prepare_legend_ws_data, _get_wrapped_cells, \
     _get_colored_rows, _get_attribution_line, _get_col_letter, _get_trainings_by_educ_group_year, _add_training_data, \
     _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
-    _get_absolute_credits, _get_volumes, _get_data_part2
-from base.models.enums import proposal_type, proposal_state
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.models.enums import learning_component_year_type
-from osis_common.document import xls_build
+    _get_data_part2, prepare_xls_content, annotate_qs
 from base.models.enums import education_group_categories
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.business.learning_units import GenerateContainer
-from base.tests.factories.entity_version import EntityVersionFactory
 from base.models.enums import entity_type, organization_type
-from base.tests.factories.user import UserFactory
+from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
-from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from attribution.business import attribution_charge_new
-from attribution.tests.factories.attribution_new import AttributionNewFactory
-from base.tests.factories.tutor import TutorFactory
+from base.models.enums import proposal_type, proposal_state
+from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.business.learning_units import GenerateContainer
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.person import PersonFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from base.tests.factories.tutor import TutorFactory
+from base.tests.factories.user import UserFactory
+from osis_common.document import xls_build
 
 COL_TEACHERS_LETTER = 'L'
 COL_PROGRAMS_LETTER = 'Z'
@@ -180,24 +182,6 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(_get_significant_volume(None), '')
         self.assertEqual(_get_significant_volume(0), '')
 
-    def test_update_volumes_data(self):
-        volumes = {
-            learning_component_year_type.LECTURING: VOLUMES_INITIALIZED,
-            learning_component_year_type.PRACTICAL_EXERCISES: VOLUMES_INITIALIZED
-        }
-        lecturing_data = {'PLANNED_CLASSES': 1, 'VOLUME_Q1': 10, 'VOLUME_TOTAL': 50, 'VOLUME_Q2': 40}
-        compo = {
-            'learning_component_year': LearningComponentYearFactory(
-                learning_container_year=self.learning_container_luy1,
-                type=learning_component_year_type.LECTURING),
-            'volumes': lecturing_data
-        }
-        volumes_updated = _update_volumes_data(compo, volumes)
-        self.assertCountEqual(volumes_updated.get(learning_component_year_type.LECTURING),
-                              lecturing_data)
-        self.assertCountEqual(volumes_updated.get(learning_component_year_type.PRACTICAL_EXERCISES),
-                              VOLUMES_INITIALIZED)
-
     def test_prepare_legend_ws_data(self):
         expected = {
             xls_build.HEADER_TITLES_KEY: [str(_('Legend'))],
@@ -253,50 +237,6 @@ class TestLearningUnitXls(TestCase):
         param = _get_parameters_configurable_list(learning_units, titles, an_user)
         self.assertEqual(param.get(xls_build.STYLED_CELLS), {WRAP_TEXT_STYLE: ['C2', 'C3']})
 
-    def test_get_absolute_credits(self):
-        credits_luy = 15
-        luy = LearningUnitYearFactory(credits=credits_luy)
-        GroupElementYearFactory(
-            child_branch=None,
-            child_leaf=luy
-        )
-        self.assertEqual(_get_absolute_credits(luy), credits_luy)
-
-    def test_get_absolute_credits_empty(self):
-        luy = LearningUnitYearFactory(credits=None)
-        GroupElementYearFactory(
-            child_branch=None,
-            child_leaf=luy
-        )
-        self.assertEqual(_get_absolute_credits(luy), '')
-
-    def test_get_volumes(self):
-        learning_container_luy = LearningContainerYearFactory(academic_year=self.current_academic_year)
-        luy = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                      learning_container_year=learning_container_luy)
-
-        LearningComponentYearFactory(
-            learning_container_year=learning_container_luy,
-            type=learning_component_year_type.LECTURING,
-            hourly_volume_total_annual=15,
-            hourly_volume_partial_q1=10,
-            hourly_volume_partial_q2=5,
-            planned_classes=1
-        )
-        LearningComponentYearFactory(
-            learning_container_year=learning_container_luy,
-            type=learning_component_year_type.PRACTICAL_EXERCISES,
-            hourly_volume_total_annual=20,
-            hourly_volume_partial_q1=10,
-            hourly_volume_partial_q2=10,
-            planned_classes=1
-        )
-        volumes = _get_volumes(luy)
-        self.assertEqual(volumes.get('LECTURING'),
-                         {'VOLUME_TOTAL': 15, 'PLANNED_CLASSES': 1, 'VOLUME_Q1': 10, 'VOLUME_Q2': 5})
-        self.assertEqual(volumes.get('PRACTICAL_EXERCISES'),
-                         {'VOLUME_TOTAL': 20, 'PLANNED_CLASSES': 1, 'VOLUME_Q1': 10, 'VOLUME_Q2': 10})
-
     def test_get_data_part2(self):
         learning_container_luy = LearningContainerYearFactory(academic_year=self.current_academic_year)
         luy = LearningUnitYearFactory(academic_year=self.current_academic_year,
@@ -338,11 +278,17 @@ class TestLearningUnitXls(TestCase):
                                                                        attribution=an_attribution,
                                                                        allocation_charge=5.0)
 
+        # Simulate annotate
+        luy = annotate_qs(LearningUnitYear.objects.filter(pk=luy.pk)).first()
+        luy.entity_requirement = EntityVersionFactory()
+
         luy.attribution_charge_news = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
             luy)
+
+
         expected_common = [
             str(_(luy.periodicity.title())),
-            str(_('Yes')) if luy.status else str(_('No')),
+            str(_('yes')) if luy.status else str(_('no')),
             component_lecturing.hourly_volume_total_annual,
             component_lecturing.hourly_volume_partial_q1,
             component_lecturing.hourly_volume_partial_q2,
@@ -351,10 +297,9 @@ class TestLearningUnitXls(TestCase):
             component_practical.hourly_volume_partial_q1,
             component_practical.hourly_volume_partial_q2,
             component_practical.planned_classes,
-            str(_(luy.quadrimester.title()))if luy.quadrimester else '',
-            str(_(luy.session.title())) if luy.session else '',
+            luy.get_quadrimester_display() or '',
+            luy.get_session_display() or '',
             "",
-            ''
         ]
         self.assertEqual(_get_data_part2(luy, False), expected_common)
         self.assertEqual(

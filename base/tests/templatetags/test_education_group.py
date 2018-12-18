@@ -32,7 +32,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, pgettext
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
-from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
+from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP, Categories
 from base.templatetags.education_group import li_with_deletion_perm, button_with_permission, \
     button_order_with_permission, BUTTON_ORDER_TEMPLATE, li_with_create_perm_training, \
     li_with_create_perm_mini_training, li_with_create_perm_group, link_detach_education_group, \
@@ -188,9 +188,9 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         result = li_with_create_perm_training(self.context, self.url, "")
 
         msg = pgettext("female", UNAUTHORIZED_TYPE_MSG) % {
-            "child_category": _(TRAINING),
-            "category": _(self.education_group_year.education_group_type.category),
-            "type": self.education_group_year.education_group_type.name
+            "child_category": Categories.TRAINING.value,
+            "category": self.education_group_year.education_group_type.get_category_display(),
+            "type": self.education_group_year.education_group_type.get_name_display()
         }
         msg = msg.capitalize()
         self.assertEqual(
@@ -207,9 +207,9 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     def test_li_with_create_perm_mini_training_disabled(self):
         result = li_with_create_perm_mini_training(self.context, self.url, "")
         msg = pgettext("female", UNAUTHORIZED_TYPE_MSG) % {
-            "child_category": _(MINI_TRAINING),
-            "category": _(self.education_group_year.education_group_type.category),
-            "type": self.education_group_year.education_group_type.name
+            "child_category": Categories.MINI_TRAINING.value,
+            "category": self.education_group_year.education_group_type.get_category_display(),
+            "type": self.education_group_year.education_group_type.get_name_display()
         }
         msg = msg.capitalize()
         self.assertEqual(
@@ -226,9 +226,9 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     def test_li_with_create_perm_group_disabled(self):
         result = li_with_create_perm_group(self.context, self.url, "")
         msg = pgettext("female", UNAUTHORIZED_TYPE_MSG) % {
-            "child_category": _(GROUP),
-            "category": _(self.education_group_year.education_group_type.category),
-            "type": self.education_group_year.education_group_type.name
+            "child_category": Categories.GROUP.value,
+            "category": self.education_group_year.education_group_type.get_category_display(),
+            "type": self.education_group_year.education_group_type.get_name_display()
         }
         msg = msg.capitalize()
         self.assertEqual(

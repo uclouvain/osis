@@ -30,6 +30,7 @@ from django.db.models import Case, When
 from django.utils.translation import ugettext_lazy as _
 
 from base.models.enums import education_group_categories, education_group_types
+from base.models.enums.education_group_categories import Categories
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 GROUP_TYPE_OPTION = 'Option'
@@ -56,8 +57,8 @@ class EducationGroupTypeManager(models.Manager):
     def get_queryset(self):
         return EducationGroupTypeQueryset(self.model, using=self._db)
 
-    def get_by_natural_key(self, external_id):
-        return self.get(external_id=external_id)
+    def get_by_natural_key(self, name):
+        return self.get(name=name)
 
 
 class EducationGroupType(SerializableModel):
@@ -68,8 +69,8 @@ class EducationGroupType(SerializableModel):
 
     category = models.CharField(
         max_length=25,
-        choices=education_group_categories.CATEGORIES,
-        default=education_group_categories.TRAINING,
+        choices=Categories.choices(),
+        default=Categories.TRAINING.name,
         verbose_name=_('Category'),
     )
 
@@ -77,6 +78,7 @@ class EducationGroupType(SerializableModel):
         max_length=255,
         choices=education_group_types.ALL_TYPES,
         verbose_name=_('Type of training'),
+        unique=True,
     )
 
     learning_unit_child_allowed = models.BooleanField(default=False)
@@ -85,7 +87,7 @@ class EducationGroupType(SerializableModel):
         return self.get_name_display()
 
     def natural_key(self):
-        return (self.external_id,)
+        return (self.name,)
 
 
 def search(**kwargs):

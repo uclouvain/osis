@@ -53,7 +53,7 @@ class TestSearchForm(TestCase):
     def test_get_research_criteria(self):
         data = QueryDict(mutable=True)
         data.update({
-            "requirement_entity_acronym": "info",
+            "requirement_entity_acronym": "INFO",
             "tutor": "Jean Marcel",
             "academic_year_id": str(self.academic_years[0].id),
         })

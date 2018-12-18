@@ -42,6 +42,7 @@ from base.models.education_group_certificate_aim import EducationGroupCertificat
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.entity_version import get_last_version
 from base.models.enums import education_group_categories, rate_code, decree_category
+from base.models.enums.education_group_categories import Categories
 from reference.models.domain import Domain
 from reference.models.enums import domain_type
 
@@ -56,8 +57,8 @@ def _get_section_choices():
 
 
 class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
-    category = education_group_categories.TRAINING
-    category_text = _(dict(education_group_categories.CATEGORIES)[category])
+    category = Categories.TRAINING.name
+    category_text = Categories.TRAINING.value
 
     secondary_domains = AutoCompleteSelectMultipleField(
         'university_domains', required=False, help_text="", label=_('secondary domains').title()

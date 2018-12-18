@@ -33,9 +33,9 @@
 
         <div style="margin-top:10px;">
 
-            {% if learning_units %}
+            {% if page_obj %}
                 <strong style="margin-left:10px;color:grey;">
-                    {{ learning_units|length }} {% trans 'learning units' %}
+                    {{ learning_units_count }} {% trans 'learning units' %}
                 </strong>
 
                 <div class="dropdown {{ dropdirection }} text-right">
@@ -51,7 +51,6 @@
                             <a id="btn_produce_xls_with_parameters"
                                style="margin-right:10px;"
                                title="{% trans 'Produce a customizable xls of learning units' %}"
-                               href="#"
                                data-toggle="modal" data-target="#modalXlsLuyWithParameters">
                                 &nbsp;{% trans 'Configurable list of learning units' %}
                             </a>
@@ -59,7 +58,6 @@
                         <li>
                             <a id="btn_produce_xls_comparison"
                                style="margin-right:10px;" title="Produce xls of comparison"
-                               href="#"
                                data-toggle="modal" data-target="#modalComparisonLuy">
                                 &nbsp;{% trans 'List of learning_units with comparison' %}
                             </a>
@@ -88,7 +86,7 @@
                         <th>{% trans 'Status' %}</th>
                     </tr>
                     </thead>
-                    {% for learning_unit in learning_units %}
+                    {% for learning_unit in page_obj %}
                         <tr data-id="{{ learning_unit.id }}" data-value="{{ learning_unit.acronym }}">
                             <td>{{ learning_unit.academic_year.name }}</td>
                             <td>
@@ -102,8 +100,8 @@
                             <td>
                                 {{ learning_unit.get_subtype_display |default_if_none:'-' }}
                             </td>
-                            <td>{{ learning_unit.entities.REQUIREMENT_ENTITY.acronym|default_if_none:'-' }}</td>
-                            <td>{{ learning_unit.entities.ALLOCATION_ENTITY.acronym|default_if_none:'-' }}</td>
+                            <td>{{ learning_unit.entity_requirement|default_if_none:'-' }}</td>
+                            <td>{{ learning_unit.entity_allocation|default_if_none:'-' }}</td>
                             <td>{% if learning_unit.credits %}{{ learning_unit.credits }}{% endif %}</td>
                             <td>
                                 {% if learning_unit.status %}
@@ -123,6 +121,9 @@
                         </tr>
                     {% endfor %}
                 </table>
+                <div class="text-center">
+                    {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+                </div>
             {% endif %}
         </div>
     </div>
