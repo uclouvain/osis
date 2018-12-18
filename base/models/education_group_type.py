@@ -57,8 +57,8 @@ class EducationGroupTypeManager(models.Manager):
     def get_queryset(self):
         return EducationGroupTypeQueryset(self.model, using=self._db)
 
-    def get_by_natural_key(self, external_id):
-        return self.get(external_id=external_id)
+    def get_by_natural_key(self, name):
+        return self.get(name=name)
 
 
 class EducationGroupType(SerializableModel):
@@ -78,6 +78,7 @@ class EducationGroupType(SerializableModel):
         max_length=255,
         choices=education_group_types.ALL_TYPES,
         verbose_name=_('Type of training'),
+        unique=True,
     )
 
     learning_unit_child_allowed = models.BooleanField(default=False)
@@ -86,7 +87,7 @@ class EducationGroupType(SerializableModel):
         return self.get_name_display()
 
     def natural_key(self):
-        return (self.external_id,)
+        return (self.name,)
 
 
 def search(**kwargs):
