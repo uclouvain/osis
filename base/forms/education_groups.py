@@ -31,6 +31,7 @@ from base.business.entity import get_entities_ids
 from base.models import academic_year, education_group_year
 from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_categories import Categories
 
 
 class EntityManagementModelChoiceField(ModelChoiceField):
@@ -69,7 +70,7 @@ class EducationGroupFilter(forms.Form):
     )
 
     category = forms.ChoiceField(
-        choices=[("", pgettext("plural", "All"))] + list(education_group_categories.CATEGORIES),
+        choices=[("", pgettext("plural", "All"))] + list(Categories.choices()),
         required=False,
         label=_('Category')
     )

@@ -31,7 +31,7 @@ from base.business.group_element_years.postponement import PostponeContent, NotP
 from base.models.academic_calendar import AcademicCalendar
 from base.models.education_group_type import find_authorized_types
 from base.models.enums import academic_calendar_type
-from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
+from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP, Categories
 
 ERRORS_MSG = {
     "base.add_educationgroup": "The user has not permission to create education groups.",
@@ -55,11 +55,11 @@ def is_eligible_to_add_group(person, education_group, raise_exception=False):
 def _is_eligible_to_add_education_group(person, education_group, category, education_group_type=None,
                                         raise_exception=False):
     return check_permission(person, "base.add_educationgroup", raise_exception) and \
-        _is_eligible_to_add_education_group_with_category(person, category, raise_exception) and \
-        _is_eligible_education_group(person, education_group, raise_exception) and \
-        (not management.is_max_child_reached(education_group, education_group_type)
-         if education_group_type and education_group
-         else check_authorized_type(education_group, category, raise_exception))
+           _is_eligible_to_add_education_group_with_category(person, category, raise_exception) and \
+           _is_eligible_education_group(person, education_group, raise_exception) and \
+           (not management.is_max_child_reached(education_group, education_group_type)
+            if education_group_type and education_group
+            else check_authorized_type(education_group, category, raise_exception))
 
 
 def is_eligible_to_change_education_group(person, education_group, raise_exception=False):
@@ -182,9 +182,9 @@ def check_authorized_type(education_group, category, raise_exception=False):
             "female" if parent_category in [TRAINING, MINI_TRAINING] else "male",
             "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
         ) % {
-            "child_category": _(category),
-            "category": _(education_group.education_group_type.category),
-            "type": education_group.education_group_type.name,
+            "child_category": Categories[category].value,
+            "category": education_group.education_group_type.get_category_display(),
+            "type": education_group.education_group_type.get_name_display(),
         })
 
     return result
@@ -220,9 +220,9 @@ def _is_eligible_to_edit_general_information(person, education_group, raise_exce
 def _is_central_or_academic_calendar_opened(education_group, person, raise_exception):
     return person.is_central_manager or \
            is_academic_calendar_opened(
-                education_group,
-                academic_calendar_type.EDUCATION_GROUP_EDITION,
-                raise_exception
+               education_group,
+               academic_calendar_type.EDUCATION_GROUP_EDITION,
+               raise_exception
            )
 
 
