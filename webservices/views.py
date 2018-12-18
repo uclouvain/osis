@@ -389,14 +389,13 @@ def get_conditions_admissions(context):
     admission_condition, created = AdmissionCondition.objects.get_or_create(
         education_group_year=context.education_group_year
     )
-
+    admission_condition_common = None
     if full_suffix.upper() in COMMON_OFFER:
-        admission_condition_common = AdmissionCondition.objects.get(
-            education_group_year__acronym=common_acronym,
-            education_group_year__academic_year=context.education_group_year.academic_year
+        common_education_group_year = EducationGroupYear.objects.get(
+            acronym=common_acronym,
+            academic_year=context.education_group_year.academic_year
         )
-    else:
-        admission_condition_common = None
+        admission_condition_common = common_education_group_year.admission_condition
     result = {
         'id': 'conditions_admission',
         "label": "conditions_admission",

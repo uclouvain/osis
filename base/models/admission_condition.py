@@ -9,7 +9,11 @@ from osis_common.models import osis_model_admin
 
 
 class AdmissionCondition(models.Model):
-    education_group_year = models.OneToOneField('base.EducationGroupYear', on_delete=models.CASCADE)
+    education_group_year = models.OneToOneField(
+        'base.EducationGroupYear',
+        on_delete=models.CASCADE,
+        related_name='admission_condition'
+    )
 
     # texte alert (2m et 2m1)
     text_alert_message = models.TextField(default='')
