@@ -389,7 +389,8 @@ def get_conditions_admissions(context):
     admission_condition, created = AdmissionCondition.objects.get_or_create(
         education_group_year=context.education_group_year
     )
-    if acronym_suffix in COMMON_OFFER:
+
+    if full_suffix.upper() in COMMON_OFFER:
         common_education_group_year = EducationGroupYear.objects.get(
             acronym=common_acronym,
             academic_year=context.education_group_year.academic_year
