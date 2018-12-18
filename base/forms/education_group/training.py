@@ -207,7 +207,7 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
 
         education_group_yr_hops = getattr(kwargs.pop('instance', None), 'hops', Hops())
         self.hops_form = self.hops_form_class(data=args[0],
-                                          instance=education_group_yr_hops)
+                                              instance=education_group_yr_hops)
 
     def _post_save(self):
         education_group_instance = self.forms[EducationGroupModelForm].instance
