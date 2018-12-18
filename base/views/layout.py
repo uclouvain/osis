@@ -44,8 +44,6 @@ def _check_notice(request, values):
 def render(request, template, values):
     _check_notice(request, values)
 
-    values['js'] = randint(0, 100)
-
     return shortcuts.render(request, template, values)
 
 
