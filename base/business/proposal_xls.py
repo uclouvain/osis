@@ -77,9 +77,13 @@ def create_xls(user, proposals, filters):
         xls_build.prepare_xls_parameters_list(working_sheets_data, configure_parameters(user)), filters)
 
 
-def create_xls_proposal(user, proposals, filters):
-    return xls_build.generate_xls(prepare_xls_parameters_list(prepare_xls_content(proposals),
-                                                              configure_parameters(user)), filters)
+def create_xls_proposal(user, learning_units, filters):
+    return xls_build.generate_xls(
+        prepare_xls_parameters_list(
+            prepare_xls_content(proposals),
+            configure_parameters(user)
+        ), filters
+    )
 
 
 def configure_parameters(user):

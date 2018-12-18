@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% load staticfiles %}
 {% load i18n %}
-{% load bootstrap3 %}
 {% load waffle_tags %}
 
 {% comment "License" %}
@@ -160,7 +159,7 @@
     }
 
     $("#id_check_all").click(function(){
-        $('input:checkbox').not(this).prop('checked', this.checked);
+        $('input:checkbox.selected_object').not(this).prop('checked', this.checked);
     });
 
 </script>

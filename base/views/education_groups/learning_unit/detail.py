@@ -39,6 +39,7 @@ from base.business.education_groups.learning_units.prerequisite import \
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_categories import Categories
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.prerequisite import Prerequisite
@@ -90,7 +91,7 @@ class LearningUnitPrerequisite(LearningUnitGenericDetailView):
     def dispatch(self, request, *args, **kwargs):
         is_root_a_training = EducationGroupYear.objects.filter(
             id=kwargs["root_id"],
-            education_group_type__category__in=education_group_categories.TRAINING_CATEGORIES
+            education_group_type__category__in=Categories.training_categories()
         ).exists()
         if is_root_a_training:
             return LearningUnitPrerequisiteTraining.as_view()(request, *args, **kwargs)

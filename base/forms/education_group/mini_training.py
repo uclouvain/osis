@@ -28,12 +28,13 @@ from base.business.education_groups.postponement import PostponementEducationGro
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, EducationGroupYearModelForm
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from django.utils.translation import ugettext_lazy as _
+
+from base.models.enums.education_group_categories import Categories
 
 
 class MiniTrainingYearModelForm(EducationGroupYearModelForm):
-    category = education_group_categories.MINI_TRAINING
-    category_text = _(dict(education_group_categories.CATEGORIES)[category])
+    category = Categories.MINI_TRAINING.name
+    category_text = Categories.MINI_TRAINING.value
 
     class Meta(EducationGroupYearModelForm.Meta):
         model = EducationGroupYear

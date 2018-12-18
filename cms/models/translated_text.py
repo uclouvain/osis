@@ -100,13 +100,6 @@ def find_by_reference(reference):
     return TranslatedText.objects.filter(reference=reference)
 
 
-def find_with_changed(entity, text_labels_name):
-    queryset = TranslatedText.objects.filter(entity=entity,
-                                             text_label__label__in=text_labels_name,
-                                             changed__isnull=False)
-    return queryset.select_related('text_label')
-
-
 def build_list_of_cms_content_by_reference(reference):
     return [
         (translated_text.language, translated_text.text_label, translated_text.entity, translated_text.text)
