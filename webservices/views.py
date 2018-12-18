@@ -391,14 +391,10 @@ def get_conditions_admissions(context):
     )
 
     if full_suffix.upper() in COMMON_OFFER:
-        common_education_group_year = EducationGroupYear.objects.get(
-            acronym=common_acronym,
-            academic_year=context.education_group_year.academic_year
+        admission_condition_common = AdmissionCondition.objects.get(
+            education_group_year__acronym=common_acronym,
+            education_group_year__academic_year=context.education_group_year.academic_year
         )
-
-        admission_condition_common = AdmissionCondition.objects.filter(
-            education_group_year=common_education_group_year
-        ).first()
     else:
         admission_condition_common = None
     result = {
