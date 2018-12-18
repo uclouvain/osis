@@ -205,7 +205,7 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        education_group_yr_hops = getattr(self.instance, 'hops', Hops())
+        education_group_yr_hops = getattr(kwargs.pop('instance', None), 'hops', Hops())
         self.hops_form = self.hops_form_class(data=args[0],
                                           instance=education_group_yr_hops)
 
