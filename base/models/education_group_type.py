@@ -30,6 +30,7 @@ from django.db.models import Case, When
 from django.utils.translation import ugettext_lazy as _
 
 from base.models.enums import education_group_categories, education_group_types
+from base.models.enums.education_group_categories import Categories
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 GROUP_TYPE_OPTION = 'Option'
@@ -68,8 +69,8 @@ class EducationGroupType(SerializableModel):
 
     category = models.CharField(
         max_length=25,
-        choices=education_group_categories.CATEGORIES,
-        default=education_group_categories.TRAINING,
+        choices=Categories.choices(),
+        default=Categories.TRAINING.name,
         verbose_name=_('Category'),
     )
 
