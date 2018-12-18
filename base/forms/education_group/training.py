@@ -228,11 +228,6 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
         )
         return egy_instance
 
-    def init_hops_form_class(self, args):
-        education_group_yr_hops = getattr(self.instance, 'hops', Hops())
-        self.hops_form = self.hops_form_class(data=args[0],
-                                              instance=education_group_yr_hops)
-
 
 @register('university_domains')
 class UniversityDomainsLookup(LookupChannel):
