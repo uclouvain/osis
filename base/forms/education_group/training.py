@@ -205,8 +205,9 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        education_group_yr = kwargs.pop('instance', None)
-        self.init_hops_form_class(args, education_group_yr)
+        education_group_yr_hops = getattr(self.instance, 'hops', Hops())
+        self.hops_form = self.hops_form_class(data=args[0],
+                                          instance=education_group_yr_hops)
 
     def _post_save(self):
         education_group_instance = self.forms[EducationGroupModelForm].instance
@@ -227,12 +228,8 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
         )
         return egy_instance
 
-    def init_hops_form_class(self, args, education_group_yr):
-        try:
-            education_group_yr_hops = education_group_yr.hops
-        except AttributeError:
-            education_group_yr_hops = Hops()
-
+    def init_hops_form_class(self, args):
+        education_group_yr_hops = getattr(self.instance, 'hops', Hops())
         self.hops_form = self.hops_form_class(data=args[0],
                                               instance=education_group_yr_hops)
 
