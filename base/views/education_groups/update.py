@@ -154,7 +154,8 @@ def _update_training(request, education_group_year, root):
     return layout.render(request, "education_group/update_trainings.html", {
         "education_group_year": education_group_year,
         "form_education_group_year": form_education_group_year.forms[forms.ModelForm],
-        "form_education_group": form_education_group_year.forms[EducationGroupModelForm]
+        "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
+        "form_hops": form_education_group_year.hops_form,
     })
 
 
