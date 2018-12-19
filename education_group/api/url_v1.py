@@ -26,12 +26,9 @@
 from django.conf.urls import url
 
 
-from education_group.api.views.schema import schema_view
 from education_group.api.views.training import TrainingList, TrainingDetail
 
 urlpatterns = [
-    url(r"^$", schema_view),
-
     url(r'^trainings/$', TrainingList.as_view(), name=TrainingList.name),
     url(r'^trainings/(?P<uuid>[0-9a-f-]+)$', TrainingDetail.as_view(), name=TrainingDetail.name),
 ]

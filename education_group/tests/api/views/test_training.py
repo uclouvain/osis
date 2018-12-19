@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
+
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -34,7 +36,7 @@ from base.models.enums import education_group_categories
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.user import UserFactory
-from education_group.api.serializers.training import TrainingListSerializer
+from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 
 
 class GetAllTrainingTestCase(APITestCase):
@@ -108,3 +110,44 @@ class GetAllTrainingTestCase(APITestCase):
                 context={'request': RequestFactory().get(self.url, query_string)},
             )
             self.assertEqual(response.data['results'], serializer.data)
+
+
+class GetTrainingTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.training = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
+
+        cls.user = UserFactory()
+        cls.url = reverse('education_group_api_v1:training-detail', kwargs={'uuid': cls.training.uuid})
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_not_authorized(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_valid_training(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        serializer = TrainingDetailSerializer(
+            self.training,
+            context={'request': RequestFactory().get(self.url)},
+        )
+        self.assertEqual(response.data, serializer.data)
+
+    def test_get_invalid_training_case_not_found(self):
+        invalid_url = reverse('education_group_api_v1:training-detail', kwargs={'uuid':  uuid.uuid4()})
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
