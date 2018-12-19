@@ -26,8 +26,10 @@
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
+from base.models.enums import organization_type
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.api.serializers.training import TrainingListSerializer
 
 
@@ -35,7 +37,16 @@ class TrainingListSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
-        cls.training = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
+        cls.entity_version = EntityVersionFactory(
+            entity__organization__type=organization_type.MAIN
+        )
+        cls.training = TrainingFactory(
+            acronym='BIR1BA',
+            partial_acronym='LBIR1000I',
+            academic_year=cls.academic_year,
+            management_entity=cls.entity_version.entity,
+            administration_entity=cls.entity_version.entity,
+        )
         url = reverse('education_group_api_v1:training-list')
         cls.serializer = TrainingListSerializer(cls.training, context={'request': RequestFactory().get(url)})
 
@@ -53,3 +64,15 @@ class TrainingListSerializerTestCase(TestCase):
             'management_entity',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+    def test_ensure_academic_year_field_is_slugified(self):
+        self.assertEqual(
+            self.serializer.data['academic_year'],
+            self.academic_year.year
+        )
+
+    def test_ensure_education_group_type_field_is_slugified(self):
+        self.assertEqual(
+            self.serializer.data['education_group_type'],
+            self.training.education_group_type.name
+        )
