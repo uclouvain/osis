@@ -29,6 +29,7 @@ from django.core.exceptions import PermissionDenied, ImproperlyConfigured, Valid
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 
+from base.business.education_groups import create
 from base.business.group_element_years import management
 from base.forms.common import ValidationRuleMixin
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
@@ -288,6 +289,10 @@ class CommonBaseForm:
             post_save = self._post_save()
             self.education_group_year_deleted = post_save.get('object_list_deleted', [])
 
+        education_group_year_postponed = getattr(self, 'education_group_year_postponed', [])
+        self.structure = create.create_initial_group_element_year_structure(
+            [education_group_year, *education_group_year_postponed]
+        )
         return education_group_year
 
     def _is_creation(self):

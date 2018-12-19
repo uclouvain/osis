@@ -70,7 +70,7 @@
         "MOBILITY_PARTNERSHIP_LIST_CHOICE"
       ],
       "changed": "2018-12-03T08:17:48.916",
-      "min_count_authorized": "1",
+      "min_count_authorized": "0",
       "max_count_authorized": "1"
     }
   },
