@@ -31,6 +31,7 @@ from django.test import TestCase, RequestFactory
 
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.enums import organization_type
+from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group_year import (
     EducationGroupYearCommonMasterFactory,
     EducationGroupYearMasterFactory,
@@ -73,6 +74,9 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         )
         self.common_education_group_year = EducationGroupYearCommonFactory(
             academic_year=self.education_group_year.academic_year
+        )
+        ac = AdmissionConditionFactory(
+            education_group_year=common_master_education_group_year
         )
 
     def test_year_not_found(self):
@@ -517,11 +521,15 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
 
 class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
     URL_NAME = 'v0.1-ws_catalog_offer'
+    maxDiff = None
 
     def setUp(self):
         self.education_group_year_master = EducationGroupYearMasterFactory()
         self.common_master_education_group_year = EducationGroupYearCommonMasterFactory(
             academic_year=self.education_group_year_master.academic_year
+        )
+        self.admission_condition_common = AdmissionConditionFactory(
+            education_group_year=self.common_master_education_group_year
         )
 
     def test_admission_conditions_for_bachelors_without_common(self):
@@ -561,10 +569,9 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
             academic_year=education_group_year.academic_year
         )
 
-        admission_condition_common = AdmissionCondition.objects.create(
-            education_group_year=education_group_year_common,
-            text_alert_message='alert',
-            text_ca_bacs_cond_generales='this is a test')
+        admission_condition_common = AdmissionConditionFactory(
+            education_group_year=education_group_year_common
+        )
 
         iso_language, language = 'fr-be', 'fr'
 
@@ -587,31 +594,25 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
 
         useless, condition_admissions_section = remove_conditions_admission(response_json['sections'])
 
-        self.assertDictEqual(condition_admissions_section, {
-            'id': 'conditions_admission',
-            'label': 'conditions_admission',
-            'content': {
-                'alert_message': 'alert',
-                'ca_bacs_cond_generales': 'this is a test',
-                'ca_bacs_cond_particulieres': None,
-                'ca_bacs_examen_langue': None,
-                'ca_bacs_cond_speciales': None,
-            }
-        })
+        self.assertDictEqual(
+            condition_admissions_section,
+            {
+                'id': 'conditions_admission',
+                'label': 'conditions_admission',
+                'content': {
+                    'alert_message': admission_condition_common.text_alert_message,
+                    'ca_bacs_cond_generales': admission_condition_common.text_ca_bacs_cond_generales,
+                    'ca_bacs_cond_particulieres': admission_condition_common.text_ca_bacs_cond_particulieres,
+                    'ca_bacs_examen_langue': admission_condition_common.text_ca_bacs_examen_langue,
+                    'ca_bacs_cond_speciales': admission_condition_common.text_ca_bacs_cond_speciales,
+                }
+            },
+        )
 
     def test_admission_conditions_for_master(self):
         admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_year_master)
         admission_condition.text_university_bachelors = 'text_university_bachelors'
         admission_condition.save()
-
-        admission_condition_common = AdmissionCondition.objects.create(
-            education_group_year=self.common_master_education_group_year
-        )
-        admission_condition_common.text_free = 'text_free'
-        admission_condition_common.text_personalized_access = 'text_personalized_access'
-        admission_condition_common.text_adults_taking_up_university_training = 'text_adults_taking_up_university_training'
-        admission_condition_common.text_admission_enrollment_procedures = 'text_admission_enrollment_procedures'
-        admission_condition_common.save()
 
         iso_language, language = 'fr-be', 'fr'
 
@@ -636,11 +637,11 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
         sections = condition_admissions_section['content']['sections']
         self.assertEqual(sections['university_bachelors']['text'], admission_condition.text_university_bachelors)
         self.assertEqual(sections['personalized_access']['text-common'],
-                         admission_condition_common.text_personalized_access)
+                         self.admission_condition_common.text_personalized_access)
         self.assertEqual(sections['adults_taking_up_university_training']['text-common'],
-                         admission_condition_common.text_adults_taking_up_university_training)
+                         self.admission_condition_common.text_adults_taking_up_university_training)
         self.assertEqual(sections['admission_enrollment_procedures']['text-common'],
-                         admission_condition_common.text_admission_enrollment_procedures)
+                         self.admission_condition_common.text_admission_enrollment_procedures)
 
     def test_admission_conditions_for_master_with_diplomas(self):
         admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_year_master)
