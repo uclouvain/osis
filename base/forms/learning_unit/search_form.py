@@ -159,7 +159,7 @@ class LearningUnitSearchForm(BaseSearchForm):
 
 
 class LearningUnitYearForm(LearningUnitSearchForm):
-    MAX_RECORDS = 1000
+    MAX_RECORDS = 2000
     container_type = forms.ChoiceField(
         label=_('Type'),
         choices=LearningUnitSearchForm.ALL_CHOICES + learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES,
@@ -256,6 +256,8 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             self.cleaned_data['requirement_entities'] = requirement_entities
 
         queryset = self.get_queryset()
+        if self.cleaned_data and queryset.count() > self.MAX_RECORDS:
+            raise TooManyResultsException
 
         queryset = queryset.prefetch_related(
             build_entity_container_prefetch([
@@ -272,7 +274,8 @@ class LearningUnitYearForm(LearningUnitSearchForm):
         cms_list = TranslatedText.objects.filter(
             entity=LEARNING_UNIT_YEAR,
             text_label__label__in=CMS_LABEL_PEDAGOGY,
-            changed__isnull=False
+            changed__isnull=False,
+            reference__in=queryset.values_list('pk', flat=True)
         ).select_related('text_label')
 
         for learning_unit_yr in queryset:

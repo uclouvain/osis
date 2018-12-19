@@ -36,6 +36,7 @@ from base.business.learning_units.educational_information import get_responsible
 from base.business.learning_units.perms import can_learning_unit_year_educational_information_be_udpated
 from base.business.learning_units.xls_comparison import get_academic_year_of_reference
 from base.business.learning_units.xls_generator import generate_xls_teaching_material
+from base.forms.common import TooManyResultsException
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.educational_information.mail_reminder import MailReminderRow, MailReminderFormset
 from base.forms.learning_unit.search_form import LearningUnitYearForm
@@ -46,7 +47,8 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.utils.cache import cache_filter
 from base.utils.send_mail import send_mail_for_educational_information_update
-from base.views.common import check_if_display_message, display_warning_messages, paginate_queryset
+from base.views.common import check_if_display_message, display_warning_messages, paginate_queryset, \
+    display_error_messages
 from base.views.learning_units.search import SUMMARY_LIST
 
 SUCCESS_MESSAGE = _('Reminding mails sent')
@@ -82,12 +84,15 @@ def learning_units_summary_list(request):
         initial_academic_year = initial_academic_year.next()
 
     search_form = LearningUnitYearForm(request.GET or None, initial={'academic_year_id': initial_academic_year})
-    if search_form.is_valid():
-        found_learning_units = search_form.get_learning_units_and_summary_status(
-            requirement_entities=a_user_person.find_main_entities_version,
-            luy_status=True
-        )
-        check_if_display_message(request, found_learning_units)
+    try:
+        if search_form.is_valid():
+            found_learning_units = search_form.get_learning_units_and_summary_status(
+                requirement_entities=a_user_person.find_main_entities_version,
+                luy_status=True
+            )
+            check_if_display_message(request, found_learning_units)
+    except TooManyResultsException:
+        display_error_messages(request, 'too_many_results')
 
     responsible_and_learning_unit_yr_list = get_responsible_and_learning_unit_yr_list(found_learning_units)
 
@@ -101,7 +106,7 @@ def learning_units_summary_list(request):
             display_warning_messages(request, _("the list to generate is empty.").capitalize())
 
     form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
-    print(found_learning_units)
+
     context = {
         'form': search_form,
         'formset': _get_formset(request, responsible_and_learning_unit_yr_list),
