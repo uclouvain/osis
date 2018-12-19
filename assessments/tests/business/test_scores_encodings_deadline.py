@@ -222,7 +222,6 @@ class ComputeScoresEncodingsDeadlinesTest(TestCase):
         self._create_tutor_scores_submission_end_date(offer_year_delibe_end_date)
         global_submission_end_date = offer_year_delibe_end_date - timedelta(days=20)
         self.ac_score_exam_submission.end_date = global_submission_end_date
-        print(self.ac_score_exam_submission.save)
         self.ac_score_exam_submission.save()
         self._assert_date_equal(self._get_persistent_session_exam_deadline().deadline, global_submission_end_date)
 

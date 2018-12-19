@@ -26,10 +26,9 @@
 from django.db.models import Prefetch
 from django.utils import timezone
 
-from base import models as mdl
 from base.models import entity_calendar, entity_version
-from base.models import entity_version as mdl_entity_version
 from base.models.entity import Entity
+from base.models.entity_container_year import EntityContainerYear
 from base.models.entity_version import EntityVersion
 from base.models.enums import academic_calendar_type
 
@@ -68,16 +67,18 @@ def get_entity_calendar(an_entity_version, academic_yr):
 
 
 def build_entity_container_prefetch(entity_container_year_link_types):
-    parent_version_prefetch = Prefetch('parent__entityversion_set',
-                                       queryset=mdl_entity_version.search(),
-                                       to_attr='entity_versions')
-    entity_version_prefetch = Prefetch('entity__entityversion_set',
-                                       queryset=mdl_entity_version.search()
-                                       .prefetch_related(parent_version_prefetch),
-                                       to_attr='entity_versions')
-    entity_container_prefetch = Prefetch('learning_container_year__entitycontaineryear_set',
-                                         queryset=mdl.entity_container_year.search(
-                                             link_type=entity_container_year_link_types)
-                                         .prefetch_related(entity_version_prefetch),
-                                         to_attr='entity_containers_year')
+    parent_version_prefetch = Prefetch(
+        'parent__entityversion_set',
+        to_attr='entity_versions'
+    )
+    entity_version_prefetch = Prefetch(
+        'entity__entityversion_set',
+        queryset=EntityVersion.objects.prefetch_related(parent_version_prefetch),
+        to_attr='entity_versions')
+    entity_container_prefetch = Prefetch(
+        'learning_container_year__entitycontaineryear_set',
+        queryset=EntityContainerYear.objects.filter(
+            type__in=entity_container_year_link_types
+        ).prefetch_related(entity_version_prefetch)
+    )
     return entity_container_prefetch

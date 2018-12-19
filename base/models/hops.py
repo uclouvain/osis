@@ -40,7 +40,7 @@ class HopsAdmin(OsisModelAdmin):
 
 
 class Hops(models.Model):
-
+    # HOPS means "Habilitations et Offre Programmée de l’enseignement Supérieur".
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     education_group_year = models.OneToOneField('base.EducationGroupYear', on_delete=models.CASCADE)
