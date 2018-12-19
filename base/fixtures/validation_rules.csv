@@ -638,7 +638,7 @@ base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_fi
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_finality180listchoice,REQUIRED,,,
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,,,
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_subgroup,REQUIRED,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_commoncore,REQUIRED,Programme de base,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_commoncore,REQUIRED,Partie de base,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_complementarymodule,REQUIRED,Enseignements supplémentaires préparatoires,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_minorlistchoice,REQUIRED,Liste au choix Mineures,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_majorlistchoice,REQUIRED,Liste au choix Majeures,,
