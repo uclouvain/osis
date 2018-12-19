@@ -395,7 +395,7 @@ def get_conditions_admissions(context):
             acronym=common_acronym,
             academic_year=context.education_group_year.academic_year
         )
-        admission_condition_common = common_education_group_year.admission_condition
+        admission_condition_common = common_education_group_year.admissioncondition
     result = {
         'id': 'conditions_admission',
         "label": "conditions_admission",

@@ -12,7 +12,6 @@ class AdmissionCondition(models.Model):
     education_group_year = models.OneToOneField(
         'base.EducationGroupYear',
         on_delete=models.CASCADE,
-        related_name='admission_condition'
     )
 
     # texte alert (2m et 2m1)
