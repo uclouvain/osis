@@ -27,7 +27,7 @@ from rest_framework import generics
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from education_group.api.serializers.training import TrainingSerializer
+from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 
 
 class TrainingList(generics.ListAPIView):
@@ -41,7 +41,7 @@ class TrainingList(generics.ListAPIView):
                                                 'administration_entity__entityversion_set',
                                                 'management_entity__entityversion_set'
                                          )
-    serializer_class = TrainingSerializer
+    serializer_class = TrainingListSerializer
     filter_fields = (
         'acronym',
         'partial_acronym',
@@ -72,12 +72,17 @@ class TrainingDetail(generics.RetrieveAPIView):
     """
     name = 'training-detail'
     queryset = EducationGroupYear.objects.filter(education_group_type__category=education_group_categories.TRAINING)\
-                                         .select_related('education_group_type', 'academic_year') \
-                                         .prefetch_related(
+                                         .select_related(
+                                            'education_group_type',
+                                            'academic_year',
+                                            'main_teaching_campus',
+                                            'enrollment_campus',
+                                            'primary_language',
+                                         ).prefetch_related(
                                             'administration_entity__entityversion_set',
-                                            'management_entity__entityversion_set'
+                                            'management_entity__entityversion_set',
                                          )
-    serializer_class = TrainingSerializer
+    serializer_class = TrainingDetailSerializer
     lookup_field = 'uuid'
     pagination_class = None
     filter_backends = ()
