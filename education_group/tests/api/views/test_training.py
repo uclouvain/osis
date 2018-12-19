@@ -38,7 +38,6 @@ from education_group.api.serializers.training import TrainingListSerializer
 
 
 class GetAllTrainingTestCase(APITestCase):
-    """ Test module for GET all trainings API"""
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory()
@@ -50,7 +49,6 @@ class GetAllTrainingTestCase(APITestCase):
         TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=cls.academic_year)
 
     def setUp(self):
-        super().setUp()
         self.client.force_authenticate(user=self.user)
 
     def test_get_not_authorized(self):
@@ -66,6 +64,20 @@ class GetAllTrainingTestCase(APITestCase):
             response = getattr(self.client, method)(self.url)
             self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
+    def test_get_all_training_ensure_response_have_next_previous_results_count(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertTrue('previous' in response.data)
+        self.assertTrue('next' in response.data)
+        self.assertTrue('results' in response.data)
+
+        self.assertTrue('count' in response.data)
+        expected_count = EducationGroupYear.objects.filter(
+            education_group_type__category=education_group_categories.TRAINING,
+        ).count()
+        self.assertEqual(response.data['count'], expected_count)
+
     def test_get_all_training_ensure_default_order(self):
         """ This test ensure that default order is academic_year [DESC Order] + acronym [ASC Order]"""
         TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year__year=2017)
@@ -77,7 +89,7 @@ class GetAllTrainingTestCase(APITestCase):
             education_group_type__category=education_group_categories.TRAINING,
         ).order_by('-academic_year__year', 'acronym')
         serializer = TrainingListSerializer(trainings, many=True, context={'request': RequestFactory().get(self.url)})
-        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_all_training_specify_ordering_field(self):
         ordering_managed = ['acronym', 'partial_acronym', 'title', 'title_english']
@@ -95,4 +107,4 @@ class GetAllTrainingTestCase(APITestCase):
                 many=True,
                 context={'request': RequestFactory().get(self.url, query_string)},
             )
-            self.assertEqual(response.data, serializer.data)
+            self.assertEqual(response.data['results'], serializer.data)
