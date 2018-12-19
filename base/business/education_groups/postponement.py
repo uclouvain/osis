@@ -28,6 +28,7 @@ from django import forms
 from django.db import Error
 from django.utils.translation import ugettext as _
 
+from base.business.education_groups import create
 from base.business.utils.model import model_to_dict_fk, compare_objects, update_object
 from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.education_group_year import EducationGroupYear
@@ -145,6 +146,7 @@ class PostponementEducationGroupYearMixin:
         self.postpone_end_year = _compute_end_year(education_group_year.education_group)
         self._start_postponement(education_group_year)
 
+        create.create_initial_group_element_year_structure(self.education_group_year_postponed)
         return education_group_year
 
     def _start_postponement(self, education_group_year):
