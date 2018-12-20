@@ -31,8 +31,3 @@ from osis_common.decorators.deprecated import deprecated
 @deprecated
 def render(request, template, values):
     return shortcuts.render(request, template, values)
-
-
-@deprecated
-def render_to_response(request, template, values):
-    return shortcuts.render_to_response(template, values)
