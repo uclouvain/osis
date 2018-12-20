@@ -134,7 +134,7 @@ components:
             $ref: '#/components/schemas/TrainingTypeEnum'
         education_group_type_text:
           type: string
-        partial_acronym:
+        code:
           type: string
         title:
           type: string
@@ -142,12 +142,17 @@ components:
           type: string
         academic_year:
           type: number
-        active:
-          type: string
-          schema:
-            $ref: '#/components/schemas/ActiveEnum'
-        active_text:
-          type: string
+    TrainingDetailed:
+      allOf:
+        - $ref: '#/components/schemas/Training'
+        - type: object
+          properties:
+            active:
+              type: string
+              schema:
+                $ref: '#/components/schemas/ActiveEnum'
+            active_text:
+              type: string
     ActiveEnum:
       type: string
       enum:
