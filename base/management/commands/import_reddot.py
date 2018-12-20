@@ -353,12 +353,6 @@ def import_common_offer(context, offer, mapping_label_text_label):
         is_common = record.acronym == 'common'
         if is_common:
             import_offer_and_items(offer, record, mapping_label_text_label, context)
-        else:
-            TranslatedText.objects.filter(
-                entity=context.entity,
-                reference=record.id,
-                language=context.language,
-            ).delete()
 
 
 def create_offers(context, offers, mapping_label_text_label):
