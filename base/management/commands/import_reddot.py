@@ -350,7 +350,7 @@ def import_common_offer(context, offer, mapping_label_text_label):
     """
     qs = EducationGroupYear.objects.look_for_common(academic_year__year=offer['year'])
     for record in qs:
-        is_common = len(record.acronym.split("-")) == 1
+        is_common = record.acronym == 'common'
         if is_common:
             import_offer_and_items(offer, record, mapping_label_text_label, context)
         else:
