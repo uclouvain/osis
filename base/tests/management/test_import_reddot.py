@@ -16,7 +16,7 @@ from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import organization_type, education_group_categories
+from base.models.enums import organization_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.organization_type import MAIN
@@ -25,7 +25,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, \
-    EducationGroupYearCommonMasterFactory, EducationGroupYearCommonBachelorFactory
+    EducationGroupYearCommonMasterFactory, EducationGroupYearCommonBachelorFactory, EducationGroupYearCommonFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from cms.enums import entity_name
@@ -375,12 +375,12 @@ class ImportReddotTestCase(TestCase):
 
     @mock.patch('base.management.commands.import_reddot.import_offer_and_items')
     def test_import_common_offer(self, mocker):
-        education_group_year_list = [EducationGroupYearCommonMasterFactory()]
+        education_group_year_list = [EducationGroupYearCommonFactory()]
         from base.management.commands.import_reddot import import_common_offer
-        context = None
+        Context = collections.namedtuple('Context', 'entity language')
         offer = {'year': education_group_year_list[0].academic_year.year}
-        import_common_offer(context, offer, None)
-        mocker.assert_called_with(offer, education_group_year_list[0], None, context)
+        import_common_offer(Context, offer, None)
+        mocker.assert_called_with(offer, education_group_year_list[0], None, Context)
 
     @mock.patch('base.management.commands.import_reddot.import_offer_and_items')
     def test_import_offer(self, mocker):
@@ -426,19 +426,6 @@ class CreateCommonOfferForAcademicYearTest(TestCase):
         self.assertEqual(EducationGroupYear.objects.count(), 1)
         create_common_offer_for_academic_year(self.academic_year.year)
         self.assertEqual(EducationGroupYear.objects.count(), 2)
-
-    def test_case_delete_common_which_are_not_supported_anymore(self):
-        common_not_supported = EducationGroupYearFactory(
-            academic_year=self.academic_year,
-            acronym='common-9ce',
-            partial_acronym='common-9ce',
-            education_group_type__name=TrainingType.CERTIFICATE.name,
-            education_group_type__category=education_group_categories.TRAINING,
-        )
-        create_common_offer_for_academic_year(self.academic_year.year)
-
-        with self.assertRaises(EducationGroupYear.DoesNotExist):
-            EducationGroupYear.objects.get(pk=common_not_supported.pk)
 
 
 class CreateOffersTest(TestCase):
