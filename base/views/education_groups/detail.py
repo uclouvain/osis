@@ -179,7 +179,7 @@ class EducationGroupRead(EducationGroupGenericDetailView):
     def hide_for_2m(self):
         """Some informations have to be hidden for 2M.
            Co-organization and administrative data doesn't have sense for 2M (120/180-240) """
-        return not (self.object.education_group_type.category == TRAINING and \
+        return not (self.object.education_group_type.category == TRAINING and
                     self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
                                                                   TrainingType.PGRM_MASTER_180_240.name])
 
