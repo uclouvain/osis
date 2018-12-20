@@ -83,7 +83,7 @@ class TestReadEducationGroup(TestCase):
         url = reverse("education_group_read", args=[training_not_2m.pk, training_not_2m.pk])
         self.client.force_login(self.user)
         response = self.client.get(url)
-        self.assertTrue(response.context['hide_for_2M'])
+        self.assertFalse(response.context['hide_for_2M'])
 
     def test_show_coorganization_case_2m(self):
         training_2m = EducationGroupYearFactory(
@@ -93,7 +93,7 @@ class TestReadEducationGroup(TestCase):
         url = reverse("education_group_read", args=[training_2m.pk, training_2m.pk])
         self.client.force_login(self.user)
         response = self.client.get(url)
-        self.assertFalse(response.context['hide_for_2M'])
+        self.assertTrue(response.context['hide_for_2M'])
 
 
 class TestUtilizationTab(TestCase):
