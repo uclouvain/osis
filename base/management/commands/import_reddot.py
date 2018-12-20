@@ -93,8 +93,6 @@ def create_common_offer_for_academic_year(year):
             acronym = 'common-{}'.format(code)
         else:
             acronym = 'common'
-        education_group_year = EducationGroupYear.objects.filter(academic_year=academic_year,
-                                                                 acronym=acronym)
 
         if offer['code'] in COMMON_OFFER:
             _update_or_create_common_offer(
@@ -102,8 +100,6 @@ def create_common_offer_for_academic_year(year):
                 acronym,
                 offer
             )
-        else:
-            education_group_year.delete()
 
 
 def _update_or_create_common_offer(academic_year, acronym, offer):
@@ -354,7 +350,9 @@ def import_common_offer(context, offer, mapping_label_text_label):
     """
     qs = EducationGroupYear.objects.look_for_common(academic_year__year=offer['year'])
     for record in qs:
-        import_offer_and_items(offer, record, mapping_label_text_label, context)
+        is_common = record.acronym == 'common'
+        if is_common:
+            import_offer_and_items(offer, record, mapping_label_text_label, context)
 
 
 def create_offers(context, offers, mapping_label_text_label):

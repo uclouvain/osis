@@ -334,6 +334,18 @@ class TestCommonBaseFormSave(TestCase):
         self.assertEqual(created_education_group_year.education_group.start_year,
                          created_education_group_year.academic_year.year)
 
+    @patch('base.business.education_groups.create.create_initial_group_element_year_structure', return_value=[])
+    def test_assert_create_initial_group_element_year_structure_called(self, mock_create_initial_group_element_year):
+        form = self.form_class(
+            data=self.post_data,
+            parent=None,
+            education_group_type=self.education_group_type,
+            user=self.user
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        self.assertTrue(mock_create_initial_group_element_year.called)
+
 
 def _get_valid_post_data(category):
     entity_version = MainEntityVersionFactory()

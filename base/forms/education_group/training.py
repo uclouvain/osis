@@ -32,7 +32,6 @@ from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_groups import shorten
-from base.business.education_groups.create import create_initial_group_element_year_structure
 from base.business.education_groups.postponement import PostponementEducationGroupYearMixin
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, \
     MainEntitiesVersionChoiceField, EducationGroupYearModelForm
@@ -46,7 +45,6 @@ from base.models.enums.education_group_categories import Categories
 from reference.models.domain import Domain
 from reference.models.enums import domain_type
 from base.models.hops import Hops
-from base.models.education_group_year import EducationGroupYear
 
 
 class MainDomainChoiceField(forms.ModelChoiceField):
@@ -224,9 +222,6 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
         egy_instance = super().save()
         if self.hops_form.is_valid():
             self.hops_form.save(education_group_year=egy_instance)
-        self.structure = create_initial_group_element_year_structure(
-            [egy_instance, *self.education_group_year_postponed]
-        )
         return egy_instance
 
 

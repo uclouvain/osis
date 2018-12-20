@@ -99,16 +99,34 @@
     "model": "base.authorizedrelationship",
     "pk": 93,
     "fields": {
-        "parent_type": [
-            "BACHELOR"
-        ],
-        "child_type": [
-            "COMMON_CORE"
-        ],
-        "changed": "2018-08-09T15:23:22.662",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+      "parent_type": [
+        "AGGREGATION"
+      ],
+      "child_type": [
+        "MOBILITY_PARTNERSHIP_LIST_CHOICE"
+      ],
+      "changed": "2018-12-03T08:17:48.916",
+      "min_count_authorized": "0",
+      "max_count_authorized": "1",
+            "reference": false
+
+    }
+  },
+  {
+    "model": "base.authorizedrelationship",
+    "pk": 177,
+    "fields": {
+      "parent_type": [
+        "BACHELOR"
+      ],
+      "child_type": [
+        "COMMON_CORE"
+      ],
+      "changed": "2018-12-03T08:18:38.971",
+      "min_count_authorized": "1",
+      "max_count_authorized": "1",
+      "reference": true
+
     }
 },
 {
