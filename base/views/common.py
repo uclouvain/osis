@@ -32,7 +32,7 @@ from django.contrib.auth import authenticate, logout
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.views import login as django_login
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 
@@ -130,8 +130,10 @@ def home(request):
     calendar_events = None
     if academic_yr:
         calendar_events = mdl.academic_calendar.find_academic_calendar_by_academic_year_with_dates(academic_yr.id)
-    return layout.render(request, "home.html", {'academic_calendar': calendar_events,
-                                                'highlights': mdl.academic_calendar.find_highlight_academic_calendar()})
+    return render(request, "home.html", {
+        'academic_calendar': calendar_events,
+        'highlights': mdl.academic_calendar.find_highlight_academic_calendar()
+    })
 
 
 def log_out(request):
