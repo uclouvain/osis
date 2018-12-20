@@ -48,6 +48,7 @@ from base.business.education_groups import perms
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 from base.business.education_groups.perms import is_eligible_to_edit_general_information, \
     is_eligible_to_edit_admission_condition
+from base.management.commands.import_reddot import COMMON_OFFER
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
@@ -143,10 +144,10 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context['enums'] = mdl.enums.education_group_categories
 
         self.is_intro_offer = self.object.education_group_type.name in INTRO_OFFER
-        if self.is_intro_offer:
-            context['show_extra_info'] = False
-        else:
-            context['show_extra_info'] = True
+        context['show_extra_info'] = not self.is_intro_offer
+
+        common_offers = ['common-' + offer.lower() for offer in COMMON_OFFER[:-1]]
+        context['show_general_info'] = self.object.acronym not in common_offers
 
         return context
 
