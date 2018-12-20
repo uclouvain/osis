@@ -61,7 +61,7 @@
         </a>
     </li>
     {% endif %}
-    {% if education_group_year.education_group_type.category == "TRAINING" %}
+    {% if education_group_year.education_group_type.category == "TRAINING" and not hide_for_2M %}
     <li role="presentation" {% if request.path == url_administrative_tab %} class="active" {% endif %}>
         <a id="link_administrative" href="{% url 'education_group_administrative' root.pk education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"
            role="tab">
