@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load staticfiles i18n reference_link %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -26,7 +26,8 @@
 <table class="table table-hover">
     <thead>
     <tr>
-        <th>{% trans 'code' %}</th>
+        <th></th>
+        <th>{% trans 'Code' %}</th>
         <th>{% trans 'Acronym' %}</th>
         <th>{% trans 'Title' %}</th>
         <th>{% trans 'Cred. rel./abs.' %}</th>
@@ -39,20 +40,44 @@
     </thead>
     <tbody>
     {% for group_element_year in group_element_years %}
-        <tr>
-            <td>{{ group_element_year.parent.partial_acronym | default_if_none:'' }}</td>
-            <td>{{ group_element_year.parent.acronym | default_if_none:'' }}</td>
-            <td>{{ group_element_year.parent.title | default_if_none:'' }}</td>
-            <td>
-                {{ group_element_year.relative_credits | default_if_none:'-' }} /
-                {{ group_element_year.parent.credits | default_if_none:'-' }}
-            </td>
-            <td>{{ group_element_year.min_credits | default_if_none:'-' }}</td>
-            <td>{{ group_element_year.max_credits | default_if_none:'-' }}</td>
-            <td>{{ group_element_year.is_mandatory | yesno:_("yes,no") | title }}</td>
-            <td>{{ group_element_year.block | default_if_none:'-' }}</td>
-            <td>{{ group_element_year.quadrimester_derogation | default_if_none:'-' }}</td>
-        </tr>
+        {% with ref_parent=group_element_year.parent|get_parent_of_reference_link %}
+            <tr>
+                <td>
+                    {% if ref_parent %}
+                        <img src="{% static 'img/reference.jpg' %}" >
+                    {% endif %}
+                </td>
+                <td>{{ group_element_year.parent.partial_acronym | default_if_none:'' }}</td>
+                <td>{{ group_element_year.parent.acronym | default_if_none:'' }}</td>
+                <td>{{ group_element_year.parent.title | default_if_none:'' }}</td>
+                <td>
+                    {{ group_element_year.relative_credits | default_if_none:'-' }} /
+                    {{ group_element_year.parent.credits | default_if_none:'-' }}
+                </td>
+                <td>{{ group_element_year.min_credits | default_if_none:'-' }}</td>
+                <td>{{ group_element_year.max_credits | default_if_none:'-' }}</td>
+                <td>{{ group_element_year.is_mandatory | yesno:_("yes,no") | title }}</td>
+                <td>{{ group_element_year.block | default_if_none:'-' }}</td>
+                <td>{{ group_element_year.quadrimester_derogation | default_if_none:'-' }}</td>
+            </tr>
+            {% if ref_parent %}
+                <tr>
+                    <td></td>
+                    <td>{{ ref_parent.parent.partial_acronym | default_if_none:'' }}</td>
+                    <td>{{ ref_parent.parent.acronym | default_if_none:'' }}</td>
+                    <td>{{ ref_parent.parent.title | default_if_none:'' }}</td>
+                    <td>
+                        {{ ref_parent.relative_credits | default_if_none:'-' }} /
+                        {{ ref_parent.parent.credits | default_if_none:'-' }}
+                    </td>
+                    <td>{{ ref_parent.min_credits | default_if_none:'-' }}</td>
+                    <td>{{ ref_parent.max_credits | default_if_none:'-' }}</td>
+                    <td>{{ ref_parent.is_mandatory | yesno:_("yes,no") | title }}</td>
+                    <td>{{ ref_parent.block | default_if_none:'-' }}</td>
+                    <td>{{ ref_parent.quadrimester_derogation | default_if_none:'-' }}</td>
+                </tr>
+            {% endif %}
+        {% endwith %}
     {% endfor %}
     </tbody>
 </table>
