@@ -24,7 +24,9 @@
 #
 ##############################################################################
 from django import forms
+from django.utils.translation import gettext as _
 
+from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.group_element_year import GroupElementYear
 
 
@@ -33,8 +35,6 @@ class UpdateGroupElementYearForm(forms.ModelForm):
         model = GroupElementYear
         fields = [
             "relative_credits",
-            "min_credits",
-            "max_credits",
             "is_mandatory",
             "block",
             "quadrimester_derogation",
@@ -47,3 +47,20 @@ class UpdateGroupElementYearForm(forms.ModelForm):
             "comment_english": forms.Textarea(attrs={'rows': 5}),
 
         }
+
+    def clean_link_type(self):
+        data_cleaned = self.cleaned_data.get('link_type')
+        if data_cleaned:
+            if self.instance.child_branch and not AuthorizedRelationship.objects.filter(
+                    parent_type=self.instance.parent.education_group_type,
+                    child_type=self.instance.child_branch.education_group_type,
+                    reference=True,
+            ).exists():
+                raise forms.ValidationError(_(
+                    "You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s.") % {
+                                                "parent_type": self.instance.parent.education_group_type,
+                                                "child_type": self.instance.child_branch.education_group_type,
+                                            })
+            elif self.instance.child_leaf:
+                raise forms.ValidationError(_("You are not allowed to create a reference with a learning unit"))
+        return data_cleaned

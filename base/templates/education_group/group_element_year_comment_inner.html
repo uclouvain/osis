@@ -23,13 +23,17 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<div class="modal-content" id="form-modal-content">
-    <div id="form-modal-body" class="modal-body">
 
+<div class="modal-content" id="form-modal-content">
+    <div class="modal-header">
+        <h4 class="text-center">{{ form.instance.child.acronym }}</h4>
+    </div>
+
+
+    <div id="form-modal-body" class="modal-body">
         <form method="post" id="form_comment_update" action="{{ request.path }}">
             {% csrf_token %}
-
-            <div class="form-group row" style="margin-top:10px;">
+            <div class="form-group row">
                 {% bootstrap_field form.link_type form_group_class="col-md-4" %}
                 {% bootstrap_field form.is_mandatory label=_('Required') form_group_class="col-md-4" %}
                 {% bootstrap_field form.relative_credits form_group_class="col-md-4" %}
@@ -44,9 +48,14 @@
             <div class="form-group row">
                 {% bootstrap_field form.comment_english form_group_class="col-md-12" %}
             </div>
-
-            {% include "blocks/forms/create_cancel_buttons_modal.html" %}
         </form>
 
     </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+        <button type="submit" onclick="$('#form_comment_update').submit();" class="btn btn-primary pull-right">
+            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
+        </button>
+    </div>
 </div>
+

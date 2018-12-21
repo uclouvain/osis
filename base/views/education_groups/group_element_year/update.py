@@ -26,15 +26,15 @@
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
-from django.core.exceptions import ObjectDoesNotExist, ValidationError, PermissionDenied
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from django.views.generic import DeleteView, FormView
+from django.views.generic import DeleteView
 from django.views.generic import UpdateView
 from waffle.decorators import waffle_flag
 
@@ -226,7 +226,7 @@ class UpdateGroupElementYearView(GenericUpdateGroupElementYearMixin, UpdateView)
 
     # SuccessMessageMixin
     def get_success_message(self, cleaned_data):
-        return _("The comments of %(acronym)s has been updated") % {'acronym': self.object.child}
+        return _("The link of %(acronym)s has been updated") % {'acronym': self.object.child}
 
     def get_success_url(self):
         return reverse("education_group_content", args=[self.kwargs["root_id"], self.education_group_year.pk])
