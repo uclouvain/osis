@@ -38,4 +38,3 @@ def get_parent_of_reference_link(education_group_yr):
         link_type=link_type.REFERENCE,
     )
     return group_elmt_yrs.first()
-
