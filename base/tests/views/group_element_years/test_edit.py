@@ -73,7 +73,7 @@ class TestEdit(TestCase):
     def test_edit_comment_get(self, mock_permission):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertTemplateUsed(response, "education_group/group_element_year_comment.html")
+        self.assertTemplateUsed(response, "education_group/group_element_year_comment_inner.html")
 
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
     def test_edit_comment_get_ajax(self, mock_permission):

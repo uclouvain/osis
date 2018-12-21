@@ -34,7 +34,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from django.views.generic import DeleteView
+from django.views.generic import DeleteView, FormView
 from django.views.generic import UpdateView
 from waffle.decorators import waffle_flag
 
@@ -222,7 +222,7 @@ class GenericUpdateGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessM
 class UpdateGroupElementYearView(GenericUpdateGroupElementYearMixin, UpdateView):
     # UpdateView
     form_class = UpdateGroupElementYearForm
-    template_name = "education_group/group_element_year_comment.html"
+    template_name = "education_group/group_element_year_comment_inner.html"
 
     # SuccessMessageMixin
     def get_success_message(self, cleaned_data):
