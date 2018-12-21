@@ -57,6 +57,14 @@ class TrainingType(ChoiceEnum):
     MASTER_MC = _("Master of specialist")
     INTERNSHIP = _("Internship")
 
+    @classmethod
+    def default_value(cls):
+        return [
+            cls.AGGREGATION.name, cls.BACHELOR.name, cls.FORMATION_PHD.name, cls.PHD.name, cls.MASTER_MA_120.name,
+            cls.MASTER_MD_120.name, cls.MASTER_MS_120.name, cls.MASTER_MA_180_240.name, cls.MASTER_MD_180_240.name,
+            cls.MASTER_MS_180_240.name, cls.MASTER_M1.name, cls.MASTER_MC.name
+        ]
+
 
 class MiniTrainingType(ChoiceEnum):
     DEEPENING = _("Deepening")
@@ -72,14 +80,6 @@ class MiniTrainingType(ChoiceEnum):
     def minors(cls):
         return [
             cls.SOCIETY_MINOR.name, cls.ACCESS_MINOR.name, cls.OPEN_MINOR.name, cls.DISCIPLINARY_COMPLEMENT_MINOR.name
-        ]
-
-    @classmethod
-    def default_joint_diploma(cls):
-        return [
-            cls.AGGREGATION.name, cls.BACHELOR.name, cls.FORMATION_PHD.name, cls.PHD.name, cls.MASTER_MA_120.name,
-            cls.MASTER_MD_120.name, cls.MASTER_MS_120.name, cls.MASTER_MA_180_240.name, cls.MASTER_MD_180_240.name,
-            cls.MASTER_MS_180_240.name, cls.MASTER_M1.name, cls.MASTER_MC.name
         ]
 
     @classmethod

@@ -167,9 +167,14 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
                                                     .select_related('decree')\
                                                     .order_by('-decree__name', 'name')
 
-        if self.initial['academic_year'] is None and\
-                self.education_group_type.name not in TrainingType.AGGREGATION.name:
-            self.initial['joint_diploma'] = False
+        if self.initial['academic_year'] is None:
+            if self.education_group_type.name in TrainingType.default_value():
+                self.fields['joint_diploma'].initial = True
+                self.fields['diploma_printing_title'].required = True
+            else:
+                self.fields['joint_diploma'].initial = False
+                self.fields['diploma_printing_title'].required = False
+
 
     def save(self, commit=True):
         education_group_year = super().save(commit=False)
