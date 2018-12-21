@@ -75,6 +75,14 @@ class MiniTrainingType(ChoiceEnum):
         ]
 
     @classmethod
+    def default_joint_diploma(cls):
+        return [
+            cls.AGGREGATION.name, cls.BACHELOR.name, cls.FORMATION_PHD.name, cls.PHD.name, cls.MASTER_MA_120.name,
+            cls.MASTER_MD_120.name, cls.MASTER_MS_120.name, cls.MASTER_MA_180_240.name, cls.MASTER_MD_180_240.name,
+            cls.MASTER_MS_180_240.name, cls.MASTER_M1.name, cls.MASTER_MC.name
+        ]
+
+    @classmethod
     def to_postpone(cls):
         return cls.minors() + [cls.DEEPENING.name]
 
