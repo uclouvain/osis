@@ -35,6 +35,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
+from base.management.commands.import_reddot import COMMON_OFFER
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
@@ -388,15 +389,13 @@ def get_conditions_admissions(context):
     admission_condition, created = AdmissionCondition.objects.get_or_create(
         education_group_year=context.education_group_year
     )
-
-    common_education_group_year = EducationGroupYear.objects.get(
-        acronym=common_acronym,
-        academic_year=context.education_group_year.academic_year
-    )
-    admission_condition_common = AdmissionCondition.objects.filter(
-        education_group_year=common_education_group_year
-    ).first()
-
+    admission_condition_common = None
+    if full_suffix.upper() in COMMON_OFFER:
+        common_education_group_year = EducationGroupYear.objects.get(
+            acronym=common_acronym,
+            academic_year=context.education_group_year.academic_year
+        )
+        admission_condition_common = common_education_group_year.admissioncondition
     result = {
         'id': 'conditions_admission',
         "label": "conditions_admission",

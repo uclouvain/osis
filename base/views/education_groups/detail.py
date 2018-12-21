@@ -48,6 +48,7 @@ from base.business.education_groups import perms
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 from base.business.education_groups.perms import is_eligible_to_edit_general_information, \
     is_eligible_to_edit_admission_condition
+from base.management.commands.import_reddot import COMMON_OFFER
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
@@ -57,7 +58,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import TrainingType
+from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.person import Person
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys
@@ -83,6 +84,18 @@ COMMON_PARAGRAPH = (
     'agregation',
     'finalites_didactiques',
     'prerequis'
+)
+
+INTRO_OFFER = (
+    TrainingType.MASTER_MS_120.name,
+    TrainingType.MASTER_MS_180_240.name,
+    TrainingType.MASTER_MD_120.name,
+    TrainingType.MASTER_MD_180_240.name,
+    TrainingType.MASTER_MA_120.name,
+    TrainingType.MASTER_MA_180_240.name,
+    GroupType.COMMON_CORE.name,
+    GroupType.SUB_GROUP.name,
+    MiniTrainingType.OPTION.name
 )
 
 
@@ -129,6 +142,12 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
             education_group=context['object'],
         )
         context['enums'] = mdl.enums.education_group_categories
+
+        self.is_intro_offer = self.object.education_group_type.name in INTRO_OFFER
+        context['show_extra_info'] = not self.is_intro_offer
+
+        common_offers = ['common-' + offer.lower() for offer in COMMON_OFFER[:-1]]
+        context['show_general_info'] = self.object.acronym not in common_offers
 
         return context
 
@@ -204,7 +223,6 @@ class EducationGroupDiplomas(EducationGroupGenericDetailView):
 
 class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     template_name = "education_group/tab_general_informations.html"
-    limited_by_category = (education_group_categories.TRAINING, education_group_categories.MINI_TRAINING)
 
     def get_queryset(self):
         """ Optimization """
@@ -212,10 +230,9 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         is_common_education_group_year = self.object.acronym.startswith('common')
         sections_to_display = self.get_appropriate_sections()
-        show_contacts = not sections_to_display or CONTACTS_KEY in sections_to_display
+        show_contacts = (not sections_to_display or CONTACTS_KEY in sections_to_display) and not self.is_intro_offer
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(
@@ -236,16 +253,18 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         # Load the info from the common education group year
         common_education_group_year = None
         if not is_common_education_group_year:
-            common_education_group_year = EducationGroupYear.objects.get(
-                acronym='common',
+            common_education_group_year = EducationGroupYear.objects.get_common(
                 academic_year=self.object.academic_year,
             )
 
         # Load the labels
         Section = namedtuple('Section', 'title labels')
         sections_with_translated_labels = []
-
-        for section in settings.SECTION_LIST:
+        if self.is_intro_offer:
+            sections_list = settings.SECTION_INTRO
+        else:
+            sections_list = settings.SECTION_LIST
+        for section in sections_list:
             translated_labels = self.get_translated_labels_and_content(section,
                                                                        self.user_language_code,
                                                                        common_education_group_year,
@@ -460,10 +479,14 @@ class EducationGroupContent(EducationGroupGenericDetailView):
         context = super().get_context_data(**kwargs)
 
         context["group_element_years"] = self.object.groupelementyear_set.annotate(
-                code_scs=Case(
+                acronym=Case(
                         When(child_leaf__isnull=False, then=F("child_leaf__acronym")),
                         When(child_branch__isnull=False, then=F("child_branch__acronym")),
                      ),
+                code=Case(
+                    When(child_branch__isnull=False, then=F("child_branch__partial_acronym")),
+                    default=None
+                ),
                 title=Case(
                         When(child_leaf__isnull=False, then=F("child_leaf__specific_title")),
                         When(child_branch__isnull=False, then=F("child_branch__title")),
@@ -474,7 +497,15 @@ class EducationGroupContent(EducationGroupGenericDetailView):
                 ),
             ).order_by('order')
 
+        context['show_minor_major_option_table'] = self._show_minor_major_option_table()
         return context
+
+    def _show_minor_major_option_table(self):
+        return self.object.education_group_type.name in (
+            GroupType.MAJOR_LIST_CHOICE.name,
+            GroupType.MINOR_LIST_CHOICE.name,
+            GroupType.OPTION_LIST_CHOICE.name
+        )
 
 
 class EducationGroupUsing(EducationGroupGenericDetailView):

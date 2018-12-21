@@ -32,7 +32,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
@@ -40,8 +40,8 @@ from attribution.business import attribution_charge_new
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
-    get_same_container_year_components, find_language_in_settings, \
-    CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language
+    get_same_container_year_components, CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language
+from reference.models.language import find_language_in_settings
 from base.business.learning_unit import get_learning_unit_comparison_context
 from base.business.learning_units import perms as business_perms
 from base.business.learning_units.comparison import get_keys, compare_learning_unit_years, \
@@ -89,7 +89,7 @@ def learning_unit_components(request, learning_unit_year_id):
     context = get_common_context_learning_unit_year(learning_unit_year_id, person)
     learning_unit_year = context['learning_unit_year']
     context['warnings'] = learning_unit_year.warnings
-    data_components = get_same_container_year_components(context['learning_unit_year'], True)
+    data_components = get_same_container_year_components(context['learning_unit_year'])
     context['components'] = data_components.get('components')
     context['REQUIREMENT_ENTITY'] = data_components.get('REQUIREMENT_ENTITY')
     context['ADDITIONAL_REQUIREMENT_ENTITY_1'] = data_components.get('ADDITIONAL_REQUIREMENT_ENTITY_1')

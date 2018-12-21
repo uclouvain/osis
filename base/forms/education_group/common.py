@@ -29,6 +29,7 @@ from django.core.exceptions import PermissionDenied, ImproperlyConfigured, Valid
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 
+from base.business.education_groups import create
 from base.business.group_element_years import management
 from base.forms.common import ValidationRuleMixin
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
@@ -40,12 +41,12 @@ from base.models.education_group_type import find_authorized_types, EducationGro
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import find_pedagogical_entities_version, get_last_version
 from base.models.enums import academic_calendar_type, education_group_categories
+from base.models.enums.education_group_categories import Categories
 from reference.models.language import Language
 from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT, \
     MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT, GROUP_PGRM_ENCODING_PERIOD, \
     GROUP_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
-from base.models.enums.education_group_types import ALL_TYPES
 
 
 class MainCampusChoiceField(forms.ModelChoiceField):
@@ -288,6 +289,8 @@ class CommonBaseForm:
             post_save = self._post_save()
             self.education_group_year_deleted = post_save.get('object_list_deleted', [])
 
+        create.create_initial_group_element_year_structure([education_group_year])
+
         return education_group_year
 
     def _is_creation(self):
@@ -323,7 +326,8 @@ class EducationGroupTypeForm(forms.Form):
         )
 
         self.fields["name"].label = _("Which type of %(category)s do you want to create ?") % {
-            "category": _(dict(education_group_categories.CATEGORIES)[category])}
+            "category": Categories[category].value
+        }
 
     def clean_name(self):
         education_group_type = self.cleaned_data["name"]

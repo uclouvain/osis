@@ -26,10 +26,9 @@
 import collections
 import itertools
 
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.messages import WARNING
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -45,11 +44,12 @@ from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm,
 from base.forms.search.search_form import get_research_criteria
 from base.models.academic_year import current_academic_year, get_last_academic_years, starting_academic_year
 from base.models.enums import learning_container_year_types, learning_unit_year_subtypes
-from base.models.person import Person, find_by_user
+from base.models.learning_unit_year import LearningUnitYear
+from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils.cache import cache_filter
-from base.views import layout
-from base.views.common import check_if_display_message, display_error_messages, display_messages_by_level
+from base.views.common import check_if_display_message, display_messages_by_level, \
+    paginate_queryset, display_error_messages
 
 SIMPLE_SEARCH = 1
 SERVICE_COURSES_SEARCH = 2
@@ -67,20 +67,24 @@ def learning_units_search(request, search_type):
     service_course_search = search_type == SERVICE_COURSES_SEARCH
     borrowed_course_search = search_type == BORROWED_COURSE
 
-    form = LearningUnitYearForm(request.GET or None,
-                                service_course_search=service_course_search,
-                                borrowed_course_search=borrowed_course_search,
-                                initial={'academic_year_id': starting_academic_year()})
-    found_learning_units = []
+    form = LearningUnitYearForm(
+        request.GET or None,
+        service_course_search=service_course_search,
+        borrowed_course_search=borrowed_course_search,
+        initial={'academic_year_id': starting_academic_year()}
+    )
+    found_learning_units = LearningUnitYear.objects.none()
     try:
         if form.is_valid():
             found_learning_units = form.get_activity_learning_units()
             check_if_display_message(request, found_learning_units)
+
     except TooManyResultsException:
-        messages.add_message(request, messages.ERROR, _('Too many results! Please be more specific.'))
+        display_error_messages(request, 'too_many_results')
 
     if request.POST.get('xls_status') == "xls":
         return create_xls(request.user, found_learning_units, _get_filter(form, search_type))
+
     if request.POST.get('xls_status') == "xls_comparison":
         return create_xls_comparison(
             request.user,
@@ -90,28 +94,35 @@ def learning_units_search(request, search_type):
         )
 
     if request.POST.get('xls_status') == "xls_with_parameters":
-        return create_xls_with_parameters(request.user,
-                                          found_learning_units,
-                                          _get_filter(form, search_type),
-                                          {WITH_GRP: request.POST.get('with_grp') == 'true',
-                                           WITH_ATTRIBUTIONS: request.POST.get('with_attributions') == 'true'})
+        return create_xls_with_parameters(
+            request.user,
+            found_learning_units,
+            _get_filter(form, search_type),
+            {
+                WITH_GRP: request.POST.get('with_grp') == 'true',
+                WITH_ATTRIBUTIONS: request.POST.get('with_attributions') == 'true'
+            }
+        )
 
-    a_person = find_by_user(request.user)
     form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
+
     context = {
         'form': form,
         'academic_years': get_last_academic_years(),
         'container_types': learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES,
         'types': learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
-        'learning_units': found_learning_units,
+        'learning_units_count': len(found_learning_units)
+        if isinstance(found_learning_units, list) else
+        found_learning_units.count(),
         'current_academic_year': starting_academic_year(),
         'experimental_phase': True,
         'search_type': search_type,
-        'is_faculty_manager': a_person.is_faculty_manager,
-        'form_comparison': form_comparison
+        'is_faculty_manager': request.user.person.is_faculty_manager,
+        'form_comparison': form_comparison,
+        'page_obj': paginate_queryset(found_learning_units, request.GET),
     }
 
-    return layout.render(request, "learning_units.html", context)
+    return render(request, "learning_units.html", context)
 
 
 @login_required
@@ -139,22 +150,23 @@ def learning_units_borrowed_course(request):
 @permission_required('base.can_access_learningunit', raise_exception=True)
 @cache_filter()
 def learning_units_proposal_search(request):
-    search_form = LearningUnitProposalForm(request.GET or None, initial={'academic_year_id': current_academic_year()})
+    search_form = LearningUnitProposalForm(
+        request.GET or None,
+        initial={'academic_year_id': current_academic_year()}
+    )
     user_person = get_object_or_404(Person, user=request.user)
-    proposals = []
-    research_criteria = []
-    try:
-        if search_form.is_valid():
-            research_criteria = get_research_criteria(search_form)
-            proposals = search_form.get_proposal_learning_units()
-            check_if_display_message(request, proposals)
-    except TooManyResultsException:
-        display_error_messages(request, 'too_many_results')
+    found_learning_units = LearningUnitYear.objects.none()
+
+    if search_form.is_valid():
+        found_learning_units = search_form.get_proposal_learning_units()
+        check_if_display_message(request, found_learning_units)
 
     if request.GET.get('xls_status') == "xls":
-        return create_xls_proposal(request.user, proposals, _get_filter(search_form, PROPOSAL_SEARCH))
+        return create_xls_proposal(request.user, found_learning_units, _get_filter(search_form, PROPOSAL_SEARCH))
 
     if request.POST:
+        research_criteria = get_research_criteria(search_form) if search_form.is_valid() else []
+
         selected_proposals_id = request.POST.getlist("selected_action", default=[])
         selected_proposals = ProposalLearningUnit.objects.filter(id__in=selected_proposals_id)
         messages_by_level = apply_action_on_proposals(selected_proposals, user_person, request.POST, research_criteria)
@@ -168,11 +180,12 @@ def learning_units_proposal_search(request):
         'current_academic_year': current_academic_year(),
         'experimental_phase': True,
         'search_type': PROPOSAL_SEARCH,
-        'proposals': proposals,
+        'learning_units_count': found_learning_units.count(),
         'is_faculty_manager': user_person.is_faculty_manager,
-        'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(proposals)),
+        'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
+        'page_obj': paginate_queryset(found_learning_units, request.GET),
     }
-    return layout.render(request, "learning_units.html", context)
+    return render(request, "learning_units.html", context)
 
 
 def apply_action_on_proposals(proposals, author, post_data, research_criteria):
@@ -211,19 +224,16 @@ def _get_search_type_label(search_type):
 @permission_required('base.can_access_externallearningunityear', raise_exception=True)
 @cache_filter()
 def learning_units_external_search(request):
-    search_form = ExternalLearningUnitYearForm(request.GET or None,
-                                               initial={'academic_year_id': current_academic_year()})
+    search_form = ExternalLearningUnitYearForm(
+        request.GET or None,
+        initial={'academic_year_id': current_academic_year()}
+    )
     user_person = get_object_or_404(Person, user=request.user)
-    external_learning_units = []
-    try:
-        if search_form.is_valid():
-            external_learning_units = search_form.get_learning_units()
-            check_if_display_message(request, external_learning_units)
-    except TooManyResultsException:
-        display_error_messages(request, 'too_many_results')
+    found_learning_units = LearningUnitYear.objects.none()
 
-    if request.POST:
-        return redirect(reverse("learning_unit_proposal_search") + "?{}".format(request.GET.urlencode()))
+    if search_form.is_valid():
+        found_learning_units = search_form.get_queryset()
+        check_if_display_message(request, found_learning_units)
 
     context = {
         'form': search_form,
@@ -231,8 +241,9 @@ def learning_units_external_search(request):
         'current_academic_year': current_academic_year(),
         'experimental_phase': True,
         'search_type': EXTERNAL_SEARCH,
-        'learning_units': external_learning_units,
+        'learning_units_count': found_learning_units.count(),
         'is_faculty_manager': user_person.is_faculty_manager,
-        'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(external_learning_units)),
+        'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
+        'page_obj': paginate_queryset(found_learning_units, request.GET),
     }
-    return layout.render(request, "learning_units.html", context)
+    return render(request, "learning_units.html", context)

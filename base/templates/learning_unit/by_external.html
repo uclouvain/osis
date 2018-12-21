@@ -32,10 +32,10 @@
         {% include "learning_unit/blocks/form/search_form_external_learning_unit.html" %}
 
         <div style="margin-top:10px;">
-            {% if learning_units %}
+            {% if page_obj %}
                 <br>
                 <strong style="margin-left:10px;color:grey;">
-                    {{ learning_units|length }}
+                    {{ learning_units_count }}
                     {% trans 'Learning units'|lower %}
                 </strong>
 
@@ -50,20 +50,19 @@
                         <th>{% trans 'Status' %}</th>
                     </tr>
                     </thead>
-                    {% for external_learning_unit_yr in learning_units %}
-                        <tr data-id="{{ external_learning_unit_yr.id }}"
-                            data-value="{{ external_learning_unit_yr.code_local }}">
-                            <td>{{ external_learning_unit_yr.learning_unit_year.academic_year.name }}</td>
-                            <td><a href="{% url 'learning_unit' external_learning_unit_yr.learning_unit_year.id %}"
-                                   id="lnk_learning_unit_{{ learning_unit.id }}">
-                                {{ external_learning_unit_yr.learning_unit_year.acronym }}
+                    {% for obj in page_obj %}
+                        <tr data-id="{{ obj.id }}"
+                            data-value="{{ obj.externallearningunityear.code_local }}">
+                            <td>{{ obj.academic_year.name }}</td>
+                            <td><a href="{% url 'learning_unit' obj.id %}" id="lnk_learning_unit_{{ obj.pk }}">
+                                {{ obj.acronym }}
                             </a>
                             </td>
-                            <td>{{ external_learning_unit_yr.learning_unit_year.complete_title | default_if_none:'' }}</td>
-                            <td>{{ external_learning_unit_yr.learning_unit_year.campus.organization | default_if_none:'' }}</td>
-                            <td>{{ external_learning_unit_yr.external_credits | default_if_none:'' }}</td>
+                            <td>{{ obj.complete_title | default_if_none:'' }}</td>
+                            <td>{{ obj.campus.organization | default_if_none:'' }}</td>
+                            <td>{{ obj.externallearningunityear.external_credits | default_if_none:'' }}</td>
                             <td>
-                                {% if external_learning_unit_yr.learning_unit_year.status %}
+                                {% if obj.status %}
                                     <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:green;"
                                           title="{% trans 'Active' %}"></span>
                                     <div style="display:none;">1</div>
@@ -76,6 +75,9 @@
                         </tr>
                     {% endfor %}
                 </table>
+                <div class="text-center">
+                    {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+                </div>
             {% endif %}
         </div>
     </div>

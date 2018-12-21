@@ -23,9 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import factory
+import factory.fuzzy
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 
 
-def convert_to_uppercase(string_value):
-    if string_value:
-        return string_value.upper()
-    return string_value
+class HopsFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "base.Hops"
+
+    education_group_year = factory.SubFactory(EducationGroupYearFactory)
+    ares_study = factory.fuzzy.FuzzyInteger(1, 9999)
+    ares_graca = factory.fuzzy.FuzzyInteger(1, 9999)
+    ares_ability = factory.fuzzy.FuzzyInteger(1, 9999)

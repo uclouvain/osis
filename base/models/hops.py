@@ -27,10 +27,10 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class HopsAdmin(SerializableModelAdmin):
+class HopsAdmin(OsisModelAdmin):
     list_display = ('ares_study', 'ares_graca', 'ares_ability', 'changed')
     list_filter = ('ares_study', )
     raw_id_fields = (
@@ -39,8 +39,8 @@ class HopsAdmin(SerializableModelAdmin):
     search_fields = ['ares_study']
 
 
-class Hops(SerializableModel):
-
+class Hops(models.Model):
+    # HOPS means "Habilitations et Offre Programmée de l’enseignement Supérieur".
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     education_group_year = models.OneToOneField('base.EducationGroupYear', on_delete=models.CASCADE)

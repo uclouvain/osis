@@ -50,12 +50,10 @@ class EntityCalendar(AbstractCalendar):
 
 
 def find_by_entity_and_reference(entity_id, reference, academic_year=None):
-    if not academic_year:
-        academic_year = starting_academic_year()
     try:
         return EntityCalendar.objects.filter(
             entity_id=entity_id,
-            academic_calendar__academic_year=academic_year,
+            academic_calendar__academic_year=academic_year or starting_academic_year(),
             academic_calendar__reference=reference
         ).select_related('entity', 'academic_calendar__academic_year').get()
     except ObjectDoesNotExist:

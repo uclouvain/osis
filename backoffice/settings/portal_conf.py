@@ -53,3 +53,10 @@ SECTION_LIST = [
                 ('infos_pratiques', 'specific'),
             ]),
 ]
+
+SECTION_INTRO = [
+    Section(title=_('Welcome'),
+            labels=[
+                ('intro', 'specific'),
+            ])
+]

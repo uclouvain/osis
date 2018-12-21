@@ -28,7 +28,6 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from base.models import entity_version
-from base.models.entity import Entity
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.utils.utils import get_object_or_none
@@ -111,10 +110,6 @@ def filter_proposal_fields(queryset, **kwargs):
         queryset = queryset.filter(proposallearningunit__state=proposal_state)
 
     return queryset
-
-
-def find_distinct_folder_entities():
-    return Entity.objects.filter(proposallearningunit__isnull=False).distinct()
 
 
 def is_learning_unit_year_in_proposal(luy):

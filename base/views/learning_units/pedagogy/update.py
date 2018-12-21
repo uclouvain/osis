@@ -29,7 +29,8 @@ from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from base import models as mdl
-from base.business.learning_unit import find_language_in_settings, CMS_LABEL_PEDAGOGY_FR_ONLY
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
+from reference.models.language import find_language_in_settings
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm
 from base.models import learning_unit_year
