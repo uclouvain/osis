@@ -26,6 +26,7 @@
 <table class="table table-hover">
     <thead>
     <tr>
+        <th></th>
         <th>{% trans 'Code' %}</th>
         <th>{% trans 'Acronym' %}</th>
         <th>{% trans 'Title' %}</th>
@@ -39,13 +40,14 @@
     </thead>
     <tbody>
     {% for group_element_year in group_element_years %}
-        {% with ref_parent=group_element_year.parent|get_parent %}
+        {% with ref_parent=group_element_year.parent|get_parent_of_reference_link %}
             <tr>
                 <td>
                     {% if ref_parent %}
                         <img src="{% static 'img/reference.jpg' %}" >
                     {% endif %}
-                    {{ group_element_year.parent.partial_acronym | default_if_none:'' }}</td>
+                </td>
+                <td>{{ group_element_year.parent.partial_acronym | default_if_none:'' }}</td>
                 <td>{{ group_element_year.parent.acronym | default_if_none:'' }}</td>
                 <td>{{ group_element_year.parent.title | default_if_none:'' }}</td>
                 <td>
@@ -58,9 +60,9 @@
                 <td>{{ group_element_year.block | default_if_none:'-' }}</td>
                 <td>{{ group_element_year.quadrimester_derogation | default_if_none:'-' }}</td>
             </tr>
-
             {% if ref_parent %}
                 <tr>
+                    <td></td>
                     <td>{{ ref_parent.parent.partial_acronym | default_if_none:'' }}</td>
                     <td>{{ ref_parent.parent.acronym | default_if_none:'' }}</td>
                     <td>{{ ref_parent.parent.title | default_if_none:'' }}</td>

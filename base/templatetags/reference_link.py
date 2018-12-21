@@ -32,13 +32,10 @@ register = template.Library()
 
 
 @register.filter
-def get_parent(parent_education_group_year):
+def get_parent_of_reference_link(education_group_yr):
     group_elmt_yrs = mdl.group_element_year.GroupElementYear.objects.filter(
-        child_branch=parent_education_group_year,
+        child_branch=education_group_yr,
         link_type=link_type.REFERENCE,
     )
-
-    for group_element_yr in group_elmt_yrs:
-        return group_element_yr
-    return None
+    return group_elmt_yrs.first()
 
