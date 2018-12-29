@@ -1,5 +1,5 @@
 {% extends "education_group/layout.html" %}
-{% load education_group format %}
+{% load education_group format i18n staticfiles %}
 
 {% block breadcrumb %}
     {{ block.super }}
@@ -26,3 +26,57 @@
         </h2>
     </div>
 {% endblock %}
+
+{% block content %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <a class="btn btn-default" style="margin-left: 15px;" onclick="switchTreeVisibility()">
+                    <span class="fa fa-bars" aria-hidden="true"></span>
+                </a>
+                <div class="pull-right" style="margin-right: 15px;">
+                    {% block top_action_bar %}
+                    {% endblock %}
+
+                </div>
+            </div>
+        </div>
+        <div class="panel-body" id="tabs">
+            <div class="tab-content" id="tab_content">
+                <div role="tabpanel" class="tab-pane active" id="identification">
+                    <div class="row" style="display:flex;">
+
+                        <div id="panel-collapse" class="col-md-0">
+                            <div id="collapse" class="panel panel-default"
+                                 style="height: 100%;display:flex;overflow: auto;">
+                                <div class="panel-body">
+                                    <div class="row" id="panel_file_tree"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="panel-data" class="col-md-12" style="height: 100%;">
+                            {% include "education_group/tabs.html" %}
+                            <br>
+                            {% block details %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer text-right">
+            {% block bottom_action_bar %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <script>
+        const root_id = "{{ root_id }}";
+        const url_resolver_match = "{% url_resolver_match %}";
+        const tree = JSON.parse('{{ tree | escapejs }}');
+        const management_url = "{% url "education_groups_management" %}";
+    </script>
+    <script type="text/javascript" src="{% static 'js/education_group/education_group_tree.js' %}">
+    </script>
+{% endblock content %}
