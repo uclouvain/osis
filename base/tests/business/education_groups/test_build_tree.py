@@ -24,10 +24,12 @@
 #
 ##############################################################################
 
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.test import TestCase
 from django.urls import reverse
 
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
+from base.models.enums.link_type import REFERENCE
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -101,3 +103,16 @@ class TestBuildTree(TestCase):
                 node.children[1].children[0].group_element_year.pk if node.children[1].group_element_year else '#'
             )
         )
+
+    def test_build_tree_reference(self):
+        """
+        This tree contains a reference link.
+        The icon of its children should be adapted and the referenced node shoudn't appear in the json tree.
+        """
+        self.group_element_year_1.link_type = REFERENCE
+        self.group_element_year_1.save()
+
+        node = NodeBranchJsTree(self.parent)
+
+        self.assertEqual(node.children[0].group_element_year, self.group_element_year_1_1)
+        self.assertEqual(node.children[0]._get_icon(),  static('img/reference.jpg'))
