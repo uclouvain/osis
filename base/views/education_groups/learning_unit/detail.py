@@ -72,8 +72,6 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
         context['root_id'] = root.pk
         context['parent'] = root
         context['tree'] = json.dumps(NodeBranchJsTree(root).to_json())
-        print(context["tree"])
-
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         return context
 
