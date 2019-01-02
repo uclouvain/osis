@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,23 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
+from django import template
+from django.forms import forms
+from base import models as mdl
+from base.models.enums import link_type
 
-import factory.fuzzy
-
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+register = template.Library()
 
 
-class GroupElementYearFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "base.GroupElementYear"
-
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
-    parent = factory.SubFactory(EducationGroupYearFactory)
-    child_branch = factory.SubFactory(EducationGroupYearFactory)
-    child_leaf = None
-    is_mandatory = False
-    link_type = None
+@register.filter
+def get_parent_of_reference_link(education_group_yr):
+    group_elmt_yrs = mdl.group_element_year.GroupElementYear.objects.filter(
+        child_branch=education_group_yr,
+        link_type=link_type.REFERENCE,
+    )
+    return group_elmt_yrs.first()
