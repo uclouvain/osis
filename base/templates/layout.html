@@ -109,6 +109,7 @@
 {% endif %}>
 {% hijack_notification %}
 {% analytical_body_top %}
+
 {% block layout_navbar_top %}
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container-fluid p0-50">
@@ -368,11 +369,10 @@
     <br>
     <br>
 </div>
-
-<nav class="navbar navbar-default navbar-fixed-bottom">
+<footer class="panel-footer">
     <div class="container-fluid p0-50">
-        <p class="navbar-text pull-left"><a
-                href="{{ user_manual.global }}"
+        <p class="navbar-text pull-left">
+            <a href="{{ user_manual.global }}"
                 target="_blank" id="lnk_user_manual">{% trans 'Documentation' %}</a> |
             <a href="http://uclouvain.github.io/osis/" target="_blank"
                id="lnk_osis_website">{% trans 'Website' %}</a> |
@@ -384,10 +384,13 @@
             {% endif %}
         </p>
 
-        <p class="navbar-text pull-right"><span class="glyphicon glyphicon-copyright-mark"></span> {% now "Y" %} <a
-                href="http://www.uclouvain.be" target="_blank" id="lnk_ucl">Université catholique de Louvain</a></p>
+        <p class="navbar-text pull-right">
+            <span class="glyphicon glyphicon-copyright-mark"></span> {% now "Y" %} <a
+                href="http://www.uclouvain.be" target="_blank" id="lnk_ucl">Université catholique de Louvain</a>
+        </p>
     </div>
-</nav>
+</footer>
+
 
 <script src="{% static 'js/osis.js' %}"></script>
 <script type="text/javascript" src="{% static "js/modal_form_submit.js" %}"></script>
