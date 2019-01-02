@@ -32,16 +32,16 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from attribution.business import attribution_charge_new
 from attribution.models.attribution_charge_new import AttributionChargeNew
+from attribution.models.enums.function import Functions
 from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language
-from reference.models.language import find_language_in_settings
 from base.business.learning_unit import get_learning_unit_comparison_context
 from base.business.learning_units import perms as business_perms
 from base.business.learning_units.comparison import get_keys, compare_learning_unit_years, \
@@ -56,6 +56,7 @@ from base.models.person import Person
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models import text_label
+from reference.models.language import find_language_in_settings
 from . import layout
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
@@ -336,10 +337,6 @@ def _has_changed(data_reference, data_1, data_2, key):
     return data_reference.get(key) != data_1.get(key) or data_reference.get(key) != data_2.get(key)
 
 
-CHARGE_REPARTITION_WARNING_MESSAGE = "The sum of volumes for the partims for professor %(tutor)s is superior to the " \
-                                     "volume of parent learning unit for this professor"
-
-
 def get_charge_repartition_warning_messages(learning_container_year):
     total_charges_by_attribution_and_learning_subtype = AttributionChargeNew.objects \
         .filter(attribution__learning_container_year=learning_container_year) \
@@ -371,7 +368,8 @@ def get_charge_repartition_warning_messages(learning_container_year):
                                         charges[0]["attribution__tutor__person__middle_name"],
                                         charges[0]["attribution__tutor__person__last_name"])
             tutor_name_with_function = "{} ({})".format(tutor_name,
-                                                        _(charges[0]["attribution__function"]))
-            msg = _(CHARGE_REPARTITION_WARNING_MESSAGE) % {"tutor": tutor_name_with_function}
+                                                        getattr(Functions, charges[0]["attribution__function"]).value)
+            msg = _("The sum of volumes for the partims for professor %(tutor)s is superior to the "
+                    "volume of parent learning unit for this professor") % {"tutor": tutor_name_with_function}
             msgs.append(msg)
     return msgs
