@@ -92,8 +92,7 @@ from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.views.learning_unit import learning_unit_comparison
 from base.views.learning_unit import learning_unit_components, learning_class_year_edit, learning_unit_specifications, \
-    learning_unit_formations, get_charge_repartition_warning_messages, CHARGE_REPARTITION_WARNING_MESSAGE, \
-    learning_unit_attributions
+    learning_unit_formations, get_charge_repartition_warning_messages, learning_unit_attributions
 from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.search import learning_units_service_course
@@ -1578,6 +1577,6 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
         tutor_name = Person.get_str(self.attribution_full.tutor.person.first_name,
                                     self.attribution_full.tutor.person.middle_name,
                                     self.attribution_full.tutor.person.last_name)
-        tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.function))
-        self.assertListEqual(msgs,
-                             [_(CHARGE_REPARTITION_WARNING_MESSAGE) % {"tutor": tutor_name_with_function}])
+        tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.get_function_display()))
+        self.assertListEqual(msgs, [_("The sum of volumes for the partims for professor %(tutor)s is superior to the "
+                     "volume of parent learning unit for this professor") % {"tutor": tutor_name_with_function}])
