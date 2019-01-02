@@ -29,6 +29,10 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
 
+from base.tests.factories.user import UserFactory
+from base.views.common import home
+from osis_common.tests.factories.application_notice import ApplicationNoticeFactory
+
 
 class ErrorViewTestCase(TestCase):
     def setUp(self):
@@ -41,3 +45,15 @@ class ErrorViewTestCase(TestCase):
         self.client.login(username='tmp', password='tmp')
         response = self.client.get(reverse('academic_calendar_read', args=[46898]), follow=True)
         self.assertEqual(response.status_code, 404)
+
+
+class TestCheckNotice(TestCase):
+    def setUp(self):
+        self.url = reverse(home)
+        self.notice = ApplicationNoticeFactory()
+        self.client.force_login(UserFactory())
+
+    def test_context(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['subject'], self.notice.subject)
+        self.assertEqual(response.context['notice'], self.notice.notice)
