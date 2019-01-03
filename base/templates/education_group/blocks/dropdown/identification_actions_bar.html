@@ -59,13 +59,14 @@
                 {% endflag %}
 
                 {% flag "education_group_attach" %}
-                    <li {% if not can_change_education_group %} class="disabled" {% endif %}>
-                        {% url 'education_groups_management' as management_url %}
-                        <a {% if can_change_education_group %}
-                            href="{% url_add_query management_url root_id=parent.id element_id=education_group_year.id group_element_year_id=group_to_parent|default_if_none:0 action="attach" %}"
-                        {% endif %}>
-                            {% trans 'Attach' %}
-                        </a>
+                    {% url 'education_groups_management' as management_url %}
+                    <li {% if not can_change_education_group %}
+                                class="disabled"
+                            {% else %}
+                                class="trigger_modal"
+                                data-url="{% url_add_query management_url root_id=parent.id element_id=education_group_year.id group_element_year_id=group_to_parent|default_if_none:0 action="attach" %}"
+                            {% endif %}>
+                        <a>{% trans 'Attach' %}</a>
                     </li>
                 {% endflag %}
 

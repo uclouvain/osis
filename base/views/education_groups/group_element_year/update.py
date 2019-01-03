@@ -31,22 +31,24 @@ from django.db import IntegrityError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
+from django.utils import cache
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from django.views.generic import DeleteView
+from django.views.generic import DeleteView, CreateView
 from django.views.generic import UpdateView
 from waffle.decorators import waffle_flag
 
 from base.business import group_element_years
 from base.business.group_element_years.management import SELECT_CACHE_KEY, select_education_group_year, \
-    select_learning_unit_year
-from base.forms.education_group.group_element_year import UpdateGroupElementYearForm
+    select_learning_unit_year, extract_child_from_cache
+from base.forms.education_group.group_element_year import GroupElementYearForm
 from base.models.education_group_year import EducationGroupYear
 from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.utils.utils import get_object_or_none
+from base.utils.cache import cache
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.education_groups.select import build_success_message, build_success_json_response
@@ -83,7 +85,7 @@ def management(request):
 
 
 def _get_data_from_request(request, name):
-    return getattr(request, request.method, {}).get(name)
+    return getattr(request, "GET", {}).get(name)
 
 
 def _get_concerned_object(element_id, group_element_year):
@@ -141,25 +143,29 @@ def _detach(request, group_element_year, *args, **kwargs):
     )
 
 
-@require_http_methods(['GET', 'POST'])
 def _attach(request, group_element_year, *args, **kwargs):
-    parent = kwargs['element']
     try:
-        group_element_years.management.attach_from_cache(parent)
-        success_msg = _("Attached to \"%(acronym)s\"") % {'acronym': parent}
-        display_success_messages(request, success_msg)
+        selected_data = cache.get(SELECT_CACHE_KEY)
+        kwargs.update(extract_child_from_cache(kwargs['element'], selected_data))
+        return CreateGroupElementYearView.as_view()(request, *args, **kwargs)
+
     except ObjectDoesNotExist:
         warning_msg = _("Please Select or Move an item before Attach it")
         display_warning_messages(request, warning_msg)
+
     except IncompatiblesTypesException as e:
         warning_msg = e.errors
         display_warning_messages(request, warning_msg)
+
     except MaxChildrenReachedException as e:
         warning_msg = e.errors
         display_warning_messages(request, warning_msg)
     except IntegrityError as e:
-        warning_msg = _(str(e))
+        warning_msg = str(e)
         display_warning_messages(request, warning_msg)
+
+    # Attach is display in a modal, so we have to return a json response to avoid a double redirection.
+    return JsonResponse({"success": True})
 
 
 @require_http_methods(['POST'])
@@ -182,7 +188,7 @@ def _get_action_method(request):
         'attach': _attach,
         'select': _select,
     }
-    data = getattr(request, request.method, {})
+    data = getattr(request, "GET", {})
     action = data.get('action')
     if action not in available_actions.keys():
         raise AttributeError('Action should be {}'.format(','.join(available_actions.keys())))
@@ -213,15 +219,42 @@ class GenericUpdateGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessM
 
     @property
     def education_group_year(self):
+        parent = self.kwargs.get('parent')
+        if parent:
+            return parent
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("education_group_year_id"))
 
     def get_root(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
 
+class CreateGroupElementYearView(GenericUpdateGroupElementYearMixin, CreateView):
+    # CreateView
+    form_class = GroupElementYearForm
+    template_name = "education_group/group_element_year_comment_inner.html"
+
+    def get_form_kwargs(self):
+        """ For the creation, the group_element_year needs a parent and a child """
+        kwargs = super().get_form_kwargs()
+
+        kwargs.update({
+            'parent': self.kwargs['parent'],
+            'child_branch': self.kwargs.get('child_branch'),
+            'child_leaf': self.kwargs.get('child_leaf')
+        })
+        return kwargs
+
+    # SuccessMessageMixin
+    def get_success_message(self, cleaned_data):
+        return _("The link of %(acronym)s has been created") % {'acronym': self.object.child}
+
+    def get_success_url(self):
+        return self.kwargs.get('http_referer')
+
+
 class UpdateGroupElementYearView(GenericUpdateGroupElementYearMixin, UpdateView):
     # UpdateView
-    form_class = UpdateGroupElementYearForm
+    form_class = GroupElementYearForm
     template_name = "education_group/group_element_year_comment_inner.html"
 
     # SuccessMessageMixin
@@ -234,7 +267,7 @@ class UpdateGroupElementYearView(GenericUpdateGroupElementYearMixin, UpdateView)
 
 class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView):
     # DeleteView
-    template_name = "education_group/group_element_year/confirm_detach.html"
+    template_name = "education_group/group_element_year/confirm_detach_inner.html"
 
     def delete(self, request, *args, **kwargs):
         child_leaf = self.get_object().child_leaf

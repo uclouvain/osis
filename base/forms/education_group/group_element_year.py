@@ -30,7 +30,7 @@ from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.group_element_year import GroupElementYear
 
 
-class UpdateGroupElementYearForm(forms.ModelForm):
+class GroupElementYearForm(forms.ModelForm):
     class Meta:
         model = GroupElementYear
         fields = [
@@ -48,6 +48,17 @@ class UpdateGroupElementYearForm(forms.ModelForm):
 
         }
 
+    def __init__(self, *args, parent=None, child_branch=None, child_leaf=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # No need to attach FK to an existing GroupElementYear
+        if self.instance.pk:
+            return
+
+        self.instance.parent = parent
+        self.instance.child_leaf = child_leaf
+        self.instance.child_branch = child_branch
+
     def clean_link_type(self):
         data_cleaned = self.cleaned_data.get('link_type')
         if data_cleaned:
@@ -57,10 +68,12 @@ class UpdateGroupElementYearForm(forms.ModelForm):
                     reference=True,
             ).exists():
                 raise forms.ValidationError(_(
-                    "You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s.") % {
-                                                "parent_type": self.instance.parent.education_group_type,
-                                                "child_type": self.instance.child_branch.education_group_type,
-                                            })
+                    "You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
+                ) % {
+                        "parent_type": self.instance.parent.education_group_type,
+                        "child_type": self.instance.child_branch.education_group_type,
+                    }
+                )
             elif self.instance.child_leaf:
                 raise forms.ValidationError(_("You are not allowed to create a reference with a learning unit"))
         return data_cleaned

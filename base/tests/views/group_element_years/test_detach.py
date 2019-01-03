@@ -84,7 +84,7 @@ class TestDetach(TestCase):
     def test_detach_case_get_without_ajax_success(self, mock_permission):
         response = self.client.get(self.url, data=self.post_valid_data, follow=True)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/group_element_year/confirm_detach.html")
+        self.assertTemplateUsed(response, "education_group/group_element_year/confirm_detach_innner.html")
 
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
     def test_detach_case_get_with_ajax_success(self, mock_permission):

@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Count, Subquery, Q
 from django.utils.translation import ugettext as _
 
 from base.models import group_element_year, authorized_relationship
@@ -55,58 +54,61 @@ def _set_selected_element_on_cache(id, modelname):
 
 
 def attach_from_cache(parent):
+    """ Fetch the child in user cache and get or create the group element year """
     selected_data = cache.get(SELECT_CACHE_KEY)
     if selected_data:
-        kwargs = {'parent': parent}
-        if selected_data['modelname'] == LEARNING_UNIT_YEAR:
-            luy = LearningUnitYear.objects.get(pk=selected_data['id'])
-            if not parent.education_group_type.learning_unit_child_allowed:
-                raise IncompatiblesTypesException(
-                    errors=_("You cannot attach \"%(child)s\" (type \"%(child_type)s\") "
-                             "to \"%(parent)s\" (type \"%(parent_type)s\")") % {
-                               'child': luy,
-                               'child_type': _("Learning unit"),
-                               'parent': parent,
-                               'parent_type': parent.education_group_type,
-                           }
-                )
-            kwargs['child_leaf'] = luy
-        elif selected_data['modelname'] == EDUCATION_GROUP_YEAR:
-            egy = EducationGroupYear.objects.get(pk=selected_data['id'])
-            if not _types_are_compatible(parent, egy):
-                raise IncompatiblesTypesException(
-                    errors=_("You cannot attach \"%(child)s\" (type \"%(child_type)s\") "
-                             "to \"%(parent)s\" (type \"%(parent_type)s\")") % {
-                        'child': egy,
-                        'child_type': egy.education_group_type,
-                        'parent': parent,
-                        'parent_type': parent.education_group_type,
-                    }
-                )
-            if is_max_child_reached(parent, egy.education_group_type):
-                raise MaxChildrenReachedException(
-                    errors=_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
-                             "has already reached the limit.") % {
-                        'child_type': egy.education_group_type,
-                        'parent': parent
-                    }
-                )
-            kwargs['child_branch'] = egy
+        kwargs = extract_child_from_cache(parent, selected_data)
+
         new_gey = group_element_year.get_or_create_group_element_year(**kwargs)
-        _clear_cache()
+
+        # Clear cache
+        cache.set(SELECT_CACHE_KEY, None, timeout=None)
+
         return new_gey
     raise ObjectDoesNotExist
 
 
-def _clear_cache():
-    cache.set(SELECT_CACHE_KEY, None, timeout=None)
+def extract_child_from_cache(parent, selected_data):
+    kwargs = {'parent': parent}
+    if selected_data['modelname'] == LEARNING_UNIT_YEAR:
+        luy = LearningUnitYear.objects.get(pk=selected_data['id'])
+        if not parent.education_group_type.learning_unit_child_allowed:
+            raise IncompatiblesTypesException(
+                errors=_("You cannot attach \"%(child)s\" (type \"%(child_type)s\") "
+                         "to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                           'child': luy,
+                           'child_type': _("Learning unit"),
+                           'parent': parent,
+                           'parent_type': parent.education_group_type,
+                       }
+            )
+        kwargs['child_leaf'] = luy
+    elif selected_data['modelname'] == EDUCATION_GROUP_YEAR:
+        egy = EducationGroupYear.objects.get(pk=selected_data['id'])
+        if not _types_are_compatible(parent, egy):
+            raise IncompatiblesTypesException(
+                errors=_("You cannot attach \"%(child)s\" (type \"%(child_type)s\") "
+                         "to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                           'child': egy,
+                           'child_type': egy.education_group_type,
+                           'parent': parent,
+                           'parent_type': parent.education_group_type,
+                       }
+            )
+        if is_max_child_reached(parent, egy.education_group_type):
+            raise MaxChildrenReachedException(
+                errors=_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
+                         "has already reached the limit.") % {
+                           'child_type': egy.education_group_type,
+                           'parent': parent
+                       }
+            )
+        kwargs['child_branch'] = egy
+    return kwargs
 
 
 def _types_are_compatible(parent, child):
-    return authorized_relationship.AuthorizedRelationship.objects.filter(
-        parent_type=parent.education_group_type,
-        child_type=child.education_group_type,
-    ).exists()
+    return parent.education_group_type.authorized_parent_type.filter(child_type=child.education_group_type,).exists()
 
 
 def is_max_child_reached(parent, child_education_group_type):

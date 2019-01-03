@@ -185,11 +185,11 @@ class GroupElementYear(OrderedModel):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.child_branch and self.child_leaf:
-            raise IntegrityError("It is forbidden to save a GroupElementYear with a child branch and a child leaf.")
+            raise IntegrityError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))
         if self.child_branch == self.parent:
-            raise IntegrityError("It is forbidden to attach an element to itself.")
+            raise IntegrityError(_("It is forbidden to attach an element to itself."))
         if self.parent and self.child_branch in self.parent.ascendants_of_branch:
-            raise IntegrityError("It is forbidden to attach an element to one of its included elements.")
+            raise IntegrityError(_("It is forbidden to attach an element to one of its included elements."))
 
         return super().save(force_insert, force_update, using, update_fields)
 

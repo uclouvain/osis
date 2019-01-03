@@ -31,7 +31,8 @@
 
 
     <div id="form-modal-body" class="modal-body">
-        <form method="post" id="form_comment_update" action="{{ request.path }}">
+        {# the action needs the get parameters to use the proxy manager -> get_full_path #}
+        <form method="post" id="form_comment_update" action="{{ request.get_full_path }}">
             {% csrf_token %}
             <div class="form-group row">
                 {% bootstrap_field form.link_type form_group_class="col-md-4" %}
