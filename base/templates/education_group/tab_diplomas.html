@@ -25,54 +25,30 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block content %}
+{% block top_action_bar %}
+    {% include "education_group/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown" tab_to_show='diplomas_certificates' %}
+{% endblock %}
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <div class="row">
-            {% include "education_group/blocks/hamburger_button.html" %}
-            <div class="pull-right" style="margin-right: 15px;">
-                {% include "education_group/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown" tab_to_show='diplomas_certificates'%}
-            </div>
-        </div>
-    </div>
-    <div class="panel-body" id="tabs">
-        <div class="tab-content" id="tab_content">
-            <div role="tabpanel" class="tab-pane active" id="diplomas">
-                <div class="row" style="display:flex;">
-                    {% include "education_group/training_tree.html" %}
-                    <div id="panel-data" class="col-md-12" style="height: 100%;">
+{% block details %}
+    <label>{% trans 'Leads to diploma/certificate' %}</label><br>
+    {{ education_group_year.joint_diploma|yesno|title }}
 
-                        {% include "education_group/tabs.html" %}
+    <br><br>
 
-                        <br>
+    <label>{% trans 'Diploma title' %}</label><br>
+    {{ education_group_year.diploma_printing_title | default_if_none:'-' }}
 
-                        <label>{% trans 'Leads to diploma/certificate' %}</label><br>
-                        {{ education_group_year.joint_diploma|yesno|title }}
+    <br><br>
 
-                        <br><br>
+    <label>{% trans 'Professionnal title' %}</label><br>
+    {{ education_group_year.professional_title | default_if_none:'-' }}
 
-                        <label>{% trans 'Diploma title'%}</label><br>
-                        {{education_group_year.diploma_printing_title | default_if_none:'-'}}
+    <br><br>
 
-                        <br><br>
-
-                        <label>{% trans 'Professionnal title'%}</label><br>
-                        {{education_group_year.professional_title | default_if_none:'-'}}
-
-                        <br><br>
-
-                        <label>{% trans 'certificate aims'|capfirst %}</label><br>
-                        <ul>
-                            {% for aim in education_group_year.certificate_aims.all %}
-                                <li>{{ aim.section }} - {{ aim.code }} {{ aim.description }}</li>
-                            {% endfor %}
-                        </ul>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    <label>{% trans 'certificate aims'|capfirst %}</label><br>
+    <ul>
+        {% for aim in education_group_year.certificate_aims.all %}
+            <li>{{ aim.section }} - {{ aim.code }} {{ aim.description }}</li>
+        {% endfor %}
+    </ul>
 {% endblock %}

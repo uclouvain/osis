@@ -25,176 +25,174 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+{% block top_action_bar %}
+    {% include "education_group/blocks/dropdown/administrative_data_actions_bar.html" with dropdirection="dropdown" %}
+{% endblock %}
 
-{% block content %}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <div class="row">
-            {% include "education_group/blocks/hamburger_button.html" %}
-            <div class="pull-right" style="margin-right: 15px;">
-                {% include "education_group/blocks/dropdown/administrative_data_actions_bar.html" with dropdirection="dropdown"%}
-            </div>
+{% block details %}
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <label>{% trans 'Course enrollment' %}</label><br>
+            {% if course_enrollment.dates and course_enrollment.dates.start_date %}
+                <label>{% trans 'From' %}</label>
+                {{ course_enrollment.dates.start_date| default_if_none:'-'|date:"d/m/Y" }}
+                <label>{% trans 'to' %}</label>
+                {{ course_enrollment.dates.end_date| default_if_none:'-'|date:"d/m/Y" }}
+            {% endif %}
+            <br>
+            <table class="table">
+                <thead>
+                <tr>
+                    <td></td>
+                    <td><label>{% trans 'Session' %} 1</label></td>
+                    <td><label>{% trans 'Session' %} 2</label></td>
+                    <td><label>{% trans 'Session' %} 3</label></td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><label>{% trans 'Exams Enrollments' %}</label></td>
+                    <td>
+                        {% if exam_enrollments.session1 and exam_enrollments.session1.start_date %}
+                            <label>{% trans 'From' %}</label>
+                            {{ exam_enrollments.session1.start_date| default_if_none:'-'|date:"d/m/Y" }}
+                            <label>{% trans 'to' %}</label>
+                            {{ exam_enrollments.session1.end_date| default_if_none:'-'|date:"d/m/Y" }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if exam_enrollments.session2 and exam_enrollments.session2.start_date %}
+                            <label>{% trans 'From' %}</label>
+                            {{ exam_enrollments.session2.start_date| default_if_none:'-'|date:"d/m/Y" }}
+                            <label>{% trans 'to' %}</label>
+                            {{ exam_enrollments.session2.end_date| default_if_none:'-'|date:"d/m/Y" }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if exam_enrollments.session3 and exam_enrollments.session3.start_date %}
+                            <label>{% trans 'From' %}</label>
+                            {{ exam_enrollments.session3.start_date| default_if_none:'-'|date:"d/m/Y" }}
+                            <label>{% trans 'to' %}</label>
+                            {{ exam_enrollments.session3.end_date | default_if_none:'-'|date:"d/m/Y" }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td><label>{% trans 'Marks presentation' %}</label></td>
+                    <td>{{ scores_exam_submission.session1.start_date| default_if_none:'-'|date:"d/m/Y" }}</td>
+                    <td>{{ scores_exam_submission.session2.start_date| default_if_none:'-'|date:"d/m/Y" }}</td>
+                    <td>{{ scores_exam_submission.session3.start_date| default_if_none:'-'|date:"d/m/Y" }}</td>
+                </tr>
+                <tr>
+                    <td><label>{% trans 'Dissertation submission' %}</label></td>
+                    <td>{{ dissertation_submission.session1.start_date| default_if_none:'-'|date:"d/m/Y" }}</td>
+                    <td>{{ dissertation_submission.session2.start_date| default_if_none:'-'|date:"d/m/Y" }}</td>
+                    <td>{{ dissertation_submission.session3.start_date| default_if_none:'-'|date:"d/m/Y" }}</td>
+                </tr>
+                <tr>
+                    <td><label>{% trans 'Deliberation' %}</label></td>
+                    <td>
+                        {% if deliberation.session1 and deliberation.session1.start_date %}
+                            {{ deliberation.session1.start_date| default_if_none:''|date:"d/m/Y" }}
+                            <label>{% trans 'at' %}</label>
+                            {{ deliberation.session1.start_date | default_if_none:'-'|date:"H:i" }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if deliberation.session2 and deliberation.session2.start_date %}
+                            {{ deliberation.session2.start_date| default_if_none:'-'|date:"d/m/Y" }}
+                            <label>{% trans 'at' %}</label>
+                            {{ deliberation.session2.start_date | default_if_none:'-'|date:"H:i" }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if deliberation.session3 and deliberation.session3.start_date %}
+                            {{ deliberation.session3.start_date| default_if_none:'-'|date:"d/m/Y" }}
+                            <label>{% trans 'at' %}</label>
+                            {{ deliberation.session3.start_date | default_if_none:'-'|date:"H:i" }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td><label>{% trans 'Scores diffusion' %}</label></td>
+                    <td>
+                        {% if scores_exam_diffusion.session1 and scores_exam_diffusion.session1.start_date %}
+                            {{ scores_exam_diffusion.session1.start_date| default_if_none:'-'|date:"d/m/Y" }}
+                            <label>{% trans 'at' %}</label>
+                            {{ scores_exam_diffusion.session1.start_date | default_if_none:'-'|date:"H:i" }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if scores_exam_diffusion.session2 and scores_exam_diffusion.session2.start_date %}
+                            {{ scores_exam_diffusion.session2.start_date| default_if_none:'-'|date:"d/m/Y" }}
+                            <label>{% trans 'at' %}</label>
+                            {{ scores_exam_diffusion.session2.start_date | default_if_none:'-'|date:"H:i" }}
+                            </td>
+                        {% endif %}
+                    <td>
+                        {% if scores_exam_diffusion.session3 and scores_exam_diffusion.session3.start_date %}
+                            {{ scores_exam_diffusion.session3.start_date| default_if_none:'-'|date:"d/m/Y" }}
+                            <label>{% trans 'at' %}</label>
+                            {{ scores_exam_diffusion.session3.start_date | default_if_none:'-'|date:"H:i" }}
+                            </td>
+                        {% endif %}
+                </tr>
+                </tbody>
+            </table>
+
         </div>
     </div>
-    <div class="panel-body" id="tabs">
-        <div class="tab-content" id="tab_content">
-            <div role="tabpanel" class="tab-pane active" id="administrative_data">
-                <div class="row" style="display:flex;">
-                    {% include "education_group/training_tree.html" %}
-                    <div id="panel-data" class="col-md-12" style="height: 100%;">
-                        {% include "education_group/tabs.html" %}
-                        <br>
-                        <div class="panel panel-default">
-                            <div class="panel-body">
-                                <label>{% trans 'Course enrollment' %}</label><br>
-                                {% if course_enrollment.dates and course_enrollment.dates.start_date %}
-                                   <label>{% trans 'From' %}</label> {{course_enrollment.dates.start_date| default_if_none:'-'|date:"d/m/Y"}} <label>{% trans 'to' %}</label> {{course_enrollment.dates.end_date| default_if_none:'-'|date:"d/m/Y"}}
-                                {% endif %}
-                                <br>
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <td></td>
-                                            <td><label>{% trans 'Session' %} 1</label></td>
-                                            <td><label>{% trans 'Session' %} 2</label></td>
-                                            <td><label>{% trans 'Session' %} 3</label></td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><label>{% trans 'Exams Enrollments' %}</label></td>
-                                            <td>
-                                                {% if exam_enrollments.session1 and exam_enrollments.session1.start_date %}
-                                                    <label>{% trans 'From' %}</label> {{exam_enrollments.session1.start_date| default_if_none:'-'|date:"d/m/Y"}} <label>{% trans 'to' %}</label> {{ exam_enrollments.session1.end_date| default_if_none:'-'|date:"d/m/Y" }}
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                {% if exam_enrollments.session2 and exam_enrollments.session2.start_date %}
-                                                    <label>{% trans 'From' %}</label> {{exam_enrollments.session2.start_date| default_if_none:'-'|date:"d/m/Y"}} <label>{% trans 'to' %}</label> {{ exam_enrollments.session2.end_date| default_if_none:'-'|date:"d/m/Y" }}
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                {% if exam_enrollments.session3 and exam_enrollments.session3.start_date %}
-                                                    <label>{% trans 'From' %}</label> {{exam_enrollments.session3.start_date| default_if_none:'-'|date:"d/m/Y"}} <label>{% trans 'to' %}</label> {{ exam_enrollments.session3.end_date | default_if_none:'-'|date:"d/m/Y"}}
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><label>{% trans 'Marks presentation' %}</label></td>
-                                            <td>{{scores_exam_submission.session1.start_date| default_if_none:'-'|date:"d/m/Y"}}</td>
-                                            <td>{{scores_exam_submission.session2.start_date| default_if_none:'-'|date:"d/m/Y"}}</td>
-                                            <td>{{scores_exam_submission.session3.start_date| default_if_none:'-'|date:"d/m/Y"}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td><label>{% trans 'Dissertation submission' %}</label></td>
-                                            <td>{{dissertation_submission.session1.start_date| default_if_none:'-'|date:"d/m/Y"}}</td>
-                                            <td>{{dissertation_submission.session2.start_date| default_if_none:'-'|date:"d/m/Y"}}</td>
-                                            <td>{{dissertation_submission.session3.start_date| default_if_none:'-'|date:"d/m/Y"}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td><label>{% trans 'Deliberation' %}</label></td>
-                                            <td>
-                                                {% if deliberation.session1 and deliberation.session1.start_date %}
-                                                    {{ deliberation.session1.start_date| default_if_none:''|date:"d/m/Y"}} <label>{% trans 'at' %}</label> {{ deliberation.session1.start_date | default_if_none:'-'|date:"H:i"}}
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                {% if deliberation.session2 and deliberation.session2.start_date %}
-                                                    {{ deliberation.session2.start_date| default_if_none:'-'|date:"d/m/Y"}} <label>{% trans 'at' %}</label> {{ deliberation.session2.start_date | default_if_none:'-'|date:"H:i"}}
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                {% if deliberation.session3 and deliberation.session3.start_date %}
-                                                    {{ deliberation.session3.start_date| default_if_none:'-'|date:"d/m/Y"}} <label>{% trans 'at' %}</label> {{ deliberation.session3.start_date | default_if_none:'-'|date:"H:i"}}
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><label>{% trans 'Scores diffusion' %}</label></td>
-                                            <td>
-                                                {% if scores_exam_diffusion.session1 and scores_exam_diffusion.session1.start_date %}
-                                                    {{ scores_exam_diffusion.session1.start_date| default_if_none:'-'|date:"d/m/Y"}} <label>{% trans 'at' %}</label> {{ scores_exam_diffusion.session1.start_date | default_if_none:'-'|date:"H:i"}}
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                {% if scores_exam_diffusion.session2 and scores_exam_diffusion.session2.start_date %}
-                                                    {{ scores_exam_diffusion.session2.start_date| default_if_none:'-'|date:"d/m/Y"}} <label>{% trans 'at' %}</label> {{ scores_exam_diffusion.session2.start_date | default_if_none:'-'|date:"H:i"}}</td>
-                                                {% endif %}
-                                            <td>
-                                                {% if scores_exam_diffusion.session3 and scores_exam_diffusion.session3.start_date %}
-                                                    {{ scores_exam_diffusion.session3.start_date| default_if_none:'-'|date:"d/m/Y"}} <label>{% trans 'at' %}</label> {{ scores_exam_diffusion.session3.start_date | default_if_none:'-'|date:"H:i"}}</td>
-                                                {% endif %}
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                            </div>
-                        </div>
-                        <br>
-                        <div class="panel panel-default">
-                            <div class="panel-heading"><label>{% trans 'Additional info' %}</label></div>
-                            <div class="panel-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>{% trans 'Weighting' %}</label><br>
-                                        {% if education_group_year.weighting %}
-                                            {% trans 'yes' %}
-                                        {% else %}
-                                            {% trans 'no' %}
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label>{% trans 'Default learning unit enrollment' %}</label><br>
-                                        {% if education_group_year.default_learning_unit_enrollment %}
-                                            {% trans 'yes' %}
-                                        {% else %}
-                                            {% trans 'no' %}
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <br>
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <label>{% trans 'Jury'%}</label>
-                            </div>
-                            <div class="panel-body">
-                                {% if mandataries %}
-                                    {% for mandatary in mandataries %}
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <label>{% trans mandatary.mandate.function %}</label><br>
-                                                {{ mandatary.person }}
-
-                                            </div>
-                                        {% if mandatary.mandate.qualification %}
-                                            <div class="col-md-8">
-                                                <label>{% trans 'Signatory qualification' %}</label><br>
-                                                {{ mandatary.mandate.qualification }}<br>
-                                            </div>
-                                        {% endif %}
-                                        </div>
-                                        <br>
-                                    {% endfor%}
-                                {%endif%}
-                            </div>
-                        </div>
-                        <br>
-                        <div class="panel panel-default">
-                            <div class="panel-heading"> <label>{% trans 'Administration'%}</label></div>
-                            <div class="panel-body">
-                                {% if pgm_mgrs %}
-                                    {% for pgm_mgr in pgm_mgrs %}
-                                        {{ pgm_mgr.person }}<br>
-                                    {% endfor%}
-                                {%endif%}
-                            </div>
-                        </div>
-                    </div>
+    <br>
+    <div class="panel panel-default">
+        <div class="panel-heading"><label>{% trans 'Additional info' %}</label></div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>{% trans 'Weighting' %}</label><br>
+                    {{ education_group_year.weighting | yesno }}
+                </div>
+                <div class="col-md-6">
+                    <label>{% trans 'Default learning unit enrollment' %}</label><br>
+                    {{ education_group_year.default_learning_unit_enrollment | yesno }}
                 </div>
             </div>
         </div>
     </div>
-</div>
+    <br>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <label>{% trans 'Jury' %}</label>
+        </div>
+        <div class="panel-body">
+            {% if mandataries %}
+                {% for mandatary in mandataries %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>{% trans mandatary.mandate.function %}</label><br>
+                            {{ mandatary.person }}
+
+                        </div>
+                        {% if mandatary.mandate.qualification %}
+                            <div class="col-md-8">
+                                <label>{% trans 'Signatory qualification' %}</label><br>
+                                {{ mandatary.mandate.qualification }}<br>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <br>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    <br>
+    <div class="panel panel-default">
+        <div class="panel-heading"><label>{% trans 'Administration' %}</label></div>
+        <div class="panel-body">
+            {% if pgm_mgrs %}
+                {% for pgm_mgr in pgm_mgrs %}
+                    {{ pgm_mgr.person }}<br>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

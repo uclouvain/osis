@@ -1,3 +1,5 @@
+// FIXME this method has been override by another script block
+
 $(document).ready(function()
 {
     $('#tbl_coorganization').DataTable(
