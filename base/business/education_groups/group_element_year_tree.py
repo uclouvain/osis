@@ -51,13 +51,23 @@ class NodeBranchJsTree:
         for group_element_year in self.get_queryset():
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
                 node = NodeBranchJsTree(self.root, group_element_year, parent=self)
-                # When the link is a reference, we have to hide the node and attach its children to its parent.
-                if self.reference:
-                    self.parent.children.append(node)
-                else:
-                    self.children.append(node)
+
             elif group_element_year.child_leaf:
-                self.children.append(NodeLeafJsTree(self.root, group_element_year))
+                node = NodeLeafJsTree(self.root, group_element_year)
+
+            else:
+                continue
+
+            self._append_node(node)
+
+    def _append_node(self, node):
+        """
+        When the link is a reference, we have to hide the node and attach its children to its parent.
+        """
+        if self.reference:
+            self.parent.children.append(node)
+        else:
+            self.children.append(node)
 
     def get_queryset(self):
         has_prerequisite = PrerequisiteItem.objects.filter(
@@ -82,7 +92,7 @@ class NodeBranchJsTree:
         return {
             'text': self.education_group_year.verbose,
             'icon': self.icon,
-            'children': [child.to_json() for child in self.children],
+            'children': [child.to_json() for child in self.children if not child.reference],
             'a_attr': {
                 'href': self.get_url(),
                 'root': self.root.pk,
