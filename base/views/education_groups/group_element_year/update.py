@@ -34,13 +34,13 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from django.views.generic import DeleteView, FormView, CreateView
+from django.views.generic import DeleteView
 from django.views.generic import UpdateView
 from waffle.decorators import waffle_flag
 
 from base.business import group_element_years
 from base.business.group_element_years.management import SELECT_CACHE_KEY, select_education_group_year, \
-    select_learning_unit_year, initial_for_group_element_year
+    select_learning_unit_year
 from base.forms.education_group.group_element_year import UpdateGroupElementYearForm
 from base.models.education_group_year import EducationGroupYear
 from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException
@@ -143,12 +143,6 @@ def _detach(request, group_element_year, *args, **kwargs):
 
 @require_http_methods(['GET', 'POST'])
 def _attach(request, group_element_year, *args, **kwargs):
-    return CreateGroupElementYearView.as_view()(
-        request,
-        group_element_year_id=group_element_year.pk,
-        *args,
-        **kwargs
-    )
     parent = kwargs['element']
     try:
         group_element_years.management.attach_from_cache(parent)
@@ -233,23 +227,6 @@ class UpdateGroupElementYearView(GenericUpdateGroupElementYearMixin, UpdateView)
     # SuccessMessageMixin
     def get_success_message(self, cleaned_data):
         return _("The comments of %(acronym)s has been updated") % {'acronym': self.object.child}
-
-    def get_success_url(self):
-        return reverse("education_group_content", args=[self.kwargs["root_id"], self.education_group_year.pk])
-
-
-class CreateGroupElementYearView(GenericUpdateGroupElementYearMixin, CreateView):
-    # UpdateView
-    form_class = UpdateGroupElementYearForm
-    template_name = "education_group/group_element_year_comment_inner.html"
-
-    def get_initial(self):
-        initial_for_group_element_year(self.parent, )
-        return super().get_initial()
-
-    # SuccessMessageMixin
-    def get_success_message(self, cleaned_data):
-        return _("The link of %(acronym)s has been updated") % {'acronym': self.object.child}
 
     def get_success_url(self):
         return reverse("education_group_content", args=[self.kwargs["root_id"], self.education_group_year.pk])
