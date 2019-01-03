@@ -122,7 +122,6 @@ class NodeBranchJsTree:
 
 
 class NodeLeafJsTree(NodeBranchJsTree):
-    """ The leaf has no child """
     element_type = LEARNING_UNIT_YEAR
 
     @property
@@ -166,5 +165,5 @@ class NodeLeafJsTree(NodeBranchJsTree):
         return url + self.url_group_to_parent()
 
     def generate_children(self):
-        """ The leaf has no children """
+        """ The leaf does not have children """
         return

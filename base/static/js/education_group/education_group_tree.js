@@ -75,7 +75,7 @@ $(document).ready(function () {
                 // the key is important if you have multiple trees in the same domain
                 // The key includes the root_id
                 "key": location.pathname.split('/', 3).join('/'),
-                "opened":true,
+                "opened": true,
                 "selected": false,
             },
             "contextmenu": {
@@ -90,7 +90,11 @@ $(document).ready(function () {
                             $.ajax({
                                 url: management_url,
                                 dataType: 'json',
-                                data: {'element_id': element_id, 'group_element_year_id': group_element_year_id, 'action': 'select'},
+                                data: {
+                                    'element_id': element_id,
+                                    'group_element_year_id': group_element_year_id,
+                                    'action': 'select'
+                                },
                                 type: 'POST',
                                 success: function (jsonResponse) {
                                     displayInfoMessage(jsonResponse, 'message_info_container')
@@ -103,14 +107,22 @@ $(document).ready(function () {
                         "label": gettext("Attach"),
                         "separator_before": true,
                         "action": function (data) {
-                            var __ret = get_data_from_tree(data);
-                            var group_element_year_id = __ret.group_element_year_id;
-                            var element_id = __ret.element_id;
-                            var attach_data = build_url_data(element_id, group_element_year_id, 'attach');
-                            window.location.href = management_url + "?" + attach_data;
+                            let __ret = get_data_from_tree(data);
+                            let group_element_year_id = __ret.group_element_year_id;
+                            let element_id = __ret.element_id;
+                            let attach_data = build_url_data(element_id, group_element_year_id, 'attach');
+
+                            $('#form-modal-ajax-content').load(management_url, attach_data, function (response, status, xhr) {
+                                if (status === "success") {
+                                    $('#form-ajax-modal').modal('toggle');
+                                    formAjaxSubmit('#form-modal-ajax-content form', '#form-ajax-modal');
+                                } else {
+                                    window.location.href = management_url + "?" + attach_data
+                                }
+                            });
                         },
                         "_disabled": function (data) {
-                            var __ret = get_data_from_tree(data);
+                            let __ret = get_data_from_tree(data);
                             return __ret.element_type === "learningunityear";
                         }
                     },
@@ -128,11 +140,10 @@ $(document).ready(function () {
                             var detach_data = build_url_data(element_id, group_element_year_id, 'detach');
 
                             $('#form-modal-ajax-content').load(management_url, detach_data, function (response, status, xhr) {
-                                if ( status === "success" ){
+                                if (status === "success") {
                                     $('#form-ajax-modal').modal('toggle');
                                     formAjaxSubmit('#form-modal-ajax-content form', '#form-ajax-modal');
-                                }
-                                else {
+                                } else {
                                     window.location.href = management_url + "?" + detach_data
                                 }
 
@@ -141,7 +152,11 @@ $(document).ready(function () {
                             $.ajax({
                                 url: management_url,
                                 dataType: 'json',
-                                data: {'element_id': element_id, 'group_element_year_id': group_element_year_id, 'action': 'select'},
+                                data: {
+                                    'element_id': element_id,
+                                    'group_element_year_id': group_element_year_id,
+                                    'action': 'select'
+                                },
                                 type: 'POST',
                                 success: function (jsonResponse) {
                                     displayInfoMessage(jsonResponse, 'message_info_container')
