@@ -84,8 +84,9 @@ class EditChargeRepartition(EditAttributionView):
     }
 
     def get_success_message(self, forms):
-        return _("Repartition modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
-                                                                         "function": _(self.attribution.function)}
+        return _("Repartition modified for %(tutor)s (%(function)s)") %\
+                        {"tutor": self.attribution.tutor.person,
+                         "function": _(self.attribution.get_function_display())}
 
 
 class AddChargeRepartition(EditAttributionView):
@@ -123,5 +124,6 @@ class AddChargeRepartition(EditAttributionView):
         return None
 
     def get_success_message(self, forms):
-        return _("Repartition added for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
-                                                                      "function": _(self.attribution.function)}
+        return _("Repartition added for %(tutor)s (%(function)s)") %\
+                        {"tutor": self.attribution.tutor.person,
+                         "function": _(self.attribution.get_function_display())}
