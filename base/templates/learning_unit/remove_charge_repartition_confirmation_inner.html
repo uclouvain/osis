@@ -28,7 +28,7 @@
 
     <form method="post" id="form_delete_attribution" action="{{ request.path }}">
         {% csrf_token %}
-        <p>{% trans "delete" %} {{ attribution.tutor.person }} ({% trans attribution.get_function_display  %})</p>
+        <p>{% trans "delete" %} {{ attribution.tutor.person }} ({{ attribution.get_function_display  }})</p>
         <p>{%trans "Are you sure?" %}</p>
 
         {% if not request.is_ajax %}
