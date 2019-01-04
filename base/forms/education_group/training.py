@@ -172,9 +172,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
                 self.fields['joint_diploma'].initial = True
                 self.fields['diploma_printing_title'].required = True
             else:
-                self.fields['joint_diploma'].initial = False
                 self.fields['diploma_printing_title'].required = False
-
 
     def save(self, commit=True):
         education_group_year = super().save(commit=False)
