@@ -36,12 +36,11 @@ class NodeBranchJsTree:
     """ Use to generate json from a list of education group years compatible with jstree """
     element_type = EDUCATION_GROUP_YEAR
 
-    def __init__(self, root, group_element_year=None, parent=None):
+    def __init__(self, root, group_element_year=None):
 
         self.children = []
         self.root = root
         self.group_element_year = group_element_year
-        self.parent = parent
         self.reference = self.group_element_year.link_type == REFERENCE if self.group_element_year else False
         self.icon = self._get_icon()
 
@@ -50,7 +49,7 @@ class NodeBranchJsTree:
     def generate_children(self):
         for group_element_year in self.get_queryset():
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
-                node = NodeBranchJsTree(self.root, group_element_year, parent=self)
+                node = NodeBranchJsTree(self.root, group_element_year)
 
             elif group_element_year.child_leaf:
                 node = NodeLeafJsTree(self.root, group_element_year)
@@ -58,15 +57,6 @@ class NodeBranchJsTree:
             else:
                 continue
 
-            self._append_node(node)
-
-    def _append_node(self, node):
-        """
-        When the link is a reference, we have to hide the node and attach its children to its parent.
-        """
-        if self.reference:
-            self.parent.children.append(node)
-        else:
             self.children.append(node)
 
     def get_queryset(self):
@@ -92,7 +82,7 @@ class NodeBranchJsTree:
         return {
             'text': self.education_group_year.verbose,
             'icon': self.icon,
-            'children': [child.to_json() for child in self.children if not child.reference],
+            'children': [child.to_json() for child in self.children],
             'a_attr': {
                 'href': self.get_url(),
                 'root': self.root.pk,
@@ -105,8 +95,7 @@ class NodeBranchJsTree:
         }
 
     def _get_icon(self):
-        """ If the parent is a reference link, change the icon. """
-        if getattr(self.parent, 'reference', False):
+        if self.reference:
             return static('img/reference.jpg')
 
     @property
