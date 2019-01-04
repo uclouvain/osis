@@ -40,7 +40,6 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, link_type, quadrimesters
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.models.learning_unit_year import LearningUnitYear
-from osis_common.decorators.deprecated import deprecated
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -136,13 +135,17 @@ class GroupElementYear(OrderedModel):
 
     own_comment = models.CharField(max_length=500, blank=True, null=True)
 
-    quadrimester_derogation = models.CharField(max_length=10,
-                                               choices=quadrimesters.DEROGATION_QUADRIMESTERS,
-                                               blank=True, null=True, verbose_name=_('Quadrimester derogation'))
+    quadrimester_derogation = models.CharField(
+        max_length=10,
+        choices=quadrimesters.DEROGATION_QUADRIMESTERS,
+        blank=True, null=True, verbose_name=_('Quadrimester derogation')
+    )
 
-    link_type = models.CharField(max_length=25,
-                                 choices=link_type.LINK_TYPE,
-                                 blank=True, null=True, verbose_name=_('Link type'))
+    link_type = models.CharField(
+        max_length=25,
+        choices=link_type.LINK_TYPE,
+        blank=True, null=True, verbose_name=_('Link type')
+    )
 
     order_with_respect_to = 'parent'
 
@@ -216,28 +219,6 @@ def search(**kwargs):
         queryset = queryset.filter(child_leaf=kwargs['child_leaf'])
 
     return queryset
-
-
-def get_group_element_year_by_id(id):
-    return GroupElementYear.objects.get(id=id)
-
-
-# TODO : education_group_yr.parent.all() instead
-@deprecated
-def find_by_parent(an_education_group_year):
-    return GroupElementYear.objects.filter(parent=an_education_group_year)
-
-
-# TODO : education_group_yr.child_branch.all() instead
-@deprecated
-def find_by_child_branch(an_education_group_year):
-    return GroupElementYear.objects.filter(child_branch=an_education_group_year)
-
-
-# TODO : education_group_yr.child_leaf.all() instead
-@deprecated
-def find_by_child_leaf(learning_unit_year):
-    return GroupElementYear.objects.filter(child_leaf=learning_unit_year)
 
 
 def find_learning_unit_formations(objects, parents_as_instances=False):
