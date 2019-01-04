@@ -26,7 +26,6 @@
 
 from django.contrib import messages
 from django.db.models import Prefetch, Q
-from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -200,5 +199,6 @@ class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView)
         return response
 
     def get_success_message(self):
-        return _("Attribution removed for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
-                                                                        "function": _(self.attribution.function)}
+        return _("Attribution removed for %(tutor)s (%(function)s)") %\
+                        {"tutor": self.attribution.tutor.person,
+                         "function": _(self.attribution.get_function_display())}
