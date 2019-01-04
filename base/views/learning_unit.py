@@ -32,7 +32,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
@@ -69,8 +69,9 @@ ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
 def learning_unit_formations(request, learning_unit_year_id):
     context = get_common_context_learning_unit_year(learning_unit_year_id, get_object_or_404(Person, user=request.user))
     learn_unit_year = context["learning_unit_year"]
-    group_elements_years = mdl.group_element_year.search(child_leaf=learn_unit_year) \
-        .select_related("parent", "child_leaf", "parent__education_group_type").order_by('parent__partial_acronym')
+    group_elements_years = learn_unit_year.child_leaf.select_related(
+        "parent", "child_leaf", "parent__education_group_type"
+    ).order_by('parent__partial_acronym')
     education_groups_years = [group_element_year.parent for group_element_year in group_elements_years]
     formations_by_educ_group_year = mdl.group_element_year.find_learning_unit_formations(education_groups_years,
                                                                                          parents_as_instances=True)
@@ -80,7 +81,7 @@ def learning_unit_formations(request, learning_unit_year_id):
     context['root_formations'] = education_group_year.find_with_enrollments_count(learn_unit_year)
     context['experimental_phase'] = True
 
-    return layout.render(request, "learning_unit/formations.html", context)
+    return render(request, "learning_unit/formations.html", context)
 
 
 @login_required
@@ -116,7 +117,7 @@ def learning_unit_attributions(request, learning_unit_year_id):
 
     warning_msgs = get_charge_repartition_warning_messages(context["learning_unit_year"].learning_container_year)
     display_warning_messages(request, warning_msgs)
-    return layout.render(request, "learning_unit/attributions.html", context)
+    return render(request, "learning_unit/attributions.html", context)
 
 
 @login_required
@@ -141,7 +142,7 @@ def learning_unit_specifications(request, learning_unit_year_id):
     context.update({'LANGUAGE_CODE_FR': settings.LANGUAGE_CODE_FR, 'LANGUAGE_CODE_EN': settings.LANGUAGE_CODE_EN})
     context['can_update_learning_achievement'] = can_update_learning_achievement(learning_unit_year, person)
     context['experimental_phase'] = True
-    return layout.render(request, "learning_unit/specifications.html", context)
+    return render(request, "learning_unit/specifications.html", context)
 
 
 @login_required
@@ -171,7 +172,7 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
     user_language = mdl.person.get_user_interface_language(request.user)
     context['text_label_translated'] = get_text_label_translated(text_lb, user_language)
     context['language_translated'] = find_language_in_settings(language)
-    return layout.render(request, "learning_unit/specifications_edit.html", context)
+    return render(request, "learning_unit/specifications_edit.html", context)
 
 
 @login_required
@@ -196,7 +197,7 @@ def learning_unit_component_edit(request, learning_unit_year_id):
                                          instance=context['learning_component_year'])
     form.load_initial()  # Load data from database
     context['form'] = form
-    return layout.render(request, "learning_unit/component_edit.html", context)
+    return render(request, "learning_unit/component_edit.html", context)
 
 
 @login_required

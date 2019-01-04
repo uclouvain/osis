@@ -107,12 +107,10 @@ class TestBuildTree(TestCase):
     def test_build_tree_reference(self):
         """
         This tree contains a reference link.
-        The icon of its children should be adapted and the referenced node shoudn't appear in the json tree.
         """
         self.group_element_year_1.link_type = REFERENCE
         self.group_element_year_1.save()
 
         node = NodeBranchJsTree(self.parent)
 
-        self.assertEqual(node.children[0].group_element_year, self.group_element_year_1_1)
         self.assertEqual(node.children[0]._get_icon(),  static('img/reference.jpg'))
