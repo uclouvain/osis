@@ -26,195 +26,184 @@
 {% load bootstrap3 %}
 {% load i18n %}
 {% load staticfiles %}
+{% block top_action_bar %}
+    {% if can_edit_information %}
+        <a class="btn btn-default btn-publish" style="margin-right: 20px;"
+           href="{% url 'education_group_publish' parent.pk education_group_year.id %}">
+            {% trans 'Publish' %}
+        </a>
+    {% endif %}
+{% endblock %}
 
-{% block content %}
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <div class="row">
-                {% include "education_group/blocks/hamburger_button.html" %}
-                {% if can_edit_information %}
-                <div class="pull-right" style="margin-right: 15px;">
-                    <a class="btn btn-default btn-publish" style="margin-right: 20px;" href="{% url 'education_group_publish' parent.pk education_group_year.id %}">
-                        {% trans 'Publish' %}
-                    </a>
+
+{% block details %}
+    <div class="row">
+        {% if info.is_common %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="alert_message" text=_("Alert Message") field=admission_condition.text_alert_message field_en=admission_condition.text_alert_message_en %}
+        {% endif %}
+
+        {% if info.is_common and info.is_bachelor %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_generales" text=_("General Conditions") field=admission_condition.text_ca_bacs_cond_generales field_en=admission_condition.text_ca_bacs_cond_generales_en %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_particulieres" text=_("Specific Conditions") field=admission_condition.text_ca_bacs_cond_particulieres field_en=admission_condition.text_ca_bacs_cond_particulieres %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_examen_langue" text=_("Language Exam") field=admission_condition.text_ca_bacs_examen_langue field_en=admission_condition.text_ca_bacs_examen_langue_en %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_speciales" text=_("Special Conditions") field=admission_condition.text_ca_bacs_cond_speciales field_en=admission_condition.text_ca_bacs_cond_speciales_en %}
+        {% endif %}
+
+        {% if info.show_free_text %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="free" text=_("Free Text") field=admission_condition.text_free field_en=admission_condition.text_free_en %}
+        {% endif %}
+
+        {% if info.show_components_for_agreg_and_mc %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_cond_generales" text=_("General Conditions") field=admission_condition.text_ca_cond_generales field_en=admission_condition.text_ca_cond_generales_en %}
+        {% endif %}
+        {% if info.show_components_for_agreg %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_maitrise_fr" text=_("French language proficiency examination") field=admission_condition.text_ca_maitrise_fr field_en=admission_condition.text_ca_maitrise_en %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_allegement" text=_("Reduction") field=admission_condition.text_ca_allegement field_en=admission_condition.text_ca_allegement_en %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_ouv_adultes" text=_("Opening to Adults") field=admission_condition.text_ca_ouv_adultes field_en=admission_condition.text_ca_ouv_adultes_en %}
+        {% endif %}
+        {% if info.is_specific and info.is_master %}
+            <div id="university_bachelors">
+                <h3>{% trans 'University Bachelors' %}</h3>
+                <div class="dropdown" style="margin-bottom: 10px;">
+                    <button class="btn btn-primary dropdown-toggle" type="button"
+                            data-toggle="dropdown">
+                        {{ language.tab_lang }}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        {% for lang in language.list %}
+                            {% if lang != language.tab_lang %}
+                                <li>
+                                    <a href="{% url 'tab_lang_edit' root.pk education_group_year.pk lang %}">{{ lang }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
                 </div>
-                {% endif %}
+                {% language language.tab_lang %}
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th width="30%">{% trans 'Diploma' %}</th>
+                            <th width="20%">{% trans 'Conditions' %}</th>
+                            <th width="150px">{% trans 'Access' %}</th>
+                            <th>{% trans 'Remarks' %}</th>
+                            {% if can_edit_information %}
+                                <th width="10%">{% trans 'Actions' %}</th>{% endif %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="ucl_bachelors" header_text=_("UCL Bachelors") records=record.ucl_bachelors %}
+                        {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="others_bachelors_french" header_text=_("Others Bachelors of the French speaking Community of Belgium") records=record.others_bachelors_french %}
+                        {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="bachelors_dutch" header_text=_("Bachelors of the Dutch speaking Community of Belgium") records=record.bachelors_dutch %}
+                        {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="foreign_bachelors" header_text=_("Foreign Bachelors") records=record.foreign_bachelors %}
+                        </tbody>
+                    </table>
+                {% endlanguage %}
+                <hr/>
             </div>
-        </div>
-        <div class="panel-body" id="tabs">
-            <div class="tab-content" id="tab_content">
-                <div role="tabpanel" class="tab-pane active" id="admission_conditions">
-                    <div class="row" style="display:flex;">
-                        {% include "education_group/training_tree.html" %}
-                        <div id="panel-data" class="col-md-12" style="height: 100%;">
-                            {% include "education_group/tabs.html" %}
-                            <br/>
-
-                            <div class="row">
-                                {% if info.is_common %}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="alert_message" text=_("Alert Message") field=admission_condition.text_alert_message field_en=admission_condition.text_alert_message_en%}
-                                {% endif %}
-
-                                {% if info.is_common and info.is_bachelor %}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_generales" text=_("General Conditions") field=admission_condition.text_ca_bacs_cond_generales field_en=admission_condition.text_ca_bacs_cond_generales_en%}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_particulieres" text=_("Specific Conditions") field=admission_condition.text_ca_bacs_cond_particulieres field_en=admission_condition.text_ca_bacs_cond_particulieres%}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_examen_langue" text=_("Language Exam") field=admission_condition.text_ca_bacs_examen_langue field_en=admission_condition.text_ca_bacs_examen_langue_en%}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_speciales" text=_("Special Conditions") field=admission_condition.text_ca_bacs_cond_speciales field_en=admission_condition.text_ca_bacs_cond_speciales_en%}
-                                {% endif %}
-
-                                {% if info.show_free_text %}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="free" text=_("Free Text") field=admission_condition.text_free field_en=admission_condition.text_free_en %}
-                                {% endif %}
-
-                                {% if info.show_components_for_agreg_and_mc %}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_cond_generales" text=_("General Conditions") field=admission_condition.text_ca_cond_generales field_en=admission_condition.text_ca_cond_generales_en %}
-                                {% endif %}
-                                {% if info.show_components_for_agreg %}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_maitrise_fr" text=_("French language proficiency examination") field=admission_condition.text_ca_maitrise_fr field_en=admission_condition.text_ca_maitrise_en %}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_allegement" text=_("Reduction") field=admission_condition.text_ca_allegement field_en=admission_condition.text_ca_allegement_en %}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_ouv_adultes" text=_("Opening to Adults") field=admission_condition.text_ca_ouv_adultes field_en=admission_condition.text_ca_ouv_adultes_en %}
-                                {% endif %}
-                                {% if info.is_specific and info.is_master %}
-                                    <div id="university_bachelors">
-                                        <h3>{% trans 'University Bachelors' %}</h3>
-                                        <div class="dropdown" style="margin-bottom: 10px;">
-                                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
-                                                {{ language.tab_lang }}
-                                                <span class="caret"></span>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                {% for lang in language.list %}
-                                                    {% if lang != language.tab_lang %}
-                                                        <li><a href="{% url 'tab_lang_edit' root.pk education_group_year.pk lang %}">{{ lang }}</a></li>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
-                                        {% language language.tab_lang %}
-                                            <table class="table table-bordered">
-                                                <thead>
-                                                <tr>
-                                                    <th width="30%">{% trans 'Diploma' %}</th>
-                                                    <th width="20%">{% trans 'Conditions' %}</th>
-                                                    <th width="150px">{% trans 'Access' %}</th>
-                                                    <th>{% trans 'Remarks' %}</th>
-                                                    {% if can_edit_information %}<th width="10%">{% trans 'Actions' %}</th>{% endif %}
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="ucl_bachelors" header_text=_("UCL Bachelors") records=record.ucl_bachelors %}
-                                                {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="others_bachelors_french" header_text=_("Others Bachelors of the French speaking Community of Belgium") records=record.others_bachelors_french %}
-                                                {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="bachelors_dutch" header_text=_("Bachelors of the Dutch speaking Community of Belgium") records=record.bachelors_dutch %}
-                                                {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="foreign_bachelors" header_text=_("Foreign Bachelors") records=record.foreign_bachelors %}
-                                                </tbody>
-                                            </table>
-                                        {% endlanguage %}
-                                        <hr/>
-                                    </div>
-                                {% endif %}
-                                {% if info.is_master %}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="non_university_bachelors" text=_("Non university Bachelors") field=admission_condition.text_non_university_bachelors field_en=admission_condition.text_non_university_bachelors_en %}
-                                {% endif %}
-                                {% if info.is_specific and info.is_master %}
-                                    <div id="holders_second_university_degree">
-                                        <h3>{% trans 'Holders of a 2nd cycle University degree' %}</h3>
-                                        <div class="dropdown" style="margin-bottom: 10px;">
-                                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
-                                                {{ language.tab_lang }}
-                                                <span class="caret"></span>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                {% for lang in language.list %}
-                                                    {% if lang != language.tab_lang %}
-                                                        <li><a href="{% url 'tab_lang_edit' root.pk education_group_year.pk lang %}">
-                                                            {{ lang }}
-                                                        </a></li>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
-                                        {% language language.tab_lang %}
-                                            <table class="table table-bordered">
-                                                <thead>
-                                                <tr>
-                                                    <th width="30%">{% trans 'Diploma' %}</th>
-                                                    <th width="20%">{% trans 'Conditions' %}</th>
-                                                    <th width="150px">{% trans 'Access' %}</th>
-                                                    <th>{% trans 'Remarks' %}</th>
-                                                    {% if can_edit_information %}<th width="10%">{% trans 'Actions' %}</th>{% endif %}
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="graduates" header_text=_("Graduates") records=record.graduates %}
-                                                {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="masters" header_text=_("Masters") records=record.masters %}
-                                                </tbody>
-                                            </table>
-                                        {% endlanguage %}
-                                    </div>
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="holders_non_university_second_degree" text=_("Holders of a non-University 2nd cycle degree") field=admission_condition.text_holders_non_university_second_degree field_en=admission_condition.text_holders_non_university_second_degree_en %}
-                                {% endif %}
-                                {% if info.is_master %}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="adults_taking_up_university_training" text=_("Adults taking up their university training") field=admission_condition.text_adults_taking_up_university_training field_en=admission_condition.text_adults_taking_up_university_training_en %}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="personalized_access" text=_("Personalized access") field=admission_condition.text_personalized_access field_en=admission_condition.text_personalized_access_en %}
-                                    {% include 'education_group/blocks/admission_condition_text.html' with section_name="admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=admission_condition.text_admission_enrollment_procedures field_en=admission_condition.text_admission_enrollment_procedures_en %}
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+        {% endif %}
+        {% if info.is_master %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="non_university_bachelors" text=_("Non university Bachelors") field=admission_condition.text_non_university_bachelors field_en=admission_condition.text_non_university_bachelors_en %}
+        {% endif %}
+        {% if info.is_specific and info.is_master %}
+            <div id="holders_second_university_degree">
+                <h3>{% trans 'Holders of a 2nd cycle University degree' %}</h3>
+                <div class="dropdown" style="margin-bottom: 10px;">
+                    <button class="btn btn-primary dropdown-toggle" type="button"
+                            data-toggle="dropdown">
+                        {{ language.tab_lang }}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        {% for lang in language.list %}
+                            {% if lang != language.tab_lang %}
+                                <li>
+                                    <a href="{% url 'tab_lang_edit' root.pk education_group_year.pk lang %}">
+                                        {{ lang }}
+                                    </a></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
                 </div>
+                {% language language.tab_lang %}
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th width="30%">{% trans 'Diploma' %}</th>
+                            <th width="20%">{% trans 'Conditions' %}</th>
+                            <th width="150px">{% trans 'Access' %}</th>
+                            <th>{% trans 'Remarks' %}</th>
+                            {% if can_edit_information %}
+                                <th width="10%">{% trans 'Actions' %}</th>{% endif %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="graduates" header_text=_("Graduates") records=record.graduates %}
+                        {% include 'education_group/blocks/admission_condition_table_row.html' with section_name="masters" header_text=_("Masters") records=record.masters %}
+                        </tbody>
+                    </table>
+                {% endlanguage %}
             </div>
-        </div>
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="holders_non_university_second_degree" text=_("Holders of a non-University 2nd cycle degree") field=admission_condition.text_holders_non_university_second_degree field_en=admission_condition.text_holders_non_university_second_degree_en %}
+        {% endif %}
+        {% if info.is_master %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="adults_taking_up_university_training" text=_("Adults taking up their university training") field=admission_condition.text_adults_taking_up_university_training field_en=admission_condition.text_adults_taking_up_university_training_en %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="personalized_access" text=_("Personalized access") field=admission_condition.text_personalized_access field_en=admission_condition.text_personalized_access_en %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=admission_condition.text_admission_enrollment_procedures field_en=admission_condition.text_admission_enrollment_procedures_en %}
+        {% endif %}
     </div>
 
+
     {% if can_edit_information %}
-    <div class="modal fade" id="modify_text" role="dialog" data-backdrop="static"></div>
-    <div class="modal fade" id="save_term" role="dialog" data-backdrop="static"></div>
+        <div class="modal fade" id="modify_text" role="dialog" data-backdrop="static"></div>
+        <div class="modal fade" id="save_term" role="dialog" data-backdrop="static"></div>
     {% endif %}
 
 {% endblock %}
 
 {% block script %}
     {% if can_edit_information %}
-    <script>
-        $('a.line-edit-btn').click(function (evt) {
-            evt.preventDefault();
-            var url = $(this).data('form');
-            var modal = $('#save_term');
-            modal.load(url, function() {
-               $(this).modal('show');
+        <script>
+            $('a.line-edit-btn').click(function (evt) {
+                evt.preventDefault();
+                var url = $(this).data('form');
+                var modal = $('#save_term');
+                modal.load(url, function () {
+                    $(this).modal('show');
+                });
+                return false;
             });
-            return false;
-        });
 
-        $('a.modify-text-btn').click(function (evt) {
-            evt.preventDefault();
-            var url = $(this).data('form');
-            var modal = $("#modify_text");
-            modal.load(url, function() {
-                $(this).modal('show');
+            $('a.modify-text-btn').click(function (evt) {
+                evt.preventDefault();
+                var url = $(this).data('form');
+                var modal = $("#modify_text");
+                modal.load(url, function () {
+                    $(this).modal('show');
+                });
+                return false;
             });
-            return false;
-        });
 
-        $('a.action-order').click(function(evt) {
-            evt.preventDefault();
-            var record = $(this).data('record'),
-                action = $(this).data('action');
+            $('a.action-order').click(function (evt) {
+                evt.preventDefault();
+                var record = $(this).data('record'),
+                    action = $(this).data('action');
 
-            $.ajax({
-                type: 'POST',
-                url: "{% url 'education_group_year_admission_condition_line_order' root.pk education_group_year.pk %}",
-                dataType: 'json',
-                data: JSON.stringify({'record': record, 'action': action}),
-                success: function(xhr, ajaxOptions, thrownError) {
-                    if (xhr.hasOwnProperty('success_url')) {
-                        window.location.href = xhr['success_url'];
-                    } else {
-                        window.location.reload();
+                $.ajax({
+                    type: 'POST',
+                    url: "{% url 'education_group_year_admission_condition_line_order' root.pk education_group_year.pk %}",
+                    dataType: 'json',
+                    data: JSON.stringify({'record': record, 'action': action}),
+                    success: function (xhr, ajaxOptions, thrownError) {
+                        if (xhr.hasOwnProperty('success_url')) {
+                            window.location.href = xhr['success_url'];
+                        } else {
+                            window.location.reload();
+                        }
                     }
-                }
-            })
-        });
-    </script>
+                })
+            });
+        </script>
     {% endif %}
 {% endblock %}

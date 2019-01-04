@@ -25,36 +25,17 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+{% block top_action_bar %}
+    {% include "education_group/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown" %}
+{% endblock %}
 
-{% block content %}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <div class="row">
-            {% include "education_group/blocks/hamburger_button.html" %}
-            <div class="pull-right" style="margin-right: 15px;">
-                {% include "education_group/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown"%}
-            </div>
-        </div>
-    </div>
-    <div class="panel-body" id="tabs">
-        <div class="tab-content" id="tab_content">
-            <div role="tabpanel" class="tab-pane active" id="content">
-                <div class="row" style="display:flex;">
-                    {% include "education_group/training_tree.html" %}
-                    <div id="panel-data" class="col-md-12" style="height: 100%;">
-                        {% include "education_group/tabs.html" %}
-                        <br>
-                        {% if show_minor_major_option_table %}
-                            {% include "education_group/blocks/content_minor_major_option_table.html" %}
-                        {% else %}
-                            {% include "education_group/blocks/content_default_table.html" %}
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
+{% block details %}
+    {% if show_minor_major_option_table %}
+        {% include "education_group/blocks/content_minor_major_option_table.html" %}
+    {% else %}
+        {% include "education_group/blocks/content_default_table.html" %}
+    {% endif %}
 {% endblock %}
 
 {% block script %}
