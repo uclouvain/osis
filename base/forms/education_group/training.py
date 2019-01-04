@@ -167,12 +167,13 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
                                                     .select_related('decree')\
                                                     .order_by('-decree__name', 'name')
 
-        if not self.initial['academic_year']:
+        if not getattr(self.initial, 'academic_year', None):
             self.set_initial_diploma_values()
 
     def set_initial_diploma_values(self):
         """Set initial diploma values for update form"""
-        if self.education_group_type.name in TrainingType.with_diploma_values_set_initially_as_true():
+        if self.education_group_type and \
+                self.education_group_type.name in TrainingType.with_diploma_values_set_initially_as_true():
             self.fields['joint_diploma'].initial = True
             self.fields['diploma_printing_title'].required = True
         else:
