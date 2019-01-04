@@ -67,13 +67,12 @@ class GroupElementYearForm(forms.ModelForm):
                     child_type=self.instance.child_branch.education_group_type,
                     reference=True,
             ).exists():
-                raise forms.ValidationError(_(
+                self.add_error('link_type', _(
                     "You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
                 ) % {
                         "parent_type": self.instance.parent.education_group_type,
                         "child_type": self.instance.child_branch.education_group_type,
-                    }
-                )
+                    })
             elif self.instance.child_leaf:
-                raise forms.ValidationError(_("You are not allowed to create a reference with a learning unit"))
+                self.add_error('link_type', _("You are not allowed to create a reference with a learning unit"))
         return data_cleaned

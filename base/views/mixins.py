@@ -82,7 +82,8 @@ class AjaxTemplateMixin:
             ]
         return template_names
 
-    def _convert_template_name_to_ajax_template_name(self, template_name):
+    @staticmethod
+    def _convert_template_name_to_ajax_template_name(template_name):
         if "_inner.html" not in template_name:
             split = template_name.split('.html')
             split[-1] = '_inner'
@@ -91,31 +92,25 @@ class AjaxTemplateMixin:
         return template_name
 
     def form_valid(self, form):
-        redirect = super().form_valid(form)
-
-        # When the form is saved, we return only the url, not all the template
-        if self.request.is_ajax():
-            return JsonResponse({"success": True, "success_url": self.get_success_url()})
-        else:
-            return redirect
+        response = super().form_valid(form)
+        return self._ajax_response() or response
 
     def forms_valid(self, forms):
-        redirect = super().forms_valid(forms)
-
-        # When the form is saved, we return only the url, not all the template
-        if self.request.is_ajax():
-            return JsonResponse({"success": True, "success_url": self.get_success_url()})
-        else:
-            return redirect
+        response = super().forms_valid(forms)
+        return self._ajax_response() or response
 
     def delete(self, request, *args, **kwargs):
-        redirect = super().delete(request, *args, **kwargs)
+        response = super().delete(request, *args, **kwargs)
+        return self._ajax_response() or response
 
+    def _ajax_response(self):
         # When the form is saved, we return only the url, not all the template
         if self.request.is_ajax():
-            return JsonResponse({"success": True, "success_url": self.get_success_url()})
-        else:
-            return redirect
+            response = {"success": True}
+            url = self.get_success_url()
+            if url:
+                response['success_url'] = url
+            return JsonResponse(response)
 
 
 class DeleteViewWithDependencies(FlagMixin, RulesRequiredMixin, AjaxTemplateMixin, DeleteView):

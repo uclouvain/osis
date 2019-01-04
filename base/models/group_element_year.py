@@ -25,6 +25,7 @@
 ##############################################################################
 import itertools
 
+from django.core.exceptions import ValidationError
 from django.db import models, IntegrityError
 from django.db.models import Q, F, Case, When
 from django.utils import translation
@@ -187,14 +188,16 @@ class GroupElementYear(OrderedModel):
         ordering = ('order',)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        if self.child_branch and self.child_leaf:
-            raise IntegrityError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))
-        if self.child_branch == self.parent:
-            raise IntegrityError(_("It is forbidden to attach an element to itself."))
-        if self.parent and self.child_branch in self.parent.ascendants_of_branch:
-            raise IntegrityError(_("It is forbidden to attach an element to one of its included elements."))
-
+        self.clean()
         return super().save(force_insert, force_update, using, update_fields)
+
+    def clean(self):
+        if self.child_branch and self.child_leaf:
+            raise ValidationError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))
+        if self.child_branch == self.parent:
+            raise ValidationError(_("It is forbidden to attach an element to itself."))
+        if self.parent and self.child_branch in self.parent.ascendants_of_branch:
+            raise ValidationError(_("It is forbidden to attach an element to one of its included elements."))
 
     @cached_property
     def child(self):

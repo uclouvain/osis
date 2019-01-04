@@ -154,6 +154,7 @@ class TestUpdate(TestCase):
 
     def test_permission_required(self):
         response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
 
         self.mocked_perm.assert_called_once_with(self.person, self.education_group_year, raise_exception=True)
 
@@ -396,7 +397,7 @@ class TestSelectAttach(TestCase):
 
     def test_select_case_education_group(self):
         response = self.client.post(
-            self.url_management,
+            self.append_get_data(self.url_management, self.select_data),
             data=self.select_data,
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
@@ -449,12 +450,15 @@ class TestSelectAttach(TestCase):
 
         # Select :
         self.client.post(
-            self.url_management,
+            self.append_get_data(self.url_management, self.select_data),
             data=self.select_data
         )
 
         # Attach :
-        self.client.post(self.url_management, data=self.attach_data, HTTP_REFERER='http://foo/bar')
+        self.client.post(
+            self.append_get_data(self.url_management, self.attach_data),
+            data=self.attach_data, HTTP_REFERER='http://foo/bar'
+        )
 
         expected_group_element_year_count = GroupElementYear.objects.filter(
             parent=self.new_parent_education_group_year,
@@ -463,6 +467,10 @@ class TestSelectAttach(TestCase):
         self.assertEqual(expected_group_element_year_count, 1)
 
         self._assert_link_with_inital_parent_present()
+
+    @staticmethod
+    def append_get_data(url, data):
+        return url + '?' + '&'.join(str(k) + '=' + str(v) for k, v in data.items())
 
     def test_attach_case_child_education_group_year_without_authorized_relationship_fails(self):
         expected_absent_group_element_year = GroupElementYear.objects.filter(
@@ -631,7 +639,8 @@ class TestSelectAttach(TestCase):
                 self.child_education_group_year.id
             ]
         )
-        response = self.client.get(self.url_management, data=self.attach_data, follow=True, HTTP_REFERER=http_referer)
+        response = self.client.get(self.append_get_data(self.url_management, self.attach_data),
+                                   data=self.attach_data, follow=True, HTTP_REFERER=http_referer)
 
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)

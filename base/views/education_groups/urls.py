@@ -93,6 +93,9 @@ urlpatterns = [
         url(r'^select/$', education_group_select, name='education_group_select'),
         url(r'^content/', include([
             url(u'^$', detail.EducationGroupContent.as_view(), name='education_group_content'),
+            url(u'^create/$', group_element_year.create.CreateGroupElementYearView.as_view(),
+                name='education_group_attach'
+                ),
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
                 url(r'^comment/$', group_element_year.update.UpdateGroupElementYearView.as_view(),
                     name="group_element_year_management_comment")

@@ -25,21 +25,17 @@
 ##############################################################################
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import cache
-from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from django.views.generic import DeleteView, CreateView
 from django.views.generic import UpdateView
 from waffle.decorators import waffle_flag
 
-from base.business import group_element_years
 from base.business.group_element_years.management import SELECT_CACHE_KEY, select_education_group_year, \
     select_learning_unit_year, extract_child_from_cache
 from base.forms.education_group.group_element_year import GroupElementYearForm
@@ -49,10 +45,12 @@ from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.utils.utils import get_object_or_none
 from base.utils.cache import cache
-from base.views.common import display_success_messages, display_warning_messages, display_error_messages
+from base.views.common import display_success_messages, display_warning_messages
 from base.views.education_groups import perms
+from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
+from base.views.education_groups.group_element_year.create import CreateGroupElementYearView
+from base.views.education_groups.group_element_year.delete import DetachGroupElementYearView
 from base.views.education_groups.select import build_success_message, build_success_json_response
-from base.views.mixins import AjaxTemplateMixin, FlagMixin, RulesRequiredMixin
 
 
 @login_required
@@ -85,7 +83,7 @@ def management(request):
 
 
 def _get_data_from_request(request, name):
-    return getattr(request, "GET", {}).get(name)
+    return getattr(request, request.method, {}).get(name)
 
 
 def _get_concerned_object(element_id, group_element_year):
@@ -112,7 +110,7 @@ def _check_perm_for_management(request, element, group_element_year):
         perms.can_change_education_group(request.user, group_element_year.parent)
     elif _get_data_from_request(request, 'action') in actions_needing_perm_on_education_group_year_itself:
         # In this case, element MUST BE an EducationGroupYear (we cannot take action on a learning_unit_year)
-        if type(element) != EducationGroupYear:
+        if isinstance(element, EducationGroupYear):
             raise ValidationError(
                 "It is forbidden to update the content of an object which is not an EducationGroupYear"
             )
@@ -188,71 +186,14 @@ def _get_action_method(request):
         'attach': _attach,
         'select': _select,
     }
-    data = getattr(request, "GET", {})
+    data = getattr(request, request.method, {})
     action = data.get('action')
     if action not in available_actions.keys():
         raise AttributeError('Action should be {}'.format(','.join(available_actions.keys())))
     return available_actions[action]
 
 
-@method_decorator(login_required, name='dispatch')
-class GenericUpdateGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin):
-    model = GroupElementYear
-    context_object_name = "group_element_year"
-    pk_url_kwarg = "group_element_year_id"
-
-    # FlagMixin
-    flag = "education_group_update"
-
-    # RulesRequiredMixin
-    raise_exception = True
-    rules = [perms.can_change_education_group]
-
-    def _call_rule(self, rule):
-        """ The permission is computed from the education_group_year """
-        return rule(self.request.user, self.education_group_year)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['root'] = self.kwargs["root_id"]
-        return context
-
-    @property
-    def education_group_year(self):
-        parent = self.kwargs.get('parent')
-        if parent:
-            return parent
-        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("education_group_year_id"))
-
-    def get_root(self):
-        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
-
-
-class CreateGroupElementYearView(GenericUpdateGroupElementYearMixin, CreateView):
-    # CreateView
-    form_class = GroupElementYearForm
-    template_name = "education_group/group_element_year_comment_inner.html"
-
-    def get_form_kwargs(self):
-        """ For the creation, the group_element_year needs a parent and a child """
-        kwargs = super().get_form_kwargs()
-
-        kwargs.update({
-            'parent': self.kwargs['parent'],
-            'child_branch': self.kwargs.get('child_branch'),
-            'child_leaf': self.kwargs.get('child_leaf')
-        })
-        return kwargs
-
-    # SuccessMessageMixin
-    def get_success_message(self, cleaned_data):
-        return _("The link of %(acronym)s has been created") % {'acronym': self.object.child}
-
-    def get_success_url(self):
-        return self.kwargs.get('http_referer')
-
-
-class UpdateGroupElementYearView(GenericUpdateGroupElementYearMixin, UpdateView):
+class UpdateGroupElementYearView(GenericGroupElementYearMixin, UpdateView):
     # UpdateView
     form_class = GroupElementYearForm
     template_name = "education_group/group_element_year_comment_inner.html"
@@ -263,45 +204,3 @@ class UpdateGroupElementYearView(GenericUpdateGroupElementYearMixin, UpdateView)
 
     def get_success_url(self):
         return reverse("education_group_content", args=[self.kwargs["root_id"], self.education_group_year.pk])
-
-
-class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView):
-    # DeleteView
-    template_name = "education_group/group_element_year/confirm_detach_inner.html"
-
-    def delete(self, request, *args, **kwargs):
-        child_leaf = self.get_object().child_leaf
-        child_branch = self.get_object().child_branch
-        parent = self.get_object().parent
-        if child_leaf and child_leaf.has_or_is_prerequisite(parent):
-            # FIXME Method should be in permission to view and display message in page
-            error_msg = \
-                _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
-                    "acronym": child_leaf.acronym
-                }
-            display_error_messages(request, error_msg)
-            return JsonResponse({"error": True, "success_url": self.get_success_url()})
-        if child_branch and \
-                group_element_years.management.is_min_child_reached(parent, child_branch.education_group_type):
-            error_msg = \
-                _("Cannot detach child \"%(child)s\". "
-                  "The parent must have at least one child of type \"%(type)s\".") % {
-                    "child": child_branch,
-                    "type": child_branch.education_group_type
-                }
-            display_error_messages(request, error_msg)
-            return JsonResponse({"error": True, "success_url": self.get_success_url()})
-
-        success_msg = _("\"%(child)s\" has been detached from \"%(parent)s\"") % {
-            'child': self.get_object().child,
-            'parent': self.get_object().parent,
-        }
-        display_success_messages(request, success_msg)
-        return super().delete(request, *args, **kwargs)
-
-    def _call_rule(self, rule):
-        """ The permission is computed from the parent education_group_year """
-        return rule(self.request.user, self.get_object().parent)
-
-    def get_success_url(self):
-        return self.kwargs.get('http_referer')

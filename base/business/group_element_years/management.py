@@ -23,10 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 
-from base.models import group_element_year, authorized_relationship
+from base.models import authorized_relationship
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import count_constraint
 from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException
@@ -53,23 +52,11 @@ def _set_selected_element_on_cache(id, modelname):
     return True
 
 
-def attach_from_cache(parent):
-    """ Fetch the child in user cache and get or create the group element year """
-    selected_data = cache.get(SELECT_CACHE_KEY)
-    if selected_data:
-        kwargs = extract_child_from_cache(parent, selected_data)
-
-        new_gey = group_element_year.get_or_create_group_element_year(**kwargs)
-
-        # Clear cache
-        cache.set(SELECT_CACHE_KEY, None, timeout=None)
-
-        return new_gey
-    raise ObjectDoesNotExist
-
-
 def extract_child_from_cache(parent, selected_data):
     kwargs = {'parent': parent}
+    if not selected_data:
+        return {}
+
     if selected_data['modelname'] == LEARNING_UNIT_YEAR:
         luy = LearningUnitYear.objects.get(pk=selected_data['id'])
         if not parent.education_group_type.learning_unit_child_allowed:

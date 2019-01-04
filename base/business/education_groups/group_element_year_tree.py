@@ -90,6 +90,7 @@ class NodeBranchJsTree:
                 'element_id': self.education_group_year.pk,
                 'element_type': self.element_type,
                 'title': self.education_group_year.acronym,
+                'attach_url': reverse('education_group_attach', args=[self.root.pk, self.education_group_year.pk])
             },
             'id': 'id_{}_{}'.format(self.education_group_year.pk, group_element_year_pk),
         }
