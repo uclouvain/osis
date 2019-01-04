@@ -25,7 +25,6 @@
 ##############################################################################
 from unittest import mock
 
-from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.http import HttpResponse
@@ -33,13 +32,13 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import CentralManagerFactory
-from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 
@@ -79,12 +78,6 @@ class TestDetach(TestCase):
         response = self.client.post(self.url, data=self.post_valid_data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self.assertTemplateUsed(response, "access_denied.html")
-
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
-    def test_detach_case_get_without_ajax_success(self, mock_permission):
-        response = self.client.get(self.url, data=self.post_valid_data, follow=True)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/group_element_year/confirm_detach_innner.html")
 
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
     def test_detach_case_get_with_ajax_success(self, mock_permission):

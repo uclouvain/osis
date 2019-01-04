@@ -25,7 +25,7 @@
 ##############################################################################
 from unittest import mock
 
-from django.db import IntegrityError
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from base.models import group_element_year
@@ -227,7 +227,8 @@ class TestFindBuildParentListByEducationGroupYearId(TestCase):
             self.current_academic_year = create_current_academic_year()
             self.child_leaf = LearningUnitYearFactory(academic_year=self.current_academic_year)
 
-        def _build_hierarchy(self, academic_year, direct_parent_type, child_leaf):
+        @staticmethod
+        def _build_hierarchy(academic_year, direct_parent_type, child_leaf):
             group_element_child = GroupElementYearFactory(
                 parent=EducationGroupYearFactory(academic_year=academic_year, education_group_type=direct_parent_type),
                 child_branch=None,
@@ -417,7 +418,7 @@ class TestSaveGroupElementYear(TestCase):
 
     def test_loop_save_on_itself_ko(self):
         egy = EducationGroupYearFactory()
-        with self.assertRaises(IntegrityError):
+        with self.assertRaises(ValidationError):
             GroupElementYearFactory(
                 parent=egy,
                 child_branch=egy,
@@ -437,7 +438,7 @@ class TestSaveGroupElementYear(TestCase):
             child_branch=egy2,
         )
 
-        with self.assertRaises(IntegrityError):
+        with self.assertRaises(ValidationError):
             GroupElementYearFactory(
                 parent=egy1,
                 child_branch=egy3,
@@ -446,7 +447,7 @@ class TestSaveGroupElementYear(TestCase):
     def test_save_with_child_branch_and_child_leaf_ko(self):
         egy = EducationGroupYearFactory()
         luy = LearningUnitYearFactory()
-        with self.assertRaises(IntegrityError):
+        with self.assertRaises(ValidationError):
             GroupElementYearFactory(
                 parent=egy,
                 child_branch=egy,

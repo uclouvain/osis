@@ -26,7 +26,7 @@
 import itertools
 
 from django.core.exceptions import ValidationError
-from django.db import models, IntegrityError
+from django.db import models
 from django.db.models import Q, F, Case, When
 from django.utils import translation
 from django.utils.functional import cached_property

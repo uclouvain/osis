@@ -450,14 +450,15 @@ class TestSelectAttach(TestCase):
 
         # Select :
         self.client.post(
-            self.append_get_data(self.url_management, self.select_data),
+            self.url_management,
             data=self.select_data
         )
 
         # Attach :
         self.client.post(
-            self.append_get_data(self.url_management, self.attach_data),
-            data=self.attach_data, HTTP_REFERER='http://foo/bar'
+            reverse("education_group_attach",
+                    args=[self.attach_data["root_id"],
+                          self.attach_data["element_id"]]),
         )
 
         expected_group_element_year_count = GroupElementYear.objects.filter(
@@ -639,10 +640,15 @@ class TestSelectAttach(TestCase):
                 self.child_education_group_year.id
             ]
         )
-        response = self.client.get(self.append_get_data(self.url_management, self.attach_data),
-                                   data=self.attach_data, follow=True, HTTP_REFERER=http_referer)
+        response = self.client.get(
+            reverse("education_group_attach",
+                    args=[self.attach_data["root_id"],
+                          self.attach_data["element_id"]]),
+        )
 
         messages = list(get_messages(response.wsgi_request))
+        print(messages)
+
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), _("Please Select or Move an item before Attach it"))
 

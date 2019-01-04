@@ -110,7 +110,7 @@ def _check_perm_for_management(request, element, group_element_year):
         perms.can_change_education_group(request.user, group_element_year.parent)
     elif _get_data_from_request(request, 'action') in actions_needing_perm_on_education_group_year_itself:
         # In this case, element MUST BE an EducationGroupYear (we cannot take action on a learning_unit_year)
-        if isinstance(element, EducationGroupYear):
+        if type(element) != EducationGroupYear:
             raise ValidationError(
                 "It is forbidden to update the content of an object which is not an EducationGroupYear"
             )
