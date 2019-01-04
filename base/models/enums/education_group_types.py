@@ -56,7 +56,7 @@ class TrainingType(ChoiceEnum):
     MASTER_MS_180_240 = _("Master MS 180-240")
     MASTER_M1 = _("Master in 60 credits")
     MASTER_MC = _("Master of specialist")
-    INTERNSHIP = pgettext_lazy("Intership for education group", "Internship")
+    INTERNSHIP = pgettext_lazy("Internship for education group", "Internship")
 
 
 class MiniTrainingType(ChoiceEnum):
