@@ -168,7 +168,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
                                                     .order_by('-decree__name', 'name')
 
         if self.initial['academic_year'] is None:
-            if self.education_group_type.name in TrainingType.default_value():
+            if self.education_group_type.name in TrainingType.with_diploma_values_set_initially_as_true():
                 self.fields['joint_diploma'].initial = True
                 self.fields['diploma_printing_title'].required = True
             else:
