@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-03 11:55+0100\n"
+"POT-Creation-Date: 2019-01-04 14:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3867,6 +3867,10 @@ msgstr ""
 #: tests/templatetags/test_education_group.py:439
 #, python-format
 msgid "The user has not permission to create a %(category)s."
+msgstr ""
+
+#: business/education_groups/perms.py:152
+msgid "The user is not attached to the management entity"
 msgstr ""
 
 #: business/learning_units/edition.py:617

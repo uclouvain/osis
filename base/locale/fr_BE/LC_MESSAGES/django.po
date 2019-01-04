@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-03 11:55+0100\n"
-"PO-Revision-Date: 2019-01-03 11:56+0100\n"
+"POT-Creation-Date: 2019-01-04 14:09+0100\n"
+"PO-Revision-Date: 2019-01-04 14:10+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_BE\n"
@@ -3971,6 +3971,10 @@ msgstr "L'utilisateur n'a pas la permission de modifier les formations."
 #, python-format
 msgid "The user has not permission to create a %(category)s."
 msgstr "L'utilisateur n'a pas la permission de créer une %(category)s."
+
+#: business/education_groups/perms.py:152
+msgid "The user is not attached to the management entity"
+msgstr "L'utilisateur n'est pas attaché à l'entité de gestion"
 
 #: business/learning_units/edition.py:617
 #: tests/business/learning_units/test_edition.py:465
