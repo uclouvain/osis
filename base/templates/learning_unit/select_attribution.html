@@ -45,7 +45,7 @@
                 {% for attribution in attributions %}
                     <tr>
                         <td>{{ attribution.tutor.person }}</td>
-                        <td>{% trans attribution.function %}</td>
+                        <td>{{ attribution.get_function_display }}</td>
                         <td>{{ attribution.start_year | default_if_none:'' }}</td>
                         <td>{{ attribution.duration | default_if_none:'' }}</td>
                         <td>{{ attribution.lecturing_charges.0.allocation_charge | floatformat:2 }}</td>
