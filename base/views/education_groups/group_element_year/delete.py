@@ -46,6 +46,14 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
         return context
 
     def _check_if_deletable(self, obj):
+        """
+        The use cannot delete the object if :
+            - the child has or is prerequisite
+            - the minimum of children is reached
+
+        In that case, a message will be display in the modal to block the post action.
+        """
+
         child_leaf = obj.child_leaf
         child_branch = obj.child_branch
         error_msg = ""

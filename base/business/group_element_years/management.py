@@ -25,7 +25,7 @@
 ##############################################################################
 from django.utils.translation import ugettext as _
 
-from base.models import authorized_relationship
+from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import count_constraint
 from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException
@@ -120,10 +120,10 @@ def _is_limit_child_reached(parent, child_education_group_type, boolean_func):
         child_branch__education_group_type=child_education_group_type
     ).count()
     try:
-        auth_rel = authorized_relationship.AuthorizedRelationship.objects.get(
+        auth_rel = AuthorizedRelationship.objects.get(
             parent_type=parent.education_group_type,
             child_type=child_education_group_type,
         )
-    except authorized_relationship.AuthorizedRelationship.DoesNotExist:
+    except AuthorizedRelationship.DoesNotExist:
         return True
     return boolean_func(number_children_of_same_type, auth_rel)

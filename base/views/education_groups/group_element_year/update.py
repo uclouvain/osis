@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -42,7 +41,6 @@ from base.models.utils.utils import get_object_or_none
 from base.views.common import display_success_messages
 from base.views.education_groups import perms
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
-from base.views.education_groups.group_element_year.delete import DetachGroupElementYearView
 from base.views.education_groups.select import build_success_message, build_success_json_response
 
 
@@ -90,7 +88,6 @@ def _get_concerned_object(element_id, group_element_year):
 
 def _check_perm_for_management(request, element, group_element_year):
     actions_needing_perm_on_parent = [
-        "detach",
         "up",
         "down",
     ]
@@ -114,16 +111,6 @@ def _down(request, group_element_year, *args, **kwargs):
     display_success_messages(request, success_msg)
 
 
-@require_http_methods(['GET', 'POST'])
-def _detach(request, group_element_year, *args, **kwargs):
-    return DetachGroupElementYearView.as_view()(
-        request,
-        group_element_year_id=group_element_year.pk,
-        *args,
-        **kwargs
-    )
-
-
 @require_http_methods(['POST'])
 def _select(request, group_element_year, *args, **kwargs):
     element = kwargs['element']
@@ -140,7 +127,6 @@ def _get_action_method(request):
     available_actions = {
         'up': _up,
         'down': _down,
-        'detach': _detach,
         'select': _select,
     }
     data = getattr(request, request.method, {})

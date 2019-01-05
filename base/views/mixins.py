@@ -28,7 +28,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
+from django.http import Http404, HttpResponseRedirect
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
