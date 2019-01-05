@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from django.db import IntegrityError
 from django.http import JsonResponse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DeleteView
@@ -39,7 +38,11 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        self._check_if_deletable(self.object)
+        if self._check_if_deletable(self.object):
+            context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s ? ") % {
+                "acronym": self.object.child.acronym
+            }
+
         return context
 
     def _check_if_deletable(self, obj):
@@ -67,7 +70,7 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
         if not self._check_if_deletable(obj):
-            return JsonResponse({"error": True, "success_url": self.get_success_url()})
+            return JsonResponse({"error": True})
 
         success_msg = _("\"%(child)s\" has been detached from \"%(parent)s\"") % {
             'child': obj.child,

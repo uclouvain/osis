@@ -140,6 +140,9 @@ class NodeLeafJsTree(NodeBranchJsTree):
                 'title': self.learning_unit_year.complete_title,
                 'has_prerequisite': self.group_element_year.has_prerequisite,
                 'is_prerequisite': self.group_element_year.is_prerequisite,
+                'detach_url': reverse('group_element_year_delete', args=[
+                    self.root.pk, self.group_element_year.parent.pk, self.group_element_year.pk
+                ]) if self.group_element_year else '#'
             },
             'id': 'id_{}_{}'.format(self.learning_unit_year.pk, group_element_year_pk),
         }

@@ -29,10 +29,7 @@
             {# the action needs the get parameters to use the proxy manager -> get_full_path #}
             <form method="post" id="form_detach_confirm" action="{{ request.get_full_path }}">
                 {% csrf_token %}
-                {% trans "Are you sure you want to detach this content?" %}
-                {% if not request.is_ajax %}
-                    <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-danger"/>
-                {% endif %}
+                {{ confirmation_message }}
             </form>
 
             <div class="modal-footer">
