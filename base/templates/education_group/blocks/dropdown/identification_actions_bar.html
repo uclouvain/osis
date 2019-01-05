@@ -111,9 +111,10 @@
 
 {% block script %}
     <script>
-        function select() {
-            $.post({
-                url: '../select/',
+        function select_education_group() {
+            $.ajax({
+                type: "POST",
+                url: "{% url "education_group_select" parent.pk education_group_year.pk %}",
                 data: {'element_id': {{ education_group_year.id }}},
                 dataType: 'json',
                 success: function (jsonResponse) {
