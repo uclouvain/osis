@@ -25,30 +25,23 @@
 ##############################################################################
 
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db import IntegrityError
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from django.utils import cache
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from django.views.generic import UpdateView
 from waffle.decorators import waffle_flag
 
-from base.business.group_element_years.management import SELECT_CACHE_KEY, select_education_group_year, \
-    select_learning_unit_year, extract_child_from_cache
+from base.business.group_element_years.management import select_education_group_year, \
+    select_learning_unit_year
 from base.forms.education_group.group_element_year import GroupElementYearForm
 from base.models.education_group_year import EducationGroupYear
-from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.utils.utils import get_object_or_none
-from base.utils.cache import cache
-from base.views.common import display_success_messages, display_warning_messages
+from base.views.common import display_success_messages
 from base.views.education_groups import perms
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
-from base.views.education_groups.group_element_year.create import CreateGroupElementYearView
 from base.views.education_groups.group_element_year.delete import DetachGroupElementYearView
 from base.views.education_groups.select import build_success_message, build_success_json_response
 
@@ -101,20 +94,10 @@ def _check_perm_for_management(request, element, group_element_year):
         "up",
         "down",
     ]
-    actions_needing_perm_on_education_group_year_itself = [
-        "attach",
-    ]
 
     if _get_data_from_request(request, 'action') in actions_needing_perm_on_parent:
         # In this case, element can be EducationGroupYear OR LearningUnitYear because we check perm on its parent
         perms.can_change_education_group(request.user, group_element_year.parent)
-    elif _get_data_from_request(request, 'action') in actions_needing_perm_on_education_group_year_itself:
-        # In this case, element MUST BE an EducationGroupYear (we cannot take action on a learning_unit_year)
-        if type(element) != EducationGroupYear:
-            raise ValidationError(
-                "It is forbidden to update the content of an object which is not an EducationGroupYear"
-            )
-        perms.can_change_education_group(request.user, element)
 
 
 @require_http_methods(['POST'])
@@ -141,31 +124,6 @@ def _detach(request, group_element_year, *args, **kwargs):
     )
 
 
-def _attach(request, group_element_year, *args, **kwargs):
-    try:
-        selected_data = cache.get(SELECT_CACHE_KEY)
-        kwargs.update(extract_child_from_cache(kwargs['element'], selected_data))
-        return CreateGroupElementYearView.as_view()(request, *args, **kwargs)
-
-    except ObjectDoesNotExist:
-        warning_msg = _("Please Select or Move an item before Attach it")
-        display_warning_messages(request, warning_msg)
-
-    except IncompatiblesTypesException as e:
-        warning_msg = e.errors
-        display_warning_messages(request, warning_msg)
-
-    except MaxChildrenReachedException as e:
-        warning_msg = e.errors
-        display_warning_messages(request, warning_msg)
-    except IntegrityError as e:
-        warning_msg = str(e)
-        display_warning_messages(request, warning_msg)
-
-    # Attach is display in a modal, so we have to return a json response to avoid a double redirection.
-    return JsonResponse({"success": True})
-
-
 @require_http_methods(['POST'])
 def _select(request, group_element_year, *args, **kwargs):
     element = kwargs['element']
@@ -183,7 +141,6 @@ def _get_action_method(request):
         'up': _up,
         'down': _down,
         'detach': _detach,
-        'attach': _attach,
         'select': _select,
     }
     data = getattr(request, request.method, {})

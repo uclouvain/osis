@@ -47,7 +47,8 @@ $(document).ready(function () {
             element_type: obj.a_attr.element_type,
             has_prerequisite: obj.a_attr.has_prerequisite,
             is_prerequisite: obj.a_attr.is_prerequisite,
-            attach_url: obj.a_attr.attach_url
+            attach_url: obj.a_attr.attach_url,
+            detach_url: obj.a_attr.detach_url
         };
     }
 
@@ -129,36 +130,18 @@ $(document).ready(function () {
                         "label": gettext("Detach"),
                         "action": function (data) {
                             var __ret = get_data_from_tree(data);
-                            var group_element_year_id = __ret.group_element_year_id;
-                            var element_id = __ret.element_id;
-                            if (group_element_year_id === '0') {
+                            if (__ret.detach_url === '#') {
                                 return;
                             }
 
-                            var detach_data = build_url_data(element_id, group_element_year_id, 'detach');
-
-                            $('#form-modal-ajax-content').load(management_url, detach_data, function (response, status, xhr) {
+                            $('#form-modal-ajax-content').load(__ret.detach_url, function (response, status, xhr) {
                                 if (status === "success") {
                                     $('#form-ajax-modal').modal('toggle');
                                     formAjaxSubmit('#form-modal-ajax-content form', '#form-ajax-modal');
                                 } else {
-                                    window.location.href = management_url + "?" + detach_data
+                                    window.location.href = __ret.detach_url
                                 }
 
-                            });
-
-                            $.ajax({
-                                url: management_url,
-                                dataType: 'json',
-                                data: {
-                                    'element_id': element_id,
-                                    'group_element_year_id': group_element_year_id,
-                                    'action': 'select'
-                                },
-                                type: 'POST',
-                                success: function (jsonResponse) {
-                                    displayInfoMessage(jsonResponse, 'message_info_container')
-                                }
                             });
                         },
                         "_disabled": function (data) {
