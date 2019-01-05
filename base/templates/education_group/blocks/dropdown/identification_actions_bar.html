@@ -60,24 +60,19 @@
 
                 {% flag "education_group_attach" %}
                     <li {% if not can_change_education_group %}
-                                class="disabled"
-                            {% else %}
-                                class="trigger_modal"
-                                data-url="{% url 'education_group_attach' parent.id education_group_year.id %}"
-                            {% endif %}>
+                        class="disabled"
+                    {% else %}
+                        class="trigger_modal"
+                        data-url="{% url 'education_group_attach' parent.id education_group_year.id %}"
+                    {% endif %}>
                         <a>{% trans 'Attach' %}</a>
                     </li>
                 {% endflag %}
 
                 {% flag "education_group_detach" %}
-                    {# TODO The url should be compute in template tag : link_detach_education_group #}
                     {% if group_to_parent %}
-                        {% url_resolver_match as url_resolver_match %}
-                        {% url 'education_groups_management' as management_url %}
-                        {% url_add_query management_url root_id=parent.id element_id=education_group_year.id group_element_year_id=group_to_parent action="detach" source=url_resolver_match as detach_url %}
-
+                        {% url 'group_element_year_delete' parent.id education_group_year.id group_to_parent as detach_url %}
                     {% endif %}
-
                     {% link_detach_education_group detach_url %}
                 {% endflag %}
 
