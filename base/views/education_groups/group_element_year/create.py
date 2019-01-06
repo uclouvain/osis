@@ -48,6 +48,8 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
         try:
             selected_data = cache.get(SELECT_CACHE_KEY)
             cached_data = extract_child_from_cache(self.education_group_year, selected_data)
+            if not cached_data:
+                raise ObjectDoesNotExist
             kwargs.update({
                 'parent': self.education_group_year,
                 'child_branch': cached_data.get('child_branch'),

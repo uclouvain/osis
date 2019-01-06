@@ -69,7 +69,7 @@ urlpatterns = [
         create.SelectEducationGroupTypeView.as_view(),
         name='select_education_group_type'
     ),
-    url(r'^management/$', group_element_year.update.    management, name='education_groups_management'),
+    url(r'^management/$', group_element_year.update.management, name='education_groups_management'),
 
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
 
@@ -99,7 +99,7 @@ urlpatterns = [
                 url(r'^delete/$', group_element_year.delete.DetachGroupElementYearView.as_view(),
                     name='group_element_year_delete'),
                 url(r'^update/$', group_element_year.update.UpdateGroupElementYearView.as_view(),
-                    name="group_element_year_management_comment")
+                    name="group_element_year_update")
             ]))
         ])),
         url(r'^utilization/$', detail.EducationGroupUsing.as_view(), name='education_group_utilization'),
