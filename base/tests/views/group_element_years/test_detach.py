@@ -81,7 +81,11 @@ class TestDetach(TestCase):
 
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
     def test_detach_case_get_with_ajax_success(self, mock_permission):
-        response = self.client.get(self.url, data=self.post_valid_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = self.client.get(reverse("group_element_year_delete", args=[
+            self.education_group_year.id,
+            self.education_group_year.id,
+            self.group_element_year.id
+        ]), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "education_group/group_element_year/confirm_detach_inner.html")
 
@@ -95,8 +99,17 @@ class TestDetach(TestCase):
             self.education_group_year.id,
             self.education_group_year.id
         ])
-        response = self.client.post(self.url, data=self.post_valid_data, follow=True, HTTP_REFERER=http_referer)
+        response = self.client.post(reverse("group_element_year_delete", args=[
+            self.education_group_year.id,
+            self.education_group_year.id,
+            self.group_element_year.id
+        ]), follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        # response = self.client.post(self.url, data=self.post_valid_data, follow=True, HTTP_REFERER=http_referer)
         self.assertEqual(response.status_code, HttpResponse.status_code)
+        print(response)
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+        print(messages)
+        self.assertJSONEqual(str(response.content, encoding='utf8'), {})
         self.assertRedirects(response, http_referer)
         self.assertTrue(mock_delete.called)
 
@@ -177,4 +190,3 @@ class TestDetachLearningUnitPrerequisite(TestCase):
                 "acronym": self.luy.acronym}
         )
         self.assertFalse(mock_delete.called)
-

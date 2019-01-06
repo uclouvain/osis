@@ -45,7 +45,7 @@ class TestEdit(TestCase):
         cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year)
         cls.person = CentralManagerFactory()
         cls.url = reverse(
-            "group_element_year_management_comment",
+            "group_element_year_update",
             kwargs={
                 "root_id": cls.education_group_year.id,
                 "education_group_year_id": cls.education_group_year.id,
