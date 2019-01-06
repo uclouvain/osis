@@ -398,7 +398,7 @@ class TestSelectAttach(TestCase):
 
     def test_select_case_education_group(self):
         response = self.client.post(
-            self.append_get_data(self.url_management, self.select_data),
+            self.url_management,
             data=self.select_data,
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
@@ -469,10 +469,6 @@ class TestSelectAttach(TestCase):
         self.assertEqual(expected_group_element_year_count, 1)
 
         self._assert_link_with_inital_parent_present()
-
-    @staticmethod
-    def append_get_data(url, data):
-        return url + '?' + '&'.join(str(k) + '=' + str(v) for k, v in data.items())
 
     def test_attach_case_child_education_group_year_without_authorized_relationship_fails(self):
         expected_absent_group_element_year = GroupElementYear.objects.filter(
@@ -612,7 +608,7 @@ class TestSelectAttach(TestCase):
         self.assertEquals(expected_group_element_year_count, 1)
 
     def test_attach_without_selecting_gives_warning(self):
-        cache.set(management.SELECT_CACHE_KEY, None, timeout=None,)
+        cache.set(management.SELECT_CACHE_KEY, None, timeout=None, )
 
         expected_absent_group_element_year = GroupElementYear.objects.filter(
             parent=self.new_parent_education_group_year,
