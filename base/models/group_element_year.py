@@ -25,7 +25,8 @@
 ##############################################################################
 import itertools
 
-from django.db import models, IntegrityError
+from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models import Q, F, Case, When
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -38,9 +39,9 @@ from base.models import education_group_type, education_group_year
 from base.models.education_group_type import GROUP_TYPE_OPTION
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, link_type, quadrimesters
+from base.models.enums.link_type import LinkTypes
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.models.learning_unit_year import LearningUnitYear
-from osis_common.decorators.deprecated import deprecated
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -136,13 +137,17 @@ class GroupElementYear(OrderedModel):
 
     own_comment = models.CharField(max_length=500, blank=True, null=True)
 
-    quadrimester_derogation = models.CharField(max_length=10,
-                                               choices=quadrimesters.DEROGATION_QUADRIMESTERS,
-                                               blank=True, null=True, verbose_name=_('Quadrimester derogation'))
+    quadrimester_derogation = models.CharField(
+        max_length=10,
+        choices=quadrimesters.DEROGATION_QUADRIMESTERS,
+        blank=True, null=True, verbose_name=_('Quadrimester derogation')
+    )
 
-    link_type = models.CharField(max_length=25,
-                                 choices=link_type.LINK_TYPE,
-                                 blank=True, null=True, verbose_name=_('Link type'))
+    link_type = models.CharField(
+        max_length=25,
+        choices=LinkTypes.choices(),
+        blank=True, null=True, verbose_name=_('Link type')
+    )
 
     order_with_respect_to = 'parent'
 
@@ -184,14 +189,16 @@ class GroupElementYear(OrderedModel):
         ordering = ('order',)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        if self.child_branch and self.child_leaf:
-            raise IntegrityError("It is forbidden to save a GroupElementYear with a child branch and a child leaf.")
-        if self.child_branch == self.parent:
-            raise IntegrityError("It is forbidden to attach an element to itself.")
-        if self.parent and self.child_branch in self.parent.ascendants_of_branch:
-            raise IntegrityError("It is forbidden to attach an element to one of its included elements.")
-
+        self.clean()
         return super().save(force_insert, force_update, using, update_fields)
+
+    def clean(self):
+        if self.child_branch and self.child_leaf:
+            raise ValidationError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))
+        if self.child_branch == self.parent:
+            raise ValidationError(_("It is forbidden to attach an element to itself."))
+        if self.parent and self.child_branch in self.parent.ascendants_of_branch:
+            raise ValidationError(_("It is forbidden to attach an element to one of its included elements."))
 
     @cached_property
     def child(self):
@@ -216,28 +223,6 @@ def search(**kwargs):
         queryset = queryset.filter(child_leaf=kwargs['child_leaf'])
 
     return queryset
-
-
-def get_group_element_year_by_id(id):
-    return GroupElementYear.objects.get(id=id)
-
-
-# TODO : education_group_yr.parent.all() instead
-@deprecated
-def find_by_parent(an_education_group_year):
-    return GroupElementYear.objects.filter(parent=an_education_group_year)
-
-
-# TODO : education_group_yr.child_branch.all() instead
-@deprecated
-def find_by_child_branch(an_education_group_year):
-    return GroupElementYear.objects.filter(child_branch=an_education_group_year)
-
-
-# TODO : education_group_yr.child_leaf.all() instead
-@deprecated
-def find_by_child_leaf(learning_unit_year):
-    return GroupElementYear.objects.filter(child_leaf=learning_unit_year)
 
 
 def find_learning_unit_formations(objects, parents_as_instances=False):

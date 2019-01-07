@@ -46,7 +46,9 @@ $(document).ready(function () {
             element_id: obj.a_attr.element_id,
             element_type: obj.a_attr.element_type,
             has_prerequisite: obj.a_attr.has_prerequisite,
-            is_prerequisite: obj.a_attr.is_prerequisite
+            is_prerequisite: obj.a_attr.is_prerequisite,
+            attach_url: obj.a_attr.attach_url,
+            detach_url: obj.a_attr.detach_url
         };
     }
 
@@ -75,7 +77,7 @@ $(document).ready(function () {
                 // the key is important if you have multiple trees in the same domain
                 // The key includes the root_id
                 "key": location.pathname.split('/', 3).join('/'),
-                "opened":true,
+                "opened": true,
                 "selected": false,
             },
             "contextmenu": {
@@ -84,13 +86,17 @@ $(document).ready(function () {
                     "select": {
                         "label": gettext("Select"),
                         "action": function (data) {
-                            var __ret = get_data_from_tree(data);
-                            var element_id = __ret.element_id;
-                            var group_element_year_id = __ret.group_element_year_id;
+                            let __ret = get_data_from_tree(data);
+                            let element_id = __ret.element_id;
+                            let group_element_year_id = __ret.group_element_year_id;
                             $.ajax({
                                 url: management_url,
                                 dataType: 'json',
-                                data: {'element_id': element_id, 'group_element_year_id': group_element_year_id, 'action': 'select'},
+                                data: {
+                                    'element_id': element_id,
+                                    'group_element_year_id': group_element_year_id,
+                                    'action': 'select'
+                                },
                                 type: 'POST',
                                 success: function (jsonResponse) {
                                     displayInfoMessage(jsonResponse, 'message_info_container')
@@ -103,14 +109,19 @@ $(document).ready(function () {
                         "label": gettext("Attach"),
                         "separator_before": true,
                         "action": function (data) {
-                            var __ret = get_data_from_tree(data);
-                            var group_element_year_id = __ret.group_element_year_id;
-                            var element_id = __ret.element_id;
-                            var attach_data = build_url_data(element_id, group_element_year_id, 'attach');
-                            window.location.href = management_url + "?" + attach_data;
+                            let __ret = get_data_from_tree(data);
+
+                            $('#form-modal-ajax-content').load(__ret.attach_url, function (response, status, xhr) {
+                                if (status === "success") {
+                                    $('#form-ajax-modal').modal('toggle');
+                                    formAjaxSubmit('#form-modal-ajax-content form', '#form-ajax-modal');
+                                } else {
+                                    window.location.href = __ret.attach_url
+                                }
+                            });
                         },
                         "_disabled": function (data) {
-                            var __ret = get_data_from_tree(data);
+                            let __ret = get_data_from_tree(data);
                             return __ret.element_type === "learningunityear";
                         }
                     },
@@ -118,38 +129,23 @@ $(document).ready(function () {
                     "detach": {
                         "label": gettext("Detach"),
                         "action": function (data) {
-                            var __ret = get_data_from_tree(data);
-                            var group_element_year_id = __ret.group_element_year_id;
-                            var element_id = __ret.element_id;
-                            if (group_element_year_id === '0') {
+                            let __ret = get_data_from_tree(data);
+                            if (__ret.detach_url === '#') {
                                 return;
                             }
 
-                            var detach_data = build_url_data(element_id, group_element_year_id, 'detach');
-
-                            $('#form-modal-ajax-content').load(management_url, detach_data, function (response, status, xhr) {
-                                if ( status === "success" ){
+                            $('#form-modal-ajax-content').load(__ret.detach_url, function (response, status, xhr) {
+                                if (status === "success") {
                                     $('#form-ajax-modal').modal('toggle');
                                     formAjaxSubmit('#form-modal-ajax-content form', '#form-ajax-modal');
-                                }
-                                else {
-                                    window.location.href = management_url + "?" + detach_data
+                                } else {
+                                    window.location.href = __ret.detach_url
                                 }
 
-                            });
-
-                            $.ajax({
-                                url: management_url,
-                                dataType: 'json',
-                                data: {'element_id': element_id, 'group_element_year_id': group_element_year_id, 'action': 'select'},
-                                type: 'POST',
-                                success: function (jsonResponse) {
-                                    displayInfoMessage(jsonResponse, 'message_info_container')
-                                }
                             });
                         },
                         "_disabled": function (data) {
-                            var __ret = get_data_from_tree(data);
+                            let __ret = get_data_from_tree(data);
                             // tree's root and learning_unit having/being prerequisite(s) cannot be detached
                             return __ret.group_element_year_id === null ||
                                 __ret.has_prerequisite === true ||
