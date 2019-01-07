@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-07 11:09+0100\n"
-"PO-Revision-Date: 2019-01-07 11:16+0100\n"
+"PO-Revision-Date: 2019-01-07 11:21+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_BE\n"
@@ -4551,8 +4551,7 @@ msgstr ""
 #: tests/forms/education_group/test_groupElementYearForm.py:52
 msgid "You are not allowed to create a reference with a learning unit"
 msgstr ""
-"Vous n'êtes pas autorisé de créer une référence avec une unité "
-"d’enseignement "
+"Vous n'êtes pas autorisé de créer une référence avec une unité d’enseignement"
 
 #: business/group_element_years/postponement.py:73
 msgid "You are not allowed to postpone this training in the future."

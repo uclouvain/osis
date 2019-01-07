@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-07 11:09+0100\n"
+"POT-Creation-Date: 2019-01-07 11:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -312,11 +312,12 @@ msgstr ""
 msgid "Access"
 msgstr ""
 
+#: models/group_element_year.py:124
 #: templates/education_group/blocks/content_minor_major_option_table.html:33
 msgid "Access condition"
 msgstr ""
 
-#: models/enums/education_group_types.py:42 models/enums/rate_code.py:46
+#: models/enums/education_group_types.py:43 models/enums/rate_code.py:46
 msgid "Access contest"
 msgstr ""
 
@@ -324,7 +325,7 @@ msgstr ""
 msgid "Access denied!"
 msgstr ""
 
-#: models/enums/education_group_types.py:64
+#: models/enums/education_group_types.py:65
 msgid "Access minor"
 msgstr ""
 
@@ -486,7 +487,7 @@ msgstr ""
 msgid "Advanced master in medical specialization"
 msgstr ""
 
-#: models/enums/education_group_types.py:32
+#: models/enums/education_group_types.py:33
 msgid "Aggregation"
 msgstr ""
 
@@ -663,7 +664,7 @@ msgstr ""
 msgid "Attributions"
 msgstr ""
 
-#: models/enums/education_group_types.py:36
+#: models/enums/education_group_types.py:37
 msgid "Bachelor"
 msgstr ""
 
@@ -709,7 +710,7 @@ msgstr ""
 msgid "By"
 msgstr ""
 
-#: models/enums/education_group_types.py:38
+#: models/enums/education_group_types.py:39
 msgid "CAPAES"
 msgstr ""
 
@@ -776,7 +777,7 @@ msgstr ""
 msgid "Central"
 msgstr ""
 
-#: models/enums/education_group_types.py:37
+#: models/enums/education_group_types.py:38
 msgid "Certificate"
 msgstr ""
 
@@ -784,15 +785,15 @@ msgstr ""
 msgid "Certificate medicine competence"
 msgstr ""
 
-#: models/enums/education_group_types.py:35
+#: models/enums/education_group_types.py:36
 msgid "Certificate of holding credits"
 msgstr ""
 
-#: models/enums/education_group_types.py:33
+#: models/enums/education_group_types.py:34
 msgid "Certificate of participation"
 msgstr ""
 
-#: models/enums/education_group_types.py:34
+#: models/enums/education_group_types.py:35
 msgid "Certificate of success"
 msgstr ""
 
@@ -887,7 +888,7 @@ msgstr ""
 msgid "Common English title"
 msgstr ""
 
-#: models/enums/education_group_types.py:83
+#: models/enums/education_group_types.py:84
 msgid "Common core"
 msgstr ""
 
@@ -906,7 +907,7 @@ msgstr ""
 msgid "Comparison of learning units"
 msgstr ""
 
-#: models/enums/education_group_types.py:90
+#: models/enums/education_group_types.py:91
 msgid "Complementary module"
 msgstr ""
 
@@ -1060,7 +1061,7 @@ msgstr ""
 msgid "Decree category"
 msgstr ""
 
-#: models/enums/education_group_types.py:62
+#: models/enums/education_group_types.py:63
 msgid "Deepening"
 msgstr ""
 
@@ -1091,6 +1092,7 @@ msgid "Deliberation"
 msgstr ""
 
 #: models/certificate_aim.py:62
+#: models/education_group_publication_contact.py:78
 #: templates/academic_calendar/academic_calendar.html:63
 #: templates/academic_calendar/academic_calendar_form.html:89
 #: templates/learning_unit/class_edit.html:47
@@ -1139,7 +1141,7 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
-#: models/enums/education_group_types.py:66
+#: models/enums/education_group_types.py:67
 msgid "Disciplinary complement minor"
 msgstr ""
 
@@ -1465,7 +1467,7 @@ msgstr ""
 msgid "FGS"
 msgstr ""
 
-#: models/enums/education_group_types.py:67
+#: models/enums/education_group_types.py:68
 msgid "FSA speciality"
 msgstr ""
 
@@ -1490,11 +1492,11 @@ msgstr ""
 msgid "Female"
 msgstr ""
 
-#: models/enums/education_group_types.py:87
+#: models/enums/education_group_types.py:88
 msgid "Finality 120 list choice"
 msgstr ""
 
-#: models/enums/education_group_types.py:88
+#: models/enums/education_group_types.py:89
 msgid "Finality 180 list choice"
 msgstr ""
 
@@ -1546,7 +1548,7 @@ msgstr ""
 msgid "Foreign Bachelors"
 msgstr ""
 
-#: models/enums/education_group_types.py:46
+#: models/enums/education_group_types.py:47
 msgid "Formation PhD"
 msgstr ""
 
@@ -1787,8 +1789,13 @@ msgstr ""
 msgid "International title"
 msgstr ""
 
-#: models/education_group_year.py:214 models/enums/education_group_types.py:58
+#: models/education_group_year.py:214
 #: models/enums/learning_container_year_types.py:39
+msgid "Internship"
+msgstr ""
+
+#: models/enums/education_group_types.py:59
+msgctxt "Internship for education group"
 msgid "Internship"
 msgstr ""
 
@@ -1822,7 +1829,7 @@ msgstr ""
 msgid "Isn't a proposal"
 msgstr ""
 
-#: models/enums/education_group_types.py:44
+#: models/enums/education_group_types.py:45
 msgid "Isolated classes"
 msgstr ""
 
@@ -1865,7 +1872,7 @@ msgid ""
 "JavaScript."
 msgstr ""
 
-#: models/enums/education_group_types.py:47
+#: models/enums/education_group_types.py:48
 msgid "Junior year"
 msgstr ""
 
@@ -1918,7 +1925,7 @@ msgstr ""
 msgid "Language Exam"
 msgstr ""
 
-#: models/enums/education_group_types.py:43
+#: models/enums/education_group_types.py:44
 msgid "Language classes"
 msgstr ""
 
@@ -2108,7 +2115,7 @@ msgstr ""
 msgid "Maintenance of data with the SQL language"
 msgstr ""
 
-#: models/enums/education_group_types.py:85
+#: models/enums/education_group_types.py:86
 msgid "Major list choice"
 msgstr ""
 
@@ -2209,35 +2216,35 @@ msgstr ""
 msgid "Master"
 msgstr ""
 
-#: models/enums/education_group_types.py:49
+#: models/enums/education_group_types.py:50
 msgid "Master MA 120"
 msgstr ""
 
-#: models/enums/education_group_types.py:53
+#: models/enums/education_group_types.py:54
 msgid "Master MA 180-240"
 msgstr ""
 
-#: models/enums/education_group_types.py:50
+#: models/enums/education_group_types.py:51
 msgid "Master MD 120"
 msgstr ""
 
-#: models/enums/education_group_types.py:54
+#: models/enums/education_group_types.py:55
 msgid "Master MD 180-240"
 msgstr ""
 
-#: models/enums/education_group_types.py:51
+#: models/enums/education_group_types.py:52
 msgid "Master MS 120"
 msgstr ""
 
-#: models/enums/education_group_types.py:55
+#: models/enums/education_group_types.py:56
 msgid "Master MS 180-240"
 msgstr ""
 
-#: models/enums/education_group_types.py:56
+#: models/enums/education_group_types.py:57
 msgid "Master in 60 credits"
 msgstr ""
 
-#: models/enums/education_group_types.py:57
+#: models/enums/education_group_types.py:58
 msgid "Master of specialist"
 msgstr ""
 
@@ -2281,7 +2288,7 @@ msgstr ""
 msgid "Mini-Training"
 msgstr ""
 
-#: models/enums/education_group_types.py:84
+#: models/enums/education_group_types.py:85
 msgid "Minor list choice"
 msgstr ""
 
@@ -2294,11 +2301,11 @@ msgstr ""
 msgid "Mobility"
 msgstr ""
 
-#: models/enums/education_group_types.py:69
+#: models/enums/education_group_types.py:70
 msgid "Mobility partnership"
 msgstr ""
 
-#: models/enums/education_group_types.py:89
+#: models/enums/education_group_types.py:90
 msgid "Mobility partnership list choice"
 msgstr ""
 
@@ -2581,7 +2588,7 @@ msgstr ""
 msgid "Open for externs"
 msgstr ""
 
-#: models/enums/education_group_types.py:65
+#: models/enums/education_group_types.py:66
 msgid "Open minor"
 msgstr ""
 
@@ -2593,11 +2600,11 @@ msgstr ""
 msgid "Operation"
 msgstr ""
 
-#: models/enums/education_group_types.py:68
+#: models/enums/education_group_types.py:69
 msgid "Option"
 msgstr ""
 
-#: models/enums/education_group_types.py:86
+#: models/enums/education_group_types.py:87
 msgid "Option list choice"
 msgstr ""
 
@@ -2737,7 +2744,12 @@ msgstr ""
 msgid "Personalized access"
 msgstr ""
 
-#: models/enums/education_group_types.py:45 models/offer_year.py:41
+#: models/offer_year.py:41
+msgid "Ph.D"
+msgstr ""
+
+#: models/enums/education_group_types.py:46
+msgctxt "Ph.D for education group"
 msgid "Ph.D"
 msgstr ""
 
@@ -2887,11 +2899,11 @@ msgstr ""
 msgid "Program commission"
 msgstr ""
 
-#: models/enums/education_group_types.py:48
+#: models/enums/education_group_types.py:49
 msgid "Program master 120"
 msgstr ""
 
-#: models/enums/education_group_types.py:52
+#: models/enums/education_group_types.py:53
 msgid "Program master 180-240"
 msgstr ""
 
@@ -3159,7 +3171,7 @@ msgstr ""
 msgid "Research center"
 msgstr ""
 
-#: models/enums/education_group_types.py:39
+#: models/enums/education_group_types.py:40
 msgid "Research certificate"
 msgstr ""
 
@@ -3328,7 +3340,7 @@ msgstr ""
 msgid "Signatory qualification"
 msgstr ""
 
-#: models/enums/education_group_types.py:63
+#: models/enums/education_group_types.py:64
 msgid "Society minor"
 msgstr ""
 
@@ -3430,7 +3442,7 @@ msgstr ""
 msgid "Students"
 msgstr ""
 
-#: models/enums/education_group_types.py:91
+#: models/enums/education_group_types.py:92
 msgid "Sub group"
 msgstr ""
 
@@ -3872,6 +3884,10 @@ msgstr ""
 msgid "The user has not permission to create a %(category)s."
 msgstr ""
 
+#: business/education_groups/perms.py:152
+msgid "The user is not attached to the management entity"
+msgstr ""
+
 #: business/learning_units/edition.py:617
 #: tests/business/learning_units/test_edition.py:465
 #, python-format
@@ -4166,11 +4182,11 @@ msgstr ""
 msgid "University certificate 30 credits"
 msgstr ""
 
-#: models/enums/education_group_types.py:40
+#: models/enums/education_group_types.py:41
 msgid "University first cycle certificate"
 msgstr ""
 
-#: models/enums/education_group_types.py:41
+#: models/enums/education_group_types.py:42
 msgid "University second cycle certificate"
 msgstr ""
 
@@ -4565,10 +4581,6 @@ msgstr ""
 msgid "academic events"
 msgstr ""
 
-#: models/group_element_year.py:124
-msgid "access condition"
-msgstr ""
-
 # TODO
 #: templates/learning_unit/blocks/form/form_external.html:17
 #: templates/learning_unit/blocks/form/form_external.html:19
@@ -4777,10 +4789,6 @@ msgstr ""
 
 #: tests/templatetags/test_education_group.py:47
 msgid "delete education group"
-msgstr ""
-
-#: models/education_group_publication_contact.py:78
-msgid "description"
 msgstr ""
 
 #: models/education_group_year.py:206
