@@ -86,9 +86,9 @@ $(document).ready(function () {
                     "select": {
                         "label": gettext("Select"),
                         "action": function (data) {
-                            var __ret = get_data_from_tree(data);
-                            var element_id = __ret.element_id;
-                            var group_element_year_id = __ret.group_element_year_id;
+                            let __ret = get_data_from_tree(data);
+                            let element_id = __ret.element_id;
+                            let group_element_year_id = __ret.group_element_year_id;
                             $.ajax({
                                 url: management_url,
                                 dataType: 'json',
@@ -129,7 +129,7 @@ $(document).ready(function () {
                     "detach": {
                         "label": gettext("Detach"),
                         "action": function (data) {
-                            var __ret = get_data_from_tree(data);
+                            let __ret = get_data_from_tree(data);
                             if (__ret.detach_url === '#') {
                                 return;
                             }
@@ -145,7 +145,7 @@ $(document).ready(function () {
                             });
                         },
                         "_disabled": function (data) {
-                            var __ret = get_data_from_tree(data);
+                            let __ret = get_data_from_tree(data);
                             // tree's root and learning_unit having/being prerequisite(s) cannot be detached
                             return __ret.group_element_year_id === null ||
                                 __ret.has_prerequisite === true ||
