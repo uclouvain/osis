@@ -24,9 +24,9 @@
 #
 ##############################################################################
 from django import template
-from django.forms import forms
+
 from base import models as mdl
-from base.models.enums import link_type
+from base.models.enums.link_type import LinkTypes
 
 register = template.Library()
 
@@ -35,6 +35,6 @@ register = template.Library()
 def get_parent_of_reference_link(education_group_yr):
     group_elmt_yrs = mdl.group_element_year.GroupElementYear.objects.filter(
         child_branch=education_group_yr,
-        link_type=link_type.REFERENCE,
+        link_type=LinkTypes.REFERENCE.name,
     )
     return group_elmt_yrs.first()

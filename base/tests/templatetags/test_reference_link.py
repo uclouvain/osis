@@ -25,6 +25,7 @@
 ##############################################################################
 from django.test import TestCase
 
+from base.models.enums.link_type import LinkTypes
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -58,7 +59,7 @@ class ReferenceLinkTagTests(TestCase):
         group_element_yr_reference = GroupElementYearFactory(
             parent=self.grandfather,
             child_branch=self.child,
-            link_type=link_type.REFERENCE,
+            link_type=LinkTypes.REFERENCE.name,
         )
         self.assertEqual(get_parent_of_reference_link(group_element_yr_reference.child_branch),
                          group_element_yr_reference)

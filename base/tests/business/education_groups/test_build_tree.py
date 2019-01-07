@@ -29,7 +29,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
-from base.models.enums.link_type import REFERENCE
+from base.models.enums.link_type import LinkTypes
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -108,7 +108,7 @@ class TestBuildTree(TestCase):
         """
         This tree contains a reference link.
         """
-        self.group_element_year_1.link_type = REFERENCE
+        self.group_element_year_1.link_type = LinkTypes.REFERENCE.name
         self.group_element_year_1.save()
 
         node = NodeBranchJsTree(self.parent)

@@ -28,7 +28,7 @@ from django.db.models import OuterRef, Exists
 from django.urls import reverse
 
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
-from base.models.enums.link_type import REFERENCE
+from base.models.enums.link_type import LinkTypes
 from base.models.prerequisite_item import PrerequisiteItem
 
 
@@ -41,7 +41,8 @@ class NodeBranchJsTree:
         self.children = []
         self.root = root
         self.group_element_year = group_element_year
-        self.reference = self.group_element_year.link_type == REFERENCE if self.group_element_year else False
+        self.reference = self.group_element_year.link_type == LinkTypes.REFERENCE.name \
+            if self.group_element_year else False
         self.icon = self._get_icon()
 
         self.generate_children()

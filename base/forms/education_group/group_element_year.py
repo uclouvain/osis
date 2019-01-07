@@ -26,7 +26,6 @@
 from django import forms
 from django.utils.translation import gettext as _
 
-from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.group_element_year import GroupElementYear
 
 
@@ -62,8 +61,8 @@ class GroupElementYearForm(forms.ModelForm):
     def clean_link_type(self):
         data_cleaned = self.cleaned_data.get('link_type')
         if data_cleaned:
-            if self.instance.child_branch and not AuthorizedRelationship.objects.filter(
-                    parent_type=self.instance.parent.education_group_type,
+            parent_type = self.instance.parent.education_group_type
+            if self.instance.child_branch and not parent_type.authorizedrelationship_set.filter(
                     child_type=self.instance.child_branch.education_group_type,
                     reference=True,
             ).exists():
