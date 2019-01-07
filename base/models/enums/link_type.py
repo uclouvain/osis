@@ -23,8 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import ugettext_lazy as _
+
 from base.models.utils.utils import ChoiceEnum
 
 
 class LinkTypes(ChoiceEnum):
-    REFERENCE = "REFERENCE"
+    REFERENCE = _("Reference")
