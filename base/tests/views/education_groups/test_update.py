@@ -154,6 +154,7 @@ class TestUpdate(TestCase):
 
     def test_permission_required(self):
         response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
 
         self.mocked_perm.assert_called_once_with(self.person, self.education_group_year, raise_exception=True)
 
@@ -379,6 +380,7 @@ class TestSelectAttach(TestCase):
             "group_element_year_id": self.initial_group_element_year.id,
             "action": "select",
         }
+        self.root = group_above_new_parent.parent
         self.attach_data = {
             "root_id": group_above_new_parent.parent.id,
             "element_id": self.new_parent_education_group_year.id,
@@ -454,7 +456,11 @@ class TestSelectAttach(TestCase):
         )
 
         # Attach :
-        self.client.post(self.url_management, data=self.attach_data, HTTP_REFERER='http://foo/bar')
+        self.client.post(
+            reverse("education_group_attach",
+                    args=[self.attach_data["root_id"],
+                          self.attach_data["element_id"]]),
+        )
 
         expected_group_element_year_count = GroupElementYear.objects.filter(
             parent=self.new_parent_education_group_year,
@@ -479,15 +485,10 @@ class TestSelectAttach(TestCase):
             data=self.select_data
         )
 
-        # Attach :
-        http_referer = reverse(
-            "education_group_read",
-            args=[
-                self.initial_parent_education_group_year.id,
-                self.child_education_group_year.id
-            ]
+        response = self.client.get(
+            reverse("education_group_attach", args=[self.root.pk, self.new_parent_education_group_year.pk])
         )
-        response = self.client.get(self.url_management, data=self.attach_data, follow=True, HTTP_REFERER=http_referer)
+        self.assertEqual(response.status_code, 200)
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         self.assertEqual(
@@ -527,25 +528,14 @@ class TestSelectAttach(TestCase):
         )
 
         # Attach :
-        http_referer = reverse(
-            "education_group_read",
-            args=[
-                self.initial_parent_education_group_year.id,
-                self.child_education_group_year.id
-            ]
+        response = self.client.post(
+            reverse("education_group_attach", args=[
+                self.new_parent_education_group_year.id, self.child_education_group_year.id
+            ]),
+            data={}
         )
-        url_attach = reverse("education_groups_management")
-        url_attach_data = {
-            "root_id": self.new_parent_education_group_year.id,
-            "element_id": self.child_education_group_year.id,
-            "group_element_year_id": self.initial_group_element_year.id,
-            "action": "attach"
-        }
-        response = self.client.get(url_attach, data=url_attach_data, follow=True, HTTP_REFERER=http_referer)
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(
-            str(messages[1]),
+        self.assertFormError(
+            response, 'form', '__all__',
             _("It is forbidden to attach an element to one of its included elements.")
         )
 
@@ -577,14 +567,9 @@ class TestSelectAttach(TestCase):
         )
 
         # Attach :
-        http_referer = reverse(
-            "education_group_read",
-            args=[
-                self.initial_parent_education_group_year.id,
-                self.child_education_group_year.id
-            ]
+        response = self.client.get(
+            reverse("education_group_attach", args=[self.root.pk, self.new_parent_education_group_year.pk])
         )
-        response = self.client.get(self.url_management, data=self.attach_data, follow=True, HTTP_REFERER=http_referer)
 
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self.assertTemplateUsed(response, "access_denied.html")
@@ -609,7 +594,12 @@ class TestSelectAttach(TestCase):
             {'id': self.learning_unit_year.pk, 'modelname': management.LEARNING_UNIT_YEAR},
             timeout=None,
         )
-        self.client.post(self.url_management, data=self.attach_data, HTTP_REFERER='http://foo/bar')
+
+        response = self.client.post(
+            reverse("education_group_attach", args=[self.root.pk, self.new_parent_education_group_year.pk]),
+            data={}
+        )
+        self.assertEqual(response.status_code, 302)
 
         expected_group_element_year_count = GroupElementYear.objects.filter(
             parent=self.new_parent_education_group_year,
@@ -618,22 +608,23 @@ class TestSelectAttach(TestCase):
         self.assertEquals(expected_group_element_year_count, 1)
 
     def test_attach_without_selecting_gives_warning(self):
+        cache.set(management.SELECT_CACHE_KEY, None, timeout=None, )
+
         expected_absent_group_element_year = GroupElementYear.objects.filter(
             parent=self.new_parent_education_group_year,
             child_branch=self.child_education_group_year
         ).exists()
         self.assertFalse(expected_absent_group_element_year)
 
-        http_referer = reverse(
-            "education_group_read",
-            args=[
-                self.initial_parent_education_group_year.id,
-                self.child_education_group_year.id
-            ]
+        response = self.client.get(
+            reverse("education_group_attach",
+                    args=[self.root.pk,
+                          self.new_parent_education_group_year.pk]),
         )
-        response = self.client.get(self.url_management, data=self.attach_data, follow=True, HTTP_REFERER=http_referer)
+        self.assertEqual(response.status_code, 200)
 
         messages = list(get_messages(response.wsgi_request))
+
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), _("Please Select or Move an item before Attach it"))
 

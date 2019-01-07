@@ -42,3 +42,4 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
     child_branch = factory.SubFactory(EducationGroupYearFactory)
     child_leaf = None
     is_mandatory = False
+    link_type = None

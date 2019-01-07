@@ -23,8 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models.utils.utils import ChoiceEnum
+from django import template
+
+from base import models as mdl
+from base.models.enums.link_type import LinkTypes
+
+register = template.Library()
 
 
-class LinkTypes(ChoiceEnum):
-    REFERENCE = "REFERENCE"
+@register.filter
+def get_parent_of_reference_link(education_group_yr):
+    group_elmt_yrs = mdl.group_element_year.GroupElementYear.objects.filter(
+        child_branch=education_group_yr,
+        link_type=LinkTypes.REFERENCE.name,
+    )
+    return group_elmt_yrs.first()

@@ -48,6 +48,7 @@ from base.business.education_groups import perms
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 from base.business.education_groups.perms import is_eligible_to_edit_general_information, \
     is_eligible_to_edit_admission_condition
+from base.management.commands.import_reddot import COMMON_OFFER
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
@@ -143,10 +144,10 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context['enums'] = mdl.enums.education_group_categories
 
         self.is_intro_offer = self.object.education_group_type.name in INTRO_OFFER
-        if self.is_intro_offer:
-            context['show_extra_info'] = False
-        else:
-            context['show_extra_info'] = True
+        context['show_extra_info'] = not self.is_intro_offer
+
+        common_offers = ['common-' + offer.lower() for offer in COMMON_OFFER[:-1]]
+        context['show_general_info'] = self.object.acronym not in common_offers
 
         return context
 
@@ -168,7 +169,7 @@ class EducationGroupRead(EducationGroupGenericDetailView):
 
         context["education_group_languages"] = self.object.educationgrouplanguage_set.order_by('order').values_list(
             'language__name', flat=True)
-        context["show_coorganization"] = self.show_coorganization()
+        context["hide_for_2M"] = self.hide_for_2m()
         context["versions"] = self.get_related_versions()
 
         return context
@@ -176,11 +177,12 @@ class EducationGroupRead(EducationGroupGenericDetailView):
     def get_template_names(self):
         return self.templates.get(self.object.education_group_type.category)
 
-    def show_coorganization(self):
-        """Co-organization doesn't have sense for 2M (120/180-240) """
-        return self.object.education_group_type.category == TRAINING and \
-            self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
-                                                          TrainingType.PGRM_MASTER_180_240.name]
+    def hide_for_2m(self):
+        """Some informations have to be hidden for 2M.
+           Co-organization and administrative data doesn't have sense for 2M (120/180-240) """
+        return not (self.object.education_group_type.category == TRAINING and
+                    self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
+                                                                  TrainingType.PGRM_MASTER_180_240.name])
 
     def get_related_versions(self):
         versions = Version.objects.get_for_object(self.object).select_related('revision__user__person')
@@ -512,8 +514,7 @@ class EducationGroupUsing(EducationGroupGenericDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["group_element_years"] = mdl.group_element_year.find_by_child_branch(self.object) \
-            .select_related("parent")
+        context["group_element_years"] = self.object.child_branch.select_related("parent")
         return context
 
 

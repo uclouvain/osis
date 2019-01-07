@@ -28,6 +28,7 @@ import datetime
 from django.test import TestCase
 
 from base.models import exam_enrollment, exceptions
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.models import test_student, test_offer_enrollment, test_learning_unit_enrollment, \
     test_session_exam, test_academic_year, test_offer_year
@@ -54,7 +55,7 @@ def create_exam_enrollment_with_student(num_id, registration_id, offer_year, lea
 
 class ExamEnrollmentTest(TestCase):
     def setUp(self):
-        self.academic_year = test_academic_year.create_academic_year()
+        self.academic_year = create_current_academic_year()
         self.offer_year = test_offer_year.create_offer_year('SINF1BA', 'Bachelor in informatica', self.academic_year)
         self.learn_unit_year = LearningUnitYearFactory(acronym='LSINF1010',
                                                        specific_title='Introduction to algorithmic',

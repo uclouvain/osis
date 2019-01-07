@@ -391,15 +391,12 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
         self.assertFalse(form.is_valid())
 
     def test_update_case_correct_data(self):
-        now = datetime.datetime.now()
         self.post_data['periodicity'] = ANNUAL
-        learn_unit_year = LearningUnitYear.objects.get(learning_unit=self.learn_unit_structure.learning_unit_full,
-                                                       academic_year=AcademicYear.objects.get(year=now.year))
         form = _instanciate_form(
-            learn_unit_year.academic_year,
+            self.current_academic_year,
             post_data=self.post_data,
             person=self.person,
-            learning_unit_instance=learn_unit_year.learning_unit
+            learning_unit_instance=self.learning_unit_year.learning_unit
         )
 
         self.assertTrue(form.is_valid(), form.errors)

@@ -24,85 +24,70 @@
 #
 ##############################################################################
 import datetime
-from unittest import mock
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 
 from base.forms.academic_calendar import AcademicCalendarForm
 from base.models.academic_calendar import AcademicCalendar
-from base.models.academic_year import AcademicYear
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.user import SuperUserFactory
-from base.views.academic_calendar import academic_calendars, academic_calendar_form
+from base.views.academic_calendar import _compute_progress
 
 now = datetime.datetime.now()
 today = datetime.date.today()
 
 
 class AcademicCalendarViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_years = AcademicYearFactory.produce_in_future(quantity=6)
+        cls.academic_calendars = [
+            AcademicCalendarFactory(academic_year=cls.academic_years[i])
+            for i in range(len(cls.academic_years))
+        ]
+
+        cls.academic_calendars[2].reference = academic_calendar_type.TESTING
+        cls.academic_calendars[2].save()
+
+        cls.person = PersonWithPermissionsFactory("can_access_academic_calendar")
+        cls.person.user.is_superuser = True
+        cls.person.user.save()
+        cls.url = reverse('academic_calendars')
+
     def setUp(self):
-        self.academic_years = [
-            AcademicYearFactory.build(
-                start_date=today.replace(year=today.year + i),
-                end_date=today.replace(year=today.year + 1 + i),
-                year=today.year + i
-            )
-            for i in range(7)
-        ]
+        self.client.force_login(self.person.user)
 
-        self.academic_years[0].save()
-        for i in range(1, 7):
-            super(AcademicYear, self.academic_years[i]).save()
+    def test_academic_calendars(self):
+        response = self.client.get(self.url, data={"show_academic_events": "on"})
 
-        self.academic_calendars = [
-            AcademicCalendarFactory(academic_year=self.academic_years[i])
-            for i in range(7)
-        ]
+        self.assertTemplateUsed(response, 'academic_calendar/academic_calendars.html')
+        self._compare_academic_calendar_json(response.context, self.academic_calendars[0])
 
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_academic_calendars(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
+    def test_academic_calendars_search(self):
+        response = self.client.get(
+            self.url,
+            data={'academic_year': self.academic_years[1].id, 'show_academic_events': 'on'}
+        )
 
-        request_factory = RequestFactory()
+        self.assertTemplateUsed(response, 'academic_calendar/academic_calendars.html')
+        self._compare_academic_calendar_json(response.context, self.academic_calendars[1])
 
-        request = request_factory.get(reverse('academic_calendars') + "?show_academic_events=on")
-        request.user = mock.Mock()
+    def test_project_calendars_search(self):
+        response = self.client.get(
+            self.url,
+            data={'academic_year': self.academic_years[2].id, 'show_academic_events': 'on', 'show_project_events': 'on'}
+        )
 
-        academic_calendars(request)
+        self.assertTemplateUsed(response, 'academic_calendar/academic_calendars.html')
+        self._compare_academic_calendar_json(response.context, self.academic_calendars[2],
+                                             category=academic_calendar_type.PROJECT_CATEGORY)
 
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'academic_calendar/academic_calendars.html')
-        self._compare_academic_calendar_json(context, self.academic_calendars[0])
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_academic_calendars_search(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-
-        request_factory = RequestFactory()
-        get_data = {'academic_year': self.academic_years[1].id, 'show_academic_events': 'on'}
-        request = request_factory.get(reverse('academic_calendars'), get_data)
-        request.user = mock.Mock()
-
-        academic_calendars(request)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'academic_calendar/academic_calendars.html')
-        self._compare_academic_calendar_json(context, self.academic_calendars[1])
-
-    def _compare_academic_calendar_json(self, context, calendar):
+    def _compare_academic_calendar_json(self, context, calendar, category=academic_calendar_type.ACADEMIC_CATEGORY):
         self.assertDictEqual(
             context['academic_calendar_json'],
             {'data': [
@@ -111,94 +96,20 @@ class AcademicCalendarViewTestCase(TestCase):
                     'text': calendar.title,
                     'start_date': calendar.start_date.strftime('%d-%m-%Y'),
                     'end_date': calendar.end_date.strftime('%d-%m-%Y'),
-                    'progress': 0,
+                    'progress': _compute_progress(calendar),
                     'id': calendar.id,
-                    'category': academic_calendar_type.ACADEMIC_CATEGORY,
+                    'category': category,
                 }
             ]}
         )
 
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_project_calendars_search(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
+    def test_academic_calendar_read(self):
+        url = reverse("academic_calendar_form", args=[self.academic_calendars[1].id])
 
-        self.academic_calendars[1].reference = academic_calendar_type.TESTING
-        self.academic_calendars[1].start_date = today - datetime.timedelta(days=1)
-        self.academic_calendars[1].end_date = today + datetime.timedelta(days=1)
-        self.academic_calendars[1].save()
+        response = self.client.get(url)
 
-        request_factory = RequestFactory()
-        get_data = {'academic_year': self.academic_years[1].id, 'show_project_events': 'on'}
-        request = request_factory.get(reverse('academic_calendars'), get_data)
-        request.user = SuperUserFactory()
-
-        academic_calendars(request)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'academic_calendar/academic_calendars.html')
-        self._compare_project_calendar_json(context, self.academic_calendars[1], 0.5)
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_project_calendars_search_progress_1(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-
-        self.academic_calendars[1].reference = academic_calendar_type.TESTING
-        self.academic_calendars[1].start_date = today - datetime.timedelta(days=10)
-        self.academic_calendars[1].end_date = today - datetime.timedelta(days=1)
-        self.academic_calendars[1].save()
-
-        request_factory = RequestFactory()
-        get_data = {'academic_year': self.academic_years[1].id, 'show_project_events': 'on'}
-        request = request_factory.get(reverse('academic_calendars'), get_data)
-        request.user = SuperUserFactory()
-
-        academic_calendars(request)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'academic_calendar/academic_calendars.html')
-        self._compare_project_calendar_json(context, self.academic_calendars[1], 1)
-
-    def _compare_project_calendar_json(self, context, calendar, progress):
-        self.assertDictEqual(
-            context['academic_calendar_json'],
-            {'data': [
-                {
-                    'color': academic_calendar_type.CALENDAR_TYPES_COLORS.get(calendar.reference, '#337ab7'),
-                    'text': calendar.title,
-                    'start_date': calendar.start_date.strftime('%d-%m-%Y'),
-                    'end_date': calendar.end_date.strftime('%d-%m-%Y'),
-                    'progress': progress,
-                    'id': calendar.id,
-                    'category': academic_calendar_type.PROJECT_CATEGORY,
-                }
-            ]}
-        )
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_academic_calendar_read(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse('academic_calendars'))
-        request.user = mock.Mock()
-
-        academic_calendar_form(request, self.academic_calendars[1].id)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'academic_calendar/academic_calendar_form.html')
-        self.assertIsInstance(context['form'], AcademicCalendarForm)
+        self.assertTemplateUsed(response, 'academic_calendar/academic_calendar_form.html')
+        self.assertIsInstance(response.context['form'], AcademicCalendarForm)
 
         data = {
             "academic_year": self.academic_years[1].pk,
@@ -208,31 +119,25 @@ class AcademicCalendarViewTestCase(TestCase):
             "end_date": datetime.date.today() + datetime.timedelta(days=2)
         }
 
-        request = request_factory.post(reverse('academic_calendars'), data)
-        request.user = mock.Mock()
-        academic_calendar_form(request, self.academic_calendars[1].id)
+        response = self.client.post(url, data=data)
 
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'academic_calendar/academic_calendar.html')
+        self.assertTemplateUsed(response, 'academic_calendar/academic_calendar.html')
 
 
 class AcademicCalendarDeleteTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+        cls.person = PersonFactory(user=SuperUserFactory())
+
     def setUp(self):
-        academic_year = AcademicYearFactory(
-                start_date=today.replace(year=today.year),
-                end_date=today.replace(year=today.year + 1),
-                year=today.year
-        )
-        self.academic_calendar = AcademicCalendarFactory(academic_year=academic_year)
-        self.user = SuperUserFactory()
-        self.person = PersonFactory(user=self.user)
+        self.academic_calendar = AcademicCalendarFactory(academic_year=self.academic_year)
         self.client.force_login(self.person.user)
         self.url = reverse('academic_calendar_delete', kwargs={'pk': self.academic_calendar.pk})
 
     def test_academic_calendar_delete_not_superuser(self):
-        self.user.is_superuser = False
-        self.user.save()
+        person_not_superuser = PersonFactory()
+        self.client.force_login(person_not_superuser.user)
 
         response = self.client.post(self.url)
 
@@ -242,10 +147,7 @@ class AcademicCalendarDeleteTestCase(TestCase):
     def test_academic_calendar_delete(self):
         response = self.client.post(self.url)
 
-        self.assertRedirects(
-            response,
-            reverse('academic_calendars')
-        )
+        self.assertRedirects(response, reverse('academic_calendars'))
 
         with self.assertRaises(AcademicCalendar.DoesNotExist):
             self.academic_calendar.refresh_from_db()
