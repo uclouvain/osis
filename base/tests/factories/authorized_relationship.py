@@ -37,3 +37,4 @@ class AuthorizedRelationshipFactory(factory.DjangoModelFactory):
     child_type = factory.SubFactory(EducationGroupTypeFactory)
     min_count_authorized = count_constraint.ZERO
     max_count_authorized = count_constraint.MANY
+    reference = False

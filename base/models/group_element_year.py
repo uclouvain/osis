@@ -39,6 +39,7 @@ from base.models import education_group_type, education_group_year
 from base.models.education_group_type import GROUP_TYPE_OPTION
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, link_type, quadrimesters
+from base.models.enums.link_type import LinkTypes
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -144,7 +145,7 @@ class GroupElementYear(OrderedModel):
 
     link_type = models.CharField(
         max_length=25,
-        choices=link_type.LINK_TYPE,
+        choices=LinkTypes.choices(),
         blank=True, null=True, verbose_name=_('Link type')
     )
 

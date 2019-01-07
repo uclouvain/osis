@@ -62,7 +62,7 @@ class GroupElementYearForm(forms.ModelForm):
         data_cleaned = self.cleaned_data.get('link_type')
         if data_cleaned:
             parent_type = self.instance.parent.education_group_type
-            if self.instance.child_branch and not parent_type.authorizedrelationship_set.filter(
+            if self.instance.child_branch and not parent_type.authorized_parent_type.filter(
                     child_type=self.instance.child_branch.education_group_type,
                     reference=True,
             ).exists():
