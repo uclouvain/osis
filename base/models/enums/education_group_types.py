@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import pgettext_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from base.models.utils.utils import ChoiceEnum
@@ -42,7 +43,7 @@ class TrainingType(ChoiceEnum):
     ACCESS_CONTEST = _("Access contest")
     LANGUAGE_CLASS = _("Language classes")
     ISOLATED_CLASS = _("Isolated classes")
-    PHD = _("Ph.D")
+    PHD = pgettext_lazy("Ph.D for education group", "Ph.D")
     FORMATION_PHD = _("Formation PhD")
     JUNIOR_YEAR = _("Junior year")
     PGRM_MASTER_120 = _("Program master 120")
@@ -55,7 +56,7 @@ class TrainingType(ChoiceEnum):
     MASTER_MS_180_240 = _("Master MS 180-240")
     MASTER_M1 = _("Master in 60 credits")
     MASTER_MC = _("Master of specialist")
-    INTERNSHIP = _("Internship")
+    INTERNSHIP = pgettext_lazy("Internship for education group", "Internship")
 
 
 class MiniTrainingType(ChoiceEnum):
