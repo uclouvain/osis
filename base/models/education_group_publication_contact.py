@@ -75,7 +75,7 @@ class EducationGroupPublicationContact(OrderedModel):
         max_length=255,
         default='',
         blank=True,
-        verbose_name=_('description')
+        verbose_name=_('Description')
     )
     type = models.CharField(
         max_length=100,
