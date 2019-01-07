@@ -137,8 +137,6 @@ class TrainingDetailSerializerTestCase(TestCase):
             'inter_university_belgium',
             'inter_university_abroad',
             'primary_language',
-            'language_association',
-            'language_association_text',
             'keywords',
             'duration',
             'duration_unit',
