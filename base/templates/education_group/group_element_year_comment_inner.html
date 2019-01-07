@@ -52,6 +52,11 @@
                 <div class="form-group row">
                     {% bootstrap_field form.comment_english form_group_class="col-md-12" %}
                 </div>
+                {% if form.access_condition %}
+                <div class="form-group row">
+                    {% bootstrap_field form.access_condition form_group_class="col-md-4" %}
+                </div>
+                {% endif %}
             </form>
         </div>
 

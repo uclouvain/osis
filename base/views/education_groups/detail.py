@@ -502,11 +502,7 @@ class EducationGroupContent(EducationGroupGenericDetailView):
         return context
 
     def _show_minor_major_option_table(self):
-        return self.object.education_group_type.name in (
-            GroupType.MAJOR_LIST_CHOICE.name,
-            GroupType.MINOR_LIST_CHOICE.name,
-            GroupType.OPTION_LIST_CHOICE.name
-        )
+        return self.object.education_group_type.name in GroupType.minor_major_option()
 
 
 class EducationGroupUsing(EducationGroupGenericDetailView):

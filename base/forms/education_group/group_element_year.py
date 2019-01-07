@@ -26,6 +26,7 @@
 from django import forms
 from django.utils.translation import gettext as _
 
+from base.models.enums.education_group_types import GroupType
 from base.models.group_element_year import GroupElementYear
 
 
@@ -75,3 +76,8 @@ class GroupElementYearForm(forms.ModelForm):
             elif self.instance.child_leaf:
                 self.add_error('link_type', _("You are not allowed to create a reference with a learning unit"))
         return data_cleaned
+
+
+class GroupElementYearMinorMajorOptionForm(GroupElementYearForm):
+    class Meta(GroupElementYearForm.Meta):
+        fields = GroupElementYearForm.Meta.fields + ["access_condition"]

@@ -121,7 +121,7 @@ class GroupElementYear(OrderedModel):
 
     access_condition = models.BooleanField(
         default=False,
-        verbose_name=_('access condition')
+        verbose_name=_('Access condition')
     )
 
     comment = models.TextField(
