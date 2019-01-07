@@ -27,7 +27,7 @@ import datetime
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DeleteView
@@ -41,7 +41,6 @@ from base.models.utils.utils import get_object_or_none
 from base.utils.cache import cache_filter
 from base.views import common
 from base.views.mixins import RulesRequiredMixin
-from . import layout
 
 
 def _build_gantt_json(academic_calendar_list, show_academic_events, show_project_events):
@@ -112,7 +111,7 @@ def academic_calendars(request):
     ad_hoc_list = {'ad_hoc_events': _build_gantt_markers_data(academic_calendar_list, show_ad_hoc_events)}
     show_gantt_diagram = bool(len(academic_calendar_json['data']))
 
-    return layout.render(
+    return render(
         request,
         "academic_calendar/academic_calendars.html",
         {
@@ -145,7 +144,7 @@ def _build_gantt_markers_data(academic_calendar_list, show_ad_hoc_events):
 @permission_required('base.can_access_academic_calendar', raise_exception=True)
 def academic_calendar_read(request, academic_calendar_id):
     academic_calendar = get_object_or_404(mdl.academic_calendar.AcademicCalendar, pk=academic_calendar_id)
-    return layout.render(
+    return render(
         request,
         "academic_calendar/academic_calendar.html",
         {
@@ -167,7 +166,7 @@ def academic_calendar_form(request, academic_calendar_id):
         if academic_cal_form.is_valid():
             academic_cal_form.save()
             return academic_calendar_read(request, academic_cal_form.instance.id)
-    return layout.render(
+    return render(
         request,
         "academic_calendar/academic_calendar_form.html",
         {
