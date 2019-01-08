@@ -23,10 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.db.models import OuterRef, Exists
 from django.urls import reverse
 
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
+from base.models.enums.link_type import LinkTypes
 from base.models.prerequisite_item import PrerequisiteItem
 
 
@@ -35,19 +37,28 @@ class NodeBranchJsTree:
     element_type = EDUCATION_GROUP_YEAR
 
     def __init__(self, root, group_element_year=None):
+
+        self.children = []
         self.root = root
         self.group_element_year = group_element_year
-        self.children = self.generate_children()
+        self.reference = self.group_element_year.link_type == LinkTypes.REFERENCE.name \
+            if self.group_element_year else False
+        self.icon = self._get_icon()
+
+        self.generate_children()
 
     def generate_children(self):
-        result = []
         for group_element_year in self.get_queryset():
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
-                result.append(NodeBranchJsTree(self.root, group_element_year))
-            elif group_element_year.child_leaf:
-                result.append(NodeLeafJsTree(self.root, group_element_year))
+                node = NodeBranchJsTree(self.root, group_element_year)
 
-        return result
+            elif group_element_year.child_leaf:
+                node = NodeLeafJsTree(self.root, group_element_year)
+
+            else:
+                continue
+
+            self.children.append(node)
 
     def get_queryset(self):
         has_prerequisite = PrerequisiteItem.objects.filter(
@@ -71,6 +82,7 @@ class NodeBranchJsTree:
         group_element_year_pk = self.group_element_year.pk if self.group_element_year else '#'
         return {
             'text': self.education_group_year.verbose,
+            'icon': self.icon,
             'children': [child.to_json() for child in self.children],
             'a_attr': {
                 'href': self.get_url(),
@@ -79,9 +91,17 @@ class NodeBranchJsTree:
                 'element_id': self.education_group_year.pk,
                 'element_type': self.element_type,
                 'title': self.education_group_year.acronym,
+                'attach_url': reverse('education_group_attach', args=[self.root.pk, self.education_group_year.pk]),
+                'detach_url': reverse('group_element_year_delete', args=[
+                    self.root.pk, self.education_group_year.pk, self.group_element_year.pk
+                ]) if self.group_element_year else '#'
             },
             'id': 'id_{}_{}'.format(self.education_group_year.pk, group_element_year_pk),
         }
+
+    def _get_icon(self):
+        if self.reference:
+            return static('img/reference.jpg')
 
     @property
     def education_group_year(self):
@@ -96,7 +116,6 @@ class NodeBranchJsTree:
 
 
 class NodeLeafJsTree(NodeBranchJsTree):
-    """ The leaf has no child """
     element_type = LEARNING_UNIT_YEAR
 
     @property
@@ -112,7 +131,7 @@ class NodeLeafJsTree(NodeBranchJsTree):
         group_element_year_pk = self.group_element_year.pk if self.group_element_year else '#'
         return {
             'text': self.learning_unit_year.acronym,
-            'icon': self._get_icon(),
+            'icon': self.icon,
             'a_attr': {
                 'href': self.get_url(),
                 'root': self.root.pk,
@@ -122,6 +141,9 @@ class NodeLeafJsTree(NodeBranchJsTree):
                 'title': self.learning_unit_year.complete_title,
                 'has_prerequisite': self.group_element_year.has_prerequisite,
                 'is_prerequisite': self.group_element_year.is_prerequisite,
+                'detach_url': reverse('group_element_year_delete', args=[
+                    self.root.pk, self.group_element_year.parent.pk, self.group_element_year.pk
+                ]) if self.group_element_year else '#'
             },
             'id': 'id_{}_{}'.format(self.learning_unit_year.pk, group_element_year_pk),
         }
@@ -140,4 +162,5 @@ class NodeLeafJsTree(NodeBranchJsTree):
         return url + self.url_group_to_parent()
 
     def generate_children(self):
-        return []
+        """ The leaf does not have children """
+        return

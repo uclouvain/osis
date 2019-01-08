@@ -89,7 +89,6 @@ def common_context_processor(request):
                'environment': env,
                'sentry_dns': sentry_dns,
                'release_tag': release_tag}
-
     _check_notice(request, context)
     return context
 

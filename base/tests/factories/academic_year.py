@@ -75,12 +75,12 @@ class AcademicYearFactory(DjangoModelFactory):
 
     @staticmethod
     def produce_in_past(from_year=None, quantity=3):
-        from_year = from_year or datetime.date.today().year
+        from_year = from_year or get_current_year()
         return [AcademicYearFactory(year=from_year-i) for i in range(quantity)]
 
     @staticmethod
     def produce_in_future(current_year=None, quantity=10):
-        current_year = current_year or datetime.date.today().year
+        current_year = current_year or get_current_year()
         academic_years = [AcademicYearFactory.build(year=current_year + i) for i in range(quantity)]
         return AcademicYear.objects.bulk_create(academic_years)
 

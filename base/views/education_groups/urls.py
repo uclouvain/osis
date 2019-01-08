@@ -37,7 +37,6 @@ from base.views.education_groups.select import education_group_select, learning_
 from base.views.education_groups.update import CertificateAimAutocomplete, PostponeGroupElementYearView
 from . import search, create, detail, update, delete, group_element_year
 from .achievement.urls import urlpatterns as urlpatterns_achievement
-import base.views.filter
 
 urlpatterns = [
     url(
@@ -93,9 +92,14 @@ urlpatterns = [
         url(r'^select/$', education_group_select, name='education_group_select'),
         url(r'^content/', include([
             url(u'^$', detail.EducationGroupContent.as_view(), name='education_group_content'),
+            url(u'^create/$', group_element_year.create.CreateGroupElementYearView.as_view(),
+                name='education_group_attach'
+                ),
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
-                url(r'^comment/$', group_element_year.update.UpdateGroupElementYearView.as_view(),
-                    name="group_element_year_management_comment")
+                url(r'^delete/$', group_element_year.delete.DetachGroupElementYearView.as_view(),
+                    name='group_element_year_delete'),
+                url(r'^update/$', group_element_year.update.UpdateGroupElementYearView.as_view(),
+                    name="group_element_year_update")
             ]))
         ])),
         url(r'^utilization/$', detail.EducationGroupUsing.as_view(), name='education_group_utilization'),
