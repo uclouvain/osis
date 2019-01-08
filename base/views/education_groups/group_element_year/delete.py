@@ -39,7 +39,7 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self._check_if_deletable(self.object):
-            context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s ? ") % {
+            context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s ?") % {
                 "acronym": self.object.child.acronym
             }
 
