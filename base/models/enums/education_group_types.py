@@ -58,6 +58,14 @@ class TrainingType(ChoiceEnum):
     MASTER_MC = _("Master of specialist")
     INTERNSHIP = pgettext_lazy("Internship for education group", "Internship")
 
+    @classmethod
+    def with_diploma_values_set_initially_as_true(cls):
+        return [
+            cls.AGGREGATION.name, cls.BACHELOR.name, cls.FORMATION_PHD.name, cls.PHD.name, cls.MASTER_MA_120.name,
+            cls.MASTER_MD_120.name, cls.MASTER_MS_120.name, cls.MASTER_MA_180_240.name, cls.MASTER_MD_180_240.name,
+            cls.MASTER_MS_180_240.name, cls.MASTER_M1.name, cls.MASTER_MC.name
+        ]
+
 
 class MiniTrainingType(ChoiceEnum):
     DEEPENING = _("Deepening")
