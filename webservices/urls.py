@@ -25,8 +25,10 @@
 ##############################################################################
 from django.conf.urls import url, include
 
+
 import continuing_education.urls_api_v1
 import education_group.api.url_v1
+
 from webservices.views import ws_catalog_offer
 
 
@@ -39,5 +41,6 @@ urlpatterns = [
             include(continuing_education.urls_api_v1.urlpatterns, namespace='continuing_education_api_v1')),
         url(r'^education_group/',
             include(education_group.api.url_v1, namespace='education_group_api_v1')),
+
     ])),
 ]
