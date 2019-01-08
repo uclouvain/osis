@@ -42,8 +42,7 @@
                 <td width="45%" style="white-space: pre;">{{ group.title }}</td>
                 <td width="20%">{{ group.access_condition| yesno:_("yes,no") |title }}</td>
                 <td width="15%">
-                    {% url 'group_element_year_update' root.pk education_group_year.pk group.pk as update_url %}
-                    {% button_with_permission _("Edit") "edit" update_url %}
+                    {% include "education_group/blocks/content_actions.html" with cannot_order=True %}
                 </td>
             </tr>
         {% endfor %}

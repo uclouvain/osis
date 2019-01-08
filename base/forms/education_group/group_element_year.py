@@ -81,3 +81,16 @@ class GroupElementYearForm(forms.ModelForm):
 class GroupElementYearMinorMajorOptionForm(GroupElementYearForm):
     class Meta(GroupElementYearForm.Meta):
         fields = GroupElementYearForm.Meta.fields + ["access_condition"]
+
+    def save(self, commit=True):
+        obj = super().save(commit)
+        self._reorder_children_by_partial_acronym(obj.parent)
+        return obj
+
+    @staticmethod
+    def _reorder_children_by_partial_acronym(parent):
+        children = parent.children.order_by("child_branch__partial_acronym")
+
+        for counter, child in enumerate(children):
+            child.order = counter
+            child.save()

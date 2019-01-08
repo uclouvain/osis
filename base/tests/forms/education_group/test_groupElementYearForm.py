@@ -26,10 +26,11 @@
 from django.test import TestCase
 from django.utils.translation import gettext as _
 
-from base.forms.education_group.group_element_year import GroupElementYearForm
+from base.forms.education_group.group_element_year import GroupElementYearForm, GroupElementYearMinorMajorOptionForm
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
@@ -90,3 +91,25 @@ class TestGroupElementYearForm(TestCase):
         )
 
         self.assertTrue(form.is_valid())
+
+
+class TestGroupElementYearMinorMajorOptionForm(TestCase):
+    def setUp(self):
+        self.group_element_1 = GroupElementYearFactory(
+            child_branch__partial_acronym="SECOND",
+            order=1
+        )
+        self.group_element_2 = GroupElementYearFactory(
+            parent=self.group_element_1.parent,
+            child_branch__partial_acronym="FIRST",
+            order=2
+        )
+
+    def test_reorder_children_by_partial_acronym(self):
+        GroupElementYearMinorMajorOptionForm._reorder_children_by_partial_acronym(self.group_element_1.parent)
+
+        self.group_element_1.refresh_from_db()
+        self.group_element_2.refresh_from_db()
+        self.assertTrue(
+            self.group_element_1.order == 1 and self.group_element_2.order == 0
+        )
