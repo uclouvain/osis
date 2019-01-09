@@ -41,12 +41,12 @@ def publish(education_group_year):
     publish_url = _get_url_to_publish(education_group_year)
 
     try:
-        request = requests.get(
+        response = requests.get(
             publish_url,
             headers={"Authorization": settings.ESB_AUTHORIZATION},
             timeout=settings.REQUESTS_TIMEOUT
         )
-        if request.status_code == HttpResponse.status_code:
+        if response.status_code == HttpResponse.status_code:
             return _get_portal_url(education_group_year)
         else:
             raise PublishException(_("This program has no page to publish on it"))
@@ -60,10 +60,10 @@ def get_relevant_sections(education_group_year):
 
     relevant_sections_url = _get_portal_url(education_group_year) + "?" + settings.GET_SECTION_PARAM
     try:
-        request = requests.get(relevant_sections_url, timeout=settings.REQUESTS_TIMEOUT).json()
+        response = requests.get(relevant_sections_url, timeout=settings.REQUESTS_TIMEOUT).json()
     except (json.JSONDecodeError, requests.exceptions.Timeout, requests.exceptions.ConnectionError):
         raise RelevantSectionException(_("Unable to retrieve appropriate sections for this programs"))
-    return request.get('sections') or []
+    return response.get('sections') or []
 
 
 def _get_url_to_publish(education_group_year):
