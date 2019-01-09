@@ -41,6 +41,7 @@ class GroupElementYearForm(forms.ModelForm):
             "link_type",
             "comment",
             "comment_english",
+            "access_condition"
         ]
         widgets = {
             "comment": forms.Textarea(attrs={'rows': 5}),
@@ -51,6 +52,13 @@ class GroupElementYearForm(forms.ModelForm):
     def __init__(self, *args, parent=None, child_branch=None, child_leaf=None, **kwargs):
         super().__init__(*args, **kwargs)
 
+        if self._is_parent_a_minor_major_option(self.instance, parent):
+            self._keep_only_fields(["access_condition"])
+        elif self._is_child_a_minor_major_option(self.instance, child_branch):
+            self._keep_only_fields(["block"])
+        else:
+            self.fields.pop("access_condition")
+
         # No need to attach FK to an existing GroupElementYear
         if self.instance.pk:
             return
@@ -58,6 +66,12 @@ class GroupElementYearForm(forms.ModelForm):
         self.instance.parent = parent
         self.instance.child_leaf = child_leaf
         self.instance.child_branch = child_branch
+
+    def save(self, commit=True):
+        obj = super().save(commit)
+        if self._is_parent_a_minor_major_option(obj, obj.parent):
+            self._reorder_children_by_partial_acronym(obj.parent)
+        return obj
 
     def clean_link_type(self):
         data_cleaned = self.cleaned_data.get('link_type')
@@ -77,17 +91,6 @@ class GroupElementYearForm(forms.ModelForm):
                 self.add_error('link_type', _("You are not allowed to create a reference with a learning unit"))
         return data_cleaned
 
-
-class GroupElementYearMinorMajorOptionForm(GroupElementYearForm):
-    class Meta(GroupElementYearForm.Meta):
-        fields = ["access_condition"]
-        widgets = {}
-
-    def save(self, commit=True):
-        obj = super().save(commit)
-        self._reorder_children_by_partial_acronym(obj.parent)
-        return obj
-
     @staticmethod
     def _reorder_children_by_partial_acronym(parent):
         children = parent.children.order_by("child_branch__partial_acronym")
@@ -95,3 +98,27 @@ class GroupElementYearMinorMajorOptionForm(GroupElementYearForm):
         for counter, child in enumerate(children):
             child.order = counter
             child.save()
+
+    def _keep_only_fields(self, fields_to_keep):
+        for field in self.Meta.fields:
+            if field not in fields_to_keep:
+                self.fields.pop(field)
+
+    def _is_parent_a_minor_major_option(self, instance, parent):
+        parent_egy = None
+        if parent:
+            parent_egy = parent
+        elif instance:
+            parent_egy = instance.parent
+
+        return parent_egy.education_group_type.name in GroupType.minor_major_option() if parent_egy else False
+
+    def _is_child_a_minor_major_option(self, instance, child):
+        child_egy = None
+
+        if child:
+            child_egy = child
+        elif instance:
+            child_egy = instance.child_branch
+
+        return child_egy.education_group_type.name in GroupType.minor_major_option() if child_egy else False

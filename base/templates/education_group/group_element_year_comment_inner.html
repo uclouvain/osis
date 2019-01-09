@@ -31,9 +31,7 @@
             <h4 class="text-center">{{ form.instance.child.acronym }}</h4>
         </div>
 
-
         <div id="form-modal-body" class="modal-body">
-
             {% bootstrap_form_errors form %}
             <form method="post" id="form_comment_update" action="{{ request.path }}">
                 {% csrf_token %}
@@ -46,7 +44,6 @@
                 {% bootstrap_row field_0=form.comment_english form_group_class_0="col-md-12" %}
 
                 {% bootstrap_row field_0=form.access_condition form_group_class_0="col-md-4" %}
-
             </form>
         </div>
 

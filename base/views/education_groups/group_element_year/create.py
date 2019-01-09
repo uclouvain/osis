@@ -29,8 +29,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView
 
 from base.business.group_element_years.management import SELECT_CACHE_KEY, extract_child_from_cache
-from base.forms.education_group.group_element_year import GroupElementYearForm, GroupElementYearMinorMajorOptionForm
-from base.models.enums.education_group_types import GroupType
+from base.forms.education_group.group_element_year import GroupElementYearForm
 from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException
 from base.utils.cache import cache
 from base.views.common import display_warning_messages
@@ -39,11 +38,8 @@ from base.views.education_groups.group_element_year.common import GenericGroupEl
 
 class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
     # CreateView
+    form_class = GroupElementYearForm
     template_name = "education_group/group_element_year_comment_inner.html"
-
-    def get_form_class(self):
-        is_minor_major_option = self.education_group_year.education_group_type.name in GroupType.minor_major_option()
-        return GroupElementYearMinorMajorOptionForm if is_minor_major_option else GroupElementYearForm
 
     def get_form_kwargs(self):
         """ For the creation, the group_element_year needs a parent and a child """
