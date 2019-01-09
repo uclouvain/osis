@@ -27,6 +27,7 @@ from collections import defaultdict
 
 from bootstrap3.templatetags import bootstrap3
 from django import template
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -41,8 +42,7 @@ def bootstrap_row(**kwargs):
     keys = sorted(field_parameters_by_position.keys())
     fields = [field_parameters_by_position[key] for key in keys
               if "field" in field_parameters_by_position[key] and field_parameters_by_position[key]["field"]]
-
-    return _render_row(fields)
+    return mark_safe(_render_row(fields))
 
 
 def extract_position_and_field_parameter(field_parameter):
