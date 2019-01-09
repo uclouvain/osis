@@ -109,7 +109,8 @@ class GroupElementYearForm(forms.ModelForm):
         elif instance:
             parent_egy = instance.parent
 
-        return parent_egy.education_group_type.name in GroupType.minor_major_option_list_choice() if parent_egy else False
+        return parent_egy.education_group_type.name in GroupType.minor_major_option_list_choice() \
+            if parent_egy else False
 
     def _is_child_a_minor_major_option_list_choice(self, instance, child):
         child_egy = None
