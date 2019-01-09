@@ -80,7 +80,8 @@ class GroupElementYearForm(forms.ModelForm):
 
 class GroupElementYearMinorMajorOptionForm(GroupElementYearForm):
     class Meta(GroupElementYearForm.Meta):
-        fields = GroupElementYearForm.Meta.fields + ["access_condition"]
+        fields = ["access_condition"]
+        widgets = {}
 
     def save(self, commit=True):
         obj = super().save(commit)
