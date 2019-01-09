@@ -23,20 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import continuing_education.urls_api_v1
-from django.conf.urls import url, include
+from django.test import TestCase
 
-import education_group.api.url_v1
-from webservices.views import ws_catalog_offer
+from base.api.serializers.person import PersonDetailSerializer
 
-urlpatterns = [
-    url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/(?P<acronym>[a-zA-Z0-9]+)$',
-        ws_catalog_offer,
-        name='v0.1-ws_catalog_offer'),
-    url(r'^v1/', include([
-        url(r'^continuing_education/',
-            include(continuing_education.urls_api_v1.urlpatterns, namespace='continuing_education_api_v1')),
-        url(r'^education_group/',
-            include(education_group.api.url_v1, namespace='education_group_api_v1')),
-    ])),
-]
+
+class PersonDetailSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.serializer = PersonDetailSerializer()
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'first_name',
+            'last_name',
+            'email',
+            'gender'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+
