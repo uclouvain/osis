@@ -28,7 +28,6 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 
-from base.forms.education_group.group_element_year import GroupElementYearForm
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
 from base.views.education_groups import perms
