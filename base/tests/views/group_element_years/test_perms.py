@@ -28,7 +28,7 @@ from django.test import TestCase
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_types import GroupType
-from base.tests.factories.academic_calendar import AcademicCalendarFactory, CloseAcademicCalendarFactory, \
+from base.tests.factories.academic_calendar import CloseAcademicCalendarFactory, \
     OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
