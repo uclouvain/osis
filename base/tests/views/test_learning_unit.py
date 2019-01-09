@@ -90,10 +90,9 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
-from base.views.learning_unit import learning_unit_comparison
+from base.views.learning_unit import learning_unit_comparison, learning_unit_specifications_edit
 from base.views.learning_unit import learning_unit_components, learning_class_year_edit, learning_unit_specifications, \
-    learning_unit_formations, get_charge_repartition_warning_messages, CHARGE_REPARTITION_WARNING_MESSAGE, \
-    learning_unit_attributions
+    learning_unit_formations, get_charge_repartition_warning_messages, learning_unit_attributions
 from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.search import learning_units_service_course
@@ -734,8 +733,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/identification.html')
         self.assertEqual(len(response.context['learning_container_year_partims']), 3)
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_unit_formation(self, mock_render):
+    def test_learning_unit_formation(self):
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=self.learning_container_yr)
         educ_group_type_matching_filters = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
@@ -755,17 +753,10 @@ class LearningUnitViewTestCase(TestCase):
             parent=EducationGroupYearFactory(partial_acronym='TMATH600R', academic_year=self.current_academic_year,
                                              education_group_type=educ_group_type_matching_filters))
 
-        request_factory = RequestFactory()
+        response = self.client.get(reverse('learning_unit_formations', args=[learning_unit_year.id]))
+        context = response.context
 
-        request = request_factory.get(reverse('learning_unit_formations', args=[learning_unit_year.id]))
-        request.user = self.a_superuser
-
-        learning_unit_formations(request, learning_unit_year.id)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/formations.html')
+        self.assertTemplateUsed(response, 'learning_unit/formations.html')
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
         self.assertEqual(context['learning_unit_year'], learning_unit_year)
         expected_order = [group_element2, group_element1, group_element3]
@@ -1226,30 +1217,21 @@ class LearningUnitViewTestCase(TestCase):
 
         self.assertTemplateUsed(response, 'learning_unit/attributions.html')
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_unit_specifications_edit(self, mock_render):
+    def test_learning_unit_specifications_edit(self):
         a_label = 'label'
         learning_unit_year = LearningUnitYearFactory()
         text_label_lu = TextLabelFactory(order=1, label=a_label, entity=entity_name.LEARNING_UNIT_YEAR)
         TranslatedTextFactory(text_label=text_label_lu, entity=entity_name.LEARNING_UNIT_YEAR)
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse('learning_unit',
-                                              args=[learning_unit_year.id]), data={
-            'label': a_label,
-            'language': 'en'
-        })
-        request.user = self.a_superuser
-        # request.label = 'label'
-        # request.language = 'en'
-        from base.views.learning_unit import learning_unit_specifications_edit
 
-        learning_unit_specifications_edit(request, learning_unit_year.id)
+        response = self.client.get(
+            reverse(learning_unit_specifications_edit,
+                    args=[learning_unit_year.id]), data={
+                'label': a_label,
+                'language': 'en'
+            })
 
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/specifications_edit.html')
-        self.assertIsInstance(context['form'], LearningUnitSpecificationsEditForm)
+        self.assertTemplateUsed(response, 'learning_unit/specifications_edit.html')
+        self.assertIsInstance(response.context['form'], LearningUnitSpecificationsEditForm)
 
     def test_learning_unit_specifications_save(self):
         learning_unit_year = LearningUnitYearFactory()
@@ -1578,6 +1560,7 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
         tutor_name = Person.get_str(self.attribution_full.tutor.person.first_name,
                                     self.attribution_full.tutor.person.middle_name,
                                     self.attribution_full.tutor.person.last_name)
-        tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.function))
-        self.assertListEqual(msgs,
-                             [_(CHARGE_REPARTITION_WARNING_MESSAGE) % {"tutor": tutor_name_with_function}])
+        tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.get_function_display()))
+        self.assertListEqual(msgs, [_("The sum of volumes for the partims for professor %(tutor)s is superior to the "
+                                      "volume of parent learning unit for this professor") % {
+                                        "tutor": tutor_name_with_function}])

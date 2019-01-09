@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import pgettext_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from base.models.utils.utils import ChoiceEnum
@@ -42,7 +43,7 @@ class TrainingType(ChoiceEnum):
     ACCESS_CONTEST = _("Access contest")
     LANGUAGE_CLASS = _("Language classes")
     ISOLATED_CLASS = _("Isolated classes")
-    PHD = _("Ph.D")
+    PHD = pgettext_lazy("Ph.D for education group", "Ph.D")
     FORMATION_PHD = _("Formation PhD")
     JUNIOR_YEAR = _("Junior year")
     PGRM_MASTER_120 = _("Program master 120")
@@ -55,7 +56,15 @@ class TrainingType(ChoiceEnum):
     MASTER_MS_180_240 = _("Master MS 180-240")
     MASTER_M1 = _("Master in 60 credits")
     MASTER_MC = _("Master of specialist")
-    INTERNSHIP = _("Internship")
+    INTERNSHIP = pgettext_lazy("Internship for education group", "Internship")
+
+    @classmethod
+    def with_diploma_values_set_initially_as_true(cls):
+        return [
+            cls.AGGREGATION.name, cls.BACHELOR.name, cls.FORMATION_PHD.name, cls.PHD.name, cls.MASTER_MA_120.name,
+            cls.MASTER_MD_120.name, cls.MASTER_MS_120.name, cls.MASTER_MA_180_240.name, cls.MASTER_MD_180_240.name,
+            cls.MASTER_MS_180_240.name, cls.MASTER_M1.name, cls.MASTER_MC.name
+        ]
 
 
 class MiniTrainingType(ChoiceEnum):
@@ -89,6 +98,12 @@ class GroupType(ChoiceEnum):
     MOBILITY_PARTNERSHIP_LIST_CHOICE = _("Mobility partnership list choice")
     COMPLEMENTARY_MODULE = _("Complementary module")
     SUB_GROUP = _("Sub group")
+
+    @classmethod
+    def minor_major_option_list_choice(cls):
+        return [
+            cls.MINOR_LIST_CHOICE.name, cls.MAJOR_LIST_CHOICE.name, cls.OPTION_LIST_CHOICE.name
+        ]
 
 
 ALL_TYPES = TrainingType.choices() + MiniTrainingType.choices() + GroupType.choices()

@@ -32,12 +32,13 @@ from django.contrib.auth import authenticate, logout
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.views import login as django_login
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl
 from base.models.utils import native
+from osis_common.models import application_notice
 from . import layout
 
 ITEMS_PER_PAGE = 25
@@ -83,10 +84,26 @@ def common_context_processor(request):
     else:
         sentry_dns = ''
     release_tag = settings.RELEASE_TAG if hasattr(settings, 'RELEASE_TAG') else None
-    return {'installed_apps': settings.INSTALLED_APPS,
-            'environment': env,
-            'sentry_dns': sentry_dns,
-            'release_tag': release_tag}
+
+    context = {'installed_apps': settings.INSTALLED_APPS,
+               'environment': env,
+               'sentry_dns': sentry_dns,
+               'release_tag': release_tag}
+    _check_notice(request, context)
+    return context
+
+
+def _check_notice(request, values):
+    if 'subject' not in request.session and 'notice' not in request.session:
+        notice = application_notice.find_current_notice()
+        if notice:
+            request.session.set_expiry(3600)
+            request.session['subject'] = notice.subject
+            request.session['notice'] = notice.notice
+
+    if 'subject' in request.session and 'notice' in request.session:
+        values['subject'] = request.session['subject']
+        values['notice'] = request.session['notice']
 
 
 def login(request):
@@ -112,8 +129,10 @@ def home(request):
     calendar_events = None
     if academic_yr:
         calendar_events = mdl.academic_calendar.find_academic_calendar_by_academic_year_with_dates(academic_yr.id)
-    return layout.render(request, "home.html", {'academic_calendar': calendar_events,
-                                                'highlights': mdl.academic_calendar.find_highlight_academic_calendar()})
+    return render(request, "home.html", {
+        'academic_calendar': calendar_events,
+        'highlights': mdl.academic_calendar.find_highlight_academic_calendar()
+    })
 
 
 def log_out(request):

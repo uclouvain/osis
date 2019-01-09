@@ -24,6 +24,7 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+{% if not cannot_order %}
 <form id="form_group_element_year_actions" method="POST" style="display:inline;"
       action="{% url 'education_groups_management' %}">
     <input type="hidden" name="root_id" value="{{ root.id }}"/>
@@ -35,13 +36,12 @@
         {% button_order_with_permission _("Down") "btn_operation_down_"|addstr:group.id "down" %}
     </div>
 </form>
+{% endif %}
 
 <div class="btn-group">
-    {% url_resolver_match as url_resolver_match %}
-    {% url 'education_groups_management' as management_url %}
-    {% url_add_query management_url root_id=root.id element_id=group.child_id group_element_year_id=group.id action="detach" source=url_resolver_match as detach_url %}
+    {% url 'group_element_year_delete' root.pk education_group_year.pk group.pk as detach_url %}
     {% button_with_permission _("Detach") "detach" detach_url %}
 
-    {% url 'group_element_year_management_comment' root_id=parent.id education_group_year_id=education_group_year.id group_element_year_id=group.id as update_comment_url %}
-    {% button_with_permission _("Edit") "edit" update_comment_url %}
+    {% url 'group_element_year_update' root.pk education_group_year.pk group.pk as update_url %}
+    {% button_with_permission _("Edit") "edit" update_url %}
 </div>

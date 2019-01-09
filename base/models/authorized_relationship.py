@@ -24,9 +24,10 @@
 #
 ##############################################################################
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
-from base.models.enums.count_constraint import MIN_COUNT_CONSTRAINTS, MAX_COUNT_CONSTRAINTS, ZERO, MANY
 from base.models.education_group_type import EducationGroupType
+from base.models.enums.count_constraint import MIN_COUNT_CONSTRAINTS, MAX_COUNT_CONSTRAINTS, ZERO, MANY
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -42,6 +43,12 @@ class AuthorizedRelationship(models.Model):
 
     min_count_authorized = models.CharField(max_length=5, choices=MIN_COUNT_CONSTRAINTS, default=ZERO)
     max_count_authorized = models.CharField(max_length=5, choices=MAX_COUNT_CONSTRAINTS, default=MANY)
+
+    reference = models.BooleanField(
+        default=False,
+        verbose_name=_('Reference'),
+        help_text=_("True when the relation is authorized for reference link.")
+    )
 
     def __str__(self):
         return '{} - {}'.format(self.parent_type, self.child_type)

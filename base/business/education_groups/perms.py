@@ -149,7 +149,7 @@ def check_link_to_management_entity(education_group, person, raise_exception):
     else:
         result = True
 
-    can_raise_exception(raise_exception, result, "The user is not attached to the management entity")
+    can_raise_exception(raise_exception, result, _("The user is not attached to the management entity"))
 
     return result
 

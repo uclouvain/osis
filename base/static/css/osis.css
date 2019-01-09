@@ -23,8 +23,26 @@
 * OSIS Custom layout
 */
 
+html {
+    height: 100%;
+    box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+body {
+    position: relative;
+    margin: 0;
+    padding-bottom: 6rem;
+    min-height: 100%;
+}
+
 .nopadding {
-   padding: 0 !important;
+    padding: 0 !important;
 }
 
 .nomargin {
@@ -33,11 +51,10 @@
 
 /* Indication Status QA - DEV */
 
-.qamode
-{
-    background-image:url("../img/qamode.svg");
+.qamode {
+    background-image: url("../img/qamode.svg");
     background-repeat: repeat;
-    background-position:center;
+    background-position: center;
 }
 
 .qagreen {
@@ -56,11 +73,10 @@
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
 }
 
-.testmode
-{
-    background-image:url("../img/testmode.svg");
+.testmode {
+    background-image: url("../img/testmode.svg");
     background-repeat: repeat;
-    background-position:center;
+    background-position: center;
 }
 
 
@@ -80,11 +96,10 @@
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
 }
 
-.devmode
-{
-    background-image:url("../img/devmode.svg");
+.devmode {
+    background-image: url("../img/devmode.svg");
     background-repeat: repeat;
-    background-position:center;
+    background-position: center;
 }
 
 .devorange {
@@ -103,11 +118,10 @@
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
 }
 
-.localmode
-{
-    background-image:url("../img/localmode.svg");
+.localmode {
+    background-image: url("../img/localmode.svg");
     background-repeat: repeat;
-    background-position:center;
+    background-position: center;
 }
 
 .localred {
@@ -127,13 +141,13 @@
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
 }
 
-.proposal_value{
+.proposal_value {
     color: #5CB85C;
     cursor: help;
 }
 
-.required_field .control-label:after{
-    content:" *";
+.required_field .control-label:after {
+    content: " *";
 }
 
 .list-group-flush:first-child .list-group-item:first-child {
@@ -158,4 +172,12 @@
  */
 * html .ui-autocomplete {
     height: 200px;
+}
+
+.footer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #f5f5f5;
 }
