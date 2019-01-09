@@ -23,20 +23,42 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import continuing_education.urls_api_v1
-from django.conf.urls import url, include
+from collections import defaultdict
 
-import education_group.api.url_v1
-from webservices.views import ws_catalog_offer
+from bootstrap3.templatetags import bootstrap3
+from django import template
+from django.utils.safestring import mark_safe
 
-urlpatterns = [
-    url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/(?P<acronym>[a-zA-Z0-9]+)$',
-        ws_catalog_offer,
-        name='v0.1-ws_catalog_offer'),
-    url(r'^v1/', include([
-        url(r'^continuing_education/',
-            include(continuing_education.urls_api_v1.urlpatterns, namespace='continuing_education_api_v1')),
-        url(r'^education_group/',
-            include(education_group.api.url_v1, namespace='education_group_api_v1')),
-    ])),
-]
+register = template.Library()
+
+
+@register.simple_tag
+def bootstrap_row(**kwargs):
+    field_parameters_by_position = defaultdict(dict)
+    for name, value in kwargs.items():
+        position, field_parameter = extract_position_and_field_parameter(name)
+        field_parameters_by_position[position][field_parameter] = value
+
+    keys = sorted(field_parameters_by_position.keys())
+    fields = [field_parameters_by_position[key] for key in keys
+              if "field" in field_parameters_by_position[key] and field_parameters_by_position[key]["field"]]
+    return mark_safe(_render_row(fields))
+
+
+def extract_position_and_field_parameter(field_parameter):
+    field_parameter, separator, position = field_parameter.rpartition("_")
+    return int(position), field_parameter
+
+
+def _render_row(fields):
+    if not fields:
+        return ""
+
+    rendering = '<div class="form-group row">\n'
+
+    for field in fields:
+        rendering += "\t" + bootstrap3.bootstrap_field(**field) + "\n"
+
+    rendering += '</div>'
+
+    return rendering
