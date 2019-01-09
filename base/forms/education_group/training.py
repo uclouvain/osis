@@ -166,7 +166,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
                                                     .select_related('decree')\
                                                     .order_by('-decree__name', 'name')
         if self.fields['certificate_aims'].disabled:
-            self.fields['section'].disabled=True
+            self.fields['section'].disabled = True
 
     def save(self, commit=True):
         education_group_year = super().save(commit=False)
