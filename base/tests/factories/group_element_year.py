@@ -42,4 +42,4 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
     child_leaf = None
     is_mandatory = False
     link_type = None
-    order = 0
+    order = None
