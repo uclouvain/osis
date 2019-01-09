@@ -42,6 +42,7 @@ from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.entity_version import get_last_version
 from base.models.enums import education_group_categories, rate_code, decree_category
 from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import TrainingType
 from reference.models.domain import Domain
 from reference.models.enums import domain_type
 from base.models.hops import Hops
@@ -165,6 +166,18 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         self.fields['main_domain'].queryset = Domain.objects.filter(type=domain_type.UNIVERSITY)\
                                                     .select_related('decree')\
                                                     .order_by('-decree__name', 'name')
+
+        if not getattr(self.initial, 'academic_year', None):
+            self.set_initial_diploma_values()
+
+    def set_initial_diploma_values(self):
+        if self.education_group_type and \
+                self.education_group_type.name in TrainingType.with_diploma_values_set_initially_as_true():
+            self.fields['joint_diploma'].initial = True
+            self.fields['diploma_printing_title'].required = True
+        else:
+            self.fields['joint_diploma'].initial = False
+            self.fields['diploma_printing_title'].required = False
 
     def save(self, commit=True):
         education_group_year = super().save(commit=False)

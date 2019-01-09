@@ -405,8 +405,11 @@ def get_conditions_admissions(context):
 
 
 def get_evaluation(education_group_year, language_code):
+    try:
+        label, text = get_evaluation_text(education_group_year, language_code)
+    except TranslatedText.DoesNotExist:
+        label = text = None
 
-    label, text = get_evaluation_text(education_group_year, language_code)
     common_text = get_common_evaluation_text(education_group_year, language_code)
 
     return {

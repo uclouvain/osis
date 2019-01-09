@@ -1024,6 +1024,26 @@ class GetEvaluationTestCase(TestCase):
         self.assertTrue('content' in context)
         self.assertTrue('free_text' in context)
 
+    def test_get_evaluation_doesnotexist(self):
+        education_group_year = EducationGroupYearFactory()
+        common_education_group_year = EducationGroupYearCommonFactory(
+            academic_year=education_group_year.academic_year
+        )
+        text_label = TextLabelFactory(entity=OFFER_YEAR, label='evaluation')
+        TranslatedTextLabelFactory(text_label=text_label, language='fr-be', label='evaluation')
+
+        TranslatedTextRandomFactory(text_label=text_label,
+                                    language='fr-be',
+                                    reference=common_education_group_year.id,
+                                    entity=text_label.entity,
+                                    text='<tag>{section}-commun</tag>'.format(section='evaluation'))
+        context = get_evaluation(education_group_year,  settings.LANGUAGE_CODE_FR)
+        self.assertEqual(context['id'], business.EVALUATION_KEY)
+        self.assertEqual(context['label'], None)
+        self.assertTrue('content' in context)
+        self.assertTrue('free_text' in context)
+        self.assertEqual(context['free_text'], None)
+
 
 class GetContactsTestCase(TestCase):
     def setUp(self):
