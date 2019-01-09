@@ -52,9 +52,9 @@ class GroupElementYearForm(forms.ModelForm):
     def __init__(self, *args, parent=None, child_branch=None, child_leaf=None, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if self._is_parent_a_minor_major_option(self.instance, parent):
+        if self._is_parent_a_minor_major_option_list_choice(self.instance, parent):
             self._keep_only_fields(["access_condition"])
-        elif self._is_child_a_minor_major_option(self.instance, child_branch):
+        elif self._is_child_a_minor_major_option_list_choice(self.instance, child_branch):
             self._keep_only_fields(["block"])
         else:
             self.fields.pop("access_condition")
@@ -69,7 +69,7 @@ class GroupElementYearForm(forms.ModelForm):
 
     def save(self, commit=True):
         obj = super().save(commit)
-        if self._is_parent_a_minor_major_option(obj, obj.parent):
+        if self._is_parent_a_minor_major_option_list_choice(obj, obj.parent):
             self._reorder_children_by_partial_acronym(obj.parent)
         return obj
 
@@ -100,20 +100,18 @@ class GroupElementYearForm(forms.ModelForm):
             child.save()
 
     def _keep_only_fields(self, fields_to_keep):
-        for field in self.Meta.fields:
-            if field not in fields_to_keep:
-                self.fields.pop(field)
+        self.fields = {name: field for name, field in self.fields.items() if name in fields_to_keep}
 
-    def _is_parent_a_minor_major_option(self, instance, parent):
+    def _is_parent_a_minor_major_option_list_choice(self, instance, parent):
         parent_egy = None
         if parent:
             parent_egy = parent
         elif instance:
             parent_egy = instance.parent
 
-        return parent_egy.education_group_type.name in GroupType.minor_major_option() if parent_egy else False
+        return parent_egy.education_group_type.name in GroupType.minor_major_option_list_choice() if parent_egy else False
 
-    def _is_child_a_minor_major_option(self, instance, child):
+    def _is_child_a_minor_major_option_list_choice(self, instance, child):
         child_egy = None
 
         if child:
@@ -121,4 +119,4 @@ class GroupElementYearForm(forms.ModelForm):
         elif instance:
             child_egy = instance.child_branch
 
-        return child_egy.education_group_type.name in GroupType.minor_major_option() if child_egy else False
+        return child_egy.education_group_type.name in GroupType.minor_major_option_list_choice() if child_egy else False

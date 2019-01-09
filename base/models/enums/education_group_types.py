@@ -100,7 +100,7 @@ class GroupType(ChoiceEnum):
     SUB_GROUP = _("Sub group")
 
     @classmethod
-    def minor_major_option(cls):
+    def minor_major_option_list_choice(cls):
         return [
             cls.MINOR_LIST_CHOICE.name, cls.MAJOR_LIST_CHOICE.name, cls.OPTION_LIST_CHOICE.name
         ]
