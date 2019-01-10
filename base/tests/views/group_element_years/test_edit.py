@@ -61,9 +61,7 @@ class TestEdit(TestCase):
             return_value=True
         )
         self.mocked_perm = self.perm_patcher.start()
-
-    def tearDown(self):
-        self.perm_patcher.stop()
+        self.addCleanup(self.perm_patcher.stop)
 
     def test_edit_case_user_not_logged(self):
         self.client.logout()
