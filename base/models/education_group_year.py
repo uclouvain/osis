@@ -41,7 +41,7 @@ from base.models.enums import academic_type, internship_presence, schedule_type,
 from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
 from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
-from base.models.enums.education_group_types import MiniTrainingType
+from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.exceptions import MaximumOneParentAllowedException
 from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
@@ -492,6 +492,26 @@ class EducationGroupYear(SerializableModel):
     @property
     def is_common(self):
         return self.acronym.startswith('common')
+
+    @property
+    def is_master120(self):
+        return self.education_group_type.name in TrainingType.PGRM_MASTER_120
+
+    @property
+    def is_master60(self):
+        return self.education_group_type.name in TrainingType.MASTER_M1
+
+    @property
+    def is_agregation(self):
+        return self.education_group_type.name in TrainingType.AGGREGATION
+
+    @property
+    def is_specialized_master(self):
+        return self.education_group_type.name in TrainingType.MASTER_MC
+
+    @property
+    def is_bachelor(self):
+        return self.education_group_type.name in TrainingType.BACHELOR
 
     @property
     def verbose(self):
