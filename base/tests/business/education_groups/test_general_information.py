@@ -52,6 +52,12 @@ class TestPublishGeneralInformation(TestCase):
         with self.assertRaises(ImproperlyConfigured):
             general_information.publish(self.training)
 
+    @mock.patch('threading.Thread')
+    def test_publish_call_seperate_thread(self, mock_thread):
+        mock_thread.start.return_value = True
+        general_information.publish(self.training)
+        self.assertTrue(mock_thread.start)
+
     @mock.patch('requests.get', return_value=HttpResponseNotFound)
     def test_publish_case_not_found_return_false(self, mock_requests):
         response = general_information._publish(self.training)
