@@ -34,7 +34,7 @@ from requests import Timeout
 
 from base.business.education_groups import general_information
 from base.business.education_groups.general_information import PublishException, RelevantSectionException, \
-    _get_portal_url
+    _get_portal_url, _bulk_publish
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory
 
@@ -53,9 +53,10 @@ class TestPublishGeneralInformation(TestCase):
             general_information.publish(self.training)
 
     @mock.patch('requests.get', return_value=HttpResponseNotFound)
-    def test_publish_case_not_found_raise_exception(self, mock_requests):
-        with self.assertRaises(PublishException):
-            general_information._publish(self.training)
+    def test_publish_case_not_found_return_false(self, mock_requests):
+        response = general_information._publish(self.training)
+        self.assertIsInstance(response, bool)
+        self.assertFalse(response)
 
     @mock.patch('requests.get', side_effect=Timeout)
     def test_publish_case_timout_reached(self, mock_requests):
@@ -79,6 +80,17 @@ class TestGetPortalUrl(TestCase):
             code=training.acronym
         )
         self.assertEqual(_get_portal_url(training), url_expected)
+
+
+class TestBulkPublish(TestCase):
+    @mock.patch('base.business.education_groups.general_information._publish', return_value=True)
+    def test_bulk_publish(self, mock_publish):
+        training_1 = TrainingFactory()
+        training_2 = TrainingFactory()
+
+        result = _bulk_publish([training_1, training_2])
+        self.assertIsInstance(result, list)
+        self.assertListEqual(result, [True, True])
 
 
 @override_settings(URL_TO_PORTAL_UCL="http://portal-url.com", GET_SECTION_PARAM="sectionsParams")
