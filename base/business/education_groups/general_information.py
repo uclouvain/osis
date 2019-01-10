@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import json
-import logging
 from threading import Thread
 
 import requests
@@ -32,9 +31,6 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
-
-
-logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 def publish(education_group_year):
