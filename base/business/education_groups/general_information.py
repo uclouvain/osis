@@ -24,6 +24,8 @@
 #
 ##############################################################################
 import json
+import logging
+from threading import Thread
 
 import requests
 from django.conf import settings
@@ -32,26 +34,18 @@ from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 
 
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
+
 def publish(education_group_year):
     if not all([settings.ESB_API_URL, settings.ESB_AUTHORIZATION, settings.ESB_REFRESH_PEDAGOGY_ENDPOINT,
                 settings.URL_TO_PORTAL_UCL]):
         raise ImproperlyConfigured('ESB_API_URL / ESB_AUTHORIZATION / ESB_REFRESH_PEDAGOGY_ENDPOINT / '
                                    'URL_TO_PORTAL_UCL / must be set in configuration')
 
-    publish_url = _get_url_to_publish(education_group_year)
-
-    try:
-        response = requests.get(
-            publish_url,
-            headers={"Authorization": settings.ESB_AUTHORIZATION},
-            timeout=settings.REQUESTS_TIMEOUT
-        )
-        if response.status_code == HttpResponse.status_code:
-            return _get_portal_url(education_group_year)
-        else:
-            raise PublishException(_("This program has no page to publish on it"))
-    except Exception:
-        raise PublishException(_("Unable to publish sections for this programs"))
+    t = Thread(target=_publish, args=(education_group_year,))
+    t.start()
+    return _get_portal_url(education_group_year)
 
 
 def get_relevant_sections(education_group_year):
@@ -64,6 +58,25 @@ def get_relevant_sections(education_group_year):
     except (json.JSONDecodeError, requests.exceptions.Timeout, requests.exceptions.ConnectionError):
         raise RelevantSectionException(_("Unable to retrieve appropriate sections for this programs"))
     return response.get('sections') or []
+
+
+def _publish(education_group_year):
+    publish_url = _get_url_to_publish(education_group_year)
+    try:
+        response = requests.get(
+            publish_url,
+            headers={"Authorization": settings.ESB_AUTHORIZATION},
+            timeout=settings.REQUESTS_TIMEOUT
+        )
+        if response.status_code != HttpResponse.status_code:
+            raise PublishException(
+                "The program {acronym} has no page to publish on it".format(acronym=education_group_year.acronym)
+            )
+        return True
+    except Exception:
+        raise PublishException("Unable to publish sections for the program {acronym}".format(
+            acronym=education_group_year.acronym)
+        )
 
 
 def _get_url_to_publish(education_group_year):

@@ -26,13 +26,15 @@
 from unittest import mock
 
 import requests
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseNotFound, HttpResponse
 from django.test import TestCase, override_settings
 from requests import Timeout
 
 from base.business.education_groups import general_information
-from base.business.education_groups.general_information import PublishException, RelevantSectionException
+from base.business.education_groups.general_information import PublishException, RelevantSectionException, \
+    _get_portal_url
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory
 
@@ -53,17 +55,30 @@ class TestPublishGeneralInformation(TestCase):
     @mock.patch('requests.get', return_value=HttpResponseNotFound)
     def test_publish_case_not_found_raise_exception(self, mock_requests):
         with self.assertRaises(PublishException):
-            general_information.publish(self.training)
+            general_information._publish(self.training)
 
     @mock.patch('requests.get', side_effect=Timeout)
     def test_publish_case_timout_reached(self, mock_requests):
         with self.assertRaises(PublishException):
-            general_information.publish(self.training)
+            general_information._publish(self.training)
 
     @mock.patch('requests.get', return_value=HttpResponse)
     def test_publish_case_success(self, mock_requests):
-        url_portal = general_information.publish(self.training)
-        self.assertIsInstance(url_portal, str)
+        response = general_information._publish(self.training)
+        self.assertIsInstance(response, bool)
+        self.assertTrue(response)
+
+
+@override_settings(URL_TO_PORTAL_UCL="http://portal-url.com/prog-{year}-{code}")
+class TestGetPortalUrl(TestCase):
+    def test_get_portal_url_case_training(self):
+        training = TrainingFactory()
+
+        url_expected = settings.URL_TO_PORTAL_UCL.format(
+            year=training.academic_year.year,
+            code=training.acronym
+        )
+        self.assertEqual(_get_portal_url(training), url_expected)
 
 
 @override_settings(URL_TO_PORTAL_UCL="http://portal-url.com", GET_SECTION_PARAM="sectionsParams")
