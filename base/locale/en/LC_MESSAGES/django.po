@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-10 10:30+0100\n"
+"POT-Creation-Date: 2019-01-11 11:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -467,7 +467,7 @@ msgstr ""
 msgid "Administration entity"
 msgstr ""
 
-#: templates/education_group/tabs.html:70
+#: templates/education_group/tabs.html:54
 msgid "Administrative data"
 msgstr ""
 
@@ -957,7 +957,7 @@ msgstr ""
 msgid "Contacts"
 msgstr ""
 
-#: templates/education_group/tabs.html:76
+#: templates/education_group/tabs.html:60
 msgid "Content"
 msgstr ""
 
@@ -1653,7 +1653,7 @@ msgstr ""
 msgid "General configuration"
 msgstr ""
 
-#: templates/education_group/tabs.html:54
+#: templates/education_group/tabs.html:72
 msgid "General informations"
 msgstr ""
 
@@ -3826,12 +3826,13 @@ msgid ""
 "are not inside the selected training %(root)s"
 msgstr ""
 
-#: views/education_groups/achievement/update.py:146
-msgid "The program aim has been updated"
+#: views/education_groups/detail.py:371
+#, python-format
+msgid "The program %(acronym)s will be published soon"
 msgstr ""
 
-#: views/education_groups/detail.py:375
-msgid "The program are published. Click on the link to display it : "
+#: views/education_groups/achievement/update.py:146
+msgid "The program aim has been updated"
 msgstr ""
 
 #: templates/education_group/pdf_content.html:76
@@ -3975,7 +3976,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
-#: views/education_groups/detail.py:337
+#: views/education_groups/detail.py:333
 #, python-format
 msgid "This label %s does not exist"
 msgstr ""
@@ -4004,10 +4005,6 @@ msgstr ""
 
 #: templates/studies.html:44
 msgid "This process helps tutors while scores encoding."
-msgstr ""
-
-#: business/education_groups/general_information.py:52
-msgid "This program has no page to publish on it"
 msgstr ""
 
 #: business/group_element_years/postponement.py:80
@@ -4158,11 +4155,7 @@ msgstr ""
 msgid "URL of the learning unit"
 msgstr ""
 
-#: business/education_groups/general_information.py:54
-msgid "Unable to publish sections for this programs"
-msgstr ""
-
-#: business/education_groups/general_information.py:65
+#: business/education_groups/general_information.py:64
 msgid "Unable to retrieve appropriate sections for this programs"
 msgstr ""
 
@@ -4239,7 +4232,7 @@ msgid "User interface language"
 msgstr ""
 
 #: templates/education_group/learning_unit/tabs.html:35
-#: templates/education_group/tabs.html:81
+#: templates/education_group/tabs.html:65
 msgid "Utilizations"
 msgstr ""
 
@@ -5064,7 +5057,7 @@ msgstr ""
 msgid "section"
 msgstr ""
 
-#: templates/education_group/tabs.html:62
+#: templates/education_group/tabs.html:80
 msgid "skills and achievements"
 msgstr ""
 

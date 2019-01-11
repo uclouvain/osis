@@ -367,9 +367,8 @@ def publish(request, education_group_year_id, root_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
 
     try:
-        portal_url = general_information.publish(education_group_year)
-        message = _("The program are published. Click on the link to display it : ") + \
-            "<a href=" + portal_url + ">" + education_group_year.acronym + "</a>"
+        general_information.publish(education_group_year)
+        message = _("The program %(acronym)s will be published soon") % {'acronym': education_group_year.acronym}
         display_success_messages(request, message, extra_tags='safe')
     except PublishException as e:
         display_error_messages(request, str(e))
@@ -432,23 +431,23 @@ class EducationGroupContent(EducationGroupGenericDetailView):
         context = super().get_context_data(**kwargs)
 
         context["group_element_years"] = self.object.groupelementyear_set.annotate(
-                acronym=Case(
-                        When(child_leaf__isnull=False, then=F("child_leaf__acronym")),
-                        When(child_branch__isnull=False, then=F("child_branch__acronym")),
-                     ),
-                code=Case(
-                    When(child_branch__isnull=False, then=F("child_branch__partial_acronym")),
-                    default=None
-                ),
-                title=Case(
-                        When(child_leaf__isnull=False, then=F("child_leaf__specific_title")),
-                        When(child_branch__isnull=False, then=F("child_branch__title")),
-                     ),
-                child_id=Case(
-                    When(child_leaf__isnull=False, then=F("child_leaf__id")),
-                    When(child_branch__isnull=False, then=F("child_branch__id")),
-                ),
-            ).order_by('order')
+            acronym=Case(
+                When(child_leaf__isnull=False, then=F("child_leaf__acronym")),
+                When(child_branch__isnull=False, then=F("child_branch__acronym")),
+            ),
+            code=Case(
+                When(child_branch__isnull=False, then=F("child_branch__partial_acronym")),
+                default=None
+            ),
+            title=Case(
+                When(child_leaf__isnull=False, then=F("child_leaf__specific_title")),
+                When(child_branch__isnull=False, then=F("child_branch__title")),
+            ),
+            child_id=Case(
+                When(child_leaf__isnull=False, then=F("child_leaf__id")),
+                When(child_branch__isnull=False, then=F("child_branch__id")),
+            ),
+        ).order_by('order')
 
         context['show_minor_major_option_table'] = self._show_minor_major_option_table()
         return context
