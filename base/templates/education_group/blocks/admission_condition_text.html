@@ -24,26 +24,36 @@
 {% load i18n %}
 
 <div id="{{ section }}">
-    <h3>{{ text }}{% if can_edit_information %}
-        {% url 'education_group_year_admission_condition_update_text' root.pk education_group_year.pk as update_text_url %}
-        <a href="#" role="button"
-           class="button modify-text-btn"
-           data-form="{{ update_text_url }}?section={{ section_name }}&title={{ text.split|join:"%20" }}">
-            <span class="glyphicon glyphicon-edit" style="font-size: 16px;" aria-hidden="true"></span>
-        </a>
-    {% endif %}
+    <h3 {% if not canEdit %}class="education_group_year-common italic"{% endif %}>{{ text }}
+        {% if can_edit_information and canEdit %}
+            {% url 'education_group_year_admission_condition_update_text' root.pk education_group_year.pk as update_text_url %}
+            <a href="#" role="button"
+               class="button modify-text-btn"
+               data-form="{{ update_text_url }}?section={{ section_name }}&title={{ text.split|join:"%20" }}">
+                <span class="glyphicon glyphicon-edit" style="font-size: 16px;" aria-hidden="true"></span>
+            </a>
+        {% endif %}
     </h3>
     <div class="row">
         <div class="col-md-6" id="text_{{ section }}_fr">
             {% if field %}
-                {{ field|safe }}
+                {% if canEdit %}
+                    {{ field|safe }}
+                {% else %}
+                    <span class="education_group_year-common italic"> {{ field|safe }}</span>
+                {%  endif %}
             {% else %}
                 <span class="italic">{% trans 'Add the French content of this paragraph' %}</span>
             {% endif %}
         </div>
         <div class="col-md-6" id="text_{{ section }}_en">
             {% if field_en %}
-                {{ field_en|safe }}
+                {% if canEdit %}
+                    {{ field_en|safe }}
+                {% else %}
+                    <span class="education_group_year-common italic"> {{ field_en|safe }}</span>
+                {%  endif %}
+
             {% else %}
                 <span class="italic">{% trans 'Add the English content of this paragraph' %}</span>
             {% endif %}
