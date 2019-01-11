@@ -534,7 +534,6 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
             acronym = 'common-2mc'
         else:
             return None
-        print(vars(self.object.academic_year))
         common_conditions, created = AdmissionCondition.objects.get_or_create(
             education_group_year__acronym=acronym,
             education_group_year__academic_year=edy.academic_year
