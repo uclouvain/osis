@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-10 10:30+0100\n"
+"POT-Creation-Date: 2019-01-11 10:32+0100\n"
 "PO-Revision-Date: 2019-01-10 09:56+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -81,7 +81,7 @@ msgstr[1] "%(count_enrollment)d étudiants sont inscrits à l'offre."
 msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
 msgstr "%(date)s doit être comprise entre %(start_date)s et %(end_date)s"
 
-#: models/education_group.py:77 models/education_group_year.py:675
+#: models/education_group.py:77 models/education_group_year.py:679
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr "%(max)s doit être plus grand ou égal à %(min)s"
@@ -490,7 +490,7 @@ msgstr "Administration"
 msgid "Administration entity"
 msgstr "Entité d'administration"
 
-#: templates/education_group/tabs.html:70
+#: templates/education_group/tabs.html:54
 msgid "Administrative data"
 msgstr "Données administratives"
 
@@ -991,7 +991,7 @@ msgstr "Consolider la proposition"
 msgid "Contacts"
 msgstr "Contacts"
 
-#: templates/education_group/tabs.html:76
+#: templates/education_group/tabs.html:60
 msgid "Content"
 msgstr "Contenu"
 
@@ -999,7 +999,7 @@ msgstr "Contenu"
 msgid "Coorganization"
 msgstr "Coorganization"
 
-#: templatetags/education_group.py:166
+#: templatetags/education_group.py:167
 #, python-format
 msgid "Copy the content from %(previous_anac)s to %(current_anac)s"
 msgstr "Recopier le contenu de %(previous_anac)s à %(current_anac)s"
@@ -1693,11 +1693,11 @@ msgstr "Conditions Générales"
 msgid "General configuration"
 msgstr "Configuration générale"
 
-#: templates/education_group/tabs.html:54
+#: templates/education_group/tabs.html:72
 msgid "General informations"
 msgstr "Infos générales"
 
-#: templatetags/education_group.py:427
+#: templatetags/education_group.py:429
 #: tests/templatetags/test_education_group.py:267
 #: tests/templatetags/test_education_group.py:269
 msgid "Generate pdf"
@@ -1895,7 +1895,7 @@ msgstr ""
 msgid "It is necessary to indicate the internship subtype."
 msgstr "Il est nécessaire d'indiquer le sous-type de stage."
 
-#: templatetags/education_group.py:404
+#: templatetags/education_group.py:406
 #: tests/templatetags/test_education_group.py:242
 #, python-format
 msgid "It is not possible to %(action)s the root element."
@@ -2389,7 +2389,7 @@ msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:85
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:75
-#: templatetags/education_group.py:222
+#: templatetags/education_group.py:223
 #: tests/templatetags/test_education_group.py:437
 msgid "Modify"
 msgstr "Modifier"
@@ -2641,7 +2641,7 @@ msgstr "Un"
 msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
 
-#: templatetags/education_group.py:216
+#: templatetags/education_group.py:217
 #: tests/templatetags/test_education_group.py:433 views/education_group.py:69
 msgid ""
 "Only program managers of the education group OR central manager linked to "
@@ -3931,7 +3931,7 @@ msgstr ""
 msgid "The program aim has been updated"
 msgstr ""
 
-#: views/education_groups/detail.py:375
+#: views/education_groups/detail.py:371
 msgid "The program are published. Click on the link to display it : "
 msgstr "Le programme a été publié. Cliquez sur le lien pour l'afficher : "
 
@@ -3978,7 +3978,7 @@ msgstr ""
 "La somme des volumes des partims pour le professeur %(tutor)s est supérieure "
 "au volume de l'unité d'apprentissage parent pour ce professeur"
 
-#: templatetags/education_group.py:402
+#: templatetags/education_group.py:404
 #: tests/templatetags/test_education_group.py:230
 #: tests/templatetags/test_education_group.py:254
 msgid "The user has not permission to change education groups."
@@ -4071,8 +4071,8 @@ msgstr "Ce champ ne peut pas être défini"
 
 #: forms/common.py:80 models/education_group_publication_contact.py:99
 #: models/education_group_publication_contact.py:100
-#: models/education_group_year.py:662 models/education_group_year.py:683
-#: models/education_group_year.py:685
+#: models/education_group_year.py:666 models/education_group_year.py:687
+#: models/education_group_year.py:689
 #: tests/views/learning_units/proposals/test_creation.py:186
 #: tests/views/learning_units/proposals/test_creation.py:187
 #: tests/views/learning_units/proposals/test_creation.py:188
@@ -4093,7 +4093,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 
-#: views/education_groups/detail.py:337
+#: views/education_groups/detail.py:333
 #, python-format
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
@@ -4127,10 +4127,6 @@ msgstr "Gestion des stages des étudiants."
 #: templates/studies.html:44
 msgid "This process helps tutors while scores encoding."
 msgstr "Processus visant à aider les enseignants pour l'encodage des notes."
-
-#: business/education_groups/general_information.py:52
-msgid "This program has no page to publish on it"
-msgstr "Ce programme n'a pas de page sur laquelle le publier"
 
 #: business/group_element_years/postponement.py:80
 msgid "This training has no content to postpone."
@@ -4280,14 +4276,7 @@ msgstr "Diplôme avec l'UCL"
 msgid "URL of the learning unit"
 msgstr "URL de l'unité d'enseignement"
 
-#: business/education_groups/general_information.py:54
-#, fuzzy
-#| msgid "Unable to retrieve appropriate sections for this programs"
-msgid "Unable to publish sections for this programs"
-msgstr ""
-"Impossible de récupérer les sections pertinentes pour le programme consulté"
-
-#: business/education_groups/general_information.py:65
+#: business/education_groups/general_information.py:64
 msgid "Unable to retrieve appropriate sections for this programs"
 msgstr ""
 "Impossible de récupérer les sections pertinentes pour le programme consulté"
@@ -4365,7 +4354,7 @@ msgid "User interface language"
 msgstr "Langue de l'interface utilisateur"
 
 #: templates/education_group/learning_unit/tabs.html:35
-#: templates/education_group/tabs.html:81
+#: templates/education_group/tabs.html:65
 msgid "Utilizations"
 msgstr "Utilisations"
 
@@ -4686,6 +4675,12 @@ msgstr ""
 "Vous ne pouvez pas supprimer une unité d'enseignement qui a des prérequis ou "
 "qui est prérequis."
 
+#: business/group_element_years/perms.py:40
+#, fuzzy, python-format
+#| msgid "Are you sure you want to delete %(education_group_year)s?"
+msgid "You cannot modify content for %(education_group_types)s"
+msgstr "Vous ne pouvez pas modifier le contenu pour %(education_group_year)s"
+
 #: business/learning_units/perms.py:72
 msgid "You don't have the rights to consolidate"
 msgstr "Vous n'avez pas le droit de consolider"
@@ -4709,7 +4704,7 @@ msgstr ""
 "Une proposition de modification de type {} a été faite pour l'unité "
 "d'enseignement {}."
 
-#: models/education_group_year.py:668
+#: models/education_group_year.py:672
 msgid "You should precise at least minimum or maximum constraint"
 msgstr "Vous devez préciser au moins la contrainte minimum ou maximum"
 
@@ -4913,7 +4908,7 @@ msgstr "confirmer"
 
 #: business/learning_units/edition.py:435
 #: business/learning_units/xls_comparison.py:59 business/proposal_xls.py:39
-#: models/education_group_year.py:334 models/education_group_year.py:504
+#: models/education_group_year.py:334 models/education_group_year.py:508
 #: models/enums/constraint_type.py:32 models/group_element_year.py:163
 #: models/group_element_year.py:179
 #: tests/models/test_education_group_year.py:93
@@ -5055,11 +5050,11 @@ msgstr "logo"
 msgid "main domain"
 msgstr "domaine principal"
 
-#: models/education_group_year.py:359 models/education_group_year.py:676
+#: models/education_group_year.py:359 models/education_group_year.py:680
 msgid "maximum constraint"
 msgstr "contrainte maximum"
 
-#: models/education_group_year.py:352 models/education_group_year.py:677
+#: models/education_group_year.py:352 models/education_group_year.py:681
 msgid "minimum constraint"
 msgstr "contrainte minimum"
 
@@ -5232,7 +5227,7 @@ msgstr "domaines secondaires"
 msgid "section"
 msgstr "rubrique"
 
-#: templates/education_group/tabs.html:62
+#: templates/education_group/tabs.html:80
 msgid "skills and achievements"
 msgstr "compétences et acquis"
 
@@ -5357,6 +5352,16 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "This program has no page to publish on it"
+#~ msgstr "Ce programme n'a pas de page sur laquelle le publier"
+
+#, fuzzy
+#~| msgid "Unable to retrieve appropriate sections for this programs"
+#~ msgid "Unable to publish sections for this programs"
+#~ msgstr ""
+#~ "Impossible de récupérer les sections pertinentes pour le programme "
+#~ "consulté"
 
 #, fuzzy
 #~| msgid "Access condition"

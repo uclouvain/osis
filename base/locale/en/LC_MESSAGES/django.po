@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-10 10:30+0100\n"
+"POT-Creation-Date: 2019-01-11 10:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,7 +77,7 @@ msgstr[1] ""
 msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
 msgstr ""
 
-#: models/education_group.py:77 models/education_group_year.py:675
+#: models/education_group.py:77 models/education_group_year.py:679
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr ""
@@ -467,7 +467,7 @@ msgstr ""
 msgid "Administration entity"
 msgstr ""
 
-#: templates/education_group/tabs.html:70
+#: templates/education_group/tabs.html:54
 msgid "Administrative data"
 msgstr ""
 
@@ -957,7 +957,7 @@ msgstr ""
 msgid "Contacts"
 msgstr ""
 
-#: templates/education_group/tabs.html:76
+#: templates/education_group/tabs.html:60
 msgid "Content"
 msgstr ""
 
@@ -965,7 +965,7 @@ msgstr ""
 msgid "Coorganization"
 msgstr ""
 
-#: templatetags/education_group.py:166
+#: templatetags/education_group.py:167
 #, python-format
 msgid "Copy the content from %(previous_anac)s to %(current_anac)s"
 msgstr ""
@@ -1653,11 +1653,11 @@ msgstr ""
 msgid "General configuration"
 msgstr ""
 
-#: templates/education_group/tabs.html:54
+#: templates/education_group/tabs.html:72
 msgid "General informations"
 msgstr ""
 
-#: templatetags/education_group.py:427
+#: templatetags/education_group.py:429
 #: tests/templatetags/test_education_group.py:267
 #: tests/templatetags/test_education_group.py:269
 msgid "Generate pdf"
@@ -1852,7 +1852,7 @@ msgstr ""
 msgid "It is necessary to indicate the internship subtype."
 msgstr ""
 
-#: templatetags/education_group.py:404
+#: templatetags/education_group.py:406
 #: tests/templatetags/test_education_group.py:242
 #, python-format
 msgid "It is not possible to %(action)s the root element."
@@ -2331,7 +2331,7 @@ msgstr ""
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:85
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:75
-#: templatetags/education_group.py:222
+#: templatetags/education_group.py:223
 #: tests/templatetags/test_education_group.py:437
 msgid "Modify"
 msgstr ""
@@ -2577,7 +2577,7 @@ msgstr ""
 msgid "One of the partial volumes must have a value to 0."
 msgstr ""
 
-#: templatetags/education_group.py:216
+#: templatetags/education_group.py:217
 #: tests/templatetags/test_education_group.py:433 views/education_group.py:69
 msgid ""
 "Only program managers of the education group OR central manager linked to "
@@ -3830,7 +3830,7 @@ msgstr ""
 msgid "The program aim has been updated"
 msgstr ""
 
-#: views/education_groups/detail.py:375
+#: views/education_groups/detail.py:371
 msgid "The program are published. Click on the link to display it : "
 msgstr ""
 
@@ -3871,7 +3871,7 @@ msgid ""
 "the volume of parent learning unit for this professor"
 msgstr ""
 
-#: templatetags/education_group.py:402
+#: templatetags/education_group.py:404
 #: tests/templatetags/test_education_group.py:230
 #: tests/templatetags/test_education_group.py:254
 msgid "The user has not permission to change education groups."
@@ -3955,8 +3955,8 @@ msgstr ""
 
 #: forms/common.py:80 models/education_group_publication_contact.py:99
 #: models/education_group_publication_contact.py:100
-#: models/education_group_year.py:662 models/education_group_year.py:683
-#: models/education_group_year.py:685
+#: models/education_group_year.py:666 models/education_group_year.py:687
+#: models/education_group_year.py:689
 #: tests/views/learning_units/proposals/test_creation.py:186
 #: tests/views/learning_units/proposals/test_creation.py:187
 #: tests/views/learning_units/proposals/test_creation.py:188
@@ -3975,7 +3975,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
-#: views/education_groups/detail.py:337
+#: views/education_groups/detail.py:333
 #, python-format
 msgid "This label %s does not exist"
 msgstr ""
@@ -4004,10 +4004,6 @@ msgstr ""
 
 #: templates/studies.html:44
 msgid "This process helps tutors while scores encoding."
-msgstr ""
-
-#: business/education_groups/general_information.py:52
-msgid "This program has no page to publish on it"
 msgstr ""
 
 #: business/group_element_years/postponement.py:80
@@ -4158,11 +4154,7 @@ msgstr ""
 msgid "URL of the learning unit"
 msgstr ""
 
-#: business/education_groups/general_information.py:54
-msgid "Unable to publish sections for this programs"
-msgstr ""
-
-#: business/education_groups/general_information.py:65
+#: business/education_groups/general_information.py:64
 msgid "Unable to retrieve appropriate sections for this programs"
 msgstr ""
 
@@ -4239,7 +4231,7 @@ msgid "User interface language"
 msgstr ""
 
 #: templates/education_group/learning_unit/tabs.html:35
-#: templates/education_group/tabs.html:81
+#: templates/education_group/tabs.html:65
 msgid "Utilizations"
 msgstr ""
 
@@ -4533,6 +4525,11 @@ msgid ""
 "prerequisite(s)"
 msgstr ""
 
+#: business/group_element_years/perms.py:40
+#, python-format
+msgid "You cannot modify content for %(education_group_types)s"
+msgstr ""
+
 #: business/learning_units/perms.py:72
 msgid "You don't have the rights to consolidate"
 msgstr ""
@@ -4554,7 +4551,7 @@ msgstr ""
 msgid "You proposed a modification of type {} for the learning unit {}."
 msgstr ""
 
-#: models/education_group_year.py:668
+#: models/education_group_year.py:672
 msgid "You should precise at least minimum or maximum constraint"
 msgstr ""
 
@@ -4752,7 +4749,7 @@ msgstr ""
 
 #: business/learning_units/edition.py:435
 #: business/learning_units/xls_comparison.py:59 business/proposal_xls.py:39
-#: models/education_group_year.py:334 models/education_group_year.py:504
+#: models/education_group_year.py:334 models/education_group_year.py:508
 #: models/enums/constraint_type.py:32 models/group_element_year.py:163
 #: models/group_element_year.py:179
 #: tests/models/test_education_group_year.py:93
@@ -4891,11 +4888,11 @@ msgstr ""
 msgid "main domain"
 msgstr ""
 
-#: models/education_group_year.py:359 models/education_group_year.py:676
+#: models/education_group_year.py:359 models/education_group_year.py:680
 msgid "maximum constraint"
 msgstr ""
 
-#: models/education_group_year.py:352 models/education_group_year.py:677
+#: models/education_group_year.py:352 models/education_group_year.py:681
 msgid "minimum constraint"
 msgstr ""
 
@@ -5064,7 +5061,7 @@ msgstr ""
 msgid "section"
 msgstr ""
 
-#: templates/education_group/tabs.html:62
+#: templates/education_group/tabs.html:80
 msgid "skills and achievements"
 msgstr ""
 
