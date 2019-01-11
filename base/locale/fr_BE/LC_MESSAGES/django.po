@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-11 10:43+0100\n"
+"POT-Creation-Date: 2019-01-11 11:09+0100\n"
 "PO-Revision-Date: 2019-01-10 09:56+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3927,13 +3927,15 @@ msgstr ""
 "Les prérequis %(prerequisites)s pour l'unité d'enseignement "
 "%(learning_unit)s ne sont pas dans la formation sélectionnée %(root)s"
 
+#: views/education_groups/detail.py:371
+#, python-format
+msgid "The program %(acronym)s will be published soon"
+msgstr "Le programme %(acronym)s sera publié sous peu"
+
 #: views/education_groups/achievement/update.py:146
 msgid "The program aim has been updated"
 msgstr ""
 
-#: views/education_groups/detail.py:371
-msgid "The program are published. Click on the link to display it : "
-msgstr "Le programme a été publié. Cliquez sur le lien pour l'afficher : "
 
 #: templates/education_group/pdf_content.html:76
 msgid "The registration form is available at the Secretariat of"
@@ -5352,46 +5354,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "This program has no page to publish on it"
-#~ msgstr "Ce programme n'a pas de page sur laquelle le publier"
-
-#, fuzzy
-#~| msgid "Unable to retrieve appropriate sections for this programs"
-#~ msgid "Unable to publish sections for this programs"
-#~ msgstr ""
-#~ "Impossible de récupérer les sections pertinentes pour le programme "
-#~ "consulté"
-
-#, fuzzy
-#~| msgid "Access condition"
-#~ msgid "access condition"
-#~ msgstr "Condition d'accès"
-
-#, fuzzy
-#~| msgid "Description"
-#~ msgid "description"
-#~ msgstr "Description"
-
-#~ msgid "Attached to \"%(acronym)s\""
-#~ msgstr "L'élément sélectionné a été attaché à \"%(acronym)s\""
-
-#~ msgid "Absolute credits"
-#~ msgstr "Crédits absolus"
-
-#~ msgid "No"
-#~ msgstr "Non"
-
-#~ msgid "Please choose at least one criteria!"
-#~ msgstr "Veuillez remplir au moins 1 critère de recherche!"
-
-#~ msgid "Too many results! Please be more specific."
-#~ msgstr ""
-#~ "Votre recherche renvoie trop de résultats, veuillez affiner vos critères "
-#~ "de recherche."
-
-#~ msgid "Yes"
-#~ msgstr "Oui"
-
-#~ msgid "components"
-#~ msgstr "composants"

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-11 10:43+0100\n"
+"POT-Creation-Date: 2019-01-11 11:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3826,12 +3826,13 @@ msgid ""
 "are not inside the selected training %(root)s"
 msgstr ""
 
-#: views/education_groups/achievement/update.py:146
-msgid "The program aim has been updated"
+#: views/education_groups/detail.py:371
+#, python-format
+msgid "The program %(acronym)s will be published soon"
 msgstr ""
 
-#: views/education_groups/detail.py:371
-msgid "The program are published. Click on the link to display it : "
+#: views/education_groups/achievement/update.py:146
+msgid "The program aim has been updated"
 msgstr ""
 
 #: templates/education_group/pdf_content.html:76
