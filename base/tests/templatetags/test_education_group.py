@@ -323,7 +323,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             result,
             {
                 'class_button': 'btn-default btn-sm disabled',
-                'load_modal': True,
+                'load_modal': False,
                 'url': '#',
                 'title': _("The education group edition period is not open."),
                 'icon': 'fa-edit'
