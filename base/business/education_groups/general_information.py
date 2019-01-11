@@ -24,12 +24,19 @@
 #
 ##############################################################################
 import json
+import logging
+from threading import Thread
 
 import requests
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
+
+from base.models.group_element_year import find_learning_unit_formations
+
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 def publish(education_group_year):
@@ -38,20 +45,12 @@ def publish(education_group_year):
         raise ImproperlyConfigured('ESB_API_URL / ESB_AUTHORIZATION / ESB_REFRESH_PEDAGOGY_ENDPOINT / '
                                    'URL_TO_PORTAL_UCL / must be set in configuration')
 
-    publish_url = _get_url_to_publish(education_group_year)
+    trainings = find_learning_unit_formations([education_group_year], parents_as_instances=True)
 
-    try:
-        response = requests.get(
-            publish_url,
-            headers={"Authorization": settings.ESB_AUTHORIZATION},
-            timeout=settings.REQUESTS_TIMEOUT
-        )
-        if response.status_code == HttpResponse.status_code:
-            return _get_portal_url(education_group_year)
-        else:
-            raise PublishException(_("This program has no page to publish on it"))
-    except Exception:
-        raise PublishException(_("Unable to publish sections for this programs"))
+    education_groups_to_publish = [education_group_year] + trainings.get(education_group_year.pk, [])
+    t = Thread(target=_bulk_publish, args=(education_groups_to_publish,))
+    t.start()
+    return _get_portal_url(education_group_year)
 
 
 def get_relevant_sections(education_group_year):
@@ -64,6 +63,30 @@ def get_relevant_sections(education_group_year):
     except (json.JSONDecodeError, requests.exceptions.Timeout, requests.exceptions.ConnectionError):
         raise RelevantSectionException(_("Unable to retrieve appropriate sections for this programs"))
     return response.get('sections') or []
+
+
+def _bulk_publish(education_group_years):
+    return [_publish(education_group_year) for education_group_year in education_group_years]
+
+
+def _publish(education_group_year):
+    publish_url = _get_url_to_publish(education_group_year)
+    try:
+        response = requests.get(
+            publish_url,
+            headers={"Authorization": settings.ESB_AUTHORIZATION},
+            timeout=settings.REQUESTS_TIMEOUT
+        )
+        if response.status_code != HttpResponse.status_code:
+            logger.info(
+                "The program {acronym} has no page to publish on it".format(acronym=education_group_year.acronym)
+            )
+            return False
+        return True
+    except Exception:
+        raise PublishException("Unable to publish sections for the program {acronym}".format(
+            acronym=education_group_year.acronym)
+        )
 
 
 def _get_url_to_publish(education_group_year):

@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-09 15:22+0100\n"
-"PO-Revision-Date: 2019-01-07 11:21+0100\n"
+"POT-Creation-Date: 2019-01-10 10:30+0100\n"
+"PO-Revision-Date: 2019-01-10 09:56+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_BE\n"
@@ -781,8 +781,8 @@ msgstr ""
 "Impossible de détacher l'enfant \"%(child)s\". Le parent doit au moins avoir "
 "un enfant de type \"%(type)s\"."
 
-#: tests/views/group_element_years/test_detach.py:147
-#: tests/views/group_element_years/test_detach.py:168
+#: tests/views/group_element_years/test_detach.py:154
+#: tests/views/group_element_years/test_detach.py:173
 #: views/education_groups/group_element_year/delete.py:62
 #, python-format
 msgid ""
@@ -1878,7 +1878,7 @@ msgid "It is forbidden to attach an element to itself."
 msgstr "Il est interdit d’attacher un élément à lui-même."
 
 #: models/group_element_year.py:201
-#: tests/views/education_groups/test_update.py:539
+#: tests/views/education_groups/test_update.py:541
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 "Il est interdit d'attacher un élement à un autre élement y étant inclus."
@@ -2545,7 +2545,7 @@ msgstr "Pas de destinataire pour ce message"
 msgid "No result!"
 msgstr "Aucun résultat!"
 
-#: business/education_groups/perms.py:183
+#: business/education_groups/perms.py:184
 #, python-format
 msgctxt "female"
 msgid ""
@@ -2830,7 +2830,7 @@ msgstr "Classes prévues"
 msgid "Platform"
 msgstr "Plateforme"
 
-#: tests/views/education_groups/test_update.py:629
+#: tests/views/education_groups/test_update.py:630
 #: views/education_groups/group_element_year/create.py:60
 msgid "Please Select or Move an item before Attach it"
 msgstr "Veuillez Sélectionner ou Déplacer un élément avant d'Attacher"
@@ -3984,14 +3984,14 @@ msgstr ""
 msgid "The user has not permission to change education groups."
 msgstr "L'utilisateur n'a pas la permission de modifier les formations."
 
-#: business/education_groups/perms.py:140
+#: business/education_groups/perms.py:141
 #: tests/templatetags/test_education_group.py:386
 #: tests/templatetags/test_education_group.py:407
 #, python-format
 msgid "The user has not permission to create a %(category)s."
 msgstr "L'utilisateur n'a pas la permission de créer une %(category)s."
 
-#: business/education_groups/perms.py:152
+#: business/education_groups/perms.py:153
 msgid "The user is not attached to the management entity"
 msgstr ""
 
@@ -4669,7 +4669,7 @@ msgstr ""
 
 #: business/group_element_years/management.py:64
 #: business/group_element_years/management.py:77
-#: tests/views/education_groups/test_update.py:496
+#: tests/views/education_groups/test_update.py:498
 #, python-format
 msgid ""
 "You cannot attach \"%(child)s\" (type \"%(child_type)s\") to \"%(parent)s"
@@ -4960,7 +4960,7 @@ msgstr "supprimer l'oganisation de formartion"
 
 #: models/education_group_year.py:206
 msgid "dissertation"
-msgstr "dissertation"
+msgstr "mémoire"
 
 #: models/education_group_year.py:315
 msgid "duration unit"

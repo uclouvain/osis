@@ -24,17 +24,14 @@
 #
 ##############################################################################
 import json
-from collections import OrderedDict, namedtuple
+from collections import namedtuple
 
-import requests
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.core.exceptions import ImproperlyConfigured
 from django.db.models import F, Case, When
-from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -65,7 +62,6 @@ from base.models.person import Person
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
-from cms import models as mdl_cms
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
