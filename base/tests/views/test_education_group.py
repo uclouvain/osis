@@ -31,7 +31,6 @@ from unittest import mock
 
 import bs4
 import reversion
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
@@ -44,13 +43,15 @@ from base.business.education_groups.general_information import PublishException
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.certificate_aim import CertificateAimFactory
 from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
 from base.tests.factories.education_group_language import EducationGroupLanguageFactory
 from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory, \
-    TrainingFactory
+    TrainingFactory, EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonBachelorFactory, \
+    EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
@@ -833,7 +834,28 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
                                                                education_group_type=type_training)
         cls.education_group_child = EducationGroupYearFactory(acronym="Child_1", academic_year=academic_year,
                                                               education_group_type=type_training)
-
+        if cls.education_group_child.is_agregation:
+            common_edy = EducationGroupYearCommonAgregationFactory(
+                academic_year=academic_year
+            )
+        elif cls.education_group_child.is_bachelor:
+            common_edy = EducationGroupYearCommonBachelorFactory(
+                academic_year=academic_year
+            )
+        elif cls.education_group_child.is_specialized_master:
+            common_edy = EducationGroupYearCommonSpecializedMasterFactory(
+                academic_year=academic_year
+            )
+        elif cls.education_group_child.is_master120 or cls.education_group_child.is_master60:
+            common_edy = EducationGroupYearCommonMasterFactory(
+                academic_year=academic_year
+            )
+        else:
+            common_edy = None
+        if common_edy:
+            AdmissionConditionFactory(
+                education_group_year=common_edy
+            )
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
 
         cls.cms_label_for_child = TranslatedTextFactory(text_label=TextLabelFactory(entity=entity_name.OFFER_YEAR),
