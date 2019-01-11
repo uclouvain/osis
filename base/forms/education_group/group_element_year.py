@@ -103,21 +103,15 @@ class GroupElementYearForm(forms.ModelForm):
         self.fields = {name: field for name, field in self.fields.items() if name in fields_to_keep}
 
     def _is_parent_a_minor_major_option_list_choice(self, instance, parent):
-        parent_egy = None
+        parent_egy = instance and instance.parent
         if parent:
             parent_egy = parent
-        elif instance:
-            parent_egy = instance.parent
 
-        return parent_egy.education_group_type.name in GroupType.minor_major_option_list_choice() \
-            if parent_egy else False
+        return parent_egy.is_minor_major_option_list_choice if parent_egy else False
 
     def _is_child_a_minor_major_option_list_choice(self, instance, child):
-        child_egy = None
-
+        child_egy = instance and instance.child_branch
         if child:
             child_egy = child
-        elif instance:
-            child_egy = instance.child_branch
 
-        return child_egy.education_group_type.name in GroupType.minor_major_option_list_choice() if child_egy else False
+        return child_egy.is_minor_major_option_list_choice if child_egy else False

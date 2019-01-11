@@ -454,11 +454,8 @@ class EducationGroupContent(EducationGroupGenericDetailView):
                 ),
             ).order_by('order')
 
-        context['show_minor_major_option_table'] = self._show_minor_major_option_table()
+        context['show_minor_major_option_table'] = self.object.is_minor_major_option_list_choice
         return context
-
-    def _show_minor_major_option_table(self):
-        return self.object.education_group_type.name in GroupType.minor_major_option_list_choice()
 
 
 class EducationGroupUsing(EducationGroupGenericDetailView):
