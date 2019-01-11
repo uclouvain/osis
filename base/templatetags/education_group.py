@@ -39,6 +39,7 @@ from base.business.education_groups.perms import is_eligible_to_delete_education
     is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_change_achievement, \
     is_eligible_to_delete_achievement, is_eligible_to_postpone_education_group
+from base.business.group_element_years.perms import is_eligible_to_create_group_element_year
 from base.models.academic_year import AcademicYear
 from base.models.enums.learning_unit_year_periodicity import BIENNIAL_EVEN, BIENNIAL_ODD, ANNUAL
 from base.models.utils.utils import get_verbose_field_value
@@ -242,11 +243,12 @@ def button_order_with_permission(context, title, id_button, value):
 
 @register.inclusion_tag("blocks/button/button_template.html", takes_context=True)
 def button_with_permission(context, title, value, url):
-    permission_denied_message, disabled, root = _get_permission(context, is_eligible_to_change_education_group)
+    permission_denied_message, disabled, root = _get_permission(context, is_eligible_to_create_group_element_year)
     load_modal = True
 
     if disabled:
         title = permission_denied_message
+        load_modal = False
 
     return {
         'load_modal': load_modal,

@@ -53,9 +53,9 @@ class GroupElementYearForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self._is_parent_a_minor_major_option_list_choice(self.instance, parent):
-            self._keep_only_fields(["access_condition"])
+            self._keep_only_fields(["link_type", "access_condition"])
         elif self._is_child_a_minor_major_option_list_choice(self.instance, child_branch):
-            self._keep_only_fields(["block"])
+            self._keep_only_fields(["link_type", "block"])
         else:
             self.fields.pop("access_condition")
 
