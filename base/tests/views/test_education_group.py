@@ -42,6 +42,7 @@ from waffle.testutils import override_flag
 from base.business.education_groups.general_information import PublishException
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.enums import education_group_categories, academic_calendar_type
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.certificate_aim import CertificateAimFactory
@@ -56,6 +57,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory
+from base.views.education_groups.detail import get_appropriate_common_admission_condition
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
@@ -828,34 +830,24 @@ class EducationGroupEditAdministrativeData(TestCase):
 class AdmissionConditionEducationGroupYearTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        academic_year = AcademicYearFactory()
+        cls.academic_year = AcademicYearFactory()
         type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
-        cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=academic_year,
+        cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=cls.academic_year,
                                                                education_group_type=type_training)
-        cls.education_group_child = EducationGroupYearFactory(acronym="Child_1", academic_year=academic_year,
+        cls.education_group_child = EducationGroupYearFactory(acronym="Child_1", academic_year=cls.academic_year,
                                                               education_group_type=type_training)
-        if cls.education_group_child.is_agregation:
-            common_edy = EducationGroupYearCommonAgregationFactory(
-                academic_year=academic_year
-            )
-        elif cls.education_group_child.is_bachelor:
-            common_edy = EducationGroupYearCommonBachelorFactory(
-                academic_year=academic_year
-            )
-        elif cls.education_group_child.is_specialized_master:
-            common_edy = EducationGroupYearCommonSpecializedMasterFactory(
-                academic_year=academic_year
-            )
-        elif cls.education_group_child.is_master120 or cls.education_group_child.is_master60:
-            common_edy = EducationGroupYearCommonMasterFactory(
-                academic_year=academic_year
-            )
-        else:
-            common_edy = None
-        if common_edy:
-            AdmissionConditionFactory(
-                education_group_year=common_edy
-            )
+        cls.agregation_adm_cond = AdmissionConditionFactory(
+            education_group_year=EducationGroupYearCommonAgregationFactory(academic_year=cls.academic_year)
+        )
+        cls.bachelor_adm_cond = AdmissionConditionFactory(
+            education_group_year=EducationGroupYearCommonBachelorFactory(academic_year=cls.academic_year)
+        )
+        cls.special_master_adm_cond = AdmissionConditionFactory(
+            education_group_year=EducationGroupYearCommonSpecializedMasterFactory(academic_year=cls.academic_year)
+        )
+        cls.master_adm_cond = AdmissionConditionFactory(
+            education_group_year=EducationGroupYearCommonMasterFactory(academic_year=cls.academic_year)
+        )
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
 
         cls.cms_label_for_child = TranslatedTextFactory(text_label=TextLabelFactory(entity=entity_name.OFFER_YEAR),
@@ -1256,3 +1248,49 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         url = reverse('tab_lang_edit', args=(self.education_group_parent.id, self.education_group_child.id, 'fr'))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
+
+    def test_get_appropriate_common_offer_for_common(self):
+        edy = EducationGroupYearCommonFactory(
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, None)
+
+    def test_get_appropriate_common_offer_for_bachelor(self):
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.BACHELOR.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.bachelor_adm_cond)
+
+    def test_get_appropriate_common_offer_for_agregation(self):
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.AGGREGATION.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.agregation_adm_cond)
+
+    def test_get_appropriate_common_offer_for_master(self):
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.master_adm_cond)
+
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.MASTER_M1.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.master_adm_cond)
+
+    def test_get_appropriate_common_offer_for_special_master(self):
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.MASTER_MC.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.special_master_adm_cond)
