@@ -495,23 +495,23 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def is_master120(self):
-        return self.education_group_type.name in TrainingType.PGRM_MASTER_120
+        return self.education_group_type.name == TrainingType.PGRM_MASTER_120.name
 
     @property
     def is_master60(self):
-        return self.education_group_type.name in TrainingType.MASTER_M1
+        return self.education_group_type.name == TrainingType.MASTER_M1.name
 
     @property
     def is_agregation(self):
-        return self.education_group_type.name in TrainingType.AGGREGATION
+        return self.education_group_type.name == TrainingType.AGGREGATION.name
 
     @property
     def is_specialized_master(self):
-        return self.education_group_type.name in TrainingType.MASTER_MC
+        return self.education_group_type.name == TrainingType.MASTER_MC.name
 
     @property
     def is_bachelor(self):
-        return self.education_group_type.name in TrainingType.BACHELOR
+        return self.education_group_type.name == TrainingType.BACHELOR.name
 
     @property
     def verbose(self):
