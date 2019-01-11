@@ -535,3 +535,4 @@ def get_appropriate_common_admission_condition(edy):
     else:
         return None
 
+
