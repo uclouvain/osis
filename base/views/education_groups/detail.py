@@ -43,10 +43,10 @@ from reversion.models import Version
 from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
 from base.business.education_groups import perms, general_information
+from base.business.education_groups.general_information import PublishException, RelevantSectionException
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 from base.business.education_groups.perms import is_eligible_to_edit_general_information, \
     is_eligible_to_edit_admission_condition
-from base.business.education_groups.general_information import PublishException, RelevantSectionException
 from base.management.commands.import_reddot import COMMON_OFFER
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
@@ -480,37 +480,38 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         is_specific = not is_common
         is_minor = self.object.is_minor
         is_deepening = self.object.is_deepening
+        is_bachelor = self.object.is_bachelor
 
         is_master = acronym.endswith(('2m', '2m1'))
         is_agregation = acronym.endswith('2a')
         is_mc = acronym.endswith('2mc')
+        common_conditions = self._get_appropriate_common_offer(self.object)
 
         class AdmissionConditionForm(forms.Form):
             text_field = forms.CharField(widget=CKEditorWidget(config_name='minimal'))
 
         admission_condition_form = AdmissionConditionForm()
         admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=self.object)
-
         record = {}
         for section in SECTIONS_WITH_TEXT:
             record[section] = AdmissionConditionLine.objects.filter(
                 admission_condition=admission_condition,
                 section=section
             ).annotate_text(tab_lang)
-
         context.update({
             'admission_condition_form': admission_condition_form,
             'can_edit_information': is_eligible_to_edit_admission_condition(context['person'], context['object']),
             'info': {
                 'is_specific': is_specific,
                 'is_common': is_common,
-                'is_bachelor': is_common and self.object.education_group_type.name == TrainingType.BACHELOR.name,
+                'is_bachelor': is_bachelor,
                 'is_master': is_master,
-                'show_components_for_agreg': is_common and is_agregation,
-                'show_components_for_agreg_and_mc': is_common and is_agregation or is_mc,
+                'show_components_for_agreg': is_agregation,
+                'show_components_for_agreg_and_mc': is_agregation or is_mc,
                 'show_free_text': (is_specific and (is_master or is_agregation or is_mc)) or is_minor or is_deepening,
             },
             'admission_condition': admission_condition,
+            'common_conditions': common_conditions,
             'record': record,
             'language': {
                 'list': ["fr-be", "en"],
@@ -519,3 +520,23 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         })
 
         return context
+
+    def _get_appropriate_common_offer(self, edy):
+        if edy.is_common:
+            return None
+        elif edy.is_bachelor:
+            acronym = 'common-1ba'
+        elif edy.is_agregation:
+            acronym = 'common-2a'
+        elif edy.is_master120 or edy.is_master60:
+            acronym = 'common-2m'
+        elif edy.is_specialized_master:
+            acronym = 'common-2mc'
+        else:
+            return None
+        print(vars(self.object.academic_year))
+        common_conditions, created = AdmissionCondition.objects.get_or_create(
+            education_group_year__acronym=acronym,
+            education_group_year__academic_year=edy.academic_year
+        )
+        return common_conditions
