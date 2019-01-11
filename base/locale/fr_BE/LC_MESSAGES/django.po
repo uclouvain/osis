@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-10 10:30+0100\n"
+"POT-Creation-Date: 2019-01-11 11:09+0100\n"
 "PO-Revision-Date: 2019-01-10 09:56+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -490,7 +490,7 @@ msgstr "Administration"
 msgid "Administration entity"
 msgstr "Entité d'administration"
 
-#: templates/education_group/tabs.html:70
+#: templates/education_group/tabs.html:54
 msgid "Administrative data"
 msgstr "Données administratives"
 
@@ -991,7 +991,7 @@ msgstr "Consolider la proposition"
 msgid "Contacts"
 msgstr "Contacts"
 
-#: templates/education_group/tabs.html:76
+#: templates/education_group/tabs.html:60
 msgid "Content"
 msgstr "Contenu"
 
@@ -1693,7 +1693,7 @@ msgstr "Conditions Générales"
 msgid "General configuration"
 msgstr "Configuration générale"
 
-#: templates/education_group/tabs.html:54
+#: templates/education_group/tabs.html:72
 msgid "General informations"
 msgstr "Infos générales"
 
@@ -3927,13 +3927,14 @@ msgstr ""
 "Les prérequis %(prerequisites)s pour l'unité d'enseignement "
 "%(learning_unit)s ne sont pas dans la formation sélectionnée %(root)s"
 
+#: views/education_groups/detail.py:371
+#, python-format
+msgid "The program %(acronym)s will be published soon"
+msgstr "Le programme %(acronym)s sera publié sous peu"
+
 #: views/education_groups/achievement/update.py:146
 msgid "The program aim has been updated"
 msgstr ""
-
-#: views/education_groups/detail.py:375
-msgid "The program are published. Click on the link to display it : "
-msgstr "Le programme a été publié. Cliquez sur le lien pour l'afficher : "
 
 #: templates/education_group/pdf_content.html:76
 msgid "The registration form is available at the Secretariat of"
@@ -4093,7 +4094,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 
-#: views/education_groups/detail.py:337
+#: views/education_groups/detail.py:333
 #, python-format
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
@@ -4127,10 +4128,6 @@ msgstr "Gestion des stages des étudiants."
 #: templates/studies.html:44
 msgid "This process helps tutors while scores encoding."
 msgstr "Processus visant à aider les enseignants pour l'encodage des notes."
-
-#: business/education_groups/general_information.py:52
-msgid "This program has no page to publish on it"
-msgstr "Ce programme n'a pas de page sur laquelle le publier"
 
 #: business/group_element_years/postponement.py:80
 msgid "This training has no content to postpone."
@@ -4280,14 +4277,7 @@ msgstr "Diplôme avec l'UCL"
 msgid "URL of the learning unit"
 msgstr "URL de l'unité d'enseignement"
 
-#: business/education_groups/general_information.py:54
-#, fuzzy
-#| msgid "Unable to retrieve appropriate sections for this programs"
-msgid "Unable to publish sections for this programs"
-msgstr ""
-"Impossible de récupérer les sections pertinentes pour le programme consulté"
-
-#: business/education_groups/general_information.py:65
+#: business/education_groups/general_information.py:64
 msgid "Unable to retrieve appropriate sections for this programs"
 msgstr ""
 "Impossible de récupérer les sections pertinentes pour le programme consulté"
@@ -4365,7 +4355,7 @@ msgid "User interface language"
 msgstr "Langue de l'interface utilisateur"
 
 #: templates/education_group/learning_unit/tabs.html:35
-#: templates/education_group/tabs.html:81
+#: templates/education_group/tabs.html:65
 msgid "Utilizations"
 msgstr "Utilisations"
 
@@ -5232,7 +5222,7 @@ msgstr "domaines secondaires"
 msgid "section"
 msgstr "rubrique"
 
-#: templates/education_group/tabs.html:62
+#: templates/education_group/tabs.html:80
 msgid "skills and achievements"
 msgstr "compétences et acquis"
 
@@ -5357,36 +5347,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr "oui,non"
-
-#, fuzzy
-#~| msgid "Access condition"
-#~ msgid "access condition"
-#~ msgstr "Condition d'accès"
-
-#, fuzzy
-#~| msgid "Description"
-#~ msgid "description"
-#~ msgstr "Description"
-
-#~ msgid "Attached to \"%(acronym)s\""
-#~ msgstr "L'élément sélectionné a été attaché à \"%(acronym)s\""
-
-#~ msgid "Absolute credits"
-#~ msgstr "Crédits absolus"
-
-#~ msgid "No"
-#~ msgstr "Non"
-
-#~ msgid "Please choose at least one criteria!"
-#~ msgstr "Veuillez remplir au moins 1 critère de recherche!"
-
-#~ msgid "Too many results! Please be more specific."
-#~ msgstr ""
-#~ "Votre recherche renvoie trop de résultats, veuillez affiner vos critères "
-#~ "de recherche."
-
-#~ msgid "Yes"
-#~ msgstr "Oui"
-
-#~ msgid "components"
-#~ msgstr "composants"
