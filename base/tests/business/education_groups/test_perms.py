@@ -51,10 +51,9 @@ class TestPerms(TestCase):
 
     def test_is_education_group_creation_period_opened(self):
         person = PersonFactory()
-        education_group = EducationGroupYearFactory()
-        today = datetime.date.today()
-
         current_ac = create_current_academic_year()
+        education_group = EducationGroupYearFactory(academic_year=current_ac)
+        today = datetime.date.today()
 
         closed_period = AcademicCalendarFactory(start_date=today + datetime.timedelta(days=1),
                                                 end_date=today + datetime.timedelta(days=3),
