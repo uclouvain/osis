@@ -39,6 +39,6 @@ def _user_can_update_group_element_year_of_type(person, egy, raise_exception):
     result = person.is_central_manager or egy.education_group_type.name not in group_type_only_central_can_create
     can_raise_exception(raise_exception, result, _("You cannot modify content for %(education_group_types)s") %
                         {"education_group_types":
-                            ", ".join([str(GroupType.MAJOR_LIST_CHOICE.value), str(GroupType.MINOR_LIST_CHOICE.name)])
+                            ", ".join([str(GroupType.MAJOR_LIST_CHOICE.value), str(GroupType.MINOR_LIST_CHOICE.value)])
                          })
     return result
