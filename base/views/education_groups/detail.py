@@ -485,7 +485,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         is_master = acronym.endswith(('2m', '2m1'))
         is_agregation = acronym.endswith('2a')
         is_mc = acronym.endswith('2mc')
-        common_conditions = self._get_appropriate_common_offer(self.object)
+        common_conditions = get_appropriate_common_admission_condition(self.object)
 
         class AdmissionConditionForm(forms.Form):
             text_field = forms.CharField(widget=CKEditorWidget(config_name='minimal'))
@@ -521,21 +521,22 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
 
         return context
 
-    def _get_appropriate_common_offer(self, edy):
-        if edy.is_common:
-            return None
-        elif edy.is_bachelor:
-            acronym = 'common-1ba'
-        elif edy.is_agregation:
-            acronym = 'common-2a'
-        elif edy.is_master120 or edy.is_master60:
-            acronym = 'common-2m'
-        elif edy.is_specialized_master:
-            acronym = 'common-2mc'
-        else:
-            return None
-        common_conditions = AdmissionCondition.objects.get(
-            education_group_year__acronym=acronym,
-            education_group_year__academic_year=edy.academic_year
-        )
-        return common_conditions
+
+def get_appropriate_common_admission_condition(edy):
+    if edy.is_common:
+        return None
+    elif edy.is_bachelor:
+        acronym = 'common-1ba'
+    elif edy.is_agregation:
+        acronym = 'common-2a'
+    elif edy.is_master120 or edy.is_master60:
+        acronym = 'common-2m'
+    elif edy.is_specialized_master:
+        acronym = 'common-2mc'
+    else:
+        return None
+    common_conditions = AdmissionCondition.objects.get(
+        education_group_year__acronym=acronym,
+        education_group_year__academic_year=edy.academic_year
+    )
+    return common_conditions
