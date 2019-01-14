@@ -99,3 +99,8 @@ class EducationGroupManagerTest(TestCase):
             list(EducationGroup.objects.trainings()),
             [self.education_group_training]
         )
+
+        self.assertNotEqual(
+            list(EducationGroup.objects.all()),
+            list(EducationGroup.objects.trainings())
+        )
