@@ -1251,7 +1251,8 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
     def test_get_appropriate_common_offer_for_common(self):
         edy = EducationGroupYearCommonFactory(
-            academic_year=self.academic_year
+            academic_year=self.academic_year,
+            education_group_type__category=education_group_categories.MINI_TRAINING
         )
         result = get_appropriate_common_admission_condition(edy)
         self.assertEqual(result, None)

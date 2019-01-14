@@ -60,7 +60,8 @@ class GroupElementYearForm(forms.ModelForm):
             self.instance.child_leaf = child_leaf
             self.instance.child_branch = child_branch
 
-        self._define_fields()
+        if self.instance.parent:
+            self._define_fields()
 
     def _define_fields(self):
         parent_type = self.instance.parent.education_group_type

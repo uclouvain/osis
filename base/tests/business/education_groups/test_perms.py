@@ -124,10 +124,10 @@ class TestPerms(TestCase):
 
     def test_is_education_group_general_information_edit_period_opened(self):
         person = PersonFactory()
-        education_group = EducationGroupYearFactory()
         today = datetime.date.today()
 
         current_ac = create_current_academic_year()
+        education_group = EducationGroupYearFactory(academic_year=current_ac)
 
         closed_period = AcademicCalendarFactory(
             start_date=today + datetime.timedelta(days=1),
@@ -174,7 +174,7 @@ class TestPerms(TestCase):
         entity_version = EntityVersionFactory(acronym='UCL')
         entity = entity_version.entity
         person.user.user_permissions.add(Permission.objects.get(codename="can_edit_educationgroup_pedagogy"))
-        personEntity = PersonEntityFactory(person=person, entity=entity)
+        person_entity = PersonEntityFactory(person=person, entity=entity)
         education_group = EducationGroupYearCommonBachelorFactory(
             management_entity=entity,
             administration_entity=entity
