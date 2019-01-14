@@ -43,19 +43,19 @@ class EducationGroupTypeFactory(DjangoModelFactory):
 
     class Params:
         minitraining = factory.Trait(
-            category=education_group_types.MiniTrainingType,
+            category=education_group_categories.MINI_TRAINING,
             name=factory.Iterator(education_group_types.MiniTrainingType.choices(), getter=operator.itemgetter(0))
         )
 
         group = factory.Trait(
-            category=education_group_types.GroupType,
+            category=education_group_categories.GROUP,
             name=factory.Iterator(education_group_types.GroupType.choices(), getter=operator.itemgetter(0))
         )
 
 
 class MiniTrainingEducationGroupTypeFactory(EducationGroupTypeFactory):
-    category = education_group_categories.MINI_TRAINING
+    minitraining = True
 
 
 class GroupEducationGroupTypeFactory(EducationGroupTypeFactory):
-    category = education_group_categories.GROUP
+    group = True
