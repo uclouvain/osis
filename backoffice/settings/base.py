@@ -86,6 +86,7 @@ INSTALLED_APPS = (
     'compat',
     'hijack_admin',
     'reversion',
+    'django.contrib.sites',
 )
 
 MIDDLEWARE = (
