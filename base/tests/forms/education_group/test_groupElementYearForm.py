@@ -27,18 +27,20 @@ from django.test import TestCase
 from django.utils.translation import gettext as _
 
 from base.forms.education_group.group_element_year import GroupElementYearForm
+from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, MiniTrainingFactory, \
+    GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class TestGroupElementYearForm(TestCase):
     def setUp(self):
-        self.parent = EducationGroupYearFactory()
+        self.parent = TrainingFactory()
         self.child_leaf = LearningUnitYearFactory()
-        self.child_branch = EducationGroupYearFactory()
+        self.child_branch = MiniTrainingFactory()
 
     def test_clean_link_type_reference_between_eg_lu(self):
         form = GroupElementYearForm(
@@ -109,3 +111,67 @@ class TestGroupElementYearForm(TestCase):
         self.assertTrue(
             group_element_1.order == 1 and group_element_2.order == 0
         )
+
+    def test_remove_access_condition_when_not_authorized_relationship(self):
+        expected_fields = [
+            "relative_credits",
+            "is_mandatory",
+            "block",
+            "quadrimester_derogation",
+            "link_type",
+            "comment",
+            "comment_english",
+        ]
+
+        form = GroupElementYearForm(parent=self.parent, child_branch=self.child_branch)
+        self.assertCountEqual(expected_fields, list(form.fields.keys()))
+        self.assertEqual(
+            LinkTypes.REFERENCE.name,
+            form.fields["link_type"].initial
+        )
+
+    def test_only_keep_access_condition_when_parent_is_minor_major_option_list_choice(self):
+        expected_fields = [
+            "access_condition"
+        ]
+        for name in GroupType.minor_major_option_list_choice():
+            with self.subTest(type=name):
+                parent = GroupFactory(education_group_type__name=name)
+                AuthorizedRelationshipFactory(
+                    parent_type=parent.education_group_type,
+                    child_type=self.child_branch.education_group_type
+                )
+                form = GroupElementYearForm(parent=parent, child_branch=self.child_branch)
+                self.assertCountEqual(expected_fields, list(form.fields.keys()))
+
+    def test_only_keep_block_when_parent_is_formation_and_child_is_minor_major_option_list_choice(self):
+        expected_fields = [
+            "block"
+        ]
+        for name in GroupType.minor_major_option_list_choice():
+            with self.subTest(type=name):
+                child_branch = GroupFactory(education_group_type__name=name)
+                AuthorizedRelationshipFactory(
+                    parent_type=self.parent.education_group_type,
+                    child_type=child_branch.education_group_type
+                )
+                form = GroupElementYearForm(parent=self.parent, child_branch=child_branch)
+                self.assertCountEqual(expected_fields, list(form.fields.keys()))
+
+    def test_remove_access_condition_when_authorized_relationship(self):
+        expected_fields = [
+            "relative_credits",
+            "is_mandatory",
+            "block",
+            "quadrimester_derogation",
+            "link_type",
+            "comment",
+            "comment_english",
+        ]
+
+        AuthorizedRelationshipFactory(
+            parent_type=self.parent.education_group_type,
+            child_type=self.child_branch.education_group_type
+        )
+        form = GroupElementYearForm(parent=self.parent, child_branch=self.child_branch)
+        self.assertCountEqual(expected_fields, list(form.fields.keys()))
