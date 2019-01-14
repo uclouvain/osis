@@ -46,22 +46,16 @@ class Hops(models.Model):
     education_group_year = models.OneToOneField('base.EducationGroupYear', on_delete=models.CASCADE)
 
     ares_study = models.IntegerField(
-        blank=True,
-        null=True,
         verbose_name=_('ARES study code'),
         validators=[MinValueValidator(1), MaxValueValidator(9999)],
     )
 
     ares_graca = models.IntegerField(
-        blank=True,
-        null=True,
         verbose_name=_('ARES-GRACA'),
         validators=[MinValueValidator(1), MaxValueValidator(9999)],
     )
 
     ares_ability = models.IntegerField(
-        blank=True,
-        null=True,
         verbose_name=_('ARES ability'),
         validators=[MinValueValidator(1), MaxValueValidator(9999)],
 
