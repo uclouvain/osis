@@ -181,3 +181,10 @@ body {
     left: 0;
     background-color: #f5f5f5;
 }
+
+/*
+ * Css for education information cms to ensure a good rendering.
+ */
+#pedagogy pre {
+    white-space: normal;
+}
