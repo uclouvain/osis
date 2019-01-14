@@ -42,7 +42,7 @@ from waffle.testutils import override_flag
 from base.business.education_groups.general_information import PublishException
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.enums import education_group_categories, academic_calendar_type
-from base.models.enums.education_group_types import TrainingType
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.certificate_aim import CertificateAimFactory
@@ -1252,7 +1252,9 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
     def test_get_appropriate_common_offer_for_common(self):
         edy = EducationGroupYearCommonFactory(
             academic_year=self.academic_year,
-            education_group_type__category=education_group_categories.MINI_TRAINING
+            education_group_type__category=education_group_categories.MINI_TRAINING,
+            education_group_type__name=MiniTrainingType.OPTION.name
+
         )
         result = get_appropriate_common_admission_condition(edy)
         self.assertEqual(result, None)
