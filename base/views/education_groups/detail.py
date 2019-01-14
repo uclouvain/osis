@@ -529,5 +529,4 @@ def get_appropriate_common_admission_condition(edy):
             else edy.education_group_type.name,
             academic_year=edy.academic_year
         ).select_related('admissioncondition').get().admissioncondition
-    else:
-        return None
+    return None
