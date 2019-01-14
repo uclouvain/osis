@@ -113,27 +113,12 @@ class TestGroupElementYearForm(TestCase):
         )
 
     def test_remove_access_condition_when_not_authorized_relationship(self):
-        expected_fields = [
-            "relative_credits",
-            "is_mandatory",
-            "block",
-            "quadrimester_derogation",
-            "link_type",
-            "comment",
-            "comment_english",
-        ]
-
         form = GroupElementYearForm(parent=self.parent, child_branch=self.child_branch)
-        self.assertCountEqual(expected_fields, list(form.fields.keys()))
-        self.assertEqual(
-            LinkTypes.REFERENCE.name,
-            form.fields["link_type"].initial
-        )
+        self.assertTrue("access_condition" not in list(form.fields.keys()))
+        self.assertEqual(LinkTypes.REFERENCE.name, form.fields["link_type"].initial)
 
     def test_only_keep_access_condition_when_parent_is_minor_major_option_list_choice(self):
-        expected_fields = [
-            "access_condition"
-        ]
+        expected_fields = ["access_condition"]
         for name in GroupType.minor_major_option_list_choice():
             with self.subTest(type=name):
                 parent = GroupFactory(education_group_type__name=name)
@@ -159,19 +144,9 @@ class TestGroupElementYearForm(TestCase):
                 self.assertCountEqual(expected_fields, list(form.fields.keys()))
 
     def test_remove_access_condition_when_authorized_relationship(self):
-        expected_fields = [
-            "relative_credits",
-            "is_mandatory",
-            "block",
-            "quadrimester_derogation",
-            "link_type",
-            "comment",
-            "comment_english",
-        ]
-
         AuthorizedRelationshipFactory(
             parent_type=self.parent.education_group_type,
             child_type=self.child_branch.education_group_type
         )
         form = GroupElementYearForm(parent=self.parent, child_branch=self.child_branch)
-        self.assertCountEqual(expected_fields, list(form.fields.keys()))
+        self.assertTrue("access_condition" not in list(form.fields.keys()))

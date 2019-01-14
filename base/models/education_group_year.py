@@ -41,7 +41,7 @@ from base.models.enums import academic_type, internship_presence, schedule_type,
 from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
 from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
-from base.models.enums.education_group_types import MiniTrainingType, TrainingType
+from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
 from base.models.exceptions import MaximumOneParentAllowedException
 from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
