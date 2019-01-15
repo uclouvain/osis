@@ -4,9 +4,6 @@ from __future__ import unicode_literals
 from django.core.management.sql import emit_post_migrate_signal
 
 from django.db import migrations
-from base.models.program_manager import ProgramManager
-from base.models.student import Student
-from base.models.tutor import Tutor
 
 
 def add_administrators_group(apps, schema_editor):
@@ -89,6 +86,9 @@ class Migration(migrations.Migration):
     dependencies = [
         ('base', '0056_create_permissions'),
         ('contenttypes', '__latest__'),
+        # We call explicitly emit_post_migrate_signal and contrib.sites have some post_migration,
+        # so we must ensure that tables of app sites is correctly created
+        ('sites', '__latest__'),
     ]
 
     operations = [
