@@ -94,15 +94,16 @@ class GroupElementYearForm(forms.ModelForm):
         if data_cleaned == LinkTypes.REFERENCE.name and self.instance.child_branch:
             parent_type = self.instance.parent.education_group_type
 
-            for ref_child in self.instance.child_branch.children_without_leaf:
-                if parent_type.authorized_parent_type.filter(child_type=ref_child).exists():
+            for ref_group in self.instance.child_branch.children_group_element_years:
+                ref_child_type = ref_group.child_branch.education_group_type
+                if parent_type.authorized_parent_type.filter(child_type=ref_child_type).exists():
                     continue
 
                 self.add_error('link_type', _(
                     "You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
                 ) % {
                    "parent_type": parent_type,
-                   "child_type": ref_child.education_group_type,
+                   "child_type": ref_child_type,
                 })
 
         return data_cleaned

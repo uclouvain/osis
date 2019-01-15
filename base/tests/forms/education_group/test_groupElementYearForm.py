@@ -59,8 +59,8 @@ class TestGroupElementYearForm(TestCase):
         AuthorizedRelationshipFactory(
             parent_type=self.parent.education_group_type,
             child_type=self.child_branch.education_group_type,
-            reference=False
         )
+        ref_group = GroupElementYearFactory(parent=self.child_branch)
 
         form = GroupElementYearForm(
             data={'link_type': LinkTypes.REFERENCE.name},
@@ -75,7 +75,7 @@ class TestGroupElementYearForm(TestCase):
                 "You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
             ) % {
                  "parent_type": self.parent.education_group_type,
-                 "child_type": self.child_branch.education_group_type,
+                 "child_type": ref_group.child_branch.education_group_type,
              }]
         )
 
@@ -83,7 +83,11 @@ class TestGroupElementYearForm(TestCase):
         AuthorizedRelationshipFactory(
             parent_type=self.parent.education_group_type,
             child_type=self.child_branch.education_group_type,
-            reference=True
+        )
+        ref_group = GroupElementYearFactory(parent=self.child_branch)
+        AuthorizedRelationshipFactory(
+            parent_type=self.parent.education_group_type,
+            child_type=ref_group.child_branch.education_group_type,
         )
 
         form = GroupElementYearForm(

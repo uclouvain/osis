@@ -603,16 +603,13 @@ class EducationGroupYear(SerializableModel):
                 raise MaximumOneParentAllowedException('Only one training parent is allowed')
 
     @cached_property
-    def children_without_leaf(self):
-        return self.children.exclude(child_leaf__isnull=False)
-
-    @cached_property
     def children(self):
         return self.groupelementyear_set.select_related('child_branch', 'child_leaf')
 
     @cached_property
     def children_group_element_years(self):
-        return self.children_without_leaf
+        """ Return groupelementyears with a child_branch """
+        return self.children.exclude(child_leaf__isnull=False)
 
     @cached_property
     def group_element_year_branches(self):
