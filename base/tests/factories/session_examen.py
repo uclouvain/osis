@@ -31,7 +31,7 @@ import factory.fuzzy
 import factory.fuzzy
 
 from base.models.enums import number_session as number_session_enum
-from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_year import OfferYearFactory
 
 
@@ -40,8 +40,7 @@ class SessionExamFactory(factory.DjangoModelFactory):
         model = 'base.SessionExam'
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     number_session = factory.Iterator(number_session_enum.NUMBERS_SESSION, getter=operator.itemgetter(0))
-    learning_unit_year = factory.SubFactory(LearningUnitYear)
+    learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
     offer_year = factory.SubFactory(OfferYearFactory)

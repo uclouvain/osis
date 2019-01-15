@@ -31,7 +31,7 @@ import factory.fuzzy
 from django.utils import timezone
 
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION, EDUCATION_GROUP_EDITION, \
-    ACADEMIC_CALENDAR_TYPES
+    ACADEMIC_CALENDAR_TYPES, SCORES_EXAM_SUBMISSION
 from base.tests.factories.academic_year import AcademicYearFactory
 from osis_common.utils.datetime import get_tzinfo
 
@@ -82,7 +82,7 @@ class CloseAcademicCalendarFactory(AcademicCalendarFactory):
 
 
 class AcademicCalendarExamSubmissionFactory(AcademicCalendarFactory):
-    reference = 'SCORES_EXAM_SUBMISSION'
+    reference = SCORES_EXAM_SUBMISSION
 
 
 class AcademicCalendarSummaryCourseSubmissionFactory(AcademicCalendarFactory):
