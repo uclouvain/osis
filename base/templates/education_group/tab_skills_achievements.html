@@ -25,7 +25,12 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 {% block top_action_bar %}
-    {% include "education_group/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown" %}
+    {% if can_edit_information and not education_group_year.is_common %}
+        <a class="btn btn-default btn-publish" style="margin-right: 20px;"
+           href="{% url 'education_group_publish' parent.pk education_group_year.id %}">
+            {% trans 'Publish' %}
+        </a>
+    {% endif %}
 {% endblock %}
 
 {% block details %}

@@ -25,6 +25,7 @@
 ############################################################################
 from django.conf import settings
 
+from base.business.education_groups import perms
 from base.views.education_groups.detail import EducationGroupGenericDetailView
 from cms.enums import entity_name
 from cms.models import translated_text
@@ -69,12 +70,11 @@ class EducationGroupSkillsAchievements(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context.update(
-            {
-                'LANGUAGE_CODE_FR': settings.LANGUAGE_CODE_FR,
-                'LANGUAGE_CODE_EN': settings.LANGUAGE_CODE_EN
-             }
-        )
+        context.update({
+            'LANGUAGE_CODE_FR': settings.LANGUAGE_CODE_FR,
+            'LANGUAGE_CODE_EN': settings.LANGUAGE_CODE_EN,
+            'can_edit_information': perms.is_eligible_to_edit_general_information(context['person'], context['object'])
+        })
 
         context["education_group_achievements"] = self.get_achievements()
         context[CMS_LABEL_PROGRAM_AIM] = {

@@ -82,10 +82,8 @@ def _postpone_m2m(education_group_year, postponed_egy):
             m2m_cls(education_group_year=postponed_egy, **m2m_data_to_postpone).save()
 
 
-def duplicate_education_group_year(old_education_group_year, new_academic_year, dict_new_value=None,
-                                   dict_initial_egy=None):
-    if not dict_new_value:
-        dict_new_value = model_to_dict_fk(old_education_group_year, exclude=FIELD_TO_EXCLUDE)
+def duplicate_education_group_year(old_education_group_year, new_academic_year, dict_initial_egy=None):
+    dict_new_value = model_to_dict_fk(old_education_group_year, exclude=FIELD_TO_EXCLUDE)
 
     defaults_values = {x: v for x, v in dict_new_value.items() if not isinstance(v, list)}
 
@@ -150,18 +148,22 @@ class PostponementEducationGroupYearMixin:
         return education_group_year
 
     def _start_postponement(self, education_group_year):
-        dict_new_value = model_to_dict_fk(education_group_year, exclude=self.field_to_exclude)
-
         for academic_year in AcademicYear.objects.filter(year__gt=self.postpone_start_year,
                                                          year__lte=self.postpone_end_year):
             try:
                 postponed_egy = duplicate_education_group_year(
-                    education_group_year, academic_year, dict_new_value, self.dict_initial_egy
+                    education_group_year, academic_year, self.dict_initial_egy
                 )
                 self.education_group_year_postponed.append(postponed_egy)
 
             except ConsistencyError as e:
                 self.add_postponement_errors(e)
+
+            finally:
+                education_group_year = EducationGroupYear.objects.get(
+                    academic_year=academic_year,
+                    education_group=education_group_year.education_group
+                )
 
     def add_postponement_errors(self, consistency_error):
         for difference in consistency_error.differences:
