@@ -33,6 +33,7 @@ from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import cache
 
+# TODO Use meta name instead
 LEARNING_UNIT_YEAR = 'learningunityear'
 EDUCATION_GROUP_YEAR = 'educationgroupyear'
 SELECT_CACHE_KEY = 'child_to_cache_id'
@@ -72,16 +73,7 @@ def extract_child_from_cache(parent, selected_data):
         kwargs['child_leaf'] = luy
     elif selected_data['modelname'] == EDUCATION_GROUP_YEAR:
         egy = EducationGroupYear.objects.get(pk=selected_data['id'])
-        if not _types_are_compatible(parent, egy):
-            raise IncompatiblesTypesException(
-                errors=_("You cannot attach \"%(child)s\" (type \"%(child_type)s\") "
-                         "to \"%(parent)s\" (type \"%(parent_type)s\")") % {
-                           'child': egy,
-                           'child_type': egy.education_group_type,
-                           'parent': parent,
-                           'parent_type': parent.education_group_type,
-                       }
-            )
+
         if is_max_child_reached(parent, egy.education_group_type):
             raise MaxChildrenReachedException(
                 errors=_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
@@ -92,10 +84,6 @@ def extract_child_from_cache(parent, selected_data):
             )
         kwargs['child_branch'] = egy
     return kwargs
-
-
-def _types_are_compatible(parent, child):
-    return parent.education_group_type.authorized_parent_type.filter(child_type=child.education_group_type,).exists()
 
 
 def is_max_child_reached(parent, child_education_group_type):

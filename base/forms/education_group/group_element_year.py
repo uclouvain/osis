@@ -63,10 +63,12 @@ class GroupElementYearForm(forms.ModelForm):
             self._define_fields()
 
     def _define_fields(self):
-        parent_type = self.instance.parent.education_group_type
-        if self.instance.child_branch and not parent_type.authorized_parent_type.filter(
-                child_type=self.instance.child_branch.education_group_type).exists():
+        if self.instance.child_branch and not self._check_authorized_relationship(
+                self.instance.child_branch.education_group_type):
             self.fields.pop("access_condition")
+
+            # Change the initial but (for strange reasons) let the possibility to the user to try with the main link.
+            # Like that he will see the form error.
             self.fields["link_type"].initial = LinkTypes.REFERENCE.name
 
         elif self._is_education_group_year_a_minor_major_option_list_choice(self.instance.parent):
@@ -86,27 +88,47 @@ class GroupElementYearForm(forms.ModelForm):
         return obj
 
     def clean_link_type(self):
-        """ In the case of a reference link. We have to check if all referenced children of the child_branch can
-        be attach to the parent.
+        """
+        All of these controls only work with child branch.
         """
         data_cleaned = self.cleaned_data.get('link_type')
 
-        if data_cleaned == LinkTypes.REFERENCE.name and self.instance.child_branch:
-            parent_type = self.instance.parent.education_group_type
+        if not self.instance.child_branch:
+            # The validation with learning_units (child_leaf) is in the model.
+            return data_cleaned
 
+        parent_type = self.instance.parent.education_group_type
+
+        if data_cleaned != LinkTypes.REFERENCE.name:
+            # For the main link,  we have to check if the parent type is compatible with its child's type
+            child = self.instance.child_branch
+            if not self._check_authorized_relationship(child.education_group_type):
+                raise forms.ValidationError(
+                    _("You cannot attach \"%(child)s\" (type \"%(child_type)s\") to \"%(parent)s\" (type "
+                      "\"%(parent_type)s\")") % {
+                        'child': child,
+                        'child_type': child.education_group_type,
+                        'parent': self.instance.parent,
+                        'parent_type': parent_type,
+                    }
+                )
+        else:
+            # All types of children are allowed for the reference link but we must check the type of grandchildren
             for ref_group in self.instance.child_branch.children_group_element_years:
                 ref_child_type = ref_group.child_branch.education_group_type
-                if parent_type.authorized_parent_type.filter(child_type=ref_child_type).exists():
+                if self._check_authorized_relationship(ref_child_type):
                     continue
-
-                self.add_error('link_type', _(
-                    "You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
-                ) % {
-                   "parent_type": parent_type,
-                   "child_type": ref_child_type,
-                })
+                raise forms.ValidationError(
+                    _("You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
+                      ) % {
+                        "parent_type": parent_type,
+                        "child_type": ref_child_type,
+                    })
 
         return data_cleaned
+
+    def _check_authorized_relationship(self, child_type):
+        return self.instance.parent.education_group_type.authorized_parent_type.filter(child_type=child_type).exists()
 
     @staticmethod
     def _reorder_children_by_partial_acronym(parent):

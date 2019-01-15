@@ -30,7 +30,7 @@ from base.forms.education_group.group_element_year import GroupElementYearForm
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, MiniTrainingFactory, \
+from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory, \
     GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
