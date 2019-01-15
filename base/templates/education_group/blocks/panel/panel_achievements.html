@@ -42,8 +42,9 @@
     {% for achievement in education_group_achievements %}
         <div class="row">
             <div class="col-md-1">
+                <strong>{{ achievement.code_name }}</strong>
                 <span data-toggle="collapse" data-target="#row_detail_achievement_{{ achievement.pk }}"
-                      class="glyphicon glyphicon-chevron-right collapse_span">
+                      class="glyphicon glyphicon-chevron-right collapse_span pull-right">
                 </span>
             </div>
             <div class="col-md-11">
@@ -67,8 +68,11 @@
 
                 <div id="row_detail_achievement_{{ achievement.pk }}" class="row collapse in"
                      style="padding-left: 20px">
-                    <div class="col-md-12">
-                        {% for detail_achievement in achievement.educationgroupdetailedachievement_set.all %}
+                     {% for detail_achievement in achievement.educationgroupdetailedachievement_set.all %}
+                         <div class="col-md-1">
+                             <strong>{{ detail_achievement.code_name }}</strong>
+                         </div>
+                        <div class="col-md-11">
                             <div class="row" id="education_group_detail_achievement_{{ detail_achievement.pk }}">
                                 <div class="col-md-5">
                                     {{ detail_achievement.french_text | safe }}
