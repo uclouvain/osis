@@ -29,8 +29,8 @@ import string
 
 import factory.fuzzy
 
-from base.models.enums import number_session, academic_calendar_type
-from .academic_calendar import AcademicCalendarFactory, AcademicCalendarExamSubmissionFactory
+from base.models.enums import number_session
+from .academic_calendar import AcademicCalendarExamSubmissionFactory
 
 
 class SessionExamCalendarFactory(factory.DjangoModelFactory):
