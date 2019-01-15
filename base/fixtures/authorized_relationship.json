@@ -1,7 +1,7 @@
 [
 {
     "model": "base.authorizedrelationship",
-    "pk": 87,
+    "pk": 172,
     "fields": {
         "parent_type": [
             "AGGREGATION"
@@ -9,47 +9,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:19:36.016",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:14:21.624",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 88,
-    "fields": {
-        "parent_type": [
-            "AGGREGATION"
-        ],
-        "child_type": [
-            "OPTION_LIST_CHOICE"
-        ],
-        "changed": "2018-08-09T15:20:07.478",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 89,
-    "fields": {
-        "parent_type": [
-            "AGGREGATION"
-        ],
-        "child_type": [
-            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
-        ],
-        "changed": "2018-08-09T15:20:30.656",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 90,
+    "pk": 173,
     "fields": {
         "parent_type": [
             "CERTIFICATE_OF_PARTICIPATION"
@@ -57,15 +24,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:21:06.073",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:15:47.510",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 91,
+    "pk": 174,
     "fields": {
         "parent_type": [
             "CERTIFICATE_OF_SUCCESS"
@@ -73,15 +39,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:21:46.211",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:16:38.682",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 92,
+    "pk": 175,
     "fields": {
         "parent_type": [
             "CERTIFICATE_OF_HOLDING_CREDITS"
@@ -89,49 +54,44 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:22:05.892",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:17:11.622",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 93,
+    "pk": 176,
     "fields": {
-      "parent_type": [
-        "AGGREGATION"
-      ],
-      "child_type": [
-        "MOBILITY_PARTNERSHIP_LIST_CHOICE"
-      ],
-      "changed": "2018-12-03T08:17:48.916",
-      "min_count_authorized": "0",
-      "max_count_authorized": "1",
-            "reference": false
-
+        "parent_type": [
+            "AGGREGATION"
+        ],
+        "child_type": [
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T08:17:48.916",
+        "min_count_authorized": "0",
+        "max_count_authorized": "1"
     }
-  },
-  {
+},
+{
     "model": "base.authorizedrelationship",
     "pk": 177,
     "fields": {
-      "parent_type": [
-        "BACHELOR"
-      ],
-      "child_type": [
-        "COMMON_CORE"
-      ],
-      "changed": "2018-12-03T08:18:38.971",
-      "min_count_authorized": "1",
-      "max_count_authorized": "1",
-      "reference": true
-
+        "parent_type": [
+            "BACHELOR"
+        ],
+        "child_type": [
+            "COMMON_CORE"
+        ],
+        "changed": "2018-12-03T08:18:38.971",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 94,
+    "pk": 178,
     "fields": {
         "parent_type": [
             "BACHELOR"
@@ -139,15 +99,14 @@
         "child_type": [
             "MINOR_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:23:43.118",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "changed": "2018-12-03T08:19:16.710",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 95,
+    "pk": 179,
     "fields": {
         "parent_type": [
             "BACHELOR"
@@ -155,31 +114,14 @@
         "child_type": [
             "MAJOR_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:23:58.050",
+        "changed": "2018-12-03T08:19:53.282",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 96,
-    "fields": {
-        "parent_type": [
-            "BACHELOR"
-        ],
-        "child_type": [
-            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
-        ],
-        "changed": "2018-08-09T15:24:27.937",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 97,
+    "pk": 180,
     "fields": {
         "parent_type": [
             "CERTIFICATE"
@@ -187,15 +129,29 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:24:53.744",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:21:20.140",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 98,
+    "pk": 181,
+    "fields": {
+        "parent_type": [
+            "BACHELOR"
+        ],
+        "child_type": [
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T08:22:20.723",
+        "min_count_authorized": "0",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 182,
     "fields": {
         "parent_type": [
             "CAPAES"
@@ -203,15 +159,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:25:26.887",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:23:01.455",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 99,
+    "pk": 183,
     "fields": {
         "parent_type": [
             "RESEARCH_CERTIFICATE"
@@ -219,15 +174,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:25:48.063",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:23:34.871",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 100,
+    "pk": 184,
     "fields": {
         "parent_type": [
             "UNIVERSITY_FIRST_CYCLE_CERTIFICATE"
@@ -235,15 +189,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:26:13.735",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:24:12.531",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 101,
+    "pk": 185,
     "fields": {
         "parent_type": [
             "UNIVERSITY_SECOND_CYCLE_CERTIFICATE"
@@ -251,15 +204,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:26:31.828",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:24:38.986",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 102,
+    "pk": 186,
     "fields": {
         "parent_type": [
             "ACCESS_CONTEST"
@@ -267,15 +219,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:26:58.065",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:25:10.154",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 103,
+    "pk": 187,
     "fields": {
         "parent_type": [
             "LANGUAGE_CLASS"
@@ -283,15 +234,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:27:15.816",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:25:36.291",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 104,
+    "pk": 188,
     "fields": {
         "parent_type": [
             "ISOLATED_CLASS"
@@ -299,15 +249,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:27:37.753",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:26:10.820",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 105,
+    "pk": 189,
     "fields": {
         "parent_type": [
             "PHD"
@@ -315,15 +264,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:27:50.370",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:26:39.490",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 106,
+    "pk": 190,
     "fields": {
         "parent_type": [
             "FORMATION_PHD"
@@ -331,15 +279,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:28:01.574",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:27:03.425",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 107,
+    "pk": 191,
     "fields": {
         "parent_type": [
             "JUNIOR_YEAR"
@@ -347,15 +294,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:28:47.468",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:27:26.267",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 108,
+    "pk": 192,
     "fields": {
         "parent_type": [
             "PGRM_MASTER_120"
@@ -363,15 +309,29 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:29:31.797",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:28:17.709",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 109,
+    "pk": 193,
+    "fields": {
+        "parent_type": [
+            "PGRM_MASTER_120"
+        ],
+        "child_type": [
+            "COMPLEMENTARY_MODULE"
+        ],
+        "changed": "2018-12-03T08:28:42.294",
+        "min_count_authorized": "0",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 194,
     "fields": {
         "parent_type": [
             "PGRM_MASTER_120"
@@ -379,15 +339,14 @@
         "child_type": [
             "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:29:51.514",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "changed": "2018-12-03T08:29:25.113",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 110,
+    "pk": 195,
     "fields": {
         "parent_type": [
             "PGRM_MASTER_120"
@@ -395,207 +354,194 @@
         "child_type": [
             "FINALITY_120_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:30:11.603",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "changed": "2018-12-03T08:29:57.983",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 111,
+    "pk": 196,
     "fields": {
         "parent_type": [
             "PGRM_MASTER_120"
+        ],
+        "child_type": [
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T08:30:24.410",
+        "min_count_authorized": "0",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 197,
+    "fields": {
+        "parent_type": [
+            "MASTER_MA_120"
+        ],
+        "child_type": [
+            "COMMON_CORE"
+        ],
+        "changed": "2018-12-03T08:35:04.829",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 198,
+    "fields": {
+        "parent_type": [
+            "MASTER_MA_120"
+        ],
+        "child_type": [
+            "OPTION_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T08:35:31.842",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 199,
+    "fields": {
+        "parent_type": [
+            "MASTER_MA_120"
+        ],
+        "child_type": [
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T08:36:42.304",
+        "min_count_authorized": "0",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 200,
+    "fields": {
+        "parent_type": [
+            "MASTER_MD_120"
+        ],
+        "child_type": [
+            "COMMON_CORE"
+        ],
+        "changed": "2018-12-03T08:37:32.357",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 201,
+    "fields": {
+        "parent_type": [
+            "MASTER_MD_120"
+        ],
+        "child_type": [
+            "OPTION_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T08:38:13.904",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 202,
+    "fields": {
+        "parent_type": [
+            "MASTER_MD_120"
+        ],
+        "child_type": [
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T08:38:36.941",
+        "min_count_authorized": "0",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 203,
+    "fields": {
+        "parent_type": [
+            "MASTER_MS_120"
+        ],
+        "child_type": [
+            "COMMON_CORE"
+        ],
+        "changed": "2018-12-03T08:40:05.800",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 204,
+    "fields": {
+        "parent_type": [
+            "MASTER_MS_120"
+        ],
+        "child_type": [
+            "OPTION_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T08:40:25.262",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 205,
+    "fields": {
+        "parent_type": [
+            "MASTER_MS_120"
+        ],
+        "child_type": [
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T08:41:46.330",
+        "min_count_authorized": "0",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 206,
+    "fields": {
+        "parent_type": [
+            "PGRM_MASTER_180_240"
+        ],
+        "child_type": [
+            "COMMON_CORE"
+        ],
+        "changed": "2018-12-03T08:42:43.608",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 207,
+    "fields": {
+        "parent_type": [
+            "PGRM_MASTER_180_240"
         ],
         "child_type": [
             "COMPLEMENTARY_MODULE"
         ],
-        "changed": "2018-08-09T15:30:31.185",
+        "changed": "2018-12-03T08:43:08.696",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 112,
-    "fields": {
-        "parent_type": [
-            "PGRM_MASTER_120"
-        ],
-        "child_type": [
-            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
-        ],
-        "changed": "2018-08-09T15:31:06.514",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 113,
-    "fields": {
-        "parent_type": [
-            "MASTER_MA_120"
-        ],
-        "child_type": [
-            "COMMON_CORE"
-        ],
-        "changed": "2018-08-09T15:31:32.433",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 114,
-    "fields": {
-        "parent_type": [
-            "MASTER_MA_120"
-        ],
-        "child_type": [
-            "OPTION_LIST_CHOICE"
-        ],
-        "changed": "2018-08-09T15:32:02.943",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 115,
-    "fields": {
-        "parent_type": [
-            "MASTER_MA_120"
-        ],
-        "child_type": [
-            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
-        ],
-        "changed": "2018-08-09T15:32:33.006",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 116,
-    "fields": {
-        "parent_type": [
-            "MASTER_MD_120"
-        ],
-        "child_type": [
-            "COMMON_CORE"
-        ],
-        "changed": "2018-08-09T15:33:06.115",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 117,
-    "fields": {
-        "parent_type": [
-            "MASTER_MD_120"
-        ],
-        "child_type": [
-            "OPTION_LIST_CHOICE"
-        ],
-        "changed": "2018-08-09T15:33:22.602",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 118,
-    "fields": {
-        "parent_type": [
-            "MASTER_MD_120"
-        ],
-        "child_type": [
-            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
-        ],
-        "changed": "2018-08-09T15:33:38.614",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 119,
-    "fields": {
-        "parent_type": [
-            "MASTER_MS_120"
-        ],
-        "child_type": [
-            "COMMON_CORE"
-        ],
-        "changed": "2018-08-09T15:34:18.852",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 120,
-    "fields": {
-        "parent_type": [
-            "MASTER_MS_120"
-        ],
-        "child_type": [
-            "OPTION_LIST_CHOICE"
-        ],
-        "changed": "2018-08-09T15:34:33.715",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 121,
-    "fields": {
-        "parent_type": [
-            "MASTER_MS_120"
-        ],
-        "child_type": [
-            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
-        ],
-        "changed": "2018-08-09T15:34:45.425",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 122,
-    "fields": {
-        "parent_type": [
-            "PGRM_MASTER_180_240"
-        ],
-        "child_type": [
-            "COMMON_CORE"
-        ],
-        "changed": "2018-08-09T15:35:27.430",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 123,
+    "pk": 208,
     "fields": {
         "parent_type": [
             "PGRM_MASTER_180_240"
@@ -603,15 +549,14 @@
         "child_type": [
             "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:42:32.726",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "changed": "2018-12-03T08:43:38.138",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 124,
+    "pk": 209,
     "fields": {
         "parent_type": [
             "PGRM_MASTER_180_240"
@@ -619,31 +564,14 @@
         "child_type": [
             "FINALITY_180_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:42:54.365",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "changed": "2018-12-03T08:44:13.285",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 125,
-    "fields": {
-        "parent_type": [
-            "PGRM_MASTER_180_240"
-        ],
-        "child_type": [
-            "COMPLEMENTARY_MODULE"
-        ],
-        "changed": "2018-08-09T15:43:15.846",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 126,
+    "pk": 210,
     "fields": {
         "parent_type": [
             "PGRM_MASTER_180_240"
@@ -651,15 +579,14 @@
         "child_type": [
             "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:43:35.468",
+        "changed": "2018-12-03T08:44:28.002",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 127,
+    "pk": 211,
     "fields": {
         "parent_type": [
             "MASTER_MA_180_240"
@@ -667,15 +594,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:43:57.914",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:45:22.664",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 128,
+    "pk": 212,
     "fields": {
         "parent_type": [
             "MASTER_MA_180_240"
@@ -683,15 +609,14 @@
         "child_type": [
             "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:44:16.555",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "changed": "2018-12-03T08:45:41.763",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 129,
+    "pk": 213,
     "fields": {
         "parent_type": [
             "MASTER_MA_180_240"
@@ -699,15 +624,14 @@
         "child_type": [
             "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:44:37.821",
+        "changed": "2018-12-03T08:45:59.652",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 130,
+    "pk": 214,
     "fields": {
         "parent_type": [
             "MASTER_MD_180_240"
@@ -715,15 +639,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:45:08",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:46:34.965",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 131,
+    "pk": 215,
     "fields": {
         "parent_type": [
             "MASTER_MD_180_240"
@@ -731,15 +654,14 @@
         "child_type": [
             "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:45:25.854",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "changed": "2018-12-03T08:46:46.141",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 132,
+    "pk": 216,
     "fields": {
         "parent_type": [
             "MASTER_MD_180_240"
@@ -747,15 +669,14 @@
         "child_type": [
             "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:45:58.461",
+        "changed": "2018-12-03T08:47:07.046",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 133,
+    "pk": 217,
     "fields": {
         "parent_type": [
             "MASTER_MS_180_240"
@@ -763,15 +684,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:49:27.632",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:47:39.087",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 134,
+    "pk": 218,
     "fields": {
         "parent_type": [
             "MASTER_MS_180_240"
@@ -779,15 +699,14 @@
         "child_type": [
             "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:49:43.158",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "changed": "2018-12-03T08:47:59.706",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 135,
+    "pk": 219,
     "fields": {
         "parent_type": [
             "MASTER_MS_180_240"
@@ -795,15 +714,14 @@
         "child_type": [
             "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:49:54.236",
+        "changed": "2018-12-03T08:48:16.368",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 136,
+    "pk": 220,
     "fields": {
         "parent_type": [
             "MASTER_M1"
@@ -811,31 +729,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:50:15.266",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:49:03.500",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 137,
-    "fields": {
-        "parent_type": [
-            "MASTER_M1"
-        ],
-        "child_type": [
-            "OPTION_LIST_CHOICE"
-        ],
-        "changed": "2018-08-09T15:50:31.824",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 138,
+    "pk": 221,
     "fields": {
         "parent_type": [
             "MASTER_M1"
@@ -843,15 +744,29 @@
         "child_type": [
             "COMPLEMENTARY_MODULE"
         ],
-        "changed": "2018-08-09T15:50:48.976",
+        "changed": "2018-12-03T08:49:33.689",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 139,
+    "pk": 222,
+    "fields": {
+        "parent_type": [
+            "MASTER_M1"
+        ],
+        "child_type": [
+            "OPTION_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T08:49:55.801",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 223,
     "fields": {
         "parent_type": [
             "MASTER_M1"
@@ -859,15 +774,14 @@
         "child_type": [
             "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:51:10.851",
+        "changed": "2018-12-03T08:50:07.752",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 140,
+    "pk": 224,
     "fields": {
         "parent_type": [
             "MASTER_MC"
@@ -875,31 +789,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:51:34.086",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:51:11.571",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 141,
-    "fields": {
-        "parent_type": [
-            "MASTER_MC"
-        ],
-        "child_type": [
-            "OPTION_LIST_CHOICE"
-        ],
-        "changed": "2018-08-09T15:51:48.978",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 142,
+    "pk": 225,
     "fields": {
         "parent_type": [
             "MASTER_MC"
@@ -907,15 +804,29 @@
         "child_type": [
             "COMPLEMENTARY_MODULE"
         ],
-        "changed": "2018-08-09T15:52:01.477",
+        "changed": "2018-12-03T08:51:30.761",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 143,
+    "pk": 226,
+    "fields": {
+        "parent_type": [
+            "MASTER_MC"
+        ],
+        "child_type": [
+            "OPTION_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T08:51:51.754",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 227,
     "fields": {
         "parent_type": [
             "MASTER_MC"
@@ -923,15 +834,14 @@
         "child_type": [
             "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T15:52:21.426",
+        "changed": "2018-12-03T08:52:03.057",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": false
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 144,
+    "pk": 228,
     "fields": {
         "parent_type": [
             "INTERNSHIP"
@@ -939,15 +849,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:52:42.012",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:52:33.593",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 145,
+    "pk": 229,
     "fields": {
         "parent_type": [
             "DEEPENING"
@@ -955,15 +864,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:52:58.856",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:52:53.434",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 146,
+    "pk": 230,
     "fields": {
         "parent_type": [
             "SOCIETY_MINOR"
@@ -971,15 +879,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:53:19.286",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:53:13.430",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 147,
+    "pk": 231,
     "fields": {
         "parent_type": [
             "ACCESS_MINOR"
@@ -987,15 +894,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:53:34.284",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:53:29.541",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 148,
+    "pk": 232,
     "fields": {
         "parent_type": [
             "OPEN_MINOR"
@@ -1003,15 +909,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:53:47.019",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:53:56.995",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 149,
+    "pk": 233,
     "fields": {
         "parent_type": [
             "DISCIPLINARY_COMPLEMENT_MINOR"
@@ -1019,15 +924,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:54:01.445",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:54:14.243",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 150,
+    "pk": 234,
     "fields": {
         "parent_type": [
             "FSA_SPECIALITY"
@@ -1035,15 +939,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:54:38.672",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:54:40.661",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 151,
+    "pk": 235,
     "fields": {
         "parent_type": [
             "OPTION"
@@ -1051,15 +954,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:54:52.819",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:55:07.982",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 152,
+    "pk": 236,
     "fields": {
         "parent_type": [
             "MOBILITY_PARTNERSHIP"
@@ -1067,15 +969,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:55:04.463",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T08:55:30.678",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 153,
+    "pk": 237,
     "fields": {
         "parent_type": [
             "COMMON_CORE"
@@ -1083,15 +984,14 @@
         "child_type": [
             "SUB_GROUP"
         ],
-        "changed": "2018-08-09T15:55:19.047",
+        "changed": "2018-12-03T08:58:43.531",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "max_count_authorized": "MANY"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 154,
+    "pk": 238,
     "fields": {
         "parent_type": [
             "COMPLEMENTARY_MODULE"
@@ -1099,15 +999,14 @@
         "child_type": [
             "COMMON_CORE"
         ],
-        "changed": "2018-08-09T15:56:10.130",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "changed": "2018-12-03T09:00:27.004",
+        "min_count_authorized": "1",
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 155,
+    "pk": 239,
     "fields": {
         "parent_type": [
             "MINOR_LIST_CHOICE"
@@ -1115,63 +1014,14 @@
         "child_type": [
             "DEEPENING"
         ],
-        "changed": "2018-08-09T15:56:50.589",
+        "changed": "2018-12-03T09:03:09.135",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "max_count_authorized": "MANY"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 156,
-    "fields": {
-        "parent_type": [
-            "MINOR_LIST_CHOICE"
-        ],
-        "child_type": [
-            "DISCIPLINARY_COMPLEMENT_MINOR"
-        ],
-        "changed": "2018-08-09T15:57:31.245",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 157,
-    "fields": {
-        "parent_type": [
-            "MINOR_LIST_CHOICE"
-        ],
-        "child_type": [
-            "OPEN_MINOR"
-        ],
-        "changed": "2018-08-09T15:57:56.195",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 158,
-    "fields": {
-        "parent_type": [
-            "MINOR_LIST_CHOICE"
-        ],
-        "child_type": [
-            "ACCESS_MINOR"
-        ],
-        "changed": "2018-08-09T15:58:13.221",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
-    }
-},
-{
-    "model": "base.authorizedrelationship",
-    "pk": 159,
+    "pk": 240,
     "fields": {
         "parent_type": [
             "MINOR_LIST_CHOICE"
@@ -1179,15 +1029,74 @@
         "child_type": [
             "SOCIETY_MINOR"
         ],
-        "changed": "2018-08-09T15:58:30.128",
+        "changed": "2018-12-03T09:10:29.005",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "max_count_authorized": "MANY"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 160,
+    "pk": 241,
+    "fields": {
+        "parent_type": [
+            "MINOR_LIST_CHOICE"
+        ],
+        "child_type": [
+            "ACCESS_MINOR"
+        ],
+        "changed": "2018-12-03T09:10:38.249",
+        "min_count_authorized": "0",
+        "max_count_authorized": "MANY"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 242,
+    "fields": {
+        "parent_type": [
+            "MINOR_LIST_CHOICE"
+        ],
+        "child_type": [
+            "OPEN_MINOR"
+        ],
+        "changed": "2018-12-03T09:10:46.402",
+        "min_count_authorized": "0",
+        "max_count_authorized": "MANY"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 243,
+    "fields": {
+        "parent_type": [
+            "MINOR_LIST_CHOICE"
+        ],
+        "child_type": [
+            "DISCIPLINARY_COMPLEMENT_MINOR"
+        ],
+        "changed": "2018-12-03T09:10:55.946",
+        "min_count_authorized": "0",
+        "max_count_authorized": "MANY"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 244,
+    "fields": {
+        "parent_type": [
+            "MINOR_LIST_CHOICE"
+        ],
+        "child_type": [
+            "MINOR_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T09:12:25.369",
+        "min_count_authorized": "0",
+        "max_count_authorized": "MANY"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 245,
     "fields": {
         "parent_type": [
             "MAJOR_LIST_CHOICE"
@@ -1195,15 +1104,29 @@
         "child_type": [
             "FSA_SPECIALITY"
         ],
-        "changed": "2018-08-09T15:58:54.904",
+        "changed": "2018-12-03T09:14:10.023",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "max_count_authorized": "MANY"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 161,
+    "pk": 246,
+    "fields": {
+        "parent_type": [
+            "MAJOR_LIST_CHOICE"
+        ],
+        "child_type": [
+            "MAJOR_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T09:15:13.187",
+        "min_count_authorized": "0",
+        "max_count_authorized": "MANY"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 247,
     "fields": {
         "parent_type": [
             "OPTION_LIST_CHOICE"
@@ -1211,15 +1134,29 @@
         "child_type": [
             "OPTION"
         ],
-        "changed": "2018-08-09T15:59:19.519",
+        "changed": "2018-12-03T09:15:56.053",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "max_count_authorized": "MANY"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 162,
+    "pk": 248,
+    "fields": {
+        "parent_type": [
+            "OPTION_LIST_CHOICE"
+        ],
+        "child_type": [
+            "OPTION_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T09:16:12.398",
+        "min_count_authorized": "0",
+        "max_count_authorized": "MANY"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 249,
     "fields": {
         "parent_type": [
             "FINALITY_120_LIST_CHOICE"
@@ -1227,15 +1164,14 @@
         "child_type": [
             "MASTER_MA_120"
         ],
-        "changed": "2018-08-09T15:59:50.548",
+        "changed": "2018-12-03T09:18:31.821",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 163,
+    "pk": 250,
     "fields": {
         "parent_type": [
             "FINALITY_120_LIST_CHOICE"
@@ -1243,15 +1179,14 @@
         "child_type": [
             "MASTER_MD_120"
         ],
-        "changed": "2018-08-09T16:00:03.255",
+        "changed": "2018-12-03T09:18:55.058",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 164,
+    "pk": 251,
     "fields": {
         "parent_type": [
             "FINALITY_120_LIST_CHOICE"
@@ -1259,15 +1194,29 @@
         "child_type": [
             "MASTER_MS_120"
         ],
-        "changed": "2018-08-09T16:00:19.195",
+        "changed": "2018-12-03T09:19:16.591",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "max_count_authorized": "MANY"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 165,
+    "pk": 252,
+    "fields": {
+        "parent_type": [
+            "FINALITY_120_LIST_CHOICE"
+        ],
+        "child_type": [
+            "FINALITY_120_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T09:19:44.425",
+        "min_count_authorized": "0",
+        "max_count_authorized": "MANY"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 253,
     "fields": {
         "parent_type": [
             "FINALITY_180_LIST_CHOICE"
@@ -1275,15 +1224,14 @@
         "child_type": [
             "MASTER_MA_180_240"
         ],
-        "changed": "2018-08-09T16:00:43.345",
+        "changed": "2018-12-03T09:20:24.636",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 166,
+    "pk": 254,
     "fields": {
         "parent_type": [
             "FINALITY_180_LIST_CHOICE"
@@ -1291,15 +1239,14 @@
         "child_type": [
             "MASTER_MD_180_240"
         ],
-        "changed": "2018-08-09T16:01:05.540",
+        "changed": "2018-12-03T09:21:06.272",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "max_count_authorized": "1"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 167,
+    "pk": 255,
     "fields": {
         "parent_type": [
             "FINALITY_180_LIST_CHOICE"
@@ -1307,15 +1254,44 @@
         "child_type": [
             "MASTER_MS_180_240"
         ],
-        "changed": "2018-08-09T16:10:58.042",
+        "changed": "2018-12-03T09:21:25.722",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "max_count_authorized": "MANY"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 168,
+    "pk": 256,
+    "fields": {
+        "parent_type": [
+            "FINALITY_180_LIST_CHOICE"
+        ],
+        "child_type": [
+            "FINALITY_180_LIST_CHOICE"
+        ],
+        "changed": "2018-12-03T09:21:48.051",
+        "min_count_authorized": "0",
+        "max_count_authorized": "MANY"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 257,
+    "fields": {
+        "parent_type": [
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
+        ],
+        "child_type": [
+            "MOBILITY_PARTNERSHIP"
+        ],
+        "changed": "2018-12-03T09:22:53.179",
+        "min_count_authorized": "0",
+        "max_count_authorized": "MANY"
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 258,
     "fields": {
         "parent_type": [
             "MOBILITY_PARTNERSHIP_LIST_CHOICE"
@@ -1323,15 +1299,14 @@
         "child_type": [
             "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T16:11:40.888",
+        "changed": "2018-12-03T09:23:07.751",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "max_count_authorized": "MANY"
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 169,
+    "pk": 259,
     "fields": {
         "parent_type": [
             "SUB_GROUP"
@@ -1339,10 +1314,9 @@
         "child_type": [
             "SUB_GROUP"
         ],
-        "changed": "2018-08-09T16:11:55.324",
+        "changed": "2018-12-03T09:23:31.872",
         "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "max_count_authorized": "MANY"
     }
 },
 {

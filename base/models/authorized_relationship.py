@@ -44,11 +44,5 @@ class AuthorizedRelationship(models.Model):
     min_count_authorized = models.CharField(max_length=5, choices=MIN_COUNT_CONSTRAINTS, default=ZERO)
     max_count_authorized = models.CharField(max_length=5, choices=MAX_COUNT_CONSTRAINTS, default=MANY)
 
-    reference = models.BooleanField(
-        default=False,
-        verbose_name=_('Reference'),
-        help_text=_("True when the relation is authorized for reference link.")
-    )
-
     def __str__(self):
         return '{} - {}'.format(self.parent_type, self.child_type)

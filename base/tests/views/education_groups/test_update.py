@@ -472,46 +472,6 @@ class TestSelectAttach(TestCase):
 
         self._assert_link_with_inital_parent_present()
 
-    def test_attach_case_child_education_group_year_without_authorized_relationship_fails(self):
-        expected_absent_group_element_year = GroupElementYear.objects.filter(
-            parent=self.new_parent_education_group_year,
-            child_branch=self.child_education_group_year
-        ).exists()
-        self.assertFalse(expected_absent_group_element_year)
-
-        self._assert_link_with_inital_parent_present()
-
-        # Select :
-        self.client.post(
-            self.url_management,
-            data=self.select_data
-        )
-
-        response = self.client.get(
-            reverse("education_group_attach", args=[self.root.pk, self.new_parent_education_group_year.pk])
-        )
-        self.assertEqual(response.status_code, 200)
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            str(messages[0]),
-            _("You cannot attach \"%(child)s\" (type \"%(child_type)s\") "
-              "to \"%(parent)s\" (type \"%(parent_type)s\")") % {
-                'child': self.child_education_group_year,
-                'child_type': self.child_education_group_year.education_group_type,
-                'parent': self.new_parent_education_group_year,
-                'parent_type': self.new_parent_education_group_year.education_group_type,
-            }
-        )
-
-        expected_absent_group_element_year = GroupElementYear.objects.filter(
-            parent=self.new_parent_education_group_year,
-            child_branch=self.child_education_group_year
-        ).exists()
-        self.assertFalse(expected_absent_group_element_year)
-
-        self._assert_link_with_inital_parent_present()
-
     def test_attach_child_education_group_year_to_one_of_its_descendants_creating_loop(self):
         # We attempt to create a loop : child --> initial_parent --> new_parent --> child
         GroupElementYearFactory(
