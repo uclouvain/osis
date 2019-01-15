@@ -29,7 +29,8 @@ from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.business.education_groups import shorten
-from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
+from base.models.enums import education_group_categories
+from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel, SerializableModelManager
 
 
 class EducationGroupAdmin(VersionAdmin, SerializableModelAdmin):
@@ -37,7 +38,17 @@ class EducationGroupAdmin(VersionAdmin, SerializableModelAdmin):
     search_fields = ('educationgroupyear__acronym',)
 
 
+class EducationGroupManager(SerializableModelManager):
+    def having_related_training(self, **kwargs):
+        # .distinct() is necessary if there is more than one training egy related to an education_group
+        return self.filter(
+            educationgroupyear__education_group_type__category=education_group_categories.TRAINING,
+            **kwargs
+        ).distinct()
+
+
 class EducationGroup(SerializableModel):
+    objects = EducationGroupManager()
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
