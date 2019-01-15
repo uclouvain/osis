@@ -132,7 +132,6 @@ class GroupElementYearForm(forms.ModelForm):
                     "child_type": ref_child_type,
                 })
 
-
     def _check_authorized_relationship(self, child_type):
         return self.instance.parent.education_group_type.authorized_parent_type.filter(child_type=child_type).exists()
 
