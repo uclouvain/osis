@@ -1347,7 +1347,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 160,
+    "pk": 170,
     "fields": {
         "parent_type": [
             "MINOR_LIST_CHOICE"
