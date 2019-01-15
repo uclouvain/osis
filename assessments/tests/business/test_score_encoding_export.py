@@ -49,11 +49,11 @@ class XlsTests(TestCase):
     def setUp(self):
         self.academic_year = create_current_academic_year()
         self.academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
-                                                         academic_year=self.academic_year,
+                                                         academic_year__current=True,
                                                          reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=self.academic_calendar,
                                                                 number_session=number_session.ONE)
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.academic_year)
+        learning_unit_yr = LearningUnitYearFactory(learning_container_year__academic_year__current=True)
         self.session_exam = SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_yr)
         self.workbook = Workbook()
         self.worksheet = self.workbook.active

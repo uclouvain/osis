@@ -43,4 +43,5 @@ class SessionExamFactory(factory.DjangoModelFactory):
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     number_session = factory.Iterator(number_session_enum.NUMBERS_SESSION, getter=operator.itemgetter(0))
     learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
-    offer_year = factory.SubFactory(OfferYearFactory)
+    offer_year = factory.SubFactory(OfferYearFactory,
+                                    academic_year=factory.SelfAttribute('..learning_unit_year.academic_year'))
