@@ -27,7 +27,6 @@ from django import forms
 from django.utils.translation import gettext as _
 
 from base.models.enums import education_group_categories
-from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 
@@ -87,21 +86,25 @@ class GroupElementYearForm(forms.ModelForm):
         return obj
 
     def clean_link_type(self):
+        """ In the case of a reference link. We have to check if all referenced children of the child_branch can
+        be attach to the parent.
+        """
         data_cleaned = self.cleaned_data.get('link_type')
-        if data_cleaned:
+
+        if data_cleaned == LinkTypes.REFERENCE.name and self.instance.child_branch:
             parent_type = self.instance.parent.education_group_type
-            if self.instance.child_branch and not parent_type.authorized_parent_type.filter(
-                    child_type=self.instance.child_branch.education_group_type,
-                    reference=True,
-            ).exists():
+
+            for ref_child in self.instance.child_branch.children_without_leaf:
+                if parent_type.authorized_parent_type.filter(child_type=ref_child).exists():
+                    continue
+
                 self.add_error('link_type', _(
                     "You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
                 ) % {
-                        "parent_type": self.instance.parent.education_group_type,
-                        "child_type": self.instance.child_branch.education_group_type,
-                    })
-            elif self.instance.child_leaf:
-                self.add_error('link_type', _("You are not allowed to create a reference with a learning unit"))
+                   "parent_type": parent_type,
+                   "child_type": ref_child.education_group_type,
+                })
+
         return data_cleaned
 
     @staticmethod
