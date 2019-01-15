@@ -41,6 +41,6 @@ class TestConvertToDecimal(TestCase):
         with self.assertRaises(ValueError):
             score_encoding_list._convert_to_decimal(float(15.555), True)
 
-    def test_when_deciamls_unothorized(self):
+    def test_when_deciamls_unauthorized(self):
         with self.assertRaises(ValueError):
             score_encoding_list._convert_to_decimal(float(15.555), False)
