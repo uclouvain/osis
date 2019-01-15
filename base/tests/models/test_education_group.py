@@ -84,7 +84,7 @@ class EducationGroupManagerTest(TestCase):
     def test_education_group_trainings_manager(self):
         self.assertCountEqual(
             EducationGroup.objects.all(),
-            EducationGroup.objects.trainings()
+            EducationGroup.objects.having_related_training()
         )
 
     def test_education_group_trainings_manager_with_other_types(self):
@@ -96,11 +96,11 @@ class EducationGroupManagerTest(TestCase):
         )
 
         self.assertCountEqual(
-            list(EducationGroup.objects.trainings()),
+            list(EducationGroup.objects.having_related_training()),
             [self.education_group_training]
         )
 
         self.assertNotEqual(
             list(EducationGroup.objects.all()),
-            list(EducationGroup.objects.trainings())
+            list(EducationGroup.objects.having_related_training())
         )

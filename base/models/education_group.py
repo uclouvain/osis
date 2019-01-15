@@ -39,7 +39,8 @@ class EducationGroupAdmin(VersionAdmin, SerializableModelAdmin):
 
 
 class EducationGroupManager(SerializableModelManager):
-    def trainings(self, **kwargs):
+    def having_related_training(self, **kwargs):
+        # .distinct() is necessary if there is more than one training egy related to an education_group
         return self.filter(
             educationgroupyear__education_group_type__category=education_group_categories.TRAINING,
             **kwargs
