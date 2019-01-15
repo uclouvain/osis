@@ -67,9 +67,38 @@ class HopsEducationGroupYearModelForm(forms.ModelForm):
             'ares_ability',
         ]
 
+    def is_valid(self):
+        return super(HopsEducationGroupYearModelForm, self).is_valid() and self._valid_hops()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["ares_study"].required = False
+        self.fields["ares_graca"].required = False
+        self.fields["ares_ability"].required = False
+
     def save(self, education_group_year):
         self.instance.education_group_year = education_group_year
-        return super().save()
+        if self._has_ares_data():
+            return super().save()
+        else:
+            if self.instance.id:
+                # Need to be deleted
+                self.instance.delete()
+            return None
+
+    def _valid_hops(self):
+        if self.cleaned_data.get('ares_study') is None and self.cleaned_data.get(
+                'ares_graca') is None and self.cleaned_data.get('ares_ability') is None:
+            return True
+        else:
+            if not (self._has_ares_data()):
+                self.add_error('ares_study', _('The fields concerning ARES have to be ALL filled-in or none of them'))
+                return False
+        return True
+
+    def _has_ares_data(self):
+        return self.cleaned_data.get('ares_study') and self.cleaned_data.get('ares_graca') and self.cleaned_data.get(
+            'ares_ability')
 
 
 class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
@@ -238,6 +267,9 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
         if self.hops_form.is_valid():
             self.hops_form.save(education_group_year=egy_instance)
         return egy_instance
+
+    def is_valid(self):
+        return super(TrainingForm, self).is_valid() and self.hops_form.is_valid()
 
 
 @register('university_domains')

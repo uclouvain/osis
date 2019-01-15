@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-11 11:09+0100\n"
+"POT-Creation-Date: 2019-01-15 10:40+0100\n"
 "PO-Revision-Date: 2019-01-10 09:56+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -81,7 +81,7 @@ msgstr[1] "%(count_enrollment)d étudiants sont inscrits à l'offre."
 msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
 msgstr "%(date)s doit être comprise entre %(start_date)s et %(end_date)s"
 
-#: models/education_group.py:77 models/education_group_year.py:679
+#: models/education_group.py:77 models/education_group_year.py:699
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr "%(max)s doit être plus grand ou égal à %(min)s"
@@ -212,17 +212,17 @@ msgstr "AESS CAPAES"
 msgid "AND"
 msgstr "ET"
 
-#: models/hops.py:65
+#: models/hops.py:59
 #: templates/education_group/blocks/academic_offer_info.html:39
 msgid "ARES ability"
 msgstr "Habilitation ARES"
 
-#: models/hops.py:51
+#: models/hops.py:49
 #: templates/education_group/blocks/academic_offer_info.html:31
 msgid "ARES study code"
 msgstr "Code étude ARES"
 
-#: models/hops.py:58
+#: models/hops.py:54
 #: templates/education_group/blocks/academic_offer_info.html:35
 msgid "ARES-GRACA"
 msgstr "ARES-GRACA"
@@ -330,8 +330,8 @@ msgid "Accepted"
 msgstr "Accepté"
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:38
-#: templates/education_group/tab_admission_conditions.html:89
-#: templates/education_group/tab_admission_conditions.html:135
+#: templates/education_group/tab_admission_conditions.html:123
+#: templates/education_group/tab_admission_conditions.html:172
 msgid "Access"
 msgstr "Accès"
 
@@ -379,8 +379,8 @@ msgstr "Sigle"
 #: templates/education_group/blocks/dropdown/administrative_data_actions_bar.html:36
 #: templates/education_group/blocks/dropdown/education_groups_action_button.html:33
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:36
-#: templates/education_group/tab_admission_conditions.html:92
-#: templates/education_group/tab_admission_conditions.html:138
+#: templates/education_group/tab_admission_conditions.html:126
+#: templates/education_group/tab_admission_conditions.html:175
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:46
 msgid "Actions"
 msgstr "Actions"
@@ -426,13 +426,13 @@ msgstr "Ajouter attribution"
 msgid "Add potential courses"
 msgstr "Ajouts de cours éventuels"
 
-#: templates/education_group/blocks/admission_condition_text.html:48
+#: templates/education_group/blocks/admission_condition_text.html:58
 #: templates/education_group/blocks/row_label_general_informations.html:55
 #: templates/education_group/blocks/row_translatedtext_side_by_side.html:38
 msgid "Add the English content of this paragraph"
 msgstr "Ajouter le contenu Anglais de ce paragraphe"
 
-#: templates/education_group/blocks/admission_condition_text.html:41
+#: templates/education_group/blocks/admission_condition_text.html:46
 #: templates/education_group/blocks/row_label_general_informations.html:48
 #: templates/education_group/blocks/row_translatedtext_side_by_side.html:31
 msgid "Add the French content of this paragraph"
@@ -494,7 +494,8 @@ msgstr "Entité d'administration"
 msgid "Administrative data"
 msgstr "Données administratives"
 
-#: templates/education_group/tab_admission_conditions.html:153
+#: templates/education_group/tab_admission_conditions.html:196
+#: templates/education_group/tab_admission_conditions.html:198
 msgid "Admission and Enrolment Procedures for general registration"
 msgstr "Procédures d'admission et d'inscription"
 
@@ -502,7 +503,8 @@ msgstr "Procédures d'admission et d'inscription"
 msgid "Admission exam"
 msgstr "Concours"
 
-#: templates/education_group/tab_admission_conditions.html:151
+#: templates/education_group/tab_admission_conditions.html:188
+#: templates/education_group/tab_admission_conditions.html:190
 msgid "Adults taking up their university training"
 msgstr "Adultes en reprise d'études"
 
@@ -519,6 +521,7 @@ msgid "Alert"
 msgstr "Alerte"
 
 #: templates/education_group/tab_admission_conditions.html:42
+#: templates/education_group/tab_admission_conditions.html:44
 msgid "Alert Message"
 msgstr "Message d'alerte"
 
@@ -695,7 +698,7 @@ msgstr "Attributions"
 msgid "Bachelor"
 msgstr "Bachelier"
 
-#: templates/education_group/tab_admission_conditions.html:98
+#: templates/education_group/tab_admission_conditions.html:132
 msgid "Bachelors of the Dutch speaking Community of Belgium"
 msgstr "Bachelier de la Communauté flamande de Belgique"
 
@@ -959,8 +962,8 @@ msgid "Components"
 msgstr "Composants"
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:44
-#: templates/education_group/tab_admission_conditions.html:88
-#: templates/education_group/tab_admission_conditions.html:134
+#: templates/education_group/tab_admission_conditions.html:122
+#: templates/education_group/tab_admission_conditions.html:171
 #: templates/education_group/tabs.html:88
 msgid "Conditions"
 msgstr "Conditions"
@@ -1152,8 +1155,8 @@ msgid "Details"
 msgstr "Détails"
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:43
-#: templates/education_group/tab_admission_conditions.html:87
-#: templates/education_group/tab_admission_conditions.html:133
+#: templates/education_group/tab_admission_conditions.html:121
+#: templates/education_group/tab_admission_conditions.html:170
 msgid "Diploma"
 msgstr "Diplôme"
 
@@ -1428,7 +1431,7 @@ msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 "Assurez-vous que cette valeur est inférieure ou égale à %(limit_value)s."
 
-#: forms/education_group/training.py:159
+#: forms/education_group/training.py:188
 msgid "Enter text to search"
 msgstr "Entrez le texte à rechercher"
 
@@ -1584,7 +1587,7 @@ msgstr "Pour accord,"
 msgid "Force state"
 msgstr "Forcer l'état"
 
-#: templates/education_group/tab_admission_conditions.html:99
+#: templates/education_group/tab_admission_conditions.html:133
 msgid "Foreign Bachelors"
 msgstr "Bacheliers étrangers"
 
@@ -1617,7 +1620,7 @@ msgstr "Code OF"
 msgid "Formerly"
 msgstr "Anciennement"
 
-#: templates/education_group/tab_admission_conditions.html:53
+#: templates/education_group/tab_admission_conditions.html:71
 msgid "Free Text"
 msgstr "Zone libre"
 
@@ -1628,7 +1631,8 @@ msgstr "Zone libre"
 msgid "French"
 msgstr "Français"
 
-#: templates/education_group/tab_admission_conditions.html:60
+#: templates/education_group/tab_admission_conditions.html:83
+#: templates/education_group/tab_admission_conditions.html:85
 msgid "French language proficiency examination"
 msgstr "Maîtrise de la langue française"
 
@@ -1684,8 +1688,10 @@ msgstr "Orientation coopération internationale CCD/CUD"
 msgid "Gender"
 msgstr "Genre"
 
-#: templates/education_group/tab_admission_conditions.html:46
-#: templates/education_group/tab_admission_conditions.html:57
+#: templates/education_group/tab_admission_conditions.html:49
+#: templates/education_group/tab_admission_conditions.html:51
+#: templates/education_group/tab_admission_conditions.html:76
+#: templates/education_group/tab_admission_conditions.html:78
 msgid "General Conditions"
 msgstr "Conditions Générales"
 
@@ -1715,7 +1721,7 @@ msgstr "Continuer"
 msgid "Grade"
 msgstr "Niveau"
 
-#: templates/education_group/tab_admission_conditions.html:142
+#: templates/education_group/tab_admission_conditions.html:179
 msgid "Graduates"
 msgstr "Diplômés"
 
@@ -1739,11 +1745,11 @@ msgstr "Titre raccourcis de l'événement"
 msgid "Highlight title"
 msgstr "Titre de l'événement"
 
-#: templates/education_group/tab_admission_conditions.html:111
+#: templates/education_group/tab_admission_conditions.html:148
 msgid "Holders of a 2nd cycle University degree"
 msgstr "Diplômés du 2° cycle universitaire"
 
-#: templates/education_group/tab_admission_conditions.html:148
+#: templates/education_group/tab_admission_conditions.html:185
 msgid "Holders of a non-University 2nd cycle degree"
 msgstr "Diplômés de 2° cycle non universitaire"
 
@@ -1966,7 +1972,8 @@ msgstr "Label"
 msgid "Language"
 msgstr "Langue"
 
-#: templates/education_group/tab_admission_conditions.html:48
+#: templates/education_group/tab_admission_conditions.html:59
+#: templates/education_group/tab_admission_conditions.html:61
 msgid "Language Exam"
 msgstr "Examen de langue"
 
@@ -2311,7 +2318,7 @@ msgstr "Master de spécialisation"
 msgid "Master thesis"
 msgstr "Thèse de master"
 
-#: templates/education_group/tab_admission_conditions.html:143
+#: templates/education_group/tab_admission_conditions.html:180
 msgid "Masters"
 msgstr "Masters"
 
@@ -2567,7 +2574,8 @@ msgstr "Non académiques"
 msgid "Non academic CREF"
 msgstr "Non académique CREF"
 
-#: templates/education_group/tab_admission_conditions.html:107
+#: templates/education_group/tab_admission_conditions.html:141
+#: templates/education_group/tab_admission_conditions.html:143
 msgid "Non university Bachelors"
 msgstr "Bacheliers non universitaires"
 
@@ -2658,7 +2666,8 @@ msgstr "Ouvert aux externes"
 msgid "Open minor"
 msgstr "Mineure d’ouverture"
 
-#: templates/education_group/tab_admission_conditions.html:62
+#: templates/education_group/tab_admission_conditions.html:93
+#: templates/education_group/tab_admission_conditions.html:95
 msgid "Opening to Adults"
 msgstr "Ouverture aux adultes"
 
@@ -2747,7 +2756,7 @@ msgstr "Autre remarque"
 msgid "Other teacher(s)"
 msgstr "Autre(s) enseignant(s)"
 
-#: templates/education_group/tab_admission_conditions.html:97
+#: templates/education_group/tab_admission_conditions.html:131
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr "Autres bacheliers de la Communauté française de Belgique"
 
@@ -2806,7 +2815,8 @@ msgstr "Périodicité"
 msgid "Person not in accordance with proposal state"
 msgstr "Personne qui ne peut pas travailler avec une proposition dans cet état"
 
-#: templates/education_group/tab_admission_conditions.html:152
+#: templates/education_group/tab_admission_conditions.html:192
+#: templates/education_group/tab_admission_conditions.html:194
 msgid "Personalized access"
 msgstr "Accès personnalisé"
 
@@ -3146,7 +3156,8 @@ msgstr "Classes effectives/prévues"
 msgid "Received on"
 msgstr "Reçu le"
 
-#: templates/education_group/tab_admission_conditions.html:61
+#: templates/education_group/tab_admission_conditions.html:88
+#: templates/education_group/tab_admission_conditions.html:90
 msgid "Reduction"
 msgstr "Inscriptions en allègement"
 
@@ -3181,8 +3192,8 @@ msgid "Release"
 msgstr "Release"
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:45
-#: templates/education_group/tab_admission_conditions.html:90
-#: templates/education_group/tab_admission_conditions.html:136
+#: templates/education_group/tab_admission_conditions.html:124
+#: templates/education_group/tab_admission_conditions.html:173
 #: utils/send_mail.py:235
 msgid "Remarks"
 msgstr "Remarques"
@@ -3323,7 +3334,7 @@ msgstr "Recherche des programmes annualisés"
 msgid "Search type"
 msgstr "Type de recherche"
 
-#: forms/education_group/training.py:150
+#: forms/education_group/training.py:179
 msgid "Search..."
 msgstr "Recherche..."
 
@@ -3420,11 +3431,13 @@ msgstr "Mineure de société"
 msgid "Source code"
 msgstr "Code source"
 
-#: templates/education_group/tab_admission_conditions.html:49
+#: templates/education_group/tab_admission_conditions.html:64
+#: templates/education_group/tab_admission_conditions.html:66
 msgid "Special Conditions"
 msgstr "Conditions spéciales"
 
-#: templates/education_group/tab_admission_conditions.html:47
+#: templates/education_group/tab_admission_conditions.html:54
+#: templates/education_group/tab_admission_conditions.html:56
 msgid "Specific Conditions"
 msgstr "Conditions Spécifiques"
 
@@ -3739,6 +3752,10 @@ msgstr "L'entité '%(acronym)s' n'existe plus en %(year)s"
 msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr "L'événement \"%(event)s\" a été supprimé avec succès"
 
+#: forms/education_group/training.py:96
+msgid "The fields concerning ARES have to be ALL filled-in or none of them"
+msgstr "Les champs concernant les données de l'ARES doivent être soit être tous remplis ou alors tous nuls"
+
 #: models/education_group_year.py:81
 msgid "The following education groups ended with error"
 msgstr "Les groupement suivants se sont terminés par une erreur"
@@ -3936,7 +3953,6 @@ msgstr "Le programme %(acronym)s sera publié sous peu"
 msgid "The program aim has been updated"
 msgstr ""
 
-
 #: templates/education_group/pdf_content.html:76
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
@@ -4073,8 +4089,8 @@ msgstr "Ce champ ne peut pas être défini"
 
 #: forms/common.py:80 models/education_group_publication_contact.py:99
 #: models/education_group_publication_contact.py:100
-#: models/education_group_year.py:666 models/education_group_year.py:687
-#: models/education_group_year.py:689
+#: models/education_group_year.py:686 models/education_group_year.py:707
+#: models/education_group_year.py:709
 #: tests/views/learning_units/proposals/test_creation.py:186
 #: tests/views/learning_units/proposals/test_creation.py:187
 #: tests/views/learning_units/proposals/test_creation.py:188
@@ -4265,7 +4281,7 @@ msgstr "Type d'événement"
 msgid "Type of training"
 msgstr "Type de formation"
 
-#: templates/education_group/tab_admission_conditions.html:96
+#: templates/education_group/tab_admission_conditions.html:130
 msgid "UCL Bachelors"
 msgstr "Bacheliers UCL"
 
@@ -4291,7 +4307,7 @@ msgstr "Indéfini"
 msgid "Unique"
 msgstr "Unique"
 
-#: templates/education_group/tab_admission_conditions.html:66
+#: templates/education_group/tab_admission_conditions.html:100
 msgid "University Bachelors"
 msgstr "Bacheliers universitaires"
 
@@ -4543,8 +4559,8 @@ msgstr ""
 "Vous êtes gestionnaire facultaire et le proposition n'est pas en état "
 "'faculté' donc vous ne pouvez pas éditer"
 
-#: forms/education_group/group_element_year.py:85
-#: tests/forms/education_group/test_groupElementYearForm.py:73
+#: forms/education_group/group_element_year.py:98
+#: tests/forms/education_group/test_groupElementYearForm.py:75
 #, python-format
 msgid ""
 "You are not allow to create a reference link between a %(parent_type)s and a "
@@ -4563,8 +4579,8 @@ msgstr ""
 "Vous n'êtes pas autorisé de copier le contenu de ce type d'organisation de "
 "formation."
 
-#: forms/education_group/group_element_year.py:91
-#: tests/forms/education_group/test_groupElementYearForm.py:53
+#: forms/education_group/group_element_year.py:104
+#: tests/forms/education_group/test_groupElementYearForm.py:55
 msgid "You are not allowed to create a reference with a learning unit"
 msgstr ""
 "Vous n'êtes pas autorisé de créer une référence avec une unité d’enseignement"
@@ -4706,7 +4722,7 @@ msgstr ""
 "Une proposition de modification de type {} a été faite pour l'unité "
 "d'enseignement {}."
 
-#: models/education_group_year.py:672
+#: models/education_group_year.py:692
 msgid "You should precise at least minimum or maximum constraint"
 msgstr "Vous devez préciser au moins la contrainte minimum ou maximum"
 
@@ -4910,7 +4926,7 @@ msgstr "confirmer"
 
 #: business/learning_units/edition.py:435
 #: business/learning_units/xls_comparison.py:59 business/proposal_xls.py:39
-#: models/education_group_year.py:334 models/education_group_year.py:508
+#: models/education_group_year.py:334 models/education_group_year.py:528
 #: models/enums/constraint_type.py:32 models/group_element_year.py:163
 #: models/group_element_year.py:179
 #: tests/models/test_education_group_year.py:93
@@ -5052,11 +5068,11 @@ msgstr "logo"
 msgid "main domain"
 msgstr "domaine principal"
 
-#: models/education_group_year.py:359 models/education_group_year.py:680
+#: models/education_group_year.py:359 models/education_group_year.py:700
 msgid "maximum constraint"
 msgstr "contrainte maximum"
 
-#: models/education_group_year.py:352 models/education_group_year.py:681
+#: models/education_group_year.py:352 models/education_group_year.py:701
 msgid "minimum constraint"
 msgstr "contrainte minimum"
 
@@ -5220,7 +5236,7 @@ msgstr "note(s) enregistrée(s)"
 msgid "search"
 msgstr "recherche"
 
-#: forms/education_group/training.py:80 models/education_group_year.py:383
+#: forms/education_group/training.py:109 models/education_group_year.py:383
 #: templates/education_group/identification_training_details.html:77
 msgid "secondary domains"
 msgstr "domaines secondaires"
