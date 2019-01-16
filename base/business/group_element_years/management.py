@@ -73,15 +73,6 @@ def extract_child_from_cache(parent, selected_data):
 
     elif selected_data['modelname'] == EDUCATION_GROUP_YEAR:
         egy = EducationGroupYear.objects.get(pk=selected_data['id'])
-
-        if is_max_child_reached(parent, egy.education_group_type):
-            raise MaxChildrenReachedException(
-                errors=_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
-                         "has already reached the limit.") % {
-                           'child_type': egy.education_group_type,
-                           'parent': parent
-                       }
-            )
         kwargs['child_branch'] = egy
 
     return kwargs

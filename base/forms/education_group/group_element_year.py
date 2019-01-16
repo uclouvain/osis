@@ -29,6 +29,7 @@ from django.utils.translation import gettext as _
 from base.business.group_element_years.management import is_max_child_reached
 from base.models.enums import education_group_categories
 from base.models.enums.link_type import LinkTypes
+from base.models.exceptions import MaxChildrenReachedException
 from base.models.group_element_year import GroupElementYear
 
 
@@ -117,6 +118,18 @@ class GroupElementYearForm(forms.ModelForm):
                     'parent': self.instance.parent,
                     'parent_type': parent_type,
                 }
+            )
+
+        # TODO refactor
+        parent = self.instance.parent
+
+        if is_max_child_reached(parent, child.education_group_type):
+            raise MaxChildrenReachedException(
+                errors=_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
+                         "has already reached the limit.") % {
+                           'child_type': child.education_group_type,
+                           'parent': parent
+                       }
             )
 
     def _clean_link_type_reference(self):
