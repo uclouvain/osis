@@ -3778,7 +3778,7 @@ msgstr "L'événement \"%(event)s\" a été supprimé avec succès"
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
 "Les champs concernant les données de l'ARES doivent être soit être tous "
-"remplis ou alors tous nuls"
+"remplis ou alors tous vides"
 
 #: models/education_group_year.py:81
 msgid "The following education groups ended with error"

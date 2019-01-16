@@ -139,9 +139,21 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
             data={},
             instance=self.hops
         )
-        if form_education_group_year.is_valid():
-            hops_updated = form_education_group_year.save(education_group_year=self.parent_education_group_year)
-            self.assertIsNone(hops_updated)
+        self.assertTrue(form_education_group_year.is_valid())
+        hops_updated = form_education_group_year.save(education_group_year=self.parent_education_group_year)
+        self.assertIsNone(hops_updated)
+
+    def test_save_hopsform_with_null_ares_data(self):
+        form_education_group_year = HopsEducationGroupYearModelForm(
+            data={'ares_study': 10,
+                  'ares_graca': 10,
+                  'ares_ability': 10,
+                  },
+            instance=self.hops
+        )
+        self.assertTrue(form_education_group_year.is_valid())
+        hops_updated = form_education_group_year.save(education_group_year=self.parent_education_group_year)
+        self.assertIsNone(hops_updated)
 
 
 class TestPostponementEducationGroupYear(TestCase):
