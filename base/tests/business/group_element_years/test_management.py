@@ -48,7 +48,7 @@ class TestChildReachedMixin():
             child_branch__education_group_type=self.child_type
         )
 
-    def create_authorized_relationship(self, max_count=count_constraint.MANY, min_count=count_constraint.ZERO):
+    def create_authorized_relationship(self, max_count=None, min_count=0):
         return AuthorizedRelationshipFactory(
             parent_type=self.parent_type,
             child_type=self.child_type,
@@ -63,22 +63,22 @@ class TestIsMaxChildReached(TestChildReachedMixin, TestCase):
 
     def test_should_return_false_if_no_group_element_years_of_child_type_and_max_count_set_to_one(self):
         GroupElementYearFactory(parent=self.parent_egy)
-        self.create_authorized_relationship(max_count=count_constraint.ONE)
+        self.create_authorized_relationship(max_count=1)
         self.assertFalse(is_max_child_reached(self.parent_egy, self.child_egy.education_group_type))
 
     def test_should_return_false_if_no_group_element_years_child_type_and_max_count_set_to_many(self):
-        self.create_authorized_relationship(max_count=count_constraint.MANY)
+        self.create_authorized_relationship(max_count=None)
         self.assertFalse(is_max_child_reached(self.parent_egy, self.child_egy.education_group_type))
 
     def test_should_return_true_if_one_group_element_years_child_type_and_max_count_set_to_one(self):
         self.create_group_element_years_of_child_type()
-        self.create_authorized_relationship(max_count=count_constraint.ONE)
+        self.create_authorized_relationship(max_count=1)
         self.assertTrue(is_max_child_reached(self.parent_egy, self.child_egy.education_group_type))
 
     def test_should_return_false_if_multiple_group_element_years_of_child_type_and_max_count_set_to_many(self):
         self.create_group_element_years_of_child_type()
         self.create_group_element_years_of_child_type()
-        self.create_authorized_relationship(max_count=count_constraint.MANY)
+        self.create_authorized_relationship(max_count=None)
         self.assertFalse(is_max_child_reached(self.parent_egy, self.child_egy.education_group_type))
 
 
@@ -88,25 +88,25 @@ class TestIsMinChildReached(TestChildReachedMixin, TestCase):
 
     def test_should_return_true_if_no_group_element_years_of_child_type_and_min_count_set_to_zero(self):
         GroupElementYearFactory(parent=self.parent_egy)
-        self.create_authorized_relationship(min_count=count_constraint.ZERO)
+        self.create_authorized_relationship(min_count=0)
         self.assertFalse(is_min_child_reached(self.parent_egy, self.child_egy.education_group_type))
 
     def test_should_return_true_if_no_group_element_years_child_type_and_min_count_set_to_one(self):
-        self.create_authorized_relationship(min_count=count_constraint.ONE)
+        self.create_authorized_relationship(min_count=1)
         self.assertTrue(is_min_child_reached(self.parent_egy, self.child_egy.education_group_type))
 
     def test_should_return_false_if_one_group_element_year_of_child_type_and_min_count_set_to_zero(self):
         self.create_group_element_years_of_child_type()
-        self.create_authorized_relationship(min_count=count_constraint.ZERO)
+        self.create_authorized_relationship(min_count=0)
         self.assertFalse(is_min_child_reached(self.parent_egy, self.child_egy.education_group_type))
 
     def test_should_return_true_if_one_group_element_years_of_child_type_and_min_count_set_to_one(self):
         self.create_group_element_years_of_child_type()
-        self.create_authorized_relationship(min_count=count_constraint.ONE)
+        self.create_authorized_relationship(min_count=1)
         self.assertTrue(is_min_child_reached(self.parent_egy, self.child_egy.education_group_type))
 
     def test_should_return_false_if_multiple_group_element_years_of_child_type_and_min_count_set_to_one(self):
         self.create_group_element_years_of_child_type()
         self.create_group_element_years_of_child_type()
-        self.create_authorized_relationship(min_count=count_constraint.ONE)
+        self.create_authorized_relationship(min_count=1)
         self.assertFalse(is_min_child_reached(self.parent_egy, self.child_egy.education_group_type))

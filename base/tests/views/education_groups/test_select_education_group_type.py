@@ -60,8 +60,8 @@ class TestSelectEducationGroupTypeView(TestCase):
             AuthorizedRelationshipFactory(
                 parent_type=self.parent_education_group_year.education_group_type,
                 child_type=eg_type,
-                min_count_authorized=count_constraint.ZERO,
-                max_count_authorized=count_constraint.ONE
+                min_count_authorized=0,
+                max_count_authorized=1,
             )
             for eg_type in self.education_group_types
         ]

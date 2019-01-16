@@ -71,6 +71,7 @@ def extract_child_from_cache(parent, selected_data):
                        }
             )
         kwargs['child_leaf'] = luy
+
     elif selected_data['modelname'] == EDUCATION_GROUP_YEAR:
         egy = EducationGroupYear.objects.get(pk=selected_data['id'])
 
@@ -83,13 +84,14 @@ def extract_child_from_cache(parent, selected_data):
                        }
             )
         kwargs['child_branch'] = egy
+
     return kwargs
 
 
 def is_max_child_reached(parent, child_education_group_type):
     def _is_max_child_reached(number_children, authorized_relationship):
         max_count = authorized_relationship.max_count_authorized
-        return number_children > 0 and max_count == count_constraint.ONE
+        return number_children > 0 and max_count == 1
 
     return _is_limit_child_reached(parent, child_education_group_type, _is_max_child_reached)
 
@@ -97,7 +99,7 @@ def is_max_child_reached(parent, child_education_group_type):
 def is_min_child_reached(parent, child_education_group_type):
     def _is_min_child_reached(number_children, authorized_relationship):
         min_count = authorized_relationship.min_count_authorized
-        return min_count == count_constraint.ONE and number_children < 2
+        return min_count == 1 and number_children < 2
 
     return _is_limit_child_reached(parent, child_education_group_type, _is_min_child_reached)
 

@@ -72,7 +72,7 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
         cls.auth_rel = AuthorizedRelationshipFactory(
             parent_type=cls.master_type,
             child_type=cls.finality_type,
-            min_count_authorized=count_constraint.ONE,
+            min_count_authorized=1,
         )
         cls.validation_rule_title = ValidationRuleFactory(
             field_reference="base_educationgroupyear.title.osis.education_group_type_finality120listchoice",
@@ -141,7 +141,7 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
         AuthorizedRelationshipFactory(
             parent_type=self.master_type,
             child_type=self.major_type,
-            min_count_authorized=count_constraint.ONE,
+            min_count_authorized=1,
         )
         children_egy = create_initial_group_element_year_structure([self.egy])[self.egy.id]
         self.assertEqual(len(children_egy), 2)

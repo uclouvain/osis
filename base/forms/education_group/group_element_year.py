@@ -132,6 +132,8 @@ class GroupElementYearForm(forms.ModelForm):
                     "child_type": ref_child_type,
                 })
 
+
+
     def _check_authorized_relationship(self, child_type):
         return self.instance.parent.education_group_type.authorized_parent_type.filter(child_type=child_type).exists()
 
@@ -146,5 +148,6 @@ class GroupElementYearForm(forms.ModelForm):
     def _keep_only_fields(self, fields_to_keep):
         self.fields = {name: field for name, field in self.fields.items() if name in fields_to_keep}
 
-    def _is_education_group_year_a_minor_major_option_list_choice(self, egy):
+    @staticmethod
+    def _is_education_group_year_a_minor_major_option_list_choice(egy):
         return egy.is_minor_major_option_list_choice if egy else False
