@@ -3454,7 +3454,7 @@ msgstr "Conditions spéciales"
 #: templates/education_group/tab_admission_conditions.html:54
 #: templates/education_group/tab_admission_conditions.html:56
 msgid "Specific Conditions"
-msgstr "Conditions Spécifiques"
+msgstr "Conditions Particulières"
 
 #: templates/learning_unit/blocks/tabs.html:67
 #: templates/learning_unit/proposal/tabs.html:60
