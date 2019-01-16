@@ -31,36 +31,40 @@ from base.models.enums.education_group_types import GroupType
 from base.tests.factories.academic_calendar import CloseAcademicCalendarFactory, \
     OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
+from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory, FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.views.education_groups.group_element_year.perms import can_create_group_element_year
+from base.views.education_groups.group_element_year.perms import can_update_group_element_year
 
 
-class TestCanCreateGroupElementYear(TestCase):
+class TestCanUpdateGroupElementYear(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_acy, cls.previous_acy = AcademicYearFactory.produce_in_past(quantity=2)
-        cls.training_egy = TrainingFactory(academic_year=cls.current_acy)
+        cls.group_element_year = GroupElementYearFactory(
+            parent=TrainingFactory(academic_year=cls.current_acy),
+            child_branch=MiniTrainingFactory(academic_year=cls.current_acy)
+        )
 
     def test_raise_permission_denied_when_user_not_linked_to_entity(self):
         person = PersonFactory()
         with self.assertRaises(PermissionDenied):
-            can_create_group_element_year(person.user, self.training_egy)
+            can_update_group_element_year(person.user, self.group_element_year)
 
     def test_return_true_if_is_central_manager(self):
-        person_entity = PersonEntityFactory(entity=self.training_egy.management_entity,
+        person_entity = PersonEntityFactory(entity=self.group_element_year.parent.management_entity,
                                             person=CentralManagerFactory())
 
-        self.assertTrue(can_create_group_element_year(person_entity.person.user, self.training_egy))
+        self.assertTrue(can_update_group_element_year(person_entity.person.user, self.group_element_year))
 
     def test_raise_permission_denied_if_person_is_faculty_manager_and_period_closed(self):
         CloseAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=self.previous_acy)
-        person_entity = PersonEntityFactory(entity=self.training_egy.management_entity,
+        person_entity = PersonEntityFactory(entity=self.group_element_year.parent.management_entity,
                                             person=FacultyManagerFactory())
 
         with self.assertRaises(PermissionDenied):
-            can_create_group_element_year(person_entity.person.user, self.training_egy)
+            can_update_group_element_year(person_entity.person.user, self.group_element_year)
 
     def test_raise_permission_denied_when_minor_or_major_list_choice_and_person_is_faculty_manager(self):
         OpenAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=self.previous_acy)
@@ -68,10 +72,12 @@ class TestCanCreateGroupElementYear(TestCase):
             GroupFactory(education_group_type__name=GroupType.MINOR_LIST_CHOICE.name, academic_year=self.current_acy),
             GroupFactory(education_group_type__name=GroupType.MAJOR_LIST_CHOICE.name, academic_year=self.current_acy)
         ]
-        person_entity = PersonEntityFactory(entity=self.training_egy.management_entity,
+        person_entity = PersonEntityFactory(entity=self.group_element_year.parent.management_entity,
                                             person=FacultyManagerFactory())
 
         for egy in egys:
             with self.subTest(type=egy.education_group_type):
                 with self.assertRaises(PermissionDenied):
-                    can_create_group_element_year(person_entity.person.user, egy)
+                    group_element_year = GroupElementYearFactory(parent=self.group_element_year.parent,
+                                                                 child_branch=egy)
+                    can_update_group_element_year(person_entity.person.user, group_element_year)

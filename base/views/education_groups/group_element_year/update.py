@@ -40,6 +40,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.utils.utils import get_object_or_none
 from base.views.common import display_success_messages
 from base.views.education_groups import perms
+from base.views.education_groups.group_element_year import perms as group_element_year_perms
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
 from base.views.education_groups.select import build_success_message, build_success_json_response
 
@@ -140,6 +141,12 @@ class UpdateGroupElementYearView(GenericGroupElementYearMixin, UpdateView):
     # UpdateView
     form_class = GroupElementYearForm
     template_name = "education_group/group_element_year_comment_inner.html"
+
+    rules = [group_element_year_perms.can_update_group_element_year]
+
+    def _call_rule(self, rule):
+        """ The permission is computed from the education_group_year """
+        return rule(self.request.user, self.object)
 
     # SuccessMessageMixin
     def get_success_message(self, cleaned_data):
