@@ -12,12 +12,11 @@
 On se conforme au [guide PEP8](https://www.python.org/dev/peps/pep-0008/#indentation)
 
 Dans la mesure du possible, on essaie de tenir compte des conseils suivants : 
-- Pour représenter une structure de données (list, dict, etc.), on passe une ligne entre chaque élément, ainsi qu'après l'ouverture de la structure et avant sa fermeture.
+- Pour représenter une structure de données (list, dict, etc.), on peut passer une ligne entre chaque élément, ainsi qu'après l'ouverture de la structure et avant sa fermeture, si la liste est longue et/ou contient de longs éléments et/ou s'étend sur plusieurs lignes.
 ```python
 # Mauvais
-fruits = ['banane', 'pomme', 'poire']
-légumes = {'1': 'carotte', 
-    '2': 'courgette', 
+fruits = ['banane', 'pomme', 'poire', 'long_element_in_list_1', 'long_element_in_list_2', 'long_element_in_list_3', 'long_element_in_list_4'] 
+légumes = {'1': 'carotte', '2': 'courgette', 
     '3': 'salade'}
             
 # Bon
@@ -25,6 +24,10 @@ fruits = [
     'banane',
     'pomme',
     'poire',
+    'long_element_in_list_1',
+    'long_element_in_list_2',
+    'long_element_in_list_3',
+    'long_element_in_list_4'
 ]
 légumes = {
     '1': 'carotte', 
