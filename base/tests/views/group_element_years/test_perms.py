@@ -32,7 +32,7 @@ from base.tests.factories.academic_calendar import CloseAcademicCalendarFactory,
     OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory, FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.views.education_groups.group_element_year.perms import can_update_group_element_year
@@ -53,6 +53,13 @@ class TestCanUpdateGroupElementYear(TestCase):
             can_update_group_element_year(person.user, self.group_element_year)
 
     def test_return_true_if_is_central_manager(self):
+        person_entity = PersonEntityFactory(entity=self.group_element_year.parent.management_entity,
+                                            person=CentralManagerFactory())
+
+        self.assertTrue(can_update_group_element_year(person_entity.person.user, self.group_element_year))
+
+    def test_return_true_if_child_is_learning_unit_and_user_is_central_manager(self):
+        GroupElementYearChildLeafFactory(parent=self.group_element_year.parent)
         person_entity = PersonEntityFactory(entity=self.group_element_year.parent.management_entity,
                                             person=CentralManagerFactory())
 
