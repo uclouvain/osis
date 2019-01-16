@@ -45,20 +45,26 @@
 
         <div>
             <label>{% trans 'Title in French' %}</label>
-            <strong class="text-primary">{{ parent.title | default_if_none:'' }}</strong><br>
+            {% if parent.title %}
+                <strong class="text-primary">{{ parent.title }}</strong><br>
+            {% endif %}
             {{ education_group_year.title | default_if_none:'-' }}
         </div>
         <br>
         <div>
             <label>{% trans 'Title in English' %}</label>
-            <strong class="text-primary">{{ parent.title_english | default_if_none:'' }}</strong><br>
+            {% if parent.title_english %}
+                <strong class="text-primary">{{ parent.title_english }}</strong><br>
+            {% endif %}
             {{ education_group_year.title_english | default_if_none:'' }}
         </div>
         {% if education_group_year.education_group_type.category != 'GROUP' %}
             <br>
             <div>
                 <label>{% trans 'Keywords' %}</label><br>
-                <strong class="text-primary">{{ parent.keywords | default_if_none:'' }}</strong><br>
+                {% if parent.keywords %}
+                    <strong class="text-primary">{{ parent.keywords }}</strong><br>
+                {%  endif %}
                 {{ education_group_year.keywords | default_if_none:'' }}
             </div>
         {% endif %}
