@@ -337,7 +337,7 @@ class TestSelectAttach(TestCase):
         self.client = Client()
         self.client.force_login(self.person.user)
         self.perm_patcher = mock.patch(
-            "base.business.group_element_years.perms.is_eligible_to_update_group_element_year",
+            "base.business.education_groups.perms.is_eligible_to_change_education_group",
             return_value=True
         )
         self.mocked_perm = self.perm_patcher.start()
