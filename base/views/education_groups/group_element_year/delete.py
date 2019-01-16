@@ -29,12 +29,19 @@ from django.views.generic import DeleteView
 
 from base.business.group_element_years.management import is_min_child_reached
 from base.views.common import display_error_messages, display_success_messages
+from base.views.education_groups.group_element_year import perms as group_element_year_perms
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
 
 
 class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     # DeleteView
     template_name = "education_group/group_element_year/confirm_detach_inner.html"
+
+    rules = [group_element_year_perms.can_update_group_element_year]
+
+    def _call_rule(self, rule):
+        """ The permission is computed from the education_group_year """
+        return rule(self.request.user, self.get_object())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

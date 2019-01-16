@@ -40,7 +40,7 @@
 
 <div class="btn-group">
     {% url 'group_element_year_delete' root.pk education_group_year.pk group.pk as detach_url %}
-    {% button_with_permission _("Detach") "detach" detach_url %}
+    {% group_element_year_button_with_permission _("Detach") "detach" detach_url %}
 
     {% url 'group_element_year_update' root.pk education_group_year.pk group.pk as update_url %}
     {% group_element_year_button_with_permission _("Edit") "edit" update_url %}
