@@ -36,6 +36,7 @@ from base.models.hops import Hops
 
 EDUCATION_GROUP_MAX_POSTPONE_YEARS = 6
 FIELD_TO_EXCLUDE = ['id', 'uuid', 'external_id', 'academic_year']
+HOPS_FIELDS = ('ares_study',  'ares_graca', 'ares_ability')
 
 
 class ConsistencyError(Error):
@@ -65,7 +66,7 @@ def _compute_end_year(education_group):
     return max(max_postponement_end_year, latest_egy.academic_year.year)
 
 
-def _postpone_m2m(education_group_year, postponed_egy):
+def _postpone_m2m(education_group_year, postponed_egy, hops_values):
     fields_to_exclude = []
 
     opts = education_group_year._meta
@@ -81,6 +82,9 @@ def _postpone_m2m(education_group_year, postponed_egy):
         for m2m_obj in m2m_cls.objects.all().filter(education_group_year_id=education_group_year):
             m2m_data_to_postpone = model_to_dict_fk(m2m_obj, exclude=['id', 'external_id', 'education_group_year'])
             m2m_cls(education_group_year=postponed_egy, **m2m_data_to_postpone).save()
+
+    if hops_values and any(elem in HOPS_FIELDS for elem in hops_values):
+        _postpone_hops(hops_values, postponed_egy)
 
 
 def duplicate_education_group_year(old_education_group_year, new_academic_year, dict_initial_egy=None,
@@ -99,7 +103,7 @@ def duplicate_education_group_year(old_education_group_year, new_academic_year, 
     # During create of new postponed object, we need to update only the m2m relations
     if created:
         # Postpone the m2m [languages / secondary_domains]
-        _postpone_m2m(old_education_group_year, postponed_egy)
+        _postpone_m2m(old_education_group_year, postponed_egy, hops_values)
 
     # During the update, we need to check if the postponed object has been modify
     else:
@@ -112,10 +116,7 @@ def duplicate_education_group_year(old_education_group_year, new_academic_year, 
 
         update_object(postponed_egy, dict_new_value)
         # Postpone the m2m [languages / secondary_domains]
-        _postpone_m2m(old_education_group_year, postponed_egy)
-
-    if 'ares_study' in hops_values:
-        _postpone_hops(hops_values, postponed_egy)
+        _postpone_m2m(old_education_group_year, postponed_egy, hops_values)
 
     return postponed_egy
 

@@ -29,6 +29,7 @@ from unittest.mock import patch
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
 
 from base.business.utils.model import model_to_dict_fk
 from base.forms.education_group.training import TrainingForm, TrainingEducationGroupYearForm, \
@@ -46,16 +47,14 @@ from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
 from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
 from base.tests.factories.entity_version import MainEntityVersionFactory
+from base.tests.factories.hops import HopsFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin
-from base.tests.factories.hops import HopsFactory
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.language import LanguageFactory
 from rules_management.enums import TRAINING_DAILY_MANAGEMENT, TRAINING_PGRM_ENCODING_PERIOD
 from rules_management.tests.fatories import PermissionFactory, FieldReferenceFactory
-from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
 
 
 class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
