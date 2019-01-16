@@ -44,6 +44,7 @@ from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
 from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException, RelevantSectionException
+from base.business.education_groups.general_information_sections import SECTION_LIST, SECTION_INTRO
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 from base.business.education_groups.perms import is_eligible_to_edit_general_information, \
     is_eligible_to_edit_admission_condition
@@ -260,9 +261,9 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         Section = namedtuple('Section', 'title labels')
         sections_with_translated_labels = []
         if self.is_intro_offer:
-            sections_list = settings.SECTION_INTRO
+            sections_list = SECTION_INTRO
         else:
-            sections_list = settings.SECTION_LIST
+            sections_list = SECTION_LIST
         for section in sections_list:
             translated_labels = self.get_translated_labels_and_content(section,
                                                                        self.user_language_code,
