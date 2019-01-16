@@ -41,12 +41,6 @@ class PersonDetailSerializerTestCase(TestCase):
             'last_name',
             'email',
             'gender',
-            'user'
+            'uuid'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
-
-    def test_ensure_user_field_is_slugified(self):
-        self.assertEqual(
-            self.serializer.data['user'],
-            self.person.user.username
-        )

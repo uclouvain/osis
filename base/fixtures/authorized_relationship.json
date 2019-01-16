@@ -1318,5 +1318,21 @@
         "min_count_authorized": 0,
         "max_count_authorized": null
     }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 170,
+    "fields": {
+        "parent_type": [
+            "MINOR_LIST_CHOICE"
+        ],
+        "child_type": [
+            "FSA_SPECIALITY"
+        ],
+        "changed": "2018-08-09T15:58:54.904",
+        "min_count_authorized": "0",
+        "max_count_authorized": "MANY",
+        "reference": true
+    }
 }
 ]

@@ -28,7 +28,7 @@ msgstr ""
 msgid "%(access_value)s is not an accepted value"
 msgstr ""
 
-#: business/education_groups/postponement.py:168
+#: business/education_groups/postponement.py:170
 #, python-format
 msgid "%(col_name)s has been already modified."
 msgstr ""
@@ -77,7 +77,7 @@ msgstr[1] ""
 msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
 msgstr ""
 
-#: models/education_group.py:77 models/education_group_year.py:696
+#: models/education_group.py:88 models/education_group_year.py:696
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr ""
@@ -475,6 +475,10 @@ msgstr ""
 msgid "Administrative data"
 msgstr ""
 
+#: business/education_groups/general_information_sections.py:57
+msgid "Admission"
+msgstr ""
+
 #: templates/education_group/tab_admission_conditions.html:196
 #: templates/education_group/tab_admission_conditions.html:198
 msgid "Admission and Enrolment Procedures for general registration"
@@ -696,6 +700,10 @@ msgstr ""
 #: tests/business/test_learning_unit_xls.py:172
 #: tests/business/test_learning_unit_xls.py:325
 msgid "Beg. of attribution"
+msgstr ""
+
+#: business/education_groups/general_information_sections.py:63
+msgid "Benefits and organization"
 msgstr ""
 
 #: templates/student/student.html:59
@@ -946,7 +954,7 @@ msgstr ""
 msgid "Confirm your action."
 msgstr ""
 
-#: business/education_groups/postponement.py:173
+#: business/education_groups/postponement.py:175
 #: forms/learning_unit/learning_unit_postponement.py:289
 #, python-format
 msgid "Consistency error in %(academic_year)s : %(error)s"
@@ -1000,8 +1008,8 @@ msgstr ""
 
 #: templates/education_group/blocks/contacts_general_informations.html:65
 #: templates/education_group/blocks/coorganization.html:156
-#: templates/education_group/blocks/panel/panel_achievements.html:89
-#: templates/education_group/blocks/panel/panel_achievements.html:101
+#: templates/education_group/blocks/panel/panel_achievements.html:93
+#: templates/education_group/blocks/panel/panel_achievements.html:105
 #: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:28
 #: templates/learning_unit/specifications.html:86
 #: templates/learning_unit/specifications.html:183
@@ -1117,6 +1125,10 @@ msgstr ""
 #: tests/templatetags/test_education_group.py:243
 #: tests/templatetags/test_education_group.py:257
 msgid "Detach"
+msgstr ""
+
+#: business/education_groups/general_information_sections.py:45
+msgid "Detailed programme"
 msgstr ""
 
 #: templates/academic_calendar/academic_calendars.html:169
@@ -1972,7 +1984,7 @@ msgstr ""
 msgid "Learning location"
 msgstr ""
 
-#: business/group_element_years/management.py:67
+#: business/group_element_years/management.py:68
 #: templates/learning_unit/breadcrumb.html:30
 #: templates/learning_unit/comparison.html:29 templates/learning_units.html:62
 #: templates/my_osis/profile.html:131
@@ -3027,6 +3039,7 @@ msgstr ""
 
 #: templates/education_group/tab_admission_conditions.html:33
 #: templates/education_group/tab_general_informations.html:32
+#: templates/education_group/tab_skills_achievements.html:31
 msgid "Publish"
 msgstr ""
 
@@ -3378,7 +3391,7 @@ msgstr ""
 msgid "Specifications"
 msgstr ""
 
-#: models/education_group.py:47 models/education_group.py:79
+#: models/education_group.py:58 models/education_group.py:90
 #: templates/education_group/identification_mini_training_details.html:38
 #: templates/education_group/identification_training_details.html:96
 #: templates/learning_unit/add_charge_repartition_inner.html:35
@@ -3532,6 +3545,10 @@ msgstr ""
 #: templates/learning_unit/blocks/panel/educational_informations.html:111
 #: templates/learning_unit/teaching_material/modal_edit.html:31
 msgid "Teaching material"
+msgstr ""
+
+#: business/education_groups/general_information_sections.py:41
+msgid "Teaching profile"
 msgstr ""
 
 #: business/learning_units/edition.py:452 models/learning_container_year.py:62
@@ -3845,7 +3862,7 @@ msgid ""
 "are not inside the selected training %(root)s"
 msgstr ""
 
-#: views/education_groups/detail.py:371
+#: views/education_groups/detail.py:372
 #, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr ""
@@ -3995,7 +4012,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
-#: views/education_groups/detail.py:333
+#: views/education_groups/detail.py:334
 #, python-format
 msgid "This label %s does not exist"
 msgstr ""
@@ -4207,7 +4224,7 @@ msgid "Unscheduled events"
 msgstr ""
 
 #: templates/education_group/blocks/content_actions.html:35
-#: templates/education_group/blocks/form/achievement_action_bar.html:13
+#: templates/education_group/blocks/form/achievement_action_bar.html:14
 #: templates/learning_unit/specifications.html:114
 msgid "Up"
 msgstr ""
@@ -4385,6 +4402,11 @@ msgstr ""
 #: models/education_group_year.py:402
 #: templates/education_group/tab_administrative_data.html:151
 msgid "Weighting"
+msgstr ""
+
+#: business/education_groups/general_information_sections.py:33
+#: business/education_groups/general_information_sections.py:75
+msgid "Welcome"
 msgstr ""
 
 #: forms/education_group/common.py:327
@@ -4790,7 +4812,7 @@ msgstr ""
 #: templates/academic_calendar/blocks/modal/modal_confirm_delete.html:39
 #: templates/education_group/blocks/coorganization.html:91
 #: templates/education_group/blocks/coorganization.html:142
-#: templates/education_group/blocks/form/achievement_action_bar.html:25
+#: templates/education_group/blocks/form/achievement_action_bar.html:23
 #: templates/education_group/blocks/modal/modal_organization_confirm_delete_inner.html:17
 #: templates/education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html:17
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:114
@@ -4818,7 +4840,7 @@ msgstr ""
 msgid "email"
 msgstr ""
 
-#: models/education_group.py:53 models/education_group.py:78
+#: models/education_group.py:64 models/education_group.py:89
 msgid "end"
 msgstr ""
 
