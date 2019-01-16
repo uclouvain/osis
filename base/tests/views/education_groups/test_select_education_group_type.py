@@ -28,10 +28,10 @@ from unittest import mock
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
-from waffle.testutils import override_flag
 from django.utils.translation import ugettext_lazy as _
+from waffle.testutils import override_flag
 
-from base.models.enums import education_group_categories, count_constraint
+from base.models.enums import education_group_categories
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -60,8 +60,8 @@ class TestSelectEducationGroupTypeView(TestCase):
             AuthorizedRelationshipFactory(
                 parent_type=self.parent_education_group_year.education_group_type,
                 child_type=eg_type,
-                min_count_authorized=count_constraint.ZERO,
-                max_count_authorized=count_constraint.ONE
+                min_count_authorized=0,
+                max_count_authorized=1,
             )
             for eg_type in self.education_group_types
         ]
