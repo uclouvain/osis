@@ -30,4 +30,3 @@ class FundingCodes(ChoiceEnum):
     A = "A"
     B = "B"
     C = "C"
-
