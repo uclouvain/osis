@@ -3,11 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:192
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:193
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 11:27+0100\n"
+"POT-Creation-Date: 2019-01-16 11:52+0100\n"
 "PO-Revision-Date: 2019-01-16 11:31+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2031,7 +2033,7 @@ msgstr "Acquis d'apprentissage"
 msgid "Learning location"
 msgstr "Lieu d'enseignement"
 
-#: business/group_element_years/management.py:68
+#: business/group_element_years/management.py:67
 #: templates/learning_unit/breadcrumb.html:30
 #: templates/learning_unit/comparison.html:29 templates/learning_units.html:62
 #: templates/my_osis/profile.html:131
@@ -5385,9 +5387,6 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "True when the relation is authorized for reference link."
-#~ msgstr "Vrai lorsque la relation est autorisée pour le lien de référence."
 
 #~ msgid "Many"
 #~ msgstr "Plusieurs"
