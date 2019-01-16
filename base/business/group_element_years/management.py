@@ -27,9 +27,8 @@ from django.utils.translation import ugettext as _
 
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import count_constraint
+from base.models.enums.link_type import LinkTypes
 from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException
-from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import cache
 
@@ -71,6 +70,7 @@ def extract_child_from_cache(parent, selected_data):
                        }
             )
         kwargs['child_leaf'] = luy
+
     elif selected_data['modelname'] == EDUCATION_GROUP_YEAR:
         egy = EducationGroupYear.objects.get(pk=selected_data['id'])
 
@@ -83,13 +83,14 @@ def extract_child_from_cache(parent, selected_data):
                        }
             )
         kwargs['child_branch'] = egy
+
     return kwargs
 
 
 def is_max_child_reached(parent, child_education_group_type):
     def _is_max_child_reached(number_children, authorized_relationship):
         max_count = authorized_relationship.max_count_authorized
-        return number_children > 0 and max_count == count_constraint.ONE
+        return max_count and number_children >= max_count
 
     return _is_limit_child_reached(parent, child_education_group_type, _is_max_child_reached)
 
@@ -97,19 +98,26 @@ def is_max_child_reached(parent, child_education_group_type):
 def is_min_child_reached(parent, child_education_group_type):
     def _is_min_child_reached(number_children, authorized_relationship):
         min_count = authorized_relationship.min_count_authorized
-        return min_count == count_constraint.ONE and number_children < 2
+        return bool(min_count) and number_children <= authorized_relationship.min_count_authorized
 
     return _is_limit_child_reached(parent, child_education_group_type, _is_min_child_reached)
 
 
 def _is_limit_child_reached(parent, child_education_group_type, boolean_func):
-    number_children_of_same_type = GroupElementYear.objects.filter(
-        parent=parent,
+    """ Fetch the number of children with the same type """
+    number_children_of_same_type = parent.groupelementyear_set.filter(
         child_branch__education_group_type=child_education_group_type
     ).count()
+
+    # Add children of reference links.
+    for link in parent.groupelementyear_set.all():
+        if link.link_type == LinkTypes.REFERENCE.name and link.child_branch:
+            number_children_of_same_type += link.child_branch.groupelementyear_set.filter(
+                child_branch__education_group_type=child_education_group_type
+            ).count()
+
     try:
-        auth_rel = AuthorizedRelationship.objects.get(
-            parent_type=parent.education_group_type,
+        auth_rel = parent.education_group_type.authorized_parent_type.get(
             child_type=child_education_group_type,
         )
     except AuthorizedRelationship.DoesNotExist:

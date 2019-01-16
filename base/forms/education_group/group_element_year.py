@@ -26,6 +26,7 @@
 from django import forms
 from django.utils.translation import gettext as _
 
+from base.business.group_element_years.management import is_max_child_reached
 from base.models.enums import education_group_categories
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
@@ -123,14 +124,24 @@ class GroupElementYearForm(forms.ModelForm):
         # All types of children are allowed for the reference link but we must check the type of grandchildren
         for ref_group in self.instance.child_branch.children_group_element_years:
             ref_child_type = ref_group.child_branch.education_group_type
-            if self._check_authorized_relationship(ref_child_type):
-                continue
-            raise forms.ValidationError(
-                _("You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
-                  ) % {
-                    "parent_type": parent_type,
-                    "child_type": ref_child_type,
-                })
+
+            if not self._check_authorized_relationship(ref_child_type):
+                raise forms.ValidationError(
+                    _("You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
+                      ) % {
+                        "parent_type": parent_type,
+                        "child_type": ref_child_type,
+                    })
+
+            # We have to check if the max limit is reached for all grandchildren
+            if is_max_child_reached(self.instance.parent, ref_child_type):
+                raise forms.ValidationError(
+                    _("The number of children of type \"%(child_type)s\" for \"%(parent)s\" has already reached the "
+                      "limit.") % {
+                        'child_type': ref_child_type,
+                        'parent': self.instance.parent
+                    }
+                )
 
     def _check_authorized_relationship(self, child_type):
         return self.instance.parent.education_group_type.authorized_parent_type.filter(child_type=child_type).exists()
@@ -146,5 +157,6 @@ class GroupElementYearForm(forms.ModelForm):
     def _keep_only_fields(self, fields_to_keep):
         self.fields = {name: field for name, field in self.fields.items() if name in fields_to_keep}
 
-    def _is_education_group_year_a_minor_major_option_list_choice(self, egy):
+    @staticmethod
+    def _is_education_group_year_a_minor_major_option_list_choice(egy):
         return egy.is_minor_major_option_list_choice if egy else False

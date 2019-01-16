@@ -31,7 +31,6 @@ from base.forms.common import ValidationRuleMixin
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import count_constraint
 from base.models.group_element_year import GroupElementYear
 from base.models.utils import utils
 from base.models.validation_rule import ValidationRule
@@ -52,7 +51,7 @@ def create_initial_group_element_year_structure(parent_egys):
 
     auth_rels = AuthorizedRelationship.objects.filter(
         parent_type=first_parent.education_group_type,
-        min_count_authorized=count_constraint.ONE
+        min_count_authorized=1
     ).only('child_type').select_related('child_type')
 
     for relationship in auth_rels:
