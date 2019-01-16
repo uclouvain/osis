@@ -27,7 +27,7 @@
 from django.test import TestCase
 
 from base.business.education_groups.create import create_initial_group_element_year_structure
-from base.models.enums import education_group_types, education_group_categories, count_constraint
+from base.models.enums import education_group_types, education_group_categories
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory

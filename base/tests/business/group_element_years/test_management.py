@@ -26,7 +26,7 @@
 from django.test import TestCase
 
 from base.business.group_element_years.management import is_max_child_reached, is_min_child_reached
-from base.models.enums import count_constraint
+from base.models.enums.link_type import LinkTypes
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -42,9 +42,10 @@ class TestChildReachedMixin():
         cls.parent_egy = EducationGroupYearFactory(education_group_type=cls.parent_type)
         cls.child_egy = EducationGroupYearFactory(education_group_type=cls.child_type)
 
-    def create_group_element_years_of_child_type(self):
+    def create_group_element_years_of_child_type(self, parent=None, link_type=None):
         return GroupElementYearFactory(
-            parent=self.parent_egy,
+            parent=parent or self.parent_egy,
+            link_type=link_type,
             child_branch__education_group_type=self.child_type
         )
 
@@ -81,6 +82,16 @@ class TestIsMaxChildReached(TestChildReachedMixin, TestCase):
         self.create_authorized_relationship(max_count=None)
         self.assertFalse(is_max_child_reached(self.parent_egy, self.child_egy.education_group_type))
 
+    def test_with_reference_link(self):
+        self.create_authorized_relationship(max_count=3)
+
+        ref_group = self.create_group_element_years_of_child_type(link_type=LinkTypes.REFERENCE.name)
+        self.create_group_element_years_of_child_type(parent=ref_group.child_branch)
+        self.assertFalse(is_max_child_reached(self.parent_egy, self.child_egy.education_group_type))
+
+        self.create_group_element_years_of_child_type(parent=ref_group.child_branch)
+        self.assertTrue(is_max_child_reached(self.parent_egy, self.child_egy.education_group_type))
+
 
 class TestIsMinChildReached(TestChildReachedMixin, TestCase):
     def test_when_no_authorized_relationship(self):
@@ -109,4 +120,16 @@ class TestIsMinChildReached(TestChildReachedMixin, TestCase):
         self.create_group_element_years_of_child_type()
         self.create_group_element_years_of_child_type()
         self.create_authorized_relationship(min_count=1)
+        self.assertFalse(is_min_child_reached(self.parent_egy, self.child_egy.education_group_type))
+
+    def test_with_reference_link(self):
+        self.create_authorized_relationship(min_count=2)
+
+        ref_group = self.create_group_element_years_of_child_type(link_type=LinkTypes.REFERENCE.name)
+        self.assertTrue(is_min_child_reached(self.parent_egy, self.child_egy.education_group_type))
+
+        self.create_group_element_years_of_child_type(parent=ref_group.child_branch)
+        self.assertTrue(is_min_child_reached(self.parent_egy, self.child_egy.education_group_type))
+
+        self.create_group_element_years_of_child_type(parent=ref_group.child_branch)
         self.assertFalse(is_min_child_reached(self.parent_egy, self.child_egy.education_group_type))

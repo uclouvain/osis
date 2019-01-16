@@ -40,7 +40,6 @@ class AuthorizedRelationship(models.Model):
     child_type = models.ForeignKey(EducationGroupType, related_name='authorized_child_type')
     changed = models.DateTimeField(auto_now=True)
 
-    # FIXME :  It must be an integerField.
     min_count_authorized = models.PositiveIntegerField(
         default=0,
         verbose_name=_("Minimum number of permitted relationships")

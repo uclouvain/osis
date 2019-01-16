@@ -31,7 +31,6 @@ from base.forms.common import ValidationRuleMixin
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import count_constraint
 from base.models.group_element_year import GroupElementYear
 from base.models.utils import utils
 from base.models.validation_rule import ValidationRule
