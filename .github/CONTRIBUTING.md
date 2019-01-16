@@ -9,6 +9,9 @@
 - Le nom d'une fonction doit être explicite et claire sur ce qu'elle fait (un 'get_' renvoie un élément, un 'search_' renvoie une liste d'élements...)
 
 ### Coding style :
+On se conforme au [guide PEP8](https://www.python.org/dev/peps/pep-0008/#indentation)
+
+Dans la mesure du possible, on essaie de tenir compte des conseils suivants : 
 - Pour représenter une structure de données (list, dict, etc.), on passe une ligne entre chaque élément, ainsi qu'après l'ouverture de la structure et avant sa fermeture.
 ```python
 # Mauvais
