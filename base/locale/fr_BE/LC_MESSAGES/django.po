@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 11:52+0100\n"
+"POT-Creation-Date: 2019-01-16 13:27+0100\n"
 "PO-Revision-Date: 2019-01-16 11:31+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -499,13 +499,11 @@ msgid "Administrative data"
 msgstr "Données administratives"
 
 #: business/education_groups/general_information_sections.py:57
-#, fuzzy
-#| msgid "Admission exam"
 msgid "Admission"
 msgstr "Concours"
 
-#: templates/education_group/tab_admission_conditions.html:196
-#: templates/education_group/tab_admission_conditions.html:198
+#: templates/education_group/tab_admission_conditions.html:199
+#: templates/education_group/tab_admission_conditions.html:201
 msgid "Admission and Enrolment Procedures for general registration"
 msgstr "Procédures d'admission et d'inscription"
 
@@ -513,8 +511,8 @@ msgstr "Procédures d'admission et d'inscription"
 msgid "Admission exam"
 msgstr "Concours"
 
-#: templates/education_group/tab_admission_conditions.html:188
-#: templates/education_group/tab_admission_conditions.html:190
+#: templates/education_group/tab_admission_conditions.html:189
+#: templates/education_group/tab_admission_conditions.html:191
 msgid "Adults taking up their university training"
 msgstr "Adultes en reprise d'études"
 
@@ -2596,8 +2594,8 @@ msgstr "Non académiques"
 msgid "Non academic CREF"
 msgstr "Non académique CREF"
 
-#: templates/education_group/tab_admission_conditions.html:141
-#: templates/education_group/tab_admission_conditions.html:143
+#: templates/education_group/tab_admission_conditions.html:142
+#: templates/education_group/tab_admission_conditions.html:144
 msgid "Non university Bachelors"
 msgstr "Bacheliers non universitaires"
 
@@ -2833,8 +2831,8 @@ msgstr "Périodicité"
 msgid "Person not in accordance with proposal state"
 msgstr "Personne qui ne peut pas travailler avec une proposition dans cet état"
 
-#: templates/education_group/tab_admission_conditions.html:192
 #: templates/education_group/tab_admission_conditions.html:194
+#: templates/education_group/tab_admission_conditions.html:196
 msgid "Personalized access"
 msgstr "Accès personnalisé"
 
@@ -3775,9 +3773,12 @@ msgstr "L'entité '%(acronym)s' n'existe plus en %(year)s"
 msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr "L'événement \"%(event)s\" a été supprimé avec succès"
 
-#: forms/education_group/training.py:96
+#: forms/education_group/training.py:95
+#: tests/forms/education_group/test_training.py:119
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
-msgstr "Les champs concernant les données de l'ARES doivent être soit être tous remplis ou alors tous nuls"
+msgstr ""
+"Les champs concernant les données de l'ARES doivent être soit être tous "
+"remplis ou alors tous nuls"
 
 #: models/education_group_year.py:81
 msgid "The following education groups ended with error"
