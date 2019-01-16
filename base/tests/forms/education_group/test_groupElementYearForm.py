@@ -30,7 +30,7 @@ from base.forms.education_group.group_element_year import GroupElementYearForm
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, MiniTrainingFactory, \
+from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory, \
     GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -59,8 +59,8 @@ class TestGroupElementYearForm(TestCase):
         AuthorizedRelationshipFactory(
             parent_type=self.parent.education_group_type,
             child_type=self.child_branch.education_group_type,
-            reference=False
         )
+        ref_group = GroupElementYearFactory(parent=self.child_branch)
 
         form = GroupElementYearForm(
             data={'link_type': LinkTypes.REFERENCE.name},
@@ -75,7 +75,7 @@ class TestGroupElementYearForm(TestCase):
                 "You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
             ) % {
                  "parent_type": self.parent.education_group_type,
-                 "child_type": self.child_branch.education_group_type,
+                 "child_type": ref_group.child_branch.education_group_type,
              }]
         )
 
@@ -83,7 +83,11 @@ class TestGroupElementYearForm(TestCase):
         AuthorizedRelationshipFactory(
             parent_type=self.parent.education_group_type,
             child_type=self.child_branch.education_group_type,
-            reference=True
+        )
+        ref_group = GroupElementYearFactory(parent=self.child_branch)
+        AuthorizedRelationshipFactory(
+            parent_type=self.parent.education_group_type,
+            child_type=ref_group.child_branch.education_group_type,
         )
 
         form = GroupElementYearForm(
@@ -150,3 +154,22 @@ class TestGroupElementYearForm(TestCase):
         )
         form = GroupElementYearForm(parent=self.parent, child_branch=self.child_branch)
         self.assertTrue("access_condition" not in list(form.fields.keys()))
+
+    def test_child_education_group_year_without_authorized_relationship_fails(self):
+        form = GroupElementYearForm(
+            data={'link_type': ""},
+            parent=self.parent,
+            child_branch=self.child_branch
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors["link_type"],
+            [ _("You cannot attach \"%(child)s\" (type \"%(child_type)s\") "
+              "to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                'child': self.child_branch,
+                'child_type': self.child_branch.education_group_type,
+                'parent': self.parent,
+                'parent_type': self.parent.education_group_type,
+            }]
+        )
