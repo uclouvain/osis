@@ -32,6 +32,7 @@ from base.business.education_groups import create
 from base.business.utils.model import model_to_dict_fk, compare_objects, update_object
 from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.education_group_year import EducationGroupYear
+from base.models.hops import Hops
 
 EDUCATION_GROUP_MAX_POSTPONE_YEARS = 6
 FIELD_TO_EXCLUDE = ['id', 'uuid', 'external_id', 'academic_year']
@@ -82,7 +83,8 @@ def _postpone_m2m(education_group_year, postponed_egy):
             m2m_cls(education_group_year=postponed_egy, **m2m_data_to_postpone).save()
 
 
-def duplicate_education_group_year(old_education_group_year, new_academic_year, dict_initial_egy=None):
+def duplicate_education_group_year(old_education_group_year, new_academic_year, dict_initial_egy=None,
+                                   hops_values=None):
     dict_new_value = model_to_dict_fk(old_education_group_year, exclude=FIELD_TO_EXCLUDE)
 
     defaults_values = {x: v for x, v in dict_new_value.items() if not isinstance(v, list)}
@@ -112,7 +114,17 @@ def duplicate_education_group_year(old_education_group_year, new_academic_year, 
         # Postpone the m2m [languages / secondary_domains]
         _postpone_m2m(old_education_group_year, postponed_egy)
 
+    if hops_values:
+        _postpone_hops(hops_values, postponed_egy)
+
     return postponed_egy
+
+
+def _postpone_hops(hops_values, postponed_egy):
+    Hops.objects.update_or_create(education_group_year=postponed_egy,
+                                  defaults={'ares_study': hops_values['ares_study'],
+                                            'ares_graca': hops_values['ares_graca'],
+                                            'ares_ability': hops_values['ares_ability']})
 
 
 class PostponementEducationGroupYearMixin:
@@ -152,7 +164,7 @@ class PostponementEducationGroupYearMixin:
                                                          year__lte=self.postpone_end_year):
             try:
                 postponed_egy = duplicate_education_group_year(
-                    education_group_year, academic_year, self.dict_initial_egy
+                    education_group_year, academic_year, self.dict_initial_egy, self.hops_form.data
                 )
                 self.education_group_year_postponed.append(postponed_egy)
 
