@@ -138,10 +138,10 @@
             </div>
         {% endif %}
         {% if info.is_master %}
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="non_university_bachelors" text=_("Non university Bachelors") field=admission_condition.text_non_university_bachelors field_en=admission_condition.text_non_university_bachelors_en can_edit=True %}
             {% if common_conditions %}
                 {% include 'education_group/blocks/admission_condition_text.html' with section_name="non_university_bachelors" text=_("Non university Bachelors") field=common_conditions.text_non_university_bachelors field_en=common_conditions.text_non_university_bachelors_en can_edit=False %}
             {% endif %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="non_university_bachelors" text=_("Non university Bachelors") field=admission_condition.text_non_university_bachelors field_en=admission_condition.text_non_university_bachelors_en can_edit=True %}
         {% endif %}
         {% if info.is_specific and info.is_master %}
             <div id="holders_second_university_degree">
@@ -185,18 +185,20 @@
             {% include 'education_group/blocks/admission_condition_text.html' with section_name="holders_non_university_second_degree" text=_("Holders of a non-University 2nd cycle degree") field=admission_condition.text_holders_non_university_second_degree field_en=admission_condition.text_holders_non_university_second_degree_en can_edit=True %}
         {% endif %}
         {% if info.is_master %}
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="adults_taking_up_university_training" text=_("Adults taking up their university training") field=admission_condition.text_adults_taking_up_university_training field_en=admission_condition.text_adults_taking_up_university_training_en can_edit=True %}
             {% if common_conditions %}
                 {% include 'education_group/blocks/admission_condition_text.html' with section_name="adults_taking_up_university_training" text=_("Adults taking up their university training") field=common_conditions.text_adults_taking_up_university_training field_en=common_conditions.text_adults_taking_up_university_training_en can_edit=False %}
             {% endif %}
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="personalized_access" text=_("Personalized access") field=admission_condition.text_personalized_access field_en=admission_condition.text_personalized_access_en can_edit=True %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="adults_taking_up_university_training" text=_("Adults taking up their university training") field=admission_condition.text_adults_taking_up_university_training field_en=admission_condition.text_adults_taking_up_university_training_en can_edit=True %}
+
             {% if common_conditions %}
                 {% include 'education_group/blocks/admission_condition_text.html' with section_name="personalized_access" text=_("Personalized access") field=common_conditions.text_personalized_access field_en=common_conditions.text_personalized_access_en can_edit=False %}
             {% endif %}
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=admission_condition.text_admission_enrollment_procedures field_en=admission_condition.text_admission_enrollment_procedures_en can_edit=True %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="personalized_access" text=_("Personalized access") field=admission_condition.text_personalized_access field_en=admission_condition.text_personalized_access_en can_edit=True %}
+
             {% if common_conditions %}
                 {% include 'education_group/blocks/admission_condition_text.html' with section_name="admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=common_conditions.text_admission_enrollment_procedures field_en=common_conditions.text_admission_enrollment_procedures_en can_edit=False %}
             {% endif %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=admission_condition.text_admission_enrollment_procedures field_en=admission_condition.text_admission_enrollment_procedures_en can_edit=True %}
         {% endif %}
     </div>
 
