@@ -26,8 +26,8 @@
 from django import forms
 from django.utils.translation import gettext as _
 
+from base.business.group_element_years.management import is_max_child_reached
 from base.models.enums import education_group_categories
-from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 
@@ -64,10 +64,12 @@ class GroupElementYearForm(forms.ModelForm):
             self._define_fields()
 
     def _define_fields(self):
-        parent_type = self.instance.parent.education_group_type
-        if self.instance.child_branch and not parent_type.authorized_parent_type.filter(
-                child_type=self.instance.child_branch.education_group_type).exists():
+        if self.instance.child_branch and not self._check_authorized_relationship(
+                self.instance.child_branch.education_group_type):
             self.fields.pop("access_condition")
+
+            # Change the initial but (for strange reasons) let the possibility to the user to try with the main link.
+            # Like that he will see the form error.
             self.fields["link_type"].initial = LinkTypes.REFERENCE.name
 
         elif self._is_education_group_year_a_minor_major_option_list_choice(self.instance.parent):
@@ -87,22 +89,62 @@ class GroupElementYearForm(forms.ModelForm):
         return obj
 
     def clean_link_type(self):
+        """
+        All of these controls only work with child branch.
+        The validation with learning_units (child_leaf) is in the model.
+        """
         data_cleaned = self.cleaned_data.get('link_type')
-        if data_cleaned:
-            parent_type = self.instance.parent.education_group_type
-            if self.instance.child_branch and not parent_type.authorized_parent_type.filter(
-                    child_type=self.instance.child_branch.education_group_type,
-                    reference=True,
-            ).exists():
-                self.add_error('link_type', _(
-                    "You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
-                ) % {
-                        "parent_type": self.instance.parent.education_group_type,
-                        "child_type": self.instance.child_branch.education_group_type,
-                    })
-            elif self.instance.child_leaf:
-                self.add_error('link_type', _("You are not allowed to create a reference with a learning unit"))
+
+        if self.instance.child_branch:
+            if data_cleaned == LinkTypes.REFERENCE.name:
+                self._clean_link_type_reference()
+            else:
+                self._clean_link_type_main()
         return data_cleaned
+
+    def _clean_link_type_main(self):
+        parent_type = self.instance.parent.education_group_type
+
+        # For the main link,  we have to check if the parent type is compatible with its child's type
+        child = self.instance.child_branch
+        if not self._check_authorized_relationship(child.education_group_type):
+            raise forms.ValidationError(
+                _("You cannot attach \"%(child)s\" (type \"%(child_type)s\") to \"%(parent)s\" (type "
+                  "\"%(parent_type)s\")") % {
+                    'child': child,
+                    'child_type': child.education_group_type,
+                    'parent': self.instance.parent,
+                    'parent_type': parent_type,
+                }
+            )
+
+    def _clean_link_type_reference(self):
+        parent_type = self.instance.parent.education_group_type
+
+        # All types of children are allowed for the reference link but we must check the type of grandchildren
+        for ref_group in self.instance.child_branch.children_group_element_years:
+            ref_child_type = ref_group.child_branch.education_group_type
+
+            if not self._check_authorized_relationship(ref_child_type):
+                raise forms.ValidationError(
+                    _("You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
+                      ) % {
+                        "parent_type": parent_type,
+                        "child_type": ref_child_type,
+                    })
+
+            # We have to check if the max limit is reached for all grandchildren
+            if is_max_child_reached(self.instance.parent, ref_child_type):
+                raise forms.ValidationError(
+                    _("The number of children of type \"%(child_type)s\" for \"%(parent)s\" has already reached the "
+                      "limit.") % {
+                        'child_type': ref_child_type,
+                        'parent': self.instance.parent
+                    }
+                )
+
+    def _check_authorized_relationship(self, child_type):
+        return self.instance.parent.education_group_type.authorized_parent_type.filter(child_type=child_type).exists()
 
     @staticmethod
     def _reorder_children_by_partial_acronym(parent):
@@ -115,5 +157,6 @@ class GroupElementYearForm(forms.ModelForm):
     def _keep_only_fields(self, fields_to_keep):
         self.fields = {name: field for name, field in self.fields.items() if name in fields_to_keep}
 
-    def _is_education_group_year_a_minor_major_option_list_choice(self, egy):
+    @staticmethod
+    def _is_education_group_year_a_minor_major_option_list_choice(egy):
         return egy.is_minor_major_option_list_choice if egy else False

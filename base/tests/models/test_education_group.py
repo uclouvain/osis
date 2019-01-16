@@ -25,9 +25,13 @@
 ##############################################################################
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+
+from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_categories import GROUP
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 
 
@@ -65,3 +69,38 @@ class EducationGroupTest(TestCase):
         )
         education_group.clean()
         education_group.save()
+
+
+class EducationGroupManagerTest(TestCase):
+    def setUp(self):
+        self.education_group_training = EducationGroupFactory()
+        most_recent_year = 2018
+        for year in range(2016, most_recent_year + 1):
+            EducationGroupYearFactory(
+                education_group=self.education_group_training,
+                academic_year=AcademicYearFactory(year=year)
+            )
+
+    def test_education_group_trainings_manager(self):
+        self.assertCountEqual(
+            EducationGroup.objects.all(),
+            EducationGroup.objects.having_related_training()
+        )
+
+    def test_education_group_trainings_manager_with_other_types(self):
+        education_group_not_training = EducationGroupFactory()
+        EducationGroupYearFactory(
+            education_group=education_group_not_training,
+            academic_year=AcademicYearFactory(year=2015),
+            education_group_type=EducationGroupTypeFactory(category=GROUP)
+        )
+
+        self.assertCountEqual(
+            list(EducationGroup.objects.having_related_training()),
+            [self.education_group_training]
+        )
+
+        self.assertNotEqual(
+            list(EducationGroup.objects.all()),
+            list(EducationGroup.objects.having_related_training())
+        )

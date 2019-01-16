@@ -23,19 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
+from base.models.utils.utils import ChoiceEnum
 
 
-ZERO = "0"
-ONE = "1"
-MANY = "MANY"
-
-MAX_COUNT_CONSTRAINTS = (
-    (ONE, _("One")),
-    (MANY, _("Many")),
-)
-
-MIN_COUNT_CONSTRAINTS = (
-    (ZERO, _("Zero")),
-    (ONE, _("One")),
-)
+class FundingCodes(ChoiceEnum):
+    A = "A"
+    B = "B"
+    C = "C"

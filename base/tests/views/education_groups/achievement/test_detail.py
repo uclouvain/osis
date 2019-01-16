@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+from unittest import mock
+
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.test import TestCase
@@ -55,7 +57,7 @@ class TestEducationGroupSkillsAchievements(TestCase):
         self.assertEqual(response.status_code, 200)
         return response
 
-    def test_get__achievements(self):
+    def test_get_achievements(self):
         achievement = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
 
         response = self._call_url_as_http_get()
@@ -64,7 +66,13 @@ class TestEducationGroupSkillsAchievements(TestCase):
             response.context["education_group_achievements"][0], achievement
         )
 
-    def test_get__certificate_aim(self):
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_edit_general_information", return_value=True)
+    def test_context_have_can_edit_information_args(self, mock_perm):
+        response = self._call_url_as_http_get()
+        self.assertTrue("can_edit_information" in response.context)
+        self.assertTrue(response.context["can_edit_information"])
+
+    def test_get_certificate_aim(self):
         certificate_aim_french = TranslatedTextFactory(
             entity=entity_name.OFFER_YEAR,
             reference=self.education_group_year.id,
@@ -85,7 +93,7 @@ class TestEducationGroupSkillsAchievements(TestCase):
             response.context[CMS_LABEL_PROGRAM_AIM][settings.LANGUAGE_CODE_EN], certificate_aim_english
         )
 
-    def test_get__additional_informations(self):
+    def test_get_additional_informations(self):
         additional_infos_french = TranslatedTextFactory(
             entity=entity_name.OFFER_YEAR,
             reference=self.education_group_year.id,

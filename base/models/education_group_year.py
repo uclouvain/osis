@@ -42,6 +42,7 @@ from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
 from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
+from base.models.enums.funding_codes import FundingCodes
 from base.models.exceptions import MaximumOneParentAllowedException
 from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
@@ -157,6 +158,7 @@ class EducationGroupYear(SerializableModel):
         max_length=1,
         blank=True,
         default="",
+        choices=FundingCodes.choices(),
         verbose_name=_('Funding direction')
     )
 
@@ -169,6 +171,7 @@ class EducationGroupYear(SerializableModel):
         max_length=1,
         blank=True,
         default="",
+        choices=FundingCodes.choices(),
         verbose_name=_('Funding international cooperation CCD/CUD direction')
     )
 
@@ -603,16 +606,13 @@ class EducationGroupYear(SerializableModel):
                 raise MaximumOneParentAllowedException('Only one training parent is allowed')
 
     @cached_property
-    def children_without_leaf(self):
-        return self.children.exclude(child_leaf__isnull=False)
-
-    @cached_property
     def children(self):
         return self.groupelementyear_set.select_related('child_branch', 'child_leaf')
 
     @cached_property
     def children_group_element_years(self):
-        return self.children_without_leaf
+        """ Return groupelementyears with a child_branch """
+        return self.children.exclude(child_leaf__isnull=False)
 
     @cached_property
     def group_element_year_branches(self):
