@@ -52,26 +52,24 @@ from reference.tests.factories.country import CountryFactory
 
 
 class ScoreSheetAddressTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.offer_year = OfferYearFactory(academic_year=cls.academic_year)
+        cls.entity_address_admin = cls._create_data_for_entity_address(score_sheet_address_choices.ENTITY_ADMINISTRATION)
+        cls.entity_address_manag = cls._create_data_for_entity_address(score_sheet_address_choices.ENTITY_MANAGEMENT)
+        cls.address_fields = ['location', 'postal_code', 'city', 'country', 'phone', 'fax']
 
-    def setUp(self):
-        today = datetime.date.today()
-        self.academic_year = AcademicYearFactory(start_date=today,
-                                                 end_date=today.replace(year=today.year + 1),
-                                                 year=today.year)
-        self.offer_year = OfferYearFactory(academic_year=self.academic_year)
-        self.entity_address_admin = self._create_data_for_entity_address(score_sheet_address_choices.ENTITY_ADMINISTRATION)
-        self.entity_address_manag = self._create_data_for_entity_address(score_sheet_address_choices.ENTITY_MANAGEMENT)
-        self.address_fields = ['location', 'postal_code', 'city', 'country', 'phone', 'fax']
-
-    def _create_data_for_entity_address(self, entity_type):
+    @classmethod
+    def _create_data_for_entity_address(cls, entity_type):
         past_date = datetime.datetime(year=2015, month=1, day=1)
-        education_group_year=EducationGroupYearFactory(academic_year=self.academic_year)
+        education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         country = CountryFactory()
         entity = EntityFactory(country=country)
         EntityVersionFactory(entity=entity,
                              start_date=past_date,
                              end_date=None)
-        OfferYearEntityFactory(offer_year=self.offer_year,
+        OfferYearEntityFactory(offer_year=cls.offer_year,
                                entity=entity,
                                type=entity_type,
                                education_group_year=education_group_year)
