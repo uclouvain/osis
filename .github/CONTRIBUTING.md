@@ -49,10 +49,10 @@ légumes = {
 }
 ```
 
-- Lors d'un appel de fonction à plusieurs paramètres, on passe une ligne entre chaque paramètre, ainsi qu'après l'ouverture de la liste de paramètres et avant sa fermeture.
+- Lors d'un appel de fonction à plusieurs paramètres, si tous les paramètres ne tiennent pas sur une ligne, on passe une ligne entre chaque paramètre, ainsi qu'après l'ouverture de la liste de paramètres et avant sa fermeture.
 ```python
 # Mauvais
-result = my_function(first_parameter, second_parameter, third_parameter)
+result = my_function(first_long_parameter, second_parameter_which_has_a_really_really_long_name, third_parameter_which_has_an_even_longer_name)
 
 result = my_function(first_parameter, 
                      second_parameter, 
