@@ -1,5 +1,5 @@
 {% load staticfiles %}
-{% load i18n format education_group %}
+{% load i18n format education_group group_element_year %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -43,5 +43,5 @@
     {% button_with_permission _("Detach") "detach" detach_url %}
 
     {% url 'group_element_year_update' root.pk education_group_year.pk group.pk as update_url %}
-    {% button_with_permission _("Edit") "edit" update_url %}
+    {% group_element_year_button_with_permission _("Edit") "edit" update_url %}
 </div>

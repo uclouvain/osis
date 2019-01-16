@@ -146,7 +146,7 @@ class UpdateGroupElementYearView(GenericGroupElementYearMixin, UpdateView):
 
     def _call_rule(self, rule):
         """ The permission is computed from the education_group_year """
-        return rule(self.request.user, self.object)
+        return rule(self.request.user, self.get_object())
 
     # SuccessMessageMixin
     def get_success_message(self, cleaned_data):
