@@ -50,7 +50,7 @@ SECTION_LIST = [
                 ('finalites', 'specific'),
                 ('options', 'specific'),
                 ('finalites_didactiques', 'common'),
-                ('caap', 'specific,common'),
+                ('caap', 'common,specific'),
                 ('agregation', 'common'),
                 ('prerequis', 'common'),
             ]),
@@ -58,12 +58,12 @@ SECTION_LIST = [
             labels=[
                 ('acces_professions', 'specific'),
                 ('bacheliers_concernes', 'specific'),
-                ('module_complementaire', 'specific,common')
+                ('module_complementaire', 'common,specific')
             ]),
     Section(title=_('Benefits and organization'),
             labels=[
                 ('pedagogie', 'specific'),
-                ('evaluation', 'specific,common'),
+                ('evaluation', 'common,specific'),
                 ('mobilite', 'specific'),
                 ('formations_accessibles', 'specific'),
                 ('certificats', 'specific'),
