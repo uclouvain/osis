@@ -2148,6 +2148,16 @@
                 "educationgroupyear"
             ],
             [
+                "change_person",
+                "base",
+                "person"
+            ],
+            [
+                "change_student",
+                "base",
+                "student"
+            ],
+            [
                 "is_administrator",
                 "base",
                 "person"
