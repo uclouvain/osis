@@ -114,7 +114,7 @@ def duplicate_education_group_year(old_education_group_year, new_academic_year, 
         # Postpone the m2m [languages / secondary_domains]
         _postpone_m2m(old_education_group_year, postponed_egy)
 
-    if hops_values:
+    if 'ares_study' in hops_values:
         _postpone_hops(hops_values, postponed_egy)
 
     return postponed_egy
