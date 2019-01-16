@@ -1,15 +1,32 @@
-from collections.__init__ import namedtuple
+##############################################################################
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
+from collections import namedtuple
 
 from django.utils.translation import ugettext_lazy as _
 
-# the parameter labels is a list of string and tuple
-# labels=['welcome_introduction',
-#         ('caap', 'specific,custom')]
-# second parameter can have few values:
-# specific
-# common
-# specific,common
-# Used base.views.education_groups.detail.EducationGroupGeneralInformation#get_sections_with_translated_labels
 Section = namedtuple('Section', 'title labels')
 
 SECTION_LIST = [
