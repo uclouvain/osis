@@ -83,7 +83,7 @@ def _postpone_m2m(education_group_year, postponed_egy, hops_values):
             m2m_data_to_postpone = model_to_dict_fk(m2m_obj, exclude=['id', 'external_id', 'education_group_year'])
             m2m_cls(education_group_year=postponed_egy, **m2m_data_to_postpone).save()
 
-    if hops_values and any(elem in HOPS_FIELDS for elem in hops_values):
+    if hops_values and any(elem in HOPS_FIELDS and hops_values[elem] for elem in hops_values):
         _postpone_hops(hops_values, postponed_egy)
 
 
