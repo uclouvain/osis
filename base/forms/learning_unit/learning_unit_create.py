@@ -39,6 +39,8 @@ from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
 from reference.models.language import find_all_languages
 
+CRUCIAL_YEAR_FOR_CREDITS_VALIDATION = 2018
+
 
 def _create_learning_container_year_type_list():
     return add_blank(LEARNING_CONTAINER_YEAR_TYPES_WITHOUT_EXTERNAL)
@@ -138,6 +140,16 @@ class LearningUnitYearModelForm(forms.ModelForm):
         self.instance.learning_unit = kwargs.pop('learning_unit')
         instance = super().save(**kwargs)
         return instance
+
+    def is_valid(self):
+        return super(LearningUnitYearModelForm, self).is_valid() and self._is_credits_valid()
+
+    def _is_credits_valid(self):
+        if self.instance.id is None or self.instance.academic_year.year >= CRUCIAL_YEAR_FOR_CREDITS_VALIDATION:
+            if not float(self.cleaned_data['credits']).is_integer():
+                self.add_error('credits', _('The credits value should be an integer'))
+                return False
+        return True
 
 
 class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
