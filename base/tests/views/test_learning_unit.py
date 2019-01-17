@@ -63,7 +63,6 @@ from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
-from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.person import Person
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -92,7 +91,7 @@ from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.views.learning_unit import learning_unit_comparison, learning_unit_specifications_edit
 from base.views.learning_unit import learning_unit_components, learning_class_year_edit, learning_unit_specifications, \
-    learning_unit_formations, get_charge_repartition_warning_messages, learning_unit_attributions
+    get_charge_repartition_warning_messages, learning_unit_attributions
 from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.search import learning_units_service_course
@@ -1072,68 +1071,6 @@ class LearningUnitViewTestCase(TestCase):
         faulty_dict = dict(self.get_valid_data())
         faulty_dict['requirement_entity'] = entity_version.id
         return faulty_dict
-
-    def test_learning_unit_check_acronym(self):
-        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
-
-        url = reverse('check_acronym', kwargs={'subtype': FULL})
-        get_data = {'acronym': 'goodacronym', 'year_id': self.academic_year_1.id}
-        response = self.client.get(url, get_data, **kwargs)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
-            {'valid': False,
-             'existing_acronym': False,
-             'existed_acronym': False,
-             'first_using': "",
-             'last_using': ""}
-        )
-
-        learning_unit_container_year = LearningContainerYearFactory(
-            academic_year=self.current_academic_year
-        )
-        learning_unit_year = LearningUnitYearFactory(
-            acronym="LCHIM1210",
-            learning_container_year=learning_unit_container_year,
-            subtype=learning_unit_year_subtypes.FULL,
-            academic_year=self.current_academic_year
-        )
-        learning_unit_year.save()
-
-        get_data = {'acronym': 'LCHIM1210', 'year_id': self.current_academic_year.id}
-        response = self.client.get(url, get_data, **kwargs)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
-            {'valid': True,
-             'existing_acronym': True,
-             'existed_acronym': False,
-             'first_using': str(self.current_academic_year),
-             'last_using': ""}
-        )
-
-        learning_unit_year = LearningUnitYearFactory(
-            acronym="LCHIM1211",
-            learning_container_year=learning_unit_container_year,
-            subtype=learning_unit_year_subtypes.FULL,
-            academic_year=self.current_academic_year
-        )
-        learning_unit_year.save()
-
-        get_data = {'acronym': 'LCHIM1211', 'year_id': self.academic_year_6.id}
-        response = self.client.get(url, get_data, **kwargs)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
-            {'valid': True,
-             'existing_acronym': False,
-             'existed_acronym': True,
-             'first_using': "",
-             'last_using': str(self.current_academic_year)}
-        )
 
     def _get_volumes_data(self, learning_units_year):
         if not isinstance(learning_units_year, list):
