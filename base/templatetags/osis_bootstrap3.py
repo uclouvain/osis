@@ -23,19 +23,42 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
+from collections import defaultdict
+
+from bootstrap3.templatetags import bootstrap3
+from django import template
+from django.utils.safestring import mark_safe
+
+register = template.Library()
 
 
-ZERO = "0"
-ONE = "1"
-MANY = "MANY"
+@register.simple_tag
+def bootstrap_row(**kwargs):
+    field_parameters_by_position = defaultdict(dict)
+    for name, value in kwargs.items():
+        position, field_parameter = extract_position_and_field_parameter(name)
+        field_parameters_by_position[position][field_parameter] = value
 
-MAX_COUNT_CONSTRAINTS = (
-    (ONE, _("One")),
-    (MANY, _("Many")),
-)
+    keys = sorted(field_parameters_by_position.keys())
+    fields = [field_parameters_by_position[key] for key in keys
+              if "field" in field_parameters_by_position[key] and field_parameters_by_position[key]["field"]]
+    return mark_safe(_render_row(fields))
 
-MIN_COUNT_CONSTRAINTS = (
-    (ZERO, _("Zero")),
-    (ONE, _("One")),
-)
+
+def extract_position_and_field_parameter(field_parameter):
+    field_parameter, separator, position = field_parameter.rpartition("_")
+    return int(position), field_parameter
+
+
+def _render_row(fields):
+    if not fields:
+        return ""
+
+    rendering = '<div class="form-group row">\n'
+
+    for field in fields:
+        rendering += "\t" + bootstrap3.bootstrap_field(**field) + "\n"
+
+    rendering += '</div>'
+
+    return rendering

@@ -29,9 +29,6 @@ import sys
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
-# Used in base.views.education_groups.detail.EducationGroupGeneralInformation#get_sections_with_translated_labels
-from .portal_conf import SECTION_LIST, SECTION_INTRO
-
 BASE_DIR = os.path.dirname((os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 # SECURITY Settings
@@ -55,6 +52,7 @@ MESSAGE_STORAGE = os.environ.get('MESSAGE_STORAGE', 'django.contrib.messages.sto
 # Specific apps (all osis modules except base and reference(mandatory) + env specific apps like sentry)
 # have to be defined in environment settings (ex: dev.py)
 INSTALLED_APPS = (
+    'django.contrib.sites',
     'dal',  # Dependency from 'partnership' module (Django auto-complete-light)
     'dal_select2',  # Dependency from 'partnership' module (Django auto-complete-light)
     'django.contrib.admin',
@@ -70,6 +68,7 @@ INSTALLED_APPS = (
     'reference',
     'rules_management',
     'base',
+    'education_group',
     'statici18n',
     'rest_framework',
     'rest_framework.authtoken',
@@ -381,8 +380,11 @@ REST_FRAMEWORK = {
 }
 
 # ESB Configuration
+ESB_API_URL = os.environ.get('ESB_API_URL')
 ESB_AUTHORIZATION = os.environ.get('ESB_AUTHORIZATION')
+# TODO: rename to ESB_STUDENT_ENDPOINT
 ESB_STUDENT_API = os.environ.get('ESB_STUDENT_API')
+ESB_REFRESH_PEDAGOGY_ENDPOINT = os.environ.get('ESB_REFRESH_PEDAGOGY_ENDPOINT')
 
 RELEASE_TAG = os.environ.get('RELEASE_TAG')
 
@@ -430,15 +432,15 @@ WAFFLE_FLAG_DEFAULT = os.environ.get("WAFFLE_FLAG_DEFAULT", "False").lower() == 
 
 # HIJACK
 HIJACK_LOGIN_REDIRECT_URL = '/'  # Where admins are redirected to after hijacking a user
-HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user/'  # Where admins are redirected to after releasing a user
+# Where admins are redirected to after releasing a user
+HIJACK_LOGOUT_REDIRECT_URL = "/{admin_url}auth/user".format(admin_url=ADMIN_URL)
 HIJACK_ALLOW_GET_REQUESTS = True
 HIJACK_USE_BOOTSTRAP = True
 
 REQUESTS_TIMEOUT = 20
 
 # PEDAGOGY INFORMATION
-URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/prog-{anac}{type}-{code}")
-REFRESH_PARAM = os.environ.get("REFRESH_PARAM", "")
+URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/prog-{year}-{code}")
 GET_SECTION_PARAM = os.environ.get("GET_SECTION_PARAM", "")
 
 YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 2018))

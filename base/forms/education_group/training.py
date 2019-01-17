@@ -67,9 +67,39 @@ class HopsEducationGroupYearModelForm(forms.ModelForm):
             'ares_ability',
         ]
 
+    def is_valid(self):
+        return super(HopsEducationGroupYearModelForm, self).is_valid() and self._valid_hops()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["ares_study"].required = False
+        self.fields["ares_graca"].required = False
+        self.fields["ares_ability"].required = False
+
     def save(self, education_group_year):
         self.instance.education_group_year = education_group_year
-        return super().save()
+        if self._has_ares_data():
+            return super().save()
+        else:
+            if self.instance.id:
+                # Need to be deleted when data is none
+                self.instance.delete()
+            return None
+
+    def _valid_hops(self):
+        ares_fields = [
+            self.cleaned_data.get('ares_study') is None,
+            self.cleaned_data.get('ares_graca') is None,
+            self.cleaned_data.get('ares_ability') is None
+        ]
+        if any(ares_fields) and not all(ares_fields):
+            self.add_error('ares_study', _('The fields concerning ARES have to be ALL filled-in or none of them'))
+            return False
+        return True
+
+    def _has_ares_data(self):
+        return self.cleaned_data.get('ares_study') and self.cleaned_data.get('ares_graca') and self.cleaned_data.get(
+            'ares_ability')
 
 
 class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
@@ -80,7 +110,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         'university_domains', required=False, help_text="", label=_('secondary domains').title()
     )
 
-    section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False)
+    section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False, disabled=True)
 
     class Meta(EducationGroupYearModelForm.Meta):
         fields = [
@@ -166,6 +196,8 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         self.fields['main_domain'].queryset = Domain.objects.filter(type=domain_type.UNIVERSITY)\
                                                     .select_related('decree')\
                                                     .order_by('-decree__name', 'name')
+        if not self.fields['certificate_aims'].disabled:
+            self.fields['section'].disabled = False
 
         if not getattr(self.initial, 'academic_year', None):
             self.set_initial_diploma_values()
@@ -236,6 +268,9 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
         if self.hops_form.is_valid():
             self.hops_form.save(education_group_year=egy_instance)
         return egy_instance
+
+    def is_valid(self):
+        return super(TrainingForm, self).is_valid() and self.hops_form.is_valid()
 
 
 @register('university_domains')

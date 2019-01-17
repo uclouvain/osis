@@ -31,29 +31,33 @@ from unittest import mock
 
 import bs4
 import reversion
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, RequestFactory, override_settings
 from waffle.testutils import override_flag
 
+from base.business.education_groups.general_information import PublishException
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.enums import education_group_categories, academic_calendar_type
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.certificate_aim import CertificateAimFactory
 from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
 from base.tests.factories.education_group_language import EducationGroupLanguageFactory
 from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory, \
+    TrainingFactory, EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonBachelorFactory, \
+    EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory
-from base.views.education_groups.detail import _get_code_and_type
+from base.views.education_groups.detail import get_appropriate_common_admission_condition
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
@@ -306,6 +310,7 @@ class EducationGroupDiplomas(TestCase):
                 )
 
 
+@override_settings(URL_TO_PORTAL_UCL="http://portal-url.com", GET_SECTION_PARAM="sectionsParams")
 class EducationGroupGeneralInformations(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -478,90 +483,44 @@ class EducationGroupGeneralInformations(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
-    @mock.patch("requests.get", return_value=HttpResponseNotFound)
-    def test_education_group_year_pedagogy_publish_not_found(self, mock_get):
-        url = reverse('education_group_publish', args=(self.education_group_child.id, self.education_group_parent.id))
-        response = self.client.get(url)
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.ERROR, msg_level)
-        self.assertEqual(response.status_code, 302)
-        code, type_education_group_year = _get_code_and_type(self.education_group_parent)
-        url = settings.URL_TO_PORTAL_UCL.format(
-            type=type_education_group_year,
-            anac=self.education_group_parent.academic_year.year,
-            code=code
-        )
-        url += "?" + settings.REFRESH_PARAM
-        mock_get.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
 
-    @mock.patch("requests.get", return_value=HttpResponse)
-    def test_education_group_year_pedagogy_publish_found(self, mock_get):
-        education_group_real = EducationGroupYearFactory(acronym="SINF1BA", academic_year=self.current_academic_year,
-                                                         education_group_type=self.type_training)
-        url = reverse('education_group_publish', args=(self.education_group_parent.id, education_group_real.id))
-        response = self.client.get(url)
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.SUCCESS, msg_level)
-        self.assertEqual(response.status_code, 302)
-        code, type_education_group_year = _get_code_and_type(education_group_real)
-        url = settings.URL_TO_PORTAL_UCL.format(
-            type=type_education_group_year,
-            anac=education_group_real.academic_year.year,
-            code=code
-        )
-        url += "?" + settings.REFRESH_PARAM
-        mock_get.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
+class EducationGroupPublishViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+        cls.training = TrainingFactory(academic_year=cls.academic_year)
+        cls.url = reverse('education_group_publish', args=(cls.training.pk, cls.training.pk))
+        cls.person = PersonWithPermissionsFactory('can_access_education_group')
 
-    def test_education_group_year_pedagogy_publish_when_not_logged(self):
+    def setUp(self):
+        self.client.force_login(self.person.user)
+
+    def test_publish_case_user_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
         self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
-    @mock.patch("requests.get", return_value=HttpResponse)
-    def test_education_group_year_pedagogy_publish_minor(self, mock_get):
-        education_group_minor = EducationGroupYearFactory(partial_acronym="LALLE100I",
-                                                          academic_year=self.current_academic_year,
-                                                          education_group_type=self.type_minor)
-        url = reverse('education_group_publish', args=(self.education_group_parent.id, education_group_minor.id))
-        response = self.client.get(url)
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.SUCCESS, msg_level)
-        self.assertEqual(response.status_code, 302)
-        code, type_education_group_year = _get_code_and_type(education_group_minor)
-        url = settings.URL_TO_PORTAL_UCL.format(
-            type=type_education_group_year,
-            anac=education_group_minor.academic_year.year,
-            code=code
-        )
-        url += "?" + settings.REFRESH_PARAM
-        mock_get.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
+    @mock.patch("base.business.education_groups.general_information.publish", side_effect=lambda e: "portal-url")
+    def test_publish_case_ok_redirection_with_success_message(self, mock_publish):
+        response = self.client.get(self.url)
 
-    @mock.patch("requests.get", return_value=HttpResponse)
-    def test_education_group_year_pedagogy_publish_deepening(self, mock_get):
-        education_group_deep = EducationGroupYearFactory(partial_acronym="LDRT100P",
-                                                         academic_year=self.current_academic_year,
-                                                         education_group_type=self.type_deepening)
-        url = reverse('education_group_publish', args=(self.education_group_parent.id, education_group_deep.id))
-        response = self.client.get(url)
         msg = [m.message for m in get_messages(response.wsgi_request)]
         msg_level = [m.level for m in get_messages(response.wsgi_request)]
+
         self.assertEqual(len(msg), 1)
         self.assertIn(messages.SUCCESS, msg_level)
         self.assertEqual(response.status_code, 302)
-        code, type_education_group_year = _get_code_and_type(education_group_deep)
-        url = settings.URL_TO_PORTAL_UCL.format(
-            type=type_education_group_year,
-            anac=education_group_deep.academic_year.year,
-            code=code
-        )
-        url += "?" + settings.REFRESH_PARAM
-        mock_get.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
+
+    @mock.patch("base.business.education_groups.general_information.publish", side_effect=PublishException('error'))
+    def test_publish_case_ko_redirection_with_error_message(self, mock_publish):
+        response = self.client.get(self.url)
+
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        msg_level = [m.level for m in get_messages(response.wsgi_request)]
+
+        self.assertEqual(len(msg), 1)
+        self.assertIn(messages.ERROR, msg_level)
+        self.assertEqual(response.status_code, 302)
 
 
 @override_flag('education_group_update', active=True)
@@ -871,13 +830,24 @@ class EducationGroupEditAdministrativeData(TestCase):
 class AdmissionConditionEducationGroupYearTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        academic_year = AcademicYearFactory()
+        cls.academic_year = AcademicYearFactory()
         type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
-        cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=academic_year,
+        cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=cls.academic_year,
                                                                education_group_type=type_training)
-        cls.education_group_child = EducationGroupYearFactory(acronym="Child_1", academic_year=academic_year,
+        cls.education_group_child = EducationGroupYearFactory(acronym="Child_1", academic_year=cls.academic_year,
                                                               education_group_type=type_training)
-
+        cls.agregation_adm_cond = AdmissionConditionFactory(
+            education_group_year=EducationGroupYearCommonAgregationFactory(academic_year=cls.academic_year)
+        )
+        cls.bachelor_adm_cond = AdmissionConditionFactory(
+            education_group_year=EducationGroupYearCommonBachelorFactory(academic_year=cls.academic_year)
+        )
+        cls.special_master_adm_cond = AdmissionConditionFactory(
+            education_group_year=EducationGroupYearCommonSpecializedMasterFactory(academic_year=cls.academic_year)
+        )
+        cls.master_adm_cond = AdmissionConditionFactory(
+            education_group_year=EducationGroupYearCommonMasterFactory(academic_year=cls.academic_year)
+        )
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
 
         cls.cms_label_for_child = TranslatedTextFactory(text_label=TextLabelFactory(entity=entity_name.OFFER_YEAR),
@@ -1278,3 +1248,52 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         url = reverse('tab_lang_edit', args=(self.education_group_parent.id, self.education_group_child.id, 'fr'))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
+
+    def test_get_appropriate_common_offer_for_common(self):
+        edy = EducationGroupYearCommonFactory(
+            academic_year=self.academic_year,
+            education_group_type__category=education_group_categories.MINI_TRAINING,
+            education_group_type__name=MiniTrainingType.OPTION.name
+
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, None)
+
+    def test_get_appropriate_common_offer_for_bachelor(self):
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.BACHELOR.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.bachelor_adm_cond)
+
+    def test_get_appropriate_common_offer_for_agregation(self):
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.AGGREGATION.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.agregation_adm_cond)
+
+    def test_get_appropriate_common_offer_for_master(self):
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.master_adm_cond)
+
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.MASTER_M1.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.master_adm_cond)
+
+    def test_get_appropriate_common_offer_for_special_master(self):
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.MASTER_MC.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.special_master_adm_cond)
