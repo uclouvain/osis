@@ -31,7 +31,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
 from base.business.utils.model import model_to_dict_fk
-from base.forms.education_group.training import TrainingForm, TrainingEducationGroupYearForm
+from base.forms.education_group.training import TrainingForm, TrainingEducationGroupYearForm, \
+    HopsEducationGroupYearModelForm
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, internship_presence
@@ -48,17 +49,26 @@ from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin
+from base.tests.factories.hops import HopsFactory
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.language import LanguageFactory
 from rules_management.enums import TRAINING_DAILY_MANAGEMENT, TRAINING_PGRM_ENCODING_PERIOD
 from rules_management.tests.fatories import PermissionFactory, FieldReferenceFactory
+from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 
 class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
     def setUp(self):
         self.education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
         self.form_class = TrainingEducationGroupYearForm
+        self.hops_form_class = HopsEducationGroupYearModelForm
         super(TestTrainingEducationGroupYearForm, self).setUp(education_group_type=self.education_group_type)
+        self.hops = HopsFactory(education_group_year=self.parent_education_group_year,
+                                ares_study=100,
+                                ares_graca=200,
+                                ares_ability=300
+                                )
 
     @patch('base.forms.education_group.common.find_authorized_types')
     def test_get_context_for_field_references_case_not_in_editing_pgrm_period(self, mock_authorized_types):
@@ -84,6 +94,54 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
             user=self.user,
         ).get_context()
         self.assertTrue(context, TRAINING_PGRM_ENCODING_PERIOD)
+
+    def test_valid_hopsform(self):
+        form_education_group_year = HopsEducationGroupYearModelForm(
+            data={
+                'ares_study': 1,
+                'ares_graca': 2,
+                'ares_ability': 3,
+            },
+            instance=self.hops
+        )
+        self.assertFalse(form_education_group_year.fields["ares_study"].required)
+        self.assertFalse(form_education_group_year.fields["ares_graca"].required)
+        self.assertFalse(form_education_group_year.fields["ares_ability"].required)
+
+    def test_not_valid_hopsform(self):
+        form_education_group_year = HopsEducationGroupYearModelForm(
+            data={
+                'ares_study': 1,
+            },
+            instance=self.hops)
+        self.assertFalse(form_education_group_year.is_valid())
+        self.assertEqual(list(form_education_group_year.errors['ares_study'])[0],
+                         _('The fields concerning ARES have to be ALL filled-in or none of them'))
+
+    def test_save_hopsform(self):
+        form_education_group_year = HopsEducationGroupYearModelForm(
+            data={
+                'ares_study': 10,
+                'ares_graca': 20,
+                'ares_ability': 30,
+            },
+            instance=self.hops
+        )
+        if form_education_group_year.is_valid():
+            hops_updated = form_education_group_year.save(education_group_year=self.parent_education_group_year)
+            self.assertEqual(hops_updated.ares_study, 10)
+            self.assertEqual(hops_updated.ares_graca, 20)
+            self.assertEqual(hops_updated.ares_ability, 30)
+            self.assertEqual(hops_updated.id, self.hops.id)
+
+    def test_save_hopsform_without_ares_data(self):
+        form_education_group_year = HopsEducationGroupYearModelForm(
+            data={},
+            instance=self.hops
+        )
+        self.assertTrue(form_education_group_year.is_valid())
+        hops_updated = form_education_group_year.save(education_group_year=self.parent_education_group_year)
+        self.assertIsNone(hops_updated)
 
 
 class TestPostponementEducationGroupYear(TestCase):

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 11:52+0100\n"
+"POT-Creation-Date: 2019-01-16 13:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -479,8 +479,8 @@ msgstr ""
 msgid "Admission"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:196
-#: templates/education_group/tab_admission_conditions.html:198
+#: templates/education_group/tab_admission_conditions.html:199
+#: templates/education_group/tab_admission_conditions.html:201
 msgid "Admission and Enrolment Procedures for general registration"
 msgstr ""
 
@@ -488,8 +488,8 @@ msgstr ""
 msgid "Admission exam"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:188
-#: templates/education_group/tab_admission_conditions.html:190
+#: templates/education_group/tab_admission_conditions.html:189
+#: templates/education_group/tab_admission_conditions.html:191
 msgid "Adults taking up their university training"
 msgstr ""
 
@@ -1407,7 +1407,7 @@ msgstr ""
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
-#: forms/education_group/training.py:159
+#: forms/education_group/training.py:188
 msgid "Enter text to search"
 msgstr ""
 
@@ -2532,8 +2532,8 @@ msgstr ""
 msgid "Non academic CREF"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:141
-#: templates/education_group/tab_admission_conditions.html:143
+#: templates/education_group/tab_admission_conditions.html:142
+#: templates/education_group/tab_admission_conditions.html:144
 msgid "Non university Bachelors"
 msgstr ""
 
@@ -2765,8 +2765,8 @@ msgstr ""
 msgid "Person not in accordance with proposal state"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:192
 #: templates/education_group/tab_admission_conditions.html:194
+#: templates/education_group/tab_admission_conditions.html:196
 msgid "Personalized access"
 msgstr ""
 
@@ -3280,7 +3280,7 @@ msgstr ""
 msgid "Search type"
 msgstr ""
 
-#: forms/education_group/training.py:150
+#: forms/education_group/training.py:179
 msgid "Search..."
 msgstr ""
 
@@ -3692,6 +3692,11 @@ msgstr ""
 #: views/academic_calendar.py:198
 #, python-format
 msgid "The event \"%(event)s\" has been deleted successfully"
+msgstr ""
+
+#: forms/education_group/training.py:95
+#: tests/forms/education_group/test_training.py:119
+msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
 
 #: models/education_group_year.py:81
@@ -5086,7 +5091,7 @@ msgstr ""
 msgid "search"
 msgstr ""
 
-#: forms/education_group/training.py:80 models/education_group_year.py:383
+#: forms/education_group/training.py:109 models/education_group_year.py:383
 #: templates/education_group/identification_training_details.html:77
 msgid "secondary domains"
 msgstr ""
