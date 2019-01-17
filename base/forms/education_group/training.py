@@ -82,18 +82,19 @@ class HopsEducationGroupYearModelForm(forms.ModelForm):
             return super().save()
         else:
             if self.instance.id:
-                # Need to be deleted
+                # Need to be deleted when data is none
                 self.instance.delete()
             return None
 
     def _valid_hops(self):
-        if self.cleaned_data.get('ares_study') is None and self.cleaned_data.get(
-                'ares_graca') is None and self.cleaned_data.get('ares_ability') is None:
-            return True
-        else:
-            if not (self._has_ares_data()):
-                self.add_error('ares_study', _('The fields concerning ARES have to be ALL filled-in or none of them'))
-                return False
+        ares_fields = [
+            self.cleaned_data.get('ares_study') is None,
+            self.cleaned_data.get('ares_graca') is None,
+            self.cleaned_data.get('ares_ability') is None
+        ]
+        if any(ares_fields) and not all(ares_fields):
+            self.add_error('ares_study', _('The fields concerning ARES have to be ALL filled-in or none of them'))
+            return False
         return True
 
     def _has_ares_data(self):

@@ -138,9 +138,9 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
             data={},
             instance=self.hops
         )
-        if form_education_group_year.is_valid():
-            hops_updated = form_education_group_year.save(education_group_year=self.parent_education_group_year)
-            self.assertIsNone(hops_updated)
+        self.assertTrue(form_education_group_year.is_valid())
+        hops_updated = form_education_group_year.save(education_group_year=self.parent_education_group_year)
+        self.assertIsNone(hops_updated)
 
 
 class TestPostponementEducationGroupYear(TestCase):
