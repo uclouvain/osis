@@ -23,22 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url, include
+from django.test import TestCase
+from rest_framework import serializers
 
-import continuing_education.api.url_v1
-import education_group.api.url_v1
-from webservices.api.views.auth_token import AuthToken
-from webservices.views import ws_catalog_offer
+from base.tests.factories.user import UserFactory
+from webservices.api.serializers.auth_token import AuthTokenSerializer
 
-urlpatterns = [
-    url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/(?P<acronym>[a-zA-Z0-9]+)$',
-        ws_catalog_offer,
-        name='v0.1-ws_catalog_offer'),
-    url(r'^v1/', include([
-        url(r'^auth/token$', AuthToken.as_view(), name=AuthToken.name),
-        url(r'^continuing_education/',
-            include(continuing_education.api.url_v1.urlpatterns, namespace='continuing_education_api_v1')),
-        url(r'^education_group/',
-            include(education_group.api.url_v1, namespace='education_group_api_v1')),
-    ])),
-]
+
+class AuthTokenSerializerTestCase(TestCase):
+    def test_serializer_case_username_required(self):
+        serializer = AuthTokenSerializer(data={})
+        self.assertFalse(serializer.is_valid())
+
+    def test_serializer_case_username_not_exist(self):
+        serializer = AuthTokenSerializer(data={'username': 'dummy-username'})
+        with self.assertRaises(serializers.ValidationError):
+            serializer.is_valid(raise_exception=True)
+
+    def test_serializer_case_success_ensure_user(self):
+        user = UserFactory()
+        serializer = AuthTokenSerializer(data={'username': user.username})
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data['user'], user)
