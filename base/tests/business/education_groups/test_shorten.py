@@ -142,6 +142,17 @@ class TestGetProtectedMessageEducationGroupYear(EducationGroupShortenContext):
             self.assertEqual(protected_message[idx]['education_group_year'].academic_year, ac_year)
             self.assertEqual(protected_message[idx]['messages'], msg_expected)
 
+    def test_get_protected_messages_linked_with_epc(self):
+        edy = EducationGroupYearFactory(
+            education_group=self.education_group_year.education_group,
+            management_entity=self.entity,
+            administration_entity=self.entity,
+            academic_year=self.generated_ac_years.academic_years[0],
+            linked_with_epc=True
+        )
+        protected_messages = shorten._get_protected_messages([edy])
+        self.assertEqual(protected_messages[0]['messages'][0], _('Linked with EPC'))
+
 
 class TestGetFormatedErrorMessage(EducationGroupShortenContext):
     def test_get_formated_error_msg(self):

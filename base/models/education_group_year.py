@@ -473,6 +473,11 @@ class EducationGroupYear(SerializableModel):
         blank=True,
     )
 
+    linked_with_epc = models.BooleanField(
+        default=False,
+        verbose_name=_('Linked with EPC')
+    )
+
     class Meta:
         verbose_name = _("Education group year")
         unique_together = ('education_group', 'academic_year')
@@ -509,7 +514,7 @@ class EducationGroupYear(SerializableModel):
         return self.education_group_type.name == TrainingType.MASTER_M1.name
 
     @property
-    def is_agregation(self):
+    def is_aggregation(self):
         return self.education_group_type.name == TrainingType.AGGREGATION.name
 
     @property
