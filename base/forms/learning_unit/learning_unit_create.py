@@ -149,9 +149,6 @@ class LearningUnitYearModelForm(forms.ModelForm):
                 raise ValidationError(_('The credits value should be an integer'))
         return credits_
 
-    def is_valid(self):
-        return super(LearningUnitYearModelForm, self).is_valid()
-
 
 class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
     class Meta(LearningUnitYearModelForm.Meta):
