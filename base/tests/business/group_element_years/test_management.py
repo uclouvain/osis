@@ -32,7 +32,7 @@ from base.tests.factories.academic_year import AcademicYearFactory, create_curre
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 
 
 class TestChildReachedMixin():
@@ -138,120 +138,87 @@ class TestIsMinChildReached(TestChildReachedMixin, TestCase):
 
 
 class TestComputeNumberChildren(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.parent_egy = EducationGroupYearFactory()
+        cls.education_group_types = EducationGroupTypeFactory.create_batch(3)
+        GroupElementYearFactory.create_batch(
+            3,
+            parent=cls.parent_egy,
+            child_branch__education_group_type=cls.education_group_types[0]
+        )
+        GroupElementYearFactory.create_batch(
+            2,
+            parent=cls.parent_egy,
+            child_branch__education_group_type=cls.education_group_types[1]
+        )
+        GroupElementYearChildLeafFactory.create_batch(
+            2,
+            parent=cls.parent_egy
+        )
+
+        cls.reference_group_element_year_children = GroupElementYearFactory(
+            parent=cls.parent_egy,
+            child_branch__education_group_type=cls.education_group_types[0],
+            link_type=LinkTypes.REFERENCE.name
+        )
+        GroupElementYearFactory.create_batch(
+            2,
+            parent=cls.reference_group_element_year_children.child_branch,
+            child_branch__education_group_type=cls.education_group_types[1]
+        )
+        GroupElementYearFactory(
+            parent=cls.reference_group_element_year_children.child_branch,
+            child_branch__education_group_type=cls.education_group_types[2]
+        )
+
+        cls.child = EducationGroupYearFactory(education_group_type=cls.education_group_types[0])
+        GroupElementYearFactory.create_batch(
+            2,
+            parent=cls.child,
+            child_branch__education_group_type=cls.education_group_types[2]
+        )
+
     def test_when_no_children(self):
         parent_without_children = EducationGroupYearFactory()
-        child = EducationGroupYearFactory()
 
         expected_result = {
-            child.education_group_type.id: 1
+            self.education_group_types[0].id: 1
         }
-        self.assertDictEqual(expected_result, compute_number_children(parent_without_children, child, None))
-
-    def test_when_children_of_same_education_group_type_of_link_main(self):
-        parent_egy = EducationGroupYearFactory()
-        children_education_group_type = EducationGroupTypeFactory()
-        [GroupElementYearFactory(parent=parent_egy, child_branch__education_group_type=children_education_group_type)
-         for _ in range(3)]
-
-        child = EducationGroupYearFactory(education_group_type=children_education_group_type)
-
-        expected_result = {
-            children_education_group_type.id: 4
-        }
-        self.assertEqual(
+        self.assertDictEqual(
             expected_result,
-            compute_number_children(parent_egy, child, None)
+            compute_number_children(parent_without_children, self.child, None)
         )
 
-    def test_when_children_of_different_education_group_type_of_link_main(self):
-        parent_egy = EducationGroupYearFactory()
-        children_education_group_type_1 = EducationGroupTypeFactory()
-        children_education_group_type_2 = EducationGroupTypeFactory()
-        [GroupElementYearFactory(parent=parent_egy, child_branch__education_group_type=children_education_group_type_1)
-         for _ in range(3)]
-        [GroupElementYearFactory(parent=parent_egy, child_branch__education_group_type=children_education_group_type_2)
-         for _ in range(1)]
-
-        child = EducationGroupYearFactory(education_group_type=children_education_group_type_2)
-
+    def test_when_children(self):
         expected_result = {
-            children_education_group_type_1.id: 3,
-            children_education_group_type_2.id: 2
+            self.education_group_types[0].id: 3 + 1,
+            self.education_group_types[1].id: 4,
+            self.education_group_types[2].id: 1
         }
         self.assertEqual(
             expected_result,
-            compute_number_children(parent_egy, child, None)
+            compute_number_children(self.parent_egy, self.child, None)
         )
 
-    def test_when_children_with_link_main_reference(self):
-        parent_egy = EducationGroupYearFactory()
-        children_education_group_type_1 = EducationGroupTypeFactory()
-        [GroupElementYearFactory(parent=parent_egy, child_branch__education_group_type=children_education_group_type_1)
-         for _ in range(3)]
-
-        reference_group_element_year = GroupElementYearFactory(parent=parent_egy, link_type=LinkTypes.REFERENCE.name)
-
-        children_education_group_type_2 = EducationGroupTypeFactory()
-        [GroupElementYearFactory(parent=reference_group_element_year.child_branch,
-                                 child_branch__education_group_type=children_education_group_type_2)
-         for _ in range(2)]
-
-        child = EducationGroupYearFactory(education_group_type=children_education_group_type_2)
-
+    def test_when_children_with_link_reference(self):
         expected_result = {
-            children_education_group_type_1.id: 3,
-            children_education_group_type_2.id: 3
+            self.education_group_types[0].id: 3,
+            self.education_group_types[1].id: 4,
+            self.education_group_types[2].id: 1 + 2
         }
         self.assertEqual(
             expected_result,
-            compute_number_children(parent_egy, child, None)
+            compute_number_children(self.parent_egy, self.child, LinkTypes.REFERENCE.name)
         )
 
-    def test_when_children_of_different_education_group_type_of_link_main_and_reference(self):
-        parent_egy = EducationGroupYearFactory()
-        children_education_group_type_1 = EducationGroupTypeFactory()
-        children_education_group_type_2 = EducationGroupTypeFactory()
-        [GroupElementYearFactory(parent=parent_egy, child_branch__education_group_type=children_education_group_type_1)
-         for _ in range(3)]
-        [GroupElementYearFactory(parent=parent_egy, child_branch__education_group_type=children_education_group_type_2)
-         for _ in range(1)]
-
-        child = EducationGroupYearFactory(education_group_type=children_education_group_type_2)
-        children_education_group_type_3 = EducationGroupTypeFactory()
-        [GroupElementYearFactory(parent=child, child_branch__education_group_type=children_education_group_type_3)
-         for _ in range(2)]
-
+    def test_when_switching_link_type_of_existing_child(self):
         expected_result = {
-            children_education_group_type_1.id: 3,
-            children_education_group_type_2.id: 1,
-            children_education_group_type_3.id: 2
+            self.education_group_types[0].id: 3 + 1,
+            self.education_group_types[1].id: 4 - 2,
+            # self.education_group_types[2].id: 1 - 1
         }
         self.assertEqual(
             expected_result,
-            compute_number_children(parent_egy, child, LinkTypes.REFERENCE.name)
-        )
-
-    def test_when_switching_existing_children(self):
-        parent_egy = EducationGroupYearFactory()
-        children_education_group_type_1 = EducationGroupTypeFactory()
-        children_education_group_type_2 = EducationGroupTypeFactory()
-        [GroupElementYearFactory(parent=parent_egy, child_branch__education_group_type=children_education_group_type_1)
-         for _ in range(3)]
-        [GroupElementYearFactory(parent=parent_egy, child_branch__education_group_type=children_education_group_type_2)
-         for _ in range(1)]
-
-        grp = GroupElementYearFactory(parent=parent_egy)
-        child = grp.child_branch
-        children_education_group_type_3 = EducationGroupTypeFactory()
-        [GroupElementYearFactory(parent=child, child_branch__education_group_type=children_education_group_type_3)
-         for _ in range(2)]
-
-        expected_result = {
-            children_education_group_type_1.id: 3,
-            children_education_group_type_2.id: 1,
-            children_education_group_type_3.id: 2
-        }
-        self.assertEqual(
-            expected_result,
-            compute_number_children(parent_egy, child, LinkTypes.REFERENCE.name)
+            compute_number_children(self.parent_egy, self.reference_group_element_year_children.child_branch, None)
         )

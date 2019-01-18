@@ -121,11 +121,14 @@ def _is_limit_child_reached(parent, child_education_group_type, boolean_func):
 
 
 def compute_number_children(egy, child, link_type):
-    reference_link_child = egy.groupelementyear_set.filter(link_type=LinkTypes.REFERENCE.name).\
+    reference_link_child = egy.groupelementyear_set.exclude(child_branch=child).\
+        filter(link_type=LinkTypes.REFERENCE.name).\
         values_list("child_branch", flat=True)
 
     education_group_types_count = GroupElementYear.objects.\
-        filter(Q(parent__in=reference_link_child) | Q(parent=egy)).exclude(child_branch=child).filter(link_type=None).\
+        filter(Q(parent__in=reference_link_child) | Q(parent=egy)).exclude(Q(parent=egy) & Q(child_branch=child)).\
+        filter(link_type=None).\
+        exclude(child_branch=None). \
         annotate(education_group_type=F("child_branch__education_group_type")). \
         values("education_group_type"). \
         order_by("education_group_type").\
@@ -136,7 +139,8 @@ def compute_number_children(egy, child, link_type):
         number_children[record["education_group_type"]] += record["count"]
 
     if link_type == LinkTypes.REFERENCE.name:
-        count = GroupElementYear.objects.filter(parent=child).\
+        count = GroupElementYear.objects.filter(parent=child). \
+            exclude(child_branch=None). \
             annotate(education_group_type=F("child_branch__education_group_type")). \
             values("education_group_type"). \
             order_by("education_group_type").\
