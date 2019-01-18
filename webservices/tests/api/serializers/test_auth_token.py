@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.contrib.auth import backends
 from django.test import TestCase
 from rest_framework import serializers
 
@@ -39,6 +40,17 @@ class AuthTokenSerializerTestCase(TestCase):
         serializer = AuthTokenSerializer(data={'username': 'dummy-username'})
         with self.assertRaises(serializers.ValidationError):
             serializer.is_valid(raise_exception=True)
+
+    def test_serializer_case_username_not_exist_with_force_create(self):
+        serializer = AuthTokenSerializer(data={'username': 'dummy-username', 'force_user_creation': True})
+        self.assertTrue(serializer.is_valid())
+
+        UserModel = backends.get_user_model()
+        user_created = serializer.validated_data['user']
+        self.assertEqual(
+            'dummy-username',
+            getattr(user_created, UserModel.USERNAME_FIELD)
+        )
 
     def test_serializer_case_success_ensure_user(self):
         user = UserFactory()

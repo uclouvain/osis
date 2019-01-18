@@ -29,7 +29,11 @@ paths:
               properties:
                   username:
                     type: string
-                    description: The username which we to get a token
+                    description: The username which we want to get a token
+                  force_user_creation:
+                    type: boolean
+                    description: If the username specified doesn't not exist, force creation of user
+                    default: false
       responses:
         '200':
           description: OK

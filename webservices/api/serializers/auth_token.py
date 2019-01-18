@@ -31,12 +31,19 @@ from rest_framework import serializers
 
 class AuthTokenSerializer(serializers.Serializer):
     username = serializers.CharField(label=_("Username"), required=True)
+    force_user_creation = serializers.BooleanField(label=_("Create user if not exists"), default=False)
 
     def validate(self, attrs):
         UserModel = backends.get_user_model()
-        try:
-            attrs['user'] = UserModel.objects.get(username=attrs['username'])
-        except UserModel.DoesNotExist:
-            msg = _('Unable to find username provided.')
-            raise serializers.ValidationError({'username': msg})
+        user_kwargs = {UserModel.USERNAME_FIELD: attrs['username']}
+
+        if attrs['force_user_creation']:
+            user, created = UserModel.objects.get_or_create(**user_kwargs)
+        else:
+            try:
+                user = UserModel.objects.get(**user_kwargs)
+            except UserModel.DoesNotExist:
+                msg = _('Unable to find username provided.')
+                raise serializers.ValidationError({'username': msg})
+        attrs['user'] = user
         return attrs
