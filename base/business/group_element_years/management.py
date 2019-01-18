@@ -23,12 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import defaultdict
+
+from django.db.models import Count, Q, F
 from django.utils.translation import ugettext as _
 
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.link_type import LinkTypes
-from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException
+from base.models.exceptions import IncompatiblesTypesException
+from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import cache
 
@@ -114,3 +118,32 @@ def _is_limit_child_reached(parent, child_education_group_type, boolean_func):
     except AuthorizedRelationship.DoesNotExist:
         return True
     return boolean_func(number_children_of_same_type, auth_rel)
+
+
+def compute_number_children(egy, child, link_type):
+    reference_link_child = egy.groupelementyear_set.filter(link_type=LinkTypes.REFERENCE.name).\
+        values_list("child_branch", flat=True)
+
+    education_group_types_count = GroupElementYear.objects.\
+        filter(Q(parent__in=reference_link_child) | Q(parent=egy)).exclude(child_branch=child).filter(link_type=None).\
+        annotate(education_group_type=F("child_branch__education_group_type")). \
+        values("education_group_type"). \
+        order_by("education_group_type").\
+        annotate(count=Count("education_group_type"))
+
+    number_children = defaultdict(int)
+    for record in education_group_types_count:
+        number_children[record["education_group_type"]] += record["count"]
+
+    if link_type == LinkTypes.REFERENCE.name:
+        count = GroupElementYear.objects.filter(parent=child).\
+            annotate(education_group_type=F("child_branch__education_group_type")). \
+            values("education_group_type"). \
+            order_by("education_group_type").\
+            annotate(count=Count("education_group_type"))
+        for c in count:
+            number_children[c["education_group_type"]] += c["count"]
+    else:
+        number_children[child.education_group_type.id] += 1
+
+    return number_children
