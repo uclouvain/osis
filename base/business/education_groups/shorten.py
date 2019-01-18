@@ -57,7 +57,6 @@ def check_education_group_end_date(education_group, end_year):
 
 
 def _get_formated_error_msg(end_year, protected_messages):
-    print('def _get_formated_error_msg(end_year, protected_messages)')
     error_msg = _("Cannot set end year to %(end_year)s :") % {'end_year': end_year}
     error_msg += "<ul>"
     for protected_message in protected_messages:
