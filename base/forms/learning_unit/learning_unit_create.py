@@ -38,6 +38,9 @@ from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
 from reference.models.language import find_all_languages
+from django.core.exceptions import ValidationError
+
+CRUCIAL_YEAR_FOR_CREDITS_VALIDATION = 2018
 
 
 def _create_learning_container_year_type_list():
@@ -138,6 +141,13 @@ class LearningUnitYearModelForm(forms.ModelForm):
         self.instance.learning_unit = kwargs.pop('learning_unit')
         instance = super().save(**kwargs)
         return instance
+
+    def clean_credits(self):
+        credits_ = self.cleaned_data['credits']
+        if self.instance.id is None or self.instance.academic_year.year >= CRUCIAL_YEAR_FOR_CREDITS_VALIDATION:
+            if not float(credits_).is_integer():
+                raise ValidationError(_('The credits value should be an integer'))
+        return credits_
 
 
 class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
