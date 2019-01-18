@@ -34,9 +34,11 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import MINI_TRAINING
 from base.models.enums.education_group_types import MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
+from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 
 
 class TestFetchEducationGroupToPostpone(TestCase):
@@ -55,6 +57,40 @@ class TestFetchEducationGroupToPostpone(TestCase):
         result, errors = EducationGroupAutomaticPostponement().postpone()
         self.assertEqual(len(result), 1)
         self.assertFalse(errors)
+
+    def test_if_structure_is_postponed(self):
+        parent = EducationGroupYearFactory(
+            education_group=self.education_group,
+            academic_year=self.academic_years[-2],
+        )
+        mandatory_child = GroupFactory(
+            academic_year=self.academic_years[-2],
+        )
+        not_mandatory_child = GroupFactory(
+            academic_year=self.academic_years[-2],
+        )
+        GroupElementYearFactory(parent=parent, child_branch=mandatory_child)
+        GroupElementYearFactory(parent=parent, child_branch=not_mandatory_child)
+        AuthorizedRelationshipFactory(
+            parent_type=parent.education_group_type,
+            child_type=mandatory_child.education_group_type,
+            min_count_authorized=1
+        )
+        AuthorizedRelationshipFactory(
+            parent_type=parent.education_group_type,
+            child_type=not_mandatory_child.education_group_type,
+            min_count_authorized=0
+        )
+
+        self.assertEqual(EducationGroupYear.objects.count(), 3)
+
+        result, errors = EducationGroupAutomaticPostponement().postpone()
+
+        self.assertEqual(len(result), 1)
+        self.assertFalse(errors)
+
+        self.assertEqual(result[0].education_group,self.education_group)
+        self.assertEqual(result[0].groupelementyear_set.count(), 1)
 
     def test_egy_to_not_duplicated(self):
         # The learning unit is over

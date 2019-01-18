@@ -33,6 +33,7 @@ from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
 from base.models.utils import utils
+from base.models.utils.utils import get_object_or_none
 from base.models.validation_rule import ValidationRule
 
 REGEX_TRAINING_PARTIAL_ACRONYM = r"^(?P<sigle_ele>[A-Z]{3,5})\d{3}[A-Z]$"
@@ -62,8 +63,8 @@ def create_initial_group_element_year_structure(parent_egys):
 
         grp_ele = _get_or_create_branch(
             child_education_group_type,
-            validation_rule_title.initial_value,
-            validation_rule_partial_acronym.initial_value,
+            validation_rule_title.initial_value if validation_rule_title else "",
+            validation_rule_partial_acronym.initial_value if validation_rule_partial_acronym else "",
             first_parent
         )
         children_created[first_parent.id].append(grp_ele)
@@ -137,7 +138,7 @@ def _get_validation_rule(field_name, education_group_type):
         field_name,
         education_group_type.external_id
     )
-    return ValidationRule.objects.get(pk=egy_title_reference)
+    return get_object_or_none(ValidationRule, pk=egy_title_reference)
 
 
 def _generate_child_partial_acronym(parent, child_initial_value, child_type):
