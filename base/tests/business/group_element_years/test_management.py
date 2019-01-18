@@ -26,7 +26,7 @@
 from django.test import TestCase
 
 from base.business.group_element_years.management import is_max_child_reached, is_min_child_reached, \
-    compute_number_children
+    compute_number_children_by_education_group_type
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
@@ -137,7 +137,7 @@ class TestIsMinChildReached(TestChildReachedMixin, TestCase):
         self.assertFalse(is_min_child_reached(self.parent_egy, self.child_egy.education_group_type))
 
 
-class TestComputeNumberChildren(TestCase):
+class TestComputeNumberChildrenByEducationGroupType(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.parent_egy = EducationGroupYearFactory()
@@ -187,7 +187,7 @@ class TestComputeNumberChildren(TestCase):
         }
         self.assertDictEqual(
             expected_result,
-            compute_number_children(parent_without_children, self.child, None)
+            compute_number_children_by_education_group_type(parent_without_children, self.child, None)
         )
 
     def test_when_children(self):
@@ -198,7 +198,7 @@ class TestComputeNumberChildren(TestCase):
         }
         self.assertEqual(
             expected_result,
-            compute_number_children(self.parent_egy, self.child, None)
+            compute_number_children_by_education_group_type(self.parent_egy, self.child, None)
         )
 
     def test_when_children_with_link_reference(self):
@@ -209,7 +209,7 @@ class TestComputeNumberChildren(TestCase):
         }
         self.assertEqual(
             expected_result,
-            compute_number_children(self.parent_egy, self.child, LinkTypes.REFERENCE.name)
+            compute_number_children_by_education_group_type(self.parent_egy, self.child, LinkTypes.REFERENCE.name)
         )
 
     def test_when_switching_link_type_of_existing_child(self):
@@ -220,5 +220,5 @@ class TestComputeNumberChildren(TestCase):
         }
         self.assertEqual(
             expected_result,
-            compute_number_children(self.parent_egy, self.reference_group_element_year_children.child_branch, None)
+            compute_number_children_by_education_group_type(self.parent_egy, self.reference_group_element_year_children.child_branch, None)
         )

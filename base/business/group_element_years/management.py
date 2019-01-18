@@ -120,34 +120,35 @@ def _is_limit_child_reached(parent, child_education_group_type, boolean_func):
     return boolean_func(number_children_of_same_type, auth_rel)
 
 
-def compute_number_children(egy, child, link_type):
+def compute_number_children_by_education_group_type(egy, child, link_type):
     reference_link_child = egy.groupelementyear_set.exclude(child_branch=child).\
         filter(link_type=LinkTypes.REFERENCE.name).\
         values_list("child_branch", flat=True)
+    parents = list(reference_link_child) + [egy.id]
 
-    education_group_types_count = GroupElementYear.objects.\
-        filter(Q(parent__in=reference_link_child) | Q(parent=egy)).exclude(Q(parent=egy) & Q(child_branch=child)).\
-        filter(link_type=None).\
-        exclude(child_branch=None). \
-        annotate(education_group_type=F("child_branch__education_group_type")). \
-        values("education_group_type"). \
-        order_by("education_group_type").\
-        annotate(count=Count("education_group_type"))
+    education_group_types_count = _get_education_group_types_count(parents, child.id)
 
     number_children = defaultdict(int)
     for record in education_group_types_count:
         number_children[record["education_group_type"]] += record["count"]
 
     if link_type == LinkTypes.REFERENCE.name:
-        count = GroupElementYear.objects.filter(parent=child). \
-            exclude(child_branch=None). \
-            annotate(education_group_type=F("child_branch__education_group_type")). \
-            values("education_group_type"). \
-            order_by("education_group_type").\
-            annotate(count=Count("education_group_type"))
-        for c in count:
-            number_children[c["education_group_type"]] += c["count"]
+        child_education_group_types_count = _get_education_group_types_count([child], None)
+        for record in child_education_group_types_count:
+            number_children[record["education_group_type"]] += record["count"]
     else:
         number_children[child.education_group_type.id] += 1
 
     return number_children
+
+
+def _get_education_group_types_count(parents, child_to_exclude):
+    return GroupElementYear.objects.\
+        filter(parent__in=parents). \
+        exclude(child_branch=child_to_exclude).\
+        exclude(child_branch=None). \
+        filter(link_type=None).\
+        annotate(education_group_type=F("child_branch__education_group_type")). \
+        values("education_group_type"). \
+        order_by("education_group_type").\
+        annotate(count=Count("education_group_type"))
