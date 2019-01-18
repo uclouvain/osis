@@ -32,9 +32,11 @@ from base.business.education_groups import create
 from base.business.utils.model import model_to_dict_fk, compare_objects, update_object
 from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.education_group_year import EducationGroupYear
+from base.models.hops import Hops
 
 EDUCATION_GROUP_MAX_POSTPONE_YEARS = 6
 FIELD_TO_EXCLUDE = ['id', 'uuid', 'external_id', 'academic_year']
+HOPS_FIELDS = ('ares_study',  'ares_graca', 'ares_ability')
 
 
 class ConsistencyError(Error):
@@ -64,7 +66,7 @@ def _compute_end_year(education_group):
     return max(max_postponement_end_year, latest_egy.academic_year.year)
 
 
-def _postpone_m2m(education_group_year, postponed_egy):
+def _postpone_m2m(education_group_year, postponed_egy, hops_values):
     fields_to_exclude = []
 
     opts = education_group_year._meta
@@ -81,8 +83,12 @@ def _postpone_m2m(education_group_year, postponed_egy):
             m2m_data_to_postpone = model_to_dict_fk(m2m_obj, exclude=['id', 'external_id', 'education_group_year'])
             m2m_cls(education_group_year=postponed_egy, **m2m_data_to_postpone).save()
 
+    if hops_values and any(elem in HOPS_FIELDS and hops_values[elem] for elem in hops_values):
+        _postpone_hops(hops_values, postponed_egy)
 
-def duplicate_education_group_year(old_education_group_year, new_academic_year, dict_initial_egy=None):
+
+def duplicate_education_group_year(old_education_group_year, new_academic_year, dict_initial_egy=None,
+                                   hops_values=None):
     dict_new_value = model_to_dict_fk(old_education_group_year, exclude=FIELD_TO_EXCLUDE)
 
     defaults_values = {x: v for x, v in dict_new_value.items() if not isinstance(v, list)}
@@ -97,7 +103,7 @@ def duplicate_education_group_year(old_education_group_year, new_academic_year, 
     # During create of new postponed object, we need to update only the m2m relations
     if created:
         # Postpone the m2m [languages / secondary_domains]
-        _postpone_m2m(old_education_group_year, postponed_egy)
+        _postpone_m2m(old_education_group_year, postponed_egy, hops_values)
 
     # During the update, we need to check if the postponed object has been modify
     else:
@@ -110,9 +116,16 @@ def duplicate_education_group_year(old_education_group_year, new_academic_year, 
 
         update_object(postponed_egy, dict_new_value)
         # Postpone the m2m [languages / secondary_domains]
-        _postpone_m2m(old_education_group_year, postponed_egy)
+        _postpone_m2m(old_education_group_year, postponed_egy, hops_values)
 
     return postponed_egy
+
+
+def _postpone_hops(hops_values, postponed_egy):
+    Hops.objects.update_or_create(education_group_year=postponed_egy,
+                                  defaults={'ares_study': hops_values['ares_study'],
+                                            'ares_graca': hops_values['ares_graca'],
+                                            'ares_ability': hops_values['ares_ability']})
 
 
 class PostponementEducationGroupYearMixin:
@@ -128,6 +141,7 @@ class PostponementEducationGroupYearMixin:
         super().__init__(*args, **kwargs)
         self.postpone_start_year = None
         self.postpone_end_year = None
+        # The list will not include the current instance of education group year
         self.education_group_year_postponed = []
         self.postponement_errors = {}
         self.warnings = []
@@ -152,7 +166,7 @@ class PostponementEducationGroupYearMixin:
                                                          year__lte=self.postpone_end_year):
             try:
                 postponed_egy = duplicate_education_group_year(
-                    education_group_year, academic_year, self.dict_initial_egy
+                    education_group_year, academic_year, self.dict_initial_egy, self.hops_form.data
                 )
                 self.education_group_year_postponed.append(postponed_egy)
 

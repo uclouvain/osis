@@ -26,6 +26,7 @@
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 
+from base.business.education_groups.create import create_initial_group_element_year_structure
 from base.business.education_groups.postponement import duplicate_education_group_year
 from base.business.utils.postponement import AutomaticPostponement
 from base.models.education_group_year import EducationGroupYear
@@ -55,3 +56,7 @@ class EducationGroupAutomaticPostponement(AutomaticPostponement):
 
     def get_to_not_duplicated(self):
         return self.queryset.filter(education_group__end_year__lt=self.last_academic_year.year)
+
+    def post_extend(self):
+        """ After the main postponement, we need to create the structure of the education_group_years """
+        create_initial_group_element_year_structure(self.result)
