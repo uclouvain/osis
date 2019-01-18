@@ -141,6 +141,7 @@ class PostponementEducationGroupYearMixin:
         super().__init__(*args, **kwargs)
         self.postpone_start_year = None
         self.postpone_end_year = None
+        # The list will not include the current instance of education group year
         self.education_group_year_postponed = []
         self.postponement_errors = {}
         self.warnings = []
