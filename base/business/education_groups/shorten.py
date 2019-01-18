@@ -57,6 +57,7 @@ def check_education_group_end_date(education_group, end_year):
 
 
 def _get_formated_error_msg(end_year, protected_messages):
+    print('def _get_formated_error_msg(end_year, protected_messages)')
     error_msg = _("Cannot set end year to %(end_year)s :") % {'end_year': end_year}
     error_msg += "<ul>"
     for protected_message in protected_messages:
@@ -86,6 +87,9 @@ def get_protected_messages_by_education_group_year(education_group_year):
     have_pgrm_content = GroupElementYear.objects.filter(parent=education_group_year).exists()
     if have_pgrm_content:
         protected_message.append(_("The content of the education group is not empty."))
+
+    if education_group_year.linked_with_epc:
+        protected_message.append(_("Linked with EPC"))
 
     return protected_message
 
