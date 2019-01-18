@@ -480,7 +480,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         is_bachelor = self.object.is_bachelor
 
         is_master = acronym.endswith(('2m', '2m1'))
-        is_agregation = acronym.endswith('2a')
+        is_aggregation = acronym.endswith('2a')
         is_mc = acronym.endswith('2mc')
         common_conditions = get_appropriate_common_admission_condition(self.object)
 
@@ -503,9 +503,9 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
                 'is_common': is_common,
                 'is_bachelor': is_bachelor,
                 'is_master': is_master,
-                'show_components_for_agreg': is_agregation,
-                'show_components_for_agreg_and_mc': is_agregation or is_mc,
-                'show_free_text': (is_specific and (is_master or is_agregation or is_mc)) or is_minor or is_deepening,
+                'show_components_for_agreg': is_aggregation,
+                'show_components_for_agreg_and_mc': is_aggregation or is_mc,
+                'show_free_text': (is_specific and (is_master or is_aggregation or is_mc)) or is_minor or is_deepening,
             },
             'admission_condition': admission_condition,
             'common_conditions': common_conditions,
@@ -521,7 +521,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
 
 def get_appropriate_common_admission_condition(edy):
     if not edy.is_common and \
-            any([edy.is_bachelor, edy.is_master60, edy.is_master120, edy.is_agregation, edy.is_specialized_master]):
+            any([edy.is_bachelor, edy.is_master60, edy.is_master120, edy.is_aggregation, edy.is_specialized_master]):
         return EducationGroupYear.objects.look_for_common(
             education_group_type__name=TrainingType.PGRM_MASTER_120.name if edy.is_master60
             else edy.education_group_type.name,
