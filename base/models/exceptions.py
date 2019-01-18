@@ -61,6 +61,12 @@ class IncompatiblesTypesException(Exception):
         self.errors = errors
 
 
+class MinChildrenReachedException(Exception):
+    def __init__(self, message=None, errors=None):
+        super(MinChildrenReachedException, self).__init__(message)
+        self.errors = errors
+
+
 class MaxChildrenReachedException(Exception):
     def __init__(self, message=None, errors=None):
         super(MaxChildrenReachedException, self).__init__(message)

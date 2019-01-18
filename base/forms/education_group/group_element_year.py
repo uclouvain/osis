@@ -26,7 +26,7 @@
 from django import forms
 from django.utils.translation import gettext as _
 
-from base.business.group_element_years.management import is_max_child_reached
+from base.business.group_element_years.management import is_max_child_reached, check_min_max_child_reached
 from base.models.enums import education_group_categories
 from base.models.enums.link_type import LinkTypes
 from base.models.exceptions import MaxChildrenReachedException
@@ -96,66 +96,8 @@ class GroupElementYearForm(forms.ModelForm):
         The validation with learning_units (child_leaf) is in the model.
         """
         data_cleaned = self.cleaned_data.get('link_type')
-
-        if self.instance.child_branch:
-            if data_cleaned == LinkTypes.REFERENCE.name:
-                self._clean_link_type_reference()
-            else:
-                self._clean_link_type_main()
+        check_min_max_child_reached(self.instance.parent, self.instance.child_branch, data_cleaned)
         return data_cleaned
-
-    def _clean_link_type_main(self):
-        parent_type = self.instance.parent.education_group_type
-
-        # For the main link,  we have to check if the parent type is compatible with its child's type
-        child = self.instance.child_branch
-        if not self._check_authorized_relationship(child.education_group_type):
-            raise forms.ValidationError(
-                _("You cannot attach \"%(child)s\" (type \"%(child_type)s\") to \"%(parent)s\" (type "
-                  "\"%(parent_type)s\")") % {
-                    'child': child,
-                    'child_type': child.education_group_type,
-                    'parent': self.instance.parent,
-                    'parent_type': parent_type,
-                }
-            )
-
-        # TODO refactor
-        parent = self.instance.parent
-
-        if is_max_child_reached(parent, child.education_group_type):
-            raise MaxChildrenReachedException(
-                errors=_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
-                         "has already reached the limit.") % {
-                           'child_type': child.education_group_type,
-                           'parent': parent
-                       }
-            )
-
-    def _clean_link_type_reference(self):
-        parent_type = self.instance.parent.education_group_type
-
-        # All types of children are allowed for the reference link but we must check the type of grandchildren
-        for ref_group in self.instance.child_branch.children_group_element_years:
-            ref_child_type = ref_group.child_branch.education_group_type
-
-            if not self._check_authorized_relationship(ref_child_type):
-                raise forms.ValidationError(
-                    _("You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
-                      ) % {
-                        "parent_type": parent_type,
-                        "child_type": ref_child_type,
-                    })
-
-            # We have to check if the max limit is reached for all grandchildren
-            if is_max_child_reached(self.instance.parent, ref_child_type):
-                raise forms.ValidationError(
-                    _("The number of children of type \"%(child_type)s\" for \"%(parent)s\" has already reached the "
-                      "limit.") % {
-                        'child_type': ref_child_type,
-                        'parent': self.instance.parent
-                    }
-                )
 
     def _check_authorized_relationship(self, child_type):
         return self.instance.parent.education_group_type.authorized_parent_type.filter(child_type=child_type).exists()

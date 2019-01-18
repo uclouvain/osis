@@ -27,7 +27,8 @@ from django.http import JsonResponse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DeleteView
 
-from base.business.group_element_years.management import is_min_child_reached
+from base.business.group_element_years.management import check_min_max_child_reached
+from base.models.exceptions import MinChildrenReachedException
 from base.views.common import display_error_messages, display_success_messages
 from base.views.education_groups.group_element_year import perms as group_element_year_perms
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
@@ -68,13 +69,13 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
                 _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
                     "acronym": child_leaf.acronym
                 }
-        if child_branch and is_min_child_reached(obj.parent, child_branch.education_group_type):
-            error_msg = \
-                _("Cannot detach child \"%(child)s\". "
-                  "The parent must have at least one child of type \"%(type)s\".") % {
-                    "child": child_branch,
-                    "type": child_branch.education_group_type
-                }
+        if child_branch:
+            try:
+                check_min_max_child_reached(obj, child_branch, child_branch.link_type)
+            except MinChildrenReachedException as e:
+                error_msg = e.errors
+            except Exception:
+                pass
 
         if error_msg:
             display_error_messages(self.request, error_msg)

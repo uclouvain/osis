@@ -31,7 +31,7 @@ from django.utils.translation import ugettext as _
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.link_type import LinkTypes
-from base.models.exceptions import IncompatiblesTypesException
+from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException, MinChildrenReachedException
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import cache
@@ -83,61 +83,62 @@ def extract_child_from_cache(parent, selected_data):
 
 
 def is_max_child_reached(parent, child_education_group_type):
-    def _is_max_child_reached(number_children, authorized_relationship):
-        max_count = authorized_relationship.max_count_authorized
-        return max_count and number_children >= max_count
-
-    return _is_limit_child_reached(parent, child_education_group_type, _is_max_child_reached)
-
-
-def is_min_child_reached(parent, child_education_group_type):
-    def _is_min_child_reached(number_children, authorized_relationship):
-        min_count = authorized_relationship.min_count_authorized
-        return bool(min_count) and number_children <= authorized_relationship.min_count_authorized
-
-    return _is_limit_child_reached(parent, child_education_group_type, _is_min_child_reached)
-
-
-def _is_limit_child_reached(parent, child_education_group_type, boolean_func):
-    """ Fetch the number of children with the same type """
-    number_children_of_same_type = parent.groupelementyear_set.filter(
-        child_branch__education_group_type=child_education_group_type
-    ).count()
-
-    # Add children of reference links.
-    for link in parent.groupelementyear_set.all():
-        if link.link_type == LinkTypes.REFERENCE.name and link.child_branch:
-            number_children_of_same_type += link.child_branch.groupelementyear_set.filter(
-                child_branch__education_group_type=child_education_group_type
-            ).count()
-
     try:
-        auth_rel = parent.education_group_type.authorized_parent_type.get(
-            child_type=child_education_group_type,
-        )
+        auth_rel = parent.education_group_type.authorized_parent_type.get(pk=child_education_group_type)
     except AuthorizedRelationship.DoesNotExist:
         return True
-    return boolean_func(number_children_of_same_type, auth_rel)
+    number_children_by_education_group_type = compute_number_children_by_education_group_type(parent, None, None)
+    return child_education_group_type.name not in number_children_by_education_group_type or \
+        number_children_by_education_group_type[child_education_group_type.name] < auth_rel.max_count_authorized
+
+
+def check_min_max_child_reached(parent, child, new_link_type):
+    auth_rels = parent.education_group_type.authorized_parent_type.all()
+    auth_rels_dict = {auth_rel.child_type.name: (auth_rel.min_count_authorized, auth_rel.max_count_authorized)
+                      for auth_rel in auth_rels}
+
+    number_children_by_education_group_type = compute_number_children_by_education_group_type(parent, child,
+                                                                                              new_link_type)
+    for education_group_type_name, number_children in number_children_by_education_group_type.items():
+        if education_group_type_name not in auth_rels_dict:
+            raise AuthorizedRelationship.DoesNotExist
+        min_authorized, max_authorized = auth_rels_dict[education_group_type_name]
+
+        if number_children < min_authorized:
+            raise MinChildrenReachedException(
+                errors=_("The parent must have at least one child of type \"%(type)s\".") % {
+                        "type": education_group_type_name
+                    }
+            )
+
+        if max_authorized is not None and number_children > max_authorized:
+            raise MaxChildrenReachedException(
+                errors=_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
+                         "has already reached the limit.") % {
+                           'child_type': _(education_group_type_name),
+                           'parent': parent
+                       }
+            )
 
 
 def compute_number_children_by_education_group_type(egy, child, link_type):
     reference_link_child = egy.groupelementyear_set.exclude(child_branch=child).\
         filter(link_type=LinkTypes.REFERENCE.name).\
         values_list("child_branch", flat=True)
-    parents = list(reference_link_child) + [egy.id]
 
-    education_group_types_count = _get_education_group_types_count(parents, child.id)
+    parents = list(reference_link_child) + [egy.id]
+    education_group_types_count = _get_education_group_types_count(parents, child.id if child else None)
 
     number_children = defaultdict(int)
     for record in education_group_types_count:
-        number_children[record["education_group_type"]] += record["count"]
+        number_children[record["education_group_type_name"]] += record["count"]
 
     if link_type == LinkTypes.REFERENCE.name:
         child_education_group_types_count = _get_education_group_types_count([child], None)
         for record in child_education_group_types_count:
-            number_children[record["education_group_type"]] += record["count"]
-    else:
-        number_children[child.education_group_type.id] += 1
+            number_children[record["education_group_type_name"]] += record["count"]
+    elif child:
+        number_children[child.education_group_type.name] += 1
 
     return number_children
 
@@ -148,7 +149,7 @@ def _get_education_group_types_count(parents, child_to_exclude):
         exclude(child_branch=child_to_exclude).\
         exclude(child_branch=None). \
         filter(link_type=None).\
-        annotate(education_group_type=F("child_branch__education_group_type")). \
-        values("education_group_type"). \
-        order_by("education_group_type").\
-        annotate(count=Count("education_group_type"))
+        annotate(education_group_type_name=F("child_branch__education_group_type__name")). \
+        values("education_group_type_name"). \
+        order_by("education_group_type_name").\
+        annotate(count=Count("education_group_type_name"))
