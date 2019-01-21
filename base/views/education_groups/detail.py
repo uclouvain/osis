@@ -147,13 +147,20 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
 
         common_offers = ['common-' + offer.lower() for offer in COMMON_OFFER[:-1]]
         context['show_general_info'] = self.object.acronym not in common_offers
-
+        context["hide_for_2M"] = self.hide_for_2m()
         return context
 
     def get(self, request, *args, **kwargs):
         if self.limited_by_category:
             assert_category_of_education_group_year(self.get_object(), self.limited_by_category)
         return super().get(request, *args, **kwargs)
+
+    def hide_for_2m(self):
+        """Some informations have to be hidden for 2M.
+           Co-organization and administrative data doesn't have sense for 2M (120/180-240) """
+        return not (self.object.education_group_type.category == TRAINING and
+                    self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
+                                                                  TrainingType.PGRM_MASTER_180_240.name])
 
 
 class EducationGroupRead(EducationGroupGenericDetailView):
@@ -168,7 +175,6 @@ class EducationGroupRead(EducationGroupGenericDetailView):
 
         context["education_group_languages"] = self.object.educationgrouplanguage_set.order_by('order').values_list(
             'language__name', flat=True)
-        context["hide_for_2M"] = self.hide_for_2m()
         context["versions"] = self.get_related_versions()
 
         return context
@@ -176,12 +182,6 @@ class EducationGroupRead(EducationGroupGenericDetailView):
     def get_template_names(self):
         return self.templates.get(self.object.education_group_type.category)
 
-    def hide_for_2m(self):
-        """Some informations have to be hidden for 2M.
-           Co-organization and administrative data doesn't have sense for 2M (120/180-240) """
-        return not (self.object.education_group_type.category == TRAINING and
-                    self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
-                                                                  TrainingType.PGRM_MASTER_180_240.name])
 
     def get_related_versions(self):
         versions = Version.objects.get_for_object(self.object).select_related('revision__user__person')
