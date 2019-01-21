@@ -100,11 +100,7 @@ class GroupElementYearForm(forms.ModelForm):
         try:
             old_link = self.instance if self.instance.pk else None
             new_link = GroupElementYear(child_branch=self.instance.child_branch, link_type=data_cleaned)
-            check_min_max_child_reached(
-                self.instance.parent,
-                old_link,
-                new_link
-            )
+            check_min_max_child_reached(self.instance.parent, old_link, new_link)
         except MaxChildrenReachedException as e:
             raise ValidationError(e.errors)
         except MinChildrenReachedException as e:

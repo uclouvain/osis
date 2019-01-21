@@ -330,7 +330,7 @@ class EducationGroupTypeForm(forms.Form):
 
     def clean_name(self):
         education_group_type = self.cleaned_data["name"]
-        if self.parent and management.is_max_child_reached(self.parent, education_group_type):
+        if self.parent and management.is_max_child_reached(self.parent, education_group_type.pk):
             raise ValidationError(
                 _("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
                   "has already reached the limit.") % {
