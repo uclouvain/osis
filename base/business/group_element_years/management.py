@@ -96,12 +96,13 @@ def check_min_max_child_reached(parent, child, new_link_type):
     auth_rels = parent.education_group_type.authorized_parent_type.all()
     auth_rels_dict = {auth_rel.child_type.name: (auth_rel.min_count_authorized, auth_rel.max_count_authorized)
                       for auth_rel in auth_rels}
-
     number_children_by_education_group_type = compute_number_children_by_education_group_type(parent, child,
                                                                                               new_link_type)
+
     for education_group_type_name, number_children in number_children_by_education_group_type.items():
         if education_group_type_name not in auth_rels_dict:
             raise AuthorizedRelationship.DoesNotExist
+
         min_authorized, max_authorized = auth_rels_dict[education_group_type_name]
 
         if number_children < min_authorized:
@@ -121,35 +122,49 @@ def check_min_max_child_reached(parent, child, new_link_type):
             )
 
 
-def compute_number_children_by_education_group_type(egy, child, link_type):
-    reference_link_child = egy.groupelementyear_set.exclude(child_branch=child).\
-        filter(link_type=LinkTypes.REFERENCE.name).\
+def compute_number_children_by_education_group_type(egy, old_link, new_link):
+    reference_link_child = egy.groupelementyear_set.filter(link_type=LinkTypes.REFERENCE.name).\
         values_list("child_branch", flat=True)
-
     parents = list(reference_link_child) + [egy.id]
-    education_group_types_count = _get_education_group_types_count(parents, child.id if child else None)
+    current_count = _get_education_group_types_count(parents)
 
-    number_children = defaultdict(int)
-    for record in education_group_types_count:
-        number_children[record["education_group_type_name"]] += record["count"]
+    if not old_link:
+        old_link_count = {}
+    elif old_link.link_type == LinkTypes.REFERENCE.name:
+        old_link_count = _get_education_group_types_count([old_link.child_branch])
+    else:
+        old_link_count = {old_link.child_branch.education_group_type.name: 1}
 
-    if link_type == LinkTypes.REFERENCE.name:
-        child_education_group_types_count = _get_education_group_types_count([child], None)
-        for record in child_education_group_types_count:
-            number_children[record["education_group_type_name"]] += record["count"]
-    elif child:
-        number_children[child.education_group_type.name] += 1
+    if not new_link:
+        new_link_count = {}
+    elif new_link.link_type == LinkTypes.REFERENCE.name:
+        new_link_count = _get_education_group_types_count([new_link.child_branch])
+    else:
+        new_link_count = {new_link.child_branch.education_group_type.name: 1}
 
-    return number_children
+    # decrease
+    for type_name, count in old_link_count.items():
+        if type_name in current_count:
+            current_count[type_name] -= count
+
+    # increase
+    for type_name, count in new_link_count.items():
+        if type_name in current_count:
+            current_count[type_name] += count
+        else:
+            current_count[type_name] = count
+
+    return current_count
 
 
-def _get_education_group_types_count(parents, child_to_exclude):
-    return GroupElementYear.objects.\
+def _get_education_group_types_count(parents):
+    qs = GroupElementYear.objects.\
         filter(parent__in=parents). \
-        exclude(child_branch=child_to_exclude).\
         exclude(child_branch=None). \
         filter(link_type=None).\
         annotate(education_group_type_name=F("child_branch__education_group_type__name")). \
         values("education_group_type_name"). \
         order_by("education_group_type_name").\
         annotate(count=Count("education_group_type_name"))
+
+    return {record["education_group_type_name"]: record["count"] for record in qs}

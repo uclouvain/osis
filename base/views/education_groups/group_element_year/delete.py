@@ -60,7 +60,6 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
 
         In that case, a message will be display in the modal to block the post action.
         """
-
         child_leaf = obj.child_leaf
         child_branch = obj.child_branch
         error_msg = ""
@@ -71,7 +70,7 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
                 }
         if child_branch:
             try:
-                check_min_max_child_reached(obj, child_branch, child_branch.link_type)
+                check_min_max_child_reached(obj, child_branch, obj.link_type)
             except MinChildrenReachedException as e:
                 error_msg = e.errors
             except Exception:

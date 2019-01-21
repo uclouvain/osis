@@ -24,12 +24,13 @@
 #
 ##############################################################################
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
 from base.business.group_element_years.management import is_max_child_reached, check_min_max_child_reached
 from base.models.enums import education_group_categories
 from base.models.enums.link_type import LinkTypes
-from base.models.exceptions import MaxChildrenReachedException
+from base.models.exceptions import MaxChildrenReachedException, MinChildrenReachedException
 from base.models.group_element_year import GroupElementYear
 
 
@@ -96,7 +97,12 @@ class GroupElementYearForm(forms.ModelForm):
         The validation with learning_units (child_leaf) is in the model.
         """
         data_cleaned = self.cleaned_data.get('link_type')
-        check_min_max_child_reached(self.instance.parent, self.instance.child_branch, data_cleaned)
+        try:
+            check_min_max_child_reached(self.instance.parent, self.instance.child_branch, data_cleaned)
+        except MaxChildrenReachedException as e:
+            raise ValidationError(e.errors)
+        except MinChildrenReachedException as e:
+            raise ValidationError(e.errors)
         return data_cleaned
 
     def _check_authorized_relationship(self, child_type):

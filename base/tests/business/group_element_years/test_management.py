@@ -143,9 +143,12 @@ class TestComputeNumberChildrenByEducationGroupType(TestCase):
         expected_result = {
             self.education_group_types[0].name: 1
         }
+
+        old_link = None
+        new_link = GroupElementYearFactory.build(child_branch=self.child, link_type=None)
         self.assertDictEqual(
             expected_result,
-            compute_number_children_by_education_group_type(parent_without_children, self.child, None)
+            compute_number_children_by_education_group_type(parent_without_children, old_link, new_link)
         )
 
     def test_when_children(self):
@@ -154,9 +157,11 @@ class TestComputeNumberChildrenByEducationGroupType(TestCase):
             self.education_group_types[1].name: 4,
             self.education_group_types[2].name: 1
         }
-        self.assertEqual(
+        old_link = None
+        new_link = GroupElementYearFactory.build(child_branch=self.child, link_type=None)
+        self.assertDictEqual(
             expected_result,
-            compute_number_children_by_education_group_type(self.parent_egy, self.child, None)
+            compute_number_children_by_education_group_type(self.parent_egy, old_link, new_link)
         )
 
     def test_when_children_with_link_reference(self):
@@ -165,18 +170,23 @@ class TestComputeNumberChildrenByEducationGroupType(TestCase):
             self.education_group_types[1].name: 4,
             self.education_group_types[2].name: 1 + 2
         }
-        self.assertEqual(
+        old_link = None
+        new_link = GroupElementYearFactory.build(child_branch=self.child, link_type=LinkTypes.REFERENCE.name)
+        self.assertDictEqual(
             expected_result,
-            compute_number_children_by_education_group_type(self.parent_egy, self.child, LinkTypes.REFERENCE.name)
+            compute_number_children_by_education_group_type(self.parent_egy, old_link, new_link)
         )
 
     def test_when_switching_link_type_of_existing_child(self):
         expected_result = {
             self.education_group_types[0].name: 3 + 1,
             self.education_group_types[1].name: 4 - 2,
-            # self.education_group_types[2].id: 1 - 1
+            self.education_group_types[2].name: 1 - 1
         }
-        self.assertEqual(
+        old_link = self.reference_group_element_year_children
+        new_link = GroupElementYearFactory.build(child_branch=self.reference_group_element_year_children.child_branch,
+                                                 link_type=None)
+        self.assertDictEqual(
             expected_result,
-            compute_number_children_by_education_group_type(self.parent_egy, self.reference_group_element_year_children.child_branch, None)
+            compute_number_children_by_education_group_type(self.parent_egy, old_link, new_link)
         )
