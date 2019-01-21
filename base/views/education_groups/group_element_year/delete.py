@@ -70,7 +70,7 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
                 }
         if child_branch:
             try:
-                check_min_max_child_reached(obj, child_branch, obj.link_type)
+                check_min_max_child_reached(obj.parent, obj, None)
             except MinChildrenReachedException as e:
                 error_msg = e.errors
             except Exception:

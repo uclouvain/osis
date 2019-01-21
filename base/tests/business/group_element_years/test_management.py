@@ -46,6 +46,7 @@ class TestCheckMinMaxChildReached(TestCase):
 
         cls.parent_egy = EducationGroupYearFactory(education_group_type=cls.parent_type)
         cls.child_egy = EducationGroupYearFactory(education_group_type=cls.child_type)
+        cls.new_link = GroupElementYearFactory.build(child_branch=cls.child_egy)
 
     def setUp(self):
         returned_value = {
@@ -76,23 +77,23 @@ class TestCheckMinMaxChildReached(TestCase):
 
     def test_when_no_authorized_relationship(self):
         with self.assertRaises(AuthorizedRelationship.DoesNotExist):
-            check_min_max_child_reached(self.parent_egy, self.child_egy, self.child_type)
+            check_min_max_child_reached(self.parent_egy, None, self.new_link)
 
     def test_should_raise_exception_when_max_count_exceeded(self):
         self.create_authorized_relationship(max_count=1)
 
         with self.assertRaises(MaxChildrenReachedException):
-            check_min_max_child_reached(self.parent_egy, self.child_egy, self.child_type)
+            check_min_max_child_reached(self.parent_egy, None, self.new_link)
 
     def test_should_raise_exception_when_min_count_subceeded(self):
         self.create_authorized_relationship(min_count=3)
 
         with self.assertRaises(MinChildrenReachedException):
-            check_min_max_child_reached(self.parent_egy, self.child_egy, self.child_type)
+            check_min_max_child_reached(self.parent_egy, None, self.new_link)
 
     def test_when_limit_respected(self):
         self.create_authorized_relationship()
-        self.assertIsNone(check_min_max_child_reached(self.parent_egy, self.child_egy, self.child_type))
+        check_min_max_child_reached(self.parent_egy, None, self.new_link)
 
 
 class TestComputeNumberChildrenByEducationGroupType(TestCase):

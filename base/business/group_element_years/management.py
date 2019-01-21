@@ -92,12 +92,12 @@ def is_max_child_reached(parent, child_education_group_type):
         number_children_by_education_group_type[child_education_group_type.name] < auth_rel.max_count_authorized
 
 
-def check_min_max_child_reached(parent, child, new_link_type):
+def check_min_max_child_reached(parent, old_link, new_link):
     auth_rels = parent.education_group_type.authorized_parent_type.all()
     auth_rels_dict = {auth_rel.child_type.name: (auth_rel.min_count_authorized, auth_rel.max_count_authorized)
                       for auth_rel in auth_rels}
-    number_children_by_education_group_type = compute_number_children_by_education_group_type(parent, child,
-                                                                                              new_link_type)
+    number_children_by_education_group_type = compute_number_children_by_education_group_type(parent, old_link,
+                                                                                              new_link)
 
     for education_group_type_name, number_children in number_children_by_education_group_type.items():
         if education_group_type_name not in auth_rels_dict:
@@ -127,7 +127,6 @@ def compute_number_children_by_education_group_type(egy, old_link, new_link):
         values_list("child_branch", flat=True)
     parents = list(reference_link_child) + [egy.id]
     current_count = _get_education_group_types_count(parents)
-
     if not old_link:
         old_link_count = {}
     elif old_link.link_type == LinkTypes.REFERENCE.name:
