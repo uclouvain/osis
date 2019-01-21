@@ -25,7 +25,7 @@
 ##############################################################################
 from django import forms
 from django.forms import ModelChoiceField
-from django.utils.translation import ugettext_lazy as _, pgettext
+from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 
 from base.business.entity import get_entities_ids
 from base.models import academic_year, education_group_year
@@ -57,7 +57,7 @@ class ModelChoiceFieldWithData(forms.ModelChoiceField):
 
     def set_data_attrs(self):
         # Lazy load of the attrs
-        self.widget.data_attrs = self.queryset.in_bulk()
+        self.widget.data_attrs = EducationGroupType.objects.all().order_by_translated_name().in_bulk()
 
 
 class EducationGroupFilter(forms.Form):
@@ -65,12 +65,12 @@ class EducationGroupFilter(forms.Form):
     academic_year = forms.ModelChoiceField(
         queryset=academic_year.find_academic_years(),
         required=False,
-        empty_label=pgettext("plural", "All"),
+        empty_label=pgettext_lazy("plural", "All"),
         label=_('Ac yr.')
     )
 
     category = forms.ChoiceField(
-        choices=[("", pgettext("plural", "All"))] + list(Categories.choices()),
+        choices=[("", pgettext_lazy("plural", "All"))] + list(Categories.choices()),
         required=False,
         label=_('Category')
     )
@@ -78,7 +78,7 @@ class EducationGroupFilter(forms.Form):
     education_group_type = ModelChoiceFieldWithData(
         queryset=EducationGroupType.objects.all(),
         required=False,
-        empty_label=pgettext("plural", "All"),
+        empty_label=pgettext_lazy("plural", "All"),
         label=_('Type')
     )
 
@@ -90,6 +90,7 @@ class EducationGroupFilter(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        print('ici')
         self.fields["education_group_type"].queryset = EducationGroupType.objects.all().order_by_translated_name()
         self.fields["education_group_type"].set_data_attrs()
 

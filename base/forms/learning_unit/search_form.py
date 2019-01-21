@@ -29,7 +29,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import OuterRef, Subquery, Exists, Prefetch
 from django.db.models.fields import BLANK_CHOICE_DASH
-from django.utils.translation import ugettext_lazy as _, pgettext
+from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 
 from attribution.models.attribution import Attribution
 from base import models as mdl
@@ -59,13 +59,13 @@ from reference.models.country import Country
 
 
 class LearningUnitSearchForm(BaseSearchForm):
-    ALL_LABEL = (None, pgettext("plural", "All"))
+    ALL_LABEL = (None, pgettext_lazy("plural", "All"))
     ALL_CHOICES = (ALL_LABEL,)
 
     academic_year_id = forms.ModelChoiceField(
         label=_('Ac yr.'),
         queryset=AcademicYear.objects.all(),
-        empty_label=pgettext("plural", "All"),
+        empty_label=pgettext_lazy("plural", "All"),
     )
 
     requirement_entity_acronym = forms.CharField(
