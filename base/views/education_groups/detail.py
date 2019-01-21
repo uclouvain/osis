@@ -182,7 +182,6 @@ class EducationGroupRead(EducationGroupGenericDetailView):
     def get_template_names(self):
         return self.templates.get(self.object.education_group_type.category)
 
-
     def get_related_versions(self):
         versions = Version.objects.get_for_object(self.object).select_related('revision__user__person')
 
