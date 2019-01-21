@@ -147,13 +147,20 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
 
         common_offers = ['common-' + offer.lower() for offer in COMMON_OFFER[:-1]]
         context['show_general_info'] = self.object.acronym not in common_offers
-
+        context["hide_for_2M"] = self.hide_for_2m()
         return context
 
     def get(self, request, *args, **kwargs):
         if self.limited_by_category:
             assert_category_of_education_group_year(self.get_object(), self.limited_by_category)
         return super().get(request, *args, **kwargs)
+
+    def hide_for_2m(self):
+        """Some informations have to be hidden for 2M.
+           Co-organization and administrative data doesn't have sense for 2M (120/180-240) """
+        return not (self.object.education_group_type.category == TRAINING and
+                    self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
+                                                                  TrainingType.PGRM_MASTER_180_240.name])
 
 
 class EducationGroupRead(EducationGroupGenericDetailView):
@@ -168,20 +175,12 @@ class EducationGroupRead(EducationGroupGenericDetailView):
 
         context["education_group_languages"] = self.object.educationgrouplanguage_set.order_by('order').values_list(
             'language__name', flat=True)
-        context["hide_for_2M"] = self.hide_for_2m()
         context["versions"] = self.get_related_versions()
 
         return context
 
     def get_template_names(self):
         return self.templates.get(self.object.education_group_type.category)
-
-    def hide_for_2m(self):
-        """Some informations have to be hidden for 2M.
-           Co-organization and administrative data doesn't have sense for 2M (120/180-240) """
-        return not (self.object.education_group_type.category == TRAINING and
-                    self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
-                                                                  TrainingType.PGRM_MASTER_180_240.name])
 
     def get_related_versions(self):
         versions = Version.objects.get_for_object(self.object).select_related('revision__user__person')
@@ -480,7 +479,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         is_bachelor = self.object.is_bachelor
 
         is_master = acronym.endswith(('2m', '2m1'))
-        is_agregation = acronym.endswith('2a')
+        is_aggregation = acronym.endswith('2a')
         is_mc = acronym.endswith('2mc')
         common_conditions = get_appropriate_common_admission_condition(self.object)
 
@@ -503,9 +502,9 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
                 'is_common': is_common,
                 'is_bachelor': is_bachelor,
                 'is_master': is_master,
-                'show_components_for_agreg': is_agregation,
-                'show_components_for_agreg_and_mc': is_agregation or is_mc,
-                'show_free_text': (is_specific and (is_master or is_agregation or is_mc)) or is_minor or is_deepening,
+                'show_components_for_agreg': is_aggregation,
+                'show_components_for_agreg_and_mc': is_aggregation or is_mc,
+                'show_free_text': (is_specific and (is_master or is_aggregation or is_mc)) or is_minor or is_deepening,
             },
             'admission_condition': admission_condition,
             'common_conditions': common_conditions,
@@ -521,7 +520,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
 
 def get_appropriate_common_admission_condition(edy):
     if not edy.is_common and \
-            any([edy.is_bachelor, edy.is_master60, edy.is_master120, edy.is_agregation, edy.is_specialized_master]):
+            any([edy.is_bachelor, edy.is_master60, edy.is_master120, edy.is_aggregation, edy.is_specialized_master]):
         return EducationGroupYear.objects.look_for_common(
             education_group_type__name=TrainingType.PGRM_MASTER_120.name if edy.is_master60
             else edy.education_group_type.name,

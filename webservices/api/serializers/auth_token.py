@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,16 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory.fuzzy
+from django.contrib.auth import backends
+from django.utils.translation import ugettext_lazy as _
 
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from rest_framework import serializers
 
 
-class AuthorizedRelationshipFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = 'base.AuthorizedRelationship'
+class AuthTokenSerializer(serializers.Serializer):
+    username = serializers.CharField(label=_("Username"), required=True)
+    force_user_creation = serializers.BooleanField(label=_("Create user if not exists"), default=False)
 
-    parent_type = factory.SubFactory(EducationGroupTypeFactory)
-    child_type = factory.SubFactory(EducationGroupTypeFactory)
-    min_count_authorized = 0
-    max_count_authorized = None
+    def validate(self, attrs):
+        UserModel = backends.get_user_model()
+        user_kwargs = {UserModel.USERNAME_FIELD: attrs['username']}
+
+        if attrs['force_user_creation']:
+            user, created = UserModel.objects.get_or_create(**user_kwargs)
+        else:
+            try:
+                user = UserModel.objects.get(**user_kwargs)
+            except UserModel.DoesNotExist:
+                msg = _('Unable to find username provided.')
+                raise serializers.ValidationError({'username': msg})
+        attrs['user'] = user
+        return attrs

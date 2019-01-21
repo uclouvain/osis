@@ -71,6 +71,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     duration_unit = factory.Iterator(DURATION_UNIT, getter=operator.itemgetter(0))
     duration = factory.fuzzy.FuzzyInteger(1, 5)
     constraint_type = CREDITS
+    linked_with_epc = False
 
 
 class MiniTrainingFactory(EducationGroupYearFactory):

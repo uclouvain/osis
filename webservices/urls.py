@@ -27,6 +27,7 @@ from django.conf.urls import url, include
 
 import continuing_education.api.url_v1
 import education_group.api.url_v1
+from webservices.api.views.auth_token import AuthToken
 from webservices.views import ws_catalog_offer
 
 urlpatterns = [
@@ -34,6 +35,7 @@ urlpatterns = [
         ws_catalog_offer,
         name='v0.1-ws_catalog_offer'),
     url(r'^v1/', include([
+        url(r'^auth/token$', AuthToken.as_view(), name=AuthToken.name),
         url(r'^continuing_education/',
             include(continuing_education.api.url_v1.urlpatterns, namespace='continuing_education_api_v1')),
         url(r'^education_group/',

@@ -346,7 +346,7 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
     def test_save_method_update_instance(self):
         post_data = get_valid_form_data(self.learning_unit_year_partim)
         update_fields_luy_model = {
-            'credits': 2.5,
+            'credits': 2,
             'specific_title': factory.fuzzy.FuzzyText(length=15).fuzz(),
             'specific_title_english': factory.fuzzy.FuzzyText(length=15).fuzz(),
         }
@@ -384,7 +384,7 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
         parent_acronym = self.learning_unit_year_partim.learning_container_year.acronym
         partim_acronym = parent_acronym + 'X'
         post_data['acronym_2'] = partim_acronym[-1]
-        post_data['credits'] = 2.5
+        post_data['credits'] = 2
 
         form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
                                  academic_year=self.learning_unit_year_full.academic_year,

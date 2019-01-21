@@ -29,10 +29,6 @@ from base.models.person import Person
 
 
 class PersonDetailSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(
-        slug_field='username',
-        queryset=Person.objects.all(),
-    )
 
     class Meta:
         model = Person
@@ -41,5 +37,5 @@ class PersonDetailSerializer(serializers.ModelSerializer):
             'last_name',
             'email',
             'gender',
-            'user'
+            'uuid'
         )

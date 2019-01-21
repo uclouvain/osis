@@ -41,6 +41,7 @@ from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.user import UserFactory
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 
 ACRONYM_ALLOCATION = 'INFO'
 ACRONYM_REQUIREMENT = 'DRT'
@@ -56,37 +57,37 @@ class TestProposalXls(TestCase):
         self.l_unit_yr_1 = LearningUnitYearFactory(acronym="LBIR1212", learning_container_year=l_container_year,
                                                    academic_year=self.academic_year,
                                                    subtype=learning_unit_year_subtypes.FULL)
-        self.l_unit_yr_1.entities = {
-            entity_container_year_link_type.REQUIREMENT_ENTITY: EntityVersionFactory(acronym=ACRONYM_REQUIREMENT,
-                                                                                     entity=EntityFactory()),
-            entity_container_year_link_type.ALLOCATION_ENTITY: EntityVersionFactory(acronym=ACRONYM_ALLOCATION,
-                                                                                    entity=EntityFactory())
-        }
+        entity_requirement_ver = EntityVersionFactory(acronym=ACRONYM_REQUIREMENT,
+                                                      entity=EntityFactory())
+        self.l_unit_yr_1.entity_requirement = entity_requirement_ver.acronym
+        entity_allocation_ver = EntityVersionFactory(acronym=ACRONYM_ALLOCATION, entity=EntityFactory())
+        self.l_unit_yr_1.entity_allocation = entity_allocation_ver.acronym
         entity_vr = EntityVersionFactory(acronym='ESPO')
 
-        self.proposal_1 = ProposalLearningUnitFactory(learning_unit_year=self.l_unit_yr_1, entity=entity_vr.entity)
+        self.proposal_1 = ProposalLearningUnitFactory(learning_unit_year=self.l_unit_yr_1,
+                                                      entity=entity_vr.entity)
         self.user = UserFactory()
 
     def test_prepare_xls_content_no_data(self):
         self.assertEqual(proposal_xls.prepare_xls_content([]), [])
 
     def test_prepare_xls_content_with_data(self):
-        proposals_data = proposal_xls.prepare_xls_content([self.proposal_1])
+        proposals_data = proposal_xls.prepare_xls_content([self.proposal_1.learning_unit_year])
         self.assertEqual(len(proposals_data), 1)
         self.assertEqual(proposals_data[0], self._get_xls_data())
 
     def _get_xls_data(self):
-        return [self.l_unit_yr_1.entities.get('REQUIREMENT_ENTITY').acronym,
+        return [self.l_unit_yr_1.entity_requirement,
                 self.proposal_1.learning_unit_year.acronym,
                 self.proposal_1.learning_unit_year.complete_title,
-                xls_build.translate(self.proposal_1.learning_unit_year.learning_container_year.container_type),
-                xls_build.translate(self.proposal_1.type),
-                xls_build.translate(self.proposal_1.state),
+                self.proposal_1.learning_unit_year.learning_container_year.get_container_type_display(),
+                self.proposal_1.get_type_display(),
+                self.proposal_1.get_state_display(),
                 self.proposal_1.folder,
-                xls_build.translate(self.proposal_1.learning_unit_year.learning_container_year.type_declaration_vacant),
-                xls_build.translate(self.proposal_1.learning_unit_year.periodicity),
+                self.proposal_1.learning_unit_year.learning_container_year.get_type_declaration_vacant_display(),
+                dict(PERIODICITY_TYPES)[self.proposal_1.learning_unit_year.periodicity],
                 self.proposal_1.learning_unit_year.credits,
-                self.l_unit_yr_1.entities.get('ALLOCATION_ENTITY').acronym,
+                self.l_unit_yr_1.entity_allocation,
                 self.proposal_1.date.strftime('%d-%m-%Y')]
 
     @mock.patch("osis_common.document.xls_build.generate_xls")
@@ -97,10 +98,8 @@ class TestProposalXls(TestCase):
 
     @mock.patch("osis_common.document.xls_build.generate_xls")
     def test_generate_xls_data_with_a_learning_unit(self, mock_generate_xls):
-        proposal_xls.create_xls(self.user, [self.proposal_1], None)
-
+        proposal_xls.create_xls(self.user, [self.proposal_1.learning_unit_year], None)
         xls_data = [self._get_xls_data()]
-
         expected_argument = _generate_xls_build_parameter(xls_data, self.user)
         mock_generate_xls.assert_called_with(expected_argument, None)
 

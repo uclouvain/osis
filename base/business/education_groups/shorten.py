@@ -87,6 +87,9 @@ def get_protected_messages_by_education_group_year(education_group_year):
     if have_pgrm_content:
         protected_message.append(_("The content of the education group is not empty."))
 
+    if education_group_year.linked_with_epc:
+        protected_message.append(_("Linked with EPC"))
+
     return protected_message
 
 

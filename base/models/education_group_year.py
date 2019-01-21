@@ -42,6 +42,7 @@ from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
 from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
+from base.models.enums.funding_codes import FundingCodes
 from base.models.exceptions import MaximumOneParentAllowedException
 from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
@@ -157,6 +158,7 @@ class EducationGroupYear(SerializableModel):
         max_length=1,
         blank=True,
         default="",
+        choices=FundingCodes.choices(),
         verbose_name=_('Funding direction')
     )
 
@@ -169,6 +171,7 @@ class EducationGroupYear(SerializableModel):
         max_length=1,
         blank=True,
         default="",
+        choices=FundingCodes.choices(),
         verbose_name=_('Funding international cooperation CCD/CUD direction')
     )
 
@@ -470,6 +473,11 @@ class EducationGroupYear(SerializableModel):
         blank=True,
     )
 
+    linked_with_epc = models.BooleanField(
+        default=False,
+        verbose_name=_('Linked with EPC')
+    )
+
     class Meta:
         verbose_name = _("Education group year")
         unique_together = ('education_group', 'academic_year')
@@ -506,7 +514,7 @@ class EducationGroupYear(SerializableModel):
         return self.education_group_type.name == TrainingType.MASTER_M1.name
 
     @property
-    def is_agregation(self):
+    def is_aggregation(self):
         return self.education_group_type.name == TrainingType.AGGREGATION.name
 
     @property

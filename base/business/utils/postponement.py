@@ -60,7 +60,7 @@ class AutomaticPostponement(ABC):
         self.already_duplicated = self.get_already_duplicated()
         self.to_not_duplicate = self.get_to_not_duplicated()
         self.to_duplicate = self.queryset.difference(self.already_duplicated, self.to_not_duplicate)
-        self.result = []
+        self.result = []  # Contains the list of postponed objects.
         self.errors = []
 
     def postpone(self):
@@ -69,6 +69,8 @@ class AutomaticPostponement(ABC):
                                   self.already_duplicated, self.to_not_duplicate)
 
         self._extend_objects()
+
+        self.post_extend()
 
         # send statistics with results to the managers
         self.send_after.__func__(self.last_academic_year, self.result, self.already_duplicated,
@@ -109,3 +111,7 @@ class AutomaticPostponement(ABC):
             "msg": self.msg_result % {'number_extended': len(self.result), 'number_error': len(self.errors)},
             "errors": [str(obj) for obj in self.errors]
         }
+
+    def post_extend(self):
+        """ Allow the user to add actions to execute after the main postponement """
+        pass

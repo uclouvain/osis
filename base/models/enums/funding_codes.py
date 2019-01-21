@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,16 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory.fuzzy
-
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from base.models.utils.utils import ChoiceEnum
 
 
-class AuthorizedRelationshipFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = 'base.AuthorizedRelationship'
-
-    parent_type = factory.SubFactory(EducationGroupTypeFactory)
-    child_type = factory.SubFactory(EducationGroupTypeFactory)
-    min_count_authorized = 0
-    max_count_authorized = None
+class FundingCodes(ChoiceEnum):
+    A = "A"
+    B = "B"
+    C = "C"
