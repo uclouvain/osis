@@ -854,7 +854,7 @@ msgstr "Attestation de réussite"
 
 #: business/education_group.py:73
 msgid "Chair of the exam board"
-msgstr "Président du jury"
+msgstr "Président de jury"
 
 #: models/enums/exam_enrollment_justification_type.py:43
 msgid "Cheating"
@@ -1500,7 +1500,7 @@ msgstr "Événement"
 
 #: business/education_group.py:74
 msgid "Exam board secretary"
-msgstr "Secrétaire du jury"
+msgstr "Secrétaire de jury"
 
 #: business/education_group.py:75
 msgid "Exam board signatory"
