@@ -123,30 +123,23 @@ def check_min_max_child_reached(parent, old_link, new_link):
 
 
 def compute_number_children_by_education_group_type(egy, old_link, new_link):
+    """
+    Works by counting the number of children by education group type of the education group year egy.
+    The old link is the link that will be detached, thus we decrease the counts by it.
+    The new link is the link that will be attached, thus we increase the counts by it.
+    """
     reference_link_child = egy.groupelementyear_set.filter(link_type=LinkTypes.REFERENCE.name).\
         values_list("child_branch", flat=True)
     parents = list(reference_link_child) + [egy.id]
     current_count = _get_education_group_types_count(parents)
-    if not old_link:
-        old_link_count = {}
-    elif old_link.link_type == LinkTypes.REFERENCE.name:
-        old_link_count = _get_education_group_types_count([old_link.child_branch])
-    else:
-        old_link_count = {old_link.child_branch.education_group_type.name: 1}
 
-    if not new_link:
-        new_link_count = {}
-    elif new_link.link_type == LinkTypes.REFERENCE.name:
-        new_link_count = _get_education_group_types_count([new_link.child_branch])
-    else:
-        new_link_count = {new_link.child_branch.education_group_type.name: 1}
+    old_link_count = __get_link_children_count(old_link)
+    new_link_count = __get_link_children_count(new_link)
 
-    # decrease
     for type_name, count in old_link_count.items():
         if type_name in current_count:
             current_count[type_name] -= count
 
-    # increase
     for type_name, count in new_link_count.items():
         if type_name in current_count:
             current_count[type_name] += count
@@ -154,6 +147,14 @@ def compute_number_children_by_education_group_type(egy, old_link, new_link):
             current_count[type_name] = count
 
     return current_count
+
+
+def __get_link_children_count(link):
+    if not link:
+        return {}
+    elif link.link_type == LinkTypes.REFERENCE.name:
+        return _get_education_group_types_count([link.child_branch])
+    return {link.child_branch.education_group_type.name: 1}
 
 
 def _get_education_group_types_count(parents):
