@@ -54,10 +54,10 @@ function updateAdditionalEntityEditability(elem, id, disable_only){
 
 function validate_acronym() {
     cleanErrorMessage();
-    var newAcronym = getCompleteAcronym();
-    if (newAcronym !== InitialAcronym) {
-        var validationUrl = $('#LearningUnitYearForm').data('validate-url');
-        var year_id = $('#id_academic_year').val();
+    let newAcronym = getCompleteAcronym();
+    if (newAcronym.length > 1 && newAcronym !== InitialAcronym) {
+        let validationUrl = $('#LearningUnitYearForm').data('validate-url');
+        let year_id = $('#id_academic_year').val();
         validateAcronymAjax(validationUrl, newAcronym, year_id, callbackAcronymValidation);
     }
 }

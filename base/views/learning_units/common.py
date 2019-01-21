@@ -59,8 +59,6 @@ def show_success_proposal_learning_unit_year_creation_message(request, learning_
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def check_acronym(request, subtype):
     acronym = request.GET['acronym']
-    if len(acronym) < 2:
-        return
     academic_yr = mdl.academic_year.find_academic_year_by_id(request.GET['year_id'])
     existed_acronym = False
     existing_acronym = False
