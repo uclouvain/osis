@@ -90,7 +90,6 @@ class EducationGroupFilter(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        print('ici')
         self.fields["education_group_type"].queryset = EducationGroupType.objects.all().order_by_translated_name()
         self.fields["education_group_type"].set_data_attrs()
 
