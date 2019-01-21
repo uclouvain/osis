@@ -90,7 +90,7 @@ def is_max_child_reached(parent, child_education_group_type):
     except AuthorizedRelationship.DoesNotExist:
         return True
     number_children_by_education_group_type = compute_number_children_by_education_group_type(parent, None, None)
-    return number_children_by_education_group_type.get(child_education_group_type, 0) > auth_rel.max_count_authorized
+    return number_children_by_education_group_type.get(child_education_group_type, 0) >= auth_rel.max_count_authorized
 
 
 def check_min_max_child_reached(parent, old_link, new_link):
