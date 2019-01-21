@@ -57,10 +57,11 @@ class TestProposalXls(TestCase):
         self.l_unit_yr_1 = LearningUnitYearFactory(acronym="LBIR1212", learning_container_year=l_container_year,
                                                    academic_year=self.academic_year,
                                                    subtype=learning_unit_year_subtypes.FULL)
-        self.l_unit_yr_1.entity_requirement = EntityVersionFactory(acronym=ACRONYM_REQUIREMENT,
-                                                                   entity=EntityFactory())
-        self.l_unit_yr_1.entity_allocation = EntityVersionFactory(acronym=ACRONYM_ALLOCATION,
-                                                                   entity=EntityFactory())
+        entity_requirement_ver = EntityVersionFactory(acronym=ACRONYM_REQUIREMENT,
+                                                      entity=EntityFactory())
+        self.l_unit_yr_1.entity_requirement = entity_requirement_ver.acronym
+        entity_allocation_ver = EntityVersionFactory(acronym=ACRONYM_ALLOCATION, entity=EntityFactory())
+        self.l_unit_yr_1.entity_allocation = entity_allocation_ver.acronym
         entity_vr = EntityVersionFactory(acronym='ESPO')
 
         self.proposal_1 = ProposalLearningUnitFactory(learning_unit_year=self.l_unit_yr_1,
@@ -76,7 +77,7 @@ class TestProposalXls(TestCase):
         self.assertEqual(proposals_data[0], self._get_xls_data())
 
     def _get_xls_data(self):
-        return [self.l_unit_yr_1.entity_requirement.acronym,
+        return [self.l_unit_yr_1.entity_requirement,
                 self.proposal_1.learning_unit_year.acronym,
                 self.proposal_1.learning_unit_year.complete_title,
                 self.proposal_1.learning_unit_year.learning_container_year.get_container_type_display(),
@@ -86,7 +87,7 @@ class TestProposalXls(TestCase):
                 self.proposal_1.learning_unit_year.learning_container_year.get_type_declaration_vacant_display(),
                 dict(PERIODICITY_TYPES)[self.proposal_1.learning_unit_year.periodicity],
                 self.proposal_1.learning_unit_year.credits,
-                self.l_unit_yr_1.entity_allocation.acronym,
+                self.l_unit_yr_1.entity_allocation,
                 self.proposal_1.date.strftime('%d-%m-%Y')]
 
     @mock.patch("osis_common.document.xls_build.generate_xls")
