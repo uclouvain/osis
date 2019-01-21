@@ -2562,7 +2562,7 @@ msgstr "Pas d’impression"
 #: tests/views/test_learning_unit_proposal.py:570
 #: views/learning_units/search.py:193
 msgid "No proposals was selected."
-msgstr "Aucune propositions n'a été sélectionnées."
+msgstr "Aucune proposition n'a été sélectionnée."
 
 #: utils/send_mail.py:361
 msgid "No receiver for this message"
