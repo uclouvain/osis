@@ -34,7 +34,7 @@ from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 
 WORKSHEET_TITLE = _('Proposals')
 XLS_FILENAME = _('Proposals')
-XLS_DESCRIPTION = _("List_proposals")
+XLS_DESCRIPTION = _("List proposals")
 
 PROPOSAL_TITLES = [str(_('Req. Entity')), str(_('Code')), str(_('Title')), str(_('Type')),
                    str(_('Proposal type')), str(_('Proposal status')), str(_('Folder num.')),
