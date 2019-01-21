@@ -328,16 +328,18 @@ class EducationGroupTypeForm(forms.Form):
             "category": Categories[category].value
         }
 
-    def clean_name(self):
+    def clean(self):
+        cleaned_data = super().clean()
         education_group_type = self.cleaned_data["name"]
-        if self.parent and management.is_max_child_reached(self.parent, education_group_type.pk):
-            raise ValidationError(
-                _("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
-                  "has already reached the limit.") % {
+        if self.parent and management.is_max_child_reached(self.parent, education_group_type.name):
+            raise ValidationError({
+                "name": _("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
+                          "has already reached the limit.") % {
                     'child_type': education_group_type,
-                    'parent': self.parent}
-            )
-        return education_group_type
+                    'parent': self.parent
+                }
+            })
+        return cleaned_data
 
 
 class SelectLanguage(forms.Form):

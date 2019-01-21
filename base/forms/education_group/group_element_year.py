@@ -28,6 +28,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
 from base.business.group_element_years.management import is_max_child_reached, check_min_max_child_reached
+from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.enums import education_group_categories
 from base.models.enums.link_type import LinkTypes
 from base.models.exceptions import MaxChildrenReachedException, MinChildrenReachedException
@@ -97,6 +98,9 @@ class GroupElementYearForm(forms.ModelForm):
         The validation with learning_units (child_leaf) is in the model.
         """
         data_cleaned = self.cleaned_data.get('link_type')
+        if not self.instance.child_branch:
+            return data_cleaned
+
         try:
             old_link = self.instance if self.instance.pk else None
             new_link = GroupElementYear(child_branch=self.instance.child_branch, link_type=data_cleaned)
@@ -105,6 +109,8 @@ class GroupElementYearForm(forms.ModelForm):
             raise ValidationError(e.errors)
         except MinChildrenReachedException as e:
             raise ValidationError(e.errors)
+        except AuthorizedRelationship.DoesNotExist as e:
+            raise ValidationError(e.args[0])
         return data_cleaned
 
     def _check_authorized_relationship(self, child_type):

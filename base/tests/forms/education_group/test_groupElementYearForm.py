@@ -74,9 +74,10 @@ class TestGroupElementYearForm(TestCase):
         self.assertEqual(
             form.errors["link_type"],
             [_(
-                "You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
+                "You cannot attach a \"%(child_type)s\" to \"%(parent)s\" (type \"%(parent_type)s\")"
             ) % {
                  "parent_type": self.parent.education_group_type,
+                 "parent": self.parent,
                  "child_type": ref_group.child_branch.education_group_type,
              }]
         )
@@ -167,9 +168,7 @@ class TestGroupElementYearForm(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors["link_type"],
-            [_("You cannot attach \"%(child)s\" (type \"%(child_type)s\") "
-               "to \"%(parent)s\" (type \"%(parent_type)s\")") % {
-                 'child': self.child_branch,
+            [_("You cannot attach a \"%(child_type)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
                  'child_type': self.child_branch.education_group_type,
                  'parent': self.parent,
                  'parent_type': self.parent.education_group_type,

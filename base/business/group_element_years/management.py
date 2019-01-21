@@ -30,10 +30,12 @@ from django.utils.translation import ugettext as _
 
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import AllTypes
 from base.models.enums.link_type import LinkTypes
 from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException, MinChildrenReachedException
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.utils.utils import get_verbose_field_value
 from base.utils.cache import cache
 
 # TODO Use meta name instead
@@ -84,12 +86,11 @@ def extract_child_from_cache(parent, selected_data):
 
 def is_max_child_reached(parent, child_education_group_type):
     try:
-        auth_rel = parent.education_group_type.authorized_parent_type.get(pk=child_education_group_type)
+        auth_rel = parent.education_group_type.authorized_parent_type.get(child_type__name=child_education_group_type)
     except AuthorizedRelationship.DoesNotExist:
         return True
     number_children_by_education_group_type = compute_number_children_by_education_group_type(parent, None, None)
-    return child_education_group_type.name not in number_children_by_education_group_type or \
-        number_children_by_education_group_type[child_education_group_type.name] < auth_rel.max_count_authorized
+    return number_children_by_education_group_type.get(child_education_group_type, 0) > auth_rel.max_count_authorized
 
 
 def check_min_max_child_reached(parent, old_link, new_link):
@@ -101,14 +102,20 @@ def check_min_max_child_reached(parent, old_link, new_link):
 
     for education_group_type_name, number_children in number_children_by_education_group_type.items():
         if education_group_type_name not in auth_rels_dict:
-            raise AuthorizedRelationship.DoesNotExist
+            raise AuthorizedRelationship.DoesNotExist(
+                _("You cannot attach a \"%(child_type)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                    'child_type': AllTypes.get_value(education_group_type_name),
+                    'parent': parent,
+                    'parent_type': AllTypes.get_value(parent.education_group_type.name),
+                }
+            )
 
         min_authorized, max_authorized = auth_rels_dict[education_group_type_name]
 
         if number_children < min_authorized:
             raise MinChildrenReachedException(
                 errors=_("The parent must have at least one child of type \"%(type)s\".") % {
-                        "type": education_group_type_name
+                        "type": AllTypes.get_value(education_group_type_name)
                     }
             )
 
@@ -116,7 +123,7 @@ def check_min_max_child_reached(parent, old_link, new_link):
             raise MaxChildrenReachedException(
                 errors=_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
                          "has already reached the limit.") % {
-                           'child_type': _(education_group_type_name),
+                           'child_type': AllTypes.get_value(education_group_type_name),
                            'parent': parent
                        }
             )
