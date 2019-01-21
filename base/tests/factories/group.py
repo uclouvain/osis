@@ -23,22 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
-
-import factory.fuzzy
-
-from base.tests.factories.group import TutorGroupFactory
-from base.tests.factories.person import PersonFactory
+import factory
 
 
-class TutorFactory(factory.DjangoModelFactory):
+class GroupFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = 'base.Tutor'
-        exclude = ('group', )
+        model = 'auth.Group'
+        django_get_or_create = ('name',)
 
-    group = factory.SubFactory(TutorGroupFactory)
+    name = ""
 
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    person = factory.SubFactory(PersonFactory)
+
+class TutorGroupFactory(GroupFactory):
+    name = "tutors"
+
+
+class ProgramManagerGroupFactory(GroupFactory):
+    name = 'program_managers'
