@@ -36,7 +36,7 @@ from base.business import learning_unit_proposal as proposal_business
 from base.business.learning_unit import create_xls
 from base.business.learning_unit_xls import create_xls_with_parameters, WITH_ATTRIBUTIONS, WITH_GRP
 from base.business.learning_units.xls_comparison import create_xls_comparison, get_academic_year_of_reference
-from base.business.proposal_xls import create_xls_proposal
+from base.business.proposal_xls import create_xls as create_xls_proposal
 from base.forms.common import TooManyResultsException
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search_form import LearningUnitYearForm, ExternalLearningUnitYearForm
@@ -161,8 +161,12 @@ def learning_units_proposal_search(request):
         found_learning_units = search_form.get_proposal_learning_units()
         check_if_display_message(request, found_learning_units)
 
-    if request.GET.get('xls_status') == "xls":
-        return create_xls_proposal(request.user, found_learning_units, _get_filter(search_form, PROPOSAL_SEARCH))
+    if request.POST.get('xls_status_proposal') == "xls":
+        return create_xls_proposal(
+            user_person.user,
+            list(found_learning_units),
+            _get_filter(search_form, PROPOSAL_SEARCH)
+        )
 
     if request.POST:
         research_criteria = get_research_criteria(search_form) if search_form.is_valid() else []
