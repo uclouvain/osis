@@ -1889,7 +1889,7 @@ msgstr "Code non valide"
 
 #: templatetags/learning_unit_li.py:39
 msgid "Isn't a proposal"
-msgstr "Ce n'est pas un proposition"
+msgstr "Ce n'est pas une proposition"
 
 #: models/enums/education_group_types.py:45
 msgid "Isolated classes"
@@ -2562,7 +2562,7 @@ msgstr "Pas d’impression"
 #: tests/views/test_learning_unit_proposal.py:570
 #: views/learning_units/search.py:193
 msgid "No proposals was selected."
-msgstr "Aucune propositions n'a été sélectionnées."
+msgstr "Aucune proposition n'a été sélectionnée."
 
 #: utils/send_mail.py:361
 msgid "No receiver for this message"
