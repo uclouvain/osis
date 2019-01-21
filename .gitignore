@@ -29,5 +29,6 @@ ghostdriver.log
 .DS_Store
 /geckodriver.log
 **/*.orig
+git_submodule_ref_update.py
 
 celerybeat-schedule

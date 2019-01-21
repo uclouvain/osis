@@ -23,19 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
+from rest_framework import renderers, parsers
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from ..serializers.auth_token import AuthTokenSerializer
 
 
-ZERO = "0"
-ONE = "1"
-MANY = "MANY"
+class AuthToken(APIView):
+    """This view allow admin user to generate a token for a specific username """
+    name = 'auth-token'
+    throttle_classes = ()
+    permission_classes = (IsAdminUser,)
+    renderer_classes = (renderers.JSONRenderer,)
+    serializer_class = AuthTokenSerializer
 
-MAX_COUNT_CONSTRAINTS = (
-    (ONE, _("One")),
-    (MANY, _("Many")),
-)
-
-MIN_COUNT_CONSTRAINTS = (
-    (ZERO, _("Zero")),
-    (ONE, _("One")),
-)
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key})

@@ -87,7 +87,7 @@ class PostponeContent:
         except EducationGroupYear.DoesNotExist:
             raise NotPostponeError(_("The root does not exist in the next academic year."))
 
-        if next_instance.groupelementyear_set.exists():
+        if self._check_if_already_postponed(next_instance):
             raise NotPostponeError(_("The content has already been postponed."))
 
         return next_instance
@@ -139,3 +139,26 @@ class PostponeContent:
 
         new_gr.child_branch = new_egy
         return new_gr.save()
+
+    def _check_if_already_postponed(self, education_group_year):
+        """
+        Determine if the content has already been postponed.
+
+        First we have to check the progeny of the education group (! recursive search )
+        After verify if all nodes have an authorized relationship with a min count to 1 or a learning unit.
+        """
+        for gr in education_group_year.groupelementyear_set.all():
+            if gr.child_leaf:
+                return True
+
+            relationship = education_group_year.education_group_type.authorized_parent_type.filter(
+                child_type=gr.child_branch.education_group_type
+            ).first()
+
+            if not relationship or relationship.min_count_authorized == 0:
+                return True
+
+            if self._check_if_already_postponed(gr.child_branch):
+                return True
+
+        return False

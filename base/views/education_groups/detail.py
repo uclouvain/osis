@@ -24,17 +24,14 @@
 #
 ##############################################################################
 import json
-from collections import OrderedDict, namedtuple
+from collections import namedtuple
 
-import requests
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.core.exceptions import ImproperlyConfigured
 from django.db.models import F, Case, When
-from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -46,10 +43,11 @@ from reversion.models import Version
 from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
 from base.business.education_groups import perms, general_information
+from base.business.education_groups.general_information import PublishException, RelevantSectionException
+from base.business.education_groups.general_information_sections import SECTION_LIST, SECTION_INTRO
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 from base.business.education_groups.perms import is_eligible_to_edit_general_information, \
     is_eligible_to_edit_admission_condition
-from base.business.education_groups.general_information import PublishException, RelevantSectionException
 from base.management.commands.import_reddot import COMMON_OFFER
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
@@ -65,7 +63,6 @@ from base.models.person import Person
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
-from cms import models as mdl_cms
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
@@ -150,13 +147,20 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
 
         common_offers = ['common-' + offer.lower() for offer in COMMON_OFFER[:-1]]
         context['show_general_info'] = self.object.acronym not in common_offers
-
+        context["hide_for_2M"] = self.hide_for_2m()
         return context
 
     def get(self, request, *args, **kwargs):
         if self.limited_by_category:
             assert_category_of_education_group_year(self.get_object(), self.limited_by_category)
         return super().get(request, *args, **kwargs)
+
+    def hide_for_2m(self):
+        """Some informations have to be hidden for 2M.
+           Co-organization and administrative data doesn't have sense for 2M (120/180-240) """
+        return not (self.object.education_group_type.category == TRAINING and
+                    self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
+                                                                  TrainingType.PGRM_MASTER_180_240.name])
 
 
 class EducationGroupRead(EducationGroupGenericDetailView):
@@ -171,20 +175,12 @@ class EducationGroupRead(EducationGroupGenericDetailView):
 
         context["education_group_languages"] = self.object.educationgrouplanguage_set.order_by('order').values_list(
             'language__name', flat=True)
-        context["hide_for_2M"] = self.hide_for_2m()
         context["versions"] = self.get_related_versions()
 
         return context
 
     def get_template_names(self):
         return self.templates.get(self.object.education_group_type.category)
-
-    def hide_for_2m(self):
-        """Some informations have to be hidden for 2M.
-           Co-organization and administrative data doesn't have sense for 2M (120/180-240) """
-        return not (self.object.education_group_type.category == TRAINING and
-                    self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
-                                                                  TrainingType.PGRM_MASTER_180_240.name])
 
     def get_related_versions(self):
         versions = Version.objects.get_for_object(self.object).select_related('revision__user__person')
@@ -264,9 +260,9 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         Section = namedtuple('Section', 'title labels')
         sections_with_translated_labels = []
         if self.is_intro_offer:
-            sections_list = settings.SECTION_INTRO
+            sections_list = SECTION_INTRO
         else:
-            sections_list = settings.SECTION_LIST
+            sections_list = SECTION_LIST
         for section in sections_list:
             translated_labels = self.get_translated_labels_and_content(section,
                                                                        self.user_language_code,
@@ -371,9 +367,8 @@ def publish(request, education_group_year_id, root_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
 
     try:
-        portal_url = general_information.publish(education_group_year)
-        message = _("The program are published. Click on the link to display it : ") + \
-            "<a href=" + portal_url + ">" + education_group_year.acronym + "</a>"
+        general_information.publish(education_group_year)
+        message = _("The program %(acronym)s will be published soon") % {'acronym': education_group_year.acronym}
         display_success_messages(request, message, extra_tags='safe')
     except PublishException as e:
         display_error_messages(request, str(e))
@@ -436,29 +431,26 @@ class EducationGroupContent(EducationGroupGenericDetailView):
         context = super().get_context_data(**kwargs)
 
         context["group_element_years"] = self.object.groupelementyear_set.annotate(
-                acronym=Case(
-                        When(child_leaf__isnull=False, then=F("child_leaf__acronym")),
-                        When(child_branch__isnull=False, then=F("child_branch__acronym")),
-                     ),
-                code=Case(
-                    When(child_branch__isnull=False, then=F("child_branch__partial_acronym")),
-                    default=None
-                ),
-                title=Case(
-                        When(child_leaf__isnull=False, then=F("child_leaf__specific_title")),
-                        When(child_branch__isnull=False, then=F("child_branch__title")),
-                     ),
-                child_id=Case(
-                    When(child_leaf__isnull=False, then=F("child_leaf__id")),
-                    When(child_branch__isnull=False, then=F("child_branch__id")),
-                ),
-            ).order_by('order')
+            acronym=Case(
+                When(child_leaf__isnull=False, then=F("child_leaf__acronym")),
+                When(child_branch__isnull=False, then=F("child_branch__acronym")),
+            ),
+            code=Case(
+                When(child_branch__isnull=False, then=F("child_branch__partial_acronym")),
+                default=None
+            ),
+            title=Case(
+                When(child_leaf__isnull=False, then=F("child_leaf__specific_title")),
+                When(child_branch__isnull=False, then=F("child_branch__title")),
+            ),
+            child_id=Case(
+                When(child_leaf__isnull=False, then=F("child_leaf__id")),
+                When(child_branch__isnull=False, then=F("child_branch__id")),
+            ),
+        ).order_by('order')
 
-        context['show_minor_major_option_table'] = self._show_minor_major_option_table()
+        context['show_minor_major_option_table'] = self.object.is_minor_major_option_list_choice
         return context
-
-    def _show_minor_major_option_table(self):
-        return self.object.education_group_type.name in GroupType.minor_major_option_list_choice()
 
 
 class EducationGroupUsing(EducationGroupGenericDetailView):
@@ -484,37 +476,38 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         is_specific = not is_common
         is_minor = self.object.is_minor
         is_deepening = self.object.is_deepening
+        is_bachelor = self.object.is_bachelor
 
         is_master = acronym.endswith(('2m', '2m1'))
-        is_agregation = acronym.endswith('2a')
+        is_aggregation = acronym.endswith('2a')
         is_mc = acronym.endswith('2mc')
+        common_conditions = get_appropriate_common_admission_condition(self.object)
 
         class AdmissionConditionForm(forms.Form):
             text_field = forms.CharField(widget=CKEditorWidget(config_name='minimal'))
 
         admission_condition_form = AdmissionConditionForm()
         admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=self.object)
-
         record = {}
         for section in SECTIONS_WITH_TEXT:
             record[section] = AdmissionConditionLine.objects.filter(
                 admission_condition=admission_condition,
                 section=section
             ).annotate_text(tab_lang)
-
         context.update({
             'admission_condition_form': admission_condition_form,
             'can_edit_information': is_eligible_to_edit_admission_condition(context['person'], context['object']),
             'info': {
                 'is_specific': is_specific,
                 'is_common': is_common,
-                'is_bachelor': is_common and self.object.education_group_type.name == TrainingType.BACHELOR.name,
+                'is_bachelor': is_bachelor,
                 'is_master': is_master,
-                'show_components_for_agreg': is_common and is_agregation,
-                'show_components_for_agreg_and_mc': is_common and is_agregation or is_mc,
-                'show_free_text': (is_specific and (is_master or is_agregation or is_mc)) or is_minor or is_deepening,
+                'show_components_for_agreg': is_aggregation,
+                'show_components_for_agreg_and_mc': is_aggregation or is_mc,
+                'show_free_text': (is_specific and (is_master or is_aggregation or is_mc)) or is_minor or is_deepening,
             },
             'admission_condition': admission_condition,
+            'common_conditions': common_conditions,
             'record': record,
             'language': {
                 'list': ["fr-be", "en"],
@@ -523,3 +516,14 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         })
 
         return context
+
+
+def get_appropriate_common_admission_condition(edy):
+    if not edy.is_common and \
+            any([edy.is_bachelor, edy.is_master60, edy.is_master120, edy.is_aggregation, edy.is_specialized_master]):
+        return EducationGroupYear.objects.look_for_common(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name if edy.is_master60
+            else edy.education_group_type.name,
+            academic_year=edy.academic_year
+        ).select_related('admissioncondition').get().admissioncondition
+    return None

@@ -51,29 +51,29 @@ ORDER_COL = 'order_col'
 ORDER_DIRECTION = 'order_direction'
 #
 
-WORKSHEET_TITLE_ADMINISTRATIVE = 'trainings'
-XLS_FILENAME_ADMINISTRATIVE = 'training_administrative_data'
-XLS_DESCRIPTION_ADMINISTRATIVE = "List of trainings, with administrative data"
+WORKSHEET_TITLE_ADMINISTRATIVE = _('Trainings')
+XLS_FILENAME_ADMINISTRATIVE = _('training_administrative_data')
+XLS_DESCRIPTION_ADMINISTRATIVE = _("List of trainings with administrative data")
 
 # Column for xls with administrative data
-MANAGEMENT_ENTITY_COL = 'management_entity'
-TRANING_COL = 'TRAINING'
-TYPE_COL = 'type'
-ACADEMIC_YEAR_COL = 'Validity'
-START_COURSE_REGISTRATION_COL = 'Begining of course registration'
-END_COURSE_REGISTRATION_COL = 'Ending of course registration'
-START_EXAM_REGISTRATION_COL = 'Begining of exam registration'
-END_EXAM_REGISTRATION_COL = 'Ending of exam registration'
-MARKS_PRESENTATION_COL = 'marks_presentation'
-DISSERTATION_PRESENTATION_COL = 'dissertation_presentation'
-DELIBERATION_COL = 'DELIBERATION'
-SCORES_DIFFUSION_COL = 'scores_diffusion'
-WEIGHTING_COL = 'Weighting'
-DEFAULT_LEARNING_UNIT_ENROLLMENT_COL = 'Default learning unit enrollment'
-CHAIR_OF_THE_EXAM_BOARD_COL = 'chair_of_the_exam_board'
-EXAM_BOARD_SECRETARY_COL = 'exam_board_secretary'
-EXAM_BOARD_SIGNATORY_COL = 'Exam board signatory'
-SIGNATORY_QUALIFICATION_COL = 'signatory_qualification'
+MANAGEMENT_ENTITY_COL = _('Management entity')
+TRANING_COL = _('Training')
+TYPE_COL = _('Type')
+ACADEMIC_YEAR_COL = _('Validity')
+START_COURSE_REGISTRATION_COL = _('Begining of course registration')
+END_COURSE_REGISTRATION_COL = _('Ending of course registration')
+START_EXAM_REGISTRATION_COL = _('Begining of exam registration')
+END_EXAM_REGISTRATION_COL = _('Ending of exam registration')
+MARKS_PRESENTATION_COL = _('Marks presentation')
+DISSERTATION_PRESENTATION_COL = _('Dissertation presentation')
+DELIBERATION_COL = _('Deliberation')
+SCORES_DIFFUSION_COL = _('Scores diffusion')
+WEIGHTING_COL = _('Weighting')
+DEFAULT_LEARNING_UNIT_ENROLLMENT_COL = _('Default learning unit enrollment')
+CHAIR_OF_THE_EXAM_BOARD_COL = _('Chair of the exam board')
+EXAM_BOARD_SECRETARY_COL = _('Exam board secretary')
+EXAM_BOARD_SIGNATORY_COL = _('Exam board signatory')
+SIGNATORY_QUALIFICATION_COL = _('Signatory qualification')
 
 SESSIONS_COLUMNS = 'sessions_columns'
 SESSIONS_NUMBER = 3

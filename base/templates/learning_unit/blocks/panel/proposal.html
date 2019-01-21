@@ -14,12 +14,12 @@
             <dt>{% trans 'Folder' %}</dt>
             <dd>{{ proposal_folder_entity_version.0.acronym}} - {{ proposal.folder_id }}</dd><br>
 
-            <dt>{% trans 'type' %}</dt>
-            <dd>{% trans proposal.type %}</dd><br>
+            <dt>{% trans 'Type' %}</dt>
+            <dd>{% trans proposal.get_type_display %}</dd><br>
 
             {% block proposal_state %}
                 <dt>{% trans 'State' %}</dt>
-                <dd>{% trans proposal.state %}</dd><br>
+                <dd>{% trans proposal.get_state_display %}</dd><br>
             {% endblock proposal_state %}
 
             <dt>{% trans 'Introduced by' %}</dt>

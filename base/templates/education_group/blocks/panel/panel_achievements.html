@@ -42,8 +42,9 @@
     {% for achievement in education_group_achievements %}
         <div class="row">
             <div class="col-md-1">
+                <strong>{{ achievement.code_name }}</strong>
                 <span data-toggle="collapse" data-target="#row_detail_achievement_{{ achievement.pk }}"
-                      class="glyphicon glyphicon-chevron-right collapse_span">
+                      class="glyphicon glyphicon-chevron-right collapse_span pull-right">
                 </span>
             </div>
             <div class="col-md-11">
@@ -67,8 +68,11 @@
 
                 <div id="row_detail_achievement_{{ achievement.pk }}" class="row collapse in"
                      style="padding-left: 20px">
-                    <div class="col-md-12">
-                        {% for detail_achievement in achievement.educationgroupdetailedachievement_set.all %}
+                     {% for detail_achievement in achievement.educationgroupdetailedachievement_set.all %}
+                         <div class="col-md-1">
+                             <strong>{{ detail_achievement.code_name }}</strong>
+                         </div>
+                        <div class="col-md-11">
                             <div class="row" id="education_group_detail_achievement_{{ detail_achievement.pk }}">
                                 <div class="col-md-5">
                                     {{ detail_achievement.french_text | safe }}
@@ -85,13 +89,13 @@
                                     {% include "education_group/blocks/form/achievement_action_bar.html" with obj=detail_achievement additional_class="btn-group-sm" %}
                                 </div>
                             </div>
+                        </div>
                         {% endfor %}
                         <button title="{% trans 'Create' %}" class="btn btn-default btn-sm trigger_modal"
                                 data-url="{% url 'create_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk %}"
                                 {% permission_create_achievement %}>
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                         </button>
-                    </div>
                 </div>
                 <hr>
             </div>
@@ -103,6 +107,7 @@
             {% permission_create_achievement %}>
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
     </button>
+
     <script>
         $(function () {
             $('.collapse_span').on('click', function () {

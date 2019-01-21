@@ -27,18 +27,21 @@ from django.test import TestCase
 from django.utils.translation import gettext as _
 
 from base.forms.education_group.group_element_year import GroupElementYearForm
+from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory, \
+    GroupFactory, EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class TestGroupElementYearForm(TestCase):
     def setUp(self):
-        self.parent = EducationGroupYearFactory()
+        self.parent = TrainingFactory()
         self.child_leaf = LearningUnitYearFactory()
-        self.child_branch = EducationGroupYearFactory()
+        self.child_branch = MiniTrainingFactory()
 
     def test_clean_link_type_reference_between_eg_lu(self):
         form = GroupElementYearForm(
@@ -57,8 +60,8 @@ class TestGroupElementYearForm(TestCase):
         AuthorizedRelationshipFactory(
             parent_type=self.parent.education_group_type,
             child_type=self.child_branch.education_group_type,
-            reference=False
         )
+        ref_group = GroupElementYearFactory(parent=self.child_branch)
 
         form = GroupElementYearForm(
             data={'link_type': LinkTypes.REFERENCE.name},
@@ -73,7 +76,7 @@ class TestGroupElementYearForm(TestCase):
                 "You are not allow to create a reference link between a %(parent_type)s and a %(child_type)s."
             ) % {
                  "parent_type": self.parent.education_group_type,
-                 "child_type": self.child_branch.education_group_type,
+                 "child_type": ref_group.child_branch.education_group_type,
              }]
         )
 
@@ -81,7 +84,11 @@ class TestGroupElementYearForm(TestCase):
         AuthorizedRelationshipFactory(
             parent_type=self.parent.education_group_type,
             child_type=self.child_branch.education_group_type,
-            reference=True
+        )
+        ref_group = GroupElementYearFactory(parent=self.child_branch)
+        AuthorizedRelationshipFactory(
+            parent_type=self.parent.education_group_type,
+            child_type=ref_group.child_branch.education_group_type,
         )
 
         form = GroupElementYearForm(
@@ -109,3 +116,99 @@ class TestGroupElementYearForm(TestCase):
         self.assertTrue(
             group_element_1.order == 1 and group_element_2.order == 0
         )
+
+    def test_remove_access_condition_when_not_authorized_relationship(self):
+        form = GroupElementYearForm(parent=self.parent, child_branch=self.child_branch)
+        self.assertTrue("access_condition" not in list(form.fields.keys()))
+        self.assertEqual(LinkTypes.REFERENCE.name, form.fields["link_type"].initial)
+
+    def test_only_keep_access_condition_when_parent_is_minor_major_option_list_choice(self):
+        expected_fields = ["access_condition"]
+        for name in GroupType.minor_major_option_list_choice():
+            with self.subTest(type=name):
+                parent = GroupFactory(education_group_type__name=name)
+                AuthorizedRelationshipFactory(
+                    parent_type=parent.education_group_type,
+                    child_type=self.child_branch.education_group_type
+                )
+                form = GroupElementYearForm(parent=parent, child_branch=self.child_branch)
+                self.assertCountEqual(expected_fields, list(form.fields.keys()))
+
+    def test_only_keep_block_when_parent_is_formation_and_child_is_minor_major_option_list_choice(self):
+        expected_fields = [
+            "block"
+        ]
+        for name in GroupType.minor_major_option_list_choice():
+            with self.subTest(type=name):
+                child_branch = GroupFactory(education_group_type__name=name)
+                AuthorizedRelationshipFactory(
+                    parent_type=self.parent.education_group_type,
+                    child_type=child_branch.education_group_type
+                )
+                form = GroupElementYearForm(parent=self.parent, child_branch=child_branch)
+                self.assertCountEqual(expected_fields, list(form.fields.keys()))
+
+    def test_remove_access_condition_when_authorized_relationship(self):
+        AuthorizedRelationshipFactory(
+            parent_type=self.parent.education_group_type,
+            child_type=self.child_branch.education_group_type
+        )
+        form = GroupElementYearForm(parent=self.parent, child_branch=self.child_branch)
+        self.assertTrue("access_condition" not in list(form.fields.keys()))
+
+    def test_child_education_group_year_without_authorized_relationship_fails(self):
+        form = GroupElementYearForm(
+            data={'link_type': ""},
+            parent=self.parent,
+            child_branch=self.child_branch
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors["link_type"],
+            [_("You cannot attach \"%(child)s\" (type \"%(child_type)s\") "
+               "to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                 'child': self.child_branch,
+                 'child_type': self.child_branch.education_group_type,
+                 'parent': self.parent,
+                 'parent_type': self.parent.education_group_type,
+             }]
+        )
+
+    def test_referenced_child_with_max_limit(self):
+        child = EducationGroupYearFactory()
+
+        GroupElementYearFactory(
+            parent=self.parent,
+            child_branch=child
+        )
+
+        AuthorizedRelationshipFactory(
+            parent_type=self.parent.education_group_type,
+            child_type=child.education_group_type,
+            max_count_authorized=1,
+        )
+
+        ref_group = GroupElementYearFactory(parent=self.child_branch)
+        AuthorizedRelationshipFactory(
+            parent_type=self.parent.education_group_type,
+            child_type=ref_group.child_branch.education_group_type,
+        )
+
+        ref_group.child_branch.education_group_type = child.education_group_type
+        ref_group.child_branch.save()
+
+        form = GroupElementYearForm(
+            data={'link_type': LinkTypes.REFERENCE.name},
+            parent=self.parent,
+            child_branch=self.child_branch
+        )
+
+        self.assertFalse(form.is_valid())
+
+        self.assertEqual(form.errors['link_type'], [
+            _("The number of children of type \"%(child_type)s\" for \"%(parent)s\" has already reached the limit.") % {
+                'child_type': child.education_group_type,
+                'parent': self.parent
+            }
+        ])
