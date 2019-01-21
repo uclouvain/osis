@@ -48,7 +48,7 @@ def prepare_xls_content(proposals):
 
 def extract_xls_data_from_proposal(luy):
     proposal = find_by_learning_unit_year(luy)
-    return [luy.entity_requirement.acronym,
+    return [luy.entity_requirement,
             luy.acronym,
             luy.complete_title,
             luy.learning_container_year.get_container_type_display(),
@@ -58,7 +58,7 @@ def extract_xls_data_from_proposal(luy):
             luy.learning_container_year.get_type_declaration_vacant_display(),
             dict(PERIODICITY_TYPES)[luy.periodicity],
             luy.credits,
-            luy.entity_allocation.acronym,
+            luy.entity_allocation,
             proposal.date.strftime('%d-%m-%Y')]
 
 
