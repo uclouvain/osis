@@ -135,10 +135,7 @@ def compute_number_children_by_education_group_type(egy, old_link, new_link):
     The old link is the link that will be detached, thus we decrease the counts by it.
     The new link is the link that will be attached, thus we increase the counts by it.
     """
-    reference_link_child = egy.groupelementyear_set.filter(link_type=LinkTypes.REFERENCE.name).\
-        values_list("child_branch", flat=True)
-    parents = list(reference_link_child) + [egy.id]
-    current_count = _get_education_group_types_count(parents)
+    current_count = _get_education_group_types_count(egy)
 
     old_link_count = __get_link_children_count(old_link)
     new_link_count = __get_link_children_count(new_link)
@@ -160,18 +157,18 @@ def __get_link_children_count(link):
     if not link:
         return {}
     elif link.link_type == LinkTypes.REFERENCE.name:
-        return _get_education_group_types_count([link.child_branch])
+        return _get_education_group_types_count(link.child_branch)
     return {link.child_branch.education_group_type.name: 1}
 
 
-def _get_education_group_types_count(parents):
-    qs = GroupElementYear.objects.\
-        filter(parent__in=parents). \
-        exclude(child_branch=None). \
-        filter(link_type=None).\
+def _get_education_group_types_count(parent):
+    qs = GroupElementYear.objects. \
+        filter((Q(parent=parent) & Q(link_type=None)) |
+               (Q(parent__child_branch__parent=parent) & Q(parent__child_branch__link_type=LinkTypes.REFERENCE.name))
+               ). \
+        exclude(child_branch__education_group_type__name=None). \
         annotate(education_group_type_name=F("child_branch__education_group_type__name")). \
         values("education_group_type_name"). \
-        order_by("education_group_type_name").\
+        order_by("education_group_type_name"). \
         annotate(count=Count("education_group_type_name"))
-
     return {record["education_group_type_name"]: record["count"] for record in qs}
