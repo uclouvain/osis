@@ -42,6 +42,7 @@ class TestEducationGroupTypeOrderingForm(TestCase):
         self.assertCountEqual(list(form.fields["education_group_type"].queryset),
                             [self.educ_grp_type_A, self.educ_grp_type_B, self.educ_grp_type_D])
         educ_grp_type_C = EducationGroupTypeFactory(name='C label')
+        form = EducationGroupFilter()
         self.assertCountEqual(
             list(form.fields["education_group_type"].queryset),
             [self.educ_grp_type_A, self.educ_grp_type_B, educ_grp_type_C, self.educ_grp_type_D]
