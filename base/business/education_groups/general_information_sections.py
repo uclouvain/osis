@@ -77,3 +77,12 @@ SECTION_INTRO = [
                 ('intro', 'specific'),
             ])
 ]
+
+COMMON_GENERAL_INFO_SECTIONS = [
+    'agregation',
+    'caap',
+    'prerequis',
+    'finalites_didactiques',
+    'module_complementaire',
+    'evaluation'
+]

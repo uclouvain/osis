@@ -265,22 +265,24 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             sections_list = SECTION_INTRO
         else:
             sections_list = SECTION_LIST
+
         for section in sections_list:
             translated_labels = self.get_translated_labels_and_content(section,
                                                                        self.user_language_code,
                                                                        common_education_group_year,
                                                                        sections_to_display)
-
-            sections_with_translated_labels.append(Section(section.title, translated_labels))
+            if translated_labels:
+                sections_with_translated_labels.append(Section(section.title, translated_labels))
         return sections_with_translated_labels
 
     def get_translated_labels_and_content(self, section, user_language, common_education_group_year, sections_list):
         records = []
-        for label, selectors in section.labels:
-            if not sections_list or any(label in section for section in sections_list):
-                records.extend(
-                    self.get_selectors(common_education_group_year, label, selectors, user_language)
-                )
+        filtered_labels = {(label, selectors) for label, selectors in section.labels
+                           if not sections_list or label in sections_list}
+        for label, selectors in filtered_labels:
+            records.extend(
+                self.get_selectors(common_education_group_year, label, selectors, user_language)
+            )
         return records
 
     def get_selectors(self, common_education_group_year, label, selectors, user_language):

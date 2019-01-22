@@ -500,7 +500,7 @@ msgstr "Données administratives"
 
 #: business/education_groups/general_information_sections.py:57
 msgid "Admission"
-msgstr "Concours"
+msgstr "Admission"
 
 #: templates/education_group/tab_admission_conditions.html:199
 #: templates/education_group/tab_admission_conditions.html:201

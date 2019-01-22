@@ -36,7 +36,7 @@ from base.business.education_groups import general_information
 from base.business.education_groups.general_information import PublishException, RelevantSectionException, \
     _get_portal_url, _bulk_publish
 from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory
 
 
 @override_settings(URL_TO_PORTAL_UCL="http://portal-url.com", ESB_API_URL="api.esb.com",
@@ -138,3 +138,19 @@ class TestGetRelevantSections(TestCase):
 
         sections = general_information.get_relevant_sections(self.training)
         self.assertListEqual(sections, [])
+
+    @mock.patch('requests.get')
+    def test_get_relevant_sections_case_common_ensure_webservice_not_called(self, mock_requests):
+        common = EducationGroupYearCommonFactory()
+        expected_section = [
+            'agregation',
+            'caap',
+            'prerequis',
+            'finalites_didactiques',
+            'module_complementaire',
+            'evaluation'
+        ]
+
+        sections = general_information.get_relevant_sections(common)
+        self.assertFalse(mock_requests.called)
+        self.assertListEqual(sections, expected_section)
