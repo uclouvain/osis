@@ -27,10 +27,12 @@
 
 {% block top_action_bar %}
     {% if can_edit_information and not education_group_year.is_common %}
-        <a class="btn btn-default btn-publish" style="margin-right: 20px;"
-           href="{% url 'education_group_publish' parent.pk education_group_year.id %}">
-            {% trans 'Publish' %}
-        </a>
+        <form action="{% url 'education_group_publish' parent.pk education_group_year.id %}" method="post">
+            {% csrf_token %}
+            <button class="btn btn-default btn-publish" style="margin-right: 20px;">
+                {% trans 'Publish' %}
+            </button>
+        </form>
     {% endif %}
 {% endblock %}
 {% block details %}
