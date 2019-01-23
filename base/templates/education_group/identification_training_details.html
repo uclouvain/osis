@@ -115,7 +115,7 @@
 
         {% include 'education_group/blocks/academic_offer_info.html' %}
 
-        {% if not hide_for_2M %}
+        {% if show_coorganization %}
             {% include 'education_group/blocks/coorganization.html' %}
         {% endif %}
     {% endwith %}
