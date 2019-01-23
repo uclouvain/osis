@@ -52,6 +52,9 @@ from cms.models.translated_text_label import TranslatedTextLabel
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_CMS_DATA, SKILLS_AND_ACHIEVEMENTS_KEY, \
     SKILLS_AND_ACHIEVEMENTS_AA_DATA, CONTACTS_KEY
 
+CREATE_COMMON_FROM = 2017
+CREATE_COMMON_UNTIL = 2015
+
 BACHELOR_FIELDS = (
     'alert_message', 'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres', 'ca_bacs_examen_langue',
     'ca_bacs_cond_speciales'
@@ -410,8 +413,7 @@ class Command(BaseCommand):
         self.json_content = json.loads(path.read_text())
         self.suffix_language = '' if self.iso_language == 'fr-be' else '_en'
 
-        # Start import from 2017 until 2025
-        for year in range(2017, 2026):
+        for year in range(CREATE_COMMON_FROM, CREATE_COMMON_UNTIL + 1):
             create_common_offer_for_academic_year(year)
 
         if options['is_conditions']:

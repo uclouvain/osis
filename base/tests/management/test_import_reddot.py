@@ -1,6 +1,7 @@
 import collections
 import datetime
 from unittest import mock
+from unittest.mock import Mock
 
 from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned
@@ -47,6 +48,21 @@ class ImportReddotTestCase(TestCase):
         lang = 'fr-be'
         self.command.suffix_language = '' if lang == 'fr-be' else '_en'
         self.command.iso_language = 'fr-be'
+
+    @mock.patch('base.management.commands.import_reddot.create_common_offer_for_academic_year')
+    @mock.patch('base.management.commands.import_reddot.check_parameters')
+    @mock.patch('json.loads', return_value={})
+    def test_create_common_offer_for_academic_year_called_multiple_times(self, mock_create_common, mock_check_param,
+                                                                         mock_json_loads):
+        mock_check_param.return_value = Mock()
+        self.command.handle(
+            file='dummy-path',
+            language=self.command.iso_language,
+            year=2018,
+            is_conditions=False,
+            is_common=False
+        )
+        self.assertTrue(mock_create_common.called)
 
     @mock.patch('base.management.commands.import_reddot.get_mapping_label_texts')
     def test_load_offers_call_get_mapping(self, mock_get_mapping):
