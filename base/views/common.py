@@ -213,8 +213,8 @@ def storage(request):
     return layout.render(request, "admin/storage.html", {'table': table})
 
 
-def display_error_messages(request, messages_to_display):
-    display_messages(request, messages_to_display, messages.ERROR)
+def display_error_messages(request, messages_to_display, extra_tags=None):
+    display_messages(request, messages_to_display, messages.ERROR, extra_tags=extra_tags)
 
 
 def display_success_messages(request, messages_to_display, extra_tags=None):
