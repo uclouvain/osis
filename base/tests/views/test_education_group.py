@@ -497,12 +497,19 @@ class EducationGroupPublishViewTestCase(TestCase):
 
     def test_publish_case_user_not_logged(self):
         self.client.logout()
-        response = self.client.get(self.url)
+        response = self.client.post(self.url)
         self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    def test_public_case_methods_not_allowed(self):
+        methods_not_allowed = ['get', 'delete', 'put']
+        for method in methods_not_allowed:
+            request_to_call = getattr(self.client, method)
+            response = request_to_call(self.url)
+            self.assertEqual(response.status_code, 405)
 
     @mock.patch("base.business.education_groups.general_information.publish", side_effect=lambda e: "portal-url")
     def test_publish_case_ok_redirection_with_success_message(self, mock_publish):
-        response = self.client.get(self.url)
+        response = self.client.post(self.url)
 
         msg = [m.message for m in get_messages(response.wsgi_request)]
         msg_level = [m.level for m in get_messages(response.wsgi_request)]
@@ -513,7 +520,7 @@ class EducationGroupPublishViewTestCase(TestCase):
 
     @mock.patch("base.business.education_groups.general_information.publish", side_effect=PublishException('error'))
     def test_publish_case_ko_redirection_with_error_message(self, mock_publish):
-        response = self.client.get(self.url)
+        response = self.client.post(self.url)
 
         msg = [m.message for m in get_messages(response.wsgi_request)]
         msg_level = [m.level for m in get_messages(response.wsgi_request)]
@@ -886,7 +893,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
 
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
-        self.assertGreater(len(soup.select('a.btn-publish')), 0)
+        self.assertGreater(len(soup.select('button.btn-publish')), 0)
 
     def test_user_has_not_link_to_edit_conditions(self):
         response = self.client.get(self.url)
@@ -894,7 +901,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
 
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
-        self.assertEqual(len(soup.select('a.btn-publish')), 0)
+        self.assertEqual(len(soup.select('button.btn-publish')), 0)
 
     @mock.patch('django.contrib.auth.decorators')
     def test_education_group_year_admission_condition_remove_line_not_found(self, mock_decorators):

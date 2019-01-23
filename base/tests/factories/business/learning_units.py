@@ -225,6 +225,9 @@ class GenerateAcademicYear:
         self.end_year = end_year
         self.academic_years = LearningUnitsMixin.create_list_of_academic_years(start_year, end_year)
 
+    def __getitem__(self,index):
+        return self.academic_years[index]
+
 
 def generate_academic_years(range=2):
     current_academic_year = create_current_academic_year()
