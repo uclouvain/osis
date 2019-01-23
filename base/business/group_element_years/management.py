@@ -157,12 +157,11 @@ def compute_number_children_by_education_group_type(root, link=None, to_delete=F
          Q(child_branch__parent__child_branch__link_type=LinkTypes.REFERENCE.name))
     )
     if link:
-        # Need to remove childrens in common between root and link to not duplicate them
+        # Need to remove childrens in common between root and link to not false count
         records_to_remove_qs = EducationGroupYear.objects.filter(Q(pk=link.child_branch.pk) |
                                                                  Q(child_branch__parent=link.child_branch.pk))
         qs = qs.difference(records_to_remove_qs)
 
-        # Query child branch of link or children of it if reference link
         link_children_qs = EducationGroupYear.objects.filter(pk=link.child_branch.pk)
         if link.link_type == LinkTypes.REFERENCE.name:
             link_children_qs = EducationGroupYear.objects.filter(child_branch__parent=link.child_branch.pk)
