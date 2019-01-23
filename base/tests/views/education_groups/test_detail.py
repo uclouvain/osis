@@ -32,7 +32,7 @@ from base.models.enums.education_group_types import TrainingType, GroupType
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory, \
     MiniTrainingEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, GroupFactory, \
-    MiniTrainingFactory
+    MiniTrainingFactory, EducationGroupYearCommonFactory, EducationGroupYearCommonAgregationFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
@@ -48,12 +48,14 @@ class TestReadEducationGroup(TestCase):
         cls.person = PersonFactory(user=cls.user)
         cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
 
+    def setUp(self):
+        self.client.force_login(self.user)
+
     def test_training_template_used(self):
         training = TrainingFactory()
         url = reverse("education_group_read", args=[training.pk, training.pk])
         expected_template = "education_group/identification_training_details.html"
 
-        self.client.force_login(self.user)
         response = self.client.get(url)
         self.assertTemplateUsed(response, expected_template)
 
@@ -62,7 +64,6 @@ class TestReadEducationGroup(TestCase):
         url = reverse("education_group_read", args=[mini_training.pk, mini_training.pk])
         expected_template = "education_group/identification_mini_training_details.html"
 
-        self.client.force_login(self.user)
         response = self.client.get(url)
         self.assertTemplateUsed(response, expected_template)
 
@@ -71,7 +72,6 @@ class TestReadEducationGroup(TestCase):
         url = reverse("education_group_read", args=[group.pk, group.pk])
         expected_template = "education_group/identification_group_details.html"
 
-        self.client.force_login(self.user)
         response = self.client.get(url)
         self.assertTemplateUsed(response, expected_template)
 
@@ -81,9 +81,9 @@ class TestReadEducationGroup(TestCase):
             education_group_type__name=TrainingType.CAPAES.name
         )
         url = reverse("education_group_read", args=[training_not_2m.pk, training_not_2m.pk])
-        self.client.force_login(self.user)
+
         response = self.client.get(url)
-        self.assertFalse(response.context['hide_for_2M'])
+        self.assertTrue(response.context['show_coorganization'])
 
     def test_show_coorganization_case_2m(self):
         training_2m = EducationGroupYearFactory(
@@ -91,9 +91,54 @@ class TestReadEducationGroup(TestCase):
             education_group_type__name=TrainingType.PGRM_MASTER_120.name
         )
         url = reverse("education_group_read", args=[training_2m.pk, training_2m.pk])
-        self.client.force_login(self.user)
+
         response = self.client.get(url)
-        self.assertTrue(response.context['hide_for_2M'])
+        self.assertFalse(response.context['show_coorganization'])
+
+    def test_context_contains_show_tabs_args(self):
+        group = GroupFactory()
+        url = reverse("education_group_read", args=[group.pk, group.pk])
+
+        response = self.client.get(url)
+        self.assertTrue('show_identification' in response.context)
+        self.assertTrue('show_diploma' in response.context)
+        self.assertTrue('show_general_information' in response.context)
+        self.assertTrue('show_skills_and_achievements' in response.context)
+        self.assertTrue('show_administrative' in response.context)
+        self.assertTrue('show_content' in response.context)
+        self.assertTrue('show_utilization' in response.context)
+        self.assertTrue('show_admission_conditions' in response.context)
+
+    def test_main_common_show_only_identification_and_general_information(self):
+        main_common = EducationGroupYearCommonFactory()
+        url = reverse("education_group_read", args=[main_common.pk, main_common.pk])
+
+        response = self.client.get(url)
+        self.assertTrue(response.context['show_identification'])
+        self.assertTrue(response.context['show_general_information'])
+
+        self.assertFalse(response.context['show_diploma'])
+        self.assertFalse(response.context['show_skills_and_achievements'])
+        self.assertFalse(response.context['show_administrative'])
+        self.assertFalse(response.context['show_content'])
+        self.assertFalse(response.context['show_utilization'])
+        self.assertFalse(response.context['show_admission_conditions'])
+
+    def test_common_not_main_show_only_identification_and_admission_condition(self):
+        agregation_common = EducationGroupYearCommonAgregationFactory()
+
+        url = reverse("education_group_read", args=[agregation_common.pk, agregation_common.pk])
+
+        response = self.client.get(url)
+        self.assertTrue(response.context['show_identification'])
+        self.assertTrue(response.context['show_admission_conditions'])
+
+        self.assertFalse(response.context['show_diploma'])
+        self.assertFalse(response.context['show_skills_and_achievements'])
+        self.assertFalse(response.context['show_administrative'])
+        self.assertFalse(response.context['show_content'])
+        self.assertFalse(response.context['show_utilization'])
+        self.assertFalse(response.context['show_general_information'])
 
 
 class TestUtilizationTab(TestCase):
