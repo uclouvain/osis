@@ -47,12 +47,7 @@ from base.models.learning_unit_component import LearningUnitComponent
 
 class StepHalfIntegerWidget(forms.NumberInput):
     def __init__(self):
-        super().__init__(attrs={'step': STEP_HALF_INTEGER})
-
-
-class StepHalfIntegerWidget2(forms.NumberInput):
-    def __init__(self):
-        super().__init__(attrs={'step': '0.50', 'min': 0})
+        super().__init__(attrs={'step': STEP_HALF_INTEGER, 'min': 0})
 
 
 class VolumeField(forms.DecimalField):
@@ -329,9 +324,9 @@ class SimplifiedVolumeForm(forms.ModelForm):
             'hourly_volume_partial_q2'
         )
         widgets = {
-            'hourly_volume_total_annual': StepHalfIntegerWidget2,
-            'hourly_volume_partial_q1': StepHalfIntegerWidget2,
-            'hourly_volume_partial_q2': StepHalfIntegerWidget2,
+            'hourly_volume_total_annual': StepHalfIntegerWidget,
+            'hourly_volume_partial_q1': StepHalfIntegerWidget,
+            'hourly_volume_partial_q2': StepHalfIntegerWidget,
         }
 
     def clean(self):
