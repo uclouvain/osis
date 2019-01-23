@@ -91,11 +91,12 @@ def is_max_child_reached(parent, child_education_group_type):
         auth_rel = parent.education_group_type.authorized_parent_type.get(child_type__name=child_education_group_type)
     except AuthorizedRelationship.DoesNotExist:
         return True
+
     try:
         education_group_type_count = compute_number_children_by_education_group_type(parent, None).\
             get(education_group_type__name=child_education_group_type)["count"]
     except EducationGroupYear.DoesNotExist:
-        return True
+        education_group_type_count = 0
     return auth_rel.max_count_authorized is not None and education_group_type_count >= auth_rel.max_count_authorized
 
 
@@ -120,7 +121,7 @@ def check_authorized_relationship(root, link, to_delete=False):
                 and count > auth_rels_dict[key].max_count_authorized:
             max_reached.append(key)
 
-    # Check for technical group that would not exist
+    # Check for technical group that would not be linked to root
     for key, auth_rel in auth_rels_dict.items():
         if key not in count_children_dict and auth_rel.min_count_authorized > 1:
             min_reached.append(key)
@@ -150,30 +151,27 @@ def check_authorized_relationship(root, link, to_delete=False):
 
 
 def compute_number_children_by_education_group_type(root, link=None, to_delete=False):
-    # Query all children of root
     qs = EducationGroupYear.objects.filter(
         (Q(child_branch__parent=root) & Q(child_branch__link_type=None)) |
         (Q(child_branch__parent__child_branch__parent=root) &
          Q(child_branch__parent__child_branch__link_type=LinkTypes.REFERENCE.name))
     )
     if link:
-        # Query children of child branch of link and child branch also
+        # Need to remove childrens in common between root and link to not duplicate them
         records_to_remove_qs = EducationGroupYear.objects.filter(Q(pk=link.child_branch.pk) |
                                                                  Q(child_branch__parent=link.child_branch.pk))
-
-        # Query child branch of link or children of it if reference link
-        new_link_children_qs = EducationGroupYear.objects.filter(pk=link.child_branch.pk)
-        if link.link_type == LinkTypes.REFERENCE.name:
-            new_link_children_qs = EducationGroupYear.objects.filter(child_branch__parent=link.child_branch.pk)
-
-        # Need to remove childrens in common between root and link
         qs = qs.difference(records_to_remove_qs)
 
+        # Query child branch of link or children of it if reference link
+        link_children_qs = EducationGroupYear.objects.filter(pk=link.child_branch.pk)
+        if link.link_type == LinkTypes.REFERENCE.name:
+            link_children_qs = EducationGroupYear.objects.filter(child_branch__parent=link.child_branch.pk)
+
         if not to_delete:
-            qs = qs.union(new_link_children_qs)
+            qs = qs.union(link_children_qs)
 
     # FIXME Because when applying the annotate on the union and intersection,
-    #  it returns incorrect number and education group type name
+    #  it returns strange value for the count and education group type name
     pks = qs.values_list("pk", flat=True)
     qs = EducationGroupYear.objects.filter(pk__in=list(pks)). \
         values("education_group_type__name"). \

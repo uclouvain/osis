@@ -336,8 +336,7 @@ class EducationGroupTypeForm(forms.Form):
                                         "has already reached the limit.") % {
                     'child_type': education_group_type,
                     'parent': self.parent
-                }
-                                      )
+                })
         return education_group_type
 
 
