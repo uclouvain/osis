@@ -28,7 +28,7 @@
 
         {% include "learning_unit/blocks/form/search_form_proposal.html" %}
 
-        <form id="download_xls" method="post">
+        <form id="proposals_form" method="post">
             {% csrf_token %}
             <div style="margin-top:10px;">
                 {% if page_obj %}
