@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-21 11:36+0100\n"
+"POT-Creation-Date: 2019-01-23 09:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -311,8 +311,8 @@ msgid "Accepted"
 msgstr ""
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:38
-#: templates/education_group/tab_admission_conditions.html:123
-#: templates/education_group/tab_admission_conditions.html:172
+#: templates/education_group/tab_admission_conditions.html:125
+#: templates/education_group/tab_admission_conditions.html:174
 msgid "Access"
 msgstr ""
 
@@ -360,8 +360,8 @@ msgstr ""
 #: templates/education_group/blocks/dropdown/administrative_data_actions_bar.html:36
 #: templates/education_group/blocks/dropdown/education_groups_action_button.html:33
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:36
-#: templates/education_group/tab_admission_conditions.html:126
-#: templates/education_group/tab_admission_conditions.html:175
+#: templates/education_group/tab_admission_conditions.html:128
+#: templates/education_group/tab_admission_conditions.html:177
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:46
 msgid "Actions"
 msgstr ""
@@ -479,8 +479,8 @@ msgstr ""
 msgid "Admission"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:199
 #: templates/education_group/tab_admission_conditions.html:201
+#: templates/education_group/tab_admission_conditions.html:203
 msgid "Admission and Enrolment Procedures for general registration"
 msgstr ""
 
@@ -488,8 +488,8 @@ msgstr ""
 msgid "Admission exam"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:189
 #: templates/education_group/tab_admission_conditions.html:191
+#: templates/education_group/tab_admission_conditions.html:193
 msgid "Adults taking up their university training"
 msgstr ""
 
@@ -505,8 +505,8 @@ msgstr ""
 msgid "Alert"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:42
 #: templates/education_group/tab_admission_conditions.html:44
+#: templates/education_group/tab_admission_conditions.html:46
 msgid "Alert Message"
 msgstr ""
 
@@ -679,7 +679,7 @@ msgstr ""
 msgid "Bachelor"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:132
+#: templates/education_group/tab_admission_conditions.html:134
 msgid "Bachelors of the Dutch speaking Community of Belgium"
 msgstr ""
 
@@ -926,7 +926,7 @@ msgstr ""
 msgid "Common title"
 msgstr ""
 
-#: tests/views/test_learning_unit.py:1286 views/learning_unit.py:303
+#: tests/views/test_learning_unit.py:1223 views/learning_unit.py:303
 msgid "Comparison impossible! No learning unit to compare to"
 msgstr ""
 
@@ -952,8 +952,8 @@ msgid "Components"
 msgstr ""
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:44
-#: templates/education_group/tab_admission_conditions.html:122
-#: templates/education_group/tab_admission_conditions.html:171
+#: templates/education_group/tab_admission_conditions.html:124
+#: templates/education_group/tab_admission_conditions.html:173
 #: templates/education_group/tabs.html:88
 msgid "Conditions"
 msgstr ""
@@ -1151,8 +1151,8 @@ msgid "Details"
 msgstr ""
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:43
-#: templates/education_group/tab_admission_conditions.html:121
-#: templates/education_group/tab_admission_conditions.html:170
+#: templates/education_group/tab_admission_conditions.html:123
+#: templates/education_group/tab_admission_conditions.html:172
 msgid "Diploma"
 msgstr ""
 
@@ -1597,7 +1597,7 @@ msgstr ""
 msgid "Force state"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:133
+#: templates/education_group/tab_admission_conditions.html:135
 msgid "Foreign Bachelors"
 msgstr ""
 
@@ -1630,7 +1630,7 @@ msgstr ""
 msgid "Formerly"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:71
+#: templates/education_group/tab_admission_conditions.html:73
 msgid "Free Text"
 msgstr ""
 
@@ -1641,8 +1641,8 @@ msgstr ""
 msgid "French"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:83
 #: templates/education_group/tab_admission_conditions.html:85
+#: templates/education_group/tab_admission_conditions.html:87
 msgid "French language proficiency examination"
 msgstr ""
 
@@ -1698,10 +1698,10 @@ msgstr ""
 msgid "Gender"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:49
 #: templates/education_group/tab_admission_conditions.html:51
-#: templates/education_group/tab_admission_conditions.html:76
+#: templates/education_group/tab_admission_conditions.html:53
 #: templates/education_group/tab_admission_conditions.html:78
+#: templates/education_group/tab_admission_conditions.html:80
 msgid "General Conditions"
 msgstr ""
 
@@ -1731,7 +1731,7 @@ msgstr ""
 msgid "Grade"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:179
+#: templates/education_group/tab_admission_conditions.html:181
 msgid "Graduates"
 msgstr ""
 
@@ -1755,11 +1755,11 @@ msgstr ""
 msgid "Highlight title"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:148
+#: templates/education_group/tab_admission_conditions.html:150
 msgid "Holders of a 2nd cycle University degree"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:185
+#: templates/education_group/tab_admission_conditions.html:187
 msgid "Holders of a non-University 2nd cycle degree"
 msgstr ""
 
@@ -1958,7 +1958,7 @@ msgstr ""
 msgid "LU"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:207 tests/views/test_learning_unit.py:435
+#: forms/learning_unit/search_form.py:207 tests/views/test_learning_unit.py:434
 msgid "LU_ERRORS_INVALID_REGEX_SYNTAX"
 msgstr ""
 
@@ -1977,8 +1977,8 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:59
 #: templates/education_group/tab_admission_conditions.html:61
+#: templates/education_group/tab_admission_conditions.html:63
 msgid "Language Exam"
 msgstr ""
 
@@ -2133,7 +2133,7 @@ msgid "List of trainings with administrative data"
 msgstr ""
 
 #: business/proposal_xls.py:37
-msgid "List_proposals"
+msgid "List proposals"
 msgstr ""
 
 #: models/external_learning_unit_year.py:58
@@ -2317,7 +2317,7 @@ msgstr ""
 msgid "Master thesis"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:180
+#: templates/education_group/tab_admission_conditions.html:182
 msgid "Masters"
 msgstr ""
 
@@ -2577,8 +2577,8 @@ msgstr ""
 msgid "Non academic CREF"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:142
 #: templates/education_group/tab_admission_conditions.html:144
+#: templates/education_group/tab_admission_conditions.html:146
 msgid "Non university Bachelors"
 msgstr ""
 
@@ -2661,8 +2661,8 @@ msgstr ""
 msgid "Open minor"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:93
 #: templates/education_group/tab_admission_conditions.html:95
+#: templates/education_group/tab_admission_conditions.html:97
 msgid "Opening to Adults"
 msgstr ""
 
@@ -2751,7 +2751,7 @@ msgstr ""
 msgid "Other teacher(s)"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:131
+#: templates/education_group/tab_admission_conditions.html:133
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr ""
 
@@ -2810,8 +2810,8 @@ msgstr ""
 msgid "Person not in accordance with proposal state"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:194
 #: templates/education_group/tab_admission_conditions.html:196
+#: templates/education_group/tab_admission_conditions.html:198
 msgid "Personalized access"
 msgstr ""
 
@@ -3083,9 +3083,9 @@ msgstr ""
 msgid "Publication contact entity"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:33
-#: templates/education_group/tab_general_informations.html:32
-#: templates/education_group/tab_skills_achievements.html:31
+#: templates/education_group/tab_admission_conditions.html:34
+#: templates/education_group/tab_general_informations.html:33
+#: templates/education_group/tab_skills_achievements.html:32
 msgid "Publish"
 msgstr ""
 
@@ -3148,8 +3148,8 @@ msgstr ""
 msgid "Received on"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:88
 #: templates/education_group/tab_admission_conditions.html:90
+#: templates/education_group/tab_admission_conditions.html:92
 msgid "Reduction"
 msgstr ""
 
@@ -3184,8 +3184,8 @@ msgid "Release"
 msgstr ""
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:45
-#: templates/education_group/tab_admission_conditions.html:124
-#: templates/education_group/tab_admission_conditions.html:173
+#: templates/education_group/tab_admission_conditions.html:126
+#: templates/education_group/tab_admission_conditions.html:175
 #: utils/send_mail.py:235
 msgid "Remarks"
 msgstr ""
@@ -3424,13 +3424,13 @@ msgstr ""
 msgid "Source code"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:64
 #: templates/education_group/tab_admission_conditions.html:66
+#: templates/education_group/tab_admission_conditions.html:68
 msgid "Special Conditions"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:54
 #: templates/education_group/tab_admission_conditions.html:56
+#: templates/education_group/tab_admission_conditions.html:58
 msgid "Specific Conditions"
 msgstr ""
 
@@ -3817,8 +3817,8 @@ msgid ""
 "year %(academic_year)s"
 msgstr ""
 
-#: tests/views/test_learning_unit.py:1314
-#: tests/views/test_learning_unit.py:1345 views/learning_unit.py:312
+#: tests/views/test_learning_unit.py:1251
+#: tests/views/test_learning_unit.py:1282 views/learning_unit.py:312
 #, python-format
 msgid "The learning unit does not exist for the academic year %(anac)s"
 msgstr ""
@@ -3920,7 +3920,7 @@ msgid ""
 "are not inside the selected training %(root)s"
 msgstr ""
 
-#: views/education_groups/detail.py:372
+#: views/education_groups/detail.py:374
 #, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr ""
@@ -3959,7 +3959,7 @@ msgstr ""
 msgid "The start date must be equals or lower than the end date"
 msgstr ""
 
-#: tests/views/test_learning_unit.py:1564 views/learning_unit.py:373
+#: tests/views/test_learning_unit.py:1501 views/learning_unit.py:373
 #, python-format
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
@@ -4070,7 +4070,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
-#: views/education_groups/detail.py:334
+#: views/education_groups/detail.py:335
 #, python-format
 msgid "This label %s does not exist"
 msgstr ""
@@ -4235,7 +4235,7 @@ msgstr ""
 msgid "Type of training"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:130
+#: templates/education_group/tab_admission_conditions.html:132
 msgid "UCL Bachelors"
 msgstr ""
 
@@ -4260,7 +4260,7 @@ msgstr ""
 msgid "Unique"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:100
+#: templates/education_group/tab_admission_conditions.html:102
 msgid "University Bachelors"
 msgstr ""
 
