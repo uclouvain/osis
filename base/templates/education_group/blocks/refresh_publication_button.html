@@ -1,9 +1,7 @@
-{% extends 'education_group/layout_detail.html' %}
 {% load i18n %}
-{% load staticfiles %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
-* designed to manage the core business of higher education institutions,com
+* designed to manage the core business of higher education institutions,
 * such as universities, faculties, institutes and professional schools.
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
@@ -24,16 +22,9 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-{% block top_action_bar %}
-    {% if can_edit_information and not education_group_year.is_common %}
-        {% include  "education_group/blocks/refresh_publication_button.html" %}
-    {% endif %}
-{% endblock %}
-
-{% block details %}
-    <div class="panel-group">
-        {% include "education_group/blocks/panel/panel_program_aims.html" with id="certificate" %}
-        {% include "education_group/blocks/panel/panel_achievements.html" with id="achievement" %}
-        {% include "education_group/blocks/panel/panel_additional_info_skills.html" with id="additionnal" %}
-    </div>
-{% endblock %}
+<form action="{% url 'education_group_publish' parent.pk education_group_year.id %}" method="post">
+    {% csrf_token %}
+    <button class="btn btn-default btn-publish" style="margin-right: 20px;">
+        {% trans 'Refresh publication' %}
+    </button>
+</form>
