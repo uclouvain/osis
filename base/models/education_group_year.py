@@ -506,6 +506,10 @@ class EducationGroupYear(SerializableModel):
         return self.acronym.startswith('common')
 
     @property
+    def is_main_common(self):
+        return self.acronym == 'common'
+
+    @property
     def is_master120(self):
         return self.education_group_type.name == TrainingType.PGRM_MASTER_120.name
 

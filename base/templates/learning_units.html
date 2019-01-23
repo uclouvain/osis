@@ -162,5 +162,13 @@
         $('input:checkbox.selected_object').not(this).prop('checked', this.checked);
     });
 
+    $("#btn_produce_xls_proposal").click(function(e) {
+        e.preventDefault();
+        var status = $("#xls_status_proposal");
+        status.val('xls');
+        $("#proposals_form").submit();
+        status.val('');
+    });
+
 </script>
 {% endblock %}
