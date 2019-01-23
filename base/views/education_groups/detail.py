@@ -32,11 +32,13 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import F, Case, When
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.http import require_http_methods
 from django.views.generic import DetailView
 from reversion.models import Version
 
@@ -363,6 +365,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
 
 @login_required
+@require_http_methods(['POST'])
 def publish(request, education_group_year_id, root_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
 
@@ -373,8 +376,9 @@ def publish(request, education_group_year_id, root_id):
     except PublishException as e:
         display_error_messages(request, str(e))
 
-    return redirect(reverse('education_group_general_informations',
-                            kwargs={'root_id': root_id, 'education_group_year_id': education_group_year_id}))
+    default_redirect_view = reverse('education_group_general_informations',
+                                    kwargs={'root_id': root_id, 'education_group_year_id': education_group_year_id})
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', default_redirect_view))
 
 
 class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
