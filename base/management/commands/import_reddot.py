@@ -410,8 +410,8 @@ class Command(BaseCommand):
         self.json_content = json.loads(path.read_text())
         self.suffix_language = '' if self.iso_language == 'fr-be' else '_en'
 
-        this_year = datetime.date.today().year - 1
-        for year in range(this_year, this_year + 6):
+        # Start import from 2017 until 2025
+        for year in range(2017, 2026):
             create_common_offer_for_academic_year(year)
 
         if options['is_conditions']:
