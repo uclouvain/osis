@@ -53,7 +53,7 @@ from webservices.business import SKILLS_AND_ACHIEVEMENTS_CMS_DATA, SKILLS_AND_AC
     SKILLS_AND_ACHIEVEMENTS_AA_DATA, CONTACTS_KEY
 
 CREATE_COMMON_FROM = 2017
-CREATE_COMMON_UNTIL = 2015
+CREATE_COMMON_UNTIL = 2025
 
 BACHELOR_FIELDS = (
     'alert_message', 'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres', 'ca_bacs_examen_langue',

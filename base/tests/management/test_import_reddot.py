@@ -52,8 +52,8 @@ class ImportReddotTestCase(TestCase):
     @mock.patch('base.management.commands.import_reddot.create_common_offer_for_academic_year')
     @mock.patch('base.management.commands.import_reddot.check_parameters')
     @mock.patch('json.loads', return_value={})
-    def test_create_common_offer_for_academic_year_called_multiple_times(self, mock_create_common, mock_check_param,
-                                                                         mock_json_loads):
+    def test_create_common_offer_for_academic_year_called_multiple_times(self, mock_json_loads, mock_check_param,
+                                                                         mock_create_common):
         mock_check_param.return_value = Mock()
         self.command.handle(
             file='dummy-path',
