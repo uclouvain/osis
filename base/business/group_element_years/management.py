@@ -122,11 +122,11 @@ def check_authorized_relationship(root, link, to_delete=False):
 
     for key, auth_rel in auth_rels_dict.items():
         if key not in count_children_dict:
-            not_authorized.append(key)
+            min_reached.append(key)
 
     if not_authorized:
         raise AuthorizedRelationshipNotRespectedException(
-                _("You cannot attach \"%(child_type)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                errors=_("You cannot attach \"%(child_type)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
                     'child_type': ','.join(str(AllTypes.get_value(name)) for name in not_authorized),
                     'parent': root,
                     'parent_type': AllTypes.get_value(root.education_group_type.name),
