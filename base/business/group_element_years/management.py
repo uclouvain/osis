@@ -120,8 +120,9 @@ def check_authorized_relationship(root, link, to_delete=False):
                 and count > auth_rels_dict[key].max_count_authorized:
             max_reached.append(key)
 
+    # Check for technical group that would not exist
     for key, auth_rel in auth_rels_dict.items():
-        if key not in count_children_dict:
+        if key not in count_children_dict and auth_rel.min_count_authorized > 1:
             min_reached.append(key)
 
     if not_authorized:
@@ -149,19 +150,23 @@ def check_authorized_relationship(root, link, to_delete=False):
 
 
 def compute_number_children_by_education_group_type(root, link=None, to_delete=False):
+    # Query all children of root
     qs = EducationGroupYear.objects.filter(
         (Q(child_branch__parent=root) & Q(child_branch__link_type=None)) |
         (Q(child_branch__parent__child_branch__parent=root) &
          Q(child_branch__parent__child_branch__link_type=LinkTypes.REFERENCE.name))
     )
     if link:
+        # Query children of child branch of link and child branch also
         records_to_remove_qs = EducationGroupYear.objects.filter(Q(pk=link.child_branch.pk) |
                                                                  Q(child_branch__parent=link.child_branch.pk))
 
+        # Query child branch of link or children of it if reference link
         new_link_children_qs = EducationGroupYear.objects.filter(pk=link.child_branch.pk)
         if link.link_type == LinkTypes.REFERENCE.name:
             new_link_children_qs = EducationGroupYear.objects.filter(child_branch__parent=link.child_branch.pk)
 
+        # Need to remove childrens in common between root and link
         qs = qs.difference(records_to_remove_qs)
 
         if not to_delete:
