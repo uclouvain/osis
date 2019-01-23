@@ -28,10 +28,11 @@ from unittest import mock
 from django.test import TestCase
 
 from base.business.group_element_years.management import compute_number_children_by_education_group_type, \
-    check_min_max_child_reached
+    check_authorized_relationship
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.enums.link_type import LinkTypes
-from base.models.exceptions import MaxChildrenReachedException, MinChildrenReachedException
+from base.models.exceptions import MaxChildrenReachedException, MinChildrenReachedException, \
+    AuthorizedRelationshipNotRespectedException
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -49,9 +50,9 @@ class TestCheckMinMaxChildReached(TestCase):
         cls.new_link = GroupElementYearFactory.build(child_branch=cls.child_egy)
 
     def setUp(self):
-        returned_value = {
-            self.child_type.name: 2
-        }
+        returned_value = [
+            {"education_group_type__name": self.child_type.name, "count": 2}
+        ]
         self.mocked_compute_number_children = mock.patch(
             "base.business.group_element_years.management.compute_number_children_by_education_group_type",
             return_value=returned_value
@@ -76,24 +77,24 @@ class TestCheckMinMaxChildReached(TestCase):
         )
 
     def test_when_no_authorized_relationship(self):
-        with self.assertRaises(AuthorizedRelationship.DoesNotExist):
-            check_min_max_child_reached(self.parent_egy, None, self.new_link)
+        with self.assertRaises(AuthorizedRelationshipNotRespectedException):
+            check_authorized_relationship(self.parent_egy, self.new_link)
 
     def test_should_raise_exception_when_max_count_exceeded(self):
         self.create_authorized_relationship(max_count=1)
 
-        with self.assertRaises(MaxChildrenReachedException):
-            check_min_max_child_reached(self.parent_egy, None, self.new_link)
+        with self.assertRaises(AuthorizedRelationshipNotRespectedException):
+            check_authorized_relationship(self.parent_egy, self.new_link)
 
     def test_should_raise_exception_when_min_count_subceeded(self):
         self.create_authorized_relationship(min_count=3)
 
-        with self.assertRaises(MinChildrenReachedException):
-            check_min_max_child_reached(self.parent_egy, None, self.new_link)
+        with self.assertRaises(AuthorizedRelationshipNotRespectedException):
+            check_authorized_relationship(self.parent_egy, self.new_link)
 
     def test_when_limit_respected(self):
         self.create_authorized_relationship()
-        check_min_max_child_reached(self.parent_egy, None, self.new_link)
+        check_authorized_relationship(self.parent_egy, self.new_link)
 
 
 class TestComputeNumberChildrenByEducationGroupType(TestCase):
@@ -141,53 +142,70 @@ class TestComputeNumberChildrenByEducationGroupType(TestCase):
     def test_when_no_children(self):
         parent_without_children = EducationGroupYearFactory()
 
-        expected_result = {
-            self.education_group_types[0].name: 1
-        }
-
-        old_link = None
-        new_link = GroupElementYearFactory.build(child_branch=self.child, link_type=None)
-        self.assertDictEqual(
-            expected_result,
-            compute_number_children_by_education_group_type(parent_without_children, old_link, new_link)
+        expected_result = [
+            self._create_result_record(self.education_group_types[0], 1)
+        ]
+        link = GroupElementYearFactory.build(child_branch=self.child, link_type=None)
+        self.assertCountEqual(
+            list(compute_number_children_by_education_group_type(parent_without_children, link)),
+            expected_result
         )
 
     def test_when_children(self):
-        expected_result = {
-            self.education_group_types[0].name: 3 + 1,
-            self.education_group_types[1].name: 4,
-            self.education_group_types[2].name: 1
-        }
-        old_link = None
-        new_link = GroupElementYearFactory.build(child_branch=self.child, link_type=None)
-        self.assertDictEqual(
-            expected_result,
-            compute_number_children_by_education_group_type(self.parent_egy, old_link, new_link)
+        expected_result = [
+            self._create_result_record(self.education_group_types[0], 3 + 1),
+            self._create_result_record(self.education_group_types[1], 4),
+            self._create_result_record(self.education_group_types[2], 1)
+        ]
+        link = GroupElementYearFactory.build(child_branch=self.child, link_type=None)
+        self.assertCountEqual(
+            list(compute_number_children_by_education_group_type(self.parent_egy, link)),
+            expected_result
         )
+        AuthorizedRelationshipFactory(parent_type=self.parent_egy.education_group_type,
+                                      child_type=self.child.education_group_type)
 
     def test_when_children_with_link_reference(self):
-        expected_result = {
-            self.education_group_types[0].name: 3,
-            self.education_group_types[1].name: 4,
-            self.education_group_types[2].name: 1 + 2
-        }
-        old_link = None
-        new_link = GroupElementYearFactory.build(child_branch=self.child, link_type=LinkTypes.REFERENCE.name)
-        self.assertDictEqual(
-            expected_result,
-            compute_number_children_by_education_group_type(self.parent_egy, old_link, new_link)
+        expected_result = [
+            self._create_result_record(self.education_group_types[0], 3),
+            self._create_result_record(self.education_group_types[1], 4),
+            self._create_result_record(self.education_group_types[2], 1 + 2)
+        ]
+        link = GroupElementYearFactory.build(child_branch=self.child, link_type=LinkTypes.REFERENCE.name)
+        self.assertCountEqual(
+            list(compute_number_children_by_education_group_type(self.parent_egy, link)),
+            expected_result
         )
 
     def test_when_switching_link_type_of_existing_child(self):
-        expected_result = {
-            self.education_group_types[0].name: 3 + 1,
-            self.education_group_types[1].name: 4 - 2,
-            self.education_group_types[2].name: 1 - 1
-        }
-        old_link = self.reference_group_element_year_children
-        new_link = GroupElementYearFactory.build(child_branch=self.reference_group_element_year_children.child_branch,
-                                                 link_type=None)
-        self.assertDictEqual(
-            expected_result,
-            compute_number_children_by_education_group_type(self.parent_egy, old_link, new_link)
+        expected_result = [
+            self._create_result_record(self.education_group_types[0], 3 + 1),
+            self._create_result_record(self.education_group_types[1], 4 - 2),
+            # self._create_result_record(self.education_group_types[2], 1 - 1)
+        ]
+
+        link = GroupElementYearFactory.build(child_branch=self.reference_group_element_year_children.child_branch,
+                                             link_type=None)
+        self.assertCountEqual(
+            list(compute_number_children_by_education_group_type(self.parent_egy, link)),
+            expected_result
         )
+
+    def test_when_deleting_link(self):
+        expected_result = [
+            self._create_result_record(self.education_group_types[0], 3),
+            self._create_result_record(self.education_group_types[1], 4 - 2),
+            # self._create_result_record(self.education_group_types[2], 1 - 1)
+        ]
+
+        link = self.reference_group_element_year_children
+        self.assertCountEqual(
+            list(compute_number_children_by_education_group_type(self.parent_egy, link, to_delete=True)),
+            expected_result
+        )
+
+    def _create_result_record(self, education_group_type, count):
+        return {
+            "education_group_type__name": education_group_type.name,
+            "count": count
+        }

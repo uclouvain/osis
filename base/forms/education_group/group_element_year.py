@@ -25,13 +25,11 @@
 ##############################################################################
 from django import forms
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext as _
 
-from base.business.group_element_years.management import is_max_child_reached, check_min_max_child_reached
-from base.models.authorized_relationship import AuthorizedRelationship
+from base.business.group_element_years.management import check_authorized_relationship
 from base.models.enums import education_group_categories
 from base.models.enums.link_type import LinkTypes
-from base.models.exceptions import MaxChildrenReachedException, MinChildrenReachedException
+from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.models.group_element_year import GroupElementYear
 
 
@@ -102,15 +100,10 @@ class GroupElementYearForm(forms.ModelForm):
             return data_cleaned
 
         try:
-            old_link = self.instance if self.instance.pk else None
             new_link = GroupElementYear(child_branch=self.instance.child_branch, link_type=data_cleaned)
-            check_min_max_child_reached(self.instance.parent, old_link, new_link)
-        except MaxChildrenReachedException as e:
+            check_authorized_relationship(self.instance.parent, new_link)
+        except AuthorizedRelationshipNotRespectedException as e:
             raise ValidationError(e.errors)
-        except MinChildrenReachedException as e:
-            raise ValidationError(e.errors)
-        except AuthorizedRelationship.DoesNotExist as e:
-            raise ValidationError(e.args[0])
         return data_cleaned
 
     def _check_authorized_relationship(self, child_type):

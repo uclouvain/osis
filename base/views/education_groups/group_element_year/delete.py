@@ -27,8 +27,8 @@ from django.http import JsonResponse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DeleteView
 
-from base.business.group_element_years.management import check_min_max_child_reached
-from base.models.exceptions import MinChildrenReachedException
+from base.business.group_element_years.management import check_authorized_relationship
+from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.views.common import display_error_messages, display_success_messages
 from base.views.education_groups.group_element_year import perms as group_element_year_perms
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
@@ -70,11 +70,9 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
                 }
         if child_branch:
             try:
-                check_min_max_child_reached(obj.parent, obj, None)
-            except MinChildrenReachedException as e:
+                check_authorized_relationship(obj.parent, obj, to_delete=True)
+            except AuthorizedRelationshipNotRespectedException as e:
                 error_msg = e.errors
-            except Exception:
-                pass
 
         if error_msg:
             display_error_messages(self.request, error_msg)
