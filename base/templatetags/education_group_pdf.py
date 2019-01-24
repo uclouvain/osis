@@ -23,21 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 
-from backoffice.settings import base
 from base.models.enums.learning_unit_year_periodicity import BIENNIAL_EVEN, BIENNIAL_ODD, ANNUAL
 from base.templatetags.education_group import register
 
-OPTIONAL_PNG = base.STATIC_URL + 'img/education_group_year/optional.png'
-MANDATORY_PNG = base.STATIC_URL + 'img/education_group_year/mandatory.png'
-VALIDATE_CASE_JPG = base.STATIC_URL + 'img/education_group_year/validate_case.jpg'
-INVALIDATE_CASE_JPG = base.STATIC_URL + 'img/education_group_year/invalidate_case.png'
-DELTA = base.STATIC_URL + 'img/education_group_year/delta.png'
-BISANNUAL_EVEN = base.STATIC_URL + 'img/education_group_year/bisannual_even.png'
-BISANNUAL_ODD = base.STATIC_URL + 'img/education_group_year/bisannual_odd.png'
+OPTIONAL_PNG = static('img/education_group_year/optional.png')
+MANDATORY_PNG = static('img/education_group_year/mandatory.png')
+VALIDATE_CASE_JPG = static('img/education_group_year/validate_case.jpg')
+INVALIDATE_CASE_JPG = static('img/education_group_year/invalidate_case.png')
+DELTA = static('img/education_group_year/delta.png')
+BISANNUAL_EVEN = static('img/education_group_year/bisannual_even.png')
+BISANNUAL_ODD = static('img/education_group_year/bisannual_odd.png')
 CHILD_BRANCH = """\
 <tr>
     <td style="padding-left:{padding}em;">
@@ -70,6 +70,7 @@ CHILD_LEAF = """\
     <td style="text-align: center;">{an_3}</td>
 </tr>
 """
+
 # margin-left is there to align the value with the remark.
 # We use 14px which is the size of the image before the value
 BRANCH_REMARK = """\
@@ -97,7 +98,6 @@ BRANCH_CONSTRAINT = """\
 
 @register.filter
 def pdf_tree_list(value):
-    print(value)
     return mark_safe(list_formatter(value))
 
 
