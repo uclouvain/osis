@@ -23,15 +23,45 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django import template
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
 
-from base.business.group_element_years import perms as business_perms
-from base.models import person
+from base.business.group_element_years.perms import is_eligible_to_update_group_element_year
+from base.templatetags.education_group import ICONS
+
+register = template.Library()
 
 
-def can_update_group_element_year(user, group_element_year, raise_exception=False):
-    pers = get_object_or_404(person.Person, user=user)
-    if not business_perms.is_eligible_to_update_group_element_year(pers, group_element_year, raise_exception):
-        raise PermissionDenied
-    return True
+def _get_permission(context, permission):
+    permission_denied_message = ""
+    group_element_year = context.get('group')
+    person = context.get('person')
+    root = context.get("root") or context.get("parent")
+
+    try:
+        result = permission(person, group_element_year, raise_exception=True)
+
+    except PermissionDenied as e:
+        result = False
+        permission_denied_message = str(e)
+
+    return permission_denied_message, "" if result else "disabled", root
+
+
+@register.inclusion_tag("blocks/button/button_template.html", takes_context=True,
+                        name='group_element_year_button_with_permission')
+def button_with_permission(context, title, value, url):
+    permission_denied_message, disabled, root = _get_permission(context, is_eligible_to_update_group_element_year)
+    load_modal = True
+
+    if disabled:
+        title = permission_denied_message
+        load_modal = False
+
+    return {
+        'load_modal': load_modal,
+        'title': title,
+        'class_button': "btn-default btn-sm " + disabled,
+        'icon': ICONS[value],
+        'url': url,
+    }

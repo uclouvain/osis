@@ -60,7 +60,7 @@ class TestDetach(TestCase):
     def setUp(self):
         self.client.force_login(self.person.user)
         self.perm_patcher = mock.patch(
-            "base.business.group_element_years.perms.is_eligible_to_create_group_element_year",
+            "base.business.group_element_years.perms.is_eligible_to_update_group_element_year",
             return_value=True
         )
         self.mocked_perm = self.perm_patcher.start()
@@ -131,7 +131,7 @@ class TestDetachLearningUnitPrerequisite(TestCase):
     def setUp(self):
         self.client.force_login(self.person.user)
         self.perm_patcher = mock.patch(
-            "base.business.group_element_years.perms.is_eligible_to_create_group_element_year",
+            "base.business.group_element_years.perms.is_eligible_to_update_group_element_year",
             return_value=True
         )
         self.mocked_perm = self.perm_patcher.start()
