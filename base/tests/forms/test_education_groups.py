@@ -28,6 +28,8 @@ from django.test import TestCase
 
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.forms.education_groups import EducationGroupFilter
+from django.utils.translation import ugettext_lazy as _
+from base.models.education_group_type import EducationGroupType
 
 
 class TestEducationGroupTypeOrderingForm(TestCase):
@@ -37,13 +39,15 @@ class TestEducationGroupTypeOrderingForm(TestCase):
         self.educ_grp_type_B = EducationGroupTypeFactory(name='B label')
         self.educ_grp_type_A = EducationGroupTypeFactory(name='A label')
 
+        self.form = EducationGroupFilter()
+        self.form.fields["education_group_type"].queryset = EducationGroupType.objects.all().order_by_translated_name()
+
     def test_ordering(self):
-        form = EducationGroupFilter()
-        self.assertCountEqual(list(form.fields["education_group_type"].queryset),
-                            [self.educ_grp_type_A, self.educ_grp_type_B, self.educ_grp_type_D])
+        self.assertEqual(list(self.form.fields["education_group_type"].queryset),
+                         [self.educ_grp_type_A, self.educ_grp_type_B, self.educ_grp_type_D])
         educ_grp_type_C = EducationGroupTypeFactory(name='C label')
-        form = EducationGroupFilter()
-        self.assertCountEqual(
-            list(form.fields["education_group_type"].queryset),
+        self.form.fields["education_group_type"].queryset = EducationGroupType.objects.all().order_by_translated_name()
+        self.assertEqual(
+            list(self.form.fields["education_group_type"].queryset),
             [self.educ_grp_type_A, self.educ_grp_type_B, educ_grp_type_C, self.educ_grp_type_D]
         )
