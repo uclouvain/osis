@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-24 11:30+0100\n"
+"POT-Creation-Date: 2019-01-24 11:52+0100\n"
 "PO-Revision-Date: 2019-01-23 09:42+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2056,7 +2056,7 @@ msgstr "Acquis d'apprentissage"
 msgid "Learning location"
 msgstr "Lieu d'enseignement"
 
-#: business/group_element_years/management.py:75
+#: business/group_element_years/management.py:70
 #: templates/learning_unit/breadcrumb.html:30
 #: templates/learning_unit/comparison.html:29 templates/learning_units.html:62
 #: templates/my_osis/profile.html:131
@@ -3975,7 +3975,6 @@ msgstr ""
 "Le nombre d'enfants de type \"%(child_type)s\" pour \"%(parent)s\" a atteint "
 "la limite maximum."
 
-#: business/group_element_years/management.py:145
 #: tests/forms/education_group/test_groupElementYearForm.py:210
 #, fuzzy, python-format
 #| msgid ""
@@ -3985,8 +3984,17 @@ msgid ""
 "The number of children of type(s) \"%(child_type)s\" for \"%(parent)s\" has "
 "already reached the limit."
 msgstr ""
-"Le nombre d'enfants de type(s) \"%(child_type)s\" pour \"%(parent)s\" a atteint "
-"la limite maximum."
+"Le nombre d'enfants de type(s) \"%(child_type)s\" pour \"%(parent)s\" a "
+"atteint la limite maximum."
+
+#: business/group_element_years/management.py:132
+#, python-format
+msgid ""
+"The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" has "
+"already reached the limit."
+msgstr ""
+"Le nombre d'enfants de type(s) \"%(child_types)s\" pour \"%(parent)s\" a "
+"atteint la limite maximum."
 
 #: models/learning_unit_year.py:384 tests/models/test_learning_unit_year.py:560
 #, python-format
@@ -4001,15 +4009,10 @@ msgstr ""
 msgid "The parent is inactive and there is at least one partim active"
 msgstr "L'UE parent est inactive et au moins un partim est actif"
 
-#: business/group_element_years/management.py:139
-#, fuzzy, python-format
-#| msgid ""
-#| "Cannot detach child \"%(child)s\". The parent must have at least one "
-#| "child of type \"%(type)s\"."
-msgid "The parent must have at least one child of type(s) \"%(type)s\"."
-msgstr ""
-"Impossible de détacher l'enfant \"%(child)s\". Le parent doit au moins avoir "
-"un enfant de type \"%(type)s\"."
+#: business/group_element_years/management.py:126
+#, python-format
+msgid "The parent must have at least one child of type(s) \"%(types)s\"."
+msgstr "Le parent doit au moins avoir un enfant de type(s) \"%(types)s\"."
 
 #: business/learning_units/simple/deletion.py:225
 #: tests/business/test_learning_unit_deletion.py:111
@@ -4756,7 +4759,7 @@ msgstr ""
 "Vous ne pouvez pas modifier les propositions liées à une année d'unité "
 "d'enseignement sous"
 
-#: business/group_element_years/management.py:72
+#: business/group_element_years/management.py:67
 #, python-format
 msgid ""
 "You cannot attach \"%(child)s\" (type \"%(child_type)s\") to \"%(parent)s"
@@ -4765,7 +4768,6 @@ msgstr ""
 "Vous ne pouvez pas attacher \"%(child)s\" (de type \"%(child_type)s\") à "
 "\"%(parent)s\" (de type \"%(parent_type)s\")"
 
-#: business/group_element_years/management.py:131
 #: tests/forms/education_group/test_groupElementYearForm.py:77
 #: tests/forms/education_group/test_groupElementYearForm.py:171
 #, fuzzy, python-format
@@ -4776,8 +4778,16 @@ msgid ""
 "You cannot attach \"%(child_type)s\" to \"%(parent)s\" (type "
 "\"%(parent_type)s\")"
 msgstr ""
-"Vous ne pouvez pas attacher \"%(child_type)s\" (de type \"%(child_type)s\") à "
-"\"%(parent)s\" (de type \"%(parent_type)s\")"
+"Vous ne pouvez pas attacher \"%(child_type)s\" (de type \"%(child_type)s\") "
+"à \"%(parent)s\" (de type \"%(parent_type)s\")"
+
+#: business/group_element_years/management.py:140
+#, python-format
+msgid ""
+"You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type "
+"\"%(parent_type)s\")"
+msgstr ""
+"Vous ne pouvez pas attacher \"%(child_types)s\" à \"%(parent)s\" (de type \"%(parent_type)s\")"
 
 #: business/learning_units/perms.py:62
 msgid ""

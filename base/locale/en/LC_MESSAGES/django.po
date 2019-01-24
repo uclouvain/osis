@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-24 11:30+0100\n"
+"POT-Creation-Date: 2019-01-24 11:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2011,7 +2011,7 @@ msgstr ""
 msgid "Learning location"
 msgstr ""
 
-#: business/group_element_years/management.py:75
+#: business/group_element_years/management.py:70
 #: templates/learning_unit/breadcrumb.html:30
 #: templates/learning_unit/comparison.html:29 templates/learning_units.html:62
 #: templates/my_osis/profile.html:131
@@ -3878,11 +3878,17 @@ msgid ""
 "already reached the limit."
 msgstr ""
 
-#: business/group_element_years/management.py:145
 #: tests/forms/education_group/test_groupElementYearForm.py:210
 #, python-format
 msgid ""
 "The number of children of type(s) \"%(child_type)s\" for \"%(parent)s\" has "
+"already reached the limit."
+msgstr ""
+
+#: business/group_element_years/management.py:132
+#, python-format
+msgid ""
+"The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" has "
 "already reached the limit."
 msgstr ""
 
@@ -3897,9 +3903,9 @@ msgstr ""
 msgid "The parent is inactive and there is at least one partim active"
 msgstr ""
 
-#: business/group_element_years/management.py:139
+#: business/group_element_years/management.py:126
 #, python-format
-msgid "The parent must have at least one child of type(s) \"%(type)s\"."
+msgid "The parent must have at least one child of type(s) \"%(types)s\"."
 msgstr ""
 
 #: business/learning_units/simple/deletion.py:225
@@ -4602,19 +4608,25 @@ msgid ""
 "You can't modify proposition which are related to a learning unit year under"
 msgstr ""
 
-#: business/group_element_years/management.py:72
+#: business/group_element_years/management.py:67
 #, python-format
 msgid ""
 "You cannot attach \"%(child)s\" (type \"%(child_type)s\") to \"%(parent)s"
 "\" (type \"%(parent_type)s\")"
 msgstr ""
 
-#: business/group_element_years/management.py:131
 #: tests/forms/education_group/test_groupElementYearForm.py:77
 #: tests/forms/education_group/test_groupElementYearForm.py:171
 #, python-format
 msgid ""
 "You cannot attach \"%(child_type)s\" to \"%(parent)s\" (type "
+"\"%(parent_type)s\")"
+msgstr ""
+
+#: business/group_element_years/management.py:140
+#, python-format
+msgid ""
+"You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type "
 "\"%(parent_type)s\")"
 msgstr ""
 

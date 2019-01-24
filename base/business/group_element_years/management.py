@@ -23,21 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import defaultdict
 
-from django.db.models import Count, Q, F, Case, When, OuterRef, Subquery, Value, CharField
+from django.db.models import Count, Q
 from django.utils.translation import ugettext as _
 
 from base.models.authorized_relationship import AuthorizedRelationship
-from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import AllTypes
 from base.models.enums.link_type import LinkTypes
-from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException, \
-    MinChildrenReachedException, AuthorizedRelationshipNotRespectedException
-from base.models.group_element_year import GroupElementYear
+from base.models.exceptions import IncompatiblesTypesException, AuthorizedRelationshipNotRespectedException
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.utils.utils import get_verbose_field_value
 from base.utils.cache import cache
 
 # TODO Use meta name instead
@@ -126,28 +121,28 @@ def check_authorized_relationship(root, link, to_delete=False):
         if key not in count_children_dict and auth_rel.min_count_authorized > 0:
             min_reached.append(key)
 
-    if not_authorized:
+    if min_reached:
         raise AuthorizedRelationshipNotRespectedException(
-                errors=_("You cannot attach \"%(child_type)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
-                    'child_type': ','.join(str(AllTypes.get_value(name)) for name in not_authorized),
-                    'parent': root,
-                    'parent_type': AllTypes.get_value(root.education_group_type.name),
-                }
-            )
-    elif min_reached:
-        raise AuthorizedRelationshipNotRespectedException(
-            errors=_("The parent must have at least one child of type(s) \"%(type)s\".") % {
-                "type": ','.join(str(AllTypes.get_value(name)) for name in min_reached)
+            errors=_("The parent must have at least one child of type(s) \"%(types)s\".") % {
+                "types": ','.join(str(AllTypes.get_value(name)) for name in min_reached)
             }
         )
     elif max_reached:
         raise AuthorizedRelationshipNotRespectedException(
-            errors=_("The number of children of type(s) \"%(child_type)s\" for \"%(parent)s\" "
+            errors=_("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
                      "has already reached the limit.") % {
-                       'child_type': ','.join(str(AllTypes.get_value(name)) for name in max_reached),
+                       'child_types': ','.join(str(AllTypes.get_value(name)) for name in max_reached),
                        'parent': root
                    }
         )
+    elif not_authorized:
+        raise AuthorizedRelationshipNotRespectedException(
+                errors=_("You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                    'child_types': ','.join(str(AllTypes.get_value(name)) for name in not_authorized),
+                    'parent': root,
+                    'parent_type': AllTypes.get_value(root.education_group_type.name),
+                }
+            )
 
 
 def compute_number_children_by_education_group_type(root, link=None, to_delete=False):
