@@ -31,8 +31,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import UpdateView
 from waffle.decorators import waffle_flag
 
-from base.business.group_element_years.management import select_education_group_year, \
-    select_learning_unit_year
+from base.business.group_element_years.management import save_element_selected
 from base.forms.education_group.group_element_year import GroupElementYearForm
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
@@ -115,11 +114,7 @@ def _down(request, group_element_year, *args, **kwargs):
 @require_http_methods(['POST'])
 def _select(request, group_element_year, *args, **kwargs):
     element = kwargs['element']
-    if type(element) == LearningUnitYear:
-        select_learning_unit_year(element)
-    elif type(element) == EducationGroupYear:
-        select_education_group_year(element)
-
+    save_element_selected(element, request.user)
     success_msg = build_success_message(element)
     return build_success_json_response(success_msg)
 
