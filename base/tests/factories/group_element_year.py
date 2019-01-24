@@ -29,6 +29,7 @@ import string
 import factory.fuzzy
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class GroupElementYearFactory(factory.django.DjangoModelFactory):
@@ -43,3 +44,9 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
     is_mandatory = False
     link_type = None
     order = None
+
+
+class GroupElementYearChildLeafFactory(GroupElementYearFactory):
+    child_branch = None
+    child_leaf = factory.SubFactory(LearningUnitYearFactory,
+                                    academic_year=factory.SelfAttribute("..parent.academic_year"))

@@ -23,13 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import defaultdict
+
+from django.db.models import Count, Q, F, Case, When, OuterRef, Subquery, Value, CharField
 from django.utils.translation import ugettext as _
 
 from base.models.authorized_relationship import AuthorizedRelationship
+from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import AllTypes
 from base.models.enums.link_type import LinkTypes
-from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException
+from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException, \
+    MinChildrenReachedException, AuthorizedRelationshipNotRespectedException
+from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.utils.utils import get_verbose_field_value
 from base.utils.cache import cache
 
 # TODO Use meta name instead
@@ -73,53 +81,99 @@ def extract_child_from_cache(parent, selected_data):
 
     elif selected_data['modelname'] == EDUCATION_GROUP_YEAR:
         egy = EducationGroupYear.objects.get(pk=selected_data['id'])
-
-        if is_max_child_reached(parent, egy.education_group_type):
-            raise MaxChildrenReachedException(
-                errors=_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
-                         "has already reached the limit.") % {
-                           'child_type': egy.education_group_type,
-                           'parent': parent
-                       }
-            )
         kwargs['child_branch'] = egy
 
     return kwargs
 
 
 def is_max_child_reached(parent, child_education_group_type):
-    def _is_max_child_reached(number_children, authorized_relationship):
-        max_count = authorized_relationship.max_count_authorized
-        return max_count and number_children >= max_count
-
-    return _is_limit_child_reached(parent, child_education_group_type, _is_max_child_reached)
-
-
-def is_min_child_reached(parent, child_education_group_type):
-    def _is_min_child_reached(number_children, authorized_relationship):
-        min_count = authorized_relationship.min_count_authorized
-        return bool(min_count) and number_children <= authorized_relationship.min_count_authorized
-
-    return _is_limit_child_reached(parent, child_education_group_type, _is_min_child_reached)
-
-
-def _is_limit_child_reached(parent, child_education_group_type, boolean_func):
-    """ Fetch the number of children with the same type """
-    number_children_of_same_type = parent.groupelementyear_set.filter(
-        child_branch__education_group_type=child_education_group_type
-    ).count()
-
-    # Add children of reference links.
-    for link in parent.groupelementyear_set.all():
-        if link.link_type == LinkTypes.REFERENCE.name and link.child_branch:
-            number_children_of_same_type += link.child_branch.groupelementyear_set.filter(
-                child_branch__education_group_type=child_education_group_type
-            ).count()
-
     try:
-        auth_rel = parent.education_group_type.authorized_parent_type.get(
-            child_type=child_education_group_type,
-        )
+        auth_rel = parent.education_group_type.authorized_parent_type.get(child_type__name=child_education_group_type)
     except AuthorizedRelationship.DoesNotExist:
         return True
-    return boolean_func(number_children_of_same_type, auth_rel)
+
+    try:
+        education_group_type_count = compute_number_children_by_education_group_type(parent, None).\
+            get(education_group_type__name=child_education_group_type)["count"]
+    except EducationGroupYear.DoesNotExist:
+        education_group_type_count = 0
+    return auth_rel.max_count_authorized is not None and education_group_type_count >= auth_rel.max_count_authorized
+
+
+def check_authorized_relationship(root, link, to_delete=False):
+    auth_rels = root.education_group_type.authorized_parent_type.all().select_related("child_type")
+    auth_rels_dict = {auth_rel.child_type.name: auth_rel for auth_rel in auth_rels}
+
+    count_children_by_education_group_type_qs = compute_number_children_by_education_group_type(root, link, to_delete)
+    count_children_dict = {
+        record["education_group_type__name"]: record["count"] for record in count_children_by_education_group_type_qs
+    }
+
+    max_reached = []
+    min_reached = []
+    not_authorized = []
+    for key, count in count_children_dict.items():
+        if key not in auth_rels_dict:
+            not_authorized.append(key)
+        elif count < auth_rels_dict[key].min_count_authorized:
+            min_reached.append(key)
+        elif auth_rels_dict[key].max_count_authorized is not None \
+                and count > auth_rels_dict[key].max_count_authorized:
+            max_reached.append(key)
+
+    # Check for technical group that would not be linked to root
+    for key, auth_rel in auth_rels_dict.items():
+        if key not in count_children_dict and auth_rel.min_count_authorized > 1:
+            min_reached.append(key)
+
+    if not_authorized:
+        raise AuthorizedRelationshipNotRespectedException(
+                errors=_("You cannot attach \"%(child_type)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                    'child_type': ','.join(str(AllTypes.get_value(name)) for name in not_authorized),
+                    'parent': root,
+                    'parent_type': AllTypes.get_value(root.education_group_type.name),
+                }
+            )
+    elif min_reached:
+        raise AuthorizedRelationshipNotRespectedException(
+            errors=_("The parent must have at least one child of type(s) \"%(type)s\".") % {
+                "type": ','.join(str(AllTypes.get_value(name)) for name in min_reached)
+            }
+        )
+    elif max_reached:
+        raise AuthorizedRelationshipNotRespectedException(
+            errors=_("The number of children of type(s) \"%(child_type)s\" for \"%(parent)s\" "
+                     "has already reached the limit.") % {
+                       'child_type': ','.join(str(AllTypes.get_value(name)) for name in max_reached),
+                       'parent': root
+                   }
+        )
+
+
+def compute_number_children_by_education_group_type(root, link=None, to_delete=False):
+    qs = EducationGroupYear.objects.filter(
+        (Q(child_branch__parent=root) & Q(child_branch__link_type=None)) |
+        (Q(child_branch__parent__child_branch__parent=root) &
+         Q(child_branch__parent__child_branch__link_type=LinkTypes.REFERENCE.name))
+    )
+    if link:
+        # Need to remove childrens in common between root and link to not false count
+        records_to_remove_qs = EducationGroupYear.objects.filter(Q(pk=link.child_branch.pk) |
+                                                                 Q(child_branch__parent=link.child_branch.pk))
+        qs = qs.difference(records_to_remove_qs)
+
+        link_children_qs = EducationGroupYear.objects.filter(pk=link.child_branch.pk)
+        if link.link_type == LinkTypes.REFERENCE.name:
+            link_children_qs = EducationGroupYear.objects.filter(child_branch__parent=link.child_branch.pk)
+
+        if not to_delete:
+            qs = qs.union(link_children_qs)
+
+    # FIXME Because when applying the annotate on the union and intersection,
+    #  it returns strange value for the count and education group type name
+    pks = qs.values_list("pk", flat=True)
+    qs = EducationGroupYear.objects.filter(pk__in=list(pks)). \
+        values("education_group_type__name"). \
+        order_by("education_group_type__name"). \
+        annotate(count=Count("education_group_type__name"))
+    return qs
