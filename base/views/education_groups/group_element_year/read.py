@@ -31,8 +31,10 @@ from django.urls import reverse
 from django.utils import translation
 from django.views.generic import FormView
 
+from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 from base.forms.education_group.common import SelectLanguage
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.link_type import LinkTypes
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.document.pdf_build import render_pdf
 
@@ -40,8 +42,7 @@ from osis_common.document.pdf_build import render_pdf
 @login_required
 def pdf_content(request, root_id, education_group_year_id, language):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    tree = get_verbose_children(education_group_year)
-
+    tree = NodeBranchJsTree(education_group_year).to_list()
     context = {
         'root': education_group_year,
         'tree': tree,
@@ -55,17 +56,6 @@ def pdf_content(request, root_id, education_group_year_id, language):
             filename=education_group_year.acronym,
             template='education_group/pdf_content.html',
         )
-
-
-def get_verbose_children(education_group_year):
-    result = []
-
-    for group_element_year in education_group_year.children:
-        result.append(group_element_year)
-        if group_element_year.child_branch:
-            result.append(get_verbose_children(group_element_year.child_branch))
-
-    return result
 
 
 class ReadEducationGroupTypeView(FlagMixin, AjaxTemplateMixin, FormView):
