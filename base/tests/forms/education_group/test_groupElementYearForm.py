@@ -74,11 +74,11 @@ class TestGroupElementYearForm(TestCase):
         self.assertEqual(
             form.errors["link_type"],
             [_(
-                "You cannot attach \"%(child_type)s\" to \"%(parent)s\" (type \"%(parent_type)s\")"
+                "You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")"
             ) % {
                  "parent_type": self.parent.education_group_type,
                  "parent": self.parent,
-                 "child_type": ref_group.child_branch.education_group_type,
+                 "child_types": ref_group.child_branch.education_group_type,
              }]
         )
 
@@ -168,8 +168,8 @@ class TestGroupElementYearForm(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors["link_type"],
-            [_("You cannot attach \"%(child_type)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
-                 'child_type': self.child_branch.education_group_type,
+            [_("You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                 'child_types': self.child_branch.education_group_type,
                  'parent': self.parent,
                  'parent_type': self.parent.education_group_type,
              }]
@@ -207,9 +207,9 @@ class TestGroupElementYearForm(TestCase):
         self.assertFalse(form.is_valid())
 
         self.assertEqual(form.errors['link_type'], [
-            _("The number of children of type(s) \"%(child_type)s\" for \"%(parent)s\" "
+            _("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
               "has already reached the limit.") % {
-                'child_type': child.education_group_type,
+                'child_types': child.education_group_type,
                 'parent': self.parent
             }
         ])
