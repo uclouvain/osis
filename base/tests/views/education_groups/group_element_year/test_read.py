@@ -28,6 +28,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -36,7 +37,6 @@ from base.tests.factories.learning_unit_component import LearningUnitComponentFa
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import SuperUserFactory
-from base.views.education_groups.group_element_year.read import get_verbose_children
 
 
 class TestRead(TestCase):
@@ -90,7 +90,7 @@ class TestRead(TestCase):
         self.assertTemplateUsed(response, 'education_group/pdf_content.html')
 
     def test_get_verbose_children(self):
-        result = get_verbose_children(self.education_group_year_1)
+        result = NodeBranchJsTree(self.education_group_year_1).to_list()
         context_waiting = [self.group_element_year_1, [self.group_element_year_2], self.group_element_year_3,
                            [self.group_element_year_4]]
         self.assertEqual(result, context_waiting)

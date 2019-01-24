@@ -1,28 +1,26 @@
-##############################################################################
-#
-#    OSIS stands for Open Student Information System. It's an application
-#    designed to manage the core business of higher education institutions,
-#    such as universities, faculties, institutes and professional schools.
-#    The core business involves the administration of students, teachers,
-#    courses, programs and so on.
-#
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    A copy of this license - GNU General Public License - is available
-#    at the root of the source code of this program.  If not,
-#    see http://www.gnu.org/licenses/.
-#
-##############################################################################
+# ########################################################################################
+#  OSIS stands for Open Student Information System. It's an application                  #
+#  designed to manage the core business of higher education institutions,                #
+#  such as universities, faculties, institutes and professional schools.                 #
+#  The core business involves the administration of students, teachers,                  #
+#  courses, programs and so on.                                                          #
+#                                                                                        #
+#  Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)    #
+#                                                                                        #
+#  This program is free software: you can redistribute it and/or modify                  #
+#  it under the terms of the GNU General Public License as published by                  #
+#  the Free Software Foundation, either version 3 of the License, or                     #
+#  (at your option) any later version.                                                   #
+#                                                                                        #
+#  This program is distributed in the hope that it will be useful,                       #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of                        #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                         #
+#  GNU General Public License for more details.                                          #
+#                                                                                        #
+#  A copy of this license - GNU General Public License - is available                    #
+#  at the root of the source code of this program.  If not,                              #
+#  see http://www.gnu.org/licenses/.                                                     #
+# ########################################################################################
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.db.models import OuterRef, Exists
 from django.urls import reverse
@@ -98,6 +96,23 @@ class NodeBranchJsTree:
             },
             'id': 'id_{}_{}'.format(self.education_group_year.pk, group_element_year_pk),
         }
+
+    def to_list(self):
+        """ Generate list of group_element_year without reference link """
+        result = []
+
+        for child in self.children:
+            child_list = child.to_list()
+
+            if child.reference:
+                result.extend(child_list)
+
+            else:
+                result.append(child.group_element_year)
+                if child_list:
+                    result.append(child_list)
+
+        return result
 
     def _get_icon(self):
         if self.reference:
