@@ -123,7 +123,7 @@ def check_authorized_relationship(root, link, to_delete=False):
 
     # Check for technical group that would not be linked to root
     for key, auth_rel in auth_rels_dict.items():
-        if key not in count_children_dict and auth_rel.min_count_authorized > 1:
+        if key not in count_children_dict and auth_rel.min_count_authorized > 0:
             min_reached.append(key)
 
     if not_authorized:
