@@ -32,7 +32,6 @@ from django.views.generic import FormView
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 from base.forms.education_group.common import SelectLanguage
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.link_type import LinkTypes
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.document.pdf_build import render_pdf
 
