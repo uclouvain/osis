@@ -94,3 +94,6 @@ msgstr ""
 
 msgid "Collapse"
 msgstr ""
+
+msgid "step_for_field"
+msgstr "Please enter a value that is a multiple of 0.5."

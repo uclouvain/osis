@@ -28,7 +28,7 @@
 {% for form in simplified_volume_management_form %}
         {% bootstrap_field form.id %}
 {% endfor %}
-<table class="table volumes_read ignore-js-validator">
+<table class="table volumes">
     <thead>
     <tr>
         <th>{% trans 'Components' %}&nbsp;&nbsp;</th>
@@ -54,3 +54,7 @@
     {% endfor %}
     </tbody>
 </table>
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'js/learning_unit/learning_unit_update.js' %}"></script>
+{% endblock script %}

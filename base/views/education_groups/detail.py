@@ -59,7 +59,7 @@ from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year import EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
-from base.models.enums.education_group_categories import TRAINING
+from base.models.enums.education_group_categories import TRAINING, GROUP
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.person import Person
 from base.utils.cache import cache
@@ -145,11 +145,15 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context['enums'] = mdl.enums.education_group_categories
 
         self.is_intro_offer = self.object.education_group_type.name in INTRO_OFFER
-        context['show_extra_info'] = not self.is_intro_offer
 
-        common_offers = ['common-' + offer.lower() for offer in COMMON_OFFER[:-1]]
-        context['show_general_info'] = self.object.acronym not in common_offers
-        context["hide_for_2M"] = self.hide_for_2m()
+        context["show_identification"] = self.show_identification()
+        context["show_diploma"] = self.show_diploma()
+        context["show_general_information"] = self.show_general_information()
+        context["show_skills_and_achievements"] = self.show_skills_and_achievements()
+        context["show_administrative"] = self.show_administrative()
+        context["show_content"] = self.show_content()
+        context["show_utilization"] = self.show_utilization()
+        context["show_admission_conditions"] = self.show_admission_conditions()
         return context
 
     def get(self, request, *args, **kwargs):
@@ -157,12 +161,32 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
             assert_category_of_education_group_year(self.get_object(), self.limited_by_category)
         return super().get(request, *args, **kwargs)
 
-    def hide_for_2m(self):
-        """Some informations have to be hidden for 2M.
-           Co-organization and administrative data doesn't have sense for 2M (120/180-240) """
-        return not (self.object.education_group_type.category == TRAINING and
-                    self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
-                                                                  TrainingType.PGRM_MASTER_180_240.name])
+    def show_identification(self):
+        return True
+
+    def show_diploma(self):
+        return self.object.education_group_type.category == TRAINING and not self.object.is_common
+
+    def show_general_information(self):
+        return not self.object.acronym.startswith('common-')
+
+    def show_skills_and_achievements(self):
+        return not self.object.is_common and self.object.education_group_type.category != GROUP
+
+    def show_administrative(self):
+        return self.object.education_group_type.category == "TRAINING" and \
+               self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
+                                                             TrainingType.PGRM_MASTER_180_240.name] and \
+               not self.object.is_common
+
+    def show_content(self):
+        return not self.object.is_common and not self.is_intro_offer
+
+    def show_utilization(self):
+        return not self.object.is_common
+
+    def show_admission_conditions(self):
+        return not self.object.is_main_common and not self.is_intro_offer
 
 
 class EducationGroupRead(EducationGroupGenericDetailView):
@@ -178,7 +202,7 @@ class EducationGroupRead(EducationGroupGenericDetailView):
         context["education_group_languages"] = self.object.educationgrouplanguage_set.order_by('order').values_list(
             'language__name', flat=True)
         context["versions"] = self.get_related_versions()
-
+        context["show_coorganization"] = self.show_coorganization()
         return context
 
     def get_template_names(self):
@@ -212,6 +236,11 @@ class EducationGroupRead(EducationGroupGenericDetailView):
             'main_teaching_campus', 'administration_entity', 'management_entity',
             'academic_year'
         )
+
+    def show_coorganization(self):
+        return self.object.education_group_type.category == "TRAINING" and \
+               self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
+                                                             TrainingType.PGRM_MASTER_180_240.name]
 
 
 class EducationGroupDiplomas(EducationGroupGenericDetailView):
@@ -265,22 +294,24 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             sections_list = SECTION_INTRO
         else:
             sections_list = SECTION_LIST
+
         for section in sections_list:
             translated_labels = self.get_translated_labels_and_content(section,
                                                                        self.user_language_code,
                                                                        common_education_group_year,
                                                                        sections_to_display)
-
-            sections_with_translated_labels.append(Section(section.title, translated_labels))
+            if translated_labels:
+                sections_with_translated_labels.append(Section(section.title, translated_labels))
         return sections_with_translated_labels
 
     def get_translated_labels_and_content(self, section, user_language, common_education_group_year, sections_list):
         records = []
-        for label, selectors in section.labels:
-            if not sections_list or any(label in section for section in sections_list):
-                records.extend(
-                    self.get_selectors(common_education_group_year, label, selectors, user_language)
-                )
+        filtered_labels = {(label, selectors) for label, selectors in section.labels
+                           if not sections_list or label in sections_list}
+        for label, selectors in filtered_labels:
+            records.extend(
+                self.get_selectors(common_education_group_year, label, selectors, user_language)
+            )
         return records
 
     def get_selectors(self, common_education_group_year, label, selectors, user_language):

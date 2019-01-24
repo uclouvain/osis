@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from _decimal import Decimal
 from collections import OrderedDict
 
 from django import forms
@@ -48,7 +47,7 @@ from base.models.learning_unit_component import LearningUnitComponent
 
 class StepHalfIntegerWidget(forms.NumberInput):
     def __init__(self):
-        super().__init__(attrs={'step': STEP_HALF_INTEGER})
+        super().__init__(attrs={'step': STEP_HALF_INTEGER, 'min': 0})
 
 
 class VolumeField(forms.DecimalField):
