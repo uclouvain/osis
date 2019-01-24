@@ -114,3 +114,9 @@ class TestBuildTree(TestCase):
         node = NodeBranchJsTree(self.parent)
 
         self.assertEqual(node.children[0]._get_icon(),  static('img/reference.jpg'))
+
+        list_children = node.to_list()
+        self.assertEqual(list_children, [
+            self.group_element_year_1_1,
+            self.group_element_year_2, [self.group_element_year_2_1]
+        ])
