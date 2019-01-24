@@ -180,8 +180,7 @@ class TestComputeNumberChildrenByEducationGroupType(TestCase):
     def test_when_switching_link_type_of_existing_child(self):
         expected_result = [
             self._create_result_record(self.education_group_types[0], 3 + 1),
-            self._create_result_record(self.education_group_types[1], 4 - 2),
-            # self._create_result_record(self.education_group_types[2], 1 - 1)
+            self._create_result_record(self.education_group_types[1], 4 - 2)
         ]
 
         link = GroupElementYearFactory.build(child_branch=self.reference_group_element_year_children.child_branch,
@@ -194,8 +193,7 @@ class TestComputeNumberChildrenByEducationGroupType(TestCase):
     def test_when_deleting_link(self):
         expected_result = [
             self._create_result_record(self.education_group_types[0], 3),
-            self._create_result_record(self.education_group_types[1], 4 - 2),
-            # self._create_result_record(self.education_group_types[2], 1 - 1)
+            self._create_result_record(self.education_group_types[1], 4 - 2)
         ]
 
         link = self.reference_group_element_year_children
