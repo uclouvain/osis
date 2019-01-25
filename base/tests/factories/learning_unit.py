@@ -44,8 +44,7 @@ class LearningUnitFactory(DjangoModelFactory):
     existing_proposal_in_epc = False
     learning_container = factory.SubFactory(LearningContainerFactory)
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     start_year = factory.fuzzy.FuzzyInteger(2015, timezone.now().year)
     end_year = factory.LazyAttribute(lambda obj: factory.fuzzy.FuzzyInteger(obj.start_year + 1, obj.start_year + 9).fuzz())
     faculty_remark = factory.fuzzy.FuzzyText(length=255)
