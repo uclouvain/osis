@@ -28,8 +28,9 @@ from django.db import IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView
 
-from base.business.group_element_years.management import extract_child_from_cache, clear_cache
+from base.business.group_element_years.management import extract_child_from_cache
 from base.forms.education_group.group_element_year import GroupElementYearForm
+from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
 
@@ -68,7 +69,7 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
         If the form is valid, save the associated model.
         """
         # Clear cache.
-        clear_cache(self.request.user)
+        ElementCache(self.request.user).clear()
         return super().form_valid(form)
 
     # SuccessMessageMixin

@@ -32,16 +32,16 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from waffle.decorators import waffle_flag
 
-from base.business.group_element_years.management import save_element_selected
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
+from base.utils.cache import ElementCache
 
 
 @login_required
 @waffle_flag("education_group_select")
 def education_group_select(request, root_id=None, education_group_year_id=None):
     education_group_year = get_object_or_404(EducationGroupYear, pk=request.POST['element_id'])
-    save_element_selected(education_group_year, request.user)
+    ElementCache(request.user).save_element_selected(education_group_year)
     success_message = build_success_message(education_group_year)
     if request.is_ajax():
         return build_success_json_response(success_message)
@@ -61,7 +61,7 @@ def education_group_select(request, root_id=None, education_group_year_id=None):
 @require_http_methods(['POST'])
 def learning_unit_select(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
-    save_element_selected(learning_unit_year, request.user)
+    ElementCache(request.user).save_element_selected(learning_unit_year)
     success_message = build_success_message(learning_unit_year)
     if request.is_ajax():
         return build_success_json_response(success_message)

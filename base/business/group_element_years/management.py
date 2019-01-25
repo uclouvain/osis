@@ -33,32 +33,16 @@ from base.models.enums.education_group_types import AllTypes
 from base.models.enums.link_type import LinkTypes
 from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.models.learning_unit_year import LearningUnitYear
-from base.utils.cache import cache
+from base.utils.cache import ElementCache
 
-# TODO Use meta name instead
+
 LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
 SELECT_CACHE_KEY = 'select_element_{user}'
 
 
-def save_element_selected(obj, user):
-    data_to_cache = {'id': obj.pk, 'modelname': obj._meta.db_table}
-    key = SELECT_CACHE_KEY.format(user=user.pk)
-    cache.set(key, data_to_cache, timeout=None)
-
-
-def retrieve_element_selected(user):
-    key = SELECT_CACHE_KEY.format(user=user.pk)
-    return cache.get(key)
-
-
-def clear_cache(user):
-    key = SELECT_CACHE_KEY.format(user=user.pk)
-    cache.set(key, None, timeout=None)
-
-
 def extract_child_from_cache(parent, user):
-    selected_data = retrieve_element_selected(user)
+    selected_data = ElementCache(user).cached_data
     kwargs = {'parent': parent}
     if not selected_data:
         return {}

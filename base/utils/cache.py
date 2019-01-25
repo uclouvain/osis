@@ -38,7 +38,7 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 try:
     cache = caches["redis"]
 except InvalidCacheBackendError:
-    logger.exception("Rolled back to default cache")
+    logger.warning("Rolled back to default cache")
     cache = caches["default"]
 
 
@@ -99,3 +99,18 @@ class RequestCache(OsisCache):
         new_get_request.update({**request.GET.dict(), **cached_value})
 
         return new_get_request
+
+
+class ElementCache(OsisCache):
+    PREFIX_KEY = 'select_element_{user}'
+
+    def __init__(self, user):
+        self.user = user
+
+    @property
+    def key(self):
+        return self.PREFIX_KEY.format(user=self.user.pk)
+
+    def save_element_selected(self, obj):
+        data_to_cache = {'id': obj.pk, 'modelname': obj._meta.db_table}
+        self.set_cached_data(data_to_cache)
