@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import abc
 import logging
 from functools import wraps
 
@@ -46,9 +47,10 @@ def cache_filter(exclude_params=None, **default_values):
         @wraps(func)
         def inner(request, *args, **kwargs):
             try:
+                request_cache = RequestCache(user=request.user, path=request.path)
                 if request.GET:
-                    _save_filter_to_cache(request, exclude_params=exclude_params)
-                _restore_filter_from_cache(request, **default_values)
+                    request_cache.save_get_parameters(request, parameters_to_exclude=exclude_params)
+                request.GET = request_cache.restore_get_request(request, **default_values)
             except Exception:
                 logger.exception('An error occurred with cache system')
             return func(request, *args, **kwargs)
@@ -56,42 +58,44 @@ def cache_filter(exclude_params=None, **default_values):
     return decorator
 
 
-def _save_filter_to_cache(request, exclude_params=None):
-    if exclude_params is None:
-        exclude_params = []
-    param_to_cache = {key: value for key, value in request.GET.items() if key not in exclude_params}
-    key = _get_filter_key(request.user, request.path)
-    cache.set(key, param_to_cache, timeout=CACHE_FILTER_TIMEOUT)
+class OsisCache(abc.ABC):
+    PREFIX_KEY = None
+
+    @abc.abstractmethod
+    def key(self):
+        return self.PREFIX_KEY
+
+    @property
+    def cached_data(self):
+        return cache.get(self.key)
+
+    def set_cached_data(self, data, timeout=None):
+        cache.set(self.key, data, timeout=timeout)
+
+    def clear(self):
+        cache.delete(self.key)
 
 
-def _restore_filter_from_cache(request, **default_values):
-    cached_value = _get_from_cache(request)
-    new_get_request = QueryDict(mutable=True)
-    if cached_value is None:
-        new_get_request.update({**request.GET.dict(), **default_values})
-    else:
+class RequestCache(OsisCache):
+    PREFIX_KEY = 'cache_filter'
+
+    def __init__(self, user, path):
+        self.user = user
+        self.path = path
+
+    @property
+    def key(self):
+        return "_".join([self.PREFIX_KEY, str(self.user.id), self.path])
+
+    def save_get_parameters(self, request, parameters_to_exclude=None):
+        parameters_to_exclude = parameters_to_exclude or []
+        param_to_cache = {key: value for key, value in request.GET.items() if key not in parameters_to_exclude}
+        self.set_cached_data(param_to_cache)
+
+    def restore_get_request(self, request, **default_values):
+        cached_value = self.cached_data or default_values
+
+        new_get_request = QueryDict(mutable=True)
         new_get_request.update({**request.GET.dict(), **cached_value})
-    request.GET = new_get_request
 
-
-def _get_from_cache(request):
-    key = _get_filter_key(request.user, request.path)
-    return cache.get(key)
-
-
-def clear_cached_filter(request):
-    path = request.POST['current_url']
-    key = _get_filter_key(request.user, path)
-    cache.delete(key)
-
-
-def get_filter_value_from_cache(user, path, filter_key):
-    key = _get_filter_key(user, path)
-    filter_cached = cache.get(key)
-    if filter_cached:
-        return filter_cached.get(filter_key)
-    return None
-
-
-def _get_filter_key(user, path):
-    return "_".join([PREFIX_CACHE_KEY, str(user.id), path])
+        return new_get_request
