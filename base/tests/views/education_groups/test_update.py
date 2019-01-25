@@ -56,7 +56,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory
-from base.utils.cache import cache
+from base.utils.cache import cache, ElementCache
 from base.views.education_groups.update import update_education_group, _get_success_redirect_url
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.language import LanguageFactory
@@ -323,16 +323,12 @@ class TestGetSuccessRedirectUrl(TestCase):
         self.assertEqual(result, expected_url)
 
 
+# TODO Use setuptestdata
 @override_flag('education_group_attach', active=True)
 @override_flag('education_group_select', active=True)
 @override_flag('education_group_update', active=True)
 class TestSelectAttach(TestCase):
     def setUp(self):
-        self.locmem_cache = cache
-        self.locmem_cache.clear()
-        self.patch = patch.object(management, 'cache', self.locmem_cache)
-        self.patch.start()
-
         self.person = PersonFactory()
         self.client = Client()
         self.client.force_login(self.person.user)
@@ -390,11 +386,7 @@ class TestSelectAttach(TestCase):
             "action": "attach",
         }
 
-        cache.set('child_to_cache_id', None, timeout=None)
-
     def tearDown(self):
-        cache.set('child_to_cache_id', None, timeout=None)
-        self.patch.stop()
         self.client.logout()
         self.perm_patcher.stop()
 
@@ -404,7 +396,8 @@ class TestSelectAttach(TestCase):
             data=self.select_data,
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
-        data_cached = cache.get(management.SELECT_CACHE_KEY)
+
+        data_cached = ElementCache(self.person.user).cached_data
 
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertIsInstance(data_cached, dict)
@@ -416,7 +409,7 @@ class TestSelectAttach(TestCase):
             self.url_select_learning_unit,
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
-        data_cached = cache.get(management.SELECT_CACHE_KEY)
+        data_cached = ElementCache(self.person.user).cached_data
 
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertIsInstance(data_cached, dict)
@@ -428,7 +421,7 @@ class TestSelectAttach(TestCase):
         response = self.client.post(self.url_select_learning_unit)
 
         # Verify cache
-        data_cached = cache.get(management.SELECT_CACHE_KEY)
+        data_cached = data_cached = ElementCache(self.person.user).cached_data
         self.assertIsInstance(data_cached, dict)
         self.assertEqual(int(data_cached['id']), self.learning_unit_year.id)
         self.assertEqual(data_cached['modelname'], management.LEARNING_UNIT_YEAR)
@@ -550,11 +543,7 @@ class TestSelectAttach(TestCase):
         ).exists()
         self.assertFalse(expected_absent_group_element_year)
 
-        cache.set(
-            management.SELECT_CACHE_KEY,
-            {'id': self.learning_unit_year.pk, 'modelname': management.LEARNING_UNIT_YEAR},
-            timeout=None,
-        )
+        data_cached = ElementCache(self.person.user).save_element_selected(self.learning_unit_year)
 
         response = self.client.post(
             reverse("education_group_attach", args=[self.root.pk, self.new_parent_education_group_year.pk]),
