@@ -209,8 +209,8 @@ def force_state_of_proposals(proposals, author, new_state):
         proposals,
         author,
         change_state,
-        "Proposal %(acronym)s (%(academic_year)s) successfully changed state.",
-        "Proposal %(acronym)s (%(academic_year)s) cannot be changed state.",
+        _("Proposal %(acronym)s (%(academic_year)s) successfully changed state."),
+        _("Proposal %(acronym)s (%(academic_year)s) cannot be changed state."),
         None,
         None,
         perms.is_eligible_to_edit_proposal
