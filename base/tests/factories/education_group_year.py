@@ -75,8 +75,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
 
 
 class MiniTrainingFactory(EducationGroupYearFactory):
-    education_group_type = factory.SubFactory('base.tests.factories.education_group_type.EducationGroupTypeFactory',
-                                              category=education_group_categories.MINI_TRAINING)
+    education_group_type__minitraining = True
 
 
 class TrainingFactory(EducationGroupYearFactory):
@@ -85,8 +84,7 @@ class TrainingFactory(EducationGroupYearFactory):
 
 
 class GroupFactory(EducationGroupYearFactory):
-    education_group_type = factory.SubFactory('base.tests.factories.education_group_type.EducationGroupTypeFactory',
-                                              category=education_group_categories.GROUP)
+    education_group_type__group = True
 
 
 class EducationGroupYearCommonBachelorFactory(EducationGroupYearFactory):

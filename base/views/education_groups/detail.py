@@ -180,7 +180,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
                not self.object.is_common
 
     def show_content(self):
-        return not self.object.is_common and not self.is_intro_offer
+        return not self.object.is_common
 
     def show_utilization(self):
         return not self.object.is_common

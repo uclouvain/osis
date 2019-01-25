@@ -28,10 +28,9 @@ from django.db import IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView
 
-from base.business.group_element_years.management import SELECT_CACHE_KEY, extract_child_from_cache
+from base.business.group_element_years.management import extract_child_from_cache
 from base.forms.education_group.group_element_year import GroupElementYearForm
-from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException
-from base.utils.cache import cache
+from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
 
@@ -46,8 +45,7 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
         kwargs = super().get_form_kwargs()
 
         try:
-            selected_data = cache.get(SELECT_CACHE_KEY)
-            cached_data = extract_child_from_cache(self.education_group_year, selected_data)
+            cached_data = extract_child_from_cache(self.education_group_year, self.request.user)
             if not cached_data:
                 raise ObjectDoesNotExist
             kwargs.update({
@@ -58,10 +56,6 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
 
         except ObjectDoesNotExist:
             warning_msg = _("Please Select or Move an item before Attach it")
-            display_warning_messages(self.request, warning_msg)
-
-        except (IncompatiblesTypesException, MaxChildrenReachedException) as e:
-            warning_msg = e.errors
             display_warning_messages(self.request, warning_msg)
 
         except IntegrityError as e:
@@ -75,7 +69,7 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
         If the form is valid, save the associated model.
         """
         # Clear cache.
-        cache.set(SELECT_CACHE_KEY, None, timeout=None)
+        ElementCache(self.request.user).clear()
         return super().form_valid(form)
 
     # SuccessMessageMixin

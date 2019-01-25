@@ -11,7 +11,7 @@ function check_simplified_volumes_form() {
                 // test if the value is x.00
                 if ( Math.floor(value.valueOf()) === value.valueOf() ) return value;
                 // test if last character is 0. if yes, we remove it
-                return ( value[value.length - 1] === '0' ? (Math.floor(value * 10) / 10) : value );
+                return ( value[value.length - 1] === '0' ? (Math.floor(value * 10) / 10).toString() : value );
             }
             return value;
         },

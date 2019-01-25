@@ -30,7 +30,6 @@ from http import HTTPStatus
 from unittest import mock
 
 import bs4
-import reversion
 from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
@@ -42,13 +41,9 @@ from waffle.testutils import override_flag
 from base.business.education_groups.general_information import PublishException
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.enums import education_group_categories, academic_calendar_type
-from base.models.enums.education_group_types import TrainingType, MiniTrainingType
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.admission_condition import AdmissionConditionFactory
-from base.tests.factories.certificate_aim import CertificateAimFactory
-from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
-from base.tests.factories.education_group_language import EducationGroupLanguageFactory
-from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory, \
     TrainingFactory, EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonBachelorFactory, \
@@ -61,253 +56,6 @@ from base.views.education_groups.detail import get_appropriate_common_admission_
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
-
-
-class EducationGroupRead(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        today = datetime.date.today()
-        academic_year = AcademicYearFactory(start_date=today, end_date=today.replace(year=today.year + 1),
-                                            year=today.year)
-        cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=academic_year)
-        cls.education_group_child_1 = EducationGroupYearFactory(acronym="Child_1", academic_year=academic_year)
-        cls.education_group_child_2 = EducationGroupYearFactory(acronym="Child_2", academic_year=academic_year)
-
-        GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child_1)
-        GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child_2)
-
-        cls.education_group_language_parent = \
-            EducationGroupLanguageFactory(education_group_year=cls.education_group_parent)
-        cls.education_group_language_child_1 = \
-            EducationGroupLanguageFactory(education_group_year=cls.education_group_child_1)
-
-        cls.user = PersonFactory().user
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        cls.url = reverse("education_group_read",
-                          args=[cls.education_group_parent.id, cls.education_group_child_1.id])
-
-    def setUp(self):
-        self.client.force_login(self.user)
-
-    def test_when_not_logged(self):
-        self.client.logout()
-        response = self.client.get(self.url)
-
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
-
-    def test_user_without_permission(self):
-        an_other_user = UserFactory()
-        self.client.force_login(an_other_user)
-        response = self.client.get(self.url)
-
-        self.assertTemplateUsed(response, "access_denied.html")
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-    def test_with_non_existent_education_group_year(self):
-        non_existent_id = self.education_group_child_1.id + self.education_group_child_2.id + \
-                          self.education_group_parent.id
-        url = reverse("education_group_read", args=[self.education_group_parent.pk, non_existent_id])
-        response = self.client.get(url)
-
-        self.assertTemplateUsed(response, "page_not_found.html")
-        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
-
-    def test_without_get_data(self):
-        response = self.client.get(self.url)
-
-        self.assertTemplateUsed(response, "education_group/tab_identification.html")
-
-        context = response.context
-        self.assertEqual(context["education_group_year"], self.education_group_child_1)
-        self.assertListEqual(
-            list(context["education_group_languages"]),
-            [self.education_group_language_child_1.language.name]
-        )
-        self.assertEqual(context["enums"], education_group_categories)
-        self.assertEqual(context["parent"], self.education_group_parent)
-
-    def test_with_root_set(self):
-        response = self.client.get(self.url, data={"root": self.education_group_parent.id})
-
-        self.assertTemplateUsed(response, "education_group/tab_identification.html")
-
-        context = response.context
-        self.assertEqual(context["education_group_year"], self.education_group_child_1)
-        self.assertListEqual(
-            list(context["education_group_languages"]),
-            [self.education_group_language_child_1.language.name]
-        )
-        self.assertEqual(context["enums"], education_group_categories)
-        self.assertEqual(context["parent"], self.education_group_parent)
-
-    def test_with_non_existent_root_id(self):
-        non_existent_id = self.education_group_child_1.id + self.education_group_child_2.id + \
-                          self.education_group_parent.id
-        url = reverse("education_group_read",
-                      args=[non_existent_id, self.education_group_child_1.id])
-
-        response = self.client.get(url)
-
-        self.assertTemplateUsed(response, "page_not_found.html")
-        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
-
-    def test_with_root_set_as_current_education_group_year(self):
-        response = self.client.get(self.url, data={"root": self.education_group_child_1.id})
-
-        self.assertTemplateUsed(response, "education_group/tab_identification.html")
-
-        context = response.context
-        self.assertEqual(context["education_group_year"], self.education_group_child_1)
-        self.assertListEqual(
-            list(context["education_group_languages"]),
-            [self.education_group_language_child_1.language.name]
-        )
-        self.assertEqual(context["enums"], education_group_categories)
-        self.assertEqual(context["parent"], self.education_group_parent)
-
-    def test_with_without_education_group_language(self):
-        url = reverse("education_group_read", args=[self.education_group_parent.pk, self.education_group_child_2.id])
-        response = self.client.get(url)
-
-        self.assertTemplateUsed(response, "education_group/tab_identification.html")
-
-        context = response.context
-        self.assertEqual(context["education_group_year"], self.education_group_child_2)
-        self.assertListEqual(
-            list(context["education_group_languages"]),
-            []
-        )
-        self.assertEqual(context["enums"], education_group_categories)
-        self.assertEqual(context["parent"], self.education_group_parent)
-
-    def test_versions(self):
-        response = self.client.get(self.url)
-        self.assertEqual(len(response.context["versions"]), 0)
-
-        with reversion.create_revision():
-            self.education_group_child_1.acronym = "Snape"
-            self.education_group_child_1.save()
-
-        response = self.client.get(self.url)
-        self.assertEqual(len(response.context["versions"]), 1)
-
-        with reversion.create_revision():
-            EducationGroupOrganizationFactory(education_group_year=self.education_group_child_1)
-
-        response = self.client.get(self.url)
-        self.assertEqual(len(response.context["versions"]), 2)
-
-
-class EducationGroupDiplomas(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        academic_year = AcademicYearFactory()
-        type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
-        cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=academic_year,
-                                                               education_group_type=type_training)
-        cls.education_group_child = EducationGroupYearFactory(acronym="Child_1", academic_year=academic_year,
-                                                              education_group_type=type_training)
-        GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
-        cls.user = UserFactory()
-        cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        cls.url = reverse("education_group_diplomas",
-                          args=[cls.education_group_parent.pk, cls.education_group_child.id])
-
-    def setUp(self):
-        self.client.force_login(self.user)
-
-    def test_when_not_logged(self):
-        self.client.logout()
-        response = self.client.get(self.url)
-
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
-
-    def test_user_without_permission(self):
-        an_other_user = UserFactory()
-        self.client.force_login(an_other_user)
-        response = self.client.get(self.url)
-
-        self.assertTemplateUsed(response, "access_denied.html")
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-    def test_with_non_existent_education_group_year(self):
-        non_existent_id = self.education_group_child.id + self.education_group_parent.id
-        url = reverse("education_group_diplomas", args=[self.education_group_parent.pk, non_existent_id])
-        response = self.client.get(url)
-
-        self.assertTemplateUsed(response, "page_not_found.html")
-        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
-
-    def test_with_education_group_year_of_type_mini_training(self):
-        mini_training_education_group_year = EducationGroupYearFactory()
-        mini_training_education_group_year.education_group_type.category = education_group_categories.MINI_TRAINING
-        mini_training_education_group_year.education_group_type.save()
-
-        url = reverse("education_group_diplomas",
-                      args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
-        response = self.client.get(url)
-
-        self.assertTemplateUsed(response, "access_denied.html")
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-    def test_with_education_group_year_of_type_group(self):
-        group_education_group_year = EducationGroupYearFactory()
-        group_education_group_year.education_group_type.category = education_group_categories.GROUP
-        group_education_group_year.education_group_type.save()
-
-        url = reverse("education_group_diplomas",
-                      args=[group_education_group_year.id, group_education_group_year.id]
-                      )
-        response = self.client.get(url)
-
-        self.assertTemplateUsed(response, "access_denied.html")
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-    def test_without_get_data(self):
-        response = self.client.get(self.url)
-
-        self.assertTemplateUsed(response, "education_group/tab_diplomas.html")
-
-        context = response.context
-        self.assertEqual(context["education_group_year"], self.education_group_child)
-        self.assertEqual(context["parent"], self.education_group_parent)
-
-    def test_with_non_existent_root_id(self):
-        non_existent_id = self.education_group_child.id + self.education_group_parent.id
-        url = reverse("education_group_diplomas", args=[non_existent_id, self.education_group_child.pk])
-        response = self.client.get(url)
-
-        self.assertTemplateUsed(response, "page_not_found.html")
-        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
-
-    def test_with_root_set(self):
-        response = self.client.get(self.url, data={"root": self.education_group_parent.id})
-
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertTemplateUsed(response, "education_group/tab_diplomas.html")
-
-        context = response.context
-        self.assertEqual(context["education_group_year"], self.education_group_child)
-        self.assertEqual(context["parent"], self.education_group_parent)
-
-    def test_get_queryset__order_certificate_aims(self):
-        self._generate_certificate_aims_with_wrong_order()
-
-        response = self.client.get(self.url, data={"root": self.education_group_parent.id})
-        certificate_aims = response.context['education_group_year'].certificate_aims.all()
-        expected_order = sorted(certificate_aims, key=lambda obj: (obj.section, obj.code))
-        self.assertListEqual(expected_order, list(certificate_aims))
-
-    def _generate_certificate_aims_with_wrong_order(self):
-        # Numbers below are used only to ensure records are saved in wrong order (there's no other meaning)
-        for section in range(4, 2, -1):
-            code_range = section * 11
-            for code in range(code_range, code_range - 2, -1):
-                EducationGroupCertificateAimFactory(
-                    education_group_year=self.education_group_child,
-                    certificate_aim=CertificateAimFactory(code=code, section=section),
-                )
 
 
 @override_settings(URL_TO_PORTAL_UCL="http://portal-url.com", GET_SECTION_PARAM="sectionsParams")
@@ -1258,10 +1006,8 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
     def test_get_appropriate_common_offer_for_common(self):
         edy = EducationGroupYearCommonFactory(
-            academic_year=self.academic_year,
-            education_group_type__category=education_group_categories.MINI_TRAINING,
-            education_group_type__name=MiniTrainingType.OPTION.name
-
+            education_group_type__minitraining=True,
+            academic_year=self.academic_year
         )
         result = get_appropriate_common_admission_condition(edy)
         self.assertEqual(result, None)

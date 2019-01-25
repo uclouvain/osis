@@ -23,65 +23,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import defaultdict
 
-from django.db.models import Count, Q, F, Case, When, OuterRef, Subquery, Value, CharField
+from django.db.models import Count, Q
 from django.utils.translation import ugettext as _
 
 from base.models.authorized_relationship import AuthorizedRelationship
-from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import AllTypes
 from base.models.enums.link_type import LinkTypes
-from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException, \
-    MinChildrenReachedException, AuthorizedRelationshipNotRespectedException
-from base.models.group_element_year import GroupElementYear
+from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.utils.utils import get_verbose_field_value
-from base.utils.cache import cache
-
-# TODO Use meta name instead
-LEARNING_UNIT_YEAR = 'learningunityear'
-EDUCATION_GROUP_YEAR = 'educationgroupyear'
-SELECT_CACHE_KEY = 'child_to_cache_id'
+from base.utils.cache import ElementCache
 
 
-def select_education_group_year(education_group_year):
-    return _set_selected_element_on_cache(education_group_year.pk, EDUCATION_GROUP_YEAR)
+LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
+EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
+SELECT_CACHE_KEY = 'select_element_{user}'
 
 
-def select_learning_unit_year(learning_unit_year):
-    return _set_selected_element_on_cache(learning_unit_year.pk, LEARNING_UNIT_YEAR)
-
-
-def _set_selected_element_on_cache(id, modelname):
-    data_to_cache = {'id': id, 'modelname': modelname}
-    cache.set(SELECT_CACHE_KEY, data_to_cache, timeout=None)
-    return True
-
-
-def extract_child_from_cache(parent, selected_data):
+def extract_child_from_cache(parent, user):
+    selected_data = ElementCache(user).cached_data
     kwargs = {'parent': parent}
     if not selected_data:
         return {}
 
     if selected_data['modelname'] == LEARNING_UNIT_YEAR:
-        luy = LearningUnitYear.objects.get(pk=selected_data['id'])
-        if not parent.education_group_type.learning_unit_child_allowed:
-            raise IncompatiblesTypesException(
-                errors=_("You cannot attach \"%(child)s\" (type \"%(child_type)s\") "
-                         "to \"%(parent)s\" (type \"%(parent_type)s\")") % {
-                           'child': luy,
-                           'child_type': _("Learning unit"),
-                           'parent': parent,
-                           'parent_type': parent.education_group_type,
-                       }
-            )
-        kwargs['child_leaf'] = luy
+        kwargs['child_leaf'] = LearningUnitYear.objects.get(pk=selected_data['id'])
 
     elif selected_data['modelname'] == EDUCATION_GROUP_YEAR:
-        egy = EducationGroupYear.objects.get(pk=selected_data['id'])
-        kwargs['child_branch'] = egy
+        kwargs['child_branch'] = EducationGroupYear.objects.get(pk=selected_data['id'])
 
     return kwargs
 
@@ -123,31 +93,31 @@ def check_authorized_relationship(root, link, to_delete=False):
 
     # Check for technical group that would not be linked to root
     for key, auth_rel in auth_rels_dict.items():
-        if key not in count_children_dict and auth_rel.min_count_authorized > 1:
+        if key not in count_children_dict and auth_rel.min_count_authorized > 0:
             min_reached.append(key)
 
-    if not_authorized:
+    if min_reached:
         raise AuthorizedRelationshipNotRespectedException(
-                errors=_("You cannot attach \"%(child_type)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
-                    'child_type': ','.join(str(AllTypes.get_value(name)) for name in not_authorized),
-                    'parent': root,
-                    'parent_type': AllTypes.get_value(root.education_group_type.name),
-                }
-            )
-    elif min_reached:
-        raise AuthorizedRelationshipNotRespectedException(
-            errors=_("The parent must have at least one child of type(s) \"%(type)s\".") % {
-                "type": ','.join(str(AllTypes.get_value(name)) for name in min_reached)
+            errors=_("The parent must have at least one child of type(s) \"%(types)s\".") % {
+                "types": ', '.join(str(AllTypes.get_value(name)) for name in min_reached)
             }
         )
     elif max_reached:
         raise AuthorizedRelationshipNotRespectedException(
-            errors=_("The number of children of type(s) \"%(child_type)s\" for \"%(parent)s\" "
+            errors=_("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
                      "has already reached the limit.") % {
-                       'child_type': ','.join(str(AllTypes.get_value(name)) for name in max_reached),
+                       'child_types': ', '.join(str(AllTypes.get_value(name)) for name in max_reached),
                        'parent': root
                    }
         )
+    elif not_authorized:
+        raise AuthorizedRelationshipNotRespectedException(
+                errors=_("You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                    'child_types': ', '.join(str(AllTypes.get_value(name)) for name in not_authorized),
+                    'parent': root,
+                    'parent_type': AllTypes.get_value(root.education_group_type.name),
+                }
+            )
 
 
 def compute_number_children_by_education_group_type(root, link=None, to_delete=False):

@@ -28,26 +28,10 @@ import operator
 import string
 
 import factory.fuzzy
-from django.utils import timezone
 
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION, EDUCATION_GROUP_EDITION, \
-    ACADEMIC_CALENDAR_TYPES
+    ACADEMIC_CALENDAR_TYPES, SCORES_EXAM_SUBMISSION
 from base.tests.factories.academic_year import AcademicYearFactory
-from osis_common.utils.datetime import get_tzinfo
-
-
-def generate_start_date(academic_calendar):
-    if academic_calendar.academic_year:
-        return academic_calendar.academic_year.start_date
-    else:
-        return datetime.date(timezone.now().year, 9, 30)
-
-
-def generate_end_date(academic_calendar):
-    if academic_calendar.academic_year:
-        return academic_calendar.academic_year.end_date
-    else:
-        return datetime.date(timezone.now().year+1, 9, 30)
 
 
 class AcademicCalendarFactory(factory.DjangoModelFactory):
@@ -55,16 +39,12 @@ class AcademicCalendarFactory(factory.DjangoModelFactory):
         model = 'base.AcademicCalendar'
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-
-    changed = factory.fuzzy.FuzzyNaiveDateTime(
-        datetime.datetime(2016, 1, 1),
-        datetime.datetime(2017, 3, 1)
-    )
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
 
     academic_year = factory.SubFactory(AcademicYearFactory)
     title = factory.Sequence(lambda n: 'Academic Calendar - %d' % n)
-    start_date = factory.LazyAttribute(generate_start_date)
-    end_date = factory.LazyAttribute(generate_end_date)
+    start_date = factory.SelfAttribute("academic_year.start_date")
+    end_date = factory.SelfAttribute("academic_year.end_date")
     highlight_title = factory.Sequence(lambda n: 'Highlight - %d' % n)
     highlight_description = factory.Sequence(lambda n: 'Description - %d' % n)
     highlight_shortcut = factory.Sequence(lambda n: 'Shortcut Highlight - %d' % n)
@@ -82,7 +62,7 @@ class CloseAcademicCalendarFactory(AcademicCalendarFactory):
 
 
 class AcademicCalendarExamSubmissionFactory(AcademicCalendarFactory):
-    reference = 'SCORES_EXAM_SUBMISSION'
+    reference = SCORES_EXAM_SUBMISSION
 
 
 class AcademicCalendarSummaryCourseSubmissionFactory(AcademicCalendarFactory):
