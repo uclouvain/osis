@@ -110,7 +110,7 @@ class TestCreate(TestCase):
                                             if eg_type.category == category)
                 self.client.get(url)
                 self.mocked_perm.assert_called_with(self.person, None, category,
-                                                    education_group_type=str(education_group_type.pk),
+                                                    education_group_type=education_group_type,
                                                     raise_exception=True)
 
     def test_template_used(self):
