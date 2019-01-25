@@ -57,7 +57,7 @@ def _is_eligible_to_add_education_group(person, education_group, category, educa
     return check_permission(person, "base.add_educationgroup", raise_exception) and \
            _is_eligible_to_add_education_group_with_category(person, category, raise_exception) and \
            _is_eligible_education_group(person, education_group, raise_exception) and \
-           (not management.is_max_child_reached(education_group, education_group_type)
+           (not management.is_max_child_reached(education_group, education_group_type.name)
             if education_group_type and education_group
             else check_authorized_type(education_group, category, raise_exception))
 
