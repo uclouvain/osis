@@ -39,6 +39,7 @@ from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.utils import cache
+from base.utils.cache import RequestCache
 from base.views import layout
 from base.views.common import display_success_messages
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
@@ -88,8 +89,10 @@ def create_education_group(request, category, education_group_type_pk, parent_id
     parent = get_object_or_404(EducationGroupYear, id=parent_id) if parent_id is not None else None
     education_group_type = get_object_or_404(EducationGroupType, pk=education_group_type_pk)
 
-    initial_academic_year = parent.academic_year_id if parent else \
-        cache.get_filter_value_from_cache(request.user, reverse('education_groups'), 'academic_year')
+    request_cache = RequestCache(request.user, reverse('education_groups'))
+    cached_data = request_cache.cached_data or {}
+
+    initial_academic_year = parent.academic_year_id if parent else cached_data.get('academic_year')
     form_education_group_year = FORMS_BY_CATEGORY[category](
         request.POST or None,
         parent=parent,
