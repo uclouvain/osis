@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-24 11:52+0100\n"
+"POT-Creation-Date: 2019-01-25 08:13+0100\n"
 "PO-Revision-Date: 2019-01-23 09:42+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1017,7 +1017,7 @@ msgstr "Contenu"
 msgid "Coorganization"
 msgstr "Coorganization"
 
-#: templatetags/education_group.py:166
+#: templatetags/education_group.py:96
 #, python-format
 msgid "Copy the content from %(previous_anac)s to %(current_anac)s"
 msgstr "Recopier le contenu de %(previous_anac)s à %(current_anac)s"
@@ -1744,7 +1744,7 @@ msgstr "Configuration générale"
 msgid "General informations"
 msgstr "Infos générales"
 
-#: templatetags/education_group.py:428
+#: templatetags/education_group.py:235
 #: tests/templatetags/test_education_group.py:267
 #: tests/templatetags/test_education_group.py:269
 msgid "Generate pdf"
@@ -1942,7 +1942,7 @@ msgstr ""
 msgid "It is necessary to indicate the internship subtype."
 msgstr "Il est nécessaire d'indiquer le sous-type de stage."
 
-#: templatetags/education_group.py:405
+#: templatetags/education_group.py:212
 #: tests/templatetags/test_education_group.py:242
 #, python-format
 msgid "It is not possible to %(action)s the root element."
@@ -2452,7 +2452,7 @@ msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:85
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:75
-#: templatetags/education_group.py:222
+#: templatetags/education_group.py:152
 #: tests/templatetags/test_education_group.py:437
 msgid "Modify"
 msgstr "Modifier"
@@ -2701,7 +2701,7 @@ msgstr "Sur dossier: accès direct ou moyennant compléments de formation"
 msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
 
-#: templatetags/education_group.py:216
+#: templatetags/education_group.py:146
 #: tests/templatetags/test_education_group.py:433 views/education_group.py:69
 msgid ""
 "Only program managers of the education group OR central manager linked to "
@@ -3062,10 +3062,18 @@ msgstr "Prolonger"
 msgid "Proposal"
 msgstr "Proposition"
 
+#: business/learning_unit_proposal.py:213
+msgid "Proposal %(acronym)s (%(academic_year)s) cannot be changed state."
+msgstr "Proposition %(acronym)s (%(academic_year)s) ne peut pas changer d'état."
+
 #: tests/views/test_learning_unit_proposal.py:692
 #, python-format
 msgid "Proposal %(acronym)s (%(academic_year)s) successfully canceled."
 msgstr "Proposition %(acronym)s (%(academic_year)s) annulée avec succès."
+
+#: business/learning_unit_proposal.py:212
+msgid "Proposal %(acronym)s (%(academic_year)s) successfully changed state."
+msgstr "Proposition %(acronym)s (%(academic_year)s) a changé d'état avec succès."
 
 #: tests/business/test_learning_unit_proposal.py:235
 #, python-format
@@ -3975,19 +3983,8 @@ msgstr ""
 "Le nombre d'enfants de type \"%(child_type)s\" pour \"%(parent)s\" a atteint "
 "la limite maximum."
 
-#: tests/forms/education_group/test_groupElementYearForm.py:210
-#, fuzzy, python-format
-#| msgid ""
-#| "The number of children of type \"%(child_type)s\" for \"%(parent)s\" has "
-#| "already reached the limit."
-msgid ""
-"The number of children of type(s) \"%(child_type)s\" for \"%(parent)s\" has "
-"already reached the limit."
-msgstr ""
-"Le nombre d'enfants de type(s) \"%(child_type)s\" pour \"%(parent)s\" a "
-"atteint la limite maximum."
-
 #: business/group_element_years/management.py:132
+#: tests/forms/education_group/test_groupElementYearForm.py:210
 #, python-format
 msgid ""
 "The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" has "
@@ -4087,7 +4084,7 @@ msgstr ""
 "La somme des volumes des partims pour le professeur %(tutor)s est supérieure "
 "au volume de l'unité d'apprentissage parent pour ce professeur"
 
-#: templatetags/education_group.py:403
+#: templatetags/education_group.py:210
 #: tests/templatetags/test_education_group.py:230
 #: tests/templatetags/test_education_group.py:254
 msgid "The user has not permission to change education groups."
@@ -4768,26 +4765,16 @@ msgstr ""
 "Vous ne pouvez pas attacher \"%(child)s\" (de type \"%(child_type)s\") à "
 "\"%(parent)s\" (de type \"%(parent_type)s\")"
 
+#: business/group_element_years/management.py:140
 #: tests/forms/education_group/test_groupElementYearForm.py:77
 #: tests/forms/education_group/test_groupElementYearForm.py:171
-#, fuzzy, python-format
-#| msgid ""
-#| "You cannot attach \"%(child)s\" (type \"%(child_type)s\") to \"%(parent)s"
-#| "\" (type \"%(parent_type)s\")"
-msgid ""
-"You cannot attach \"%(child_type)s\" to \"%(parent)s\" (type "
-"\"%(parent_type)s\")"
-msgstr ""
-"Vous ne pouvez pas attacher \"%(child_type)s\" (de type \"%(child_type)s\") "
-"à \"%(parent)s\" (de type \"%(parent_type)s\")"
-
-#: business/group_element_years/management.py:140
 #, python-format
 msgid ""
 "You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type "
 "\"%(parent_type)s\")"
 msgstr ""
-"Vous ne pouvez pas attacher \"%(child_types)s\" à \"%(parent)s\" (de type \"%(parent_type)s\")"
+"Vous ne pouvez pas attacher \"%(child_types)s\" à \"%(parent)s\" (de type "
+"\"%(parent_type)s\")"
 
 #: business/learning_units/perms.py:62
 msgid ""
@@ -5468,6 +5455,28 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr "oui,non"
+
+#, fuzzy
+#~| msgid ""
+#~| "The number of children of type \"%(child_type)s\" for \"%(parent)s\" has "
+#~| "already reached the limit."
+#~ msgid ""
+#~ "The number of children of type(s) \"%(child_type)s\" for \"%(parent)s\" "
+#~ "has already reached the limit."
+#~ msgstr ""
+#~ "Le nombre d'enfants de type(s) \"%(child_type)s\" pour \"%(parent)s\" a "
+#~ "atteint la limite maximum."
+
+#, fuzzy
+#~| msgid ""
+#~| "You cannot attach \"%(child)s\" (type \"%(child_type)s\") to \"%(parent)s"
+#~| "\" (type \"%(parent_type)s\")"
+#~ msgid ""
+#~ "You cannot attach \"%(child_type)s\" to \"%(parent)s\" (type "
+#~ "\"%(parent_type)s\")"
+#~ msgstr ""
+#~ "Vous ne pouvez pas attacher \"%(child_type)s\" (de type \"%(child_type)s"
+#~ "\") à \"%(parent)s\" (de type \"%(parent_type)s\")"
 
 #~ msgid ""
 #~ "You are not allow to create a reference link between a %(parent_type)s "

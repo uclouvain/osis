@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-24 11:52+0100\n"
+"POT-Creation-Date: 2019-01-25 08:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -985,7 +985,7 @@ msgstr ""
 msgid "Coorganization"
 msgstr ""
 
-#: templatetags/education_group.py:166
+#: templatetags/education_group.py:96
 #, python-format
 msgid "Copy the content from %(previous_anac)s to %(current_anac)s"
 msgstr ""
@@ -1706,7 +1706,7 @@ msgstr ""
 msgid "General informations"
 msgstr ""
 
-#: templatetags/education_group.py:428
+#: templatetags/education_group.py:235
 #: tests/templatetags/test_education_group.py:267
 #: tests/templatetags/test_education_group.py:269
 msgid "Generate pdf"
@@ -1901,7 +1901,7 @@ msgstr ""
 msgid "It is necessary to indicate the internship subtype."
 msgstr ""
 
-#: templatetags/education_group.py:405
+#: templatetags/education_group.py:212
 #: tests/templatetags/test_education_group.py:242
 #, python-format
 msgid "It is not possible to %(action)s the root element."
@@ -2396,7 +2396,7 @@ msgstr ""
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:85
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:75
-#: templatetags/education_group.py:222
+#: templatetags/education_group.py:152
 #: tests/templatetags/test_education_group.py:437
 msgid "Modify"
 msgstr ""
@@ -2639,7 +2639,7 @@ msgstr ""
 msgid "One of the partial volumes must have a value to 0."
 msgstr ""
 
-#: templatetags/education_group.py:216
+#: templatetags/education_group.py:146
 #: tests/templatetags/test_education_group.py:433 views/education_group.py:69
 msgid ""
 "Only program managers of the education group OR central manager linked to "
@@ -2995,9 +2995,19 @@ msgstr ""
 msgid "Proposal"
 msgstr ""
 
+#: business/learning_unit_proposal.py:213
+#, python-format
+msgid "Proposal %(acronym)s (%(academic_year)s) cannot be changed state."
+msgstr ""
+
 #: tests/views/test_learning_unit_proposal.py:692
 #, python-format
 msgid "Proposal %(acronym)s (%(academic_year)s) successfully canceled."
+msgstr ""
+
+#: business/learning_unit_proposal.py:212
+#, python-format
+msgid "Proposal %(acronym)s (%(academic_year)s) successfully changed state."
 msgstr ""
 
 #: tests/business/test_learning_unit_proposal.py:235
@@ -3878,14 +3888,8 @@ msgid ""
 "already reached the limit."
 msgstr ""
 
-#: tests/forms/education_group/test_groupElementYearForm.py:210
-#, python-format
-msgid ""
-"The number of children of type(s) \"%(child_type)s\" for \"%(parent)s\" has "
-"already reached the limit."
-msgstr ""
-
 #: business/group_element_years/management.py:132
+#: tests/forms/education_group/test_groupElementYearForm.py:210
 #, python-format
 msgid ""
 "The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" has "
@@ -3973,7 +3977,7 @@ msgid ""
 "the volume of parent learning unit for this professor"
 msgstr ""
 
-#: templatetags/education_group.py:403
+#: templatetags/education_group.py:210
 #: tests/templatetags/test_education_group.py:230
 #: tests/templatetags/test_education_group.py:254
 msgid "The user has not permission to change education groups."
@@ -4615,15 +4619,9 @@ msgid ""
 "\" (type \"%(parent_type)s\")"
 msgstr ""
 
+#: business/group_element_years/management.py:140
 #: tests/forms/education_group/test_groupElementYearForm.py:77
 #: tests/forms/education_group/test_groupElementYearForm.py:171
-#, python-format
-msgid ""
-"You cannot attach \"%(child_type)s\" to \"%(parent)s\" (type "
-"\"%(parent_type)s\")"
-msgstr ""
-
-#: business/group_element_years/management.py:140
 #, python-format
 msgid ""
 "You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type "
