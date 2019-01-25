@@ -40,8 +40,7 @@ class OfferYearEntityFactory(factory.DjangoModelFactory):
         model = 'base.OfferYearEntity'
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     offer_year = factory.SubFactory(OfferYearFactory)
     entity = factory.SubFactory(EntityFactory)
     type = factory.Iterator(offer_year_entity_type.TYPES, getter=operator.itemgetter(0))
