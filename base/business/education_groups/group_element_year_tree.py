@@ -27,14 +27,36 @@ from django.urls import reverse
 
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 from base.models.enums.link_type import LinkTypes
+from base.models.group_element_year import build_tree_in_memory, GroupElementYear
 from base.models.prerequisite_item import PrerequisiteItem
+
+def instance_NodeBranchJsTree(root):
+
+    has_prerequisite = PrerequisiteItem.objects.filter(
+        prerequisite__education_group_year__id=root.id,
+        prerequisite__learning_unit_year__id=OuterRef("child_leaf__id"),
+    )
+
+    is_prerequisite = PrerequisiteItem.objects.filter(
+        learning_unit__learningunityear__id=OuterRef("child_leaf__id"),
+        prerequisite__education_group_year=root.id,
+    )
+
+    queryset = GroupElementYear.objects.all() \
+        .annotate(has_prerequisite=Exists(has_prerequisite)) \
+        .annotate(is_prerequisite=Exists(is_prerequisite)) \
+        .select_related('child_branch__academic_year',
+                        'child_leaf__academic_year',
+                        'child_leaf__learning_container_year')
+    group_elem_year_instance_by_id = build_tree_in_memory(root, queryset)
+    return NodeBranchJsTree(root, cache_group_elements_year=group_elem_year_instance_by_id)
 
 
 class NodeBranchJsTree:
     """ Use to generate json from a list of education group years compatible with jstree """
     element_type = EDUCATION_GROUP_YEAR
 
-    def __init__(self, root, group_element_year=None):
+    def __init__(self, root, group_element_year=None, cache_group_elements_year=None):
 
         self.children = []
         self.root = root
@@ -42,16 +64,18 @@ class NodeBranchJsTree:
         self.reference = self.group_element_year.link_type == LinkTypes.REFERENCE.name \
             if self.group_element_year else False
         self.icon = self._get_icon()
+        self.cache_group_elements_year = cache_group_elements_year or {}
+        # build_tree_in_memory(self.education_group_year, self.get_queryset())
 
         self.generate_children()
 
     def generate_children(self):
-        for group_element_year in self.get_queryset():
+        for group_element_year in self.cache_group_elements_year.get(self.education_group_year.id) or []:
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
-                node = NodeBranchJsTree(self.root, group_element_year)
+                node = NodeBranchJsTree(self.root, group_element_year, cache_group_elements_year=self.cache_group_elements_year)
 
             elif group_element_year.child_leaf:
-                node = NodeLeafJsTree(self.root, group_element_year)
+                node = NodeLeafJsTree(self.root, group_element_year, cache_group_elements_year=self.cache_group_elements_year)
 
             else:
                 continue

@@ -288,12 +288,7 @@ def _extract_common_academic_year(objects):
 
 
 def _build_parent_list_by_education_group_year_id(academic_year, filters=None):
-    columns_needed_for_filters = filters.keys() if filters else []
-    group_elements = list(search(academic_year=academic_year)
-                          .filter(parent__isnull=False)
-                          .filter(Q(child_leaf__isnull=False) | Q(child_branch__isnull=False))
-                          .select_related('education_group_year__education_group_type')
-                          .values('parent', 'child_branch', 'child_leaf', *columns_needed_for_filters))
+    group_elements = _fetch_group_elements_year(academic_year, filters=filters)
     result = {}
     # TODO :: uses .annotate() on queryset to make the below expected result
     for group_element_year in group_elements:
@@ -301,6 +296,16 @@ def _build_parent_list_by_education_group_year_id(academic_year, filters=None):
                                child_leaf=group_element_year['child_leaf'])
         result.setdefault(key, []).append(group_element_year)
     return result
+
+
+def _fetch_group_elements_year(academic_year, filters=None):
+    columns_needed_for_filters = filters.keys() if filters else []
+    group_elements = list(search(academic_year=academic_year)
+                          .filter(parent__isnull=False)
+                          .filter(Q(child_leaf__isnull=False) | Q(child_branch__isnull=False))
+                          .select_related('education_group_year__education_group_type')
+                          .values('id', 'parent', 'child_branch', 'child_leaf', *columns_needed_for_filters))
+    return group_elements
 
 
 def _build_child_key(child_branch=None, child_leaf=None):
@@ -333,6 +338,92 @@ def _find_elements(group_elements_by_child_id, filters, child_leaf_id=None, chil
 
 def _match_any_filters(element_year, filters):
     return any(element_year[col_name] in values_list for col_name, values_list in filters.items())
+
+
+
+class Hierarchy:
+    _parent_id = None
+    group_elem_id = None
+    child_branch = None
+    child_leaf = None
+
+    _children_hierarchy = None  # list of Hierarchy children from _parent_id
+    # _leaf_children_ids = None
+
+    # parents = None
+    # children = None
+
+    def __init__(self, parent_id, group_elem_id, child_branch, child_leaf):
+        self._parent_id = parent_id
+        self.group_elem_id = group_elem_id
+        self.child_branch = child_branch
+        self.child_leaf = child_leaf
+
+        self._children_hierarchy = []
+        # self._leaf_children_ids = []
+
+    def add_hierarchy_child(self, child_hierarchy):
+        if child_hierarchy:
+            self._children_hierarchy.append(child_hierarchy)
+
+    def set_children_instances(self, children_instance_by_id):
+        self.children = [children_instance_by_id.get(group_elem_id) for group_elem_id in self._children_hierarchy
+                         if children_instance_by_id.get(group_elem_id)]
+
+    # def add_leaf_child(self, child_id):
+    #     if child_id:
+    #         self._leaf_children_ids.append(child_id)
+
+    def fetch_and_initialize_instances(self):
+        pass
+
+
+def fetch_group_elements(group_element_year_queryset):
+    pass
+
+
+def build_tree_in_memory(root: EducationGroupYear, queryset):
+    elements = _fetch_group_elements_year(root.academic_year)
+    # 'parent', 'child_branch', 'child_leaf'
+
+    # root_hierarchy = Hierarchy(root.id)
+
+    group_elems_by_parent_id = {}
+    for elem in elements:
+        parent_id = elem['parent']
+        group_elem = Hierarchy(parent_id, elem['id'], elem['child_branch'], elem['child_leaf'])
+        group_elems_by_parent_id.setdefault(parent_id, []).append(group_elem)
+
+
+    result = _init_children(root.id, group_elems_by_parent_id)
+    group_elem_ids = {obj.group_elem_id for obj in result}
+    queryset = queryset.filter(pk__in=group_elem_ids)
+    group_elem_year_instance_by_id = {obj.id: obj for obj in queryset}
+    for obj in result:
+        obj.set_children_instances(group_elem_year_instance_by_id)
+
+    test = {}
+    for obj in group_elem_year_instance_by_id.values():
+        test.setdefault(obj.parent_id, []).append(obj)
+
+    return test
+
+    # for elem in elements:
+    #     hierarchy = Hierarchy(elem['parent'])
+    #     hierarchy.add_branch_child(elem['child_branch'])
+    #     hierarchy.add_leaf_child(elem['child_leaf'])
+
+
+def _init_children(parent_id, group_elems_by_parent_id):
+    all_group_elem = []
+    children = group_elems_by_parent_id.get(parent_id) or []
+    for child_hierarchy in children:
+        child_branch = child_hierarchy.child_branch
+        child_hierarchy._children_hierarchy = group_elems_by_parent_id.get(child_branch) or []
+        all_group_elem.append(child_hierarchy)
+        all_group_elem += _init_children(child_branch, group_elems_by_parent_id)
+    return all_group_elem
+
 
 
 def get_or_create_group_element_year(parent, child_branch=None, child_leaf=None):
