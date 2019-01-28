@@ -23,39 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import operator
-
 import factory
-from factory.django import DjangoModelFactory
-
-from base.models.enums import education_group_categories, education_group_types
 
 
-class EducationGroupTypeFactory(DjangoModelFactory):
+class GroupFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = "base.EducationGroupType"
-        django_get_or_create = ('category', 'name')
+        model = 'auth.Group'
+        django_get_or_create = ('name',)
 
-    external_id = factory.Sequence(lambda n: '10000000%02d' % n)
-    category = education_group_categories.TRAINING
-    name = factory.Iterator(education_group_types.TrainingType.choices(), getter=operator.itemgetter(0))
-    learning_unit_child_allowed = False
-
-    class Params:
-        minitraining = factory.Trait(
-            category=education_group_categories.MINI_TRAINING,
-            name=factory.Iterator(education_group_types.MiniTrainingType.choices(), getter=operator.itemgetter(0))
-        )
-
-        group = factory.Trait(
-            category=education_group_categories.GROUP,
-            name=factory.Iterator(education_group_types.GroupType.choices(), getter=operator.itemgetter(0))
-        )
+    name = ""
 
 
-class MiniTrainingEducationGroupTypeFactory(EducationGroupTypeFactory):
-    minitraining = True
+class TutorGroupFactory(GroupFactory):
+    name = "tutors"
 
 
-class GroupEducationGroupTypeFactory(EducationGroupTypeFactory):
-    group = True
+class ProgramManagerGroupFactory(GroupFactory):
+    name = 'program_managers'
