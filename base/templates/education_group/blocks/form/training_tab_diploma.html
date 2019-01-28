@@ -25,67 +25,60 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+
+{% bootstrap_field form_education_group_year.joint_diploma %}
+
+{% bootstrap_field form_education_group_year.diploma_printing_title %}
+
+{% bootstrap_field form_education_group_year.professional_title %}
+
+{% trans 'certificate aims'|capfirst as label_certificate_aims %}
+{% bootstrap_label label_certificate_aims %}
+
 <div class="row">
-    <div class="col-md-6">
-        {% bootstrap_field form_education_group_year.joint_diploma %}
-        <br>
-        {% bootstrap_field form_education_group_year.diploma_printing_title %}
-        <br>
-        {% bootstrap_field form_education_group_year.professional_title %}
-        <br>
-        {% trans 'certificate aims'|capfirst as label_certificate_aims %}
-        {% bootstrap_label  label_certificate_aims %}
-        <br>
+    <div class="col-md-1">
+        {% trans 'filter by section'|capfirst as label_section %}
+        <p>{{ label_section }} : </p>
 
-        <div class="row">
-            <div class="col-md-4">
-                {% trans 'filter by section'|capfirst as label_section %}
-                <p>{{ label_section }} : </p>
-                {% bootstrap_field form_education_group_year.section show_label=False %}
-            </div>
-            <div class="col-md-8"></div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-sm-12 col-md-12">
-                {{ form_education_group_year.certificate_aims }}
-            </div>
-        </div>
-        <br>
+        {% bootstrap_field form_education_group_year.section show_label=False %}
     </div>
-
-    <div class="col-md-6"></div>
+    <div class="col-md-11">
+        {{ form_education_group_year.certificate_aims }}
+    </div>
 </div>
 
 {{ form_education_group_year.media }}
 
 <style>
 
-    .select2-container--default .select2-selection--multiple .select2-selection__rendered{
+    .select2-container--default .select2-selection--multiple .select2-selection__rendered {
         display: grid;
         padding: 0 0 5px 0;
     }
 
-    {# Not displiaying possibility to remove all selected elements #}
-    .select2-container--default .select2-selection--multiple .select2-selection__clear{
-        display:none;
+     /* Not displiaying possibility to remove all selected elements */
+    .select2-container--default .select2-selection--multiple .select2-selection__clear {
+        display: none;
     }
 
     /* Overrided to get items in list */
     .select2-container .select2-selection--multiple,
     .select2-container--open .select2-dropdown--above {
-        max-width: 870px;
-        min-width: 870px;
+        width: 100%;
     }
 
     @media screen and (max-width: 960px) {
-        {# To align dropdown list to the width of selected elements #}
+        /* To align dropdown list to the width of selected elements */
         .select2-container--open .select2-dropdown--above,
         .select2-container .select2-selection--multiple {
-            max-width: 500px;
-            min-width: 500px;
+            width: 100%;
+
         }
     }
 
+    /* When the lines are too long in <li> */
+    .select2-selection__rendered li {
+        white-space: pre-line;
+    }
 
 </style>
