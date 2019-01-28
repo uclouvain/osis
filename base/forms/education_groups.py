@@ -76,7 +76,7 @@ class EducationGroupFilter(forms.Form):
     )
 
     education_group_type = ModelChoiceFieldWithData(
-        queryset=EducationGroupType.objects.all().order_by_translated_name(),
+        queryset=EducationGroupType.objects.none(),
         required=False,
         empty_label=pgettext_lazy("plural", "All"),
         label=_('Type')
@@ -90,6 +90,7 @@ class EducationGroupFilter(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["education_group_type"].queryset = EducationGroupType.objects.all().order_by_translated_name()
         self.fields["education_group_type"].set_data_attrs()
 
     def clean_category(self):
