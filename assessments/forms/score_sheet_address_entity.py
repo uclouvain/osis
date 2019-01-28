@@ -34,4 +34,3 @@ class ScoreSheetAddressEntityForm(bootstrap.BootstrapModelForm):
     class Meta:
         model = score_sheet_address.ScoreSheetAddress
         exclude = ['external_id', 'changed', 'country', 'recipient', 'location', 'postal_code', 'city', 'offer_year']
-
