@@ -27,14 +27,21 @@ from django.http import JsonResponse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DeleteView
 
-from base.business.group_element_years.management import is_min_child_reached
+from base.business.group_element_years.management import check_authorized_relationship
+from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.views.common import display_error_messages, display_success_messages
+from base.views.education_groups.group_element_year import perms as group_element_year_perms
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
 
 
 class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     # DeleteView
     template_name = "education_group/group_element_year/confirm_detach_inner.html"
+
+    rules = [group_element_year_perms.can_update_group_element_year]
+
+    def _call_rule(self, rule):
+        return rule(self.request.user, self.get_object())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -53,7 +60,6 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
 
         In that case, a message will be display in the modal to block the post action.
         """
-
         child_leaf = obj.child_leaf
         child_branch = obj.child_branch
         error_msg = ""
@@ -62,13 +68,11 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
                 _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
                     "acronym": child_leaf.acronym
                 }
-        if child_branch and is_min_child_reached(obj.parent, child_branch.education_group_type):
-            error_msg = \
-                _("Cannot detach child \"%(child)s\". "
-                  "The parent must have at least one child of type \"%(type)s\".") % {
-                    "child": child_branch,
-                    "type": child_branch.education_group_type
-                }
+        if child_branch:
+            try:
+                check_authorized_relationship(obj.parent, obj, to_delete=True)
+            except AuthorizedRelationshipNotRespectedException as e:
+                error_msg = e.errors
 
         if error_msg:
             display_error_messages(self.request, error_msg)

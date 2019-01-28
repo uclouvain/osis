@@ -28,17 +28,21 @@ from base.business.education_groups.perms import _is_eligible_education_group, c
 from base.models.enums.education_group_types import GroupType
 
 
-def is_eligible_to_create_group_element_year(person, egy, raise_exception):
+def is_eligible_to_update_group_element_year(person, group_element_year, raise_exception):
+    return _is_eligible_education_group(person, group_element_year.parent, raise_exception) and \
+           (not group_element_year.child_branch
+            or _can_user_update_education_group_year_child(person, group_element_year.child_branch, raise_exception))
 
-    return _is_eligible_education_group(person, egy, raise_exception) and \
-           _user_can_update_group_element_year_of_type(person, egy, raise_exception)
 
-
-def _user_can_update_group_element_year_of_type(person, egy, raise_exception):
-    group_type_only_central_can_create = (GroupType.MAJOR_LIST_CHOICE.name, GroupType.MINOR_LIST_CHOICE.name)
-    result = person.is_central_manager or egy.education_group_type.name not in group_type_only_central_can_create
-    can_raise_exception(raise_exception, result, _("You cannot modify content for %(education_group_types)s") %
-                        {"education_group_types":
-                            ", ".join([str(GroupType.MAJOR_LIST_CHOICE.value), str(GroupType.MINOR_LIST_CHOICE.value)])
-                         })
+def _can_user_update_education_group_year_child(person, egy_child, raise_exception):
+    group_type_only_central_can_update = (GroupType.MAJOR_LIST_CHOICE.name, GroupType.MINOR_LIST_CHOICE.name)
+    result = person.is_central_manager or \
+        egy_child.education_group_type.name not in group_type_only_central_can_update
+    can_raise_exception(
+        raise_exception,
+        result,
+        _("You cannot modify content for %(education_group_types)s") % {
+            "education_group_types": ", ".join([str(GroupType.MAJOR_LIST_CHOICE.value),
+                                                str(GroupType.MINOR_LIST_CHOICE.value)])
+        })
     return result

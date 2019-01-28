@@ -1330,9 +1330,8 @@
             "FSA_SPECIALITY"
         ],
         "changed": "2018-08-09T15:58:54.904",
-        "min_count_authorized": "0",
-        "max_count_authorized": "MANY",
-        "reference": true
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 }
 ]

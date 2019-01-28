@@ -33,6 +33,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 
+from base.business.education_groups.general_information_sections import COMMON_GENERAL_INFO_SECTIONS
 from base.models.group_element_year import find_learning_unit_formations
 
 
@@ -56,6 +57,9 @@ def publish(education_group_year):
 def get_relevant_sections(education_group_year):
     if not all([settings.URL_TO_PORTAL_UCL, settings.GET_SECTION_PARAM]):
         raise ImproperlyConfigured('URL_TO_PORTAL_UCL / GET_SECTION_PARAM must be set in configuration')
+
+    if education_group_year.is_common:
+        return COMMON_GENERAL_INFO_SECTIONS
 
     relevant_sections_url = _get_portal_url(education_group_year) + "?" + settings.GET_SECTION_PARAM
     try:
