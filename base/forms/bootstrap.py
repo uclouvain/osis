@@ -35,13 +35,6 @@ class BootstrapModelForm(forms.ModelForm):
         set_form_control(self)
 
 
-class BootstrapForm(forms.Form):
-
-    def __init__(self, *args, **kwargs):
-        super(BootstrapForm, self).__init__(*args, **kwargs)
-        set_form_control(self)
-
-
 @deprecated
 def set_form_control(self):
     for field in iter(self.fields):
