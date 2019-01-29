@@ -43,6 +43,7 @@ from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING
+from base.views import layout
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.education_groups.detail import EducationGroupGenericDetailView
@@ -189,7 +190,7 @@ def _update_mini_training(request, education_group_year, root):
     if form.is_valid():
         return _common_success_redirect(request, form, root)
 
-    return render(request, "education_group/update_minitrainings.html", {
+    return layout.render(request, "education_group/update_minitrainings.html", {
         "form_education_group_year": form.forms[forms.ModelForm],
         "education_group_year": education_group_year,
         "form_education_group": form.forms[EducationGroupModelForm]
