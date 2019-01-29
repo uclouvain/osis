@@ -23,26 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import QuerySet
-from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 
-BLANK_CHOICE = [(None, "---------")]
-ALL_CHOICE = [("all", pgettext_lazy("plural", "All"))]
+from django.test import TestCase
 
-
-def add_blank(choices):
-    if isinstance(choices, QuerySet):
-        choices = list(choices)
-    if isinstance(choices, list):
-        return BLANK_CHOICE + choices
-
-    return tuple(BLANK_CHOICE) + choices
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from base.forms.education_groups import EducationGroupFilter
 
 
-def add_all(choices):
-    if isinstance(choices, QuerySet):
-        choices = list(choices)
-    if isinstance(choices, list):
-        return ALL_CHOICE + choices
+class TestEducationGroupTypeOrderingForm(TestCase):
 
-    return tuple(ALL_CHOICE) + choices
+    def setUp(self):
+        self.educ_grp_type_D = EducationGroupTypeFactory(name='D label')
+        self.educ_grp_type_B = EducationGroupTypeFactory(name='B label')
+        self.educ_grp_type_A = EducationGroupTypeFactory(name='A label')
+
+    def test_ordering(self):
+        self.form = EducationGroupFilter()
+        self.assertEqual(list(self.form.fields["education_group_type"].queryset),
+                         [self.educ_grp_type_A, self.educ_grp_type_B, self.educ_grp_type_D])
+
+        educ_grp_type_C = EducationGroupTypeFactory(name='C label')
+        self.form = EducationGroupFilter()
+        self.assertEqual(
+            list(self.form.fields["education_group_type"].queryset),
+            [self.educ_grp_type_A, self.educ_grp_type_B, educ_grp_type_C, self.educ_grp_type_D]
+        )
