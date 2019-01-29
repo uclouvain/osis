@@ -14,6 +14,7 @@ $("#id_category").click(function() {
  * @param id_elem element id of the select to sort
  */
 function sort_dropdown_type(id_elem){
+    console.log('sort_dropdown_type');
     // get the wanted select
     let select_edu_group_type = $("#" + id_elem);
     // extract the options from the select
@@ -23,7 +24,11 @@ function sort_dropdown_type(id_elem){
 
     my_options.sort(function(a,b) {
         // localCompare is used to compare String based on the current locale
-        return a.text.localeCompare(b.text);
+        if(a.text == 'All' || a.text == 'Tous') {
+
+        }else{
+            return a.text.localeCompare(b.text);
+        }
     });
     // replace the old list with the sorted one
     select_edu_group_type.empty().append( my_options );
