@@ -3788,7 +3788,7 @@ msgstr ""
 #: tests/forms/learning_unit/test_learningUnitYearModelForm.py:89
 #: tests/models/test_learning_unit_year.py:598
 msgid "The credits value should be an integer"
-msgstr "La valeur du champs crédits doit être un entier"
+msgstr "La valeur du champ crédits doit être un entier"
 
 #: tests/templatetags/test_education_group.py:48
 #: tests/templatetags/test_education_group.py:328
