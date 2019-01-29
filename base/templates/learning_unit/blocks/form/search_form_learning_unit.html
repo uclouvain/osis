@@ -1,5 +1,5 @@
 {% extends "blocks/forms/search_form.html" %}
-{% load bootstrap3 format staticfiles %}
+{% load bootstrap3 staticfiles %}
 
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
@@ -36,12 +36,7 @@
 {% block search_form_row_2 %}
     {% with activity_search_type=1 service_search_type=2 borrowed_search_type=5 %}
         {% bootstrap_field form.status form_group_class="col-md-2" %}
-
-        {% url 'search_tutors' as url_search_tutors %}
-        {% with span_search_tutor='<a href="%s" class="link_data_lookup"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>'|format:url_search_tutors%}
-            {% bootstrap_field form.tutor form_group_class="col-md-2" %}
-        {% endwith %}
-
+        {% bootstrap_field form.tutor form_group_class="col-md-2" %}
         {% bootstrap_field form.requirement_entity_acronym form_group_class="col-md-2" %}
 
     {% if search_type == service_search_type or search_type == activity_search_type or search_type == borrowed_search_type%}

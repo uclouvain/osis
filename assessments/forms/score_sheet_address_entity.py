@@ -23,14 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.forms import bootstrap
-from assessments.models import score_sheet_address
 from django import forms
 
+from assessments.models.score_sheet_address import ScoreSheetAddress
 
-class ScoreSheetAddressEntityForm(bootstrap.BootstrapModelForm):
+
+class ScoreSheetAddressEntityForm(forms.ModelForm):
     email = forms.EmailField(required=False)
 
     class Meta:
-        model = score_sheet_address.ScoreSheetAddress
+        model = ScoreSheetAddress
         exclude = ['external_id', 'changed', 'country', 'recipient', 'location', 'postal_code', 'city', 'offer_year']
