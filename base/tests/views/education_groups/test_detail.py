@@ -26,6 +26,7 @@
 from http import HTTPStatus
 
 import reversion
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.http import HttpResponseNotFound, HttpResponseForbidden
 from django.test import TestCase
@@ -34,6 +35,7 @@ from django.urls import reverse
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, GroupType
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.certificate_aim import CertificateAimFactory
 from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
@@ -48,6 +50,7 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
+from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
 
 
@@ -226,6 +229,29 @@ class TestReadEducationGroup(TestCase):
 
         response = self.client.get(url)
         self.assertFalse(response.context['show_coorganization'])
+
+    def test_show_and_edit_coorganization(self):
+        user = UserFactory()
+        person = PersonFactory(user=user)
+        user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        person.user.user_permissions.add(Permission.objects.get(codename='change_educationgroup'))
+        training_not_2m = EducationGroupYearFactory(
+            education_group_type__category=TRAINING,
+            education_group_type__name=TrainingType.CAPAES.name
+        )
+        PersonEntityFactory(person=person, entity=training_not_2m.management_entity)
+        url = reverse("education_group_read", args=[training_not_2m.pk, training_not_2m.pk])
+        self.client.force_login(user)
+
+        response = self.client.get(url)
+        self.assertTrue(response.context['show_coorganization'])
+        self.assertFalse(response.context['can_change_coorganization'])
+
+        user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
+
+        response = self.client.get(url)
+        self.assertTrue(response.context['show_coorganization'])
+        self.assertTrue(response.context['can_change_coorganization'])
 
     def test_context_contains_show_tabs_args(self):
         group = GroupFactory()

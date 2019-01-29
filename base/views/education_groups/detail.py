@@ -142,6 +142,10 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
             person=self.get_person(),
             education_group=context['object'],
         )
+        context['can_change_coorganization'] = perms.is_eligible_to_change_coorganization(
+            person=self.get_person(),
+            education_group=context['object'],
+        )
         context['enums'] = mdl.enums.education_group_categories
 
         self.is_intro_offer = self.object.education_group_type.name in INTRO_OFFER
