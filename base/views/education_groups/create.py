@@ -35,15 +35,15 @@ from base.forms.education_group.common import EducationGroupModelForm, Education
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
 from base.forms.education_group.training import TrainingForm
+from base.models.academic_year import current_academic_year
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from base.utils import cache
 from base.utils.cache import RequestCache
 from base.views import layout
 from base.views.common import display_success_messages
-from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from base.views.education_groups.perms import can_create_education_group
+from base.views.mixins import FlagMixin, AjaxTemplateMixin
 
 FORMS_BY_CATEGORY = {
     education_group_categories.GROUP: GroupForm,
@@ -91,6 +91,9 @@ def create_education_group(request, category, education_group_type_pk, parent_id
 
     request_cache = RequestCache(request.user, reverse('education_groups'))
     cached_data = request_cache.cached_data or {}
+
+    if not cached_data.get('academic_year'):
+        cached_data['academic_year'] = current_academic_year()
 
     initial_academic_year = parent.academic_year_id if parent else cached_data.get('academic_year')
     form_education_group_year = FORMS_BY_CATEGORY[category](
