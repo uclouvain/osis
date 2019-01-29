@@ -92,7 +92,8 @@ def create_education_group(request, category, education_group_type_pk, parent_id
     request_cache = RequestCache(request.user, reverse('education_groups'))
     cached_data = request_cache.cached_data or {}
 
-    if not cached_data.get('academic_year'):
+    academic_year = cached_data.get('academic_year')
+    if not academic_year:
         cached_data['academic_year'] = current_academic_year()
 
     initial_academic_year = parent.academic_year_id if parent else cached_data.get('academic_year')
