@@ -2165,7 +2165,7 @@ msgstr "Liste des enseignants"
 
 #: templates/education_group/search.html:125
 msgid "List of trainings"
-msgstr "Liste des organisation de formation"
+msgstr "Liste des organisations de formation"
 
 #: business/education_group.py:56 templates/education_group/search.html:132
 msgid "List of trainings with administrative data"
@@ -3788,7 +3788,7 @@ msgstr ""
 #: tests/forms/learning_unit/test_learningUnitYearModelForm.py:89
 #: tests/models/test_learning_unit_year.py:598
 msgid "The credits value should be an integer"
-msgstr "La valeur du champs crédits doit être un entier"
+msgstr "La valeur du champ crédits doit être un entier"
 
 #: tests/templatetags/test_education_group.py:48
 #: tests/templatetags/test_education_group.py:328

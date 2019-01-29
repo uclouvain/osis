@@ -23,20 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
 
-from base.models.person import Person
+from django.test import TestCase
+
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from base.forms.education_groups import EducationGroupFilter
 
 
-class PersonDetailSerializer(serializers.ModelSerializer):
-    uuid = serializers.UUIDField(required=False)
+class TestEducationGroupTypeOrderingForm(TestCase):
 
-    class Meta:
-        model = Person
-        fields = (
-            'first_name',
-            'last_name',
-            'email',
-            'gender',
-            'uuid'
+    def setUp(self):
+        self.educ_grp_type_D = EducationGroupTypeFactory(name='D label')
+        self.educ_grp_type_B = EducationGroupTypeFactory(name='B label')
+        self.educ_grp_type_A = EducationGroupTypeFactory(name='A label')
+
+    def test_ordering(self):
+        self.form = EducationGroupFilter()
+        self.assertEqual(list(self.form.fields["education_group_type"].queryset),
+                         [self.educ_grp_type_A, self.educ_grp_type_B, self.educ_grp_type_D])
+
+        educ_grp_type_C = EducationGroupTypeFactory(name='C label')
+        self.form = EducationGroupFilter()
+        self.assertEqual(
+            list(self.form.fields["education_group_type"].queryset),
+            [self.educ_grp_type_A, self.educ_grp_type_B, educ_grp_type_C, self.educ_grp_type_D]
         )
