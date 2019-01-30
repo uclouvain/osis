@@ -39,6 +39,10 @@ class ChoiceEnum(Enum):
     def translation_choices(cls):
         return tuple((x.name, _(x.value)) for x in cls)
 
+    @classmethod
+    def get_value(cls, key):
+        return getattr(cls, key, key).value if hasattr(cls, key) else key
+
 
 def get_object_or_none(klass, *args, **kwargs):
     try:

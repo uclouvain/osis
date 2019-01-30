@@ -37,7 +37,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 class ExternalLearningUnitYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('external_id', 'external_acronym', 'external_credits', 'url', 'learning_unit_year',
-                    'requesting_entity', "author", "date")
+                    'requesting_entity', "author", "creation_date")
     search_fields = ['acronym', 'learning_unit_year__acronym', 'author']
 
 
@@ -46,13 +46,16 @@ class ExternalLearningUnitYear(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
 
     external_acronym = models.CharField(
-        max_length=15,
-        db_index=True,
+        null=True,
         blank=True,
+        max_length=25,
+        db_index=True,
         verbose_name=_('External code')
     )
 
     external_credits = models.DecimalField(
+        null=True,
+        blank=True,
         max_digits=5,
         decimal_places=2,
         verbose_name=_('Local credits'),
@@ -62,7 +65,12 @@ class ExternalLearningUnitYear(models.Model):
         ]
     )
 
-    url = models.URLField(max_length=255, blank=True, verbose_name=_('URL of the learning unit'))
+    url = models.URLField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name=_('URL of the learning unit'),
+    )
 
     learning_unit_year = models.OneToOneField(
         'LearningUnitYear',
@@ -72,12 +80,16 @@ class ExternalLearningUnitYear(models.Model):
 
     requesting_entity = models.ForeignKey(
         'Entity',
+        null=True,
+        blank=True,
         verbose_name=_('Requesting entity'),
         on_delete=models.PROTECT,
     )
 
+    co_graduation = models.BooleanField(default=False, verbose_name=_('Co-graduation'))
+    mobility = models.BooleanField(default=False, verbose_name=_('Mobility'))
     author = models.ForeignKey('Person', null=True)
-    date = models.DateTimeField(auto_now=True)
+    creation_date = models.DateTimeField(null=True, auto_now_add=True)
 
     class Meta:
         unique_together = ('learning_unit_year', 'external_acronym',)

@@ -373,9 +373,6 @@
             "groups": [
                 [
                     "central_managers"
-                ],
-                [
-                    "central_managers"
                 ]
             ]
         },
@@ -390,11 +387,7 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
+            "groups": []
         },
         "model": "rules_management.fieldreference"
     },
@@ -420,11 +413,7 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
+            "groups": []
         },
         "model": "rules_management.fieldreference"
     },
@@ -1709,6 +1698,9 @@
             "groups": [
                 [
                     "central_managers"
+                ],
+                [
+                    "faculty_managers"
                 ]
             ]
         },
@@ -1956,6 +1948,9 @@
             "groups": [
                 [
                     "central_managers"
+                ],
+                [
+                    "faculty_managers"
                 ]
             ]
         },
@@ -1986,6 +1981,9 @@
             "groups": [
                 [
                     "central_managers"
+                ],
+                [
+                    "faculty_managers"
                 ]
             ]
         },
@@ -2529,6 +2527,9 @@
             "groups": [
                 [
                     "central_managers"
+                ],
+                [
+                    "faculty_managers"
                 ]
             ]
         },
@@ -2559,6 +2560,9 @@
             "groups": [
                 [
                     "central_managers"
+                ],
+                [
+                    "faculty_managers"
                 ]
             ]
         },
@@ -2947,14 +2951,7 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": [
-                [
-                    "central_managers"
-                ],
-                [
-                    "faculty_managers"
-                ]
-            ]
+            "groups": []
         },
         "model": "rules_management.fieldreference"
     },
@@ -3653,9 +3650,6 @@
             "groups": [
                 [
                     "central_managers"
-                ],
-                [
-                    "faculty_managers"
                 ]
             ]
         },
@@ -3870,11 +3864,7 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
+            "groups": []
         },
         "model": "rules_management.fieldreference"
     },
@@ -3900,14 +3890,7 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": [
-                [
-                    "central_managers"
-                ],
-                [
-                    "faculty_managers"
-                ]
-            ]
+            "groups": []
         },
         "model": "rules_management.fieldreference"
     },

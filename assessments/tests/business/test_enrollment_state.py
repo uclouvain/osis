@@ -27,28 +27,30 @@ import datetime
 
 from django.test import TestCase
 
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.session_examen import SessionExamFactory
 from base.models.enums import number_session, academic_calendar_type
 from assessments.templatetags.enrollment_state import get_line_color
 from assessments.business.enrollment_state import ENROLLED_LATE_COLOR, NOT_ENROLLED_COLOR
 from base.models.enums import exam_enrollment_state as enrollment_states
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_calendar import AcademicCalendarFactory, AcademicCalendarExamSubmissionFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class EnrollmentStateTests(TestCase):
     def setUp(self):
-        self.academic_year = create_current_academic_year()
-        self.academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
-                                                         academic_year=self.academic_year,
-                                                         reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+        self.academic_calendar = AcademicCalendarExamSubmissionFactory(
+            title="Submission of score encoding - 1",
+            academic_year__current=True
+        )
         self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=self.academic_calendar,
                                                                 number_session=number_session.ONE)
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.academic_year)
-        self.session_exam = SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_yr)
+        self.session_exam = SessionExamFactory(
+            number_session=number_session.ONE,
+            learning_unit_year__academic_year__current=True
+        )
 
     def test_get_line_color_not_enrolled(self):
         exam_enrollment = ExamEnrollmentFactory(session_exam=self.session_exam,
@@ -56,16 +58,17 @@ class EnrollmentStateTests(TestCase):
         self.assertEqual(get_line_color(exam_enrollment), NOT_ENROLLED_COLOR)
 
     def test_get_line_color_enrolled_late(self):
-        exam_enrollment = ExamEnrollmentFactory(session_exam=self.session_exam,
-                                                enrollment_state=enrollment_states.ENROLLED,
-                                                date_enrollment=self.academic_calendar.start_date + datetime.timedelta(
-                                                    days=1))
+        exam_enrollment = ExamEnrollmentFactory(
+            session_exam=self.session_exam,
+            enrollment_state=enrollment_states.ENROLLED,
+            date_enrollment=self.academic_calendar.start_date + datetime.timedelta(days=1)
+        )
         self.assertEqual(get_line_color(exam_enrollment), ENROLLED_LATE_COLOR)
 
     def test_get_line_color_enrolled(self):
-        exam_enrollment = ExamEnrollmentFactory(session_exam=self.session_exam,
-                                                enrollment_state=enrollment_states.ENROLLED,
-                                                date_enrollment=self.academic_calendar.start_date - datetime.timedelta(
-                                                    days=1))
-
+        exam_enrollment = ExamEnrollmentFactory(
+            session_exam=self.session_exam,
+            enrollment_state=enrollment_states.ENROLLED,
+            date_enrollment=self.academic_calendar.start_date - datetime.timedelta(days=1)
+        )
         self.assertIsNone(get_line_color(exam_enrollment))

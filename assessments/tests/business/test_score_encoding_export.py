@@ -46,15 +46,18 @@ ROW_NUMBER = 1
 
 
 class XlsTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+        cls.academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
+                                                        academic_year__current=True,
+                                                        reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+        cls.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=cls.academic_calendar,
+                                                               number_session=number_session.ONE)
+        learning_unit_yr = LearningUnitYearFactory(learning_container_year__academic_year__current=True)
+        cls.session_exam = SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_yr)
+
     def setUp(self):
-        self.academic_year = create_current_academic_year()
-        self.academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
-                                                         academic_year=self.academic_year,
-                                                         reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
-        self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=self.academic_calendar,
-                                                                number_session=number_session.ONE)
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.academic_year)
-        self.session_exam = SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_yr)
         self.workbook = Workbook()
         self.worksheet = self.workbook.active
 
@@ -93,7 +96,6 @@ class XlsTests(TestCase):
             Color(rgb=WHITE_RGB))
 
     def test_color_legend(self):
-
         _color_legend(self.worksheet)
         self.assertEqual(
             self.worksheet.cell(row=FIRST_ROW_LEGEND_ENROLLMENT_STATUS,

@@ -126,7 +126,7 @@
                             {{ coorganization.is_producing_annexe | yesno | title }}
                         </td>
                         <td>
-                            {% if can_change_education_group %}
+                            {% if can_change_coorganization %}
                                 <a title="{% trans 'Edit' %}"
                                    class="btn coorganization-edit-btn trigger_modal" role="button"
                                    data-url="{% url 'coorganization_edit' root_id=root.pk education_group_year_id=education_group_year.id coorganization_id=coorganization.id %}">
@@ -135,7 +135,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if can_change_education_group %}
+                            {% if can_change_coorganization %}
                                 <a class="trigger_modal btn"
                                    data-url="{% url 'coorganization_delete' root.pk education_group_year.id coorganization.pk %}"
                                    id="btn_delete_coorganization_{{ coorganization.id }}"
@@ -150,7 +150,7 @@
             </table>
         {% endif %}
         <br>
-        {% if can_change_education_group %}
+        {% if can_change_coorganization %}
             <a class="btn btn-info btn-sm coorganization-edit-btn trigger_modal"
                data-url="{% url 'coorganization_create' root_id=root.pk education_group_year_id=education_group_year.id %}"
                title="{% trans 'Create' %}"

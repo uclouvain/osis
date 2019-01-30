@@ -30,8 +30,8 @@ from base.business.group_element_years import perms as business_perms
 from base.models import person
 
 
-def can_create_group_element_year(user, egy, raise_exception=False):
+def can_update_group_element_year(user, group_element_year, raise_exception=False):
     pers = get_object_or_404(person.Person, user=user)
-    if not business_perms.is_eligible_to_create_group_element_year(pers, egy, raise_exception):
+    if not business_perms.is_eligible_to_update_group_element_year(pers, group_element_year, raise_exception):
         raise PermissionDenied
     return True

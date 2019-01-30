@@ -27,53 +27,90 @@ from collections import namedtuple
 
 from django.utils.translation import ugettext_lazy as _
 
+# This all text_label which are related to "general information" for education group year
+# The key MUST be in french because it depend on Webservice (filtering)
+PEDAGOGY = 'pedagogie'
+MOBILITY = 'mobilite'
+FURTHER_TRAININGS = 'formations_accessibles'
+CERTIFICATES = 'certificats'
+COMPLEMENTARY_MODULE = 'module_complementaire'
+EVALUATION = 'evaluation'
+STRUCTURE = 'structure'
+DETAILED_PROGRAM = 'programme_detaille'
+WELCOME_INTRODUCTION = 'welcome_introduction'
+WELCOME_JOB = 'welcome_job'
+WELCOME_PROFIL = 'welcome_profil'
+WELCOME_PROGRAM = 'welcome_programme'
+WELCOME_PATH = 'welcome_parcours'
+CAAP = 'caap'
+ACCESS_TO_PROFESSIONS = 'acces_professions'
+BACHELOR_CONCERNED = 'bacheliers_concernes'
+PRACTICAL_INFO = 'infos_pratiques'
+MINORS = 'mineures'
+MAJORS = 'majeures'
+PURPOSES = 'finalites'
+DIDACTIC_PURPOSES = 'finalites_didactiques'
+AGREGATION = 'agregation'
+PREREQUISITE = 'prerequis'
+OPTIONS = 'options'
+INTRODUCTION = 'intro'
+
 Section = namedtuple('Section', 'title labels')
 
 SECTION_LIST = [
     Section(title=_('Welcome'),
             labels=[
-                ('welcome_introduction', 'specific'),
-                ('welcome_profil', 'specific'),
-                ('welcome_job', 'specific'),
-                ('welcome_programme', 'specific'),
-                ('welcome_parcours', 'specific'),
+                (WELCOME_INTRODUCTION, 'specific'),
+                (WELCOME_PROFIL, 'specific'),
+                (WELCOME_JOB, 'specific'),
+                (WELCOME_PROGRAM, 'specific'),
+                (WELCOME_PATH, 'specific'),
             ]),
     Section(title=_('Teaching profile'),
             labels=[
-                ('structure', 'specific')
+                (STRUCTURE, 'specific')
             ]),
-    Section(title=_('Detailed programme'),
+    Section(title=_('Program'),
             labels=[
-                ('mineures', 'specific'),
-                ('majeures', 'specific'),
-                ('programme_detaille', 'specific'),
-                ('finalites', 'specific'),
-                ('options', 'specific'),
-                ('finalites_didactiques', 'common'),
-                ('caap', 'common,specific'),
-                ('agregation', 'common'),
-                ('prerequis', 'common'),
+                (MINORS, 'specific'),
+                (MAJORS, 'specific'),
+                (DETAILED_PROGRAM, 'specific'),
+                (PURPOSES, 'specific'),
+                (OPTIONS, 'specific'),
+                (DIDACTIC_PURPOSES, 'common'),
+                (CAAP, 'common,specific'),
+                (AGREGATION, 'common'),
+                (PREREQUISITE, 'common'),
             ]),
     Section(title=_('Admission'),
             labels=[
-                ('acces_professions', 'specific'),
-                ('bacheliers_concernes', 'specific'),
-                ('module_complementaire', 'common,specific')
+                (ACCESS_TO_PROFESSIONS, 'specific'),
+                (BACHELOR_CONCERNED, 'specific'),
+                (COMPLEMENTARY_MODULE, 'common,specific')
             ]),
     Section(title=_('Benefits and organization'),
             labels=[
-                ('pedagogie', 'specific'),
-                ('evaluation', 'common,specific'),
-                ('mobilite', 'specific'),
-                ('formations_accessibles', 'specific'),
-                ('certificats', 'specific'),
-                ('infos_pratiques', 'specific'),
+                (PEDAGOGY, 'specific'),
+                (EVALUATION, 'common,specific'),
+                (MOBILITY, 'specific'),
+                (FURTHER_TRAININGS, 'specific'),
+                (CERTIFICATES, 'specific'),
+                (PRACTICAL_INFO, 'specific'),
             ]),
 ]
 
 SECTION_INTRO = [
     Section(title=_('Welcome'),
             labels=[
-                ('intro', 'specific'),
+                (INTRODUCTION, 'specific'),
             ])
+]
+
+COMMON_GENERAL_INFO_SECTIONS = [
+    AGREGATION,
+    CAAP,
+    PREREQUISITE,
+    DIDACTIC_PURPOSES,
+    COMPLEMENTARY_MODULE,
+    EVALUATION
 ]
