@@ -70,7 +70,7 @@ SECTION_LIST = [
             labels=[
                 (STRUCTURE, 'specific')
             ]),
-    Section(title=_('Detailed programme'),
+    Section(title=_('Program'),
             labels=[
                 (MINORS, 'specific'),
                 (MAJORS, 'specific'),
