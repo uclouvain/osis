@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import Q
+from django.db.models import Q, F
 from django.utils.translation import ugettext as _
 
 from base.business.education_groups.create import create_initial_group_element_year_structure
@@ -46,16 +46,27 @@ class EducationGroupAutomaticPostponement(AutomaticPostponement):
 
     def get_queryset(self, queryset=None):
         # We need to postpone only trainings and some mini trainings
-        return super().get_queryset(queryset).filter(
+        if not queryset:
+            queryset = self.model.objects.all()
+
+        # Take the last education_group_year available.
+        queryset = queryset.filter(academic_year__year=F('education_group__educationgroupyear__academic_year__year'))
+        return queryset.filter(
             Q(education_group_type__category=TRAINING) |
             Q(education_group_type__name__in=MiniTrainingType.to_postpone())
         )
 
     def get_already_duplicated(self):
-        return self.queryset.filter(education_group__educationgroupyear__academic_year=self.last_academic_year)
+        """ The egy is already duplicated if:
+            - the academic year is the N+6
+        """
+        return self.queryset.filter(academic_year__gte=self.last_academic_year)
 
     def get_to_not_duplicated(self):
-        return self.queryset.filter(education_group__end_year__lt=self.last_academic_year.year)
+        return self.queryset.filter(
+            Q(education_group__end_year__lt=self.last_academic_year.year) |
+            Q(academic_year__year=F('education_group__end_year'))
+        )
 
     def post_extend(self):
         """ After the main postponement, we need to create the structure of the education_group_years """

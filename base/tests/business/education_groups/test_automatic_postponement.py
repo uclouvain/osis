@@ -50,12 +50,19 @@ class TestFetchEducationGroupToPostpone(TestCase):
     def test_fetch_education_group_to_postpone_to_N6(self):
         EducationGroupYearFactory(
             education_group=self.education_group,
-            academic_year=self.academic_years[-2],
+            academic_year=self.academic_years[-4],
+        )
+        education_group_to_postpone = EducationGroupYearFactory(
+            education_group=self.education_group,
+            academic_year=self.academic_years[-3],
         )
 
-        self.assertEqual(EducationGroupYear.objects.count(), 1)
+        self.assertEqual(EducationGroupYear.objects.count(), 2)
         result, errors = EducationGroupAutomaticPostponement().postpone()
         self.assertEqual(len(result), 1)
+        self.assertEqual(result[-1].academic_year.year, get_current_year()+6)
+        self.assertEqual(result[-1].education_group, education_group_to_postpone.education_group)
+
         self.assertFalse(errors)
 
     def test_if_structure_is_postponed(self):
