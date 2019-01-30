@@ -109,7 +109,10 @@ def find_root_by_name(text_label_name):
 
 def education_group_year_pedagogy_edit_post(request, education_group_year_id, root_id):
     form = EducationGroupPedagogyEditForm(request.POST)
-
+    redirect_url = reverse('education_group_general_informations', kwargs={
+        'root_id': root_id,
+        'education_group_year_id': education_group_year_id
+    })
     if form.is_valid():
         label = form.cleaned_data['label']
 
@@ -129,11 +132,7 @@ def education_group_year_pedagogy_edit_post(request, education_group_year_id, ro
         record.text = form.cleaned_data['text_english']
         record.save()
 
-    redirect_url = reverse('education_group_general_informations', kwargs={
-        'root_id': root_id,
-        'education_group_year_id': education_group_year_id
-    })
-
+        redirect_url += "#section_{label_name}".format(label_name=label)
     return redirect(redirect_url)
 
 

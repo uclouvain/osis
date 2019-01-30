@@ -231,6 +231,9 @@ class EducationGroupGeneralInformations(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
+        anchor_expected = '#section_welcome_introduction'
+        self.assertTrue(anchor_expected in response.url)
+
 
 class EducationGroupPublishViewTestCase(TestCase):
     @classmethod
