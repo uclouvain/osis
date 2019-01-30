@@ -178,6 +178,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
                 attrs={
                     'data-html': True,
                     'data-placeholder': _('Search...'),
+                    'data-width': '100%',
                 },
                 forward=['section'],
             )

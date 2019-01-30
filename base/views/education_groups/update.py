@@ -27,7 +27,7 @@
 from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _, ngettext
@@ -137,7 +137,7 @@ def _update_group(request, education_group_year, root):
     if form_education_group_year.is_valid():
         return _common_success_redirect(request, form_education_group_year, root)
 
-    return layout.render(request, html_page, {
+    return render(request, html_page, {
         "education_group_year": education_group_year,
         "form_education_group_year": form_education_group_year.forms[forms.ModelForm],
         "form_education_group": form_education_group_year.forms[EducationGroupModelForm]
@@ -151,7 +151,7 @@ def _update_training(request, education_group_year, root):
     if form_education_group_year.is_valid():
         return _common_success_redirect(request, form_education_group_year, root)
 
-    return layout.render(request, "education_group/update_trainings.html", {
+    return render(request, "education_group/update_trainings.html", {
         "education_group_year": education_group_year,
         "form_education_group_year": form_education_group_year.forms[forms.ModelForm],
         "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
