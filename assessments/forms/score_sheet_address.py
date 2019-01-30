@@ -23,21 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.forms import bootstrap
-from assessments.models import score_sheet_address
 from django import forms
-from reference.models import country
+from django.utils.translation import gettext_lazy
+
+from assessments.models.score_sheet_address import ScoreSheetAddress
+from reference.models.country import Country
 
 
-class ScoreSheetAddressForm(bootstrap.BootstrapModelForm):
-    country = forms.ModelChoiceField(queryset=country.find_all(), required=False)
-    recipient = forms.CharField(max_length=255)
-    location = forms.CharField(max_length=255)
-    postal_code = forms.CharField(max_length=255)
-    city = forms.CharField(max_length=255)
+class ScoreSheetAddressForm(forms.ModelForm):
+    country = forms.ModelChoiceField(queryset=Country.objects.all(), required=False, label=gettext_lazy('Country'))
+    recipient = forms.CharField(max_length=255, label=gettext_lazy('Recipient'))
+    location = forms.CharField(max_length=255, label=gettext_lazy('Location'))
+    postal_code = forms.CharField(max_length=255, label=gettext_lazy('Postal code'))
+    city = forms.CharField(max_length=255, label=gettext_lazy('City'))
     offer_year = forms.CharField()
     email = forms.EmailField(required=False)
 
     class Meta:
-        model = score_sheet_address.ScoreSheetAddress
+        model = ScoreSheetAddress
         exclude = ['external_id', 'changed']

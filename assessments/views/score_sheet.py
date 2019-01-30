@@ -26,16 +26,19 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
-from base import models as mdl
-from reference import models as mdl_ref
-from base.views import layout
-from assessments.forms import score_sheet_address, score_sheet_address_entity
 from assessments.business import score_encoding_sheet
-from django.utils.translation import ugettext_lazy as _
+from assessments.forms import score_sheet_address_entity
+from assessments.forms.score_sheet_address import ScoreSheetAddressForm
 from assessments.models import score_sheet_address as score_sheet_address_model
+from base import models as mdl
+from base.models.offer_year import OfferYear
+from base.models.utils.utils import get_object_or_none
+from reference.models.country import Country
 
 
 @login_required
@@ -44,22 +47,24 @@ from assessments.models import score_sheet_address as score_sheet_address_model
 @require_http_methods(["GET"])
 def offer_score_encoding_tab(request, offer_year_id):
     context = _get_common_context(request, offer_year_id)
-    dict = score_encoding_sheet.get_score_sheet_address(context.get('offer_year'))
-    entity_id_selected = dict['entity_id_selected']
-    address = dict['address']
+    score_sheet_address = score_encoding_sheet.get_score_sheet_address(context.get('offer_year'))
+    entity_id_selected = score_sheet_address['entity_id_selected']
+    address = score_sheet_address['address']
     if not address.get('offer_year'):
         address['offer_year'] = offer_year_id
-    form = score_sheet_address.ScoreSheetAddressForm(initial=address)
+    form = ScoreSheetAddressForm(initial=address)
     context.update({'entity_id_selected': entity_id_selected, 'form': form})
-    return layout.render(request, "offer/score_sheet_address_tab.html", context)
+    return render(request, "offer/score_sheet_address_tab.html", context)
 
 
 def _get_common_context(request, offer_year_id):
-    offer_year = mdl.offer_year.find_by_id(offer_year_id)
-    countries = mdl_ref.country.find_all()
-    is_program_manager = mdl.program_manager.is_program_manager(request.user, offer_year=offer_year)
-    entity_versions = score_encoding_sheet.get_entity_version_choices(offer_year)
-    return locals()
+    offer_year = get_object_or_none(OfferYear, pk=offer_year_id)
+    return {
+        'offer_year': offer_year,
+        'countries': Country.objects.all(),
+        'is_program_manager': mdl.program_manager.is_program_manager(request.user, offer_year=offer_year),
+        'entity_versions': score_encoding_sheet.get_entity_version_choices(offer_year),
+    }
 
 
 @login_required
@@ -73,13 +78,15 @@ def save_score_sheet_address(request, offer_year_id):
         return _save_from_entity_address(context, entity_version_id_selected, offer_year_id, request)
     else:
         form = _save_customized_address(request, offer_year_id)
-        context.update({'form': form})
-        return layout.render(request, "offer/score_sheet_address_tab.html", context)
+        context['form'] = form
+        return render(request, "offer/score_sheet_address_tab.html", context)
 
 
 def _save_customized_address(request, offer_year_id):
-    form = score_sheet_address.ScoreSheetAddressForm(request.POST,
-                                                     instance=score_sheet_address_model.get_from_offer_year(offer_year_id))
+    form = ScoreSheetAddressForm(
+        request.POST,
+        instance=score_sheet_address_model.get_from_offer_year(offer_year_id)
+    )
     if form.is_valid():
         form.save()
         messages.add_message(request, messages.SUCCESS, _("Score sheet address was successfully saved."))
@@ -96,7 +103,7 @@ def _save_from_entity_address(context, entity_version_id_selected, offer_year_id
         return HttpResponseRedirect(reverse("offer_score_encoding_tab", args=[offer_year_id]))
     else:
         incorrect_email_management(context, email_encode, offer_year_id)
-        return layout.render(request, "offer/score_sheet_address_tab.html", context)
+        return render(request, "offer/score_sheet_address_tab.html", context)
 
 
 def incorrect_email_management(context_param, email_encode, offer_year_id):
@@ -107,9 +114,8 @@ def incorrect_email_management(context_param, email_encode, offer_year_id):
     address['email'] = email_encode
     if not address.get('offer_year'):
         address['offer_year'] = offer_year_id
-    form = score_sheet_address.ScoreSheetAddressForm(initial=address)
+    form = ScoreSheetAddressForm(initial=address)
     form.errors['email'] = _('Enter a valid email address.')
     context.update({'form': form})
     context.update({'entity_id_selected': entity_id_selected})
     return context
-

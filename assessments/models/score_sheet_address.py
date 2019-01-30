@@ -24,6 +24,8 @@
 #
 ##############################################################################
 from django.db import models
+from django.utils.translation import gettext_lazy
+
 from assessments.models.enums import score_sheet_address_choices
 from django.core.exceptions import ObjectDoesNotExist
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -44,13 +46,13 @@ class ScoreSheetAddress(models.Model):
     entity_address_choice = models.CharField(max_length=50, blank=True, null=True, choices=score_sheet_address_choices.CHOICES)
     # Address fields
     recipient = models.CharField(max_length=255, blank=True, null=True)
-    location = models.CharField(max_length=255, blank=True, null=True)  # Address for scores cheets
+    location = models.CharField(max_length=255, blank=True, null=True)  # Address for scores sheets
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
     country = models.ForeignKey('reference.Country', blank=True, null=True)
-    phone = models.CharField(max_length=30, blank=True, null=True)
-    fax = models.CharField(max_length=30, blank=True, null=True)
-    email = models.EmailField(null=True, blank=True)
+    phone = models.CharField(max_length=30, blank=True, null=True, verbose_name=gettext_lazy("Phone"))
+    fax = models.CharField(max_length=30, blank=True, null=True, verbose_name=gettext_lazy("Fax"))
+    email = models.EmailField(null=True, blank=True, verbose_name=gettext_lazy("Email"))
 
     @property
     def customized(self):
