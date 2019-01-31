@@ -65,7 +65,7 @@
         {% endif %}
 
         {% if info.show_free_text %}
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="free" text=_("Free Text") field=admission_condition.text_free field_en=admission_condition.text_free_en can_edit=True %}
+            {% include 'education_group/blocks/admission_condition_text.html' with section_name="free" text=_("Specific admission requirements") field=admission_condition.text_free field_en=admission_condition.text_free_en can_edit=True %}
         {% endif %}
 
         {% if info.show_components_for_agreg_and_mc %}

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-30 14:10+0100\n"
+"POT-Creation-Date: 2019-01-31 09:10+0100\n"
 "PO-Revision-Date: 2019-01-23 09:42+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1183,7 +1183,6 @@ msgstr "Diplôme"
 msgid "Diploma title"
 msgstr "Intitulé du diplôme/du certificat"
 
-#: templates/education_group/blocks/form/training.html:47
 #: templates/education_group/tabs.html:48
 msgid "Diplomas /  Certificates"
 msgstr "Diplômes /  Certificats"
@@ -1461,7 +1460,7 @@ msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 "Assurez-vous que cette valeur est inférieure ou égale à %(limit_value)s."
 
-#: forms/education_group/training.py:189
+#: forms/education_group/training.py:190
 msgid "Enter text to search"
 msgstr "Entrez le texte à rechercher"
 
@@ -1658,10 +1657,6 @@ msgstr "Code OF"
 msgid "Formerly"
 msgstr "Anciennement"
 
-#: templates/education_group/tab_admission_conditions.html:68
-msgid "Free Text"
-msgstr "Zone libre"
-
 #: forms/education_group/achievement.py:49
 #: forms/education_group/achievement.py:79
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:39
@@ -1795,7 +1790,6 @@ msgstr "Diplômés de 2° cycle non universitaire"
 msgid "Home"
 msgstr "Page d'accueil"
 
-#: templates/education_group/blocks/form/training.html:42
 #: templates/education_group/tabs.html:41 templates/entity/tabs.html:33
 #: templates/learning_unit/blocks/tabs.html:39
 #: templates/learning_unit/blocks/tabs.html:52
@@ -2074,7 +2068,7 @@ msgstr "Unité d'enseignement %(acronym)s mise à jour avec succès."
 
 #: templates/blocks/forms/search_form.html:44
 #: templates/learning_unit/blocks/form/search_form_external_learning_unit.html:45
-#: templates/learning_unit/blocks/form/search_form_learning_unit.html:75
+#: templates/learning_unit/blocks/form/search_form_learning_unit.html:70
 msgid "Learning unit search"
 msgstr "Recherche d'unités d'enseignement"
 
@@ -3507,6 +3501,10 @@ msgstr "Conditions spéciales"
 #: templates/education_group/tab_admission_conditions.html:53
 msgid "Specific Conditions"
 msgstr "Conditions Particulières"
+
+#: templates/education_group/tab_admission_conditions.html:68
+msgid "Specific admission requirements"
+msgstr "Conditions spécifiques d'admission"
 
 #: templates/learning_unit/blocks/tabs.html:67
 #: templates/learning_unit/proposal/tabs.html:60
@@ -4970,7 +4968,7 @@ msgstr "mise-à-jour bloquée pour l'enseignant"
 msgid "cancel"
 msgstr "annuler"
 
-#: templates/education_group/blocks/form/training_tab_diploma.html:36
+#: templates/education_group/blocks/form/training_tab_diploma.html:35
 #: templates/education_group/tab_diplomas.html:48
 msgid "certificate aims"
 msgstr "attendus du diplôme"
@@ -5021,7 +5019,7 @@ msgid "date_format"
 msgstr "%d/%m/%Y"
 
 # TODO
-#: templatetags/format.py:51
+#: templatetags/format.py:35
 msgid "date_format_string"
 msgstr "d/m/Y"
 
@@ -5086,7 +5084,7 @@ msgstr "n° facultaire"
 msgid "field reference"
 msgstr "référence de champ"
 
-#: templates/education_group/blocks/form/training_tab_diploma.html:42
+#: templates/education_group/blocks/form/training_tab_diploma.html:40
 msgid "filter by section"
 msgstr "préfiltrer par rubrique"
 
