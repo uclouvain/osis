@@ -26,7 +26,7 @@
 import itertools
 
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, connection
 from django.db.models import Q, F, Case, When
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -341,88 +341,150 @@ def _match_any_filters(element_year, filters):
 
 
 
-class Hierarchy:
-    _parent_id = None
-    group_elem_id = None
-    child_branch = None
-    child_leaf = None
-
-    _children_hierarchy = None  # list of Hierarchy children from _parent_id
-    # _leaf_children_ids = None
-
-    # parents = None
-    # children = None
-
-    def __init__(self, parent_id, group_elem_id, child_branch, child_leaf):
-        self._parent_id = parent_id
-        self.group_elem_id = group_elem_id
-        self.child_branch = child_branch
-        self.child_leaf = child_leaf
-
-        self._children_hierarchy = []
-        # self._leaf_children_ids = []
-
-    def add_hierarchy_child(self, child_hierarchy):
-        if child_hierarchy:
-            self._children_hierarchy.append(child_hierarchy)
-
-    def set_children_instances(self, children_instance_by_id):
-        self.children = [children_instance_by_id.get(group_elem_id) for group_elem_id in self._children_hierarchy
-                         if children_instance_by_id.get(group_elem_id)]
-
-    # def add_leaf_child(self, child_id):
-    #     if child_id:
-    #         self._leaf_children_ids.append(child_id)
-
-    def fetch_and_initialize_instances(self):
-        pass
-
-
-def fetch_group_elements(group_element_year_queryset):
-    pass
-
-
-def build_tree_in_memory(root: EducationGroupYear, queryset):
-    elements = _fetch_group_elements_year(root.academic_year)
-    # 'parent', 'child_branch', 'child_leaf'
-
-    # root_hierarchy = Hierarchy(root.id)
-
-    group_elems_by_parent_id = {}
-    for elem in elements:
-        parent_id = elem['parent']
-        group_elem = Hierarchy(parent_id, elem['id'], elem['child_branch'], elem['child_leaf'])
-        group_elems_by_parent_id.setdefault(parent_id, []).append(group_elem)
+# class Hierarchy:
+#     _parent_id = None
+#     group_elem_id = None
+#     child_branch = None
+#     child_leaf = None
+#
+#     _children_hierarchy = None  # list of Hierarchy children from _parent_id
+#     # _leaf_children_ids = None
+#
+#     # parents = None
+#     # children = None
+#
+#     def __init__(self, parent_id, group_elem_id, child_branch, child_leaf):
+#         self._parent_id = parent_id
+#         self.group_elem_id = group_elem_id
+#         self.child_branch = child_branch
+#         self.child_leaf = child_leaf
+#
+#         self._children_hierarchy = []
+#         # self._leaf_children_ids = []
+#
+#     # def add_hierarchy_child(self, child_hierarchy):
+#     #     if child_hierarchy:
+#     #         self._children_hierarchy.append(child_hierarchy)
+#
+#     def set_children_instances(self, children_instance_by_id):
+#         self.children = [children_instance_by_id.get(group_elem_id) for group_elem_id in self._children_hierarchy
+#                          if children_instance_by_id.get(group_elem_id)]
+#
+#     # def add_leaf_child(self, child_id):
+#     #     if child_id:
+#     #         self._leaf_children_ids.append(child_id)
+#
+#     def fetch_and_initialize_instances(self):
+#         pass
+#
+#
+# def fetch_group_elements(group_element_year_queryset):
+#     pass
 
 
-    result = _init_children(root.id, group_elems_by_parent_id)
-    group_elem_ids = {obj.group_elem_id for obj in result}
-    queryset = queryset.filter(pk__in=group_elem_ids)
-    group_elem_year_instance_by_id = {obj.id: obj for obj in queryset}
-    for obj in result:
-        obj.set_children_instances(group_elem_year_instance_by_id)
 
-    test = {}
-    for obj in group_elem_year_instance_by_id.values():
-        test.setdefault(obj.parent_id, []).append(obj)
+SQL_RECURSIVE_QUERY_EDUCATION_GROUP = """\
+WITH RECURSIVE group_element_year_parent AS (
 
-    return test
+    SELECT id, child_branch_id, child_leaf_id, parent_id, 0 AS level
+    FROM base_groupelementyear 
+    WHERE parent_id IN ({list_root_ids})
 
-    # for elem in elements:
-    #     hierarchy = Hierarchy(elem['parent'])
-    #     hierarchy.add_branch_child(elem['child_branch'])
-    #     hierarchy.add_leaf_child(elem['child_leaf'])
+    UNION ALL
+
+    SELECT child.id,
+           child.child_branch_id,
+           child.child_leaf_id,
+           child.parent_id,
+           parent.level + 1
+
+    FROM base_groupelementyear AS child
+    INNER JOIN group_element_year_parent AS parent on parent.child_branch_id = child.parent_id
+    
+    )
+
+SELECT * FROM group_element_year_parent ;
+"""
 
 
-def _init_children(parent_id, group_elems_by_parent_id):
-    all_group_elem = []
-    children = group_elems_by_parent_id.get(parent_id) or []
-    for child_hierarchy in children:
-        child_branch = child_hierarchy.child_branch
-        child_hierarchy._children_hierarchy = group_elems_by_parent_id.get(child_branch) or []
-        all_group_elem.append(child_hierarchy)
-        all_group_elem += _init_children(child_branch, group_elems_by_parent_id)
-    return all_group_elem
+def _fetch_row_sql(root_ids):
+    with connection.cursor() as cursor:
+        query = SQL_RECURSIVE_QUERY_EDUCATION_GROUP.format(list_root_ids=','.join(str(root_id) for root_id in root_ids))
+        cursor.execute(query)
+
+        return [
+            {
+                'id': row[0],
+                'child_branch_id': row[1],
+                'child_leaf_id': row[2],
+                'parent_id': row[3],
+                'level': row[4],
+            } for row in cursor.fetchall()
+        ]
+
+
+def fetch_all_group_elements_behind_hierarchy(root: EducationGroupYear, queryset) -> dict:
+    if queryset.model != GroupElementYear:
+        raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
+
+    elements = _fetch_row_sql([root.id])
+
+    distinct_group_elem_ids = {elem['id'] for elem in elements}
+    queryset = queryset.filter(pk__in=distinct_group_elem_ids)
+
+    group_elems_by_parent_id = {}  # Map {'educationGroupYear parent': [GroupElementYear, GroupElementYear...]}
+    for group_elem_year in queryset:
+        parent_id = group_elem_year.parent_id
+        group_elems_by_parent_id.setdefault(parent_id, []).append(group_elem_year)
+    return group_elems_by_parent_id
+
+
+#
+# def build_tree_in_memory(root: EducationGroupYear, queryset):
+#     # TODO :: replace this fetch by recursive row SQL
+#     elements = _fetch_row_sql([root.id])
+#     # 'parent', 'child_branch', 'child_leaf'
+#
+#     # root_hierarchy = Hierarchy(root.id)
+#
+#     group_elems_by_parent_id = {}  # Map {'educationGroupYear parent': [GroupElementYear, GroupElementYear...]}
+#     for elem in elements:
+#         parent_id = elem['parent']
+#         group_elem = Hierarchy(parent_id, elem['id'], elem['child_branch'], elem['child_leaf'])
+#         group_elems_by_parent_id.setdefault(parent_id, []).append(group_elem)
+#
+#
+#     result = _init_children(root.id, group_elems_by_parent_id)
+#     group_elem_ids = {obj.group_elem_id for obj in result}
+#     queryset = queryset.filter(pk__in=group_elem_ids)
+#     group_elem_year_instance_by_id = {obj.id: obj for obj in queryset}
+#
+#     root_obj = next(obj for obj in result if obj.root_id == root.id)
+#
+#     # for obj in result:
+#     #     obj.set_children_instances(group_elem_year_instance_by_id)
+#
+#     test = {}
+#     for obj in group_elem_year_instance_by_id.values():
+#         test.setdefault(obj.parent_id, []).append(obj)
+#
+#     return test
+#
+#     # for elem in elements:
+#     #     hierarchy = Hierarchy(elem['parent'])
+#     #     hierarchy.add_branch_child(elem['child_branch'])
+#     #     hierarchy.add_leaf_child(elem['child_leaf'])
+#
+#
+# def _init_children(parent_id, group_elems_by_parent_id):
+#     all_group_elem = []
+#     children = group_elems_by_parent_id.get(parent_id) or []
+#     for child_hierarchy in children:
+#         child_branch = child_hierarchy.child_branch
+#         child_hierarchy._children_hierarchy = group_elems_by_parent_id.get(child_branch) or []
+#         all_group_elem.append(child_hierarchy)
+#         all_group_elem += _init_children(child_branch, group_elems_by_parent_id)
+#     return all_group_elem
 
 
 

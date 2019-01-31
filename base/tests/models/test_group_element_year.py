@@ -30,7 +30,8 @@ from django.test import TestCase
 
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories
+from base.models.enums import education_group_categories, education_group_types
+from base.models.enums.education_group_types import TrainingType
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -453,3 +454,58 @@ class TestSaveGroupElementYear(TestCase):
                 child_branch=egy,
                 child_leaf=luy,
             )
+
+
+class TestFetchGroupElementsBehindHierarchy(TestCase):
+    """Unit tests on fetch_all_group_elements_behind_hierarchy()"""
+
+    def setUp(self):
+        formation_master_type = EducationGroupTypeFactory(
+            category=education_group_categories.TRAINING,
+            name=education_group_types.TrainingType.PGRM_MASTER_120,
+        )
+        self.root = EducationGroupYearFactory(acronym='DROI2M', education_group_type=formation_master_type)
+
+        finality_list_type = EducationGroupTypeFactory(
+            category=education_group_categories.GROUP,
+            name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE,
+        )
+        finality_list = EducationGroupYearFactory(acronym='LIST FINALITIES', education_group_type=finality_list_type)
+
+        formation_master_md_type = EducationGroupTypeFactory(
+            category=education_group_categories.TRAINING,
+            name=education_group_types.TrainingType.MASTER_MD_120,
+        )
+        formation_master_md = EducationGroupYearFactory(acronym='DROI2MD', education_group_type=formation_master_md_type)
+
+        common_core_type = EducationGroupTypeFactory(
+            category=education_group_categories.GROUP,
+            name=education_group_types.GroupType.COMMON_CORE,
+        )
+        common_core = EducationGroupYearFactory(acronym='TC DROI2MD', education_group_type=common_core_type)
+
+        self.link_1 = GroupElementYearFactory(parent=self.root, child_branch=finality_list, child_leaf=None)
+        self.link_1_bis = GroupElementYearFactory(parent=self.root, child_branch=EducationGroupYearFactory(), child_leaf=None)
+        self.link_2 = GroupElementYearFactory(parent=finality_list, child_branch=formation_master_md, child_leaf=None)
+        self.link_3 = GroupElementYearFactory(parent=formation_master_md, child_branch=common_core, child_leaf=None)
+        self.link_4 = GroupElementYearFactory(parent=common_core, child_leaf=LearningUnitYearFactory(), child_branch=None)
+
+    def test_with_one_root_id(self):
+        queryset = GroupElementYear.objects.all().select_related(
+            'child_branch__academic_year',
+            'child_leaf__academic_year',
+            # [...] other fetch
+        )
+        result = group_element_year.fetch_all_group_elements_behind_hierarchy(self.root, queryset)
+        expected_result = {
+            self.link_1.parent_id: [self.link_1, self.link_1_bis],
+            self.link_2.parent_id: [self.link_2],
+            self.link_3.parent_id: [self.link_3],
+            self.link_4.parent_id: [self.link_4],
+        }
+        self.assertDictEqual(result, expected_result)
+
+    def test_when_queryset_is_not_from_group_element_year_model(self):
+        wrong_queryset_model = EducationGroupYear.objects.all()
+        with self.assertRaises(AttributeError):
+            group_element_year.fetch_all_group_elements_behind_hierarchy(self.root, wrong_queryset_model)
