@@ -37,7 +37,7 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelF
     LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.forms.learning_unit.learning_unit_create_2 import FullForm, FACULTY_OPEN_FIELDS, \
-    FULL_READ_ONLY_FIELDS
+    FULL_READ_ONLY_FIELDS, PROPOSAL_READ_ONLY_FIELDS
 from base.models.academic_year import AcademicYear
 from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
@@ -217,7 +217,7 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
             proposal=True
         )
 
-        for elem in FACULTY_OPEN_FIELDS:
+        for elem in PROPOSAL_READ_ONLY_FIELDS:
             self.assertEqual(form.fields[elem].disabled, True)
             self.assertEqual(form.fields['academic_year'].disabled, True)
 
