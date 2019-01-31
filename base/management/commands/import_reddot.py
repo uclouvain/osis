@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import collections
-import datetime
 import json
 import pathlib
 from itertools import chain
@@ -287,7 +286,7 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_FR, 'mineures', 'Mineures'),
     (settings.LANGUAGE_CODE_FR, 'majeures', 'Majeures'),
     (settings.LANGUAGE_CODE_FR, 'finalites', 'Finalités'),
-    (settings.LANGUAGE_CODE_FR, 'finalites_didactiques', 'Finalités Didactique'),
+    (settings.LANGUAGE_CODE_FR, 'finalites_didactiques-commun', 'Finalités Didactique'),
     (settings.LANGUAGE_CODE_FR, 'agregation', 'Agrégation'),
     (settings.LANGUAGE_CODE_FR, 'prerequis', 'Prérequis'),
     (settings.LANGUAGE_CODE_FR, 'contact_intro', 'Introduction'),
@@ -311,7 +310,7 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_EN, 'mineures', 'Minors'),
     (settings.LANGUAGE_CODE_EN, 'majeures', 'Majors'),
     (settings.LANGUAGE_CODE_EN, 'finalites', 'Focuses'),
-    (settings.LANGUAGE_CODE_EN, 'finalites_didactiques', 'Teaching Focuses'),
+    (settings.LANGUAGE_CODE_EN, 'finalites_didactiques-commun', 'Teaching Focuses'),
     (settings.LANGUAGE_CODE_EN, 'agregation', 'Agregation'),
     (settings.LANGUAGE_CODE_EN, 'prerequis', 'Prerequis'),
     (settings.LANGUAGE_CODE_EN, 'contact_intro', 'Introduction'),
