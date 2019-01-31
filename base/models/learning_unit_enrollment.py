@@ -74,9 +74,5 @@ def find_by_student(a_student):
                   'learning_unit_year__acronym')
 
 
-def find_by_offer_enrollment(an_offer_enrollment):
-    return LearningUnitEnrollment.objects.filter(offer_enrollment=an_offer_enrollment)
-
-
 def find_by_learning_unit_year(a_learning_unit_year):
     return LearningUnitEnrollment.objects.filter(learning_unit_year=a_learning_unit_year)

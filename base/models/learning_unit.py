@@ -142,14 +142,6 @@ class LearningUnit(SerializableModel):
         return AcademicYear.objects.filter(learningunityear__learning_unit=self).aggregate(Max('year'))['year__max']
 
 
-def find_by_id(learning_unit_id):
-    return LearningUnit.objects.get(pk=learning_unit_id)
-
-
-def find_by_ids(learning_unit_ids):
-    return LearningUnit.objects.filter(pk__in=learning_unit_ids)
-
-
 def get_by_acronym_with_highest_academic_year(acronym):
     return LearningUnit.objects.filter(
         learningunityear__acronym=acronym

@@ -59,8 +59,3 @@ class EducationGroupOrganization(models.Model):
     @cached_property
     def address(self):
         return organization_address.find_by_organization(self.organization).first()
-
-
-def search(**kwargs):
-    if "education_group_year" in kwargs:
-        return EducationGroupOrganization.objects.filter(education_group_year=kwargs['education_group_year'])

@@ -49,19 +49,6 @@ class LearningUnitTest(TestCase):
         with self.assertRaises(AttributeError):
             l_unit.save()
 
-    def test_find_by_id(self):
-        l_unit_1 = LearningUnitFactory()
-        LearningUnitFactory()
-        LearningUnitFactory()
-        self.assertEqual(l_unit_1, learning_unit.find_by_id(l_unit_1.id))
-
-    def test_find_by_ids(self):
-        l_unit_1 = LearningUnitFactory()
-        l_unit_2 = LearningUnitFactory()
-        LearningUnitFactory()
-        LearningUnitFactory()
-        self.assertEqual(2, len( learning_unit.find_by_ids( (l_unit_1.id, l_unit_2.id) )))
-
     def test_get_partims_related(self):
         current_year = datetime.date.today().year
         academic_year = AcademicYearFactory(year=current_year)
