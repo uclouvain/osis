@@ -76,7 +76,7 @@ class GetAllCountryTestCase(APITestCase):
         self.assertEqual(response.data['count'], expected_count)
 
     def test_get_all_country_ensure_default_order(self):
-        """ This test ensure that default order is name [DESC Order]"""
+        """ This test ensure that default order is name [ASC Order]"""
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
