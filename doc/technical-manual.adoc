@@ -126,7 +126,8 @@ Execute the following commands to install PostgreSQL:
 
     $ sudo apt-get install postgresql
     $ sudo su - postgres -c "createuser -s $USER"
-    $ sudo apt-get install python3-dev, libpq-dev
+    $ sudo apt-get install python3
+    $ sudo apt-get install libpq-dev
 
 The first command installs PostgreSQL and creates a user named after the current logged OS user. The libraries python3-dev and libpq-dev are also installed for development purposes.
 
