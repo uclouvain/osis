@@ -70,7 +70,7 @@ SECTION_LIST = [
             labels=[
                 (STRUCTURE, 'specific')
             ]),
-    Section(title=_('Program'),
+    Section(title=_('Detailed program'),
             labels=[
                 (MINORS, 'specific'),
                 (MAJORS, 'specific'),
@@ -80,7 +80,7 @@ SECTION_LIST = [
                 (DIDACTIC_PURPOSES, 'common'),
                 (CAAP, 'common,specific'),
                 (AGREGATION, 'common'),
-                (PREREQUISITE, 'common'),
+                (PREREQUISITE, 'common,specific'),
             ]),
     Section(title=_('Admission'),
             labels=[
