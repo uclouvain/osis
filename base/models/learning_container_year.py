@@ -50,8 +50,10 @@ class LearningContainerYear(SerializableModel):
     learning_container = models.ForeignKey('LearningContainer')
 
     container_type = models.CharField(
-        max_length=20, verbose_name=_('Type'),
-        choices=learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES
+        verbose_name=_('Type'),
+        db_index=True,
+        max_length=20,
+        choices=learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES,
     )
 
     common_title = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('Common title'))
@@ -86,17 +88,3 @@ class LearningContainerYear(SerializableModel):
     def get_partims_related(self):
         return learning_unit_year.search(learning_container_year_id=self,
                                          subtype=learning_unit_year_subtypes.PARTIM).order_by('acronym')
-
-    def get_attributions(self):
-        return AttributionNew.objects.filter(learning_container_year=self).select_related('tutor')
-
-
-def search(an_academic_year=None, a_learning_container=None):
-    queryset = LearningContainerYear.objects
-
-    if an_academic_year:
-        queryset = queryset.filter(academic_year=an_academic_year)
-    if a_learning_container:
-        queryset = queryset.filter(learning_container=a_learning_container)
-
-    return queryset

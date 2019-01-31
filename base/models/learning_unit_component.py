@@ -49,16 +49,6 @@ class LearningUnitComponent(SerializableModel):
         return u"%s - %s" % (self.learning_component_year.type, self.learning_unit_year)
 
 
-def find_by_learning_year_type(a_learning_unit_year=None, a_type=None):
-    if a_learning_unit_year and a_type:
-        try:
-            return LearningUnitComponent.objects.get(learning_unit_year=a_learning_unit_year,
-                                                     type=a_type)
-        except ObjectDoesNotExist:
-            return None
-    return None
-
-
 def find_by_learning_unit_year(a_learning_unit_year):
     return LearningUnitComponent.objects.filter(learning_unit_year=a_learning_unit_year)\
         .order_by('learning_component_year__acronym')
@@ -78,9 +68,3 @@ def search(a_learning_component_year=None, a_learning_unit_year=None):
         queryset = queryset.filter(learning_unit_year=a_learning_unit_year)
 
     return queryset.select_related('learning_unit_year__academic_year')
-
-
-def used_by(learning_component_year, learning_unit_year):
-    if search(learning_component_year, learning_unit_year).exists():
-        return True
-    return False

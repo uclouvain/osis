@@ -31,6 +31,7 @@ from django.test import TestCase, Client, RequestFactory
 
 from assessments.views import pgm_manager_administration
 from base.models import program_manager
+from base.tests.factories.group import ProgramManagerGroupFactory
 
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.person import PersonFactory
@@ -44,25 +45,23 @@ from django.core.urlresolvers import reverse
 
 
 class PgmManagerAdministrationTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        ProgramManagerGroupFactory()
 
-    def setUp(self):
-        self.user = User.objects.create_user('tmp', 'tmp@gmail.com', 'tmp')
-        self.person = PersonFactory()
+        cls.user = User.objects.create_user('tmp', 'tmp@gmail.com', 'tmp')
+        cls.person = PersonFactory()
 
-        self.structure_parent1 = StructureFactory(acronym='SSH')
+        cls.structure_parent1 = StructureFactory(acronym='SSH')
 
-        self.structure_child1 = StructureFactory(acronym='TECO', part_of=self.structure_parent1)
-        self.structure_child11 = StructureFactory(acronym='TEBI', part_of=self.structure_child1)
+        cls.structure_child1 = StructureFactory(acronym='TECO', part_of=cls.structure_parent1)
+        cls.structure_child11 = StructureFactory(acronym='TEBI', part_of=cls.structure_child1)
 
-        self.structure_child2 = StructureFactory(acronym='ESPO', part_of=self.structure_parent1)
-        self.structure_child21 = StructureFactory(acronym='ECON', part_of=self.structure_child2)
-        self.structure_child22 = StructureFactory(acronym='COMU', part_of=self.structure_child2)
+        cls.structure_child2 = StructureFactory(acronym='ESPO', part_of=cls.structure_parent1)
+        cls.structure_child21 = StructureFactory(acronym='ECON', part_of=cls.structure_child2)
+        cls.structure_child22 = StructureFactory(acronym='COMU', part_of=cls.structure_child2)
 
-        a_year = datetime.now().year
-        self.academic_year_previous = AcademicYearFactory(year=a_year-1)
-        self.academic_year_current = AcademicYearFactory(year=a_year)
-
-        self.Client = Client()
+        cls.academic_year_previous, cls.academic_year_current = AcademicYearFactory.produce_in_past(quantity=2)
 
     def test_find_children_entities_from_acronym(self):
         self.assertIsNone(pgm_manager_administration.get_managed_entities(None))
@@ -239,8 +238,8 @@ class PgmManagerAdministrationTest(TestCase):
         self.assertCountEqual(offer_year_results, [offer_year1])
 
         offer_year_results = pgm_manager_administration._filter_by_person(self.person, [], self.academic_year_current,
-                                                              an_offer_type)
-        self.assertCountEqual(offer_year_results, [offer_year1,offer_year2])
+                                                                          an_offer_type)
+        self.assertCountEqual(offer_year_results, [offer_year1, offer_year2])
 
         an_other_offer_type = OfferTypeFactory()
         offer_year_results = pgm_manager_administration._filter_by_person(self.person, [self.structure_parent1],
@@ -362,15 +361,6 @@ class PgmManagerAdministrationTest(TestCase):
         data = pgm_manager_administration._get_administrator_entities_acronym_list(data)
 
         self.assertEqual(data, "A, B")
-
-
-def add_permission(user, codename):
-    perm = get_permission(codename)
-    user.user_permissions.add(perm)
-
-
-def get_permission(codename):
-    return Permission.objects.get(codename=codename)
 
 
 def set_post_request(mock_decorators, data_dict, url):

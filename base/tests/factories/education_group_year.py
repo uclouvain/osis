@@ -60,7 +60,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     administration_entity = factory.SubFactory(EntityFactory)
     main_teaching_campus = factory.SubFactory(CampusFactory)
     credits = factory.fuzzy.FuzzyInteger(MINIMUM_CREDITS, MAXIMUM_CREDITS)
-    min_constraint = factory.fuzzy.FuzzyInteger(MINIMUM_CREDITS, MAXIMUM_CREDITS)
+    min_constraint = factory.fuzzy.FuzzyInteger(1, MAXIMUM_CREDITS)
     max_constraint = factory.lazy_attribute(lambda a: a.min_constraint)
     remark = factory.fuzzy.FuzzyText(length=255)
     remark_english = factory.fuzzy.FuzzyText(length=255)
@@ -75,8 +75,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
 
 
 class MiniTrainingFactory(EducationGroupYearFactory):
-    education_group_type = factory.SubFactory('base.tests.factories.education_group_type.EducationGroupTypeFactory',
-                                              category=education_group_categories.MINI_TRAINING)
+    education_group_type__minitraining = True
 
 
 class TrainingFactory(EducationGroupYearFactory):
@@ -85,8 +84,7 @@ class TrainingFactory(EducationGroupYearFactory):
 
 
 class GroupFactory(EducationGroupYearFactory):
-    education_group_type = factory.SubFactory('base.tests.factories.education_group_type.EducationGroupTypeFactory',
-                                              category=education_group_categories.GROUP)
+    education_group_type__group = True
 
 
 class EducationGroupYearCommonBachelorFactory(EducationGroupYearFactory):

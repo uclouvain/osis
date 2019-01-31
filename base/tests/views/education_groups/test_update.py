@@ -26,7 +26,6 @@
 import json
 from http import HTTPStatus
 from unittest import mock
-from unittest.mock import patch
 
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
@@ -56,7 +55,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory
-from base.utils.cache import cache
+from base.utils.cache import ElementCache
 from base.views.education_groups.update import update_education_group, _get_success_redirect_url
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.language import LanguageFactory
@@ -327,21 +326,9 @@ class TestGetSuccessRedirectUrl(TestCase):
 @override_flag('education_group_select', active=True)
 @override_flag('education_group_update', active=True)
 class TestSelectAttach(TestCase):
-    def setUp(self):
-        self.locmem_cache = cache
-        self.locmem_cache.clear()
-        self.patch = patch.object(management, 'cache', self.locmem_cache)
-        self.patch.start()
-
+    @classmethod
+    def setUpTestData(self):
         self.person = PersonFactory()
-        self.client = Client()
-        self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch(
-            "base.business.group_element_years.perms.is_eligible_to_create_group_element_year",
-            return_value=True
-        )
-        self.mocked_perm = self.perm_patcher.start()
-
         self.academic_year = create_current_academic_year()
         self.child_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
         self.learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
@@ -390,50 +377,46 @@ class TestSelectAttach(TestCase):
             "action": "attach",
         }
 
-        cache.set('child_to_cache_id', None, timeout=None)
+    def setUp(self):
+        self.client = Client()
+        self.client.force_login(self.person.user)
+        self.perm_patcher = mock.patch(
+            "base.business.education_groups.perms.is_eligible_to_change_education_group",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
 
     def tearDown(self):
-        cache.set('child_to_cache_id', None, timeout=None)
-        self.patch.stop()
         self.client.logout()
         self.perm_patcher.stop()
 
     def test_select_case_education_group(self):
-        response = self.client.post(
-            self.url_management,
-            data=self.select_data,
-            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
-        )
-        data_cached = cache.get(management.SELECT_CACHE_KEY)
+        response = self.client.post(self.url_management, data=self.select_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        data_cached = ElementCache(self.person.user).cached_data
 
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertIsInstance(data_cached, dict)
-        self.assertEqual(int(data_cached['id']), self.child_education_group_year.id)
-        self.assertEqual(data_cached['modelname'], management.EDUCATION_GROUP_YEAR)
+        self.assertDictEqual(
+            data_cached,
+            {'modelname': management.EDUCATION_GROUP_YEAR, 'id':self.child_education_group_year.id}
+        )
 
     def test_select_ajax_case_learning_unit_year(self):
         response = self.client.post(
             self.url_select_learning_unit,
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
-        data_cached = cache.get(management.SELECT_CACHE_KEY)
+        data_cached = ElementCache(self.person.user).cached_data
 
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertIsInstance(data_cached, dict)
-        self.assertEqual(int(data_cached['id']), self.learning_unit_year.id)
-        self.assertEqual(data_cached['modelname'], management.LEARNING_UNIT_YEAR)
+        self.assertDictEqual(
+            data_cached,
+            {'modelname': management.LEARNING_UNIT_YEAR, 'id': self.learning_unit_year.id}
+        )
 
-    def test_select_case_learning_unit_year(self):
+    def test_select_redirects_if_not_ajax(self):
         """In this test, we ensure that redirect is made if the request is not in AJAX """
         response = self.client.post(self.url_select_learning_unit)
 
-        # Verify cache
-        data_cached = cache.get(management.SELECT_CACHE_KEY)
-        self.assertIsInstance(data_cached, dict)
-        self.assertEqual(int(data_cached['id']), self.learning_unit_year.id)
-        self.assertEqual(data_cached['modelname'], management.LEARNING_UNIT_YEAR)
-
-        # Verify redirection
         redirected_url = reverse('learning_unit', args=[self.learning_unit_year.id])
         self.assertRedirects(response, redirected_url, fetch_redirect_response=False)
 
@@ -550,11 +533,7 @@ class TestSelectAttach(TestCase):
         ).exists()
         self.assertFalse(expected_absent_group_element_year)
 
-        cache.set(
-            management.SELECT_CACHE_KEY,
-            {'id': self.learning_unit_year.pk, 'modelname': management.LEARNING_UNIT_YEAR},
-            timeout=None,
-        )
+        data_cached = ElementCache(self.person.user).save_element_selected(self.learning_unit_year)
 
         response = self.client.post(
             reverse("education_group_attach", args=[self.root.pk, self.new_parent_education_group_year.pk]),
@@ -569,8 +548,7 @@ class TestSelectAttach(TestCase):
         self.assertEquals(expected_group_element_year_count, 1)
 
     def test_attach_without_selecting_gives_warning(self):
-        cache.set(management.SELECT_CACHE_KEY, None, timeout=None, )
-
+        ElementCache(self.person.user).clear()
         expected_absent_group_element_year = GroupElementYear.objects.filter(
             parent=self.new_parent_education_group_year,
             child_branch=self.child_education_group_year

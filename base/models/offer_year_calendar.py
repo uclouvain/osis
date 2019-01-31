@@ -81,10 +81,6 @@ def find_offer_year_events(offer_yr):
                                                                              'academic_calendar__title')
 
 
-def find_by_id(offer_year_calendar_id):
-    return OfferYearCalendar.objects.get(pk=offer_year_calendar_id)
-
-
 def find_by_offer_year(offer_yr, academic_calendar_type=None):
     queryset = OfferYearCalendar.objects.filter(offer_year=offer_yr)
     if academic_calendar_type:

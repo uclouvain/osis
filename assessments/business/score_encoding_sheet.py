@@ -47,7 +47,7 @@ def get_score_sheet_address(off_year):
             entity_id = map_offer_year_entity_type_with_entity_id[address.entity_address_choice]
             ent_version = entity_version.get_last_version(entity_id)
             entity = entity_model.get_by_internal_id(entity_id)
-            if not entity: # Case no address found for this entity
+            if not entity:  # Case no address found for this entity
                 entity = entity_model.Entity()
             email = address.email
             address = entity

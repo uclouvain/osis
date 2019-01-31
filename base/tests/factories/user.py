@@ -54,9 +54,14 @@ class UserFactory(factory.django.DjangoModelFactory):
     last_login = factory.LazyAttribute(lambda _o: datetime.datetime(2000, 1, 1, tzinfo=get_tzinfo()))
     date_joined = factory.LazyAttribute(lambda _o: datetime.datetime(1999, 1, 1, tzinfo=get_tzinfo()))
 
+    class Params:
+        superuser = factory.Trait(
+            username=factory.Sequence(lambda n: 'superusername_{0}'.format(n)),
+            is_superuser=True,
+            is_staff=True,
+            is_active=True
+        )
+
 
 class SuperUserFactory(UserFactory):
-    username = factory.Sequence(lambda n: 'superusername_{0}'.format(n))
-    is_superuser = True
-    is_staff = True
-    is_active = True
+    superuser = True

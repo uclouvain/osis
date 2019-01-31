@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,9 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import factory
 
 
-def delete_admin_action(actions):
-    if 'delete_selected' in actions:
-        del actions['delete_selected']
-    return actions
+class GroupFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = 'auth.Group'
+        django_get_or_create = ('name',)
+
+    name = ""
+
+
+class TutorGroupFactory(GroupFactory):
+    name = "tutors"
+
+
+class ProgramManagerGroupFactory(GroupFactory):
+    name = 'program_managers'

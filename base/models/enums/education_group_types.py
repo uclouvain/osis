@@ -106,4 +106,8 @@ class GroupType(ChoiceEnum):
         ]
 
 
+AllTypes = ChoiceEnum('AllTypes', [(t.name, t.value) for t in TrainingType] +
+                      [(t.name, t.value) for t in MiniTrainingType] +
+                      [(t.name, t.value) for t in GroupType])
+
 ALL_TYPES = TrainingType.choices() + MiniTrainingType.choices() + GroupType.choices()

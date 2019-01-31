@@ -138,7 +138,7 @@ class TestGetLearningUnitsWhichAreNotInsideTraining(TestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory()
         cls.education_group_year_root = TrainingFactory(academic_year=cls.academic_year)
-        cls.education_group_year_childs = [MiniTrainingFactory(academic_year=cls.academic_year) for _ in range(0,3)]
+        cls.education_group_year_childs = [MiniTrainingFactory(academic_year=cls.academic_year) for _ in range(0, 3)]
 
         cls.group_element_years_root_to_child = [
             GroupElementYearFactory(parent=cls.education_group_year_root,
@@ -188,4 +188,4 @@ class TestGetLearningUnitsWhichAreNotInsideTraining(TestCase):
         learning_units_acronym = [luy_outside.acronym, luy_outside_2.acronym] + self.all_learning_units_acronym
         self.assertCountEqual(get_learning_units_which_are_outside_of_education_group(self.education_group_year_root,
                                                                                       learning_units_acronym),
-                         [luy_outside.acronym, luy_outside_2.acronym])
+                              [luy_outside.acronym, luy_outside_2.acronym])

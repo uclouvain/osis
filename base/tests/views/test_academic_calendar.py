@@ -54,9 +54,7 @@ class AcademicCalendarViewTestCase(TestCase):
         cls.academic_calendars[2].reference = academic_calendar_type.TESTING
         cls.academic_calendars[2].save()
 
-        cls.person = PersonWithPermissionsFactory("can_access_academic_calendar")
-        cls.person.user.is_superuser = True
-        cls.person.user.save()
+        cls.person = PersonWithPermissionsFactory("can_access_academic_calendar", user__superuser=True)
         cls.url = reverse('academic_calendars')
 
     def setUp(self):
@@ -127,8 +125,8 @@ class AcademicCalendarViewTestCase(TestCase):
 class AcademicCalendarDeleteTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = create_current_academic_year()
-        cls.person = PersonFactory(user=SuperUserFactory())
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.person = PersonFactory(user__superuser=True)
 
     def setUp(self):
         self.academic_calendar = AcademicCalendarFactory(academic_year=self.academic_year)

@@ -73,6 +73,11 @@ class AcademicYearFactory(DjangoModelFactory):
     start_date = factory.LazyAttribute(lambda obj: datetime.date(obj.year, 9, 15))
     end_date = factory.LazyAttribute(lambda obj: datetime.date(obj.year + 1, 9, 30))
 
+    class Params:
+        current = factory.Trait(
+            year=get_current_year()
+        )
+
     @staticmethod
     def produce_in_past(from_year=None, quantity=3):
         from_year = from_year or get_current_year()

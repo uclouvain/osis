@@ -26,7 +26,7 @@
 
 from django.test import TestCase
 
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.session_examen import SessionExamFactory
 from base.models.enums import number_session, academic_calendar_type
@@ -39,14 +39,11 @@ from assessments.templatetags.enrollment_state import enrolled_exists
 
 class EnrollmentTests(TestCase):
     def setUp(self):
-        self.academic_year = create_current_academic_year()
-        self.academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
-                                                         academic_year=self.academic_year,
-                                                         reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
-        self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=self.academic_calendar,
+        self.academic_year = AcademicYearFactory(current=True)
+        self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar__academic_year=self.academic_year,
                                                                 number_session=number_session.ONE)
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.academic_year)
-        self.session_exam = SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_yr)
+        self.session_exam = SessionExamFactory(number_session=number_session.ONE,
+                                               learning_unit_year__academic_year=self.academic_year)
 
     def test_not_enrolled_exam_exists(self):
         exam_enrollment = ExamEnrollmentFactory(session_exam=self.session_exam,

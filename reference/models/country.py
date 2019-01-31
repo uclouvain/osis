@@ -29,8 +29,8 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class CountryAdmin(SerializableModelAdmin):
-    list_display = ('uuid', 'name', 'iso_code', 'nationality', 'european_union', 'dialing_code', 'cref_code', 'currency',
-                    'continent')
+    list_display = ('uuid', 'name', 'iso_code', 'nationality', 'european_union', 'dialing_code', 'cref_code',
+                    'currency', 'continent')
     list_filter = ('european_union',)
     ordering = ('name',)
     search_fields = ['name']
@@ -49,6 +49,9 @@ class Country(SerializableModel):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ('name',)
 
 
 def find_all():

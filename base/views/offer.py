@@ -24,7 +24,10 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
+from django.shortcuts import get_object_or_404
+
 from base import models as mdl
+from base.models.offer_year_calendar import OfferYearCalendar
 from . import layout
 
 
@@ -96,7 +99,7 @@ def offer_program_managers_tab(request, offer_year_id):
 @login_required
 @permission_required('base.can_access_offer', raise_exception=True)
 def offer_year_calendar_read(request, id):
-    offer_year_calendar = mdl.offer_year_calendar.find_by_id(id)
+    offer_year_calendar = get_object_or_404(OfferYearCalendar, pk=id)
     is_programme_manager = mdl.program_manager.is_program_manager(request.user,
                                                                   offer_year=offer_year_calendar.offer_year)
     return layout.render(request, "offer_year_calendar.html", {'offer_year_calendar':   offer_year_calendar,
