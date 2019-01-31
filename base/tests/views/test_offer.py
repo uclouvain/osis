@@ -130,19 +130,15 @@ class OfferViewTestCase(TestCase):
 
     @mock.patch('django.contrib.auth.decorators')
     @mock.patch('base.views.layout.render')
-    @mock.patch('base.models.offer_year_calendar')
     @mock.patch('base.models.program_manager')
     def test_offer_year_calendar_read(self,
                                       mock_program_manager,
-                                      mock_offer_year_calendar,
                                       mock_render,
                                       mock_decorators):
         mock_decorators.login_required = lambda x: x
         mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
 
-        offer_year = mock.Mock(id=1)
-        mock_offer_year_calendar.find_by_id.return_value = offer_year
-
+        offer_year = OfferYearCalendarFactory()
         mock_program_manager.is_program_manager.return_value = True
 
         request_factory = RequestFactory()

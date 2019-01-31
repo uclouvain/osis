@@ -262,28 +262,6 @@ def create_exam_enrollment_historic(user, enrollment):
     exam_enrollment_history.save()
 
 
-def get_progress(session_exm_list, learning_unt):
-    tot_progress = 0
-    tot_enrollments = 0
-    for session_exm in session_exm_list:
-        enrollments = list(find_exam_enrollments_by_session_learningunit(session_exm, learning_unt))
-        if enrollments:
-            progress = 0
-            for e in enrollments:
-                if e.score_final is not None or e.justification_final is not None:
-                    progress += 1
-            tot_progress = tot_progress + progress
-            tot_enrollments += len(enrollments)
-    return str(tot_progress) + "/" + str(tot_enrollments)
-
-
-def find_exam_enrollments_by_session_learningunit(session_exm, a_learning_unit_year):
-    enrollments = ExamEnrollment.objects.filter(session_exam=session_exm) \
-        .filter(enrollment_state=enrollment_states.ENROLLED) \
-        .filter(learning_unit_enrollment__learning_unit_year=a_learning_unit_year)
-    return enrollments
-
-
 def get_progress_by_learning_unit_years_and_offer_years(user,
                                                         session_exam_number,
                                                         learning_unit_year_id=None,

@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required
