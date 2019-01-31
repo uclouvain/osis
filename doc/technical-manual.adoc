@@ -33,11 +33,6 @@ Git is a distributed version control system used to manage the source code of OS
 
     $ sudo apt-get install git
 
-The source code has some submodules that have to be cloned as well:
-
-    $ git submodule init
-    $ git submodule update
-
 Next, we add some personal information in the local Git installation to make sure you are well identified in all commits:
 
     $ git config --global user.name "[Firstname] [Lastname]"
@@ -102,6 +97,10 @@ We can test the installation by cloning the OSIS repository:
     $ mkdir -p ~/python/projects/osis
     $ cd ~/python/projects/osis
     $ git clone git@github.com:uclouvain/osis.git
+    
+The source code has some submodules that have to be cloned as well:
+    $ git submodule init
+    $ git submodule update
 
 This configuration works only when we use a ssh connection to GitHub. To verify that, go to one of your local GitHub projects and check the url pointing to the server:
 
