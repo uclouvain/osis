@@ -391,7 +391,9 @@ def get_conditions_admissions(context):
     )
     admission_condition_common = None
 
-    if full_suffix.upper() in [COMMON_OFFER, '2M1']:
+    common_offers = COMMON_OFFER
+    common_offers.append('2M1')
+    if full_suffix.upper() in common_offers:
         common_education_group_year = EducationGroupYear.objects.get(
             acronym=common_acronym,
             academic_year=context.education_group_year.academic_year
