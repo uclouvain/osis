@@ -390,7 +390,8 @@ def get_conditions_admissions(context):
         education_group_year=context.education_group_year
     )
     admission_condition_common = None
-    if full_suffix.upper() in COMMON_OFFER:
+
+    if full_suffix.upper() in [COMMON_OFFER, '2M1']:
         common_education_group_year = EducationGroupYear.objects.get(
             acronym=common_acronym,
             academic_year=context.education_group_year.academic_year
