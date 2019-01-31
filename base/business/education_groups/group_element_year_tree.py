@@ -32,34 +32,13 @@ from base.models.group_element_year import GroupElementYear, fetch_all_group_ele
 from base.models.prerequisite_item import PrerequisiteItem
 
 
-# def instance_NodeBranchJsTree(root):
-#
-#     has_prerequisite = PrerequisiteItem.objects.filter(
-#         prerequisite__education_group_year__id=root.id,
-#         prerequisite__learning_unit_year__id=OuterRef("child_leaf__id"),
-#     )
-#
-#     is_prerequisite = PrerequisiteItem.objects.filter(
-#         learning_unit__learningunityear__id=OuterRef("child_leaf__id"),
-#         prerequisite__education_group_year=root.id,
-#     )
-#
-#     queryset = GroupElementYear.objects.all() \
-#         .annotate(has_prerequisite=Exists(has_prerequisite)) \
-#         .annotate(is_prerequisite=Exists(is_prerequisite)) \
-#         .select_related('child_branch__academic_year',
-#                         'child_leaf__academic_year',
-#                         'child_leaf__learning_container_year',
-#                         'parent')
-#     group_elem_year_instance_by_id = build_tree_in_memory(root, queryset)
-#     return NodeBranchJsTree(root, cache_group_elements_year=group_elem_year_instance_by_id)
-
-
 class NodeBranchJsTree:  # rename to EducationGroupHierarchy
     """ Use to generate json from a list of education group years compatible with jstree """
     element_type = EDUCATION_GROUP_YEAR
 
-    def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear=None, cache_group_elements_year=None):
+    _cache_hierarchy = None
+
+    def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear=None, cache_hierarchy=None):
 
         self.children = []
         self.root = root
@@ -67,18 +46,25 @@ class NodeBranchJsTree:  # rename to EducationGroupHierarchy
         self.reference = self.group_element_year.link_type == LinkTypes.REFERENCE.name \
             if self.group_element_year else False
         self.icon = self._get_icon()
-        self.cache_group_elements_year = cache_group_elements_year or fetch_all_group_elements_behind_hierarchy(self.education_group_year, self.get_queryset())
-        # build_tree_in_memory(self.education_group_year, self.get_queryset())
-
+        self._cache_hierarchy = cache_hierarchy
         self.generate_children()
 
+    @property
+    def cache_hierarchy(self):
+        if self._cache_hierarchy is None:
+            self._cache_hierarchy = self._init_cache()
+        return self._cache_hierarchy
+
+    def _init_cache(self):
+        return fetch_all_group_elements_behind_hierarchy(self.education_group_year, self.get_queryset()) or {}
+
     def generate_children(self):
-        for group_element_year in self.cache_group_elements_year.get(self.education_group_year.id) or []:
+        for group_element_year in self.cache_hierarchy.get(self.education_group_year.id) or []:
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
-                node = NodeBranchJsTree(self.root, group_element_year, cache_group_elements_year=self.cache_group_elements_year)
+                node = NodeBranchJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy)
 
             elif group_element_year.child_leaf:
-                node = NodeLeafJsTree(self.root, group_element_year, cache_group_elements_year=self.cache_group_elements_year)
+                node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy)
 
             else:
                 continue
