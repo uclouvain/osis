@@ -317,7 +317,7 @@ def _build_parent_list_by_education_group_year_id(academic_year, filters=None):
                           .filter(parent__isnull=False)
                           .filter(Q(child_leaf__isnull=False) | Q(child_branch__isnull=False))
                           .select_related('education_group_year__education_group_type')
-                          .values('id', 'parent', 'child_branch', 'child_leaf', *columns_needed_for_filters))
+                          .values('parent', 'child_branch', 'child_leaf', *columns_needed_for_filters))
     result = {}
     # TODO :: uses .annotate() on queryset to make the below expected result
     for group_element_year in group_elements:
