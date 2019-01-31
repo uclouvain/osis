@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-30 14:10+0100\n"
+"POT-Creation-Date: 2019-01-31 09:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1151,7 +1151,6 @@ msgstr ""
 msgid "Diploma title"
 msgstr ""
 
-#: templates/education_group/blocks/form/training.html:47
 #: templates/education_group/tabs.html:48
 msgid "Diplomas /  Certificates"
 msgstr ""
@@ -1423,7 +1422,7 @@ msgstr ""
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
-#: forms/education_group/training.py:189
+#: forms/education_group/training.py:190
 msgid "Enter text to search"
 msgstr ""
 
@@ -1620,10 +1619,6 @@ msgstr ""
 msgid "Formerly"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:68
-msgid "Free Text"
-msgstr ""
-
 #: forms/education_group/achievement.py:49
 #: forms/education_group/achievement.py:79
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:39
@@ -1757,7 +1752,6 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
-#: templates/education_group/blocks/form/training.html:42
 #: templates/education_group/tabs.html:41 templates/entity/tabs.html:33
 #: templates/learning_unit/blocks/tabs.html:39
 #: templates/learning_unit/blocks/tabs.html:52
@@ -2028,7 +2022,7 @@ msgstr ""
 
 #: templates/blocks/forms/search_form.html:44
 #: templates/learning_unit/blocks/form/search_form_external_learning_unit.html:45
-#: templates/learning_unit/blocks/form/search_form_learning_unit.html:75
+#: templates/learning_unit/blocks/form/search_form_learning_unit.html:70
 msgid "Learning unit search"
 msgstr ""
 
@@ -3436,6 +3430,10 @@ msgstr ""
 msgid "Specific Conditions"
 msgstr ""
 
+#: templates/education_group/tab_admission_conditions.html:68
+msgid "Specific admission requirements"
+msgstr ""
+
 #: templates/learning_unit/blocks/tabs.html:67
 #: templates/learning_unit/proposal/tabs.html:60
 msgid "Specifications"
@@ -4810,7 +4808,7 @@ msgstr ""
 msgid "cancel"
 msgstr ""
 
-#: templates/education_group/blocks/form/training_tab_diploma.html:36
+#: templates/education_group/blocks/form/training_tab_diploma.html:35
 #: templates/education_group/tab_diplomas.html:48
 msgid "certificate aims"
 msgstr ""
@@ -4859,7 +4857,7 @@ msgstr ""
 msgid "date_format"
 msgstr "%m/%d/%Y"
 
-#: templatetags/format.py:51
+#: templatetags/format.py:35
 msgid "date_format_string"
 msgstr "m/d/Y"
 
@@ -4924,7 +4922,7 @@ msgstr ""
 msgid "field reference"
 msgstr ""
 
-#: templates/education_group/blocks/form/training_tab_diploma.html:42
+#: templates/education_group/blocks/form/training_tab_diploma.html:40
 msgid "filter by section"
 msgstr ""
 
