@@ -99,6 +99,7 @@ We can test the installation by cloning the OSIS repository:
     $ git clone git@github.com:uclouvain/osis.git
     
 The source code has some submodules that have to be cloned as well:
+
     $ git submodule init
     $ git submodule update
 
