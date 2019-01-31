@@ -61,4 +61,3 @@ class CountryDetail(generics.RetrieveAPIView):
     queryset = Country.objects.all()
     serializer_class = CountryListSerializer
     lookup_field = 'uuid'
-
