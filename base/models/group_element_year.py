@@ -62,7 +62,7 @@ SQL_RECURSIVE_QUERY_EDUCATION_GROUP = """\
 WITH RECURSIVE group_element_year_parent AS (
 
     SELECT id, child_branch_id, child_leaf_id, parent_id, 0 AS level
-    FROM base_groupelementyear 
+    FROM base_groupelementyear
     WHERE parent_id IN ({list_root_ids})
 
     UNION ALL
@@ -75,7 +75,7 @@ WITH RECURSIVE group_element_year_parent AS (
 
     FROM base_groupelementyear AS child
     INNER JOIN group_element_year_parent AS parent on parent.child_branch_id = child.parent_id
-    
+
     )
 
 SELECT * FROM group_element_year_parent ;
