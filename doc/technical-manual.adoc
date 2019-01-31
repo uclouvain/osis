@@ -33,12 +33,6 @@ Git is a distributed version control system used to manage the source code of OS
 
     $ sudo apt-get install git
 
-We can test the installation by cloning the OSIS repository:
-
-    $ mkdir -p ~/python/projects/osis
-    $ cd ~/python/projects/osis
-    $ git clone git@github.com:uclouvain/osis.git
-
 The source code has some submodules that have to be cloned as well:
 
     $ git submodule init
@@ -102,6 +96,12 @@ To make sure everything is working, lets test the connection:
       _
       Hi [username]! You've successfully authenticated, but GitHub does not
       provide shell access.
+
+We can test the installation by cloning the OSIS repository:
+
+    $ mkdir -p ~/python/projects/osis
+    $ cd ~/python/projects/osis
+    $ git clone git@github.com:uclouvain/osis.git
 
 This configuration works only when we use a ssh connection to GitHub. To verify that, go to one of your local GitHub projects and check the url pointing to the server:
 
