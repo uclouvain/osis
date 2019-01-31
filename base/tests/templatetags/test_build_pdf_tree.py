@@ -26,7 +26,7 @@
 from django.template import Context, Template
 from django.test import TestCase
 
-from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
+from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_periodicity import BIENNIAL_ODD, BIENNIAL_EVEN
 from base.templatetags.education_group_pdf import pdf_tree_list
@@ -123,7 +123,7 @@ class TestBuildPDFTree(TestCase):
         )
 
     def test_build_pdf_tree_with_mandatory(self):
-        tree = NodeBranchJsTree(self.education_group_year_1).to_list()
+        tree = EducationGroupHierarchy(self.education_group_year_1).to_list()
         out = Template(
             "{% load education_group_pdf %}"
             "{{ tree|pdf_tree_list }}"
@@ -138,7 +138,7 @@ class TestBuildPDFTree(TestCase):
         self.group_element_year_2.is_mandatory = False
         self.group_element_year_2.save()
 
-        tree = NodeBranchJsTree(self.education_group_year_1).to_list()
+        tree = EducationGroupHierarchy(self.education_group_year_1).to_list()
         out = Template(
             "{% load education_group_pdf %}"
             "{{ tree|pdf_tree_list }}"

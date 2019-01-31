@@ -32,7 +32,7 @@ from base.models.group_element_year import GroupElementYear, fetch_all_group_ele
 from base.models.prerequisite_item import PrerequisiteItem
 
 
-class NodeBranchJsTree:  # rename to EducationGroupHierarchy
+class EducationGroupHierarchy:
     """ Use to generate json from a list of education group years compatible with jstree """
     element_type = EDUCATION_GROUP_YEAR
 
@@ -61,7 +61,7 @@ class NodeBranchJsTree:  # rename to EducationGroupHierarchy
     def generate_children(self):
         for group_element_year in self.cache_hierarchy.get(self.education_group_year.id) or []:
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
-                node = NodeBranchJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy)
+                node = EducationGroupHierarchy(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy)
 
             elif group_element_year.child_leaf:
                 node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy)
@@ -144,7 +144,7 @@ class NodeBranchJsTree:  # rename to EducationGroupHierarchy
         return url + self.url_group_to_parent()
 
 
-class NodeLeafJsTree(NodeBranchJsTree):
+class NodeLeafJsTree(EducationGroupHierarchy):
     element_type = LEARNING_UNIT_YEAR
 
     @property
