@@ -359,7 +359,7 @@ def _match_any_filters(element_year, filters):
     return any(element_year[col_name] in values_list for col_name, values_list in filters.items())
 
 
-def fetch_all_group_elements_behind_hierarchy(root: EducationGroupYear, queryset) -> dict:
+def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict:
     if queryset.model != GroupElementYear:
         raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
 

@@ -28,7 +28,7 @@ from django.urls import reverse
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.link_type import LinkTypes
-from base.models.group_element_year import GroupElementYear, fetch_all_group_elements_behind_hierarchy
+from base.models.group_element_year import GroupElementYear, fetch_all_group_elements_in_tree
 from base.models.prerequisite_item import PrerequisiteItem
 
 
@@ -38,7 +38,7 @@ class EducationGroupHierarchy:
 
     _cache_hierarchy = None
 
-    def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear=None, cache_hierarchy=None):
+    def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear=None, cache_hierarchy: dict=None):
 
         self.children = []
         self.root = root
@@ -56,7 +56,7 @@ class EducationGroupHierarchy:
         return self._cache_hierarchy
 
     def _init_cache(self):
-        return fetch_all_group_elements_behind_hierarchy(self.education_group_year, self.get_queryset()) or {}
+        return fetch_all_group_elements_in_tree(self.education_group_year, self.get_queryset()) or {}
 
     def generate_children(self):
         for group_element_year in self.cache_hierarchy.get(self.education_group_year.id) or []:

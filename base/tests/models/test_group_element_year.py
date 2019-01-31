@@ -496,7 +496,7 @@ class TestFetchGroupElementsBehindHierarchy(TestCase):
             'child_leaf__academic_year',
             # [...] other fetch
         )
-        result = group_element_year.fetch_all_group_elements_behind_hierarchy(self.root, queryset)
+        result = group_element_year.fetch_all_group_elements_in_tree(self.root, queryset)
         expected_result = {
             self.link_1.parent_id: [self.link_1, self.link_1_bis],
             self.link_2.parent_id: [self.link_2],
@@ -508,4 +508,4 @@ class TestFetchGroupElementsBehindHierarchy(TestCase):
     def test_when_queryset_is_not_from_group_element_year_model(self):
         wrong_queryset_model = EducationGroupYear.objects.all()
         with self.assertRaises(AttributeError):
-            group_element_year.fetch_all_group_elements_behind_hierarchy(self.root, wrong_queryset_model)
+            group_element_year.fetch_all_group_elements_in_tree(self.root, wrong_queryset_model)
