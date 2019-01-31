@@ -23,25 +23,41 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url, include
+from rest_framework import generics
 
-import continuing_education.api.url_v1
-import education_group.api.url_v1
-import reference.api.url_v1
-from webservices.api.views.auth_token import AuthToken
-from webservices.views import ws_catalog_offer
+from reference.api.serializers.country import CountryListSerializer
+from reference.models.country import Country
 
-urlpatterns = [
-    url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/(?P<acronym>[a-zA-Z0-9]+)$',
-        ws_catalog_offer,
-        name='v0.1-ws_catalog_offer'),
-    url(r'^v1/', include([
-        url(r'^auth/token$', AuthToken.as_view(), name=AuthToken.name),
-        url(r'^continuing_education/',
-            include(continuing_education.api.url_v1.urlpatterns, namespace='continuing_education_api_v1')),
-        url(r'^education_group/',
-            include(education_group.api.url_v1, namespace='education_group_api_v1')),
-        url(r'^reference/',
-            include(reference.api.url_v1, namespace='reference_api_v1')),
-    ])),
-]
+
+class CountryList(generics.ListAPIView):
+    """
+       Return a list of all the country.
+    """
+    name = 'country-list'
+    queryset = Country.objects.all()
+    serializer_class = CountryListSerializer
+    filter_fields = (
+        'iso_code',
+        'name',
+    )
+    search_fields = (
+        'iso_code',
+        'name',
+    )
+    ordering_fields = (
+        'iso_code',
+        'name',
+    )
+    ordering = (
+        'name',
+    )  # Default ordering
+
+
+class CountryDetail(generics.RetrieveAPIView):
+    """
+        Return the detail of the country
+    """
+    name = 'country-detail'
+    queryset = Country.objects.all()
+    serializer_class = CountryListSerializer
+    lookup_field = 'uuid'

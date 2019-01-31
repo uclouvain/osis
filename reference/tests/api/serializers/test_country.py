@@ -23,25 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url, include
+from django.test import TestCase, RequestFactory
+from django.urls import reverse
 
-import continuing_education.api.url_v1
-import education_group.api.url_v1
-import reference.api.url_v1
-from webservices.api.views.auth_token import AuthToken
-from webservices.views import ws_catalog_offer
+from reference.api.serializers.country import CountryListSerializer
+from reference.tests.factories.country import CountryFactory
 
-urlpatterns = [
-    url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/(?P<acronym>[a-zA-Z0-9]+)$',
-        ws_catalog_offer,
-        name='v0.1-ws_catalog_offer'),
-    url(r'^v1/', include([
-        url(r'^auth/token$', AuthToken.as_view(), name=AuthToken.name),
-        url(r'^continuing_education/',
-            include(continuing_education.api.url_v1.urlpatterns, namespace='continuing_education_api_v1')),
-        url(r'^education_group/',
-            include(education_group.api.url_v1, namespace='education_group_api_v1')),
-        url(r'^reference/',
-            include(reference.api.url_v1, namespace='reference_api_v1')),
-    ])),
-]
+
+class CountryListSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.country = CountryFactory()
+        url = reverse('reference_api_v1:country-list')
+        cls.serializer = CountryListSerializer(cls.country, context={'request': RequestFactory().get(url)})
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'url',
+            'uuid',
+            'iso_code',
+            'name',
+            'nationality'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
