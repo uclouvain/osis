@@ -94,6 +94,14 @@
 - Ajouter la référence au ticket Jira dans le titre de la pull request (format = "OSIS-12345")
 - Utiliser un titre de pull request qui identifie son contenu (facilite la recherche de pull requests et permet aux contributeurs du projet d'avoir une idée sur son contenu)
 
+### Pull request de màj de la référence d'un submodule :
+Quand la PR correspond à la mise-à-jour de la référence pour un submodule, indiquer dans la description de la PR les références des tickets Jira du submodule qui passent dans cette mise-à-jour de référence (format : "IUFC-123").
+
+Pour les trouver : 
+1) Une fois la PR ouverte, cliquer sur l'onglet "Files Changed"
+2) Cliquer sur "x files" dans le texte "Submodule xyz updated x files"
+3) Cela ouvre la liste des commits qui vont passer dans la mise-à-jour de référence -> les références des tickets Jira sont indiquées dans les messages de commits.
+
 ### Ressources et dépendances :
 - Ne pas faire de référence à des librairie/ressources externes ; ajouter la librairie utilisée dans le dossier 'static'
 
