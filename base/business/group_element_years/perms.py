@@ -36,8 +36,9 @@ def is_eligible_to_update_group_element_year(person, group_element_year, raise_e
 
 def _can_user_update_education_group_year_child(person, egy_child, raise_exception):
     group_type_only_central_can_update = (GroupType.MAJOR_LIST_CHOICE.name, GroupType.MINOR_LIST_CHOICE.name)
-    result = person.is_central_manager or \
-        egy_child.education_group_type.name not in group_type_only_central_can_update
+    result = person.is_central_manager or (
+            egy_child.education_group_type.name not in group_type_only_central_can_update and not egy_child.is_minor
+    )
     can_raise_exception(
         raise_exception,
         result,
