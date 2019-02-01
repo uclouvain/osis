@@ -33,7 +33,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import F, Case, When
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
@@ -47,10 +47,9 @@ from base.business.education_group import assert_category_of_education_group_yea
 from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException, RelevantSectionException
 from base.business.education_groups.general_information_sections import SECTION_LIST, SECTION_INTRO
-from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
+from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.business.education_groups.perms import is_eligible_to_edit_general_information, \
     is_eligible_to_edit_admission_condition
-from base.management.commands.import_reddot import COMMON_OFFER
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
@@ -135,7 +134,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context['parent_training'] = self.object.parent_by_training()
 
         if self.with_tree:
-            context['tree'] = json.dumps(NodeBranchJsTree(self.root).to_json())
+            context['tree'] = json.dumps(EducationGroupHierarchy(self.root).to_json())
 
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
