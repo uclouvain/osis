@@ -8,6 +8,87 @@
 - Séparation des fonctions: deux lignes vides
 - Le nom d'une fonction doit être explicite et claire sur ce qu'elle fait (un 'get_' renvoie un élément, un 'search_' renvoie une liste d'élements...)
 
+### Coding style :
+On se conforme au [guide PEP8](https://www.python.org/dev/peps/pep-0008/#indentation)
+
+Dans la mesure du possible, on essaie de tenir compte des conseils suivants : 
+- Pour représenter une structure de données (list, dict, etc.), on peut passer une ligne entre chaque élément, ainsi qu'après l'ouverture de la structure et avant sa fermeture, si la liste est longue et/ou contient de longs éléments et/ou s'étend sur plusieurs lignes.
+```python
+# Mauvais
+fruits = ['banane', 'pomme', 'poire', 'long_element_in_list_1', 'long_element_in_list_2', 'long_element_in_list_3', 'long_element_in_list_4'] 
+légumes = {'1': 'carotte', '2': 'courgette', 
+    '3': 'salade'}
+            
+# Bon
+fruits = [
+    'banane',
+    'pomme',
+    'poire',
+    'long_element_in_list_1',
+    'long_element_in_list_2',
+    'long_element_in_list_3',
+    'long_element_in_list_4'
+]
+légumes = {
+    '1': 'carotte', 
+    '2': 'courgette', 
+    '3': 'salade',
+}
+```
+
+- Le dernier élément de la structure a également une virgule. Cela permet d'éviter que cette ligne apparaisse dans le diff de git quand on rajoute un élément à la fin de structure.
+```python
+# Mauvais
+fruits = [
+    'banane',
+    'pomme',
+    'poire'
+]
+# Bon
+légumes = {
+    '1': 'carotte', 
+    '2': 'courgette', 
+    '3': 'salade',
+}
+```
+
+- Lors d'un appel de fonction à plusieurs paramètres, si tous les paramètres ne tiennent pas sur une ligne, on passe une ligne entre chaque paramètre, ainsi qu'après l'ouverture de la liste de paramètres et avant sa fermeture.
+```python
+# Mauvais
+result = my_function(first_long_parameter, second_parameter_which_has_a_really_really_long_name, third_parameter_which_has_an_even_longer_name)
+
+result = my_function(first_parameter, 
+                     second_parameter, 
+                     third_parameter)
+# Bon
+result = my_function(
+    first_parameter,
+    second_parameter,
+    third_parameter
+)
+```
+
+- Les règles précédentes sont cumulatives : 
+```python
+# Mauvais
+return render(request, "template.html", {
+        'students': students, 'faculties': faculties,
+        'teacher': teacher
+        })
+
+# Bon
+return render(
+    request,
+    "template.html",
+    {
+        'students': students,
+        'faculties': faculties,
+        'teacher': teacher,
+    }
+)
+```
+- Voir en plus le [Coding Style de Django](https://docs.djangoproject.com/en/1.11/internals/contributing/writing-code/coding-style/).
+
 ### Documentation du code :
 - Documenter les fonctions (paramètres, fonctionnement, ce qu'elle renvoie)
 - Ne pas hésiter à laisser une ligne de commentaire dans le code, décrivant brièvement le fonctionnement d'algorithme plus compliqué/plus longs
