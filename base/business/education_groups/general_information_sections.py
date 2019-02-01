@@ -106,6 +106,13 @@ SECTION_INTRO = [
             ])
 ]
 
+SECTION_DIDACTIC = [
+    Section(title=_('Detailed program'),
+            labels=[
+                (COMMON_DIDACTIC_PURPOSES, 'common'),
+            ])
+]
+
 COMMON_GENERAL_INFO_SECTIONS = [
     AGREGATION,
     CAAP,
