@@ -49,7 +49,7 @@ PRACTICAL_INFO = 'infos_pratiques'
 MINORS = 'mineures'
 MAJORS = 'majeures'
 PURPOSES = 'finalites'
-DIDACTIC_PURPOSES = 'finalites_didactiques-commun'
+COMMON_DIDACTIC_PURPOSES = 'finalites_didactiques-commun'
 AGREGATION = 'agregation'
 PREREQUISITE = 'prerequis'
 OPTIONS = 'options'
@@ -77,7 +77,7 @@ SECTION_LIST = [
                 (DETAILED_PROGRAM, 'specific'),
                 (PURPOSES, 'specific'),
                 (OPTIONS, 'specific'),
-                (DIDACTIC_PURPOSES, 'common'),
+                (COMMON_DIDACTIC_PURPOSES, 'common'),
                 (CAAP, 'common,specific'),
                 (AGREGATION, 'common'),
                 (PREREQUISITE, 'common'),
@@ -110,7 +110,7 @@ COMMON_GENERAL_INFO_SECTIONS = [
     AGREGATION,
     CAAP,
     PREREQUISITE,
-    DIDACTIC_PURPOSES,
+    COMMON_DIDACTIC_PURPOSES,
     COMPLEMENTARY_MODULE,
     EVALUATION
 ]
