@@ -82,7 +82,7 @@ NUMBER_SESSIONS = 3
 
 COMMON_PARAGRAPH = (
     'agregation',
-    'finalites_didactiques',
+    'finalites_didactiques-commun',
     'prerequis'
 )
 
