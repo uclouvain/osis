@@ -95,6 +95,37 @@
 ### Ressources et dépendances :
 - Ne pas faire de référence à des librairie/ressources externes ; ajouter la librairie utilisée dans le dossier 'static'
 
+### Emails
+- Utiliser la fonction d'envoi de mail décrite dans `osis_common/messaging/send_mail.py`. Exemple:
+```python
+from osis_common.messaging import message_config, send_message as message_service
+from base.models.person import Person
+
+def send_an_email(receiver: Person):
+    receiver = message_config.create_receiver(receiver.id, receiver.email, receiver.language)
+    table = message_config.create_table(
+        'Table title', 
+        ['column 1', 'column 2'], 
+        ['content col 1', 'content col 2']
+    )
+    context = {
+        'variable_used_in_template': 'value',
+    }
+    subject_context = {
+        'variable_used_in_subject_context': 'value',
+    }
+    message_content = message_config.create_message_content(
+        'template_name_as_html', 
+        'template_name_as_txt', 
+        [table], 
+        [receiver],
+        context,
+        subject_context
+    )
+    return message_service.send_messages(message_content)
+
+```
+
 ### Tests : 
 #### Vues :
 Idéalement lorsqu'on teste une view, on doit vérifier :
