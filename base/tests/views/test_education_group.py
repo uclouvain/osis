@@ -134,6 +134,25 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertEqual(context["parent"], self.education_group_parent)
         self.assertEqual(context["education_group_year"], self.education_group_child)
 
+    def test_with_didactic_offer(self):
+        education_group_year = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.MASTER_MD_120.name,
+            academic_year=self.current_academic_year,
+        )
+        url = reverse("education_group_general_informations",
+                      args=[education_group_year.pk, education_group_year.id])
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+
+        context = response.context
+        self.assertEqual(context["parent"], education_group_year)
+        self.assertEqual(context["education_group_year"], education_group_year)
+        sections = context['sections_with_translated_labels']
+
+        self.assertEqual(sections[0].labels[0]['label'], 'intro')
+        self.assertEqual(sections[1].labels[0]['label'], 'finalites_didactiques-commun')
+
     @mock.patch('base.views.education_groups.detail.is_eligible_to_edit_general_information',
                 side_effect=lambda p, o: True)
     def test_user_has_link_to_edit_pedagogy(self, mock_is_eligible):
