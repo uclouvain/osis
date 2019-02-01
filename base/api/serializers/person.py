@@ -29,6 +29,7 @@ from base.models.person import Person
 
 
 class PersonDetailSerializer(serializers.ModelSerializer):
+    uuid = serializers.UUIDField(required=False)
 
     class Meta:
         model = Person

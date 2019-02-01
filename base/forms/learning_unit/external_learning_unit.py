@@ -101,7 +101,7 @@ class ExternalLearningUnitModelForm(forms.ModelForm):
         self.instance.author = person
         self.fields['requesting_entity'].queryset = self.person.find_main_entities_version
 
-        if hasattr(self.instance, 'requesting_entity'):
+        if self.instance.id and hasattr(self.instance, 'requesting_entity'):
             self.initial['requesting_entity'] = get_last_version(self.instance.requesting_entity)
 
     class Meta:

@@ -23,27 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from urllib.parse import urlsplit, urlunsplit
-
 from django import template
-from django.http import QueryDict
 from django.template.defaultfilters import date
 from django.utils.translation import ugettext_lazy as _
 
 register = template.Library()
-
-
-@register.filter
-def format(value, arg):
-    return value % arg
-
-
-@register.filter
-def str_format(value, args):
-    if args is None:
-        return value
-    args_list = args.split('|')
-    return value.format(*args_list)
 
 
 @register.filter
@@ -57,30 +41,6 @@ def date_in_form_format(value):
 
 
 @register.filter
-def join_with_spaces(array, arg):
-    arg = "-" if arg is None else arg
-    return " {} ".format(_(arg).lower()).join(array)
-
-
-@register.filter
 def addstr(arg1, arg2):
     """concatenate arg1 & arg2"""
     return str(arg1) + str(arg2)
-
-
-@register.simple_tag
-def url_add_query(url, **kwargs):
-    """
-    Append a querystring to a url.
-    """
-
-    parsed = urlsplit(url)
-    querystring = QueryDict(parsed.query, mutable=True)
-    querystring.update(kwargs)
-    return urlunsplit(parsed._replace(query=querystring.urlencode()))
-
-
-@register.filter
-def db_table_with_pk(prefix, obj):
-    """ Use to generate html ids"""
-    return "{}_{}_{}".format(prefix, obj._meta.db_table, obj.pk)

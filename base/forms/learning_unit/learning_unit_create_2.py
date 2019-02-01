@@ -45,6 +45,7 @@ from reference.models import language
 
 FULL_READ_ONLY_FIELDS = {"acronym", "academic_year", "container_type"}
 FULL_PROPOSAL_READ_ONLY_FIELDS = {"academic_year", "container_type", "professional_integration"}
+PROPOSAL_READ_ONLY_FIELDS = {"container_type"}
 
 FACULTY_OPEN_FIELDS = {
     'quadrimester',
@@ -252,7 +253,7 @@ class FullForm(LearningUnitBaseForm):
     def _disable_fields_as_faculty_manager(self):
         faculty_type_not_restricted = [t[0] for t in LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY]
         if self.proposal:
-            self.disable_fields(FACULTY_OPEN_FIELDS)
+            self.disable_fields(PROPOSAL_READ_ONLY_FIELDS)
         elif self.instance.learning_container_year and \
                 self.instance.learning_container_year.container_type not in faculty_type_not_restricted:
             self.disable_fields(self.fields.keys() - set(FACULTY_OPEN_FIELDS))
