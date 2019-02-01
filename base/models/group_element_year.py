@@ -63,7 +63,7 @@ WITH RECURSIVE group_element_year_parent AS (
 
     SELECT id, child_branch_id, child_leaf_id, parent_id, 0 AS level
     FROM base_groupelementyear
-    WHERE parent_id IN ({list_root_ids})
+    WHERE parent_id IN (%s)
 
     UNION ALL
 
@@ -377,9 +377,7 @@ def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict
 
 def _fetch_row_sql(root_ids):
     with connection.cursor() as cursor:
-        query = SQL_RECURSIVE_QUERY_EDUCATION_GROUP.format(list_root_ids=','.join(str(root_id) for root_id in root_ids))
-        cursor.execute(query)
-
+        cursor.execute(SQL_RECURSIVE_QUERY_EDUCATION_GROUP, root_ids)
         return [
             {
                 'id': row[0],
