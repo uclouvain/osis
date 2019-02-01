@@ -36,7 +36,7 @@ from base.business.education_groups import general_information
 from base.business.education_groups.general_information import PublishException, RelevantSectionException, \
     _get_portal_url, _bulk_publish
 from base.business.education_groups.general_information_sections import AGREGATION, CAAP, PREREQUISITE, \
-    DIDACTIC_PURPOSES, COMPLEMENTARY_MODULE, EVALUATION
+    COMMON_DIDACTIC_PURPOSES, COMPLEMENTARY_MODULE, EVALUATION
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory
 
@@ -148,7 +148,7 @@ class TestGetRelevantSections(TestCase):
             AGREGATION,
             CAAP,
             PREREQUISITE,
-            DIDACTIC_PURPOSES,
+            COMMON_DIDACTIC_PURPOSES,
             COMPLEMENTARY_MODULE,
             EVALUATION
         ]
