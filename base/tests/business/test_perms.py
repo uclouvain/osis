@@ -46,6 +46,7 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
@@ -139,6 +140,22 @@ class PermsTestCase(TestCase):
         self.assertFalse(perms.is_eligible_to_create_partim(luy, a_person))
         self.assertFalse(perms.is_eligible_to_create_modification_proposal(luy, a_person))
         self.assertFalse(perms.is_eligible_to_delete_learning_unit_year(luy, a_person))
+
+    def test_when_external_learning_unit_is_not_co_graduation(self):
+        a_person = self.create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP)
+        luy = LearningUnitYearFactory(academic_year=self.academic_yr, learning_unit__existing_proposal_in_epc=False)
+        ExternalLearningUnitYearFactory(learning_unit_year=luy, co_graduation=False)
+        self.assertFalse(perms.is_external_learning_unit_cograduation(luy, a_person, False))
+        self.assertFalse(perms.is_eligible_for_modification(luy, a_person))
+        self.assertFalse(perms.is_eligible_for_modification_end_date(luy, a_person))
+        self.assertFalse(perms.is_eligible_to_create_partim(luy, a_person))
+        self.assertFalse(perms.is_eligible_to_create_modification_proposal(luy, a_person))
+        self.assertFalse(perms.is_eligible_to_delete_learning_unit_year(luy, a_person))
+
+    def test_when_learning_unit_is_not_external(self):
+        learning_unit_year = LearningUnitYearFactory()
+        person = PersonFactory()
+        self.assertTrue(perms.is_external_learning_unit_cograduation(learning_unit_year, person, False))
 
     def test_cannot_faculty_manager_modify_end_date_no_container(self):
         luy = LearningUnitYearFactory(academic_year=self.academic_yr,
