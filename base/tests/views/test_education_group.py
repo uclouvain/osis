@@ -137,7 +137,7 @@ class EducationGroupGeneralInformations(TestCase):
     @mock.patch('base.views.education_groups.detail.is_eligible_to_edit_general_information',
                 side_effect=lambda p, o: True)
     def test_user_has_link_to_edit_pedagogy(self, mock_is_eligible):
-        self.user.user_permissions.add(Permission.objects.get(codename='can_edit_educationgroup_pedagogy'))
+        self.user.user_permissions.add(Permission.objects.get(codename='change_pedagogyinformation'))
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -483,7 +483,7 @@ class EducationGroupYearEditPedagogy(TestCase):
     def setUp(self):
         self.person = PersonFactory()
 
-        self.permission = Permission.objects.get(codename='can_edit_educationgroup_pedagogy')
+        self.permission = Permission.objects.get(codename='change_pedagogyinformation')
         self.person.user.user_permissions.add(self.permission)
 
         self.education_group_year = EducationGroupYearFactory()
@@ -613,7 +613,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_edit_educationgroup_pedagogy"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="change_pedagogyinformation"))
         cls.url = reverse("education_group_year_admission_condition_edit",
                           args=[cls.education_group_parent.pk, cls.education_group_child.id])
 
@@ -637,7 +637,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
     @mock.patch('base.views.education_groups.detail.is_eligible_to_edit_admission_condition',
                 side_effect=lambda p, o: True)
     def test_user_has_link_to_edit_conditions(self, mock_is_eligible):
-        self.user.user_permissions.add(Permission.objects.get(codename='can_edit_educationgroup_pedagogy'))
+        self.user.user_permissions.add(Permission.objects.get(codename='change_pedagogyinformation'))
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)

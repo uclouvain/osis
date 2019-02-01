@@ -168,7 +168,7 @@ def education_group_year_pedagogy_edit_get(request, education_group_year_id):
 
 
 @login_required
-@permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
+@permission_required('base.change_pedagogyinformation', raise_exception=True)
 @require_http_methods(['GET', 'POST'])
 def education_group_year_pedagogy_edit(request, root_id, education_group_year_id):
     if request.method == 'POST':
@@ -178,7 +178,7 @@ def education_group_year_pedagogy_edit(request, root_id, education_group_year_id
 
 
 @login_required
-@permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
+@permission_required('base.change_pedagogyinformation', raise_exception=True)
 def education_group_year_admission_condition_remove_line(request, root_id, education_group_year_id):
     admission_condition_line_id = request.GET['id']
 
@@ -274,7 +274,7 @@ def education_group_year_admission_condition_update_line_get(request):
 
 
 @login_required
-@permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
+@permission_required('base.change_pedagogyinformation', raise_exception=True)
 def education_group_year_admission_condition_update_line(request, root_id, education_group_year_id):
     if request.method == 'POST':
         return education_group_year_admission_condition_update_line_post(request, root_id, education_group_year_id)
@@ -318,7 +318,7 @@ def education_group_year_admission_condition_update_text_get(request, education_
 
 
 @login_required
-@permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
+@permission_required('base.change_pedagogyinformation', raise_exception=True)
 def education_group_year_admission_condition_update_text(request, root_id, education_group_year_id):
     if request.method == 'POST':
         return education_group_year_admission_condition_update_text_post(request, root_id, education_group_year_id)
@@ -327,7 +327,7 @@ def education_group_year_admission_condition_update_text(request, root_id, educa
 
 @login_required
 @ajax_required
-@permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
+@permission_required('base.change_pedagogyinformation', raise_exception=True)
 def education_group_year_admission_condition_line_order(request, root_id, education_group_year_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     info = json.loads(request.body.decode('utf-8'))
@@ -348,7 +348,7 @@ def education_group_year_admission_condition_line_order(request, root_id, educat
 
 
 @login_required
-@permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
+@permission_required('base.change_pedagogyinformation', raise_exception=True)
 def education_group_year_admission_condition_tab_lang_edit(request, root_id, education_group_year_id, language):
     cache.set(get_tab_lang_keys(request.user), language, timeout=CACHE_TIMEOUT)
 
