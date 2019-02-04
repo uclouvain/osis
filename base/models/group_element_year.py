@@ -26,7 +26,7 @@
 import itertools
 
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, connection
 from django.db.models import Q, F, Case, When
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -56,6 +56,30 @@ class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
         'parent__partial_acronym'
     ]
     list_filter = ('is_mandatory', 'access_condition', 'quadrimester_derogation', 'parent__academic_year')
+
+
+SQL_RECURSIVE_QUERY_EDUCATION_GROUP = """\
+WITH RECURSIVE group_element_year_parent AS (
+
+    SELECT id, child_branch_id, child_leaf_id, parent_id, 0 AS level
+    FROM base_groupelementyear
+    WHERE parent_id IN (%s)
+
+    UNION ALL
+
+    SELECT child.id,
+           child.child_branch_id,
+           child.child_leaf_id,
+           child.parent_id,
+           parent.level + 1
+
+    FROM base_groupelementyear AS child
+    INNER JOIN group_element_year_parent AS parent on parent.child_branch_id = child.parent_id
+
+    )
+
+SELECT * FROM group_element_year_parent ;
+"""
 
 
 class GroupElementYearManager(models.Manager):
@@ -333,6 +357,36 @@ def _find_elements(group_elements_by_child_id, filters, child_leaf_id=None, chil
 
 def _match_any_filters(element_year, filters):
     return any(element_year[col_name] in values_list for col_name, values_list in filters.items())
+
+
+def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict:
+    if queryset.model != GroupElementYear:
+        raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
+
+    elements = _fetch_row_sql([root.id])
+
+    distinct_group_elem_ids = {elem['id'] for elem in elements}
+    queryset = queryset.filter(pk__in=distinct_group_elem_ids)
+
+    group_elems_by_parent_id = {}  # Map {<EducationGroupYear.id>: [GroupElementYear, GroupElementYear...]}
+    for group_elem_year in queryset:
+        parent_id = group_elem_year.parent_id
+        group_elems_by_parent_id.setdefault(parent_id, []).append(group_elem_year)
+    return group_elems_by_parent_id
+
+
+def _fetch_row_sql(root_ids):
+    with connection.cursor() as cursor:
+        cursor.execute(SQL_RECURSIVE_QUERY_EDUCATION_GROUP, root_ids)
+        return [
+            {
+                'id': row[0],
+                'child_branch_id': row[1],
+                'child_leaf_id': row[2],
+                'parent_id': row[3],
+                'level': row[4],
+            } for row in cursor.fetchall()
+        ]
 
 
 def get_or_create_group_element_year(parent, child_branch=None, child_leaf=None):
