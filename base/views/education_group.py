@@ -50,6 +50,7 @@ from base.models.enums import education_group_categories
 from base.models.person import get_user_interface_language
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys, CACHE_TIMEOUT
+from base.views.education_groups.perms import can_change_admission_condition, can_change_general_information
 from cms.enums import entity_name
 from cms.models import translated_text_label
 from cms.models.text_label import TextLabel
@@ -168,22 +169,19 @@ def education_group_year_pedagogy_edit_get(request, education_group_year_id):
 
 
 @login_required
-@permission_required('base.change_pedagogyinformation', raise_exception=True)
 @require_http_methods(['GET', 'POST'])
+@can_change_general_information
 def education_group_year_pedagogy_edit(request, root_id, education_group_year_id):
     if request.method == 'POST':
         return education_group_year_pedagogy_edit_post(request, education_group_year_id, root_id)
-
     return education_group_year_pedagogy_edit_get(request, education_group_year_id)
 
 
 @login_required
-@permission_required('base.change_pedagogyinformation', raise_exception=True)
+@can_change_admission_condition
 def education_group_year_admission_condition_remove_line(request, root_id, education_group_year_id):
     admission_condition_line_id = request.GET['id']
-
-    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    admission_condition = get_object_or_404(AdmissionCondition, education_group_year=education_group_year)
+    admission_condition = get_object_or_404(AdmissionCondition, education_group_year__pk=education_group_year_id)
     admission_condition_line = get_object_or_404(AdmissionConditionLine,
                                                  admission_condition=admission_condition,
                                                  pk=admission_condition_line_id)
@@ -274,7 +272,7 @@ def education_group_year_admission_condition_update_line_get(request):
 
 
 @login_required
-@permission_required('base.change_pedagogyinformation', raise_exception=True)
+@can_change_admission_condition
 def education_group_year_admission_condition_update_line(request, root_id, education_group_year_id):
     if request.method == 'POST':
         return education_group_year_admission_condition_update_line_post(request, root_id, education_group_year_id)
@@ -327,9 +325,8 @@ def education_group_year_admission_condition_update_text(request, root_id, educa
 
 @login_required
 @ajax_required
-@permission_required('base.change_pedagogyinformation', raise_exception=True)
+@can_change_admission_condition
 def education_group_year_admission_condition_line_order(request, root_id, education_group_year_id):
-    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     info = json.loads(request.body.decode('utf-8'))
 
     admission_condition_line = get_object_or_404(AdmissionConditionLine, pk=info['record'])
@@ -348,9 +345,7 @@ def education_group_year_admission_condition_line_order(request, root_id, educat
 
 
 @login_required
-@permission_required('base.change_pedagogyinformation', raise_exception=True)
 def education_group_year_admission_condition_tab_lang_edit(request, root_id, education_group_year_id, language):
     cache.set(get_tab_lang_keys(request.user), language, timeout=CACHE_TIMEOUT)
-
     return redirect(reverse('education_group_year_admission_condition_edit',
                             kwargs={'root_id': root_id, 'education_group_year_id': education_group_year_id}))

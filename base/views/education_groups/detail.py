@@ -48,8 +48,6 @@ from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException, RelevantSectionException
 from base.business.education_groups.general_information_sections import SECTION_LIST, SECTION_INTRO, SECTION_DIDACTIC
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
-from base.business.education_groups.perms import is_eligible_to_edit_general_information, \
-    is_eligible_to_edit_admission_condition
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
@@ -280,7 +278,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             ),
             'contacts': self.get_contacts_section(),
             'show_contacts': show_contacts,
-            'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object'])
+            'can_edit_information': perms.is_eligible_to_edit_general_information(context['person'], context['object'])
         })
         return context
 
@@ -539,7 +537,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
             ).annotate_text(tab_lang)
         context.update({
             'admission_condition_form': admission_condition_form,
-            'can_edit_information': is_eligible_to_edit_admission_condition(context['person'], context['object']),
+            'can_edit_information': perms.is_eligible_to_edit_admission_condition(context['person'], context['object']),
             'info': {
                 'is_specific': is_specific,
                 'is_common': is_common,

@@ -3003,6 +3003,11 @@
                 "admissioncondition"
             ],
             [
+                "change_commonadmissioncondition",
+                "base",
+                "admissioncondition"
+            ],
+            [
                 "change_learningclassyear",
                 "base",
                 "learningclassyear"
@@ -3399,11 +3404,6 @@
         "fields": {
             "name": "sic",
             "permissions": [
-                [
-                    "change_commonpedagogyinformation",
-                    "base",
-                    "educationgroup"
-                ],
                 [
                     "change_commonadmissioncondition",
                     "base",

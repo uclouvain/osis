@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+from unittest import mock
 
 from django.test import TestCase
 
@@ -155,6 +156,14 @@ class TestPerms(TestCase):
 
 
 class TestGeneralInformationPerms(TestCase):
+    def setUp(self):
+        self.perm_patcher = mock.patch(
+            "base.business.education_groups.perms._is_eligible_education_group",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
+
     def test_is_eligible_to_edit_common_general_information_case_user_without_perms(self):
         common_bachelor = EducationGroupYearCommonBachelorFactory()
         person = PersonFactory()
@@ -177,6 +186,14 @@ class TestGeneralInformationPerms(TestCase):
 
 
 class TestAdmissionConditionPerms(TestCase):
+    def setUp(self):
+        self.perm_patcher = mock.patch(
+            "base.business.education_groups.perms._is_eligible_education_group",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
+
     def test_is_eligible_to_edit_common_admission_case_user_without_perms(self):
         common_bachelor = EducationGroupYearCommonBachelorFactory()
         person = PersonFactory()
