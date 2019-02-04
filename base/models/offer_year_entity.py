@@ -78,9 +78,3 @@ def get_from_offer_year_and_type(offer_year, education_group_type):
         return OfferYearEntity.objects.get(offer_year=offer_year, type=education_group_type)
     except ObjectDoesNotExist:
         return None
-
-
-def find_by_education_group_year_first(education_group_yr, education_group_type):
-    results = search(education_group_year=education_group_yr, type=education_group_type)
-    if results:
-        return results.first()

@@ -23,17 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+from django.conf.urls import url
 
-from base.models.offer_enrollment import OfferEnrollment
+from reference.api.views.country import CountryList, CountryDetail
 
-
-def create_date_enrollment():
-    return datetime.date.today()
-
-
-def create_offer_enrollment(student, offer_year):
-    an_offer_enrollment = OfferEnrollment(date_enrollment=create_date_enrollment(),
-                                                           student=student, offer_year=offer_year)
-    an_offer_enrollment.save()
-    return an_offer_enrollment
+urlpatterns = [
+    url(r'^countries/$', CountryList.as_view(), name=CountryList.name),
+    url(r'^countries/(?P<uuid>[0-9a-f-]+)$', CountryDetail.as_view(), name=CountryDetail.name),
+]

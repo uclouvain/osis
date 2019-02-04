@@ -49,7 +49,7 @@ PRACTICAL_INFO = 'infos_pratiques'
 MINORS = 'mineures'
 MAJORS = 'majeures'
 PURPOSES = 'finalites'
-DIDACTIC_PURPOSES = 'finalites_didactiques'
+COMMON_DIDACTIC_PURPOSES = 'finalites_didactiques-commun'
 AGREGATION = 'agregation'
 PREREQUISITE = 'prerequis'
 OPTIONS = 'options'
@@ -70,17 +70,17 @@ SECTION_LIST = [
             labels=[
                 (STRUCTURE, 'specific')
             ]),
-    Section(title=_('Program'),
+    Section(title=_('Detailed program'),
             labels=[
                 (MINORS, 'specific'),
                 (MAJORS, 'specific'),
                 (DETAILED_PROGRAM, 'specific'),
                 (PURPOSES, 'specific'),
                 (OPTIONS, 'specific'),
-                (DIDACTIC_PURPOSES, 'common'),
+                (COMMON_DIDACTIC_PURPOSES, 'common'),
                 (CAAP, 'common,specific'),
                 (AGREGATION, 'common'),
-                (PREREQUISITE, 'common'),
+                (PREREQUISITE, 'common,specific'),
             ]),
     Section(title=_('Admission'),
             labels=[
@@ -106,11 +106,18 @@ SECTION_INTRO = [
             ])
 ]
 
+SECTION_DIDACTIC = [
+    Section(title=_('Detailed program'),
+            labels=[
+                (COMMON_DIDACTIC_PURPOSES, 'common'),
+            ])
+]
+
 COMMON_GENERAL_INFO_SECTIONS = [
     AGREGATION,
     CAAP,
     PREREQUISITE,
-    DIDACTIC_PURPOSES,
+    COMMON_DIDACTIC_PURPOSES,
     COMPLEMENTARY_MODULE,
     EVALUATION
 ]

@@ -23,17 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+from rest_framework import serializers
 
-from base.models.offer_enrollment import OfferEnrollment
-
-
-def create_date_enrollment():
-    return datetime.date.today()
+from reference.models.country import Country
 
 
-def create_offer_enrollment(student, offer_year):
-    an_offer_enrollment = OfferEnrollment(date_enrollment=create_date_enrollment(),
-                                                           student=student, offer_year=offer_year)
-    an_offer_enrollment.save()
-    return an_offer_enrollment
+class CountryListSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='reference_api_v1:country-detail', lookup_field='uuid')
+
+    class Meta:
+        model = Country
+        fields = (
+            'url',
+            'uuid',
+            'iso_code',
+            'name',
+            'nationality'
+        )

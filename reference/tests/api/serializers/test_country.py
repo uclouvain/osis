@@ -23,17 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+from django.test import TestCase, RequestFactory
+from django.urls import reverse
 
-from base.models.offer_enrollment import OfferEnrollment
-
-
-def create_date_enrollment():
-    return datetime.date.today()
+from reference.api.serializers.country import CountryListSerializer
+from reference.tests.factories.country import CountryFactory
 
 
-def create_offer_enrollment(student, offer_year):
-    an_offer_enrollment = OfferEnrollment(date_enrollment=create_date_enrollment(),
-                                                           student=student, offer_year=offer_year)
-    an_offer_enrollment.save()
-    return an_offer_enrollment
+class CountryListSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.country = CountryFactory()
+        url = reverse('reference_api_v1:country-list')
+        cls.serializer = CountryListSerializer(cls.country, context={'request': RequestFactory().get(url)})
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'url',
+            'uuid',
+            'iso_code',
+            'name',
+            'nationality'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

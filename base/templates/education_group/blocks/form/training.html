@@ -36,30 +36,7 @@
         </div>
 
         <div class="panel-body">
-            <ul class="nav nav-tabs" role="tablist">
-                <li role="presentation" class="{% if not request.GET.tab_to_show %} active {% endif %}">
-                    <a href="#description" aria-controls="description" role="tab" data-toggle="tab">
-                        {% trans 'Identification' %}
-                    </a>
-                </li>
-                <li role="presentation" class="{% if request.GET.tab_to_show == 'diplomas_certificates' %} active {% endif %}">
-                    <a href="#diplomas_certificates" aria-controls="profile" role="tab" data-toggle="tab">
-                        {% trans 'Diplomas /  Certificates' %}
-                    </a>
-                </li>
-            </ul>
-            <br>
-
-            <!-- Tab panes -->
-            <div class="tab-content">
-                <div role="tabpanel" class="tab-pane {% if not request.GET.tab_to_show %} active {% endif %}" id="description">
-                    {% include "education_group/blocks/form/training_tab_identification.html" %}
-                </div>
-
-                <div role="tabpanel" class="tab-pane {% if request.GET.tab_to_show == 'diplomas_certificates' %} active {% endif %}" id="diplomas_certificates">
-                    {% include "education_group/blocks/form/training_tab_diploma.html" %}
-                </div>
-            </div>
+            {% include "education_group/blocks/form/training_tab_identification.html" %}
         </div>
 
         <div class="panel-footer text-right">

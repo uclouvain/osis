@@ -26,7 +26,6 @@
 import json
 from http import HTTPStatus
 from unittest import mock
-from unittest.mock import patch
 
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
@@ -56,7 +55,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory
-from base.utils.cache import cache, ElementCache
+from base.utils.cache import ElementCache
 from base.views.education_groups.update import update_education_group, _get_success_redirect_url
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.language import LanguageFactory

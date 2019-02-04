@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-30 14:10+0100\n"
+"POT-Creation-Date: 2019-01-31 16:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -49,7 +49,7 @@ msgstr ""
 
 #: models/education_group_year.py:76
 #: tests/views/group_element_years/test_postpone.py:108
-#: views/education_groups/update.py:225
+#: views/education_groups/update.py:224
 #, python-format
 msgid "%(count)d education group has been postponed with success."
 msgid_plural "%(count)d education groups have been postponed with success."
@@ -588,7 +588,7 @@ msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr ""
 
 #: tests/views/group_element_years/test_postpone.py:88
-#: views/education_groups/update.py:214
+#: views/education_groups/update.py:213
 #, python-format
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr ""
@@ -1135,6 +1135,10 @@ msgstr ""
 msgid "Detach"
 msgstr ""
 
+#: business/education_groups/general_information_sections.py:73
+msgid "Detailed program"
+msgstr ""
+
 #: templates/academic_calendar/academic_calendars.html:169
 #: templates/academic_calendar/academic_calendars.html:204
 msgid "Details"
@@ -1151,7 +1155,6 @@ msgstr ""
 msgid "Diploma title"
 msgstr ""
 
-#: templates/education_group/blocks/form/training.html:47
 #: templates/education_group/tabs.html:48
 msgid "Diplomas /  Certificates"
 msgstr ""
@@ -1283,15 +1286,15 @@ msgstr ""
 msgid "Education group year"
 msgstr ""
 
-#: tests/views/education_groups/test_update.py:278
-#: tests/views/education_groups/test_update.py:284
-#: views/education_groups/update.py:112
+#: tests/views/education_groups/test_update.py:277
+#: tests/views/education_groups/test_update.py:283
+#: views/education_groups/update.py:111
 #, python-format
 msgid ""
 "Education group year %(acronym)s (%(academic_year)s) successfuly deleted."
 msgstr ""
 
-#: views/education_groups/update.py:104
+#: views/education_groups/update.py:103
 #, python-format
 msgid ""
 "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
@@ -1423,7 +1426,7 @@ msgstr ""
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
-#: forms/education_group/training.py:189
+#: forms/education_group/training.py:190
 msgid "Enter text to search"
 msgstr ""
 
@@ -1620,10 +1623,6 @@ msgstr ""
 msgid "Formerly"
 msgstr ""
 
-#: templates/education_group/tab_admission_conditions.html:68
-msgid "Free Text"
-msgstr ""
-
 #: forms/education_group/achievement.py:49
 #: forms/education_group/achievement.py:79
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:39
@@ -1646,7 +1645,7 @@ msgstr ""
 #: templates/education_group/tab_administrative_data.html:65
 #: templates/education_group/tab_administrative_data.html:73
 #: templatetags/learning_unit.py:45 templatetags/learning_unit.py:51
-#: tests/models/test_learning_unit.py:91 tests/models/test_learning_unit.py:93
+#: tests/models/test_learning_unit.py:78 tests/models/test_learning_unit.py:80
 msgid "From"
 msgstr ""
 
@@ -1757,7 +1756,6 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
-#: templates/education_group/blocks/form/training.html:42
 #: templates/education_group/tabs.html:41 templates/entity/tabs.html:33
 #: templates/learning_unit/blocks/tabs.html:39
 #: templates/learning_unit/blocks/tabs.html:52
@@ -1884,7 +1882,7 @@ msgid "It is forbidden to attach an element to itself."
 msgstr ""
 
 #: models/group_element_year.py:203
-#: tests/views/education_groups/test_update.py:485
+#: tests/views/education_groups/test_update.py:484
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 
@@ -2028,7 +2026,7 @@ msgstr ""
 
 #: templates/blocks/forms/search_form.html:44
 #: templates/learning_unit/blocks/form/search_form_external_learning_unit.html:45
-#: templates/learning_unit/blocks/form/search_form_learning_unit.html:75
+#: templates/learning_unit/blocks/form/search_form_learning_unit.html:70
 msgid "Learning unit search"
 msgstr ""
 
@@ -2825,7 +2823,7 @@ msgstr ""
 msgid "Platform"
 msgstr ""
 
-#: tests/views/education_groups/test_update.py:569
+#: tests/views/education_groups/test_update.py:568
 #: views/education_groups/group_element_year/create.py:58
 msgid "Please Select or Move an item before Attach it"
 msgstr ""
@@ -2950,10 +2948,6 @@ msgstr ""
 
 #: templates/my_osis/home.html:41 templates/my_osis/profile.html:31
 msgid "Profile"
-msgstr ""
-
-#: business/education_groups/general_information_sections.py:73
-msgid "Program"
 msgstr ""
 
 #: templates/academic_actors.html:44 templates/offer/tabs.html:47
@@ -3434,6 +3428,10 @@ msgstr ""
 #: templates/education_group/tab_admission_conditions.html:51
 #: templates/education_group/tab_admission_conditions.html:53
 msgid "Specific Conditions"
+msgstr ""
+
+#: templates/education_group/tab_admission_conditions.html:68
+msgid "Specific admission requirements"
 msgstr ""
 
 #: templates/learning_unit/blocks/tabs.html:67
@@ -3932,7 +3930,7 @@ msgid ""
 "are not inside the selected training %(root)s"
 msgstr ""
 
-#: views/education_groups/detail.py:409
+#: views/education_groups/detail.py:408
 #, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr ""
@@ -4082,7 +4080,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
-#: views/education_groups/detail.py:370
+#: views/education_groups/detail.py:369
 #, python-format
 msgid "This label %s does not exist"
 msgstr ""
@@ -4810,7 +4808,7 @@ msgstr ""
 msgid "cancel"
 msgstr ""
 
-#: templates/education_group/blocks/form/training_tab_diploma.html:36
+#: templates/education_group/blocks/form/training_tab_diploma.html:35
 #: templates/education_group/tab_diplomas.html:48
 msgid "certificate aims"
 msgstr ""
@@ -4859,7 +4857,7 @@ msgstr ""
 msgid "date_format"
 msgstr "%m/%d/%Y"
 
-#: templatetags/format.py:51
+#: templatetags/format.py:35
 msgid "date_format_string"
 msgstr "m/d/Y"
 
@@ -4924,7 +4922,7 @@ msgstr ""
 msgid "field reference"
 msgstr ""
 
-#: templates/education_group/blocks/form/training_tab_diploma.html:42
+#: templates/education_group/blocks/form/training_tab_diploma.html:40
 msgid "filter by section"
 msgstr ""
 
@@ -5009,7 +5007,7 @@ msgid "no"
 msgstr ""
 
 #: forms/learning_unit/edition.py:38 templatetags/learning_unit.py:51
-#: tests/models/test_learning_unit.py:93
+#: tests/models/test_learning_unit.py:80
 msgid "no planned end"
 msgstr ""
 
@@ -5196,7 +5194,7 @@ msgstr ""
 #: templates/education_group/tab_administrative_data.html:67
 #: templates/education_group/tab_administrative_data.html:75
 #: templates/learning_unit/blocks/modal/modal_warning_state_modification.html:33
-#: templatetags/learning_unit.py:47 tests/models/test_learning_unit.py:91
+#: templatetags/learning_unit.py:47 tests/models/test_learning_unit.py:78
 msgid "to"
 msgstr ""
 

@@ -643,6 +643,44 @@ class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
         self.assertEqual(sections['admission_enrollment_procedures']['text-common'],
                          self.admission_condition_common.text_admission_enrollment_procedures)
 
+    def test_admission_conditions_for_master_2m1(self):
+        edy_master = EducationGroupYearMasterFactory(
+            acronym='hist2m1',
+            academic_year=self.education_group_year_master.academic_year
+        )
+        admission_condition = AdmissionCondition.objects.create(education_group_year=edy_master)
+        admission_condition.text_university_bachelors = 'text_university_bachelors'
+        admission_condition.save()
+
+        iso_language, language = 'fr-be', 'fr'
+
+        message = {
+            'anac': edy_master.academic_year.year,
+            'code_offre': edy_master.acronym,
+            'sections': [
+                'conditions_admissions'
+            ]
+        }
+
+        response = self.post(edy_master.academic_year.year,
+                             language,
+                             edy_master.acronym,
+                             data=message)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content_type, 'application/json')
+
+        response_json = response.json()
+
+        useless, condition_admissions_section = remove_conditions_admission(response_json['sections'])
+        sections = condition_admissions_section['content']['sections']
+        self.assertEqual(sections['university_bachelors']['text'], admission_condition.text_university_bachelors)
+        self.assertEqual(sections['personalized_access']['text-common'],
+                         self.admission_condition_common.text_personalized_access)
+        self.assertEqual(sections['adults_taking_up_university_training']['text-common'],
+                         self.admission_condition_common.text_adults_taking_up_university_training)
+        self.assertEqual(sections['admission_enrollment_procedures']['text-common'],
+                         self.admission_condition_common.text_admission_enrollment_procedures)
+
     def test_admission_conditions_for_master_with_diplomas(self):
         admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_year_master)
 
