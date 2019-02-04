@@ -2147,7 +2147,7 @@ msgstr "Type de lien"
 #: business/education_groups/shorten.py:91 models/education_group_year.py:478
 #: tests/business/education_groups/test_shorten.py:154
 msgid "Linked with EPC"
-msgstr "Certaines contraintes du côté de l'application EPC empêchent la suppression de cette organisation de formation."
+msgstr "Liens existants dans l'application EPC."
 
 #: templates/learning_unit/by_activity.html:62
 msgid "List of learning_units with comparison"
