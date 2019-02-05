@@ -156,7 +156,7 @@ class PermsTestCase(TestCase):
         mock_is_learning_unit_year_in_range_to_be_modified.return_value = True
         mock_any_existing_proposal_in_epc.return_value = True
         mock_is_year_editable.return_value = True
-        a_person = self.create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP)
+        a_person = CentralManagerFactory()
         luy = LearningUnitYearFactory(academic_year=self.academic_yr, learning_unit__existing_proposal_in_epc=False)
         ExternalLearningUnitYearFactory(learning_unit_year=luy, co_graduation=False)
         self.assertFalse(perms.is_external_learning_unit_cograduation(luy, a_person, False))
