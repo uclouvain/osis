@@ -45,7 +45,7 @@ from base.tests.factories.user import UserFactory
 from base.models.person import get_user_interface_language, \
     change_language
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
-from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory
+from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory, SICFactory
 from base.tests.factories import user
 
 
@@ -173,6 +173,13 @@ class PersonTest(PersonTestCase):
         del a_person.is_faculty_manager
         a_person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
         self.assertTrue(a_person.is_faculty_manager)
+
+    def test_is_sic(self):
+        a_person = PersonFactory()
+        self.assertFalse(a_person.is_sic)
+
+        a_person = SICFactory()
+        self.assertTrue(a_person.is_sic)
 
     def test_show_username_from_person_with_user(self):
         self.assertEqual(self.person_with_user.username(), "user_with_person")
