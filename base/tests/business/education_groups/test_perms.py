@@ -167,6 +167,28 @@ class TestCommonEducationGroupStrategyPerms(TestCase):
         for year in range(cls.current_academic_year.year - 10, cls.current_academic_year.year + 10):
             AcademicYearFactory(year=year)
 
+    def test_person_property(self):
+        person = PersonWithPermissionsFactory()
+        perm = CommonEducationGroupStrategyPerms(person.user, TrainingFactory())
+        self.assertEqual(perm.person, person)
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible",
+                side_effect=PermissionDenied())
+    def test_is_eligible_case_no_raising_exception(self, mock_is_eligible):
+        person = PersonWithPermissionsFactory()
+        perm = CommonEducationGroupStrategyPerms(person.user, TrainingFactory())
+
+        self.assertFalse(perm.is_eligible(raise_exception=False))
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible",
+                side_effect=PermissionDenied())
+    def test_is_eligible_case_raising_exception(self, mock_is_eligible):
+        person = PersonWithPermissionsFactory()
+        perm = CommonEducationGroupStrategyPerms(person.user, TrainingFactory())
+
+        with self.assertRaises(PermissionDenied):
+            perm.is_eligible(raise_exception=True)
+
     def test_is_current_academic_year_in_range_of_editable_education_group_year_case_not_in_range(self):
         """This test ensure that we cannot modify OF which greater than N+1"""
         training_in_future = TrainingFactory(academic_year__year=self.current_academic_year.year + 2)
