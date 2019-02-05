@@ -33,7 +33,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import F, Case, When
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
@@ -46,11 +46,8 @@ from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
 from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException, RelevantSectionException
-from base.business.education_groups.general_information_sections import SECTION_LIST, SECTION_INTRO
-from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
-from base.business.education_groups.perms import is_eligible_to_edit_general_information, \
-    is_eligible_to_edit_admission_condition
-from base.management.commands.import_reddot import COMMON_OFFER
+from base.business.education_groups.general_information_sections import SECTION_LIST, SECTION_INTRO, SECTION_DIDACTIC
+from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
@@ -83,7 +80,7 @@ NUMBER_SESSIONS = 3
 
 COMMON_PARAGRAPH = (
     'agregation',
-    'finalites_didactiques',
+    'finalites_didactiques-commun',
     'prerequis'
 )
 
@@ -97,6 +94,11 @@ INTRO_OFFER = (
     GroupType.COMMON_CORE.name,
     GroupType.SUB_GROUP.name,
     MiniTrainingType.OPTION.name
+)
+
+DIDACTIC_OFFERS = (
+    TrainingType.MASTER_MD_120.name,
+    TrainingType.MASTER_MD_180_240.name,
 )
 
 
@@ -135,7 +137,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context['parent_training'] = self.object.parent_by_training()
 
         if self.with_tree:
-            context['tree'] = json.dumps(NodeBranchJsTree(self.root).to_json())
+            context['tree'] = json.dumps(EducationGroupHierarchy(self.root).to_json())
 
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
@@ -149,6 +151,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context['enums'] = mdl.enums.education_group_categories
 
         self.is_intro_offer = self.object.education_group_type.name in INTRO_OFFER
+        self.is_didactic_offer = self.object.education_group_type.name in DIDACTIC_OFFERS
 
         context["show_identification"] = self.show_identification()
         context["show_diploma"] = self.show_diploma()
@@ -275,7 +278,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             ),
             'contacts': self.get_contacts_section(),
             'show_contacts': show_contacts,
-            'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object'])
+            'can_edit_information': perms.is_eligible_to_edit_general_information(context['person'], context['object'])
         })
         return context
 
@@ -296,9 +299,10 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         sections_with_translated_labels = []
         if self.is_intro_offer:
             sections_list = SECTION_INTRO
+            if self.is_didactic_offer:
+                sections_list = sections_list + SECTION_DIDACTIC
         else:
             sections_list = SECTION_LIST
-
         for section in sections_list:
             translated_labels = self.get_translated_labels_and_content(section,
                                                                        self.user_language_code,
@@ -310,12 +314,11 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
     def get_translated_labels_and_content(self, section, user_language, common_education_group_year, sections_list):
         records = []
-        filtered_labels = {(label, selectors) for label, selectors in section.labels
-                           if not sections_list or label in sections_list}
-        for label, selectors in filtered_labels:
-            records.extend(
-                self.get_selectors(common_education_group_year, label, selectors, user_language)
-            )
+        for label, selectors in section.labels:
+            if not sections_list or label in sections_list:
+                records.extend(
+                    self.get_selectors(common_education_group_year, label, selectors, user_language)
+                )
         return records
 
     def get_selectors(self, common_education_group_year, label, selectors, user_language):
@@ -503,7 +506,6 @@ class EducationGroupUsing(EducationGroupGenericDetailView):
 
 class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
     template_name = "education_group/tab_admission_conditions.html"
-    permission_required = 'base.can_edit_educationgroup_pedagogy'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -535,7 +537,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
             ).annotate_text(tab_lang)
         context.update({
             'admission_condition_form': admission_condition_form,
-            'can_edit_information': is_eligible_to_edit_admission_condition(context['person'], context['object']),
+            'can_edit_information': perms.is_eligible_to_edit_admission_condition(context['person'], context['object']),
             'info': {
                 'is_specific': is_specific,
                 'is_common': is_common,

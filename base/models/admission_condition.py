@@ -69,6 +69,11 @@ class AdmissionCondition(models.Model):
     def __str__(self):
         return "Admission condition - {}".format(self.education_group_year)
 
+    class Meta:
+        permissions = (
+            ("change_commonadmissioncondition", "Can change common admission condition"),
+        )
+
 
 class AdmissionConditionAdmin(osis_model_admin.OsisModelAdmin):
     list_display = ('name',)

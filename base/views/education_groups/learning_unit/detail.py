@@ -34,7 +34,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView
 
 from base.business.education_groups import perms
-from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
+from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.business.education_groups.learning_units.prerequisite import \
     get_prerequisite_acronyms_which_are_outside_of_education_group
 from base.models import group_element_year
@@ -71,7 +71,7 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
         context['root'] = root
         context['root_id'] = root.pk
         context['parent'] = root
-        context['tree'] = json.dumps(NodeBranchJsTree(root).to_json())
+        context['tree'] = json.dumps(EducationGroupHierarchy(root).to_json())
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         return context
 

@@ -386,10 +386,12 @@ def get_conditions_admissions(context):
     common_acronym = 'common-{}'.format(full_suffix)
     if common_acronym == 'common-2m1':
         common_acronym = 'common-2m'
+        full_suffix = '2m'
     admission_condition, created = AdmissionCondition.objects.get_or_create(
         education_group_year=context.education_group_year
     )
     admission_condition_common = None
+
     if full_suffix.upper() in COMMON_OFFER:
         common_education_group_year = EducationGroupYear.objects.get(
             acronym=common_acronym,
