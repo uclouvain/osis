@@ -11,7 +11,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base','0013_project_refactoring'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

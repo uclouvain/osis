@@ -40,7 +40,7 @@
                         <input value="{{ form_education_group_year.category_text }}"
                                disabled class="form-control" >
                     </div>
-                    {% bootstrap_field form_education_group_year.education_group_type form_group_class="col-md-6"%}
+                    {% bootstrap_field form_education_group_year.education_group_type form_group_class="col-md-6" %}
                 </div>
                 <br>
                 <div class="row">
@@ -122,7 +122,6 @@
                 {% bootstrap_field form_education_group_year.funding_direction_cud %}
             </div>
         </div>
-
     </div>
 </div>
 <div class="panel panel-default">
@@ -144,5 +143,11 @@
             {% bootstrap_field form_education_group_year.co_graduation form_group_class="col-md-4" %}
             {% bootstrap_field form_education_group_year.co_graduation_coefficient form_group_class="col-md-4" %}
         </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        {% include "education_group/blocks/form/training_tab_diploma.html" %}
     </div>
 </div>

@@ -27,13 +27,12 @@ import datetime
 from unittest import mock
 
 from django.core.urlresolvers import reverse
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 
+from assessments.forms.score_sheet_address import ScoreSheetAddressForm
+from assessments.views import score_sheet
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.offer_year import OfferYearFactory
-from assessments.views import score_sheet
-from assessments.forms.score_sheet_address import ScoreSheetAddressForm
-from django.test import Client
 from base.tests.factories.user import SuperUserFactory
 
 
@@ -52,23 +51,14 @@ class OfferScoreSheetTabViewTest(TestCase):
         context = score_sheet._get_common_context(request, self.offer_year.id)
         self.assert_list_contains(list(context.keys()), self.COMMON_CONTEXT_KEYS)
 
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_offer_score_encoding_tab(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
+    def test_offer_score_encoding_tab(self):
+        self.client.force_login(SuperUserFactory())
+        response = self.client.get(reverse('offer_score_encoding_tab', args=[self.offer_year.id]))
 
-        request_factory = RequestFactory()
-
-        request = request_factory.get(reverse('offer_score_encoding_tab', args=[self.offer_year.id]))
-        request.user = mock.Mock()
-        score_sheet.offer_score_encoding_tab(request, self.offer_year.id)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'offer/score_sheet_address_tab.html')
+        self.assertTemplateUsed(response, 'offer/score_sheet_address_tab.html')
         context_keys = self.COMMON_CONTEXT_KEYS + ['entity_id_selected', 'form']
-        self.assert_list_contains(list(context.keys()), context_keys)
-        self.assertEqual(context['offer_year'], self.offer_year)
+        self.assert_list_contains(list(response.context.keys()), context_keys)
+        self.assertEqual(response.context['offer_year'], self.offer_year)
 
     def assert_list_contains(self, container, member):
         self.assertFalse([item for item in member if item not in container])
@@ -86,21 +76,12 @@ class OfferScoreSheetTabViewTest(TestCase):
         self.assertEqual(response.url, reverse('offer_score_encoding_tab', args=[self.offer_year.id]))
 
     @mock.patch('assessments.views.score_sheet._save_customized_address')
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_save_score_sheet_address_case_customized_address(self, mock_render, mock_decorators, mock_save_customized_address):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
+    def test_save_score_sheet_address_case_customized_address(self, mock_save_customized_address):
+        self.client.force_login(SuperUserFactory())
+
         mock_save_customized_address.return_value = ScoreSheetAddressForm()
 
-        request_factory = RequestFactory()
+        response = self.client.post(reverse('save_score_sheet_address', args=[self.offer_year.id]))
 
-        request = request_factory.post(reverse('save_score_sheet_address', args=[self.offer_year.id]))
-        request.user = mock.Mock()
-        score_sheet.save_score_sheet_address(request, self.offer_year.id)
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'offer/score_sheet_address_tab.html')
-        self.assert_list_contains(list(context.keys()), self.COMMON_CONTEXT_KEYS + ['form'])
-
+        self.assertTemplateUsed(response, 'offer/score_sheet_address_tab.html')
+        self.assert_list_contains(list(response.context.keys()), self.COMMON_CONTEXT_KEYS + ['form'])

@@ -25,7 +25,7 @@
 ##############################################################################
 from django import forms
 from django.forms import ModelChoiceField
-from django.utils.translation import ugettext_lazy as _, pgettext
+from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 
 from base.business.entity import get_entities_ids
 from base.models import academic_year, education_group_year
@@ -65,20 +65,20 @@ class EducationGroupFilter(forms.Form):
     academic_year = forms.ModelChoiceField(
         queryset=academic_year.find_academic_years(),
         required=False,
-        empty_label=pgettext("plural", "All"),
+        empty_label=pgettext_lazy("plural", "All"),
         label=_('Ac yr.')
     )
 
     category = forms.ChoiceField(
-        choices=[("", pgettext("plural", "All"))] + list(Categories.choices()),
+        choices=[("", pgettext_lazy("plural", "All"))] + list(Categories.choices()),
         required=False,
         label=_('Category')
     )
 
     education_group_type = ModelChoiceFieldWithData(
-        queryset=EducationGroupType.objects.all(),
+        queryset=EducationGroupType.objects.none(),
         required=False,
-        empty_label=pgettext("plural", "All"),
+        empty_label=pgettext_lazy("plural", "All"),
         label=_('Type')
     )
 

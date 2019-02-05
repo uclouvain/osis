@@ -141,6 +141,12 @@ body {
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
 }
 
+/* Prevent hidden element because of heigth fixed navbar when use anchor */
+div:target{
+    padding-top: 50px;  /* Size of navbar */
+    margin-top: -50px;
+}
+
 .proposal_value {
     color: #5CB85C;
     cursor: help;

@@ -2988,9 +2988,24 @@
                 "educationgroupachievement"
             ],
             [
-                "can_edit_educationgroup_pedagogy",
+                "change_pedagogyinformation",
                 "base",
                 "educationgroup"
+            ],
+            [
+                "change_commonpedagogyinformation",
+                "base",
+                "educationgroup"
+            ],
+            [
+                "change_admissioncondition",
+                "base",
+                "admissioncondition"
+            ],
+            [
+                "change_commonadmissioncondition",
+                "base",
+                "admissioncondition"
             ],
             [
                 "change_learningclassyear",
@@ -3141,7 +3156,7 @@
                 "educationgroup"
             ],
             [
-                "can_edit_educationgroup_pedagogy",
+                "change_pedagogyinformation",
                 "base",
                 "educationgroup"
             ],
@@ -3309,6 +3324,11 @@
                 "can_manage_attribution",
                 "base",
                 "person"
+            ],
+            [
+                "change_admissioncondition",
+                "base",
+                "admissioncondition"
             ]
         ]
     }
@@ -3385,14 +3405,9 @@
             "name": "sic",
             "permissions": [
                 [
-                    "can_edit_common_education_group",
+                    "change_commonadmissioncondition",
                     "base",
-                    "educationgroup"
-                ],
-                [
-                    "can_edit_educationgroup_pedagogy",
-                    "base",
-                    "educationgroup"
+                    "admissioncondition"
                 ],
                 [
                     "can_access_education_group",

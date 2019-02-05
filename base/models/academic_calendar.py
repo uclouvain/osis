@@ -140,10 +140,6 @@ def find_academic_calendar_by_academic_year_with_dates(academic_year_id):
                                    .order_by('start_date')
 
 
-def find_by_ids(academic_calendars_id):
-    return AcademicCalendar.objects.filter(pk__in=academic_calendars_id)
-
-
 def get_by_reference_and_academic_year(a_reference, an_academic_year):
     return get_object_or_none(AcademicCalendar, reference=a_reference, academic_year=an_academic_year)
 

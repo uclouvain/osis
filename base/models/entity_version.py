@@ -347,20 +347,6 @@ def get_last_version(entity, date=None):
     return qs.latest('start_date')
 
 
-def get_last_version_by_entity_id(entity_id):
-    now = datetime.datetime.now(get_tzinfo())
-    return EntityVersion.objects.current(now).filter(entity__id=entity_id).latest('start_date')
-
-
-def get_by_entity_parent(entity_parent):
-    if entity_parent is None:
-        return None
-    try:
-        return EntityVersion.objects.entity(entity_parent).get()
-    except EntityVersion.DoesNotExist:
-        return None
-
-
 def get_by_entity_and_date(entity, date=None):
     if date is None:
         date = timezone.now()
@@ -526,13 +512,6 @@ def find_last_entity_version_by_learning_unit_year_id(learning_unit_year_id, ent
             latest('start_date')
     except EntityVersion.DoesNotExist:
         return None
-
-
-def search_by_acronyms(entities):
-    q = Q()
-    for entity in entities:
-        q |= Q(acronym__icontains=entity.acronym)
-    return EntityVersion.objects.filter(q)
 
 
 def find_entity_version_according_academic_year(an_entity, an_academic_year):

@@ -23,9 +23,41 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from rest_framework import generics
+
+from reference.api.serializers.country import CountryListSerializer
+from reference.models.country import Country
 
 
-def delete_admin_action(actions):
-    if 'delete_selected' in actions:
-        del actions['delete_selected']
-    return actions
+class CountryList(generics.ListAPIView):
+    """
+       Return a list of all the country.
+    """
+    name = 'country-list'
+    queryset = Country.objects.all()
+    serializer_class = CountryListSerializer
+    filter_fields = (
+        'iso_code',
+        'name',
+    )
+    search_fields = (
+        'iso_code',
+        'name',
+    )
+    ordering_fields = (
+        'iso_code',
+        'name',
+    )
+    ordering = (
+        'name',
+    )  # Default ordering
+
+
+class CountryDetail(generics.RetrieveAPIView):
+    """
+        Return the detail of the country
+    """
+    name = 'country-detail'
+    queryset = Country.objects.all()
+    serializer_class = CountryListSerializer
+    lookup_field = 'uuid'

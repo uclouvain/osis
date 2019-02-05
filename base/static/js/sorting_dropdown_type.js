@@ -23,7 +23,12 @@ function sort_dropdown_type(id_elem){
 
     my_options.sort(function(a,b) {
         // localCompare is used to compare String based on the current locale
-        return a.text.localeCompare(b.text);
+        if(a.value) {
+            return a.text.localeCompare(b.text);
+        }else{
+            // If no value -> equals to 'All' which has to be at the top of the dropdown  list
+            return -1;
+        }
     });
     // replace the old list with the sorted one
     select_edu_group_type.empty().append( my_options );
