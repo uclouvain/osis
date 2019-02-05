@@ -38,7 +38,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 class ExternalLearningUnitYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('external_id', 'external_acronym', 'external_credits', 'url', 'learning_unit_year',
                     'requesting_entity', "author", "creation_date")
-    search_fields = ['acronym', 'learning_unit_year__acronym', 'author']
+    search_fields = ['learning_unit_year__acronym']
 
 
 class ExternalLearningUnitYear(models.Model):

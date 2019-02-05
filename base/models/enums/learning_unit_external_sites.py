@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,29 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
-
-import factory.fuzzy
-from factory.django import DjangoModelFactory
-
-from base.models.learning_unit_year import MINIMUM_CREDITS, MAXIMUM_CREDITS
-from base.tests.factories.entity import EntityFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory
+from osis_common.utils.enumerations import ChoiceEnum
 
 
-class ExternalLearningUnitYearFactory(DjangoModelFactory):
-    class Meta:
-        model = "base.ExternalLearningUnitYear"
-        
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
-    external_acronym = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    external_credits = factory.fuzzy.FuzzyDecimal(MINIMUM_CREDITS, MAXIMUM_CREDITS, precision=0)
-
-    learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
-    requesting_entity = factory.SubFactory(EntityFactory)
-    author = factory.SubFactory(PersonFactory)
-    co_graduation = True
+class LearningUnitExternalSite(ChoiceEnum):
+    B = "G"
+    L = "L"
+    M = "M"
+    T = "T"
+    W = "W"
