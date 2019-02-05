@@ -30,6 +30,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.forms.utils.choice_field import add_blank
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
 from base.models.enums.learning_unit_management_sites import LearningUnitManagementSite
 
 
@@ -38,7 +39,7 @@ def _create_first_letter_choices():
 
 
 def _create_external_first_letter_choices():
-    return add_blank(LearningUnitManagementSite.choices())
+    return add_blank(LearningUnitExternalSite.choices())
 
 
 class AcronymInput(forms.MultiWidget):
