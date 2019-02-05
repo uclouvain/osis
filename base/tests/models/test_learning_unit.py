@@ -24,18 +24,23 @@
 #
 ##############################################################################
 import datetime
+from gettext import ngettext
 
+from django.contrib.messages import get_messages
 from django.db import DatabaseError
 from django.test import TestCase
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from base.models import learning_unit
 from base.models.enums import learning_unit_year_subtypes
 from base.templatetags.learning_unit import academic_years, academic_year
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
+from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.user import SuperUserFactory
 
 
 def create_learning_unit(acronym, title):
@@ -75,9 +80,10 @@ class LearningUnitTest(TestCase):
         self.assertEqual(len(all_partims_container_year_2), 0)
 
     def test_academic_years_tags(self):
-        self.assertEqual(academic_years(2017, 2018), _('From').title()+" 2017-18 "+_('to').lower()+" 2018-19")
+        self.assertEqual(academic_years(2017, 2018), _('From').title() + " 2017-18 " + _('to').lower() + " 2018-19")
         self.assertEqual(academic_years(None, 2018), "-")
-        self.assertEqual(academic_years(2017, None), _('From').title()+" 2017-18 ("+_('no planned end').lower()+")")
+        self.assertEqual(academic_years(2017, None),
+                         _('From').title() + " 2017-18 (" + _('no planned end').lower() + ")")
         self.assertEqual(academic_years(None, None), "-")
 
     def test_academic_year_tags(self):
@@ -127,3 +133,28 @@ class LearningUnitGetByAcronymWithLatestAcademicYearTest(TestCase):
             learning_unit.get_by_acronym_with_highest_academic_year(acronym='LDROI1200'),
             self.learning_unit_year_2017.learning_unit
         )
+
+
+class TestLearningUnitAdmin(TestCase):
+    def test_apply_learning_unit_year_postponement(self):
+        """ Postpone to N+6 in Learning Unit Admin """
+        current_year = get_current_year()
+        academic_years = GenerateAcademicYear(current_year, current_year + 6)
+
+        lu = LearningUnitFactory(end_year=None)
+        LearningUnitYearFactory(
+            academic_year=academic_years[0],
+            learning_unit=lu
+        )
+
+        postpone_url = reverse('admin:base_learningunit_changelist')
+
+        self.client.force_login(SuperUserFactory())
+        response = self.client.post(postpone_url, data={'action': 'apply_learning_unit_year_postponement',
+                                                        '_selected_action': [lu.pk]})
+
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(msg[0], ngettext(
+            "%(count)d learning unit has been postponed with success",
+            "%(count)d learning units have been postponed with success", 6
+        ) % {'count': 6})
