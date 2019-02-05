@@ -113,6 +113,7 @@ class Person(SerializableModel):
     def is_faculty_manager(self):
         return self.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists()
 
+    @cached_property
     def is_sic(self):
         return self.user.groups.filter(name=SIC_GROUP).exists()
 
