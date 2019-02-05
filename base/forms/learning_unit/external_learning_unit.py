@@ -100,13 +100,16 @@ class ExternalLearningUnitModelForm(forms.ModelForm):
         super().__init__(data, *args, **kwargs)
         self.instance.author = person
         self.fields['requesting_entity'].queryset = self.person.find_main_entities_version
+        self.fields['co_graduation'].initial = True
+        self.fields['co_graduation'].disabled = True
+        self.fields['mobility'].disabled = True
 
         if self.instance.id and hasattr(self.instance, 'requesting_entity'):
             self.initial['requesting_entity'] = get_last_version(self.instance.requesting_entity)
 
     class Meta:
         model = ExternalLearningUnitYear
-        fields = ('external_acronym', 'external_credits', 'url', 'requesting_entity')
+        fields = ('external_acronym', 'external_credits', 'url', 'requesting_entity', 'co_graduation', 'mobility')
 
     def post_clean(self, start_date):
         entity = self.cleaned_data.get('requesting_entity')
