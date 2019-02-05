@@ -32,7 +32,8 @@ from django.utils.translation import ugettext_lazy as _
 from attribution.models.attribution import find_all_tutors_by_learning_unit_year
 from base import models as mdl_base
 from base.business.entity import get_entity_calendar
-from base.business.learning_unit_year_with_context import volume_learning_component_year
+from base.business.learning_unit_year_with_context import volume_learning_component_year, \
+    volume_from_initial_learning_component_year
 from base.business.learning_units.comparison import get_entity_by_type
 from base.business.xls import get_name_or_username
 from base.models import entity_container_year
@@ -116,7 +117,7 @@ def get_same_container_year_components(learning_unit_year):
 
         entity_components_yr = learning_component_year.entitycomponentyear_set.all()
         if indx == 0:
-            additionnal_entities = _get_entities(entity_components_yr)
+            additionnal_entities = get_entities(entity_components_yr)
 
         components.append(
             {
@@ -190,7 +191,7 @@ def get_components_identification(learning_unit_yr):
         entity_components_yr = learning_component_year.entitycomponentyear_set.all()
 
         if not additional_entities:
-            additional_entities = _get_entities(entity_components_yr)
+            additional_entities = get_entities(entity_components_yr)
 
         components.append(
             {
@@ -260,7 +261,7 @@ def _compose_components_dict(components, additional_entities):
     return data_components
 
 
-def _get_entities(entity_components_yr):
+def get_entities(entity_components_yr):
     return {
         e.entity_container_year.type: e.entity_container_year.entity.most_recent_acronym
         for e in entity_components_yr
@@ -329,3 +330,28 @@ def get_learning_unit_comparison_context(learning_unit_year):
         get_entity_by_type(learning_unit_year, entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2)
     context['learning_container_year_partims'] = learning_unit_year.get_partims_related()
     return context
+
+
+def get_components_identification_initial_data(proposal):
+    components = []
+    additional_entities = proposal.initial_data.get('entities')
+    learning_component_year_list_from_initial = proposal.initial_data.get('learning_component_years')
+    if learning_component_year_list_from_initial:
+        for learning_component_year in learning_component_year_list_from_initial:
+            entity_components_yr = mdl_base.entity_component_year.EntityComponentYear.objects.filter(
+                learning_component_year=learning_component_year.get('id')
+            )
+
+            components.append(
+                {
+                    'learning_component_year': learning_component_year,
+                    'entity_component_yr': entity_components_yr.first(),
+                    'volumes': volume_from_initial_learning_component_year(
+                        learning_component_year,
+                        entity_components_yr
+                    )
+                }
+            )
+
+        return _compose_components_dict(components, additional_entities)
+    return {}

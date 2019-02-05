@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import functools
+import json
 
 from django.contrib.messages import ERROR, SUCCESS
 from django.contrib.messages import INFO
@@ -44,6 +45,8 @@ from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.enums.proposal_type import ProposalType
 from base.utils import send_mail as send_mail_util
 from reference.models import language
+from base.business.learning_unit_year_with_context import volume_learning_component_year
+from base.business.learning_unit import get_entities, _compose_components_dict
 
 APP_BASE_LABEL = 'base'
 END_FOREIGN_KEY_NAME = "_id"
@@ -53,16 +56,22 @@ VALUES_WHICH_NEED_TRANSLATION = ["periodicity", "container_type", "internship_su
 LABEL_ACTIVE = _('Active')
 LABEL_INACTIVE = _('Inactive')
 INITIAL_DATA_FIELDS = {
-        'learning_container_year': [
-            "id", "acronym", "common_title", "container_type", "in_charge"
-        ],
-        'learning_unit': [
-            "id", "end_year"
-        ],
-        'learning_unit_year': [
-            "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity"
-        ]
-    }
+    'learning_container_year': [
+        "id", "acronym", "common_title", "container_type", "in_charge", "common_title_english", "team", "is_vacant",
+        "type_declaration_vacant",
+    ],
+    'learning_unit': [
+        "id", "end_year", "faculty_remark", "other_remark"
+    ],
+    'learning_unit_year': [
+        "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity",
+        "status", "professional_integration", "specific_title", "specific_title_english", "quadrimester", "session",
+        "attribution_procedure",
+    ],
+    'learning_component_year': [
+        "id", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2", "planned_classes",
+    ],
+}
 
 
 def compute_proposal_type(proposal_learning_unit_year, learning_unit_year):
@@ -86,6 +95,7 @@ def reinitialize_data_before_proposal(learning_unit_proposal):
                                         initial_data["learning_container_year"])
     _reinitialize_entities_before_proposal(learning_unit_year.learning_container_year,
                                            initial_data["entities"])
+    _reinitialize_components_before_proposal(initial_data["learning_component_years"])
 
 
 def _reinitialize_model_before_proposal(obj_model, attribute_initial_values):
@@ -132,10 +142,10 @@ def get_difference_of_proposal(initial_data, learning_unit_year):
         initial_data_by_model = initial_data.get(model)
         if not initial_data_by_model:
             continue
+        for key, value in initial_data_by_model.items():
+            if not (value is None and actual_data[model][key] == '') and value != actual_data[model][key]:
+                differences.update({key: initial_data_by_model[key]})
 
-        differences.update(
-            {key: initial_data_by_model[key] for key, value in initial_data_by_model.items()
-             if value != actual_data[model][key]})
     return differences
 
 
@@ -383,8 +393,10 @@ def copy_learning_unit_data(learning_unit_year):
     learning_unit_year_values = _get_attributes_values(learning_unit_year,
                                                        INITIAL_DATA_FIELDS['learning_unit_year'])
     learning_unit_year_values["credits"] = float(learning_unit_year.credits) if learning_unit_year.credits else None
-    return get_initial_data(entities_by_type, learning_container_year_values, learning_unit_values,
-                            learning_unit_year_values)
+    initial_data = get_initial_data(entities_by_type, learning_container_year_values, learning_unit_values,
+                                    learning_unit_year_values)
+    initial_data.update({'learning_component_years': get_components_initial_data(learning_unit_year)})
+    return initial_data
 
 
 def _get_attributes_values(obj, attributes_name):
@@ -396,7 +408,7 @@ def get_initial_data(entities_by_type, learning_container_year_values, learning_
         "learning_container_year": learning_container_year_values,
         "learning_unit_year": learning_unit_year_values,
         "learning_unit": learning_unit_values,
-        "entities": get_entities(entities_by_type)
+        "entities": get_entities(entities_by_type),
     }
     return initial_data
 
@@ -410,3 +422,36 @@ def get_entity_by_type(entity_type, entities_by_type):
         return entities_by_type[entity_type].id
     else:
         return None
+
+
+def convert_volume_to_float(data, key):
+    return {key: float(data.get(key))} if key in data and data.get(key) else {key: None}
+
+
+def update_or_create_learning_unit_component(obj_model, attribute_initial_values):
+    for attribute_name, attribute_value in attribute_initial_values.items():
+        if attribute_name != "id":
+            cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+            setattr(obj_model, attribute_name, cleaned_initial_value)
+    obj_model.save()
+
+
+def _reinitialize_components_before_proposal(initial_components):
+    for initial_data_by_model in initial_components:
+        an_id = initial_data_by_model.get('id')
+        if an_id:
+            learning_component_year = mdl_base.learning_component_year.LearningComponentYear.objects.get(pk=an_id)
+            update_or_create_learning_unit_component(learning_component_year, initial_data_by_model)
+
+
+def get_components_initial_data(learning_unit_year):
+    components = mdl_base.learning_component_year.find_by_learning_container_year(
+        learning_unit_year.learning_container_year)
+    component_values_list = []
+    for component in components:
+        data = _get_attributes_values(component, INITIAL_DATA_FIELDS['learning_component_year'])
+        data.update(convert_volume_to_float(data, 'hourly_volume_total_annual'))
+        data.update(convert_volume_to_float(data, 'hourly_volume_partial_q1'))
+        data.update(convert_volume_to_float(data, 'hourly_volume_partial_q2'))
+        component_values_list.append(data)
+    return component_values_list

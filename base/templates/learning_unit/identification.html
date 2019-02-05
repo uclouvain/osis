@@ -90,7 +90,7 @@
                                     {% dl_tooltip learning_unit_year 'periodicity' %}
                                 </div>
                                 <div class="col-md-3">
-                                    {% dl_tooltip learning_unit_year 'status' label_text='status' value=learning_unit_year.status_verbose %}
+                                    {% dl_tooltip learning_unit_year 'status' label_text=_('State') value=learning_unit_year.status_verbose %}
                                 </div>
                                 <div class="col-md-3">
                                     {% dl_tooltip learning_unit_year 'language' %}
@@ -100,21 +100,21 @@
                         <div class="row">
                             {% block content_row3 %}
                                 <div class="col-md-3">
-                                    {% dl_tooltip learning_unit_year 'professional_integration' value=learning_unit_year.professional_integration|yesno:_("YES,NO") %}
+                                    {% dl_tooltip learning_unit_year 'professional_integration' value=learning_unit_year.professional_integration|yesno:_("yes,no")|title %}
                                 </div>
                             {% endblock content_row3 %}
                         </div>
                         {% block titles %}
                             {% if learning_unit_year.subtype == "PARTIM" %}
-                                {% dl_tooltip learning_unit_year.learning_container_year 'common_title' title='title_1' inherited=learning_unit_year.subtype %}
-                                {% dl_tooltip learning_unit_year 'specific_title' label_text=_('Title proper to the partim') title='title_2' %}
-                                {% dl_tooltip learning_unit_year.learning_container_year 'common_title_english' title='title_1_in_english' inherited=learning_unit_year.subtype %}
-                                {% dl_tooltip learning_unit_year 'specific_title_english' label_text=_('English title proper to the partim') title='title_2_in_english' %}
+                                {% dl_tooltip learning_unit_year.learning_container_year 'common_title' title='Common title' inherited=learning_unit_year.subtype %}
+                                {% dl_tooltip learning_unit_year 'specific_title' label_text=_('Title proper to the partim') title='Title proper to the partim' %}
+                                {% dl_tooltip learning_unit_year.learning_container_year 'common_title_english' title='Common English title' inherited=learning_unit_year.subtype %}
+                                {% dl_tooltip learning_unit_year 'specific_title_english' label_text=_('English title proper to the partim') title='English title proper' %}
                             {% else %}
-                                {% dl_tooltip learning_unit_year.learning_container_year 'common_title' title='title_1' inherited=learning_unit_year.subtype %}
-                                {% dl_tooltip learning_unit_year 'specific_title' title='title_2' %}
-                                {% dl_tooltip learning_unit_year.learning_container_year 'common_title_english' title='title_1_in_english' inherited=learning_unit_year.subtype %}
-                                {% dl_tooltip learning_unit_year 'specific_title_english' title='title_2_in_english' %}
+                                {% dl_tooltip learning_unit_year.learning_container_year 'common_title' title='Common title' inherited=learning_unit_year.subtype %}
+                                {% dl_tooltip learning_unit_year 'specific_title' title='French title proper' %}
+                                {% dl_tooltip learning_unit_year.learning_container_year 'common_title_english' title='Common English title' inherited=learning_unit_year.subtype %}
+                                {% dl_tooltip learning_unit_year 'specific_title_english' title='English title proper' %}
                             {% endif %}
                         {% endblock titles %}
                     </div>
@@ -161,8 +161,7 @@
                                         <p id="id_is_vacant">{{ learning_unit_year.learning_container_year.is_vacant | yesno:_("yes,no") |title }}</p>
                                     </div>
                                     <div class="col-md-3">
-                                        <label>{% trans 'Team management' %}</label><br>
-                                        <p id="id_team">{{ learning_unit_year.learning_container_year.team | yesno:_("yes,no") |title }}</p>
+                                        <p id="id_team">{% dl_tooltip learning_unit_year.learning_container_year 'team' value=learning_unit_year.learning_container_year.team|yesno:_("yes,no")|title %}</p>
                                     </div>
                                     <div class="col-md-4">
                                         <label>{% trans 'Decision' %}</label><br>

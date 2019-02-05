@@ -79,6 +79,8 @@ from base.views.learning_units.proposal.update import update_learning_unit_propo
 from base.views.learning_units.search import PROPOSAL_SEARCH, learning_units_proposal_search, ACTION_CONSOLIDATE, \
     ACTION_BACK_TO_INITIAL, ACTION_FORCE_STATE
 from reference.tests.factories.language import LanguageFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from base.models.enums import learning_component_year_type
 
 LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
 
@@ -214,7 +216,7 @@ class TestLearningUnitModificationProposal(TestCase):
         self.assertEqual(response.context['person'], self.person)
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
         luy_initial = response.context['learning_unit_year_form'].initial
-        lu_initial = response.context['learning_unit_form'].initial
+        response.context['learning_unit_form'].initial
         lcy_initial = response.context['learning_container_year_form'].initial
         self.assertEqual(luy_initial['academic_year'], self.learning_unit_year.academic_year.id)
         self.assertEqual(luy_initial['acronym'], [
@@ -258,15 +260,23 @@ class TestLearningUnitModificationProposal(TestCase):
     def test_initial_data_fields(self):
         expected_initial_data_fields = {
             'learning_container_year': [
-                "id", "acronym", "common_title", "container_type", "in_charge"
+                "id", "acronym", "common_title", "container_type", "in_charge", "common_title_english", "team",
+                "is_vacant", "type_declaration_vacant",
             ],
             'learning_unit': [
-                "id", "end_year"
+                "id", "end_year", "faculty_remark", "other_remark",
             ],
             'learning_unit_year': [
-                "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity"
-            ]
+                "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity",
+                "status", "professional_integration", "specific_title", "specific_title_english", "quadrimester",
+                "session", "attribution_procedure",
+            ],
+            'learning_component_year': [
+                "id", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
+                "planned_classes",
+            ],
         }
+
         self.assertEqual(expected_initial_data_fields, INITIAL_DATA_FIELDS)
 
     @transaction.atomic()
@@ -747,6 +757,14 @@ def _create_proposal_learning_unit(acronym):
         type=entity_container_year_link_type.REQUIREMENT_ENTITY,
         entity=an_entity
     )
+    learning_component_lecturing = LearningComponentYearFactory(
+        learning_container_year=a_learning_unit_year.learning_container_year,
+        type=learning_component_year_type.LECTURING
+    )
+    learning_component_practical = LearningComponentYearFactory(
+        learning_container_year=a_learning_unit_year.learning_container_year,
+        type=learning_component_year_type.PRACTICAL_EXERCISES)
+
     initial_data = {
         "learning_container_year": {
             "id": a_learning_unit_year.learning_container_year.id,
@@ -775,7 +793,20 @@ def _create_proposal_learning_unit(acronym):
             entity_container_year_link_type.ALLOCATION_ENTITY: None,
             entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
             entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
-        }
+        },
+        "learning_component_years": [
+            {"id": learning_component_lecturing.id, "planned_classes": learning_component_lecturing.planned_classes,
+             "hourly_volume_partial_q1": learning_component_lecturing.hourly_volume_partial_q1,
+             "hourly_volume_partial_q2": learning_component_lecturing.hourly_volume_partial_q2,
+             "hourly_volume_total_annual": learning_component_lecturing.hourly_volume_total_annual
+             },
+            {"id": learning_component_practical.id, "planned_classes": learning_component_practical.planned_classes,
+             "hourly_volume_partial_q1": learning_component_practical.hourly_volume_partial_q1,
+             "hourly_volume_partial_q2": learning_component_practical.hourly_volume_partial_q2,
+             "hourly_volume_total_annual": learning_component_practical.hourly_volume_total_annual
+             }
+        ]
+
     }
 
     return ProposalLearningUnitFactory(learning_unit_year=a_learning_unit_year,

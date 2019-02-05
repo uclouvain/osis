@@ -496,6 +496,9 @@ class can_learning_unit_year_educational_information_be_udpated(BasePerm):
 
 
 def is_year_editable(learning_unit_year, person, raise_exception):
+    print('is_year_editable')
+    print(learning_unit_year.academic_year.year)
+    print(settings.YEAR_LIMIT_LUE_MODIFICATION)
     result = learning_unit_year.academic_year.year >= settings.YEAR_LIMIT_LUE_MODIFICATION
     msg = "{}.  {}".format(
         _("You can't modify learning unit under year : %(year)d") %
