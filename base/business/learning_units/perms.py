@@ -153,7 +153,7 @@ def is_eligible_for_cancel_of_proposal(proposal, person, raise_exception=False):
         _is_person_in_accordance_with_proposal_state(proposal, person, raise_exception) and \
         _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception) and \
         _has_person_the_right_to_make_proposal(proposal, person, raise_exception) and \
-        is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
+        is_external_learning_unit_cograduation(proposal.learning_unit_year, person, raise_exception)
     can_raise_exception(
         raise_exception, result,
         MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL
