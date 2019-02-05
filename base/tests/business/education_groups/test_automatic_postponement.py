@@ -56,13 +56,14 @@ class TestFetchEducationGroupToPostpone(TestCase):
             education_group=self.education_group,
             academic_year=self.academic_years[-3],
         )
-
         self.assertEqual(EducationGroupYear.objects.count(), 2)
+
         result, errors = EducationGroupAutomaticPostponement().postpone()
-        self.assertEqual(len(result), 1)
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(EducationGroupYear.objects.count(), 4)
         self.assertEqual(result[-1].academic_year.year, get_current_year()+6)
         self.assertEqual(result[-1].education_group, education_group_to_postpone.education_group)
-
         self.assertFalse(errors)
 
     def test_if_structure_is_postponed(self):
@@ -139,7 +140,7 @@ class TestFetchEducationGroupToPostpone(TestCase):
 
         result, errors = EducationGroupAutomaticPostponement().postpone()
         self.assertTrue(mock_method.called)
-        self.assertEqual(errors, [egy_with_error])
+        self.assertEqual(errors, [egy_with_error.education_group])
         self.assertEqual(len(result), 0)
 
     def test_education_group_wrong_mini_training(self):

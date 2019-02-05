@@ -23,16 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
+from django.contrib.messages import get_messages
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.urls import reverse
+from django.utils.translation import ngettext
 
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import GROUP
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
+from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.user import SuperUserFactory
 
 
 class EducationGroupTest(TestCase):
@@ -104,3 +110,28 @@ class EducationGroupManagerTest(TestCase):
             list(EducationGroup.objects.all()),
             list(EducationGroup.objects.having_related_training())
         )
+
+
+class TestEducationGroupAdmin(TestCase):
+    def test_apply_education_group_year_postponement(self):
+        """ Postpone to N+6 in Education Group Admin """
+        current_year = get_current_year()
+        academic_years = GenerateAcademicYear(current_year, current_year + 6)
+
+        eg = EducationGroupFactory(end_year=None)
+        EducationGroupYearFactory(
+            academic_year=academic_years[0],
+            education_group=eg
+        )
+
+        postpone_url = reverse('admin:base_educationgroup_changelist')
+
+        self.client.force_login(SuperUserFactory())
+        response = self.client.post(postpone_url, data={'action': 'apply_education_group_year_postponement',
+                                                        '_selected_action': [eg.pk]})
+
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(msg[0], ngettext(
+            "%(count)d education group has been postponed with success.",
+            "%(count)d education groups have been postponed with success.", 6
+        ) % {'count': 6})
