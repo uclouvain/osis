@@ -41,6 +41,3 @@ class CountrySerializer(serializers.HyperlinkedModelSerializer):
             'name',
             'nationality'
         )
-        extra_kwargs = {
-            'iso_code': {'validators': []},
-        }
