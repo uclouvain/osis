@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+from unittest import mock
 
 from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
@@ -37,11 +38,11 @@ from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import proposal_state, proposal_type, learning_container_year_types
 from base.models.enums.attribution_procedure import EXTERNAL
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.enums.learning_container_year_types import OTHER_COLLECTIVE, OTHER_INDIVIDUAL, MASTER_THESIS, COURSE
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.enums.proposal_type import ProposalType
 from base.models.person import Person
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -141,16 +142,24 @@ class PermsTestCase(TestCase):
         self.assertFalse(perms.is_eligible_to_create_modification_proposal(luy, a_person))
         self.assertFalse(perms.is_eligible_to_delete_learning_unit_year(luy, a_person))
 
-    def test_when_external_learning_unit_is_not_co_graduation(self):
+    @mock.patch('base.business.learning_units.perms.is_year_editable')
+    @mock.patch('base.business.learning_units.perms._any_existing_proposal_in_epc')
+    @mock.patch('base.business.learning_units.perms._is_learning_unit_year_in_range_to_be_modified')
+    @mock.patch('base.business.learning_units.perms.is_person_linked_to_entity_in_charge_of_lu')
+    def test_when_external_learning_unit_is_not_co_graduation(
+            self,
+            mock_is_person_linked_to_entity_in_charge_of_lu,
+            mock_is_learning_unit_year_in_range_to_be_modified,
+            mock_any_existing_proposal_in_epc,
+            mock_is_year_editable):
+        mock_is_person_linked_to_entity_in_charge_of_lu.return_value = True
+        mock_is_learning_unit_year_in_range_to_be_modified.return_value = True
+        mock_any_existing_proposal_in_epc.return_value = True
+        mock_is_year_editable.return_value = True
         a_person = self.create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP)
         luy = LearningUnitYearFactory(academic_year=self.academic_yr, learning_unit__existing_proposal_in_epc=False)
         ExternalLearningUnitYearFactory(learning_unit_year=luy, co_graduation=False)
         self.assertFalse(perms.is_external_learning_unit_cograduation(luy, a_person, False))
-        self.assertFalse(perms.is_eligible_for_modification(luy, a_person))
-        self.assertFalse(perms.is_eligible_for_modification_end_date(luy, a_person))
-        self.assertFalse(perms.is_eligible_to_create_partim(luy, a_person))
-        self.assertFalse(perms.is_eligible_to_create_modification_proposal(luy, a_person))
-        self.assertFalse(perms.is_eligible_to_delete_learning_unit_year(luy, a_person))
 
     def test_when_learning_unit_is_not_external(self):
         learning_unit_year = LearningUnitYearFactory()
