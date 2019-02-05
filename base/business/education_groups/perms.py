@@ -130,7 +130,7 @@ def is_academic_calendar_opened(education_group, type_academic_calendar, raise_e
 
 def _is_eligible_education_group(person, education_group, raise_exception):
     return (check_link_to_management_entity(education_group, person, raise_exception) and
-            (person.is_central_manager or
+            (person.is_central_manager or person.is_sic or
              is_academic_calendar_opened(
                  education_group,
                  academic_calendar_type.EDUCATION_GROUP_EDITION,
@@ -208,30 +208,14 @@ def get_education_group_year_eligible_management_entities(education_group):
 
 
 def is_eligible_to_edit_general_information(person, education_group, raise_exception=False):
-    return check_permission(person, 'base.can_edit_educationgroup_pedagogy', raise_exception) and \
-           _is_eligible_to_edit_general_information(person, education_group, raise_exception)
+    perm_name = 'base.change_commonpedagogyinformation' if education_group.is_common else \
+                    'base.change_pedagogyinformation'
+    return check_permission(person, perm_name, raise_exception) and \
+        _is_eligible_education_group(person, education_group, raise_exception)
 
 
 def is_eligible_to_edit_admission_condition(person, education_group, raise_exception=False):
-    return is_eligible_to_edit_general_information(person, education_group, raise_exception) or \
-           check_permission(person, 'base.can_edit_common_education_group') and \
-           _is_common_educationgroup_and_can_edit(education_group, person)
-
-
-def _is_eligible_to_edit_general_information(person, education_group, raise_exception):
-    return check_link_to_management_entity(education_group, person, raise_exception) and \
-           _is_central_or_academic_calendar_opened(education_group, person, raise_exception)
-
-
-def _is_central_or_academic_calendar_opened(education_group, person, raise_exception):
-    return person.is_central_manager or \
-           is_academic_calendar_opened(
-               education_group,
-               academic_calendar_type.EDUCATION_GROUP_EDITION,
-               raise_exception
-           )
-
-
-def _is_common_educationgroup_and_can_edit(education_group, person):
-    return education_group.is_common and \
-           person.is_sic
+    perm_name = 'base.change_commonadmissioncondition' if education_group.is_common else \
+                    'base.change_admissioncondition'
+    return check_permission(person, perm_name, raise_exception) and \
+        _is_eligible_education_group(person, education_group, raise_exception)
