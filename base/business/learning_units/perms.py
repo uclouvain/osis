@@ -37,6 +37,7 @@ from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YE
 from base.models.entity import Entity
 from base.models.entity_version import find_last_entity_version_by_learning_unit_year_id
 from base.models.enums import learning_container_year_types, entity_container_year_link_type
+from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
