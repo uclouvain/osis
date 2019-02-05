@@ -316,7 +316,7 @@ def education_group_year_admission_condition_update_text_get(request, education_
 
 
 @login_required
-@permission_required('base.change_pedagogyinformation', raise_exception=True)
+@can_change_admission_condition
 def education_group_year_admission_condition_update_text(request, root_id, education_group_year_id):
     if request.method == 'POST':
         return education_group_year_admission_condition_update_text_post(request, root_id, education_group_year_id)
