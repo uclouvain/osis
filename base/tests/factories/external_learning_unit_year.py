@@ -48,3 +48,4 @@ class ExternalLearningUnitYearFactory(DjangoModelFactory):
     learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
     requesting_entity = factory.SubFactory(EntityFactory)
     author = factory.SubFactory(PersonFactory)
+    co_graduation = True
