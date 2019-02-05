@@ -40,6 +40,7 @@ from django.test import TestCase, RequestFactory, override_settings
 from waffle.testutils import override_flag
 
 from base.business.education_groups.general_information import PublishException
+from base.forms.education_group_admission import UpdateTextForm
 from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.enums import education_group_categories, academic_calendar_type
@@ -861,81 +862,117 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertEqual(response['diploma'], 'diploma')
         self.assertEqual(response['access'], CONDITION_ADMISSION_ACCESSES[2][0])
 
+    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_admission_condition', return_value=False)
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_post')
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_get')
-    @mock.patch('django.contrib.auth.decorators')
-    def test_education_group_year_admission_condition_update_text(self,
-                                                                  mock_decorators,
-                                                                  mock_get,
-                                                                  mock_post):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
+    def test_case_update_text_admission_condition_without_perms(self, mock_update_get, mock_update_post, mock_perms):
+        update_url = reverse(
+            "education_group_year_admission_condition_update_text",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+        response = self.client.get(update_url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-        root_id = self.education_group_parent.id
-        education_group_year_id = self.education_group_child.id
+        self.assertFalse(mock_update_post.called)
+        self.assertFalse(mock_update_get.called)
 
-        request = RequestFactory().post('/')
-        request.user = mock.Mock()
+    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_admission_condition', return_value=True)
+    @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_post')
+    @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_get',
+                side_effect=lambda *args, **kwargs: HttpResponse())
+    def test_case_get_update_text_admission_condition(self, mock_update_get, mock_update_post, mock_perms):
+        update_url = reverse(
+            "education_group_year_admission_condition_update_text",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+        response = self.client.get(update_url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
 
-        from base.views.education_group import education_group_year_admission_condition_update_text
-        response = education_group_year_admission_condition_update_text(request, root_id, education_group_year_id)
-        mock_post.assert_called_once_with(request, root_id, education_group_year_id)
+        self.assertFalse(mock_update_post.called)
+        self.assertTrue(mock_update_get.called)
 
-        request = RequestFactory().get('/')
-        request.user = mock.Mock()
-        response = education_group_year_admission_condition_update_text(request, root_id, education_group_year_id)
-        mock_get.assert_called_once_with(request, education_group_year_id)
+    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_admission_condition', return_value=True)
+    @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_post',
+                side_effect=lambda *args, **kwargs: HttpResponse())
+    @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_get')
+    def test_case_post_update_text_admission_condition(self, mock_update_get, mock_update_post, mock_perms):
+        update_url = reverse(
+            "education_group_year_admission_condition_update_text",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+        response = self.client.post(update_url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        self.assertTrue(mock_update_post.called)
+        self.assertFalse(mock_update_get.called)
 
     @mock.patch('base.views.layout.render')
-    def test_education_group_year_admission_condition_update_text_get(self, mock_render):
+    def test_get_update_text_admission_condition_ensure_context_data(self, mock_render):
+        AdmissionCondition.objects.create(
+            education_group_year=self.education_group_child,
+            text_free='texte en français',
+            text_free_en='text in english'
+        )
+
+        update_url = reverse(
+            "education_group_year_admission_condition_update_text",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+        querystring_data = {'section': 'free', 'language': 'fr', 'title': 'Free Text'}
+        request = RequestFactory().get(update_url, data=querystring_data)
+        request.user = self.person.user
+
         from base.views.education_group import education_group_year_admission_condition_update_text_get
-
-        info = {
-            'section': 'free',
-            'language': 'fr',
-            'title': 'Free Text',
-        }
-        request = RequestFactory().get('/?{}'.format(urllib.parse.urlencode(info)))
-        request.user = mock.Mock()
-
-        AdmissionCondition.objects.create(education_group_year=self.education_group_child)
         education_group_year_admission_condition_update_text_get(request, self.education_group_child.id)
 
         unused_request, template_name, context = mock_render.call_args[0]
+
         self.assertEqual(template_name, 'education_group/condition_text_edit.html')
         self.assertIn('form', context)
 
+        form = context['form']
+        self.assertIsInstance(form, UpdateTextForm)
+        self.assertEqual(form.initial['section'], querystring_data['section'])
+        self.assertEqual(form.initial['text_fr'], self.education_group_child.admissioncondition.text_free)
+        self.assertEqual(form.initial['text_en'], self.education_group_child.admissioncondition.text_free_en)
+
     def test_education_group_year_admission_condition_update_text_post_form_is_valid(self):
-        root_id = self.education_group_parent.id
-        education_group_year_id = self.education_group_child.id
-
-        values = {
-            'section': 'free',
-            'text_fr': 'Texte en Français',
-            'text_en': 'Text in English'
-        }
-        request = RequestFactory().post('/', values)
-
         AdmissionCondition.objects.create(education_group_year=self.education_group_child)
 
+        update_url = reverse(
+            "education_group_year_admission_condition_update_text",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+        post_data = {'section': 'free', 'text_fr': 'Texte en Français', 'text_en': 'Text in English'}
+        request = RequestFactory().post(update_url, data=post_data)
+        request.user = self.person.user
+
         from base.views.education_group import education_group_year_admission_condition_update_text_post
-        response = education_group_year_admission_condition_update_text_post(request, root_id, education_group_year_id)
+        response = education_group_year_admission_condition_update_text_post(
+            request,
+            self.education_group_parent.id,
+            self.education_group_child.id,
+        )
 
         self.education_group_child.admissioncondition.refresh_from_db()
-        self.assertEqual(self.education_group_child.admissioncondition.text_free, values['text_fr'])
-        self.assertEqual(self.education_group_child.admissioncondition.text_free_en, values['text_en'])
+        self.assertEqual(self.education_group_child.admissioncondition.text_free, post_data['text_fr'])
+        self.assertEqual(self.education_group_child.admissioncondition.text_free_en, post_data['text_en'])
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
     @mock.patch('base.forms.education_group_admission.UpdateTextForm.is_valid', return_value=False)
-    def test_education_group_year_admission_condition_update_text_post_form_is_not_valid(self,
-                                                                                         mock_is_valid):
-        root_id = self.education_group_parent.id
-        education_group_year_id = self.education_group_child.id
-
-        request = RequestFactory().post('/')
+    def test_education_group_year_admission_condition_update_text_post_form_is_not_valid(self, mock_is_valid):
+        update_url = reverse(
+            "education_group_year_admission_condition_update_text",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+        request = RequestFactory().post(update_url, data={})
 
         from base.views.education_group import education_group_year_admission_condition_update_text_post
-        response = education_group_year_admission_condition_update_text_post(request, root_id, education_group_year_id)
+        response = education_group_year_admission_condition_update_text_post(
+            request,
+            self.education_group_parent.id,
+            self.education_group_child.id,
+        )
 
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
