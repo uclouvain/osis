@@ -101,7 +101,6 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
         response = self.client.get(reverse(learning_unit_edition_end_date, args=[self.learning_unit_year.id]))
         self.assertTemplateUsed(response, "learning_unit/simple/update_end_date.html")
 
-
     @mock.patch('base.business.learning_units.perms.is_eligible_for_modification_end_date')
     def test_view_learning_unit_edition_post(self, mock_perms):
         mock_perms.return_value = True
@@ -390,35 +389,24 @@ class TestLearningUnitVolumesManagement(TestCase):
         PersonEntityFactory(entity=self.generate_container.entities[0], person=self.person)
 
     @mock.patch('base.models.program_manager.is_program_manager')
-    @mock.patch('base.views.layout.render')
-    def test_learning_unit_volumes_management_get_full_form(self, mock_render, mock_program_manager):
+    def test_learning_unit_volumes_management_get_full_form(self, mock_program_manager):
         mock_program_manager.return_value = True
 
-        request_factory = RequestFactory()
-        request = request_factory.get(self.url)
+        response = self.client.get(self.url)
 
-        request.user = self.user
-        request.session = 'session'
-        request._messages = FallbackStorage(request)
-
-        learning_unit_volumes_management(request, learning_unit_year_id=self.learning_unit_year.id, form_type="full")
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/volumes_management.html')
-        self.assertEqual(context['learning_unit_year'], self.learning_unit_year)
-        for formset in context['formsets'].keys():
+        self.assertTemplateUsed(response, 'learning_unit/volumes_management.html')
+        self.assertEqual(response.context['learning_unit_year'], self.learning_unit_year)
+        for formset in response.context['formsets'].keys():
             self.assertIn(formset, [self.learning_unit_year, self.learning_unit_year_partim])
 
         # Check that we display only the current learning_unit_year in the volumes management page (not all the family)
         self.assertListEqual(
-            context['learning_units'],
+            response.context['learning_units'],
             [self.learning_unit_year, self.learning_unit_year_partim]
         )
 
     @mock.patch('base.models.program_manager.is_program_manager')
-    @mock.patch('base.views.layout.render')
-    def test_learning_unit_volumes_management_get_simple_form(self, mock_render, mock_program_manager):
+    def test_learning_unit_volumes_management_get_simple_form(self, mock_program_manager):
         mock_program_manager.return_value = True
 
         simple_url = reverse('learning_unit_volumes_management', kwargs={
@@ -426,27 +414,15 @@ class TestLearningUnitVolumesManagement(TestCase):
             'form_type': 'simple'
         })
 
-        request_factory = RequestFactory()
-        request = request_factory.get(simple_url)
+        response = self.client.get(simple_url)
 
-        request.user = self.user
-        request.session = 'session'
-        request._messages = FallbackStorage(request)
-
-        learning_unit_volumes_management(request, learning_unit_year_id=self.learning_unit_year.id, form_type="simple")
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/volumes_management.html')
-        self.assertEqual(context['learning_unit_year'], self.learning_unit_year)
-        for formset in context['formsets'].keys():
+        self.assertTemplateUsed(response, 'learning_unit/volumes_management.html')
+        self.assertEqual(response.context['learning_unit_year'], self.learning_unit_year)
+        for formset in response.context['formsets'].keys():
             self.assertIn(formset, [self.learning_unit_year, self.learning_unit_year_partim])
 
         # Check that we display only the current learning_unit_year in the volumes management page (not all the family)
-        self.assertListEqual(
-            context['learning_units'],
-            [self.learning_unit_year]
-        )
+        self.assertListEqual(response.context['learning_units'], [self.learning_unit_year])
 
     @mock.patch('base.models.program_manager.is_program_manager')
     def test_learning_unit_volumes_management_post_full_form(self, mock_program_manager):

@@ -140,7 +140,7 @@ class TeachingMaterialDeleteTestCase(TestCase):
     def test_teaching_material_create_template_used(self, mock_is_linked_to_entity_charge):
         mock_is_linked_to_entity_charge.return_value = True
         response = self.client.get(self.url)
-        self.assertEqual(response, 'learning_unit/teaching_material/modal_delete.html')
+        self.assertTemplateUsed(response, 'learning_unit/teaching_material/modal_delete.html')
 
 
 def _get_central_manager_person_with_permission():

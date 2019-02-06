@@ -847,34 +847,18 @@ class TestEditProposal(TestCase):
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self.assertTemplateUsed(response, 'access_denied.html')
 
-    @mock.patch('base.views.layout.render')
-    def test_edit_proposal_get(self, mock_render):
-        request_factory = RequestFactory()
+    def test_edit_proposal_get(self):
+        response = self.client.get(self.url)
 
-        request = request_factory.get(self.url)
+        self.assertTemplateUsed(response, 'learning_unit/proposal/update_modification.html')
+        self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
-        request.user = self.person.user
-        update_learning_unit_proposal(request, self.learning_unit_year.id)
+    def test_edit_proposal_get_as_central_manager_with_instance(self):
+        response = self.client.get(self.url)
 
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_unit/proposal/update_modification.html')
-        self.assertIsInstance(context['form_proposal'], ProposalLearningUnitForm)
-
-    @mock.patch('base.views.layout.render')
-    def test_edit_proposal_get_as_central_manager_with_instance(self, mock_render):
-        request_factory = RequestFactory()
-
-        request = request_factory.get(self.url)
-
-        request.user = self.person.user
-        update_learning_unit_proposal(request, self.learning_unit_year.id)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_unit/proposal/update_modification.html')
-        self.assertIsInstance(context['form_proposal'], ProposalLearningUnitForm)
-        self.assertEqual(context['form_proposal'].initial['state'], str(ProposalState.FACULTY.name))
+        self.assertTemplateUsed(response, 'learning_unit/proposal/update_modification.html')
+        self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
+        self.assertEqual(response.context['form_proposal'].initial['state'], str(ProposalState.FACULTY.name))
 
     def get_valid_data(self):
         return {
@@ -935,46 +919,29 @@ class TestEditProposal(TestCase):
         self.proposal.refresh_from_db()
         self.assertEqual(self.proposal.state, 'FACULTY')
 
-    @mock.patch('base.views.layout.render')
-    def test_edit_proposal_post_wrong_data(self, mock_render):
+    def test_edit_proposal_post_wrong_data(self):
         self.person.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
-        request_factory = RequestFactory()
-        request = request_factory.post(self.url, data=self.get_faulty_data())
 
-        request.user = self.person.user
-        request.session = 'session'
-        request._messages = FallbackStorage(request)
+        response = self.client.post(self.url, data=self.get_faulty_data())
 
-        update_learning_unit_proposal(request, self.learning_unit_year.id)
+        self.assertTemplateUsed(response, 'learning_unit/proposal/update_modification.html')
+        self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_unit/proposal/update_modification.html')
-        self.assertIsInstance(context['form_proposal'], ProposalLearningUnitForm)
-
-        form = context['form_proposal']
+        form = response.context['form_proposal']
         self.assertEqual(len(form.errors), 1)
 
         self.proposal.refresh_from_db()
         self.assertEqual(self.proposal.state, ProposalState.FACULTY.name)
 
-    @mock.patch('base.views.layout.render')
-    def test_edit_suppression_proposal_get(self, mock_render):
+    def test_edit_suppression_proposal_get(self):
         self.proposal.type = ProposalType.SUPPRESSION.name
         self.proposal.save()
 
-        request_factory = RequestFactory()
+        response = self.client.get(self.url)
 
-        request = request_factory.get(self.url)
-
-        request.user = self.person.user
-        update_learning_unit_proposal(request, self.learning_unit_year.id)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_unit/proposal/update_suppression.html')
-        self.assertIsInstance(context['form_end_date'], LearningUnitEndDateForm)
-        self.assertIsInstance(context['form_proposal'], ProposalLearningUnitForm)
+        self.assertTemplateUsed(response, 'learning_unit/proposal/update_suppression.html')
+        self.assertIsInstance(response.context['form_end_date'], LearningUnitEndDateForm)
+        self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
     def test_edit_suppression_proposal_post(self):
         self.proposal.type = ProposalType.SUPPRESSION.name
