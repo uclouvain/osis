@@ -42,7 +42,7 @@ from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 
 
@@ -51,24 +51,25 @@ class TestDeleteGroupEducationView(TestCase):
 
     def setUp(self):
         current_ac = create_current_academic_year()
-        next_ac = AcademicYearFactory(year=current_ac.year + 1)
 
         self.education_group1 = EducationGroupFactory()
         self.education_group2 = EducationGroupFactory()
-        self.education_group_year1 = EducationGroupYearFactory(education_group=self.education_group1,
-                                                               academic_year=next_ac)
-        self.education_group_year2 = EducationGroupYearFactory(education_group=self.education_group2,
-                                                               academic_year=next_ac)
-        self.person = PersonFactory()
+        self.education_group_year1 = EducationGroupYearFactory(
+            education_group=self.education_group1,
+            academic_year=current_ac,
+        )
+        self.education_group_year2 = EducationGroupYearFactory(
+            education_group=self.education_group2,
+            academic_year=current_ac,
+        )
+        self.person = PersonWithPermissionsFactory("delete_educationgroup")
         PersonEntityFactory(person=self.person, entity=self.education_group_year1.management_entity)
         PersonEntityFactory(person=self.person, entity=self.education_group_year2.management_entity)
 
         self.url = reverse('delete_education_group', args=[self.education_group_year1.id,
                                                            self.education_group_year1.education_group.id])
         self.url2 = reverse('delete_education_group', args=[self.education_group_year2.id,
-                                                           self.education_group_year2.education_group.id])
-
-        self.person.user.user_permissions.add(Permission.objects.get(codename="delete_educationgroup"))
+                                                            self.education_group_year2.education_group.id])
         self.client.force_login(user=self.person.user)
 
         self.academic_calendar = AcademicCalendarFactory(

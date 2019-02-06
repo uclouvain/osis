@@ -108,38 +108,23 @@ def is_eligible_to_delete_education_group(person, education_group, raise_excepti
            _is_eligible_education_group(person, education_group, raise_exception)
 
 
-def is_academic_calendar_opened(education_group, type_academic_calendar, raise_exception=False):
-    result = False
+def is_education_group_edit_period_opened(education_group, raise_exception=False):
+    error_msg = None
 
-    ac = AcademicCalendar.objects.filter(reference=type_academic_calendar).open_calendars()
+    qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION).open_calendars()
+    if not qs.exists():
+        error_msg = "The education group edition period is not open."
+    elif education_group and not qs.filter(academic_year=education_group.academic_year).exists():
+        error_msg = "This education group is not editable during this period."
 
-    # Check if the edition period is open
-    if not ac:
-        can_raise_exception(raise_exception, result, "The education group edition period is not open.")
-
-    # During the edition period, the manager can only edit the N+1 education_group_year.
-
-    elif education_group and education_group.academic_year != ac.get().academic_year.next():
-        can_raise_exception(
-            raise_exception, result, "this education group is not editable during this period."
-        )
-
-    else:
-        result = True
-
+    result = error_msg is None
+    can_raise_exception(raise_exception, result, error_msg)
     return result
 
 
 def _is_eligible_education_group(person, education_group, raise_exception):
     return (check_link_to_management_entity(education_group, person, raise_exception) and
-            (person.is_central_manager or
-             is_academic_calendar_opened(
-                 education_group,
-                 academic_calendar_type.EDUCATION_GROUP_EDITION,
-                 raise_exception
-             )
-             )
-            )
+            (person.is_central_manager or is_education_group_edit_period_opened(education_group, raise_exception)))
 
 
 def _is_eligible_to_add_education_group_with_category(person, category, raise_exception):
@@ -312,11 +297,7 @@ class AdmissionConditionPerms(CommonEducationGroupStrategyPerms):
     def _is_faculty_manager_eligible(self):
         if self.education_group_year.academic_year.year < current_academic_year().year:
             raise PermissionDenied(_("The faculty manager cannot modify admission which are lower than N"))
-        if is_academic_calendar_opened(
-                self.education_group_year,
-                academic_calendar_type.EDUCATION_GROUP_EDITION,
-                False
-             ):
+        if not is_education_group_edit_period_opened(self.education_group_year):
             raise PermissionDenied(_("The faculty manager cannot modify outside of program edition period"))
         return True
 
