@@ -117,6 +117,29 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
         self.assertEqual(child_egy.acronym, expected_acronym)
         self.assertTrue(child_egy.id)
 
+    def test_education_group_year_children_attribute_empty_partial_acronym(self):
+        """ Check if the app can handle an empty partial acronym
+        TODO : Remove that test when the db will be cleaned.
+        """
+        attributes_to_inherit = ("academic_year", "main_teaching_campus", "management_entity")
+        expected_title = "{} {}".format(self.validation_rule_title.initial_value, self.egy.acronym)
+        expected_acronym = "{}{}".format(
+            self.validation_rule_title.initial_value.replace(" ", "").upper(),
+            self.egy.acronym
+        )
+
+        self.egy.partial_acronym = None
+
+        child_egy = create_initial_group_element_year_structure([self.egy])[self.egy.id][0].child_branch
+
+        for field in attributes_to_inherit:
+            self.assertEqual(getattr(child_egy, field), getattr(self.egy, field))
+        self.assertEqual(child_egy.education_group_type, self.finality_type)
+        self.assertEqual(child_egy.title, expected_title)
+        self.assertEqual(child_egy.partial_acronym, "")
+        self.assertEqual(child_egy.acronym, expected_acronym)
+        self.assertTrue(child_egy.id)
+
     def test_should_create_education_group_with_start_and_year_equal_to_parent_academic_year(self):
         child_egy = create_initial_group_element_year_structure([self.egy])[self.egy.id][0].child_branch
         self.assertEqual(
