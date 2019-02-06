@@ -285,4 +285,3 @@ def _bool_to_string(value):
         return "yes" if value else "no"
 
     return str(value)
-
