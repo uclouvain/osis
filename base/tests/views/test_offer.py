@@ -27,83 +27,50 @@ import datetime
 from unittest import mock
 
 from django.core.urlresolvers import reverse
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.user import SuperUserFactory
 
 
 class OfferViewTestCase(TestCase):
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_offers(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
+    def setUp(self):
+        self.superuser = SuperUserFactory()
+        self.client.force_login(self.superuser)
 
+    def test_offers(self):
         today = datetime.date.today()
         academic_year = AcademicYearFactory(start_date=today,
                                             end_date=today.replace(year=today.year + 1),
                                             year=today.year)
 
-        request_factory = RequestFactory()
+        response = self.client.get(reverse('offers'))
 
-        request = request_factory.get(reverse('offers'))
-        request.user = mock.Mock()
+        self.assertTemplateUsed(response, 'offers.html')
+        self.assertEqual(len(response.context['offers']), 0)
+        self.assertEqual(response.context['academic_year'], academic_year.id)
 
-        from base.views.offer import offers
-
-        offers(request)
-
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'offers.html')
-        self.assertEqual(len(context['offers']), 0)
-        self.assertEqual(context['academic_year'], academic_year.id)
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_offers_search(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-
-        request_factory = RequestFactory()
+    def test_offers_search(self):
         today = datetime.date.today()
         academic_year = AcademicYearFactory(start_date=today,
                                             end_date=today.replace(year=today.year + 1),
                                             year=today.year)
 
-        request = request_factory.get(reverse('offers_search'), data={
+        response = self.client.get(reverse('offers_search'), data={
             'entity_acronym': 'entity',
             'code': 'code',
             'academic_year': academic_year.id,
         })
-        request.user = mock.Mock()
 
-        from base.views.offer import offers_search
-        offers_search(request)
+        self.assertTemplateUsed(response, 'offers.html')
+        self.assertEqual(response.context['offer_years'].count(), 0)
 
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'offers.html')
-        self.assertEqual(context['offer_years'].count(), 0)
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
     @mock.patch('base.models.program_manager.is_program_manager', return_value=True)
-    def test_offer_read(self,
-                        mock_program_manager,
-                        mock_render,
-                        mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-
+    def test_offer_read(self, mock_program_manager):
         today = datetime.date.today()
         academic_year = AcademicYearFactory(start_date=today,
                                             end_date=today.replace(year=today.year + 1),
@@ -116,43 +83,17 @@ class OfferViewTestCase(TestCase):
                                                        academic_calendar=academic_calendar)
         ProgramManagerFactory(offer_year=offer_year)
 
-        request = mock.Mock(method='GET')
+        response = self.client.get(reverse('offer_read', args=[offer_year.pk]))
 
-        from base.views.offer import offer_read
+        self.assertTemplateUsed(response, 'offer/tab_identification.html')
 
-        offer_read(request, offer_year_calendar.id)
-
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'offer/tab_identification.html')
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
     @mock.patch('base.models.program_manager')
-    def test_offer_year_calendar_read(self,
-                                      mock_program_manager,
-                                      mock_render,
-                                      mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-
+    def test_offer_year_calendar_read(self, mock_program_manager):
         offer_year = OfferYearCalendarFactory()
         mock_program_manager.is_program_manager.return_value = True
 
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse('offer_year_calendar_read', args=[offer_year.id]))
-        request.user = mock.Mock()
+        response = self.client.get(reverse('offer_year_calendar_read', args=[offer_year.id]))
 
-        from base.views.offer import offer_year_calendar_read
-
-        offer_year_calendar_read(request, offer_year.id)
-
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'offer_year_calendar.html')
-        self.assertEqual(context['offer_year_calendar'], offer_year)
-        self.assertEqual(context['is_programme_manager'], mock_program_manager.is_program_manager())
+        self.assertTemplateUsed(response, 'offer_year_calendar.html')
+        self.assertEqual(response.context['offer_year_calendar'], offer_year)
+        self.assertEqual(response.context['is_programme_manager'], mock_program_manager.is_program_manager())

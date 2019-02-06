@@ -26,11 +26,11 @@
 import json
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch
 from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
@@ -56,7 +56,6 @@ from cms.models import translated_text_label
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from osis_common.decorators.ajax import ajax_required
-from . import layout
 
 
 @login_required
@@ -99,7 +98,7 @@ def education_group_edit_administrative_data(request, root_id, education_group_y
         messages.add_message(request, messages.SUCCESS, _('The administrative data has been successfully modified'))
         return HttpResponseRedirect(reverse('education_group_administrative', args=[root_id, education_group_year_id]))
 
-    return layout.render(request, "education_group/tab_edit_administrative_data.html", locals())
+    return render(request, "education_group/tab_edit_administrative_data.html", locals())
 
 
 def find_root_by_name(text_label_name):
@@ -165,7 +164,7 @@ def education_group_year_pedagogy_edit_get(request, education_group_year_id):
         label=label_name,
         language=get_user_interface_language(request.user)
     )
-    return layout.render(request, 'education_group/pedagogy_edit.html', context)
+    return render(request, 'education_group/pedagogy_edit.html', context)
 
 
 @login_required
@@ -268,7 +267,7 @@ def education_group_year_admission_condition_update_line_get(request):
     context = {
         'form': form
     }
-    return layout.render(request, 'education_group/condition_line_edit.html', context)
+    return render(request, 'education_group/condition_line_edit.html', context)
 
 
 @login_required
@@ -312,7 +311,7 @@ def education_group_year_admission_condition_update_text_get(request, education_
         'form': form,
         'title': title,
     }
-    return layout.render(request, 'education_group/condition_text_edit.html', context)
+    return render(request, 'education_group/condition_text_edit.html', context)
 
 
 @login_required

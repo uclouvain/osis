@@ -31,7 +31,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from waffle.decorators import waffle_flag
 
 from base.business import learning_unit_year_with_context
@@ -45,7 +45,6 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
-from base.views import layout
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages
 from base.views.learning_unit import learning_unit_components
 from base.views.learning_units import perms
@@ -159,7 +158,7 @@ def learning_unit_volumes_management(request, learning_unit_year_id, form_type):
     if request.is_ajax():
         return JsonResponse({'errors': volume_edition_formset_container.errors})
 
-    return layout.render(request, "learning_unit/volumes_management.html", context)
+    return render(request, "learning_unit/volumes_management.html", context)
 
 
 def _get_learning_units_for_context(luy, with_family=False):

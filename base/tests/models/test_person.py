@@ -149,7 +149,7 @@ class PersonTest(PersonTestCase):
         create_person_with_user(user)
         person.change_language(user, "en")
         a_person = person.find_by_user(user)
-        self.assertEquals(a_person.language, "en")
+        self.assertEqual(a_person.language, "en")
 
     def test_calculate_age(self):
         a_person = PersonFactory()

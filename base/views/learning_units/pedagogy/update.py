@@ -24,24 +24,23 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from base import models as mdl
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
-from reference.models.language import find_language_in_settings
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm
 from base.models import learning_unit_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
-from base.views import layout
 from base.views.common import display_success_messages
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from base.views.learning_units.perms import PermissionDecorator
 from cms.models import text_label
+from reference.models.language import find_language_in_settings
 
 
 @login_required
@@ -88,4 +87,4 @@ def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
     context['language_translated'] = find_language_in_settings(language)
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
     context['label_name'] = label_name
-    return layout.render(request, "learning_unit/pedagogy_edit.html", context)
+    return render(request, "learning_unit/pedagogy_edit.html", context)

@@ -39,7 +39,6 @@ from django.utils.translation import ugettext_lazy as _
 from base import models as mdl
 from base.models.utils import native
 from osis_common.models import application_notice
-from . import layout
 
 ITEMS_PER_PAGE = 25
 
@@ -47,31 +46,31 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 def page_not_found(request):
-    response = layout.render(request, 'page_not_found.html', {})
+    response = render(request, 'page_not_found.html', {})
     response.status_code = 404
     return response
 
 
 def method_not_allowed(request):
-    response = layout.render(request, 'method_not_allowed.html', {})
+    response = render(request, 'method_not_allowed.html', {})
     response.status_code = 405
     return response
 
 
 def access_denied(request, exception):
-    response = layout.render(request, 'access_denied.html', {'exception': exception})
+    response = render(request, 'access_denied.html', {'exception': exception})
     response.status_code = 403
     return response
 
 
 def server_error(request):
-    response = layout.render(request, 'server_error.html', {})
+    response = render(request, 'server_error.html', {})
     response.status_code = 500
     return response
 
 
 def noscript(request):
-    return layout.render(request, 'noscript.html', {})
+    return render(request, 'noscript.html', {})
 
 
 def common_context_processor(request):
@@ -143,25 +142,25 @@ def log_out(request):
 
 
 def logged_out(request):
-    return layout.render(request, 'logged_out.html', {})
+    return render(request, 'logged_out.html', {})
 
 
 @login_required
 @permission_required('base.can_access_student_path', raise_exception=True)
 def studies(request):
-    return layout.render(request, "studies.html", {'section': 'studies'})
+    return render(request, "studies.html", {'section': 'studies'})
 
 
 @login_required
 @permission_required('base.can_access_catalog', raise_exception=True)
 def catalog(request):
-    return layout.render(request, "catalog.html", {'section': 'catalog'})
+    return render(request, "catalog.html", {'section': 'catalog'})
 
 
 @login_required
 @user_passes_test(lambda u: u.is_staff and u.has_perm('base.is_administrator'))
 def data(request):
-    return layout.render(request, "admin/data.html", {'section': 'data'})
+    return render(request, "admin/data.html", {'section': 'data'})
 
 
 @login_required
@@ -169,7 +168,7 @@ def data(request):
 def data_maintenance(request):
     sql_command = request.POST.get('sql_command')
     results = native.execute(sql_command)
-    return layout.render(request, "admin/data_maintenance.html", {'section': 'data_maintenance',
+    return render(request, "admin/data_maintenance.html", {'section': 'data_maintenance',
                                                                   'sql_command': sql_command,
                                                                   'results': results})
 
@@ -177,7 +176,7 @@ def data_maintenance(request):
 @login_required
 @permission_required('base.can_access_academicyear', raise_exception=True)
 def academic_year(request):
-    return layout.render(
+    return render(
         request,
         "academic_year.html",
         {
@@ -210,7 +209,7 @@ def storage(request):
         if len(row) < num_cols:
             row.append('')
 
-    return layout.render(request, "admin/storage.html", {'table': table})
+    return render(request, "admin/storage.html", {'table': table})
 
 
 def display_error_messages(request, messages_to_display, extra_tags=None):
