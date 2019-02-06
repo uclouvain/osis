@@ -55,19 +55,6 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
         )
 
         cls.current_academic_year, cls.next_academic_year = AcademicYearFactory.produce_in_future(quantity=2)
-        cls.egy = EducationGroupYearFactory(
-            education_group_type=cls.master_type,
-            acronym="TEST2M",
-            partial_acronym="LTEST100B",
-            academic_year=cls.current_academic_year
-        )
-        cls.egy_next_year = EducationGroupYearFactory(
-            education_group_type=cls.master_type,
-            acronym="TEST2M",
-            partial_acronym="LTEST100B",
-            academic_year=cls.next_academic_year,
-            education_group=cls.egy.education_group
-        )
 
         cls.auth_rel = AuthorizedRelationshipFactory(
             parent_type=cls.master_type,
@@ -90,6 +77,21 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
         cls.validation_rule_partial_acronym_major = ValidationRuleFactory(
             field_reference="base_educationgroupyear.partial_acronym.osis.education_group_type_majorlistchoice",
             initial_value="200K",
+        )
+
+    def setUp(self):
+        self.egy = EducationGroupYearFactory(
+            education_group_type=self.master_type,
+            acronym="TEST2M",
+            partial_acronym="LTEST100B",
+            academic_year=self.current_academic_year
+        )
+        self.egy_next_year = EducationGroupYearFactory(
+            education_group_type=self.master_type,
+            acronym="TEST2M",
+            partial_acronym="LTEST100B",
+            academic_year=self.next_academic_year,
+            education_group=self.egy.education_group
         )
 
     def test_should_return_empty_result_when_no_education_group_years_parent(self):
