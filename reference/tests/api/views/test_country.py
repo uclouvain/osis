@@ -32,7 +32,7 @@ from rest_framework.settings import api_settings
 from rest_framework.test import APITestCase
 
 from base.tests.factories.user import UserFactory
-from reference.api.serializers.country import CountryListSerializer
+from reference.api.serializers.country import CountrySerializer
 from reference.models.country import Country
 from reference.tests.factories.country import CountryFactory
 
@@ -82,7 +82,7 @@ class GetAllCountryTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         countries = Country.objects.all().order_by('name')
-        serializer = CountryListSerializer(countries, many=True, context={'request': RequestFactory().get(self.url)})
+        serializer = CountrySerializer(countries, many=True, context={'request': RequestFactory().get(self.url)})
         self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_all_country_specify_ordering_field(self):
@@ -94,7 +94,7 @@ class GetAllCountryTestCase(APITestCase):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
             countries = Country.objects.all().order_by(order)
-            serializer = CountryListSerializer(
+            serializer = CountrySerializer(
                 countries,
                 many=True,
                 context={'request': RequestFactory().get(self.url, query_string)},
@@ -130,7 +130,7 @@ class GetCountryTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        serializer = CountryListSerializer(
+        serializer = CountrySerializer(
             self.country,
             context={'request': RequestFactory().get(self.url)},
         )
