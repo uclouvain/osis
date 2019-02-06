@@ -1340,27 +1340,19 @@ class TestLearningUnitComponents(TestCase):
         self.academic_years = GenerateAcademicYear(start_year=2010, end_year=2020).academic_years
         self.generated_container = GenerateContainer(start_year=2010, end_year=2020)
         self.a_superuser = SuperUserFactory()
+        self.client.force_login(self.a_superuser)
         self.person = PersonFactory(user=self.a_superuser)
 
-    @mock.patch('base.views.layout.render')
     @mock.patch('base.models.program_manager.is_program_manager')
-    def test_learning_unit_components(self, mock_program_manager, mock_render):
+    def test_learning_unit_components(self, mock_program_manager):
         mock_program_manager.return_value = True
 
         learning_unit_year = self.generated_container.generated_container_years[0].learning_unit_year_full
 
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse(learning_unit_components, args=[learning_unit_year.id]))
-        request.user = self.a_superuser
+        response = self.client.get(reverse(learning_unit_components, args=[learning_unit_year.id]))
 
-        learning_unit_components(request, learning_unit_year.id)
-
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/components.html')
-        components = context['components']
+        self.assertTemplateUsed(response, 'learning_unit/components.html')
+        components = response.context['components']
         self.assertEqual(len(components), 4)
 
         for component in components:
