@@ -42,4 +42,4 @@ class LearningUnitAutomaticPostponement(AutomaticPostponement):
     def get_queryset(self, queryset=None):
         return super().get_queryset(queryset).filter(
             learningunityear__learning_container_year__isnull=False
-        )
+        ).distinct()
