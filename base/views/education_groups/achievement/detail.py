@@ -73,7 +73,7 @@ class EducationGroupSkillsAchievements(EducationGroupGenericDetailView):
         context.update({
             'LANGUAGE_CODE_FR': settings.LANGUAGE_CODE_FR,
             'LANGUAGE_CODE_EN': settings.LANGUAGE_CODE_EN,
-            'can_edit_information': perms.is_eligible_to_edit_general_information(context['person'], context['object'])
+            'can_edit_information': perms.is_eligible_to_edit_admission_condition(context['person'], context['object'])
         })
 
         context["education_group_achievements"] = self.get_achievements()
