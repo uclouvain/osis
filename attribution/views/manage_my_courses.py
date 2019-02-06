@@ -24,24 +24,22 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
+from attribution.models.attribution import find_all_summary_responsibles_by_learning_unit_years
 from attribution.views.perms import tutor_can_view_educational_information
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
     find_educational_information_submission_dates_of_learning_unit_year, can_user_edit_educational_information
-from base.models.learning_unit_year import find_learning_unit_years_by_academic_year_tutor_attributions
-from attribution.models.attribution import find_all_summary_responsibles_by_learning_unit_years
-
 from base.models import academic_year, entity_calendar
 from base.models.enums import academic_calendar_type
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.learning_unit_year import find_learning_unit_years_by_academic_year_tutor_attributions
 from base.models.tutor import Tutor
-from base.views import layout
 from base.views import teaching_material
-from base.views.learning_units.pedagogy.update import edit_learning_unit_pedagogy
 from base.views.learning_units.pedagogy.read import read_learning_unit_pedagogy
+from base.views.learning_units.pedagogy.update import edit_learning_unit_pedagogy
 from base.views.learning_units.perms import PermissionDecorator
 
 
@@ -66,7 +64,7 @@ def list_my_attributions_summary_editable(request):
         'entity_calendars': entity_calendars,
         'score_responsibles': score_responsibles,
     }
-    return layout.render(request, 'manage_my_courses/list_my_courses_summary_editable.html', context)
+    return render(request, 'manage_my_courses/list_my_courses_summary_editable.html', context)
 
 
 @login_required

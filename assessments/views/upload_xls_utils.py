@@ -284,7 +284,7 @@ def _check_intergity_data(row, **kwargs):
                              _("You don't have access rights for this offer or it doesn't exist in our database")),
                 messages.ERROR)
         else:
-            # ... if it's beacause the registration id doesn't exist
+            # ... if it's because the registration id doesn't exist
             raise UploadValueError("%s" % _("Student not registered for exam"), messages.ERROR)
 
 

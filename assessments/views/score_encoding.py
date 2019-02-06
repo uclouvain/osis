@@ -131,10 +131,10 @@ def scores_encoding(request):
                                                                         acronym=learning_unit_year_acronym) \
                                           .values_list('id', flat=True))
         if tutor_id and tutor_id != NOBODY:
-            learning_unit_year_ids_filter_by_tutor = \
-                mdl_attr.attribution.search(tutor=tutor_id, list_learning_unit_year=learning_unit_year_ids) \
-                    .distinct('learning_unit_year') \
-                    .values_list('learning_unit_year_id', flat=True)
+            learning_unit_year_ids_filter_by_tutor = mdl_attr.attribution.search(
+                tutor=tutor_id, list_learning_unit_year=learning_unit_year_ids
+            ).distinct('learning_unit_year').values_list('learning_unit_year_id', flat=True)
+
             learning_unit_year_ids = list(learning_unit_year_ids_filter_by_tutor)
 
         score_encoding_progress_list = score_encoding_progress.get_scores_encoding_progress(
