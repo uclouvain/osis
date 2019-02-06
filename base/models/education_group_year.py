@@ -30,7 +30,7 @@ from django.db.models import Count, OuterRef, Exists
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _, ngettext
+from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
@@ -61,29 +61,7 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
 
     actions = [
         'resend_messages_to_queue',
-        'apply_education_group_year_postponement'
     ]
-
-    def apply_education_group_year_postponement(self, request, queryset):
-        # Potential circular imports
-        from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponement
-        from base.views.common import display_success_messages, display_error_messages
-
-        result, errors = EducationGroupAutomaticPostponement(queryset).postpone()
-        count = len(result)
-        display_success_messages(
-            request, ngettext(
-                "%(count)d education group has been postponed with success.",
-                "%(count)d education groups have been postponed with success.", count
-            ) % {'count': count}
-        )
-        if errors:
-            display_error_messages(request, "{} : {}".format(
-                _("The following education groups ended with error"),
-                ", ".join([str(error) for error in errors])
-            ))
-
-    apply_education_group_year_postponement.short_description = _("Apply postponement on education group year")
 
 
 class EducationGroupYearManager(SerializableModelManager):
