@@ -30,7 +30,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.messages import WARNING
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business import learning_unit_proposal as proposal_business
 from base.business.learning_unit import create_xls

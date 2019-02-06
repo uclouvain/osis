@@ -25,7 +25,7 @@
 ##############################################################################
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView
@@ -121,7 +121,7 @@ def create_education_group(request, category, education_group_type_pk, parent_id
             }
         )
 
-    return layout.render(request, TEMPLATES_BY_CATEGORY.get(category), data)
+    return render(request, TEMPLATES_BY_CATEGORY.get(category), data)
 
 
 def _common_success_redirect(request, form, parent=None):

@@ -40,7 +40,6 @@ from base import models as mdl
 from base.forms.organization import OrganizationFilter
 from base.models.campus import Campus
 from base.models.organization import Organization
-from base.views import layout
 from reference import models as mdlref
 from reference.models.country import Country
 
@@ -91,7 +90,7 @@ def organization_address_edit(request, organization_address_id):
     organization_address = mdl.organization_address.find_by_id(organization_address_id)
     organization_id = organization_address.organization.id
     countries = mdlref.country.find_all()
-    return layout.render(
+    return render(
         request, "organization/organization_address_form.html",
         {
             'organization_address': organization_address,
@@ -145,7 +144,7 @@ def organization_address_create(request, organization_address_id):
     organization_address = mdl.organization_address.OrganizationAddress()
     organization = mdl.organization.find_by_id(organization_address_id)
     countries = mdlref.country.find_all()
-    return layout.render(request, "organization/organization_address_form.html",
+    return render(request, "organization/organization_address_form.html",
                          {'organization_address': organization_address,
                           'organization_id': organization.id,
                           'countries': countries})
