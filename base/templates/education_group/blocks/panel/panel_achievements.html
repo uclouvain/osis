@@ -1,6 +1,6 @@
 {% extends "blocks/panel/panel_cms_collapse.html" %}
 {% load staticfiles %}
-{% load i18n format education_group %}
+{% load i18n format %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -58,10 +58,12 @@
                     </div>
 
                     <div class="col-md-2">
-                        {% url "education_group_achievements_actions" parent.pk education_group_year.pk achievement.pk as action_url %}
-                        {% url 'update_education_group_achievement' root.pk education_group_year.pk achievement.pk as update_url %}
-                        {% url 'delete_education_group_achievement' root.pk education_group_year.pk achievement.pk as delete_url %}
-                        {% include "education_group/blocks/form/achievement_action_bar.html" with obj=achievement %}
+                        {% if can_edit_information %}
+                            {% url "education_group_achievements_actions" parent.pk education_group_year.pk achievement.pk as action_url %}
+                            {% url 'update_education_group_achievement' root.pk education_group_year.pk achievement.pk as update_url %}
+                            {% url 'delete_education_group_achievement' root.pk education_group_year.pk achievement.pk as delete_url %}
+                            {% include "education_group/blocks/form/achievement_action_bar.html" with obj=achievement %}
+                        {% endif %}
                     </div>
                 </div>
                 <br>
@@ -83,30 +85,34 @@
                                 </div>
 
                                 <div class="col-md-2">
-                                    {% url "education_group_detailed_achievements_actions" parent.pk education_group_year.pk  achievement.pk detail_achievement.pk as action_url %}
-                                    {% url 'update_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk detail_achievement.pk as update_url %}
-                                    {% url 'delete_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk detail_achievement.pk as delete_url %}
-                                    {% include "education_group/blocks/form/achievement_action_bar.html" with obj=detail_achievement additional_class="btn-group-sm" %}
+                                    {% if can_edit_information %}
+                                        {% url "education_group_detailed_achievements_actions" parent.pk education_group_year.pk  achievement.pk detail_achievement.pk as action_url %}
+                                        {% url 'update_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk detail_achievement.pk as update_url %}
+                                        {% url 'delete_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk detail_achievement.pk as delete_url %}
+                                        {% include "education_group/blocks/form/achievement_action_bar.html" with obj=detail_achievement additional_class="btn-group-sm" %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                         {% endfor %}
-                        <button title="{% trans 'Create' %}" class="btn btn-default btn-sm trigger_modal"
-                                data-url="{% url 'create_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk %}"
-                                {% permission_create_achievement %}>
-                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                        </button>
+                        {% if can_edit_information %}
+                            <button title="{% trans 'Create' %}" class="btn btn-default btn-sm trigger_modal"
+                                    data-url="{% url 'create_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk %}">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            </button>
+                        {% endif %}
                 </div>
                 <hr>
             </div>
         </div>
     {% endfor %}
 
-    <button title="{% trans 'Create' %}" class="btn btn-default trigger_modal"
-            data-url="{% url 'create_education_group_achievement' root.pk education_group_year.pk %}"
-            {% permission_create_achievement %}>
-        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-    </button>
+    {% if can_edit_information %}
+        <button title="{% trans 'Create' %}" class="btn btn-default trigger_modal"
+                data-url="{% url 'create_education_group_achievement' root.pk education_group_year.pk %}">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        </button>
+    {% endif %}
 
     <script>
         $(function () {
