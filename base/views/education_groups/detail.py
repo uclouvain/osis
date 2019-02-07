@@ -197,8 +197,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         return not self.object.is_main_common and not self.is_intro_offer and self.show_infos()
 
     def show_infos(self):
-        edy_year = self.object.academic_year.year
-        return 2017 <= edy_year < current_academic_year().year + 2
+        return 2017 <= self.object.academic_year.year < current_academic_year().year + 2
 
 
 class EducationGroupRead(EducationGroupGenericDetailView):
