@@ -92,7 +92,7 @@ class TestFetchLearningUnitToPostpone(TestCase):
         self.assertEqual(LearningUnitYear.objects.count(), 1)
 
         result, errors = LearningUnitAutomaticPostponement().postpone()
-        self.assertEqual(errors, [luy_with_error])
+        self.assertEqual(errors, [luy_with_error.learning_unit])
         self.assertEqual(len(result), 0)
 
 

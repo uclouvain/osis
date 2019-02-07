@@ -30,11 +30,16 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.forms.utils.choice_field import add_blank
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
 from base.models.enums.learning_unit_management_sites import LearningUnitManagementSite
 
 
 def _create_first_letter_choices():
     return add_blank(LearningUnitManagementSite.choices())
+
+
+def _create_external_first_letter_choices():
+    return add_blank(LearningUnitExternalSite.choices())
 
 
 class AcronymInput(forms.MultiWidget):
@@ -58,11 +63,11 @@ class AcronymInput(forms.MultiWidget):
 
 
 class ExternalAcronymInput(AcronymInput):
-    choices = (('X', 'X'),)
+    choices = _create_external_first_letter_choices()
 
     def __init__(self, attrs=None):
         super().__init__(attrs)
-        self.widgets[0].attrs['disabled'] = True
+        self.widgets[0].attrs['required'] = True
 
 
 class AcronymField(forms.MultiValueField):

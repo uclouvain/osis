@@ -24,24 +24,32 @@
 #
 ##############################################################################
 import datetime
+from unittest import mock
 
-from django.contrib.auth.models import Permission
+from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
-from base.business.education_groups.perms import is_academic_calendar_opened, check_permission, \
-    check_authorized_type, is_eligible_to_edit_general_information, is_eligible_to_edit_admission_condition
+from base.business.education_groups.perms import is_education_group_edit_period_opened, check_permission, \
+    check_authorized_type, is_eligible_to_edit_general_information, is_eligible_to_edit_admission_condition, \
+    GeneralInformationPerms, CommonEducationGroupStrategyPerms, AdmissionConditionPerms
 from base.models.enums import academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonBachelorFactory
-from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, SICFactory
-from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, \
+    EducationGroupYearCommonBachelorFactory, TrainingFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, SICFactory, \
+    FacultyManagerFactory
+from base.tests.factories.user import UserFactory
 
 
 class TestPerms(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.current_academic_year)
+
     def test_has_person_the_right_to_add_education_group(self):
         person_without_right = PersonFactory()
         self.assertFalse(check_permission(person_without_right, "base.add_educationgroup"))
@@ -49,63 +57,39 @@ class TestPerms(TestCase):
         person_with_right = PersonWithPermissionsFactory("add_educationgroup")
         self.assertTrue(check_permission(person_with_right, "base.add_educationgroup"))
 
-    def test_is_education_group_creation_period_opened(self):
-        person = PersonFactory()
-        current_ac = create_current_academic_year()
-        education_group = EducationGroupYearFactory(academic_year=current_ac)
+    def test_is_education_group_edit_period_opened_case_period_closed(self):
         today = datetime.date.today()
 
-        closed_period = AcademicCalendarFactory(start_date=today + datetime.timedelta(days=1),
-                                                end_date=today + datetime.timedelta(days=3),
-                                                academic_year=current_ac,
-                                                reference=academic_calendar_type.EDUCATION_GROUP_EDITION)
-
-        next_ac = AcademicYearFactory(year=current_ac.year + 1)
-
-        # The period is closed
-        self.assertFalse(
-            is_academic_calendar_opened(
-                education_group,
-                academic_calendar_type.EDUCATION_GROUP_EDITION
-            )
+        AcademicCalendarFactory(
+            start_date=today + datetime.timedelta(days=1),
+            end_date=today + datetime.timedelta(days=3),
+            academic_year=self.current_academic_year,
+            reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
         )
+        self.assertFalse(is_education_group_edit_period_opened(self.education_group_year))
 
-        opened_period = closed_period
-        opened_period.start_date = today
-        opened_period.save()
+    def test_is_education_group_edit_period_opened_case_period_opened(self):
+        today = datetime.date.today()
 
-        # It is open the academic_year does not match
-        self.assertFalse(
-            is_academic_calendar_opened(
-                education_group,
-                academic_calendar_type.EDUCATION_GROUP_EDITION
-            )
+        AcademicCalendarFactory(
+            start_date=today - datetime.timedelta(days=1),
+            end_date=today + datetime.timedelta(days=3),
+            academic_year=self.current_academic_year,
+            reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
         )
+        self.assertTrue(is_education_group_edit_period_opened(self.education_group_year))
 
-        # It is open and the education_group is in N+1 academic_year
-        education_group.academic_year = next_ac
-        education_group.save()
-        self.assertTrue(
-            is_academic_calendar_opened(
-                education_group,
-                academic_calendar_type.EDUCATION_GROUP_EDITION,
-                raise_exception=True
-            )
+    def test_is_education_group_edit_period_opened_case_period_opened_but_not_same_academic_year(self):
+        today = datetime.date.today()
+        education_group_year = EducationGroupYearFactory(academic_year__year=self.current_academic_year.year + 1)
+
+        AcademicCalendarFactory(
+            start_date=today - datetime.timedelta(days=1),
+            end_date=today + datetime.timedelta(days=3),
+            academic_year=self.current_academic_year,
+            reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
         )
-
-    def test_is_person_central_manager(self):
-        person = PersonFactory()
-        self.assertFalse(person.is_central_manager)
-
-        central_manager = CentralManagerFactory()
-        self.assertTrue(central_manager.is_central_manager)
-
-    def test_is_person_sic(self):
-        person = PersonFactory()
-        self.assertFalse(person.is_sic())
-
-        sic = SICFactory()
-        self.assertTrue(sic.is_sic())
+        self.assertFalse(is_education_group_edit_period_opened(education_group_year))
 
     def test_check_unauthorized_type(self):
         education_group = EducationGroupYearFactory()
@@ -122,68 +106,290 @@ class TestPerms(TestCase):
         result = check_authorized_type(None, TRAINING)
         self.assertTrue(result)
 
-    def test_is_education_group_general_information_edit_period_opened(self):
-        person = PersonFactory()
-        today = datetime.date.today()
 
-        current_ac = create_current_academic_year()
-        education_group = EducationGroupYearFactory(academic_year=current_ac)
+class TestCommonEducationGroupStrategyPerms(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonWithPermissionsFactory()
+        cls.current_academic_year = create_current_academic_year()
+        for year in range(cls.current_academic_year.year - 10, cls.current_academic_year.year + 10):
+            AcademicYearFactory(year=year)
 
-        closed_period = AcademicCalendarFactory(
-            start_date=today + datetime.timedelta(days=1),
-            end_date=today + datetime.timedelta(days=3),
-            academic_year=current_ac,
-            reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
-        )
+    def test_person_property(self):
+        person = PersonWithPermissionsFactory()
+        perm = CommonEducationGroupStrategyPerms(person.user, TrainingFactory())
+        self.assertEqual(perm.person, person)
 
-        next_ac = AcademicYearFactory(year=current_ac.year + 1)
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible",
+                side_effect=PermissionDenied())
+    def test_is_eligible_case_no_raising_exception(self, mock_is_eligible):
+        person = PersonWithPermissionsFactory()
+        perm = CommonEducationGroupStrategyPerms(person.user, TrainingFactory())
 
-        # The period is closed
-        self.assertFalse(
-            is_academic_calendar_opened(
-                education_group,
-                academic_calendar_type.EDUCATION_GROUP_EDITION
-            )
-        )
+        self.assertFalse(perm.is_eligible(raise_exception=False))
 
-        opened_period = closed_period
-        opened_period.start_date = today
-        opened_period.save()
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible",
+                side_effect=PermissionDenied())
+    def test_is_eligible_case_raising_exception(self, mock_is_eligible):
+        person = PersonWithPermissionsFactory()
+        perm = CommonEducationGroupStrategyPerms(person.user, TrainingFactory())
 
-        # It is open the academic_year does not match
-        self.assertFalse(
-            is_academic_calendar_opened(
-                education_group,
-                academic_calendar_type.EDUCATION_GROUP_EDITION
-            )
-        )
+        with self.assertRaises(PermissionDenied):
+            perm.is_eligible(raise_exception=True)
 
-        # It is open and the education_group is in N+1 academic_year
-        education_group.academic_year = next_ac
-        education_group.save()
-        self.assertTrue(
-            is_academic_calendar_opened(
-                education_group,
-                academic_calendar_type.EDUCATION_GROUP_EDITION,
-                raise_exception=True
-            )
-        )
+    def test_is_current_academic_year_in_range_of_editable_education_group_year_case_not_in_range(self):
+        """This test ensure that we cannot modify OF which greater than N+1"""
+        training_in_future = TrainingFactory(academic_year__year=self.current_academic_year.year + 2)
 
-    def test_is_eligible_to_edit_common_offer_as_central_manager(self):
-        person = CentralManagerFactory()
-        entity_version = EntityVersionFactory(acronym='UCL')
-        entity = entity_version.entity
-        person.user.user_permissions.add(Permission.objects.get(codename="can_edit_educationgroup_pedagogy"))
-        person_entity = PersonEntityFactory(person=person, entity=entity)
-        education_group = EducationGroupYearCommonBachelorFactory(
-            management_entity=entity,
-            administration_entity=entity
-        )
-        self.assertTrue(is_eligible_to_edit_general_information(person, education_group))
+        perm = CommonEducationGroupStrategyPerms(self.person.user, training_in_future)
+        self.assertFalse(perm._is_current_academic_year_in_range_of_editable_education_group_year())
 
-    def test_is_eligible_to_edit_common_offer_as_sic(self):
-        person = SICFactory()
-        person.user.user_permissions.add(Permission.objects.get(codename="can_edit_educationgroup_pedagogy"))
-        person.user.user_permissions.add(Permission.objects.get(codename="can_edit_common_education_group"))
-        education_group = EducationGroupYearCommonBachelorFactory()
-        self.assertTrue(is_eligible_to_edit_admission_condition(person, education_group))
+    def test_is_current_academic_year_in_range_of_editable_education_group_year_case_in_range(self):
+        """This test ensure that we modify OF which lower than N+1"""
+        training_n1 = TrainingFactory(academic_year__year=self.current_academic_year.year + 1)
+        training = TrainingFactory(academic_year=self.current_academic_year)
+
+        for education_group_year in [training_n1, training]:
+            perm = CommonEducationGroupStrategyPerms(self.person.user, education_group_year)
+            self.assertTrue(perm._is_current_academic_year_in_range_of_editable_education_group_year())
+
+    @mock.patch('base.business.education_groups.perms.check_link_to_management_entity', return_value=True)
+    def test_is_linked_to_management_entity(self, mock_check_link):
+        training = TrainingFactory()
+        perm = CommonEducationGroupStrategyPerms(self.person.user, training)
+
+        self.assertTrue(perm._is_linked_to_management_entity())
+        self.assertTrue(mock_check_link.called)
+
+    def test_is_eligible_case_user_as_superuser(self):
+        super_user = UserFactory(is_superuser=True)
+        training = TrainingFactory()
+
+        perm = CommonEducationGroupStrategyPerms(super_user, training)
+        self.assertTrue(perm._is_eligible())
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_current_academic_year_in_range_of_editable_education_group_year", return_value=True)
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_linked_to_management_entity", return_value=True)
+    def test_ensure_is_eligible_case_all_submethod_true(self, mock_linked_to_management, mock_is_current_in_range):
+        perm = CommonEducationGroupStrategyPerms(self.person.user, TrainingFactory())
+
+        self.assertTrue(perm._is_eligible())
+        self.assertTrue(mock_linked_to_management.called)
+        self.assertTrue(mock_is_current_in_range.called)
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_current_academic_year_in_range_of_editable_education_group_year", return_value=False)
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_linked_to_management_entity", return_value=True)
+    def test_ensure_is_eligible_case_permission_denied(self, mock_linked_to_management, mock_is_current_in_range):
+        perm = CommonEducationGroupStrategyPerms(self.person.user, TrainingFactory())
+
+        with self.assertRaises(PermissionDenied):
+            perm._is_eligible()
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_current_academic_year_in_range_of_editable_education_group_year", return_value=True)
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_linked_to_management_entity", return_value=False)
+    def test_ensure_is_eligible_case_permission_denied(self, mock_linked_to_management, mock_is_current_in_range):
+        perm = CommonEducationGroupStrategyPerms(self.person.user, TrainingFactory())
+
+        with self.assertRaises(PermissionDenied):
+            perm._is_eligible()
+
+
+class TestGeneralInformationPerms(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        cls.common_bachelor = EducationGroupYearCommonBachelorFactory(academic_year=cls.current_academic_year)
+        cls.training = TrainingFactory(academic_year=cls.current_academic_year)
+
+    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
+    def test_is_eligible_to_edit_general_information(self, mock_is_eligible):
+        person = PersonWithPermissionsFactory()
+
+        self.assertTrue(is_eligible_to_edit_general_information(person, self.common_bachelor))
+        self.assertTrue(mock_is_eligible.called)
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
+    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms._is_user_have_perm", return_value=True)
+    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms._is_central_manager_eligible")
+    def test_is_eligible_case_user_is_central_manager(self, mock_is_central_eligible, mock_user_have_perm,
+                                                      mock_super_is_eligible):
+        central_manager = CentralManagerFactory()
+        perm = GeneralInformationPerms(central_manager.user, self.common_bachelor)
+        perm._is_eligible()
+
+        self.assertTrue(mock_super_is_eligible.called)
+        self.assertTrue(mock_is_central_eligible.called)
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
+    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms._is_user_have_perm", return_value=True)
+    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms._is_faculty_manager_eligible")
+    def test_is_eligible_case_user_is_faculty_manager(self, mock_is_faculty_eligible, mock_user_have_perm,
+                                                      mock_super_is_eligible):
+        faculty_manager = FacultyManagerFactory()
+        perm = GeneralInformationPerms(faculty_manager.user, self.common_bachelor)
+        perm._is_eligible()
+
+        self.assertTrue(mock_super_is_eligible.called)
+        self.assertTrue(mock_is_faculty_eligible.called)
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
+    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms._is_user_have_perm", return_value=True)
+    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms._is_sic_eligible")
+    def test_is_eligible_case_user_is_sic(self, mock_is_sic_eligible, mock_user_have_perm, mock_super_is_eligible):
+        sic = SICFactory()
+        perm = GeneralInformationPerms(sic.user, self.common_bachelor)
+        perm._is_eligible()
+
+        self.assertTrue(mock_super_is_eligible.called)
+        self.assertTrue(mock_is_sic_eligible.called)
+
+    def test_is_user_have_perm_for_common_case_user_without_perm(self):
+        person = PersonWithPermissionsFactory()
+
+        perm = GeneralInformationPerms(person.user, self.common_bachelor)
+        self.assertFalse(perm._is_user_have_perm())
+
+    def test_is_user_have_perm_for_common_case_user_with_perm(self):
+        person = PersonWithPermissionsFactory("change_commonpedagogyinformation")
+
+        perm = GeneralInformationPerms(person.user, self.common_bachelor)
+        self.assertTrue(perm._is_user_have_perm())
+
+    def test_is_user_have_perm_for_non_common_case_user_without_perm(self):
+        person = PersonWithPermissionsFactory()
+
+        perm = GeneralInformationPerms(person.user, self.training)
+        self.assertFalse(perm._is_user_have_perm())
+
+    def test_is_user_have_perm_for_non_common_case_user_with_perm(self):
+        person = PersonWithPermissionsFactory("change_pedagogyinformation")
+
+        perm = GeneralInformationPerms(person.user, self.training)
+        self.assertTrue(perm._is_user_have_perm())
+
+    def test_is_central_manager_eligible(self):
+        central_manager = CentralManagerFactory()
+
+        for education_group_year in [self.common_bachelor, self.training]:
+            perm = GeneralInformationPerms(central_manager.user, education_group_year)
+            self.assertTrue(perm._is_central_manager_eligible())
+
+    def test_is_sic_eligible(self):
+        sic_manager = SICFactory()
+
+        for education_group_year in [self.common_bachelor, self.training]:
+            perm = GeneralInformationPerms(sic_manager.user, education_group_year)
+            self.assertTrue(perm._is_sic_eligible())
+
+    def test_is_faculty_manager_case_cannot_modify_data_in_past(self):
+        previous_year = self.current_academic_year.year - 1
+
+        training_in_past = TrainingFactory(academic_year__year=previous_year)
+        common_in_past = EducationGroupYearCommonBachelorFactory(academic_year__year=previous_year)
+        faculty_manager = FacultyManagerFactory()
+
+        for education_group_year in [training_in_past, common_in_past]:
+            perm = GeneralInformationPerms(faculty_manager.user, education_group_year)
+            with self.assertRaises(PermissionDenied):
+                perm._is_faculty_manager_eligible()
+
+    def test_is_faculty_manager_eligible(self):
+        faculty_manager = FacultyManagerFactory()
+
+        for education_group_year in [self.training, self.common_bachelor]:
+            perm = GeneralInformationPerms(faculty_manager.user, education_group_year)
+            self.assertTrue(perm._is_faculty_manager_eligible())
+
+
+class TestAdmissionConditionPerms(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        cls.common_bachelor = EducationGroupYearCommonBachelorFactory(academic_year=cls.current_academic_year)
+        cls.training = TrainingFactory(academic_year=cls.current_academic_year)
+
+    @mock.patch("base.business.education_groups.perms.AdmissionConditionPerms.is_eligible", return_value=True)
+    def test_is_eligible_to_edit_general_information(self, mock_is_eligible):
+        person = PersonWithPermissionsFactory()
+
+        self.assertTrue(is_eligible_to_edit_admission_condition(person, self.common_bachelor))
+        self.assertTrue(mock_is_eligible.called)
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
+    @mock.patch("base.business.education_groups.perms.AdmissionConditionPerms._is_user_have_perm", return_value=True)
+    @mock.patch("base.business.education_groups.perms.AdmissionConditionPerms._is_central_manager_eligible")
+    def test_is_eligible_case_user_is_central_manager(self, mock_is_central_eligible, mock_user_have_perm,
+                                                      mock_super_is_eligible):
+        central_manager = CentralManagerFactory()
+        perm = AdmissionConditionPerms(central_manager.user, self.common_bachelor)
+        perm._is_eligible()
+
+        self.assertTrue(mock_super_is_eligible.called)
+        self.assertTrue(mock_is_central_eligible.called)
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
+    @mock.patch("base.business.education_groups.perms.AdmissionConditionPerms._is_user_have_perm", return_value=True)
+    @mock.patch("base.business.education_groups.perms.AdmissionConditionPerms._is_faculty_manager_eligible")
+    def test_is_eligible_case_user_is_faculty_manager(self, mock_is_faculty_eligible, mock_user_have_perm,
+                                                      mock_super_is_eligible):
+        faculty_manager = FacultyManagerFactory()
+        perm = AdmissionConditionPerms(faculty_manager.user, self.common_bachelor)
+        perm._is_eligible()
+
+        self.assertTrue(mock_super_is_eligible.called)
+        self.assertTrue(mock_is_faculty_eligible.called)
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
+    @mock.patch("base.business.education_groups.perms.AdmissionConditionPerms._is_user_have_perm", return_value=True)
+    @mock.patch("base.business.education_groups.perms.AdmissionConditionPerms._is_sic_eligible")
+    def test_is_eligible_case_user_is_sic(self, mock_is_sic_eligible, mock_user_have_perm, mock_super_is_eligible):
+        sic = SICFactory()
+        perm = AdmissionConditionPerms(sic.user, self.common_bachelor)
+        perm._is_eligible()
+
+        self.assertTrue(mock_super_is_eligible.called)
+        self.assertTrue(mock_is_sic_eligible.called)
+
+    def test_is_user_have_perm_for_common_case_user_without_perm(self):
+        person = PersonWithPermissionsFactory()
+
+        perm = AdmissionConditionPerms(person.user, self.common_bachelor)
+        self.assertFalse(perm._is_user_have_perm())
+
+    def test_is_user_have_perm_for_common_case_user_with_perm(self):
+        person = PersonWithPermissionsFactory("change_commonadmissioncondition")
+
+        perm = AdmissionConditionPerms(person.user, self.common_bachelor)
+        self.assertTrue(perm._is_user_have_perm())
+
+    def test_is_user_have_perm_for_non_common_case_user_without_perm(self):
+        person = PersonWithPermissionsFactory()
+
+        perm = AdmissionConditionPerms(person.user, self.training)
+        self.assertFalse(perm._is_user_have_perm())
+
+    def test_is_user_have_perm_for_non_common_case_user_with_perm(self):
+        person = PersonWithPermissionsFactory("change_admissioncondition")
+
+        perm = AdmissionConditionPerms(person.user, self.training)
+        self.assertTrue(perm._is_user_have_perm())
+
+    def test_is_faculty_manager_case_cannot_modify_data_in_past(self):
+        previous_year = self.current_academic_year.year - 1
+
+        training_in_past = TrainingFactory(academic_year__year=previous_year)
+        common_in_past = EducationGroupYearCommonBachelorFactory(academic_year__year=previous_year)
+        faculty_manager = FacultyManagerFactory()
+
+        for education_group_year in [training_in_past, common_in_past]:
+            perm = AdmissionConditionPerms(faculty_manager.user, education_group_year)
+            with self.assertRaises(PermissionDenied):
+                perm._is_faculty_manager_eligible()
+
+    @mock.patch("base.business.education_groups.perms.is_education_group_edit_period_opened", return_value=False)
+    def test_is_faculty_manager_case_cannot_modify_data_outside_period(self, mock_calendar_opened):
+        person = PersonWithPermissionsFactory()
+
+        perm = AdmissionConditionPerms(person.user, self.training)
+        with self.assertRaises(PermissionDenied):
+            perm._is_eligible()
