@@ -30,6 +30,7 @@ from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
@@ -47,7 +48,9 @@ class TestEducationGroupSkillsAchievements(TestCase):
         self.mocked_perm = self.perm_patcher.start()
         self.addCleanup(self.perm_patcher.stop)
 
-        self.education_group_year = EducationGroupYearFactory()
+        self.education_group_year = EducationGroupYearFactory(
+            academic_year=AcademicYearFactory(current=True)
+        )
         self.person = PersonWithPermissionsFactory("can_access_education_group")
         self.client.force_login(self.person.user)
 

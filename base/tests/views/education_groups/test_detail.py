@@ -303,6 +303,30 @@ class TestReadEducationGroup(TestCase):
         self.assertFalse(response.context['show_utilization'])
         self.assertFalse(response.context['show_general_information'])
 
+    def test_not_show_general_info_and_admission_condition_and_achievement_for_n_plus_2(self):
+        edy = EducationGroupYearFactory(
+            academic_year=AcademicYearFactory(year=self.academic_year.year+2),
+        )
+
+        url = reverse("education_group_read", args=[edy.pk, edy.pk])
+
+        response = self.client.get(url)
+        self.assertFalse(response.context['show_general_information'])
+        self.assertFalse(response.context['show_admission_conditions'])
+        self.assertFalse(response.context['show_skills_and_achievements'])
+
+    def test_not_show_general_info_and_admission_condition_and_achievement_for_year_smaller_than_2017(self):
+        edy = EducationGroupYearFactory(
+            academic_year=AcademicYearFactory(year=2016),
+        )
+
+        url = reverse("education_group_read", args=[edy.pk, edy.pk])
+
+        response = self.client.get(url)
+        self.assertFalse(response.context['show_general_information'])
+        self.assertFalse(response.context['show_admission_conditions'])
+        self.assertFalse(response.context['show_skills_and_achievements'])
+
 
 class EducationGroupDiplomas(TestCase):
     @classmethod
