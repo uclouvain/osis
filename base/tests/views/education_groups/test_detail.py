@@ -182,6 +182,7 @@ class TestReadEducationGroup(TestCase):
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
         cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.academic_year = AcademicYearFactory(current=True)
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -268,7 +269,9 @@ class TestReadEducationGroup(TestCase):
         self.assertTrue('show_admission_conditions' in response.context)
 
     def test_main_common_show_only_identification_and_general_information(self):
-        main_common = EducationGroupYearCommonFactory()
+        main_common = EducationGroupYearCommonFactory(
+            academic_year=self.academic_year
+        )
         url = reverse("education_group_read", args=[main_common.pk, main_common.pk])
 
         response = self.client.get(url)
@@ -283,7 +286,9 @@ class TestReadEducationGroup(TestCase):
         self.assertFalse(response.context['show_admission_conditions'])
 
     def test_common_not_main_show_only_identification_and_admission_condition(self):
-        agregation_common = EducationGroupYearCommonAgregationFactory()
+        agregation_common = EducationGroupYearCommonAgregationFactory(
+            academic_year=self.academic_year
+        )
 
         url = reverse("education_group_read", args=[agregation_common.pk, agregation_common.pk])
 
