@@ -91,13 +91,13 @@ class TestPublicationContactCreateView(PublicationContactViewSetupTest):
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
+    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
     def test_assert_template_used(self, mock_permissions):
         response = self.client.get(self.url_create)
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "education_group/blocks/modal/modal_publication_contact_edit_inner.html")
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
+    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
     def test_create_post(self, mock_permissions):
         # Remove current
         self.publication_contact.delete()
@@ -147,7 +147,7 @@ class TestPublicationContactUpdateView(PublicationContactViewSetupTest):
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
+    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
     def test_assert_template_used(self, mock_permissions):
         response = self.client.get(self.url_edit)
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -179,7 +179,7 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
+    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
     def test_template_used(self, mock_permission):
         response = self.client.get(self.url_delete)
         self.assertTemplateUsed(
@@ -189,7 +189,7 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
 
     @mock.patch("base.views.education_groups.detail.EducationGroupGeneralInformation.get_appropriate_sections",
                 return_value=[])
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
+    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
     def test_delete_assert_redirection(self, mock_permissions, mock_get_appropriate_sections):
         http_referer = reverse('education_group_general_informations', args=[
             self.training.pk,
@@ -233,7 +233,7 @@ class TestEntityPublicationContactUpdateView(PublicationContactViewSetupTest):
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
+    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
     def test_template_used(self, mock_permission):
         response = self.client.get(self.url_update)
         self.assertTemplateUsed(
@@ -243,7 +243,7 @@ class TestEntityPublicationContactUpdateView(PublicationContactViewSetupTest):
 
     @mock.patch("base.views.education_groups.detail.EducationGroupGeneralInformation.get_appropriate_sections",
                 return_value=[])
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
+    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
     def test_update_assert_db(self, mock_permission, mock_get_appropriate_sections):
         response = self.client.post(self.url_update, {
             'publication_contact_entity': self.entity_version.pk
