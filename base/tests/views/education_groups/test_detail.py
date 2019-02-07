@@ -36,7 +36,7 @@ from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.certificate_aim import CertificateAimFactory
 from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
 from base.tests.factories.education_group_language import EducationGroupLanguageFactory
@@ -497,6 +497,7 @@ class TestUtilizationTab(TestCase):
 
 class TestContent(TestCase):
     def setUp(self):
+        self.current_academic_year = create_current_academic_year()
         self.person = PersonFactory()
         self.education_group_year_1 = EducationGroupYearFactory()
         self.education_group_year_2 = EducationGroupYearFactory()
