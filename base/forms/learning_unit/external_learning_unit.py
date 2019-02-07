@@ -74,7 +74,6 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
             if organization_address:
                 country = organization_address.country
                 initial["country"] = country.pk
-
         super().__init__(*args, instance=instance, initial=initial, external=True, **kwargs)
 
     class Meta(LearningUnitYearModelForm.Meta):

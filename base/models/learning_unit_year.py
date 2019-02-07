@@ -324,12 +324,6 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         if self.acronym in learning_unit_years.values_list('acronym', flat=True):
             raise ValidationError({'acronym': _('Existing acronym')})
 
-# def clean_acronym(self, learning_unit_years):
-#     if self.acronym in learning_unit_years.values_list('acronym', flat=True):
-#         raise ValidationError({'acronym': _('Existing acronym')})
-#     if not re.match(REGEX_BY_SUBTYPE[self.subtype], self.acronym):
-#         raise ValidationError({'acronym': _('Invalid code')})
-
     @property
     def warnings(self):
         if self._warnings is None:

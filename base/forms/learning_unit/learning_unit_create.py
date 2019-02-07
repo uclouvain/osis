@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
+
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
@@ -31,11 +33,11 @@ from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, spl
 from base.forms.utils.choice_field import add_blank
 from base.models.campus import find_main_campuses
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY
+from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, EXTERNAL
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_WITHOUT_EXTERNAL, INTERNSHIP
 from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
-from base.models.learning_unit import LearningUnit
+from base.models.learning_unit import LearningUnit, REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
 from reference.models.language import find_all_languages
 from django.core.exceptions import ValidationError
@@ -79,6 +81,7 @@ class LearningUnitYearModelForm(forms.ModelForm):
     def __init__(self, data, person, subtype, *args, external=False, **kwargs):
         super().__init__(data, *args, **kwargs)
 
+        self.external = external
         self.instance.subtype = subtype
         self.person = person
 
@@ -124,6 +127,13 @@ class LearningUnitYearModelForm(forms.ModelForm):
         widgets = {
             'credits': forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
         }
+
+    def clean_acronym(self):
+        if self.external and not re.match(REGEX_BY_SUBTYPE[EXTERNAL], self.cleaned_data["acronym"]):
+            raise ValidationError({'acronym': _('Invalid code')})
+        elif not re.match(REGEX_BY_SUBTYPE[self.instance.subtype], self.cleaned_data["acronym"]):
+            raise ValidationError({'acronym': _('Invalid code')})
+        return self.cleaned_data["acronym"]
 
     def post_clean(self, container_type):
         if "internship_subtype" in self.fields \
