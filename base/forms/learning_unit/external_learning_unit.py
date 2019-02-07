@@ -49,7 +49,7 @@ from reference.models.country import Country
 class LearningContainerYearExternalModelForm(LearningContainerYearModelForm):
 
     def prepare_fields(self):
-        self.fields["container_type"].choices = ((EXTERNAL, _(EXTERNAL)),)
+        self.fields["container_type"].choices = ((EXTERNAL, _("External")),)
         self.fields['container_type'].disabled = True
         self.fields['container_type'].required = False
 
