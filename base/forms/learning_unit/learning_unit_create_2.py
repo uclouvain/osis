@@ -44,7 +44,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from reference.models import language
 
 FULL_READ_ONLY_FIELDS = {"acronym", "academic_year", "container_type"}
-FULL_PROPOSAL_READ_ONLY_FIELDS = {"academic_year", "container_type", "professional_integration"}
+FULL_PROPOSAL_READ_ONLY_FIELDS = {"academic_year", "container_type"}
 PROPOSAL_READ_ONLY_FIELDS = {"container_type"}
 
 FACULTY_OPEN_FIELDS = {

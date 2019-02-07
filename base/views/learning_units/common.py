@@ -31,7 +31,7 @@ from django.shortcuts import get_object_or_404
 
 from base import models as mdl
 from base.business.learning_unit import get_organization_from_learning_unit_year, get_all_attributions, \
-    get_components_identification, get_components_identification_initial_data
+    get_components_identification
 from base.business.learning_unit_proposal import get_difference_of_proposal
 from base.business.learning_units.edition import create_learning_unit_year_creation_message, \
     create_proposal_learning_unit_year_creation_message
@@ -105,11 +105,8 @@ def get_learning_unit_identification_context(learning_unit_year_id, person):
     context['proposal'] = proposal
     context['proposal_folder_entity_version'] = mdl.entity_version.get_by_entity_and_date(
         proposal.entity, None) if proposal else None
-    context['differences'] = get_difference_of_proposal(proposal.initial_data, learning_unit_year) \
+    context['differences'] = get_difference_of_proposal(proposal, learning_unit_year) \
         if proposal and proposal.learning_unit_year == learning_unit_year \
-        else {}
-    context['components_initial_data'] = get_components_identification_initial_data(
-        proposal) if proposal and proposal.learning_unit_year == learning_unit_year \
         else {}
 
     # append permissions

@@ -1054,14 +1054,16 @@ class TestLearningUnitProposalDisplay(TestCase):
             quadrimester="Q3",
             credits=4,
             campus=cls.campus,
-            language=cls.language_pt
+            language=cls.language_pt,
+            periodicity=learning_unit_year_periodicity.BIENNIAL_EVEN
         )
 
         cls.proposal_learning_unit = ProposalLearningUnitFactory(learning_unit_year=cls.learning_unit_yr)
         cls.initial_credits = 3.0
         cls.initial_quadrimester = 'Q1'
         cls.initial_language = cls.language_it.pk
-        cls.initial_data_learning_unit_year = {'credits': cls.initial_credits}
+        cls.initial_periodicity = learning_unit_year_periodicity.ANNUAL
+        cls.initial_data_learning_unit_year = {'credits': cls.initial_credits, 'periodicity': cls.initial_periodicity}
 
         cls.initial_language_en = cls.language_it
         cls.generator_learning_container = GenerateContainer(start_year=cls.academic_year.year,
@@ -1083,21 +1085,20 @@ class TestLearningUnitProposalDisplay(TestCase):
         }}
         proposal.learning_unit_year.credits = self.learning_unit_yr.credits
 
-        differences = proposal_business.get_difference_of_proposal(proposal.initial_data, proposal.learning_unit_year)
-
-        self.assertEqual(differences.get('credits'), self.initial_credits)
+        differences = proposal_business.get_difference_of_proposal(proposal, proposal.learning_unit_year)
+        self.assertEqual(float(differences.get('credits')), self.initial_credits)
 
     def test_get_the_old_value(self):
         differences = proposal_business._get_the_old_value('credits',
                                                            {"credits": self.initial_credits + 1},
                                                            {'credits': self.initial_credits})
-        self.assertEqual(differences.get('credits'), "{}".format(self.initial_credits))
+        self.assertEqual(differences, "{}".format(self.initial_credits))
 
     def test_get_the_old_value_no_initial_value(self):
         differences = proposal_business._get_the_old_value('credits',
                                                            {"credits": self.initial_credits + 1},
                                                            {})
-        self.assertEqual(differences.get('credits'), proposal_business.NO_PREVIOUS_VALUE)
+        self.assertEqual(differences, proposal_business.NO_PREVIOUS_VALUE)
 
     def test_get_the_old_value_for_foreign_key(self):
         initial_data_learning_unit_year = {'language': self.language_pt.pk}
@@ -1105,35 +1106,35 @@ class TestLearningUnitProposalDisplay(TestCase):
         differences = proposal_business._get_the_old_value('language',
                                                            current_data,
                                                            initial_data_learning_unit_year)
-        self.assertEqual(differences.get('language'), str(self.language_pt))
+        self.assertEqual(differences, str(self.language_pt))
 
     def test_get_the_old_value_for_foreign_key_no_previous_value(self):
         initial_data = {"language": None}
         current_data = {"language_id": self.language_it.pk}
 
         differences = proposal_business._get_the_old_value('language', current_data, initial_data)
-        self.assertEqual(differences.get('language'), proposal_business.NO_PREVIOUS_VALUE)
+        self.assertEqual(differences, proposal_business.NO_PREVIOUS_VALUE)
 
         initial_data = {}
         differences = proposal_business._get_the_old_value('language', current_data, initial_data)
-        self.assertEqual(differences.get('language'), proposal_business.NO_PREVIOUS_VALUE)
+        self.assertEqual(differences, proposal_business.NO_PREVIOUS_VALUE)
 
     def test_get_the_old_value_with_translation(self):
         key = proposal_business.VALUES_WHICH_NEED_TRANSLATION[0]
         initial_data = {key: learning_unit_year_periodicity.ANNUAL}
         current_data = {key: learning_unit_year_periodicity.BIENNIAL_EVEN}
         differences = proposal_business._get_the_old_value(key, current_data, initial_data)
-        self.assertEqual(differences.get(key), _(learning_unit_year_periodicity.ANNUAL))
+        self.assertEqual(differences, _(learning_unit_year_periodicity.ANNUAL))
 
     def test_get_str_representing_old_data_from_foreign_key(self):
         differences = proposal_business._get_str_representing_old_data_from_foreign_key('campus', self.campus.id)
-        self.assertEqual(differences.get('campus'), str(self.campus))
+        self.assertEqual(differences, str(self.campus))
 
     def test_get_str_representing_old_data_from_foreign_key_equals_no_value(self):
         differences = proposal_business._get_str_representing_old_data_from_foreign_key(
             'campus',
             proposal_business.NO_PREVIOUS_VALUE)
-        self.assertEqual(differences.get('campus'), proposal_business.NO_PREVIOUS_VALUE)
+        self.assertEqual(differences, proposal_business.NO_PREVIOUS_VALUE)
 
     def test_replace_key_of_foreign_key(self):
         changed_dict = proposal_business._replace_key_of_foreign_key(
@@ -1143,18 +1144,24 @@ class TestLearningUnitProposalDisplay(TestCase):
 
     def test_get_old_value_of_foreign_key_for_campus(self):
         differences = proposal_business._get_old_value_of_foreign_key('campus', self.campus.id)
-        self.assertEqual(differences.get('campus'), str(self.campus))
+        self.assertEqual(differences, str(self.campus))
 
     def test_get_old_value_of_foreign_key_for_language(self):
         differences = proposal_business._get_old_value_of_foreign_key('language', self.language_it.pk)
-        self.assertEqual(differences.get('language'), str(self.language_it))
+        self.assertEqual(differences, str(self.language_it))
 
     def test_get_status_initial_value(self):
-        key = 'status'
-        self.assertEqual(proposal_business._get_status_initial_value(True, key),
-                         {key: proposal_business.LABEL_ACTIVE})
-        self.assertEqual(proposal_business._get_status_initial_value(False, key),
-                         {key: proposal_business.LABEL_INACTIVE})
+        self.assertEqual(proposal_business._get_status_initial_value(True),
+                         proposal_business.LABEL_ACTIVE)
+        self.assertEqual(proposal_business._get_status_initial_value(False),
+                         proposal_business.LABEL_INACTIVE)
+
+    def test_get_old_value_for_periodicity(self):
+        differences = proposal_business._get_the_old_value('periodicity',
+                                                           {"periodicity": self.learning_unit_yr.periodicity},
+                                                           {'periodicity': self.initial_periodicity})
+        self.assertEqual(differences,
+                         dict(learning_unit_year_periodicity.PERIODICITY_TYPES)[self.initial_periodicity])
 
     def get_an_entity_version(self):
         other_entity = self.generator_learning_container.generated_container_years[0] \

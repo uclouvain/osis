@@ -27,13 +27,10 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym, LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
 from base.models.utils.utils import get_verbose_field_value
-from base.models.entity import find_by_id
-from reference.models.language import find_by_id as language_find_by_id
 
 register = template.Library()
 DIFFERENCE_CSS = "style='color:#5CB85C;'"
@@ -68,20 +65,9 @@ def academic_year(year):
 @register.filter
 def get_difference_css(differences, parameter, default_if_none=""):
     if parameter in differences:
-        if '_ENTITY' in parameter:
-            entity = find_by_id(differences[parameter])
-            value = entity.most_recent_acronym if entity else None
-        elif parameter == 'language':
-            lang = language_find_by_id(differences[parameter])
-            value = lang.name if lang else None
-        elif parameter == 'periodicity':
-            value = dict(PERIODICITY_TYPES)[differences[parameter]] if differences[parameter] else None
-        elif parameter == 'status':
-            value = _("Active") if differences[parameter] else _("Inactive")
-        else:
-            value = differences[parameter]
+        value = differences[parameter]
         return mark_safe(
-            " data-toggle=tooltip title='{} : {}' class='{}' ".format(
+            ' data-toggle=tooltip title="{} : {}" class="{}" '.format(
                 LABEL_VALUE_BEFORE_PROPOSAL,
                 value or default_if_none,
                 CSS_PROPOSAL_VALUE
@@ -200,7 +186,7 @@ def dl_component_tooltip(context, key, **kwargs):
     id = kwargs.get('id', '')
 
     volumes = {}
-    components_initial_data = context.get('components_initial_data', {})
+    components_initial_data = context.get('differences', {}).get('components_initial_data', {})
     if components_initial_data != {}:
         for rec in components_initial_data.get('components', {}):
             if rec.get('learning_component_year').get('id') == id:
@@ -241,7 +227,7 @@ def get_component_volume_css(values, parameter, default_if_none="", value=None):
 @register.simple_tag(takes_context=True)
 def th_tooltip(context, key, **kwargs):
     value = kwargs.get('value', '')
-    differences = context.get('differences', None)
+    differences = context.get('differences')
     default_if_none = '-'
 
     if differences:

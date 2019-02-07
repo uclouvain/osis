@@ -198,6 +198,7 @@ class TestComputeProposalType(TestCase):
             'learning_unit_year': {'acronym': 'bibi'}})
 
         actual_proposal_type = compute_proposal_type(proposal, proposal.learning_unit_year)
+
         self.assertEqual(proposal_type.ProposalType.TRANSFORMATION.name, actual_proposal_type)
 
     def test_return_modification_when_data_changed_consist_of_other_fields_than_first_letter_or_acronym(self):

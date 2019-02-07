@@ -30,7 +30,7 @@ from django.views.generic import DetailView
 from reversion.models import Version
 
 from base.business.learning_unit import get_organization_from_learning_unit_year, get_all_attributions, \
-    get_components_identification, get_components_identification_initial_data
+    get_components_identification
 from base.business.learning_unit_proposal import get_difference_of_proposal
 from base.business.learning_units.perms import is_eligible_to_create_partim, learning_unit_year_permissions, \
     learning_unit_proposal_permissions, is_eligible_for_modification
@@ -103,10 +103,8 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
 
         context['proposal_folder_entity_version'] = get_by_entity_and_date(
             proposal.entity, None) if proposal else None
-        context['differences'] = get_difference_of_proposal(proposal.initial_data, self.object) \
+        context['differences'] = get_difference_of_proposal(proposal, self.object) \
             if proposal and proposal.learning_unit_year == self.object else {}
-        context['components_initial_data'] = get_components_identification_initial_data(
-            proposal) if proposal and proposal.learning_unit_year == self.object else {}
 
         context.update(self.get_context_permission(proposal))
         context["versions"] = self.get_versions()

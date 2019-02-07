@@ -157,26 +157,19 @@
                             <div class="panel-body">
                                 <div class="row">
                                     <div class="col-md-2">
-                                        <label>{% trans 'Vacant' %}</label><br>
-                                        <p id="id_is_vacant">{{ learning_unit_year.learning_container_year.is_vacant | yesno:_("yes,no") |title }}</p>
+                                        <p id="id_is_vacant">{% dl_tooltip learning_unit_year.learning_container_year 'is_vacant' value=learning_unit_year.learning_container_year.is_vacant|yesno:_("yes,no")|title %}</p>
                                     </div>
                                     <div class="col-md-3">
                                         <p id="id_team">{% dl_tooltip learning_unit_year.learning_container_year 'team' value=learning_unit_year.learning_container_year.team|yesno:_("yes,no")|title %}</p>
                                     </div>
                                     <div class="col-md-4">
-                                        <label>{% trans 'Decision' %}</label><br>
                                         <p id="id_type_declaration_vacant">
-                                            {% if learning_unit_year.learning_container_year.type_declaration_vacant %}
-                                                {{ learning_unit_year.learning_container_year.get_type_declaration_vacant_display }}
-                                            {% endif %}
+                                            {% dl_tooltip learning_unit_year.learning_container_year 'type_declaration_vacant' value=learning_unit_year.learning_container_year.get_type_declaration_vacant_display %}
                                         </p>
                                     </div>
                                     <div class="col-md-3">
-                                        <label>{% trans 'Procedure' %}</label><br>
                                         <p id="id_attribution_procedure">
-                                            {% if learning_unit_year.attribution_procedure %}
-                                                {{ learning_unit_year.get_attribution_procedure_display }}
-                                            {% endif %}
+                                            {% dl_tooltip learning_unit_year 'attribution_procedure' value=learning_unit_year.get_attribution_procedure_display %}
                                         </p>
                                     </div>
                                 </div>

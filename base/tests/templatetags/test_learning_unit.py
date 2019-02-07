@@ -59,7 +59,7 @@ class LearningUnitTagTest(TestCase):
                        'parameter2': 'tooltip2'}
 
         self.assertEqual(get_difference_css(differences, key_parameter_1),
-                         " data-toggle=tooltip title='{} : {}' class='{}' ".format(LABEL_VALUE_BEFORE_PROPOSAL,
+                         ' data-toggle=tooltip title="{} : {}" class="{}" '.format(LABEL_VALUE_BEFORE_PROPOSAL,
                                                                                    tooltip_parameter1,
                                                                                    CSS_PROPOSAL_VALUE))
 
@@ -144,55 +144,28 @@ class LearningUnitTagTest(TestCase):
                                                                       CSS_PROPOSAL_VALUE)))
 
     def test_th_tooltip(self):
-        differences = {'REQUIREMENT_ENTITY': self.entity_vers.entity.id}
+        differences = {'REQUIREMENT_ENTITY': self.entity_vers.entity.most_recent_acronym}
         context = {'differences': differences}
-
         self.assertEqual(
             th_tooltip(context=context, key='REQUIREMENT_ENTITY', value=self.entity_vers.entity),
-            "<span  data-toggle=tooltip title='{} : {}' class='{}' >{}</span>".format(
+            '<span  data-toggle=tooltip title="{} : {}" class="{}" >{}</span>'.format(
                 LABEL_VALUE_BEFORE_PROPOSAL, ENTITY_ACRONYM, CSS_PROPOSAL_VALUE, ENTITY_ACRONYM)
         )
 
     def test_th_tooltip_no_css(self):
         self.assertEqual(
-            th_tooltip(context={'differences': {}}, key='REQUIREMENT_ENTITY', value=self.entity_vers.entity),
+            th_tooltip(context={}, key='REQUIREMENT_ENTITY', value=self.entity_vers.entity),
             "<span >{}</span>".format(ENTITY_ACRONYM)
         )
 
-    def test_get_differences_css_for_entity(self):
-        differences = {'REQUIREMENT_ENTITY': self.entity_vers.entity.id}
-
-        self.assertEqual(get_difference_css(differences, 'REQUIREMENT_ENTITY'), mark_safe(
-            " data-toggle=tooltip title='{} : {}' class='{}' ".format(LABEL_VALUE_BEFORE_PROPOSAL,
-                                                                      ENTITY_ACRONYM,
-                                                                      CSS_PROPOSAL_VALUE)))
-
-    def test_get_difference_css_language(self):
-
-        differences = {'language': LanguageFactory(name="French").id}
-
-        self.assertEqual(get_difference_css(differences, 'language'), mark_safe(
-            " data-toggle=tooltip title='{} : {}' class='{}' ".format(LABEL_VALUE_BEFORE_PROPOSAL,
-                                                                      "French",
-                                                                      CSS_PROPOSAL_VALUE)))
-
-    def test_get_difference_css_luy(self):
-        luy = LearningUnitYearFactory(periodicity=ANNUAL, status=True)
-
-        differences = {'periodicity': luy.periodicity, 'status': True}
-
-        self.assertEqual(get_difference_css(differences, 'periodicity'), mark_safe(
-            " data-toggle=tooltip title='{} : {}' class='{}' ".format(LABEL_VALUE_BEFORE_PROPOSAL,
-                                                                      _(dict(PERIODICITY_TYPES)["ANNUAL"]),
-                                                                      CSS_PROPOSAL_VALUE)))
-        self.assertEqual(get_difference_css(differences, 'status'), mark_safe(
-            " data-toggle=tooltip title='{} : {}' class='{}' ".format(LABEL_VALUE_BEFORE_PROPOSAL,
-                                                                      _("Active"),
-                                                                      CSS_PROPOSAL_VALUE)))
+    def test_dl_component_tooltip_no_data(self):
+        self.assertEqual(dl_component_tooltip({}, "VOLUME_Q1", value=VOLUME), VOLUME)
+        self.assertEqual(
+            dl_component_tooltip({'differences': {'components_initial_data': {}}}, "VOLUME_Q1", value=VOLUME),
+            VOLUME
+        )
 
     def test_dl_component_tooltip(self):
-        self.assertEqual(dl_component_tooltip({}, "VOLUME_Q1", value=VOLUME), VOLUME)
-        self.assertEqual(dl_component_tooltip({'components_initial_data': {}}, "VOLUME_Q1", value=VOLUME), VOLUME)
         lcy = LearningComponentYearFactory(hourly_volume_partial_q1=OTHER_VOLUME)
 
         context = {
@@ -206,9 +179,10 @@ class LearningUnitTagTest(TestCase):
                 ]
             }
         }
+
         expected_html = "<dl><dd  data-toggle=tooltip title='{} : {}' class='{}'  id='id_volume_q1'><p style='' " \
                         "title=''>{}</p></dd></dl>". \
             format(LABEL_VALUE_BEFORE_PROPOSAL, OTHER_VOLUME, CSS_PROPOSAL_VALUE, VOLUME)
         self.assertEqual(
-            dl_component_tooltip(context, "VOLUME_Q1", value=VOLUME, id=lcy.id),
+            dl_component_tooltip({'differences': context}, "VOLUME_Q1", value=VOLUME, id=lcy.id),
             expected_html)
