@@ -48,6 +48,7 @@ from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException, RelevantSectionException
 from base.business.education_groups.general_information_sections import SECTION_LIST, SECTION_INTRO, SECTION_DIDACTIC
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
+from base.models.academic_year import current_academic_year
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
@@ -175,10 +176,10 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         return self.object.education_group_type.category == TRAINING and not self.object.is_common
 
     def show_general_information(self):
-        return not self.object.acronym.startswith('common-')
+        return not self.object.acronym.startswith('common-') and self.show_infos()
 
     def show_skills_and_achievements(self):
-        return not self.object.is_common and self.object.education_group_type.category != GROUP
+        return not self.object.is_common and self.object.education_group_type.category != GROUP and self.show_infos()
 
     def show_administrative(self):
         return self.object.education_group_type.category == "TRAINING" and \
@@ -193,7 +194,11 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         return not self.object.is_common
 
     def show_admission_conditions(self):
-        return not self.object.is_main_common and not self.is_intro_offer
+        return not self.object.is_main_common and not self.is_intro_offer and self.show_infos()
+
+    def show_infos(self):
+        edy_year = self.object.academic_year.year
+        return 2017 <= edy_year < current_academic_year().year + 2
 
 
 class EducationGroupRead(EducationGroupGenericDetailView):
