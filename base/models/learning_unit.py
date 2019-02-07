@@ -29,11 +29,12 @@ from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models.academic_year import current_academic_year, AcademicYear
+from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
 from osis_common.models.serializable_model import SerializableModel, \
     SerializableModelAdmin
 
-LEARNING_UNIT_ACRONYM_REGEX_BASE = "^[BLMWX][A-Z]{2,4}\d{4}"
+LEARNING_UNIT_ACRONYM_REGEX_BASE = "^[BGLMTWX][A-Z]{2,4}\d{4}"
 LETTER_OR_DIGIT = "[A-Z0-9]"
 STRING_END = "$"
 LEARNING_UNIT_ACRONYM_REGEX_ALL = LEARNING_UNIT_ACRONYM_REGEX_BASE + LETTER_OR_DIGIT + "{0,1}" + STRING_END
@@ -43,7 +44,8 @@ LEARNING_UNIT_ACRONYM_REGEX_EXTERNAL = "^[GLMTW][A-Z]{2,4}\d{4}$"
 
 REGEX_BY_SUBTYPE = {
     PARTIM: LEARNING_UNIT_ACRONYM_REGEX_PARTIM,
-    FULL: LEARNING_UNIT_ACRONYM_REGEX_FULL
+    FULL: LEARNING_UNIT_ACRONYM_REGEX_FULL,
+    EXTERNAL: LEARNING_UNIT_ACRONYM_REGEX_EXTERNAL
 }
 
 

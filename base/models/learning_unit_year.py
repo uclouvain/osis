@@ -42,7 +42,7 @@ from base.models.enums import learning_unit_year_subtypes, internship_subtypes, 
 from base.models.enums.learning_container_year_types import COURSE, INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, ANNUAL, BIENNIAL_EVEN, BIENNIAL_ODD
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_ALL, REGEX_BY_SUBTYPE
+from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_ALL
 from base.models.prerequisite_item import PrerequisiteItem
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -323,8 +323,12 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def clean_acronym(self, learning_unit_years):
         if self.acronym in learning_unit_years.values_list('acronym', flat=True):
             raise ValidationError({'acronym': _('Existing acronym')})
-        if not re.match(REGEX_BY_SUBTYPE[self.subtype], self.acronym):
-            raise ValidationError({'acronym': _('Invalid code')})
+
+# def clean_acronym(self, learning_unit_years):
+#     if self.acronym in learning_unit_years.values_list('acronym', flat=True):
+#         raise ValidationError({'acronym': _('Existing acronym')})
+#     if not re.match(REGEX_BY_SUBTYPE[self.subtype], self.acronym):
+#         raise ValidationError({'acronym': _('Invalid code')})
 
     @property
     def warnings(self):
