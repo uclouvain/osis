@@ -30,7 +30,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator, RegexVa
 from django.db import models
 from django.db.models import Q, Sum
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _, ngettext
+from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models import entity_container_year as mdl_entity_container_year, group_element_year
@@ -70,29 +70,7 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
     search_fields = ['acronym', 'structure__acronym', 'external_id']
     actions = [
         'resend_messages_to_queue',
-        'apply_learning_unit_year_postponement'
     ]
-
-    def apply_learning_unit_year_postponement(self, request, queryset):
-        # Potential circular imports
-        from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponement
-        from base.views.common import display_success_messages, display_error_messages
-
-        result, errors = LearningUnitAutomaticPostponement(queryset).postpone()
-        count = len(result)
-        display_success_messages(
-            request, ngettext(
-                '%(count)d learning unit has been postponed with success',
-                '%(count)d learning units have been postponed with success', count
-            ) % {'count': count}
-        )
-        if errors:
-            display_error_messages(request, "{} : {}".format(
-                _("The following learning units ended with error"),
-                ", ".join([str(error) for error in errors])
-            ))
-
-    apply_learning_unit_year_postponement.short_description = _("Apply postponement on learning unit year")
 
 
 class LearningUnitYearWithContainerManager(models.Manager):

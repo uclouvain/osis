@@ -34,7 +34,7 @@ from base.forms.education_group.publication_contact import EducationGroupPublica
     EducationGroupEntityPublicationContactForm
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
-from base.views.education_groups import perms
+from base.business.education_groups import perms as business_perms
 from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 
 
@@ -47,10 +47,10 @@ class CommonEducationGroupPublicationContactView(RulesRequiredMixin, AjaxTemplat
 
     # RulesRequiredMixin
     raise_exception = True
-    rules = [perms.can_change_education_group]
+    rules = [business_perms.is_eligible_to_edit_general_information]
 
     def _call_rule(self, rule):
-        return rule(self.person.user, self.education_group_year)
+        return rule(self.person, self.education_group_year)
 
     @cached_property
     def person(self):
