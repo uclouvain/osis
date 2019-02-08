@@ -122,19 +122,6 @@ def messages_templates_index(request):
 
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
-def send_message_again(request, message_id):
-    message_history = message_history_mdl.find_by_id(message_id)
-
-    if not has_email(message_history):
-        messages.add_message(request, messages.ERROR, _("The message can't be sent again, no email provided."))
-    else:
-        send_mail.send_again(message_id)
-        messages.add_message(request, messages.INFO, _('The message was sent again.'))
-    return HttpResponseRedirect(reverse('admin:base_messagehistory_changelist'))
-
-
-@login_required
 def profile_attributions(request):
     data = _get_data(request)
     data.update({'tab_attribution_on': True})
@@ -163,10 +150,3 @@ def get_messages_formset(my_messages):
                                 'read': message_hist.read_by_user
                                 } for message_hist in my_messages]
     return formset_factory(MyMessageForm, extra=0)(initial=initial_formset_content)
-
-
-def has_email(message_history):
-    person = mdl.person.find_by_id(message_history.receiver_id)
-    if person and person.email:
-        return True
-    return False
