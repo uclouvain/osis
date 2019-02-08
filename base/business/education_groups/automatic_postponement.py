@@ -21,7 +21,7 @@
 #  at the root of the source code of this program.  If not,                                        #
 #  see http://www.gnu.org/licenses/.                                                               #
 # ##################################################################################################
-from django.db.models import Q, F, Max
+from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from base.business.education_groups.create import create_initial_group_element_year_structure
@@ -50,6 +50,6 @@ class EducationGroupAutomaticPostponement(AutomaticPostponement):
             Q(educationgroupyear__education_group_type__name__in=MiniTrainingType.to_postpone())
         ).distinct()
 
-    def post_extend(self):
+    def post_extend(self, original_object, list_postponed_objects):
         """ After the main postponement, we need to create the structure of the education_group_years """
-        create_initial_group_element_year_structure(self.result)
+        create_initial_group_element_year_structure([original_object] + list_postponed_objects)
