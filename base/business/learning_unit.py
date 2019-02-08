@@ -116,7 +116,7 @@ def get_same_container_year_components(learning_unit_year):
 
         entity_components_yr = learning_component_year.entitycomponentyear_set.all()
         if indx == 0:
-            additionnal_entities = _get_entities(entity_components_yr)
+            additionnal_entities = get_entities(entity_components_yr)
 
         components.append(
             {
@@ -127,7 +127,7 @@ def get_same_container_year_components(learning_unit_year):
             }
         )
     components = sorted(components, key=itemgetter('learning_unit_usage'))
-    return _compose_components_dict(components, additionnal_entities)
+    return compose_components_dict(components, additionnal_entities)
 
 
 def get_organization_from_learning_unit_year(learning_unit_year):
@@ -190,7 +190,7 @@ def get_components_identification(learning_unit_yr):
         entity_components_yr = learning_component_year.entitycomponentyear_set.all()
 
         if not additional_entities:
-            additional_entities = _get_entities(entity_components_yr)
+            additional_entities = get_entities(entity_components_yr)
 
         components.append(
             {
@@ -203,7 +203,7 @@ def get_components_identification(learning_unit_yr):
             }
         )
 
-    return _compose_components_dict(components, additional_entities)
+    return compose_components_dict(components, additional_entities)
 
 
 def _is_used_by_full_learning_unit_year(a_learning_class_year):
@@ -254,13 +254,13 @@ def is_summary_submission_opened():
                                                                academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
 
 
-def _compose_components_dict(components, additional_entities):
+def compose_components_dict(components, additional_entities):
     data_components = {'components': components}
     data_components.update(additional_entities)
     return data_components
 
 
-def _get_entities(entity_components_yr):
+def get_entities(entity_components_yr):
     return {
         e.entity_container_year.type: e.entity_container_year.entity.most_recent_acronym
         for e in entity_components_yr
