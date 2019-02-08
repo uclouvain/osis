@@ -155,10 +155,7 @@ def get_difference_of_proposal(proposal, learning_unit_year):
         initial_data_by_model = initial_data.get(model)
         if not initial_data_by_model:
             continue
-        for column_name, value in initial_data_by_model.items():
-            if not (value is None and actual_data[model][column_name] == '') and \
-               value != actual_data[model][column_name]:
-                differences[column_name] = _get_the_old_value(column_name, actual_data[model], initial_data_by_model)
+        differences = _get_model_differences(actual_data, differences, initial_data_by_model, model)
     return _get_differences_of_proposal_components(differences, proposal)
 
 
@@ -213,7 +210,6 @@ def _get_old_value_when_not_foreign_key(initial_value, key):
             old_value = _get_status_initial_value(initial_value)
         elif key in ('periodicity', 'attribution_procedure', 'type_declaration_vacant'):
             old_value = _get_enum_value(key, initial_value)
-
         elif key in BOOLEAN_FIELDS:
             old_value = "{}".format(_('Yes') if bool(initial_value) else _('No'))
         else:
@@ -530,3 +526,12 @@ def _get_differences_of_proposal_components(differences_param, proposal):
 
 def _get_name_attribute(obj):
     return obj.name if obj else None
+
+
+def _get_model_differences(actual_data, differences_param, initial_data_by_model, model):
+    differences = differences_param
+    for column_name, value in initial_data_by_model.items():
+        if not (value is None and actual_data[model][column_name] == '') and \
+                        value != actual_data[model][column_name]:
+            differences[column_name] = _get_the_old_value(column_name, actual_data[model], initial_data_by_model)
+    return differences
