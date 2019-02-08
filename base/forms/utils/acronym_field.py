@@ -89,10 +89,6 @@ class AcronymField(forms.MultiValueField):
 class ExternalAcronymField(AcronymField):
     widget = ExternalAcronymInput
 
-    def clean(self, value):
-        value[0] = 'X'
-        return super().clean(value)
-
 
 class PartimAcronymInput(forms.MultiWidget):
     template_name = 'learning_unit/blocks/widget/partim_widget.html'
