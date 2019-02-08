@@ -187,4 +187,3 @@ def volume_from_initial_learning_component_year(learning_component_year, entity_
                               requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
                               requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0)])
     }
-

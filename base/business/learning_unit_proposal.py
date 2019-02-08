@@ -159,11 +159,7 @@ def get_difference_of_proposal(proposal, learning_unit_year):
             if not (value is None and actual_data[model][column_name] == '') and \
                value != actual_data[model][column_name]:
                 differences[column_name] = _get_the_old_value(column_name, actual_data[model], initial_data_by_model)
-    comp = get_components_identification_initial_data(proposal)
-    if comp:
-        differences['components_initial_data'] = get_components_identification_initial_data(proposal)
-
-    return differences
+    return _get_differences_of_proposal_components(differences, proposal)
 
 
 def _replace_key_of_foreign_key(data):
@@ -188,12 +184,10 @@ def _get_str_representing_old_data_from_foreign_key(key, initial_value):
 
 def _get_old_value_of_foreign_key(key, initial_value):
     if key == 'campus':
-        a_campus = mdl_base.campus.find_by_id(initial_value)
-        return a_campus.name if a_campus else None
+        return _get_name_attribute(mdl_base.campus.find_by_id(initial_value))
 
     if key == 'language':
-        lang = language.find_by_id(initial_value)
-        return lang.name if lang else None
+        return _get_name_attribute(language.find_by_id(initial_value))
 
     if '_ENTITY' in key:
         an_entity = find_by_id(initial_value)
@@ -211,26 +205,24 @@ def _get_status_initial_value(initial_value):
 
 
 def _get_old_value_when_not_foreign_key(initial_value, key):
+    old_value = NO_PREVIOUS_VALUE
     if initial_value != NO_PREVIOUS_VALUE:
         if key in VALUES_WHICH_NEED_TRANSLATION:
-            return _(initial_value)
+            old_value = _(initial_value)
         elif key == 'status':
-            return _get_status_initial_value(initial_value)
-        elif key == 'periodicity':
-            return dict(PERIODICITY_TYPES)[initial_value] if initial_value else NO_PREVIOUS_VALUE
-        elif key == 'attribution_procedure':
-            return dict(attribution_procedure.ATTRIBUTION_PROCEDURES)[initial_value]
-        elif key == 'type_declaration_vacant' and initial_value != NO_PREVIOUS_VALUE:
-            return dict(vacant_declaration_type.DECLARATION_TYPE)[initial_value]
+            old_value = _get_status_initial_value(initial_value)
+        elif key in ('periodicity', 'attribution_procedure', 'type_declaration_vacant'):
+            old_value = _get_enum_value(key, initial_value)
+
         elif key in BOOLEAN_FIELDS:
-            return "{}".format(_('Yes') if bool(initial_value) else _('No'))
+            old_value = "{}".format(_('Yes') if bool(initial_value) else _('No'))
         else:
-            return "{}".format(initial_value)
+            old_value = "{}".format(initial_value)
     else:
         if key in BOOLEAN_FIELDS:
-            return _('No')
-        else:
-            return NO_PREVIOUS_VALUE
+            old_value = _('No')
+
+    return old_value
 
 
 def _get_rid_of_blank_value(data):
@@ -511,19 +503,30 @@ def get_components_identification_initial_data(proposal):
 
         return compose_components_dict(components, additional_entities)
     return None
-#
-#
-# def _get_previous_value(key, initial_value):
-#     if initial_value is None:
-#         return NO_PREVIOUS_VALUE
-#     else:
-#         if _is_foreign_key(key, str(initial_value)):
-#             return _get_str_representing_old_data_from_foreign_key(key, initial_value)[key]
-#         else:
-#
-#             if key == 'credits':
-#                 credits = _get_old_value_when_not_foreign_key(initial_value, key)[key]
-#                 return float(credits) if credits else None
-#             else:
-#                 return _get_old_value_when_not_foreign_key(initial_value, key)[key]
 
+
+def _get_enum_value(key, a_enum_value):
+    if key == 'periodicity':
+        return _get_value_from_enum(PERIODICITY_TYPES, a_enum_value)
+    elif key == 'attribution_procedure':
+        return _get_value_from_enum(attribution_procedure.ATTRIBUTION_PROCEDURES, a_enum_value)
+    elif key == 'type_declaration_vacant':
+        return _get_value_from_enum(vacant_declaration_type.DECLARATION_TYPE, a_enum_value)
+    else:
+        return None
+
+
+def _get_value_from_enum(tup, enum_value):
+    return dict(tup)[enum_value] if enum_value else NO_PREVIOUS_VALUE
+
+
+def _get_differences_of_proposal_components(differences_param, proposal):
+    differences = differences_param
+    comp = get_components_identification_initial_data(proposal)
+    if comp:
+        differences['components_initial_data'] = get_components_identification_initial_data(proposal)
+    return differences
+
+
+def _get_name_attribute(obj):
+    return obj.name if obj else None
