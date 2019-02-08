@@ -3421,6 +3421,11 @@
                     "change_admission",
                     "continuing_education",
                     "admission"
+                ],
+                [
+                    "can_validate_registration",
+                    "continuing_education",
+                    "admission"
                 ]
             ]
         }
