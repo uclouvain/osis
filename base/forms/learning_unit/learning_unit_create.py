@@ -131,7 +131,7 @@ class LearningUnitYearModelForm(forms.ModelForm):
     def clean_acronym(self):
         if self.external and not re.match(REGEX_BY_SUBTYPE[EXTERNAL], self.cleaned_data["acronym"]):
             raise ValidationError(_('Invalid code'))
-        elif not re.match(REGEX_BY_SUBTYPE[self.instance.subtype], self.cleaned_data["acronym"]):
+        elif not self.external and not re.match(REGEX_BY_SUBTYPE[self.instance.subtype], self.cleaned_data["acronym"]):
             raise ValidationError(_('Invalid code'))
         return self.cleaned_data["acronym"]
 
