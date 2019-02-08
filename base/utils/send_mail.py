@@ -343,24 +343,6 @@ def build_scores_sheet_attachment(list_exam_enrollments):
     return (name, content, mimetype)
 
 
-def send_again(message_history_id):
-    """
-    send a message from message history again
-    :param message_history_id The id of the message history to send again
-    :return the sent message
-
-    TO-DO : correction of send_message in osis-common to get the associated receiver , based on id and receiver model
-
-    """
-    message_history = message_history_mdl.find_by_id(message_history_id)
-    person = person_mdl.find_by_id(message_history.receiver_id)
-    if person:
-        receiver = message_config.create_receiver(person.id, person.email, person.language)
-        return message_service.send_again(receiver, message_history_id)
-    else:
-        return _('No receiver for this message')
-
-
 def send_mail_for_educational_information_update(teachers, learning_units_years):
     html_template_ref = EDUCATIONAL_INFORMATION_UPDATE_HTML
     txt_template_ref = EDUCATIONAL_INFORMATION_UPDATE_TXT
