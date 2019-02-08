@@ -56,11 +56,11 @@ def my_messages_index(request):
     else:
         my_messages_formset = get_messages_formset(my_messages)
     return render(request,
-                         "my_osis/my_messages.html",
-                         {
-                             'my_messages_formset': my_messages_formset,
-                             'my_message_action_form': MyMessageActionForm()
-                         })
+                  "my_osis/my_messages.html",
+                  {
+                      'my_messages_formset': my_messages_formset,
+                      'my_message_action_form': MyMessageActionForm()
+                  })
 
 
 @login_required

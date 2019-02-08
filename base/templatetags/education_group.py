@@ -285,18 +285,3 @@ def _bool_to_string(value):
         return "yes" if value else "no"
 
     return str(value)
-
-
-@register.simple_tag(takes_context=True)
-def permission_change_achievement(context):
-    return _get_permission(context, is_eligible_to_change_achievement)[1]
-
-
-@register.simple_tag(takes_context=True)
-def permission_delete_achievement(context):
-    return _get_permission(context, is_eligible_to_delete_achievement)[1]
-
-
-@register.simple_tag(takes_context=True)
-def permission_create_achievement(context):
-    return _get_permission(context, is_eligible_to_change_achievement)[1]

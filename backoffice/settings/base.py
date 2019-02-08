@@ -271,6 +271,7 @@ CKEDITOR_CONFIGS = {
             ['NumberedList', 'BulletedList'],
             ['Link', 'Unlink'],
             ['CreateDiv'],
+            {'name': 'insert', 'items': ['Table']},
         ]
     },
     'default': {

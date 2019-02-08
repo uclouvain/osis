@@ -54,8 +54,8 @@ def student_search(request):
         name = request.GET.get('name')
         students_list = mdl.student.search(name)
     return render(request, "student/students.html", {'students': students_list,
-                                                            'registration_id': registration_id,
-                                                            'name': name})
+                                                     'registration_id': registration_id,
+                                                     'name': name})
 
 
 @login_required

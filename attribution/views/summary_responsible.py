@@ -26,6 +26,7 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
 from attribution import models as mdl_attr
@@ -34,7 +35,6 @@ from attribution.business.entity_manager import _append_entity_version
 from attribution.business.summary_responsible import search_attributions, get_attributions_data
 from base import models as mdl_base
 from base.models.entity_manager import is_entity_manager, has_perm_entity_manager
-from base.views import layout
 
 
 @login_required
@@ -66,7 +66,7 @@ def search(request):
             "summary_responsible": summary_responsible,
             "init": "1"
         })
-    return layout.render(request, 'summary_responsible.html', context)
+    return render(request, 'summary_responsible.html', context)
 
 
 @login_required
@@ -81,7 +81,7 @@ def edit(request):
     learning_unit_year_id = request.GET.get('learning_unit_year').strip('learning_unit_year_')
     attributions_data = get_attributions_data(request.user, learning_unit_year_id)
     context.update(attributions_data)
-    return layout.render(request, 'summary_responsible_edit.html', context)
+    return render(request, 'summary_responsible_edit.html', context)
 
 
 @login_required

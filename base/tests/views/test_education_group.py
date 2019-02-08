@@ -90,6 +90,12 @@ class EducationGroupGeneralInformations(TestCase):
 
     def setUp(self):
         self.client.force_login(self.person.user)
+        self.perm_patcher = mock.patch(
+            "base.business.education_groups.perms.GeneralInformationPerms.is_eligible",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
 
     def test_when_not_logged(self):
         self.client.logout()
@@ -148,8 +154,7 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertEqual(sections[0].labels[0]['label'], 'intro')
         self.assertEqual(sections[1].labels[0]['label'], 'finalites_didactiques-commun')
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_general_information', return_value=True)
-    def test_case_user_has_link_to_edit_pedagogy(self, mock_is_eligible_to_edit_general_info):
+    def test_case_user_has_link_to_edit_pedagogy(self):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -158,7 +163,7 @@ class EducationGroupGeneralInformations(TestCase):
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
         self.assertGreater(len(soup.select('a.pedagogy-edit-btn')), 0)
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_general_information', return_value=False)
+    @mock.patch('base.business.education_groups.perms.GeneralInformationPerms.is_eligible', return_value=False)
     def test_user_has_not_link_to_edit_pedagogy(self, mock_is_eligible_to_edit_general_info):
         response = self.client.get(self.url)
 
@@ -196,6 +201,12 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         cls.url = reverse("education_group_pedagogy_edit", args=[cls.training.pk, cls.training.pk])
 
     def setUp(self):
+        self.perm_patcher = mock.patch(
+            "base.business.education_groups.perms.GeneralInformationPerms.is_eligible",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
         self.client.force_login(self.person.user)
 
     def test_when_not_logged(self):
@@ -203,7 +214,7 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertRedirects(response, "/login/?next={}".format(self.url))
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_general_information', return_value=False)
+    @mock.patch('base.business.education_groups.perms.GeneralInformationPerms.is_eligible', return_value=False)
     @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_get')
     @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_post')
     def test_get_pedagogy_info_case_user_without_permission(self, mock_edit_post, mock_edit_get, mock_perms):
@@ -213,11 +224,10 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         self.assertFalse(mock_edit_post.called)
         self.assertFalse(mock_edit_get.called)
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_general_information', return_value=True)
     @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_get',
                 side_effect=lambda *args, **kwargs: HttpResponse())
     @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_post')
-    def test_get_pedagogy_info_case_user_with_permission(self, mock_edit_post, mock_edit_get, mock_perms):
+    def test_get_pedagogy_info_case_user_with_permission(self, mock_edit_post, mock_edit_get):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
@@ -242,7 +252,7 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         self.assertEqual(form.initial['text_french'], self.translated_text_in_french.text)
         self.assertEqual(form.initial['text_english'], self.translated_text_in_english.text)
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_general_information', return_value=False)
+    @mock.patch('base.business.education_groups.perms.GeneralInformationPerms.is_eligible', return_value=False)
     @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_get')
     @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_post')
     def test_post_pedagogy_info_case_user_without_permission(self, mock_edit_post, mock_edit_get, mock_perms):
@@ -252,11 +262,10 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         self.assertFalse(mock_edit_post.called)
         self.assertFalse(mock_edit_get.called)
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_general_information', return_value=True)
     @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_get')
     @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_post',
                 side_effect=lambda *args, **kwargs: HttpResponse())
-    def test_post_pedagogy_info_case_user_with_permission(self, mock_edit_post, mock_edit_get, mock_perms):
+    def test_post_pedagogy_info_case_user_with_permission(self, mock_edit_post, mock_edit_get):
         response = self.client.post(self.url, data={})
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
@@ -612,6 +621,12 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         )
 
     def setUp(self):
+        self.perm_patcher = mock.patch(
+            "base.business.education_groups.perms.AdmissionConditionPerms.is_eligible",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
         self.client.force_login(self.person.user)
 
     def test_when_not_logged(self):
@@ -629,8 +644,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_admission_condition', return_value=True)
-    def test_user_has_link_to_edit_conditions(self, mock_perms):
+    def test_user_has_link_to_edit_conditions(self):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -639,7 +653,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
         self.assertGreater(len(soup.select('button.btn-publish')), 0)
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_admission_condition', return_value=False)
+    @mock.patch('base.business.education_groups.perms.AdmissionConditionPerms.is_eligible', return_value=False)
     def test_user_has_not_link_to_edit_conditions(self, mock_perms):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -648,8 +662,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
         self.assertEqual(len(soup.select('button.btn-publish')), 0)
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_admission_condition', return_value=True)
-    def test_case_admission_condition_remove_line_not_found(self, mock_perms):
+    def test_case_admission_condition_remove_line_not_found(self):
         delete_url = reverse(
             "education_group_year_admission_condition_remove_line",
             args=[self.education_group_parent.pk, self.education_group_child.pk]
@@ -658,8 +671,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_admission_condition', return_value=True)
-    def test_case_admission_condition_remove_line(self, mock_perms):
+    def test_case_admission_condition_remove_line(self):
         delete_url = reverse(
             "education_group_year_admission_condition_remove_line",
             args=[self.education_group_parent.pk, self.education_group_child.pk]
@@ -674,11 +686,10 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertEqual(response.status_code,  HttpResponseRedirect.status_code)
         self.assertEqual(qs.count(), 0)
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_admission_condition', return_value=True)
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_line_get',
                 side_effect=lambda *args, **kwargs: HttpResponse())
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_line_post')
-    def test_case_admission_condition_update_line(self, mock_edit_post, mock_edit_get, mock_perms):
+    def test_case_admission_condition_update_line(self, mock_edit_post, mock_edit_get):
         update_url = reverse(
             "education_group_year_admission_condition_update_line",
             args=[self.education_group_parent.pk, self.education_group_child.pk]
@@ -852,7 +863,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertEqual(response['diploma'], 'diploma')
         self.assertEqual(response['access'], CONDITION_ADMISSION_ACCESSES[2][0])
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_admission_condition', return_value=False)
+    @mock.patch('base.business.education_groups.perms.AdmissionConditionPerms.is_eligible', return_value=False)
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_post')
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_get')
     def test_case_update_text_admission_condition_without_perms(self, mock_update_get, mock_update_post, mock_perms):
@@ -866,11 +877,10 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertFalse(mock_update_post.called)
         self.assertFalse(mock_update_get.called)
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_admission_condition', return_value=True)
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_post')
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_get',
                 side_effect=lambda *args, **kwargs: HttpResponse())
-    def test_case_get_update_text_admission_condition(self, mock_update_get, mock_update_post, mock_perms):
+    def test_case_get_update_text_admission_condition(self, mock_update_get, mock_update_post):
         update_url = reverse(
             "education_group_year_admission_condition_update_text",
             args=[self.education_group_parent.pk, self.education_group_child.pk]
@@ -881,11 +891,10 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertFalse(mock_update_post.called)
         self.assertTrue(mock_update_get.called)
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_admission_condition', return_value=True)
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_post',
                 side_effect=lambda *args, **kwargs: HttpResponse())
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_get')
-    def test_case_post_update_text_admission_condition(self, mock_update_get, mock_update_post, mock_perms):
+    def test_case_post_update_text_admission_condition(self, mock_update_get, mock_update_post):
         update_url = reverse(
             "education_group_year_admission_condition_update_text",
             args=[self.education_group_parent.pk, self.education_group_child.pk]
@@ -966,8 +975,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_edit_admission_condition', return_value=True)
-    def test_webservice_education_group_year_admission_condition_line_order(self, mock_perms):
+    def test_webservice_education_group_year_admission_condition_line_order(self):
         kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
 
         admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_child)

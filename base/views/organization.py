@@ -145,9 +145,9 @@ def organization_address_create(request, organization_address_id):
     organization = mdl.organization.find_by_id(organization_address_id)
     countries = mdlref.country.find_all()
     return render(request, "organization/organization_address_form.html",
-                         {'organization_address': organization_address,
-                          'organization_id': organization.id,
-                          'countries': countries})
+                  {'organization_address': organization_address,
+                   'organization_id': organization.id,
+                   'countries': countries})
 
 
 @login_required

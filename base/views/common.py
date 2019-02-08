@@ -169,8 +169,8 @@ def data_maintenance(request):
     sql_command = request.POST.get('sql_command')
     results = native.execute(sql_command)
     return render(request, "admin/data_maintenance.html", {'section': 'data_maintenance',
-                                                                  'sql_command': sql_command,
-                                                                  'results': results})
+                                                           'sql_command': sql_command,
+                                                           'results': results})
 
 
 @login_required

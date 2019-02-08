@@ -25,7 +25,7 @@
 ##############################################################################
 from rest_framework import generics
 
-from reference.api.serializers.country import CountryListSerializer
+from reference.api.serializers.country import CountrySerializer
 from reference.models.country import Country
 
 
@@ -35,7 +35,7 @@ class CountryList(generics.ListAPIView):
     """
     name = 'country-list'
     queryset = Country.objects.all()
-    serializer_class = CountryListSerializer
+    serializer_class = CountrySerializer
     filter_fields = (
         'iso_code',
         'name',
@@ -59,5 +59,5 @@ class CountryDetail(generics.RetrieveAPIView):
     """
     name = 'country-detail'
     queryset = Country.objects.all()
-    serializer_class = CountryListSerializer
+    serializer_class = CountrySerializer
     lookup_field = 'uuid'

@@ -26,7 +26,7 @@
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
-from reference.api.serializers.country import CountryListSerializer
+from reference.api.serializers.country import CountrySerializer
 from reference.tests.factories.country import CountryFactory
 
 
@@ -35,7 +35,7 @@ class CountryListSerializerTestCase(TestCase):
     def setUpTestData(cls):
         cls.country = CountryFactory()
         url = reverse('reference_api_v1:country-list')
-        cls.serializer = CountryListSerializer(cls.country, context={'request': RequestFactory().get(url)})
+        cls.serializer = CountrySerializer(cls.country, context={'request': RequestFactory().get(url)})
 
     def test_contains_expected_fields(self):
         expected_fields = [

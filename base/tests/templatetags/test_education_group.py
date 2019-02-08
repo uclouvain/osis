@@ -289,11 +289,10 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
     """ This class will test the tag as faculty manager """
 
     def setUp(self):
-        self.education_group_year = TrainingFactory()
+        current_ac = create_current_academic_year()
+        self.education_group_year = TrainingFactory(academic_year=current_ac)
         self.person = FacultyManagerFactory("delete_educationgroup", "change_educationgroup", "add_educationgroup")
         PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
-
-        current_ac = create_current_academic_year()
 
         # Create an academic calendar in order to check permission [Faculty can modify when period is opened]
         self.academic_calendar = AcademicCalendarFactory(
@@ -302,8 +301,6 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             end_date=timezone.now() + timedelta(weeks=+1),
             academic_year=current_ac,
         )
-
-        self.next_ac = AcademicYearFactory(year=current_ac.year + 1)
 
         self.client.force_login(user=self.person.user)
         self.url = reverse('delete_education_group', args=[self.education_group_year.id, self.education_group_year.id])
@@ -331,8 +328,6 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         )
 
     def test_button_tag_case_inside_education_group_edition_period(self):
-        self.education_group_year.academic_year = self.next_ac
-
         result = button_with_permission(self.context, "title", "edit", "#")
         self.assertDictEqual(
             result,
@@ -362,8 +357,6 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         )
 
     def test_li_tag_case_inside_education_group_edition_period(self):
-        self.education_group_year.academic_year = self.next_ac
-
         result = li_with_deletion_perm(self.context, self.url, DELETE_MSG)
         self.assertEqual(
             result, {

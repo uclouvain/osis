@@ -25,7 +25,7 @@
 ##############################################################################
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext
 from reversion.admin import VersionAdmin
 
 from base.business.education_groups import shorten
@@ -36,6 +36,31 @@ from osis_common.models.serializable_model import SerializableModelAdmin, Serial
 class EducationGroupAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('most_recent_acronym', 'start_year', 'end_year', 'changed')
     search_fields = ('educationgroupyear__acronym',)
+
+    actions = [
+        'apply_education_group_year_postponement'
+    ]
+
+    def apply_education_group_year_postponement(self, request, queryset):
+        # Potential circular imports
+        from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponement
+        from base.views.common import display_success_messages, display_error_messages
+
+        result, errors = EducationGroupAutomaticPostponement(queryset).postpone()
+        count = len(result)
+        display_success_messages(
+            request, ngettext(
+                "%(count)d education group has been postponed with success.",
+                "%(count)d education groups have been postponed with success.", count
+            ) % {'count': count}
+        )
+        if errors:
+            display_error_messages(request, "{} : {}".format(
+                _("The following education groups ended with error"),
+                ", ".join([str(error) for error in errors])
+            ))
+
+    apply_education_group_year_postponement.short_description = _("Apply postponement on education group year")
 
 
 class EducationGroupManager(SerializableModelManager):
