@@ -422,16 +422,6 @@ def _get_attributes_values(obj, attributes_name):
     return model_to_dict(obj, fields=attributes_name)
 
 
-def get_initial_data(entities_by_type, learning_container_year_values, learning_unit_values, learning_unit_year_values):
-    initial_data = {
-        "learning_container_year": learning_container_year_values,
-        "learning_unit_year": learning_unit_year_values,
-        "learning_unit": learning_unit_values,
-        "entities": get_entities(entities_by_type),
-    }
-    return initial_data
-
-
 def get_entities(entities_by_type):
     return {entity_type: get_entity_by_type(entity_type, entities_by_type) for entity_type in ENTITY_TYPE_LIST}
 
