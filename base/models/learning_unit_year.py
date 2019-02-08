@@ -42,7 +42,7 @@ from base.models.enums import learning_unit_year_subtypes, internship_subtypes, 
 from base.models.enums.learning_container_year_types import COURSE, INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, ANNUAL, BIENNIAL_EVEN, BIENNIAL_ODD
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_ALL
+from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -103,7 +103,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     changed = models.DateTimeField(null=True, auto_now=True)
     acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('Code'),
-                               validators=[RegexValidator(LEARNING_UNIT_ACRONYM_REGEX_ALL)])
+                               validators=[RegexValidator(LEARNING_UNIT_ACRONYM_REGEX_MODEL)])
     specific_title = models.CharField(max_length=255, blank=True, null=True,
                                       verbose_name=_('French title proper'))
     specific_title_english = models.CharField(max_length=250, blank=True, null=True,
