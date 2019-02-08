@@ -68,13 +68,13 @@ class LearningUnitTagLiEditTest(TestCase):
         self.academic_year = create_current_academic_year()
         self.previous_academic_year = AcademicYearFactory(year=self.academic_year.year-1)
         self.later_academic_year = AcademicYearFactory(year=self.academic_year.year+5)
-        lcy = LearningContainerYearFactory(academic_year=self.academic_year,
-                                           container_type=learning_container_year_types.COURSE)
+        self.lcy = LearningContainerYearFactory(academic_year=self.academic_year,
+                                                container_type=learning_container_year_types.COURSE)
         self.learning_unit_year = LearningUnitYearFactory(
             academic_year=self.academic_year,
             subtype=learning_unit_year_subtypes.FULL,
             learning_unit=self.learning_unit,
-            learning_container_year=lcy
+            learning_container_year=self.lcy
         )
         self.previous_learning_unit_year = LearningUnitYearFactory(
             academic_year=self.previous_academic_year,
@@ -97,7 +97,7 @@ class LearningUnitTagLiEditTest(TestCase):
         self.requirement_entity = self.person_entity.entity
         self.proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year,
                                                     initial_data={
-                                                        'learning_container_year': {'common_title': lcy.common_title},
+                                                        'learning_container_year': {'common_title': self.lcy.common_title},
                                                         'entities': {'REQUIREMENT_ENTITY': self.requirement_entity.id}
                                                     },
                                                     )
@@ -220,13 +220,20 @@ class LearningUnitTagLiEditTest(TestCase):
         )
 
     def test_li_edit_date_person_test_is_eligible_to_modify_end_date_based_on_container_type(self):
+        lu = LearningUnitFactory(existing_proposal_in_epc=False)
+        learning_unit_year_without_proposal = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+            subtype=learning_unit_year_subtypes.FULL,
+            learning_unit=lu,
+            learning_container_year=self.lcy
+        )
         person_faculty_manager = FacultyManagerFactory()
 
         PersonEntityFactory(person=person_faculty_manager,
                             entity=self.entity_container_yr.entity)
 
         self.context['user'] = person_faculty_manager.user
-        self.context['learning_unit_year'] = self.learning_unit_year
+        self.context['learning_unit_year'] = learning_unit_year_without_proposal
         result = li_edit_date_lu(self.context, self.url_edit, "")
 
         self.assertEqual(
@@ -245,18 +252,18 @@ class LearningUnitTagLiEditTest(TestCase):
         )
         # test 2nd condition true
         self.context['user'] = person_faculty_manager.user
-        self.learning_unit_year.subtype = learning_unit_year_subtypes.PARTIM
-        self.learning_unit_year.save()
-        self.context['learning_unit_year'] = self.learning_unit_year
+        learning_unit_year_without_proposal.subtype = learning_unit_year_subtypes.PARTIM
+        learning_unit_year_without_proposal.save()
+        self.context['learning_unit_year'] = learning_unit_year_without_proposal
 
         self.assertEqual(li_edit_date_lu(self.context, self.url_edit, ""),
                          self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, url=self.url_edit))
         # test 3rd condition true
-        self.learning_unit_year.learning_container_year.container_type = learning_container_year_types.OTHER_COLLECTIVE
-        self.learning_unit_year.learning_container_year.save()
-        self.learning_unit_year.subtype = learning_unit_year_subtypes.FULL
-        self.learning_unit_year.save()
-        self.context['learning_unit_year'] = self.learning_unit_year
+        learning_unit_year_without_proposal.learning_container_year.container_type = learning_container_year_types.OTHER_COLLECTIVE
+        learning_unit_year_without_proposal.learning_container_year.save()
+        learning_unit_year_without_proposal.subtype = learning_unit_year_subtypes.FULL
+        learning_unit_year_without_proposal.save()
+        self.context['learning_unit_year'] = learning_unit_year_without_proposal
 
         self.assertEqual(li_edit_date_lu(self.context, self.url_edit, ""),
                          self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, url=self.url_edit))
