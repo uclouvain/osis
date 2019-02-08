@@ -28,8 +28,9 @@ from rest_framework import serializers
 from reference.models.country import Country
 
 
-class CountryListSerializer(serializers.HyperlinkedModelSerializer):
+class CountrySerializer(serializers.HyperlinkedModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='reference_api_v1:country-detail', lookup_field='uuid')
+    name = serializers.CharField(required=False)
 
     class Meta:
         model = Country

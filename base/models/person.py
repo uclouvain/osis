@@ -151,7 +151,8 @@ class Person(SerializableModel):
 
     def is_linked_to_entity_in_charge_of_learning_unit_year(self, learning_unit_year):
         if learning_unit_year.is_external():
-            return self.is_attached_entity(learning_unit_year.externallearningunityear.requesting_entity)
+            requesting_entity = learning_unit_year.externallearningunityear.requesting_entity
+            return self.is_attached_entity(requesting_entity) if requesting_entity else False
 
         entities = Entity.objects.filter(
             entitycontaineryear__learning_container_year=learning_unit_year.learning_container_year,
@@ -161,15 +162,11 @@ class Person(SerializableModel):
         return self.is_attached_entities(entities)
 
     def is_attached_entities(self, entities):
-        for entity in entities:
-            if self.is_attached_entity(entity):
-                return True
-        return False
+        return any(self.is_attached_entity(entity) for entity in entities)
 
     def is_attached_entity(self, entity):
         if not isinstance(entity, Entity):
             raise ImproperlyConfigured("entity must be an instance of Entity.")
-
         return entity.id in self.linked_entities
 
     @cached_property

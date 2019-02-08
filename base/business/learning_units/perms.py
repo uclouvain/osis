@@ -37,6 +37,7 @@ from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YE
 from base.models.entity import Entity
 from base.models.entity_version import find_last_entity_version_by_learning_unit_year_id
 from base.models.enums import learning_container_year_types, entity_container_year_link_type
+from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
@@ -77,6 +78,7 @@ MSG_NOT_ELIGIBLE_TO_CREATE_MODIFY_PROPOSAL = _("You are not eligible to create/m
 MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR = _("You can't modify proposal which is on an other year")
 MSG_NOT_ELIGIBLE_FOR_MODIFICATION_BECAUSE_OF_TYPE = _("This learning unit isn't eligible for modification because of "
                                                       "it's type")
+MSG_CANNOT_UPDATE_EXTERNAL_UNIT_NOT_COGRADUATION = _("You can only edit co-graduation external learning units")
 
 
 def _any_existing_proposal_in_epc(learning_unit_year, _, raise_exception=False):
@@ -89,12 +91,24 @@ def _any_existing_proposal_in_epc(learning_unit_year, _, raise_exception=False):
     return result
 
 
+def is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception):
+    result = not hasattr(learning_unit_year, 'externallearningunityear') or \
+             learning_unit_year.externallearningunityear.co_graduation
+    can_raise_exception(
+        raise_exception,
+        result,
+        MSG_CANNOT_UPDATE_EXTERNAL_UNIT_NOT_COGRADUATION,
+    )
+    return result
+
+
 def is_eligible_for_modification(learning_unit_year, person, raise_exception=False):
     result = \
         is_year_editable(learning_unit_year, person, raise_exception) and \
         _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
         _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception) and \
-        is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise_exception)
+        is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise_exception) and \
+        is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
     return result
 
 
@@ -103,7 +117,8 @@ def is_eligible_for_modification_end_date(learning_unit_year, person, raise_exce
         is_year_editable(learning_unit_year, person, raise_exception) and \
         not (is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
         is_eligible_for_modification(learning_unit_year, person, raise_exception) and \
-        _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person, raise_exception)
+        _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person, raise_exception) and\
+        is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
 
 
 def is_eligible_to_create_partim(learning_unit_year, person, raise_exception=False):
@@ -111,7 +126,8 @@ def is_eligible_to_create_partim(learning_unit_year, person, raise_exception=Fal
         _any_existing_proposal_in_epc,
         is_person_linked_to_entity_in_charge_of_lu,
         is_academic_year_in_range_to_create_partim,
-        is_learning_unit_year_full
+        is_learning_unit_year_full,
+        is_external_learning_unit_cograduation
     )(learning_unit_year, person, raise_exception)
 
 
@@ -122,7 +138,8 @@ def is_eligible_to_create_modification_proposal(learning_unit_year, person, rais
         not(is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception))and \
         _is_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception)and \
         not(is_learning_unit_year_in_proposal(learning_unit_year, person, raise_exception))and \
-        is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person, raise_exception)
+        is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person, raise_exception) and \
+        is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
     #  TODO detail why button is disabled
     can_raise_exception(
         raise_exception, result,
@@ -135,7 +152,8 @@ def is_eligible_for_cancel_of_proposal(proposal, person, raise_exception=False):
     result = \
         _is_person_in_accordance_with_proposal_state(proposal, person, raise_exception) and \
         _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception) and \
-        _has_person_the_right_to_make_proposal(proposal, person, raise_exception)
+        _has_person_the_right_to_make_proposal(proposal, person, raise_exception) and \
+        is_external_learning_unit_cograduation(proposal.learning_unit_year, person, raise_exception)
     can_raise_exception(
         raise_exception, result,
         MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL

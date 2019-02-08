@@ -26,14 +26,14 @@
 from unittest import mock
 
 from django.conf import settings
-from django.contrib.auth.models import Permission
+from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.user import UserFactory
+from base.tests.factories.person import PersonWithPermissionsFactory
 from base.views.education_groups.achievement.detail import CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
 from cms.enums import entity_name
 from cms.tests.factories.translated_text import TranslatedTextFactory
@@ -41,20 +41,25 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 
 class TestEducationGroupSkillsAchievements(TestCase):
     def setUp(self):
+        self.perm_patcher = mock.patch(
+            "base.business.education_groups.perms.AdmissionConditionPerms.is_eligible",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
 
-        self.education_group_year = EducationGroupYearFactory()
-
-        self.user = UserFactory()
-        self.person = PersonFactory(user=self.user)
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        self.client.force_login(self.user)
+        self.education_group_year = EducationGroupYearFactory(
+            academic_year=AcademicYearFactory(current=True)
+        )
+        self.person = PersonWithPermissionsFactory("can_access_education_group")
+        self.client.force_login(self.person.user)
 
     def _call_url_as_http_get(self):
         response = self.client.get(
             reverse("education_group_skills_achievements",
                     args=[self.education_group_year.pk, self.education_group_year.pk])
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         return response
 
     def test_get_achievements(self):
@@ -66,8 +71,7 @@ class TestEducationGroupSkillsAchievements(TestCase):
             response.context["education_group_achievements"][0], achievement
         )
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_edit_general_information", return_value=True)
-    def test_context_have_can_edit_information_args(self, mock_perm):
+    def test_context_have_can_edit_information_args(self):
         response = self._call_url_as_http_get()
         self.assertTrue("can_edit_information" in response.context)
         self.assertTrue(response.context["can_edit_information"])

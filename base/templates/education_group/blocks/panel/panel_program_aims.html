@@ -45,10 +45,12 @@
              </div>
          </div>
          <div class="col-md-1">
-            {% url 'education_group_achievement_program_aim' root_id=root.pk education_group_year_id=education_group_year.pk as update_url %}
-            <a class="trigger_modal pull-right" data-url="{{ update_url }}" data-modal_class="modal-lg" title={% trans 'Edit' %}>
-                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-            </a>
+            {% if can_edit_information %}
+                {% url 'education_group_achievement_program_aim' root_id=root.pk education_group_year_id=education_group_year.pk as update_url %}
+                <a class="trigger_modal pull-right" data-url="{{ update_url }}" data-modal_class="modal-lg" title={% trans 'Edit' %}>
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                </a>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

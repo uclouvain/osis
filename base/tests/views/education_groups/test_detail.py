@@ -36,7 +36,7 @@ from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.certificate_aim import CertificateAimFactory
 from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
 from base.tests.factories.education_group_language import EducationGroupLanguageFactory
@@ -182,6 +182,7 @@ class TestReadEducationGroup(TestCase):
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
         cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.academic_year = AcademicYearFactory(current=True)
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -268,7 +269,9 @@ class TestReadEducationGroup(TestCase):
         self.assertTrue('show_admission_conditions' in response.context)
 
     def test_main_common_show_only_identification_and_general_information(self):
-        main_common = EducationGroupYearCommonFactory()
+        main_common = EducationGroupYearCommonFactory(
+            academic_year=self.academic_year
+        )
         url = reverse("education_group_read", args=[main_common.pk, main_common.pk])
 
         response = self.client.get(url)
@@ -283,7 +286,9 @@ class TestReadEducationGroup(TestCase):
         self.assertFalse(response.context['show_admission_conditions'])
 
     def test_common_not_main_show_only_identification_and_admission_condition(self):
-        agregation_common = EducationGroupYearCommonAgregationFactory()
+        agregation_common = EducationGroupYearCommonAgregationFactory(
+            academic_year=self.academic_year
+        )
 
         url = reverse("education_group_read", args=[agregation_common.pk, agregation_common.pk])
 
@@ -297,6 +302,30 @@ class TestReadEducationGroup(TestCase):
         self.assertFalse(response.context['show_content'])
         self.assertFalse(response.context['show_utilization'])
         self.assertFalse(response.context['show_general_information'])
+
+    def test_not_show_general_info_and_admission_condition_and_achievement_for_n_plus_2(self):
+        edy = EducationGroupYearFactory(
+            academic_year=AcademicYearFactory(year=self.academic_year.year+2),
+        )
+
+        url = reverse("education_group_read", args=[edy.pk, edy.pk])
+
+        response = self.client.get(url)
+        self.assertFalse(response.context['show_general_information'])
+        self.assertFalse(response.context['show_admission_conditions'])
+        self.assertFalse(response.context['show_skills_and_achievements'])
+
+    def test_not_show_general_info_and_admission_condition_and_achievement_for_year_smaller_than_2017(self):
+        edy = EducationGroupYearFactory(
+            academic_year=AcademicYearFactory(year=2016),
+        )
+
+        url = reverse("education_group_read", args=[edy.pk, edy.pk])
+
+        response = self.client.get(url)
+        self.assertFalse(response.context['show_general_information'])
+        self.assertFalse(response.context['show_admission_conditions'])
+        self.assertFalse(response.context['show_skills_and_achievements'])
 
 
 class EducationGroupDiplomas(TestCase):
@@ -468,6 +497,7 @@ class TestUtilizationTab(TestCase):
 
 class TestContent(TestCase):
     def setUp(self):
+        self.current_academic_year = create_current_academic_year()
         self.person = PersonFactory()
         self.education_group_year_1 = EducationGroupYearFactory()
         self.education_group_year_2 = EducationGroupYearFactory()
