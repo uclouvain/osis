@@ -24,13 +24,12 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
 from base.forms.search.search_tutor import TutorSearchForm
 from base.models.tutor import Tutor
 from base.utils.cache import RequestCache
-from base.views import layout
 from base.views.common import paginate_queryset
 
 
@@ -45,7 +44,7 @@ def search_tutors(request):
 
     tutors = paginate_queryset(tutors_qs, request.GET)
 
-    return layout.render(request, "search/search.html", {
+    return render(request, "search/search.html", {
         "form": form,
         "tutors": tutors
     })
