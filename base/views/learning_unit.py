@@ -57,7 +57,6 @@ from base.views.common import display_warning_messages, display_error_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models import text_label
 from reference.models.language import find_language_in_settings
-from . import layout
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
                      'ADDITIONAL_REQUIREMENT_ENTITY_1', 'ADDITIONAL_REQUIREMENT_ENTITY_2',
@@ -99,7 +98,7 @@ def learning_unit_components(request, learning_unit_year_id):
     context['tab_active'] = 'components'
     context['can_manage_volume'] = business_perms.is_eligible_for_modification(context["learning_unit_year"], person)
     context['experimental_phase'] = True
-    return layout.render(request, "learning_unit/components.html", context)
+    return render(request, "learning_unit/components.html", context)
 
 
 @login_required
@@ -230,7 +229,7 @@ def learning_class_year_edit(request, learning_unit_year_id):
     )
     form.load_initial()  # Load data from database
     context['form'] = form
-    return layout.render(request, "learning_unit/class_edit.html", context)
+    return render(request, "learning_unit/class_edit.html", context)
 
 
 def learning_unit_comparison(request, learning_unit_year_id):
@@ -298,7 +297,7 @@ def learning_unit_comparison(request, learning_unit_year_id):
         )
         _add_warnings_for_inexisting_luy(request, next_academic_yr, next_lu)
         _add_warnings_for_inexisting_luy(request, previous_academic_yr, previous_lu)
-        return layout.render(request, "learning_unit/comparison.html", context)
+        return render(request, "learning_unit/comparison.html", context)
     else:
         display_error_messages(request, _('Comparison impossible! No learning unit to compare to'))
         return HttpResponseRedirect(reverse('learning_unit', args=[learning_unit_year_id]))

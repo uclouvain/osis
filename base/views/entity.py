@@ -23,14 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
 
 from base.business.entity_version import update_entity, create_versions_of_existing_entity, \
     update_end_date_of_existing_versions
 from base.models import entity
-from base.models import entity_version
 from base.serializers import EntitySerializer
 
 
