@@ -218,11 +218,11 @@ def _get_data(learning_unit_yr, new_line, first_data, partims=True):
         data.append(get_partims_as_str(learning_unit_yr.get_partims_related()))
     data.extend(
         [
-        learning_unit_yr.learning_unit.faculty_remark,
-        learning_unit_yr.learning_unit.other_remark,
-        _('Yes') if learning_unit_yr.learning_container_year.is_vacant else _('No'),
-        learning_unit_yr.learning_container_year.get_type_declaration_vacant_display(),
-        learning_unit_yr.get_attribution_procedure_display(),
+            learning_unit_yr.learning_unit.faculty_remark,
+            learning_unit_yr.learning_unit.other_remark,
+            _('Yes') if learning_unit_yr.learning_container_year.is_vacant else _('No'),
+            learning_unit_yr.learning_container_year.get_type_declaration_vacant_display(),
+            learning_unit_yr.get_attribution_procedure_display(),
         ]
     )
 
