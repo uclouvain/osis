@@ -88,8 +88,8 @@
                         {% url "learning_unit_modification_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_modification_proposal_url%}
                         {% li_modification_proposal learning_unit_modification_proposal_url _('Put in proposal') 'link_proposal_modification' %}
 
-                        {% url "learning_unit_suppression_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_modification_proposal_url%}
-                        {% li_suppression_proposal learning_unit_suppression_proposal _('Put in suppression proposal') 'link_proposal_suppression' %}
+                        {% url "learning_unit_suppression_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_suppression_proposal_url%}
+                        {% li_suppression_proposal learning_unit_suppression_proposal_url _('Put in proposal for ending date') 'link_proposal_suppression' %}
 
                         <li class="divider"></li>
 
