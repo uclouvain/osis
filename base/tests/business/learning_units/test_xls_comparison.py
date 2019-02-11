@@ -48,6 +48,7 @@ from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class TestComparisonXls(TestCase):
@@ -155,12 +156,7 @@ class TestPropositionComparisonXls(TestCase):
                                                     initial_data={"learning_unit": {"faculty_remark": "First remark"}})
 
     def test_get_proposal_data(self):
-        self.partim.delete()
-        print(len(LearningComponentYear.objects.filter(
-            learning_container_year=self.learning_unit_year_1.learning_container_year,
-            type=PRACTICAL_EXERCISES
-        )))
-        practical_components = LearningComponentYear.objects.filter(
+        practical_component = LearningComponentYear.objects.filter(
             learning_container_year=self.learning_unit_year_1.learning_container_year,
             type=PRACTICAL_EXERCISES
         ).first()
@@ -168,6 +164,7 @@ class TestPropositionComparisonXls(TestCase):
             learning_container_year=self.learning_unit_year_1.learning_container_year,
             type=LECTURING
         ).first()
+
         data = _get_proposal_data(self.learning_unit_year_1)
 
         self.assertEqual(data[0], _('Proposal'))
@@ -201,25 +198,24 @@ class TestPropositionComparisonXls(TestCase):
         else:
             self.assertEqual(data[21], '')
             self.assertEqual(data[22], '')
-        self.assertEqual(data[23], self.partim.subdivision)
-        self.assertEqual(data[24], self.learning_unit_year_1.learning_unit.faculty_remark)
-        self.assertEqual(data[25], self.learning_unit_year_1.learning_unit.other_remark)
-        self.assertEqual(data[26], _('Yes') if self.learning_unit_year_1.learning_container_year.is_vacant else _('No'))
-        self.assertEqual(data[27], self.learning_unit_year_1.learning_container_year.get_type_declaration_vacant_display())
-        self.assertEqual(data[28], self.learning_unit_year_1.get_attribution_procedure_display())
+        self.assertEqual(data[23], self.learning_unit_year_1.learning_unit.faculty_remark)
+        self.assertEqual(data[24], self.learning_unit_year_1.learning_unit.other_remark)
+        self.assertEqual(data[25], _('Yes') if self.learning_unit_year_1.learning_container_year.is_vacant else _('No'))
+        self.assertEqual(data[26], self.learning_unit_year_1.learning_container_year.get_type_declaration_vacant_display())
+        self.assertEqual(data[27], self.learning_unit_year_1.get_attribution_procedure_display())
 
-        self.assertEqual(data[29], DEFAULT_ACRONYM_COMPONENT.get(lecturing_component.type))
-        self.assertEqual(data[30], float(lecturing_component.hourly_volume_total_annual) if lecturing_component.hourly_volume_total_annual else 0)
-        self.assertEqual(data[31], float(lecturing_component.hourly_volume_partial_q1) if lecturing_component.hourly_volume_partial_q1 else 0)
-        self.assertEqual(data[32], float(lecturing_component.hourly_volume_partial_q2) if lecturing_component.hourly_volume_partial_q2 else 0)
-        self.assertEqual(data[33], lecturing_component.real_classes)
-        self.assertEqual(data[34], lecturing_component.planned_classes)
-        self.assertEqual(data[39], DEFAULT_ACRONYM_COMPONENT.get(practical_component.type))
-        self.assertEqual(data[40], float(practical_component.hourly_volume_total_annual) if practical_component.hourly_volume_total_annual else 0)
-        self.assertEqual(data[41], float(practical_component.hourly_volume_partial_q1) if practical_component.hourly_volume_partial_q1 else 0)
-        self.assertEqual(data[42], float(practical_component.hourly_volume_partial_q2) if practical_component.hourly_volume_partial_q2 else 0)
-        self.assertEqual(data[43], practical_component.real_classes)
-        self.assertEqual(data[44], practical_component.planned_classes)
+        self.assertEqual(data[28], DEFAULT_ACRONYM_COMPONENT.get(lecturing_component.type))
+        self.assertEqual(data[29], float(lecturing_component.hourly_volume_total_annual) if lecturing_component.hourly_volume_total_annual else 0)
+        self.assertEqual(data[30], float(lecturing_component.hourly_volume_partial_q1) if lecturing_component.hourly_volume_partial_q1 else 0)
+        self.assertEqual(data[31], float(lecturing_component.hourly_volume_partial_q2) if lecturing_component.hourly_volume_partial_q2 else 0)
+        self.assertEqual(data[32], lecturing_component.real_classes)
+        self.assertEqual(data[33], lecturing_component.planned_classes)
+        self.assertEqual(data[38], DEFAULT_ACRONYM_COMPONENT.get(practical_component.type))
+        self.assertEqual(data[39], float(practical_component.hourly_volume_total_annual) if practical_component.hourly_volume_total_annual else 0)
+        self.assertEqual(data[40], float(practical_component.hourly_volume_partial_q1) if practical_component.hourly_volume_partial_q1 else 0)
+        self.assertEqual(data[41], float(practical_component.hourly_volume_partial_q2) if practical_component.hourly_volume_partial_q2 else 0)
+        self.assertEqual(data[42], practical_component.real_classes)
+        self.assertEqual(data[43], practical_component.planned_classes)
 
     def test_check_changes(self):
         line_number = 0

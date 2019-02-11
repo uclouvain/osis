@@ -27,7 +27,7 @@ from django.utils.translation import ugettext_lazy as _
 from openpyxl.utils import get_column_letter
 
 from base.business.proposal_xls import BLANK_VALUE, XLS_DESCRIPTION_COMPARISON, XLS_COMPARISON_FILENAME, \
-    COMPARISON_PROPOSAL_TITLES, COMPARISON_WORKSHEET_TITLE, BASIC_TITLES, COMPONENTS_TITLES
+    COMPARISON_PROPOSAL_TITLES, COMPARISON_WORKSHEET_TITLE, BASIC_TITLES, COMPONENTS_TITLES, PARTIM_TITLE
 from base.models.campus import find_by_id as find_campus_by_id
 from base.models.entity import find_by_id
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES
@@ -187,7 +187,7 @@ def _component_data(components, learning_component_yr_type):
             EMPTY_VALUE, EMPTY_VALUE]
 
 
-def _get_data(learning_unit_yr, new_line, first_data):
+def _get_data(learning_unit_yr, new_line, first_data, partims=True):
     organization = get_organization_from_learning_unit_year(learning_unit_yr)
 
     data = [
@@ -213,14 +213,18 @@ def _get_data(learning_unit_yr, new_line, first_data):
         _get_entity_to_display(learning_unit_yr.entities.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2)),
         _('Yes') if learning_unit_yr.professional_integration else _('No'),
         organization.name if organization else EMPTY_VALUE,
-        learning_unit_yr.campus if learning_unit_yr.campus else EMPTY_VALUE,
-        get_partims_as_str(learning_unit_yr.get_partims_related()),
+        learning_unit_yr.campus if learning_unit_yr.campus else EMPTY_VALUE]
+    if partims:
+        data.append(get_partims_as_str(learning_unit_yr.get_partims_related()))
+    data.extend(
+        [
         learning_unit_yr.learning_unit.faculty_remark,
         learning_unit_yr.learning_unit.other_remark,
         _('Yes') if learning_unit_yr.learning_container_year.is_vacant else _('No'),
         learning_unit_yr.learning_container_year.get_type_declaration_vacant_display(),
         learning_unit_yr.get_attribution_procedure_display(),
-    ]
+        ]
+    )
 
     return data
 
@@ -345,7 +349,7 @@ def prepare_xls_content_for_comparison(luy_with_proposals):
     modified_cells_no_border = []
     for luy_with_proposal in luy_with_proposals:
         top_border.extend(get_border_columns(line_index + 1))
-        data_proposal =_get_proposal_data(luy_with_proposal)
+        data_proposal = _get_proposal_data(luy_with_proposal)
         data.append(data_proposal)
 
         proposal = find_by_learning_unit_year(luy_with_proposal)
@@ -388,7 +392,6 @@ def _get_data_from_initial_data(initial_data):
     lu_initial = initial_data.get('learning_unit', None)
     luy_initial = initial_data.get('learning_unit_year', None)
     lcy_initial = initial_data.get('learning_container_year', None)
-    volumes = initial_data.get('volumes')
 
     data = [
         str(_('Initial data')),
@@ -397,7 +400,7 @@ def _get_data_from_initial_data(initial_data):
         dict(LEARNING_CONTAINER_YEAR_TYPES)[lcy_initial['container_type']] if
         lcy_initial['container_type'] else '-',
         translate_status(luy_initial['status']),
-        learning_unit_yr.get_subtype_display(),  # pas dans initial
+        learning_unit_yr.get_subtype_display(),
         get_translation(luy_initial['internship_subtype']),
         volume_format(luy_initial['credits']),
         language.name if language else EMPTY_VALUE,
@@ -415,7 +418,6 @@ def _get_data_from_initial_data(initial_data):
         _('Yes') if luy_initial['professional_integration'] else _('No'),
         organization.name if organization else BLANK_VALUE,
         campus if campus else BLANK_VALUE,
-        '',
         get_representing_string(lu_initial['faculty_remark']),
         get_representing_string(lu_initial['other_remark']),
         _('Yes') if lcy_initial.get('is_vacant') else _('No'),
@@ -424,11 +426,7 @@ def _get_data_from_initial_data(initial_data):
         dict(attribution_procedure.ATTRIBUTION_PROCEDURES)[luy_initial.get('attribution_procedure')] if luy_initial.get(
             'attribution_procedure') else BLANK_VALUE,
     ]
-
-    if volumes:
-        data = data + _get_component_data_by_type(volumes.get(LECTURING), LECTURING)
-        data = data + _get_component_data_by_type(volumes.get(PRACTICAL_EXERCISES), PRACTICAL_EXERCISES)
-    return data
+    return _get_data_from_components_initial_data(data, initial_data)
 
 
 def _check_changes(initial_data, proposal_data, line_index):
@@ -450,11 +448,12 @@ def create_xls_proposal_comparison(user, learning_units_with_proposal, filters):
     working_sheets_data = data.get('data')
     cells_modified_with_green_font = data.get(CELLS_MODIFIED_NO_BORDER)
     cells_with_top_border = data.get(CELLS_TOP_BORDER)
+    titles = [''] + COMPARISON_PROPOSAL_TITLES.remove(PARTIM_TITLE)
     parameters = {
         xls_build.DESCRIPTION: XLS_DESCRIPTION_COMPARISON,
         xls_build.USER: get_name_or_username(user),
         xls_build.FILENAME: XLS_COMPARISON_FILENAME,
-        xls_build.HEADER_TITLES: [''] + COMPARISON_PROPOSAL_TITLES,
+        xls_build.HEADER_TITLES: titles,
         xls_build.WS_TITLE: COMPARISON_WORKSHEET_TITLE,
     }
     dict_styled_cells = {}
@@ -469,14 +468,7 @@ def create_xls_proposal_comparison(user, learning_units_with_proposal, filters):
 
 
 def _get_basic_components(learning_unit_yr):
-    learning_unit_yrs = learning_unit_year_with_context.get_with_context(
-        learning_container_year_id=learning_unit_yr.learning_container_year.id
-    )
-    if learning_unit_yrs:
-        for l in learning_unit_yrs:
-            if l.id == learning_unit_yr.id:
-                learning_unit_yr = l
-                break
+    learning_unit_yr = find_learning_unit_yr_with_components_data(learning_unit_yr)
     components = list(learning_unit_yr.components.keys())
     components_values = list(learning_unit_yr.components.values())
 
@@ -505,6 +497,27 @@ def _get_components_data(learning_unit_yr):
 
 
 def _get_proposal_data(learning_unit_yr):
-    data_proposal = [_('Proposal')] + _get_data(learning_unit_yr, False, None)
+    data_proposal = [_('Proposal')] + _get_data(learning_unit_yr, False, None, False)
     data_proposal.extend(_get_components_data(learning_unit_yr))
     return data_proposal
+
+
+def find_learning_unit_yr_with_components_data(learning_unit_yr):
+    learning_unit_yrs = learning_unit_year_with_context.get_with_context(
+        learning_container_year_id=learning_unit_yr.learning_container_year.id
+    )
+    if learning_unit_yrs:
+        for l in learning_unit_yrs:
+            if l.id == learning_unit_yr.id:
+                learning_unit_yr = l
+                break
+    return learning_unit_yr
+
+
+def _get_data_from_components_initial_data(data_without_components, initial_data):
+    data = data_without_components
+    volumes = initial_data.get('volumes')
+    if volumes:
+        data = data + _get_component_data_by_type(volumes.get(LECTURING), LECTURING)
+        data = data + _get_component_data_by_type(volumes.get(PRACTICAL_EXERCISES), PRACTICAL_EXERCISES)
+    return data

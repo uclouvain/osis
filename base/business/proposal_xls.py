@@ -31,6 +31,8 @@ from base.business.xls import get_name_or_username
 from base.models.proposal_learning_unit import find_by_learning_unit_year
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 
+PARTIM_TITLE = str(_('Partims'))
+
 WORKSHEET_TITLE = _('Proposals')
 XLS_FILENAME = _('Proposals')
 XLS_DESCRIPTION = _("List proposals")
@@ -63,7 +65,7 @@ BASIC_TITLES = [
     str(_('Profes. integration')),
     str(_('Institution')),
     str(_('Learning location')),
-    str(_('Partims')),
+    PARTIM_TITLE,
     str(_("Faculty remark")),
     str(_("Other remark")),
     str(_("Vacant")),
