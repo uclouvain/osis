@@ -94,8 +94,8 @@
                 </td>
                 <td>{{ component.learning_unit_usage }}</td>
                 <td>{% if component.learning_component_year.type %}
-                    {% trans component.learning_component_year.type %}
-                {% endif %}
+                        {{ component.learning_component_year.get_type_display }}
+                    {% endif %}
                 </td>
                 <td>/
                     {# FIXME :: Temporary solution - waiting for business clarification about "components" concept (untyped, ...)#}

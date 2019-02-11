@@ -23,14 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
-import operator
 
 from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.postgres.search import SearchQuery, SearchVector, TrigramSimilarity
-from django.db.models import Q, Value
-from django.db.models.functions import Concat
+from django.db.models import Q
 
 from base.models.person import Person
 

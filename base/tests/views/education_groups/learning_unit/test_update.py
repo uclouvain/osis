@@ -85,14 +85,14 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
     def test_context(self):
         response = self.client.get(self.url)
         context = response.context
-        self.assertEquals(
+        self.assertEqual(
             context['root'],
             self.education_group_year_parents[0]
         )
 
         tree = json.loads(context['tree'])
         self.assertTrue(tree)
-        self.assertEquals(
+        self.assertEqual(
             tree['text'],
             self.education_group_year_parents[0].verbose
         )

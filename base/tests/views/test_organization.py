@@ -68,22 +68,14 @@ class OrganizationViewTestCase(TestCase):
         self.assertEqual(address.city, "New York")
         self.assertEqual(address.country, country)
 
-    @mock.patch('base.views.layout.render')
-    def test_organization_address_create(self, mock_render):
+    def test_organization_address_create(self):
         from base.views.organization import organization_address_create
 
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse(organization_address_create, args=[self.organization.id]))
-        request.user = mock.Mock()
+        response = self.client.get(reverse(organization_address_create, args=[self.organization.id]))
 
-        organization_address_create(request, self.organization.id)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, "organization/organization_address_form.html")
-        self.assertIsInstance(context.get("organization_address"), OrganizationAddress)
-        self.assertEqual(context.get("organization_id"), self.organization.id)
+        self.assertTemplateUsed(response, "organization/organization_address_form.html")
+        self.assertIsInstance(response.context.get("organization_address"), OrganizationAddress)
+        self.assertEqual(response.context.get("organization_id"), self.organization.id)
 
     def test_organization_address_delete(self):
         address = OrganizationAddressFactory(organization=self.organization)
@@ -93,22 +85,14 @@ class OrganizationViewTestCase(TestCase):
         with self.assertRaises(ObjectDoesNotExist):
             organization_address.find_by_id(address.id)
 
-    @mock.patch('base.views.layout.render')
-    def test_organization_address_edit(self, mock_render):
+    def test_organization_address_edit(self):
         from base.views.organization import organization_address_edit
         address = OrganizationAddressFactory(organization=self.organization)
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse(organization_address_edit, args=[address.id]))
-        request.user = mock.Mock()
+        response = self.client.get(reverse(organization_address_edit, args=[address.id]))
 
-        organization_address_edit(request, address.id)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, "organization/organization_address_form.html")
-        self.assertEqual(context.get("organization_address"), address)
-        self.assertEqual(context.get("organization_id"), self.organization.id)
+        self.assertTemplateUsed(response, "organization/organization_address_form.html")
+        self.assertEqual(response.context.get("organization_address"), address)
+        self.assertEqual(response.context.get("organization_id"), self.organization.id)
 
     def test_organization_address_new_empty(self):
         from base.views.organization import organization_address_new

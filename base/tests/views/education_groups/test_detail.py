@@ -327,11 +327,35 @@ class TestReadEducationGroup(TestCase):
         self.assertFalse(response.context['show_admission_conditions'])
         self.assertFalse(response.context['show_skills_and_achievements'])
 
+    def test_not_show_general_info_for_group_which_are_not_common_core(self):
+        group_type = GroupEducationGroupTypeFactory(name=GroupType.SUB_GROUP.name)
+
+        group = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type=group_type,
+        )
+        url = reverse("education_group_read", args=[group.pk, group.pk])
+        response = self.client.get(url)
+
+        self.assertFalse(response.context['show_general_information'])
+
+    def test_show_general_info_for_group_which_are_common_core(self):
+        common_type = GroupEducationGroupTypeFactory(name=GroupType.COMMON_CORE.name)
+
+        group = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type=common_type,
+        )
+        url = reverse("education_group_read", args=[group.pk, group.pk])
+        response = self.client.get(url)
+
+        self.assertTrue(response.context['show_general_information'])
+
 
 class EducationGroupDiplomas(TestCase):
     @classmethod
     def setUpTestData(cls):
-        academic_year = AcademicYearFactory()
+        academic_year = create_current_academic_year()
         type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
         cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=academic_year,
                                                                education_group_type=type_training)

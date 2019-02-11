@@ -103,7 +103,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
 
         context['proposal_folder_entity_version'] = get_by_entity_and_date(
             proposal.entity, None) if proposal else None
-        context['differences'] = get_difference_of_proposal(proposal.initial_data, self.object) \
+        context['differences'] = get_difference_of_proposal(proposal, self.object) \
             if proposal and proposal.learning_unit_year == self.object else {}
 
         context.update(self.get_context_permission(proposal))

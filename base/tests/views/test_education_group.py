@@ -54,7 +54,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory,
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
-from base.tests.factories.user import UserFactory
+from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.views.education_groups.detail import get_appropriate_common_admission_condition
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
@@ -234,7 +234,7 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         self.assertFalse(mock_edit_post.called)
         self.assertTrue(mock_edit_get.called)
 
-    @mock.patch('base.views.layout.render')
+    @mock.patch('base.views.education_group.render')
     def test_get_pedagogy_info_ensure_context_data(self, mock_render):
         request = RequestFactory().get(self.url, data={'label': self.text_label.label})
         request.user = self.person.user
@@ -393,34 +393,24 @@ class EducationGroupViewTestCase(TestCase):
             }
         )
 
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
     @mock.patch('base.business.education_group.can_user_edit_administrative_data')
-    def test_education_edit_administrative_data(self,
-                                                mock_can_user_edit_administrative_data,
-                                                mock_render,
-                                                mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-        education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
+    def test_education_edit_administrative_data(self, mock_can_user_edit_administrative_data):
         from base.views.education_group import education_group_edit_administrative_data
+        self.client.force_login(SuperUserFactory())
 
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse(education_group_edit_administrative_data, kwargs={
+        education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
+        mock_can_user_edit_administrative_data.return_value = True
+
+        response = self.client.get(reverse(education_group_edit_administrative_data, kwargs={
             'root_id': education_group_year.id,
             'education_group_year_id': education_group_year.id
         }))
-        request.user = mock.Mock()
-        mock_can_user_edit_administrative_data.return_value = True
 
-        education_group_edit_administrative_data(request, education_group_year.id, education_group_year.id)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'education_group/tab_edit_administrative_data.html')
-        self.assertEqual(context['education_group_year'], education_group_year)
-        self.assertEqual(context['course_enrollment_validity'], False)
-        self.assertEqual(context['formset_session_validity'], False)
-        self.assertIn('additional_info_form', context)
+        self.assertTemplateUsed(response, 'education_group/tab_edit_administrative_data.html')
+        self.assertEqual(response.context['education_group_year'], education_group_year)
+        self.assertEqual(response.context['course_enrollment_validity'], False)
+        self.assertEqual(response.context['formset_session_validity'], False)
+        self.assertIn('additional_info_form', response.context)
 
     def test_education_content(self):
         an_education_group = EducationGroupYearFactory()
@@ -454,6 +444,7 @@ class EducationGroupAdministrativedata(TestCase):
             self.education_group_year.id, self.education_group_year.id
         ])
         self.client.force_login(self.person.user)
+        create_current_academic_year()
 
     def test_when_not_logged(self):
         self.client.logout()
@@ -711,7 +702,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertTrue(mock_edit_get.called)
 
     @mock.patch('base.views.education_group.get_content_of_admission_condition_line')
-    @mock.patch('base.views.layout.render')
+    @mock.patch('base.views.education_group.render')
     def test_case_admission_condition_update_existing_line(self, mock_render, mock_get_content):
         section = 'ucl_bachelors'
         admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_child)
@@ -741,7 +732,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         mock_get_content.assert_called_once_with('read', admission_condition_line, '')
 
     @mock.patch('base.views.education_group.get_content_of_admission_condition_line')
-    @mock.patch('base.views.layout.render')
+    @mock.patch('base.views.education_group.render')
     def test_education_group_year_admission_condition_update_line_get_no_admission_condition_line(self,
                                                                                                   mock_render,
                                                                                                   mock_get_content):
@@ -915,7 +906,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertTrue(mock_update_post.called)
         self.assertFalse(mock_update_get.called)
 
-    @mock.patch('base.views.layout.render')
+    @mock.patch('base.views.education_group.render')
     def test_get_update_text_admission_condition_ensure_context_data(self, mock_render):
         AdmissionCondition.objects.create(
             education_group_year=self.education_group_child,
