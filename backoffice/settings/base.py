@@ -264,6 +264,7 @@ CKEDITOR_CONFIGS = {
         'extraAllowedContent': 'div(reddot_*,contacts_*)',
         'extraPlugins': ','.join(['reddot', 'pastefromword']),
         'stylesSet': REDDOT_STYLES,
+        'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
@@ -279,6 +280,7 @@ CKEDITOR_CONFIGS = {
         'allowedContent': True,
         'extraAllowedContent': 'div(reddot_*,contacts_*)',
         'extraPlugins': ','.join(['reddot', 'pastefromword']),
+        'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
@@ -300,6 +302,7 @@ CKEDITOR_CONFIGS = {
     },
     'minimal': {
         'toolbar': 'Custom',
+        'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
             ['Bold', 'Italic', 'Underline'],
@@ -309,6 +312,7 @@ CKEDITOR_CONFIGS = {
     },
     'minimal_plus_headers': {
         'toolbar': 'Custom',
+        'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
             ['Format', 'Styles'],
