@@ -43,6 +43,7 @@ from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import is_person_linked_to_entity_in_charge_of_learning_unit
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_common.utils.datetime import get_tzinfo, convert_date_to_datetime
 from osis_common.utils.perms import conjunction, disjunction, negation, BasePerm
 
@@ -79,6 +80,7 @@ MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR = _("You can't modify proposal which is on an o
 MSG_NOT_ELIGIBLE_FOR_MODIFICATION_BECAUSE_OF_TYPE = _("This learning unit isn't eligible for modification because of "
                                                       "it's type")
 MSG_CANNOT_UPDATE_EXTERNAL_UNIT_NOT_COGRADUATION = _("You can only edit co-graduation external learning units")
+MSG_CANNOT_EDIT_BECAUSE_OF_PROPOSAL = _("You can't edit because the learning unit has proposal")
 
 
 def _any_existing_proposal_in_epc(learning_unit_year, _, raise_exception=False):
@@ -108,7 +110,8 @@ def is_eligible_for_modification(learning_unit_year, person, raise_exception=Fal
         _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
         _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception) and \
         is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise_exception) and \
-        is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
+        is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception) and \
+        _check_proposal_edition(learning_unit_year, person, raise_exception)
     return result
 
 
@@ -559,3 +562,19 @@ def _is_container_type_course_dissertation_or_internship2(learning_unit_year, _,
     return \
         learning_unit_year.learning_container_year and \
         learning_unit_year.learning_container_year.container_type in FACULTY_UPDATABLE_CONTAINER_TYPES
+
+
+def _check_proposal_edition(learning_unit_year, person, raise_exception):
+    if person.is_faculty_manager:
+        result = not ProposalLearningUnit.objects.filter(
+            learning_unit_year__learning_unit=learning_unit_year.learning_unit,
+            learning_unit_year__academic_year__year__lte=learning_unit_year.academic_year.year).exists()
+    else:
+        result = True
+
+    can_raise_exception(
+        raise_exception,
+        result,
+        MSG_CANNOT_EDIT_BECAUSE_OF_PROPOSAL,
+    )
+    return result
