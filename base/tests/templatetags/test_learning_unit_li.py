@@ -35,7 +35,7 @@ from base.business.learning_units.perms import MSG_EXISTING_PROPOSAL_IN_EPC, MSG
     MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE, MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY, MSG_NOT_GOOD_RANGE_OF_YEARS, \
     is_eligible_to_consolidate_proposal, MSG_NO_RIGHTS_TO_CONSOLIDATE, \
     MSG_NOT_ELIGIBLE_TO_CONSOLIDATE_PROPOSAL, MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES, \
-    MSG_NOT_ELIGIBLE_TO_DELETE_LU, MSG_CAN_DELETE_ACCORDING_TO_TYPE
+    MSG_NOT_ELIGIBLE_TO_DELETE_LU, MSG_CAN_DELETE_ACCORDING_TO_TYPE, MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR
 from base.templatetags.learning_unit_li import li_edit_lu, li_edit_date_lu, li_modification_proposal, is_valid_proposal, \
     MSG_IS_NOT_A_PROPOSAL, MSG_PROPOSAL_NOT_ON_CURRENT_LU, DISABLED, li_suppression_proposal, li_cancel_proposal, \
     li_edit_proposal, li_consolidate_proposal, li_delete_all_lu
@@ -171,10 +171,10 @@ class LearningUnitTagLiEditTest(TestCase):
         self.context["proposal"] = self.proposal
         result = li_suppression_proposal(self.context, self.url_edit, "")
         self.assertEqual(
-            result, self._get_result_data_expected_for_proposal("link_proposal_suppression",
-                                                                MSG_EXISTING_PROPOSAL_IN_EPC,
-                                                                DISABLED
-                                                                )
+            result, self._get_result_data_expected_for_proposal_suppression("link_proposal_suppression",
+                                                                            MSG_EXISTING_PROPOSAL_IN_EPC,
+                                                                            DISABLED
+                                                                            )
         )
         result = li_modification_proposal(self.context, self.url_edit, "")
 
@@ -290,6 +290,7 @@ class LearningUnitTagLiEditTest(TestCase):
         self.assertEqual(permission_denied_message, "")
         self.assertEqual(disabled, "")
 
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_li_edit_proposal_as_faculty_manager(self):
         person_faculty_manager = FacultyManagerFactory()
         self.context['user'] = person_faculty_manager.user
@@ -460,3 +461,19 @@ class LearningUnitTagLiEditTest(TestCase):
 
     def _get_class(self, title):
         return DISABLED if title != '' else ''
+
+    def _get_result_data_expected_for_proposal_suppression(self, id_li, title, class_li):
+        if class_li != "":
+            url = "#"
+        else:
+            url = self.url_edit
+        return {
+            'load_modal': False,
+            'id_li': id_li,
+            'url': url,
+            'title': title,
+            'class_li': class_li,
+            'text': "",
+            'data_target': "",
+
+        }

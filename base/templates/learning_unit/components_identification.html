@@ -1,6 +1,7 @@
 {% load staticfiles %}
 {% load i18n %}
 {% load components_classes %}
+{% load learning_unit %}
 {% load waffle_tags %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -29,7 +30,7 @@
     <thead>
     <tr>
         <th>{% trans 'Own components' %}</th>
-        <th>{% trans 'code' %}</th>
+        <th>{% trans 'Code' %}</th>
         <th>{% trans 'Vol. Q1' %}</th>
         <th>{% trans 'Vol. Q2' %}</th>
         <th>
@@ -60,9 +61,9 @@
                 {# FIXME :: Temporary solution - waiting for business clarification about "components" concept (untyped, ...)#}
                 {% if component.learning_component_year.acronym  == 'NT' %}PM{% else %}
                     {{ component.learning_component_year.acronym  | default_if_none:'' }}{% endif %}</td>
-            <td>{{ component.volumes.VOLUME_Q1|floatformat | default_if_none:'' }}</td>
-            <td>{{ component.volumes.VOLUME_Q2|floatformat | default_if_none:'' }}</td>
-            <td>{{ component.volumes.VOLUME_TOTAL|floatformat | default_if_none:'' }}</td>
+            <td>{% dl_component_tooltip 'VOLUME_Q1' value=component.volumes.VOLUME_Q1 id=component.learning_component_year.id  default_if_none='' %}</td>
+            <td>{% dl_component_tooltip 'VOLUME_Q2' value=component.volumes.VOLUME_Q2 id=component.learning_component_year.id  default_if_none='' %}</td>
+            <td>{% dl_component_tooltip 'VOLUME_TOTAL' value=component.volumes.VOLUME_TOTAL id=component.learning_component_year.id  default_if_none='' %}</td>
             <td>
                 <span class="badge fixed_width {{ component.learning_component_year.planned_classes |get_css_class:component.learning_component_year.real_classes }}">
                     {{ component.learning_component_year.real_classes| default_if_none:'0' }} /
@@ -70,9 +71,9 @@
                 </span>
             </td>
 
-            <td>{{ component.volumes.VOLUME_GLOBAL|floatformat| default_if_none:'0' }}</td>
+            <td>{% dl_component_tooltip 'VOLUME_GLOBAL' value=component.volumes.VOLUME_GLOBAL id=component.learning_component_year.id  default_if_none='0' %}</td>
             {% block additional_requirement_entity_volumes %}
-                {% include "learning_unit/blocks/additional_requirement_entity_volumes.html" %}
+                {% include "learning_unit/blocks/additional_requirement_entity_volumes_identification.html" %}
             {% endblock %}
         </tr>
     {% endfor %}

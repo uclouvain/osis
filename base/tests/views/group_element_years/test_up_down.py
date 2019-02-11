@@ -34,6 +34,7 @@ from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import CentralManagerFactory
@@ -107,7 +108,8 @@ class TestUp(TestCase):
 class TestDown(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.education_group_year = EducationGroupYearFactory()
+        cls.current_academic_year = create_current_academic_year()
+        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.current_academic_year)
         # Create contents of education group years [3 elements]
         cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year)
         cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year)

@@ -1,6 +1,6 @@
 {% load staticfiles i18n bootstrap3 %}
 
-<form method="post" id="LearningUnitYearForm" data-validate-url="{% url 'check_acronym' subtype %}">
+<form method="post" id="LearningUnitYearForm" data-validate-url="{% url 'check_acronym' subtype="EXTERNAL" %}">
     {% csrf_token %}
 
     <div class="row">

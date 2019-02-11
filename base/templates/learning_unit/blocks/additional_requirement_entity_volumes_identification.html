@@ -1,0 +1,10 @@
+{% load learning_unit %}
+{% if REQUIREMENT_ENTITY %}
+    <td>{% dl_component_tooltip 'VOLUME_REQUIREMENT_ENTITY' value=component.volumes.VOLUME_REQUIREMENT_ENTITY id=component.learning_component_year.id  default_if_none='0' %}</td>
+{% endif %}
+{% if ADDITIONAL_REQUIREMENT_ENTITY_1 %}
+    <td>{% dl_component_tooltip 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1' value=component.volumes.VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1 id=component.learning_component_year.id  default_if_none='0' %}</td>
+{% endif %}
+{% if ADDITIONAL_REQUIREMENT_ENTITY_2 %}
+    <td>{% dl_component_tooltip 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2' value=component.volumes.VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2 id=component.learning_component_year.id  default_if_none='0' %}</td>
+{% endif %}

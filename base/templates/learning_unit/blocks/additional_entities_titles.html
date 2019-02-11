@@ -1,9 +1,10 @@
+{% load learning_unit %}
 {% if REQUIREMENT_ENTITY %}
-<th>{{ REQUIREMENT_ENTITY }}</th>
+    <th>{% th_tooltip 'REQUIREMENT_ENTITY' value=REQUIREMENT_ENTITY %}</th>
 {% endif %}
 {% if ADDITIONAL_REQUIREMENT_ENTITY_1 %}
-    <th>{{ ADDITIONAL_REQUIREMENT_ENTITY_1 }}</th>
+    <th>{% th_tooltip 'ADDITIONAL_REQUIREMENT_ENTITY_1' value=ADDITIONAL_REQUIREMENT_ENTITY_1 %}</th>
 {% endif %}
 {% if ADDITIONAL_REQUIREMENT_ENTITY_2 %}
-    <th>{{ ADDITIONAL_REQUIREMENT_ENTITY_2 }}</th>
+    <th>{% th_tooltip 'ADDITIONAL_REQUIREMENT_ENTITY_2' value=ADDITIONAL_REQUIREMENT_ENTITY_2 %}</th>
 {% endif %}

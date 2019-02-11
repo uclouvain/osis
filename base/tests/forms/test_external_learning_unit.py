@@ -64,7 +64,7 @@ def get_valid_external_learning_unit_form_data(academic_year, person, learning_u
     if not learning_unit_year:
         container_year = LearningContainerYearFactory(academic_year=academic_year)
         learning_unit_year = LearningUnitYearFactory.build(
-            acronym='XOSIS1111',
+            acronym='GOSIS1111',
             academic_year=academic_year,
             learning_container_year=container_year,
             subtype=learning_unit_year_subtypes.FULL,
@@ -140,7 +140,7 @@ class TestExternalLearningUnitForm(TestCase):
 
         self.assertIsInstance(luy, LearningUnitYear)
         self.assertEqual(luy.learning_container_year.container_type, EXTERNAL)
-        self.assertEqual(luy.acronym[0], 'X')
+        self.assertEqual(luy.acronym[0], 'G')
         self.assertEqual(luy.externallearningunityear.author, self.person)
         self.assertEqual(luy.learning_unit.start_year, self.academic_year.year)
 
