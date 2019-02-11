@@ -444,6 +444,7 @@ class EducationGroupAdministrativedata(TestCase):
             self.education_group_year.id, self.education_group_year.id
         ])
         self.client.force_login(self.person.user)
+        create_current_academic_year()
 
     def test_when_not_logged(self):
         self.client.logout()

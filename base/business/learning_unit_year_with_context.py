@@ -171,3 +171,19 @@ def get_learning_component_prefetch():
         to_attr='learning_unit_components'
     )
     return learning_component_prefetch
+
+
+def volume_from_initial_learning_component_year(learning_component_year, entity_components_year):
+    requirement_vols = _get_requirement_entities_volumes(entity_components_year)
+    return {
+        'VOLUME_TOTAL': learning_component_year['hourly_volume_total_annual'],
+        'VOLUME_Q1': learning_component_year['hourly_volume_partial_q1'],
+        'VOLUME_Q2': learning_component_year['hourly_volume_partial_q2'],
+        'PLANNED_CLASSES': learning_component_year.get('planned_classes'),
+        'VOLUME_REQUIREMENT_ENTITY': requirement_vols.get(entity_types.REQUIREMENT_ENTITY, 0),
+        'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
+        'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0),
+        'VOLUME_GLOBAL': sum([requirement_vols.get(entity_types.REQUIREMENT_ENTITY, 0),
+                              requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
+                              requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0)])
+    }

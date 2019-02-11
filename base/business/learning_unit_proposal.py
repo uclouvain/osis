@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import functools
+import json
 
 from django.contrib.messages import ERROR, SUCCESS
 from django.contrib.messages import INFO
@@ -40,35 +41,55 @@ from base.models import entity_container_year, campus, entity
 from base.models.academic_year import find_academic_year_by_year
 from base.models.entity_container_year import find_entities_grouped_by_linktype
 from base.models.enums import proposal_state, proposal_type
-from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
+from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
+    ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.models.enums.proposal_type import ProposalType
 from base.utils import send_mail as send_mail_util
 from reference.models import language
+from base.business.learning_unit_year_with_context import volume_learning_component_year
+from base.business.learning_unit import compose_components_dict
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
+from base.models.entity import find_by_id
+from reference.models.language import find_by_id as language_find_by_id
+from base.business.learning_unit_year_with_context import volume_from_initial_learning_component_year
+from base.models.enums import vacant_declaration_type, attribution_procedure
+
+BOOLEAN_FIELDS = ('professional_integration', 'is_vacant', 'team')
+FOREIGN_KEY_NAME = (
+    'language', 'campus', REQUIREMENT_ENTITY, ALLOCATION_ENTITY, ADDITIONAL_REQUIREMENT_ENTITY_1,
+    ADDITIONAL_REQUIREMENT_ENTITY_2,
+)
 
 APP_BASE_LABEL = 'base'
 END_FOREIGN_KEY_NAME = "_id"
 NO_PREVIOUS_VALUE = '-'
 # TODO : VALUES_WHICH_NEED_TRANSLATION ?
-VALUES_WHICH_NEED_TRANSLATION = ["periodicity", "container_type", "internship_subtype"]
+VALUES_WHICH_NEED_TRANSLATION = ["container_type", "internship_subtype"]
 LABEL_ACTIVE = _('Active')
 LABEL_INACTIVE = _('Inactive')
 INITIAL_DATA_FIELDS = {
-        'learning_container_year': [
-            "id", "acronym", "common_title", "container_type", "in_charge"
-        ],
-        'learning_unit': [
-            "id", "end_year"
-        ],
-        'learning_unit_year': [
-            "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity"
-        ]
-    }
+    'learning_container_year': [
+        "id", "acronym", "common_title", "container_type", "in_charge", "common_title_english", "team", "is_vacant",
+        "type_declaration_vacant",
+    ],
+    'learning_unit': [
+        "id", "end_year", "faculty_remark", "other_remark"
+    ],
+    'learning_unit_year': [
+        "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity",
+        "status", "professional_integration", "specific_title", "specific_title_english", "quadrimester", "session",
+        "attribution_procedure",
+    ],
+    'learning_component_year': [
+        "id", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2", "planned_classes",
+    ],
+}
 
 
 def compute_proposal_type(proposal_learning_unit_year, learning_unit_year):
     if proposal_learning_unit_year.type in [ProposalType.CREATION.name, ProposalType.SUPPRESSION.name]:
         return proposal_learning_unit_year.type
-    differences = get_difference_of_proposal(proposal_learning_unit_year.initial_data, learning_unit_year)
+    differences = get_difference_of_proposal(proposal_learning_unit_year, learning_unit_year)
     if differences.get('acronym') and len(differences) == 1:
         return ProposalType.TRANSFORMATION.name
     elif differences.get('acronym'):
@@ -86,6 +107,7 @@ def reinitialize_data_before_proposal(learning_unit_proposal):
                                         initial_data["learning_container_year"])
     _reinitialize_entities_before_proposal(learning_unit_year.learning_container_year,
                                            initial_data["entities"])
+    _reinitialize_components_before_proposal(initial_data.get("learning_component_years") or {})
 
 
 def _reinitialize_model_before_proposal(obj_model, attribute_initial_values):
@@ -125,31 +147,20 @@ def delete_learning_unit_proposal(learning_unit_proposal):
         lu.delete()
 
 
-def get_difference_of_proposal(initial_data, learning_unit_year):
+def get_difference_of_proposal(proposal, learning_unit_year):
+    initial_data = proposal.initial_data
     actual_data = copy_learning_unit_data(learning_unit_year)
     differences = {}
     for model in ['learning_unit', 'learning_unit_year', 'learning_container_year', 'entities']:
         initial_data_by_model = initial_data.get(model)
         if not initial_data_by_model:
             continue
-
-        differences.update(
-            {key: initial_data_by_model[key] for key, value in initial_data_by_model.items()
-             if value != actual_data[model][key]})
-    return differences
+        differences = _get_model_differences(actual_data, differences, initial_data_by_model, model)
+    return _get_differences_of_proposal_components(differences, proposal)
 
 
 def _replace_key_of_foreign_key(data):
     return {key_name.replace(END_FOREIGN_KEY_NAME, ''): data[key_name] for key_name in data.keys()}
-
-
-def _compare_initial_current_data(current_data, initial_data):
-    corrected_dict = _replace_key_of_foreign_key(current_data)
-    differences = {}
-    for attribute, initial_value in initial_data.items():
-        if attribute in corrected_dict and initial_data.get(attribute, None) != corrected_dict.get(attribute):
-            differences.update(_get_the_old_value(attribute, current_data, initial_data))
-    return differences
 
 
 def _get_the_old_value(key, current_data, initial_data):
@@ -165,34 +176,49 @@ def _get_str_representing_old_data_from_foreign_key(key, initial_value):
     if initial_value != NO_PREVIOUS_VALUE:
         return _get_old_value_of_foreign_key(key, initial_value)
     else:
-        return {key: NO_PREVIOUS_VALUE}
+        return NO_PREVIOUS_VALUE
 
 
 def _get_old_value_of_foreign_key(key, initial_value):
-    differences = {}
     if key == 'campus':
-        differences.update({key: str(mdl_base.campus.find_by_id(initial_value))})
+        return _get_name_attribute(mdl_base.campus.find_by_id(initial_value))
 
     if key == 'language':
-        differences.update({key: str(language.find_by_id(initial_value))})
-    return differences
+        return _get_name_attribute(language.find_by_id(initial_value))
+
+    if '_ENTITY' in key:
+        an_entity = find_by_id(initial_value)
+        return an_entity.most_recent_acronym if an_entity else None
+
+    return None
 
 
 def _is_foreign_key(key, current_data):
-    return "{}{}".format(key, END_FOREIGN_KEY_NAME) in current_data
+    return "{}{}".format(key, END_FOREIGN_KEY_NAME) in current_data or '_ENTITY' in key or key in FOREIGN_KEY_NAME
 
 
-def _get_status_initial_value(initial_value, key):
-    return {key: LABEL_ACTIVE} if initial_value else {key: LABEL_INACTIVE}
+def _get_status_initial_value(initial_value):
+    return LABEL_ACTIVE if initial_value else LABEL_INACTIVE
 
 
 def _get_old_value_when_not_foreign_key(initial_value, key):
-    if key in VALUES_WHICH_NEED_TRANSLATION and initial_value != NO_PREVIOUS_VALUE:
-        return {key: "{}".format(_(initial_value))}
-    elif key == 'status':
-        return _get_status_initial_value(initial_value, key)
+    old_value = NO_PREVIOUS_VALUE
+    if initial_value != NO_PREVIOUS_VALUE:
+        if key in VALUES_WHICH_NEED_TRANSLATION:
+            old_value = _(initial_value)
+        elif key == 'status':
+            old_value = _get_status_initial_value(initial_value)
+        elif key in ('periodicity', 'attribution_procedure', 'type_declaration_vacant'):
+            old_value = _get_enum_value(key, initial_value)
+        elif key in BOOLEAN_FIELDS:
+            old_value = "{}".format(_('Yes') if bool(initial_value) else _('No'))
+        else:
+            old_value = "{}".format(initial_value)
     else:
-        return {key: "{}".format(initial_value)}
+        if key in BOOLEAN_FIELDS:
+            old_value = _('No')
+
+    return old_value
 
 
 def _get_rid_of_blank_value(data):
@@ -376,29 +402,24 @@ def compute_proposal_state(a_person):
 def copy_learning_unit_data(learning_unit_year):
     learning_container_year = learning_unit_year.learning_container_year
     entities_by_type = entity_container_year.find_entities_grouped_by_linktype(learning_container_year)
-    learning_container_year_values = _get_attributes_values(learning_container_year,
-                                                            INITIAL_DATA_FIELDS['learning_container_year'])
-    learning_unit_values = _get_attributes_values(learning_unit_year.learning_unit,
-                                                  INITIAL_DATA_FIELDS['learning_unit'])
+
     learning_unit_year_values = _get_attributes_values(learning_unit_year,
                                                        INITIAL_DATA_FIELDS['learning_unit_year'])
     learning_unit_year_values["credits"] = float(learning_unit_year.credits) if learning_unit_year.credits else None
-    return get_initial_data(entities_by_type, learning_container_year_values, learning_unit_values,
-                            learning_unit_year_values)
+
+    return {
+        "learning_container_year": _get_attributes_values(learning_container_year,
+                                                          INITIAL_DATA_FIELDS['learning_container_year']),
+        "learning_unit_year": learning_unit_year_values,
+        "learning_unit": _get_attributes_values(learning_unit_year.learning_unit,
+                                                INITIAL_DATA_FIELDS['learning_unit']),
+        "entities": get_entities(entities_by_type),
+        'learning_component_years': get_components_initial_data(learning_unit_year),
+    }
 
 
 def _get_attributes_values(obj, attributes_name):
     return model_to_dict(obj, fields=attributes_name)
-
-
-def get_initial_data(entities_by_type, learning_container_year_values, learning_unit_values, learning_unit_year_values):
-    initial_data = {
-        "learning_container_year": learning_container_year_values,
-        "learning_unit_year": learning_unit_year_values,
-        "learning_unit": learning_unit_values,
-        "entities": get_entities(entities_by_type)
-    }
-    return initial_data
 
 
 def get_entities(entities_by_type):
@@ -410,3 +431,97 @@ def get_entity_by_type(entity_type, entities_by_type):
         return entities_by_type[entity_type].id
     else:
         return None
+
+
+def convert_volume_to_float(data, key):
+    return {key: float(data.get(key))} if key in data and data.get(key) else {key: None}
+
+
+def update_or_create_learning_unit_component(obj_model, attribute_initial_values):
+    for attribute_name, attribute_value in attribute_initial_values.items():
+        if attribute_name != "id":
+            cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+            setattr(obj_model, attribute_name, cleaned_initial_value)
+    obj_model.save()
+
+
+def _reinitialize_components_before_proposal(initial_components):
+    for initial_data_by_model in initial_components:
+        an_id = initial_data_by_model.get('id')
+        if an_id:
+            learning_component_year = mdl_base.learning_component_year.LearningComponentYear.objects.get(pk=an_id)
+            update_or_create_learning_unit_component(learning_component_year, initial_data_by_model)
+
+
+def get_components_initial_data(learning_unit_year):
+    components = mdl_base.learning_component_year.find_by_learning_container_year(
+        learning_unit_year.learning_container_year)
+    component_values_list = []
+    for component in components:
+        data = _get_attributes_values(component, INITIAL_DATA_FIELDS['learning_component_year'])
+        data.update(convert_volume_to_float(data, 'hourly_volume_total_annual'))
+        data.update(convert_volume_to_float(data, 'hourly_volume_partial_q1'))
+        data.update(convert_volume_to_float(data, 'hourly_volume_partial_q2'))
+        component_values_list.append(data)
+    return component_values_list
+
+
+def get_components_identification_initial_data(proposal):
+    components = []
+    additional_entities = proposal.initial_data.get('entities')
+    learning_component_year_list_from_initial = proposal.initial_data.get('learning_component_years')
+    if learning_component_year_list_from_initial:
+        for learning_component_year in learning_component_year_list_from_initial:
+            entity_components_yr = mdl_base.entity_component_year.EntityComponentYear.objects.filter(
+                learning_component_year=learning_component_year.get('id')
+            )
+
+            components.append(
+                {
+                    'learning_component_year': learning_component_year,
+                    'entity_component_yr': entity_components_yr.first(),
+                    'volumes': volume_from_initial_learning_component_year(
+                        learning_component_year,
+                        entity_components_yr
+                    )
+                }
+            )
+
+        return compose_components_dict(components, additional_entities)
+    return None
+
+
+def _get_enum_value(key, a_enum_value):
+    if key == 'periodicity':
+        return _get_value_from_enum(PERIODICITY_TYPES, a_enum_value)
+    elif key == 'attribution_procedure':
+        return _get_value_from_enum(attribution_procedure.ATTRIBUTION_PROCEDURES, a_enum_value)
+    elif key == 'type_declaration_vacant':
+        return _get_value_from_enum(vacant_declaration_type.DECLARATION_TYPE, a_enum_value)
+    else:
+        return None
+
+
+def _get_value_from_enum(tup, enum_value):
+    return dict(tup)[enum_value] if enum_value else NO_PREVIOUS_VALUE
+
+
+def _get_differences_of_proposal_components(differences_param, proposal):
+    differences = differences_param
+    comp = get_components_identification_initial_data(proposal)
+    if comp:
+        differences['components_initial_data'] = get_components_identification_initial_data(proposal)
+    return differences
+
+
+def _get_name_attribute(obj):
+    return obj.name if obj else None
+
+
+def _get_model_differences(actual_data, differences_param, initial_data_by_model, model):
+    differences = differences_param
+    for column_name, value in initial_data_by_model.items():
+        if not (value is None and actual_data[model][column_name] == '') and \
+                        value != actual_data[model][column_name]:
+            differences[column_name] = _get_the_old_value(column_name, actual_data[model], initial_data_by_model)
+    return differences

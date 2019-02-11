@@ -144,17 +144,6 @@ class MyOsisViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'my_osis/profile.html')
         self.assertEqual(response.context['person'].language, LANGUAGE_CODE_EN)
 
-    def test_has_no_email(self):
-        message_history_record = self.get_message_history()
-        message_history_record.receiver_id = None
-        self.assertFalse(my_osis.has_email(message_history_record))
-
-    def test_has_email(self):
-        receiver_person = PersonFactory()
-        message_history_record = self.get_message_history()
-        message_history_record.receiver_id = receiver_person.id
-        self.assertTrue(my_osis.has_email(message_history_record))
-
     def get_request(self):
         request_factory = RequestFactory()
         request = request_factory.get(reverse('home'))

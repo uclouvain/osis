@@ -331,7 +331,7 @@ class TestReadEducationGroup(TestCase):
 class EducationGroupDiplomas(TestCase):
     @classmethod
     def setUpTestData(cls):
-        academic_year = AcademicYearFactory()
+        academic_year = create_current_academic_year()
         type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
         cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=academic_year,
                                                                education_group_type=type_training)
