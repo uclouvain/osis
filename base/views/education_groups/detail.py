@@ -178,7 +178,9 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
 
     def show_general_information(self):
         return not self.object.acronym.startswith('common-') and \
-               self.is_general_info_and_condition_admission_in_display_range()
+               self.is_general_info_and_condition_admission_in_display_range() and \
+               (self.object.education_group_type.category != GROUP or
+                self.object.education_group_type.name == GroupType.COMMON_CORE.name)
 
     def show_skills_and_achievements(self):
         return not self.object.is_common and self.object.education_group_type.category != GROUP and \
