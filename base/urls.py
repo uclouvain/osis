@@ -225,7 +225,6 @@ urlpatterns = [
             url(r'^(?P<message_id>[0-9]+)/', include([
                 url(r'^read/$', my_osis.read_message, name="read_my_message"),
                 url(r'^delete/$', my_osis.delete_from_my_messages, name="delete_my_message"),
-                url(r'^send_message_again/$', my_osis.send_message_again, name='send_message_again')
             ]))
         ])),
         url(r'^profile/', include([

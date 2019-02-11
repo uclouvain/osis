@@ -21,35 +21,33 @@
 #  at the root of the source code of this program.  If not,                                        #
 #  see http://www.gnu.org/licenses/.                                                               #
 # ##################################################################################################
-from django.db.models import Q
-from django.utils.translation import ugettext as _
+from django.conf import settings
+from django.db import connection
+from django.utils import translation
+from django.utils.translation import ugettext_lazy as _
 
-from base.business.education_groups.create import create_initial_group_element_year_structure
-from base.business.education_groups.postponement import duplicate_education_group_year
-from base.business.utils.postponement import AutomaticPostponement
-from base.models.education_group import EducationGroup
-from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import MiniTrainingType
-from base.utils.send_mail import send_mail_before_annual_procedure_of_automatic_postponement_of_egy, \
-    send_mail_after_annual_procedure_of_automatic_postponement_of_egy
+from reference.models.enums import institutional_grade_type as instit_grade_type_enum
 
 
-class EducationGroupAutomaticPostponement(AutomaticPostponement):
-    model = EducationGroup
-    annualized_set = "educationgroupyear"
+def get_key_from_value_institu_great_type_enum(instit_grade_type_name):
+    if not instit_grade_type_name:
+        return None
+    for key, value in instit_grade_type_enum.INSTITUTIONAL_GRADE_CHOICES:
+        lang_dict = {lang[0]: [] for lang in settings.LANGUAGES}
+        for lang in lang_dict:
+            translation.activate(lang)
+            if _(value) == instit_grade_type_name or value == instit_grade_type_name or key == instit_grade_type_name:
+                translation.deactivate()
+                return key
+            translation.deactivate()
+    return None
 
-    send_before = send_mail_before_annual_procedure_of_automatic_postponement_of_egy
-    send_after = send_mail_after_annual_procedure_of_automatic_postponement_of_egy
-    extend_method = duplicate_education_group_year
-    msg_result = _("%(number_extended)s education group(s) extended and %(number_error)s error(s)")
 
-    def get_queryset(self, queryset=None):
-        # We need to postpone only trainings and some mini trainings
-        return super().get_queryset(queryset).filter(
-            Q(educationgroupyear__education_group_type__category=TRAINING) |
-            Q(educationgroupyear__education_group_type__name__in=MiniTrainingType.to_postpone())
-        ).distinct()
-
-    def post_extend(self, original_object, list_postponed_objects):
-        """ After the main postponement, we need to create the structure of the education_group_years """
-        create_initial_group_element_year_structure([original_object] + list_postponed_objects)
+def move_fk_to_enum(apps, schema_editor):
+    with connection.cursor() as cursor:
+        cursor.execute("select gt.id, igt.name from reference_gradetype gt, reference_institutionalgradetype igt where gt.institutional_grade_type_id = igt.id");
+        all_gt_instit_gt = cursor.fetchall()
+    for grade_type_id, instit_grade_type_name in all_gt_instit_gt:
+        key = get_key_from_value_institu_great_type_enum(instit_grade_type_name)
+        with connection.cursor() as cursor:
+            cursor.execute("update reference_gradetype set institutional_grade_type = %s where id= %s ", [key, grade_type_id])

@@ -32,6 +32,7 @@ from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.utils.utils import get_object_or_none
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from django.core.serializers.json import DjangoJSONEncoder
 
 
 class ProposalLearningUnitAdmin(OsisModelAdmin):
@@ -62,7 +63,7 @@ class ProposalLearningUnit(models.Model):
         default=ProposalState.FACULTY.name
     )
 
-    initial_data = JSONField(default={})
+    initial_data = JSONField(default={}, encoder=DjangoJSONEncoder)
     entity = models.ForeignKey('Entity')
     folder_id = models.PositiveIntegerField()
 
