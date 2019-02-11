@@ -105,7 +105,12 @@ class PostponeContent:
             next_instance = self.get_instance_n1(instance)
 
         for gr in instance.groupelementyear_set.all():
-            new_gr = update_related_object(gr, "parent", next_instance)
+            # For strange reasons, the education_group_year is not every times connected to a common education_group,
+            # so we have to use the acronym to find the next group_element_year.
+            new_gr = next_instance.groupelementyear_set.filter(child_branch__acronym=gr.child.acronym).first()
+            if not new_gr:
+                new_gr = update_related_object(gr, "parent", next_instance)
+
             if new_gr.child_leaf:
                 self._postpone_child_leaf(gr, new_gr)
             else:

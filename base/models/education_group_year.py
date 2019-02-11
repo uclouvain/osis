@@ -50,14 +50,14 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('acronym', 'title', 'academic_year', 'education_group_type', 'changed')
+    list_display = ('acronym', 'partial_acronym', 'title', 'academic_year', 'education_group_type', 'changed')
     list_filter = ('academic_year', 'education_group_type')
     raw_id_fields = (
         'education_group_type', 'academic_year',
         'education_group', 'enrollment_campus',
         'main_teaching_campus', 'primary_language'
     )
-    search_fields = ['acronym']
+    search_fields = ['acronym', 'partial_acronym', 'title']
 
     actions = [
         'resend_messages_to_queue',
