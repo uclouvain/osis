@@ -21,35 +21,16 @@
 #  at the root of the source code of this program.  If not,                                        #
 #  see http://www.gnu.org/licenses/.                                                               #
 # ##################################################################################################
-from django.db.models import Q
-from django.utils.translation import ugettext as _
-
-from base.business.education_groups.create import create_initial_group_element_year_structure
-from base.business.education_groups.postponement import duplicate_education_group_year
-from base.business.utils.postponement import AutomaticPostponement
-from base.models.education_group import EducationGroup
-from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import MiniTrainingType
-from base.utils.send_mail import send_mail_before_annual_procedure_of_automatic_postponement_of_egy, \
-    send_mail_after_annual_procedure_of_automatic_postponement_of_egy
+import uuid
 
 
-class EducationGroupAutomaticPostponement(AutomaticPostponement):
-    model = EducationGroup
-    annualized_set = "educationgroupyear"
-
-    send_before = send_mail_before_annual_procedure_of_automatic_postponement_of_egy
-    send_after = send_mail_after_annual_procedure_of_automatic_postponement_of_egy
-    extend_method = duplicate_education_group_year
-    msg_result = _("%(number_extended)s education group(s) extended and %(number_error)s error(s)")
-
-    def get_queryset(self, queryset=None):
-        # We need to postpone only trainings and some mini trainings
-        return super().get_queryset(queryset).filter(
-            Q(educationgroupyear__education_group_type__category=TRAINING) |
-            Q(educationgroupyear__education_group_type__name__in=MiniTrainingType.to_postpone())
-        ).distinct()
-
-    def post_extend(self, original_object, list_postponed_objects):
-        """ After the main postponement, we need to create the structure of the education_group_years """
-        create_initial_group_element_year_structure([original_object] + list_postponed_objects)
+def set_uuid_field(apps, schema_editor):
+    """
+    Set a random uuid value to all existing rows in all models in database.
+    """
+    reference = apps.get_app_config('reference')
+    for model_class in reference.get_models():
+        ids = model_class.objects.values_list('id', flat=True)
+        if ids:
+            for pk in ids:
+                model_class.objects.filter(pk=pk).update(uuid=uuid.uuid4())

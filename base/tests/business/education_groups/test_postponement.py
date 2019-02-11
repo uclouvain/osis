@@ -191,7 +191,6 @@ class TestPostpone(TestCase):
             self.postponer = PostponeContent(self.current_education_group_year)
         self.assertEqual(str(cm.exception), _("The content has already been postponed."))
 
-
     def test_init_already_postponed_content_with_child_leaf(self):
         gr = GroupElementYearFactory(parent=self.next_education_group_year,
                                      child_branch=None,
@@ -200,7 +199,6 @@ class TestPostpone(TestCase):
         with self.assertRaises(NotPostponeError) as cm:
             self.postponer = PostponeContent(self.current_education_group_year)
         self.assertEqual(str(cm.exception), _("The content has already been postponed."))
-
 
     def test_init_old_education_group(self):
         self.education_group.end_year = 1200
@@ -255,6 +253,34 @@ class TestPostpone(TestCase):
         new_child_branch = new_root.groupelementyear_set.get().child_branch
         self.assertEqual(new_child_branch, n1_child_branch)
         self.assertEqual(new_child_branch.academic_year, self.next_academic_year)
+
+    def test_postpone_with_same_child_branch_existing_in_N1(self):
+        n1_child_branch = EducationGroupYearFactory(
+            academic_year=self.next_academic_year,
+            acronym=self.current_group_element_year.child_branch.acronym,
+        )
+        n_child_branch = GroupElementYearFactory(parent=self.current_group_element_year.child_branch)
+
+        GroupElementYearFactory(
+            parent=self.next_education_group_year,
+            child_branch=n1_child_branch
+        )
+
+        AuthorizedRelationshipFactory(
+            parent_type=self.next_education_group_year.education_group_type,
+            child_type=n1_child_branch.education_group_type,
+            min_count_authorized=1
+        )
+
+        self.postponer = PostponeContent(self.current_education_group_year)
+
+        new_root = self.postponer.postpone()
+
+        self.assertEqual(new_root, self.next_education_group_year)
+        self.assertEqual(new_root.groupelementyear_set.count(), 1)
+        new_child_branch = new_root.groupelementyear_set.get().child_branch
+        self.assertEqual(new_child_branch.groupelementyear_set.get().child_branch.education_group,
+                         n_child_branch.child_branch.education_group)
 
     def test_postpone_with_child_branches(self):
         sub_group = GroupElementYearFactory(parent=self.current_group_element_year.child_branch)

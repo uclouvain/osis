@@ -171,10 +171,10 @@ class LearningUnitTagLiEditTest(TestCase):
         self.context["proposal"] = self.proposal
         result = li_suppression_proposal(self.context, self.url_edit, "")
         self.assertEqual(
-            result, self._get_result_data_expected_for_proposal("link_proposal_suppression",
-                                                                MSG_EXISTING_PROPOSAL_IN_EPC,
-                                                                DISABLED
-                                                                )
+            result, self._get_result_data_expected_for_proposal_suppression("link_proposal_suppression",
+                                                                            MSG_EXISTING_PROPOSAL_IN_EPC,
+                                                                            DISABLED
+                                                                            )
         )
         result = li_modification_proposal(self.context, self.url_edit, "")
 
@@ -454,3 +454,19 @@ class LearningUnitTagLiEditTest(TestCase):
 
     def _get_class(self, title):
         return DISABLED if title != '' else ''
+
+    def _get_result_data_expected_for_proposal_suppression(self, id_li, title, class_li):
+        if class_li != "":
+            url = "#"
+        else:
+            url = self.url_edit
+        return {
+            'load_modal': False,
+            'id_li': id_li,
+            'url': url,
+            'title': title,
+            'class_li': class_li,
+            'text': "",
+            'data_target': "",
+
+        }
