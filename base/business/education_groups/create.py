@@ -84,7 +84,17 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
         return existing_grp_ele
 
     year = parent_egy.academic_year.year
-    child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
+
+    previous_grp_ele = utils.get_object_or_none(
+        GroupElementYear,
+        parent__education_group=parent_egy.education_group,
+        parent__academic_year__year__in=[year - 1, year],
+        child_branch__education_group_type=child_education_group_type
+    )
+    if not previous_grp_ele:
+        child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
+    else:
+        child_eg = previous_grp_ele.child_branch.education_group
 
     child_egy = EducationGroupYear.objects.create(
         academic_year=parent_egy.academic_year,
@@ -107,8 +117,7 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
         education_group=child_eg
     )
 
-    grp_ele = GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)
-    return grp_ele
+    return GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)
 
 
 def _duplicate_branch(child_education_group_type, parent_egy, last_child):
@@ -121,15 +130,16 @@ def _duplicate_branch(child_education_group_type, parent_egy, last_child):
         return existing_grp_ele
 
     year = parent_egy.academic_year.year
-    child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
+    # child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
+    last_child.education_group.end_year = year
+    last_child.education_group.save()
 
     child_egy = model.duplicate_object(last_child)
-    child_egy.education_group = child_eg
+    child_egy.education_group = last_child.education_group
     child_egy.academic_year = parent_egy.academic_year
     child_egy.save()
 
-    grp_ele = GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)
-    return grp_ele
+    return GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)
 
 
 def _get_validation_rule(field_name, education_group_type):
