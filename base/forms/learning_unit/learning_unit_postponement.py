@@ -107,10 +107,14 @@ class LearningUnitPostponementForm:
 
     def _compute_forms_to_insert_update_delete(self, data):
         if self._has_proposal(self.learning_unit_instance):
-            proposal = ProposalLearningUnit.objects.filter(learning_unit_year__learning_unit=self.learning_unit_instance).order_by('learning_unit_year__academic_year__year').first()
+            proposal = ProposalLearningUnit.objects.filter(
+                learning_unit_year__learning_unit=self.learning_unit_instance
+            ).order_by('learning_unit_year__academic_year__year').first()
             max_postponement_year = proposal.learning_unit_year.academic_year.year
-            ac_year_postponement_range=academic_year.AcademicYear.objects.filter(year__gte=self.start_postponement.year,
-                                                       year__lt=proposal.learning_unit_year.academic_year.year)
+            ac_year_postponement_range = academic_year.AcademicYear.objects.filter(
+                year__gte=self.start_postponement.year,
+                year__lt=proposal.learning_unit_year.academic_year.year
+            )
 
             existing_learn_unit_years = learning_unit_year.LearningUnitYear.objects \
                 .filter(academic_year__year__gte=self.start_postponement.year) \
@@ -343,8 +347,8 @@ class LearningUnitPostponementForm:
                 component = None
 
             if component and component.repartition_volume != reparation_volume:
-                name = component.learning_component_year.acronym + "-" \
-                       + component.entity_container_year.entity.most_recent_acronym
+                name = component.learning_component_year.acronym + "-" + \
+                       component.entity_container_year.entity.most_recent_acronym
 
                 self.consistency_errors.setdefault(luy.academic_year, []).append(
                     _("The repartition volume of %(col_name)s has been already modified. "
