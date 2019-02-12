@@ -323,7 +323,7 @@ class LearningUnitTagLiEditTest(TestCase):
         result = li_edit_proposal(self.context, self.url_edit, "")
         self.assertEqual(
             result,
-            self._get_result_data_expected_for_proposal('link_proposal_edit', MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL,
+            self._get_result_data_expected_for_proposal('link_proposal_edit', MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR,
                                                         DISABLED)
         )
 
