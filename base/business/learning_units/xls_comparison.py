@@ -27,7 +27,7 @@ from django.utils.translation import ugettext_lazy as _
 from openpyxl.utils import get_column_letter
 
 from base.business.proposal_xls import BLANK_VALUE, XLS_DESCRIPTION_COMPARISON, XLS_COMPARISON_FILENAME, \
-    COMPARISON_PROPOSAL_TITLES, COMPARISON_WORKSHEET_TITLE, BASIC_TITLES, COMPONENTS_TITLES, PARTIM_TITLE
+    COMPARISON_PROPOSAL_TITLES, COMPARISON_WORKSHEET_TITLE, BASIC_TITLES, COMPONENTS_TITLES
 from base.models.campus import find_by_id as find_campus_by_id
 from base.models.entity import find_by_id
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES
@@ -92,12 +92,12 @@ def create_xls_comparison(user, learning_unit_years, filters, academic_yr_compar
     }
     dict_styled_cells = {}
     if cells_modified_with_green_font:
-        dict_styled_cells.update({xls_build.STYLE_MODIFIED: cells_modified_with_green_font})
+        dict_styled_cells[xls_build.STYLE_MODIFIED: cells_modified_with_green_font]
 
     if cells_with_top_border:
-        dict_styled_cells.update({xls_build.STYLE_BORDER_TOP: cells_with_top_border})
+        dict_styled_cells[xls_build.STYLE_BORDER_TOP:cells_with_top_border]
     if dict_styled_cells:
-        parameters.update({xls_build.STYLED_CELLS: dict_styled_cells})
+        parameters[xls_build.STYLED_CELLS: dict_styled_cells]
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 
@@ -320,7 +320,7 @@ def _get_component_data_by_type(component, type):
 
 def _get_learning_unit_yr_with_component(learning_unit_years):
     learning_unit_years = LearningUnitYear.objects.filter(
-        learning_unit__in=(_get_learning_units(learning_unit_years)),
+        learning_unit__in=[luy.id for luy in learning_unit_years],
         academic_year__year__in=(
             learning_unit_years[0].academic_year.year)
     ).select_related(
@@ -439,7 +439,7 @@ def _check_changes(initial_data, proposal_data, line_index):
 
 
 def get_representing_string(value):
-    return value if value else BLANK_VALUE
+    return value or BLANK_VALUE
 
 
 def create_xls_proposal_comparison(user, learning_units_with_proposal, filters):
@@ -448,17 +448,18 @@ def create_xls_proposal_comparison(user, learning_units_with_proposal, filters):
     working_sheets_data = data.get('data')
     cells_modified_with_green_font = data.get(CELLS_MODIFIED_NO_BORDER)
     cells_with_top_border = data.get(CELLS_TOP_BORDER)
-    titles = [''] + COMPARISON_PROPOSAL_TITLES.remove(PARTIM_TITLE)
+
     parameters = {
         xls_build.DESCRIPTION: XLS_DESCRIPTION_COMPARISON,
         xls_build.USER: get_name_or_username(user),
         xls_build.FILENAME: XLS_COMPARISON_FILENAME,
-        xls_build.HEADER_TITLES: titles,
+        xls_build.HEADER_TITLES: COMPARISON_PROPOSAL_TITLES,
         xls_build.WS_TITLE: COMPARISON_WORKSHEET_TITLE,
     }
     dict_styled_cells = {}
     if cells_modified_with_green_font:
         dict_styled_cells.update({xls_build.STYLE_MODIFIED: cells_modified_with_green_font})
+        # dict_styled_cells[xls_build.STYLE_MODIFIED] = cells_modified_with_green_font
 
     if cells_with_top_border:
         dict_styled_cells.update({xls_build.STYLE_BORDER_TOP: cells_with_top_border})
@@ -469,8 +470,11 @@ def create_xls_proposal_comparison(user, learning_units_with_proposal, filters):
 
 def _get_basic_components(learning_unit_yr):
     learning_unit_yr = find_learning_unit_yr_with_components_data(learning_unit_yr)
-    components = list(learning_unit_yr.components.keys())
-    components_values = list(learning_unit_yr.components.values())
+    components = []
+    components_values = []
+    for key, value in learning_unit_yr.components.items():
+        components.append(key)
+        components_values.append(value)
 
     practical_component = None
     lecturing_component = None
@@ -485,7 +489,7 @@ def _get_basic_components(learning_unit_yr):
 
 def _build_component(real_classes, components_values, index):
     a_component = components_values[index]
-    a_component.update({'REAL_CLASSES': real_classes})
+    a_component['REAL_CLASSES'] = real_classes
     return a_component
 
 
@@ -507,10 +511,8 @@ def find_learning_unit_yr_with_components_data(learning_unit_yr):
         learning_container_year_id=learning_unit_yr.learning_container_year.id
     )
     if learning_unit_yrs:
-        for l in learning_unit_yrs:
-            if l.id == learning_unit_yr.id:
-                learning_unit_yr = l
-                break
+        learning_unit_yr = next(luy for luy in learning_unit_yrs if luy.id == learning_unit_yr.id)
+
     return learning_unit_yr
 
 

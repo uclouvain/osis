@@ -31,8 +31,6 @@ from base.business.xls import get_name_or_username
 from base.models.proposal_learning_unit import find_by_learning_unit_year
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 
-PARTIM_TITLE = str(_('Partims'))
-
 WORKSHEET_TITLE = _('Proposals')
 XLS_FILENAME = _('Proposals')
 XLS_DESCRIPTION = _("List proposals")
@@ -42,7 +40,7 @@ PROPOSAL_TITLES = [str(_('Req. Entity')), str(_('Code')), str(_('Title')), str(_
                    str(_('Decision')), str(_('Periodicity')), str(_('Credits')),
                    str(_('Alloc. Ent.')), str(_('Proposals date'))]
 
-BASIC_TITLES = [
+BASIC_TITLES_PART_1 = [
     str(_('Code')),
     str(_('Ac yr.')),
     str(_('Type')),
@@ -65,13 +63,16 @@ BASIC_TITLES = [
     str(_('Profes. integration')),
     str(_('Institution')),
     str(_('Learning location')),
-    PARTIM_TITLE,
+]
+BASIC_TITLES_PART_2 = [
     str(_("Faculty remark")),
     str(_("Other remark")),
     str(_("Vacant")),
     str(_("Decision")),
     str(_("Procedure")),
 ]
+
+BASIC_TITLES = BASIC_TITLES_PART_1 + [str(_('Partims'))] + BASIC_TITLES_PART_2
 
 COMPONENTS_TITLES = [
     "PM {}".format(_('code')),
@@ -97,7 +98,9 @@ COMPONENTS_TITLES = [
 ]
 
 COMPARISON_PROPOSAL_TITLES = \
-    BASIC_TITLES + \
+    [''] + \
+    BASIC_TITLES_PART_1 + \
+    BASIC_TITLES_PART_2 + \
     COMPONENTS_TITLES
 
 COMPARISON_WORKSHEET_TITLE = _("Proposals comparison")
