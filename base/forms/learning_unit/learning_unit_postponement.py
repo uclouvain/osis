@@ -106,7 +106,8 @@ class LearningUnitPostponementForm:
         return min(end_year, max_postponement_year) if end_year else max_postponement_year
 
     def _compute_forms_to_insert_update_delete(self, data):
-        if self._has_proposal(self.learning_unit_instance):
+        if self._has_proposal(self.learning_unit_instance) and \
+                (self.person.is_faculty_manager and not self.person.is_central_manager):
             proposal = ProposalLearningUnit.objects.filter(
                 learning_unit_year__learning_unit=self.learning_unit_instance
             ).order_by('learning_unit_year__academic_year__year').first()
@@ -280,7 +281,8 @@ class LearningUnitPostponementForm:
         form_kwargs = {'learning_unit_instance': self.learning_unit_instance,
                        'start_year': self.learning_unit_instance.start_year}
         current_form = self._get_learning_unit_base_form(self.start_postponement, **form_kwargs)
-        if self._has_proposal(self.learning_unit_instance):
+        if self._has_proposal(self.learning_unit_instance) and\
+                (self.person.is_faculty_manager and not self.person.is_central_manager):
             max_postponement_year = self._compute_max_postponement_year()
             academic_years = academic_year.find_academic_years(start_year=self.start_postponement.year,
                                                                end_year=max_postponement_year)
