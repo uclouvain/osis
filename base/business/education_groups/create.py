@@ -131,7 +131,7 @@ def _duplicate_branch(child_education_group_type, parent_egy, last_child):
 
     year = parent_egy.academic_year.year
     # child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
-    last_child.education_group.end_year=year
+    last_child.education_group.end_year = year
     last_child.education_group.save()
 
     child_egy = model.duplicate_object(last_child)
