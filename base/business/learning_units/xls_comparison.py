@@ -50,7 +50,6 @@ from base.business.utils.convert import volume_format
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.business import learning_unit_year_with_context
-from base.models.proposal_learning_unit import find_by_learning_unit_year
 from reference.models.language import find_by_id as find_language_by_id
 
 EMPTY_VALUE = ''
@@ -352,11 +351,11 @@ def prepare_xls_content_for_comparison(luy_with_proposals):
         data_proposal = _get_proposal_data(luy_with_proposal)
         data.append(data_proposal)
 
-        proposal = find_by_learning_unit_year(luy_with_proposal)
+        proposal = luy_with_proposal.proposallearningunit
         initial_luy_data = proposal.initial_data
 
         if initial_luy_data:
-            initial_data = extract_xls_data_from_proposal_initial_data(luy_with_proposal)
+            initial_data = _get_data_from_initial_data(luy_with_proposal.proposallearningunit.initial_data)
             data.append(initial_data)
         else:
             initial_data = []
@@ -372,11 +371,6 @@ def prepare_xls_content_for_comparison(luy_with_proposals):
         CELLS_TOP_BORDER: top_border or None,
         CELLS_MODIFIED_NO_BORDER: modified_cells_no_border or None,
     }
-
-
-def extract_xls_data_from_proposal_initial_data(learning_unit_year):
-    proposal = find_by_learning_unit_year(learning_unit_year)
-    return _get_data_from_initial_data(proposal.initial_data)
 
 
 def _get_data_from_initial_data(initial_data):

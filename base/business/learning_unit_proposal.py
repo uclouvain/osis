@@ -534,10 +534,7 @@ def _get_volumes_for_initial(learning_unit_year):
     volumes = None
     learning_unit_yrs = learning_unit_year_with_context.get_with_context(
         learning_container_year_id=learning_unit_year.learning_container_year.id)
-    # for learning_unit_yr in learning_unit_yrs:
-    #     if learning_unit_yr.id == learning_unit_year.id:
-    #         volumes = learning_unit_yr.components
-    #         break
+
     volumes = next(luy.components for luy in learning_unit_yrs if luy.id == learning_unit_year.id)
 
     volumes_for_initial = {}
