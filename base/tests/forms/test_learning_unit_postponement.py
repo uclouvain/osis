@@ -194,7 +194,7 @@ class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMi
                                               learning_unit_instance=instance_luy_base_form.learning_unit_instance,
                                               data=instance_luy_base_form.data)
 
-        self.assertEqual(len(form._forms_to_delete), 1)
+        self.assertEqual(len(form._forms_to_upsert), 1)
 
 
 class TestLearningUnitPostponementFormIsValid(LearningUnitPostponementFormContextMixin):
