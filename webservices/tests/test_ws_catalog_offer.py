@@ -27,10 +27,15 @@ import datetime
 
 import django
 from django.conf import settings
+from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
+from rest_framework.test import APITestCase
 
+from base.business.education_groups import general_information_sections
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.enums import organization_type
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group_year import (
     EducationGroupYearCommonMasterFactory,
@@ -41,7 +46,9 @@ from base.tests.factories.education_group_year import (
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.user import UserFactory
 from cms.enums.entity_name import OFFER_YEAR
+from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextRandomFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
@@ -517,6 +524,64 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         response_sections = convert_sections_list_of_dict_to_dict(sections)
 
         self.assertEqual(len(response_sections), 0)
+
+
+class WsCatalogCommonOfferPostTestCase(APITestCase):
+    maxDiff = None
+
+    def setUp(self):
+        self.academic_year = AcademicYearFactory(current=True)
+        self.common = EducationGroupYearCommonFactory(academic_year=self.academic_year)
+        self.language = 'fr'
+
+        # Create random text related to common text label in french
+        for label_name in general_information_sections.COMMON_GENERAL_INFO_SECTIONS:
+            TranslatedTextRandomFactory(
+                language='fr-be',
+                reference=str(self.common.pk),
+                text_label__label=label_name
+            )
+
+        self.url = reverse('v0.1-ws_catalog_common_offer',
+                           kwargs={"year": self.academic_year.year, "language": self.language})
+        self.client.force_authenticate(user=UserFactory())
+
+    def test_get_text_case_all_translated_text_in_french(self):
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.content_type, 'application/json')
+
+        response_json = response.json()
+        self.assertTrue(all(label_name in response_json.keys()
+                            for label_name in general_information_sections.COMMON_GENERAL_INFO_SECTIONS))
+        self.assertTrue(all(value for value in response_json.values()))
+
+    def test_get_text_case_no_data_return_all_sections_with_none_as_value(self):
+        TranslatedText.objects.all().delete()
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.content_type, 'application/json')
+
+        response_json = response.json()
+        self.assertTrue(all(label_name in response_json.keys()
+                            for label_name in general_information_sections.COMMON_GENERAL_INFO_SECTIONS))
+        self.assertTrue(all(value is None for value in response_json.values()))
+
+    def test_get_text_case_empty_str_as_data_return_all_sections_with_none_as_value(self):
+        TranslatedText.objects.all().update(text='')
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.content_type, 'application/json')
+
+        response_json = response.json()
+        self.assertTrue(all(label_name in response_json.keys()
+                            for label_name in general_information_sections.COMMON_GENERAL_INFO_SECTIONS))
+        self.assertTrue(all(value is None for value in response_json.values()))
 
 
 class WsOfferCatalogAdmissionsCondition(TestCase, Helper):
