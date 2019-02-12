@@ -50,6 +50,7 @@ class TestSendMessage(TestCase):
 
         self.academic_year = test_academic_year.create_academic_year()
         test_academic_year.create_academic_year(year=self.academic_year.year - 1)
+
         self.learning_unit_year = LearningUnitYearFactory(acronym="TEST",
                                                           specific_title="Cours de test",
                                                           academic_year=self.academic_year)
