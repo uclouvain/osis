@@ -39,7 +39,8 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LearningUnit
-from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
+from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal, find_by_learning_unit_year
+from base.models.proposal_learning_unit import ProposalLearningUnit
 
 FIELDS_TO_NOT_POSTPONE = {
     'is_vacant': 'learning_container_year.is_vacant',
@@ -105,14 +106,27 @@ class LearningUnitPostponementForm:
         return min(end_year, max_postponement_year) if end_year else max_postponement_year
 
     def _compute_forms_to_insert_update_delete(self, data):
-        max_postponement_year = self._compute_max_postponement_year()
-        ac_year_postponement_range = academic_year.find_academic_years(start_year=self.start_postponement.year,
-                                                                       end_year=max_postponement_year)
-        existing_learn_unit_years = learning_unit_year.LearningUnitYear.objects \
-            .filter(academic_year__year__gte=self.start_postponement.year) \
-            .filter(learning_unit=self.learning_unit_instance) \
-            .select_related('learning_container_year', 'learning_unit', 'academic_year') \
-            .order_by('academic_year__year')
+        if self._has_proposal(self.learning_unit_instance):
+            proposal = ProposalLearningUnit.objects.filter(learning_unit_year__learning_unit=self.learning_unit_instance).order_by('learning_unit_year__academic_year__year').first()
+            max_postponement_year = proposal.learning_unit_year.academic_year.year
+            ac_year_postponement_range=academic_year.AcademicYear.objects.filter(year__gte=self.start_postponement.year,
+                                                       year__lt=proposal.learning_unit_year.academic_year.year)
+
+            existing_learn_unit_years = learning_unit_year.LearningUnitYear.objects \
+                .filter(academic_year__year__gte=self.start_postponement.year) \
+                .filter(academic_year__year__lt=max_postponement_year) \
+                .filter(learning_unit=self.learning_unit_instance) \
+                .select_related('learning_container_year', 'learning_unit', 'academic_year') \
+                .order_by('academic_year__year')
+        else:
+            max_postponement_year = self._compute_max_postponement_year()
+            ac_year_postponement_range = academic_year.find_academic_years(start_year=self.start_postponement.year,
+                                                                           end_year=max_postponement_year)
+            existing_learn_unit_years = learning_unit_year.LearningUnitYear.objects \
+                .filter(academic_year__year__gte=self.start_postponement.year) \
+                .filter(learning_unit=self.learning_unit_instance) \
+                .select_related('learning_container_year', 'learning_unit', 'academic_year') \
+                .order_by('academic_year__year')
         to_delete = to_update = to_insert = []
 
         if self.start_postponement.is_past():
@@ -262,8 +276,13 @@ class LearningUnitPostponementForm:
         form_kwargs = {'learning_unit_instance': self.learning_unit_instance,
                        'start_year': self.learning_unit_instance.start_year}
         current_form = self._get_learning_unit_base_form(self.start_postponement, **form_kwargs)
-        academic_years = sorted([form.instance.academic_year for form in self._forms_to_upsert if form.instance],
-                                key=lambda ac_year: ac_year.year)
+        if self._has_proposal(self.learning_unit_instance):
+            max_postponement_year = self._compute_max_postponement_year()
+            academic_years = academic_year.find_academic_years(start_year=self.start_postponement.year,
+                                                               end_year=max_postponement_year)
+        else:
+            academic_years = sorted([form.instance.academic_year for form in self._forms_to_upsert if form.instance],
+                                    key=lambda ac_year: ac_year.year)
 
         self.consistency_errors = OrderedDict()
         for ac_year in academic_years:
@@ -367,3 +386,7 @@ class LearningUnitPostponementForm:
 
     def _is_update_action(self):
         return self.learning_unit_full_instance or self.learning_unit_instance
+
+    @staticmethod
+    def _has_proposal(luy):
+        return ProposalLearningUnit.objects.filter(learning_unit_year__learning_unit=luy).exists()
