@@ -37,19 +37,29 @@
         </tr>
         {% for key, values in component.items %}
             {% if key != 'type' %}
+                {% if key == "planned_classes" %}
+                    {%  trans "Planned classes"|capfirst as title %}
+                {% elif key == "VOLUME_TOTAL" %}
+                    {%  trans "Volume total"|capfirst as title %}
+                {% elif key == "VOLUME_Q1" %}
+                    {%  trans "Volume Q1"|capfirst as title %}
+                {% elif key == "VOLUME_Q2" %}
+                    {%  trans "Volume Q2"|capfirst as title %}
+                {% endif %}
                 <tr>
                     <td class="table_header">
                         <table>
                             <tr>
                                 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                                <td>
-                                    {% trans key %}
-                                    {% if key != 'VOLUME_REQUIREMENT_ENTITY' and key != 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1' and key != 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2' %}
-                                        &nbsp;
-                                    {% else %}
-                                        : {% if key == 'VOLUME_REQUIREMENT_ENTITY' %}{{ REQUIREMENT_ENTITY }}{% endif %}{% if key == 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1' %}{{ ADDITIONAL_REQUIREMENT_ENTITY_1 }}{% endif %}{% if key == 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2' %}{{ ADDITIONAL_REQUIREMENT_ENTITY_2 }}{% endif %}
-                                    {% endif %}
-                                </td>
+                                {% if key == 'VOLUME_REQUIREMENT_ENTITY' %}
+                                    <td>{{ REQUIREMENT_ENTITY }}</td>
+                                {%elif key == 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1' %}
+                                    <td>{{ ADDITIONAL_REQUIREMENT_ENTITY_1 }}</td>
+                                {% elif key == 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2' %}
+                                    <td>{{ ADDITIONAL_REQUIREMENT_ENTITY_2 }}</td>
+                                {% else %}
+                                    <td>{{ title }}</td>
+                                {% endif %}
                             </tr>
                         </table>
 

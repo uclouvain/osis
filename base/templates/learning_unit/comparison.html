@@ -49,14 +49,43 @@
                     </thead>
                     <tbody>
                         {% for key in fields %}
+                            {% if key == "acronym" %}
+                                {%  trans "Acronym"|capfirst as title %}
+                            {% elif key == "attribution_procedure" %}
+                                {%  trans "Procedure"|capfirst as title %}
+                            {% elif key == "credits" %}
+                                {%  trans "Credits"|capfirst as title %}
+                            {% elif key == "periodicity" %}
+                                {%  trans "Periodicity"|capfirst as title %}
+                            {% elif key == "professional_integration" %}
+                                {%  trans "professional integration"|capfirst as title %}
+                            {% elif key == "specific_title" %}
+                                {%  trans "French title proper"|capfirst as title %}
+                            {% elif key == "specific_title_english" %}
+                                {%  trans "English title proper"|capfirst as title %}
+                            {% endif %}
                             <tr>
-                                <td class="table_header">{%  trans key %}</td>
+                                <td class="table_header">{{ title }}</td>
                                 {% if previous_lu %}
-                                    <td>{% if previous_values|get_item:key %}<label style='color:#5CB85C;'>{{ previous_values|get_item:key }}</label>{% else %}{{ learning_unit_year|get_attribute:key | default_if_none:''}}{% endif %}</td>
+                                    <td>
+                                        {% if previous_values|get_item:key %}
+                                            <label style='color:#5CB85C;'>{{ previous_values|get_item:key }}</label>
+                                        {% else %}
+                                            {{ learning_unit_year|get_attribute:key | default_if_none:''}}
+                                        {% endif %}
+                                    </td>
                                 {% endif %}
-                                <td>{{ learning_unit_year|get_attribute:key | default_if_none:'' }}</td>
+                                <td>
+                                    {{ learning_unit_year|get_attribute:key | default_if_none:'' }}
+                                </td>
                                 {% if next_lu %}
-                                    <td>{% if next_values|get_item:key %}<label style='color:#5CB85C;'>{{ next_values|get_item:key}}</label>{% else %}{{ learning_unit_year|get_attribute:key | default_if_none:''}}{% endif %}</td>
+                                    <td>
+                                        {% if next_values|get_item:key %}
+                                            <label style='color:#5CB85C;'>{{ next_values|get_item:key}}</label>
+                                        {% else %}
+                                            {{ learning_unit_year|get_attribute:key | default_if_none:''}}
+                                        {% endif %}
+                                    </td>
                                 {% endif %}
                             </tr>
                         {% endfor %}
@@ -73,28 +102,58 @@
                             </tr>
                         {% endif %}
                         {% if entity_changes %}
-                            {% for k in entity_changes %}
+                            {% for key in entity_changes %}
+                                {% if key == _("Learning location") %}
+                                    {%  trans "Learning location"|capfirst as title %}
+                                {% elif key == "additional_requirement_entity_1" %}
+                                    {%  trans "Additional requirement entity 1"|capfirst as title %}
+                                {% elif key == "additional_requirement_entity_2" %}
+                                    {%  trans "Additional requirement entity 2"|capfirst as title %}
+                                {% elif key == "allocation_entity" %}
+                                    {%  trans "Allocation entity"|capfirst as title %}
+                                {% elif key == "requirement_entity" %}
+                                    {%  trans "Requirement entity"|capfirst as title %}
+                                {% endif %}
                                 <tr {% if forloop.first %}style="border-top: groove"{% endif %}>
-                                    <td class="table_header">{% trans k %}</td>
+                                    <td class="table_header">{{ title }}</td>
                                     {% if previous_lu %}
-                                        <td>{% value_label entity_changes key=k sub_key='prev' key_comp='current' %}</td>
+                                        <td>{% value_label entity_changes key=key sub_key='prev' key_comp='current' %}</td>
                                     {% endif %}
-                                    <td>{% value_label entity_changes key=k sub_key='current' key_comp='current' %}</td>
+                                    <td>{% value_label entity_changes key=key sub_key='current' key_comp='current' %}</td>
                                     {% if next_lu %}
-                                        <td>{% value_label entity_changes key=k sub_key='next' key_comp='current'%}</td>
+                                        <td>{% value_label entity_changes key=key sub_key='next' key_comp='current'%}</td>
                                     {% endif %}
                                 </tr>
                             {% endfor %}
                         {% endif %}
                         {% for key in  fields_lcy %}
+                            {% if key == "is_vacant" %}
+                                {%  trans "Vacant"|capfirst as title %}
+                            {% elif key == "team" %}
+                                {%  trans "Team management"|capfirst as title %}
+                            {% elif key == "type_declaration_vacant" %}
+                                {%  trans "Decision"|capfirst as title %}
+                            {% endif %}
                             <tr {% if forloop.first%}style="border-top: groove"{% endif %}>
-                                <td class="table_header">{%  trans key %}</td>
+                                <td class="table_header">{{ title }}</td>
                                 {% if previous_lu %}
-                                    <td>{% if previous_lcy_values|get_item:key %}<label style='color:#5CB85C;'>{{ previous_lcy_values|get_item:key }}</label>{% else %}{{ learning_unit_year.learning_container_year|get_attribute:key | default_if_none:''}}{% endif %}</td>
+                                    <td>
+                                        {% if previous_lcy_values|get_item:key %}
+                                            <label style='color:#5CB85C;'>{{ previous_lcy_values|get_item:key }}</label>
+                                        {% else %}
+                                            {{ learning_unit_year.learning_container_year|get_attribute:key | default_if_none:''}}
+                                        {% endif %}
+                                    </td>
                                 {% endif %}
                                 <td>{{ learning_unit_year.learning_container_year|get_attribute:key | default_if_none:'' }}</td>
                                 {% if next_lu %}
-                                    <td>{% if next_lcy_values|get_item:key %}<label style='color:#5CB85C;'>{{ next_lcy_values|get_item:key}}</label>{% else %}{{ learning_unit_year.learning_container_year|get_attribute:key | default_if_none:''}}{% endif %}</td>
+                                    <td>
+                                        {% if next_lcy_values|get_item:key %}
+                                            <label style='color:#5CB85C;'>{{ next_lcy_values|get_item:key}}</label>
+                                        {% else %}
+                                            {{ learning_unit_year.learning_container_year|get_attribute:key | default_if_none:''}}
+                                        {% endif %}
+                                    </td>
                                 {% endif %}
                             </tr>
                         {% endfor%}
