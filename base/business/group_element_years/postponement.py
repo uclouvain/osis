@@ -122,11 +122,14 @@ class PostponeContent:
 
                 self.result.append(new_gr)
 
+        self._post_postponement()
+
+        return next_instance
+
+    def _post_postponement(self):
         # Postpone the prerequisite only at the end to be sure to have all learning units and education groups
         for old_luy, new_luy in self.postponed_luy:
             self._postpone_prerequisite(old_luy, new_luy)
-
-        return next_instance
 
     def _postpone_child_leaf(self, old_gr, new_gr):
         """
@@ -196,5 +199,4 @@ class PostponeContent:
                     defaults={
                         'learning_unit': item.learning_unit
                     }
-
                 )
