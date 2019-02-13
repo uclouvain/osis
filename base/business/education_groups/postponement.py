@@ -29,14 +29,14 @@ from django.db import Error
 from django.utils.translation import ugettext as _
 
 from base.business.education_groups import create
-from base.business.utils.model import model_to_dict_fk, compare_objects, update_object
+from base.business.utils.model import model_to_dict_fk, compare_objects, update_object, update_related_object
 from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.hops import Hops
 
 EDUCATION_GROUP_MAX_POSTPONE_YEARS = 6
 FIELD_TO_EXCLUDE = ['id', 'uuid', 'external_id', 'academic_year', 'linked_with_epc']
-HOPS_FIELDS = ('ares_study',  'ares_graca', 'ares_ability')
+HOPS_FIELDS = ('ares_study', 'ares_graca', 'ares_ability')
 
 
 class ConsistencyError(Error):
@@ -86,6 +86,9 @@ def _postpone_m2m(education_group_year, postponed_egy, hops_values):
     if hops_values and any(elem in HOPS_FIELDS and hops_values[elem] for elem in hops_values):
         _postpone_hops(hops_values, postponed_egy)
 
+    for prerequisite in education_group_year.prerequisite_set.all():
+        _postpone_prerequisite(prerequisite, postponed_egy)
+
 
 def duplicate_education_group_year(old_education_group_year, new_academic_year, dict_initial_egy=None,
                                    hops_values=None):
@@ -126,6 +129,17 @@ def _postpone_hops(hops_values, postponed_egy):
                                   defaults={'ares_study': hops_values['ares_study'],
                                             'ares_graca': hops_values['ares_graca'],
                                             'ares_ability': hops_values['ares_ability']})
+
+
+def _postpone_prerequisite(prerequisite, next_egy):
+    new_prerequisite = update_related_object(prerequisite, 'education_group_year', next_egy)
+
+    luy = prerequisite.learning_unit_year
+    new_prerequisite.learning_unit_year = luy.get_learning_unit_next_year() or luy
+    new_prerequisite.save()
+
+    for item in prerequisite.prerequisiteitem_set.all():
+        update_related_object(item, 'prerequisite', new_prerequisite)
 
 
 class PostponementEducationGroupYearMixin:

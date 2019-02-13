@@ -124,7 +124,7 @@ class PostponeContent:
     def _postpone_child_leaf(old_gr, new_gr):
         """
         During the postponement of the learning units, we will take the next learning unit year
-        but if it does not exist for N+1, we will attach the current instance .
+        but if it does not exist for N+1, we will attach the current instance.
         """
         old_luy = old_gr.child_leaf
         new_luy = old_luy.get_learning_unit_next_year() or old_luy
@@ -133,7 +133,7 @@ class PostponeContent:
 
     def _postpone_child_branch(self, old_gr, new_gr):
         """
-        Unlike child leaf, the child branch must also be postponed (recursively)
+        Unlike child leaf, the child branch must be postponed (recursively)
         """
         old_egy = old_gr.child_branch
         new_egy = old_egy.next_year()

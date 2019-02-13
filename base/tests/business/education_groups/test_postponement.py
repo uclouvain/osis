@@ -46,6 +46,8 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.prerequisite import PrerequisiteFactory
+from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 
 class EducationGroupPostponementTestCase(TestCase):
@@ -285,6 +287,9 @@ class TestPostpone(TestCase):
     def test_postpone_with_child_branches(self):
         sub_group = GroupElementYearFactory(parent=self.current_group_element_year.child_branch)
 
+        sub_prerequisite = PrerequisiteFactory(education_group_year=sub_group.child_branch)
+        PrerequisiteItemFactory(prerequisite=sub_prerequisite)
+
         self.postponer = PostponeContent(self.current_education_group_year)
 
         new_root = self.postponer.postpone()
@@ -298,6 +303,13 @@ class TestPostpone(TestCase):
         new_child_branch_2 = new_child_branch.groupelementyear_set.get().child_branch
         self.assertEqual(new_child_branch_2.acronym, sub_group.child_branch.acronym)
         self.assertEqual(new_child_branch_2.academic_year, self.next_academic_year)
+
+        new_sub_prerequisite = new_child_branch_2.prerequisite_set.get()
+
+        self.assertEqual(new_sub_prerequisite.education_group_year.education_group,
+                         sub_prerequisite.education_group_year.education_group)
+
+        self.assertEqual(new_sub_prerequisite.prerequisiteitem_set.count(), 1)
 
     def test_postpone_with_old_child_leaf(self):
         luy = LearningUnitYearFactory(academic_year=self.current_academic_year)
