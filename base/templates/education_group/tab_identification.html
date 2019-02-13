@@ -25,37 +25,9 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block content %}
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <div class="row">
-                {% include "education_group/blocks/hamburger_button.html" %}
-                <div class="pull-right" style="margin-right: 15px;">
-                    {% include "education_group/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown" %}
-                </div>
-            </div>
-        </div>
-        <div class="panel-body" id="tabs">
-            <div class="tab-content" id="tab_content">
-                <div role="tabpanel" class="tab-pane active" id="identification">
-                    <div class="row" style="display:flex;">
-                        {% include "education_group/training_tree.html" %}
-                        <div id="panel-data" class="col-md-12" style="height: 100%;">
-                            {% include "education_group/tabs.html" %}
-                            <br>
-                            {% block details %}
-                            {% endblock %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="panel-footer text-right">
-            {% include "education_group/blocks/dropdown/identification_actions_bar.html"  with dropdirection="dropup" %}
-
-        </div>
-    </div>
+{% block top_action_bar %}
+    {% include "education_group/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown" %}
 {% endblock %}
-{% block script %}
-    <script type="text/javascript" src="{% static 'js/education_group/tbl_coorganization.js' %}"></script>
+{% block bottom_action_bar %}
+    {% include "education_group/blocks/dropdown/identification_actions_bar.html"  with dropdirection="dropup" %}
 {% endblock %}

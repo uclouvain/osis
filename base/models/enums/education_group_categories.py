@@ -23,19 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.utils.translation import ugettext_lazy as _
+
+from base.models.utils.utils import ChoiceEnum
 
 TRAINING = "TRAINING"
 MINI_TRAINING = "MINI_TRAINING"
 GROUP = "GROUP"
 
-CATEGORIES = (
-    (TRAINING, _(TRAINING)),
-    (MINI_TRAINING, _(MINI_TRAINING)),
-    (GROUP, _(GROUP)),
-)
 
-TRAINING_CATEGORIES = (
-    TRAINING, MINI_TRAINING
-)
+class Categories(ChoiceEnum):
+    TRAINING = _("Training")
+    MINI_TRAINING = _("Mini-Training")
+    GROUP = _("Group")
+
+    @classmethod
+    def training_categories(cls):
+        return cls.TRAINING.name, cls.MINI_TRAINING.name

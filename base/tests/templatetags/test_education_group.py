@@ -25,13 +25,14 @@
 ##############################################################################
 from datetime import timedelta
 
+from django.core.exceptions import FieldDoesNotExist
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, pgettext
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
-from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
+from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP, Categories
 from base.templatetags.education_group import li_with_deletion_perm, button_with_permission, \
     button_order_with_permission, BUTTON_ORDER_TEMPLATE, li_with_create_perm_training, \
     li_with_create_perm_mini_training, li_with_create_perm_group, link_detach_education_group, \
@@ -46,18 +47,6 @@ from base.tests.factories.person_entity import PersonEntityFactory
 DELETE_MSG = _("delete education group")
 PERMISSION_DENIED_MSG = _("The education group edition period is not open.")
 UNAUTHORIZED_TYPE_MSG = "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
-
-DISABLED_LI = """
-<li class="disabled" id="{}">
-    <a href="#" data-toggle="tooltip" title="{}">{}</a>
-</li>
-"""
-
-ENABLED_LI = """
-<li class="" id="{}">
-    <a href="{}" data-toggle="tooltip" title="">{}</a>
-</li>
-"""
 
 CUSTOM_LI_TEMPLATE = """
     <li {li_attributes}>
@@ -167,9 +156,9 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         result = li_with_create_perm_training(self.context, self.url, "")
 
         msg = pgettext("female", UNAUTHORIZED_TYPE_MSG) % {
-            "child_category": _(TRAINING),
-            "category": _(self.education_group_year.education_group_type.category),
-            "type": self.education_group_year.education_group_type.name
+            "child_category": Categories.TRAINING.value,
+            "category": self.education_group_year.education_group_type.get_category_display(),
+            "type": self.education_group_year.education_group_type.get_name_display()
         }
         msg = msg.capitalize()
         self.assertEqual(
@@ -186,9 +175,9 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     def test_li_with_create_perm_mini_training_disabled(self):
         result = li_with_create_perm_mini_training(self.context, self.url, "")
         msg = pgettext("female", UNAUTHORIZED_TYPE_MSG) % {
-            "child_category": _(MINI_TRAINING),
-            "category": _(self.education_group_year.education_group_type.category),
-            "type": self.education_group_year.education_group_type.name
+            "child_category": Categories.MINI_TRAINING.value,
+            "category": self.education_group_year.education_group_type.get_category_display(),
+            "type": self.education_group_year.education_group_type.get_name_display()
         }
         msg = msg.capitalize()
         self.assertEqual(
@@ -205,9 +194,9 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     def test_li_with_create_perm_group_disabled(self):
         result = li_with_create_perm_group(self.context, self.url, "")
         msg = pgettext("female", UNAUTHORIZED_TYPE_MSG) % {
-            "child_category": _(GROUP),
-            "category": _(self.education_group_year.education_group_type.category),
-            "type": self.education_group_year.education_group_type.name
+            "child_category": Categories.GROUP.value,
+            "category": self.education_group_year.education_group_type.get_category_display(),
+            "type": self.education_group_year.education_group_type.get_name_display()
         }
         msg = msg.capitalize()
         self.assertEqual(
@@ -249,7 +238,8 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         result = link_detach_education_group(self.context, "#")
         expected_result = CUSTOM_LI_TEMPLATE.format(
             li_attributes=""" class="disabled" """,
-            a_attributes=""" title=" {}" """.format(_("It is not possible to detach the root element.")),
+            a_attributes=""" title=" {}" """.format(
+                _("It is not possible to %(action)s the root element.") % {"action": _("Detach").lower()}),
             text=_('Detach'),
         )
         self.assertHTMLEqual(result, expected_result)
@@ -266,6 +256,7 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
             ),
             text=_('Detach'),
         )
+        self.maxDiff = None
         self.assertHTMLEqual(result, expected_result)
 
     def test_tag_link_pdf_content_education_group_not_permitted(self):
@@ -274,7 +265,7 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
             li_attributes=""" id="btn_operation_pdf_content" """,
             a_attributes=""" href="#" title="{}" {} """.format(
                 _("Generate pdf"),
-                _(""), ),
+                "", ),
             text=_('Generate pdf'),
         )
         self.assertEqual(
@@ -298,11 +289,10 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
     """ This class will test the tag as faculty manager """
 
     def setUp(self):
-        self.education_group_year = TrainingFactory()
+        current_ac = create_current_academic_year()
+        self.education_group_year = TrainingFactory(academic_year=current_ac)
         self.person = FacultyManagerFactory("delete_educationgroup", "change_educationgroup", "add_educationgroup")
         PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
-
-        current_ac = create_current_academic_year()
 
         # Create an academic calendar in order to check permission [Faculty can modify when period is opened]
         self.academic_calendar = AcademicCalendarFactory(
@@ -311,8 +301,6 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             end_date=timezone.now() + timedelta(weeks=+1),
             academic_year=current_ac,
         )
-
-        self.next_ac = AcademicYearFactory(year=current_ac.year + 1)
 
         self.client.force_login(user=self.person.user)
         self.url = reverse('delete_education_group', args=[self.education_group_year.id, self.education_group_year.id])
@@ -332,7 +320,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             result,
             {
                 'class_button': 'btn-default btn-sm disabled',
-                'load_modal': True,
+                'load_modal': False,
                 'url': '#',
                 'title': _("The education group edition period is not open."),
                 'icon': 'fa-edit'
@@ -340,8 +328,6 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         )
 
     def test_button_tag_case_inside_education_group_edition_period(self):
-        self.education_group_year.academic_year = self.next_ac
-
         result = button_with_permission(self.context, "title", "edit", "#")
         self.assertDictEqual(
             result,
@@ -371,8 +357,6 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         )
 
     def test_li_tag_case_inside_education_group_edition_period(self):
-        self.education_group_year.academic_year = self.next_ac
-
         result = li_with_deletion_perm(self.context, self.url, DELETE_MSG)
         self.assertEqual(
             result, {
@@ -443,7 +427,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         )
 
         self.assertEqual(result["is_disabled"], "disabled")
-        self.assertEqual(result["text"], _("edit"))
+        self.assertEqual(result["text"], _("Modify"))
 
 
 class TestEducationGroupDlWithParent(TestCase):
@@ -458,14 +442,14 @@ class TestEducationGroupDlWithParent(TestCase):
     def test_dl_value_in_education_group(self):
         response = dl_with_parent(self.context, "acronym")
         self.assertEqual(response["value"], self.education_group_year.acronym)
-        self.assertEqual(response["label"], _("acronym"))
+        self.assertEqual(response["label"], _("Acronym"))
         self.assertEqual(response["parent_value"], None)
 
     def test_dl_value_in_parent(self):
         self.education_group_year.acronym = ""
         response = dl_with_parent(self.context, "acronym")
         self.assertEqual(response["value"], "")
-        self.assertEqual(response["label"], _("acronym"))
+        self.assertEqual(response["label"], _("Acronym"))
         self.assertEqual(response["parent_value"], self.parent.acronym)
 
     def test_dl_default_value(self):
@@ -474,7 +458,7 @@ class TestEducationGroupDlWithParent(TestCase):
         response = dl_with_parent(self.context, "acronym", default_value="avada kedavra")
 
         self.assertEqual(response["value"], "")
-        self.assertEqual(response["label"], _("acronym"))
+        self.assertEqual(response["label"], _("Acronym"))
         self.assertEqual(response["parent_value"], "")
         self.assertEqual(response["default_value"], "avada kedavra")
 
@@ -497,6 +481,5 @@ class TestEducationGroupDlWithParent(TestCase):
 
     def test_dl_invalid_key(self):
         self.education_group_year.partial_deliberation = False
-        response = dl_with_parent(self.context, "partial_deliberation", "not_a_real_attr")
-        self.assertEqual(response["value"], None)
-        self.assertEqual(response["parent_value"], None)
+        with self.assertRaises(FieldDoesNotExist):
+            response = dl_with_parent(self.context, "not_a_real_attr")

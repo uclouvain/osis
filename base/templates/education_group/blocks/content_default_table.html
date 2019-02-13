@@ -1,0 +1,86 @@
+{% load i18n %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th>{% trans 'Code SCS' %}</th>
+        <th>{% trans "Title" %} / {% trans "Formation's code" %}</th>
+        <th>{% trans 'Cred. rel./abs.' %}</th>
+        <th>{% trans 'Mandatory' %}</th>
+        <th>{% trans 'Block' %}</th>
+        <th>{% trans 'Quad. derog.' %}</th>
+        <th>{% trans 'Link type' %}</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for group in group_element_years %}
+        <tr>
+            <td width="10%">{{ group.acronym }}</td>
+            <td width="20%">{{ group.title }}</td>
+            <td width="12%">{{ group.relative_credits | default_if_none:'-' }} /{{ group.child.credits|floatformat | default_if_none:'-' }}</td>
+            <td width="6%">{{ group.is_mandatory | yesno }}</td>
+            <td width="6%">{{ group.block | default_if_none:'-' }}</td>
+            <td width="5%">{{ group.get_quadrimester_derogation_display|default_if_none:'-' }}</td>
+            <td width="14%">{{ group.get_link_type_display|default_if_none:'-' }}</td>
+            <td width="15%">
+                {% include "education_group/blocks/content_actions.html" %}
+            </td>
+        </tr>
+        {% with nb_col_spanned=10 %}
+            <tr>
+                <td colspan="{{ nb_col_spanned }}" style="border-top: none;border-bottom: none;">
+                    {% if group.own_comment %}
+                        <label>{% trans 'Own comment' %}</label> :&nbsp;
+                        {{ group.own_comment }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% if group.comment %}
+                <tr style="border-spacing: 100px">
+                    <td colspan="{{ nb_col_spanned }}" style="border-top: none; border-bottom: none;">
+                        {% if group.comment %}
+                            <label>{% trans 'Comment' %}</label> :&nbsp;
+                            {{ group.comment }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+            {% if group.comment_english %}
+                <tr>
+                    <td colspan="{{ nb_col_spanned }}" style="border-top: none; border-bottom: none;">
+                        {% if group.comment_english %}
+                            <label>{% trans 'english comment'|capfirst %}</label> :&nbsp;
+                            {{ group.comment_english }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+        {% endwith %}
+    {% endfor %}
+    </tbody>
+</table>

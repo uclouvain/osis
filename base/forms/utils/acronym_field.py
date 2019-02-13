@@ -30,11 +30,16 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.forms.utils.choice_field import add_blank
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
 from base.models.enums.learning_unit_management_sites import LearningUnitManagementSite
 
 
 def _create_first_letter_choices():
     return add_blank(LearningUnitManagementSite.choices())
+
+
+def _create_external_first_letter_choices():
+    return add_blank(LearningUnitExternalSite.choices())
 
 
 class AcronymInput(forms.MultiWidget):
@@ -58,11 +63,11 @@ class AcronymInput(forms.MultiWidget):
 
 
 class ExternalAcronymInput(AcronymInput):
-    choices = (('X', 'X'),)
+    choices = _create_external_first_letter_choices()
 
     def __init__(self, attrs=None):
         super().__init__(attrs)
-        self.widgets[0].attrs['disabled'] = True
+        self.widgets[0].attrs['required'] = True
 
 
 class AcronymField(forms.MultiValueField):
@@ -75,7 +80,7 @@ class AcronymField(forms.MultiValueField):
             forms.CharField(*args, max_length=max_length, **kwargs)
         ]
         super().__init__(list_fields, *args, **kwargs)
-        self.label = _("acronym")
+        self.label = _("Acronym")
 
     def compress(self, data_list):
         return ''.join(data_list).upper()
@@ -83,10 +88,6 @@ class AcronymField(forms.MultiValueField):
 
 class ExternalAcronymField(AcronymField):
     widget = ExternalAcronymInput
-
-    def clean(self, value):
-        value[0] = 'X'
-        return super().clean(value)
 
 
 class PartimAcronymInput(forms.MultiWidget):
@@ -125,7 +126,7 @@ class PartimAcronymField(forms.MultiValueField):
         kwargs['require_all_fields'] = kwargs.pop('required', True)
         super().__init__(list_fields, *args, **kwargs)
         self.apply_attrs_to_widgets('disabled', disabled)
-        self.label = _("acronym")
+        self.label = _("Acronym")
 
     def apply_attrs_to_widgets(self, property, values):
         for index, subwidget in enumerate(self.widget.widgets):

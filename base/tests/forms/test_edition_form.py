@@ -31,7 +31,7 @@ from django.utils.translation import gettext
 from base.business.learning_unit_year_with_context import get_with_context
 from base.forms.learning_unit.edition_volume import VolumeEditionForm, VolumeEditionBaseFormset, \
     VolumeEditionFormsetContainer
-from base.models.person import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.person import PersonFactory
@@ -88,7 +88,7 @@ class TestVolumeEditionForm(TestCase):
                 initial=component_values,
                 component=component,
                 entities=self.learning_unit_with_context.entities)
-            self.assertTrue(form.is_valid())  # Accept that vol_q1 + vol_q2 is not equal to vol_tot
+            self.assertFalse(form.is_valid())
 
     def test_post_volume_form_wrong_volume_tot_requirement(self):
         for component, component_values in self.learning_unit_with_context.components.items():
@@ -99,7 +99,7 @@ class TestVolumeEditionForm(TestCase):
                 initial=component_values,
                 component=component,
                 entities=self.learning_unit_with_context.entities)
-            self.assertTrue(form.is_valid())  # Accept that vol_tot * cp is not equal to vol_global
+            self.assertFalse(form.is_valid())
 
     def test_post_volume_form_wrong_vol_req_entity(self):
         for component, component_values in self.learning_unit_with_context.components.items():
@@ -145,6 +145,8 @@ def _get_wrong_data_empty_field():
 def _get_wrong_data_volume_tot():
     data = _get_valid_data()
     data['volume_total'] = 3
+    data['volume_q1'] = 2
+    data['volume_Q2'] = 2
     return data
 
 
@@ -309,35 +311,35 @@ class TestVolumeEditionFormsetContainer(TestCase):
     def test_volume_edition_as_faculty_manager(self):
         component = LearningComponentYearFactory()
         form = VolumeEditionForm(
-            data={'volume_q1': 12, 'volume_q2': 12},
+            data={'volume_q1': 12, 'volume_q2': 12, 'volume_total': 24},
             component=component,
             learning_unit_year=self.learning_unit_year_full,
             is_faculty_manager=True, initial={'volume_q1': 0, 'volume_q2': 12}
         )
 
         form.is_valid()
-        self.assertEqual(form.errors['volume_q2'], [gettext('One of the partial volumes must have a value to 0.')])
-        self.assertEqual(form.errors['volume_q1'], [gettext('One of the partial volumes must have a value to 0.')])
+        self.assertEqual(form.errors['volume_q2'][1], gettext('One of the partial volumes must have a value to 0.'))
+        self.assertEqual(form.errors['volume_q1'][1], gettext('One of the partial volumes must have a value to 0.'))
 
         form = VolumeEditionForm(
-            data={'volume_q1': 0, 'volume_q2': 12},
+            data={'volume_q1': 0, 'volume_q2': 12, 'volume_total': 24},
             component=component,
             learning_unit_year=self.learning_unit_year_full,
             is_faculty_manager=True, initial={'volume_q1': 12, 'volume_q2': 12}
         )
 
         form.is_valid()
-        self.assertEqual(form.errors['volume_q1'], [gettext('The volume can not be set to 0.')])
+        self.assertEqual(form.errors['volume_q1'][1], gettext('The volume can not be set to 0.'))
 
         form = VolumeEditionForm(
-            data={'volume_q1': 12, 'volume_q2': 0},
+            data={'volume_q1': 12, 'volume_q2': 0, 'volume_total': 24},
             component=component,
             learning_unit_year=self.learning_unit_year_full,
             is_faculty_manager=True, initial={'volume_q1': 12, 'volume_q2': 12}
         )
 
         form.is_valid()
-        self.assertEqual(form.errors['volume_q2'], [gettext('The volume can not be set to 0.')])
+        self.assertEqual(form.errors['volume_q2'][1], gettext('The volume can not be set to 0.'))
 
 
 def get_valid_formset_data(prefix, is_partim=False):

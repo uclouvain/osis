@@ -38,7 +38,7 @@ from base.models.enums import organization_type, proposal_type, proposal_state, 
     learning_unit_year_periodicity, internship_subtypes, learning_unit_year_subtypes
 from base.models.enums.proposal_state import ProposalState
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.person import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
@@ -115,15 +115,15 @@ class TestSave(TestCase):
             'additional_requirement_entity_2-entity': self.entity_version.id,
 
             # Learning component year data model form
-            'form-TOTAL_FORMS': '2',
-            'form-INITIAL_FORMS': '0',
-            'form-MAX_NUM_FORMS': '2',
-            'form-0-hourly_volume_total_annual': 20,
-            'form-0-hourly_volume_partial_q1': 10,
-            'form-0-hourly_volume_partial_q2': 10,
-            'form-1-hourly_volume_total_annual': 20,
-            'form-1-hourly_volume_partial_q1': 10,
-            'form-1-hourly_volume_partial_q2': 10,
+            'component-TOTAL_FORMS': '2',
+            'component-INITIAL_FORMS': '0',
+            'component-MAX_NUM_FORMS': '2',
+            'component-0-hourly_volume_total_annual': 20,
+            'component-0-hourly_volume_partial_q1': 10,
+            'component-0-hourly_volume_partial_q2': 10,
+            'component-1-hourly_volume_total_annual': 20,
+            'component-1-hourly_volume_partial_q1': 10,
+            'component-1-hourly_volume_partial_q2': 10,
         }
 
     def test_learning_unit_proposal_form_get_as_faculty_manager(self):
@@ -247,7 +247,11 @@ class TestSave(TestCase):
                 "acronym": self.learning_unit_year.acronym,
                 "common_title": self.learning_unit_year.learning_container_year.common_title,
                 "container_type": self.learning_unit_year.learning_container_year.container_type,
-                "in_charge": self.learning_unit_year.learning_container_year.in_charge
+                "in_charge": self.learning_unit_year.learning_container_year.in_charge,
+                "team": self.learning_unit_year.learning_container_year.team,
+                "common_title_english": self.learning_unit_year.learning_container_year.common_title_english,
+                "is_vacant": self.learning_unit_year.learning_container_year.is_vacant,
+                "type_declaration_vacant": self.learning_unit_year.learning_container_year.type_declaration_vacant,
             },
             "learning_unit_year": {
                 "id": self.learning_unit_year.id,
@@ -258,17 +262,26 @@ class TestSave(TestCase):
                 "credits": self.learning_unit_year.credits,
                 "campus": self.learning_unit_year.campus.id,
                 "periodicity": self.learning_unit_year.periodicity,
+                "status": self.learning_unit_year.status,
+                "session": self.learning_unit_year.session,
+                "quadrimester": self.learning_unit_year.quadrimester,
+                "specific_title_english": self.learning_unit_year.specific_title_english,
+                "professional_integration": self.learning_unit_year.professional_integration,
+                "attribution_procedure": self.learning_unit_year.attribution_procedure,
             },
             "learning_unit": {
                 "id": self.learning_unit_year.learning_unit.id,
-                'end_year': self.learning_unit_year.learning_unit.end_year
+                'end_year': self.learning_unit_year.learning_unit.end_year,
+                "other_remark": self.learning_unit_year.learning_unit.other_remark,
+                "faculty_remark": self.learning_unit_year.learning_unit.faculty_remark,
             },
             "entities": {
                 entity_container_year_link_type.REQUIREMENT_ENTITY: self.entity_container_year.entity.id,
                 entity_container_year_link_type.ALLOCATION_ENTITY: None,
                 entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
                 entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
-            }
+            },
+            "learning_component_years": []
         }
 
         form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)

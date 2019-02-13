@@ -32,7 +32,8 @@ def get_scores_encoding_progress(user, offer_year_id, number_session, academic_y
                                                                                    offer_year_id=offer_year_id,
                                                                                    session_exam_number=number_session,
                                                                                    academic_year=academic_year,
-                                                                                   learning_unit_year_ids=learning_unit_year_ids)
+                                                                                   learning_unit_year_ids=learning_unit_year_ids,
+                                                                                   only_enrolled=True)
 
     return _sort_by_acronym([ScoreEncodingProgress(**row) for row in list(queryset)])
 

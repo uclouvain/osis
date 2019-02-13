@@ -29,9 +29,12 @@ from base.forms.education_group.common import CommonBaseForm, EducationGroupMode
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 
+from base.models.enums.education_group_categories import Categories
+
 
 class MiniTrainingYearModelForm(EducationGroupYearModelForm):
-    category = education_group_categories.MINI_TRAINING
+    category = Categories.MINI_TRAINING.name
+    category_text = Categories.MINI_TRAINING.value
 
     class Meta(EducationGroupYearModelForm.Meta):
         model = EducationGroupYear

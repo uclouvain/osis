@@ -64,7 +64,7 @@ def get_valid_external_learning_unit_form_data(academic_year, person, learning_u
     if not learning_unit_year:
         container_year = LearningContainerYearFactory(academic_year=academic_year)
         learning_unit_year = LearningUnitYearFactory.build(
-            acronym='XOSIS1111',
+            acronym='GOSIS1111',
             academic_year=academic_year,
             learning_container_year=container_year,
             subtype=learning_unit_year_subtypes.FULL,
@@ -140,7 +140,7 @@ class TestExternalLearningUnitForm(TestCase):
 
         self.assertIsInstance(luy, LearningUnitYear)
         self.assertEqual(luy.learning_container_year.container_type, EXTERNAL)
-        self.assertEqual(luy.acronym[0], 'X')
+        self.assertEqual(luy.acronym[0], 'G')
         self.assertEqual(luy.externallearningunityear.author, self.person)
         self.assertEqual(luy.learning_unit.start_year, self.academic_year.year)
 
@@ -200,7 +200,7 @@ class TestExternalLearningUnitSearchForm(TestCase):
 
         form = ExternalLearningUnitYearForm(form_data)
         self.assertTrue(form.is_valid())
-        self.assertCountEqual(form.get_activity_learning_units(), [self.external_lu_1])
+        self.assertCountEqual(form.get_activity_learning_units(), [self.external_lu_1.learning_unit_year])
 
     def test_search_learning_units_on_partial_acronym(self):
         form_data = {
@@ -209,7 +209,10 @@ class TestExternalLearningUnitSearchForm(TestCase):
 
         form = ExternalLearningUnitYearForm(form_data)
         self.assertTrue(form.is_valid())
-        self.assertCountEqual(form.get_activity_learning_units(), [self.external_lu_1, self.external_lu_2])
+        self.assertCountEqual(form.get_activity_learning_units(), [
+            self.external_lu_1.learning_unit_year,
+            self.external_lu_2.learning_unit_year
+        ])
 
     def test_search_learning_units_by_country(self):
         form_data = {
@@ -218,7 +221,8 @@ class TestExternalLearningUnitSearchForm(TestCase):
 
         form = ExternalLearningUnitYearForm(form_data)
         self.assertTrue(form.is_valid())
-        self.assertCountEqual(form.get_activity_learning_units(), [self.external_lu_BE_1, self.external_lu_BE_2])
+        self.assertCountEqual(form.get_activity_learning_units(), [
+            self.external_lu_BE_1.learning_unit_year, self.external_lu_BE_2.learning_unit_year])
 
     def test_search_learning_units_by_city(self):
         form_data = {
@@ -227,7 +231,7 @@ class TestExternalLearningUnitSearchForm(TestCase):
 
         form = ExternalLearningUnitYearForm(form_data)
         self.assertTrue(form.is_valid())
-        self.assertCountEqual(form.get_activity_learning_units(), [self.external_lu_BE_1])
+        self.assertCountEqual(form.get_activity_learning_units(), [self.external_lu_BE_1.learning_unit_year])
 
     def test_search_learning_units_by_campus(self):
         form_data = {
@@ -237,9 +241,4 @@ class TestExternalLearningUnitSearchForm(TestCase):
 
         form = ExternalLearningUnitYearForm(form_data)
         self.assertTrue(form.is_valid())
-        self.assertCountEqual(form.get_activity_learning_units(), [self.external_lu_BE_1])
-
-    def test_has_no_criteria(self):
-        form = ExternalLearningUnitYearForm({})
-        self.assertFalse(form.is_valid())
-        self.assertIn(_("minimum_one_criteria"), form.errors['__all__'])
+        self.assertCountEqual(form.get_activity_learning_units(), [self.external_lu_BE_1.learning_unit_year])

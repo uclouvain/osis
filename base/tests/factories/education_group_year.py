@@ -29,8 +29,9 @@ import factory.fuzzy
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, active_status, schedule_type
+from base.models.enums.constraint_type import CREDITS
 from base.models.enums.duration_unit import DURATION_UNIT
-from base.models.enums.education_group_types import BACHELOR, PGRM_MASTER_120
+from base.models.enums.education_group_types import TrainingType
 from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
@@ -46,6 +47,7 @@ def generate_title(education_group_year):
 class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = EducationGroupYear
+        django_get_or_create = ('education_group', 'academic_year',)
 
     education_group = factory.SubFactory(EducationGroupFactory)
     academic_year = factory.SubFactory(AcademicYearFactory)
@@ -58,7 +60,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     administration_entity = factory.SubFactory(EntityFactory)
     main_teaching_campus = factory.SubFactory(CampusFactory)
     credits = factory.fuzzy.FuzzyInteger(MINIMUM_CREDITS, MAXIMUM_CREDITS)
-    min_constraint = factory.fuzzy.FuzzyInteger(MINIMUM_CREDITS, MAXIMUM_CREDITS)
+    min_constraint = factory.fuzzy.FuzzyInteger(1, MAXIMUM_CREDITS)
     max_constraint = factory.lazy_attribute(lambda a: a.min_constraint)
     remark = factory.fuzzy.FuzzyText(length=255)
     remark_english = factory.fuzzy.FuzzyText(length=255)
@@ -68,11 +70,12 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     default_learning_unit_enrollment = False
     duration_unit = factory.Iterator(DURATION_UNIT, getter=operator.itemgetter(0))
     duration = factory.fuzzy.FuzzyInteger(1, 5)
+    constraint_type = CREDITS
+    linked_with_epc = False
 
 
 class MiniTrainingFactory(EducationGroupYearFactory):
-    education_group_type = factory.SubFactory('base.tests.factories.education_group_type.EducationGroupTypeFactory',
-                                              category=education_group_categories.MINI_TRAINING)
+    education_group_type__minitraining = True
 
 
 class TrainingFactory(EducationGroupYearFactory):
@@ -81,24 +84,53 @@ class TrainingFactory(EducationGroupYearFactory):
 
 
 class GroupFactory(EducationGroupYearFactory):
-    education_group_type = factory.SubFactory('base.tests.factories.education_group_type.EducationGroupTypeFactory',
-                                              category=education_group_categories.GROUP)
+    education_group_type__group = True
 
 
 class EducationGroupYearCommonBachelorFactory(EducationGroupYearFactory):
     acronym = 'common-1ba'
+    partial_acronym = 'common-1ba'
     education_group_type = factory.SubFactory(
-        'base.tests.factories.education_group_type.ExistingEducationGroupTypeFactory',
-        name=BACHELOR
+        'base.tests.factories.education_group_type.EducationGroupTypeFactory',
+        name=TrainingType.BACHELOR.name,
+        category=education_group_categories.TRAINING
+    )
+
+
+class EducationGroupYearCommonAgregationFactory(EducationGroupYearFactory):
+    acronym = 'common-2a'
+    partial_acronym = 'common-2a'
+    education_group_type = factory.SubFactory(
+        'base.tests.factories.education_group_type.EducationGroupTypeFactory',
+        name=TrainingType.AGGREGATION.name,
+        category=education_group_categories.TRAINING
+    )
+
+
+class EducationGroupYearCommonSpecializedMasterFactory(EducationGroupYearFactory):
+    acronym = 'common-2mc'
+    partial_acronym = 'common-2mc'
+    education_group_type = factory.SubFactory(
+        'base.tests.factories.education_group_type.EducationGroupTypeFactory',
+        name=TrainingType.MASTER_MC.name,
+        category=education_group_categories.TRAINING
     )
 
 
 class EducationGroupYearCommonMasterFactory(EducationGroupYearFactory):
     acronym = 'common-2m'
+    partial_acronym = 'common-2m'
     education_group_type = factory.SubFactory(
-        'base.tests.factories.education_group_type.ExistingEducationGroupTypeFactory',
-        name=PGRM_MASTER_120
+        'base.tests.factories.education_group_type.EducationGroupTypeFactory',
+        name=TrainingType.PGRM_MASTER_120.name,
+        category=education_group_categories.TRAINING
     )
+
 
 class EducationGroupYearMasterFactory(EducationGroupYearCommonMasterFactory):
     acronym = 'actu2m'
+
+
+class EducationGroupYearCommonFactory(EducationGroupYearFactory):
+    acronym = 'common'
+    partial_acronym = 'common'

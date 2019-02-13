@@ -28,7 +28,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
+from django.http import Http404, HttpResponseRedirect
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
@@ -82,7 +82,8 @@ class AjaxTemplateMixin:
             ]
         return template_names
 
-    def _convert_template_name_to_ajax_template_name(self, template_name):
+    @staticmethod
+    def _convert_template_name_to_ajax_template_name(template_name):
         if "_inner.html" not in template_name:
             split = template_name.split('.html')
             split[-1] = '_inner'
@@ -91,31 +92,25 @@ class AjaxTemplateMixin:
         return template_name
 
     def form_valid(self, form):
-        redirect = super().form_valid(form)
-
-        # When the form is saved, we return only the url, not all the template
-        if self.request.is_ajax():
-            return JsonResponse({"success": True, "success_url": self.get_success_url()})
-        else:
-            return redirect
+        response = super().form_valid(form)
+        return self._ajax_response() or response
 
     def forms_valid(self, forms):
-        redirect = super().forms_valid(forms)
-
-        # When the form is saved, we return only the url, not all the template
-        if self.request.is_ajax():
-            return JsonResponse({"success": True, "success_url": self.get_success_url()})
-        else:
-            return redirect
+        response = super().forms_valid(forms)
+        return self._ajax_response() or response
 
     def delete(self, request, *args, **kwargs):
-        redirect = super().delete(request, *args, **kwargs)
+        response = super().delete(request, *args, **kwargs)
+        return self._ajax_response() or response
 
+    def _ajax_response(self):
         # When the form is saved, we return only the url, not all the template
         if self.request.is_ajax():
-            return JsonResponse({"success": True, "success_url": self.get_success_url()})
-        else:
-            return redirect
+            response = {"success": True}
+            url = self.get_success_url()
+            if url:
+                response['success_url'] = url
+            return JsonResponse(response)
 
 
 class DeleteViewWithDependencies(FlagMixin, RulesRequiredMixin, AjaxTemplateMixin, DeleteView):
@@ -153,13 +148,15 @@ class MultiFormMixin(ContextMixin):
     initial = {}
     prefix = None
     success_url = None
+    instantiated_forms = {}
 
     def get_form_classes(self):
         return self.form_classes
 
     def get_forms(self, form_classes):
-        return dict([(key, self._create_form(key, class_name))
-                     for key, class_name in form_classes.items()])
+        self.instantiated_forms = dict([(key, self._create_form(key, class_name))
+                                        for key, class_name in form_classes.items()])
+        return self.instantiated_forms
 
     def get_all_forms(self):
         return self.get_forms(self.form_classes)

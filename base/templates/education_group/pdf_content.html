@@ -1,4 +1,4 @@
-{% load education_group %}
+{% load education_group education_group_pdf %}
 {% load staticfiles %}
 {% load i18n %}
 <!doctype html>
@@ -13,20 +13,20 @@
             size: A4 portrait;
             margin: 2cm 1cm 2cm 1cm;
 
-            @top-left {
-                content: "{% trans 'academic_year' %} {{ root.academic_year }} \A {{ root.verbose_title|safe }}";
+            @top-right {
+                content: "{% trans 'Academic year' %} {{ root.academic_year }} \A {{ root.verbose_title|safe }}";
                 white-space: pre-line;
                 font-size: 11px;
             }
 
-            @top-right {
+            @top-left {
                 background: url("{% static 'img/logo_uclouvain.png' %}") no-repeat;
                 display: inline-block;
                 width: 92mm;
                 padding-top: 65px;
                 font-size: 9px;
                 text-align: center;
-                content: "Université catholique de Louvain";
+                content: "";
             }
 
             @bottom-left {
@@ -88,25 +88,25 @@
                 <tr>
                     <td>{% trans "training"|title %}</td>
                     <td style="width:170px;"> .....</td>
-                    <td>{% trans "mobile_phone" %}</td>
+                    <td>{% trans "Mobile phone" %}</td>
                     <td style="width:170px;"> .....</td>
                 </tr>
                 <tr>
-                    <td>{% trans "first_name" %}</td>
+                    <td>{% trans "Firstname" %}</td>
                     <td style="width:170px;"> .....</td>
                     <td>{% trans "email" %}</td>
                     <td style="width:170px;"> .....</td>
                 </tr>
                 <tr>
-                    <td>{% trans "name"|title %}</td>
+                    <td>{% trans "Name" %}</td>
                     <td style="width:170px;"> .....</td>
                     <td>{% trans "faculty number"|title %}</td>
                     <td style="width:170px;"> .....</td>
                 </tr>
                 <tr>
-                    <td>{% trans "registration_id" %}</td>
+                    <td>{% trans "Registration ID" %}</td>
                     <td style="width:170px;"> .....</td>
-                    <td>{% trans "(optional)" %}</td>
+                    <td>({% trans "optional" %})</td>
                 </tr>
                 </tbody>
             </table>
@@ -155,7 +155,7 @@
             </div>&emsp; &emsp;
             {% if root.is_minor %}
                 <div style="display: inline;margin-left: 110px;">
-                    {% trans 'For approval' %}
+                    {% trans 'For approval,' %}
                 </div>
             {% endif %}
             <br>&emsp;

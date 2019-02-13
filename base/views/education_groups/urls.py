@@ -30,11 +30,13 @@ from base.views.education_groups.coorganization import CreateEducationGroupOrgan
     UpdateEducationGroupOrganizationView, CoorganizationDeleteView
 from base.views.education_groups.group_element_year.read import pdf_content
 from base.views.education_groups.learning_unit import detail as learning_unit_detail, update as learning_unit_update
+from base.views.education_groups.publication_contact import CreateEducationGroupPublicationContactView, \
+    UpdateEducationGroupPublicationContactView, EducationGroupPublicationContactDeleteView, \
+    UpdateEducationGroupEntityPublicationContactView
 from base.views.education_groups.select import education_group_select, learning_unit_select
 from base.views.education_groups.update import CertificateAimAutocomplete, PostponeGroupElementYearView
 from . import search, create, detail, update, delete, group_element_year
 from .achievement.urls import urlpatterns as urlpatterns_achievement
-import base.views.filter
 
 urlpatterns = [
     url(
@@ -90,9 +92,14 @@ urlpatterns = [
         url(r'^select/$', education_group_select, name='education_group_select'),
         url(r'^content/', include([
             url(u'^$', detail.EducationGroupContent.as_view(), name='education_group_content'),
+            url(u'^create/$', group_element_year.create.CreateGroupElementYearView.as_view(),
+                name='education_group_attach'
+                ),
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
-                url(r'^comment/$', group_element_year.update.UpdateGroupElementYearView.as_view(),
-                    name="group_element_year_management_comment")
+                url(r'^delete/$', group_element_year.delete.DetachGroupElementYearView.as_view(),
+                    name='group_element_year_delete'),
+                url(r'^update/$', group_element_year.update.UpdateGroupElementYearView.as_view(),
+                    name="group_element_year_update")
             ]))
         ])),
         url(r'^utilization/$', detail.EducationGroupUsing.as_view(), name='education_group_utilization'),
@@ -117,7 +124,9 @@ urlpatterns = [
         url(r'^admission_conditions/line/order$',
             education_group.education_group_year_admission_condition_line_order,
             name='education_group_year_admission_condition_line_order'),
-
+        url(r'^admission_conditions/lang/edit/(?P<language>[A-Za-z-]+)/$',
+            education_group.education_group_year_admission_condition_tab_lang_edit,
+            name='tab_lang_edit'),
         url(r'^delete/$', delete.DeleteGroupEducationView.as_view(), name="delete_education_group"),
         url(r'^group_content/', group_element_year.read.ReadEducationGroupTypeView.as_view(), name="group_content"),
         url(r'^pdf_content/(?P<language>[a-z\-]+)', pdf_content, name="pdf_content"),
@@ -135,6 +144,21 @@ urlpatterns = [
             url(r'^delete/(?P<coorganization_id>[0-9]+)$',
                 CoorganizationDeleteView.as_view(),
                 name="coorganization_delete"),
+        ])),
+
+        url(r'^publication_contact/', include([
+            url(r'^edit_entity/$',
+                UpdateEducationGroupEntityPublicationContactView.as_view(),
+                name='publication_contact_entity_edit'),
+            url(r'^create/$',
+                CreateEducationGroupPublicationContactView.as_view(),
+                name="publication_contact_create"),
+            url(r'^edit/(?P<publication_contact_id>[0-9]+)/$',
+                UpdateEducationGroupPublicationContactView.as_view(),
+                name="publication_contact_edit"),
+            url(r'^delete/(?P<publication_contact_id>[0-9]+)$',
+                EducationGroupPublicationContactDeleteView.as_view(),
+                name="publication_contact_delete"),
         ])),
     ])),
     url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([

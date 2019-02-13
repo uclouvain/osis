@@ -25,19 +25,17 @@
 ##############################################################################
 from unittest import mock
 
-from django.contrib.auth.models import Permission, Group
+from django.contrib.auth.models import Permission
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
-from django.test import RequestFactory
 from django.test import TestCase
 from django.urls import reverse
 
 from base.forms.learning_unit_pedagogy import TeachingMaterialModelForm
 from base.models.enums.learning_unit_year_subtypes import FULL
-from base.models.person import CENTRAL_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory, CentralManagerFactory, PersonWithPermissionsFactory
+from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 
 
@@ -66,19 +64,11 @@ class TeachingMaterialCreateTestCase(TestCase):
         self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
 
     @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
-    @mock.patch('base.views.layout.render')
-    def test_teaching_material_create_template_used(self, mock_render, mock_is_linked_to_entity_charge):
+    def test_teaching_material_create_template_used(self, mock_is_linked_to_entity_charge):
         mock_is_linked_to_entity_charge.return_value = True
-        request_factory = RequestFactory()
-        request = request_factory.get(self.url)
-        request.user = self.person.user
-
-        from base.views.teaching_material import create
-        create(request, learning_unit_year_id=self.learning_unit_year.pk)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_unit/teaching_material/modal_edit.html')
-        self.assertIsInstance(context['form'], TeachingMaterialModelForm)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'learning_unit/teaching_material/modal_edit.html')
+        self.assertIsInstance(response.context['form'], TeachingMaterialModelForm)
 
 
 class TeachingMaterialUpdateTestCase(TestCase):
@@ -110,21 +100,12 @@ class TeachingMaterialUpdateTestCase(TestCase):
         self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
 
     @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
-    @mock.patch('base.views.layout.render')
-    def test_teaching_material_create_template_used(self, mock_render, mock_is_linked_to_entity_charge):
+    def test_teaching_material_create_template_used(self, mock_is_linked_to_entity_charge):
         mock_is_linked_to_entity_charge.return_value = True
-        request_factory = RequestFactory()
-        request = request_factory.get(self.url)
-        request.user = self.person.user
+        response = self.client.get(self.url)
 
-        from base.views.teaching_material import update
-        update(request,
-               learning_unit_year_id=self.learning_unit_year.pk,
-               teaching_material_id=self.teaching_material.pk)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_unit/teaching_material/modal_edit.html')
-        self.assertIsInstance(context['form'], TeachingMaterialModelForm)
+        self.assertTemplateUsed(response, 'learning_unit/teaching_material/modal_edit.html')
+        self.assertIsInstance(response.context['form'], TeachingMaterialModelForm)
 
 
 class TeachingMaterialDeleteTestCase(TestCase):
@@ -156,20 +137,10 @@ class TeachingMaterialDeleteTestCase(TestCase):
         self.assertEqual(response.status_code, 405)  # Method not allowed
 
     @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
-    @mock.patch('base.views.layout.render')
-    def test_teaching_material_create_template_used(self, mock_render, mock_is_linked_to_entity_charge):
+    def test_teaching_material_create_template_used(self, mock_is_linked_to_entity_charge):
         mock_is_linked_to_entity_charge.return_value = True
-        request_factory = RequestFactory()
-        request = request_factory.get(self.url)
-        request.user = self.person.user
-
-        from base.views.teaching_material import delete
-        delete(request,
-               learning_unit_year_id=self.learning_unit_year.pk,
-               teaching_material_id=self.teaching_material.pk)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_unit/teaching_material/modal_delete.html')
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'learning_unit/teaching_material/modal_delete.html')
 
 
 def _get_central_manager_person_with_permission():

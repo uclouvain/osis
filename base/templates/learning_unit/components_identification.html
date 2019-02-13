@@ -1,6 +1,7 @@
 {% load staticfiles %}
 {% load i18n %}
 {% load components_classes %}
+{% load learning_unit %}
 {% load waffle_tags %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -29,20 +30,20 @@
     <thead>
     <tr>
         <th>{% trans 'Own components' %}</th>
-        <th>{% trans 'code' %}</th>
-        <th>{% trans 'volume_partial' %}</th>
-        <th>{% trans 'volume_remaining' %}</th>
+        <th>{% trans 'Code' %}</th>
+        <th>{% trans 'Vol. Q1' %}</th>
+        <th>{% trans 'Vol. Q2' %}</th>
         <th>
             <abbr title="{% trans 'The annual volume must be equal to the sum of the volumes Q1 and Q2' %}">
                 {% trans 'Vol. annual' %}
             </abbr>
         </th>
         <th>
-            <abbr title="{% trans 'real_on_planned_classrooms' %}">{% trans 'Classes' %}</abbr>
+            <abbr title="{% trans 'Real/Planned classrooms' %}">{% trans 'Classes' %}</abbr>
         </th>
         <th>
             <abbr title="{% trans 'The global volume corresponding to the product of the annual volume and the number of planned classes must be equal to the sum of the volumes for each entity' %}">
-                {% trans 'vol_global' %}
+                {% trans 'Vol. global' %}
             </abbr>
         </th>
         {% block additional_entities_titles %}
@@ -53,19 +54,16 @@
     <tbody>
     {% for component in components %}
         <tr>
-            <td>{% if component.learning_component_year.type %}
-                {% trans component.learning_component_year.type %}
-            {% else %}
-                {% trans 'LECTURING' %}
-            {% endif %}
+            <td>
+                {{ component.learning_component_year.get_type_display | default_if_none:_("Lecturing") }}
             </td>
             <td>/
                 {# FIXME :: Temporary solution - waiting for business clarification about "components" concept (untyped, ...)#}
                 {% if component.learning_component_year.acronym  == 'NT' %}PM{% else %}
                     {{ component.learning_component_year.acronym  | default_if_none:'' }}{% endif %}</td>
-            <td>{{ component.volumes.VOLUME_Q1|floatformat | default_if_none:'' }}</td>
-            <td>{{ component.volumes.VOLUME_Q2|floatformat | default_if_none:'' }}</td>
-            <td>{{ component.volumes.VOLUME_TOTAL|floatformat | default_if_none:'' }}</td>
+            <td>{% dl_component_tooltip 'VOLUME_Q1' value=component.volumes.VOLUME_Q1 id=component.learning_component_year.id  default_if_none='' %}</td>
+            <td>{% dl_component_tooltip 'VOLUME_Q2' value=component.volumes.VOLUME_Q2 id=component.learning_component_year.id  default_if_none='' %}</td>
+            <td>{% dl_component_tooltip 'VOLUME_TOTAL' value=component.volumes.VOLUME_TOTAL id=component.learning_component_year.id  default_if_none='' %}</td>
             <td>
                 <span class="badge fixed_width {{ component.learning_component_year.planned_classes |get_css_class:component.learning_component_year.real_classes }}">
                     {{ component.learning_component_year.real_classes| default_if_none:'0' }} /
@@ -73,9 +71,9 @@
                 </span>
             </td>
 
-            <td>{{ component.volumes.VOLUME_GLOBAL|floatformat| default_if_none:'0' }}</td>
+            <td>{% dl_component_tooltip 'VOLUME_GLOBAL' value=component.volumes.VOLUME_GLOBAL id=component.learning_component_year.id  default_if_none='0' %}</td>
             {% block additional_requirement_entity_volumes %}
-                {% include "learning_unit/blocks/additional_requirement_entity_volumes.html" %}
+                {% include "learning_unit/blocks/additional_requirement_entity_volumes_identification.html" %}
             {% endblock %}
         </tr>
     {% endfor %}

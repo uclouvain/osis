@@ -2148,6 +2148,16 @@
                 "educationgroupyear"
             ],
             [
+                "change_person",
+                "base",
+                "person"
+            ],
+            [
+                "change_student",
+                "base",
+                "student"
+            ],
+            [
                 "is_administrator",
                 "base",
                 "person"
@@ -2978,9 +2988,24 @@
                 "educationgroupachievement"
             ],
             [
-                "can_edit_educationgroup_pedagogy",
+                "change_pedagogyinformation",
                 "base",
                 "educationgroup"
+            ],
+            [
+                "change_commonpedagogyinformation",
+                "base",
+                "educationgroup"
+            ],
+            [
+                "change_admissioncondition",
+                "base",
+                "admissioncondition"
+            ],
+            [
+                "change_commonadmissioncondition",
+                "base",
+                "admissioncondition"
             ],
             [
                 "change_learningclassyear",
@@ -3131,7 +3156,7 @@
                 "educationgroup"
             ],
             [
-                "can_edit_educationgroup_pedagogy",
+                "change_pedagogyinformation",
                 "base",
                 "educationgroup"
             ],
@@ -3299,6 +3324,11 @@
                 "can_manage_attribution",
                 "base",
                 "person"
+            ],
+            [
+                "change_admissioncondition",
+                "base",
+                "admissioncondition"
             ]
         ]
     }
@@ -3368,5 +3398,51 @@
             ]
         ]
     }
-}
+},
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "sic",
+            "permissions": [
+                [
+                    "change_commonadmissioncondition",
+                    "base",
+                    "admissioncondition"
+                ],
+                [
+                    "can_access_education_group",
+                    "base",
+                    "educationgroup"
+                ],
+                [
+                    "can_access_catalog",
+                    "base",
+                    "offer"
+                ]
+            ]
+        }
+    },
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "continuing_education_managers",
+            "permissions": [
+                [
+                    "can_access_admission",
+                    "continuing_education",
+                    "admission"
+                ],
+                [
+                    "change_admission",
+                    "continuing_education",
+                    "admission"
+                ],
+                [
+                    "can_validate_registration",
+                    "continuing_education",
+                    "admission"
+                ]
+            ]
+        }
+    }
 ]

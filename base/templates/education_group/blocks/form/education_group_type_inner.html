@@ -30,17 +30,21 @@
 
 <form method="post" id="form_education_group_type" action="{{ request.path }}">
     {% csrf_token %}
-    {% bootstrap_form form %}
+
+
+    {% bootstrap_field form.name %}
+
+
     {% if not request.is_ajax %}
-        <input type="submit" value="{% trans "i_confirm" %}" class="btn btn-primary"/>
+        <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-primary"/>
     {% endif %}
 </form>
 </div>
 
 {% if request.is_ajax %}
     <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
-        <input type="submit" value="{% trans "i_confirm" %}" class="btn btn-primary"
+        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
+        <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-primary"
                onclick="$('#form_education_group_type').submit();"/>
     </div>
     </div>

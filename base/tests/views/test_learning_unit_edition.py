@@ -57,7 +57,6 @@ from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFact
 from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.tests.forms.test_edition_form import get_valid_formset_data
 from base.views.learning_unit import learning_unit_components
-from base.views.learning_units.detail import learning_unit_identification
 from base.views.learning_units.update import learning_unit_edition_end_date, learning_unit_volumes_management, \
     update_learning_unit, _get_learning_units_for_context
 
@@ -101,7 +100,6 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
         mock_perms.return_value = True
         response = self.client.get(reverse(learning_unit_edition_end_date, args=[self.learning_unit_year.id]))
         self.assertTemplateUsed(response, "learning_unit/simple/update_end_date.html")
-
 
     @mock.patch('base.business.learning_units.perms.is_eligible_for_modification_end_date')
     def test_view_learning_unit_edition_post(self, mock_perms):
@@ -351,15 +349,15 @@ class TestEditLearningUnit(TestCase):
             'allocation_entity-entity': self.requirement_entity.id,
             'additional_requirement_entity_1-entity': '',
             # Learning component year data model form
-            'form-TOTAL_FORMS': '2',
-            'form-INITIAL_FORMS': '0',
-            'form-MAX_NUM_FORMS': '2',
-            'form-0-hourly_volume_total_annual': 20,
-            'form-0-hourly_volume_partial_q1': 10,
-            'form-0-hourly_volume_partial_q2': 10,
-            'form-1-hourly_volume_total_annual': 20,
-            'form-1-hourly_volume_partial_q1': 10,
-            'form-1-hourly_volume_partial_q2': 10,
+            'component-TOTAL_FORMS': '2',
+            'component-INITIAL_FORMS': '0',
+            'component-MAX_NUM_FORMS': '2',
+            'component-0-hourly_volume_total_annual': 20,
+            'component-0-hourly_volume_partial_q1': 10,
+            'component-0-hourly_volume_partial_q2': 10,
+            'component-1-hourly_volume_total_annual': 20,
+            'component-1-hourly_volume_partial_q1': 10,
+            'component-1-hourly_volume_partial_q2': 10,
         }
         return form_data
 
@@ -391,35 +389,24 @@ class TestLearningUnitVolumesManagement(TestCase):
         PersonEntityFactory(entity=self.generate_container.entities[0], person=self.person)
 
     @mock.patch('base.models.program_manager.is_program_manager')
-    @mock.patch('base.views.layout.render')
-    def test_learning_unit_volumes_management_get_full_form(self, mock_render, mock_program_manager):
+    def test_learning_unit_volumes_management_get_full_form(self, mock_program_manager):
         mock_program_manager.return_value = True
 
-        request_factory = RequestFactory()
-        request = request_factory.get(self.url)
+        response = self.client.get(self.url)
 
-        request.user = self.user
-        request.session = 'session'
-        request._messages = FallbackStorage(request)
-
-        learning_unit_volumes_management(request, learning_unit_year_id=self.learning_unit_year.id, form_type="full")
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/volumes_management.html')
-        self.assertEqual(context['learning_unit_year'], self.learning_unit_year)
-        for formset in context['formsets'].keys():
+        self.assertTemplateUsed(response, 'learning_unit/volumes_management.html')
+        self.assertEqual(response.context['learning_unit_year'], self.learning_unit_year)
+        for formset in response.context['formsets'].keys():
             self.assertIn(formset, [self.learning_unit_year, self.learning_unit_year_partim])
 
         # Check that we display only the current learning_unit_year in the volumes management page (not all the family)
         self.assertListEqual(
-            context['learning_units'],
+            response.context['learning_units'],
             [self.learning_unit_year, self.learning_unit_year_partim]
         )
 
     @mock.patch('base.models.program_manager.is_program_manager')
-    @mock.patch('base.views.layout.render')
-    def test_learning_unit_volumes_management_get_simple_form(self, mock_render, mock_program_manager):
+    def test_learning_unit_volumes_management_get_simple_form(self, mock_program_manager):
         mock_program_manager.return_value = True
 
         simple_url = reverse('learning_unit_volumes_management', kwargs={
@@ -427,27 +414,15 @@ class TestLearningUnitVolumesManagement(TestCase):
             'form_type': 'simple'
         })
 
-        request_factory = RequestFactory()
-        request = request_factory.get(simple_url)
+        response = self.client.get(simple_url)
 
-        request.user = self.user
-        request.session = 'session'
-        request._messages = FallbackStorage(request)
-
-        learning_unit_volumes_management(request, learning_unit_year_id=self.learning_unit_year.id, form_type="simple")
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'learning_unit/volumes_management.html')
-        self.assertEqual(context['learning_unit_year'], self.learning_unit_year)
-        for formset in context['formsets'].keys():
+        self.assertTemplateUsed(response, 'learning_unit/volumes_management.html')
+        self.assertEqual(response.context['learning_unit_year'], self.learning_unit_year)
+        for formset in response.context['formsets'].keys():
             self.assertIn(formset, [self.learning_unit_year, self.learning_unit_year_partim])
 
         # Check that we display only the current learning_unit_year in the volumes management page (not all the family)
-        self.assertListEqual(
-            context['learning_units'],
-            [self.learning_unit_year]
-        )
+        self.assertListEqual(response.context['learning_units'], [self.learning_unit_year])
 
     @mock.patch('base.models.program_manager.is_program_manager')
     def test_learning_unit_volumes_management_post_full_form(self, mock_program_manager):
@@ -507,7 +482,7 @@ class TestLearningUnitVolumesManagement(TestCase):
         msg = [m.message for m in get_messages(request)]
         self.assertEqual(len(msg), 1)
         self.assertIn(messages.SUCCESS, msg_level)
-        self.assertEqual(response.url, reverse(learning_unit_identification, args=[self.learning_unit_year.id]))
+        self.assertEqual(response.url, reverse("learning_unit", args=[self.learning_unit_year.id]))
 
         for generated_container_year in self.generate_container:
             learning_component_year = generated_container_year.learning_component_cm_full

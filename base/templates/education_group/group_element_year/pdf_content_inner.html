@@ -28,7 +28,7 @@
     <div id="form-modal-body" class="modal-body">
 {% endif %}
 
-<form method="post" id="form_pdf_content" action="{{ request.path }}" >
+<form method="post" id="form_pdf_content" class="modal_form" action="{{ request.path }}" >
     {% csrf_token %}
     {% bootstrap_form form %}
     {% include "blocks/forms/create_cancel_buttons_modal.html" %}

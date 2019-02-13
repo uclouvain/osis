@@ -24,10 +24,12 @@
 #
 ##############################################################################
 from django.db import models
+from reversion.admin import VersionAdmin
+
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
-class EntityComponentYearAdmin(SerializableModelAdmin):
+class EntityComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('entity_container_year', 'learning_component_year', 'repartition_volume',)
     search_fields = ['entity_container_year__learning_container_year__acronym']
     raw_id_fields = ('entity_container_year', 'learning_component_year')
@@ -46,12 +48,3 @@ class EntityComponentYear(SerializableModel):
 
     class Meta:
         unique_together = ('entity_container_year', 'learning_component_year', )
-
-
-def find_by_learning_container_year(learning_container_yr):
-    return EntityComponentYear.objects.filter(learning_component_year__learning_container_year=learning_container_yr)
-
-
-def find_by_entity_container_years(entity_container_yrs, a_learning_component_year):
-    return EntityComponentYear.objects.filter(entity_container_year__in=entity_container_yrs,
-                                              learning_component_year=a_learning_component_year)

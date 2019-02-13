@@ -24,10 +24,12 @@
 #
 ##############################################################################
 
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.test import TestCase
 from django.urls import reverse
 
-from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
+from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
+from base.models.enums.link_type import LinkTypes
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -52,7 +54,7 @@ class TestBuildTree(TestCase):
         )
 
     def test_init_tree(self):
-        node = NodeBranchJsTree(self.parent)
+        node = EducationGroupHierarchy(self.parent)
 
         self.assertEqual(node.education_group_year, self.parent)
         self.assertEqual(len(node.children), 2)
@@ -67,7 +69,7 @@ class TestBuildTree(TestCase):
         self.assertEqual(node.children[1].children[0].learning_unit_year, self.group_element_year_2_1.child_leaf)
 
     def test_tree_to_json(self):
-        node = NodeBranchJsTree(self.parent)
+        node = EducationGroupHierarchy(self.parent)
 
         json = node.to_json()
         self.assertEqual(json['text'], self.parent.verbose)
@@ -83,7 +85,7 @@ class TestBuildTree(TestCase):
             ) + "?group_to_parent={}".format(self.group_element_year_2_1.pk))
 
     def test_tree_to_json_ids(self):
-        node = NodeBranchJsTree(self.parent)
+        node = EducationGroupHierarchy(self.parent)
         json = node.to_json()
 
         self.assertEquals(
@@ -101,3 +103,20 @@ class TestBuildTree(TestCase):
                 node.children[1].children[0].group_element_year.pk if node.children[1].group_element_year else '#'
             )
         )
+
+    def test_build_tree_reference(self):
+        """
+        This tree contains a reference link.
+        """
+        self.group_element_year_1.link_type = LinkTypes.REFERENCE.name
+        self.group_element_year_1.save()
+
+        node = EducationGroupHierarchy(self.parent)
+
+        self.assertEqual(node.children[0]._get_icon(),  static('img/reference.jpg'))
+
+        list_children = node.to_list()
+        self.assertEqual(list_children, [
+            self.group_element_year_1_1,
+            self.group_element_year_2, [self.group_element_year_2_1]
+        ])

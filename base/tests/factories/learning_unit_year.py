@@ -60,7 +60,8 @@ class LearningUnitYearFactory(DjangoModelFactory):
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     academic_year = factory.SubFactory(AcademicYearFactory)
     learning_unit = factory.SubFactory(LearningUnitFactory)
-    learning_container_year = factory.SubFactory(LearningContainerYearFactory)
+    learning_container_year = factory.SubFactory(LearningContainerYearFactory,
+                                                 academic_year=factory.SelfAttribute('..academic_year'))
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
                                                datetime.datetime(2017, 3, 1))
     acronym = factory.Sequence(lambda n: 'LFAC%04d' % n)

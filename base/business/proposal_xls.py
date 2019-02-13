@@ -29,33 +29,36 @@ from django.utils.translation import ugettext_lazy as _
 from osis_common.document import xls_build
 from base.business.learning_unit import get_entity_acronym
 from base.business.xls import get_name_or_username
+from base.models.proposal_learning_unit import find_by_learning_unit_year
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 
-WORKSHEET_TITLE = 'Proposals'
-XLS_FILENAME = 'Proposals'
-XLS_DESCRIPTION = "List_proposals"
+WORKSHEET_TITLE = _('Proposals')
+XLS_FILENAME = _('Proposals')
+XLS_DESCRIPTION = _("List proposals")
 
-PROPOSAL_TITLES = [str(_('requirement_entity_small')), str(_('code')), str(_('title')), str(_('type')),
-                   str(_('proposal_type')), str(_('proposal_status')), str(_('folder_num')),
-                   str(_('type_declaration_vacant')), str(_('periodicity')), str(_('credits')),
-                   str(_('allocation_entity_small')), str(_('proposal_date'))]
+PROPOSAL_TITLES = [str(_('Req. Entity')), str(_('Code')), str(_('Title')), str(_('Type')),
+                   str(_('Proposal type')), str(_('Proposal status')), str(_('Folder num.')),
+                   str(_('Decision')), str(_('Periodicity')), str(_('Credits')),
+                   str(_('Alloc. Ent.')), str(_('Proposals date'))]
 
 
 def prepare_xls_content(proposals):
     return [extract_xls_data_from_proposal(proposal) for proposal in proposals]
 
 
-def extract_xls_data_from_proposal(proposal):
-    return [get_entity_acronym(proposal.learning_unit_year.entities.get('REQUIREMENT_ENTITY')),
-            proposal.learning_unit_year.acronym,
-            proposal.learning_unit_year.complete_title,
-            xls_build.translate(proposal.learning_unit_year.learning_container_year.container_type),
-            xls_build.translate(proposal.type),
-            xls_build.translate(proposal.state),
+def extract_xls_data_from_proposal(luy):
+    proposal = find_by_learning_unit_year(luy)
+    return [luy.entity_requirement,
+            luy.acronym,
+            luy.complete_title,
+            luy.learning_container_year.get_container_type_display(),
+            proposal.get_type_display(),
+            proposal.get_state_display(),
             proposal.folder,
-            xls_build.translate(proposal.learning_unit_year.learning_container_year.type_declaration_vacant),
-            xls_build.translate(proposal.learning_unit_year.periodicity),
-            proposal.learning_unit_year.credits,
-            get_entity_acronym(proposal.learning_unit_year.entities.get('ALLOCATION_ENTITY')),
+            luy.learning_container_year.get_type_declaration_vacant_display(),
+            dict(PERIODICITY_TYPES)[luy.periodicity],
+            luy.credits,
+            luy.entity_allocation,
             proposal.date.strftime('%d-%m-%Y')]
 
 
@@ -72,14 +75,8 @@ def prepare_xls_parameters_list(user, working_sheets_data):
 
 
 def create_xls(user, proposals, filters):
-    working_sheets_data = prepare_xls_content(proposals)
-    return xls_build.generate_xls(
-        xls_build.prepare_xls_parameters_list(working_sheets_data, configure_parameters(user)), filters)
-
-
-def create_xls_proposal(user, proposals, filters):
-    return xls_build.generate_xls(prepare_xls_parameters_list(prepare_xls_content(proposals),
-                                                              configure_parameters(user)), filters)
+    ws_data = xls_build.prepare_xls_parameters_list(prepare_xls_content(proposals), configure_parameters(user))
+    return xls_build.generate_xls(ws_data, filters)
 
 
 def configure_parameters(user):

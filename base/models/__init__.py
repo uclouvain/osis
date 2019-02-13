@@ -37,6 +37,7 @@ from base.models import education_group_organization
 from base.models import education_group_type
 from base.models import education_group_year
 from base.models import education_group_year_domain
+from base.models import education_group_publication_contact
 from base.models import entity
 from base.models import entity_calendar
 from base.models import entity_component_year
@@ -48,6 +49,7 @@ from base.models import external_learning_unit_year
 from base.models import external_learning_unit_year
 from base.models import external_offer
 from base.models import group_element_year
+from base.models import hops
 from base.models import learning_achievement
 from base.models import learning_class_year
 from base.models import learning_component_year
@@ -73,6 +75,7 @@ from base.models import person
 from base.models import person_address
 from base.models import person_entity
 from base.models import prerequisite
+from base.models import prerequisite_item
 from base.models import program_manager
 from base.models import proposal_learning_unit
 from base.models import session_exam

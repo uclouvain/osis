@@ -38,8 +38,10 @@ from base.models.enums import exam_enrollment_state as enrollment_states, \
 from base.models.exceptions import JustificationValueException
 from base.models.utils.admin_extentions import remove_delete_action
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from base.models.enums import exam_enrollment_state as enrollment_states
 
-JUSTIFICATION_ABSENT_FOR_TUTOR = _('absent')
+JUSTIFICATION_ABSENT_FOR_TUTOR = _('Absent')
+SCORE_BETWEEN_0_AND_20 = _("Scores must be between 0 and 20")
 
 
 class ExamEnrollmentAdmin(OsisModelAdmin):
@@ -58,14 +60,16 @@ class ExamEnrollment(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     score_draft = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
-                                      validators=[MinValueValidator(0, message="scores_must_be_between_0_and_20"),
-                                                  MaxValueValidator(20, message="scores_must_be_between_0_and_20")])
+                                      validators=[MinValueValidator(0, message=SCORE_BETWEEN_0_AND_20),
+                                                  MaxValueValidator(20, message=SCORE_BETWEEN_0_AND_20)])
     score_reencoded = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
-                                          validators=[MinValueValidator(0, message="scores_must_be_between_0_and_20"),
-                                                      MaxValueValidator(20, message="scores_must_be_between_0_and_20")])
+                                          validators=[MinValueValidator(0,
+                                                                        message=SCORE_BETWEEN_0_AND_20),
+                                                      MaxValueValidator(20,
+                                                                        message=SCORE_BETWEEN_0_AND_20)])
     score_final = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
-                                      validators=[MinValueValidator(0, message="scores_must_be_between_0_and_20"),
-                                                  MaxValueValidator(20, message="scores_must_be_between_0_and_20")])
+                                      validators=[MinValueValidator(0, message=SCORE_BETWEEN_0_AND_20),
+                                                  MaxValueValidator(20, message=SCORE_BETWEEN_0_AND_20)])
     justification_draft = models.CharField(max_length=20, blank=True, null=True,
                                            choices=justification_types.JUSTIFICATION_TYPES)
     justification_reencoded = models.CharField(max_length=20, blank=True, null=True,
@@ -78,6 +82,7 @@ class ExamEnrollment(models.Model):
                                         default=enrollment_states.ENROLLED,
                                         choices=enrollment_states.STATES,
                                         db_index=True)
+    date_enrollment = models.DateField(null=True, blank=True, verbose_name=_("Enrollment date"))
 
     def student(self):
         return self.learning_unit_enrollment.student
@@ -206,17 +211,18 @@ def is_absence_justification(justification):
 
 
 def calculate_exam_enrollment_progress(enrollments):
-    if enrollments:
-        progress = len([e for e in enrollments if e.score_final is not None or e.justification_final]) / len(
-            enrollments)
+    enrollment_enrolled = _get_enrolled_enrollments(enrollments)
+    if enrollment_enrolled:
+        progress = len([e for e in enrollment_enrolled if e.score_final is not None or e.justification_final]) / len(
+            enrollment_enrolled)
     else:
         progress = 0
     return progress * 100
 
 
 def justification_label_authorized():
-    return "%s, %s" % (_('absent_pdf_legend'),
-                       _('cheating_pdf_legend'))
+    return "%s, %s" % (_('A=Absent'),
+                       _('T=Cheating'))
 
 
 class ExamEnrollmentHistoryAdmin(OsisModelAdmin):
@@ -256,34 +262,13 @@ def create_exam_enrollment_historic(user, enrollment):
     exam_enrollment_history.save()
 
 
-def get_progress(session_exm_list, learning_unt):
-    tot_progress = 0
-    tot_enrollments = 0
-    for session_exm in session_exm_list:
-        enrollments = list(find_exam_enrollments_by_session_learningunit(session_exm, learning_unt))
-        if enrollments:
-            progress = 0
-            for e in enrollments:
-                if e.score_final is not None or e.justification_final is not None:
-                    progress += 1
-            tot_progress = tot_progress + progress
-            tot_enrollments += len(enrollments)
-    return str(tot_progress) + "/" + str(tot_enrollments)
-
-
-def find_exam_enrollments_by_session_learningunit(session_exm, a_learning_unit_year):
-    enrollments = ExamEnrollment.objects.filter(session_exam=session_exm) \
-        .filter(enrollment_state=enrollment_states.ENROLLED) \
-        .filter(learning_unit_enrollment__learning_unit_year=a_learning_unit_year)
-    return enrollments
-
-
 def get_progress_by_learning_unit_years_and_offer_years(user,
                                                         session_exam_number,
                                                         learning_unit_year_id=None,
                                                         learning_unit_year_ids=None,
                                                         offer_year_id=None,
-                                                        academic_year=None):
+                                                        academic_year=None,
+                                                        only_enrolled=False):
     if offer_year_id:
         offer_year_ids = [offer_year_id]
     else:
@@ -299,7 +284,8 @@ def get_progress_by_learning_unit_years_and_offer_years(user,
                                         offers_year=offer_year_ids,
                                         tutor=tutor_user,
                                         academic_year=academic_year,
-                                        with_session_exam_deadline=False)
+                                        with_session_exam_deadline=False,
+                                        only_enrolled=only_enrolled)
 
     return queryset.values('session_exam', 'learning_unit_enrollment__learning_unit_year',
                            'learning_unit_enrollment__offer_enrollment__offer_year') \
@@ -341,7 +327,8 @@ def find_for_score_encodings(session_exam_number,
                              student_first_name=None,
                              justification=None,
                              academic_year=None,
-                             with_session_exam_deadline=True):
+                             with_session_exam_deadline=True,
+                             only_enrolled=False):
     """
     :param session_exam_number: Integer represents the number_session of the Session_exam (1,2,3,4 or 5). It's
                                 a mandatory field to not confuse exam scores from different sessions.
@@ -359,9 +346,13 @@ def find_for_score_encodings(session_exam_number,
     if not academic_year:
         academic_year = academic_yr.current_academic_year()
 
-    queryset = ExamEnrollment.objects.filter(session_exam__number_session=session_exam_number,
-                                             learning_unit_enrollment__learning_unit_year__academic_year=academic_year,
-                                             enrollment_state=enrollment_states.ENROLLED)
+    queryset = ExamEnrollment.objects.filter(
+        session_exam__number_session=session_exam_number,
+        learning_unit_enrollment__learning_unit_year__academic_year=academic_year
+    )
+    if only_enrolled:
+        queryset = queryset.filter(enrollment_state=enrollment_states.ENROLLED)
+
     if learning_unit_year_id:
         queryset = queryset.filter(learning_unit_enrollment__learning_unit_year_id=learning_unit_year_id)
     elif learning_unit_year_ids is not None:
@@ -422,3 +413,9 @@ def find_by_student(a_student):
         .order_by('-learning_unit_enrollment__learning_unit_year__academic_year__year',
                   'session_exam__number_session',
                   'learning_unit_enrollment__learning_unit_year__acronym')
+
+
+def _get_enrolled_enrollments(enrollments):
+    if enrollments:
+        return list(filter(lambda enrollment: enrollment.enrollment_state == enrollment_states.ENROLLED, enrollments))
+    return None

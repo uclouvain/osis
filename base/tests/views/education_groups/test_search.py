@@ -43,6 +43,7 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
+from base.utils.cache import RequestCache
 
 FILTER_DATA = {"acronym": "LBIR", "title": "dummy filter"}
 
@@ -82,14 +83,10 @@ class TestEducationGroupSearchView(TestCase):
         expected_keys_found = ["form", "object_list", "object_list_count", "experimental_phase", "enums", "person"]
         self.assertTrue(all(key in response.context.keys() for key in expected_keys_found))
 
-    @mock.patch("base.utils.cache._save_filter_to_cache", side_effect=lambda *args,**kwargs: True)
-    def test_search_education_group_cache_filter(self, mock_save_filter_to_cache):
+    def test_search_education_group_cache_filter(self):
         response = self.client.get(self.url, data=FILTER_DATA)
-        self.assertTrue(mock_save_filter_to_cache.called)
-
-        # Ensure that we don't cache field related to xls
-        mock_save_filter_to_cache.assert_called_once_with(response.wsgi_request,
-                                                          exclude_params=['xls_status', 'xls_order_col'])
+        cached_data = RequestCache(self.user, self.url).cached_data
+        self.assertEqual(cached_data, FILTER_DATA)
 
 
 class TestEducationGroupDataSearchFilter(TestCase):
@@ -193,7 +190,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertEqual(context["experimental_phase"], True)
         self.assertEqual(len(context["object_list"]), 0)
         messages = [str(m) for m in context["messages"]]
-        self.assertIn(_('no_result'), messages)
+        self.assertIn(_('No result!'), messages)
 
     def test_search_with_acronym_only(self):
         response = self.client.get(self.url, data={"acronym": self.education_group_arke2a.acronym})

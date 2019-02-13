@@ -2,7 +2,7 @@
 {% load l10n %}
 {% load i18n %}
 {% load sum %}
-{% load score_display %}
+{% load score_display enrollment_state %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -29,14 +29,14 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-  <li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'student_path' %}</a></li>
-  <li><a href="{% url 'assessments' %}" id="lnk_assessments">{% trans 'evaluations' %}</a></li>
-  <li><a href="{% url 'scores_encoding' %}?{{ request.GET.urlencode }}" id="lnk_scores_encoding">{% trans 'scores_encoding' %}</a></li>
-  <li class="active">{% trans 'online_encoding' %}</li>
+  <li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'Academic background' %}</a></li>
+  <li><a href="{% url 'assessments' %}" id="lnk_assessments">{% trans 'Evaluations' %}</a></li>
+  <li><a href="{% url 'scores_encoding' %}?{{ request.GET.urlencode }}" id="lnk_scores_encoding">{% trans 'Scores encoding' %}</a></li>
+  <li class="active">{% trans 'Online encoding' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'online_encoding' %}</h2>
+    <h2>{% trans 'Online encoding' %}</h2>
 </div>
 {% include "template_messages.html" %}
 <div class="panel panel-default">
@@ -47,12 +47,12 @@
         <div class="row">
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>{% trans 'scores_responsible' %}</label><br>
+                    <label>{% trans 'Scores responsible' %}</label><br>
                     {% if tutors %}
                         <a role="button" data-toggle="collapse" data-target="#tutors_by_course"
                            aria-expanded="false" class="pull-right"
                            aria-controls="tutors_by_course"
-                           title="{% trans 'display_tutors' %}">
+                           title="{% trans 'Display all tutors for this learning unit' %}">
                           <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
                         </a>
                     {% endif %}
@@ -63,10 +63,10 @@
                             {% endfor %}
                         </ul>
                     {% else %}
-                        {% trans 'none' %}
+                        {% trans 'None' %}
                     {% endif %}
                     <div class="collapse" id="tutors_by_course">
-                        <label>{% trans 'other_tutors' %}</label><br>
+                        <label>{% trans 'Other tutors' %}</label><br>
                         <ul>
                             {% for prof in tutors %}
                                 <li>{{ prof }}</li>
@@ -77,20 +77,20 @@
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>{% trans 'academic_year' %}</label><br>
+                    <label>{% trans 'Academic year' %}</label><br>
                     {{ academic_year }}
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>{% trans 'number_session' %}</label><br>
+                    <label>{% trans 'Session number' %}</label><br>
                     {{ number_session }}
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>{%trans 'number_of_enrollments' %}</label><br>
-                    <span id="number_of_enrollments">{{ enrollments|length }}</span>
+                    <label>{%trans 'Number of enrollments' %}</label><br>
+                    <span id="number_of_enrollments">{{ total_exam_enrollments}}</span>
                 </div>
             </div>
         </div>
@@ -98,9 +98,9 @@
             {% get_current_language as LANGUAGE_CODE %}
             <span id="message_decimal_accepted">
             {% if enrollments.0.learning_unit_enrollment.learning_unit_year.decimal_scores %}
-                {% trans 'decimal_values_accepted' %}
+                {% trans 'Decimal values in scores are accepted.' %}
             {% else %}
-                {% trans 'decimal_values_ignored' %}
+                {% trans "Decimal values in scores are NOT accepted. If you try to put decimal values, it will be ignored." %}
             {% endif %}
             </span>
         </div>
@@ -108,47 +108,45 @@
             {% csrf_token %}
             <button type="submit" class="btn btn-primary" id="bt_save_online_encoding_up"
                 {% if not is_program_manager %}
-                    data-toggle="tooltip" data-placement="left" title="{% trans 'temporary_save' %}"
+                    data-toggle="tooltip" data-placement="left" title="{% trans 'Temporary save (not submitted to the faculty yet)' %}"
                 {% endif %}>
-                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}</button>
+                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}</button>
             <a class="btn btn-default" href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" role="button" id="lnk_cancel_online_encoding_up">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'cancel' %}</a>
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'Cancel' %}</a>
+            {% include 'blocks/legend.html' %}
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>{% trans 'status' %}</th>
-                        <th>{% trans 'offer' %}</th>
-                        <th>{% trans 'registration_number' %}</th>
-                        <th>{% trans 'lastname' %}</th>
-                        <th>{% trans 'firstname' %}</th>
-                        <th>{% trans 'score' %}</th>
-                        <th>{% trans 'justification' %}</th>
-                        <th>{% trans 'end_date_teacher' %}</th>
+                        <th>{% trans 'Status' %}</th>
+                        <th>{% trans 'Offer' %}</th>
+                        <th>{% trans 'Registration number' %}</th>
+                        <th>{% trans 'Lastname' %}</th>
+                        <th>{% trans 'Firstname' %}</th>
+                        <th>{% trans 'Score' %}</th>
+                        <th>{% trans 'Justification' %}</th>
+                        <th>{% trans 'Teacher deadline' %}</th>
                     </tr>
                 </thead>
                 <tbody>
                 {% for enrollment in enrollments %}
+
                     <tr style="background-color:
                                {% if not is_program_manager and enrollment.deadline_tutor_reached %}
                                     #D3D3D3
                                {% elif enrollment.deadline_reached %}
                                     #D3D3D3
                                {% else %}
-                                    {% ifchanged enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym %}
-                                        {% cycle 'white' '#E5F2FF' as rowcolors %}
-                                    {% else %}
-                                        {{ rowcolors }}
-                                    {% endifchanged %}
+                                   {% include 'blocks/row_color.html' %}
                                {% endif %}">
                         <td style="text-align:center;">
                             {% if enrollment.deadline_reached %}
-                                <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'deadline_reached' %}"></span>
+                                <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
                             {% elif enrollment.deadline_tutor_reached and not is_program_manager %}
-                                <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'deadline_reached' %}"></span>
+                                <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
                             {% endif %}
 
                             {% if enrollment.score_final != None or enrollment.justification_final %}
-                                <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'score_submitted' %}"></span>
+                                <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'Score submitted' %}"></span>
                             {% endif %}
                         </td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
@@ -159,21 +157,25 @@
 			                <input type="text" min="0" max="20" name="score_{{ enrollment.id }}"
                                 id="num_score_{{ enrollment.id }}" tabindex="{{ forloop.counter }}"
                                 class="form-control"
-                                {% if is_program_manager %}
-                                   value="{{ enrollment.score_final | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}"
-                                   {% if enrollment.deadline_reached %}
-                                        disabled
-                                   {% endif %}
+                                {% if enrollment.enrollment_state != 'ENROLLED' %}
+                                    disabled
                                 {% else %}
-                                   {% if enrollment.score_final != None %}
-                                        value="{{ enrollment.score_final | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}"
-                                   {% elif not enrollment.justification_final %}
-                                        value="{{ enrollment.score_draft | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores }}"
-                                   {% endif %}
+                                    {% if is_program_manager %}
+                                       value="{{ enrollment.score_final | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}"
+                                       {% if enrollment.deadline_reached %}
+                                            disabled
+                                       {% endif %}
+                                    {% else %}
+                                       {% if enrollment.score_final != None %}
+                                            value="{{ enrollment.score_final | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}"
+                                       {% elif not enrollment.justification_final %}
+                                            value="{{ enrollment.score_draft | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores }}"
+                                       {% endif %}
 
-                                   {% if enrollment.score_final != None or enrollment.justification_final or enrollment.deadline_reached or enrollment.deadline_tutor_reached %}
-                                       disabled
-                                   {% endif %}
+                                       {% if enrollment.score_final != None or enrollment.justification_final or enrollment.deadline_reached or enrollment.deadline_tutor_reached%}
+                                           disabled
+                                       {% endif %}
+                                    {% endif %}
                                 {% endif %}
                              >
 			            </td>
@@ -181,11 +183,11 @@
 			                <select class="form-control" name="justification_{{ enrollment.id }}" id="slt_justification_score_{{ enrollment.id }}"
                                     tabindex="{{ enrollments|length|sum:forloop.counter }}"
                                     {% if is_program_manager %}
-                                        {% if enrollment.deadline_reached %}
+                                        {% if enrollment.deadline_reached or enrollment.enrollment_state != 'ENROLLED' %}
                                             disabled
                                         {% endif %}
                                     {% else %}
-                                        {% if enrollment.score_final != None or enrollment.justification_final or enrollment.deadline_reached or enrollment.deadline_tutor_reached %}
+                                        {% if enrollment.score_final != None or enrollment.justification_final or enrollment.deadline_reached or enrollment.deadline_tutor_reached or enrollment.enrollment_state != 'ENROLLED'%}
                                             disabled
                                         {% endif %}
                                     {% endif %}>
@@ -195,20 +197,20 @@
                                         {% if enrollment.justification_final == 'ABSENCE_UNJUSTIFIED' %}
                                             selected
                                         {% endif %}>
-                                        {% trans 'ABSENCE_UNJUSTIFIED' %}
+                                        {% trans 'Unjustified absence' %}
                                     </option>
                                      <option value="ABSENCE_JUSTIFIED"
                                         {% if enrollment.justification_final == 'ABSENCE_JUSTIFIED' %}
                                             selected
                                         {% endif %}>
-                                            {% trans 'ABSENCE_JUSTIFIED' %}
+                                            {% trans 'Justified absence' %}
                                     </option>
                                 {% else %}
                                     <option value="ABSENCE_UNJUSTIFIED"
                                         {% if enrollment.justification_draft == 'ABSENCE_UNJUSTIFIED' or enrollment.justification_final == 'ABSENCE_JUSTIFIED' %}
                                             selected
                                         {% endif %}>
-                                            {% trans 'absent' %}
+                                            {% trans 'Absent' %}
                                     </option>
                                 {% endif %}
 
@@ -218,7 +220,7 @@
                                     {% elif not is_program_manager and enrollment.justification_draft == 'CHEATING' %}
                                         selected
                                     {% endif %}>
-                                    {% trans 'CHEATING' %}
+                                    {% trans 'Cheating' %}
                                 </option>
                             </select>
 			                {% if not enrollment.deadline_reached %}
@@ -233,11 +235,11 @@
             </table>
             <button type="submit" class="btn btn-primary" id="bt_save_online_encoding_down"
                 {% if not is_program_manager %}
-                    data-toggle="tooltip" data-placement="left" title="{% trans 'temporary_save' %}"
+                    data-toggle="tooltip" data-placement="left" title="{% trans 'Temporary save (not submitted to the faculty yet)' %}"
                 {% endif %}>
-                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}</button>
+                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}</button>
             <a class="btn btn-default" href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" role="button" id="lnk_cancel_online_encoding_down">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'cancel' %}</a>
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'Cancel' %}</a>
         </form>
     </div>
 </div>

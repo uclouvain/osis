@@ -31,10 +31,6 @@ from base.tests.factories.structure import StructureFactory
 from base.tests.factories.offer_type import OfferTypeFactory
 
 
-def generate_title(offer_year):
-    return '{obj.academic_year} {obj.acronym}'.format(obj=offer_year).lower()
-
-
 class OfferYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.OfferYear"
@@ -42,8 +38,7 @@ class OfferYearFactory(factory.django.DjangoModelFactory):
     offer = factory.SubFactory(OfferFactory)
     academic_year = factory.SubFactory(AcademicYearFactory)
     acronym = factory.Sequence(lambda n: 'Offer %d' % n)
-    title = factory.LazyAttribute(generate_title)
+    title = factory.LazyAttribute(lambda obj: '{obj.academic_year} {obj.acronym}'.format(obj=obj).lower())
     entity_management = factory.SubFactory(StructureFactory)
-    entity_administration_fac= factory.SubFactory(StructureFactory)
+    entity_administration_fac = factory.SubFactory(StructureFactory)
     offer_type = factory.SubFactory(OfferTypeFactory)
-

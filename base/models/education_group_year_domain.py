@@ -24,11 +24,12 @@
 #
 ##############################################################################
 from django.db import models
+from reversion.admin import VersionAdmin
 
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class EducationGroupYearDomainAdmin(OsisModelAdmin):
+class EducationGroupYearDomainAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('domain', 'education_group_year', 'changed')
     list_filter = ('education_group_year__academic_year',)
     search_fields = ['domain__name', 'education_group_year__acronym']

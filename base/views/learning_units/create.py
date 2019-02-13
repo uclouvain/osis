@@ -30,7 +30,7 @@ from waffle.decorators import waffle_flag
 
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
 from base.models.academic_year import AcademicYear
-from base.models.learning_unit_year import LearningUnitYear
+from base.models.learning_unit_year import LearningUnitYear, find_latest_by_learning_unit
 from base.models.person import Person
 from base.views.learning_units import perms
 from base.views.learning_units.common import show_success_learning_unit_year_creation_message
@@ -64,11 +64,13 @@ def create_learning_unit(request, academic_year_id):
 def create_partim_form(request, learning_unit_year_id):
     person = get_object_or_404(Person, user=request.user)
     learning_unit_year_full = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
+    end_postponement = find_latest_by_learning_unit(learning_unit_year_full.learning_unit)
 
     postponement_form = LearningUnitPostponementForm(
         person=person,
         learning_unit_full_instance=learning_unit_year_full.learning_unit,
         start_postponement=learning_unit_year_full.academic_year,
+        end_postponement=end_postponement.academic_year,
         data=request.POST or None
     )
 
@@ -84,5 +86,5 @@ def create_partim_form(request, learning_unit_year_id):
 def _save_and_redirect(postponement_form, request):
     new_luys = postponement_form.save()
     for luy in new_luys:
-        show_success_learning_unit_year_creation_message(request, luy, 'learning_unit_successfuly_created')
+        show_success_learning_unit_year_creation_message(request, luy)
     return redirect('learning_unit', learning_unit_year_id=new_luys[0].pk)

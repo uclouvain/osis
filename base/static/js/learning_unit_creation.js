@@ -6,6 +6,8 @@ const trans_invalid_acronym = gettext('invalid_acronym');
 const trans_field_required = gettext('field_is_required');
 const trans_field_min = gettext('min_for_field');
 const trans_field_max = gettext('max_for_field');
+const trans_field_step = gettext('step_for_field');
+
 
 var form = $('#LearningUnitYearForm').closest("form");
 var InitialAcronym;
@@ -54,10 +56,10 @@ function updateAdditionalEntityEditability(elem, id, disable_only){
 
 function validate_acronym() {
     cleanErrorMessage();
-    var newAcronym = getCompleteAcronym();
-    if (newAcronym !== InitialAcronym) {
-        var validationUrl = $('#LearningUnitYearForm').data('validate-url');
-        var year_id = $('#id_academic_year').val();
+    let newAcronym = getCompleteAcronym();
+    if (newAcronym.length > 1 && newAcronym !== InitialAcronym) {
+        let validationUrl = $('#LearningUnitYearForm').data('validate-url');
+        let year_id = $('#id_academic_year').val();
         validateAcronymAjax(validationUrl, newAcronym, year_id, callbackAcronymValidation);
     }
 }
@@ -146,6 +148,7 @@ $(document).ready(function() {
         required: trans_field_required,
         min: trans_field_min,
         max: trans_field_max,
+        step: trans_field_step,
         url: gettext("Please enter a valid URL."),
     });
 

@@ -23,13 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.utils import translation
 
 from attribution.tests.factories.attribution import AttributionFactory
 from base.models.enums import academic_calendar_type
@@ -48,7 +46,6 @@ LANGUAGE_CODE_EN = 'en'
 
 
 class MyOsisViewTestCase(TestCase):
-
     fixtures = ['osis_common/fixtures/messages_tests.json']
 
     def setUp(self):
@@ -72,25 +69,14 @@ class MyOsisViewTestCase(TestCase):
         self.attribution = AttributionFactory(learning_unit_year=self.learning_unit_year, summary_responsible=True,
                                               tutor=self.tutor)
 
-
     @staticmethod
     def get_message_history():
         return message_history.MessageHistory.objects.all().first()
 
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_my_osis_index(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-
+    def test_my_osis_index(self):
         from base.views.my_osis import my_osis_index
-        req_factory = RequestFactory()
-        request = req_factory.get(reverse(my_osis_index))
-        request.user = mock.Mock()
-        my_osis_index(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'my_osis/home.html')
+        response = self.client.get(reverse(my_osis_index))
+        self.assertTemplateUsed(response, 'my_osis/home.html')
 
     def test_my_messages_index(self):
         from base.views.my_osis import my_messages_index
@@ -98,8 +84,7 @@ class MyOsisViewTestCase(TestCase):
         response = self.client.get(reverse(my_messages_index))
 
         self.assertEqual(response.status_code, 200)
-        template = response.templates[0].name
-        self.assertEqual(template, 'my_osis/my_messages.html')
+        self.assertTemplateUsed(response, 'my_osis/my_messages.html')
 
     def test_get_messages_formset(self):
         messages = message_history.MessageHistory.objects.all()
@@ -115,49 +100,32 @@ class MyOsisViewTestCase(TestCase):
             self.assertEqual(message.id, form['id'].value())
             cpt += 1
 
-    @mock.patch('base.views.layout.render')
-    def test_profile(self, mock_render):
-        request = self.get_request()
+    def test_profile(self):
         from base.views.my_osis import profile
+        response = self.client.get(reverse(profile))
 
-        profile(request)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'my_osis/profile.html')
+        self.assertTemplateUsed(response, 'my_osis/profile.html')
         with self.assertRaises(KeyError):
-            context['tab_attribution_on']
+            response.context['tab_attribution_on']
 
-        self.check_context_data(context)
+        self.check_context_data(response.context)
 
-    @mock.patch('base.views.layout.render')
-    def test_profile_attributions(self, mock_render):
-        request = self.get_request()
+    def test_profile_attributions(self):
         from base.views.my_osis import profile_attributions
+        response = self.client.get(reverse(profile_attributions))
 
-        profile_attributions(request)
+        self.assertTemplateUsed(response, 'my_osis/profile.html')
+        self.assertEqual(response.context['tab_attribution_on'], True)
+        self.check_context_data(response.context)
 
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'my_osis/profile.html')
-        self.assertEqual(context['tab_attribution_on'], True)
-        self.check_context_data(context)
-
-    @mock.patch('base.views.layout.render')
-    def test_read_message(self, mock_render):
+    def test_read_message(self):
         message = self.get_message_history()
-        request = self.get_request()
         from base.views.my_osis import read_message
 
-        read_message(request, message.id)
+        response = self.client.get(reverse(read_message, args=[message.id]))
 
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'my_osis/my_message.html')
-        self.assertEqual(context['my_message'], message)
+        self.assertTemplateUsed(response, 'my_osis/my_message.html')
+        self.assertEqual(response.context['my_message'], message)
 
     def test_get_data(self):
         request = self.get_request()
@@ -166,38 +134,15 @@ class MyOsisViewTestCase(TestCase):
         data = _get_data(request)
         self.assertEqual(data['person'], self.person)
 
-    @mock.patch('base.views.layout.render')
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
-    def test_profile_lang(self, mock_render):
-
+    def test_profile_lang(self):
         data = {
             "ui_language": LANGUAGE_CODE_EN
         }
-        request_factory = RequestFactory()
-        request = request_factory.post(reverse('profile_lang'), data)
-        request.user = self.a_superuser
+        response = self.client.post(reverse('profile_lang'), data)
 
-        request.session = {translation.LANGUAGE_SESSION_KEY: LANGUAGE_CODE_FR}
-        from base.views.my_osis import profile_lang
-
-        profile_lang(request)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'my_osis/profile.html')
-        self.assertEqual(context['person'].language, LANGUAGE_CODE_EN)
-
-    def test_has_no_email(self):
-        message_history_record = self.get_message_history()
-        message_history_record.receiver_id = None
-        self.assertFalse(my_osis.has_email(message_history_record))
-
-    def test_has_email(self):
-        receiver_person = PersonFactory()
-        message_history_record = self.get_message_history()
-        message_history_record.receiver_id = receiver_person.id
-        self.assertTrue(my_osis.has_email(message_history_record))
+        self.assertTemplateUsed(response, 'my_osis/profile.html')
+        self.assertEqual(response.context['person'].language, LANGUAGE_CODE_EN)
 
     def get_request(self):
         request_factory = RequestFactory()

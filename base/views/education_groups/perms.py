@@ -27,41 +27,74 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 
 from base.business.education_groups import perms as business_perms
-from base.models import person
+from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
+from base.models.person import Person
 
 
 def can_create_education_group(view_func):
     def f_can_create_education_group(request, *args, **kwargs):
-        pers = get_object_or_404(person.Person, user=request.user)
+        pers = get_object_or_404(Person, user=request.user)
         category = kwargs['category']  # Mandatory kwargs
 
         parent_id = kwargs.get("parent_id")
         parent = get_object_or_404(EducationGroupYear, pk=parent_id) if parent_id else None
-        if not business_perms._is_eligible_to_add_education_group(pers, parent, category, raise_exception=True):
+        education_group_type_pk = kwargs.get("education_group_type_pk")
+        education_group_type = get_object_or_404(EducationGroupType, pk=education_group_type_pk)
+        if not business_perms._is_eligible_to_add_education_group(pers, parent, category,
+                                                                  education_group_type=education_group_type,
+                                                                  raise_exception=True):
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
     return f_can_create_education_group
 
 
 def can_change_education_group(user, education_group):
-    pers = get_object_or_404(person.Person, user=user)
+    pers = get_object_or_404(Person, user=user)
     if not business_perms.is_eligible_to_change_education_group(pers, education_group, raise_exception=True):
         raise PermissionDenied
     return True
 
 
 def can_delete_education_group(user, education_group):
-    pers = get_object_or_404(person.Person, user=user)
+    pers = get_object_or_404(Person, user=user)
     if not business_perms.is_eligible_to_delete_education_group(pers, education_group, raise_exception=True):
         raise PermissionDenied
     return True
 
 
 def can_delete_all_education_group(user, education_group):
-    pers = get_object_or_404(person.Person, user=user)
+    pers = get_object_or_404(Person, user=user)
     education_group_years = EducationGroupYear.objects.filter(education_group=education_group)
     for education_group_yr in education_group_years:
         if not business_perms.is_eligible_to_delete_education_group(pers, education_group_yr, raise_exception=True):
             raise PermissionDenied
     return True
+
+
+def can_change_general_information(view_func):
+    def f_can_change_general_information(request, *args, **kwargs):
+        person = get_object_or_404(Person, user=request.user)
+        education_group_year = get_object_or_404(EducationGroupYear, pk=kwargs['education_group_year_id'])
+        if not business_perms.is_eligible_to_edit_general_information(
+                person,
+                education_group_year,
+                raise_exception=True
+        ):
+            raise PermissionDenied
+        return view_func(request, *args, **kwargs)
+    return f_can_change_general_information
+
+
+def can_change_admission_condition(view_func):
+    def f_can_change_admission_condition(request, *args, **kwargs):
+        person = get_object_or_404(Person, user=request.user)
+        education_group_year = get_object_or_404(EducationGroupYear, pk=kwargs['education_group_year_id'])
+        if not business_perms.is_eligible_to_edit_admission_condition(
+                person,
+                education_group_year,
+                raise_exception=True
+        ):
+            raise PermissionDenied
+        return view_func(request, *args, **kwargs)
+    return f_can_change_admission_condition

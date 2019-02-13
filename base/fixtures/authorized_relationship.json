@@ -1,1081 +1,1337 @@
 [
 {
     "model": "base.authorizedrelationship",
-    "pk": 87,
+    "pk": 172,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2A"
+            "AGGREGATION"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:19:36.016Z"
+        "changed": "2018-12-03T08:14:21.624",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 88,
+    "pk": 173,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2A"
+            "CERTIFICATE_OF_PARTICIPATION"
         ],
         "child_type": [
-            "osis.education_group_type_optionlistchoice"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:20:07.478Z"
+        "changed": "2018-12-03T08:15:47.510",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 89,
+    "pk": 174,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2A"
+            "CERTIFICATE_OF_SUCCESS"
         ],
         "child_type": [
-            "osis.education_group_type_mobilitypartnershiplistchoice"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:20:30.656Z"
+        "changed": "2018-12-03T08:16:38.682",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 90,
+    "pk": 175,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_8FC"
+            "CERTIFICATE_OF_HOLDING_CREDITS"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:21:06.073Z"
+        "changed": "2018-12-03T08:17:11.622",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 91,
+    "pk": 176,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_7FC"
+            "AGGREGATION"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:21:46.211Z"
+        "changed": "2018-12-03T08:17:48.916",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 92,
+    "pk": 177,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_9FC"
+            "BACHELOR"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:22:05.892Z"
+        "changed": "2018-12-03T08:18:38.971",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 93,
+    "pk": 178,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_1BA"
+            "BACHELOR"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "MINOR_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:23:22.662Z"
+        "changed": "2018-12-03T08:19:16.710",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 94,
+    "pk": 179,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_1BA"
+            "BACHELOR"
         ],
         "child_type": [
-            "osis.education_group_type_minorlistchoice"
+            "MAJOR_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:23:43.118Z"
+        "changed": "2018-12-03T08:19:53.282",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 95,
+    "pk": 180,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_1BA"
+            "CERTIFICATE"
         ],
         "child_type": [
-            "osis.education_group_type_majorlistchoice"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:23:58.050Z"
+        "changed": "2018-12-03T08:21:20.140",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 96,
+    "pk": 181,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_1BA"
+            "BACHELOR"
         ],
         "child_type": [
-            "osis.education_group_type_mobilitypartnershiplistchoice"
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:24:27.937Z"
+        "changed": "2018-12-03T08:22:20.723",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 97,
+    "pk": 182,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_CE"
+            "CAPAES"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:24:53.744Z"
+        "changed": "2018-12-03T08:23:01.455",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 98,
+    "pk": 183,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2CE"
+            "RESEARCH_CERTIFICATE"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:25:26.887Z"
+        "changed": "2018-12-03T08:23:34.871",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 99,
+    "pk": 184,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_3CE"
+            "UNIVERSITY_FIRST_CYCLE_CERTIFICATE"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:25:48.063Z"
+        "changed": "2018-12-03T08:24:12.531",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 100,
+    "pk": 185,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_1FC"
+            "UNIVERSITY_SECOND_CYCLE_CERTIFICATE"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:26:13.735Z"
+        "changed": "2018-12-03T08:24:38.986",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 101,
+    "pk": 186,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2FC"
+            "ACCESS_CONTEST"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:26:31.828Z"
+        "changed": "2018-12-03T08:25:10.154",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 102,
+    "pk": 187,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_CA"
+            "LANGUAGE_CLASS"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:26:58.065Z"
+        "changed": "2018-12-03T08:25:36.291",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 103,
+    "pk": 188,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_LV"
+            "ISOLATED_CLASS"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:27:15.816Z"
+        "changed": "2018-12-03T08:26:10.820",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 104,
+    "pk": 189,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_IS"
+            "PHD"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:27:37.753Z"
+        "changed": "2018-12-03T08:26:39.490",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 105,
+    "pk": 190,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_3DP"
+            "FORMATION_PHD"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:27:50.370Z"
+        "changed": "2018-12-03T08:27:03.425",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 106,
+    "pk": 191,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_3FP"
+            "JUNIOR_YEAR"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:28:01.574Z"
+        "changed": "2018-12-03T08:27:26.267",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 107,
+    "pk": 192,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_JY"
+            "PGRM_MASTER_120"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:28:47.468Z"
+        "changed": "2018-12-03T08:28:17.709",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 108,
+    "pk": 193,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2M120"
+            "PGRM_MASTER_120"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMPLEMENTARY_MODULE"
         ],
-        "changed": "2018-08-09T13:29:31.797Z"
+        "changed": "2018-12-03T08:28:42.294",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 109,
+    "pk": 194,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2M120"
+            "PGRM_MASTER_120"
         ],
         "child_type": [
-            "osis.education_group_type_optionlistchoice"
+            "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:29:51.514Z"
+        "changed": "2018-12-03T08:29:25.113",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 110,
+    "pk": 195,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2M120"
+            "PGRM_MASTER_120"
         ],
         "child_type": [
-            "osis.education_group_type_finality120listchoice"
+            "FINALITY_120_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:30:11.603Z"
+        "changed": "2018-12-03T08:29:57.983",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 111,
+    "pk": 196,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2M120"
+            "PGRM_MASTER_120"
         ],
         "child_type": [
-            "osis.education_group_type_complementarymodule"
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:30:31.185Z"
+        "changed": "2018-12-03T08:30:24.410",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 112,
+    "pk": 197,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2M120"
+            "MASTER_MA_120"
         ],
         "child_type": [
-            "osis.education_group_type_mobilitypartnershiplistchoice"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:31:06.514Z"
+        "changed": "2018-12-03T08:35:04.829",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 113,
+    "pk": 198,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MA120"
+            "MASTER_MA_120"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:31:32.433Z"
+        "changed": "2018-12-03T08:35:31.842",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 114,
+    "pk": 199,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MA120"
+            "MASTER_MA_120"
         ],
         "child_type": [
-            "osis.education_group_type_optionlistchoice"
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:32:02.943Z"
+        "changed": "2018-12-03T08:36:42.304",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 115,
+    "pk": 200,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MA120"
+            "MASTER_MD_120"
         ],
         "child_type": [
-            "osis.education_group_type_mobilitypartnershiplistchoice"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:32:33.006Z"
+        "changed": "2018-12-03T08:37:32.357",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 116,
+    "pk": 201,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MD120"
+            "MASTER_MD_120"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:33:06.115Z"
+        "changed": "2018-12-03T08:38:13.904",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 117,
+    "pk": 202,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MD120"
+            "MASTER_MD_120"
         ],
         "child_type": [
-            "osis.education_group_type_optionlistchoice"
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:33:22.602Z"
+        "changed": "2018-12-03T08:38:36.941",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 118,
+    "pk": 203,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MD120"
+            "MASTER_MS_120"
         ],
         "child_type": [
-            "osis.education_group_type_mobilitypartnershiplistchoice"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:33:38.614Z"
+        "changed": "2018-12-03T08:40:05.800",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 119,
+    "pk": 204,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MS120"
+            "MASTER_MS_120"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:34:18.852Z"
+        "changed": "2018-12-03T08:40:25.262",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 120,
+    "pk": 205,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MS120"
+            "MASTER_MS_120"
         ],
         "child_type": [
-            "osis.education_group_type_optionlistchoice"
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:34:33.715Z"
+        "changed": "2018-12-03T08:41:46.330",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 121,
+    "pk": 206,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MS120"
+            "PGRM_MASTER_180_240"
         ],
         "child_type": [
-            "osis.education_group_type_mobilitypartnershiplistchoice"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:34:45.425Z"
+        "changed": "2018-12-03T08:42:43.608",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 122,
+    "pk": 207,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2M180"
+            "PGRM_MASTER_180_240"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMPLEMENTARY_MODULE"
         ],
-        "changed": "2018-08-09T13:35:27.430Z"
+        "changed": "2018-12-03T08:43:08.696",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 123,
+    "pk": 208,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2M180"
+            "PGRM_MASTER_180_240"
         ],
         "child_type": [
-            "osis.education_group_type_optionlistchoice"
+            "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:42:32.726Z"
+        "changed": "2018-12-03T08:43:38.138",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 124,
+    "pk": 209,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2M180"
+            "PGRM_MASTER_180_240"
         ],
         "child_type": [
-            "osis.education_group_type_finality180listchoice"
+            "FINALITY_180_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:42:54.365Z"
+        "changed": "2018-12-03T08:44:13.285",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 125,
+    "pk": 210,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2M180"
+            "PGRM_MASTER_180_240"
         ],
         "child_type": [
-            "osis.education_group_type_complementarymodule"
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:43:15.846Z"
+        "changed": "2018-12-03T08:44:28.002",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 126,
+    "pk": 211,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2M180"
+            "MASTER_MA_180_240"
         ],
         "child_type": [
-            "osis.education_group_type_mobilitypartnershiplistchoice"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:43:35.468Z"
+        "changed": "2018-12-03T08:45:22.664",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 127,
+    "pk": 212,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MA180"
+            "MASTER_MA_180_240"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:43:57.914Z"
+        "changed": "2018-12-03T08:45:41.763",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 128,
+    "pk": 213,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MA180"
+            "MASTER_MA_180_240"
         ],
         "child_type": [
-            "osis.education_group_type_optionlistchoice"
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:44:16.555Z"
+        "changed": "2018-12-03T08:45:59.652",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 129,
+    "pk": 214,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MA180"
+            "MASTER_MD_180_240"
         ],
         "child_type": [
-            "osis.education_group_type_mobilitypartnershiplistchoice"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:44:37.821Z"
+        "changed": "2018-12-03T08:46:34.965",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 130,
+    "pk": 215,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MD180"
+            "MASTER_MD_180_240"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:45:08Z"
+        "changed": "2018-12-03T08:46:46.141",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 131,
+    "pk": 216,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MD180"
+            "MASTER_MD_180_240"
         ],
         "child_type": [
-            "osis.education_group_type_optionlistchoice"
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:45:25.854Z"
+        "changed": "2018-12-03T08:47:07.046",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 132,
+    "pk": 217,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MD180"
+            "MASTER_MS_180_240"
         ],
         "child_type": [
-            "osis.education_group_type_mobilitypartnershiplistchoice"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:45:58.461Z"
+        "changed": "2018-12-03T08:47:39.087",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 133,
+    "pk": 218,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MS180"
+            "MASTER_MS_180_240"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:49:27.632Z"
+        "changed": "2018-12-03T08:47:59.706",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 134,
+    "pk": 219,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MS180"
+            "MASTER_MS_180_240"
         ],
         "child_type": [
-            "osis.education_group_type_optionlistchoice"
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:49:43.158Z"
+        "changed": "2018-12-03T08:48:16.368",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 135,
+    "pk": 220,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MS180"
+            "MASTER_M1"
         ],
         "child_type": [
-            "osis.education_group_type_mobilitypartnershiplistchoice"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:49:54.236Z"
+        "changed": "2018-12-03T08:49:03.500",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 136,
+    "pk": 221,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2M1"
+            "MASTER_M1"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMPLEMENTARY_MODULE"
         ],
-        "changed": "2018-08-09T13:50:15.266Z"
+        "changed": "2018-12-03T08:49:33.689",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 137,
+    "pk": 222,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2M1"
+            "MASTER_M1"
         ],
         "child_type": [
-            "osis.education_group_type_optionlistchoice"
+            "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:50:31.824Z"
+        "changed": "2018-12-03T08:49:55.801",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 138,
+    "pk": 223,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2M1"
+            "MASTER_M1"
         ],
         "child_type": [
-            "osis.education_group_type_complementarymodule"
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:50:48.976Z"
+        "changed": "2018-12-03T08:50:07.752",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 139,
+    "pk": 224,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2M1"
+            "MASTER_MC"
         ],
         "child_type": [
-            "osis.education_group_type_mobilitypartnershiplistchoice"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:51:10.851Z"
+        "changed": "2018-12-03T08:51:11.571",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 140,
+    "pk": 225,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MC"
+            "MASTER_MC"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMPLEMENTARY_MODULE"
         ],
-        "changed": "2018-08-09T13:51:34.086Z"
+        "changed": "2018-12-03T08:51:30.761",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 141,
+    "pk": 226,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MC"
+            "MASTER_MC"
         ],
         "child_type": [
-            "osis.education_group_type_optionlistchoice"
+            "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:51:48.978Z"
+        "changed": "2018-12-03T08:51:51.754",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 142,
+    "pk": 227,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MC"
+            "MASTER_MC"
         ],
         "child_type": [
-            "osis.education_group_type_complementarymodule"
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:52:01.477Z"
+        "changed": "2018-12-03T08:52:03.057",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 143,
+    "pk": 228,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_2MC"
+            "INTERNSHIP"
         ],
         "child_type": [
-            "osis.education_group_type_mobilitypartnershiplistchoice"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:52:21.426Z"
+        "changed": "2018-12-03T08:52:33.593",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 144,
+    "pk": 229,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_ST"
+            "DEEPENING"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:52:42.012Z"
+        "changed": "2018-12-03T08:52:53.434",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 145,
+    "pk": 230,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_deepening"
+            "SOCIETY_MINOR"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:52:58.856Z"
+        "changed": "2018-12-03T08:53:13.430",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 146,
+    "pk": 231,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_sociatyminor"
+            "ACCESS_MINOR"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:53:19.286Z"
+        "changed": "2018-12-03T08:53:29.541",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 147,
+    "pk": 232,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_accessminor"
+            "OPEN_MINOR"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:53:34.284Z"
+        "changed": "2018-12-03T08:53:56.995",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 148,
+    "pk": 233,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_openminor"
+            "DISCIPLINARY_COMPLEMENT_MINOR"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:53:47.019Z"
+        "changed": "2018-12-03T08:54:14.243",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 149,
+    "pk": 234,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_disciplinarycomplementminor"
+            "FSA_SPECIALITY"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:54:01.445Z"
+        "changed": "2018-12-03T08:54:40.661",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 150,
+    "pk": 235,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_fsaspeciality"
+            "OPTION"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:54:38.672Z"
+        "changed": "2018-12-03T08:55:07.982",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 151,
+    "pk": 236,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_option"
+            "MOBILITY_PARTNERSHIP"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:54:52.819Z"
+        "changed": "2018-12-03T08:55:30.678",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 152,
+    "pk": 237,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_mobilitypartnership"
+            "COMMON_CORE"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "SUB_GROUP"
         ],
-        "changed": "2018-08-09T13:55:04.463Z"
+        "changed": "2019-01-16T09:33:27.582",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 153,
+    "pk": 238,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_commoncore"
+            "COMPLEMENTARY_MODULE"
         ],
         "child_type": [
-            "osis.education_group_type_subgroup"
+            "COMMON_CORE"
         ],
-        "changed": "2018-08-09T13:55:19.047Z"
+        "changed": "2018-12-03T09:00:27.004",
+        "min_count_authorized": 1,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 154,
+    "pk": 239,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_complementarymodule"
+            "MINOR_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_commoncore"
+            "DEEPENING"
         ],
-        "changed": "2018-08-09T13:56:10.130Z"
+        "changed": "2019-01-16T09:33:27.590",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 155,
+    "pk": 240,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_minorlistchoice"
+            "MINOR_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_deepening"
+            "SOCIETY_MINOR"
         ],
-        "changed": "2018-08-09T13:56:50.589Z"
+        "changed": "2019-01-16T09:33:27.591",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 156,
+    "pk": 241,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_minorlistchoice"
+            "MINOR_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_disciplinarycomplementminor"
+            "ACCESS_MINOR"
         ],
-        "changed": "2018-08-09T13:57:31.245Z"
+        "changed": "2019-01-16T09:33:27.592",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 157,
+    "pk": 242,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_minorlistchoice"
+            "MINOR_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_openminor"
+            "OPEN_MINOR"
         ],
-        "changed": "2018-08-09T13:57:56.195Z"
+        "changed": "2019-01-16T09:33:27.593",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 158,
+    "pk": 243,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_minorlistchoice"
+            "MINOR_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_accessminor"
+            "DISCIPLINARY_COMPLEMENT_MINOR"
         ],
-        "changed": "2018-08-09T13:58:13.221Z"
+        "changed": "2019-01-16T09:33:27.593",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 159,
+    "pk": 244,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_minorlistchoice"
+            "MINOR_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_sociatyminor"
+            "MINOR_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:58:30.128Z"
+        "changed": "2019-01-16T09:33:27.594",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 160,
+    "pk": 245,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_majorlistchoice"
+            "MAJOR_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_fsaspeciality"
+            "FSA_SPECIALITY"
         ],
-        "changed": "2018-08-09T13:58:54.904Z"
+        "changed": "2019-01-16T09:33:27.595",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 161,
+    "pk": 246,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_optionlistchoice"
+            "MAJOR_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_option"
+            "MAJOR_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T13:59:19.519Z"
+        "changed": "2019-01-16T09:33:27.595",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 162,
+    "pk": 247,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_finality120listchoice"
+            "OPTION_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_2MA120"
+            "OPTION"
         ],
-        "changed": "2018-08-09T13:59:50.548Z"
+        "changed": "2019-01-16T09:33:27.596",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 163,
+    "pk": 248,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_finality120listchoice"
+            "OPTION_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_2MD120"
+            "OPTION_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T14:00:03.255Z"
+        "changed": "2019-01-16T09:33:27.597",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 164,
+    "pk": 249,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_finality120listchoice"
+            "FINALITY_120_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_2MS120"
+            "MASTER_MA_120"
         ],
-        "changed": "2018-08-09T14:00:19.195Z"
+        "changed": "2018-12-03T09:18:31.821",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 165,
+    "pk": 250,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_finality180listchoice"
+            "FINALITY_120_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_2MA180"
+            "MASTER_MD_120"
         ],
-        "changed": "2018-08-09T14:00:43.345Z"
+        "changed": "2018-12-03T09:18:55.058",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 166,
+    "pk": 251,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_finality180listchoice"
+            "FINALITY_120_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_2MD180"
+            "MASTER_MS_120"
         ],
-        "changed": "2018-08-09T14:01:05.540Z"
+        "changed": "2019-01-16T09:33:27.597",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 167,
+    "pk": 252,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_finality180listchoice"
+            "FINALITY_120_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_2MS180"
+            "FINALITY_120_LIST_CHOICE"
         ],
-        "changed": "2018-08-09T14:10:58.042Z"
+        "changed": "2019-01-16T09:33:27.598",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 168,
+    "pk": 253,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_mobilitypartnershiplistchoice"
+            "FINALITY_180_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_mobilitypartnershiplistchoice"
+            "MASTER_MA_180_240"
         ],
-        "changed": "2018-08-09T14:11:40.888Z"
+        "changed": "2018-12-03T09:20:24.636",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
     }
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 169,
+    "pk": 254,
     "fields": {
         "parent_type": [
-            "osis.education_group_type_subgroup"
+            "FINALITY_180_LIST_CHOICE"
         ],
         "child_type": [
-            "osis.education_group_type_subgroup"
+            "MASTER_MD_180_240"
         ],
-        "changed": "2018-08-09T14:11:55.324Z"
+        "changed": "2018-12-03T09:21:06.272",
+        "min_count_authorized": 0,
+        "max_count_authorized": 1
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 255,
+    "fields": {
+        "parent_type": [
+            "FINALITY_180_LIST_CHOICE"
+        ],
+        "child_type": [
+            "MASTER_MS_180_240"
+        ],
+        "changed": "2019-01-16T09:33:27.599",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 256,
+    "fields": {
+        "parent_type": [
+            "FINALITY_180_LIST_CHOICE"
+        ],
+        "child_type": [
+            "FINALITY_180_LIST_CHOICE"
+        ],
+        "changed": "2019-01-16T09:33:27.600",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 257,
+    "fields": {
+        "parent_type": [
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
+        ],
+        "child_type": [
+            "MOBILITY_PARTNERSHIP"
+        ],
+        "changed": "2019-01-16T09:33:27.600",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 258,
+    "fields": {
+        "parent_type": [
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
+        ],
+        "child_type": [
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
+        ],
+        "changed": "2019-01-16T09:33:27.601",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 259,
+    "fields": {
+        "parent_type": [
+            "SUB_GROUP"
+        ],
+        "child_type": [
+            "SUB_GROUP"
+        ],
+        "changed": "2019-01-16T09:33:27.602",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 170,
+    "fields": {
+        "parent_type": [
+            "MINOR_LIST_CHOICE"
+        ],
+        "child_type": [
+            "FSA_SPECIALITY"
+        ],
+        "changed": "2018-08-09T15:58:54.904",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 }
 ]

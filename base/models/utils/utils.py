@@ -39,6 +39,10 @@ class ChoiceEnum(Enum):
     def translation_choices(cls):
         return tuple((x.name, _(x.value)) for x in cls)
 
+    @classmethod
+    def get_value(cls, key):
+        return getattr(cls, key, key).value if hasattr(cls, key) else key
+
 
 def get_object_or_none(klass, *args, **kwargs):
     try:
@@ -51,3 +55,11 @@ def get_object_or_none(klass, *args, **kwargs):
             "First argument to get_object_or_none() must be a Model, Manager, "
             "or QuerySet, not '%s'." % klass__name
         )
+
+
+def get_verbose_field_value(instance, key):
+    if hasattr(instance, "get_" + key + "_display"):
+        value = getattr(instance, "get_" + key + "_display")()
+    else:
+        value = getattr(instance, key, None)
+    return value

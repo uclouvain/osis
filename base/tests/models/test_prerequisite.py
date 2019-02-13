@@ -23,16 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import skip
-
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from base.models.prerequisite import prerequisite_syntax_validator
+
+from base.models import prerequisite
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.prerequisite import PrerequisiteFactory
 
 
 class TestPrerequisiteSyntaxValidator(TestCase):
     def test_empty_string(self):
-        self.assertIsNone(prerequisite_syntax_validator(""))
+        self.assertIsNone(prerequisite.prerequisite_syntax_validator(""))
 
     def test_acronym_cannot_include_space(self):
         test_values = (
@@ -80,7 +83,7 @@ class TestPrerequisiteSyntaxValidator(TestCase):
         for test_value in test_values:
             with self.subTest(bad_prerequisite=test_value):
                 with self.assertRaises(ValidationError):
-                    prerequisite_syntax_validator(test_value)
+                    prerequisite.prerequisite_syntax_validator(test_value)
 
     def test_with_prerequisites_correctly_encoded(self):
         test_values = (
@@ -95,4 +98,4 @@ class TestPrerequisiteSyntaxValidator(TestCase):
         )
         for test_value in test_values:
             with self.subTest(good_prerequisite=test_value):
-                self.assertIsNone(prerequisite_syntax_validator(test_value))
+                self.assertIsNone(prerequisite.prerequisite_syntax_validator(test_value))

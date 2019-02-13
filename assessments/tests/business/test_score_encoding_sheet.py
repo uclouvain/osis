@@ -52,26 +52,24 @@ from reference.tests.factories.country import CountryFactory
 
 
 class ScoreSheetAddressTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.offer_year = OfferYearFactory(academic_year=cls.academic_year)
+        cls.entity_address_admin = cls._create_data_for_entity_address(score_sheet_address_choices.ENTITY_ADMINISTRATION)
+        cls.entity_address_manag = cls._create_data_for_entity_address(score_sheet_address_choices.ENTITY_MANAGEMENT)
+        cls.address_fields = ['location', 'postal_code', 'city', 'country', 'phone', 'fax']
 
-    def setUp(self):
-        today = datetime.date.today()
-        self.academic_year = AcademicYearFactory(start_date=today,
-                                                 end_date=today.replace(year=today.year + 1),
-                                                 year=today.year)
-        self.offer_year = OfferYearFactory(academic_year=self.academic_year)
-        self.entity_address_admin = self._create_data_for_entity_address(score_sheet_address_choices.ENTITY_ADMINISTRATION)
-        self.entity_address_manag = self._create_data_for_entity_address(score_sheet_address_choices.ENTITY_MANAGEMENT)
-        self.address_fields = ['location', 'postal_code', 'city', 'country', 'phone', 'fax']
-
-    def _create_data_for_entity_address(self, entity_type):
+    @classmethod
+    def _create_data_for_entity_address(cls, entity_type):
         past_date = datetime.datetime(year=2015, month=1, day=1)
-        education_group_year=EducationGroupYearFactory(academic_year=self.academic_year)
+        education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         country = CountryFactory()
         entity = EntityFactory(country=country)
         EntityVersionFactory(entity=entity,
                              start_date=past_date,
                              end_date=None)
-        OfferYearEntityFactory(offer_year=self.offer_year,
+        OfferYearEntityFactory(offer_year=cls.offer_year,
                                entity=entity,
                                type=entity_type,
                                education_group_year=education_group_year)
@@ -135,25 +133,24 @@ class ScoreSheetDataTest(TestCase):
         _create_attribution(self.learning_unit_year, person=PersonFactory(last_name='Durant', first_name='Thomas'),
                             is_score_responsible=True)
         _create_attribution(self.learning_unit_year, person=PersonFactory(last_name='Lobradi', first_name='Pierre'))
+
         self.session_exam = SessionExamFactory(number_session=1, learning_unit_year=self.learning_unit_year)
+
         # Create three students and enrol them to learning unit year
         self.student_1 = StudentFactory(person=PersonFactory(last_name='Dupont', first_name='Jacques'))
-        offer_enrollment = OfferEnrollmentFactory(offer_year=self.offer_year, student=self.student_1)
-        l_unit_enrollment = LearningUnitEnrollmentFactory(offer_enrollment=offer_enrollment, learning_unit_year=self.learning_unit_year)
-        ExamEnrollmentFactory(learning_unit_enrollment=l_unit_enrollment, session_exam=self.session_exam)
-
         self.student_2 = StudentFactory(person=PersonFactory(last_name='Dupont', first_name='Axel'))
-        offer_enrollment = OfferEnrollmentFactory(offer_year=self.offer_year, student=self.student_2)
-        l_unit_enrollment = LearningUnitEnrollmentFactory(offer_enrollment=offer_enrollment, learning_unit_year=self.learning_unit_year)
-        ExamEnrollmentFactory(learning_unit_enrollment=l_unit_enrollment, session_exam=self.session_exam)
-
         self.student_3 = StudentFactory(person=PersonFactory(last_name='Armand', first_name='Zoe'))
-        offer_enrollment = OfferEnrollmentFactory(offer_year=self.offer_year, student=self.student_3)
-        l_unit_enrollment = LearningUnitEnrollmentFactory(offer_enrollment=offer_enrollment, learning_unit_year=self.learning_unit_year)
-        ExamEnrollmentFactory(learning_unit_enrollment=l_unit_enrollment, session_exam=self.session_exam)
+
+        for student in (self.student_1, self.student_2, self.student_3):
+            offer_enrollment = OfferEnrollmentFactory(offer_year=self.offer_year, student=student)
+            lu_enrolmment = LearningUnitEnrollmentFactory(
+                offer_enrollment=offer_enrollment,
+                learning_unit_year=self.learning_unit_year
+            )
+            ExamEnrollmentFactory(learning_unit_enrollment=lu_enrolmment, session_exam=self.session_exam)
 
     def test_scores_sheet_data_no_decimal_scores(self):
-        #Get all exam enrollments
+        # Get all exam enrollments
         exam_enrollments = ExamEnrollment.objects.all()
         data_computed = score_encoding_sheet.scores_sheet_data(exam_enrollments)
         # Should be a dictionary
@@ -170,9 +167,10 @@ class ScoreSheetDataTest(TestCase):
 
 
 def _create_attribution(learning_unit_year, person, is_score_responsible=False):
-    # Create tutor
-    tutor = TutorFactory(person=person)
-    # Create two address [One private - One Professional]
     PersonAddressFactory(person=person, label='PROFESSIONAL', city="Louvain-la-neuve")
     PersonAddressFactory(person=person, label='PRIVATE', city="Bruxelles")
-    return AttributionFactory(learning_unit_year=learning_unit_year, tutor=tutor, score_responsible=is_score_responsible)
+    return AttributionFactory(
+        learning_unit_year=learning_unit_year,
+        tutor=TutorFactory(person=person),
+        score_responsible=is_score_responsible
+    )

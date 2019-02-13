@@ -73,23 +73,21 @@ class AcademicYearFactory(DjangoModelFactory):
     start_date = factory.LazyAttribute(lambda obj: datetime.date(obj.year, 9, 15))
     end_date = factory.LazyAttribute(lambda obj: datetime.date(obj.year + 1, 9, 30))
 
-    @staticmethod
-    def produce_in_past(from_year=None, quantity=3):
-        if not from_year:
-            from_year = datetime.date.today().year
-        i = 0
-        while i < quantity:
-            AcademicYearFactory(year=from_year - i)
-            i += 1
+    class Params:
+        current = factory.Trait(
+            year=get_current_year()
+        )
 
     @staticmethod
-    def produce_in_future(current_year, quantity=10):
-        i = 1
-        academic_years = []
-        while i < quantity + 1:
-            academic_years.append(AcademicYearFactory.build(year=current_year + i))
-            i += 1
-        AcademicYear.objects.bulk_create(academic_years)
+    def produce_in_past(from_year=None, quantity=3):
+        from_year = from_year or get_current_year()
+        return [AcademicYearFactory(year=from_year-i) for i in range(quantity)]
+
+    @staticmethod
+    def produce_in_future(current_year=None, quantity=10):
+        current_year = current_year or get_current_year()
+        academic_years = [AcademicYearFactory.build(year=current_year + i) for i in range(quantity)]
+        return AcademicYear.objects.bulk_create(academic_years)
 
 
 class AcademicYearFakerFactory(DjangoModelFactory):

@@ -42,12 +42,13 @@ if os.environ.get("ENABLE_DEBUG_TOOLBAR", "False").lower() == "true":
     OPTIONAL_APPS += ('debug_toolbar',)
     OPTIONAL_MIDDLEWARES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
     OPTIONAL_INTERNAL_IPS += ('127.0.0.1',)
-
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': 'base.middlewares.toolbar.show_toolbar',
+        'JQUERY_URL': os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js"),
+    }
 
 INSTALLED_APPS += OPTIONAL_APPS
 APPS_TO_TEST += OPTIONAL_APPS
 MIDDLEWARE += OPTIONAL_MIDDLEWARES
 INTERNAL_IPS += OPTIONAL_INTERNAL_IPS
-
-URL_TO_PUBLISH = 'https://uclouvain.be/prog-{anac}-{code}'
-URL_TO_GET_SECTIONS = "https://uclouvain.be/prog-{anac}{type}-{code}"
+SITE_ID = 1

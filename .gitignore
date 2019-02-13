@@ -10,6 +10,7 @@ venv/
 __pycache__/
 backoffice/server_settings.py
 /base/tests/sent_mails
+/base/tests/functional
 /reports
 .project
 .settings
@@ -28,5 +29,6 @@ ghostdriver.log
 .DS_Store
 /geckodriver.log
 **/*.orig
+git_submodule_ref_update.py
 
 celerybeat-schedule

@@ -42,9 +42,10 @@ from base.tests.factories.external_learning_unit_year import ExternalLearningUni
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
-from base.models.person import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, get_user_interface_language, \
+from base.models.person import get_user_interface_language, \
     change_language
-from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
+from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory, SICFactory
 from base.tests.factories import user
 
 
@@ -148,7 +149,7 @@ class PersonTest(PersonTestCase):
         create_person_with_user(user)
         person.change_language(user, "en")
         a_person = person.find_by_user(user)
-        self.assertEquals(a_person.language, "en")
+        self.assertEqual(a_person.language, "en")
 
     def test_calculate_age(self):
         a_person = PersonFactory()
@@ -159,17 +160,26 @@ class PersonTest(PersonTestCase):
 
     def test_is_central_manager(self):
         a_person = PersonFactory()
-        self.assertFalse(a_person.is_central_manager())
+        self.assertFalse(a_person.is_central_manager)
 
+        del a_person.is_central_manager
         a_person.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
-        self.assertTrue(a_person.is_central_manager())
+        self.assertTrue(a_person.is_central_manager)
 
     def test_is_faculty_manager(self):
         a_person = PersonFactory()
-        self.assertFalse(a_person.is_faculty_manager())
+        self.assertFalse(a_person.is_faculty_manager)
 
+        del a_person.is_faculty_manager
         a_person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
-        self.assertTrue(a_person.is_faculty_manager())
+        self.assertTrue(a_person.is_faculty_manager)
+
+    def test_is_sic(self):
+        a_person = PersonFactory()
+        self.assertFalse(a_person.is_sic)
+
+        a_person = SICFactory()
+        self.assertTrue(a_person.is_sic)
 
     def test_show_username_from_person_with_user(self):
         self.assertEqual(self.person_with_user.username(), "user_with_person")

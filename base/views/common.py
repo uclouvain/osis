@@ -32,13 +32,13 @@ from django.contrib.auth import authenticate, logout
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.views import login as django_login
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl
 from base.models.utils import native
-from . import layout
+from osis_common.models import application_notice
 
 ITEMS_PER_PAGE = 25
 
@@ -46,31 +46,31 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 def page_not_found(request):
-    response = layout.render(request, 'page_not_found.html', {})
+    response = render(request, 'page_not_found.html', {})
     response.status_code = 404
     return response
 
 
 def method_not_allowed(request):
-    response = layout.render(request, 'method_not_allowed.html', {})
+    response = render(request, 'method_not_allowed.html', {})
     response.status_code = 405
     return response
 
 
 def access_denied(request, exception):
-    response = layout.render(request, 'access_denied.html', {'exception': exception})
+    response = render(request, 'access_denied.html', {'exception': exception})
     response.status_code = 403
     return response
 
 
 def server_error(request):
-    response = layout.render(request, 'server_error.html', {})
+    response = render(request, 'server_error.html', {})
     response.status_code = 500
     return response
 
 
 def noscript(request):
-    return layout.render(request, 'noscript.html', {})
+    return render(request, 'noscript.html', {})
 
 
 def common_context_processor(request):
@@ -83,10 +83,26 @@ def common_context_processor(request):
     else:
         sentry_dns = ''
     release_tag = settings.RELEASE_TAG if hasattr(settings, 'RELEASE_TAG') else None
-    return {'installed_apps': settings.INSTALLED_APPS,
-            'environment': env,
-            'sentry_dns': sentry_dns,
-            'release_tag': release_tag}
+
+    context = {'installed_apps': settings.INSTALLED_APPS,
+               'environment': env,
+               'sentry_dns': sentry_dns,
+               'release_tag': release_tag}
+    _check_notice(request, context)
+    return context
+
+
+def _check_notice(request, values):
+    if 'subject' not in request.session and 'notice' not in request.session:
+        notice = application_notice.find_current_notice()
+        if notice:
+            request.session.set_expiry(3600)
+            request.session['subject'] = notice.subject
+            request.session['notice'] = notice.notice
+
+    if 'subject' in request.session and 'notice' in request.session:
+        values['subject'] = request.session['subject']
+        values['notice'] = request.session['notice']
 
 
 def login(request):
@@ -112,8 +128,10 @@ def home(request):
     calendar_events = None
     if academic_yr:
         calendar_events = mdl.academic_calendar.find_academic_calendar_by_academic_year_with_dates(academic_yr.id)
-    return layout.render(request, "home.html", {'academic_calendar': calendar_events,
-                                                'highlights': mdl.academic_calendar.find_highlight_academic_calendar()})
+    return render(request, "home.html", {
+        'academic_calendar': calendar_events,
+        'highlights': mdl.academic_calendar.find_highlight_academic_calendar()
+    })
 
 
 def log_out(request):
@@ -124,25 +142,25 @@ def log_out(request):
 
 
 def logged_out(request):
-    return layout.render(request, 'logged_out.html', {})
+    return render(request, 'logged_out.html', {})
 
 
 @login_required
 @permission_required('base.can_access_student_path', raise_exception=True)
 def studies(request):
-    return layout.render(request, "studies.html", {'section': 'studies'})
+    return render(request, "studies.html", {'section': 'studies'})
 
 
 @login_required
 @permission_required('base.can_access_catalog', raise_exception=True)
 def catalog(request):
-    return layout.render(request, "catalog.html", {'section': 'catalog'})
+    return render(request, "catalog.html", {'section': 'catalog'})
 
 
 @login_required
 @user_passes_test(lambda u: u.is_staff and u.has_perm('base.is_administrator'))
 def data(request):
-    return layout.render(request, "admin/data.html", {'section': 'data'})
+    return render(request, "admin/data.html", {'section': 'data'})
 
 
 @login_required
@@ -150,15 +168,15 @@ def data(request):
 def data_maintenance(request):
     sql_command = request.POST.get('sql_command')
     results = native.execute(sql_command)
-    return layout.render(request, "admin/data_maintenance.html", {'section': 'data_maintenance',
-                                                                  'sql_command': sql_command,
-                                                                  'results': results})
+    return render(request, "admin/data_maintenance.html", {'section': 'data_maintenance',
+                                                           'sql_command': sql_command,
+                                                           'results': results})
 
 
 @login_required
 @permission_required('base.can_access_academicyear', raise_exception=True)
 def academic_year(request):
-    return layout.render(
+    return render(
         request,
         "academic_year.html",
         {
@@ -191,11 +209,11 @@ def storage(request):
         if len(row) < num_cols:
             row.append('')
 
-    return layout.render(request, "admin/storage.html", {'table': table})
+    return render(request, "admin/storage.html", {'table': table})
 
 
-def display_error_messages(request, messages_to_display):
-    display_messages(request, messages_to_display, messages.ERROR)
+def display_error_messages(request, messages_to_display, extra_tags=None):
+    display_messages(request, messages_to_display, messages.ERROR, extra_tags=extra_tags)
 
 
 def display_success_messages(request, messages_to_display, extra_tags=None):
@@ -220,7 +238,7 @@ def display_messages(request, messages_to_display, level, extra_tags=None):
 
 def check_if_display_message(request, results):
     if not results:
-        messages.add_message(request, messages.WARNING, _('no_result'))
+        messages.add_message(request, messages.WARNING, _('No result!'))
     return True
 
 

@@ -44,16 +44,16 @@ from base.views import learning_unit, offer, common, institution, organization, 
 from base.views import teaching_material
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
 from base.views.learning_units.attribution import DeleteAttribution, EditAttributionView, AddAttribution
-from base.views.person import EmployeeAutocomplete
 from base.views.learning_units.charge_repartition import AddChargeRepartition, \
     EditChargeRepartition, SelectAttributionView
-from base.views.learning_units.detail import learning_unit_identification
+from base.views.learning_units.detail import DetailLearningUnitYearView
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 from base.views.organization import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete
+from base.views.person import EmployeeAutocomplete
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -138,7 +138,7 @@ urlpatterns = [
         ])),
 
         url(r'^(?P<learning_unit_year_id>[0-9]+)/', include([
-            url(r'^$', learning_unit_identification, name='learning_unit'),
+            url(r'^$', DetailLearningUnitYearView.as_view(), name='learning_unit'),
             url(r'^formations/$', learning_unit.learning_unit_formations, name="learning_unit_formations"),
             url(r'^components/$', learning_unit.learning_unit_components, name="learning_unit_components"),
             url(r'^pedagogy/', include([
@@ -225,7 +225,6 @@ urlpatterns = [
             url(r'^(?P<message_id>[0-9]+)/', include([
                 url(r'^read/$', my_osis.read_message, name="read_my_message"),
                 url(r'^delete/$', my_osis.delete_from_my_messages, name="delete_my_message"),
-                url(r'^send_message_again/$', my_osis.send_message_again, name='send_message_again')
             ]))
         ])),
         url(r'^profile/', include([

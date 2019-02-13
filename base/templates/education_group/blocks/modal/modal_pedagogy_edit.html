@@ -23,52 +23,8 @@
     * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
-
-
 <div class="modal-dialog" role="document" style="width: 850px;">
     <div class="modal-content">
-        <form class="pedagogy-form" role="form" method="POST" action="{{ request.path }}" class="form">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">×</button>
-                <h4>{{ translated_label | capfirst }}</h4>
-            </div>
-            <div class="modal-body">
-                {% csrf_token %}
-                <ul class="nav nav-tabs" id="modification_tabs" role="tablist">
-                    <li role="presentation" class="active"><a href="#modification_fr">{% trans 'French' %}</a></li>
-                    <li role="presentation"><a href="#modification_en">{% trans 'English' %}</a></li>
-                </ul>
-                <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="modification_fr">
-                        {{ form.text_french }}
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="modification_en">
-                        {{ form.text_english }}
-                    </div>
-                </div>
-                {{ form.label }}
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" type="submit">{% trans 'save' %}</button>
-                <button type="submit" class="btn" data-dismiss="modal">{% trans 'cancel' %}</button>
-            </div>
-        </form>
+         {% include "education_group/blocks/modal/modal_pedagogy_edit_inner.html" %}
     </div>
 </div>
-
-<script>
-    $(function () {
-        var richText = $('#id_text_french');
-        var config = richText.data('config');
-        CKEDITOR.replace('id_text_french', config);
-
-        var richText = $('#id_text_english');
-        var config = richText.data('config');
-        CKEDITOR.replace('id_text_english', config);
-    });
-
-    $('#modification_tabs a').click(function (e) {
-        e.preventDefault();
-        $(this).tab('show');
-    });
-</script>

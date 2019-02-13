@@ -32,30 +32,73 @@ from django.test import TestCase
 from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponement
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import MINI_TRAINING
-from base.models.enums.education_group_types import OPTION
+from base.models.enums.education_group_types import MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
+from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 
 
 class TestFetchEducationGroupToPostpone(TestCase):
     def setUp(self):
         current_year = get_current_year()
-        self.academic_years = [AcademicYearFactory(year=i) for i in range(current_year, current_year+7)]
+        self.academic_years = [AcademicYearFactory(year=i) for i in range(current_year, current_year + 7)]
         self.education_group = EducationGroupFactory(end_year=None)
 
     def test_fetch_education_group_to_postpone_to_N6(self):
         EducationGroupYearFactory(
             education_group=self.education_group,
+            academic_year=self.academic_years[-4],
+        )
+        education_group_to_postpone = EducationGroupYearFactory(
+            education_group=self.education_group,
+            academic_year=self.academic_years[-3],
+        )
+        self.assertEqual(EducationGroupYear.objects.count(), 2)
+
+        result, errors = EducationGroupAutomaticPostponement().postpone()
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(EducationGroupYear.objects.count(), 4)
+        self.assertEqual(result[-1].academic_year.year, get_current_year()+6)
+        self.assertEqual(result[-1].education_group, education_group_to_postpone.education_group)
+        self.assertFalse(errors)
+
+    def test_if_structure_is_postponed(self):
+        parent = EducationGroupYearFactory(
+            education_group=self.education_group,
             academic_year=self.academic_years[-2],
         )
+        mandatory_child = GroupFactory(
+            academic_year=self.academic_years[-2],
+        )
+        not_mandatory_child = GroupFactory(
+            academic_year=self.academic_years[-2],
+        )
+        GroupElementYearFactory(parent=parent, child_branch=mandatory_child)
+        GroupElementYearFactory(parent=parent, child_branch=not_mandatory_child)
+        AuthorizedRelationshipFactory(
+            parent_type=parent.education_group_type,
+            child_type=mandatory_child.education_group_type,
+            min_count_authorized=1
+        )
+        AuthorizedRelationshipFactory(
+            parent_type=parent.education_group_type,
+            child_type=not_mandatory_child.education_group_type,
+            min_count_authorized=0
+        )
 
-        self.assertEqual(EducationGroupYear.objects.count(), 1)
+        self.assertEqual(EducationGroupYear.objects.count(), 3)
+
         result, errors = EducationGroupAutomaticPostponement().postpone()
+
         self.assertEqual(len(result), 1)
         self.assertFalse(errors)
+
+        self.assertEqual(result[0].education_group,self.education_group)
+        self.assertEqual(result[0].groupelementyear_set.count(), 1)
 
     def test_egy_to_not_duplicated(self):
         # The learning unit is over
@@ -97,11 +140,11 @@ class TestFetchEducationGroupToPostpone(TestCase):
 
         result, errors = EducationGroupAutomaticPostponement().postpone()
         self.assertTrue(mock_method.called)
-        self.assertEqual(errors, [egy_with_error])
+        self.assertEqual(errors, [egy_with_error.education_group])
         self.assertEqual(len(result), 0)
 
     def test_education_group_wrong_mini_training(self):
-        egt = EducationGroupTypeFactory(name=OPTION, category=MINI_TRAINING)
+        egt = EducationGroupTypeFactory(name=MiniTrainingType.OPTION.name, category=MINI_TRAINING)
         EducationGroupYearFactory(
             education_group=self.education_group,
             academic_year=self.academic_years[-2],
@@ -116,13 +159,16 @@ class TestSerializePostponement(TestCase):
     @classmethod
     def setUpTestData(cls):
         current_year = get_current_year()
-        cls.academic_years = [AcademicYearFactory(year=i) for i in range(current_year, current_year+7)]
+        cls.academic_years = [AcademicYearFactory(year=i) for i in range(current_year, current_year + 7)]
         cls.egys = [EducationGroupYearFactory() for _ in range(10)]
 
     def test_empty_results_and_errors(self):
         result_dict = EducationGroupAutomaticPostponement().serialize_postponement_results()
         self.assertDictEqual(result_dict, {
-            "msg": EducationGroupAutomaticPostponement.msg_result % (len([]), len([])),
+            "msg": EducationGroupAutomaticPostponement.msg_result % {
+                "number_extended": 0,
+                "number_error": 0
+            },
             "errors": []
         })
 
@@ -133,7 +179,10 @@ class TestSerializePostponement(TestCase):
 
         result_dict = postponement.serialize_postponement_results()
         self.assertDictEqual(result_dict, {
-            "msg": postponement.msg_result % (len(self.egys), 0),
+            "msg": postponement.msg_result % {
+                "number_extended": len(self.egys),
+                "number_error": 0
+            },
             "errors": []
         })
 
@@ -143,6 +192,9 @@ class TestSerializePostponement(TestCase):
         postponement.errors = [str(egy) for egy in self.egys[5:]]
         result_dict = postponement.serialize_postponement_results()
         self.assertDictEqual(result_dict, {
-            "msg": postponement.msg_result % (len(self.egys[:5]), len(self.egys[5:])),
+            "msg": postponement.msg_result % {
+                "number_extended": len(self.egys[:5]),
+                "number_error": len(self.egys[5:])
+            },
             "errors": [str(egy) for egy in self.egys[5:]]
         })
