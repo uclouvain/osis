@@ -68,6 +68,17 @@
 </div>
 
 <script>
+
+    $(function () {
+        var richText = $('#id_remarks');
+        var config = richText.data('config');
+        CKEDITOR.replace('id_remarks', config);
+
+        var richText = $('#id_conditions');
+        var config = richText.data('config');
+        CKEDITOR.replace('id_conditions', config);
+    });
+
     $('#modification_tabs a').click(function (e) {
         e.preventDefault();
         $(this).tab('show');
