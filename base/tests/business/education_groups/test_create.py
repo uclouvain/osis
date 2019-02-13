@@ -210,6 +210,11 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
             children_egys[self.egy.id][0].child_branch.partial_acronym
         )
 
+        self.assertEqual(
+            previous_child.education_group,
+            children_egys[self.egy.id][0].child_branch.education_group
+        )
+
     def test_should_not_recreate_existing_children(self):
         child = EducationGroupYearFactory(
             education_group_type=self.finality_type,
