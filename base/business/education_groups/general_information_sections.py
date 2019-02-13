@@ -29,6 +29,8 @@ from django.utils.translation import ugettext_lazy as _
 
 # This all text_label which are related to "general information" for education group year
 # The key MUST be in french because it depend on Webservice (filtering)
+from base.models.enums.education_group_types import TrainingType
+
 PEDAGOGY = 'pedagogie'
 MOBILITY = 'mobilite'
 FURTHER_TRAININGS = 'formations_accessibles'
@@ -121,5 +123,19 @@ COMMON_GENERAL_INFO_SECTIONS = [
     COMPLEMENTARY_MODULE,
     EVALUATION
 ]
+
+# Common type which have admission conditions sections + relevant sections
+COMMON_TYPE_ADMISSION_CONDITIONS = {
+    TrainingType.BACHELOR.name:
+        ('alert_message', 'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres',
+         'ca_bacs_examen_langue', 'ca_bacs_cond_speciales', ),
+    TrainingType.AGGREGATION.name:
+        ('alert_message', 'ca_bacs_cond_generales', 'ca_maitrise_fr',
+         'ca_allegement', 'ca_ouv_adultes', ),
+    TrainingType.PGRM_MASTER_120.name:
+        ('alert_message', 'non_university_bachelors', 'adults_taking_up_university_training',
+         'personalized_access', 'admission_enrollment_procedures', ),
+    TrainingType.MASTER_MC.name: ('alert_message', 'ca_cond_generales', )
+}
 
 MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION = 2017

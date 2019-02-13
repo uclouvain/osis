@@ -29,9 +29,15 @@ import continuing_education.api.url_v1
 import education_group.api.url_v1
 import reference.api.url_v1
 from webservices.api.views.auth_token import AuthToken
-from webservices.views import ws_catalog_offer
+from webservices.views import ws_catalog_offer, ws_catalog_common_offer, ws_catalog_common_admission_condition
 
 urlpatterns = [
+    url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/common$',
+        ws_catalog_common_offer,
+        name='v0.1-ws_catalog_common_offer'),
+    url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/common/admission_condition$',
+        ws_catalog_common_admission_condition,
+        name='v0.1-ws_catalog_common_admission_condition'),
     url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/(?P<acronym>[a-zA-Z0-9]+)$',
         ws_catalog_offer,
         name='v0.1-ws_catalog_offer'),
