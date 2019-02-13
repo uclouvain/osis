@@ -43,9 +43,9 @@ from base.models.entity_version import get_last_version
 from base.models.enums import education_group_categories, rate_code, decree_category
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
+from base.models.hops import Hops
 from reference.models.domain import Domain
 from reference.models.enums import domain_type
-from base.models.hops import Hops
 
 
 class MainDomainChoiceField(forms.ModelChoiceField):
@@ -196,7 +196,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         self.fields['rate_code'].choices = sorted(rate_code.RATE_CODE, key=lambda c: c[1])
         self.fields['main_domain'].queryset = Domain.objects.filter(type=domain_type.UNIVERSITY)\
                                                     .select_related('decree')\
-                                                    .order_by('-decree__name', 'name')
+                                                    .order_by('code')
         if not self.fields['certificate_aims'].disabled:
             self.fields['section'].disabled = False
 
