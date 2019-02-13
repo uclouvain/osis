@@ -143,24 +143,6 @@ def ws_catalog_common_offer(request, year, language):
 
 @api_view(['POST'])
 @renderer_classes((JSONRenderer,))
-def ws_catalog_common_offer(request, year, language):
-    # Validation
-    common_education_group, iso_language, year = parameters_validation('common', language, year)
-    response = dict.fromkeys(general_information_sections.COMMON_GENERAL_INFO_SECTIONS, None)
-
-    qs = TranslatedText.objects.filter(
-        reference=str(common_education_group.pk),
-        language=iso_language,
-        text_label__label__in=general_information_sections.COMMON_GENERAL_INFO_SECTIONS
-    ).exclude(Q(text__isnull=True) | Q(text__exact='')).select_related('text_label')
-
-    for translated_text in qs:
-        response[translated_text.text_label.label] = translated_text.text
-    return Response(response, content_type='application/json')
-
-
-@api_view(['POST'])
-@renderer_classes((JSONRenderer,))
 def ws_catalog_common_admission_condition(request, year, language):
     # Validation
     common_education_group, iso_language, year = parameters_validation('common', language, year)
