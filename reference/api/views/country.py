@@ -41,7 +41,6 @@ class CountryList(generics.ListAPIView):
         'name',
     )
     search_fields = (
-        'iso_code',
         'name',
     )
     ordering_fields = (
