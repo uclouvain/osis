@@ -557,7 +557,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
                 'is_master': is_master,
                 'show_components_for_agreg': is_aggregation,
                 'show_components_for_agreg_and_mc': is_aggregation or is_mc,
-                'show_free_text': (is_specific and (is_master or is_aggregation or is_mc)
+                'show_free_text': (not is_common and (is_master or is_aggregation or is_mc)
                                    ) or is_minor or is_deepening or is_certificate,
             },
             'admission_condition': admission_condition,
