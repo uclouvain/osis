@@ -49,6 +49,8 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from django.contrib.auth.models import Group
+from base.models.enums.groups import FACULTY_MANAGER_GROUP
 
 FULL_ACRONYM = 'LAGRO1000'
 SUBDIVISION_ACRONYM = 'C'
@@ -176,6 +178,23 @@ class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMi
         self.assertEqual(form._forms_to_upsert[0].forms[LearningUnitYearModelForm].instance,
                          self.learning_unit_year_partim)
         self.assertEqual(len(form._forms_to_delete), 6)
+
+    def test_update_proposal(self):
+        self.faculty_manager = PersonFactory()
+        self.faculty_manager.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+
+        next_learning_unit_year = LearningUnitYear.objects.get(
+            learning_unit=self.learn_unit_structure.learning_unit_full,
+            academic_year__year=self.current_academic_year.year+1
+        )
+
+        ProposalLearningUnitFactory(learning_unit_year=next_learning_unit_year)
+        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.faculty_manager)
+        form = _instanciate_postponement_form(self.faculty_manager, self.learning_unit_year_full.academic_year,
+                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
+                                              data=instance_luy_base_form.data)
+
+        self.assertEqual(len(form._forms_to_upsert), 1)
 
 
 class TestLearningUnitPostponementFormIsValid(LearningUnitPostponementFormContextMixin):

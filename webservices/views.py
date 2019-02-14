@@ -27,14 +27,17 @@ import collections
 import functools
 import re
 
+from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
+from django.forms import model_to_dict
 from django.http import Http404
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
+from base.business.education_groups import general_information_sections
 from base.management.commands.import_reddot import COMMON_OFFER
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_year import EducationGroupYear
@@ -117,6 +120,46 @@ def ws_catalog_offer(request, year, language, acronym):
     context.description['sections'] = convert_sections_to_list_of_dict(sections)
     context.description['sections'].append(get_conditions_admissions(context))
     return Response(context.description, content_type='application/json')
+
+
+@api_view(['POST'])
+@renderer_classes((JSONRenderer,))
+def ws_catalog_common_offer(request, year, language):
+    # Validation
+    common_education_group, iso_language, year = parameters_validation('common', language, year)
+    response = dict.fromkeys(general_information_sections.COMMON_GENERAL_INFO_SECTIONS, None)
+
+    qs = TranslatedText.objects.filter(
+        reference=str(common_education_group.pk),
+        language=iso_language,
+        text_label__label__in=general_information_sections.COMMON_GENERAL_INFO_SECTIONS
+    ).exclude(Q(text__isnull=True) | Q(text__exact='')).select_related('text_label')
+
+    for translated_text in qs:
+        response[translated_text.text_label.label] = translated_text.text
+
+    return Response(response, content_type='application/json')
+
+
+@api_view(['POST'])
+@renderer_classes((JSONRenderer,))
+def ws_catalog_common_admission_condition(request, year, language):
+    # Validation
+    common_education_group, iso_language, year = parameters_validation('common', language, year)
+    context = new_context(common_education_group, iso_language, language, 'common')
+    response = {}
+
+    commons_qs = EducationGroupYear.objects.look_for_common(
+        academic_year__year=year,
+        education_group_type__name__in=general_information_sections.COMMON_TYPE_ADMISSION_CONDITIONS.keys()
+    ).exclude(pk=common_education_group.pk).select_related('admissioncondition', 'education_group_type')
+
+    for common in commons_qs:
+        relevant_attr = general_information_sections.COMMON_TYPE_ADMISSION_CONDITIONS[common.education_group_type.name]
+        response[common.acronym] = {
+            field: get_value_from_ac(common.admissioncondition, field, context) for field in relevant_attr
+        }
+    return Response(response, content_type='application/json')
 
 
 def process_message(context, education_group_year, items):
