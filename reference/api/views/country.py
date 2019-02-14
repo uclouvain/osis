@@ -34,7 +34,7 @@ class CountryList(generics.ListAPIView):
        Return a list of all the country.
     """
     name = 'country-list'
-    queryset = Country.objects.all()
+
     serializer_class = CountrySerializer
     filter_fields = (
         'iso_code',
@@ -51,6 +51,13 @@ class CountryList(generics.ListAPIView):
     ordering = (
         'name',
     )  # Default ordering
+
+    def get_queryset(self):
+        queryset = Country.objects.all()
+        name = self.request.query_params.get('name__contains', None)
+        if name is not None:
+            queryset = queryset.filter(name__icontains=name)
+        return queryset
 
 
 class CountryDetail(generics.RetrieveAPIView):
