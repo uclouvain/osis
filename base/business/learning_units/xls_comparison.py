@@ -455,9 +455,9 @@ def create_xls_proposal_comparison(user, learning_units_with_proposal, filters):
         dict_styled_cells[xls_build.STYLE_MODIFIED] = cells_modified_with_green_font
 
     if cells_with_top_border:
-        dict_styled_cells[xls_build.STYLE_BORDER_TOP]= cells_with_top_border
+        dict_styled_cells[xls_build.STYLE_BORDER_TOP] = cells_with_top_border
     if dict_styled_cells:
-        parameters[xls_build.STYLED_CELLS]=dict_styled_cells
+        parameters[xls_build.STYLED_CELLS] = dict_styled_cells
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 
