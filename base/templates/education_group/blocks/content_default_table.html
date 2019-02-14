@@ -27,8 +27,9 @@
 <table class="table table-hover">
     <thead>
     <tr>
-        <th>{% trans 'Code SCS' %}</th>
-        <th>{% trans "Title" %} / {% trans "Formation's code" %}</th>
+        <th>{% trans 'Sigle' %}/{% trans 'Shorten title' %}</th>
+        <th>{% trans 'Code' %}</th>
+        <th>{% trans "Title" %}</th>
         <th>{% trans 'Cred. rel./abs.' %}</th>
         <th>{% trans 'Mandatory' %}</th>
         <th>{% trans 'Block' %}</th>
@@ -41,6 +42,7 @@
     {% for group in group_element_years %}
         <tr>
             <td width="10%">{{ group.acronym }}</td>
+            <td>{{ group.child_branch.partial_acronym }}</td>
             <td width="20%">{{ group.title }}</td>
             <td width="12%">{{ group.relative_credits | default_if_none:'-' }} /{{ group.child.credits|floatformat | default_if_none:'-' }}</td>
             <td width="6%">{{ group.is_mandatory | yesno }}</td>
