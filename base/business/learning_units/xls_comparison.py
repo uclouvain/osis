@@ -219,6 +219,7 @@ def _get_data(learning_unit_yr, new_line, first_data, partims=True):
         [
             learning_unit_yr.learning_unit.faculty_remark,
             learning_unit_yr.learning_unit.other_remark,
+            _('Yes') if learning_unit_yr.learning_container_year.team else _('No'),
             _('Yes') if learning_unit_yr.learning_container_year.is_vacant else _('No'),
             learning_unit_yr.learning_container_year.get_type_declaration_vacant_display(),
             learning_unit_yr.get_attribution_procedure_display(),
@@ -319,10 +320,8 @@ def _get_component_data_by_type(component, type):
 
 def _get_learning_unit_yr_with_component(learning_unit_years):
     learning_unit_years = LearningUnitYear.objects.filter(
-        learning_unit__in=[luy.id for luy in learning_unit_years],
-        academic_year__year__in=(
-            learning_unit_years[0].academic_year.year)
-    ).select_related(
+        learning_unit_year_id__in=[luy.id for luy in learning_unit_years]
+        ).select_related(
         'academic_year',
         'learning_container_year',
         'learning_container_year__academic_year'
@@ -414,6 +413,7 @@ def _get_data_from_initial_data(initial_data):
         campus if campus else BLANK_VALUE,
         get_representing_string(lu_initial['faculty_remark']),
         get_representing_string(lu_initial['other_remark']),
+        _('Yes') if lcy_initial.get('team') else _('No'),
         _('Yes') if lcy_initial.get('is_vacant') else _('No'),
         dict(vacant_declaration_type.DECLARATION_TYPE)[lcy_initial.get('type_declaration_vacant')] if lcy_initial.get(
             'type_declaration_vacant') else BLANK_VALUE,
@@ -452,13 +452,12 @@ def create_xls_proposal_comparison(user, learning_units_with_proposal, filters):
     }
     dict_styled_cells = {}
     if cells_modified_with_green_font:
-        dict_styled_cells.update({xls_build.STYLE_MODIFIED: cells_modified_with_green_font})
-        # dict_styled_cells[xls_build.STYLE_MODIFIED] = cells_modified_with_green_font
+        dict_styled_cells[xls_build.STYLE_MODIFIED] = cells_modified_with_green_font
 
     if cells_with_top_border:
-        dict_styled_cells.update({xls_build.STYLE_BORDER_TOP: cells_with_top_border})
+        dict_styled_cells[xls_build.STYLE_BORDER_TOP]= cells_with_top_border
     if dict_styled_cells:
-        parameters.update({xls_build.STYLED_CELLS: dict_styled_cells})
+        parameters[xls_build.STYLED_CELLS]=dict_styled_cells
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 

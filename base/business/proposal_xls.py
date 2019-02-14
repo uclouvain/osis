@@ -67,6 +67,7 @@ BASIC_TITLES_PART_1 = [
 BASIC_TITLES_PART_2 = [
     str(_("Faculty remark")),
     str(_("Other remark")),
+    str(_("Team management")),
     str(_("Vacant")),
     str(_("Decision")),
     str(_("Procedure")),
