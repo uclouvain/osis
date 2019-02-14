@@ -2804,7 +2804,7 @@ msgstr "Autre individuel"
 
 #: models/education_group_year.py:218
 msgid "Other languages activities"
-msgstr "Activité dans d'autres langues"
+msgstr "Activités dans d'autres langues"
 
 #: models/learning_unit.py:99
 msgid "Other remark"
