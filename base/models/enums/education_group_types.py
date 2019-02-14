@@ -76,9 +76,7 @@ class TrainingType(ChoiceEnum):
             cls.PGRM_MASTER_180_240.name,
             cls.AGGREGATION.name,
             cls.CERTIFICATE.name,
-            cls.CERTIFICATE_OF_SUCCESS.name,
-            cls.CERTIFICATE_OF_HOLDING_CREDITS.name,
-            cls.CERTIFICATE_OF_HOLDING_CREDITS.name,
+            cls.RESEARCH_CERTIFICATE.name,
         ]
 
 
