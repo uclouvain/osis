@@ -3473,7 +3473,7 @@ msgstr "Titre abrégé"
 
 #: templates/education_group/blocks/content_default_table.html:30
 msgid "Shorten title"
-msgstr "Int. abr."
+msgstr "Intitulé abrégé"
 
 #: templates/my_osis/my_messages.html:80
 msgid "Show message"
