@@ -169,6 +169,12 @@
         $("#proposals_form").submit();
         status.val('');
     });
-
+    $("#btn_produce_xls_proposal_comparison").click(function(e) {
+        e.preventDefault();
+        var status = $("#xls_status_proposal");
+        status.val('xls_comparison');
+        $("#proposals_form").submit();
+        status.val('');
+    });
 </script>
 {% endblock %}

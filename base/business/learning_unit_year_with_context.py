@@ -99,6 +99,7 @@ def append_components(learning_unit_year):
                 'VOLUME_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1: vol_add_req_entity_1,
                 'VOLUME_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2: vol_add_req_entity_2,
                 'VOLUME_TOTAL_REQUIREMENT_ENTITIES': volume_global,
+                'REAL_CLASSES': component.real_classes  # Necessary for xls comparison with proposition
             }
     return learning_unit_year
 

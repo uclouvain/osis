@@ -66,6 +66,22 @@ class TrainingType(ChoiceEnum):
             cls.MASTER_MS_180_240.name, cls.MASTER_M1.name, cls.MASTER_MC.name
         ]
 
+    @classmethod
+    def with_admission_condition(cls):
+        return [
+            cls.BACHELOR.name,
+            cls.MASTER_MC.name,
+            cls.MASTER_M1.name,
+            cls.PGRM_MASTER_120.name,
+            cls.PGRM_MASTER_180_240.name,
+            cls.AGGREGATION.name,
+            cls.CERTIFICATE.name,
+            cls.RESEARCH_CERTIFICATE.name,
+            cls.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
+            cls.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name,
+            cls.CAPAES.name,
+        ]
+
 
 class MiniTrainingType(ChoiceEnum):
     DEEPENING = _("Deepening")
@@ -86,6 +102,17 @@ class MiniTrainingType(ChoiceEnum):
     @classmethod
     def to_postpone(cls):
         return cls.minors() + [cls.DEEPENING.name]
+
+    @classmethod
+    def with_admission_condition(cls):
+        return [
+            cls.DEEPENING.name,
+            cls.SOCIETY_MINOR.name,
+            cls.ACCESS_MINOR.name,
+            cls.OPEN_MINOR.name,
+            cls.DISCIPLINARY_COMPLEMENT_MINOR.name,
+            cls.FSA_SPECIALITY.name,
+        ]
 
 
 class GroupType(ChoiceEnum):

@@ -107,7 +107,7 @@ class TestLearningUnitPrerequisite(TestCase):
                                     child_leaf=cls.learning_unit_year_child,
                                     child_branch=None)
             for i in range(0, 2)
-        ]
+            ]
 
         cls.prerequisite = PrerequisiteFactory(
             learning_unit_year=cls.learning_unit_year_child,
