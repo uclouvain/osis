@@ -33,7 +33,7 @@ from waffle.models import Flag
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models import proposal_learning_unit, tutor
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, \
-    starting_academic_year
+    starting_academic_year, current_academic_year
 from base.models.entity import Entity
 from base.models.entity_version import find_last_entity_version_by_learning_unit_year_id
 from base.models.enums import learning_container_year_types, entity_container_year_link_type
@@ -81,6 +81,9 @@ MSG_NOT_ELIGIBLE_FOR_MODIFICATION_BECAUSE_OF_TYPE = _("This learning unit isn't 
                                                       "it's type")
 MSG_CANNOT_UPDATE_EXTERNAL_UNIT_NOT_COGRADUATION = _("You can only edit co-graduation external learning units")
 MSG_CANNOT_EDIT_BECAUSE_OF_PROPOSAL = _("You can't edit because the learning unit has proposal")
+MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR = _(
+    "You are not allowed to change the end year for this academic year")
+MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR = _("You are not allowed to put in proposal for this academic year")
 
 
 def _any_existing_proposal_in_epc(learning_unit_year, _, raise_exception=False):
@@ -578,3 +581,89 @@ def _check_proposal_edition(learning_unit_year, person, raise_exception):
         MSG_CANNOT_EDIT_BECAUSE_OF_PROPOSAL,
     )
     return result
+
+
+def _is_container_type_course_dissertation_or_internship(learning_unit_year, _, raise_exception):
+    result = \
+        learning_unit_year.learning_container_year and \
+        learning_unit_year.learning_container_year.container_type in FACULTY_UPDATABLE_CONTAINER_TYPES
+
+    can_raise_exception(
+        raise_exception,
+        result,
+        MSG_NOT_ELIGIBLE_FOR_MODIFICATION_BECAUSE_OF_TYPE
+    )
+    return result
+
+
+def is_eligible_to_modify_end_year_by_proposal(learning_unit_year, person, raise_exception=False):
+    result = is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception)
+
+    if result:
+        return can_modify_end_year_by_proposal(learning_unit_year, person, raise_exception)
+    else:
+        can_raise_exception(
+            raise_exception,
+            result,
+            MSG_CANNOT_EDIT_BECAUSE_OF_PROPOSAL,
+        )
+        return result
+
+
+def can_modify_end_year_by_proposal(learning_unit_year, person, raise_exception=False):
+    result = True
+    max_limit = current_academic_year().year + 6
+    if person.is_faculty_manager and not person.is_central_manager:
+        n_year = current_academic_year().next().year
+
+    elif person.is_central_manager:
+        n_year = current_academic_year().year
+    else:
+        return False
+
+    if learning_unit_year.academic_year.year < n_year or learning_unit_year.academic_year.year >= max_limit:
+        result = False
+
+    can_raise_exception(
+        raise_exception, result,
+        MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR
+    )
+    return result
+
+
+def is_eligible_to_modify_by_proposal(learning_unit_year, person, raise_exception=False):
+    result = is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception)
+
+    if result:
+        return can_modify_by_proposal(learning_unit_year, person, raise_exception)
+    else:
+        can_raise_exception(
+            raise_exception,
+            result,
+            MSG_CANNOT_EDIT_BECAUSE_OF_PROPOSAL,
+        )
+        return result
+
+
+def can_modify_by_proposal(learning_unit_year, person, raise_exception=False):
+    result = True
+
+    if person.is_faculty_manager and not person.is_central_manager:
+        n_year = current_academic_year().next().year
+        max_limit = n_year
+
+    elif person.is_central_manager:
+        n_year = current_academic_year().year
+        max_limit = n_year+1
+    else:
+        return False
+
+    if learning_unit_year.academic_year.year < n_year or learning_unit_year.academic_year.year > max_limit:
+        result = False
+
+    can_raise_exception(
+        raise_exception, result,
+        MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
+    )
+    return result
+

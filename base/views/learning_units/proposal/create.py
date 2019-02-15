@@ -28,7 +28,7 @@ from django.shortcuts import redirect, get_object_or_404, render
 from waffle.decorators import waffle_flag
 
 from base.forms.learning_unit_proposal import CreationProposalBaseForm
-from base.models.academic_year import AcademicYear
+from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.person import Person
 from base.views.learning_units.common import show_success_proposal_learning_unit_year_creation_message
 
@@ -38,9 +38,10 @@ from base.views.learning_units.common import show_success_proposal_learning_unit
 @permission_required('base.can_propose_learningunit', raise_exception=True)
 def get_proposal_learning_unit_creation_form(request, academic_year):
     person = get_object_or_404(Person, user=request.user)
-    academic_year = get_object_or_404(AcademicYear, pk=academic_year)
 
-    proposal_form = CreationProposalBaseForm(request.POST or None, person, academic_year)
+    proposal_form = CreationProposalBaseForm(request.POST or None,
+                                             person,
+                                             _get_academic_year(academic_year, person, request))
 
     if proposal_form.is_valid():
         proposal = proposal_form.save()
@@ -48,3 +49,9 @@ def get_proposal_learning_unit_creation_form(request, academic_year):
         return redirect('learning_unit', learning_unit_year_id=proposal.learning_unit_year.pk)
 
     return render(request, "learning_unit/proposal/creation.html", proposal_form.get_context())
+
+
+def _get_academic_year(academic_year, person, request):
+    if person.is_faculty_manager and request.POST.get('academic_year'):
+        return get_object_or_404(AcademicYear, pk=request.POST.get('academic_year'))
+    return get_object_or_404(AcademicYear, pk=academic_year)
