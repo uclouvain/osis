@@ -50,7 +50,13 @@ class Domain(SerializableModel):
     national = models.BooleanField(default=False) # True if is Belgian else False
 
     def __str__(self):
-        return "{}: {} {}".format(self.decree.name, self.code, self.name)
+        full_domain_name = ""
+        if self.decree:
+            full_domain_name += "{}: ".format(self.decree.name)
+        if self.code:
+            full_domain_name += "{} ".format(self.code)
+        full_domain_name += "{}".format(self.name)
+        return full_domain_name
 
 
 def find_all_for_sync():
