@@ -2688,7 +2688,7 @@ msgstr "Inscriptions aux formations"
 
 #: models/admission_condition.py:87
 msgid "On the file: direct access or access with additional training"
-msgstr "Sur dossier: accès direct ou moyennant compléments de formation"
+msgstr "Sur dossier: accès direct, moyennant compléments de formation, ou refusé"
 
 #: forms/learning_unit/edition_volume.py:153
 #: forms/learning_unit/edition_volume.py:154

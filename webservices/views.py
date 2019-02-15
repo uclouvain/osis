@@ -32,6 +32,7 @@ from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
 from django.forms import model_to_dict
 from django.http import Http404
+from django.utils import translation
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.renderers import JSONRenderer
@@ -115,10 +116,11 @@ def ws_catalog_offer(request, year, language, acronym):
     context = new_context(education_group_year, iso_language, language, acronym)
     items = request.data['sections']
 
-    sections = process_message(context, education_group_year, items)
+    with translation.override(context.language):
+        sections = process_message(context, education_group_year, items)
+        context.description['sections'] = convert_sections_to_list_of_dict(sections)
+        context.description['sections'].append(get_conditions_admissions(context))
 
-    context.description['sections'] = convert_sections_to_list_of_dict(sections)
-    context.description['sections'].append(get_conditions_admissions(context))
     return Response(context.description, content_type='application/json')
 
 

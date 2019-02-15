@@ -2624,7 +2624,7 @@ msgstr ""
 
 #: models/admission_condition.py:87
 msgid "On the file: direct access or access with additional training"
-msgstr ""
+msgstr "Based on application: accepted, conditional on further training, or refusal"
 
 #: forms/learning_unit/edition_volume.py:153
 #: forms/learning_unit/edition_volume.py:154
