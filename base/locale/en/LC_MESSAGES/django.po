@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-14 11:13+0100\n"
+"POT-Creation-Date: 2019-02-15 07:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2624,7 +2624,8 @@ msgstr ""
 
 #: models/admission_condition.py:87
 msgid "On the file: direct access or access with additional training"
-msgstr "Based on application: accepted, conditional on further training, or refusal"
+msgstr ""
+"Based on application: accepted, conditional on further training, or refusal"
 
 #: forms/learning_unit/edition_volume.py:153
 #: forms/learning_unit/edition_volume.py:154
@@ -3398,7 +3399,7 @@ msgid "Short title"
 msgstr ""
 
 #: templates/education_group/blocks/content_default_table.html:30
-msgid "Shorten title"
+msgid "Shortened title"
 msgstr ""
 
 #: templates/my_osis/my_messages.html:80

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-14 11:13+0100\n"
+"POT-Creation-Date: 2019-02-15 07:42+0100\n"
 "PO-Revision-Date: 2019-01-23 09:42+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2688,7 +2688,8 @@ msgstr "Inscriptions aux formations"
 
 #: models/admission_condition.py:87
 msgid "On the file: direct access or access with additional training"
-msgstr "Sur dossier: accès direct, moyennant compléments de formation, ou refusé"
+msgstr ""
+"Sur dossier: accès direct, moyennant compléments de formation, ou refusé"
 
 #: forms/learning_unit/edition_volume.py:153
 #: forms/learning_unit/edition_volume.py:154
@@ -3472,7 +3473,7 @@ msgid "Short title"
 msgstr "Titre abrégé"
 
 #: templates/education_group/blocks/content_default_table.html:30
-msgid "Shorten title"
+msgid "Shortened title"
 msgstr "Intitulé abrégé"
 
 #: templates/my_osis/my_messages.html:80
