@@ -529,10 +529,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         acronym = self.object.acronym.lower()
         is_common = acronym.startswith('common-')
         is_specific = not is_common
-        is_minor = self.object.is_minor
-        is_deepening = self.object.is_deepening
         is_bachelor = self.object.is_bachelor
-        is_certificate = self.object.is_certificate
 
         is_master = acronym.endswith(('2m', '2m1'))
         is_aggregation = acronym.endswith('2a')
@@ -560,8 +557,8 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
                 'is_master': is_master,
                 'show_components_for_agreg': is_aggregation,
                 'show_components_for_agreg_and_mc': is_aggregation or is_mc,
-                'show_free_text': (not is_common and (is_master or is_aggregation or is_mc)
-                                   ) or is_minor or is_deepening or is_certificate,
+                'show_free_text': self.object.education_group_type.name in TrainingType.with_admission_condition() or
+                                  self.object.education_group_type.name in MiniTrainingType.with_admission_condition()
             },
             'admission_condition': admission_condition,
             'common_conditions': common_conditions,
