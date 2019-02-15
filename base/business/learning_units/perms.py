@@ -666,4 +666,3 @@ def can_modify_by_proposal(learning_unit_year, person, raise_exception=False):
         MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
     )
     return result
-
