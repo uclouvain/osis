@@ -54,8 +54,10 @@ class LearningComponentYearFactory(factory.django.DjangoModelFactory):
 
 
 class LecturingLearningComponentYearFactory(LearningComponentYearFactory):
-    type=learning_component_year_type.LECTURING
+    type = learning_component_year_type.LECTURING
+    acronym = "PM"
 
 
 class PracticalLearningComponentYearFactory(LearningComponentYearFactory):
-    type=learning_component_year_type.PRACTICAL_EXERCISES
+    type = learning_component_year_type.PRACTICAL_EXERCISES
+    acronym = "TP"

@@ -27,7 +27,8 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym, LearningUnitYear
+from base.business.utils.convert import volume_format
+from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
 from base.models.utils.utils import get_verbose_field_value
@@ -194,21 +195,12 @@ def dl_component_tooltip(context, key, **kwargs):
                 break
 
         difference = get_component_volume_css(volumes, key, default_if_none, value) or 'title="{}"'.format(_(title))
-        value = get_style_of_value("", "", _volume_format(value))
+        value = get_style_of_value("", "", volume_format(value))
         html_id = "id='id_{}'".format(key.lower())
 
         return mark_safe("<dl><dd {difference} {id}>{value}</dd></dl>".format(
             difference=difference, id=html_id, value=str(value)))
-    return _volume_format(value) if value else default_if_none
-
-
-def _volume_format(value):
-    if value is None:
-        return ''
-    else:
-        if value - int(value) != 0:
-            return "{0:.1f}".format(value)
-        return int(value)
+    return volume_format(value) if value else default_if_none
 
 
 @register.filter
@@ -217,7 +209,7 @@ def get_component_volume_css(values, parameter, default_if_none="", value=None):
         return mark_safe(
             " data-toggle=tooltip title='{} : {}' class='{}' ".format(
                 LABEL_VALUE_BEFORE_PROPOSAL,
-                _volume_format(values[parameter]) or default_if_none,
+                volume_format(values[parameter]) or default_if_none,
                 CSS_PROPOSAL_VALUE
             )
         )

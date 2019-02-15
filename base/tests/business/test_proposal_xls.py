@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from unittest import mock
 
 from django.test import TestCase
@@ -42,6 +43,15 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.user import UserFactory
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
+from base.business.learning_unit_year_with_context import append_latest_entities
+from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm
+from base.tests.factories.organization import OrganizationFactory
+from base.models.enums.organization_type import MAIN
+from base.models.enums import entity_type
+from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.business.learning_units.xls_comparison import prepare_xls_content_for_comparison
+from base.tests.forms.test_learning_unit_proposal import build_initial_data
+
 
 ACRONYM_ALLOCATION = 'INFO'
 ACRONYM_REQUIREMENT = 'DRT'
@@ -50,13 +60,14 @@ ACRONYM_REQUIREMENT = 'DRT'
 class TestProposalXls(TestCase):
 
     def setUp(self):
-        self.academic_year = create_current_academic_year()
+        academic_year = create_current_academic_year()
         self.learning_unit = LearningUnitFactory(start_year=1900)
 
-        l_container_year = LearningContainerYearFactory(acronym="LBIR1212", academic_year=self.academic_year)
+        l_container_year = LearningContainerYearFactory(acronym="LBIR1212", academic_year=academic_year)
         self.l_unit_yr_1 = LearningUnitYearFactory(acronym="LBIR1212", learning_container_year=l_container_year,
-                                                   academic_year=self.academic_year,
-                                                   subtype=learning_unit_year_subtypes.FULL)
+                                                   academic_year=academic_year,
+                                                   subtype=learning_unit_year_subtypes.FULL,
+                                                   credits=10)
         entity_requirement_ver = EntityVersionFactory(acronym=ACRONYM_REQUIREMENT,
                                                       entity=EntityFactory())
         self.l_unit_yr_1.entity_requirement = entity_requirement_ver.acronym
@@ -67,14 +78,27 @@ class TestProposalXls(TestCase):
         self.proposal_1 = ProposalLearningUnitFactory(learning_unit_year=self.l_unit_yr_1,
                                                       entity=entity_vr.entity)
         self.user = UserFactory()
+        self._set_entities()
 
     def test_prepare_xls_content_no_data(self):
         self.assertEqual(proposal_xls.prepare_xls_content([]), [])
+        proposals_data = prepare_xls_content_for_comparison([])
+        self.assertEqual(proposals_data['data'], [])
 
     def test_prepare_xls_content_with_data(self):
         proposals_data = proposal_xls.prepare_xls_content([self.proposal_1.learning_unit_year])
         self.assertEqual(len(proposals_data), 1)
         self.assertEqual(proposals_data[0], self._get_xls_data())
+
+    def test_prepare_xls_comparison_content_with_data_without_initial_data(self):
+        proposals_data = prepare_xls_content_for_comparison([self.l_unit_yr_1])
+        self.assertEqual(len(proposals_data['data']), 1)
+
+    def test_prepare_xls_comparison_content_with_data_with_initial_data(self):
+        self.proposal_1.initial_data = build_initial_data(self.l_unit_yr_1, self.entity_container_year)
+        self.proposal_1.save()
+        proposals_data = prepare_xls_content_for_comparison([self.l_unit_yr_1])
+        self.assertEqual(len(proposals_data['data']), 2)
 
     def _get_xls_data(self):
         return [self.l_unit_yr_1.entity_requirement,
@@ -103,6 +127,24 @@ class TestProposalXls(TestCase):
         expected_argument = _generate_xls_build_parameter(xls_data, self.user)
         mock_generate_xls.assert_called_with(expected_argument, None)
 
+    def _set_entities(self):
+        today = datetime.date.today()
+        an_entity = EntityFactory(organization=OrganizationFactory(type=MAIN))
+        self.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL,
+                                                   start_date=today.replace(year=1900),
+                                                   end_date=None)
+        self.entity_container_year = EntityContainerYearFactory(
+            learning_container_year=self.l_unit_yr_1.learning_container_year,
+            type=entity_container_year_link_type.REQUIREMENT_ENTITY,
+            entity=self.entity_version.entity
+        )
+        self.entity_container_year = EntityContainerYearFactory(
+            learning_container_year=self.l_unit_yr_1.learning_container_year,
+            type=entity_container_year_link_type.ALLOCATION_ENTITY,
+            entity=self.entity_version.entity
+        )
+        append_latest_entities(self.proposal_1.learning_unit_year)
+
 
 def _generate_xls_build_parameter(xls_data, user):
     return {
@@ -117,3 +159,5 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.COLORED_ROWS: None,
         }]
     }
+
+
