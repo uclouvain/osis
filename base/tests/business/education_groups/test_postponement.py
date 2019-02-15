@@ -295,8 +295,8 @@ class TestPostpone(TestCase):
 
     def test_postpone_with_same_child_branch_existing_in_N1_without_relationship(self):
         """
-        When the postponed child is a technical child, we have to check if the link to the existing egy is correctly
-        created.
+        When the postponed child has a min_count_authorized relation to 1,
+        we have to check if the link to the existing egy is correctly created.
         """
         n1_gr = GroupElementYearFactory(
             parent=self.next_education_group_year,
