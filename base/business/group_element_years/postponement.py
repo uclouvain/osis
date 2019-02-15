@@ -29,6 +29,7 @@ from django.utils.translation import ugettext as _
 from base.business.education_groups.postponement import duplicate_education_group_year
 from base.business.utils.model import update_related_object
 from base.models.academic_year import starting_academic_year
+from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType
 from base.models.prerequisite import Prerequisite
@@ -97,7 +98,12 @@ class PostponeContent:
         return next_instance
 
     @transaction.atomic
-    def postpone(self, instance=None):
+    def postpone(self):
+        result = self._postpone()
+        self._post_postponement()
+        return result
+
+    def _postpone(self, instance=None):
         """
         We'll postpone first the group_element_years of the root,
         after that, we'll postponement recursively all the child branches and child leafs.
@@ -106,25 +112,30 @@ class PostponeContent:
             instance = self.instance
             next_instance = self.instance_n1
         else:
-            next_instance = self.get_instance_n1(instance)
+            next_instance = instance.education_group.educationgroupyear_set.get(academic_year=self.next_academic_year)
 
-        for gr in instance.groupelementyear_set.all():
-            # For strange reasons, the education_group_year is not every times connected to a common education_group,
-            # so we have to use the acronym to find the next group_element_year.
-            new_gr = next_instance.groupelementyear_set.filter(child_branch__acronym=gr.child.acronym).first()
-            if not new_gr:
-                new_gr = update_related_object(gr, "parent", next_instance)
-
-            if new_gr.child_leaf:
-                self._postpone_child_leaf(gr, new_gr)
-            else:
-                self._postpone_child_branch(gr, new_gr)
-
-                self.result.append(new_gr)
-
-        self._post_postponement()
+        for gr in instance.groupelementyear_set.select_related('child_branch__academic_year',
+                                                               'child_branch__education_group'):
+            new_gr = self._postpone_child(gr, next_instance)
+            self.result.append(new_gr)
 
         return next_instance
+
+    def _postpone_child(self, gr, next_instance):
+        """ Determine if we have to postpone a leaf or a branch """
+        new_gr = None
+
+        if gr.child_branch:
+            new_gr = next_instance.groupelementyear_set.filter(
+                child_branch__education_group=gr.child.education_group
+            ).first()
+
+        if not new_gr:
+            new_gr = update_related_object(gr, "parent", next_instance)
+
+        if new_gr.child_leaf:
+            return self._postpone_child_leaf(gr, new_gr)
+        return self._postpone_child_branch(gr, new_gr)
 
     def _post_postponement(self):
         # Postpone the prerequisite only at the end to be sure to have all learning units and education groups
@@ -149,9 +160,19 @@ class PostponeContent:
         old_egy = old_gr.child_branch
         new_egy = old_egy.next_year()
 
+        if new_egy:
+            # In the case of technical group, we have to postpone the content even if the group already
+            # exists in N+1
+            relationship = AuthorizedRelationship.objects.filter(
+                parent_type=new_gr.parent.education_group_type,
+                child_type=new_egy.education_group_type
+            ).first()
+            if relationship and relationship.min_count_authorized > 0:
+                self._postpone(old_egy)
+
         if not new_egy:
             new_egy = duplicate_education_group_year(old_egy, self.next_academic_year)
-            self.postpone(old_egy)
+            self._postpone(old_egy)
 
         new_gr.child_branch = new_egy
         return new_gr.save()

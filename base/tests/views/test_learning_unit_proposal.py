@@ -273,7 +273,7 @@ class TestLearningUnitModificationProposal(TestCase):
             ],
             'learning_component_year': [
                 "id", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
-                "planned_classes",
+                "planned_classes", "type"
             ],
         }
 

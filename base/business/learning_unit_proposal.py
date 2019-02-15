@@ -53,6 +53,7 @@ from base.models.entity import find_by_id
 from reference.models.language import find_by_id as language_find_by_id
 from base.business.learning_unit_year_with_context import volume_from_initial_learning_component_year
 from base.models.enums import vacant_declaration_type, attribution_procedure
+from base.business import learning_unit_year_with_context
 
 BOOLEAN_FIELDS = ('professional_integration', 'is_vacant', 'team')
 FOREIGN_KEY_NAME = (
@@ -82,6 +83,7 @@ INITIAL_DATA_FIELDS = {
     ],
     'learning_component_year': [
         "id", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2", "planned_classes",
+        "type"
     ],
 }
 
@@ -414,7 +416,8 @@ def copy_learning_unit_data(learning_unit_year):
         "learning_unit": _get_attributes_values(learning_unit_year.learning_unit,
                                                 INITIAL_DATA_FIELDS['learning_unit']),
         "entities": get_entities(entities_by_type),
-        'learning_component_years': get_components_initial_data(learning_unit_year),
+        "learning_component_years": get_components_initial_data(learning_unit_year),
+        "volumes": _get_volumes_for_initial(learning_unit_year)
     }
 
 
@@ -521,7 +524,21 @@ def _get_name_attribute(obj):
 def _get_model_differences(actual_data, differences_param, initial_data_by_model, model):
     differences = differences_param
     for column_name, value in initial_data_by_model.items():
-        if not (value is None and actual_data[model][column_name] == '') and \
-                        value != actual_data[model][column_name]:
+        if not (value is None and actual_data[model][column_name] == '') and value != actual_data[model][column_name]:
             differences[column_name] = _get_the_old_value(column_name, actual_data[model], initial_data_by_model)
     return differences
+
+
+def _get_volumes_for_initial(learning_unit_year):
+    # Add volumes dict to initial_data by type
+    volumes = None
+    learning_unit_yrs = learning_unit_year_with_context.get_with_context(
+        learning_container_year_id=learning_unit_year.learning_container_year.id)
+
+    volumes = next(luy.components for luy in learning_unit_yrs if luy.id == learning_unit_year.id)
+
+    volumes_for_initial = {}
+    for component_key, volume_data in volumes.items():
+        volumes_for_initial[component_key.type] = volume_data
+
+    return volumes_for_initial

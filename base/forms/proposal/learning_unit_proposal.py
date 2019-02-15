@@ -33,6 +33,7 @@ from base.models.entity import Entity
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from base.business.learning_unit_year_with_context import append_latest_entities, append_components
 
 
 def _get_entity_folder_id_ordered_by_acronym():
@@ -75,6 +76,9 @@ class LearningUnitProposalForm(LearningUnitSearchForm):
         learning_units = self.get_queryset().filter(proposallearningunit__isnull=False)
 
         learning_units = mdl.proposal_learning_unit.filter_proposal_fields(learning_units, **self.cleaned_data)
+
+        for learning_unit in learning_units:
+            append_latest_entities(learning_unit, False)
 
         return learning_units
 
