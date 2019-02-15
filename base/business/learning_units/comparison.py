@@ -30,7 +30,7 @@ from django.utils.translation import ugettext_lazy as _
 from base.models import entity_container_year as mdl_entity_container_year
 from base.models.enums import learning_component_year_type
 
-FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON = ['acronym', 'subtype', 'internship_subtype', 'credits', 'periodicity',
+FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON = ['acronym', 'internship_subtype', 'credits', 'periodicity',
                                           'status', 'language', 'professional_integration', 'specific_title',
                                           'specific_title_english', 'quadrimester',
                                           'session', 'attribution_procedure']
@@ -64,8 +64,7 @@ def _get_changed_values(data_obj1, data_obj2, included_keys, model):
         if key not in included_keys:
             continue
         try:
-            if value != data_obj2[key]:
-                changed_values.update({key: get_value(model, data_obj2, key)})
+            changed_values.update({key: get_value(model, data_obj2, key)})
         except KeyError:
             raise KeyError('Invalid key for learning_unit_year compare')
     return changed_values

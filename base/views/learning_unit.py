@@ -50,12 +50,14 @@ from base.business.learning_units.perms import can_update_learning_achievement
 from base.forms.learning_class import LearningClassEditForm
 from base.forms.learning_unit_component import LearningUnitComponentEditForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
-from base.models import education_group_year
+from base.models import education_group_year, campus, proposal_learning_unit, entity
 from base.models.enums import learning_unit_year_subtypes
 from base.models.person import Person
+from base.models import learning_component_year as mdl_learning_component_year
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models import text_label
+from reference.models import language
 from reference.models.language import find_language_in_settings
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
@@ -236,11 +238,23 @@ def learning_unit_comparison(request, learning_unit_year_id):
     learning_unit_yr = get_object_or_404(mdl.learning_unit_year.LearningUnitYear.objects.all()
                                          .select_related('learning_unit', 'learning_container_year'),
                                          pk=learning_unit_year_id)
+    if proposal_learning_unit.is_learning_unit_year_in_proposal(learning_unit_yr):
+        initial_data = proposal_learning_unit.find_by_learning_unit_year(learning_unit_yr).initial_data
+        _reinitialize_model(learning_unit_yr, initial_data["learning_unit_year"])
+        _reinitialize_model(learning_unit_yr.learning_unit, initial_data["learning_unit"])
+        _reinitialize_model(learning_unit_yr.learning_container_year, initial_data["learning_container_year"])
+        _reinitialize_components(initial_data["learning_component_years"] or {})
     context = get_learning_unit_comparison_context(learning_unit_yr)
 
     previous_academic_yr = mdl.academic_year.find_academic_year_by_year(learning_unit_yr.academic_year.year - 1)
     previous_lu = _get_learning_unit_year(previous_academic_yr, learning_unit_yr)
     if previous_lu:
+        if proposal_learning_unit.is_learning_unit_year_in_proposal(previous_lu):
+            initial_data = proposal_learning_unit.find_by_learning_unit_year(previous_lu).initial_data
+            _reinitialize_model(previous_lu, initial_data["learning_unit_year"])
+            _reinitialize_model(previous_lu.learning_unit, initial_data["learning_unit"])
+            _reinitialize_model(previous_lu.learning_container_year, initial_data["learning_container_year"])
+            _reinitialize_components(initial_data["learning_component_years"] or {})
         previous_values = compare_learning_unit_years(learning_unit_yr, previous_lu)
         previous_lcy_values = compare_learning_container_years(learning_unit_yr.learning_container_year,
                                                                previous_lu.learning_container_year)
@@ -251,6 +265,12 @@ def learning_unit_comparison(request, learning_unit_year_id):
     next_academic_yr = mdl.academic_year.find_academic_year_by_year(learning_unit_yr.academic_year.year + 1)
     next_lu = _get_learning_unit_year(next_academic_yr, learning_unit_yr)
     if next_lu:
+        if proposal_learning_unit.is_learning_unit_year_in_proposal(next_lu):
+            initial_data = proposal_learning_unit.find_by_learning_unit_year(next_lu).initial_data
+            _reinitialize_model(next_lu, initial_data["learning_unit_year"])
+            _reinitialize_model(next_lu.learning_unit, initial_data["learning_unit"])
+            _reinitialize_model(next_lu.learning_container_year, initial_data["learning_container_year"])
+            _reinitialize_components(initial_data["learning_component_years"]or {})
         next_values = compare_learning_unit_years(learning_unit_yr, next_lu)
         next_lcy_values = compare_learning_container_years(learning_unit_yr.learning_container_year,
                                                            next_lu.learning_container_year)
@@ -303,6 +323,33 @@ def learning_unit_comparison(request, learning_unit_year_id):
         return HttpResponseRedirect(reverse('learning_unit', args=[learning_unit_year_id]))
 
 
+def _reinitialize_model(obj_model, attribute_initial_values):
+    for attribute_name, attribute_value in attribute_initial_values.items():
+        if attribute_name != "id":
+            cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+            setattr(obj_model, attribute_name, cleaned_initial_value)
+
+
+def _clean_attribute_initial_value(attribute_name, attribute_value):
+    clean_attribute_value = attribute_value
+    if attribute_name == "campus":
+        clean_attribute_value = campus.find_by_id(attribute_value)
+    elif attribute_name == "language":
+        clean_attribute_value = language.find_by_id(attribute_value)
+    return clean_attribute_value
+
+
+def _reinitialize_components(initial_components):
+    for initial_data_by_model in initial_components:
+        an_id = initial_data_by_model.get('id')
+        if an_id:
+            learning_component_year = mdl_learning_component_year.LearningComponentYear.objects.get(pk=an_id)
+            for attribute_name, attribute_value in initial_data_by_model.items():
+                if attribute_name != "id":
+                    cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+                    setattr(learning_component_year, attribute_name, cleaned_initial_value)
+
+
 def _add_warnings_for_inexisting_luy(request, academic_yr, luy):
     if not luy:
         messages.add_message(
@@ -323,12 +370,11 @@ def _get_learning_unit_year(academic_yr, learning_unit_yr):
 def _get_changed_organization(context, context_prev, context_next):
     data = {}
     for key_value in ORGANIZATION_KEYS:
-        if _has_changed(context, context_next, context_prev, key_value):
-            translated_key = _('Learning location') if key_value == "campus" else _(key_value.lower())
-            data.update({translated_key: {'prev': context_prev.get(key_value),
-                                          'current': context.get(key_value),
-                                          'next': context_next.get(key_value)}
-                         })
+        translated_key = _('Learning location') if key_value == "campus" else _(key_value.lower())
+        data.update({translated_key: {'prev': context_prev.get(key_value),
+                                      'current': context.get(key_value),
+                                      'next': context_next.get(key_value)}
+                     })
 
     return collections.OrderedDict(sorted(data.items()))
 
