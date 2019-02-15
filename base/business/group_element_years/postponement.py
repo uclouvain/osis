@@ -120,7 +120,7 @@ class PostponeContent:
             self.result.append(new_gr)
 
         return next_instance
-    
+
     def _postpone_child(self, gr, next_instance):
         """ Determine if we have to postpone a leaf or a branch """
         new_gr = None
