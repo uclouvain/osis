@@ -26,7 +26,7 @@
 {% endcomment %}
 
 {% block top_action_bar %}
-    {% if can_edit_information and not education_group_year.is_common %}
+    {% if can_edit_information %}
        {% include  "education_group/blocks/refresh_publication_button.html" %}
     {% endif %}
 {% endblock %}

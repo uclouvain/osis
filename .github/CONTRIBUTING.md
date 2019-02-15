@@ -217,6 +217,10 @@ def send_an_email(receiver: Person):
 
 ```
 
+### PDF : 
+- Utiliser WeasyPrint pour la création de documents PDF (https://weasyprint.org/).
+
+
 ### Tests : 
 #### Vues :
 Idéalement lorsqu'on teste une view, on doit vérifier :
