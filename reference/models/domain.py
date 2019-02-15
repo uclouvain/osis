@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
 from django.core import serializers
-from reference.models.enums import domain_type
+from django.db import models
+
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from reference.models.enums import domain_type
 
 
 class DomainAdmin(SerializableModelAdmin):
@@ -50,6 +51,9 @@ class Domain(SerializableModel):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ('-decree__name', 'code', 'name')
 
 
 def find_all_for_sync():

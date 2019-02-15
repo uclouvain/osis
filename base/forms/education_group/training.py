@@ -195,8 +195,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         self.fields['decree_category'].choices = sorted(decree_category.DECREE_CATEGORY, key=lambda c: c[1])
         self.fields['rate_code'].choices = sorted(rate_code.RATE_CODE, key=lambda c: c[1])
         self.fields['main_domain'].queryset = Domain.objects.filter(type=domain_type.UNIVERSITY)\
-                                                    .select_related('decree')\
-                                                    .order_by('code')
+                                                    .select_related('decree')
         if not self.fields['certificate_aims'].disabled:
             self.fields['section'].disabled = False
 
