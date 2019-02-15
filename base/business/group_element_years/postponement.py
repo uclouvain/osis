@@ -116,12 +116,12 @@ class PostponeContent:
 
         for gr in instance.groupelementyear_set.select_related('child_branch__academic_year',
                                                                'child_branch__education_group'):
-            new_gr = self._postpone_child(gr)
+            new_gr = self._postpone_child(gr, next_instance)
             self.result.append(new_gr)
 
         return next_instance
     
-    def _postpone_child(self, gr):
+    def _postpone_child(self, gr, next_instance):
         """ Determine if we have to postpone a leaf or a branch """
         new_gr = None
 
