@@ -91,12 +91,14 @@ def create_xls_comparison(user, learning_unit_years, filters, academic_yr_compar
     }
     dict_styled_cells = {}
     if cells_modified_with_green_font:
-        dict_styled_cells[xls_build.STYLE_MODIFIED: cells_modified_with_green_font]
+        dict_styled_cells[xls_build.STYLE_MODIFIED] = cells_modified_with_green_font
 
     if cells_with_top_border:
-        dict_styled_cells[xls_build.STYLE_BORDER_TOP:cells_with_top_border]
+        dict_styled_cells[xls_build.STYLE_BORDER_TOP] = cells_with_top_border
+        
     if dict_styled_cells:
-        parameters[xls_build.STYLED_CELLS: dict_styled_cells]
+        parameters[xls_build.STYLED_CELLS] = dict_styled_cells
+
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 
@@ -425,10 +427,9 @@ def _get_data_from_initial_data(initial_data):
 
 def _check_changes(initial_data, proposal_data, line_index):
     modifications = []
-    for col_index, obj in enumerate(initial_data):
-        if col_index > 1:
-            if obj != proposal_data[col_index]:
-                modifications.append('{}{}'.format(get_column_letter(col_index + 1), line_index))
+    for col_index, obj in enumerate(initial_data[1:]):
+        if obj != proposal_data[col_index]:
+            modifications.append('{}{}'.format(get_column_letter(col_index + 1), line_index))
     return modifications
 
 

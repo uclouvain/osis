@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
 import json
 from collections import namedtuple
 
@@ -182,10 +183,6 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
                (self.object.education_group_type.category != GROUP or
                 self.object.education_group_type.name == GroupType.COMMON_CORE.name)
 
-    def show_skills_and_achievements(self):
-        return not self.object.is_common and self.object.education_group_type.category != GROUP and \
-               self.is_general_info_and_condition_admission_in_display_range()
-
     def show_administrative(self):
         return self.object.education_group_type.category == "TRAINING" and \
                self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
@@ -199,8 +196,14 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         return not self.object.is_common
 
     def show_admission_conditions(self):
-        return not self.object.is_main_common and not self.is_intro_offer and \
-               self.is_general_info_and_condition_admission_in_display_range()
+        # @TODO: Need to refactor after business clarification
+        return not self.object.is_main_common and \
+               self.object.education_group_type.name in itertools.chain(TrainingType.with_admission_condition(),
+                                                                        MiniTrainingType.with_admission_condition()) \
+               and self.is_general_info_and_condition_admission_in_display_range()
+
+    def show_skills_and_achievements(self):
+        return self.show_admission_conditions() and not self.object.is_common
 
     def is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.object.academic_year.year < \

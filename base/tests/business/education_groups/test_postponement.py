@@ -46,6 +46,8 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.prerequisite import PrerequisiteFactory
+from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 
 class EducationGroupPostponementTestCase(TestCase):
@@ -284,7 +286,6 @@ class TestPostpone(TestCase):
 
     def test_postpone_with_child_branches(self):
         sub_group = GroupElementYearFactory(parent=self.current_group_element_year.child_branch)
-
         self.postponer = PostponeContent(self.current_education_group_year)
 
         new_root = self.postponer.postpone()
@@ -301,6 +302,12 @@ class TestPostpone(TestCase):
 
     def test_postpone_with_old_child_leaf(self):
         luy = LearningUnitYearFactory(academic_year=self.current_academic_year)
+
+        prerequisite = PrerequisiteFactory(learning_unit_year=luy)
+        EducationGroupYearFactory(education_group=prerequisite.education_group_year.education_group,
+                                  academic_year=self.next_academic_year)
+        item = PrerequisiteItemFactory(prerequisite=prerequisite)
+
         group_leaf = GroupElementYearFactory(
             parent=self.current_education_group_year, child_branch=None, child_leaf=luy
         )
@@ -312,6 +319,12 @@ class TestPostpone(TestCase):
         self.assertEqual(new_child_leaf.acronym, group_leaf.child_leaf.acronym)
         # If the luy does not exist in N+1, it should attach N instance
         self.assertEqual(new_child_leaf.academic_year, self.current_academic_year)
+        new_prerequisite = new_child_leaf.prerequisite_set.first()
+
+        self.assertEqual(new_prerequisite.education_group_year.education_group,
+                         prerequisite.education_group_year.education_group)
+
+        self.assertEqual(new_prerequisite.prerequisiteitem_set.first().learning_unit, item.learning_unit)
 
     def test_postpone_with_new_child_leaf(self):
         luy = LearningUnitYearFactory(academic_year=self.current_academic_year)

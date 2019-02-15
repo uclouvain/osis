@@ -312,6 +312,15 @@ In some areas, we have adopted  more strict rules:
 
 Only `.po` files are committed to the repository. `.mo` files are ignored in the `.gitignore` file.
 
+[NOTE]
+====
+Don't use the u prefixing of gettext
+
+    The u prefixing of gettext functions was originally to distinguish usage between unicode strings and bytestrings on Python 2. For code that supports only Python 3, they can be used interchangeably. A deprecation for the prefixed functions may happen in a future Django release.
+
+OSIS only support Python 3
+====
+
 === Following the Git Workflow
 
 The code repository is organized in three fixed branches:
