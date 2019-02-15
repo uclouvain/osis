@@ -46,11 +46,12 @@ from base.business.learning_unit import get_learning_unit_comparison_context
 from base.business.learning_units import perms as business_perms
 from base.business.learning_units.comparison import get_keys, compare_learning_unit_years, \
     compare_learning_container_years, get_components_changes, get_partims_as_str
+from base.business.learning_units.edition import update_or_create_entity_container_year_with_components
 from base.business.learning_units.perms import can_update_learning_achievement
 from base.forms.learning_class import LearningClassEditForm
 from base.forms.learning_unit_component import LearningUnitComponentEditForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
-from base.models import education_group_year, campus, proposal_learning_unit, entity
+from base.models import education_group_year, campus, proposal_learning_unit, entity, entity_container_year
 from base.models.enums import learning_unit_year_subtypes
 from base.models.person import Person
 from base.models import learning_component_year as mdl_learning_component_year
@@ -243,6 +244,7 @@ def learning_unit_comparison(request, learning_unit_year_id):
         _reinitialize_model(learning_unit_yr, initial_data["learning_unit_year"])
         _reinitialize_model(learning_unit_yr.learning_unit, initial_data["learning_unit"])
         _reinitialize_model(learning_unit_yr.learning_container_year, initial_data["learning_container_year"])
+        _reinitialize_entities(learning_unit_yr.learning_container_year, initial_data["entities"])
         _reinitialize_components(initial_data["learning_component_years"] or {})
     context = get_learning_unit_comparison_context(learning_unit_yr)
 
@@ -348,6 +350,17 @@ def _reinitialize_components(initial_components):
                 if attribute_name != "id":
                     cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
                     setattr(learning_component_year, attribute_name, cleaned_initial_value)
+
+
+def _reinitialize_entities(learning_container_year, initial_entities_by_type):
+    for type_entity, id_entity in initial_entities_by_type.items():
+        initial_entity = entity.get_by_internal_id(id_entity)
+        if initial_entity:
+            entity_container_yr = entity_container_year.EntityContainerYear.objects.get(
+                learning_container_year=learning_container_year,
+                type=type_entity
+            )
+            entity_container_yr.entity = initial_entity
 
 
 def _add_warnings_for_inexisting_luy(request, academic_yr, luy):
