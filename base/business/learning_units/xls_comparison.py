@@ -95,7 +95,7 @@ def create_xls_comparison(user, learning_unit_years, filters, academic_yr_compar
 
     if cells_with_top_border:
         dict_styled_cells[xls_build.STYLE_BORDER_TOP] = cells_with_top_border
-        
+
     if dict_styled_cells:
         parameters[xls_build.STYLED_CELLS] = dict_styled_cells
 
