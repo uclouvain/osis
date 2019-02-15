@@ -427,9 +427,9 @@ def _get_data_from_initial_data(initial_data):
 
 def _check_changes(initial_data, proposal_data, line_index):
     modifications = []
-    for col_index, obj in enumerate(initial_data[1:]):
-        if obj != proposal_data[col_index]:
-            modifications.append('{}{}'.format(get_column_letter(col_index + 1), line_index))
+    for col_index, obj in enumerate(initial_data[2:]):
+        if obj != proposal_data[col_index+2]:
+            modifications.append('{}{}'.format(get_column_letter(col_index+2 + 1), line_index))
     return modifications
 
 
