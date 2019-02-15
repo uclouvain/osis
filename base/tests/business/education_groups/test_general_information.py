@@ -34,15 +34,18 @@ from requests import Timeout
 
 from base.business.education_groups import general_information
 from base.business.education_groups.general_information import PublishException, RelevantSectionException, \
-    _get_portal_url, _bulk_publish
+    _get_portal_url, _bulk_publish, _get_url_to_publish
 from base.business.education_groups.general_information_sections import AGREGATION, CAAP, PREREQUISITE, \
     COMMON_DIDACTIC_PURPOSES, COMPLEMENTARY_MODULE, EVALUATION
 from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory
+from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory, \
+    EducationGroupYearCommonBachelorFactory
 
 
 @override_settings(URL_TO_PORTAL_UCL="http://portal-url.com", ESB_API_URL="api.esb.com",
-                   ESB_AUTHORIZATION="Basic dummy:1234", ESB_REFRESH_PEDAGOGY_ENDPOINT="offer/{year}/{code}/refresh")
+                   ESB_AUTHORIZATION="Basic dummy:1234", ESB_REFRESH_PEDAGOGY_ENDPOINT="offer/{year}/{code}/refresh",
+                   ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT='offer/{year}/common/refresh',
+                   ESB_REFRESH_COMMON_ADMISSION_ENDPOINT='offer/{year}/common_admission/refresh')
 class TestPublishGeneralInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -156,3 +159,38 @@ class TestGetRelevantSections(TestCase):
         sections = general_information.get_relevant_sections(common)
         self.assertFalse(mock_requests.called)
         self.assertListEqual(sections, expected_section)
+
+
+@override_settings(ESB_API_URL="api.esb.com",
+                   ESB_REFRESH_PEDAGOGY_ENDPOINT="offer/{year}/{code}/refresh",
+                   ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT='offer/{year}/common/refresh',
+                   ESB_REFRESH_COMMON_ADMISSION_ENDPOINT='offer/{year}/common_admission/refresh')
+class TestGetUrlToPublish(TestCase):
+    def test_get_publish_url_case_is_common_of_common(self):
+        common = EducationGroupYearCommonFactory()
+        expected_url = "{api_url}/{endpoint}".format(
+            api_url=settings.ESB_API_URL,
+            endpoint=settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT.format(year=common.academic_year.year),
+        )
+
+        self.assertEqual(expected_url, _get_url_to_publish(common))
+
+    def test_get_publish_url_case_common_type(self):
+        bachelor_common = EducationGroupYearCommonBachelorFactory()
+        expected_url = "{api_url}/{endpoint}".format(
+            api_url=settings.ESB_API_URL,
+            endpoint=settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT.format(year=bachelor_common.academic_year.year),
+        )
+
+        self.assertEqual(expected_url, _get_url_to_publish(bachelor_common))
+
+    def test_get_publish_url_case_not_common(self):
+        training = TrainingFactory()
+        expected_url = "{api_url}/{endpoint}".format(
+            api_url=settings.ESB_API_URL,
+            endpoint=settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(
+                year=training.academic_year.year,
+                code=training.acronym
+            ),
+        )
+        self.assertEqual(expected_url, _get_url_to_publish(training))
