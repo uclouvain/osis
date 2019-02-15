@@ -96,25 +96,26 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
     else:
         child_eg = previous_grp_ele.child_branch.education_group
 
-    child_egy = EducationGroupYear.objects.create(
+    child_egy, _ = EducationGroupYear.objects.update_or_create(
         academic_year=parent_egy.academic_year,
-        main_teaching_campus=parent_egy.main_teaching_campus,
-        management_entity=parent_egy.management_entity,
-        education_group_type=child_education_group_type,
-        title="{child_title} {parent_acronym}".format(
-            child_title=title_initial_value,
-            parent_acronym=parent_egy.acronym
-        ),
-        partial_acronym=_generate_child_partial_acronym(
-            parent_egy,
-            partial_acronym_initial_value,
-            child_education_group_type
-        ),
-        acronym="{child_title}{parent_acronym}".format(
-            child_title=title_initial_value.replace(" ", "").upper(),
-            parent_acronym=parent_egy.acronym
-        ),
-        education_group=child_eg
+        education_group=child_eg,
+        defaults={
+            'main_teaching_campus': parent_egy.main_teaching_campus,
+            'management_entity': parent_egy.management_entity,
+            'education_group_type': child_education_group_type,
+            'title': "{child_title} {parent_acronym}".format(
+                child_title=title_initial_value,
+                parent_acronym=parent_egy.acronym
+            ),
+            'partial_acronym': _generate_child_partial_acronym(
+                parent_egy, partial_acronym_initial_value,
+                child_education_group_type
+            ),
+            'acronym': "{child_title}{parent_acronym}".format(
+                child_title=title_initial_value.replace(" ", "").upper(),
+                parent_acronym=parent_egy.acronym
+            ),
+        }
     )
 
     return GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)

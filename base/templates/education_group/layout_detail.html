@@ -34,6 +34,19 @@
                 <a class="btn btn-default" style="margin-left: 15px;" onclick="switchTreeVisibility()">
                     <span class="fa fa-bars" aria-hidden="true"></span>
                 </a>
+
+                {% if root == education_group_year %}
+                    <label>
+                        <select class="form-control" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
+                            {% for edy in education_group_year.education_group.educationgroupyear_set.all %}
+                                <option value="{% url "education_group_read" edy.pk edy.pk %}"
+                                        {% if edy == education_group_year %} selected="selected" {% endif %}>
+                                    {{ edy.academic_year }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                {% endif %}
                 <div class="pull-right" style="margin-right: 15px;">
                     {% block top_action_bar %}
                     {% endblock %}

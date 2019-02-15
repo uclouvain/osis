@@ -35,7 +35,8 @@ from django.utils.translation import gettext_lazy as _
 from base.business import learning_unit_proposal as proposal_business
 from base.business.learning_unit import create_xls
 from base.business.learning_unit_xls import create_xls_with_parameters, WITH_ATTRIBUTIONS, WITH_GRP
-from base.business.learning_units.xls_comparison import create_xls_comparison, get_academic_year_of_reference
+from base.business.learning_units.xls_comparison import create_xls_comparison, get_academic_year_of_reference, \
+    create_xls_proposal_comparison
 from base.business.proposal_xls import create_xls as create_xls_proposal
 from base.forms.common import TooManyResultsException
 from base.forms.learning_unit.comparison import SelectComparisonYears
@@ -163,6 +164,13 @@ def learning_units_proposal_search(request):
 
     if request.POST.get('xls_status_proposal') == "xls":
         return create_xls_proposal(
+            user_person.user,
+            list(found_learning_units),
+            _get_filter(search_form, PROPOSAL_SEARCH)
+        )
+
+    if request.POST.get('xls_status_proposal') == "xls_comparison":
+        return create_xls_proposal_comparison(
             user_person.user,
             list(found_learning_units),
             _get_filter(search_form, PROPOSAL_SEARCH)
