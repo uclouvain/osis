@@ -77,33 +77,39 @@
                                     <td class="table_header">{{ title }}</td>
                                     {% if previous_lu %}
                                         <td>
-                                            {% if key == "attribution_procedure" %}
-                                                {{ previous_lu.get_attribution_procedure_display|capfirst | default:'-' }}
-                                            {% elif key == "periodicity" %}
-                                                {{ previous_lu.get_periodicity_display|capfirst | default:'-' }}
-                                            {% elif not key == "periodicity" %}
-                                                {{ previous_lu|get_attribute:key | default:'-' }}
-                                            {% endif %}
+                                            <label {% if previous_lu|get_attribute:key != learning_unit_year|get_attribute:key %} style='color:#5CB85C;' {% endif %}>
+                                                {% if key == "attribution_procedure" %}
+                                                    {{ previous_lu.get_attribution_procedure_display | default:'-' }}
+                                                {% elif key == "periodicity" %}
+                                                    {{ previous_lu.get_periodicity_display | default:'-' }}
+                                                {% else %}
+                                                    {{ previous_lu|get_attribute:key | default:'-' }}
+                                                {% endif %}
+                                            </label>
                                         </td>
                                     {% endif %}
                                     <td>
-                                        {% if key == "attribution_procedure" %}
-                                            {{ learning_unit_year.get_attribution_procedure_display|capfirst | default:'-' }}
-                                        {% elif key == "periodicity" %}
-                                            {{ learning_unit_year.get_periodicity_display|capfirst | default:'-' }}
-                                        {% else %}
-                                            {{ learning_unit_year|get_attribute:key | default:'-' }}
-                                        {% endif %}
+                                        <label>
+                                            {% if key == "attribution_procedure" %}
+                                                {{ learning_unit_year.get_attribution_procedure_display | default:'-' }}
+                                            {% elif key == "periodicity" %}
+                                                {{ learning_unit_year.get_periodicity_display | default:'-' }}
+                                            {% else %}
+                                                {{ learning_unit_year|get_attribute:key | default:'-' }}
+                                            {% endif %}
+                                        </label>
                                     </td>
                                     {% if next_lu %}
                                         <td>
-                                            {% if key == "attribution_procedure" %}
-                                                {{ next_lu.get_attribution_procedure_display|capfirst | default:'-' }}
-                                            {% elif key == "periodicity" %}
-                                                {{ next_lu.get_periodicity_display|capfirst | default:'-' }}
-                                            {% else %}
-                                                {{ next_lu|get_attribute:key | default:'-' }}
-                                            {% endif %}
+                                            <label {% if next_lu|get_attribute:key != learning_unit_year|get_attribute:key %} style='color:#5CB85C;' {% endif %}>
+                                                {% if key == "attribution_procedure" %}
+                                                    {{ next_lu.get_attribution_procedure_display | default:'-' }}
+                                                {% elif key == "periodicity" %}
+                                                    {{ next_lu.get_periodicity_display | default:'-' }}
+                                                {% else %}
+                                                    {{ next_lu|get_attribute:key | default:'-' }}
+                                                {% endif %}
+                                            </label>
                                         </td>
                                     {% endif %}
                                 </tr>
@@ -137,11 +143,19 @@
                                 <tr {% if forloop.first %}style="border-top: groove"{% endif %}>
                                     <td class="table_header">{{ title }}</td>
                                     {% if previous_lu %}
-                                        <td>{% value_label entity_changes key=key sub_key='prev' key_comp='current' %}</td>
+                                        <td>
+                                            <label {% if previous_lu|get_attribute:key != learning_unit_year|get_attribute:key %} style='color:#5CB85C;' {% endif %}>
+                                                {% value_label entity_changes key=key sub_key='prev' key_comp='current' %}
+                                            </label>
+                                        </td>
                                     {% endif %}
-                                    <td>{% value_label entity_changes key=key sub_key='current' key_comp='current' %}</td>
+                                    <td><label>{% value_label entity_changes key=key sub_key='current' key_comp='current' %}</label></td>
                                     {% if next_lu %}
-                                        <td>{% value_label entity_changes key=key sub_key='next' key_comp='current'%}</td>
+                                        <td>
+                                            <label {% if next_lu|get_attribute:key != learning_unit_year|get_attribute:key %} style='color:#5CB85C;' {% endif %}>
+                                                {% value_label entity_changes key=key sub_key='next' key_comp='current'%}
+                                            </label>
+                                        </td>
                                     {% endif %}
                                 </tr>
                             {% endfor %}
@@ -158,27 +172,33 @@
                                 <td class="table_header">{{ title }}</td>
                                 {% if previous_lu %}
                                     <td>
-                                        {% if key == "type_declaration_vacant" %}
-                                            {{ previous_lu.learning_container_year.get_type_declaration_vacant_display|capfirst | default:'-' }}
-                                        {% else %}
-                                            {{ previous_lu.learning_container_year|get_attribute:key | default:'-' }}
-                                        {% endif %}
+                                        <label {% if previous_lu.learning_container_year|get_attribute:key != learning_unit_year.learning_container_year|get_attribute:key %} style='color:#5CB85C;' {% endif %}>
+                                            {% if key == "type_declaration_vacant" %}
+                                                {{ previous_lu.learning_container_year.get_type_declaration_vacant_display | default:'-' }}
+                                            {% else %}
+                                                {{ previous_lu.learning_container_year|get_attribute:key | default:'-' }}
+                                            {% endif %}
+                                        </label>
                                     </td>
                                 {% endif %}
                                 <td>
-                                    {% if key == "type_declaration_vacant" %}
-                                        {{ learning_unit_year.learning_container_year.get_type_declaration_vacant_display|capfirst }}
-                                    {% else %}
-                                        {{ learning_unit_year.learning_container_year|get_attribute:key | default:'-' }}
-                                    {% endif %}
+                                    <label>
+                                        {% if key == "type_declaration_vacant" %}
+                                            {{ learning_unit_year.learning_container_year.get_type_declaration_vacant_display | default:'-' }}
+                                        {% else %}
+                                            {{ learning_unit_year.learning_container_year|get_attribute:key | default:'-' }}
+                                        {% endif %}
+                                    </label>
                                 </td>
                                 {% if next_lu %}
                                     <td>
-                                        {% if key == "type_declaration_vacant" %}
-                                            {{ next_lu.learning_container_year.get_type_declaration_vacant_display|capfirst | default:'-' }}
-                                        {% else %}
-                                            {{ next_lu.learning_container_year|get_attribute:key | default:'-' }}
-                                        {% endif %}
+                                        <label {% if next_lu.learning_container_year|get_attribute:key != learning_unit_year.learning_container_year|get_attribute:key %} style='color:#5CB85C;' {% endif %}>
+                                            {% if key == "type_declaration_vacant" %}
+                                                {{ next_lu.learning_container_year.get_type_declaration_vacant_display | default:'-' }}
+                                            {% else %}
+                                                {{ next_lu.learning_container_year|get_attribute:key | default:'-' }}
+                                            {% endif %}
+                                        </label>
                                     </td>
                                 {% endif %}
                             </tr>

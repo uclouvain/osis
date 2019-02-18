@@ -68,11 +68,11 @@
 
                     </td>
                     {% if previous_lu %}
-                        <td>{{ values.0 | default:'-' }}</td>
+                        <td>{% changed_label values.0 other1=values.1 %}</td>
                     {% endif %}
                     <td>{{ values.1 | default:'-' }}</td>
                     {% if next_lu %}
-                        <td>{{ values.2 | default:'-' }}</td>
+                        <td>{% changed_label values.2 other1=values.1 %}</td>
                     {% endif %}
                 </tr>
             {% endif %}
