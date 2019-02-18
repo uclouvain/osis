@@ -33,7 +33,6 @@ class TestDomain(TestCase):
 
     def setUp(self):
         self.decree = DecreeFactory(name='Paysage')
-        self.decree2 = DecreeFactory(name='Bologne')
 
     def test_str(self):
         dom = DomainFactory(decree=self.decree, code='10H', name='Test Domain')
