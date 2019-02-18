@@ -25,7 +25,6 @@
 ##############################################################################
 from django.test import TestCase
 
-from reference.models.domain import Domain
 from reference.tests.factories.decree import DecreeFactory
 from reference.tests.factories.domain import DomainFactory
 
@@ -35,47 +34,6 @@ class TestDomain(TestCase):
     def setUp(self):
         self.decree = DecreeFactory(name='Paysage')
         self.decree2 = DecreeFactory(name='Bologne')
-
-        DomainFactory(
-            decree=self.decree,
-            code='11',
-            name='Test1'
-        )
-        DomainFactory(
-            decree=self.decree,
-            code='1',
-            name='Test2'
-        )
-        DomainFactory(
-            decree=self.decree,
-            code='5',
-            name='Test3'
-        )
-        DomainFactory(
-            decree=self.decree,
-            code='33',
-            name='Test4'
-        )
-        DomainFactory(
-            decree=self.decree2,
-            code='11a',
-            name='Test1b'
-        )
-        DomainFactory(
-            decree=self.decree2,
-            code='1b',
-            name='Test2b'
-        )
-        DomainFactory(
-            decree=self.decree2,
-            code='5d',
-            name='Test3b'
-        )
-        DomainFactory(
-            decree=self.decree2,
-            code='33t',
-            name='Test4b'
-        )
 
     def test_str(self):
         dom = DomainFactory(decree=self.decree, code='10H', name='Test Domain')
@@ -102,20 +60,10 @@ class TestDomain(TestCase):
         self.assertEqual(str(dom), expected_value)
 
     def test_sorting_domain(self):
-        """ This test ensure that default order is state [DSC decree__name] + formation [ASC code]
-        There is no need to test if the last code of a decree is higher than the first of the next decree.
-        """
-        domains = Domain.objects.all()
-        previous_domain = domains.first().decree.name
-
-        for d in domains:
-            self.assertLessEqual(d.decree.name, previous_domain)
-            previous_domain = d.decree.name
-
-        previous_domain_id = domains.first().decree
-        previous_code = '0'
-        for d in domains:
-            if d.decree == previous_domain_id:
-                self.assertGreater(d.code, previous_code)
-            previous_domain_id = d.decree
-            previous_code = d.code
+        expected_value = ('-decree__name', 'code', 'name')
+        domain = DomainFactory(
+            decree=self.decree,
+            code='11',
+            name='Test1'
+        )
+        self.assertEqual(domain._meta.ordering, expected_value)
