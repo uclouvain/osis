@@ -57,7 +57,7 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
         'education_group', 'enrollment_campus',
         'main_teaching_campus', 'primary_language'
     )
-    search_fields = ['acronym', 'partial_acronym', 'title']
+    search_fields = ['acronym', 'partial_acronym', 'title', 'education_group__pk']
 
     actions = [
         'resend_messages_to_queue',
