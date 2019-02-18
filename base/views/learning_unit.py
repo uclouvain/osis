@@ -240,23 +240,14 @@ def learning_unit_comparison(request, learning_unit_year_id):
                                          .select_related('learning_unit', 'learning_container_year'),
                                          pk=learning_unit_year_id)
     if proposal_learning_unit.is_learning_unit_year_in_proposal(learning_unit_yr):
-        initial_data = proposal_learning_unit.find_by_learning_unit_year(learning_unit_yr).initial_data
-        _reinitialize_model(learning_unit_yr, initial_data["learning_unit_year"])
-        _reinitialize_model(learning_unit_yr.learning_unit, initial_data["learning_unit"])
-        _reinitialize_model(learning_unit_yr.learning_container_year, initial_data["learning_container_year"])
-        _reinitialize_entities(learning_unit_yr.learning_container_year, initial_data["entities"])
-        _reinitialize_components(initial_data["learning_component_years"] or {})
+        reinitialize_proposal(learning_unit_yr)
     context = get_learning_unit_comparison_context(learning_unit_yr)
 
     previous_academic_yr = mdl.academic_year.find_academic_year_by_year(learning_unit_yr.academic_year.year - 1)
     previous_lu = _get_learning_unit_year(previous_academic_yr, learning_unit_yr)
     if previous_lu:
         if proposal_learning_unit.is_learning_unit_year_in_proposal(previous_lu):
-            initial_data = proposal_learning_unit.find_by_learning_unit_year(previous_lu).initial_data
-            _reinitialize_model(previous_lu, initial_data["learning_unit_year"])
-            _reinitialize_model(previous_lu.learning_unit, initial_data["learning_unit"])
-            _reinitialize_model(previous_lu.learning_container_year, initial_data["learning_container_year"])
-            _reinitialize_components(initial_data["learning_component_years"] or {})
+            reinitialize_proposal(previous_lu)
         previous_values = compare_learning_unit_years(learning_unit_yr, previous_lu)
         previous_lcy_values = compare_learning_container_years(learning_unit_yr.learning_container_year,
                                                                previous_lu.learning_container_year)
@@ -268,11 +259,7 @@ def learning_unit_comparison(request, learning_unit_year_id):
     next_lu = _get_learning_unit_year(next_academic_yr, learning_unit_yr)
     if next_lu:
         if proposal_learning_unit.is_learning_unit_year_in_proposal(next_lu):
-            initial_data = proposal_learning_unit.find_by_learning_unit_year(next_lu).initial_data
-            _reinitialize_model(next_lu, initial_data["learning_unit_year"])
-            _reinitialize_model(next_lu.learning_unit, initial_data["learning_unit"])
-            _reinitialize_model(next_lu.learning_container_year, initial_data["learning_container_year"])
-            _reinitialize_components(initial_data["learning_component_years"]or {})
+            reinitialize_proposal(next_lu)
         next_values = compare_learning_unit_years(learning_unit_yr, next_lu)
         next_lcy_values = compare_learning_container_years(learning_unit_yr.learning_container_year,
                                                            next_lu.learning_container_year)
@@ -323,6 +310,15 @@ def learning_unit_comparison(request, learning_unit_year_id):
     else:
         display_error_messages(request, _('Comparison impossible! No learning unit to compare to'))
         return HttpResponseRedirect(reverse('learning_unit', args=[learning_unit_year_id]))
+
+
+def reinitialize_proposal(previous_lu):
+    initial_data = proposal_learning_unit.find_by_learning_unit_year(previous_lu).initial_data
+    _reinitialize_model(previous_lu, initial_data["learning_unit_year"])
+    _reinitialize_model(previous_lu.learning_unit, initial_data["learning_unit"])
+    _reinitialize_model(previous_lu.learning_container_year, initial_data["learning_container_year"])
+    _reinitialize_entities(previous_lu.learning_container_year, initial_data["entities"])
+    _reinitialize_components(initial_data["learning_component_years"] or {})
 
 
 def _reinitialize_model(obj_model, attribute_initial_values):
