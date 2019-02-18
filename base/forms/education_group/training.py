@@ -41,8 +41,11 @@ from base.models.education_group_certificate_aim import EducationGroupCertificat
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.entity_version import get_last_version
 from base.models.enums import education_group_categories, rate_code, decree_category
+from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import TrainingType
 from reference.models.domain import Domain
 from reference.models.enums import domain_type
+from base.models.hops import Hops
 
 
 class MainDomainChoiceField(forms.ModelChoiceField):
@@ -54,14 +57,60 @@ def _get_section_choices():
     return add_blank(CertificateAim.objects.values_list('section', 'section').distinct().order_by('section'))
 
 
+class HopsEducationGroupYearModelForm(forms.ModelForm):
+
+    class Meta:
+        model = Hops
+        fields = [
+            'ares_study',
+            'ares_graca',
+            'ares_ability',
+        ]
+
+    def is_valid(self):
+        return super(HopsEducationGroupYearModelForm, self).is_valid() and self._valid_hops()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["ares_study"].required = False
+        self.fields["ares_graca"].required = False
+        self.fields["ares_ability"].required = False
+
+    def save(self, education_group_year):
+        self.instance.education_group_year = education_group_year
+        if self._has_ares_data():
+            return super().save()
+        else:
+            if self.instance.id:
+                # Need to be deleted when data is none
+                self.instance.delete()
+            return None
+
+    def _valid_hops(self):
+        ares_fields = [
+            self.cleaned_data.get('ares_study') is None,
+            self.cleaned_data.get('ares_graca') is None,
+            self.cleaned_data.get('ares_ability') is None
+        ]
+        if any(ares_fields) and not all(ares_fields):
+            self.add_error('ares_study', _('The fields concerning ARES have to be ALL filled-in or none of them'))
+            return False
+        return True
+
+    def _has_ares_data(self):
+        return self.cleaned_data.get('ares_study') and self.cleaned_data.get('ares_graca') and self.cleaned_data.get(
+            'ares_ability')
+
+
 class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
-    category = education_group_categories.TRAINING
+    category = Categories.TRAINING.name
+    category_text = Categories.TRAINING.value
 
     secondary_domains = AutoCompleteSelectMultipleField(
         'university_domains', required=False, help_text="", label=_('secondary domains').title()
     )
 
-    section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False)
+    section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False, disabled=True)
 
     class Meta(EducationGroupYearModelForm.Meta):
         fields = [
@@ -111,6 +160,9 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             'diploma_printing_title',
             'professional_title',
             'certificate_aims',
+            'web_re_registration',
+            'co_graduation',
+            'co_graduation_coefficient',
         ]
 
         field_classes = {
@@ -126,6 +178,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
                 attrs={
                     'data-html': True,
                     'data-placeholder': _('Search...'),
+                    'data-width': '100%',
                 },
                 forward=['section'],
             )
@@ -144,6 +197,20 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         self.fields['main_domain'].queryset = Domain.objects.filter(type=domain_type.UNIVERSITY)\
                                                     .select_related('decree')\
                                                     .order_by('-decree__name', 'name')
+        if not self.fields['certificate_aims'].disabled:
+            self.fields['section'].disabled = False
+
+        if not getattr(self.initial, 'academic_year', None):
+            self.set_initial_diploma_values()
+
+    def set_initial_diploma_values(self):
+        if self.education_group_type and \
+                self.education_group_type.name in TrainingType.with_diploma_values_set_initially_as_true():
+            self.fields['joint_diploma'].initial = True
+            self.fields['diploma_printing_title'].required = True
+        else:
+            self.fields['joint_diploma'].initial = False
+            self.fields['diploma_printing_title'].required = False
 
     def save(self, commit=True):
         education_group_year = super().save(commit=False)
@@ -178,6 +245,14 @@ class TrainingModelForm(EducationGroupModelForm):
 class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
     education_group_year_form_class = TrainingEducationGroupYearForm
     education_group_form_class = TrainingModelForm
+    hops_form_class = HopsEducationGroupYearModelForm
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        education_group_yr_hops = getattr(kwargs.pop('instance', None), 'hops', Hops())
+        self.hops_form = self.hops_form_class(data=args[0],
+                                              instance=education_group_yr_hops)
 
     def _post_save(self):
         education_group_instance = self.forms[EducationGroupModelForm].instance
@@ -188,6 +263,15 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
         return {
             'object_list_deleted': egy_deleted,
         }
+
+    def save(self):
+        egy_instance = super().save()
+        if self.hops_form.is_valid():
+            self.hops_form.save(education_group_year=egy_instance)
+        return egy_instance
+
+    def is_valid(self):
+        return super(TrainingForm, self).is_valid() and self.hops_form.is_valid()
 
 
 @register('university_domains')

@@ -34,8 +34,9 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import entity_type
 from base.models.enums import organization_type
 from base.models.enums.education_group_categories import GROUP, MINI_TRAINING
-from base.models.enums.education_group_types import OPTION
+from base.models.enums.education_group_types import MiniTrainingType
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_language import EducationGroupLanguageFactory
@@ -151,12 +152,12 @@ class TestPostpone(TestCase):
         self.education_group = EducationGroupFactory(end_year=self.next_academic_year.year)
 
         self.current_education_group_year = TrainingFactory(education_group=self.education_group,
-                                                                      academic_year=self.current_academic_year)
+                                                            academic_year=self.current_academic_year)
 
         self.current_group_element_year = GroupElementYearFactory(parent=self.current_education_group_year)
 
         self.next_education_group_year = TrainingFactory(education_group=self.education_group,
-                                                                   academic_year=self.next_academic_year)
+                                                         academic_year=self.next_academic_year)
 
     def test_init_postponement(self):
         self.postponer = PostponeContent(self.current_education_group_year)
@@ -170,7 +171,30 @@ class TestPostpone(TestCase):
         self.assertEqual(str(cm.exception), _("The root does not exist in the next academic year."))
 
     def test_init_already_postponed_content(self):
-        GroupElementYearFactory(parent=self.next_education_group_year)
+        gr = GroupElementYearFactory(parent=self.next_education_group_year)
+
+        with self.assertRaises(NotPostponeError) as cm:
+            self.postponer = PostponeContent(self.current_education_group_year)
+        self.assertEqual(str(cm.exception), _("The content has already been postponed."))
+
+        AuthorizedRelationshipFactory(
+            parent_type=self.next_education_group_year.education_group_type,
+            child_type=gr.child_branch.education_group_type,
+            min_count_authorized=1
+        )
+
+        self.postponer = PostponeContent(self.current_education_group_year)
+
+        gr_1 = GroupElementYearFactory(parent=gr.child_branch)
+
+        with self.assertRaises(NotPostponeError) as cm:
+            self.postponer = PostponeContent(self.current_education_group_year)
+        self.assertEqual(str(cm.exception), _("The content has already been postponed."))
+
+    def test_init_already_postponed_content_with_child_leaf(self):
+        gr = GroupElementYearFactory(parent=self.next_education_group_year,
+                                     child_branch=None,
+                                     child_leaf=LearningUnitYearFactory())
 
         with self.assertRaises(NotPostponeError) as cm:
             self.postponer = PostponeContent(self.current_education_group_year)
@@ -197,7 +221,7 @@ class TestPostpone(TestCase):
 
     def test_init_wrong_instance_minitraining(self):
         self.current_education_group_year.education_group_type.category = MINI_TRAINING
-        self.current_education_group_year.education_group_type.name = OPTION
+        self.current_education_group_year.education_group_type.name = MiniTrainingType.OPTION.name
         self.current_education_group_year.education_group_type.save()
 
         with self.assertRaises(NotPostponeError) as cm:
@@ -229,6 +253,34 @@ class TestPostpone(TestCase):
         new_child_branch = new_root.groupelementyear_set.get().child_branch
         self.assertEqual(new_child_branch, n1_child_branch)
         self.assertEqual(new_child_branch.academic_year, self.next_academic_year)
+
+    def test_postpone_with_same_child_branch_existing_in_N1(self):
+        n1_child_branch = EducationGroupYearFactory(
+            academic_year=self.next_academic_year,
+            acronym=self.current_group_element_year.child_branch.acronym,
+        )
+        n_child_branch = GroupElementYearFactory(parent=self.current_group_element_year.child_branch)
+
+        GroupElementYearFactory(
+            parent=self.next_education_group_year,
+            child_branch=n1_child_branch
+        )
+
+        AuthorizedRelationshipFactory(
+            parent_type=self.next_education_group_year.education_group_type,
+            child_type=n1_child_branch.education_group_type,
+            min_count_authorized=1
+        )
+
+        self.postponer = PostponeContent(self.current_education_group_year)
+
+        new_root = self.postponer.postpone()
+
+        self.assertEqual(new_root, self.next_education_group_year)
+        self.assertEqual(new_root.groupelementyear_set.count(), 1)
+        new_child_branch = new_root.groupelementyear_set.get().child_branch
+        self.assertEqual(new_child_branch.groupelementyear_set.get().child_branch.education_group,
+                         n_child_branch.child_branch.education_group)
 
     def test_postpone_with_child_branches(self):
         sub_group = GroupElementYearFactory(parent=self.current_group_element_year.child_branch)

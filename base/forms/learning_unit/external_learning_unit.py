@@ -49,7 +49,7 @@ from reference.models.country import Country
 class LearningContainerYearExternalModelForm(LearningContainerYearModelForm):
 
     def prepare_fields(self):
-        self.fields["container_type"].choices = ((EXTERNAL, _(EXTERNAL)),)
+        self.fields["container_type"].choices = ((EXTERNAL, _("External")),)
         self.fields['container_type'].disabled = True
         self.fields['container_type'].required = False
 
@@ -62,7 +62,7 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
     country = ModelChoiceField(
         queryset=Country.objects.all(),
         required=False,
-        label=_("country"),
+        label=_("Country"),
         widget=autocomplete.ModelSelect2(url='country-autocomplete')
     )
 
@@ -74,7 +74,6 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
             if organization_address:
                 country = organization_address.country
                 initial["country"] = country.pk
-
         super().__init__(*args, instance=instance, initial=initial, external=True, **kwargs)
 
     class Meta(LearningUnitYearModelForm.Meta):
@@ -91,7 +90,7 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
 
 
 class ExternalLearningUnitModelForm(forms.ModelForm):
-    requesting_entity = EntitiesVersionChoiceField(queryset=EntityVersion.objects.none(), label=_('requesting_entity'))
+    requesting_entity = EntitiesVersionChoiceField(queryset=EntityVersion.objects.none(), label=_('Requesting entity'))
     entity_version = None
 
     def __init__(self, data, person, *args, **kwargs):
@@ -100,13 +99,16 @@ class ExternalLearningUnitModelForm(forms.ModelForm):
         super().__init__(data, *args, **kwargs)
         self.instance.author = person
         self.fields['requesting_entity'].queryset = self.person.find_main_entities_version
+        self.fields['co_graduation'].initial = True
+        self.fields['co_graduation'].disabled = True
+        self.fields['mobility'].disabled = True
 
-        if hasattr(self.instance, 'requesting_entity'):
+        if self.instance.id and hasattr(self.instance, 'requesting_entity'):
             self.initial['requesting_entity'] = get_last_version(self.instance.requesting_entity)
 
     class Meta:
         model = ExternalLearningUnitYear
-        fields = ('external_acronym', 'external_credits', 'url', 'requesting_entity')
+        fields = ('external_acronym', 'external_credits', 'url', 'requesting_entity', 'co_graduation', 'mobility')
 
     def post_clean(self, start_date):
         entity = self.cleaned_data.get('requesting_entity')

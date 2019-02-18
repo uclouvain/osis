@@ -30,25 +30,15 @@ from django.db import models
 from base.business import entity_version as business_entity_version
 from base.models import entity_container_year, learning_unit_component, entity_component_year, learning_unit_year
 from base.models.enums import entity_container_year_link_type as entity_types
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from osis_common.utils.numbers import to_float_or_zero
-
-ENTITY_TYPES_VOLUME = [
-    entity_types.REQUIREMENT_ENTITY,
-    entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
-    entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
-]
-
-
-class LearningUnitYearWithContext:
-    def __init__(self, **kwargs):
-        self.learning_unit_year = kwargs.get('learning_unit_year')
 
 
 def get_with_context(**learning_unit_year_data):
     entity_container_prefetch = models.Prefetch(
         'learning_container_year__entitycontaineryear_set',
         queryset=entity_container_year.search(
-            link_type=ENTITY_TYPES_VOLUME
+            link_type=REQUIREMENT_ENTITIES
         ).prefetch_related(
             models.Prefetch('entity__entityversion_set', to_attr='entity_versions')
         ),
@@ -69,9 +59,8 @@ def get_with_context(**learning_unit_year_data):
 
 def append_latest_entities(learning_unit_yr, service_course_search=False):
     learning_unit_yr.entities = {}
-    learning_container_year = learning_unit_yr.learning_container_year
 
-    for entity_container_yr in getattr(learning_container_year, "entity_containers_year", []):
+    for entity_container_yr in learning_unit_yr.learning_container_year.entitycontaineryear_set.all():
         link_type = entity_container_yr.type
         learning_unit_yr.entities[link_type] = entity_container_yr.get_latest_entity_version()
 
@@ -115,15 +104,14 @@ def append_components(learning_unit_year):
 
 
 def _get_requirement_entities_volumes(entity_components_year):
-    needed_entity_types = [
-        entity_types.REQUIREMENT_ENTITY,
-        entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
-        entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
-    ]
     return {
-        entity_type: _get_floated_only_element_of_list([ecy.repartition_volume for ecy in entity_components_year
-                                                        if ecy.entity_container_year.type == entity_type], default=0)
-        for entity_type in needed_entity_types
+        entity_type: _get_floated_only_element_of_list(
+            [
+                ecy.repartition_volume for ecy in entity_components_year
+                if ecy.entity_container_year.type == entity_type
+            ], default=0
+        )
+        for entity_type in REQUIREMENT_ENTITIES
     }
 
 
@@ -147,18 +135,19 @@ def volume_learning_component_year(learning_component_year, entity_components_ye
         'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
         'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0),
         'VOLUME_GLOBAL': sum([requirement_vols.get(entity_types.REQUIREMENT_ENTITY, 0),
-                             requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
-                             requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0)])
+                              requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
+                              requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0)])
     }
 
 
 def is_service_course(academic_year, requirement_entity_version, allocation_entity_version):
-    if not requirement_entity_version or not allocation_entity_version\
+    if not requirement_entity_version or not allocation_entity_version \
             or requirement_entity_version == allocation_entity_version:
         return False
     requirement_parent_faculty = requirement_entity_version.find_faculty_version(academic_year)
     if not requirement_parent_faculty:
         return False
+
     allocation_parent_faculty = allocation_entity_version.find_faculty_version(academic_year)
     if not allocation_parent_faculty:
         return False
@@ -182,3 +171,19 @@ def get_learning_component_prefetch():
         to_attr='learning_unit_components'
     )
     return learning_component_prefetch
+
+
+def volume_from_initial_learning_component_year(learning_component_year, entity_components_year):
+    requirement_vols = _get_requirement_entities_volumes(entity_components_year)
+    return {
+        'VOLUME_TOTAL': learning_component_year['hourly_volume_total_annual'],
+        'VOLUME_Q1': learning_component_year['hourly_volume_partial_q1'],
+        'VOLUME_Q2': learning_component_year['hourly_volume_partial_q2'],
+        'PLANNED_CLASSES': learning_component_year.get('planned_classes'),
+        'VOLUME_REQUIREMENT_ENTITY': requirement_vols.get(entity_types.REQUIREMENT_ENTITY, 0),
+        'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
+        'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0),
+        'VOLUME_GLOBAL': sum([requirement_vols.get(entity_types.REQUIREMENT_ENTITY, 0),
+                              requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
+                              requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0)])
+    }

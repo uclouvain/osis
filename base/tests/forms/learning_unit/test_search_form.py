@@ -53,15 +53,15 @@ class TestSearchForm(TestCase):
     def test_get_research_criteria(self):
         data = QueryDict(mutable=True)
         data.update({
-            "requirement_entity_acronym": "info",
+            "requirement_entity_acronym": "INFO",
             "tutor": "Jean Marcel",
             "academic_year_id": str(self.academic_years[0].id),
         })
         form = LearningUnitSearchForm(data)
         self.assertTrue(form.is_valid())
-        expected_research_criteria = [(_('academic_year_small'), self.academic_years[0]),
-                                      (_('requirement_entity_small'), "INFO"),
-                                      (_('tutor'), "Jean Marcel")]
+        expected_research_criteria = [(_('Ac yr.'), self.academic_years[0]),
+                                      (_('Req. Entity'), "INFO"),
+                                      (_('Tutor'), "Jean Marcel")]
         actual_research_criteria = get_research_criteria(form)
         self.assertListEqual(expected_research_criteria, actual_research_criteria)
 
@@ -73,8 +73,8 @@ class TestSearchForm(TestCase):
         })
         form = LearningUnitYearForm(data)
         self.assertTrue(form.is_valid())
-        expected_research_criteria = [(_('academic_year_small'), self.academic_years[0]),
-                                      (_('type'), _(learning_container_year_types.COURSE))]
+        expected_research_criteria = [(_('Ac yr.'), self.academic_years[0]),
+                                      (_('Type'), _("Course"))]
         actual_research_criteria = get_research_criteria(form)
         self.assertListEqual(expected_research_criteria, actual_research_criteria)
 

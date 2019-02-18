@@ -95,3 +95,6 @@ msgstr "Ouvrir"
 
 msgid "Collapse"
 msgstr "Fermer"
+
+msgid "step_for_field"
+msgstr "Veuillez entrer une valeur qui est un multiple de 0,5."

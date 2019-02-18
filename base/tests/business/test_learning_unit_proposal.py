@@ -56,6 +56,8 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from base.models.enums import learning_component_year_type
 
 
 class TestLearningUnitProposalCancel(TestCase):
@@ -84,6 +86,16 @@ class TestLearningUnitProposalCancel(TestCase):
         an_entity = EntityFactory(organization=an_organization)
         self.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL, start_date=today,
                                                    end_date=today.replace(year=today.year + 1))
+        self.learning_component_year_lecturing = LearningComponentYearFactory(
+            type=learning_component_year_type.LECTURING,
+            acronym="TP",
+            learning_container_year=learning_container_year
+        )
+        self.learning_component_year_practical = LearningComponentYearFactory(
+            type=learning_component_year_type.PRACTICAL_EXERCISES,
+            acronym="PP",
+            learning_container_year=learning_container_year
+        )
 
     def test_cancel_proposal_of_type_suppression_case_success(self):
         proposal = self._create_proposal(prop_type=proposal_type.ProposalType.SUPPRESSION.name,
@@ -148,7 +160,21 @@ class TestLearningUnitProposalCancel(TestCase):
                 entity_container_year_link_type.ALLOCATION_ENTITY: None,
                 entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
                 entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
-            }
+            },
+            "learning_component_years": [
+                {"id": self.learning_component_year_lecturing.id,
+                 "planned_classes": self.learning_component_year_lecturing.planned_classes,
+                 "hourly_volume_partial_q1": self.learning_component_year_lecturing.hourly_volume_partial_q1,
+                 "hourly_volume_partial_q2": self.learning_component_year_lecturing.hourly_volume_partial_q2,
+                 "hourly_volume_total_annual": self.learning_component_year_lecturing.hourly_volume_total_annual
+                 },
+                {"id": self.learning_component_year_practical.id,
+                 "planned_classes": self.learning_component_year_practical.planned_classes,
+                 "hourly_volume_partial_q1": self.learning_component_year_practical.hourly_volume_partial_q1,
+                 "hourly_volume_partial_q2": self.learning_component_year_practical.hourly_volume_partial_q2,
+                 "hourly_volume_total_annual": self.learning_component_year_practical.hourly_volume_total_annual
+                 }
+            ]
         }
         return ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year,
                                            initial_data=initial_data_expected,
@@ -172,6 +198,7 @@ class TestComputeProposalType(TestCase):
             'learning_unit_year': {'acronym': 'bibi'}})
 
         actual_proposal_type = compute_proposal_type(proposal, proposal.learning_unit_year)
+
         self.assertEqual(proposal_type.ProposalType.TRANSFORMATION.name, actual_proposal_type)
 
     def test_return_modification_when_data_changed_consist_of_other_fields_than_first_letter_or_acronym(self):

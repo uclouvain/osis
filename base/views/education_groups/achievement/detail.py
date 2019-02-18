@@ -25,12 +25,13 @@
 ############################################################################
 from django.conf import settings
 
+from base.business.education_groups import perms
 from base.views.education_groups.detail import EducationGroupGenericDetailView
 from cms.enums import entity_name
 from cms.models import translated_text
 
-CMS_LABEL_CERTIFICAT_AIM = 'certificate_aim'
-CMS_LABEL_ADDITIONAL_INFORMATION = 'additional_informations'
+CMS_LABEL_PROGRAM_AIM = 'skills_and_achievements_introduction'
+CMS_LABEL_ADDITIONAL_INFORMATION = 'skills_and_achievements_additional_text'
 
 
 class EducationGroupSkillsAchievements(EducationGroupGenericDetailView):
@@ -42,7 +43,7 @@ class EducationGroupSkillsAchievements(EducationGroupGenericDetailView):
 
     def find_translated_texts(self, text_label_name, language_code):
         if self.cms_translated_texts is None:
-            text_labels = [CMS_LABEL_CERTIFICAT_AIM, CMS_LABEL_ADDITIONAL_INFORMATION]
+            text_labels = [CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION]
             self.cms_translated_texts = translated_text.search(
                 entity=entity_name.OFFER_YEAR,
                 reference=self.get_object().id,
@@ -54,11 +55,11 @@ class EducationGroupSkillsAchievements(EducationGroupGenericDetailView):
             None
         )
 
-    def get_french_certificate_aim(self):
-        return self.find_translated_texts(CMS_LABEL_CERTIFICAT_AIM, settings.LANGUAGE_CODE_FR)
+    def get_french_program_aim(self):
+        return self.find_translated_texts(CMS_LABEL_PROGRAM_AIM, settings.LANGUAGE_CODE_FR)
 
-    def get_english_certificate_aim(self):
-        return self.find_translated_texts(CMS_LABEL_CERTIFICAT_AIM, settings.LANGUAGE_CODE_EN)
+    def get_english_program_aim(self):
+        return self.find_translated_texts(CMS_LABEL_PROGRAM_AIM, settings.LANGUAGE_CODE_EN)
 
     def get_french_additional_info(self):
         return self.find_translated_texts(CMS_LABEL_ADDITIONAL_INFORMATION, settings.LANGUAGE_CODE_FR)
@@ -69,14 +70,19 @@ class EducationGroupSkillsAchievements(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context.update(
-            {
-                'LANGUAGE_CODE_FR': settings.LANGUAGE_CODE_FR,
-                'LANGUAGE_CODE_EN': settings.LANGUAGE_CODE_EN
-             }
-        )
+        context.update({
+            'LANGUAGE_CODE_FR': settings.LANGUAGE_CODE_FR,
+            'LANGUAGE_CODE_EN': settings.LANGUAGE_CODE_EN,
+            'can_edit_information': perms.is_eligible_to_edit_admission_condition(context['person'], context['object'])
+        })
 
         context["education_group_achievements"] = self.get_achievements()
-        context["certificate_aim"] = [self.get_french_certificate_aim(), self.get_english_certificate_aim()]
-        context["additional_informations"] = [self.get_french_additional_info(), self.get_english_additional_info()]
+        context[CMS_LABEL_PROGRAM_AIM] = {
+            settings.LANGUAGE_CODE_FR: self.get_french_program_aim(),
+            settings.LANGUAGE_CODE_EN: self.get_english_program_aim(),
+        }
+        context[CMS_LABEL_ADDITIONAL_INFORMATION] = {
+            settings.LANGUAGE_CODE_FR: self.get_french_additional_info(),
+            settings.LANGUAGE_CODE_EN: self.get_english_additional_info()
+        }
         return context

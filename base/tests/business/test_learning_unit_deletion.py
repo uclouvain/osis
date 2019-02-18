@@ -45,7 +45,7 @@ from base.models.learning_class_year import LearningClassYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_component import LearningUnitComponent
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.person import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -126,7 +126,7 @@ class LearningUnitYearDeletion(TestCase):
                                           'tutor': attribution_2.tutor},
                       msg)
 
-        msg_delete_offer_type = _('lu_included_in_group')
+        msg_delete_offer_type = _('%(subtype)s %(acronym)s is included in the group %(group)s for the year %(year)s')
 
         self.assertIn(msg_delete_offer_type
                       % {'subtype': _('The partim'),
@@ -237,10 +237,11 @@ class LearningUnitYearDeletion(TestCase):
 
         msg = deletion.delete_from_given_learning_unit_year(learning_unit_year)
 
-        msg_success = _("learning_unit_successfuly_deleted")
-        self.assertEqual(msg_success.format(acronym=learning_unit_year.acronym,
-                                            academic_year=learning_unit_year.academic_year),
-                         msg.pop())
+        msg_success = _("Learning unit %(acronym)s (%(academic_year)s) successfuly deleted.") % {
+            'acronym': learning_unit_year.acronym,
+            'academic_year': learning_unit_year.academic_year,
+        }
+        self.assertEqual(msg_success, msg.pop())
 
         self.assertEqual(LearningClassYear.objects.all().count(), 0)
 
@@ -361,6 +362,10 @@ class LearningUnitYearDeletion(TestCase):
         learning_unit_year.save()
         self.assertTrue(
             base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(learning_unit_year, person))
+
+        # Invalidate cache_property
+        del person.is_central_manager
+        del person.is_faculty_manager
 
         # With both role, greatest is taken
         add_to_group(person.user, CENTRAL_MANAGER_GROUP)

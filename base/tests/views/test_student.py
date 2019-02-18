@@ -46,96 +46,44 @@ class StudentViewTestCase(TestCase):
         user.user_permissions.add(permission)
         self.students_db = [StudentFactory() for i in range(10)]
 
-    @mock.patch('base.views.layout.render')
-    def test_students(self,  mock_render):
-        request_factory = RequestFactory()
+    def test_students(self):
+        self.client.force_login(self.program_manager_1.person.user)
 
-        request = request_factory.get(reverse('students'))
-        request.user = self.program_manager_1.person.user
+        response = self.client.get(reverse('students'))
 
-        from base.views.student import students
+        self.assertTemplateUsed(response, 'student/students.html')
+        self.assertIsNone(response.context['students'])
 
-        students(request)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'student/students.html')
-
-    @mock.patch('base.views.layout.render')
-    def test_students(self, mock_render):
-
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse('students'))
-        request.user = self.program_manager_1.person.user
-
-        from base.views.student import students
-
-        students(request)
-
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'student/students.html')
-        self.assertIsNone(context['students'])
-
-    @mock.patch('base.views.layout.render')
-    def test_students_search(self, mock_render):
+    def test_students_search(self):
         from base.views.student import student_search
 
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse(student_search), data={
-            'registration_id': self.students_db[0].registration_id}
-                                      )
-        request.user = self.program_manager_1.person.user
+        self.client.force_login(self.program_manager_1.person.user)
 
-        student_search(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'student/students.html')
-        self.assertEqual(context['students'], [self.students_db[0]])
+        response = self.client.get(reverse(student_search),
+                                   data={'registration_id': self.students_db[0].registration_id})
 
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse(student_search), data={
+        self.assertTemplateUsed(response, 'student/students.html')
+        self.assertEqual(response.context['students'], [self.students_db[0]])
+
+        response = self.client.get(reverse(student_search), data={
             'name': self.students_db[1].person.last_name[:2]}
                                       )
-        request.user = self.program_manager_1.person.user
+        self.assertTemplateUsed(response, 'student/students.html')
+        self.assertIn(self.students_db[1], response.context['students'])
 
-        student_search(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'student/students.html')
-        self.assertIn(self.students_db[1], context['students'])
+        response = self.client.get(reverse(student_search))
 
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse(student_search))
-        request.user = self.program_manager_1.person.user
+        self.assertTemplateUsed(response, 'student/students.html')
+        self.assertIsNone(response.context['students'])
 
-        student_search(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'student/students.html')
-        self.assertIsNone(context['students'])
-
-    @mock.patch('base.views.layout.render')
-    def test_student_read(self,  mock_render):
+    def test_student_read(self):
         student = StudentFactory(person=PersonFactory(last_name='Durant', first_name='Thomas'))
+        self.client.force_login(self.program_manager_1.person.user)
 
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse('student_read', args=[student.id]))
-        request.user = self.program_manager_1.person.user
+        response = self.client.get(reverse('student_read', args=[student.id]))
 
-        from base.views.student import student_read
-
-        student_read(request, student.id)
-
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'student/student.html')
-        self.assertEqual(context['student'], student)
+        self.assertTemplateUsed(response, 'student/student.html')
+        self.assertEqual(response.context['student'], student)
 
     @mock.patch('requests.get', side_effect=RequestException)
     def test_student_picture_unknown(self, mock_request_get):

@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% load format %}
+{% load format bootstrap3 %}
 {% load staticfiles %}
 {% load i18n %}
 {% comment "License" %}
@@ -41,24 +41,31 @@
 
             <div class="tab-content" id="tab_content">
                 <div role="tabpanel" class="tab-pane active" id="identification">
-                    <form method="POST" action="{% url 'save_score_sheet_address' offer_year.id %}" id="form_score_sheet_address" novalidate>
+                    <form method="POST" action="{% url 'save_score_sheet_address' offer_year.id %}"
+                          id="form_score_sheet_address" novalidate>
                         {% csrf_token %}
                         <br>
-                        <p>{% trans 'message_address_papersheet' %}</p>
+                        <p>{% trans 'Reuse the address of an entity linked to the program or inform the posting address for the papersheet.' %}</p>
                         <div class="alert alert-dismissible alert-warning text-justify">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
-                            <p>{% trans 'info_address_changed_for_papersheet' as info_address_changed_for_papersheet %}
-                                {{ info_address_changed_for_papersheet | format:offer_year.acronym}}.
+                            <p>
+                                {% blocktrans with program=offer_year.acronym %}
+                                    If you customize one of the field below, it only change the address displayed on the
+                                    score encodings sheets for the program {{ program }}.
+                                    It will never change the address of any structure. The list below will help you to
+                                    pre-fill in the form.
+                                {% endblocktrans %}
                                 <br>
-                                <b>{% trans 'optional_email_field_note' %}</b>
+                                <b>{% trans "NOTE : the 'Email' field is optional. You can fill in this field if you want it to appear on the score sheet." %}</b>
                             </p>
                         </div>
 
-                        <label for="slt_related_entities">{% trans 'select_an_address' %}...</label>
+                        <label for="slt_related_entities">{% trans 'Please select an address' %}...</label>
                         <select class="form-control" id="slt_related_entities" name="related_entity">
-                            <option value="" selected>{% trans 'customized' %}</option>
+                            <option value="" selected>{% trans 'Customized' %}</option>
                             {% for version in entity_versions %}
-                                <option {% if entity_id_selected == version.entity_id %} selected {% endif %} value="{{ version.id }}">
+                                <option {% if entity_id_selected == version.entity_id %} selected {% endif %}
+                                                                                         value="{{ version.id }}">
                                     {{ version.acronym }} - {{ version.title }}
                                 </option>
                             {% endfor %}
@@ -66,63 +73,55 @@
                         <br>
                         <div id="warning_no_address_found" class="alert alert-dismissible alert-warning">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
-                            <p><span class="fa fa-warning" aria-hidden="true"></span> {% trans 'no_entity_address_found' %}</p>
+                            <p><span class="fa fa-warning"
+                                     aria-hidden="true"></span> {% trans 'No address found for the selected entity.' %}
+                            </p>
                         </div>
                         <div id="warning_no_current_entity_version_found" class="alert alert-dismissible alert-warning">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
-                            <p><span class="fa fa-warning" aria-hidden="true"></span> {% trans 'no_current_entity_version_found' %}</p>
+                            <p><span class="fa fa-warning"
+                                     aria-hidden="true"></span> {% trans 'The selected entity no longer exists today (end date passed).' %}
+                            </p>
                         </div>
                         <br>
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="id_recipient">{% trans 'recipient' %}</label>
-                                {{ form.recipient }}
-                                <span style="color:red;">{{ form.recipient.errors }}</span>
+                                {% bootstrap_field form.recipient %}
                             </div>
                             <div class="col-md-6">
-                                <label for="id_location">{% trans 'location' %}</label>
-                                {{ form.location }}
-                                <span style="color:red;">{{ form.location.errors }}</span>
+                                {% bootstrap_field form.location %}
                             </div>
                         </div>
                         <br>
                         <div class="row">
                             <div class="col-md-3">
-                                <label for="id_postal_code">{% trans 'postal_code' %}</label>
-                                {{ form.postal_code }}
-                                <span style="color:red;">{{ form.postal_code.errors }}</span>
+                                {% bootstrap_field form.postal_code %}
                             </div>
                             <div class="col-md-5">
-                                <label for="id_city">{% trans 'city' %}</label>
-                                {{ form.city }}
-                                <span style="color:red;">{{ form.city.errors }}</span>
+                                {% bootstrap_field form.city %}
                             </div>
                             <div class="col-md-4">
-                                <label for="id_country">{% trans 'country'%}</label>
-                                {{ form.country }}
+                                {% bootstrap_field form.country %}
                             </div>
                         </div>
                         <br>
                         <div class="row">
                             <div class="col-md-3">
-                                <label for="id_phone">{% trans 'phone' %}</label>
-                                {{ form.phone }}
+                                {% bootstrap_field form.phone %}
                             </div>
                             <div class="col-md-3">
-                                <label for="id_fax">{% trans 'fax' %}</label>
-                                {{ form.fax }}
+                                {% bootstrap_field form.fax %}
                             </div>
                             <div class="col-md-6">
-                                <label for="id_email">{% trans 'email' %}</label>
-                                {{ form.email }}
-                                <span style="color:red;">{{ form.email.errors }}</span>
+                                {% bootstrap_field form.email %}
                             </div>
                         </div>
                         <br>
                         <span style="visibility:hidden;display:none;">{{ form.offer_year }}</span>
                         {% if is_program_manager %}
                             <button type="submit" class="btn btn-primary" id="bt_save_score_encoding_address">
-                                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}</button>
+                                <span class="glyphicon glyphicon-floppy-save"
+                                      aria-hidden="true"></span> {% trans 'Save' %}</button>
                         {% endif %}
                         <span id="status_save"></span>
                     </form>
@@ -153,27 +152,27 @@
         ];
 
 
-        function disableFormInputsIfReuseAddress(){
-            if($('#slt_related_entities').val() != "")
+        function disableFormInputsIfReuseAddress() {
+            if ($('#slt_related_entities').val() != "")
                 disableFormInputs();
         }
 
 
-        $('#slt_related_entities').change(function(e) {
+        $('#slt_related_entities').change(function (e) {
             var entity_version_id = $('#slt_related_entities').val();
-            if(entity_version_id != "") {
+            if (entity_version_id != "") {
                 $.ajax({
                     url: "/entities/" + entity_version_id + "/address/",
                     data: null,
                     dataType: 'json',
                     success: function (data) {
-                        if ( ! data.entity_version_exists_now){
+                        if (!data.entity_version_exists_now) {
                             showEntityVersionNotExistsMsg();
                         }
                         if (Object.keys(data.address).length != 0) {
                             disableFormInputs();
                             setFormFieldsValues(data);
-                        } else{
+                        } else {
                             setFormFieldsValuesToNone();
                             disableFormInputs();
                             showNoAddressFoundMsg();
@@ -188,32 +187,31 @@
                 });
 
 
-            }
-            else{
+            } else {
                 setFormFieldsValuesToNone();
                 enableFormInputs();
             }
         });
 
 
-        function showNoAddressFoundMsg(){
+        function showNoAddressFoundMsg() {
             $('#warning_no_address_found').show().delay(5000).hide(400);
         }
 
 
-        function showEntityVersionNotExistsMsg(){
+        function showEntityVersionNotExistsMsg() {
             $('#warning_no_current_entity_version_found').show().delay(10000).hide(400);
         }
 
 
-        function setFormFieldsValuesToNone(){
+        function setFormFieldsValuesToNone() {
             for (var i = 0; i < form_inputs.length; i++) {
                 form_inputs[i].val(null);
             }
         }
 
 
-        function setFormFieldsValues(data){
+        function setFormFieldsValues(data) {
             $('#id_recipient').val(data.recipient);
             $('#id_location').val(data.address.location);
             $('#id_postal_code').val(data.address.postal_code);
@@ -224,14 +222,14 @@
         }
 
 
-        function disableFormInputs(){
+        function disableFormInputs() {
             for (var i = 0; i < form_inputs.length; i++) {
                 form_inputs[i].prop('disabled', true);
             }
         }
 
 
-        function enableFormInputs(){
+        function enableFormInputs() {
             for (var i = 0; i < form_inputs.length; i++) {
                 form_inputs[i].prop('disabled', false);
             }

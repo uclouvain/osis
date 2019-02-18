@@ -97,6 +97,9 @@ admin.site.register(external_learning_unit_year.ExternalLearningUnitYear,
 admin.site.register(external_offer.ExternalOffer,
                     external_offer.ExternalOfferAdmin)
 
+admin.site.register(hops.Hops,
+                    hops.HopsAdmin)
+
 admin.site.register(group_element_year.GroupElementYear,
                     group_element_year.GroupElementYearAdmin)
 
@@ -175,6 +178,9 @@ admin.site.register(person_entity.PersonEntity,
 admin.site.register(prerequisite.Prerequisite,
                     prerequisite.PrerequisiteAdmin)
 
+admin.site.register(prerequisite_item.PrerequisiteItem,
+                    prerequisite_item.PrerequisiteItemAdmin)
+
 admin.site.register(program_manager.ProgramManager,
                     program_manager.ProgramManagerAdmin)
 
@@ -219,3 +225,6 @@ admin.site.register(education_group_achievement.EducationGroupAchievement,
 
 admin.site.register(education_group_detailed_achievement.EducationGroupDetailedAchievement,
                     education_group_detailed_achievement.EducationGroupDetailedAchievementAdmin)
+
+admin.site.register(education_group_publication_contact.EducationGroupPublicationContact,
+                    education_group_publication_contact.EducationGroupPublicationContactAdmin)

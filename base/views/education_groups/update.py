@@ -23,11 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _, ngettext
@@ -43,7 +42,6 @@ from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING
-from base.views import layout
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.education_groups.detail import EducationGroupGenericDetailView
@@ -100,9 +98,8 @@ def _common_success_redirect(request, form, root):
 
 
 def _get_success_message_for_update_education_group_year(root_id, education_group_year):
-    msg_key = "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly updated."
     link = reverse("education_group_read", args=[root_id, education_group_year.id])
-    return _(msg_key) % {
+    return _("Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly updated.") % {
         "link": link,
         "acronym": education_group_year.acronym,
         "academic_year": education_group_year.academic_year,
@@ -110,8 +107,7 @@ def _get_success_message_for_update_education_group_year(root_id, education_grou
 
 
 def _get_success_message_for_deleted_education_group_year(education_group_year):
-    MSG_KEY = "Education group year %(acronym)s (%(academic_year)s) successfuly deleted."
-    return _(MSG_KEY) % {
+    return _("Education group year %(acronym)s (%(academic_year)s) successfuly deleted.") % {
         "acronym": education_group_year.acronym,
         "academic_year": education_group_year.academic_year,
     }
@@ -139,7 +135,7 @@ def _update_group(request, education_group_year, root):
     if form_education_group_year.is_valid():
         return _common_success_redirect(request, form_education_group_year, root)
 
-    return layout.render(request, html_page, {
+    return render(request, html_page, {
         "education_group_year": education_group_year,
         "form_education_group_year": form_education_group_year.forms[forms.ModelForm],
         "form_education_group": form_education_group_year.forms[EducationGroupModelForm]
@@ -153,10 +149,11 @@ def _update_training(request, education_group_year, root):
     if form_education_group_year.is_valid():
         return _common_success_redirect(request, form_education_group_year, root)
 
-    return layout.render(request, "education_group/update_trainings.html", {
+    return render(request, "education_group/update_trainings.html", {
         "education_group_year": education_group_year,
         "form_education_group_year": form_education_group_year.forms[forms.ModelForm],
-        "form_education_group": form_education_group_year.forms[EducationGroupModelForm]
+        "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
+        "form_hops": form_education_group_year.hops_form,
     })
 
 
@@ -191,7 +188,7 @@ def _update_mini_training(request, education_group_year, root):
     if form.is_valid():
         return _common_success_redirect(request, form, root)
 
-    return layout.render(request, "education_group/update_minitrainings.html", {
+    return render(request, "education_group/update_minitrainings.html", {
         "form_education_group_year": form.forms[forms.ModelForm],
         "education_group_year": education_group_year,
         "form_education_group": form.forms[EducationGroupModelForm]

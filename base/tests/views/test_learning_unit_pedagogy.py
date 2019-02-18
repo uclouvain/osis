@@ -25,7 +25,6 @@
 ##############################################################################
 import datetime
 from io import BytesIO
-from unittest import mock
 from unittest.mock import patch
 
 from django.contrib.auth.models import Group
@@ -66,6 +65,7 @@ from base.views.learning_units.educational_information import learning_units_sum
 from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit
 from base.views.learning_units.search import SUMMARY_LIST
 from cms.enums import entity_name
+from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from reference.tests.factories.country import CountryFactory
@@ -97,38 +97,24 @@ class LearningUnitPedagogyTestCase(TestCase):
         with self.assertRaises(PermissionDenied):
             learning_units_summary_list(request)
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_summary_list_no_entity_calendar(self, mock_render):
-
-        request_factory = RequestFactory()
-
+    def test_learning_units_summary_list_no_entity_calendar(self):
         EntityVersionFactory(entity=self.an_entity)
 
-        request = request_factory.get(self.url)
-        request.user = self.faculty_user
         self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1100")
         self.client.force_login(self.faculty_user)
+        response = self.client.get(self.url)
 
-        learning_units_summary_list(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_units.html')
-        self.assertEqual(context['search_type'], SUMMARY_LIST)
-        self.assertEqual(len(context['learning_units_with_errors']), 0)
+        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertEqual(response.context['search_type'], SUMMARY_LIST)
+        self.assertEqual(response.context['learning_units_count'], 0)
 
-    @mock.patch('base.views.layout.render')
-    def test_learning_units_summary_list(self, mock_render):
-        request_factory = RequestFactory()
-
+    def test_learning_units_summary_list(self):
         now = datetime.datetime.now()
 
         EntityVersionFactory(entity=self.an_entity,
                              start_date=now,
                              end_date=datetime.datetime(now.year+1, 9, 15),
                              entity_type='INSTITUTE')
-
-        request = request_factory.get(self.url, data={'academic_year_id': starting_academic_year().id})
-        request.user = self.faculty_user
 
         lu = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1100")
         person_lu = PersonFactory()
@@ -137,13 +123,11 @@ class LearningUnitPedagogyTestCase(TestCase):
         self._create_entity_calendar(self.an_entity)
         self.client.force_login(self.faculty_user)
 
-        learning_units_summary_list(request)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'learning_units.html')
+        response = self.client.get(self.url, data={'academic_year_id': starting_academic_year().id})
+        self.assertTemplateUsed(response, 'learning_units.html')
+        context = response.context
         self.assertEqual(context['search_type'], SUMMARY_LIST)
-        self.assertEqual(len(context['learning_units_with_errors']), 1)
+        self.assertEqual(context['learning_units_count'], 1)
         self.assertTrue(context['is_faculty_manager'])
 
     def test_learning_units_summary_list_by_client(self):
@@ -169,6 +153,18 @@ class LearningUnitPedagogyTestCase(TestCase):
 
         luy_without_mandatory_teaching_material = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1101")
         TeachingMaterialFactory(learning_unit_year=luy_without_mandatory_teaching_material, title="cauldron", mandatory=False)
+        bibliography = TranslatedTextFactory(
+            text_label=TextLabelFactory(label='bibliography'),
+            entity=LEARNING_UNIT_YEAR,
+            text="<ul><li>Test</li></ul>",
+            reference=luy.pk
+        )
+        online_resources = TranslatedTextFactory(
+            text_label=TextLabelFactory(label='online_resources'),
+            entity=LEARNING_UNIT_YEAR,
+            text="<a href='test_url'>TestURL</a>",
+            reference=luy.pk
+        )
 
         # Test the view
         self.client.force_login(self.faculty_user)
@@ -189,8 +185,8 @@ class LearningUnitPedagogyTestCase(TestCase):
         title_values = list(t.value for t in titles)
         self.assertEqual(title_values, [
             str(_('code')).title(),
-            str(_('title')).title(),
-            str(_('requirement_entity_small')).title(),
+            str(_('Title')),
+            str(_('Req. Entity')).title(),
             str(_('bibliography')).title(),
             str(_('teaching materials')).title(),
             str(_('online resources')).title(),
@@ -200,7 +196,10 @@ class LearningUnitPedagogyTestCase(TestCase):
         first_luy = next(data)
         first_luy_values = list(t.value for t in first_luy)
         self.assertEqual(first_luy_values, [
-            luy.acronym, luy.complete_title, str(luy.requirement_entity), " ", "Magic wand", " "
+            luy.acronym,
+            luy.complete_title,
+            str(luy.requirement_entity),
+            "Test\n", "Magic wand", "TestURL - [test_url] \n"
         ])
 
         # The second luy has no mandatory teaching material

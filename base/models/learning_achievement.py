@@ -70,10 +70,6 @@ def find_learning_unit_achievement(learning_unit_yr, a_language_code, position):
         return None
 
 
-def find_by_id(an_id):
-    return LearningAchievement.objects.get(pk=an_id)
-
-
 def search(learning_unit_yr=None, position=None):
     queryset = LearningAchievement.objects
     if learning_unit_yr:

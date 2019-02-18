@@ -23,8 +23,26 @@
 * OSIS Custom layout
 */
 
+html {
+    height: 100%;
+    box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+body {
+    position: relative;
+    margin: 0;
+    padding-bottom: 6rem;
+    min-height: 100%;
+}
+
 .nopadding {
-   padding: 0 !important;
+    padding: 0 !important;
 }
 
 .nomargin {
@@ -33,11 +51,10 @@
 
 /* Indication Status QA - DEV */
 
-.qamode
-{
-    background-image:url("../img/qamode.png");
+.qamode {
+    background-image: url("../img/qamode.svg");
     background-repeat: repeat;
-    background-position:center;
+    background-position: center;
 }
 
 .qagreen {
@@ -56,11 +73,33 @@
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
 }
 
-.devmode
-{
-    background-image:url("../img/devmode.png");
+.testmode {
+    background-image: url("../img/testmode.svg");
     background-repeat: repeat;
-    background-position:center;
+    background-position: center;
+}
+
+
+.testblue {
+    background: #5079b9;
+    width: 50px;
+    height: 100%;
+    line-height: 25px;
+    text-align: center;
+    color: #fff;
+    font-size: 12px;
+    font-style: italic;
+    margin-right: 20px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    -webkit-clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
+    clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
+}
+
+.devmode {
+    background-image: url("../img/devmode.svg");
+    background-repeat: repeat;
+    background-position: center;
 }
 
 .devorange {
@@ -79,11 +118,10 @@
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
 }
 
-.localmode
-{
-    background-image:url("../img/localmode.png");
+.localmode {
+    background-image: url("../img/localmode.svg");
     background-repeat: repeat;
-    background-position:center;
+    background-position: center;
 }
 
 .localred {
@@ -103,13 +141,19 @@
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
 }
 
-.proposal_value{
+/* Prevent hidden element because of heigth fixed navbar when use anchor */
+div:target{
+    padding-top: 50px;  /* Size of navbar */
+    margin-top: -50px;
+}
+
+.proposal_value {
     color: #5CB85C;
     cursor: help;
 }
 
-.required_field .control-label:after{
-    content:" *";
+.required_field .control-label:after {
+    content: " *";
 }
 
 .list-group-flush:first-child .list-group-item:first-child {
@@ -134,4 +178,30 @@
  */
 * html .ui-autocomplete {
     height: 200px;
+}
+
+.footer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #f5f5f5;
+}
+
+/*
+ * Css for education information cms to ensure a good rendering.
+ */
+#pedagogy pre {
+    white-space: normal;
+}
+
+.btn-as-atag {
+    border: 0;
+    background: transparent;
+    color: #337ab7;
+    padding:0;
+}
+
+.btn-as-atag:disabled{
+  color: #f5f5f5;
 }

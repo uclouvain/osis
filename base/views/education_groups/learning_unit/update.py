@@ -34,7 +34,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import UpdateView
 
-from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
+from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.forms.prerequisite import LearningUnitPrerequisiteForm
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
@@ -71,7 +71,7 @@ class LearningUnitGenericUpdateView(RulesRequiredMixin, SuccessMessageMixin, Upd
         context['root'] = root
         context['root_id'] = self.kwargs.get("root_id")
         context['parent'] = root
-        context['tree'] = json.dumps(NodeBranchJsTree(root).to_json())
+        context['tree'] = json.dumps(EducationGroupHierarchy(root).to_json())
 
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         return context

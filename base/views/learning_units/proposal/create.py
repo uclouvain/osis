@@ -24,14 +24,13 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render
 from waffle.decorators import waffle_flag
 
 from base.forms.learning_unit_proposal import CreationProposalBaseForm
 from base.models.academic_year import AcademicYear
 from base.models.person import Person
-from base.views import layout
-from base.views.learning_units.common import show_success_learning_unit_year_creation_message
+from base.views.learning_units.common import show_success_proposal_learning_unit_year_creation_message
 
 
 @waffle_flag('learning_unit_proposal_create')
@@ -45,8 +44,7 @@ def get_proposal_learning_unit_creation_form(request, academic_year):
 
     if proposal_form.is_valid():
         proposal = proposal_form.save()
-        show_success_learning_unit_year_creation_message(request, proposal.learning_unit_year,
-                                                         'proposal_learning_unit_successfuly_created')
+        show_success_proposal_learning_unit_year_creation_message(request, proposal.learning_unit_year)
         return redirect('learning_unit', learning_unit_year_id=proposal.learning_unit_year.pk)
 
-    return layout.render(request, "learning_unit/proposal/creation.html", proposal_form.get_context())
+    return render(request, "learning_unit/proposal/creation.html", proposal_form.get_context())

@@ -102,7 +102,7 @@ class TestPostpone(TestCase):
         self.assertRedirects(response, self.redirect_url)
 
         message = list(response.context.get('messages'))[0]
-        print(message.message)
+
         count = 1
         msg = ngettext(
             "%(count)d education group has been postponed with success.",

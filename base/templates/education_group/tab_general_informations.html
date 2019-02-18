@@ -25,84 +25,37 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-
-{% block content %}
-
-{% url 'education_group_pedagogy_edit' parent.pk education_group_year.id as post_url %}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <div class="row">
-            {% include "education_group/blocks/hamburger_button.html" %}
-            {% if can_edit_information %}
-            <div class="pull-right" style="margin-right: 15px;">
-                <a class="btn btn-default btn-publish" style="margin-right: 20px;" href="{% url 'education_group_publish' parent.pk education_group_year.id %}">
-                    {% trans 'Publish' %}
-                </a>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="panel-body" id="tabs">
-        <div class="tab-content" id="tab_content">
-            <div role="tabpanel" class="tab-pane active" id="general_informations">
-                <div class="row" style="display:flex;">
-                    {% include "education_group/training_tree.html" %}
-                    <div id="panel-data" class="col-md-12" style="height: 100%;">
-                        {% include "education_group/tabs.html" %}
-                        <br>
-                        {% for section_name, labels in sections_with_translated_labels %}
-                            <div class="section row">
-                                <div class="col-md-12 text-center">
-                                    <h3>{{ section_name }}</h3>
-                                </div>
-                            </div>
-                            {% for label in labels %}
-                                <div class="section_label row">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <label id="label_{{ label.label }}"
-                                                   {% if label.type == 'common' %}class="education_group_year-common italic"{% endif %}>{{ label.translation }}</label>
-                                            {% if label.type == 'specific' and can_edit_information %}
-                                                <a class="pedagogy-edit-btn" href="#"
-                                                   data-form="{{ post_url }}?label={{ label.label }}"
-                                                   title="{% trans 'edit' %}">
-                                                    <span class="glyphicon glyphicon-edit"
-                                                          aria-hidden="true"></span>
-                                                </a>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <div class="row" id="content_{{ label.label }}">
-                                        <div class="col-md-6" id="content_fr_{{ label.type }}_{{ label.label }}">
-                                            {% if label|get_item:'fr-be' %}
-                                                <span {% if label.type == 'common' %}class="education_group_year-common italic"{% endif %}>{{ label|get_item:'fr-be'|truncatewords_html:40|safe }}</span>
-                                            {% else %}
-                                                <span class="italic">{% trans 'Add the French content of this paragraph' %}</span>
-                                            {% endif %}
-                                        </div>
-                                        <div class="col-md-6" id="content_en_{{ label.type }}_{{ label.label }}">
-                                            {% if label|get_item:'en' %}
-                                                <span {% if label.type == 'common' %}class="education_group_year-common italic"{% endif %}>{{ label|get_item:'en'|truncatewords_html:40|safe }}</span>
-                                            {% else %}
-                                                <span class="italic">{% trans 'Add the English content of this paragraph' %}</span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                                {% if not forloop.last %}
-                                <hr/>
-                                {% endif %}
-                            {% endfor %}
-                            <hr/>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
+{% block top_action_bar %}
+    {% if can_edit_information %}
+       {% include  "education_group/blocks/refresh_publication_button.html" %}
+    {% endif %}
 {% endblock %}
+{% block details %}
+    {% url 'education_group_pedagogy_edit' parent.pk education_group_year.id as post_url %}
+    {% for section_name, labels in sections_with_translated_labels %}
+        <div class="section row">
+            <div class="col-md-12 text-center">
+                <h3>{{ section_name }}</h3>
+            </div>
+        </div>
+        {% for label in labels %}
+            {% include  "education_group/blocks/row_label_general_informations.html" %}
+            {% if not forloop.last %}
+                <hr/>
+            {% endif %}
+        {% endfor %}
+        <hr/>
+    {% endfor %}
+
+    {% if show_contacts %}
+        <div class="row">
+            {% include  "education_group/blocks/contacts_general_informations.html" %}
+        </div>
+    {% endif %}
+
+    <div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
+{% endblock %}
+
 {% block script %}
     <script>
         {% if can_edit_information %}

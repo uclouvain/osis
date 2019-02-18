@@ -30,7 +30,8 @@ from base.views.education_groups.achievement.create import CreateEducationGroupA
 from base.views.education_groups.achievement.delete import DeleteEducationGroupAchievement, \
     DeleteEducationGroupDetailedAchievement
 from base.views.education_groups.achievement.update import EducationGroupAchievementAction, \
-    EducationGroupDetailedAchievementAction, UpdateEducationGroupAchievement, UpdateEducationGroupDetailedAchievement
+    EducationGroupDetailedAchievementAction, UpdateEducationGroupAchievement, UpdateEducationGroupDetailedAchievement, \
+    EducationGroupAchievementProgramAim, EducationGroupAchievementAdditionalInformation
 from base.views.education_groups.achievement.detail import EducationGroupSkillsAchievements
 
 urlpatterns = [
@@ -41,6 +42,18 @@ urlpatterns = [
     url(r'^create',
         CreateEducationGroupAchievement.as_view(),
         name='create_education_group_achievement'),
+
+    url(
+        r'^program_aim',
+        EducationGroupAchievementProgramAim.as_view(),
+        name='education_group_achievement_program_aim',
+    ),
+
+    url(
+        r'^additional_information',
+        EducationGroupAchievementAdditionalInformation.as_view(),
+        name='education_group_achievement_additional_information',
+    ),
 
     url(r'^(?P<education_group_achievement_pk>[0-9]+)/', include([
         url(r'^actions$',

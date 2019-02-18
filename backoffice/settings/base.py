@@ -29,9 +29,6 @@ import sys
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
-# Used in base.views.education_groups.detail.EducationGroupGeneralInformation#get_sections_with_translated_labels
-from .portal_conf import SECTION_LIST
-
 BASE_DIR = os.path.dirname((os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 # SECURITY Settings
@@ -55,6 +52,7 @@ MESSAGE_STORAGE = os.environ.get('MESSAGE_STORAGE', 'django.contrib.messages.sto
 # Specific apps (all osis modules except base and reference(mandatory) + env specific apps like sentry)
 # have to be defined in environment settings (ex: dev.py)
 INSTALLED_APPS = (
+    'django.contrib.sites',
     'dal',  # Dependency from 'partnership' module (Django auto-complete-light)
     'dal_select2',  # Dependency from 'partnership' module (Django auto-complete-light)
     'django.contrib.admin',
@@ -70,6 +68,7 @@ INSTALLED_APPS = (
     'reference',
     'rules_management',
     'base',
+    'education_group',
     'statici18n',
     'rest_framework',
     'rest_framework.authtoken',
@@ -84,6 +83,7 @@ INSTALLED_APPS = (
     'hijack',
     'compat',
     'hijack_admin',
+    'reversion',
 )
 
 MIDDLEWARE = (
@@ -99,6 +99,7 @@ MIDDLEWARE = (
     'base.middlewares.extra_http_responses_midleware.ExtraHttpResponsesMiddleware',
     'waffle.middleware.WaffleMiddleware',
     'base.middlewares.notification_middleware.NotificationMiddleware',
+    'base.middlewares.reversion_middleware.BaseRevisionMiddleware'
 )
 
 INTERNAL_IPS = ()
@@ -260,10 +261,10 @@ CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
     'reddot': {
         "removePlugins": "stylesheetparser",
-        'allowedContent': True,
         'extraAllowedContent': 'div(reddot_*,contacts_*)',
         'extraPlugins': ','.join(['reddot', 'pastefromword']),
         'stylesSet': REDDOT_STYLES,
+        'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
@@ -271,6 +272,7 @@ CKEDITOR_CONFIGS = {
             ['NumberedList', 'BulletedList'],
             ['Link', 'Unlink'],
             ['CreateDiv'],
+            {'name': 'insert', 'items': ['Table']},
         ]
     },
     'default': {
@@ -278,6 +280,7 @@ CKEDITOR_CONFIGS = {
         'allowedContent': True,
         'extraAllowedContent': 'div(reddot_*,contacts_*)',
         'extraPlugins': ','.join(['reddot', 'pastefromword']),
+        'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
@@ -299,6 +302,7 @@ CKEDITOR_CONFIGS = {
     },
     'minimal': {
         'toolbar': 'Custom',
+        'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
             ['Bold', 'Italic', 'Underline'],
@@ -308,6 +312,7 @@ CKEDITOR_CONFIGS = {
     },
     'minimal_plus_headers': {
         'toolbar': 'Custom',
+        'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
             ['Format', 'Styles'],
@@ -369,12 +374,24 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'TEST_REQUEST_DEFAULT_FORMAT': 'json'
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'DEFAULT_PAGINATION_CLASS': 'backoffice.settings.rest_framework.pagination.LimitOffsetPaginationWithUpperBound',
+    'PAGE_SIZE': 25,
+    'DEFAULT_FILTER_BACKENDS':	(
+        'django_filters.rest_framework.DjangoFilterBackend',  # Allow advanced searching
+        'rest_framework.filters.OrderingFilter',  # Allow ordering collections
+        'rest_framework.filters.SearchFilter',   # Search based on admin
+    ),
 }
 
 # ESB Configuration
+ESB_API_URL = os.environ.get('ESB_API_URL')
 ESB_AUTHORIZATION = os.environ.get('ESB_AUTHORIZATION')
+# TODO: rename to ESB_STUDENT_ENDPOINT
 ESB_STUDENT_API = os.environ.get('ESB_STUDENT_API')
+ESB_REFRESH_PEDAGOGY_ENDPOINT = os.environ.get('ESB_REFRESH_PEDAGOGY_ENDPOINT')
+ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT = os.environ.get('ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT')
+ESB_REFRESH_COMMON_ADMISSION_ENDPOINT = os.environ.get('ESB_REFRESH_COMMON_ADMISSION_ENDPOINT')
 
 RELEASE_TAG = os.environ.get('RELEASE_TAG')
 
@@ -422,8 +439,15 @@ WAFFLE_FLAG_DEFAULT = os.environ.get("WAFFLE_FLAG_DEFAULT", "False").lower() == 
 
 # HIJACK
 HIJACK_LOGIN_REDIRECT_URL = '/'  # Where admins are redirected to after hijacking a user
-HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user/'  # Where admins are redirected to after releasing a user
+# Where admins are redirected to after releasing a user
+HIJACK_LOGOUT_REDIRECT_URL = "/{admin_url}auth/user".format(admin_url=ADMIN_URL)
 HIJACK_ALLOW_GET_REQUESTS = True
 HIJACK_USE_BOOTSTRAP = True
 
-REQUESTS_TIMEOUT = 10
+REQUESTS_TIMEOUT = 20
+
+# PEDAGOGY INFORMATION
+URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/prog-{year}-{code}")
+GET_SECTION_PARAM = os.environ.get("GET_SECTION_PARAM", "")
+
+YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 2018))

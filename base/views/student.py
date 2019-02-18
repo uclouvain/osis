@@ -28,18 +28,17 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import Http404
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from requests.exceptions import RequestException
 
 from backoffice.settings.base import ESB_STUDENT_API, ESB_AUTHORIZATION
 from base import models as mdl
-from . import layout
 
 
 @login_required
 @permission_required('base.can_access_student', raise_exception=True)
 def students(request):
-    return layout.render(request, "student/students.html", {'students': None})
+    return render(request, "student/students.html", {'students': None})
 
 
 @login_required
@@ -54,9 +53,9 @@ def student_search(request):
     else:
         name = request.GET.get('name')
         students_list = mdl.student.search(name)
-    return layout.render(request, "student/students.html", {'students': students_list,
-                                                            'registration_id': registration_id,
-                                                            'name': name})
+    return render(request, "student/students.html", {'students': students_list,
+                                                     'registration_id': registration_id,
+                                                     'name': name})
 
 
 @login_required
@@ -67,7 +66,7 @@ def student_read(request, student_id):
         offers_enrollments = mdl.offer_enrollment.find_by_student(student)
         exams_enrollments = mdl.exam_enrollment.find_by_student(student)
         lu_enrollments = mdl.learning_unit_enrollment.find_by_student(student)
-    return layout.render(request, "student/student.html", locals())
+    return render(request, "student/student.html", locals())
 
 
 @login_required

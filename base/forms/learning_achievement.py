@@ -25,6 +25,7 @@
 ##############################################################################
 from ckeditor.widgets import CKEditorWidget
 from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 from base.models.learning_achievement import LearningAchievement, search
 from reference.models import language
@@ -32,7 +33,7 @@ from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
 
 
 class LearningAchievementEditForm(forms.ModelForm):
-    text = forms.CharField(widget=CKEditorWidget(config_name='minimal'), required=False)
+    text = forms.CharField(widget=CKEditorWidget(config_name='minimal_plus_headers'), required=False, label=_('Text'))
 
     class Meta:
         model = LearningAchievement

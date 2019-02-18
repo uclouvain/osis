@@ -39,7 +39,7 @@ from base.models.enums.internship_subtypes import PROFESSIONAL_INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import ANNUAL
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.person import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
@@ -74,8 +74,8 @@ class TestLearningUnitYearModelFormInit(TestCase):
 
     def test_label_specific_title_case_partim(self):
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=PARTIM)
-        self.assertEqual(self.form.fields['specific_title'].label, _('official_title_proper_to_partim'))
-        self.assertEqual(self.form.fields['specific_title_english'].label, _('official_english_title_proper_to_partim'))
+        self.assertEqual(self.form.fields['specific_title'].label, _('Title proper to the partim'))
+        self.assertEqual(self.form.fields['specific_title_english'].label, _('English title proper to the partim'))
 
     def test_case_update_academic_year_is_disabled(self):
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=PARTIM,

@@ -24,8 +24,10 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
+from django.shortcuts import get_object_or_404, render
+
 from base import models as mdl
-from . import layout
+from base.models.offer_year_calendar import OfferYearCalendar
 
 
 @login_required
@@ -37,10 +39,10 @@ def offers(request):
     academic_year_calendar = mdl.academic_year.current_academic_year()
     if academic_year_calendar:
         academic_yr = academic_year_calendar.id
-    return layout.render(request, "offers.html", {'academic_year': academic_yr,
-                                                  'academic_years': academic_years,
-                                                  'offers': [],
-                                                  'init': "1"})
+    return render(request, "offers.html", {'academic_year': academic_yr,
+                                           'academic_years': academic_years,
+                                           'offers': [],
+                                           'init': "1"})
 
 
 @login_required
@@ -55,15 +57,15 @@ def offers_search(request):
 
     academic_years = mdl.academic_year.find_academic_years()
 
-    offer_years = mdl.offer_year.search(entity=entity, academic_yr=academic_yr, acronym=acronym)\
-                                .select_related("entity_management", "academic_year")
+    offer_years = mdl.offer_year.search(entity=entity, academic_yr=academic_yr, acronym=acronym) \
+        .select_related("entity_management", "academic_year")
 
-    return layout.render(request, "offers.html", {'academic_year': academic_yr,
-                                                  'entity_acronym': entity,
-                                                  'code': acronym,
-                                                  'academic_years': academic_years,
-                                                  'offer_years': offer_years,
-                                                  'init': "0"})
+    return render(request, "offers.html", {'academic_year': academic_yr,
+                                           'entity_acronym': entity,
+                                           'code': acronym,
+                                           'academic_years': academic_years,
+                                           'offer_years': offer_years,
+                                           'init': "0"})
 
 
 @login_required
@@ -74,7 +76,7 @@ def offer_read(request, offer_year_id):
 
 def _offer_identification_tab(request, offer_year_id):
     offer_year = mdl.offer_year.find_by_id(offer_year_id)
-    return layout.render(request, "offer/tab_identification.html", locals())
+    return render(request, "offer/tab_identification.html", locals())
 
 
 @login_required
@@ -82,7 +84,7 @@ def _offer_identification_tab(request, offer_year_id):
 def offer_academic_calendar_tab(request, offer_year_id):
     offer_year = mdl.offer_year.find_by_id(offer_year_id)
     offer_year_events = mdl.offer_year_calendar.find_offer_year_events(offer_year)
-    return layout.render(request, "offer/tab_academic_calendar.html", locals())
+    return render(request, "offer/tab_academic_calendar.html", locals())
 
 
 @login_required
@@ -90,14 +92,14 @@ def offer_academic_calendar_tab(request, offer_year_id):
 def offer_program_managers_tab(request, offer_year_id):
     offer_year = mdl.offer_year.find_by_id(offer_year_id)
     program_managers = mdl.program_manager.find_by_offer_year(offer_year)
-    return layout.render(request, "offer/tab_program_managers.html", locals())
+    return render(request, "offer/tab_program_managers.html", locals())
 
 
 @login_required
 @permission_required('base.can_access_offer', raise_exception=True)
 def offer_year_calendar_read(request, id):
-    offer_year_calendar = mdl.offer_year_calendar.find_by_id(id)
+    offer_year_calendar = get_object_or_404(OfferYearCalendar, pk=id)
     is_programme_manager = mdl.program_manager.is_program_manager(request.user,
                                                                   offer_year=offer_year_calendar.offer_year)
-    return layout.render(request, "offer_year_calendar.html", {'offer_year_calendar':   offer_year_calendar,
-                                                               'is_programme_manager': is_programme_manager})
+    return render(request, "offer_year_calendar.html", {'offer_year_calendar': offer_year_calendar,
+                                                        'is_programme_manager': is_programme_manager})

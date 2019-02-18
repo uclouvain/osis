@@ -47,49 +47,49 @@ DATE_TIME_FORMAT = '%d-%m-%Y %H:%M'
 DESC = "desc"
 WORKSHEET_TITLE = 'learning_units_comparison'
 XLS_FILENAME = 'learning_units_comparison'
-XLS_DESCRIPTION = _("list_learning_units_comparison")
+XLS_DESCRIPTION = _("Comparison of learning units")
 
 LEARNING_UNIT_TITLES = [
     str(_('code')),
-    str(_('academic_year_small')),
-    str(_('type')),
-    str(_('active_title')),
-    str(_('subtype')),
+    str(_('Ac yr.')),
+    str(_('Type')),
+    str(_('Active')),
+    str(_('Subtype')),
     str(_('Internship subtype')),
-    str(_('credits')),
-    str(_('language')),
-    str(_('periodicity')),
-    str(_('quadrimester')),
-    str(_('session_title')),
-    str(_('common_title')),
-    str(_('title_proper_to_UE')),
-    str(_('common_english_title')),
-    str(_('english_title_proper_to_UE')),
+    str(_('Credits')),
+    str(_('Language')),
+    str(_('Periodicity')),
+    str(_('Quadrimester')),
+    str(_('Session derogation')),
+    str(_('Common title')),
+    str(_('English title proper')),
+    str(_('Common English title')),
+    str(_('English title proper')),
     str(_('Req. Entities')),
-    str(_('allocation_entity_small')),
+    str(_('Alloc. Ent.')),
     str(_('Add. requ. ent. 1')),
     str(_('Add. requ. ent. 2')),
     str(_('Profes. integration')),
-    str(_('institution')),
-    str(_('learning_location')),
-    str(_('partims')),
+    str(_('Institution')),
+    str(_('Learning location')),
+    str(_('Partims')),
     "PM {}".format(_('code')),
-    "PM {}".format(_('volume_partial')),
-    "PM {}".format(_('volume_remaining')),
+    "PM {}".format(_('Vol. Q1')),
+    "PM {}".format(_('Vol. Q2')),
     "PM {}".format(_('Vol. annual')),
-    "PM {}".format(_('real_classes')),
-    "PM {}".format(_('planned_classes')),
-    "PM {}".format(_('vol_global')),
+    "PM {}".format(_('Real classes')),
+    "PM {}".format(_('Planned classes')),
+    "PM {}".format(_('Vol. global')),
     "PM {}".format(_('Req. Entities')),
     "PM {}".format(_('Add. requ. ent. 1')),
     "PM {}".format(_('Add. requ. ent. 2')),
     "PP {}".format(_('code')),
-    "PP {}".format(_('volume_partial')),
-    "PP {}".format(_('volume_remaining')),
+    "PP {}".format(_('Vol. Q1')),
+    "PP {}".format(_('Vol. Q2')),
     "PP {}".format(_('Vol. annual')),
-    "PM {}".format(_('real_classes')),
-    "PM {}".format(_('planned_classes')),
-    "PP {}".format(_('vol_global')),
+    "PM {}".format(_('Real classes')),
+    "PM {}".format(_('Planned classes')),
+    "PP {}".format(_('Vol. global')),
     "PP {}".format(_('Req. Entities')),
     "PM {}".format(_('Add. requ. ent. 1')),
     "PM {}".format(_('Add. requ. ent. 2'))
@@ -132,27 +132,26 @@ def create_xls_comparison(user, learning_unit_years, filters, academic_yr_compar
 
 
 def _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison, learning_unit_years):
-    learning_unit_years = \
-        LearningUnitYear.objects.filter(
-            learning_unit__in=(_get_learning_units(learning_unit_years)),
-            academic_year__year__in=(
-                learning_unit_years[0].academic_year.year,
-                academic_yr_comparison)
-        ).select_related(
-            'academic_year',
-            'learning_container_year',
-            'learning_container_year__academic_year'
-        ).prefetch_related(
-            get_learning_component_prefetch()
-        ).prefetch_related(
-            build_entity_container_prefetch([
-                entity_types.ALLOCATION_ENTITY,
-                entity_types.REQUIREMENT_ENTITY,
-                entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
-            ])
-        ).order_by('learning_unit', 'academic_year__year')
-    [append_latest_entities(learning_unit, False) for learning_unit in learning_unit_years]
+    learning_unit_years = LearningUnitYear.objects.filter(
+        learning_unit__in=(_get_learning_units(learning_unit_years)),
+        academic_year__year__in=(
+            learning_unit_years[0].academic_year.year,
+            academic_yr_comparison)
+    ).select_related(
+        'academic_year',
+        'learning_container_year',
+        'learning_container_year__academic_year'
+    ).prefetch_related(
+        get_learning_component_prefetch()
+    ).prefetch_related(
+        build_entity_container_prefetch([
+            entity_types.ALLOCATION_ENTITY,
+            entity_types.REQUIREMENT_ENTITY,
+            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
+            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
+        ])
+    ).order_by('learning_unit', 'academic_year__year')
+    [append_latest_entities(learning_unit) for learning_unit in learning_unit_years]
     [append_components(learning_unit) for learning_unit in learning_unit_years]
     return learning_unit_years
 
@@ -181,9 +180,10 @@ def prepare_xls_content(learning_unit_yrs):
         luy_data = extract_xls_data_from_learning_unit(l_u_yr, new_line, first_data)
         if new_line:
             first_data = luy_data
-            top_border.extend(get_border_columns(line_index+1))
+            top_border.extend(get_border_columns(line_index + 1))
         else:
-            modified_cells_no_border.extend(_check_changes_other_than_code_and_year(first_data, luy_data, line_index+1))
+            modified_cells_no_border.extend(
+                _check_changes_other_than_code_and_year(first_data, luy_data, line_index + 1))
             first_data = None
         data.append(luy_data)
 
@@ -203,9 +203,9 @@ def extract_xls_data_from_learning_unit(learning_unit_yr, new_line, first_data):
 
 def _translate_status(value):
     if value:
-        return _('active').title()
+        return _('Active')
     else:
-        return _('inactive').title()
+        return _('Inactive')
 
 
 def _component_data(components, learning_component_yr_type):
@@ -222,13 +222,14 @@ def _get_data(learning_unit_yr, new_line, first_data):
     return [
         _get_acronym(learning_unit_yr, new_line, first_data),
         learning_unit_yr.academic_year.name,
-        xls_build.translate(learning_unit_yr.learning_container_year.container_type),
+        learning_unit_yr.learning_container_year.get_container_type_display()
+        if learning_unit_yr.learning_container_year.container_type else EMPTY_VALUE,
         _translate_status(learning_unit_yr.status),
-        xls_build.translate(learning_unit_yr.subtype),
-        _get_translation(learning_unit_yr.internship_subtype),
+        learning_unit_yr.get_subtype_display() if learning_unit_yr.subtype else EMPTY_VALUE,
+        learning_unit_yr.get_internship_subtype_display() if learning_unit_yr.internship_subtype else EMPTY_VALUE,
         learning_unit_yr.credits,
         learning_unit_yr.language.name if learning_unit_yr.language else EMPTY_VALUE,
-        _get_translation(learning_unit_yr.periodicity),
+        learning_unit_yr.get_periodicity_display() if learning_unit_yr.periodicity else EMPTY_VALUE,
         _get_translation(learning_unit_yr.quadrimester),
         _get_translation(learning_unit_yr.session),
         learning_unit_yr.learning_container_year.common_title,
@@ -299,10 +300,10 @@ def _check_changes_other_than_code_and_year(first_data, second_data, line_index)
     modifications = []
     for col_index, obj in enumerate(first_data):
         if col_index == ACRONYM_COL_NUMBER and second_data[ACRONYM_COL_NUMBER] != EMPTY_VALUE:
-            modifications.append('{}{}'.format(get_column_letter(col_index+1), line_index))
+            modifications.append('{}{}'.format(get_column_letter(col_index + 1), line_index))
         else:
             if obj != second_data[col_index] and col_index != ACADEMIC_COL_NUMBER:
-                modifications.append('{}{}'.format(get_column_letter(col_index+1), line_index))
+                modifications.append('{}{}'.format(get_column_letter(col_index + 1), line_index))
 
     return modifications
 

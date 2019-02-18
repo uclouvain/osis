@@ -26,15 +26,16 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Prefetch
-
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
+
 from base.models import entity_version
 from base.models.enums import entity_container_year_link_type
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
-from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES, EntityContainerYearLinkTypes
+from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
-class EntityContainerYearAdmin(SerializableModelAdmin):
+class EntityContainerYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('external_id', 'learning_container_year', 'entity', 'type')
     search_fields = ['learning_container_year__acronym', 'type']
     list_filter = ('learning_container_year__academic_year',)
@@ -45,7 +46,7 @@ class EntityContainerYear(SerializableModel):
     changed = models.DateTimeField(null=True, auto_now=True)
     entity = models.ForeignKey('Entity')
     learning_container_year = models.ForeignKey('LearningContainerYear')
-    type = models.CharField(max_length=35, choices=entity_container_year_link_type.ENTITY_CONTAINER_YEAR_LINK_TYPES)
+    type = models.CharField(max_length=35, choices=EntityContainerYearLinkTypes.choices())
     _warnings = None
 
     class Meta:
@@ -143,16 +144,3 @@ def find_by_learning_container_year_and_linktype(a_learning_container_year, link
         return EntityContainerYear.objects.get(learning_container_year=a_learning_container_year, type=linktype)
     except ObjectDoesNotExist:
         return None
-
-
-def get_entity_container_year(a_learning_container_year, a_type_entity_container_year):
-    try:
-        return EntityContainerYear.objects.get(learning_container_year=a_learning_container_year,
-                                               type=a_type_entity_container_year)
-    except ObjectDoesNotExist:
-        return None
-
-
-def find_requirement_entities(learning_container_year):
-    return EntityContainerYear.objects.filter(learning_container_year=learning_container_year,
-                                              type__in=REQUIREMENT_ENTITIES)

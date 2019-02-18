@@ -38,7 +38,6 @@ from openpyxl.writer.excel import save_virtual_workbook
 
 from assessments.business import score_encoding_sheet
 from base.models import person as person_mdl
-from base.models.academic_year import current_academic_year
 from base.models.person import Person
 from osis_common.document import paper_sheet, xls_build
 from osis_common.document.xls_build import _adjust_column_width
@@ -65,8 +64,8 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
     receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in persons]
     suject_data = {'learning_unit_name': learning_unit_name}
     template_base_data = {'learning_unit_name': learning_unit_name,
-                          'encoding_status': _('encoding_status_ended') if all_encoded
-                          else _('encoding_status_notended')
+                          'encoding_status': _('All the scores are encoded.') if all_encoded
+                          else _('It remains notes to encode.')
                           }
     header_txt = ['acronym', 'session_title', 'registration_number', 'lastname', 'firstname', 'score', 'documentation']
     submitted_enrollments_data = [
@@ -110,12 +109,14 @@ def send_mail_before_annual_procedure_of_automatic_postponement_of_luy(
         .distinct()
 
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    template_base_data = {'academic_year': current_academic_year().year,
-                          'end_academic_year': end_academic_year.year,
-                          'luys_to_postpone': luys_to_postpone.count(),
-                          'luys_already_existing': luys_already_existing.count(),
-                          'luys_ending_this_year': luys_ending_this_year.count(),
-                          }
+    template_base_data = {
+        'academic_year': end_academic_year.past().year,
+        'end_academic_year': end_academic_year.year,
+        # Use len instead of count() (it's buggy when a queryset is built with a difference())
+        'luys_to_postpone': len(luys_to_postpone),
+        'luys_already_existing': len(luys_already_existing),
+        'luys_ending_this_year': len(luys_ending_this_year),
+    }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
     return message_service.send_messages(message_content)
@@ -131,13 +132,15 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_luy(
         .distinct()
 
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    template_base_data = {'academic_year': current_academic_year().year,
-                          'end_academic_year': end_academic_year.year,
-                          'luys_postponed': len(luys_postponed),
-                          'luys_already_existing': luys_already_existing.count(),
-                          'luys_ending_this_year': luys_ending_this_year.count(),
-                          'luys_with_errors': luys_with_errors
-                          }
+    template_base_data = {
+        'academic_year': end_academic_year.past().year,
+        'end_academic_year': end_academic_year.year,
+        # Use len instead of count() (it's buggy when a queryset is built with a difference())
+        'luys_postponed': len(luys_postponed),
+        'luys_already_existing': len(luys_already_existing),
+        'luys_ending_this_year': len(luys_ending_this_year),
+        'luys_with_errors': luys_with_errors
+    }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
     return message_service.send_messages(message_content)
@@ -153,12 +156,13 @@ def send_mail_before_annual_procedure_of_automatic_postponement_of_egy(
         .distinct()
 
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    template_base_data = {'academic_year': current_academic_year().year,
-                          'end_academic_year': end_academic_year.year,
-                          'egys_to_postpone': egys_to_postpone.count(),
-                          'egys_already_existing': egys_already_existing.count(),
-                          'egys_ending_this_year': egys_ending_this_year.count(),
-                          }
+    template_base_data = {
+        'academic_year': end_academic_year.past().year,
+        'end_academic_year': end_academic_year.year,
+        'egys_to_postpone': len(egys_to_postpone),
+        'egys_already_existing': len(egys_already_existing),
+        'egys_ending_this_year': len(egys_ending_this_year),
+    }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
     return message_service.send_messages(message_content)
@@ -174,11 +178,11 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
         .distinct()
 
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    template_base_data = {'academic_year': current_academic_year().year,
+    template_base_data = {'academic_year': end_academic_year.past().year,
                           'end_academic_year': end_academic_year.year,
                           'egys_postponed': len(egys_postponed),
-                          'egys_already_existing': egys_already_existing.count(),
-                          'egys_ending_this_year': egys_ending_this_year.count(),
+                          'egys_already_existing': len(egys_already_existing),
+                          'egys_ending_this_year': len(egys_ending_this_year),
                           'egys_with_errors': egys_with_errors
                           }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
@@ -227,8 +231,8 @@ def build_proposal_report_attachment(manager, proposals_with_results, operation,
         xls_build.WORKSHEETS_DATA: [
             {
                 xls_build.CONTENT_KEY: table_data,
-                xls_build.HEADER_TITLES_KEY: [_('academic_year_small'), _('code'), _('title'), _('type'),
-                                              _("proposal_status"), _('status'), _('Remarks')],
+                xls_build.HEADER_TITLES_KEY: [_('Ac yr.'), _('code'), _('Title'), _('type'),
+                                              _("Proposal status"), _('Status'), _('Remarks')],
                 xls_build.WORKSHEET_TITLE_KEY: 'Report'
             }
         ],
@@ -271,7 +275,7 @@ def _build_worksheet_parameters(workbook, a_user, operation, research_criteria):
     worksheet_parameters = workbook.create_sheet(title=str(_('parameters')))
     now = datetime.datetime.now()
     worksheet_parameters.append([str(_('author')), str(a_user)])
-    worksheet_parameters.append([str(_('date')), now.strftime('%d-%m-%Y %H:%M')])
+    worksheet_parameters.append([str(_('Date')), now.strftime('%d-%m-%Y %H:%M')])
     worksheet_parameters.append([_('Operation'), _(operation)])
     if research_criteria:
         worksheet_parameters.append([_('Research criteria')])
@@ -332,29 +336,11 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
 
 
 def build_scores_sheet_attachment(list_exam_enrollments):
-    name = "%s.pdf" % _('scores_sheet')
+    name = "%s.pdf" % _('score(s) saved')
     mimetype = "application/pdf"
     content = paper_sheet.build_pdf(
         score_encoding_sheet.scores_sheet_data(list_exam_enrollments, tutor=None))
     return (name, content, mimetype)
-
-
-def send_again(message_history_id):
-    """
-    send a message from message history again
-    :param message_history_id The id of the message history to send again
-    :return the sent message
-
-    TO-DO : correction of send_message in osis-common to get the associated receiver , based on id and receiver model
-
-    """
-    message_history = message_history_mdl.find_by_id(message_history_id)
-    person = person_mdl.find_by_id(message_history.receiver_id)
-    if person:
-        receiver = message_config.create_receiver(person.id, person.email, person.language)
-        return message_service.send_again(receiver, message_history_id)
-    else:
-        return _('no_receiver_error')
 
 
 def send_mail_for_educational_information_update(teachers, learning_units_years):

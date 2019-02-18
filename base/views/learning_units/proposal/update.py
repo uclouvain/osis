@@ -25,7 +25,7 @@
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import transaction
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render
 from django.utils.translation import ugettext_lazy as _
 from waffle.decorators import waffle_flag
 
@@ -36,7 +36,6 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.views import layout
 from base.views.common import display_success_messages
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context
@@ -80,13 +79,15 @@ def _update_or_create_proposal(request, learning_unit_year, proposal=None):
     if proposal_base_form.is_valid():
         proposal = proposal_base_form.save()
         display_success_messages(
-            request, _("success_modification_proposal").format(_(proposal.type), learning_unit_year.acronym))
+            request, _("You proposed a modification of type {} for the learning unit {}.").format(
+                _(proposal.type), learning_unit_year.acronym)
+        )
         return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
 
     context = proposal_base_form.get_context()
     if proposal:
-        return layout.render(request, 'learning_unit/proposal/update_modification.html', context)
-    return layout.render(request, 'learning_unit/proposal/create_modification.html', context)
+        return render(request, 'learning_unit/proposal/update_modification.html', context)
+    return render(request, 'learning_unit/proposal/create_modification.html', context)
 
 
 def _update_or_create_suppression_proposal(request, learning_unit_year, proposal=None):
@@ -109,7 +110,9 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
             form_end_date.save(update_learning_unit_year=False)
 
             display_success_messages(
-                request, _("success_modification_proposal").format(_(proposal_type), learning_unit_year.acronym))
+                request, _("You proposed a modification of type {} for the learning unit {}.").format(
+                    _(proposal_type), learning_unit_year.acronym)
+            )
 
         return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
 
@@ -120,8 +123,8 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
         'form_proposal': form_proposal,
         'experimental_phase': True})
     if proposal:
-        return layout.render(request, 'learning_unit/proposal/update_suppression.html', context)
-    return layout.render(request, 'learning_unit/proposal/create_suppression.html', context)
+        return render(request, 'learning_unit/proposal/update_suppression.html', context)
+    return render(request, 'learning_unit/proposal/create_suppression.html', context)
 
 
 def _get_max_year(learning_unit_year, proposal):

@@ -183,7 +183,7 @@ class TestEducationGroupYear(SeleniumTestCase):
         self.assertFalse(term.has_edit_button())
 
     def test_can_edit_education_group(self):
-        self.user.user_permissions.add(Permission.objects.get(codename='can_edit_educationgroup_pedagogy'))
+        self.user.user_permissions.add(Permission.objects.get(codename='change_pedagogyinformation'))
         page = EducationGroupPage(driver=self.selenium, base_url=self.live_server_url + self.url).open()
 
         term = next(page.terms())
@@ -191,7 +191,7 @@ class TestEducationGroupYear(SeleniumTestCase):
         self.assertTrue(term.has_edit_button())
 
     def test_edit_education_group_french(self):
-        self.user.user_permissions.add(Permission.objects.get(codename='can_edit_educationgroup_pedagogy'))
+        self.user.user_permissions.add(Permission.objects.get(codename='change_pedagogyinformation'))
 
         page = EducationGroupPage(driver=self.selenium, base_url=self.live_server_url + self.url).open()
 
@@ -223,7 +223,7 @@ class TestEducationGroupYear(SeleniumTestCase):
         self.assertEqual(term.french, 'ceci est un test')
 
     def test_edit_education_group_english(self):
-        self.user.user_permissions.add(Permission.objects.get(codename='can_edit_educationgroup_pedagogy'))
+        self.user.user_permissions.add(Permission.objects.get(codename='change_pedagogyinformation'))
         page = EducationGroupPage(driver=self.selenium, base_url=self.live_server_url + self.url).open()
 
         term = next(page.terms())

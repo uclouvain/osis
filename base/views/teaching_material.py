@@ -24,18 +24,16 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
-from base.business.learning_units.pedagogy import delete_teaching_material
 from base.business.learning_units import perms
-from base.views.common import display_success_messages
-from base.views import layout
-
+from base.business.learning_units.pedagogy import delete_teaching_material
 from base.forms.learning_unit_pedagogy import TeachingMaterialModelForm
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.teaching_material import TeachingMaterial
+from base.views.common import display_success_messages
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.perms import PermissionDecorator
 
@@ -69,7 +67,7 @@ def create_view(request, learning_unit_year_id, success_url):
     form = TeachingMaterialModelForm(request.POST or None)
     if form.is_valid():
         return _save_and_redirect(request, form, learning_unit_yr, success_url)
-    return layout.render(request, "learning_unit/teaching_material/modal_edit.html", {'form': form})
+    return render(request, "learning_unit/teaching_material/modal_edit.html", {'form': form})
 
 
 def update_view(request, learning_unit_year_id, teaching_material_id, success_url):
@@ -78,7 +76,7 @@ def update_view(request, learning_unit_year_id, teaching_material_id, success_ur
     form = TeachingMaterialModelForm(request.POST or None, instance=teach_material)
     if form.is_valid():
         return _save_and_redirect(request, form, teach_material.learning_unit_year, success_url)
-    return layout.render(request, "learning_unit/teaching_material/modal_edit.html", {'form': form})
+    return render(request, "learning_unit/teaching_material/modal_edit.html", {'form': form})
 
 
 def delete_view(request, learning_unit_year_id, teaching_material_id, success_url):
@@ -88,7 +86,7 @@ def delete_view(request, learning_unit_year_id, teaching_material_id, success_ur
         delete_teaching_material(teach_material)
         display_success_messages(request, "The teaching material has been deleted")
         return redirect(success_url)
-    return layout.render(request, "learning_unit/teaching_material/modal_delete.html", {})
+    return render(request, "learning_unit/teaching_material/modal_delete.html", {})
 
 
 def _save_and_redirect(request, form, learning_unit_year, success_url):

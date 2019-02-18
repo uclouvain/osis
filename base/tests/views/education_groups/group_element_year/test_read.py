@@ -28,7 +28,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from base.models.enums.link_type import REFERENCE
+from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -37,7 +37,6 @@ from base.tests.factories.learning_unit_component import LearningUnitComponentFa
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import SuperUserFactory
-from base.views.education_groups.group_element_year.read import get_verbose_children
 
 
 class TestRead(TestCase):
@@ -91,15 +90,14 @@ class TestRead(TestCase):
         self.assertTemplateUsed(response, 'education_group/pdf_content.html')
 
     def test_get_verbose_children(self):
-        result = get_verbose_children(self.education_group_year_1)
+        result = EducationGroupHierarchy(self.education_group_year_1).to_list()
         context_waiting = [self.group_element_year_1, [self.group_element_year_2], self.group_element_year_3,
                            [self.group_element_year_4]]
         self.assertEqual(result, context_waiting)
 
-        verbose_branch = _("%(title)s (%(credits)s credits)") % {
-            "title": self.group_element_year_1.child.title,
-            "credits": self.group_element_year_1.relative_credits or self.group_element_year_1.child_branch.credits or 0
-        }
+        credits = self.group_element_year_1.relative_credits or self.group_element_year_1.child_branch.credits or 0
+        verbose_branch = "{} ({} {})".format(self.group_element_year_1.child.title, credits, _("credits"))
+
         self.assertEqual(self.group_element_year_1.verbose, verbose_branch)
 
         components = LearningComponentYear.objects.filter(
@@ -107,10 +105,11 @@ class TestRead(TestCase):
             total=Case(When(hourly_volume_total_annual=None, then=0),
                        default=F('hourly_volume_total_annual'))).values('type', 'total')
 
-        verbose_leaf = _("%(acronym)s %(title)s [%(volumes)s] (%(credits)s credits)") % {
-            "acronym": self.group_element_year_2.child_leaf.acronym,
-            "title": self.group_element_year_2.child_leaf.complete_title,
-            "volumes": volume_total_verbose(components),
-            "credits": self.group_element_year_2.relative_credits or self.group_element_year_2.child_leaf.credits or 0
-        }
+        verbose_leaf = "{} {} [{}] ({} {})".format(
+            self.group_element_year_2.child_leaf.acronym,
+            self.group_element_year_2.child_leaf.complete_title,
+            volume_total_verbose(components),
+            self.group_element_year_2.relative_credits or self.group_element_year_2.child_leaf.credits or 0,
+            _("credits"),
+        )
         self.assertEqual(self.group_element_year_2.verbose, verbose_leaf)

@@ -28,7 +28,8 @@ from django import forms
 from django.conf import settings
 from django.db.transaction import atomic
 
-from base.business.learning_unit import find_language_in_settings, CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_ONLY
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_ONLY
+from reference.models.language import find_language_in_settings
 from base.business.learning_units.pedagogy import is_pedagogy_data_must_be_postponed, save_teaching_material
 from base.forms.common import set_trans_txt
 from base.models import learning_unit_year

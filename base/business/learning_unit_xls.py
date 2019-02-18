@@ -23,22 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from django.utils.translation import ugettext_lazy as _
-
-from base import models as mdl_base
-from base.business.learning_unit import LEARNING_UNIT_TITLES_PART2,  XLS_DESCRIPTION, XLS_FILENAME, \
-    WORKSHEET_TITLE, get_same_container_year_components, get_entity_acronym
-from base.business.xls import get_name_or_username
-from osis_common.document import xls_build
-from attribution.business import attribution_charge_new
-from base.models.enums import learning_component_year_type
-from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
-from base.models.enums.proposal_type import ProposalType
-from openpyxl.utils import get_column_letter
 from collections import defaultdict
-# List of key that a user can modify
-VOLUMES_INITIALIZED = {'VOLUME_TOTAL': 0, 'PLANNED_CLASSES': 0, 'VOLUME_Q1': 0, 'VOLUME_Q2': 0}
+
+from django.db.models import Subquery, OuterRef
+from django.template.defaultfilters import yesno
+from django.utils.translation import ugettext_lazy as _
+from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
+from openpyxl.utils import get_column_letter
+
+from attribution.business import attribution_charge_new
+from attribution.models.enums.function import Functions
+from base import models as mdl_base
+from base.business.learning_unit import LEARNING_UNIT_TITLES_PART2, XLS_DESCRIPTION, XLS_FILENAME, \
+    WORKSHEET_TITLE
+from base.business.xls import get_name_or_username
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
+from base.models.enums.proposal_type import ProposalType
+from base.models.learning_component_year import LearningComponentYear
+from osis_common.document import xls_build
 
 TRANSFORMATION_AND_MODIFICATION_COLOR = Color('808000')
 TRANSFORMATION_COLOR = Color('ff6600')
@@ -56,44 +58,65 @@ SPACES = '  '
 HEADER_TEACHERS = _('List of teachers')
 HEADER_PROGRAMS = _('Programs')
 PROPOSAL_LINE_STYLES = {
-    ProposalType.CREATION.name: Style(font=Font(color=CREATION_COLOR),),
-    ProposalType.MODIFICATION.name: Style(font=Font(color=MODIFICATION_COLOR),),
-    ProposalType.SUPPRESSION.name: Style(font=Font(color=SUPPRESSION_COLOR),),
-    ProposalType.TRANSFORMATION.name: Style(font=Font(color=TRANSFORMATION_COLOR),),
-    ProposalType.TRANSFORMATION_AND_MODIFICATION.name: Style(font=Font(color=TRANSFORMATION_AND_MODIFICATION_COLOR),),
+    ProposalType.CREATION.name: Style(font=Font(color=CREATION_COLOR), ),
+    ProposalType.MODIFICATION.name: Style(font=Font(color=MODIFICATION_COLOR), ),
+    ProposalType.SUPPRESSION.name: Style(font=Font(color=SUPPRESSION_COLOR), ),
+    ProposalType.TRANSFORMATION.name: Style(font=Font(color=TRANSFORMATION_COLOR), ),
+    ProposalType.TRANSFORMATION_AND_MODIFICATION.name: Style(font=Font(color=TRANSFORMATION_AND_MODIFICATION_COLOR), ),
 }
 WRAP_TEXT_STYLE = Style(alignment=Alignment(wrapText=True, vertical="top"), )
 WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
 
 LEARNING_UNIT_TITLES_PART1 = [
-    str(_('code')),
-    str(_('academic_year_small')),
-    str(_('title')),
-    str(_('type')),
-    str(_('subtype')),
-    "{} ({})".format(_('requirement_entity_small'), _('fac. level')),
-    str(_('proposal_type')),
-    str(_('proposal_status')),
-    str(_('credits')),
-    str(_('allocation_entity_small')),
-    str(_('title_in_english')),
+    str(_('Code')),
+    str(_('Ac yr.')),
+    str(_('Title')),
+    str(_('Type')),
+    str(_('Subtype')),
+    "{} ({})".format(_('Req. Entity'), _('fac. level')),
+    str(_('Proposal type')),
+    str(_('Proposal status')),
+    str(_('Credits')),
+    str(_('Alloc. Ent.')),
+    str(_('Title in English')),
 ]
 
 
-def prepare_xls_content(learning_units,
-                        with_grp=False,
-                        with_attributions=False):
+def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=False):
+    qs = annotate_qs(learning_unit_years)
+
     return [
-        extract_xls_data_from_learning_unit(lu,
-                                            with_grp,
-                                            with_attributions)
-        for lu in learning_units
-        ]
+        extract_xls_data_from_learning_unit(lu, with_grp, with_attributions) for lu in qs
+    ]
+
+
+def annotate_qs(learning_unit_years):
+    """ Fetch directly in the queryset all volumes data."""
+
+    subquery_component = LearningComponentYear.objects.filter(
+        learningunityear__in=OuterRef('pk')
+    )
+    subquery_component_pm = subquery_component.filter(
+        type=LECTURING
+    )
+    subquery_component_pp = subquery_component.filter(
+        type=PRACTICAL_EXERCISES
+    )
+
+    return learning_unit_years.annotate(
+        pm_vol_q1=Subquery(subquery_component_pm.values('hourly_volume_partial_q1')[:1]),
+        pm_vol_q2=Subquery(subquery_component_pm.values('hourly_volume_partial_q2')[:1]),
+        pm_vol_tot=Subquery(subquery_component_pm.values('hourly_volume_total_annual')[:1]),
+        pm_classes=Subquery(subquery_component_pm.values('planned_classes')[:1]),
+        pp_vol_q1=Subquery(subquery_component_pp.values('hourly_volume_partial_q1')[:1]),
+        pp_vol_q2=Subquery(subquery_component_pp.values('hourly_volume_partial_q2')[:1]),
+        pp_vol_tot=Subquery(subquery_component_pp.values('hourly_volume_total_annual')[:1]),
+        pp_classes=Subquery(subquery_component_pp.values('planned_classes')[:1])
+    )
 
 
 def extract_xls_data_from_learning_unit(learning_unit_yr, with_grp, with_attributions):
-
     lu_data_part1 = _get_data_part1(learning_unit_yr)
     lu_data_part2 = _get_data_part2(learning_unit_yr, with_attributions)
 
@@ -114,9 +137,6 @@ def create_xls_with_parameters(user, learning_units, filters, extra_configuratio
 
     if with_attributions:
         titles_part1.append(str(HEADER_TEACHERS))
-        for learning_unit_yr in learning_units:
-            learning_unit_yr.attribution_charge_news = attribution_charge_new \
-                .find_attribution_charge_new_by_learning_unit_year_as_dict(learning_unit_year=learning_unit_yr)
 
     working_sheets_data = prepare_xls_content(learning_units, with_grp, with_attributions)
 
@@ -149,41 +169,6 @@ def _get_parameters_configurable_list(learning_units, titles, user):
     return parameters
 
 
-def _get_absolute_credits(learning_unit_yr):
-    group_elements_years = mdl_base.group_element_year.search(child_leaf=learning_unit_yr) \
-        .select_related("child_leaf", "parent__education_group_type").order_by('parent__partial_acronym')
-    if group_elements_years:
-        return group_elements_years.first().child_leaf.credits \
-            if group_elements_years.first().child_leaf.credits else ''
-    return ''
-
-
-def _get_volumes(learning_unit_yr):
-    volumes = {
-        learning_component_year_type.LECTURING: VOLUMES_INITIALIZED,
-        learning_component_year_type.PRACTICAL_EXERCISES: VOLUMES_INITIALIZED
-    }
-    data_components = get_same_container_year_components(learning_unit_yr, True)
-    for component in data_components.get('components'):
-        if component.get('learning_component_year').type in (learning_component_year_type.LECTURING,
-                                                             learning_component_year_type.PRACTICAL_EXERCISES):
-            volumes = _update_volumes_data(component, volumes)
-
-    return volumes
-
-
-def _update_volumes_data(component, volumes_param):
-    volumes = volumes_param.copy()
-    vol_to_update = volumes.get(component.get('learning_component_year').type).copy()
-    key_of_value_to_update = ['VOLUME_TOTAL', 'VOLUME_Q1', 'VOLUME_Q2', 'PLANNED_CLASSES']
-    for key in key_of_value_to_update:
-        if component.get('volumes').get(key):
-            vol_to_update[key] = vol_to_update.get(key) + component.get('volumes').get(key)
-
-    volumes[component.get('learning_component_year').type] = vol_to_update
-    return volumes
-
-
 def _get_significant_volume(volume):
     if volume and volume > 0:
         return volume
@@ -194,7 +179,7 @@ def _prepare_legend_ws_data():
     return {
         xls_build.HEADER_TITLES_KEY: [str(_('Legend'))],
         xls_build.CONTENT_KEY: [
-            [SPACES, _('proposal_creation')],
+            [SPACES, _('Proposal of creation')],
             [SPACES, _('Proposal for modification')],
             [SPACES, _('Suppression proposal')],
             [SPACES, _('Transformation proposal')],
@@ -221,18 +206,17 @@ def _get_wrapped_cells(learning_units, teachers_col_letter, programs_col_letter)
 def _get_colored_rows(learning_units):
     colored_cells = defaultdict(list)
     for idx, luy in enumerate(learning_units, start=1):
-        proposal = mdl_base.proposal_learning_unit.find_by_learning_unit_year(luy)
-        if proposal:
-            colored_cells[PROPOSAL_LINE_STYLES.get(proposal.type)].append(idx)
+        if getattr(luy, "proposallearningunit", None):
+            colored_cells[PROPOSAL_LINE_STYLES.get(luy.proposallearningunit.type)].append(idx)
     return colored_cells
 
 
 def _get_attribution_line(an_attribution):
     return "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
         an_attribution.get('person'),
-        _('function'),
-        _(an_attribution.get('function')) if an_attribution.get('function') else '',
-        _('substitute'),
+        _('Function'),
+        Functions[an_attribution['function']].value if 'function' in an_attribution else '',
+        _('Substitute'),
         an_attribution.get('substitute') if an_attribution.get('substitute') else '',
         _('Beg. of attribution'),
         an_attribution.get('start_year'),
@@ -265,65 +249,87 @@ def _get_trainings_by_educ_group_year(learning_unit_yr):
 
 def _add_training_data(learning_unit_yr):
     formations_by_educ_group_year = _get_trainings_by_educ_group_year(learning_unit_yr)
-    return " \n".join(["{}".format(_concatenate_training_data(formations_by_educ_group_year, group_element_year)) for
-                       group_element_year in learning_unit_yr.group_elements_years])
+    return "\n".join(["{}".format(_concatenate_training_data(formations_by_educ_group_year, group_element_year)) for
+                      group_element_year in learning_unit_yr.group_elements_years])
 
 
 def _concatenate_training_data(formations_by_educ_group_year, group_element_year):
-    training_string = "{} {} {}".format(
-        group_element_year.parent.partial_acronym if group_element_year.parent.partial_acronym else '',
-        "({})".format(
-            '{0:.2f}'.format(group_element_year.child_leaf.credits) if group_element_year.child_leaf.credits else '-'),
-        " - ".join(
-            ["{} - {}".format(training.acronym, training.title) for training in
-             formations_by_educ_group_year.get(group_element_year.parent_id)])
-    )
-    return training_string
+    concatened_string = ''
+    for training in formations_by_educ_group_year.get(group_element_year.parent_id):
+        training_string = "{} {} {}".format(
+            group_element_year.parent.partial_acronym if group_element_year.parent.partial_acronym else '',
+            "({}) {}".format(
+                '{0:.2f}'.format(
+                    group_element_year.child_leaf.credits) if group_element_year.child_leaf.credits else '-',
+                '-' if len(formations_by_educ_group_year.get(group_element_year.parent_id)) > 0 else ''),
+
+            "{} - {}".format(training.acronym, training.title)
+        )
+        concatened_string = "{} {}\n".format(concatened_string, training_string)
+    return concatened_string
 
 
 def _get_data_part2(learning_unit_yr, with_attributions):
-    volumes = _get_volumes(learning_unit_yr)
     lu_data_part2 = []
     if with_attributions:
         lu_data_part2.append(
-            " \n".join([_get_attribution_line(value) for value in learning_unit_yr.attribution_charge_news.values()]))
-    volume_lecturing = volumes.get(learning_component_year_type.LECTURING)
-    volumes_practical = volumes.get(learning_component_year_type.PRACTICAL_EXERCISES)
+            " \n".join(
+                [_get_attribution_line(value)
+                 for value in attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
+                    learning_unit_yr
+                ).values()
+                 ]
+            )
+        )
+
     lu_data_part2.extend([
-        xls_build.translate(learning_unit_yr.periodicity),
-        xls_build.translate(learning_unit_yr.status),
-        _get_significant_volume(volume_lecturing.get('VOLUME_TOTAL')),
-        _get_significant_volume(volume_lecturing.get('VOLUME_Q1')),
-        _get_significant_volume(volume_lecturing.get('VOLUME_Q2')),
-        _get_significant_volume(volume_lecturing.get('PLANNED_CLASSES')),
-        _get_significant_volume(volumes_practical.get('VOLUME_TOTAL')),
-        _get_significant_volume(volumes_practical.get('VOLUME_Q1')),
-        _get_significant_volume(volumes_practical.get('VOLUME_Q2')),
-        _get_significant_volume(volumes_practical.get('PLANNED_CLASSES')),
-        xls_build.translate(learning_unit_yr.quadrimester),
-        xls_build.translate(learning_unit_yr.session),
-        learning_unit_yr.language if learning_unit_yr.language else "",
-        _get_absolute_credits(learning_unit_yr),
+        learning_unit_yr.get_periodicity_display(),
+        yesno(learning_unit_yr.status),
+        _get_significant_volume(learning_unit_yr.pm_vol_tot or 0),
+        _get_significant_volume(learning_unit_yr.pm_vol_q1 or 0),
+        _get_significant_volume(learning_unit_yr.pm_vol_q2 or 0),
+        learning_unit_yr.pm_classes or 0,
+        _get_significant_volume(learning_unit_yr.pp_vol_tot or 0),
+        _get_significant_volume(learning_unit_yr.pp_vol_q1 or 0),
+        _get_significant_volume(learning_unit_yr.pp_vol_q2 or 0),
+        learning_unit_yr.pp_classes or 0,
+        learning_unit_yr.get_quadrimester_display() or '',
+        learning_unit_yr.get_session_display() or '',
+        learning_unit_yr.language or "",
     ])
     return lu_data_part2
 
 
 def _get_data_part1(learning_unit_yr):
-    proposal = mdl_base.proposal_learning_unit.find_by_learning_unit_year(learning_unit_yr)
+    proposal = getattr(learning_unit_yr, "proposallearningunit", None)
+
+    requirement_acronym = getattr(learning_unit_yr, 'entity_requirement', None)
+    if not requirement_acronym:
+        requirement_acronym = _get_entity_faculty_acronym(
+            learning_unit_yr.entities.get('REQUIREMENT_ENTITY'),
+            learning_unit_yr.academic_year
+        )
+
+    allocation_acronym = getattr(learning_unit_yr, 'entity_allocation', None)
+    if not allocation_acronym:
+        allocation_acronym = _get_entity_faculty_acronym(
+            learning_unit_yr.entities.get('ALLOCATION_ENTITY'),
+            learning_unit_yr.academic_year
+        )
+
     lu_data_part1 = [
         learning_unit_yr.acronym,
         learning_unit_yr.academic_year.name,
         learning_unit_yr.complete_title,
-        xls_build.translate(learning_unit_yr.learning_container_year.container_type)
-        # FIXME Condition to remove when the LearningUnitYear.learning_continer_year_id will be null=false
+        learning_unit_yr.learning_container_year.get_container_type_display()
+        # FIXME Condition to remove when the LearningUnitYear.learning_container_year_id will be null=false
         if learning_unit_yr.learning_container_year else "",
-        xls_build.translate(learning_unit_yr.subtype),
-        _get_entity_faculty_acronym(learning_unit_yr.entities.get('REQUIREMENT_ENTITY'),
-                                    learning_unit_yr.academic_year),
-        xls_build.translate(proposal.type) if proposal else '',
-        xls_build.translate(proposal.state) if proposal else '',
+        learning_unit_yr.get_subtype_display(),
+        requirement_acronym,
+        proposal.get_type_display() if proposal else '',
+        proposal.get_state_display() if proposal else '',
         learning_unit_yr.credits,
-        get_entity_acronym(learning_unit_yr.entities.get('ALLOCATION_ENTITY')),
+        allocation_acronym,
         learning_unit_yr.complete_title_english,
     ]
     return lu_data_part1

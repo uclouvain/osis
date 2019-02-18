@@ -25,14 +25,15 @@
 ##############################################################################
 from django.db import models
 from django.utils.functional import cached_property
+from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models import organization_address
 from base.models.enums import diploma_coorganization
 from osis_common.models.osis_model_admin import OsisModelAdmin
-from django.utils.translation import ugettext_lazy as _
 
 
-class EducationGroupOrganizationAdmin(OsisModelAdmin):
+class EducationGroupOrganizationAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('education_group_year', 'organization')
     raw_id_fields = ('education_group_year', 'organization')
     search_fields = ['education_group_year__acronym']
@@ -43,7 +44,7 @@ class EducationGroupOrganization(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     education_group_year = models.ForeignKey('EducationGroupYear')
     organization = models.ForeignKey('Organization')
-    all_students = models.BooleanField(default=False, verbose_name=_('for_all_students'))
+    all_students = models.BooleanField(default=False, verbose_name=_('For all students'))
     enrollment_place = models.BooleanField(default=False, verbose_name=_('Reference institution'))
     diploma = models.CharField(max_length=40,
                                choices=diploma_coorganization.COORGANIZATION_DIPLOMA_TYPE,
@@ -58,8 +59,3 @@ class EducationGroupOrganization(models.Model):
     @cached_property
     def address(self):
         return organization_address.find_by_organization(self.organization).first()
-
-
-def search(**kwargs):
-    if "education_group_year" in kwargs:
-        return EducationGroupOrganization.objects.filter(education_group_year=kwargs['education_group_year'])

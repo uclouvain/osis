@@ -28,15 +28,15 @@ from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl
-from base.business.learning_unit_year_with_context import append_latest_entities
-from base.forms.common import get_clean_data, TooManyResultsException
 from base.forms.learning_unit.search_form import LearningUnitSearchForm
-from base.models.enums import proposal_type, proposal_state
+from base.models.entity import Entity
+from base.models.enums.proposal_state import ProposalState
+from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import ProposalLearningUnit
 
 
 def _get_entity_folder_id_ordered_by_acronym():
-    entities = mdl.proposal_learning_unit.find_distinct_folder_entities()
+    entities = Entity.objects.filter(proposallearningunit__isnull=False).distinct()
     entities_sorted_by_acronym = sorted(list(entities), key=lambda t: t.most_recent_acronym)
 
     return [LearningUnitSearchForm.ALL_LABEL] + [(ent.pk, ent.most_recent_acronym)
@@ -50,47 +50,33 @@ def _get_sorted_choices(tuple_of_choices):
 class LearningUnitProposalForm(LearningUnitSearchForm):
 
     entity_folder_id = forms.ChoiceField(
-        label=_('folder_entity'),
+        label=_('Folder entity'),
         choices=lazy(_get_entity_folder_id_ordered_by_acronym, list),
         required=False
     )
 
     folder_id = forms.IntegerField(min_value=0,
                                    required=False,
-                                   label=_('folder_num'),)
+                                   label=_('Folder num.'),)
 
     proposal_type = forms.ChoiceField(
-        label=_('proposal_type'),
-        choices=_get_sorted_choices(proposal_type.CHOICES),
+        label=_('Proposal type'),
+        choices=_get_sorted_choices(ProposalType.choices()),
         required=False
     )
 
     proposal_state = forms.ChoiceField(
-        label=_('proposal_status'),
-        choices=_get_sorted_choices(proposal_state.CHOICES),
+        label=_('Proposal status'),
+        choices=_get_sorted_choices(ProposalState.choices()),
         required=False
     )
-
-    def clean(self):
-        if not self._has_criteria():
-            self.add_error(None, _('minimum_one_criteria'))
-
-        return get_clean_data(self.cleaned_data)
 
     def get_proposal_learning_units(self):
         learning_units = self.get_queryset().filter(proposallearningunit__isnull=False)
 
         learning_units = mdl.proposal_learning_unit.filter_proposal_fields(learning_units, **self.cleaned_data)
 
-        if self.cleaned_data and learning_units.count() > LearningUnitSearchForm.MAX_RECORDS:
-            raise TooManyResultsException
-
-        for learning_unit in learning_units:
-            # TODO Use an annotate
-            append_latest_entities(learning_unit, None)
-
-        # TODO It'll be easier to return a queryset of learningunits
-        return [learning_unit.proposallearningunit for learning_unit in learning_units]
+        return learning_units
 
 
 class ProposalStateModelForm(forms.ModelForm):

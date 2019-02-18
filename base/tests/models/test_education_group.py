@@ -23,12 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
+from django.contrib.messages import get_messages
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.urls import reverse
+from django.utils.translation import ngettext
+
+from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.models.enums.education_group_categories import GROUP
+from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
+from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.education_group import EducationGroupFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.user import SuperUserFactory
 
 
 class EducationGroupTest(TestCase):
@@ -65,3 +75,63 @@ class EducationGroupTest(TestCase):
         )
         education_group.clean()
         education_group.save()
+
+
+class EducationGroupManagerTest(TestCase):
+    def setUp(self):
+        self.education_group_training = EducationGroupFactory()
+        most_recent_year = 2018
+        for year in range(2016, most_recent_year + 1):
+            EducationGroupYearFactory(
+                education_group=self.education_group_training,
+                academic_year=AcademicYearFactory(year=year)
+            )
+
+    def test_education_group_trainings_manager(self):
+        self.assertCountEqual(
+            EducationGroup.objects.all(),
+            EducationGroup.objects.having_related_training()
+        )
+
+    def test_education_group_trainings_manager_with_other_types(self):
+        education_group_not_training = EducationGroupFactory()
+        EducationGroupYearFactory(
+            education_group=education_group_not_training,
+            academic_year=AcademicYearFactory(year=2015),
+            education_group_type=EducationGroupTypeFactory(category=GROUP)
+        )
+
+        self.assertCountEqual(
+            list(EducationGroup.objects.having_related_training()),
+            [self.education_group_training]
+        )
+
+        self.assertNotEqual(
+            list(EducationGroup.objects.all()),
+            list(EducationGroup.objects.having_related_training())
+        )
+
+
+class TestEducationGroupAdmin(TestCase):
+    def test_apply_education_group_year_postponement(self):
+        """ Postpone to N+6 in Education Group Admin """
+        current_year = get_current_year()
+        academic_years = GenerateAcademicYear(current_year, current_year + 6)
+
+        eg = EducationGroupFactory(end_year=None)
+        EducationGroupYearFactory(
+            academic_year=academic_years[0],
+            education_group=eg
+        )
+
+        postpone_url = reverse('admin:base_educationgroup_changelist')
+
+        self.client.force_login(SuperUserFactory())
+        response = self.client.post(postpone_url, data={'action': 'apply_education_group_year_postponement',
+                                                        '_selected_action': [eg.pk]})
+
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(msg[0], ngettext(
+            "%(count)d education group has been postponed with success.",
+            "%(count)d education groups have been postponed with success.", 6
+        ) % {'count': 6})

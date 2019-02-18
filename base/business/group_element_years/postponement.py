@@ -30,7 +30,7 @@ from base.business.education_groups.postponement import duplicate_education_grou
 from base.business.utils.model import update_related_object
 from base.models.academic_year import starting_academic_year
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import MINITRAINING_TO_POSTONE
+from base.models.enums.education_group_types import MiniTrainingType
 
 
 class NotPostponeError(Error):
@@ -62,7 +62,7 @@ class PostponeContent:
     def check_instance(self):
         if self.instance.is_training():
             pass
-        elif self.instance.education_group_type.name in MINITRAINING_TO_POSTONE:
+        elif self.instance.education_group_type.name in MiniTrainingType.to_postpone():
             pass
         else:
             raise NotPostponeError(_('You are not allowed to copy the content of this kind of education group.'))
@@ -87,7 +87,7 @@ class PostponeContent:
         except EducationGroupYear.DoesNotExist:
             raise NotPostponeError(_("The root does not exist in the next academic year."))
 
-        if next_instance.groupelementyear_set.exists():
+        if self._check_if_already_postponed(next_instance):
             raise NotPostponeError(_("The content has already been postponed."))
 
         return next_instance
@@ -105,7 +105,12 @@ class PostponeContent:
             next_instance = self.get_instance_n1(instance)
 
         for gr in instance.groupelementyear_set.all():
-            new_gr = update_related_object(gr, "parent", next_instance)
+            # For strange reasons, the education_group_year is not every times connected to a common education_group,
+            # so we have to use the acronym to find the next group_element_year.
+            new_gr = next_instance.groupelementyear_set.filter(child_branch__acronym=gr.child.acronym).first()
+            if not new_gr:
+                new_gr = update_related_object(gr, "parent", next_instance)
+
             if new_gr.child_leaf:
                 self._postpone_child_leaf(gr, new_gr)
             else:
@@ -139,3 +144,26 @@ class PostponeContent:
 
         new_gr.child_branch = new_egy
         return new_gr.save()
+
+    def _check_if_already_postponed(self, education_group_year):
+        """
+        Determine if the content has already been postponed.
+
+        First we have to check the progeny of the education group (! recursive search )
+        After verify if all nodes have an authorized relationship with a min count to 1 or a learning unit.
+        """
+        for gr in education_group_year.groupelementyear_set.all():
+            if gr.child_leaf:
+                return True
+
+            relationship = education_group_year.education_group_type.authorized_parent_type.filter(
+                child_type=gr.child_branch.education_group_type
+            ).first()
+
+            if not relationship or relationship.min_count_authorized == 0:
+                return True
+
+            if self._check_if_already_postponed(gr.child_branch):
+                return True
+
+        return False

@@ -27,12 +27,15 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym
+from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym, LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
+from base.models.utils.utils import get_verbose_field_value
 
 register = template.Library()
 DIFFERENCE_CSS = "style='color:#5CB85C;'"
+CSS_PROPOSAL_VALUE = "proposal_value"
+LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
 
 
 @register.filter
@@ -41,13 +44,13 @@ def academic_years(start_year, end_year):
         str_start_year = ''
         str_end_year = ''
         if start_year:
-            str_start_year = "{} {}-{}".format(_('from').title(), start_year, str(start_year+1)[-2:])
+            str_start_year = "{} {}-{}".format(_('From').title(), start_year, str(start_year + 1)[-2:])
         if end_year:
-            str_end_year = "{} {}-{}".format(_('to'), end_year, str(end_year+1)[-2:])
+            str_end_year = "{} {}-{}".format(_('to'), end_year, str(end_year + 1)[-2:])
         return "{} {}".format(str_start_year, str_end_year)
     else:
         if start_year and not end_year:
-            return "{} {}-{} ({})".format(_('from'), start_year, str(start_year+1)[-2:], _('not_end_year'))
+            return "{} {}-{} ({})".format(_('From'), start_year, str(start_year + 1)[-2:], _('no planned end'))
         else:
             return "-"
 
@@ -55,17 +58,21 @@ def academic_years(start_year, end_year):
 @register.filter
 def academic_year(year):
     if year:
-        return "{}-{}".format(year, str(year+1)[-2:])
+        return "{}-{}".format(year, str(year + 1)[-2:])
     return "-"
 
 
 @register.filter
 def get_difference_css(differences, parameter, default_if_none=""):
     if parameter in differences:
+        value = differences[parameter]
         return mark_safe(
-            " data-toggle=tooltip title='{} : {}' class={} ".format(_("value_before_proposal"),
-                                                                    differences[parameter] or default_if_none,
-                                                                    "proposal_value"))
+            ' data-toggle=tooltip title="{} : {}" class="{}" '.format(
+                LABEL_VALUE_BEFORE_PROPOSAL,
+                value or default_if_none,
+                CSS_PROPOSAL_VALUE
+            )
+        )
     return None
 
 
@@ -74,8 +81,9 @@ def has_proposal(luy):
     return ProposalLearningUnit.objects.filter(learning_unit_year=luy).exists()
 
 
-@register.simple_tag
-def dl_tooltip(differences, key, **kwargs):
+# TODO Use inclusion tag instead
+@register.simple_tag(takes_context=True)
+def dl_tooltip(context, instance, key, **kwargs):
     title = kwargs.get('title', '')
     label_text = _(str(kwargs.get('label_text', '')))
     url = kwargs.get('url', '')
@@ -83,12 +91,13 @@ def dl_tooltip(differences, key, **kwargs):
     value = kwargs.get('value', '')
     inherited = kwargs.get('inherited', '')
     not_annualized = kwargs.get('not_annualized', '')
+    differences = context['differences']
 
     if not label_text:
-        label_text = _(str(key.lower()))
+        label_text = instance._meta.get_field(key).verbose_name.capitalize()
 
     if not value:
-        value = default_if_none
+        value = get_verbose_field_value(instance, key)
 
     difference = get_difference_css(differences, key, default_if_none) or 'title="{}"'.format(_(title))
 
@@ -103,7 +112,10 @@ def dl_tooltip(differences, key, **kwargs):
     if not_annualized:
         label_text = get_style_of_label_text(label_text, "font-style:italic",
                                              "The value of this attribute is not annualized")
-        value = get_style_of_value("font-style:italic", "The value of this attribute is not annualized", value)
+        value = get_style_of_value("font-style:italic",
+                                   "The value of this attribute is not annualized",
+                                   value if value else default_if_none
+                                   )
 
     html_id = "id='id_{}'".format(key.lower())
 
@@ -112,7 +124,7 @@ def dl_tooltip(differences, key, **kwargs):
 
 
 def get_style_of_value(style, title, value):
-    value = '<p style="{style}" title="{title}">{value}</p>'.format(style=style, title=_(title), value=value)
+    value = "<p style='{style}' title='{title}'>{value}</p>".format(style=style, title=_(title), value=value)
     return value
 
 
@@ -164,3 +176,64 @@ def changed_label(value, other1=None):
             "<label {}>{}</label>".format(DIFFERENCE_CSS, DEFAULT_VALUE_FOR_NONE if value is None else value))
     else:
         return mark_safe("{}".format(DEFAULT_VALUE_FOR_NONE if value is None else value))
+
+
+@register.simple_tag(takes_context=True)
+def dl_component_tooltip(context, key, **kwargs):
+    title = kwargs.get('title', '')
+    default_if_none = kwargs.get('default_if_none', '')
+    value = kwargs.get('value', '')
+    id = kwargs.get('id', '')
+
+    volumes = {}
+    components_initial_data = context.get('differences', {}).get('components_initial_data', {})
+    if components_initial_data != {}:
+        for rec in components_initial_data.get('components', {}):
+            if rec.get('learning_component_year').get('id') == id:
+                volumes = rec.get('volumes')
+                break
+
+        difference = get_component_volume_css(volumes, key, default_if_none, value) or 'title="{}"'.format(_(title))
+        value = get_style_of_value("", "", _volume_format(value))
+        html_id = "id='id_{}'".format(key.lower())
+
+        return mark_safe("<dl><dd {difference} {id}>{value}</dd></dl>".format(
+            difference=difference, id=html_id, value=str(value)))
+    return _volume_format(value) if value else default_if_none
+
+
+def _volume_format(value):
+    if value is None:
+        return ''
+    else:
+        if value - int(value) != 0:
+            return "{0:.1f}".format(value)
+        return int(value)
+
+
+@register.filter
+def get_component_volume_css(values, parameter, default_if_none="", value=None):
+    if parameter in values and values[parameter] != value:
+        return mark_safe(
+            " data-toggle=tooltip title='{} : {}' class='{}' ".format(
+                LABEL_VALUE_BEFORE_PROPOSAL,
+                _volume_format(values[parameter]) or default_if_none,
+                CSS_PROPOSAL_VALUE
+            )
+        )
+    return default_if_none
+
+
+@register.simple_tag(takes_context=True)
+def th_tooltip(context, key, **kwargs):
+    value = kwargs.get('value', '')
+    differences = context.get('differences')
+    default_if_none = '-'
+
+    if differences:
+        difference = get_difference_css(differences, key, default_if_none)
+    else:
+        difference = ''
+
+    return mark_safe("<span {difference}>{value}</span>".format(
+        difference=difference, value=_(str(value))))

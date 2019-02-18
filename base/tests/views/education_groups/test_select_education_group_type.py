@@ -25,13 +25,17 @@
 ##############################################################################
 from unittest import mock
 
+from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.models.enums import education_group_categories
+from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 
 
@@ -50,6 +54,16 @@ class TestSelectEducationGroupTypeView(TestCase):
         self.education_group_types = [
             EducationGroupTypeFactory(category=category)
             for category in self.test_categories
+        ]
+
+        self.auth_rels = [
+            AuthorizedRelationshipFactory(
+                parent_type=self.parent_education_group_year.education_group_type,
+                child_type=eg_type,
+                min_count_authorized=0,
+                max_count_authorized=1,
+            )
+            for eg_type in self.education_group_types
         ]
 
         self.person = PersonFactory()
@@ -71,7 +85,7 @@ class TestSelectEducationGroupTypeView(TestCase):
         )
         self.assertTemplateUsed(response, "education_group/blocks/form/education_group_type.html")
 
-    def test_post(self):
+    def test_post_when_no_parent(self):
         response = self.client.post(
             reverse(
                 "select_education_group_type",
@@ -82,8 +96,47 @@ class TestSelectEducationGroupTypeView(TestCase):
         self.assertRedirects(
             response,
             reverse(
-                "new_education_group", args=[self.test_categories[0], self.education_group_types[0].pk]
+                "new_education_group",
+                args=[self.test_categories[0], self.education_group_types[0].pk]
             )
+        )
+
+    def test_post(self):
+        response = self.client.post(
+            reverse(
+                "select_education_group_type",
+                args=[self.test_categories[0], self.parent_education_group_year.pk]
+            ), data={"name": self.education_group_types[0].pk}
+        )
+
+        self.assertRedirects(
+            response,
+            reverse(
+                "new_education_group",
+                args=[self.test_categories[0], self.education_group_types[0].pk, self.parent_education_group_year.pk]
+            )
+        )
+
+    def test_post_invalid_when_max_limit_reached(self):
+        GroupElementYearFactory(
+            parent=self.parent_education_group_year,
+            child_branch__education_group_type=self.education_group_types[0]
+        )
+        expected_error_msg = _("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
+                               "has already reached the limit.") % {
+            'child_type': self.education_group_types[0],
+            'parent': self.parent_education_group_year
+        }
+        response = self.client.post(
+            reverse(
+                "select_education_group_type",
+                args=[self.test_categories[0], self.parent_education_group_year.pk]
+            ), data={"name": self.education_group_types[0].pk}
+        )
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertDictEqual(
+            response.context["form"].errors,
+            {"name": [expected_error_msg]}
         )
 
     def test_post_invalid(self):

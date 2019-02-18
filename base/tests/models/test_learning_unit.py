@@ -24,18 +24,23 @@
 #
 ##############################################################################
 import datetime
+from gettext import ngettext
 
+from django.contrib.messages import get_messages
 from django.db import DatabaseError
 from django.test import TestCase
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from base.models import learning_unit
 from base.models.enums import learning_unit_year_subtypes
 from base.templatetags.learning_unit import academic_years, academic_year
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
+from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.user import SuperUserFactory
 
 
 def create_learning_unit(acronym, title):
@@ -48,19 +53,6 @@ class LearningUnitTest(TestCase):
         l_unit = LearningUnitFactory.build(start_year=2000, end_year=1999)
         with self.assertRaises(AttributeError):
             l_unit.save()
-
-    def test_find_by_id(self):
-        l_unit_1 = LearningUnitFactory()
-        LearningUnitFactory()
-        LearningUnitFactory()
-        self.assertEqual(l_unit_1, learning_unit.find_by_id(l_unit_1.id))
-
-    def test_find_by_ids(self):
-        l_unit_1 = LearningUnitFactory()
-        l_unit_2 = LearningUnitFactory()
-        LearningUnitFactory()
-        LearningUnitFactory()
-        self.assertEqual(2, len( learning_unit.find_by_ids( (l_unit_1.id, l_unit_2.id) )))
 
     def test_get_partims_related(self):
         current_year = datetime.date.today().year
@@ -88,9 +80,10 @@ class LearningUnitTest(TestCase):
         self.assertEqual(len(all_partims_container_year_2), 0)
 
     def test_academic_years_tags(self):
-        self.assertEqual(academic_years(2017, 2018), _('from').title()+" 2017-18 "+_('to').lower()+" 2018-19")
+        self.assertEqual(academic_years(2017, 2018), _('From').title() + " 2017-18 " + _('to').lower() + " 2018-19")
         self.assertEqual(academic_years(None, 2018), "-")
-        self.assertEqual(academic_years(2017, None), _('from').title()+" 2017-18 ("+_('not_end_year').lower()+")")
+        self.assertEqual(academic_years(2017, None),
+                         _('From').title() + " 2017-18 (" + _('no planned end').lower() + ")")
         self.assertEqual(academic_years(None, None), "-")
 
     def test_academic_year_tags(self):
@@ -122,3 +115,46 @@ class LearningUnitTest(TestCase):
         a_learning_unit_year = LearningUnitYearFactory(learning_unit=a_learning_unit)
         self.assertEqual(a_learning_unit.title, a_learning_unit_year.specific_title)
         self.assertEqual(a_learning_unit.acronym, a_learning_unit_year.acronym)
+
+
+class LearningUnitGetByAcronymWithLatestAcademicYearTest(TestCase):
+    def setUp(self):
+        self.learning_unit_year_2009 = LearningUnitYearFactory(
+            academic_year=AcademicYearFactory(year=2009),
+            acronym='LDROI1200'
+        )
+        self.learning_unit_year_2017 = LearningUnitYearFactory(
+            academic_year=AcademicYearFactory(year=2017),
+            acronym='LDROI1200'
+        )
+
+    def test_get_by_acronym_with_highest_academic_year(self):
+        self.assertEqual(
+            learning_unit.get_by_acronym_with_highest_academic_year(acronym='LDROI1200'),
+            self.learning_unit_year_2017.learning_unit
+        )
+
+
+class TestLearningUnitAdmin(TestCase):
+    def test_apply_learning_unit_year_postponement(self):
+        """ Postpone to N+6 in Learning Unit Admin """
+        current_year = get_current_year()
+        academic_years = GenerateAcademicYear(current_year, current_year + 6)
+
+        lu = LearningUnitFactory(end_year=None)
+        LearningUnitYearFactory(
+            academic_year=academic_years[0],
+            learning_unit=lu
+        )
+
+        postpone_url = reverse('admin:base_learningunit_changelist')
+
+        self.client.force_login(SuperUserFactory())
+        response = self.client.post(postpone_url, data={'action': 'apply_learning_unit_year_postponement',
+                                                        '_selected_action': [lu.pk]})
+
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(msg[0], ngettext(
+            "%(count)d learning unit has been postponed with success",
+            "%(count)d learning units have been postponed with success", 6
+        ) % {'count': 6})

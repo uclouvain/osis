@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
+
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
@@ -31,28 +33,16 @@ from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, spl
 from base.forms.utils.choice_field import add_blank
 from base.models.campus import find_main_campuses
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
-from base.models.enums.learning_container_year_types import CONTAINER_TYPE_WITH_DEFAULT_COMPONENT, \
-    LEARNING_CONTAINER_YEAR_TYPES_WITHOUT_EXTERNAL, INTERNSHIP
-from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY
+from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, EXTERNAL
+from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_WITHOUT_EXTERNAL, INTERNSHIP
 from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
-from base.models.learning_unit import LearningUnit
+from base.models.learning_unit import LearningUnit, REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
 from reference.models.language import find_all_languages
+from django.core.exceptions import ValidationError
 
-DEFAULT_ACRONYM_COMPONENT = {
-    LECTURING: "PM",
-    PRACTICAL_EXERCISES: "PP",
-    None: "NT"
-}
-
-
-def _get_default_components_type(container_type):
-    """This function will return the default components type to create/update according to container type"""
-    if container_type in CONTAINER_TYPE_WITH_DEFAULT_COMPONENT:
-        return [LECTURING, PRACTICAL_EXERCISES]
-    return [None]
+CRUCIAL_YEAR_FOR_CREDITS_VALIDATION = 2018
 
 
 def _create_learning_container_year_type_list():
@@ -91,6 +81,7 @@ class LearningUnitYearModelForm(forms.ModelForm):
     def __init__(self, data, person, subtype, *args, external=False, **kwargs):
         super().__init__(data, *args, **kwargs)
 
+        self.external = external
         self.instance.subtype = subtype
         self.person = person
 
@@ -100,8 +91,8 @@ class LearningUnitYearModelForm(forms.ModelForm):
 
         if subtype == learning_unit_year_subtypes.PARTIM:
             self.fields['acronym'] = PartimAcronymField()
-            self.fields['specific_title'].label = _('official_title_proper_to_partim')
-            self.fields['specific_title_english'].label = _('official_english_title_proper_to_partim')
+            self.fields['specific_title'].label = _('Title proper to the partim')
+            self.fields['specific_title_english'].label = _('English title proper to the partim')
 
         # Disabled fields when it's an update
         if self.instance.pk:
@@ -125,15 +116,24 @@ class LearningUnitYearModelForm(forms.ModelForm):
         error_messages = {
             'credits': {
                 # Override unwanted DecimalField standard error messages
-                'max_digits': _('Ensure this value is less than or equal to {max_value}.').format(
-                    max_value=MAXIMUM_CREDITS),
-                'max_whole_digits': _('Ensure this value is less than or equal to {max_value}.').format(
-                    max_value=MAXIMUM_CREDITS)
+                'max_digits': _('Ensure this value is less than or equal to %(limit_value)s.') % {
+                    'limit_value': MAXIMUM_CREDITS
+                },
+                'max_whole_digits': _('Ensure this value is less than or equal to %(limit_value)s.') % {
+                    'limit_value': MAXIMUM_CREDITS
+                }
             }
         }
         widgets = {
             'credits': forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
         }
+
+    def clean_acronym(self):
+        if self.external and not re.match(REGEX_BY_SUBTYPE[EXTERNAL], self.cleaned_data["acronym"]):
+            raise ValidationError(_('Invalid code'))
+        elif not self.external and not re.match(REGEX_BY_SUBTYPE[self.instance.subtype], self.cleaned_data["acronym"]):
+            raise ValidationError(_('Invalid code'))
+        return self.cleaned_data["acronym"]
 
     def post_clean(self, container_type):
         if "internship_subtype" in self.fields \
@@ -152,12 +152,19 @@ class LearningUnitYearModelForm(forms.ModelForm):
         instance = super().save(**kwargs)
         return instance
 
+    def clean_credits(self):
+        credits_ = self.cleaned_data['credits']
+        if self.instance.id is None or self.instance.academic_year.year >= CRUCIAL_YEAR_FOR_CREDITS_VALIDATION:
+            if not float(credits_).is_integer():
+                raise ValidationError(_('The credits value should be an integer'))
+        return credits_
+
 
 class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
     class Meta(LearningUnitYearModelForm.Meta):
         labels = {
-            'specific_title': _('official_title_proper_to_partim'),
-            'specific_title_english': _('official_english_title_proper_to_partim')
+            'specific_title': _('Title proper to the partim'),
+            'specific_title_english': _('English title proper to the partim')
         }
         field_classes = {
             'acronym': PartimAcronymField
@@ -176,7 +183,7 @@ class LearningContainerYearModelForm(forms.ModelForm):
         self.fields['container_type'].widget.attrs = {'onchange': 'showInternshipSubtype()'}
 
         # Limit types for faculty_manager only if simple creation of learning_unit
-        if self.person.is_faculty_manager() and not self.proposal and self.is_create_form:
+        if self.person.is_faculty_manager and not self.proposal and self.is_create_form:
             self.fields["container_type"].choices = _create_faculty_learning_container_type_list()
         else:
             self.fields["container_type"].choices = _create_learning_container_year_type_list()
@@ -194,6 +201,6 @@ class LearningContainerYearModelForm(forms.ModelForm):
 
     def post_clean(self, specific_title):
         if not self.instance.common_title and not specific_title:
-            self.add_error("common_title", _("must_set_common_title_or_specific_title"))
+            self.add_error("common_title", _("You must either set the common title or the specific title"))
 
         return not self.errors

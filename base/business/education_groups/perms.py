@@ -24,13 +24,16 @@
 #
 ##############################################################################
 from django.core.exceptions import PermissionDenied
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext
 
+from base.business.group_element_years import management
 from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.models.academic_calendar import AcademicCalendar
+from base.models.academic_year import current_academic_year
 from base.models.education_group_type import find_authorized_types
 from base.models.enums import academic_calendar_type
-from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
+from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP, Categories
 
 ERRORS_MSG = {
     "base.add_educationgroup": "The user has not permission to create education groups.",
@@ -40,27 +43,35 @@ ERRORS_MSG = {
 
 
 def is_eligible_to_add_training(person, education_group, raise_exception=False):
-    return _is_eligible_to_add_education_group(person, education_group, TRAINING, raise_exception)
+    return _is_eligible_to_add_education_group(person, education_group, TRAINING, raise_exception=raise_exception)
 
 
 def is_eligible_to_add_mini_training(person, education_group, raise_exception=False):
-    return _is_eligible_to_add_education_group(person, education_group, MINI_TRAINING, raise_exception)
+    return _is_eligible_to_add_education_group(person, education_group, MINI_TRAINING, raise_exception=raise_exception)
 
 
 def is_eligible_to_add_group(person, education_group, raise_exception=False):
-    return _is_eligible_to_add_education_group(person, education_group, GROUP, raise_exception)
+    return _is_eligible_to_add_education_group(person, education_group, GROUP, raise_exception=raise_exception)
 
 
-def _is_eligible_to_add_education_group(person, education_group, category, raise_exception=False):
+def _is_eligible_to_add_education_group(person, education_group, category, education_group_type=None,
+                                        raise_exception=False):
     return check_permission(person, "base.add_educationgroup", raise_exception) and \
            _is_eligible_to_add_education_group_with_category(person, category, raise_exception) and \
            _is_eligible_education_group(person, education_group, raise_exception) and \
-           check_authorized_type(education_group, category, raise_exception)
+           (not management.is_max_child_reached(education_group, education_group_type.name)
+            if education_group_type and education_group
+            else check_authorized_type(education_group, category, raise_exception))
 
 
 def is_eligible_to_change_education_group(person, education_group, raise_exception=False):
     return check_permission(person, "base.change_educationgroup", raise_exception) and \
            _is_eligible_education_group(person, education_group, raise_exception)
+
+
+def is_eligible_to_change_coorganization(person, education_group, raise_exception=False):
+    return check_permission(person, "base.change_educationgroup", raise_exception) and \
+           check_link_to_management_entity(education_group, person, raise_exception) and person.is_central_manager
 
 
 def is_eligible_to_postpone_education_group(person, education_group, raise_exception=False):
@@ -97,42 +108,28 @@ def is_eligible_to_delete_education_group(person, education_group, raise_excepti
            _is_eligible_education_group(person, education_group, raise_exception)
 
 
-def is_academic_calendar_opened(education_group, type_academic_calendar, raise_exception=False):
-    result = False
+def is_education_group_edit_period_opened(education_group, raise_exception=False):
+    error_msg = None
 
-    ac = AcademicCalendar.objects.filter(reference=type_academic_calendar).open_calendars()
+    qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION).open_calendars()
+    if not qs.exists():
+        error_msg = "The education group edition period is not open."
+    elif education_group and not qs.filter(academic_year=education_group.academic_year).exists():
+        error_msg = "This education group is not editable during this period."
 
-    # Check if the edition period is open
-    if not ac:
-        can_raise_exception(raise_exception, result, "The education group edition period is not open.")
-
-    # During the edition period, the manager can only edit the N+1 education_group_year.
-    elif education_group and education_group.academic_year != ac.get().academic_year.next():
-        can_raise_exception(
-            raise_exception, result, "this education group is not editable during this period."
-        )
-
-    else:
-        result = True
-
+    result = error_msg is None
+    can_raise_exception(raise_exception, result, error_msg)
     return result
 
 
 def _is_eligible_education_group(person, education_group, raise_exception):
     return (check_link_to_management_entity(education_group, person, raise_exception) and
-            (person.is_central_manager() or
-             is_academic_calendar_opened(
-                 education_group,
-                 academic_calendar_type.EDUCATION_GROUP_EDITION,
-                 raise_exception
-             )
-             )
-            )
+            (person.is_central_manager or is_education_group_edit_period_opened(education_group, raise_exception)))
 
 
 def _is_eligible_to_add_education_group_with_category(person, category, raise_exception):
     # TRAINING/MINI_TRAINING can only be added by central managers | Faculty manager must make a proposition of creation
-    result = person.is_central_manager() or (person.is_faculty_manager() and category == GROUP)
+    result = person.is_central_manager or (person.is_faculty_manager and category == GROUP)
     msg = _("The user has not permission to create a %(category)s.") % {"category": _(category)}
     can_raise_exception(raise_exception, result, msg)
     return result
@@ -145,7 +142,7 @@ def check_link_to_management_entity(education_group, person, raise_exception):
     else:
         result = True
 
-    can_raise_exception(raise_exception, result, "The user is not attached to the management entity")
+    can_raise_exception(raise_exception, result, _("The user is not attached to the management entity"))
 
     return result
 
@@ -178,9 +175,9 @@ def check_authorized_type(education_group, category, raise_exception=False):
             "female" if parent_category in [TRAINING, MINI_TRAINING] else "male",
             "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
         ) % {
-            "child_category": _(category),
-            "category": _(education_group.education_group_type.category),
-            "type": education_group.education_group_type.name,
+            "child_category": Categories[category].value,
+            "category": education_group.education_group_type.get_category_display(),
+            "type": education_group.education_group_type.get_name_display(),
         })
 
     return result
@@ -197,18 +194,112 @@ def get_education_group_year_eligible_management_entities(education_group):
     return eligible_entities
 
 
-def is_eligible_to_edit_general_information(person, education_group, raise_exception=False):
-    return check_permission(person, 'base.can_edit_educationgroup_pedagogy', raise_exception) and \
-           _is_eligible_to_edit_general_information(person, education_group, raise_exception)
+def is_eligible_to_edit_general_information(person, education_group_year, raise_exception=False):
+    perm = GeneralInformationPerms(person.user, education_group_year)
+    return perm.is_eligible(raise_exception)
 
 
-def _is_eligible_to_edit_general_information(person, education_group, raise_exception):
-    return (check_link_to_management_entity(education_group, person, raise_exception) and
-            (person.is_central_manager() or
-             is_academic_calendar_opened(
-                 education_group,
-                 academic_calendar_type.EDITION_OF_GENERAL_INFORMATION,
-                 raise_exception
-             )
-             )
-            )
+def is_eligible_to_edit_admission_condition(person, education_group_year, raise_exception=False):
+    perm = AdmissionConditionPerms(person.user, education_group_year)
+    return perm.is_eligible(raise_exception)
+
+
+class CommonEducationGroupStrategyPerms(object):
+    def __init__(self, user, education_group_year):
+        self.user = user
+        self.education_group_year = education_group_year
+        super().__init__()
+
+    @cached_property
+    def person(self):
+        return self.user.person
+
+    def is_eligible(self, raise_exception=False):
+        try:
+            return self._is_eligible()
+        except PermissionDenied:
+            if not raise_exception:
+                return False
+            raise
+
+    def _is_eligible(self):
+        if self.user.is_superuser:
+            return True
+
+        if not self._is_current_academic_year_in_range_of_editable_education_group_year():
+            raise PermissionDenied(_("The user cannot modify data which are greater than N+1"))
+        if not self._is_linked_to_management_entity():
+            raise PermissionDenied(_("The user is not attached to the management entity"))
+        return True
+
+    def _is_current_academic_year_in_range_of_editable_education_group_year(self):
+        return self.education_group_year.academic_year.year < current_academic_year().year + 2
+
+    def _is_linked_to_management_entity(self):
+        return check_link_to_management_entity(self.education_group_year, self.person, False)
+
+
+class GeneralInformationPerms(CommonEducationGroupStrategyPerms):
+    def _is_eligible(self):
+        super()._is_eligible()
+
+        if not self._is_user_have_perm():
+            raise PermissionDenied(_("The user doesn't have right to update general information"))
+
+        if self.person.is_central_manager:
+            return self._is_central_manager_eligible()
+        elif self.person.is_faculty_manager:
+            return self._is_faculty_manager_eligible()
+        elif self.person.is_sic:
+            return self._is_sic_eligible()
+        return False
+
+    def _is_user_have_perm(self):
+        perm_name = 'base.change_commonpedagogyinformation' if self.education_group_year.is_common else \
+            'base.change_pedagogyinformation'
+        return check_permission(self.person, perm_name, False)
+
+    def _is_central_manager_eligible(self):
+        return True
+
+    def _is_faculty_manager_eligible(self):
+        if self.education_group_year.academic_year.year < current_academic_year().year:
+            raise PermissionDenied(_("The faculty manager cannot modify general information which are lower than N"))
+        return True
+
+    def _is_sic_eligible(self):
+        return True
+
+
+class AdmissionConditionPerms(CommonEducationGroupStrategyPerms):
+    def _is_eligible(self):
+        super()._is_eligible()
+
+        if not self._is_user_have_perm():
+            raise PermissionDenied(_("The user doesn't have right to update admission condition"))
+
+        if self.person.is_central_manager:
+            return self._is_central_manager_eligible()
+        elif self.person.is_faculty_manager:
+            return self._is_faculty_manager_eligible()
+        elif self.person.is_sic:
+            return self._is_sic_eligible()
+        return False
+
+    def _is_user_have_perm(self):
+        perm_name = 'base.change_commonadmissioncondition' if self.education_group_year.is_common else \
+            'base.change_admissioncondition'
+        return check_permission(self.person, perm_name, False)
+
+    def _is_central_manager_eligible(self):
+        return True
+
+    def _is_faculty_manager_eligible(self):
+        if self.education_group_year.academic_year.year < current_academic_year().year:
+            raise PermissionDenied(_("The faculty manager cannot modify admission which are lower than N"))
+        if not is_education_group_edit_period_opened(self.education_group_year):
+            raise PermissionDenied(_("The faculty manager cannot modify outside of program edition period"))
+        return True
+
+    def _is_sic_eligible(self):
+        return True

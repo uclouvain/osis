@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
-import factory
 import factory.fuzzy
+
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
 
 
 class AuthorizedRelationshipFactory(factory.DjangoModelFactory):
@@ -34,3 +34,5 @@ class AuthorizedRelationshipFactory(factory.DjangoModelFactory):
 
     parent_type = factory.SubFactory(EducationGroupTypeFactory)
     child_type = factory.SubFactory(EducationGroupTypeFactory)
+    min_count_authorized = 0
+    max_count_authorized = None

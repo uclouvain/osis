@@ -77,7 +77,7 @@ class WarningFormMixin:
         return cleaned_data
 
     def add_warning(self, name, field):
-        self.add_error(name, _("This field is empty"))
+        self.add_error(name, _("This field is required."))
         field.widget.attrs['class'] = "has-warning"
 
 
@@ -105,7 +105,11 @@ class ValidationRuleMixin(WarningFormMixin):
         return result
 
     def field_reference(self, name):
-        return '.'.join([self._meta.model._meta.db_table, name])
+        return self._field_reference(self._meta.model, name)
+
+    @staticmethod
+    def _field_reference(model, name, *args):
+        return '.'.join([model._meta.db_table, name, *args])
 
     def _set_rules_on_fields(self):
         for name, field in self.fields.items():

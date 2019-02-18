@@ -26,7 +26,6 @@
 import operator
 
 import factory
-
 from factory.django import DjangoModelFactory
 
 from base.models.enums import education_group_categories, education_group_types
@@ -35,13 +34,28 @@ from base.models.enums import education_group_categories, education_group_types
 class EducationGroupTypeFactory(DjangoModelFactory):
     class Meta:
         model = "base.EducationGroupType"
+        django_get_or_create = ('category', 'name')
 
     external_id = factory.Sequence(lambda n: '10000000%02d' % n)
     category = education_group_categories.TRAINING
-    name = factory.Iterator(education_group_types.TYPES, getter=operator.itemgetter(0))
+    name = factory.Iterator(education_group_types.TrainingType.choices(), getter=operator.itemgetter(0))
+    learning_unit_child_allowed = False
+
+    class Params:
+        minitraining = factory.Trait(
+            category=education_group_categories.MINI_TRAINING,
+            name=factory.Iterator(education_group_types.MiniTrainingType.choices(), getter=operator.itemgetter(0))
+        )
+
+        group = factory.Trait(
+            category=education_group_categories.GROUP,
+            name=factory.Iterator(education_group_types.GroupType.choices(), getter=operator.itemgetter(0))
+        )
 
 
-class ExistingEducationGroupTypeFactory(EducationGroupTypeFactory):
-    class Meta:
-        model = 'base.EducationGroupType'
-        django_get_or_create = ('category', 'name')
+class MiniTrainingEducationGroupTypeFactory(EducationGroupTypeFactory):
+    minitraining = True
+
+
+class GroupEducationGroupTypeFactory(EducationGroupTypeFactory):
+    group = True

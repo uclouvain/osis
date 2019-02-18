@@ -25,7 +25,6 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.models.education_group_language import find_by_education_group_year
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_language import EducationGroupLanguageFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -50,6 +49,3 @@ class EducationGroupLanguageTest(TestCase):
             )
         )
 
-    def test_find_by_education_group_year(self):
-        education_group_year = find_by_education_group_year(self.education_group_year.id)
-        self.assertEqual(education_group_year.count(), 2)

@@ -94,11 +94,11 @@ class AcademicCalendar(SerializableModel):
 
     def validation_start_end_dates(self):
         if self.start_date and self.end_date and self.start_date > self.end_date:
-            raise StartDateHigherThanEndDateException(_('end_start_date_error'))
+            raise StartDateHigherThanEndDateException(_('End date must be lower than start date'))
 
     def validation_mandatory_dates(self):
         if self.start_date is None or self.end_date is None:
-            raise AttributeError(_('dates_mandatory_error'))
+            raise AttributeError(_('Start date and end date are mandatory'))
 
     def get_category(self):
         if self.reference in _list_types(academic_calendar_type.ACADEMIC_CALENDAR_TYPES):
@@ -138,10 +138,6 @@ def find_academic_calendar_by_academic_year_with_dates(academic_year_id):
                                    .filter(models.Q(start_date__lte=now, end_date__gte=now) |
                                            models.Q(start_date__gte=now, end_date__gte=now)) \
                                    .order_by('start_date')
-
-
-def find_by_ids(academic_calendars_id):
-    return AcademicCalendar.objects.filter(pk__in=academic_calendars_id)
 
 
 def get_by_reference_and_academic_year(a_reference, an_academic_year):

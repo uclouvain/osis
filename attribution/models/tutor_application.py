@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
 from django.contrib import admin
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from attribution.models.enums import function
+from attribution.models.enums.function import Functions
 
 
 class TutorApplicationAdmin(admin.ModelAdmin):
@@ -45,7 +45,7 @@ class TutorApplicationAdmin(admin.ModelAdmin):
         from attribution.business import application_json
         global_ids = list(queryset.values_list('tutor__person__global_id', flat=True))
         return application_json.publish_to_portal(global_ids)
-    publish_application_to_portal.short_description = _("publish_application_to_portal")
+    publish_application_to_portal.short_description = _("Publish application to portal")
 
 
 class TutorApplication(models.Model):
@@ -53,7 +53,7 @@ class TutorApplication(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     learning_container_year = models.ForeignKey('base.LearningContainerYear')
     tutor = models.ForeignKey('base.Tutor')
-    function = models.CharField(max_length=35, blank=True, null=True, choices=function.FUNCTIONS, db_index=True)
+    function = models.CharField(max_length=35, blank=True, null=True, choices=Functions.choices(), db_index=True)
     volume_lecturing = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
     volume_pratical_exercice = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
     remark = models.TextField(blank=True, null=True)

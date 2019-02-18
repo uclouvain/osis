@@ -23,14 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
-import operator
 
 from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.postgres.search import SearchQuery, SearchVector, TrigramSimilarity
-from django.db.models import Q, Value
-from django.db.models.functions import Concat
+from django.db.models import Q
 
 from base.models.person import Person
 
@@ -42,11 +38,10 @@ class EmployeeAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView)
             qs = qs.filter(
                 Q(last_name__icontains=self.q) |
                 Q(first_name__icontains=self.q) |
-                Q(middle_name__icontains=self.q)
+                Q(middle_name__icontains=self.q) |
+                Q(global_id__icontains=self.q)
             )
         return qs.order_by("last_name", "first_name")
 
     def get_result_label(self, result):
-        return "{last_name} {first_name} ({age})".format(last_name=result.last_name,
-                                                         first_name=result.first_name,
-                                                         age=result.age)
+        return "{last_name} {first_name}".format(last_name=result.last_name, first_name=result.first_name)

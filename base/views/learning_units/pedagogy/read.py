@@ -25,7 +25,7 @@
 ##############################################################################
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 
 from base import models as mdl
 from base.business.learning_unit import get_no_summary_responsible_teachers, CMS_LABEL_PEDAGOGY_FR_ONLY, \
@@ -36,7 +36,6 @@ from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm
 from base.models import teaching_material
 from base.models.person import Person
 from base.models.tutor import find_all_summary_responsibles_by_learning_unit_year
-from base.views import layout
 from base.views.learning_units.common import get_common_context_learning_unit_year
 
 
@@ -64,4 +63,4 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
     context['summary_responsibles'] = find_all_summary_responsibles_by_learning_unit_year(learning_unit_year)
     context['other_teachers'] = get_no_summary_responsible_teachers(learning_unit_year, context['summary_responsibles'])
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
-    return layout.render(request, template, context)
+    return render(request, template, context)

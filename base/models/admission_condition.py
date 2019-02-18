@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 from ordered_model.models import OrderedModel
 
@@ -7,7 +9,10 @@ from osis_common.models import osis_model_admin
 
 
 class AdmissionCondition(models.Model):
-    education_group_year = models.OneToOneField('base.EducationGroupYear', on_delete=models.CASCADE)
+    education_group_year = models.OneToOneField(
+        'base.EducationGroupYear',
+        on_delete=models.CASCADE,
+    )
 
     # texte alert (2m et 2m1)
     text_alert_message = models.TextField(default='')
@@ -64,6 +69,11 @@ class AdmissionCondition(models.Model):
     def __str__(self):
         return "Admission condition - {}".format(self.education_group_year)
 
+    class Meta:
+        permissions = (
+            ("change_commonadmissioncondition", "Can change common admission condition"),
+        )
+
 
 class AdmissionConditionAdmin(osis_model_admin.OsisModelAdmin):
     list_display = ('name',)
@@ -78,6 +88,15 @@ CONDITION_ADMISSION_ACCESSES = [
     ('direct_access', _('Direct Access')),
     ('access_with_training', _('Access with additional training')),
 ]
+
+
+class AdmissionConditionLineQuerySet(models.QuerySet):
+    def annotate_text(self, language_code):
+        return self.annotate(
+            diploma_text=F('diploma') if language_code == settings.LANGUAGE_CODE_FR else F('diploma_en'),
+            conditions_text=F('conditions') if language_code == settings.LANGUAGE_CODE_FR else F('conditions_en'),
+            remarks_text=F('remarks') if language_code == settings.LANGUAGE_CODE_FR else F('remarks_en')
+        )
 
 
 class AdmissionConditionLine(OrderedModel):
@@ -108,7 +127,11 @@ class AdmissionConditionLine(OrderedModel):
         super().save(*args, **kwargs)
 
         if self.access not in dict(CONDITION_ADMISSION_ACCESSES):
-            raise ValidationError({'access': _('%s is not an accepted value') % (self.access,)})
+            raise ValidationError({
+                'access': _('%(access_value)s is not an accepted value') % {'access_value': self.access}
+            })
+
+    objects = AdmissionConditionLineQuerySet.as_manager()
 
 
 class AdmissionConditionLineAdmin(osis_model_admin.OsisModelAdmin):

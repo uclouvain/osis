@@ -143,6 +143,8 @@ class LearningUnitPostponementForm:
                             data_to_insert["container_type"] = \
                                 existing_learn_unit_years[0].learning_container_year.container_type
                             data_to_insert["academic_year"] = str(ac_year.id)
+                            # FIXME: component-initial_forms must be 0 for the insert in DB
+                            data_to_insert["component-INITIAL_FORMS"] = 0
                             to_insert.append(self._instantiate_base_form_as_insert(ac_year, data_to_insert))
                         else:
                             to_insert.append(self._instantiate_base_form_as_insert(ac_year, data))
@@ -185,9 +187,9 @@ class LearningUnitPostponementForm:
             learningunitcomponent__learning_unit_year=luy_to_update)
         for learning_component_year in learning_component_years:
             if learning_component_year.type == LECTURING:
-                data_to_postpone['form-0-id'] = learning_component_year.id
+                data_to_postpone['component-0-id'] = learning_component_year.id
             else:
-                data_to_postpone['form-1-id'] = learning_component_year.id
+                data_to_postpone['component-1-id'] = learning_component_year.id
 
     def _instantiate_base_form_as_insert(self, ac_year, data):
         return self._get_learning_unit_base_form(ac_year, data=data, start_year=self.start_postponement.year)
@@ -293,7 +295,8 @@ class LearningUnitPostponementForm:
     def _check_postponement_proposal_state(self, luy, ac_year):
         if is_learning_unit_year_in_proposal(luy):
             self.consistency_errors.setdefault(ac_year, []).append(
-                _("learning_unit_in_proposal_cannot_save") % {
+                _("The learning unit %(luy)s is in proposal, can not"
+                  " save the change from the year %(academic_year)s") % {
                     'luy': luy.acronym, 'academic_year': ac_year
                 }
             )

@@ -25,25 +25,62 @@
 ##############################################################################
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext
+from reversion.admin import VersionAdmin
 
 from base.business.education_groups import shorten
-from osis_common.models.osis_model_admin import OsisModelAdmin
+from base.models.enums import education_group_categories
+from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel, SerializableModelManager
 
 
-class EducationGroupAdmin(OsisModelAdmin):
+class EducationGroupAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('most_recent_acronym', 'start_year', 'end_year', 'changed')
     search_fields = ('educationgroupyear__acronym',)
 
+    actions = [
+        'apply_education_group_year_postponement'
+    ]
 
-class EducationGroup(models.Model):
+    def apply_education_group_year_postponement(self, request, queryset):
+        # Potential circular imports
+        from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponement
+        from base.views.common import display_success_messages, display_error_messages
+
+        result, errors = EducationGroupAutomaticPostponement(queryset).postpone()
+        count = len(result)
+        display_success_messages(
+            request, ngettext(
+                "%(count)d education group has been postponed with success.",
+                "%(count)d education groups have been postponed with success.", count
+            ) % {'count': count}
+        )
+        if errors:
+            display_error_messages(request, "{} : {}".format(
+                _("The following education groups ended with error"),
+                ", ".join([str(error) for error in errors])
+            ))
+
+    apply_education_group_year_postponement.short_description = _("Apply postponement on education group year")
+
+
+class EducationGroupManager(SerializableModelManager):
+    def having_related_training(self, **kwargs):
+        # .distinct() is necessary if there is more than one training egy related to an education_group
+        return self.filter(
+            educationgroupyear__education_group_type__category=education_group_categories.TRAINING,
+            **kwargs
+        ).distinct()
+
+
+class EducationGroup(SerializableModel):
+    objects = EducationGroupManager()
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
     start_year = models.PositiveIntegerField(
         blank=True,
         null=True,
-        verbose_name=_('start')
+        verbose_name=_('Start')
     )
 
     end_year = models.PositiveIntegerField(
@@ -64,7 +101,8 @@ class EducationGroup(models.Model):
     class Meta:
         permissions = (
             ("can_access_education_group", "Can access education_group"),
-            ("can_edit_educationgroup_pedagogy", "Can edit education group pedagogy")
+            ("change_commonpedagogyinformation", "Can change common pedagogy information"),
+            ("change_pedagogyinformation", "Can change pedagogy information"),
         )
 
     def clean(self):
@@ -74,7 +112,7 @@ class EducationGroup(models.Model):
                 raise ValidationError({
                     'end_year': _("%(max)s must be greater or equals than %(min)s") % {
                         "max": _("end").title(),
-                        "min": _("start").title(),
+                        "min": _("Start"),
                     }
                 })
         # Check if end_year could be set according to protected data

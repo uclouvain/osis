@@ -25,25 +25,27 @@
 ##############################################################################
 import itertools
 
-from django.db import models, IntegrityError
+from django.core.exceptions import ValidationError
+from django.db import models, connection
 from django.db.models import Q, F, Case, When
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from ordered_model.models import OrderedModel
+from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import education_group_type, education_group_year
 from base.models.education_group_type import GROUP_TYPE_OPTION
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, link_type, quadrimesters
+from base.models.enums.link_type import LinkTypes
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.models.learning_unit_year import LearningUnitYear
-from osis_common.decorators.deprecated import deprecated
-from osis_common.models import osis_model_admin
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class GroupElementYearAdmin(osis_model_admin.OsisModelAdmin):
+class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('parent', 'child_branch', 'child_leaf',)
     readonly_fields = ('order',)
     search_fields = [
@@ -53,7 +55,31 @@ class GroupElementYearAdmin(osis_model_admin.OsisModelAdmin):
         'parent__acronym',
         'parent__partial_acronym'
     ]
-    list_filter = ('is_mandatory', 'minor_access', 'quadrimester_derogation', 'parent__academic_year')
+    list_filter = ('is_mandatory', 'access_condition', 'quadrimester_derogation', 'parent__academic_year')
+
+
+SQL_RECURSIVE_QUERY_EDUCATION_GROUP = """\
+WITH RECURSIVE group_element_year_parent AS (
+
+    SELECT id, child_branch_id, child_leaf_id, parent_id, 0 AS level
+    FROM base_groupelementyear
+    WHERE parent_id IN (%s)
+
+    UNION ALL
+
+    SELECT child.id,
+           child.child_branch_id,
+           child.child_leaf_id,
+           child.parent_id,
+           parent.level + 1
+
+    FROM base_groupelementyear AS child
+    INNER JOIN group_element_year_parent AS parent on parent.child_branch_id = child.parent_id
+
+    )
+
+SELECT * FROM group_element_year_parent ;
+"""
 
 
 class GroupElementYearManager(models.Manager):
@@ -96,28 +122,31 @@ class GroupElementYear(OrderedModel):
     min_credits = models.IntegerField(
         blank=True,
         null=True,
-        verbose_name=_("min_credits"),
+        verbose_name=_("Min. credits"),
     )
 
     max_credits = models.IntegerField(
         blank=True,
         null=True,
-        verbose_name=_("max_credits"),
+        verbose_name=_("Max. credits"),
     )
 
     is_mandatory = models.BooleanField(
         default=False,
-        verbose_name=_("mandatory"),
+        verbose_name=_("Mandatory"),
     )
 
     block = models.CharField(
         max_length=7,
         blank=True,
         null=True,
-        verbose_name=_("block")
+        verbose_name=_("Block")
     )
 
-    minor_access = models.BooleanField(default=False)
+    access_condition = models.BooleanField(
+        default=False,
+        verbose_name=_('Access condition')
+    )
 
     comment = models.TextField(
         max_length=500,
@@ -132,13 +161,17 @@ class GroupElementYear(OrderedModel):
 
     own_comment = models.CharField(max_length=500, blank=True, null=True)
 
-    quadrimester_derogation = models.CharField(max_length=10,
-                                               choices=quadrimesters.DEROGATION_QUADRIMESTERS,
-                                               blank=True, null=True, verbose_name=_('Quadrimester derogation'))
+    quadrimester_derogation = models.CharField(
+        max_length=10,
+        choices=quadrimesters.DEROGATION_QUADRIMESTERS,
+        blank=True, null=True, verbose_name=_('Quadrimester derogation')
+    )
 
-    link_type = models.CharField(max_length=25,
-                                 choices=link_type.LINK_TYPE,
-                                 blank=True, null=True, verbose_name=_('Link type'))
+    link_type = models.CharField(
+        max_length=25,
+        choices=LinkTypes.choices(),
+        blank=True, null=True, verbose_name=_('Link type')
+    )
 
     order_with_respect_to = 'parent'
 
@@ -150,24 +183,25 @@ class GroupElementYear(OrderedModel):
     @property
     def verbose(self):
         if self.child_branch:
-            return _("%(title)s (%(credits)s credits)") % {
-                "title": self.child.title,
-                "credits": self.relative_credits or self.child_branch.credits or 0
-            }
+            return "{} ({} {})".format(
+                self.child.title, self.relative_credits or self.child_branch.credits or 0, _("credits")
+            )
+
         else:
             components = LearningComponentYear.objects.filter(
                 learningunitcomponent__learning_unit_year=self.child_leaf).annotate(
                 total=Case(When(hourly_volume_total_annual=None, then=0),
                            default=F('hourly_volume_total_annual'))).values('type', 'total')
 
-            return _("%(acronym)s %(title)s [%(volumes)s] (%(credits)s credits)") % {
-                "acronym": self.child_leaf.acronym,
-                "title": self.child.complete_title_english
+            return "{} {} [{}] ({} {})".format(
+                self.child_leaf.acronym,
+                self.child.complete_title_english
                 if self.child.complete_title_english and translation.get_language() == 'en'
                 else self.child.complete_title,
-                "volumes": volume_total_verbose(components),
-                "credits": self.relative_credits or self.child_leaf.credits or 0
-            }
+                volume_total_verbose(components),
+                self.relative_credits or self.child_leaf.credits or 0,
+                _("credits"),
+            )
 
     @property
     def verbose_comment(self):
@@ -179,14 +213,23 @@ class GroupElementYear(OrderedModel):
         ordering = ('order',)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        if self.child_branch and self.child_leaf:
-            raise IntegrityError("It is forbidden to save a GroupElementYear with a child branch and a child leaf.")
-        if self.child_branch == self.parent:
-            raise IntegrityError("It is forbidden to attach an element to itself.")
-        if self.parent and self.child_branch in self.parent.ascendants_of_branch:
-            raise IntegrityError("It is forbidden to attach an element to one of its included elements.")
-
+        self.clean()
         return super().save(force_insert, force_update, using, update_fields)
+
+    def clean(self):
+        if self.child_branch and self.child_leaf:
+            raise ValidationError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))
+
+        if self.child_branch == self.parent:
+            raise ValidationError(_("It is forbidden to attach an element to itself."))
+
+        if self.parent and self.child_branch in self.parent.ascendants_of_branch:
+            raise ValidationError(_("It is forbidden to attach an element to one of its included elements."))
+
+        if self.child_leaf and self.link_type == LinkTypes.REFERENCE.name:
+            raise ValidationError(
+                {'link_type': _("You are not allowed to create a reference with a learning unit")}
+            )
 
     @cached_property
     def child(self):
@@ -211,28 +254,6 @@ def search(**kwargs):
         queryset = queryset.filter(child_leaf=kwargs['child_leaf'])
 
     return queryset
-
-
-def get_group_element_year_by_id(id):
-    return GroupElementYear.objects.get(id=id)
-
-
-# TODO : education_group_yr.parent.all() instead
-@deprecated
-def find_by_parent(an_education_group_year):
-    return GroupElementYear.objects.filter(parent=an_education_group_year)
-
-
-# TODO : education_group_yr.child_branch.all() instead
-@deprecated
-def find_by_child_branch(an_education_group_year):
-    return GroupElementYear.objects.filter(child_branch=an_education_group_year)
-
-
-# TODO : education_group_yr.child_leaf.all() instead
-@deprecated
-def find_by_child_leaf(learning_unit_year):
-    return GroupElementYear.objects.filter(child_leaf=learning_unit_year)
 
 
 def find_learning_unit_formations(objects, parents_as_instances=False):
@@ -336,6 +357,36 @@ def _find_elements(group_elements_by_child_id, filters, child_leaf_id=None, chil
 
 def _match_any_filters(element_year, filters):
     return any(element_year[col_name] in values_list for col_name, values_list in filters.items())
+
+
+def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict:
+    if queryset.model != GroupElementYear:
+        raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
+
+    elements = _fetch_row_sql([root.id])
+
+    distinct_group_elem_ids = {elem['id'] for elem in elements}
+    queryset = queryset.filter(pk__in=distinct_group_elem_ids)
+
+    group_elems_by_parent_id = {}  # Map {<EducationGroupYear.id>: [GroupElementYear, GroupElementYear...]}
+    for group_elem_year in queryset:
+        parent_id = group_elem_year.parent_id
+        group_elems_by_parent_id.setdefault(parent_id, []).append(group_elem_year)
+    return group_elems_by_parent_id
+
+
+def _fetch_row_sql(root_ids):
+    with connection.cursor() as cursor:
+        cursor.execute(SQL_RECURSIVE_QUERY_EDUCATION_GROUP, root_ids)
+        return [
+            {
+                'id': row[0],
+                'child_branch_id': row[1],
+                'child_leaf_id': row[2],
+                'parent_id': row[3],
+                'level': row[4],
+            } for row in cursor.fetchall()
+        ]
 
 
 def get_or_create_group_element_year(parent, child_branch=None, child_leaf=None):

@@ -25,12 +25,13 @@
 ##############################################################################
 from django import forms
 from django.forms import ModelChoiceField
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 
 from base.business.entity import get_entities_ids
 from base.models import academic_year, education_group_year
 from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_categories import Categories
 
 
 class EntityManagementModelChoiceField(ModelChoiceField):
@@ -64,27 +65,27 @@ class EducationGroupFilter(forms.Form):
     academic_year = forms.ModelChoiceField(
         queryset=academic_year.find_academic_years(),
         required=False,
-        empty_label=_('all_label'),
-        label=_('academic_year_small')
+        empty_label=pgettext_lazy("plural", "All"),
+        label=_('Ac yr.')
     )
 
     category = forms.ChoiceField(
-        choices=[("", _('all_label'))] + list(education_group_categories.CATEGORIES),
+        choices=[("", pgettext_lazy("plural", "All"))] + list(Categories.choices()),
         required=False,
-        label=_('category')
+        label=_('Category')
     )
 
     education_group_type = ModelChoiceFieldWithData(
-        queryset=EducationGroupType.objects.all(),
+        queryset=EducationGroupType.objects.none(),
         required=False,
-        empty_label=_('all_label'),
-        label=_('type')
+        empty_label=pgettext_lazy("plural", "All"),
+        label=_('Type')
     )
 
-    acronym = forms.CharField(max_length=40, required=False, label=_('acronym'))
-    title = forms.CharField(max_length=255, required=False, label=_('title'))
-    requirement_entity_acronym = forms.CharField(max_length=20, required=False, label=_('entity'))
-    partial_acronym = forms.CharField(max_length=15, required=False, label=_('code'))
+    acronym = forms.CharField(max_length=40, required=False, label=_('Acronym'))
+    title = forms.CharField(max_length=255, required=False, label=_('Title'))
+    requirement_entity_acronym = forms.CharField(max_length=20, required=False, label=_('Entity'))
+    partial_acronym = forms.CharField(max_length=15, required=False, label=_('Code'))
     with_entity_subordinated = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):

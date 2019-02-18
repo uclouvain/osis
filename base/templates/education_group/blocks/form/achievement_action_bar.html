@@ -1,30 +1,27 @@
-{% load i18n format education_group %}
+{% load i18n format %}
 
 
 <form action="{{ action_url }}" method="post">
     {% csrf_token %}
     <div class="btn-group pull-right {{ additional_class }}" role="group" aria-label="actions">
 
-        <button type="button" title="{% trans 'update' %}" class="btn btn-primary trigger_modal"
-                data-url="{{ update_url }}" {% permission_change_achievement %}>
+        <a title="{% trans 'Update' %}" class="trigger_modal"
+           data-url="{{ update_url }}">
             <span class="glyphicon glyphicon-edit"></span>
-        </button>
+        </a>
 
-        <button type="submit" title="{% trans 'up' %}" class="btn btn-default"
-                name="action" value="up"
-                {% if forloop.counter0 == 0 %}disabled{% endif %} {% permission_change_achievement %} >
+        <button class="btn-as-atag" type="submit" {% if forloop.counter0 == 0 %}disabled{% endif %}
+                title="{% trans 'Up' %}" name="action" value="up" >
             <i class="fa fa-arrow-up"></i>
         </button>
 
-        <button type="submit" title="{% trans 'down' %}" class="btn btn-default"
-                name="action" value="down"
-                {% if forloop.last %}disabled{% endif %} {% permission_change_achievement %} >
+        <button class="btn-as-atag" type="submit" {% if forloop.last %}disabled{% endif %}
+                title="{% trans 'Down' %}" name="action" value="down" >
             <i class="fa fa-arrow-down"></i>
         </button>
 
-        <button type="button" title="{% trans 'delete' %}" class="btn btn-danger trigger_modal"
-                data-url="{{ delete_url }}" {% permission_delete_achievement %}>
+        <a title="{% trans 'delete' %}" class="trigger_modal" data-url="{{ delete_url }}" >
             <span class="glyphicon glyphicon-remove"></span>
-        </button>
+        </a>
     </div>
 </form>

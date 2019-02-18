@@ -42,13 +42,17 @@ from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import find_max_credits_of_related_partims, check_if_acronym_regex_is_valid, \
     find_learning_unit_years_by_academic_year_tutor_attributions
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
+from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
+from base.tests.factories.prerequisite import PrerequisiteFactory
+from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.tutor import TutorFactory
 
 
@@ -260,10 +264,6 @@ class LearningUnitYearGetEntityTest(TestCase):
         result = self.learning_unit_year.get_entity(entity_type=entity_container_year_link_type.REQUIREMENT_ENTITY)
         self.assertEqual(result, self.requirement_entity.entity)
 
-    def test_get_entity_case_not_found_entity_type(self):
-        with self.assertRaises(EntityContainerYear.DoesNotExist):
-            self.learning_unit_year.get_entity(entity_type=entity_container_year_link_type.ALLOCATION_ENTITY)
-
     def test_get_entity_case_no_learning_container_year(self):
         self.learning_unit_year.learning_container_year = None
         self.learning_unit_year.save()
@@ -344,7 +344,7 @@ class LearningUnitYearWarningsTest(TestCase):
 
         complete_acronym = self.learning_component_year_full_lecturing.complete_acronym
         excepted_error = "{} ({})".format(_('Volumes of {} are inconsistent').format(complete_acronym),
-                                          _('Vol_tot is not equal to vol_q1 + vol_q2'))
+                                          _('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
         self.assertIn(excepted_error, self.learning_component_year_full_lecturing.warnings)
         self.assertIn(excepted_error, self.luy_full.warnings)
 
@@ -384,7 +384,7 @@ class LearningUnitYearWarningsTest(TestCase):
 
         complete_component_acronym = self.learning_component_year_full_lecturing.complete_acronym
         excepted_error_2 = "{} ({})".format(_('Volumes of {} are inconsistent').format(complete_component_acronym),
-                                            _('Vol_tot is not equal to vol_q1 + vol_q2'))
+                                            _('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
         self.assertIn(excepted_error_2, self.learning_component_year_full_lecturing.warnings)
         self.assertIn(excepted_error_2, self.luy_full.warnings)
 
@@ -650,3 +650,106 @@ class LearningUnitYearWarningsTest(TestCase):
             self.luy_full._check_learning_component_year_warnings(),
             [excepted_error])
         self.assertIn(excepted_error, self.luy_full._check_learning_component_year_warnings())
+
+
+class TestHasOrIsPrerequisite(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
+        cls.grp_ele_leaf = GroupElementYearFactory(
+            parent__education_group_type=GroupEducationGroupTypeFactory(),
+            parent__academic_year=cls.academic_year,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(academic_year=cls.academic_year)
+        )
+        cls.second_grp_ele_leaf = GroupElementYearFactory(
+            parent=cls.grp_ele_leaf.parent,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(academic_year=cls.academic_year)
+
+        )
+        cls.grp_ele_root = GroupElementYearFactory(
+            child_branch=cls.grp_ele_leaf.parent,
+            parent__academic_year=cls.academic_year,
+        )
+
+        cls.other_grp_ele_root = GroupElementYearFactory(
+            parent__academic_year=cls.academic_year,
+            child_branch__education_group_type=GroupEducationGroupTypeFactory(),
+            child_branch__academic_year=cls.academic_year
+        )
+        cls.other_grp_ele_intermediary = GroupElementYearFactory(
+            parent=cls.other_grp_ele_root.child_branch,
+            child_branch=cls.grp_ele_root.child_branch
+        )
+
+    def test_should_return_false_when_luy_has_no_prerequisite_nor_is_prerequisite(self):
+        self.assertFalse(
+            self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
+        )
+
+    def test_should_return_false_when_luy_has_prerequisite_in_other_root(self):
+        PrerequisiteItemFactory(
+            prerequisite__learning_unit_year=self.grp_ele_leaf.child_leaf,
+            group_number=1,
+            position=1,
+        )
+        self.assertFalse(
+            self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
+        )
+
+    def test_should_return_false_when_luy_is_prerequisite_in_other_root(self):
+        PrerequisiteItemFactory(
+            learning_unit=self.grp_ele_leaf.child_leaf.learning_unit,
+            group_number=1,
+            position=1,
+        )
+        self.assertFalse(
+            self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
+        )
+
+    def test_should_return_true_if_luy_has_prerequisite(self):
+        PrerequisiteItemFactory(
+            prerequisite__education_group_year=self.grp_ele_root.parent,
+            prerequisite__learning_unit_year=self.grp_ele_leaf.child_leaf,
+            group_number=1,
+            position=1,
+        )
+        self.assertTrue(
+            self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
+        )
+
+    def test_should_return_true_if_luy_is_prerequisite(self):
+        PrerequisiteItemFactory(
+            prerequisite__education_group_year=self.grp_ele_root.parent,
+            prerequisite__learning_unit_year=self.second_grp_ele_leaf.child_leaf,
+            learning_unit=self.grp_ele_leaf.child_leaf.learning_unit,
+            group_number=1,
+            position=1,
+        )
+        self.assertTrue(
+            self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
+        )
+
+    def test_should_return_true_if_luy_has_prerequisite_in_other_root_but_same_group(self):
+        PrerequisiteItemFactory(
+            prerequisite__education_group_year=self.other_grp_ele_root.parent,
+            prerequisite__learning_unit_year=self.grp_ele_leaf.child_leaf,
+            group_number=1,
+            position=1,
+        )
+        self.assertTrue(
+            self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
+        )
+
+    def test_should_return_true_if_luy_is_prerequisite_in_other_root_but_same_group(self):
+        PrerequisiteItemFactory(
+            prerequisite__education_group_year=self.other_grp_ele_root.parent,
+            prerequisite__learning_unit_year=self.second_grp_ele_leaf.child_leaf,
+            learning_unit=self.grp_ele_leaf.child_leaf.learning_unit,
+            group_number=1,
+            position=1,
+        )
+        self.assertTrue(
+            self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
+        )

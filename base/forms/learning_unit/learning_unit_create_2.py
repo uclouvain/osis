@@ -43,10 +43,9 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from reference.models import language
 
-ID_FIELD = "id"
-
 FULL_READ_ONLY_FIELDS = {"acronym", "academic_year", "container_type"}
-FULL_PROPOSAL_READ_ONLY_FIELDS = {"academic_year", "container_type", "professional_integration"}
+FULL_PROPOSAL_READ_ONLY_FIELDS = {"academic_year", "container_type"}
+PROPOSAL_READ_ONLY_FIELDS = {"container_type"}
 
 FACULTY_OPEN_FIELDS = {
     'quadrimester',
@@ -58,7 +57,16 @@ FACULTY_OPEN_FIELDS = {
     'specific_title_english',
     "status",
     "professional_integration",
-    ID_FIELD  # THIS IS A FIX, BUT A BETTER SOLUTION SHOULD BE FIND
+    "component-0-hourly_volume_partial_q1",
+    "component-0-hourly_volume_partial_q2",
+    "component-1-hourly_volume_partial_q1",
+    "component-1-hourly_volume_partial_q2",
+}
+
+# This fields can not be disabled.
+PROTECTED_FIELDS = {
+    "component-0-id",
+    "component-1-id",
 }
 
 
@@ -147,6 +155,7 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
         return [form.changed_data for form in self.forms.values()]
 
     def disable_fields(self, fields_to_disable):
+        fields_to_disable -= PROTECTED_FIELDS
         for key, value in self.fields.items():
             if key in fields_to_disable:
                 self._disable_field(value)
@@ -170,7 +179,7 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
         specific_title = self.learning_unit_year_form.cleaned_data["specific_title"]
         if not common_title and not specific_title:
             self.learning_container_year_form.add_error(
-                "common_title", _("must_set_common_title_or_specific_title"))
+                "common_title", _("You must either set the common title or the specific title"))
             return False
         return True
 
@@ -204,7 +213,6 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
 
 
 class FullForm(LearningUnitBaseForm):
-
     subtype = learning_unit_year_subtypes.FULL
 
     def __init__(self, person, academic_year, learning_unit_instance=None, data=None, start_year=None, proposal=False,
@@ -228,7 +236,7 @@ class FullForm(LearningUnitBaseForm):
     def _restrict_academic_years_choice(self, postposal):
         if postposal:
             starting_academic_year = academic_year.starting_academic_year()
-            end_year_range = MAX_ACADEMIC_YEAR_FACULTY if self.person.is_faculty_manager() \
+            end_year_range = MAX_ACADEMIC_YEAR_FACULTY if self.person.is_faculty_manager \
                 else MAX_ACADEMIC_YEAR_CENTRAL
 
             self.fields["academic_year"].queryset = academic_year.find_academic_years(
@@ -237,7 +245,7 @@ class FullForm(LearningUnitBaseForm):
             )
 
     def _disable_fields(self):
-        if self.person.is_faculty_manager() and not self.person.is_central_manager():
+        if self.person.is_faculty_manager and not self.person.is_central_manager:
             self._disable_fields_as_faculty_manager()
         else:
             self._disable_fields_as_central_manager()
@@ -245,9 +253,7 @@ class FullForm(LearningUnitBaseForm):
     def _disable_fields_as_faculty_manager(self):
         faculty_type_not_restricted = [t[0] for t in LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY]
         if self.proposal:
-            # ID FIELD CAN NOT BE DEACTIVATED WITH FACULTY MANAGER
-            # TODO: THIS IS A FIX, BUT A BETTER SOLUTION SHOULD BE FIND
-            self.disable_fields(FACULTY_OPEN_FIELDS - set([ID_FIELD]))
+            self.disable_fields(PROPOSAL_READ_ONLY_FIELDS)
         elif self.instance.learning_container_year and \
                 self.instance.learning_container_year.container_type not in faculty_type_not_restricted:
             self.disable_fields(self.fields.keys() - set(FACULTY_OPEN_FIELDS))

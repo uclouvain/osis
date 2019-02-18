@@ -26,19 +26,18 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
 
 from base.business.learning_units.achievement import get_code_name, get_anchor_reference, DELETE, DOWN, UP, \
     AVAILABLE_ACTIONS, HTML_ANCHOR
-from base.models.learning_achievement import LearningAchievement, find_learning_unit_achievement
 from base.forms.learning_achievement import LearningAchievementEditForm
-from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
+from base.models.learning_achievement import LearningAchievement, find_learning_unit_achievement
 from base.models.learning_unit_year import LearningUnitYear
-from base.views.learning_units import perms
 from base.views.learning_unit import learning_unit_specifications
-from . import layout
+from base.views.learning_units import perms
 from reference.models import language
+from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
 
 
 def operation(learning_achievement_id, operation_str):
@@ -93,7 +92,7 @@ def update(request, learning_unit_year_id, learning_achievement_id):
                'learning_achievement': learning_achievement,
                'form': form}
 
-    return layout.render(request, "learning_unit/achievement_edit.html", context)
+    return render(request, "learning_unit/achievement_edit.html", context)
 
 
 @login_required
@@ -120,7 +119,7 @@ def create(request, learning_unit_year_id, learning_achievement_id):
                'language_code': a_language_code,
                'create': True}
 
-    return layout.render(request, "learning_unit/achievement_edit.html", context)
+    return render(request, "learning_unit/achievement_edit.html", context)
 
 
 def _save_and_redirect(form, learning_unit_year_id):
@@ -148,4 +147,4 @@ def create_first(request, learning_unit_year_id):
                'form': form,
                'language_code': FR_CODE_LANGUAGE}
 
-    return layout.render(request, "learning_unit/achievement_edit.html", context)
+    return render(request, "learning_unit/achievement_edit.html", context)

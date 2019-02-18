@@ -24,13 +24,8 @@
 #
 ##############################################################################
 import datetime
-from django.test import TestCase
-from base.models import offer_enrollment
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.student import StudentFactory
-from base.tests.factories import academic_year
-from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
+
+from base.models.offer_enrollment import OfferEnrollment
 
 
 def create_date_enrollment():
@@ -38,18 +33,7 @@ def create_date_enrollment():
 
 
 def create_offer_enrollment(student, offer_year):
-    an_offer_enrollment = offer_enrollment.OfferEnrollment(date_enrollment=create_date_enrollment(),
+    an_offer_enrollment = OfferEnrollment(date_enrollment=create_date_enrollment(),
                                                            student=student, offer_year=offer_year)
     an_offer_enrollment.save()
     return an_offer_enrollment
-
-
-class OfferEnrollementTest(TestCase):
-    def test_find_by_offers_year(self):
-        student1 = StudentFactory.create()
-        offer_year1 = OfferYearFactory()
-        OfferEnrollmentFactory(student=student1, offer_year=offer_year1)
-        result = list(offer_enrollment.find_by_offers_years([offer_year1]))
-        self.assertEqual(result[0].student, student1)
-        self.assertEqual(result[0].offer_year, offer_year1)
-        self.assertEqual(len(result), 1)

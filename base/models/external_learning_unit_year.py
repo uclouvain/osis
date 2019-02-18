@@ -28,16 +28,17 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models.learning_unit_year import MINIMUM_CREDITS, MAXIMUM_CREDITS
 from base.models.organization_address import OrganizationAddress
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class ExternalLearningUnitYearAdmin(OsisModelAdmin):
+class ExternalLearningUnitYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('external_id', 'external_acronym', 'external_credits', 'url', 'learning_unit_year',
-                    'requesting_entity', "author", "date")
-    search_fields = ['acronym', 'learning_unit_year__acronym', 'author']
+                    'requesting_entity', "author", "creation_date")
+    search_fields = ['learning_unit_year__acronym']
 
 
 class ExternalLearningUnitYear(models.Model):
@@ -45,23 +46,31 @@ class ExternalLearningUnitYear(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
 
     external_acronym = models.CharField(
-        max_length=15,
-        db_index=True,
+        null=True,
         blank=True,
-        verbose_name=_('external_code')
+        max_length=25,
+        db_index=True,
+        verbose_name=_('External code')
     )
 
     external_credits = models.DecimalField(
+        null=True,
+        blank=True,
         max_digits=5,
         decimal_places=2,
-        verbose_name=_('local_credits'),
+        verbose_name=_('Local credits'),
         validators=[
             MinValueValidator(MINIMUM_CREDITS),
             MaxValueValidator(MAXIMUM_CREDITS)
         ]
     )
 
-    url = models.URLField(max_length=255, blank=True, verbose_name=_('url of the learning unit'))
+    url = models.URLField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name=_('URL of the learning unit'),
+    )
 
     learning_unit_year = models.OneToOneField(
         'LearningUnitYear',
@@ -71,12 +80,16 @@ class ExternalLearningUnitYear(models.Model):
 
     requesting_entity = models.ForeignKey(
         'Entity',
-        verbose_name=_('requesting_entity'),
+        null=True,
+        blank=True,
+        verbose_name=_('Requesting entity'),
         on_delete=models.PROTECT,
     )
 
+    co_graduation = models.BooleanField(default=False, verbose_name=_('Co-graduation'))
+    mobility = models.BooleanField(default=False, verbose_name=_('Mobility'))
     author = models.ForeignKey('Person', null=True)
-    date = models.DateTimeField(auto_now=True)
+    creation_date = models.DateTimeField(null=True, auto_now_add=True)
 
     class Meta:
         unique_together = ('learning_unit_year', 'external_acronym',)
@@ -105,22 +118,9 @@ def search(academic_year_id=None, acronym=None, title=None, country=None, city=N
 
     if campus:
         queryset = queryset.filter(learning_unit_year__campus=campus)
-    else:
-        organization_ids = None
-        if city:
-            organization_ids = _get_organization_ids(OrganizationAddress.objects.filter(city=city))
-        else:
-            if country:
-                organization_ids = _get_organization_ids(OrganizationAddress.objects.filter(country=country))
-        if organization_ids:
-            queryset = queryset.filter(learning_unit_year__campus__organization__id__in=organization_ids)
+    elif city:
+        queryset = queryset.filter(learning_unit_year__campus__organization__organizationaddress__city=city)
+    elif country:
+        queryset = queryset.filter(learning_unit_year__campus__organization__organizationaddress__country=country)
 
     return queryset
-
-
-def _get_organization_ids(organization_addresses):
-    organizations = []
-    for organization_adr in organization_addresses:
-        if organization_adr.organization not in organizations:
-            organizations.append(organization_adr.organization.id)
-    return organizations
