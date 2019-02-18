@@ -35,7 +35,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.hops import Hops
 
 EDUCATION_GROUP_MAX_POSTPONE_YEARS = 6
-FIELD_TO_EXCLUDE = ['id', 'uuid', 'external_id', 'academic_year', 'linked_with_epc']
+FIELD_TO_EXCLUDE = ['id', 'uuid', 'external_id', 'academic_year', 'linked_with_epc', 'publication_contact_entity']
 HOPS_FIELDS = ('ares_study', 'ares_graca', 'ares_ability')
 
 
