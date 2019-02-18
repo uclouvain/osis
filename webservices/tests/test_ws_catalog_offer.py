@@ -27,10 +27,16 @@ import datetime
 
 import django
 from django.conf import settings
+from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
 
+from base.business.education_groups import general_information_sections
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.enums import organization_type
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group_year import (
     EducationGroupYearCommonMasterFactory,
@@ -41,7 +47,9 @@ from base.tests.factories.education_group_year import (
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.user import UserFactory
 from cms.enums.entity_name import OFFER_YEAR
+from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextRandomFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
@@ -517,6 +525,149 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         response_sections = convert_sections_list_of_dict_to_dict(sections)
 
         self.assertEqual(len(response_sections), 0)
+
+
+class WsCatalogCommonOfferPostTestCase(APITestCase):
+    maxDiff = None
+
+    def setUp(self):
+        self.academic_year = AcademicYearFactory(current=True)
+        self.common = EducationGroupYearCommonFactory(academic_year=self.academic_year)
+        self.language = 'fr'
+
+        # Create random text related to common text label in french
+        for label_name in general_information_sections.COMMON_GENERAL_INFO_SECTIONS:
+            TranslatedTextRandomFactory(
+                language='fr-be',
+                reference=str(self.common.pk),
+                text_label__label=label_name
+            )
+
+        self.url = reverse('v0.1-ws_catalog_common_offer',
+                           kwargs={"year": self.academic_year.year, "language": self.language})
+        self.client.force_authenticate(user=UserFactory())
+
+    def test_get_common_admission_condition_case_user_not_logged(self):
+        self.client.logout()
+
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_common_admission_case_method_not_allowed(self):
+        methods_not_allowed = ['get', 'delete', 'put']
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_text_case_all_translated_text_in_french(self):
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.content_type, 'application/json')
+
+        response_json = response.json()
+        self.assertTrue(all(label_name in response_json.keys()
+                            for label_name in general_information_sections.COMMON_GENERAL_INFO_SECTIONS))
+        self.assertTrue(all(value for value in response_json.values()))
+
+    def test_get_text_case_no_data_return_all_sections_with_none_as_value(self):
+        TranslatedText.objects.all().delete()
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.content_type, 'application/json')
+
+        response_json = response.json()
+        self.assertTrue(all(label_name in response_json.keys()
+                            for label_name in general_information_sections.COMMON_GENERAL_INFO_SECTIONS))
+        self.assertTrue(all(value is None for value in response_json.values()))
+
+    def test_get_text_case_empty_str_as_data_return_all_sections_with_none_as_value(self):
+        TranslatedText.objects.all().update(text='')
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.content_type, 'application/json')
+
+        response_json = response.json()
+        self.assertTrue(all(label_name in response_json.keys()
+                            for label_name in general_information_sections.COMMON_GENERAL_INFO_SECTIONS))
+        self.assertTrue(all(value is None for value in response_json.values()))
+
+
+class WsCatalogCommonAdmissionPostTestCase(APITestCase):
+    maxDiff = None
+
+    def setUp(self):
+        self.academic_year = AcademicYearFactory(current=True)
+        self.language = 'fr'
+
+        self.common = EducationGroupYearCommonFactory(academic_year=self.academic_year)
+        self.common_1ba = EducationGroupYearCommonBachelorFactory(academic_year=self.academic_year)
+        self.common_2a = EducationGroupYearCommonAgregationFactory(academic_year=self.academic_year)
+        self.common_2mc = EducationGroupYearCommonSpecializedMasterFactory(academic_year=self.academic_year)
+        self.common_2m = EducationGroupYearCommonMasterFactory(academic_year=self.academic_year)
+
+        for common in [self.common_1ba, self.common_2a, self.common_2mc, self.common_2m]:
+            AdmissionConditionFactory(education_group_year=common)
+
+        self.url = reverse('v0.1-ws_catalog_common_admission_condition',
+                           kwargs={"year": self.academic_year.year, "language": self.language})
+        self.client.force_authenticate(user=UserFactory())
+
+    def test_get_common_admission_condition_case_user_not_logged(self):
+        self.client.logout()
+
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_common_admission_case_method_not_allowed(self):
+        methods_not_allowed = ['get', 'delete', 'put']
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_common_admission_case_all_admission_condition_in_french(self):
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_json = response.json()
+
+        self.assertIsInstance(response_json, dict)
+
+        for common in [self.common_1ba, self.common_2a, self.common_2mc, self.common_2m]:
+            common_admission_response = response_json[common.acronym]
+            expected_fields = general_information_sections.COMMON_TYPE_ADMISSION_CONDITIONS[common.education_group_type.name]
+
+            self.assertIsInstance(common_admission_response, dict)
+            self.assertTrue(all(attr_name in common_admission_response.keys() for attr_name in expected_fields))
+
+            for field in expected_fields:
+                attr_in_french = "text_{}".format(field)
+                self.assertEqual(common_admission_response[field], getattr(common.admissioncondition, attr_in_french))
+
+    def test_get_common_admission_case_all_admission_condition_in_english(self):
+        url = reverse('v0.1-ws_catalog_common_admission_condition',
+                      kwargs={"year": self.academic_year.year, "language": settings.LANGUAGE_CODE_EN})
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_json = response.json()
+
+        self.assertIsInstance(response_json, dict)
+
+        for common in [self.common_1ba, self.common_2a, self.common_2mc, self.common_2m]:
+            common_admission_response = response_json[common.acronym]
+            expected_fields = general_information_sections.COMMON_TYPE_ADMISSION_CONDITIONS[common.education_group_type.name]
+
+            self.assertIsInstance(common_admission_response, dict)
+            self.assertTrue(all(attr_name in common_admission_response.keys() for attr_name in expected_fields))
+
+            for field in expected_fields:
+                attr_in_english = "text_{}_en".format(field)
+                self.assertEqual(common_admission_response[field], getattr(common.admissioncondition, attr_in_english))
 
 
 class WsOfferCatalogAdmissionsCondition(TestCase, Helper):

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,40 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import generics
-
-from reference.api.serializers.country import CountrySerializer
-from reference.models.country import Country
 
 
-class CountryList(generics.ListAPIView):
-    """
-       Return a list of all the country.
-    """
-    name = 'country-list'
-    queryset = Country.objects.all()
-    serializer_class = CountrySerializer
-    filter_fields = (
-        'iso_code',
-        'name',
-    )
-    search_fields = (
-        'name',
-    )
-    ordering_fields = (
-        'iso_code',
-        'name',
-    )
-    ordering = (
-        'name',
-    )  # Default ordering
-
-
-class CountryDetail(generics.RetrieveAPIView):
-    """
-        Return the detail of the country
-    """
-    name = 'country-detail'
-    queryset = Country.objects.all()
-    serializer_class = CountrySerializer
-    lookup_field = 'uuid'
+def volume_format(value):
+    if value is None:
+        return ''
+    else:
+        if value - int(value) != 0:
+            return "{0:.1f}".format(value)
+        return int(value)

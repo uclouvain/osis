@@ -457,6 +457,7 @@ class EducationGroupYear(SerializableModel):
     )
 
     class Meta:
+        ordering = ("academic_year",)
         verbose_name = _("Education group year")
         unique_together = ('education_group', 'academic_year')
 

@@ -48,11 +48,6 @@ from reference.models.domain import Domain
 from reference.models.enums import domain_type
 
 
-class MainDomainChoiceField(forms.ModelChoiceField):
-    def label_from_instance(self, domain):
-        return "{}:{} {}".format(domain.decree.name, domain.code, domain.name)
-
-
 def _get_section_choices():
     return add_blank(CertificateAim.objects.values_list('section', 'section').distinct().order_by('section'))
 
@@ -169,7 +164,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             **EducationGroupYearModelForm.Meta.field_classes,
             **{
                 "administration_entity": MainEntitiesVersionChoiceField,
-                "main_domain": MainDomainChoiceField
+                "main_domain": forms.ModelChoiceField
             }
         }
         widgets = {
