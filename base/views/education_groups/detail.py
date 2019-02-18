@@ -366,6 +366,10 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         return translations
 
     def get_content_translations_for_label(self, education_group_year, label, user_language, type):
+        # FIX ME: Change contacts ==> contact_intro in sections
+        if label == CONTACTS_KEY:
+            label = CONTACT_INTRO_KEY
+
         # fetch the translation for the current user
         translated_label = TranslatedTextLabel.objects.filter(text_label__entity=entity_name.OFFER_YEAR,
                                                               text_label__label=label,
