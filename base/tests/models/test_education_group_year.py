@@ -237,6 +237,32 @@ class EducationGroupYearCleanTest(TestCase):
         with self.assertRaises(ValidationError):
             e.clean()
 
+    def test_raise_validation_error_clean_code_when_partial_acronym_exists_in_present_or_future(self):
+        code = 'CODE'
+        current_acy, next_acy = AcademicYearFactory.produce(number_past=0, number_future=1)
+        for acy in (current_acy, next_acy):
+            with self.subTest(acy=acy):
+                EducationGroupYearFactory(partial_acronym=code, academic_year=acy,
+                                          education_group__end_year=acy.year)
+                e = EducationGroupYearFactory(partial_acronym=code, academic_year=current_acy,
+                                              education_group__start_year=current_acy.year)
+                with self.assertRaises(ValidationError):
+                    e.clean()
+
+    def test_clean_code_when_partial_acronym_existed_in_past(self):
+        code = 'CODE'
+        previous_acy, current_acy = AcademicYearFactory.produce(number_past=1, number_future=0)
+        EducationGroupYearFactory(partial_acronym=code, academic_year=previous_acy,
+                                  education_group__end_year=previous_acy.year)
+        e = EducationGroupYearFactory(partial_acronym=code, academic_year=current_acy,
+                                      education_group__start_year=current_acy.year)
+        e.clean()
+
+    def test_clean_code_when_partial_acronym_not_exists(self):
+        EducationGroupYearFactory(partial_acronym='CODE1')
+        e = EducationGroupYearFactory(partial_acronym='CODE2')
+        e.clean()
+
 
 class TestFindWithEnrollmentsCount(TestCase):
     """Unit tests on find_with_enrollments_count()"""

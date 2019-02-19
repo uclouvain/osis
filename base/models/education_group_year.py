@@ -26,7 +26,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import Count, OuterRef, Exists
+from django.db.models import Count, OuterRef, Exists, Q
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -662,6 +662,7 @@ class EducationGroupYear(SerializableModel):
         return True
 
     def clean(self):
+        self.clean_partial_acronym()
         if not self.constraint_type:
             self.clean_constraint_type()
         else:
@@ -695,6 +696,17 @@ class EducationGroupYear(SerializableModel):
             raise ValidationError({'duration': _("This field is required.")})
         elif self.duration is not None and self.duration_unit is None:
             raise ValidationError({'duration_unit': _("This field is required.")})
+
+    def clean_partial_acronym(self):
+        if self.partial_acronym:
+            partial_acronym_already_exist = EducationGroupYear.objects.filter(partial_acronym=self.partial_acronym).\
+                exclude(Q(education_group=self.education_group) |
+                        Q(education_group__end_year__lt=self.education_group.start_year))\
+                .exists()
+            if partial_acronym_already_exist:
+                raise ValidationError({
+                    'partial_acronym': "TODO"
+                })
 
     def next_year(self):
         try:
