@@ -700,8 +700,7 @@ class EducationGroupYear(SerializableModel):
     def clean_partial_acronym(self):
         if self.partial_acronym:
             partial_acronym_already_exist = EducationGroupYear.objects.filter(partial_acronym=self.partial_acronym).\
-                exclude(Q(education_group=self.education_group) |
-                        Q(education_group__end_year__lt=self.education_group.start_year))\
+                exclude(Q(education_group=self.education_group) | Q(academic_year__year__lt=self.academic_year.year))\
                 .exists()
             if partial_acronym_already_exist:
                 raise ValidationError({
