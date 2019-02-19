@@ -662,6 +662,7 @@ class EducationGroupYear(SerializableModel):
         return True
 
     def clean(self):
+        self.clean_acronym()
         self.clean_partial_acronym()
         if not self.constraint_type:
             self.clean_constraint_type()
@@ -699,12 +700,26 @@ class EducationGroupYear(SerializableModel):
 
     def clean_partial_acronym(self):
         if self.partial_acronym:
-            partial_acronym_already_exist = EducationGroupYear.objects.filter(partial_acronym=self.partial_acronym).\
-                exclude(Q(education_group=self.education_group) | Q(academic_year__year__lt=self.academic_year.year))\
-                .exists()
-            if partial_acronym_already_exist:
+            qs_egy_using_partical_acronym = EducationGroupYear.objects.filter(partial_acronym=self.partial_acronym).\
+                exclude(Q(education_group=self.education_group) | Q(academic_year__year__lt=self.academic_year.year))
+            if qs_egy_using_partical_acronym.exists():
                 raise ValidationError({
                     'partial_acronym': "TODO"
+                })
+
+    def clean_acronym(self):
+        if self.acronym:
+            qs_egy_using_acronym = EducationGroupYear.objects.filter(acronym=self.acronym).\
+                exclude(Q(education_group=self.education_group) | Q(academic_year__year__lt=self.academic_year.year))
+
+            # Groups can reuse acronym of other groups
+            if self.education_group_type.category == education_group_categories.GROUP:
+                qs_egy_using_acronym = qs_egy_using_acronym.\
+                    exclude(education_group_type__category=education_group_categories.GROUP)
+
+            if qs_egy_using_acronym.exists():
+                raise ValidationError({
+                    'acronym': "TODO"
                 })
 
     def next_year(self):
