@@ -459,7 +459,10 @@ class EducationGroupYear(SerializableModel):
     class Meta:
         ordering = ("academic_year",)
         verbose_name = _("Education group year")
-        unique_together = ('education_group', 'academic_year')
+        unique_together = (
+            ('education_group', 'academic_year'),
+            ('partial_acronym', 'academic_year')
+        )
 
     def __str__(self):
         return "{} - {} - {}".format(
@@ -701,7 +704,7 @@ class EducationGroupYear(SerializableModel):
     def clean_partial_acronym(self):
         if self.partial_acronym:
             qs_egy_using_partical_acronym = EducationGroupYear.objects.filter(partial_acronym=self.partial_acronym).\
-                exclude(Q(education_group=self.education_group) | Q(academic_year__year__lt=self.academic_year.year))
+                exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__lt=self.academic_year.year))
             if qs_egy_using_partical_acronym.exists():
                 raise ValidationError({
                     'partial_acronym': "TODO"
@@ -710,7 +713,7 @@ class EducationGroupYear(SerializableModel):
     def clean_acronym(self):
         if self.acronym:
             qs_egy_using_acronym = EducationGroupYear.objects.filter(acronym=self.acronym).\
-                exclude(Q(education_group=self.education_group) | Q(academic_year__year__lt=self.academic_year.year))
+                exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__lt=self.academic_year.year))
 
             # Groups can reuse acronym of other groups
             if self.education_group_type.category == education_group_categories.GROUP:
