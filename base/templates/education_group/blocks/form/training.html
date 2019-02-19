@@ -27,7 +27,7 @@
 {% bootstrap_form_errors form_education_group_year %}
 {% bootstrap_form_errors form_education_group %}
 
-<form method="post" id="UpdateTrainingForm">
+<form method="post" id="UpdateTrainingForm" data-validate-url="{% url 'validate_education_group_field' 'TRAINING' %}">
     {% csrf_token %}
     <div class="panel panel-default">
 
@@ -44,5 +44,49 @@
         </div>
 
     </div>
+    <script>
+        function validate_field(ev){
+            parameters = {
+                'academic_year': $("#id_academic_year").val()
+            };
+            const field_name = $(this).attr('name');
+
+            $parent = $("#UpdateTrainingForm [name='" + field_name + "']").parent();
+            $parent.removeClass('has-error');
+            $parent.removeClass('has-warning');
+            $parent.children(".help-block").remove();
+
+            parameters[field_name] = $(this).val();
+
+            const url = $('#UpdateTrainingForm').data('validate-url') + "?" + $.param(parameters);
+            $.ajax({
+               url: url
+            }).done(function(data) {
+                if (!(field_name in data)){
+                    return;
+                }
+                cls = 'has-warning';
+                if (data[field_name].level === 'error') {
+                    cls = 'has-error'
+                }
+
+                $parent.addClass(cls);
+                $parent.append("<div class='help-block'>" + data[field_name].msg+ "</div>");
+            });
+        }
+
+        $(document).ready(function() {
+                $("#id_acronym").change(validate_field);
+                $("#id_partial_acronym").change(validate_field);
+
+                // Revalidate acronym and partial acronym when modifying academic year
+                $("#id_academic_year").change(function () {
+                    $("#id_acronym").trigger("change");
+                    $("#id_partial_acronym").trigger("change");
+                })
+
+            }
+        );
+    </script>
     {% include "blocks/modal/confirmation_modal.html" %}
 </form>
