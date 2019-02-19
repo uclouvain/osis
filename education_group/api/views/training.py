@@ -25,6 +25,7 @@
 ##############################################################################
 from rest_framework import generics
 
+from base.models.academic_year import current_academic_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
@@ -35,12 +36,14 @@ class TrainingList(generics.ListAPIView):
        Return a list of all the training with optional filtering.
     """
     name = 'training-list'
-    queryset = EducationGroupYear.objects.filter(education_group_type__category=education_group_categories.TRAINING)\
-                                         .select_related('education_group_type', 'academic_year')\
-                                         .prefetch_related(
-                                                'administration_entity__entityversion_set',
-                                                'management_entity__entityversion_set'
-                                         )
+    queryset = EducationGroupYear.objects.filter(
+        education_group_type__category=education_group_categories.TRAINING,
+        academic_year__year=current_academic_year().year+1
+    ).select_related('education_group_type', 'academic_year')\
+        .prefetch_related(
+        'administration_entity__entityversion_set',
+        'management_entity__entityversion_set'
+    )
     serializer_class = TrainingListSerializer
     filter_fields = (
         'acronym',
