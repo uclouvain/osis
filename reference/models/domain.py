@@ -58,6 +58,9 @@ class Domain(SerializableModel):
         full_domain_name += "{}".format(self.name)
         return full_domain_name
 
+    class Meta:
+        ordering = ('-decree__name', 'code', 'name')
+
 
 def find_all_for_sync():
     """

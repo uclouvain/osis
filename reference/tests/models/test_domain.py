@@ -30,6 +30,7 @@ from reference.tests.factories.domain import DomainFactory
 
 
 class TestDomain(TestCase):
+
     def setUp(self):
         self.decree = DecreeFactory(name='Paysage')
 
@@ -56,3 +57,12 @@ class TestDomain(TestCase):
         expected_value = "{decree}: {name}".format(decree=dom.decree.name,
                                                    name=dom.name)
         self.assertEqual(str(dom), expected_value)
+
+    def test_sorting_domain(self):
+        expected_value = ('-decree__name', 'code', 'name')
+        domain = DomainFactory(
+            decree=self.decree,
+            code='11',
+            name='Test1'
+        )
+        self.assertEqual(domain._meta.ordering, expected_value)
