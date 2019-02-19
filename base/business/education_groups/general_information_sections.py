@@ -56,6 +56,7 @@ AGREGATION = 'agregation'
 PREREQUISITE = 'prerequis'
 OPTIONS = 'options'
 INTRODUCTION = 'intro'
+CONTACTS = 'contacts'
 
 Section = namedtuple('Section', 'title labels')
 
@@ -97,7 +98,11 @@ SECTION_LIST = [
                 (MOBILITY, 'specific'),
                 (FURTHER_TRAININGS, 'specific'),
                 (CERTIFICATES, 'specific'),
+            ]),
+    Section(title=_('In practice'),
+            labels=[
                 (PRACTICAL_INFO, 'specific'),
+                (CONTACTS, 'specific'),
             ]),
 ]
 

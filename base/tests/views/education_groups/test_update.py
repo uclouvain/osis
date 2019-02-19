@@ -242,7 +242,7 @@ class TestUpdate(TestCase):
         self.assertEqual(self.training_education_group_year.partial_acronym, 'LDVLD101R')
         self.assertEqual(self.training_education_group_year.management_entity, new_entity_version.entity)
         self.assertEqual(self.training_education_group_year.administration_entity, new_entity_version.entity)
-        self.assertListEqual(
+        self.assertCountEqual(
             list(self.training_education_group_year.secondary_domains.values_list('id', flat=True)),
             list_domains
         )
