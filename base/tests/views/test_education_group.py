@@ -688,6 +688,19 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
         self.assertEqual(len(soup.select('button.btn-publish')), 0)
 
+    def test_case_free_text_is_not_show_when_common(self):
+        common_bachelor = EducationGroupYearCommonBachelorFactory()
+        url_edit_common = reverse(
+            "education_group_year_admission_condition_edit",
+            args=[common_bachelor.pk, common_bachelor.pk]
+        )
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
+
+        self.assertFalse(response.context['info']['show_free_text'])
+
     def test_case_admission_condition_remove_line_not_found(self):
         delete_url = reverse(
             "education_group_year_admission_condition_remove_line",
