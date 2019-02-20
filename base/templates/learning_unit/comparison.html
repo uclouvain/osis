@@ -179,6 +179,45 @@
                                 <td>{% changed_label next.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' other1=current.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' %}</td>
                             {% endif %}
                         </tr>
+                        {% for key in learning_container_year_fields %}
+                            {% if key == "is_vacant" %}
+                                {%  trans "Vacant"|capfirst as title %}
+                            {% elif key == "team" %}
+                                {%  trans "Team management"|capfirst as title %}
+                            {% elif key == "type_declaration_vacant" %}
+                                {%  trans "Decision"|capfirst as title %}
+                            {% endif %}
+                            <tr{% if forloop.first%} style="border-top: groove"{% endif %}>
+                                <td class="table_header">{{ title }}</td>
+                                {% if previous %}
+                                    <td>
+                                        {% if key == "type_declaration_vacant" %}
+                                            {% changed_label previous.learning_unit_year.learning_container_year.get_type_declaration_vacant_display|default:'-' other1=current.learning_unit_year.learning_container_year.get_type_declaration_vacant_display|default:'-' %}
+                                        {% else %}
+                                            {% changed_label previous.learning_unit_year.learning_container_year|get_attribute:key|default:'-' other1=current.learning_unit_year.learning_container_year|get_attribute:key|default:'-' %}
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                                <td>
+                                    <label>
+                                        {% if key == "type_declaration_vacant" %}
+                                            {{ current.learning_unit_year.learning_container_year.get_type_declaration_vacant_display|default:'-' }}
+                                        {% else %}
+                                            {{ current.learning_unit_year.learning_container_year|get_attribute:key|default:'-' }}
+                                        {% endif %}
+                                    </label>
+                                </td>
+                                {% if next %}
+                                    <td>
+                                        {% if key == "type_declaration_vacant" %}
+                                            {% changed_label next.learning_unit_year.learning_container_year.get_type_declaration_vacant_display|default:'-' other1=current.learning_unit_year.learning_container_year.get_type_declaration_vacant_display|default:'-' %}
+                                        {% else %}
+                                            {% changed_label next.learning_unit_year.learning_container_year|get_attribute:key|default:'-' other1=current.learning_unit_year.learning_container_year|get_attribute:key|default:'-' %}
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor%}
                     </tbody>
                 </table>
             </div>
