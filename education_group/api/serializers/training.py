@@ -126,6 +126,7 @@ class TrainingDetailSerializer(TrainingListSerializer):
             'duration',
             'duration_unit',
             'duration_unit_text',
+            'language_association_text',
             'enrollment_enabled',
             'credits',
             'remark',

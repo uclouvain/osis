@@ -25,7 +25,6 @@
 ##############################################################################
 from rest_framework import generics
 
-from base.models.academic_year import current_academic_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
@@ -37,8 +36,7 @@ class TrainingList(generics.ListAPIView):
     """
     name = 'training-list'
     queryset = EducationGroupYear.objects.filter(
-        education_group_type__category=education_group_categories.TRAINING,
-        academic_year__year=current_academic_year().year+1
+        education_group_type__category=education_group_categories.TRAINING
     ).select_related('education_group_type', 'academic_year')\
         .prefetch_related(
         'administration_entity__entityversion_set',
@@ -75,8 +73,7 @@ class TrainingDetail(generics.RetrieveAPIView):
     """
     name = 'training-detail'
     queryset = EducationGroupYear.objects.filter(
-        education_group_type__category=education_group_categories.TRAINING,
-        academic_year__year=current_academic_year().year+1
+        education_group_type__category=education_group_categories.TRAINING
     ).select_related(
         'education_group_type',
         'academic_year',
