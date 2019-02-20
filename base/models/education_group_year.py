@@ -747,6 +747,7 @@ class EducationGroupYear(SerializableModel):
             exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__gte=self.academic_year.year)).\
             order_by("-academic_year__year").\
             first()
+
         if egy_using_same_acronym:
             raise ValidationError({
                 'acronym': _("Acronym already exists in %(academic_year)s") % {
