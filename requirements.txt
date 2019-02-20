@@ -19,6 +19,7 @@ requests==2.19.1
 django-bootstrap3==10.0.1
 django-ordered-model==2.1.0
 django-waffle==0.14.0
+redis==2.10.6
 django-redis==4.9.0
 beautifulsoup4==4.6.3
 pypom==2.1.0
