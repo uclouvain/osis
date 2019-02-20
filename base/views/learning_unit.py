@@ -42,11 +42,13 @@ from attribution.models.enums.function import Functions
 from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language, \
-    get_entities_comparison_context
+    get_entities_comparison_context, get_components_identification, get_organization_from_learning_unit_year
 from base.business.learning_unit import get_learning_unit_comparison_context
 from base.business.learning_units import perms as business_perms
 from base.business.learning_units.comparison import get_keys, compare_learning_unit_years, \
-    compare_learning_container_years, get_components_changes, get_partims_as_str
+    compare_learning_container_years, get_components_changes, get_partims_as_str, get_entity_by_type, \
+    FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON, \
+    FIELDS_FOR_LEARNING_COMPONENT_COMPARISON
 from base.business.learning_units.perms import can_update_learning_achievement
 from base.forms.learning_class import LearningClassEditForm
 from base.forms.learning_unit_component import LearningUnitComponentEditForm
@@ -54,6 +56,8 @@ from base.forms.learning_unit_specifications import LearningUnitSpecificationsFo
 from base.models import education_group_year, campus, proposal_learning_unit, entity
 from base.models import learning_component_year as mdl_learning_component_year
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
@@ -236,6 +240,66 @@ def learning_class_year_edit(request, learning_unit_year_id):
 
 
 def learning_unit_comparison(request, learning_unit_year_id):
+    learning_unit_year = get_object_or_404(
+        LearningUnitYear.objects.all().select_related('learning_unit','learning_container_year',
+                                                      'campus', 'campus__organization'), pk=learning_unit_year_id
+    )
+    current_context = get_context_by_learning_unit_year(learning_unit_year)
+    previous_academic_year = mdl.academic_year.find_academic_year_by_year(learning_unit_year.academic_year.year - 1)
+    previous_learning_unit_year = _get_learning_unit_year(previous_academic_year, learning_unit_year)
+    previous_context = get_context_by_learning_unit_year(previous_learning_unit_year) if previous_learning_unit_year else {}
+    next_academic_year = mdl.academic_year.find_academic_year_by_year(learning_unit_year.academic_year.year + 1)
+    next_learning_unit_year = _get_learning_unit_year(next_academic_year, learning_unit_year)
+    next_context = get_context_by_learning_unit_year(next_learning_unit_year) if next_learning_unit_year else {}
+    context = build_context_comparison(current_context, learning_unit_year, next_context, previous_context)
+    return render(request, "learning_unit/comparison.html", context)
+
+
+def get_context_by_learning_unit_year(learning_unit_year):
+    if proposal_learning_unit.is_learning_unit_year_in_proposal(learning_unit_year):
+        initial_data = proposal_learning_unit.find_by_learning_unit_year(learning_unit_year).initial_data
+        _reinitialize_model(learning_unit_year, initial_data["learning_unit_year"])
+        _reinitialize_model(learning_unit_year.learning_unit, initial_data["learning_unit"])
+        _reinitialize_model(learning_unit_year.learning_container_year, initial_data["learning_container_year"])
+        _reinitialize_components(initial_data["learning_component_years"] or {})
+        context = dict({'learning_unit_year': learning_unit_year})
+        context['campus'] = learning_unit_year.campus or {}
+        context['organization'] = get_organization_from_learning_unit_year(learning_unit_year)
+        context['language'] = language.find_by_id(learning_unit_year.language.id)
+        components = get_components_identification(learning_unit_year)
+        context['components'] = components.get('components')
+        for link_type in ENTITY_TYPE_LIST:
+            context[link_type] = get_entity_by_type(learning_unit_year, link_type)
+        context['learning_container_year_partims'] = [partim.subdivision for partim in
+                                                      learning_unit_year.get_partims_related()]
+        _reinitialize_entities(context, initial_data["entities"])
+    else:
+        context = dict({'learning_unit_year': learning_unit_year})
+        context['campus'] = learning_unit_year.campus or {}
+        context['organization'] = get_organization_from_learning_unit_year(learning_unit_year)
+        context['language'] = language.find_by_id(learning_unit_year.language.id)
+        components = get_components_identification(learning_unit_year)
+        context['components'] = components.get('components')
+        for link_type in ENTITY_TYPE_LIST:
+            context[link_type] = get_entity_by_type(learning_unit_year, link_type)
+        context['learning_container_year_partims'] = [partim.subdivision for partim in
+                                                      learning_unit_year.get_partims_related()]
+        context = get_entities_comparison_context(context, learning_unit_year)
+    return context
+
+
+def build_context_comparison(current_context, learning_unit_year, next_context, previous_context):
+    context = dict({'learning_unit_year': learning_unit_year})
+    context['previous'] = previous_context or {}
+    context['current'] = current_context or {}
+    context['next'] = next_context or {}
+    context['learning_unit_year_fields'] = FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON
+    context['learning_container_year_fields'] = FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON
+    context['learning_component_fields'] = FIELDS_FOR_LEARNING_COMPONENT_COMPARISON
+    return context
+
+
+def comparison(request, learning_unit_year_id):
     learning_unit_yr = get_object_or_404(mdl.learning_unit_year.LearningUnitYear.objects.all()
                                          .select_related('learning_unit', 'learning_container_year'),
                                          pk=learning_unit_year_id)
@@ -325,7 +389,7 @@ def learning_unit_comparison(request, learning_unit_year_id):
                 ),
                 'previous_lu': previous_lu,
                 'next_lu': next_lu,
-             }
+            }
         )
         _add_warnings_for_inexisting_luy(request, next_academic_yr, next_lu)
         _add_warnings_for_inexisting_luy(request, previous_academic_yr, previous_lu)
