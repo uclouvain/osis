@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django import forms
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
@@ -157,11 +158,13 @@ def _get_success_message_for_creation_education_group_year(parent_id, education_
 @ajax_required
 @login_required
 @permission_required("base.add_educationgroup", raise_exception=True)
-def check_field(request, category):
+def validate_field(request, category):
     accepted_fields = ["partial_acronym", "acronym"]
+
     academic_year = AcademicYear.objects.get(pk=request.GET["academic_year"])
     acronym = request.GET.get("acronym")
     partial_acronym = request.GET.get("partial_acronym")
+
     egy = EducationGroupYear(academic_year=academic_year, acronym=acronym, partial_acronym=partial_acronym,
                              education_group_type=EducationGroupType(category=category))
 
@@ -174,8 +177,8 @@ def check_field(request, category):
             if clean_field_func:
                 clean_field_func(raise_warnings=True)
         except ValidationWarning as w:
-            response[field] = {'msg': w.message_dict[field][0], 'level': 'warning'}
+            response[field] = {'msg': w.message_dict[field][0], 'level': messages.DEFAULT_TAGS[messages.WARNING]}
         except ValidationError as e:
-            response[field] = {'msg': e.message_dict[field][0], 'level': 'error'}
+            response[field] = {'msg': e.message_dict[field][0], 'level': messages.DEFAULT_TAGS[messages.ERROR]}
 
     return JsonResponse(response)

@@ -60,7 +60,7 @@ urlpatterns = [
     ),
     url(
         r'^validate_field/(?P<category>[A-Z_]+)/',
-        create.check_field,
+        create.validate_field,
         name='validate_education_group_field'
     ),
 
