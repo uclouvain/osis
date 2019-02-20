@@ -561,9 +561,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
                 'is_master': is_master,
                 'show_components_for_agreg': is_aggregation,
                 'show_components_for_agreg_and_mc': is_aggregation or is_mc,
-                'show_free_text': self.object.education_group_type.name in itertools.chain(
-                    TrainingType.with_admission_condition(), MiniTrainingType.with_admission_condition()
-                )
+                'show_free_text': self._show_free_text()
             },
             'admission_condition': admission_condition,
             'common_conditions': common_conditions,
@@ -575,6 +573,12 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         })
 
         return context
+
+    def _show_free_text(self):
+        return not self.object.is_common and self.object.education_group_type.name in itertools.chain(
+                    TrainingType.with_admission_condition(),
+                    MiniTrainingType.with_admission_condition()
+                )
 
 
 def get_appropriate_common_admission_condition(edy):
