@@ -176,7 +176,7 @@ def changed_label(value, other1=None):
         return mark_safe(
             "<label {}>{}</label>".format(DIFFERENCE_CSS, DEFAULT_VALUE_FOR_NONE if value is None else value))
     else:
-        return mark_safe("{}".format(DEFAULT_VALUE_FOR_NONE if value is None else value))
+        return mark_safe("<label>{}</label>".format(DEFAULT_VALUE_FOR_NONE if value is None else value))
 
 
 @register.simple_tag(takes_context=True)

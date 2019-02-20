@@ -92,15 +92,17 @@
                                     </td>
                                 {% endif %}
                                 <td>
-                                    {% if key == "attribution_procedure" %}
-                                        {{ current.learning_unit_year.get_attribution_procedure_display }}
-                                    {% elif key == "periodicity" %}
-                                        {{ current.learning_unit_year.get_periodicity_display|default:'-' }}
-                                    {% elif key == "language" %}
-                                        {{ current.language.name }}
-                                    {% else %}
-                                        {{ current.learning_unit_year|get_attribute:key|default:'-' }}
-                                    {% endif %}
+                                    <label>
+                                        {% if key == "attribution_procedure" %}
+                                            {{ current.learning_unit_year.get_attribution_procedure_display }}
+                                        {% elif key == "periodicity" %}
+                                            {{ current.learning_unit_year.get_periodicity_display|default:'-' }}
+                                        {% elif key == "language" %}
+                                            {{ current.language.name }}
+                                        {% else %}
+                                            {{ current.learning_unit_year|get_attribute:key|default:'-' }}
+                                        {% endif %}
+                                    </label>
                                 </td>
                                 {% if next %}
                                     <td>
@@ -123,7 +125,7 @@
                                 {% if previous %}
                                     <td>{% for elem in previous.learning_container_year_partims %}{{ elem }}{% endfor %}</td>
                                 {% endif %}
-                                    <td>{% for elem in current.learning_container_year_partims %}{{ elem }}{% endfor %}</td>
+                                    <td><label>{% for elem in current.learning_container_year_partims %}{{ elem }}{% endfor %}</label></td>
                                 {% if next %}
                                     <td>{% for elem in next.learning_container_year_partims %}{{ elem }}{% endfor %}</td>
                                 {% endif %}
@@ -134,7 +136,7 @@
                             {% if previous %}
                                 <td>{% changed_label previous.campus.name other1=current.campus.name %}</td>
                             {% endif %}
-                                <td>{{ current.campus.name }}</td>
+                                <td><label>{{ current.campus.name }}</label></td>
                             {% if next %}
                                 <td>{% changed_label next.campus.name other1=current.campus.name %}</td>
                             {% endif %}
@@ -144,7 +146,7 @@
                             {% if previous %}
                                 <td>{% changed_label previous.REQUIREMENT_ENTITY|default:'-' other1=current.REQUIREMENT_ENTITY|default:'-' %}</td>
                             {% endif %}
-                                <td>{{ current.REQUIREMENT_ENTITY|default:'-' }}</td>
+                                <td><label>{{ current.REQUIREMENT_ENTITY|default:'-' }}</label></td>
                             {% if next %}
                                 <td>{% changed_label next.REQUIREMENT_ENTITY|default:'-' other1=current.REQUIREMENT_ENTITY|default:'-' %}</td>
                             {% endif %}
@@ -154,7 +156,7 @@
                             {% if previous %}
                                 <td>{% changed_label previous.ALLOCATION_ENTITY|default:'-' other1=current.ALLOCATION_ENTITY|default:'-' %}</td>
                             {% endif %}
-                                <td>{{ current.ALLOCATION_ENTITY|default:'-' }}</td>
+                                <td><label>{{ current.ALLOCATION_ENTITY|default:'-' }}</label></td>
                             {% if next %}
                                 <td>{% changed_label next.ALLOCATION_ENTITY|default:'-' other1=current.ALLOCATION_ENTITY|default:'-' %}</td>
                             {% endif %}
@@ -164,7 +166,7 @@
                             {% if previous %}
                                 <td>{% changed_label previous.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' other1=current.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' %}</td>
                             {% endif %}
-                                <td>{{ current.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' }}</td>
+                                <td><label>{{ current.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' }}</label></td>
                             {% if next %}
                                 <td>{% changed_label next.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' other1=current.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' %}</td>
                             {% endif %}
@@ -174,7 +176,7 @@
                             {% if previous %}
                                 <td>{% changed_label previous.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' other1=current.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' %}</td>
                             {% endif %}
-                                <td>{{ current.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' }}</td>
+                                <td><label>{{ current.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' }}</label></td>
                             {% if next %}
                                 <td>{% changed_label next.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' other1=current.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' %}</td>
                             {% endif %}
