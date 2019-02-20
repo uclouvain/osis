@@ -81,13 +81,13 @@
                                 {% if previous %}
                                     <td>
                                         {% if key == "attribution_procedure" %}
-                                            {% changed_label previous.learning_unit_year.get_attribution_procedure_display other1=current.learning_unit_year.get_attribution_procedure_display %}
+                                            {% changed_label previous.learning_unit_year.get_attribution_procedure_display|default:'-' other1=current.learning_unit_year.get_attribution_procedure_display|default:'-' %}
                                         {% elif key == "periodicity" %}
-                                            {% changed_label previous.learning_unit_year.get_periodicity_display|capfirst other1=current.learning_unit_year.get_periodicity_display %}
+                                            {% changed_label previous.learning_unit_year.get_periodicity_display|default:'-' other1=current.learning_unit_year.get_periodicity_display|default:'-' %}
                                         {% elif key == "language" %}
-                                            {% changed_label previous.language.name other1=current.language.name %}
+                                            {% changed_label previous.language.name|default:'-' other1=current.language.name|default:'-' %}
                                         {% else %}
-                                            {% changed_label previous.learning_unit_year|get_attribute:key other1=current.learning_unit_year|get_attribute:key %}
+                                            {% changed_label previous.learning_unit_year|get_attribute:key|default:'-' other1=current.learning_unit_year|get_attribute:key|default:'-' %}
                                         {% endif %}
                                     </td>
                                 {% endif %}
@@ -95,11 +95,11 @@
                                     {% if key == "attribution_procedure" %}
                                         {{ current.learning_unit_year.get_attribution_procedure_display }}
                                     {% elif key == "periodicity" %}
-                                        {{ current.learning_unit_year.get_periodicity_display|capfirst }}
+                                        {{ current.learning_unit_year.get_periodicity_display|default:'-' }}
                                     {% elif key == "language" %}
                                         {{ current.language.name }}
                                     {% else %}
-                                        {{ current.learning_unit_year|get_attribute:key }}
+                                        {{ current.learning_unit_year|get_attribute:key|default:'-' }}
                                     {% endif %}
                                 </td>
                                 {% if next %}
@@ -107,7 +107,7 @@
                                         {% if key == "attribution_procedure" %}
                                             {% changed_label next.learning_unit_year.get_attribution_procedure_display other1=current.learning_unit_year.get_attribution_procedure_display %}
                                         {% elif key == "periodicity" %}
-                                            {% changed_label next.learning_unit_year.get_periodicity_display|capfirst other1=current.learning_unit_year.get_periodicity_display %}
+                                            {% changed_label next.learning_unit_year.get_periodicity_display|default:'-' other1=current.learning_unit_year.get_periodicity_display|default:'-' %}
                                         {% elif key == "language" %}
                                             {% changed_label next.language.name other1=current.language.name %}
                                         {% else %}
@@ -129,6 +129,56 @@
                                 {% endif %}
                             </tr>
                         {% endif %}
+                        <tr style="border-top: groove">
+                            <td class="table_header">{%  trans "Learning location" %}</td>
+                            {% if previous %}
+                                <td>{% changed_label previous.campus.name other1=current.campus.name %}</td>
+                            {% endif %}
+                                <td>{{ current.campus.name }}</td>
+                            {% if next %}
+                                <td>{% changed_label next.campus.name other1=current.campus.name %}</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td class="table_header">{%  trans "Requirement entity" %}</td>
+                            {% if previous %}
+                                <td>{% changed_label previous.REQUIREMENT_ENTITY|default:'-' other1=current.REQUIREMENT_ENTITY|default:'-' %}</td>
+                            {% endif %}
+                                <td>{{ current.REQUIREMENT_ENTITY|default:'-' }}</td>
+                            {% if next %}
+                                <td>{% changed_label next.REQUIREMENT_ENTITY|default:'-' other1=current.REQUIREMENT_ENTITY|default:'-' %}</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td class="table_header">{%  trans "Allocation entity" %}</td>
+                            {% if previous %}
+                                <td>{% changed_label previous.ALLOCATION_ENTITY|default:'-' other1=current.ALLOCATION_ENTITY|default:'-' %}</td>
+                            {% endif %}
+                                <td>{{ current.ALLOCATION_ENTITY|default:'-' }}</td>
+                            {% if next %}
+                                <td>{% changed_label next.ALLOCATION_ENTITY|default:'-' other1=current.ALLOCATION_ENTITY|default:'-' %}</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td class="table_header">{%  trans "Additional requirement entity 1" %}</td>
+                            {% if previous %}
+                                <td>{% changed_label previous.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' other1=current.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' %}</td>
+                            {% endif %}
+                                <td>{{ current.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' }}</td>
+                            {% if next %}
+                                <td>{% changed_label next.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' other1=current.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' %}</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td class="table_header">{%  trans "Additional requirement entity 2" %}</td>
+                            {% if previous %}
+                                <td>{% changed_label previous.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' other1=current.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' %}</td>
+                            {% endif %}
+                                <td>{{ current.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' }}</td>
+                            {% if next %}
+                                <td>{% changed_label next.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' other1=current.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' %}</td>
+                            {% endif %}
+                        </tr>
                     </tbody>
                 </table>
             </div>

@@ -241,13 +241,14 @@ def learning_class_year_edit(request, learning_unit_year_id):
 
 def learning_unit_comparison(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(
-        LearningUnitYear.objects.all().select_related('learning_unit','learning_container_year',
+        LearningUnitYear.objects.all().select_related('learning_unit', 'learning_container_year',
                                                       'campus', 'campus__organization'), pk=learning_unit_year_id
     )
     current_context = get_context_by_learning_unit_year(learning_unit_year)
     previous_academic_year = mdl.academic_year.find_academic_year_by_year(learning_unit_year.academic_year.year - 1)
     previous_learning_unit_year = _get_learning_unit_year(previous_academic_year, learning_unit_year)
-    previous_context = get_context_by_learning_unit_year(previous_learning_unit_year) if previous_learning_unit_year else {}
+    previous_context = get_context_by_learning_unit_year(
+        previous_learning_unit_year) if previous_learning_unit_year else {}
     next_academic_year = mdl.academic_year.find_academic_year_by_year(learning_unit_year.academic_year.year + 1)
     next_learning_unit_year = _get_learning_unit_year(next_academic_year, learning_unit_year)
     next_context = get_context_by_learning_unit_year(next_learning_unit_year) if next_learning_unit_year else {}
