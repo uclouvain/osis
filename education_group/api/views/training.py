@@ -74,17 +74,19 @@ class TrainingDetail(generics.RetrieveAPIView):
         Return the detail of the training
     """
     name = 'training-detail'
-    queryset = EducationGroupYear.objects.filter(education_group_type__category=education_group_categories.TRAINING)\
-                                         .select_related(
-                                            'education_group_type',
-                                            'academic_year',
-                                            'main_teaching_campus',
-                                            'enrollment_campus',
-                                            'primary_language',
-                                         ).prefetch_related(
-                                            'administration_entity__entityversion_set',
-                                            'management_entity__entityversion_set',
-                                         )
+    queryset = EducationGroupYear.objects.filter(
+        education_group_type__category=education_group_categories.TRAINING,
+        academic_year__year=current_academic_year().year+1
+    ).select_related(
+        'education_group_type',
+        'academic_year',
+        'main_teaching_campus',
+        'enrollment_campus',
+        'primary_language',
+    ).prefetch_related(
+        'administration_entity__entityversion_set',
+        'management_entity__entityversion_set',
+    )
     serializer_class = TrainingDetailSerializer
     lookup_field = 'uuid'
     pagination_class = None
