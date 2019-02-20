@@ -24,10 +24,20 @@
 #
 ##############################################################################
 from rest_framework import generics
+from django_filters import rest_framework as filters
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
+
+
+class TrainingFilter(filters.FilterSet):
+    from_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='gte')
+    to_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='lte')
+
+    class Meta:
+        model = EducationGroupYear
+        fields = ['acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year']
 
 
 class TrainingList(generics.ListAPIView):
@@ -43,12 +53,7 @@ class TrainingList(generics.ListAPIView):
         'management_entity__entityversion_set'
     )
     serializer_class = TrainingListSerializer
-    filter_fields = (
-        'acronym',
-        'partial_acronym',
-        'title',
-        'title_english',
-    )
+    filter_class = TrainingFilter
     search_fields = (
         'acronym',
         'partial_acronym',
