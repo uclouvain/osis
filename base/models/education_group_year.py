@@ -43,7 +43,7 @@ from base.models.enums import education_group_categories
 from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
 from base.models.enums.funding_codes import FundingCodes
-from base.models.exceptions import MaximumOneParentAllowedException
+from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
 from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin
@@ -701,27 +701,44 @@ class EducationGroupYear(SerializableModel):
         elif self.duration is not None and self.duration_unit is None:
             raise ValidationError({'duration_unit': _("This field is required.")})
 
-    def clean_partial_acronym(self):
-        if self.partial_acronym:
-            qs_egy_using_partical_acronym = EducationGroupYear.objects.filter(partial_acronym=self.partial_acronym).\
-                exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__lt=self.academic_year.year))
-            if qs_egy_using_partical_acronym.exists():
-                raise ValidationError({
+    def clean_partial_acronym(self, raise_warnings=False):
+        if not self.partial_acronym:
+            return
+        qs_egy_using_partial_acronym = EducationGroupYear.objects.filter(partial_acronym=self.partial_acronym).\
+            exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__lt=self.academic_year.year))
+        if qs_egy_using_partial_acronym.exists():
+            raise ValidationError({
+                'partial_acronym': "TODO"
+            })
+        if raise_warnings:
+            qs_egy_used_partial_acronym = EducationGroupYear.objects.filter(partial_acronym=self.partial_acronym). \
+                exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__gte=self.academic_year.year))
+            if qs_egy_used_partial_acronym.exists():
+                raise ValidationWarning({
                     'partial_acronym': "TODO"
                 })
 
-    def clean_acronym(self):
-        if self.acronym:
-            qs_egy_using_acronym = EducationGroupYear.objects.filter(acronym=self.acronym).\
-                exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__lt=self.academic_year.year))
+    def clean_acronym(self, raise_warnings=False):
+        if not self.acronym:
+            return
+        qs_egy_using_acronym = EducationGroupYear.objects.filter(acronym=self.acronym).\
+            exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__lt=self.academic_year.year))
 
-            # Groups can reuse acronym of other groups
-            if self.education_group_type.category == education_group_categories.GROUP:
-                qs_egy_using_acronym = qs_egy_using_acronym.\
-                    exclude(education_group_type__category=education_group_categories.GROUP)
+        # Groups can reuse acronym of other groups
+        if self.education_group_type.category == education_group_categories.GROUP:
+            qs_egy_using_acronym = qs_egy_using_acronym.\
+                exclude(education_group_type__category=education_group_categories.GROUP)
 
-            if qs_egy_using_acronym.exists():
-                raise ValidationError({
+        if qs_egy_using_acronym.exists():
+            raise ValidationError({
+                'acronym': "TODO"
+            })
+
+        if raise_warnings:
+            qs_egy_used_acronym = EducationGroupYear.objects.filter(acronym=self.acronym). \
+                exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__gte=self.academic_year.year))
+            if qs_egy_used_acronym.exists():
+                raise ValidationWarning({
                     'acronym': "TODO"
                 })
 

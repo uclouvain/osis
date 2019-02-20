@@ -33,7 +33,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView
 from waffle.decorators import waffle_flag
 
-from assessments.views.pgm_manager_administration import JSONResponse
 from base.forms.education_group.common import EducationGroupModelForm, EducationGroupTypeForm
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
@@ -42,8 +41,8 @@ from base.models.academic_year import current_academic_year, AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.exceptions import ValidationWarning
 from base.utils.cache import RequestCache
-from base.views import layout
 from base.views.common import display_success_messages
 from base.views.education_groups.perms import can_create_education_group
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
@@ -173,7 +172,9 @@ def check_field(request, category):
             attr_name = 'clean_{field_name}'.format(field_name=field)
             clean_field_func = getattr(egy, attr_name)
             if clean_field_func:
-                clean_field_func()
+                clean_field_func(raise_warnings=True)
+        except ValidationWarning as w:
+            response[field] = {'msg': w.message_dict[field][0], 'level': 'warning'}
         except ValidationError as e:
             response[field] = {'msg': e.message_dict[field][0], 'level': 'error'}
 
