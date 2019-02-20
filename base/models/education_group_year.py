@@ -704,43 +704,62 @@ class EducationGroupYear(SerializableModel):
     def clean_partial_acronym(self, raise_warnings=False):
         if not self.partial_acronym:
             return
-        qs_egy_using_partial_acronym = EducationGroupYear.objects.filter(partial_acronym=self.partial_acronym).\
-            exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__lt=self.academic_year.year))
-        if qs_egy_using_partial_acronym.exists():
+
+        egy_using_same_partial_acronym = EducationGroupYear.objects.filter(partial_acronym=self.partial_acronym).\
+            exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__lt=self.academic_year.year)).\
+            order_by('academic_year__year').\
+            first()
+
+        past_egy_using_same_partial_acronym = EducationGroupYear.objects.filter(partial_acronym=self.partial_acronym). \
+            exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__gte=self.academic_year.year)). \
+            order_by('-academic_year__year'). \
+            first()
+
+        if egy_using_same_partial_acronym:
             raise ValidationError({
-                'partial_acronym': "TODO"
+                'partial_acronym': _("Partial acronym already exists in %(academic_year)s") % {
+                    "academic_year": str(egy_using_same_partial_acronym.academic_year)
+                }
             })
-        if raise_warnings:
-            qs_egy_used_partial_acronym = EducationGroupYear.objects.filter(partial_acronym=self.partial_acronym). \
-                exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__gte=self.academic_year.year))
-            if qs_egy_used_partial_acronym.exists():
-                raise ValidationWarning({
-                    'partial_acronym': "TODO"
-                })
+
+        if raise_warnings and past_egy_using_same_partial_acronym:
+            raise ValidationWarning({
+                'partial_acronym': _("Partial acronym existed in %(academic_year)s") % {
+                    "academic_year": str(past_egy_using_same_partial_acronym.academic_year)
+                }
+            })
 
     def clean_acronym(self, raise_warnings=False):
         if not self.acronym:
             return
-        qs_egy_using_acronym = EducationGroupYear.objects.filter(acronym=self.acronym).\
+
+        egy_using_same_acronym = EducationGroupYear.objects.filter(acronym=self.acronym).\
             exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__lt=self.academic_year.year))
 
         # Groups can reuse acronym of other groups
         if self.education_group_type.category == education_group_categories.GROUP:
-            qs_egy_using_acronym = qs_egy_using_acronym.\
+            egy_using_same_acronym = egy_using_same_acronym.\
                 exclude(education_group_type__category=education_group_categories.GROUP)
 
-        if qs_egy_using_acronym.exists():
+        egy_using_same_acronym = egy_using_same_acronym.order_by("academic_year__year").first()
+
+        past_egy_using_same_acronym = EducationGroupYear.objects.filter(acronym=self.acronym). \
+            exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__gte=self.academic_year.year)).\
+            order_by("-academic_year__year").\
+            first()
+        if egy_using_same_acronym:
             raise ValidationError({
-                'acronym': "TODO"
+                'acronym': _("Acronym already exists in %(academic_year)s") % {
+                    "academic_year": str(egy_using_same_acronym.academic_year)
+                }
             })
 
-        if raise_warnings:
-            qs_egy_used_acronym = EducationGroupYear.objects.filter(acronym=self.acronym). \
-                exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__gte=self.academic_year.year))
-            if qs_egy_used_acronym.exists():
-                raise ValidationWarning({
-                    'acronym': "TODO"
-                })
+        if raise_warnings and past_egy_using_same_acronym:
+            raise ValidationWarning({
+                'acronym': _("Acronym existed in %(academic_year)s") % {
+                    "academic_year": str(past_egy_using_same_acronym.academic_year)
+                }
+            })
 
     def next_year(self):
         try:
