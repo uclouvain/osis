@@ -695,7 +695,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
             args=[common_bachelor.pk, common_bachelor.pk]
         )
 
-        response = self.client.get(self.url)
+        response = self.client.get(url_edit_common)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
 
