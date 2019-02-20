@@ -25,7 +25,6 @@
 ##############################################################################
 from unittest.mock import patch
 
-from django.core.mail.message import EmailMultiAlternatives
 from django.test import TestCase
 
 from base.models.education_group_year import EducationGroupYear
