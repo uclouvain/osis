@@ -130,7 +130,7 @@ class FilterTrainingTestCase(APITestCase):
     def test_get_training_case_filter_from_year_params(self):
         query_string = {'from_year': 2020}
 
-        response = self.client.get(self.url, kwargs=query_string)
+        response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         trainings = EducationGroupYear.objects.filter(
@@ -148,7 +148,7 @@ class FilterTrainingTestCase(APITestCase):
     def test_get_training_case_filter_to_year_params(self):
         query_string = {'to_year': 2019}
 
-        response = self.client.get(self.url, kwargs=query_string)
+        response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         trainings = EducationGroupYear.objects.filter(
