@@ -58,6 +58,11 @@ urlpatterns = [
         create.create_education_group,
         name='new_education_group'
     ),
+    url(
+        r'^validate_field/(?P<category>[A-Z_]+)/',
+        create.validate_field,
+        name='validate_education_group_field'
+    ),
 
     url(
         r'^select_type/(?P<category>[A-Z_]+)/$',
