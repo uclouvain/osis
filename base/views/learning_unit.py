@@ -253,6 +253,11 @@ def learning_unit_comparison(request, learning_unit_year_id):
     next_learning_unit_year = _get_learning_unit_year(next_academic_year, learning_unit_year)
     next_context = get_context_by_learning_unit_year(next_learning_unit_year) if next_learning_unit_year else {}
     context = build_context_comparison(current_context, learning_unit_year, next_context, previous_context)
+    context.update({'components_comparison': get_components_changes(
+        previous_context.get('components', {}),
+        current_context.get('components', {}),
+        next_context.get('components', {})
+    )})
     return render(request, "learning_unit/comparison.html", context)
 
 

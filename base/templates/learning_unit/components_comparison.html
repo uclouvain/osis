@@ -27,16 +27,15 @@
     {% for component in components_comparison %}
         <tr class="table_header" style="border-top: groove">
             <td class="table_header">{% trans 'Component' %} : {{ component|get_item:'type' }}</td>
-            {% if previous_lu %}
-                <th>{{ previous_academic_yr }}</th>
+            {% if previous %}
+                <th>{{ previous.learning_unit_year.academic_year }}</th>
             {% endif %}
-            <th>{{ learning_unit_year.academic_year }}</th>
-            {% if next_lu %}
-                <th>{{ next_academic_yr }}</th>
+            <th>{{ current.learning_unit_year.academic_year }}</th>
+            {% if next %}
+                <th>{{ next.learning_unit_year.academic_year }}</th>
             {% endif %}
         </tr>
         {% for key, values in component.items %}
-            {% if key != 'type' %}
                 {% if key == "planned_classes" %}
                     {%  trans "Planned classes"|capfirst as title %}
                 {% elif key == "VOLUME_TOTAL" %}
@@ -47,31 +46,30 @@
                     {%  trans "Volume Q2"|capfirst as title %}
                 {% elif key == "VOLUME_GLOBAL" %}
                     {%  trans "Volume global"|capfirst as title %}
+                {% elif key == "VOLUME_REQUIREMENT_ENTITY" %}
+                    {%  trans "Requirement entity"|capfirst as title %}
+                {% elif key == "VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1" %}
+                    {%  trans "Additional requirement entity 1"|capfirst as title %}
+                {% elif key == "VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2" %}
+                    {%  trans "Additional requirement entity 2"|capfirst as title %}
                 {% endif %}
+            {% if key != 'type' %}
                 <tr>
                     <td class="table_header">
                         <table>
                             <tr>
                                 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                                {% if key == 'VOLUME_REQUIREMENT_ENTITY' %}
-                                    <td>{{ REQUIREMENT_ENTITY }}</td>
-                                {%elif key == 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1' %}
-                                    <td>{{ ADDITIONAL_REQUIREMENT_ENTITY_1 }}</td>
-                                {% elif key == 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2' %}
-                                    <td>{{ ADDITIONAL_REQUIREMENT_ENTITY_2 }}</td>
-                                {% else %}
-                                    <td>{{ title }}</td>
-                                {% endif %}
+                                <td>{{ title }}</td>
                             </tr>
                         </table>
 
 
                     </td>
-                    {% if previous_lu %}
+                    {% if previous %}
                         <td>{% changed_label values.0 other1=values.1 %}</td>
                     {% endif %}
-                    <td>{{ values.1 | default:'-' }}</td>
-                    {% if next_lu %}
+                    <td><label>{{ values.1 | default_if_none:'-' }}</label></td>
+                    {% if next %}
                         <td>{% changed_label values.2 other1=values.1 %}</td>
                     {% endif %}
                 </tr>
