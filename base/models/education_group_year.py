@@ -395,7 +395,7 @@ class EducationGroupYear(SerializableModel):
 
     decree_category = models.CharField(
         max_length=40,
-        choices=decree_category.DECREE_CATEGORY,
+        choices=decree_category.DecreeCategories.choices(),
         blank=True,
         null=True,
         verbose_name=_('Decree category')
