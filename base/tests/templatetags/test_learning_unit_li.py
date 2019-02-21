@@ -75,10 +75,10 @@ class LearningUnitTagLiEditTest(TestCase):
         AcademicYearFactory(year=self.current_academic_year.year+3)
         AcademicYearFactory(year=self.current_academic_year.year+4)
         self.later_academic_year = AcademicYearFactory(year=self.current_academic_year.year+5)
-        self.lcy = LearningContainerYearFactory(academic_year=self.current_academic_year,
+        self.lcy = LearningContainerYearFactory(academic_year=self.next_academic_yr,
                                                 container_type=learning_container_year_types.COURSE)
         self.learning_unit_year = LearningUnitYearFactory(
-            academic_year=self.current_academic_year,
+            academic_year=self.next_academic_yr,
             subtype=learning_unit_year_subtypes.FULL,
             learning_unit=self.learning_unit,
             learning_container_year=self.lcy
