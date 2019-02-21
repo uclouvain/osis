@@ -47,6 +47,16 @@ paths:
           description: ''
           type: string
       - in: query
+        name: from_year
+        schema:
+          description: From which training year we want to display
+          type: integer
+      - in: query
+        name: to_year
+        schema:
+          description: To which training year we want to display
+          type: integer
+      - in: query
         name: title_english
         schema:
           description: ''
