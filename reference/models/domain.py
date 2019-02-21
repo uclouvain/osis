@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
 from django.core import serializers
-from reference.models.enums import domain_type
+from django.db import models
+
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from reference.models.enums import domain_type
 
 
 class DomainAdmin(SerializableModelAdmin):
@@ -49,7 +50,16 @@ class Domain(SerializableModel):
     national = models.BooleanField(default=False) # True if is Belgian else False
 
     def __str__(self):
-        return self.name
+        full_domain_name = ""
+        if self.decree:
+            full_domain_name += "{}: ".format(self.decree.name)
+        if self.code:
+            full_domain_name += "{} ".format(self.code)
+        full_domain_name += "{}".format(self.name)
+        return full_domain_name
+
+    class Meta:
+        ordering = ('-decree__name', 'code', 'name')
 
 
 def find_all_for_sync():

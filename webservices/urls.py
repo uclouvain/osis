@@ -23,13 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.conf.urls import url, include
 
-import continuing_education.api.url_v1
-import education_group.api.url_v1
-import reference.api.url_v1
 from webservices.api.views.auth_token import AuthToken
 from webservices.views import ws_catalog_offer, ws_catalog_common_offer, ws_catalog_common_admission_condition
+
+url_api_v1 = [url(r'^auth/token$', AuthToken.as_view(), name=AuthToken.name)]
+
+if 'education_group' in settings.INSTALLED_APPS:
+    import education_group.api.url_v1
+    url_api_v1.append(
+        url(r'^education_group/', include(education_group.api.url_v1, namespace='education_group_api_v1')))
+
+if 'reference' in settings.INSTALLED_APPS:
+    import reference.api.url_v1
+    url_api_v1.append(url(r'^reference/', include(reference.api.url_v1, namespace='reference_api_v1')))
+
+if 'continuing_education' in settings.INSTALLED_APPS:
+    import continuing_education.api.url_v1
+    url_api_v1.append(
+        url(r'^continuing_education/',
+            include(continuing_education.api.url_v1.urlpatterns, namespace='continuing_education_api_v1'))
+    )
 
 urlpatterns = [
     url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/common$',
@@ -41,13 +57,5 @@ urlpatterns = [
     url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/(?P<acronym>[a-zA-Z0-9]+)$',
         ws_catalog_offer,
         name='v0.1-ws_catalog_offer'),
-    url(r'^v1/', include([
-        url(r'^auth/token$', AuthToken.as_view(), name=AuthToken.name),
-        url(r'^continuing_education/',
-            include(continuing_education.api.url_v1.urlpatterns, namespace='continuing_education_api_v1')),
-        url(r'^education_group/',
-            include(education_group.api.url_v1, namespace='education_group_api_v1')),
-        url(r'^reference/',
-            include(reference.api.url_v1, namespace='reference_api_v1')),
-    ])),
+    url(r'^v1/', include(url_api_v1)),
 ]

@@ -27,10 +27,8 @@ import collections
 import functools
 import re
 
-from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
-from django.forms import model_to_dict
 from django.http import Http404
 from django.utils import translation
 from rest_framework.decorators import api_view, renderer_classes

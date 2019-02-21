@@ -366,6 +366,10 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         return translations
 
     def get_content_translations_for_label(self, education_group_year, label, user_language, type):
+        # FIX ME: Change contacts ==> contact_intro in sections
+        if label == CONTACTS_KEY:
+            label = CONTACT_INTRO_KEY
+
         # fetch the translation for the current user
         translated_label = TranslatedTextLabel.objects.filter(text_label__entity=entity_name.OFFER_YEAR,
                                                               text_label__label=label,
@@ -557,9 +561,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
                 'is_master': is_master,
                 'show_components_for_agreg': is_aggregation,
                 'show_components_for_agreg_and_mc': is_aggregation or is_mc,
-                'show_free_text':  self.object.education_group_type.name in itertools.chain(
-                    TrainingType.with_admission_condition(), MiniTrainingType.with_admission_condition()
-                )
+                'show_free_text': self._show_free_text()
             },
             'admission_condition': admission_condition,
             'common_conditions': common_conditions,
@@ -571,6 +573,12 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         })
 
         return context
+
+    def _show_free_text(self):
+        return not self.object.is_common and self.object.education_group_type.name in itertools.chain(
+                    TrainingType.with_admission_condition(),
+                    MiniTrainingType.with_admission_condition()
+                )
 
 
 def get_appropriate_common_admission_condition(edy):
