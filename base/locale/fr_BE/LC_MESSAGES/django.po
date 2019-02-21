@@ -81,11 +81,7 @@ msgstr[1] "%(count_enrollment)d étudiants sont inscrits à l'offre."
 msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
 msgstr "%(date)s doit être comprise entre %(start_date)s et %(end_date)s"
 
-<<<<<<< HEAD
 #: models/education_group.py:113 models/education_group_year.py:692
-=======
-#: models/education_group.py:113 models/education_group_year.py:687
->>>>>>> d6e765921b0b399e0a873f0b2f2a0c09c3a913dd
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr "%(max)s doit être plus grand ou égal à %(min)s"
