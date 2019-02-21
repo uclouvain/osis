@@ -1876,7 +1876,7 @@ msgstr ""
 msgid "Invalid code"
 msgstr ""
 
-#: templatetags/learning_unit_li.py:39
+#: templatetags/learning_unit_li.py:40
 msgid "Isn't a proposal"
 msgstr ""
 
@@ -2394,7 +2394,7 @@ msgstr ""
 msgid "Modification made"
 msgstr ""
 
-#: business/learning_units/perms.py:524
+#: business/learning_units/perms.py:527
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr ""
@@ -2610,7 +2610,7 @@ msgstr ""
 msgid "Not enrolled"
 msgstr ""
 
-#: business/learning_units/perms.py:485 business/learning_units/perms.py:491
+#: business/learning_units/perms.py:488 business/learning_units/perms.py:494
 msgid "Not in period to edit educational information."
 msgstr ""
 
@@ -3054,7 +3054,7 @@ msgstr ""
 msgid "Proposal is neither accepted nor refused."
 msgstr ""
 
-#: templatetags/learning_unit_li.py:40
+#: templatetags/learning_unit_li.py:41
 msgid "Proposal isn't on current learning unit year"
 msgstr ""
 
@@ -3891,7 +3891,7 @@ msgstr ""
 msgid "The learning unit has been updated."
 msgstr ""
 
-#: business/learning_units/perms.py:479
+#: business/learning_units/perms.py:482
 msgid "The learning unit is not summary editable."
 msgstr ""
 
@@ -4149,7 +4149,7 @@ msgstr ""
 msgid "This label %s does not exist"
 msgstr ""
 
-#: business/learning_units/perms.py:556
+#: business/learning_units/perms.py:559
 msgid "This learning unit is not eligible for proposal creation/modification"
 msgstr ""
 
@@ -4600,6 +4600,10 @@ msgid ""
 "can't edit"
 msgstr ""
 
+#: business/learning_units/perms.py:85
+msgid "You are not allowed to change the end year for this academic year"
+msgstr ""
+
 #: business/group_element_years/postponement.py:54
 #: business/group_element_years/postponement.py:73
 #: tests/business/education_groups/test_postponement.py:227
@@ -4619,6 +4623,10 @@ msgstr ""
 
 #: business/group_element_years/postponement.py:76
 msgid "You are not allowed to postpone this training in the past."
+msgstr ""
+
+#: business/learning_units/perms.py:86
+msgid "You are not allowed to put in proposal for this academic year"
 msgstr ""
 
 #: business/learning_units/perms.py:70
@@ -4650,7 +4658,7 @@ msgid ""
 "learning unit as to be a course/dissertation/internship"
 msgstr ""
 
-#: business/learning_units/perms.py:469
+#: business/learning_units/perms.py:472
 msgid "You are not summary responsible for this learning unit."
 msgstr ""
 
@@ -4680,7 +4688,7 @@ msgstr ""
 msgid "You can't modify learning unit of a previous year"
 msgstr ""
 
-#: business/learning_units/perms.py:522
+#: business/learning_units/perms.py:525
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
@@ -4689,7 +4697,7 @@ msgstr ""
 msgid "You can't modify proposal which is on an other year"
 msgstr ""
 
-#: templatetags/learning_unit_li.py:192
+#: templatetags/learning_unit_li.py:193
 msgid ""
 "You can't modify proposition which are related to a learning unit year under"
 msgstr ""
@@ -4723,7 +4731,7 @@ msgid "You have the choice between"
 msgstr ""
 
 #: forms/learning_unit/learning_unit_create.py:204
-#: forms/learning_unit/learning_unit_create_2.py:182
+#: forms/learning_unit/learning_unit_create_2.py:183
 #: tests/views/learning_units/proposals/test_creation.py:196
 msgid "You must either set the common title or the specific title"
 msgstr ""
