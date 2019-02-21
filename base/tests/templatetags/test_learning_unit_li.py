@@ -421,6 +421,19 @@ class LearningUnitTagLiEditTest(TestCase):
 
         self.assertEqual(result, expected)
 
+    def test_can_modify_end_year_by_proposal_undefined_group(self):
+        faculty_no_faculty_no_central = PersonFactory()
+        lcy = LearningContainerYearFactory(academic_year=self.previous_academic_year,
+                                           container_type=learning_container_year_types.COURSE)
+        learning_unit_yr = LearningUnitYearFactory(
+            academic_year=self.previous_academic_year,
+            subtype=learning_unit_year_subtypes.FULL,
+            learning_unit=LearningUnitFactory(),
+            learning_container_year=lcy
+        )
+
+        self.assertFalse(can_modify_end_year_by_proposal(learning_unit_yr, faculty_no_faculty_no_central, False))
+
     def test_can_modify_end_year_by_proposal_previous_n_year(self):
         faculty_person = FacultyManagerFactory()
         lcy = LearningContainerYearFactory(academic_year=self.previous_academic_year,

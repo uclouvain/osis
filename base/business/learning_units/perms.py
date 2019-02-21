@@ -598,7 +598,6 @@ def _is_container_type_course_dissertation_or_internship(learning_unit_year, _, 
 
 def is_eligible_to_modify_end_year_by_proposal(learning_unit_year, person, raise_exception=False):
     result = is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception)
-
     if result:
         return can_modify_end_year_by_proposal(learning_unit_year, person, raise_exception)
     else:
