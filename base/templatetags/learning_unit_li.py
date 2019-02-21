@@ -32,7 +32,8 @@ from base.models.person import find_by_user
 from base.business.learning_units.perms import is_year_editable
 from base.business.learning_units.perms import is_eligible_for_modification, is_eligible_for_modification_end_date, \
     is_eligible_to_create_modification_proposal, is_eligible_to_edit_proposal, is_eligible_for_cancel_of_proposal, \
-    is_eligible_to_consolidate_proposal, is_eligible_to_delete_learning_unit_year
+    is_eligible_to_consolidate_proposal, is_eligible_to_delete_learning_unit_year, \
+    is_eligible_to_modify_end_year_by_proposal, is_eligible_to_modify_by_proposal
 
 register = template.Library()
 
@@ -58,7 +59,7 @@ def li_edit_date_lu(context, url, message, url_id="link_edit_date_lu"):
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_suppression_proposal(context, url, message, url_id="link_proposal_suppression", js_script=''):
     data = _get_common_proposal_data(context, message, url, url_id)
-    data['permission'] = is_eligible_to_create_modification_proposal
+    data['permission'] = is_eligible_to_modify_end_year_by_proposal
     data['obj'] = context['learning_unit_year']
     data['load_modal'] = False
 
@@ -68,7 +69,7 @@ def li_suppression_proposal(context, url, message, url_id="link_proposal_suppres
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_modification_proposal(context, url, message, url_id="link_proposal_modification", js_script=''):
     data = _get_common_data(context, message, url, url_id)
-    data['permission'] = is_eligible_to_create_modification_proposal
+    data['permission'] = is_eligible_to_modify_by_proposal
     return li_with_permission(data)
 
 
