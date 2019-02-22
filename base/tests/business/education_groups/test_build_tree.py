@@ -29,7 +29,9 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
+from base.models.enums.education_group_types import MiniTrainingType
 from base.models.enums.link_type import LinkTypes
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -120,3 +122,66 @@ class TestBuildTree(TestCase):
             self.group_element_year_1_1,
             self.group_element_year_2, [self.group_element_year_2_1]
         ])
+
+    def test_node_to_list_flat(self):
+        node = EducationGroupHierarchy(self.parent)
+        list_children = node.to_list(flat=True)
+
+        self.assertCountEqual(list_children, [
+            self.group_element_year_1,
+            self.group_element_year_1_1,
+            self.group_element_year_2,
+            self.group_element_year_2_1
+        ])
+
+    def test_node_to_list_without_reference_content(self):
+        """
+        This test ensure that if the parameter with_reference_content is specified to False,
+        all content related to reference linked is not returned
+        """
+        self.group_element_year_1.link_type = LinkTypes.REFERENCE.name
+        self.group_element_year_1.save()
+
+        node = EducationGroupHierarchy(self.parent)
+        list_children = node.to_list(with_reference_content=False, flat=True)
+
+        self.assertCountEqual(list_children, [
+            self.group_element_year_2,
+            self.group_element_year_2_1
+        ])
+
+
+class TestGetOptionList(TestCase):
+    def setUp(self):
+        self.academic_year = AcademicYearFactory(current=True)
+        self.root = EducationGroupYearFactory(academic_year=self.academic_year)
+
+    def test_get_option_list_case_no_result(self):
+        node = EducationGroupHierarchy(self.root)
+        self.assertListEqual(node.get_option_list(), [])
+
+    def test_get_option_list_case_result_found(self):
+        option_1 = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__name=MiniTrainingType.OPTION.name
+        )
+        GroupElementYearFactory(parent=self.root, child_branch=option_1)
+        node = EducationGroupHierarchy(self.root)
+
+        self.assertListEqual(node.get_option_list(), [option_1])
+
+    def test_get_option_list_case_multiple_result_found_on_different_children(self):
+        list_option = []
+        for _ in range(5):
+            egy_child = EducationGroupYearFactory(academic_year=self.academic_year)
+            GroupElementYearFactory(parent=self.root, child_branch=egy_child)
+
+            option = EducationGroupYearFactory(
+                academic_year=self.academic_year,
+                education_group_type__name=MiniTrainingType.OPTION.name
+            )
+            list_option.append(option)
+            GroupElementYearFactory(parent=egy_child, child_branch=option)
+
+        node = EducationGroupHierarchy(self.root)
+        self.assertCountEqual(node.get_option_list(), list_option)

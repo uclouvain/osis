@@ -27,6 +27,7 @@ from django.urls import reverse
 
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear, fetch_all_group_elements_in_tree
 from base.models.prerequisite_item import PrerequisiteItem
@@ -86,6 +87,7 @@ class EducationGroupHierarchy:
             .annotate(has_prerequisite=Exists(has_prerequisite)) \
             .annotate(is_prerequisite=Exists(is_prerequisite)) \
             .select_related('child_branch__academic_year',
+                            'child_branch__education_group_type',
                             'child_leaf__academic_year',
                             'child_leaf__learning_container_year',
                             'parent')
@@ -111,21 +113,24 @@ class EducationGroupHierarchy:
             'id': 'id_{}_{}'.format(self.education_group_year.pk, group_element_year_pk),
         }
 
-    def to_list(self):
-        """ Generate list of group_element_year without reference link """
+    def to_list(self, with_reference_content=True, flat=False):
+        """ Generate list of group_element_year without reference link
+        @:param with_reference_content: Include all reference link content to the list
+        @:param flat: return a flat list
+        """
         result = []
+        _children = self.children if with_reference_content else \
+            [child for child in self.children if not child.reference]
 
-        for child in self.children:
-            child_list = child.to_list()
+        for child in _children:
+            child_list = child.to_list(with_reference_content, flat)
 
             if child.reference:
                 result.extend(child_list)
-
             else:
                 result.append(child.group_element_year)
                 if child_list:
-                    result.append(child_list)
-
+                    result.extend(child_list) if flat else result.append(child_list)
         return result
 
     def _get_icon(self):
@@ -142,6 +147,12 @@ class EducationGroupHierarchy:
     def get_url(self):
         url = reverse('education_group_read', args=[self.root.pk, self.education_group_year.pk])
         return url + self.url_group_to_parent()
+
+    def get_option_list(self):
+        return [
+            element.child_branch for element in self.to_list(with_reference_content=False, flat=True)
+            if element.child_branch.education_group_type.name == MiniTrainingType.OPTION.name
+        ]
 
 
 class NodeLeafJsTree(EducationGroupHierarchy):
