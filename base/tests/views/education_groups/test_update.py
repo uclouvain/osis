@@ -29,7 +29,7 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -157,11 +157,6 @@ class TestUpdate(TestCase):
 
         EntityVersionFactory(
             entity=self.mini_training_education_group_year.management_entity,
-            start_date=self.education_group_year.academic_year.start_date
-        )
-
-        EntityVersionFactory(
-            entity=self.mini_training_education_group_year.administration_entity,
             start_date=self.education_group_year.academic_year.start_date
         )
 
@@ -297,7 +292,7 @@ class TestUpdate(TestCase):
             "constraint_type": "",
         }
         response = self.client.post(self.mini_training_url, data=data)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
         self.mini_training_education_group_year.refresh_from_db()
         self.assertEqual(self.mini_training_education_group_year.title, 'Cours au choix')
