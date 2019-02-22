@@ -30,8 +30,20 @@
         <div class="panel panel-default">
             <div class="panel-body">
                 <div class="row">
-                    {% bootstrap_field form_education_group_year.acronym form_group_class="col-md-6" %}
-                    {% bootstrap_field form_education_group_year.partial_acronym form_group_class="col-md-6" %}
+                     <div class="col-md-6">
+                        {% bootstrap_label form_education_group_year.acronym.label %}<b>*</b>
+                         <abbr title="{{ form_education_group_year.acronym.help_text }}">
+                            <span class="glyphicon glyphicon-question-sign" style="font-size: 14pt;"></span>
+                         </abbr>
+                         {% bootstrap_field form_education_group_year.acronym show_label=False show_help=False %}
+                    </div>
+                    <div class="col-md-6">
+                        {% bootstrap_label form_education_group_year.partial_acronym.label %}<b>*</b>
+                        <abbr title="{{ form_education_group_year.partial_acronym.help_text }}">
+                            <span class="glyphicon glyphicon-question-sign" style="font-size: 14pt;"></span>
+                         </abbr>
+                        {% bootstrap_field form_education_group_year.partial_acronym show_label=False %}
+                    </div>
                 </div>
                 <br>
                 <div class="row">
