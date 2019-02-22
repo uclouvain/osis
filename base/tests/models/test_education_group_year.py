@@ -30,7 +30,7 @@ from django.utils.translation import ugettext_lazy as _
 from base.models.education_group_year import search, find_with_enrollments_count
 from base.models.enums import education_group_categories, duration_unit
 from base.models.enums.constraint_type import CREDITS
-from base.models.exceptions import MaximumOneParentAllowedException
+from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory
@@ -236,6 +236,76 @@ class EducationGroupYearCleanTest(TestCase):
 
         with self.assertRaises(ValidationError):
             e.clean()
+
+
+class TestCleanPartialAcronym(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.previous_acy, cls.current_acy, cls.next_acy = AcademicYearFactory.produce(number_past=1, number_future=1)
+        cls.partial_acronym = 'CODE'
+
+    def test_raise_validation_error_when_partial_acronym_exists_in_present_or_future(self):
+        for acy in (self.current_acy, self.next_acy):
+            with self.subTest(acy=acy):
+                EducationGroupYearFactory(partial_acronym=self.partial_acronym, academic_year=acy)
+                e = EducationGroupYearFactory.build(partial_acronym=self.partial_acronym,
+                                                    academic_year=self.current_acy)
+                with self.assertRaises(ValidationError):
+                    e.clean_partial_acronym()
+
+    def test_when_partial_acronym_existed_in_past(self):
+        EducationGroupYearFactory(partial_acronym=self.partial_acronym, academic_year=self.previous_acy)
+        e = EducationGroupYearFactory.build(partial_acronym=self.partial_acronym, academic_year=self.current_acy)
+        e.clean_partial_acronym()
+
+    def test_raise_validation_warning_when_partial_acronym_existed_in_past_and_raise_warnings_set_to_true(self):
+        EducationGroupYearFactory(partial_acronym=self.partial_acronym, academic_year=self.previous_acy)
+        e = EducationGroupYearFactory.build(partial_acronym=self.partial_acronym, academic_year=self.current_acy)
+        with self.assertRaises(ValidationWarning):
+            e.clean_partial_acronym(raise_warnings=True)
+
+    def test_when_partial_acronym_not_exists(self):
+        EducationGroupYearFactory(partial_acronym='CODE1')
+        e = EducationGroupYearFactory.build(partial_acronym='CODE2')
+        e.clean_partial_acronym()
+
+
+class TestCleanAcronym(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.previous_acy, cls.current_acy, cls.next_acy = AcademicYearFactory.produce(number_past=1, number_future=1)
+        cls.acronym = 'SIGLE'
+
+    def test_raise_validation_error_when_acronym_exists_in_present_or_future(self):
+        for acy in (self.current_acy, self.next_acy):
+            with self.subTest(acy=acy):
+                EducationGroupYearFactory(acronym=self.acronym, academic_year=acy)
+                e = EducationGroupYearFactory.build(acronym=self.acronym, academic_year=self.current_acy)
+                with self.assertRaises(ValidationError):
+                    e.clean_acronym()
+
+    def test_no_validation_error_when_group_reuse_acronym_of_another_group(self):
+        for acy in (self.current_acy, self.next_acy):
+            with self.subTest(acy=acy):
+                GroupFactory(acronym=self.acronym, academic_year=acy)
+                e = GroupFactory.build(acronym=self.acronym, academic_year=self.current_acy)
+                e.clean_acronym()
+
+    def test_when_acronym_existed_in_past(self):
+        EducationGroupYearFactory(acronym=self.acronym, academic_year=self.previous_acy)
+        e = EducationGroupYearFactory.build(acronym=self.acronym, academic_year=self.current_acy)
+        e.clean_acronym()
+
+    def test_raise_validation_warning_when_acronym_existed_in_past_and_raise_warning_set_to_true(self):
+        EducationGroupYearFactory(acronym=self.acronym, academic_year=self.previous_acy)
+        e = EducationGroupYearFactory.build(acronym=self.acronym, academic_year=self.current_acy)
+        with self.assertRaises(ValidationWarning):
+            e.clean_acronym(raise_warnings=True)
+
+    def test_when_acronym_not_exists(self):
+        EducationGroupYearFactory(acronym='CODE1')
+        e = EducationGroupYearFactory.build(acronym='CODE2')
+        e.clean_acronym()
 
 
 class TestFindWithEnrollmentsCount(TestCase):

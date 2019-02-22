@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ValidationError
 
 
 class StartDateHigherThanEndDateException(Exception):
@@ -77,3 +78,7 @@ class AuthorizedRelationshipNotRespectedException(Exception):
     def __init__(self, message=None, errors=None):
         super(AuthorizedRelationshipNotRespectedException, self).__init__(message)
         self.errors = errors
+
+
+class ValidationWarning(ValidationError):
+    pass

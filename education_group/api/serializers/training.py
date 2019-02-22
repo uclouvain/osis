@@ -51,6 +51,7 @@ class TrainingListSerializer(serializers.HyperlinkedModelSerializer):
         model = EducationGroupYear
         fields = (
             'url',
+            'uuid',
             'acronym',
             'code',
             'education_group_type',
@@ -125,6 +126,7 @@ class TrainingDetailSerializer(TrainingListSerializer):
             'duration',
             'duration_unit',
             'duration_unit_text',
+            'language_association_text',
             'enrollment_enabled',
             'credits',
             'remark',

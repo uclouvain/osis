@@ -47,7 +47,7 @@ def generate_title(education_group_year):
 class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = EducationGroupYear
-        django_get_or_create = ('education_group', 'academic_year',)
+        django_get_or_create = ('partial_acronym', 'academic_year',)
 
     education_group = factory.SubFactory(EducationGroupFactory)
     academic_year = factory.SubFactory(AcademicYearFactory)
@@ -129,6 +129,7 @@ class EducationGroupYearCommonMasterFactory(EducationGroupYearFactory):
 
 class EducationGroupYearMasterFactory(EducationGroupYearCommonMasterFactory):
     acronym = 'actu2m'
+    partial_acronym = 'actu2m'
 
 
 class EducationGroupYearCommonFactory(EducationGroupYearFactory):

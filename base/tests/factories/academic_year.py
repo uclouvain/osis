@@ -89,6 +89,12 @@ class AcademicYearFactory(DjangoModelFactory):
         academic_years = [AcademicYearFactory.build(year=current_year + i) for i in range(quantity)]
         return AcademicYear.objects.bulk_create(academic_years)
 
+    @staticmethod
+    def produce(base_year=None, number_past=1, number_future=1):
+        current_year = base_year or get_current_year()
+        acys = [AcademicYearFactory.build(year=current_year+i) for i in range(-number_past, number_future+1)]
+        return AcademicYear.objects.bulk_create(acys)
+
 
 class AcademicYearFakerFactory(DjangoModelFactory):
     class Meta:
