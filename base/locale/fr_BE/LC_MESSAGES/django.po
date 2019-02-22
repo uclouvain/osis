@@ -1023,7 +1023,7 @@ msgstr "Contenu"
 
 #: templates/education_group/organization_edit_inner.html:30
 msgid "Coorganization"
-msgstr "Coorganization"
+msgstr "Co-organisation"
 
 #: templatetags/education_group.py:96
 #, python-format
