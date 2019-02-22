@@ -26,6 +26,7 @@
 from django.contrib.auth.models import Permission
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Prefetch
+from django.utils.translation import gettext_lazy as _
 
 from rules_management.models import FieldReference
 
@@ -36,6 +37,7 @@ class ModelFormMixin:
         field = self.fields[field_name]
         field.disabled = True
         field.required = False
+        field.widget.attrs["title"] = _("You don't have sufficient rights to edit the field.")
 
 
 class PermissionFieldMixin(ModelFormMixin):

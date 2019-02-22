@@ -129,6 +129,7 @@ class ValidationRuleMixin(WarningFormMixin):
         if rule.status_field in (DISABLED, FIXED):
             field.disabled = True
             field.required = False
+            field.widget.attrs["title"] = _("You don't have sufficient rights to edit the field.")
 
         elif rule.status_field == REQUIRED:
             if not isinstance(field, forms.BooleanField):
