@@ -38,7 +38,7 @@ from base.templatetags.education_group import li_with_deletion_perm, button_with
     li_with_create_perm_mini_training, li_with_create_perm_group, link_detach_education_group, \
     link_pdf_content_education_group, button_edit_administrative_data, dl_with_parent
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory, EducationGroupYearFactory
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
@@ -376,7 +376,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         """
         self.context['education_group_year'] = MiniTrainingFactory()
         result = li_with_create_perm_mini_training(self.context, self.url, "")
-        msg = _("The user has not permission to create a %(category)s.") % {"category": _(MINI_TRAINING)}
+        msg = _("The user has not permission to create a %(category)s.") % {"category": Categories.MINI_TRAINING.value}
         msg = msg.capitalize()
 
         self.assertEqual(
@@ -397,7 +397,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         """
         self.context['education_group_year'] = TrainingFactory()
         result = li_with_create_perm_training(self.context, self.url, "")
-        msg = _("The user has not permission to create a %(category)s.") % {"category": _(TRAINING)}
+        msg = _("The user has not permission to create a %(category)s.") % {"category": Categories.TRAINING.value}
         msg = msg.capitalize()
         self.assertEqual(
             result, {
