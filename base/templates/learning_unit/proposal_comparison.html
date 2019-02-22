@@ -47,6 +47,9 @@
                             {% if next %}
                                 <th>{{ next.learning_unit_year.academic_year }}</th>
                             {% endif %}
+                            {% if current.initial_data %}
+                                <th>{%  trans 'Proposal' %}</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -116,6 +119,27 @@
                                             {% changed_label next.learning_unit_year|get_attribute:key other1=current.learning_unit_year|get_attribute:key %}
                                         {% endif %}
                                     </td>
+                                {% endif %}
+                                {% if current.initial_data %}
+                                    {% if key == "attribution_procedure" %}
+                                        {% with current.initial_data.learning_unit_year|get_item:key|title as attribution_procedure %}
+                                            <td><label>{% trans attribution_procedure %}</label></td>
+                                        {% endwith %}
+                                    {% elif key == "periodicity" %}
+                                        {% with current.initial_data.learning_unit_year|get_item:key|title as periodicity %}
+                                            <td><label>{% trans periodicity %}</label></td>
+                                        {% endwith %}
+                                    {% elif key == "status" %}
+                                        {% if current.initial_data.learning_unit_year|get_item:key == True %}
+                                            <td><label>{% trans 'Active' %}</label></td>
+                                        {% else %}
+                                            <td><label>{% trans 'Deactive' %}</label></td>
+                                        {% endif %}
+                                    {% elif key == "professional_integration" %}
+                                            <td><label>{{ current.initial_data.learning_unit_year|get_item:key|yesno }}</label></td>
+                                    {% else %}
+                                        <td><label>{{ current.initial_data.learning_unit_year|get_item:key|default:'-' }}</label></td>
+                                    {% endif %}
                                 {% endif %}
                             </tr>
                         {% endfor %}

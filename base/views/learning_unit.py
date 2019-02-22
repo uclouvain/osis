@@ -244,9 +244,31 @@ def learning_unit_proposal_comparison(request, learning_unit_year_id):
         LearningUnitYear.objects.all().select_related('learning_unit', 'learning_container_year',
                                                       'campus', 'campus__organization'), pk=learning_unit_year_id
     )
-    current_context = get_context_by_learning_unit_year(learning_unit_year)
+    current_context = get_context_proposal_comparison(learning_unit_year)
     context = build_context_comparison(current_context, learning_unit_year, {}, {})
     return render(request, "learning_unit/proposal_comparison.html", context)
+
+
+def get_context_proposal_comparison(learning_unit_year):
+    if proposal_learning_unit.is_learning_unit_year_in_proposal(learning_unit_year):
+        initial_data = proposal_learning_unit.find_by_learning_unit_year(learning_unit_year).initial_data
+        context = dict({'learning_unit_year': learning_unit_year})
+        context['campus'] = learning_unit_year.campus or {}
+        context['organization'] = get_organization_from_learning_unit_year(learning_unit_year)
+        context['language'] = language.find_by_id(learning_unit_year.language.id)
+        components = get_components_identification(learning_unit_year)
+        context['components'] = components.get('components')
+        for link_type in ENTITY_TYPE_LIST:
+            context[link_type] = get_entity_by_type(learning_unit_year, link_type)
+        context['learning_container_year_partims'] = [partim.subdivision for partim in
+                                                      learning_unit_year.get_partims_related()]
+        context = get_entities_comparison_context(context, learning_unit_year)
+        context['initial_data'] = initial_data
+        context['initial_data']['learning_unit_year']['language'] = language.find_by_id(
+            context['initial_data']['learning_unit_year']['language']).name
+    else:
+        context = {}
+    return context
 
 
 def learning_unit_comparison(request, learning_unit_year_id):
