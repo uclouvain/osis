@@ -168,7 +168,7 @@ class PostponeContent:
                 self._postpone(old_egy, new_egy)
 
         else:
-            # If the education group does not exists for the next year, we have to postpone 
+            # If the education group does not exists for the next year, we have to postpone.
             new_egy = duplicate_education_group_year(old_egy, self.next_academic_year)
             self._postpone(old_egy, new_egy)
 
