@@ -143,7 +143,7 @@
                                 {% endif %}
                             </tr>
                         {% endfor %}
-                        {% if current.learning_container_year_partims or previous.learning_container_year_partims or next.learning_container_year_partims %}
+                        {% if current.learning_container_year_partims and not current.initial_data or previous.learning_container_year_partims and not current.initial_data or next.learning_container_year_partims and not current.initial_data %}
                             <tr>
                                 <td class="table_header">{%  trans 'Partims' %}</td>
                                 {% if previous %}
