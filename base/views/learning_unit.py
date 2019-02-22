@@ -239,6 +239,16 @@ def learning_class_year_edit(request, learning_unit_year_id):
     return render(request, "learning_unit/class_edit.html", context)
 
 
+def learning_unit_proposal_comparison(request, learning_unit_year_id):
+    learning_unit_year = get_object_or_404(
+        LearningUnitYear.objects.all().select_related('learning_unit', 'learning_container_year',
+                                                      'campus', 'campus__organization'), pk=learning_unit_year_id
+    )
+    current_context = get_context_by_learning_unit_year(learning_unit_year)
+    context = build_context_comparison(current_context, learning_unit_year, {}, {})
+    return render(request, "learning_unit/proposal_comparison.html", context)
+
+
 def learning_unit_comparison(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(
         LearningUnitYear.objects.all().select_related('learning_unit', 'learning_container_year',
