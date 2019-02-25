@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+from ckeditor.fields import RichTextField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, get_language
 
@@ -66,13 +67,13 @@ class ValidationRule(models.Model):
         verbose_name=_("regex error message")
     )
 
-    help_text_en = models.TextField(
+    help_text_en = RichTextField(
         blank=True,
         null=True,
         verbose_name=_("english help text")
     )
 
-    help_text_fr = models.TextField(
+    help_text_fr = RichTextField(
         blank=True,
         null=True,
         verbose_name=_("french help text")
