@@ -204,7 +204,6 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
     # RulesRequiredMixin
     rules = [perms.can_change_education_group]
 
-    limited_by_category = TRAINING
     with_tree = False
 
     def get_context_data(self, **kwargs):

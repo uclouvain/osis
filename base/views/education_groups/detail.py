@@ -499,10 +499,6 @@ class EducationGroupContent(EducationGroupGenericDetailView):
                 When(child_branch__isnull=False, then=F("child_branch__partial_acronym")),
                 default=None
             ),
-            title=Case(
-                When(child_leaf__isnull=False, then=F("child_leaf__specific_title")),
-                When(child_branch__isnull=False, then=F("child_branch__title")),
-            ),
             child_id=Case(
                 When(child_leaf__isnull=False, then=F("child_leaf__id")),
                 When(child_branch__isnull=False, then=F("child_branch__id")),
@@ -576,9 +572,9 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
 
     def _show_free_text(self):
         return not self.object.is_common and self.object.education_group_type.name in itertools.chain(
-                    TrainingType.with_admission_condition(),
-                    MiniTrainingType.with_admission_condition()
-                )
+            TrainingType.with_admission_condition(),
+            MiniTrainingType.with_admission_condition()
+        )
 
 
 def get_appropriate_common_admission_condition(edy):
