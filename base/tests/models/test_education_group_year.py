@@ -190,6 +190,13 @@ class EducationGroupYearTest(TestCase):
             ]
         )
 
+    def test_is_mini_training(self):
+        self.assertFalse(self.education_group_year_1.is_mini_training())
+        self.assertTrue(self.education_group_year_2.is_mini_training())
+        self.assertFalse(self.education_group_year_3.is_mini_training())
+        self.assertFalse(self.education_group_year_4.is_mini_training())
+        self.assertFalse(self.education_group_year_5.is_mini_training())
+
 
 class EducationGroupYearCleanTest(TestCase):
     def test_clean_constraint_both_value_set_case_no_errors(self):
