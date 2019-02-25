@@ -197,7 +197,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         if not getattr(self.initial, 'academic_year', None):
             self.set_initial_diploma_values()
 
-        if not kwargs['instance']:
+        if 'instance' in kwargs and not kwargs['instance']:
             self.fields['academic_year'].label = _('Start')
 
     def set_initial_diploma_values(self):
