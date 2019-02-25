@@ -24,7 +24,8 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-<form method="post" id="UpdateGroupForm">
+
+<form method="post" id="UpdateGroupForm" class="education_group_form" data-validate-url="{% url 'validate_education_group_field' form_education_group_year.category %}">
     {% csrf_token %}
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -85,5 +86,6 @@
             {% include "education_group/blocks/form/create_cancel_buttons.html" %}
         </div>
     </div>
+    <script type="text/javascript" src="{% static 'js/education_group/validation.js' %}"></script>
     {% include "blocks/modal/confirmation_modal.html" %}
 </form>

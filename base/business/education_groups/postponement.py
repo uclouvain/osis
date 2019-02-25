@@ -165,9 +165,15 @@ class PostponementEducationGroupYearMixin:
         for academic_year in AcademicYear.objects.filter(year__gt=self.postpone_start_year,
                                                          year__lte=self.postpone_end_year):
             try:
-                postponed_egy = duplicate_education_group_year(
-                    education_group_year, academic_year, self.dict_initial_egy, self.hops_form.data
-                )
+                # hops is not relevant for a mini-training
+                if education_group_year.is_mini_training():
+                    postponed_egy = duplicate_education_group_year(
+                        education_group_year, academic_year, self.dict_initial_egy
+                    )
+                else:
+                    postponed_egy = duplicate_education_group_year(
+                        education_group_year, academic_year, self.dict_initial_egy, self.hops_form.data
+                    )
                 self.education_group_year_postponed.append(postponed_egy)
 
             except ConsistencyError as e:
