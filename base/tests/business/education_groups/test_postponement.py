@@ -328,6 +328,39 @@ class TestPostpone(TestCase):
             n1_1_child
         )
 
+    def test_postpone_attach_an_existing_mandatory_group_with_existing_children(self):
+        """
+        We have to postpone the mandatory children, but if they are already postponed, we have to reuse them.
+        But the copy of the structure must be stopped if these mandatory children are not empty.
+        """
+        AuthorizedRelationshipFactory(
+            parent_type=self.current_education_group_year.education_group_type,
+            child_type=self.current_group_element_year.child_branch.education_group_type,
+            min_count_authorized=1
+        )
+        self.current_group_element_year.child_branch.acronym="mandatory_child_n"
+        self.current_group_element_year.child_branch.save()
+
+        n1_mandatory_egy = EducationGroupYearFactory(
+            academic_year=self.next_academic_year,
+            acronym='mandatory_child_n1',
+            education_group=self.current_group_element_year.child_branch.education_group,
+            education_group_type=self.current_education_group_year.education_group_type,
+        )
+
+        n1_child_gr = GroupElementYearFactory(
+            parent=n1_mandatory_egy,
+            child_branch__academic_year=self.next_academic_year,
+        )
+
+        self.postponer = PostponeContent(self.current_education_group_year)
+
+        new_root = self.postponer.postpone()
+        new_mandatory_child = new_root.groupelementyear_set.first().child_branch
+        self.assertEqual(new_mandatory_child, n1_mandatory_egy)
+        self.assertEqual(new_mandatory_child.groupelementyear_set.first(), n1_child_gr)
+
+
     def test_postpone_with_child_branches(self):
         sub_group = GroupElementYearFactory(parent=self.current_group_element_year.child_branch)
         self.postponer = PostponeContent(self.current_education_group_year)
