@@ -134,7 +134,7 @@ def _is_eligible_to_add_education_group_with_category(person, category, raise_ex
     # TRAINING/MINI_TRAINING can only be added by central managers | Faculty manager must make a proposition of creation
     # based on US OSIS-2592, Faculty manager can add a MINI-TRAINING
     result = person.is_central_manager or (person.is_faculty_manager and category == Categories.MINI_TRAINING)
-    msg = _("The user has not permission to create a %(category)s.") % {"category": _(category)}
+    msg = _("The user has not permission to create a %(category)s.") % {"category": category.value}
     can_raise_exception(raise_exception, result, msg)
     return result
 
