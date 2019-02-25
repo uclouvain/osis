@@ -32,7 +32,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, pgettext
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
-from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP, Categories
+from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
 from base.templatetags.education_group import li_with_deletion_perm, button_with_permission, \
     button_order_with_permission, BUTTON_ORDER_TEMPLATE, li_with_create_perm_training, \
     li_with_create_perm_mini_training, li_with_create_perm_group, link_detach_education_group, \
@@ -137,7 +137,7 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
 
     def test_li_with_create_perm_group(self):
         relation = AuthorizedRelationshipFactory(parent_type=self.education_group_year.education_group_type)
-        relation.child_type.category = GROUP
+        relation.child_type.category = Categories.GROUP.name
         relation.child_type.save()
 
         result = li_with_create_perm_group(self.context, self.url, "")
@@ -374,7 +374,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         This test ensure that as faculty manager, the li tag is enable for mini training
         """
         relation = AuthorizedRelationshipFactory(parent_type=self.education_group_year.education_group_type)
-        relation.child_type.category = MINI_TRAINING
+        relation.child_type.category = Categories.MINI_TRAINING.name
         relation.child_type.save()
 
         result = li_with_create_perm_mini_training(self.context, self.url, "")
@@ -396,7 +396,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         """
         self.context['education_group_year'] = TrainingFactory()
         result = li_with_create_perm_training(self.context, self.url, "")
-        msg = _("The user has not permission to create a %(category)s.") % {"category": _(TRAINING)}
+        msg = _("The user has not permission to create a %(category)s.") % {"category": Categories.TRAINING.value}
         msg = msg.capitalize()
         self.assertEqual(
             result, {
