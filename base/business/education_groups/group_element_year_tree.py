@@ -27,7 +27,7 @@ from django.urls import reverse
 
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import MiniTrainingType
+from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear, fetch_all_group_elements_in_tree
 from base.models.prerequisite_item import PrerequisiteItem
@@ -113,17 +113,16 @@ class EducationGroupHierarchy:
             'id': 'id_{}_{}'.format(self.education_group_year.pk, group_element_year_pk),
         }
 
-    def to_list(self, with_reference_content=True, flat=False):
+    def to_list(self, flat=False, pruning_function=None):
         """ Generate list of group_element_year without reference link
-        @:param with_reference_content: Include all reference link content to the list
         @:param flat: return a flat list
+        @:param pruning_function: Allow to prune the tree
         """
         result = []
-        _children = self.children if with_reference_content else \
-            [child for child in self.children if not child.reference]
+        _children = filter(pruning_function, self.children) if pruning_function else self.children
 
         for child in _children:
-            child_list = child.to_list(with_reference_content, flat)
+            child_list = child.to_list(flat=flat, pruning_function=pruning_function)
 
             if child.reference:
                 result.extend(child_list)
@@ -149,8 +148,13 @@ class EducationGroupHierarchy:
         return url + self.url_group_to_parent()
 
     def get_option_list(self):
+        def pruning_function(node):
+            return not node.reference and \
+                   node.group_element_year.child_branch.education_group_type.name not in \
+                   [GroupType.FINALITY_120_LIST_CHOICE.name, GroupType.FINALITY_180_LIST_CHOICE.name]
+
         return [
-            element.child_branch for element in self.to_list(with_reference_content=False, flat=True)
+            element.child_branch for element in self.to_list(flat=True, pruning_function=pruning_function)
             if element.child_branch.education_group_type.name == MiniTrainingType.OPTION.name
         ]
 

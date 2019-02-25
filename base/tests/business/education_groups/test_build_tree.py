@@ -29,9 +29,10 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
-from base.models.enums.education_group_types import MiniTrainingType
+from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory, GroupEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -134,21 +135,18 @@ class TestBuildTree(TestCase):
             self.group_element_year_2_1
         ])
 
-    def test_node_to_list_without_reference_content(self):
+    def test_node_to_list_with_pruning_function(self):
         """
-        This test ensure that if the parameter with_reference_content is specified to False,
-        all content related to reference linked is not returned
+        This test ensure that if the parameter pruning function is specified we only get the tree
+        without node which has been pruned
         """
-        self.group_element_year_1.link_type = LinkTypes.REFERENCE.name
-        self.group_element_year_1.save()
-
         node = EducationGroupHierarchy(self.parent)
-        list_children = node.to_list(with_reference_content=False, flat=True)
+        list_children = node.to_list(
+            flat=True,
+            pruning_function=lambda child: child.group_element_year.pk == self.group_element_year_2.pk
+        )
 
-        self.assertCountEqual(list_children, [
-            self.group_element_year_2,
-            self.group_element_year_2_1
-        ])
+        self.assertCountEqual(list_children, [self.group_element_year_2])
 
 
 class TestGetOptionList(TestCase):
@@ -173,15 +171,43 @@ class TestGetOptionList(TestCase):
     def test_get_option_list_case_multiple_result_found_on_different_children(self):
         list_option = []
         for _ in range(5):
-            egy_child = EducationGroupYearFactory(academic_year=self.academic_year)
-            GroupElementYearFactory(parent=self.root, child_branch=egy_child)
+            group_child = EducationGroupYearFactory(
+                academic_year=self.academic_year,
+                education_group_type__name=GroupType.SUB_GROUP.name
+            )
+            GroupElementYearFactory(parent=self.root, child_branch=group_child)
 
             option = EducationGroupYearFactory(
                 academic_year=self.academic_year,
                 education_group_type__name=MiniTrainingType.OPTION.name
             )
             list_option.append(option)
-            GroupElementYearFactory(parent=egy_child, child_branch=option)
+            GroupElementYearFactory(parent=group_child, child_branch=option)
 
         node = EducationGroupHierarchy(self.root)
         self.assertCountEqual(node.get_option_list(), list_option)
+
+    def test_get_option_list_case_ignore_finality_list_choice(self):
+        """
+        This test ensure that the tree will be pruned when a child if type of finality list choice and option
+        isn't considered as part of tree
+        """
+        option_1 = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__name=MiniTrainingType.OPTION.name
+        )
+        GroupElementYearFactory(parent=self.root, child_branch=option_1)
+
+        for finality_type in [GroupType.FINALITY_120_LIST_CHOICE.name, GroupType.FINALITY_180_LIST_CHOICE.name]:
+            finality_group = EducationGroupYearFactory(
+                academic_year=self.academic_year,
+                education_group_type__name=finality_type
+            )
+            GroupElementYearFactory(parent=self.root, child_branch=finality_group)
+            GroupElementYearFactory(parent=finality_group, child_branch=EducationGroupYearFactory(
+                academic_year=self.academic_year,
+                education_group_type__name=MiniTrainingType.OPTION.name
+            ))
+
+        node = EducationGroupHierarchy(self.root)
+        self.assertListEqual(node.get_option_list(), [option_1])
