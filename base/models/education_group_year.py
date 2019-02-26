@@ -749,6 +749,11 @@ class EducationGroupYear(SerializableModel):
             order_by("-academic_year__year").\
             first()
 
+        # Groups can reuse acronym of other groups
+        if self.education_group_type.category == education_group_categories.GROUP:
+            past_egy_using_same_acronym = past_egy_using_same_acronym.\
+                exclude(education_group_type__category=education_group_categories.GROUP)
+
         if egy_using_same_acronym:
             raise ValidationError({
                 'acronym': _("Acronym already exists in %(academic_year)s") % {
