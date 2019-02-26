@@ -1213,15 +1213,141 @@ base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_gro
 base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2M1,REQUIRED,,,,,
 base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2MC,REQUIRED,,,,,
 base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_ST,REQUIRED,,,,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_commoncore,REQUIRED,100T,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Tt])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_complementarymodule,REQUIRED,100K,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Kk])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_minorlistchoice,REQUIRED,100G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_majorlistchoice,REQUIRED,200G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_optionlistchoice,REQUIRED,300G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_finality120listchoice,REQUIRED,400G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_finality180listchoice,REQUIRED,400G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,500G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_subgroup,REQUIRED,,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Rr])$",,,
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_commoncore,REQUIRED,100T,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Tt])$",,"Code of Common core is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3-6 numbers</li>
+<li><b>T</b></li>
+</ul>
+Examples: <i>LDRIN201T, LPSAD310T, LKINE800T</i>","Code d’une Partie de base (Tronc commun) est composée de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3-6 chiffres</li>
+<li><b>T</b></li>
+</ul>
+Exemples: <i>LDRIN201T, LPSAD310T, LKINE800T</i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_complementarymodule,REQUIRED,100K,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Kk])$",,"Code of Complementary module is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3-6 numbers</li>
+<li><b>K</b></li>
+</ul>
+Examples: <i>MAPHM280K, LDATI111K, LMATH1000K</i>","Code d’un Module complémentaire est composé de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3-6 chiffres</li>
+<li><b>K</b></li>
+</ul>
+Exemples: <i>MAPHM280K, LDATI111K, LMATH1000K</i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_minorlistchoice,REQUIRED,100G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Minor list choice is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3-6 numbers</li>
+<li><b>G</b></li>
+</ul>
+Examples: <i>LBARC913G, WFARM436G, WDENT318G</i>","Code d’une Liste au choix mineures est composée de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3-6 chiffres</li>
+<li><b>G</b></li>
+</ul>
+Exemples: <i>LBARC913G, WFARM436G, WDENT318G</i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_majorlistchoice,REQUIRED,200G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Major list choice is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3-6 numbers</li>
+<li><b>G</b></li>
+</ul>
+Examples: <i></i>","Code d’une Liste au choix majeures est composée de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3-6 chiffres</li>
+<li><b>G</b></li>
+</ul>
+Exemples: <i></i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_optionlistchoice,REQUIRED,300G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Option list choice is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3-6 numbers</li>
+<li><b>G</b></li>
+</ul>
+Examples: <i>LADPU801G, MCOMM614G, LFILO922G</i>","Code d’une Liste au choix Option est composée de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3-6 chiffres</li>
+<li><b>G</b></li>
+</ul>
+Exemples: <i>LADPU801G, MCOMM614G, LFILO922G</i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_finality120listchoice,REQUIRED,400G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Finality 120 list choice  is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3-6 numbers</li>
+<li><b>G</b></li>
+</ul>
+Examples: <i>LCHIM900G, WSBIM900G, MGESM400G</i>","Code d’une Liste au choix de finalités (120) est composée de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3-6 chiffres</li>
+<li><b>G</b></li>
+</ul>
+Exemples: <i>LCHIM900G, WSBIM900G, MGESM400G</i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_finality180listchoice,REQUIRED,400G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Finality 180 list choice is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3-6 numbers</li>
+<li><b>G</b></li>
+</ul>
+Examples: <i>TCOMU900G, WMED900G, WMD400G</i>","Code d’une Liste au choix de finalités (180) est composée de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3-6 chiffres</li>
+<li><b>G</b></li>
+</ul>
+Exemples: <i>TCOMU900G, WMED900G, WMD400G</i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,500G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Mobility partnership list choice is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3-6 numbers</li>
+<li><b>G</b></li>
+</ul>
+Examples: <i>LGENT500G</i>","Code d’une Liste au choix partenariat mobilité est composée de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3-6 chiffres</li>
+<li><b>G</b></li>
+</ul>
+Exemples: <i>LGENT500G</i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_subgroup,REQUIRED,,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Rr])$",,"Code of Sub group is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3-6 numbers</li>
+<li><b>R</b></li>
+</ul>
+Examples: <i>LTEMP712R, LSPOL914R, LARKE803R</i>","Code d’un Sous-groupe est composé de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3-6 chiffres</li>
+<li><b>R</b></li>
+</ul>
+Exemples: <i>LTEMP712R, LSPOL914R, LARKE803R</i>"
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_commoncore,REQUIRED,,,,,
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_complementarymodule,REQUIRED,,,,,
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_minorlistchoice,REQUIRED,,,,,
@@ -1249,14 +1375,126 @@ base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_
 base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_finality180listchoice,REQUIRED,,,,,
 base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,,,,,
 base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_subgroup,REQUIRED,,,,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_deepening,REQUIRED,100P,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Pp])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_sociatyminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_accessminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_openminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_disciplinarycomplementminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_fsaspeciality,REQUIRED,J,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Jj])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_option,REQUIRED,O,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Oo])$",,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_mobilitypartnership,REQUIRED,V,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Vv])$",,,
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_deepening,REQUIRED,100P,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Pp])$",,"Code of Deepening is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3 numbers</li>
+<li><b>P</b></li>
+</ul>
+Examples: <i>LBIOL100P, WFARM100P, LSINF110P</i>","Code d’un Approfondissement est composé de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3 chiffres</li>
+<li><b>P</b></li>
+</ul>
+Exemples: <i>LBIOL100P, WFARM100P, LSINF110P</i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_sociatyminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Society minor is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3 numbers</li>
+<li><b>I</b></li>
+</ul>
+Examples: <i>LCUCR100I, LDVLD100I, LGENR100I</i>","Code d’une Mineure de société est composée de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3 chiffres</li>
+<li><b>I</b></li>
+</ul>
+Exemples: <i>LCUCR100I, LDVLD100I, LGENR100I</i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_accessminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Access minor is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3 numbers</li>
+<li><b>I</b></li>
+</ul>
+Examples: <i>LECON100I, LISP100I, LLING100I</i>","Code d’une Mineure d’accès est composée de: 
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3 chiffres</li>
+<li><b>I</b></li>
+</ul>
+Exemples: <i>LECON100I, LISP100I, LLING100I</i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_openminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Open minor is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3 numbers</li>
+<li><b>I</b></li>
+</ul>
+Examples: <i>LANTI100I, WSBIM100I, LMPME100I</i>","Code d’une Mineure d’ouverture est composée de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3 chiffres</li>
+<li><b>I</b></li>
+</ul>
+Exemples: <i>LANTI100I, WSBIM100I, LMPME100I</i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_disciplinarycomplementminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Disciplinary complement minor is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3 numbers</li>
+<li><b>I</b></li>
+</ul>
+Examples: <i>LALLE100I, LCHIM100I, LITA100I</i>","Code d’une Mineure complément disciplinaire est composée de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3 chiffres</li>
+<li><b>I</b></li>
+</ul>
+Exemples: <i>LALLE100I, LCHIM100I, LITA100I</i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_fsaspeciality,REQUIRED,J,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Jj])$",,"Code of FSA speciality is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3 numbers</li>
+<li><b>J</b></li>
+</ul>
+Examples: <i>LMAJ103J, LMAJ102J, LPSP100J</i>","Code d’une Spécialité FSA (majeure) est composée de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3 chiffres</li>
+<li><b>J</b></li>
+</ul>
+Exemples: <i>LMAJ103J, LMAJ102J, LPSP100J</i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_option,REQUIRED,O,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Oo])$",,"Code of Option is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3 numbers</li>
+<li><b>O</b></li>
+</ul>
+Examples: <i>LFYAP952O, MCOMM210O, LENVI203O</i>","Code d’une Option est composée de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3 chiffres</li>
+<li><b>O</b></li>
+</ul>
+Exemples: <i>LFYAP952O, MCOMM210O, LENVI203O</i>"
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_mobilitypartnership,REQUIRED,V,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Vv])$",,"Code of Mobility partnership is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3 numbers</li>
+<li><b>V</b></li>
+</ul>
+Examples: <i>LAGRO10068V, LDRT10025V, LFIAL10177V</i>","Code d’un Parternariat de mobilité est composé de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3 chiffres</li>
+<li><b>V</b></li>
+</ul>
+Exemples: <i>LAGRO10068V, LDRT10025V, LFIAL10177V</i>"
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_deepening,REQUIRED,,,,,
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_sociatyminor,REQUIRED,,,,,
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_accessminor,REQUIRED,,,,,
