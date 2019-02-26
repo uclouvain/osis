@@ -34,6 +34,7 @@ from education_group.api.serializers.training import TrainingListSerializer, Tra
 class TrainingFilter(filters.FilterSet):
     from_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='gte')
     to_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='lte')
+    type = filters.CharFilter(field_name="education_group_type__name", lookup_expr='contains')
 
     class Meta:
         model = EducationGroupYear
