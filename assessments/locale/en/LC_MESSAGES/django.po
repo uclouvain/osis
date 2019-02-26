@@ -237,7 +237,7 @@ msgid "Encoding"
 msgstr ""
 
 msgid "End date Prof"
-msgstr "Echéance Prof"
+msgstr ""
 
 #: business/score_encoding_export.py:177 templates/blocks/legend.html:30
 msgid "Enrolled after session starts"
