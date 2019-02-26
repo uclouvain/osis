@@ -626,9 +626,10 @@ class EducationGroupYear(SerializableModel):
         return self.educationgrouporganization_set.all().order_by('all_students')
 
     def is_training(self):
-        if self.education_group_type:
-            return self.education_group_type.category == education_group_categories.TRAINING
-        return False
+        return self.education_group_type.category == education_group_categories.TRAINING
+
+    def is_mini_training(self):
+        return self.education_group_type.category == education_group_categories.MINI_TRAINING
 
     def delete(self, using=None, keep_parents=False):
         result = super().delete(using, keep_parents)

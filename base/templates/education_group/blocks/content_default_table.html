@@ -43,8 +43,15 @@
         <tr>
             <td width="10%">{{ group.acronym }}</td>
             <td>{{ group.child_branch.partial_acronym }}</td>
-            <td width="20%">{{ group.title }}</td>
-            <td width="12%">{{ group.relative_credits | default_if_none:'-' }} /{{ group.child.credits|floatformat | default_if_none:'-' }}</td>
+            <td width="20%">
+                {% if group.child_branch %}
+                    {{ group.child_branch.title }}
+                {% else %}
+                    {{ group.child_leaf.complete_title }}
+                {% endif %}
+            </td>
+            <td width="12%">{{ group.relative_credits | default_if_none:'-' }}
+                /{{ group.child.credits|floatformat | default_if_none:'-' }}</td>
             <td width="6%">{{ group.is_mandatory | yesno }}</td>
             <td width="6%">{{ group.block | default_if_none:'-' }}</td>
             <td width="5%">{{ group.get_quadrimester_derogation_display|default_if_none:'-' }}</td>

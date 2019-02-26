@@ -33,7 +33,7 @@ from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year
 from base.models.education_group_type import find_authorized_types
 from base.models.enums import academic_calendar_type
-from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP, Categories
+from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
 
 ERRORS_MSG = {
     "base.add_educationgroup": "The user has not permission to create education groups.",
@@ -43,15 +43,18 @@ ERRORS_MSG = {
 
 
 def is_eligible_to_add_training(person, education_group, raise_exception=False):
-    return _is_eligible_to_add_education_group(person, education_group, TRAINING, raise_exception=raise_exception)
+    return _is_eligible_to_add_education_group(person, education_group, Categories.TRAINING,
+                                               raise_exception=raise_exception)
 
 
 def is_eligible_to_add_mini_training(person, education_group, raise_exception=False):
-    return _is_eligible_to_add_education_group(person, education_group, MINI_TRAINING, raise_exception=raise_exception)
+    return _is_eligible_to_add_education_group(person, education_group, Categories.MINI_TRAINING,
+                                               raise_exception=raise_exception)
 
 
 def is_eligible_to_add_group(person, education_group, raise_exception=False):
-    return _is_eligible_to_add_education_group(person, education_group, GROUP, raise_exception=raise_exception)
+    return _is_eligible_to_add_education_group(person, education_group, Categories.GROUP,
+                                               raise_exception=raise_exception)
 
 
 def _is_eligible_to_add_education_group(person, education_group, category, education_group_type=None,
@@ -129,8 +132,9 @@ def _is_eligible_education_group(person, education_group, raise_exception):
 
 def _is_eligible_to_add_education_group_with_category(person, category, raise_exception):
     # TRAINING/MINI_TRAINING can only be added by central managers | Faculty manager must make a proposition of creation
-    result = person.is_central_manager or (person.is_faculty_manager and category == GROUP)
-    msg = _("The user has not permission to create a %(category)s.") % {"category": _(category)}
+    # based on US OSIS-2592, Faculty manager can add a MINI-TRAINING
+    result = person.is_central_manager or (person.is_faculty_manager and category == Categories.MINI_TRAINING)
+    msg = _("The user has not permission to create a %(category)s.") % {"category": category.value}
     can_raise_exception(raise_exception, result, msg)
     return result
 
@@ -164,7 +168,7 @@ def check_authorized_type(education_group, category, raise_exception=False):
         return True
 
     result = find_authorized_types(
-        category=category,
+        category=category.name,
         parents=[education_group]
     ).exists()
 
@@ -175,7 +179,7 @@ def check_authorized_type(education_group, category, raise_exception=False):
             "female" if parent_category in [TRAINING, MINI_TRAINING] else "male",
             "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
         ) % {
-            "child_category": Categories[category].value,
+            "child_category": category.value,
             "category": education_group.education_group_type.get_category_display(),
             "type": education_group.education_group_type.get_name_display(),
         })

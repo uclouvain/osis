@@ -99,20 +99,15 @@ class PostponeContent:
 
     @transaction.atomic
     def postpone(self):
-        result = self._postpone()
+        result = self._postpone(self.instance, self.instance_n1)
         self._post_postponement()
         return result
 
-    def _postpone(self, instance=None):
+    def _postpone(self, instance: EducationGroupYear, next_instance: EducationGroupYear):
         """
         We'll postpone first the group_element_years of the root,
         after that, we'll postponement recursively all the child branches and child leafs.
         """
-        if not instance:
-            instance = self.instance
-            next_instance = self.instance_n1
-        else:
-            next_instance = instance.education_group.educationgroupyear_set.get(academic_year=self.next_academic_year)
 
         for gr in instance.groupelementyear_set.select_related('child_branch__academic_year',
                                                                'child_branch__education_group'):
@@ -151,7 +146,8 @@ class PostponeContent:
         new_luy = old_luy.get_learning_unit_next_year() or old_luy
         self.postponed_luy.append((old_luy, new_luy))
         new_gr.child_leaf = new_luy
-        return new_gr.save()
+        new_gr.save()
+        return new_gr
 
     def _postpone_child_branch(self, old_gr, new_gr):
         """
@@ -167,15 +163,18 @@ class PostponeContent:
                 parent_type=new_gr.parent.education_group_type,
                 child_type=new_egy.education_group_type
             ).first()
-            if relationship and relationship.min_count_authorized > 0:
-                self._postpone(old_egy)
+            if relationship and relationship.min_count_authorized > 0 and not new_egy.groupelementyear_set.all():
+                # We postpone data only if the mandatory group is empty.
+                self._postpone(old_egy, new_egy)
 
-        if not new_egy:
+        else:
+            # If the education group does not exists for the next year, we have to postpone.
             new_egy = duplicate_education_group_year(old_egy, self.next_academic_year)
-            self._postpone(old_egy)
+            self._postpone(old_egy, new_egy)
 
         new_gr.child_branch = new_egy
-        return new_gr.save()
+        new_gr.save()
+        return new_gr
 
     def _check_if_already_postponed(self, education_group_year):
         """
