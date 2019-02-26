@@ -85,7 +85,6 @@ class ValidationRule(models.Model):
 
     @property
     def help_text(self):
-        # TODO create enumeration for language
         if get_language() == LanguageCodes.EN.value:
             return self.help_text_en
         return self.help_text_fr
