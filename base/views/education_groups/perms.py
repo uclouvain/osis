@@ -29,14 +29,14 @@ from django.shortcuts import get_object_or_404
 from base.business.education_groups import perms as business_perms
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_categories import Categories
 from base.models.person import Person
 
 
 def can_create_education_group(view_func):
     def f_can_create_education_group(request, *args, **kwargs):
         pers = get_object_or_404(Person, user=request.user)
-        category = kwargs['category']  # Mandatory kwargs
-
+        category = getattr(Categories, kwargs['category'])  # Mandatory kwargs
         parent_id = kwargs.get("parent_id")
         parent = get_object_or_404(EducationGroupYear, pk=parent_id) if parent_id else None
         education_group_type_pk = kwargs.get("education_group_type_pk")
