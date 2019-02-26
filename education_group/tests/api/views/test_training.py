@@ -163,6 +163,24 @@ class FilterTrainingTestCase(APITestCase):
         )
         self.assertEqual(response.data['results'], serializer.data)
 
+    def test_get_training_case_filter_type_params(self):
+        query_string = {'type': 'continue'}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        trainings = EducationGroupYear.objects.filter(
+            education_group_type__category=education_group_categories.TRAINING,
+            education_group_type__name__contains=query_string['type']
+        )
+
+        serializer = TrainingListSerializer(
+            trainings,
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
 
 class GetTrainingTestCase(APITestCase):
     @classmethod
