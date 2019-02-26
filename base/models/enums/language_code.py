@@ -29,4 +29,3 @@ from base.models.utils.utils import ChoiceEnum
 class LanguageCodes(ChoiceEnum):
     EN = 'en'
     FR = 'fr'
-
