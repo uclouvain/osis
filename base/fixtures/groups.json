@@ -3131,6 +3131,11 @@
                 "can_manage_attribution",
                 "base",
                 "person"
+            ],
+            [
+                "can_consolidate_learningunit_proposal",
+                "base",
+                "learningunit"
             ]
         ]
     }
