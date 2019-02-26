@@ -119,7 +119,7 @@ class ValidationRuleMixin(WarningFormMixin):
                 self.change_status(field, rule)
 
                 field.initial = rule.initial_value
-                field.help_text = mark_safe(rule.help_text)
+                field.help_text = rule.help_text
 
                 field.validators.append(
                     RegexValidator(rule.regex_rule, rule.regex_error_message or None)

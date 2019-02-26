@@ -39,7 +39,7 @@
                     </div>
                     <div class="col-md-6">
                         {% bootstrap_label form_education_group_year.partial_acronym.label %}<b>*</b>
-                        <abbr title="{{ form_education_group_year.partial_acronym.help_text }}">
+                        <abbr title="{{ form_education_group_year.partial_acronym.help_text | safe }}" data-toggle='tooltip' data-html='true'>
                             <span class="glyphicon glyphicon-question-sign" style="font-size: 14pt;"></span>
                          </abbr>
                         {% bootstrap_field form_education_group_year.partial_acronym show_label=False show_help=False %}
