@@ -17,29 +17,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: templates/offer/score_sheet_address_tab.html:52
-#, fuzzy, python-format
-#| msgid ""
-#| "If you customize one of the field below, it only change the address "
-#| "displayed on the score encodings sheets for the program %(program)s. It "
-#| "will never change the address of any structure. The list below will help "
-#| "you to pre-fill in the form."
-msgid ""
-"\n"
-"                                    If you customize one of the field below, "
-"it only change the address displayed on the\n"
-"                                    score encodings sheets for the program "
-"%(program)s.\n"
-"                                    It will never change the address of any "
-"structure. The list below will help you to\n"
-"                                    pre-fill in the form.\n"
-"                                "
-msgstr ""
-"Si vous personnalisez l'un des champs ci-dessous, cela ne changera que "
-"l'adresse affichée sur les pages d'encodage de notes pour le programme "
-"%(program)s. Cela ne changera jamais l'adresse d'une structure. La liste ci-"
-"dessous vous aidera à pré-remplir le formulaire."
-
 #: templates/online_encoding.html:287
 #, fuzzy, python-format
 msgid ""
@@ -344,6 +321,18 @@ msgstr "Prénom"
 #: views/upload_xls_utils.py:82
 msgid "Get Excel file"
 msgstr "Récupérer le fichier Excel"
+
+#: templates/offer/score_sheet_address_tab.html:51
+msgid ""
+"If you customize one of the field below, it only change the address "
+"displayed on the score encodings sheets for the program %%(program)s. It "
+"will never change the address of any structure. The list below will help you "
+"to pre-fill in the form."
+msgstr ""
+"Si vous personnalisez l'un des champs ci-dessous, cela ne changera que "
+"l'adresse affichée sur les pages d'encodage de notes pour le programme "
+"%(program)s. Cela ne changera jamais l'adresse d'une structure. La liste ci-"
+"dessous vous aidera à pré-remplir le formulaire."
 
 #: templates/online_double_encoding_form.html:104
 #: templates/online_encoding_form.html:103

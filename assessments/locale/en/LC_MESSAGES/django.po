@@ -1,17 +1,3 @@
-#: templates/offer/score_sheet_address_tab.html:52
-#, python-format
-msgid ""
-"\n"
-"                                    If you customize one of the field below, "
-"it only change the address displayed on the\n"
-"                                    score encodings sheets for the program "
-"%(program)s.\n"
-"                                    It will never change the address of any "
-"structure. The list below will help you to\n"
-"                                    pre-fill in the form.\n"
-"                                "
-msgstr ""
-
 #: templates/online_encoding.html:287
 #, python-format
 msgid ""
