@@ -45,17 +45,13 @@
 
         <div>
             <label>{% trans 'Title in French' %}</label>
-            {% if parent.title %}
-                <strong class="text-primary">{{ parent.title }}</strong><br>
-            {% endif %}
+            <br>
             {{ education_group_year.title | default_if_none:'-' }}
         </div>
         <br>
         <div>
             <label>{% trans 'Title in English' %}</label>
-            {% if parent.title_english %}
-                <strong class="text-primary">{{ parent.title_english }}</strong><br>
-            {% endif %}
+            <br>
             {{ education_group_year.title_english | default_if_none:'' }}
         </div>
         {% if education_group_year.education_group_type.category != 'GROUP' %}
