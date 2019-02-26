@@ -28,6 +28,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _, get_language
 
 from base.models.enums.field_status import FIELD_STATUS, NOT_REQUIRED
+from base.models.enums.language_code import LanguageCodes
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -85,6 +86,6 @@ class ValidationRule(models.Model):
     @property
     def help_text(self):
         # TODO create enumeration for language
-        if get_language() == 'en':
+        if get_language() == LanguageCodes.EN.value:
             return self.help_text_en
         return self.help_text_fr
