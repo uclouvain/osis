@@ -286,6 +286,15 @@ msgstr ""
 msgid "Get Excel file"
 msgstr ""
 
+#: templates/offer/score_sheet_address_tab.html:51
+#, python-format
+msgid ""
+"If you customize one of the field below, it only change the address "
+"displayed on the score encodings sheets for the program %%(program)s. It "
+"will never change the address of any structure. The list below will help you "
+"to pre-fill in the form."
+msgstr ""
+
 #: templates/online_double_encoding_form.html:104
 #: templates/online_encoding_form.html:103
 msgid "If you try to put decimal values, it will be ignored."
