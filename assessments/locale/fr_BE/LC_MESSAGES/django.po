@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-25 13:37+0100\n"
+"POT-Creation-Date: 2019-02-26 11:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -292,6 +292,9 @@ msgstr "Encoder les notes"
 #: templates/online_double_encoding_validation.html:108
 msgid "Encoding"
 msgstr "Encodage"
+
+msgid "End date Prof"
+msgstr "Echéance Prof"
 
 #: business/score_encoding_export.py:177 templates/blocks/legend.html:30
 msgid "Enrolled after session starts"
@@ -866,7 +869,7 @@ msgstr "Le fichier dois être un fichier excel valide"
 msgid "The manager will keep the following programs : "
 msgstr "Le gestionnaire devra conserver les programmes suivant : "
 
-#: tests/views/test_score_encoding.py:378 views/score_encoding.py:83
+#: tests/views/test_score_encoding.py:377 views/score_encoding.py:83
 #, python-format
 msgid ""
 "The period of scores' encoding %(session_number)s is closed since "
@@ -875,14 +878,14 @@ msgstr ""
 "La période d'encodage de notre %(session_number)s est fermée depuis "
 "%(str_date)s"
 
-#: tests/views/test_score_encoding.py:383 views/score_encoding.py:90
+#: tests/views/test_score_encoding.py:382 views/score_encoding.py:90
 #, python-format
 msgid ""
 "The period of scores' encoding %(session_number)s will be open %(str_date)s"
 msgstr ""
 "La période d'encodage de notes %(session_number)s va ouvrir %(str_date)s"
 
-#: tests/views/test_score_encoding.py:351 views/score_encoding.py:94
+#: tests/views/test_score_encoding.py:350 views/score_encoding.py:94
 msgid "The period of scores' encoding is not opened"
 msgstr "La période d'encodage de notes n'est pas ouverte"
 
@@ -999,7 +1002,7 @@ msgstr ""
 "du ficheir excel à fournir (bouton '%(button_value)s')"
 
 #: business/score_encoding_export.py:154 business/score_encoding_export.py:205
-#: business/score_encoding_sheet.py:104 tests/views/test_score_encoding.py:354
+#: business/score_encoding_sheet.py:104 tests/views/test_score_encoding.py:353
 #: views/score_encoding.py:75
 msgid "date_format"
 msgstr "%d%m%Y"
@@ -1023,9 +1026,6 @@ msgstr "programme(s)"
 #: views/score_encoding.py:324
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
-
-#~ msgid "End date Prof"
-#~ msgstr "Echéance Prof"
 
 #~ msgid "Not enrolled"
 #~ msgstr "Pas inscrit"

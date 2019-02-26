@@ -250,6 +250,9 @@ msgstr ""
 msgid "Encoding"
 msgstr ""
 
+msgid "End date Prof"
+msgstr "Echéance Prof"
+
 #: business/score_encoding_export.py:177 templates/blocks/legend.html:30
 msgid "Enrolled after session starts"
 msgstr ""
@@ -806,20 +809,20 @@ msgstr ""
 msgid "The manager will keep the following programs : "
 msgstr ""
 
-#: tests/views/test_score_encoding.py:378 views/score_encoding.py:83
+#: tests/views/test_score_encoding.py:377 views/score_encoding.py:83
 #, python-format
 msgid ""
 "The period of scores' encoding %(session_number)s is closed since "
 "%(str_date)s"
 msgstr ""
 
-#: tests/views/test_score_encoding.py:383 views/score_encoding.py:90
+#: tests/views/test_score_encoding.py:382 views/score_encoding.py:90
 #, python-format
 msgid ""
 "The period of scores' encoding %(session_number)s will be open %(str_date)s"
 msgstr ""
 
-#: tests/views/test_score_encoding.py:351 views/score_encoding.py:94
+#: tests/views/test_score_encoding.py:350 views/score_encoding.py:94
 msgid "The period of scores' encoding is not opened"
 msgstr ""
 
@@ -924,7 +927,7 @@ msgid ""
 msgstr ""
 
 #: business/score_encoding_export.py:154 business/score_encoding_export.py:205
-#: business/score_encoding_sheet.py:104 tests/views/test_score_encoding.py:354
+#: business/score_encoding_sheet.py:104 tests/views/test_score_encoding.py:353
 #: views/score_encoding.py:75
 msgid "date_format"
 msgstr ""
