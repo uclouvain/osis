@@ -707,14 +707,15 @@ class EducationGroupYear(SerializableModel):
             return
 
         past_egy_using_same_partial_acronym = EducationGroupYear.objects.\
-            filter(partial_acronym=self.partial_acronym, academic_year__year__lt=self.academic_year.year).\
+            filter(partial_acronym=self.partial_acronym.upper(), academic_year__year__lt=self.academic_year.year). \
+            exclude(education_group=self.education_group_id).\
             order_by('-academic_year__year')[:1]
         present_and_futur_egy_using_same_partial_acronym = EducationGroupYear.objects.\
-            filter(partial_acronym=self.partial_acronym, academic_year__year__gte=self.academic_year.year).\
+            filter(partial_acronym=self.partial_acronym.upper(), academic_year__year__gte=self.academic_year.year). \
+            exclude(education_group=self.education_group_id).\
             order_by('academic_year__year')[:1]
         egy_using_same_partial_acronym = present_and_futur_egy_using_same_partial_acronym.\
-            union(past_egy_using_same_partial_acronym).\
-            exclude(education_group=self.education_group_id).first()
+            union(past_egy_using_same_partial_acronym).first()
 
         if egy_using_same_partial_acronym and \
                 egy_using_same_partial_acronym.academic_year.year >= self.academic_year.year:
@@ -736,10 +737,12 @@ class EducationGroupYear(SerializableModel):
             return
 
         past_egy_using_same_acronym = EducationGroupYear.objects.\
-            filter(acronym=self.acronym, academic_year__year__lt=self.academic_year.year). \
+            filter(acronym=self.acronym.upper(), academic_year__year__lt=self.academic_year.year). \
+            exclude(education_group=self.education_group_id).\
             order_by("-academic_year__year")
         present_and_futur_egy_using_same_acronym = EducationGroupYear.objects.\
-            filter(acronym=self.acronym, academic_year__year__gte=self.academic_year.year).\
+            filter(acronym=self.acronym.upper(), academic_year__year__gte=self.academic_year.year). \
+            exclude(education_group=self.education_group_id).\
             order_by("academic_year__year")
 
         if self.education_group_type.category == education_group_categories.GROUP:
@@ -751,10 +754,7 @@ class EducationGroupYear(SerializableModel):
         past_egy_using_same_acronym = past_egy_using_same_acronym[:1]
         present_and_futur_egy_using_same_acronym = present_and_futur_egy_using_same_acronym[:1]
 
-        egy_using_same_acronym = present_and_futur_egy_using_same_acronym.union(past_egy_using_same_acronym).\
-            exclude(education_group=self.education_group_id)
-
-        egy_using_same_acronym = egy_using_same_acronym.first()
+        egy_using_same_acronym = present_and_futur_egy_using_same_acronym.union(past_egy_using_same_acronym).first()
 
         if egy_using_same_acronym and egy_using_same_acronym.academic_year.year >= self.academic_year.year:
             raise ValidationError({

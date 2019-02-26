@@ -36,7 +36,8 @@ from base.models.person import Person
 def can_create_education_group(view_func):
     def f_can_create_education_group(request, *args, **kwargs):
         pers = get_object_or_404(Person, user=request.user)
-        category = getattr(Categories, kwargs['category'])  # Mandatory kwargs
+        category = kwargs['category']  # Mandatory kwargs
+
         parent_id = kwargs.get("parent_id")
         parent = get_object_or_404(EducationGroupYear, pk=parent_id) if parent_id else None
         education_group_type_pk = kwargs.get("education_group_type_pk")
