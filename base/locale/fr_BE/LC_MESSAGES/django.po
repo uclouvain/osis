@@ -5188,7 +5188,7 @@ msgstr "commentaire anglais"
 #, fuzzy
 #| msgid "english comment"
 msgid "english help text"
-msgstr "commentaire anglais"
+msgstr "texte d'aide en anglais"
 
 #: business/learning_unit_xls.py:77
 msgid "fac. level"
@@ -5214,7 +5214,7 @@ msgstr "jj/mm/aaaa"
 
 #: models/validation_rule.py:78
 msgid "french help text"
-msgstr ""
+msgstr "texte d'aide en français"
 
 #: templates/education_group/learning_unit/tab_prerequisite_group.html:32
 #: templates/education_group/learning_unit/tab_prerequisite_training.html:32
