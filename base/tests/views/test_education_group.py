@@ -723,7 +723,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         self.assertEqual(qs.count(), 1)
         response = self.client.get(delete_url, data={'id': admission_condition_line.pk})
-        self.assertEqual(response.status_code,  HttpResponseRedirect.status_code)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
         self.assertEqual(qs.count(), 0)
 
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_line_get',
