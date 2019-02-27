@@ -46,7 +46,8 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
 from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
-from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin
+from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
+    SerializableQuerySet
 
 
 class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
@@ -64,12 +65,30 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
     ]
 
 
+class EducationGroupYearQueryset(SerializableQuerySet):
+    def get_nearest_years(self, year):
+        return self.aggregate(
+            futur=Min(
+                Case(When(academic_year__year__gte=year, then='academic_year__year'))
+            ),
+            past=Max(
+                Case(When(academic_year__year__lt=year, then='academic_year__year'))
+            )
+        )
+
+
 class EducationGroupYearManager(SerializableModelManager):
+    def get_queryset(self):
+        return EducationGroupYearQueryset(self.model, using=self._db)
+
     def look_for_common(self, **kwargs):
         return self.filter(acronym__startswith='common', **kwargs)
 
     def get_common(self, **kwargs):
         return self.get(acronym='common', **kwargs)
+
+    def get_nearest_years(self, year):
+        return self.get_queryset().get_nearest_years(year)
 
 
 class EducationGroupYear(SerializableModel):
@@ -711,15 +730,9 @@ class EducationGroupYear(SerializableModel):
             return
 
         egy_using_same_partial_acronym = EducationGroupYear.objects.\
-            filter(partial_acronym=self.partial_acronym.upper()).exclude(education_group=self.education_group_id).\
-            aggregate(
-                futur=Min(
-                    Case(When(academic_year__year__gte=self.academic_year.year, then='academic_year__year'))
-                ),
-                past=Max(
-                    Case(When(academic_year__year__lt=self.academic_year.year, then='academic_year__year'))
-                )
-            )
+            filter(partial_acronym=self.partial_acronym.upper()).\
+            exclude(education_group=self.education_group_id).\
+            get_nearest_years(self.academic_year.year)
 
         if egy_using_same_partial_acronym["futur"]:
             raise ValidationError({
@@ -747,14 +760,7 @@ class EducationGroupYear(SerializableModel):
             egy_using_same_acronym = egy_using_same_acronym.\
                 exclude(education_group_type__category=education_group_categories.GROUP)
 
-        egy_using_same_acronym = egy_using_same_acronym.aggregate(
-                futur=Min(
-                    Case(When(academic_year__year__gte=self.academic_year.year, then='academic_year__year'))
-                ),
-                past=Max(
-                    Case(When(academic_year__year__lt=self.academic_year.year, then='academic_year__year'))
-                )
-            )
+        egy_using_same_acronym = egy_using_same_acronym.get_nearest_years(self.academic_year.year)
 
         if egy_using_same_acronym["futur"]:
             raise ValidationError({
