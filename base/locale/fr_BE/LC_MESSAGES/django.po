@@ -388,7 +388,6 @@ msgid "Acronym existed in %(academic_year)s"
 msgstr "Code a déjà existé en %(academic_year)s"
 
 #: forms/education_group/group.py:56
-#, fuzzy
 #| msgid "Short title"
 msgid "Acronym/Short title"
 msgstr "Titre abrégé"
