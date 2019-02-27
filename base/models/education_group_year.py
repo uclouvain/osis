@@ -706,29 +706,26 @@ class EducationGroupYear(SerializableModel):
         if not self.partial_acronym:
             return
 
-        past_egy_using_same_partial_acronym = EducationGroupYear.objects.\
-            filter(partial_acronym=self.partial_acronym.upper(), academic_year__year__lt=self.academic_year.year). \
-            exclude(education_group=self.education_group_id).\
-            order_by('-academic_year__year')[:1]
-        present_and_futur_egy_using_same_partial_acronym = EducationGroupYear.objects.\
-            filter(partial_acronym=self.partial_acronym.upper(), academic_year__year__gte=self.academic_year.year). \
-            exclude(education_group=self.education_group_id).\
-            order_by('academic_year__year')[:1]
-        egy_using_same_partial_acronym = present_and_futur_egy_using_same_partial_acronym.\
-            union(past_egy_using_same_partial_acronym).first()
+        egy_using_same_partial_acronym = EducationGroupYear.objects.\
+            filter(partial_acronym=self.partial_acronym.upper()).exclude(education_group=self.education_group_id).\
+            select_related("academic_year")
 
-        if egy_using_same_partial_acronym and \
-                egy_using_same_partial_acronym.academic_year.year >= self.academic_year.year:
+        present_and_futur_egy_using_same_partial_acronym = egy_using_same_partial_acronym.\
+            filter(academic_year__year__gte=self.academic_year.year).order_by('academic_year__year').first()
+        past_egy_using_same_partial_acronym = egy_using_same_partial_acronym.\
+            filter(academic_year__year__lt=self.academic_year.year).order_by('-academic_year__year').first()
+
+        if present_and_futur_egy_using_same_partial_acronym:
             raise ValidationError({
                 'partial_acronym': _("Partial acronym already exists in %(academic_year)s") % {
-                    "academic_year": str(egy_using_same_partial_acronym.academic_year)
+                    "academic_year": str(present_and_futur_egy_using_same_partial_acronym.academic_year)
                 }
             })
 
-        if raise_warnings and egy_using_same_partial_acronym:
+        if raise_warnings and past_egy_using_same_partial_acronym:
             raise ValidationWarning({
                 'partial_acronym': _("Partial acronym existed in %(academic_year)s") % {
-                    "academic_year": str(egy_using_same_partial_acronym.academic_year)
+                    "academic_year": str(past_egy_using_same_partial_acronym.academic_year)
                 }
             })
 
@@ -736,37 +733,30 @@ class EducationGroupYear(SerializableModel):
         if not self.acronym:
             return
 
-        past_egy_using_same_acronym = EducationGroupYear.objects.\
-            filter(acronym=self.acronym.upper(), academic_year__year__lt=self.academic_year.year). \
-            exclude(education_group=self.education_group_id).\
-            order_by("-academic_year__year")
-        present_and_futur_egy_using_same_acronym = EducationGroupYear.objects.\
-            filter(acronym=self.acronym.upper(), academic_year__year__gte=self.academic_year.year). \
-            exclude(education_group=self.education_group_id).\
-            order_by("academic_year__year")
+        egy_using_same_acronym = EducationGroupYear.objects.filter(acronym=self.acronym.upper()).\
+            exclude(education_group=self.education_group_id).select_related("academic_year")
 
+        # Groups can reuse acronym of other groups
         if self.education_group_type.category == education_group_categories.GROUP:
-            past_egy_using_same_acronym = past_egy_using_same_acronym.\
-                exclude(education_group_type__category=education_group_categories.GROUP)
-            present_and_futur_egy_using_same_acronym = present_and_futur_egy_using_same_acronym. \
+            egy_using_same_acronym = egy_using_same_acronym.\
                 exclude(education_group_type__category=education_group_categories.GROUP)
 
-        past_egy_using_same_acronym = past_egy_using_same_acronym[:1]
-        present_and_futur_egy_using_same_acronym = present_and_futur_egy_using_same_acronym[:1]
+        present_and_futur_egy_using_same_acronym = egy_using_same_acronym.\
+            filter(academic_year__year__gte=self.academic_year.year).order_by("academic_year__year").first()
+        past_egy_using_same_acronym = egy_using_same_acronym. \
+            filter(academic_year__year__lt=self.academic_year.year).order_by("-academic_year__year").first()
 
-        egy_using_same_acronym = present_and_futur_egy_using_same_acronym.union(past_egy_using_same_acronym).first()
-
-        if egy_using_same_acronym and egy_using_same_acronym.academic_year.year >= self.academic_year.year:
+        if present_and_futur_egy_using_same_acronym:
             raise ValidationError({
                 'acronym': _("Acronym already exists in %(academic_year)s") % {
-                    "academic_year": str(egy_using_same_acronym.academic_year)
+                    "academic_year": str(present_and_futur_egy_using_same_acronym.academic_year)
                 }
             })
 
-        if raise_warnings and egy_using_same_acronym:
+        if raise_warnings and past_egy_using_same_acronym:
             raise ValidationWarning({
                 'acronym': _("Acronym existed in %(academic_year)s") % {
-                    "academic_year": str(egy_using_same_acronym.academic_year)
+                    "academic_year": str(past_egy_using_same_acronym.academic_year)
                 }
             })
 
