@@ -25,7 +25,10 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<form method="post" id="UpdateGroupForm" class="education_group_form" data-validate-url="{% url 'validate_education_group_field' form_education_group_year.category %}">
+<form method="post"
+      id="UpdateGroupForm"
+      class="education_group_form"
+      data-validate-url="{% if educatoin_group_year %}{% url 'validate_education_group_field' form_education_group_year.category education_group_year.pk %} {% else %}{% url 'validate_education_group_field' form_education_group_year.category %}{% endif %}">
     {% csrf_token %}
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -37,15 +40,25 @@
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <div class="row">
-                                {% bootstrap_field form_education_group_year.acronym form_group_class="col-md-6" %}
-                                {% bootstrap_field form_education_group_year.partial_acronym form_group_class="col-md-6" %}
+                                 <div class="col-md-6">
+                                    {% bootstrap_label form_education_group_year.acronym.label %}<b>*</b>
+                                    {% bootstrap_field form_education_group_year.acronym show_label=False show_help=False %}
+                                </div>
+                                <div class="col-md-6">
+                                    {% bootstrap_label form_education_group_year.partial_acronym.label %}<b>*</b>
+                                    <abbr title="{{ form_education_group_year.partial_acronym.help_text }}" data-toggle='tooltip' data-html='true'>
+                                        <span class="glyphicon glyphicon-question-sign" style="font-size: 14pt;"></span>
+                                     </abbr>
+                                    {% bootstrap_field form_education_group_year.partial_acronym show_label=False show_help=False %}
+                                </div>
                             </div>
                             <br>
                             <div class="row">
                                 <div class="col-md-6">
                                     <label>{% trans 'Category' %}</label><br>
                                     <input value="{{ form_education_group_year.category_text }}"
-                                           disabled class="form-control" >
+                                           disabled class="form-control"
+                                           title="{% trans 'The field can contain only one value.' %}">
                                 </div>
                                 {% bootstrap_field form_education_group_year.education_group_type form_group_class="col-md-6" %}
                             </div>

@@ -365,6 +365,10 @@ msgstr ""
 msgid "Acronym existed in %(academic_year)s"
 msgstr ""
 
+#: forms/education_group/group.py:56
+msgid "Acronym/Short title"
+msgstr ""
+
 #: templates/blocks/button/learning_units_action_button.html:34
 #: templates/education_group/blocks/dropdown/administrative_data_actions_bar.html:36
 #: templates/education_group/blocks/dropdown/education_groups_action_button.html:33
@@ -471,7 +475,7 @@ msgid "Administration"
 msgstr ""
 
 #: models/education_group_year.py:377 models/enums/offer_year_entity_type.py:32
-#: templates/education_group/identification_training_details.html:95
+#: templates/education_group/identification_training_details.html:93
 msgid "Administration entity"
 msgstr ""
 
@@ -1342,7 +1346,7 @@ msgid "Elaboration and management of the formation catalogue."
 msgstr ""
 
 #: templates/education_group/identification_mini_training_details.html:39
-#: templates/education_group/identification_training_details.html:97
+#: templates/education_group/identification_training_details.html:95
 msgid "End"
 msgstr ""
 
@@ -2201,7 +2205,7 @@ msgstr ""
 #: business/education_group.py:59 models/education_group_year.py:370
 #: models/enums/offer_year_entity_type.py:33
 #: templates/education_group/identification_group_details.html:37
-#: templates/education_group/identification_training_details.html:94
+#: templates/education_group/identification_training_details.html:92
 #: templates/layout.html:215
 msgid "Management entity"
 msgstr ""
@@ -2925,7 +2929,7 @@ msgid "Previous"
 msgstr ""
 
 #: models/education_group_year.py:265
-#: templates/education_group/identification_training_details.html:68
+#: templates/education_group/identification_training_details.html:66
 msgid "Primary language"
 msgstr ""
 
@@ -3167,7 +3171,7 @@ msgid "Quadrimester derogation"
 msgstr ""
 
 #: models/education_group_year.py:409
-#: templates/education_group/identification_training_details.html:60
+#: templates/education_group/identification_training_details.html:58
 msgid "Rate code"
 msgstr ""
 
@@ -3490,7 +3494,7 @@ msgstr ""
 
 #: models/education_group.py:83 models/education_group.py:115
 #: templates/education_group/identification_mini_training_details.html:38
-#: templates/education_group/identification_training_details.html:96
+#: templates/education_group/identification_training_details.html:94
 #: templates/learning_unit/add_charge_repartition_inner.html:35
 #: templates/learning_unit/attributions.html:36
 #: templates/learning_unit/select_attribution.html:36
@@ -3807,6 +3811,13 @@ msgstr ""
 
 #: business/education_groups/perms.py:310
 msgid "The faculty manager cannot modify outside of program edition period"
+msgstr ""
+
+#: forms/education_group/common.py:191
+#: templates/education_group/blocks/form/group.html:49
+#: templates/education_group/blocks/form/minitraining.html:51
+#: templates/education_group/blocks/form/training_tab_identification.html:42
+msgid "The field can contain only one value."
 msgstr ""
 
 #: forms/education_group/training.py:91
@@ -4730,6 +4741,10 @@ msgstr ""
 msgid "You cannot modify content for %(education_group_types)s"
 msgstr ""
 
+#: forms/common.py:132
+msgid "You don't have sufficient rights to edit the field."
+msgstr ""
+
 #: business/learning_units/perms.py:74
 msgid "You don't have the rights to consolidate"
 msgstr ""
@@ -4789,12 +4804,12 @@ msgstr ""
 "Acronym with min 2 et max 4 letters\n"
 "Number Code with 4 digit"
 
-#: templates/education_group/identification_training_details.html:140
+#: templates/education_group/identification_training_details.html:138
 #: templates/education_group/search.html:232 templates/learning_units.html:123
 msgid "activate to sort column ascending"
 msgstr ""
 
-#: templates/education_group/identification_training_details.html:141
+#: templates/education_group/identification_training_details.html:139
 #: templates/education_group/search.html:233 templates/learning_units.html:124
 msgid "activate to sort column descending"
 msgstr ""
@@ -5233,7 +5248,7 @@ msgid "search"
 msgstr ""
 
 #: forms/education_group/training.py:105 models/education_group_year.py:364
-#: templates/education_group/identification_training_details.html:77
+#: templates/education_group/identification_training_details.html:75
 msgid "secondary domains"
 msgstr ""
 
@@ -5317,8 +5332,8 @@ msgstr ""
 
 #: templates/education_group/identification_mini_training_details.html:38
 #: templates/education_group/identification_mini_training_details.html:39
-#: templates/education_group/identification_training_details.html:96
-#: templates/education_group/identification_training_details.html:97
+#: templates/education_group/identification_training_details.html:94
+#: templates/education_group/identification_training_details.html:95
 msgid "unspecified"
 msgstr ""
 
