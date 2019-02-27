@@ -49,10 +49,10 @@ class ReuseOldLearningUnitYearWarning(CopyWarning):
         self.academic_year = academic_year
 
     def __str__(self):
-        return _("The learning unit %(learning_unit_year)s does not exist in %(academic_year)s." % {
+        return _("The learning unit %(learning_unit_year)s does not exist in %(academic_year)s.") % {
             "learning_unit_year": self.learning_unit_year.acronym,
             "academic_year": self.academic_year
-        })
+        }
 
 
 class PrerequisiteItemWarning(CopyWarning):
