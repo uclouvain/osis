@@ -69,12 +69,12 @@ class ValidationRule(models.Model):
     )
 
     help_text_en = RichTextField(
-        null=True,
+        blank=True,
         verbose_name=_("english help text")
     )
 
     help_text_fr = RichTextField(
-        null=True,
+        blank=True,
         verbose_name=_("french help text")
     )
 
