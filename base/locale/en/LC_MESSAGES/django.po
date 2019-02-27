@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-27 14:54+0100\n"
+"POT-Creation-Date: 2019-02-27 15:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,6 +75,14 @@ msgstr[1] ""
 #: models/offer_year_calendar.py:63
 #, python-format
 msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
+msgstr ""
+
+#: business/group_element_years/postponement.py:79
+#: tests/business/education_groups/test_postponement.py:539
+#, python-format
+msgid ""
+"%(education_group_year)s is closed in %(end_year)s, there is no more link to "
+"this element in %(academic_year)s."
 msgstr ""
 
 #: models/education_group.py:113 models/education_group_year.py:693
@@ -776,12 +784,6 @@ msgstr ""
 
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:105
 msgid "Cancel the proposal"
-msgstr ""
-
-#: business/group_element_years/postponement.py:75
-#: tests/business/education_groups/test_postponement.py:538
-#, python-format
-msgid "Cannot copy %(education_group_year)s in the next academic year."
 msgstr ""
 
 #: tests/views/group_element_years/test_detach.py:154
@@ -3738,7 +3740,7 @@ msgstr ""
 msgid "The contacts modifications has been saved"
 msgstr ""
 
-#: business/group_element_years/postponement.py:138
+#: business/group_element_years/postponement.py:145
 #: tests/business/education_groups/test_postponement.py:189
 #: tests/business/education_groups/test_postponement.py:203
 #: tests/business/education_groups/test_postponement.py:212
@@ -3778,7 +3780,7 @@ msgstr ""
 msgid "The education group edition period is not open."
 msgstr ""
 
-#: business/group_element_years/postponement.py:124
+#: business/group_element_years/postponement.py:131
 #: tests/business/education_groups/test_postponement.py:221
 msgid ""
 "The end date of the education group is smaller than the year of postponement."
@@ -3876,12 +3878,11 @@ msgid ""
 "greater than %(year)s"
 msgstr ""
 
-#: business/group_element_years/postponement.py:51
+#: business/group_element_years/postponement.py:52
 #: tests/business/education_groups/test_postponement.py:423
 #, python-format
 msgid ""
-"The learning unit %(learning_unit_year)s does not exist in the next academic "
-"year"
+"The learning unit %(learning_unit_year)s does not exist in %(academic_year)s."
 msgstr ""
 
 #: business/learning_units/edition.py:483
@@ -3993,12 +3994,12 @@ msgstr ""
 msgid "The partim"
 msgstr ""
 
-#: business/group_element_years/postponement.py:63
+#: business/group_element_years/postponement.py:65
 #: tests/business/education_groups/test_postponement.py:476
 #, python-format
 msgid ""
 "The postponed learning unit %(learning_unit)s has a prerequisite %(item)s "
-"which does not exist in the next academic year."
+"which does not exist in %(academic_year)s."
 msgstr ""
 
 #: views/education_groups/learning_unit/detail.py:125
@@ -4029,7 +4030,7 @@ msgid ""
 "({%(new_value)s} instead of {%(current_value)s})"
 msgstr ""
 
-#: business/group_element_years/postponement.py:135
+#: business/group_element_years/postponement.py:142
 #: tests/business/education_groups/test_postponement.py:182
 msgid "The root does not exist in the next academic year."
 msgstr ""
@@ -4207,7 +4208,7 @@ msgstr ""
 msgid "This process helps tutors while scores encoding."
 msgstr ""
 
-#: business/group_element_years/postponement.py:127
+#: business/group_element_years/postponement.py:134
 msgid "This training has no content to postpone."
 msgstr ""
 
@@ -4636,8 +4637,8 @@ msgstr ""
 msgid "You are not allowed to change the end year for this academic year"
 msgstr ""
 
-#: business/group_element_years/postponement.py:95
-#: business/group_element_years/postponement.py:115
+#: business/group_element_years/postponement.py:102
+#: business/group_element_years/postponement.py:122
 #: tests/business/education_groups/test_postponement.py:231
 #: tests/business/education_groups/test_postponement.py:241
 msgid ""
@@ -4649,11 +4650,11 @@ msgstr ""
 msgid "You are not allowed to create a reference with a learning unit"
 msgstr ""
 
-#: business/group_element_years/postponement.py:120
+#: business/group_element_years/postponement.py:127
 msgid "You are not allowed to postpone this training in the future."
 msgstr ""
 
-#: business/group_element_years/postponement.py:118
+#: business/group_element_years/postponement.py:125
 msgid "You are not allowed to postpone this training in the past."
 msgstr ""
 
