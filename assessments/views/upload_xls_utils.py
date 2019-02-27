@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import decimal
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -41,15 +42,14 @@ from attribution import models as mdl_attr
 from base import models as mdl
 from base.models.enums import exam_enrollment_justification_type as justification_types
 
-
-col_academic_year = HEADER.index('academic_year')
-col_session = HEADER.index('Session derogation')
+col_academic_year = HEADER.index('Academic year')
+col_session = HEADER.index('Session')
 col_learning_unit = HEADER.index('Learning unit')
-col_offer = HEADER.index('program')
-col_registration_id = HEADER.index('registration_number')
-col_email = HEADER.index('email')
+col_offer = HEADER.index('Program')
+col_registration_id = HEADER.index('Registration number')
+col_email = HEADER.index('Email')
 col_score = HEADER.index('Numbered scores')
-col_justification = HEADER.index('justification')
+col_justification = HEADER.index('Justification')
 
 REGISTRATION_ID_LENGTH = 8
 
