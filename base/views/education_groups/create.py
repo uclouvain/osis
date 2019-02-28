@@ -158,7 +158,7 @@ def _get_success_message_for_creation_education_group_year(parent_id, education_
 @ajax_required
 @login_required
 @permission_required("base.add_educationgroup", raise_exception=True)
-def validate_field(request, category):
+def validate_field(request, category, education_group_year_pk=None):
     accepted_fields = ["partial_acronym", "acronym"]
 
     academic_year = AcademicYear.objects.get(pk=request.GET["academic_year"])
@@ -167,6 +167,12 @@ def validate_field(request, category):
 
     egy = EducationGroupYear(academic_year=academic_year, acronym=acronym, partial_acronym=partial_acronym,
                              education_group_type=EducationGroupType(category=category))
+
+    # This is an update
+    if education_group_year_pk:
+        egy = get_object_or_404(EducationGroupYear, pk=education_group_year_pk)
+        egy.acronym = acronym
+        egy.partial_acronym = partial_acronym
 
     response = {}
 

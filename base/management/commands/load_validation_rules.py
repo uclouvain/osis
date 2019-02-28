@@ -25,4 +25,6 @@ class Command(BaseCommand):
                 obj.initial_value = row[3].strip()
                 obj.regex_rule = row[4].strip()
                 obj.regex_error_message = row[5].strip()
+                obj.help_text_en = row[6].strip()
+                obj.help_text_fr = row[7].strip()
                 obj.save()

@@ -25,4 +25,4 @@ notifications:
 services:
   - rabbitmq
 addons:
-    postgresql: "9.4"
+    postgresql: "9.6"

@@ -32,15 +32,15 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, pgettext
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
-from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP, Categories
+from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
 from base.templatetags.education_group import li_with_deletion_perm, button_with_permission, \
     button_order_with_permission, BUTTON_ORDER_TEMPLATE, li_with_create_perm_training, \
     li_with_create_perm_mini_training, li_with_create_perm_group, link_detach_education_group, \
     link_pdf_content_education_group, button_edit_administrative_data, dl_with_parent
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
-from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory, EducationGroupYearFactory
+from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 
@@ -137,7 +137,7 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
 
     def test_li_with_create_perm_group(self):
         relation = AuthorizedRelationshipFactory(parent_type=self.education_group_year.education_group_type)
-        relation.child_type.category = GROUP
+        relation.child_type.category = Categories.GROUP.name
         relation.child_type.save()
 
         result = li_with_create_perm_group(self.context, self.url, "")
@@ -369,23 +369,22 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             }
         )
 
-    def test_li_tag_case_mini_training_disabled(self):
+    def test_li_with_create_perm_mini_training(self):
         """
-        This test ensure that as faculty manager, the li tag is disabled for mini training
-        Faculty manager must enter in proposition mode for mini training
+        This test ensure that as faculty manager, the li tag is enable for mini training
         """
-        self.context['education_group_year'] = MiniTrainingFactory()
-        result = li_with_create_perm_mini_training(self.context, self.url, "")
-        msg = _("The user has not permission to create a %(category)s.") % {"category": _(MINI_TRAINING)}
-        msg = msg.capitalize()
+        relation = AuthorizedRelationshipFactory(parent_type=self.education_group_year.education_group_type)
+        relation.child_type.category = Categories.MINI_TRAINING.name
+        relation.child_type.save()
 
+        result = li_with_create_perm_mini_training(self.context, self.url, "")
         self.assertEqual(
             result, {
-                'load_modal': False,
-                'title': msg,
-                'class_li': 'disabled',
+                'load_modal': True,
                 'id_li': 'link_create_mini_training',
-                'url': "#",
+                'url': self.url,
+                'title': '',
+                'class_li': '',
                 'text': ''
             }
         )
@@ -397,7 +396,9 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         """
         self.context['education_group_year'] = TrainingFactory()
         result = li_with_create_perm_training(self.context, self.url, "")
-        msg = _("The user has not permission to create a %(category)s.") % {"category": _(TRAINING)}
+        msg = pgettext("female", "The user has not permission to create a %(category)s.") % {
+            "category": Categories.TRAINING.value
+        }
         msg = msg.capitalize()
         self.assertEqual(
             result, {

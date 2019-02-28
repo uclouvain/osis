@@ -29,7 +29,7 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -46,7 +46,7 @@ from base.tests.factories.authorized_relationship import AuthorizedRelationshipF
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.certificate_aim import CertificateAimFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, MiniTrainingFactory
 from base.tests.factories.education_group_year import GroupFactory, TrainingFactory
 from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
 from base.tests.factories.entity_version import EntityVersionFactory, MainEntityVersionFactory
@@ -141,6 +141,24 @@ class TestUpdate(TestCase):
         )
 
         self.domains = [DomainFactory() for x in range(10)]
+
+        self.a_mini_training_education_group_type = EducationGroupTypeFactory(
+            category=education_group_categories.MINI_TRAINING)
+
+        self.mini_training_education_group_year = MiniTrainingFactory(
+            academic_year=self.current_academic_year,
+            education_group_type=self.a_mini_training_education_group_type
+        )
+
+        self.mini_training_url = reverse(
+            update_education_group,
+            args=[self.mini_training_education_group_year.pk, self.mini_training_education_group_year.pk]
+        )
+
+        EntityVersionFactory(
+            entity=self.mini_training_education_group_year.management_entity,
+            start_date=self.education_group_year.academic_year.start_date
+        )
 
     def tearDown(self):
         self.perm_patcher.stop()
@@ -247,6 +265,42 @@ class TestUpdate(TestCase):
             list_domains
         )
         self.assertNotIn(old_domain, self.education_group_year.secondary_domains.all())
+
+    def test_post_mini_training(self):
+        old_domain = DomainFactory()
+        EducationGroupYearDomainFactory(
+            education_group_year=self.mini_training_education_group_year,
+            domain=old_domain
+        )
+
+        new_entity_version = MainEntityVersionFactory()
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        data = {
+            'title': 'Cours au choix',
+            'title_english': 'deaze',
+            'education_group_type': self.a_mini_training_education_group_type.pk,
+            'credits': 42,
+            'acronym': 'CRSCHOIXDVLD',
+            'partial_acronym': 'LDVLD101R',
+            'management_entity': new_entity_version.pk,
+            'main_teaching_campus': "",
+            'academic_year': self.mini_training_education_group_year.academic_year.pk,
+            'active': ACTIVE,
+            'schedule_type': DAILY,
+            "primary_language": LanguageFactory().pk,
+            "start_year": 2010,
+            "constraint_type": "",
+        }
+        response = self.client.post(self.mini_training_url, data=data)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+        self.mini_training_education_group_year.refresh_from_db()
+        self.assertEqual(self.mini_training_education_group_year.title, 'Cours au choix')
+        self.assertEqual(self.mini_training_education_group_year.title_english, 'deaze')
+        self.assertEqual(self.mini_training_education_group_year.credits, 42)
+        self.assertEqual(self.mini_training_education_group_year.acronym, 'CRSCHOIXDVLD')
+        self.assertEqual(self.mini_training_education_group_year.partial_acronym, 'LDVLD101R')
+        self.assertEqual(self.mini_training_education_group_year.management_entity, new_entity_version.entity)
 
     def test_post_training_with_end_year(self):
         new_entity_version = MainEntityVersionFactory()

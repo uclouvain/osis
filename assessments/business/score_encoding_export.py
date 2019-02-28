@@ -24,18 +24,18 @@
 #
 ##############################################################################
 from django.http import HttpResponse
-from openpyxl import Workbook
-from openpyxl.writer.excel import save_virtual_workbook
-from openpyxl.styles import Color, Style, PatternFill, Font, colors
-from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
+from openpyxl import Workbook
+from openpyxl.styles import Color, Style, PatternFill, Font, colors
+from openpyxl.writer.excel import save_virtual_workbook
 
+from assessments.business.enrollment_state import get_line_color, ENROLLED_LATE_COLOR, NOT_ENROLLED_COLOR
 from base import models as mdl
 from base.models.enums import exam_enrollment_justification_type
-from assessments.business.enrollment_state import get_line_color, ENROLLED_LATE_COLOR, NOT_ENROLLED_COLOR
 
-HEADER = ['academic_year', 'Session derogation', 'Learning unit', 'program', 'registration_number', 'lastname',
-          'firstname', 'email', 'Numbered scores', 'justification', 'End date']
+HEADER = ['Academic year', 'Session', 'Learning unit', 'Program', 'Registration number', 'Lastname',
+          'Firstname', 'Email', 'Numbered scores', 'Justification', 'End date Prof']
 
 JUSTIFICATION_ALIASES = {
     exam_enrollment_justification_type.ABSENCE_JUSTIFIED: "M",
@@ -57,7 +57,8 @@ def export_xls(exam_enrollments):
     __display_creation_date_with_message_about_state(worksheet, row_number=4)
     __display_warning_about_students_deliberated(worksheet, row_number=5)
     worksheet.append([str('')])
-    __display_legends(worksheet)
+    show_decimal = exam_enrollments[0].learning_unit_enrollment.learning_unit_year.decimal_scores
+    __display_legends(worksheet, show_decimal)
     _color_legend(worksheet)
     worksheet.append([str('')])
     __columns_resizing(worksheet)
@@ -165,7 +166,7 @@ def __display_warning_about_students_deliberated(ws, row_number):
     ws.cell(row=row_number, column=1).font = Font(color=colors.RED)
 
 
-def __display_legends(ws):
+def __display_legends(ws, decimal):
     ws.append([
         str(_('Justification')),
         str(_("Accepted value: %(justification_label_authorized)s ")
@@ -187,6 +188,11 @@ def __display_legends(ws):
     ws.append([
         str(_('Numbered scores')),
         str(_('Score legend: %(score_legend)s (0=Score of presence)') % {"score_legend": "0 - 20"}),
+    ])
+    ws.append([
+            str(_('Decimal values in scores are accepted.'))
+            if decimal else
+            str(_('Decimal values in scores are NOT accepted.'))
     ])
 
 

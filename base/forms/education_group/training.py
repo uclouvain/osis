@@ -187,7 +187,8 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         if getattr(self.instance, 'administration_entity', None):
             self.initial['administration_entity'] = get_last_version(self.instance.administration_entity).pk
 
-        self.fields['decree_category'].choices = sorted(decree_category.DECREE_CATEGORY, key=lambda c: c[1])
+        self.fields['decree_category'].choices = sorted(decree_category.DecreeCategories.choices(),
+                                                        key=lambda c: c[1])
         self.fields['rate_code'].choices = sorted(rate_code.RATE_CODE, key=lambda c: c[1])
         self.fields['main_domain'].queryset = Domain.objects.filter(type=domain_type.UNIVERSITY)\
                                                     .select_related('decree')
@@ -196,6 +197,9 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
 
         if not getattr(self.initial, 'academic_year', None):
             self.set_initial_diploma_values()
+
+        if 'instance' in kwargs and not kwargs['instance']:
+            self.fields['academic_year'].label = _('Start')
 
     def set_initial_diploma_values(self):
         if self.education_group_type and \

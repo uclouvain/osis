@@ -59,10 +59,12 @@ urlpatterns = [
         name='new_education_group'
     ),
     url(
-        r'^validate_field/(?P<category>[A-Z_]+)/',
-        create.validate_field,
-        name='validate_education_group_field'
+        r'^validate_field/(?P<category>[A-Z_]+)/', include([
+            url(r'^$', create.validate_field, name='validate_education_group_field'),
+            url(r'^(?P<education_group_year_pk>[0-9]+)/', create.validate_field, name='validate_education_group_field'),
+        ])
     ),
+
 
     url(
         r'^select_type/(?P<category>[A-Z_]+)/$',
