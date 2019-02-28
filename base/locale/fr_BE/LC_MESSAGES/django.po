@@ -400,7 +400,11 @@ msgstr "Code a déjà existé en %(academic_year)s"
 
 #: forms/education_group/group.py:56
 msgid "Acronym/Short title"
-msgstr "Sigle/Titre abrégé"
+msgstr "Sigle/Intitulé abrégé"
+
+msgctxt "abbreviation"
+msgid "Acronym/Short title"
+msgstr "Sigle/Int. abr."
 
 #: templates/blocks/button/learning_units_action_button.html:34
 #: templates/education_group/blocks/dropdown/administrative_data_actions_bar.html:36

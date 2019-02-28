@@ -377,6 +377,10 @@ msgstr ""
 msgid "Acronym/Short title"
 msgstr ""
 
+msgctxt "abbreviation"
+msgid "Acronym/Short title"
+msgstr ""
+
 #: templates/blocks/button/learning_units_action_button.html:34
 #: templates/education_group/blocks/dropdown/administrative_data_actions_bar.html:36
 #: templates/education_group/blocks/dropdown/education_groups_action_button.html:33

@@ -52,10 +52,6 @@ class GroupYearModelForm(EducationGroupYearModelForm):
             "management_entity"
         )
 
-        labels = {
-            "acronym": _("Acronym/Short title")
-        }
-
 
 class GroupModelForm(EducationGroupModelForm):
     """ For groups, it is forbidden to update data about education_group """
