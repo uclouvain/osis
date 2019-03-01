@@ -82,3 +82,9 @@ class AuthorizedRelationshipNotRespectedException(Exception):
 
 class ValidationWarning(ValidationError):
     pass
+
+
+class AttachOptionException(Exception):
+    def __init__(self, message=None, errors=None):
+        super(AttachOptionException, self).__init__(message)
+        self.errors = errors
