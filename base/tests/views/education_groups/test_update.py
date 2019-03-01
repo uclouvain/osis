@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import json
+import random
 from http import HTTPStatus
 from unittest import mock
 
@@ -105,7 +106,8 @@ class TestUpdate(TestCase):
 
         self.training_education_group_year = TrainingFactory(
             academic_year=self.current_academic_year,
-            education_group_type=self.an_training_education_group_type
+            education_group_type=self.an_training_education_group_type,
+            education_group__start_year=random.randrange(2015, self.current_academic_year.year-1)
         )
 
         self.training_education_group_year_1 = TrainingFactory(
@@ -327,6 +329,7 @@ class TestUpdate(TestCase):
         }
         response = self.client.post(self.training_url, data=data)
         messages = [m.message for m in get_messages(response.wsgi_request)]
+
         self.assertEqual(
             messages[1], _("Education group year %(acronym)s (%(academic_year)s) successfuly deleted.") % {
                 "acronym": self.training_education_group_year_1.acronym,
