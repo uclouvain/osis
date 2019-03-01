@@ -41,3 +41,13 @@
         </div>
     </form>
 </div>
+
+<script>
+    no_role = ['OTHER_ACADEMIC_RESPONSIBLE', 'ACADEMIC_RESPONSIBLE'];
+    $('#id_type').change(function (e) {
+        var typeContact = $(this).val();
+        var to_disable = no_role.indexOf(typeContact) >= 0
+        $('#id_role_fr').attr('disabled', to_disable);
+        $('#id_role_en').attr('disabled', to_disable);
+    })
+</script>
