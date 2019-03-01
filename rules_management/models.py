@@ -38,7 +38,7 @@ class AdminForm(forms.ModelForm):
 
 class FieldReferenceAdmin(OsisModelAdmin):
     list_display = ('content_type', 'field_name', 'context')
-    search_fields = ('content_type', 'field_name', 'context',)
+    search_fields = ('content_type__model', 'field_name', 'context',)
     filter_horizontal = ('permissions', 'groups',)
     list_filter = ('context',)
     form = AdminForm

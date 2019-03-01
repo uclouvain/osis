@@ -104,7 +104,7 @@
                         {% url "learning_unit_cancel_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_cancel_proposal_url%}
                         {% li_cancel_proposal learning_unit_cancel_proposal_url _('Cancel the proposal') 'link_cancel_proposal' %}
 
-                        {% li_consolidate_proposal '#' _('Consolidate the proposal') 'link_consolidate_proposal' 'document.getElementById(\"form_consolidate\").submit();' %}
+                        {% li_consolidate_proposal '#' _('Consolidate the proposal') 'link_consolidate_proposal' 'document.getElementById(\'form_consolidate\').submit();' %}
                         <li class="divider"></li>
                         {% endflag %}
                     {% endif %}
