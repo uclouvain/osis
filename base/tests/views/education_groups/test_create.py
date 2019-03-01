@@ -35,7 +35,7 @@ from base.forms.education_group.group import GroupYearModelForm
 from base.forms.education_group.mini_training import MiniTrainingYearModelForm
 from base.forms.education_group.training import TrainingEducationGroupYearForm
 from base.models.enums import education_group_categories
-from base.models.enums.education_group_categories import TRAINING
+from base.models.enums.education_group_categories import TRAINING, Categories
 from base.models.exceptions import ValidationWarning
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
@@ -114,7 +114,7 @@ class TestCreate(TestCase):
                 education_group_type = next(eg_type for eg_type in self.education_group_types
                                             if eg_type.category == category)
                 self.client.get(url)
-                self.mocked_perm.assert_called_with(self.person, None, category,
+                self.mocked_perm.assert_called_with(self.person, None, Categories[category],
                                                     education_group_type=education_group_type,
                                                     raise_exception=True)
 

@@ -186,9 +186,9 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
         field = self.fields[key]
         if initial_value:
             self.fields[key].initial = initial_value
-
         field.disabled = True
         field.required = False
+        field.widget.attrs["title"] = _("The field can contain only one value.")
 
     def clean_acronym(self):
         data_cleaned = self.cleaned_data.get('acronym')

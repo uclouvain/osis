@@ -26,7 +26,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import Count, OuterRef, Exists, Q
+from django.db.models import Count, OuterRef, Exists, Q, Min, When, Case, Max
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -46,7 +46,8 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
 from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
-from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin
+from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
+    SerializableQuerySet
 
 
 class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
@@ -64,12 +65,30 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
     ]
 
 
+class EducationGroupYearQueryset(SerializableQuerySet):
+    def get_nearest_years(self, year):
+        return self.aggregate(
+            futur=Min(
+                Case(When(academic_year__year__gte=year, then='academic_year__year'))
+            ),
+            past=Max(
+                Case(When(academic_year__year__lt=year, then='academic_year__year'))
+            )
+        )
+
+
 class EducationGroupYearManager(SerializableModelManager):
+    def get_queryset(self):
+        return EducationGroupYearQueryset(self.model, using=self._db)
+
     def look_for_common(self, **kwargs):
         return self.filter(acronym__startswith='common', **kwargs)
 
     def get_common(self, **kwargs):
         return self.get(acronym='common', **kwargs)
+
+    def get_nearest_years(self, year):
+        return self.get_queryset().get_nearest_years(year)
 
 
 class EducationGroupYear(SerializableModel):
@@ -395,7 +414,7 @@ class EducationGroupYear(SerializableModel):
 
     decree_category = models.CharField(
         max_length=40,
-        choices=decree_category.DECREE_CATEGORY,
+        choices=decree_category.DecreeCategories.choices(),
         blank=True,
         null=True,
         verbose_name=_('Decree category')
@@ -702,31 +721,30 @@ class EducationGroupYear(SerializableModel):
         elif self.duration is not None and self.duration_unit is None:
             raise ValidationError({'duration_unit': _("This field is required.")})
 
+    @staticmethod
+    def format_year_to_academic_year(year):
+        return "{}-{}".format(str(year), str(year + 1)[-2:])
+
     def clean_partial_acronym(self, raise_warnings=False):
         if not self.partial_acronym:
             return
 
-        egy_using_same_partial_acronym = EducationGroupYear.objects.filter(partial_acronym=self.partial_acronym).\
-            exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__lt=self.academic_year.year)).\
-            order_by('academic_year__year').\
-            first()
+        egy_using_same_partial_acronym = EducationGroupYear.objects.\
+            filter(partial_acronym=self.partial_acronym.upper()).\
+            exclude(education_group=self.education_group_id).\
+            get_nearest_years(self.academic_year.year)
 
-        past_egy_using_same_partial_acronym = EducationGroupYear.objects.filter(partial_acronym=self.partial_acronym). \
-            exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__gte=self.academic_year.year)). \
-            order_by('-academic_year__year'). \
-            first()
-
-        if egy_using_same_partial_acronym:
+        if egy_using_same_partial_acronym["futur"]:
             raise ValidationError({
                 'partial_acronym': _("Partial acronym already exists in %(academic_year)s") % {
-                    "academic_year": str(egy_using_same_partial_acronym.academic_year)
+                    "academic_year": self.format_year_to_academic_year(egy_using_same_partial_acronym["futur"])
                 }
             })
 
-        if raise_warnings and past_egy_using_same_partial_acronym:
+        if raise_warnings and egy_using_same_partial_acronym["past"]:
             raise ValidationWarning({
                 'partial_acronym': _("Partial acronym existed in %(academic_year)s") % {
-                    "academic_year": str(past_egy_using_same_partial_acronym.academic_year)
+                    "academic_year": self.format_year_to_academic_year(egy_using_same_partial_acronym["past"])
                 }
             })
 
@@ -734,32 +752,27 @@ class EducationGroupYear(SerializableModel):
         if not self.acronym:
             return
 
-        egy_using_same_acronym = EducationGroupYear.objects.filter(acronym=self.acronym).\
-            exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__lt=self.academic_year.year))
+        egy_using_same_acronym = EducationGroupYear.objects. \
+            filter(acronym=self.acronym.upper()).exclude(education_group=self.education_group_id)
 
         # Groups can reuse acronym of other groups
         if self.education_group_type.category == education_group_categories.GROUP:
             egy_using_same_acronym = egy_using_same_acronym.\
                 exclude(education_group_type__category=education_group_categories.GROUP)
 
-        egy_using_same_acronym = egy_using_same_acronym.order_by("academic_year__year").first()
+        egy_using_same_acronym = egy_using_same_acronym.get_nearest_years(self.academic_year.year)
 
-        past_egy_using_same_acronym = EducationGroupYear.objects.filter(acronym=self.acronym). \
-            exclude(Q(education_group=self.education_group_id) | Q(academic_year__year__gte=self.academic_year.year)).\
-            order_by("-academic_year__year").\
-            first()
-
-        if egy_using_same_acronym:
+        if egy_using_same_acronym["futur"]:
             raise ValidationError({
                 'acronym': _("Acronym already exists in %(academic_year)s") % {
-                    "academic_year": str(egy_using_same_acronym.academic_year)
+                    "academic_year": self.format_year_to_academic_year(egy_using_same_acronym["futur"])
                 }
             })
 
-        if raise_warnings and past_egy_using_same_acronym:
+        if raise_warnings and egy_using_same_acronym["past"]:
             raise ValidationWarning({
                 'acronym': _("Acronym existed in %(academic_year)s") % {
-                    "academic_year": str(past_egy_using_same_acronym.academic_year)
+                    "academic_year": self.format_year_to_academic_year(egy_using_same_acronym["past"])
                 }
             })
 
