@@ -273,7 +273,8 @@ CKEDITOR_CONFIGS = {
             ['Link', 'Unlink'],
             ['CreateDiv'],
             {'name': 'insert', 'items': ['Table']},
-        ]
+        ],
+        'autoParagraph': False
     },
     'default': {
         "removePlugins": "stylesheetparser",
@@ -299,6 +300,7 @@ CKEDITOR_CONFIGS = {
             {'name': 'about', 'items': ['About']},
         ],
         'stylesSet': REDDOT_STYLES,
+        'autoParagraph': False
     },
     'minimal': {
         'toolbar': 'Custom',
@@ -308,7 +310,8 @@ CKEDITOR_CONFIGS = {
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList'],
             ['Link', 'Unlink']
-        ]
+        ],
+        'autoParagraph': False
     },
     'minimal_plus_headers': {
         'toolbar': 'Custom',
@@ -319,7 +322,8 @@ CKEDITOR_CONFIGS = {
             ['Bold', 'Italic', 'Underline'],
             ['Link', 'Unlink'],
             ['NumberedList', 'BulletedList']
-        ]
+        ],
+        'autoParagraph': False
     },
 }
 
