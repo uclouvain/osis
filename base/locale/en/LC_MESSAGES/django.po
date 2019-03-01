@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-27 15:15+0100\n"
+"POT-Creation-Date: 2019-03-01 14:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -85,7 +85,7 @@ msgid ""
 "this element in %(academic_year)s."
 msgstr ""
 
-#: models/education_group.py:113 models/education_group_year.py:693
+#: models/education_group.py:113 models/education_group_year.py:712
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr ""
@@ -279,11 +279,8 @@ msgid "Academic partner"
 msgstr ""
 
 #: models/enums/publication_contact_type.py:32
-msgid "Academic responsible"
-msgstr ""
-
 #: templates/education_group/blocks/contacts_general_informations.html:64
-msgid "Academic responsibles"
+msgid "Academic responsible"
 msgstr ""
 
 #: templates/learning_unit/proposal/create_suppression.html:6
@@ -345,11 +342,9 @@ msgid "Access with additional training"
 msgstr ""
 
 #: business/learning_units/edition.py:431
-#: business/learning_units/edition.py:451 forms/education_groups.py:85
-#: forms/entity.py:35 forms/organization.py:33 forms/utils/acronym_field.py:83
-#: forms/utils/acronym_field.py:129 models/education_group_year.py:102
-#: templates/education_group/blocks/table_utilizations.html:31
-#: templates/education_group/search.html:148 templates/entities.html:66
+#: business/learning_units/edition.py:451 forms/entity.py:35
+#: forms/organization.py:33 forms/utils/acronym_field.py:83
+#: forms/utils/acronym_field.py:129 templates/entities.html:66
 #: templates/entity/identification.html:51
 #: templates/entity/identification.html:115 templates/entity/versions.html:43
 #: templates/learning_unit/by_proposal.html:82
@@ -357,9 +352,6 @@ msgstr ""
 #: templates/offers.html:58 templates/offers.html:78
 #: templates/organization/organizations.html:61
 #: tests/business/learning_units/test_edition.py:152
-#: tests/templatetags/test_education_group.py:446
-#: tests/templatetags/test_education_group.py:453
-#: tests/templatetags/test_education_group.py:462
 msgid "Acronym"
 msgstr ""
 
@@ -373,10 +365,18 @@ msgstr ""
 msgid "Acronym existed in %(academic_year)s"
 msgstr ""
 
-#: forms/education_group/group.py:56
+#: forms/education_groups.py:85 models/education_group_year.py:102
+#: tests/templatetags/test_education_group.py:446
+#: tests/templatetags/test_education_group.py:453
+#: tests/templatetags/test_education_group.py:462
 msgid "Acronym/Short title"
 msgstr ""
 
+#: business/education_group.py:48
+#: templates/education_group/blocks/content_default_table.html:30
+#: templates/education_group/blocks/content_minor_major_option_table.html:31
+#: templates/education_group/blocks/table_utilizations.html:31
+#: templates/education_group/search.html:148
 msgctxt "abbreviation"
 msgid "Acronym/Short title"
 msgstr ""
@@ -1045,7 +1045,7 @@ msgstr ""
 msgid "Create"
 msgstr ""
 
-#: forms/education_group/publication_contact.py:55
+#: forms/education_group/publication_contact.py:69
 msgid "Create contact"
 msgstr ""
 
@@ -1954,7 +1954,7 @@ msgstr ""
 msgid "Jury members"
 msgstr ""
 
-#: models/education_group_year.py:279
+#: models/education_group_year.py:298
 #: templates/education_group/blocks/informations.html:60
 msgid "Keywords"
 msgstr ""
@@ -3455,17 +3455,8 @@ msgstr ""
 msgid "Short title"
 msgstr ""
 
-#: templates/education_group/blocks/content_default_table.html:30
-msgid "Shortened title"
-msgstr ""
-
 #: templates/my_osis/my_messages.html:80
 msgid "Show message"
-msgstr ""
-
-#: templates/education_group/blocks/content_default_table.html:30
-#: templates/education_group/blocks/content_minor_major_option_table.html:31
-msgid "Sigle"
 msgstr ""
 
 #: models/enums/mandate_type.py:36
@@ -3504,7 +3495,7 @@ msgstr ""
 msgid "Specifications"
 msgstr ""
 
-#: forms/education_group/training.py:201 models/education_group.py:83
+#: forms/education_group/training.py:202 models/education_group.py:83
 #: models/education_group.py:115
 #: templates/education_group/identification_mini_training_details.html:38
 #: templates/education_group/identification_training_details.html:94
@@ -4227,7 +4218,7 @@ msgstr ""
 msgid "This training has no content to postpone."
 msgstr ""
 
-#: business/education_group.py:48 business/learning_unit.py:59
+#: business/education_group.py:49 business/learning_unit.py:59
 #: business/learning_unit_xls.py:74 business/learning_units/xls_generator.py:49
 #: business/proposal_xls.py:38 forms/education_groups.py:86 forms/entity.py:38
 #: forms/learning_unit/search_form.py:180
@@ -4250,7 +4241,7 @@ msgid "Title"
 msgstr ""
 
 #: business/learning_unit.py:67 business/learning_unit_xls.py:82
-#: models/education_group_year.py:95
+#: models/education_group_year.py:114
 #: templates/education_group/blocks/informations.html:53
 msgid "Title in English"
 msgstr ""
@@ -4416,11 +4407,11 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
-#: forms/education_group/publication_contact.py:54
+#: forms/education_group/publication_contact.py:68
 msgid "Update contact"
 msgstr ""
 
-#: forms/education_group/publication_contact.py:95
+#: forms/education_group/publication_contact.py:109
 msgid "Update entity"
 msgstr ""
 
@@ -4949,9 +4940,9 @@ msgstr ""
 msgid "certificate aims"
 msgstr ""
 
-#: business/education_group.py:48 business/education_group.py:49
-#: business/learning_units/xls_generator.py:48 business/proposal_xls.py:79
-#: business/proposal_xls.py:89 models/abstracts/abstract_achievement.py:44
+#: business/education_group.py:49 business/learning_units/xls_generator.py:48
+#: business/proposal_xls.py:79 business/proposal_xls.py:89
+#: models/abstracts/abstract_achievement.py:44
 #: models/abstracts/abstract_education_group_achievement.py:53
 #: models/education_group_year.py:327
 #: templates/learning_unit/components.html:124
@@ -5343,7 +5334,7 @@ msgstr ""
 msgid "training_administrative_data"
 msgstr ""
 
-#: business/education_group.py:48 business/learning_units/edition.py:448
+#: business/education_group.py:49 business/learning_units/edition.py:448
 #: models/education_group_publication_contact.py:84
 #: templates/entity/versions.html:45
 #: templates/organization/organization.html:70
