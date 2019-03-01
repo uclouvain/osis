@@ -3870,7 +3870,11 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": []
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
         },
         "model": "rules_management.fieldreference"
     },
@@ -3896,7 +3900,11 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": []
+            "groups": [
+                [
+                    "faculty_managers"
+                ]
+            ]
         },
         "model": "rules_management.fieldreference"
     },
