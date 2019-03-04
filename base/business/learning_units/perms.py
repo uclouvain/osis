@@ -30,6 +30,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext_lazy as _
 from waffle.models import Flag
 
+from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models import proposal_learning_unit, tutor
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, \
@@ -466,10 +467,9 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
 
 
 def _is_tutor_summary_responsible_of_learning_unit_year(*, user, learning_unit_year_id, **kwargs):
-    value = LearningUnitYear.objects.filter(pk=learning_unit_year_id, attribution__summary_responsible=True,
-                                            attribution__tutor__person__user=user).exists()
+    value = _is_tutor_attributed_to_the_learning_unit(user, learning_unit_year_id)
     if not value:
-        raise PermissionDenied(_("You are not summary responsible for this learning unit."))
+        raise PermissionDenied(_("You are not attributed to this learning unit."))
 
 
 def _is_learning_unit_year_summary_editable(*, learning_unit_year_id, **kwargs):
