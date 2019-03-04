@@ -614,6 +614,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory()
+        AcademicYearFactory(current=True)
         cls.education_group_parent = TrainingFactory(acronym="Parent", academic_year=cls.academic_year)
         cls.education_group_child = TrainingFactory(acronym="Child_1", academic_year=cls.academic_year)
 
