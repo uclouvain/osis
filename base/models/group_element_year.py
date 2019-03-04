@@ -38,7 +38,7 @@ from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import education_group_type, education_group_year
 from base.models.education_group_type import GROUP_TYPE_OPTION
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories, link_type, quadrimesters
+from base.models.enums import education_group_categories, quadrimesters
 from base.models.enums.link_type import LinkTypes
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.models.learning_unit_year import LearningUnitYear
@@ -87,24 +87,6 @@ class GroupElementYearManager(models.Manager):
         return super().get_queryset().filter(
             Q(child_branch__isnull=False) | Q(child_leaf__learning_container_year__isnull=False)
         )
-
-    def roots(self):
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                WITH RECURSIVE group_element_year_parent AS (
-                    SELECT *
-                    FROM base_groupelementyear
-                    WHERE id IN (%s)
-                
-                    UNION ALL
-                               
-                    SELECT *
-                    FROM base_groupelementyear AS child
-                    INNER JOIN group_element_year_parent AS parent on parent.child_branch_id = child.parent_id
-                )
-                
-                SELECT * FROM group_element_year_parent ;            
-            """)
 
 
 class GroupElementYear(OrderedModel):

@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
-from base.models.exceptions import AttachOptionException
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 
@@ -53,7 +53,6 @@ class TestAttachEducationGroupYearStrategy(TestCase):
         it is present in root master 2m level
         """
         strategy = AttachEducationGroupYearStrategy(
-            root=self.master_120,
             parent=self.master_120_specialized,
             child=self.option_in_parent
         )
@@ -68,7 +67,6 @@ class TestAttachEducationGroupYearStrategy(TestCase):
         GroupElementYearFactory(parent=subgroup, child_branch=self.option_in_parent)
 
         strategy = AttachEducationGroupYearStrategy(
-            root=self.master_120,
             parent=self.master_120_specialized,
             child=subgroup
         )
@@ -81,12 +79,11 @@ class TestAttachEducationGroupYearStrategy(TestCase):
         """
         option_which_are_not_in_2m = MiniTrainingFactory(education_group_type__name=MiniTrainingType.OPTION.name)
         strategy = AttachEducationGroupYearStrategy(
-            root=self.master_120,
             parent=self.master_120_specialized,
             child=option_which_are_not_in_2m
         )
 
-        with self.assertRaises(AttachOptionException):
+        with self.assertRaises(ValidationError):
             strategy.is_valid()
 
     def test_is_not_valid_case_attach_group_which_contains_option_which_are_not_within_master_120(self):
@@ -102,9 +99,8 @@ class TestAttachEducationGroupYearStrategy(TestCase):
         GroupElementYearFactory(parent=subgroup, child_branch=self.option_in_parent)
 
         strategy = AttachEducationGroupYearStrategy(
-            root=self.master_120,
             parent=self.master_120_specialized,
             child=subgroup
         )
-        with self.assertRaises(AttachOptionException):
+        with self.assertRaises(ValidationError):
             strategy.is_valid()

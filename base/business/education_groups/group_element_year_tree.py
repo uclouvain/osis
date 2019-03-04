@@ -150,7 +150,7 @@ class EducationGroupHierarchy:
 
     def get_option_list(self):
         def pruning_function(node):
-            return not node.reference and \
+            return not node.reference and node.group_element_year.child_branch and \
                    node.group_element_year.child_branch.education_group_type.name not in \
                    [GroupType.FINALITY_120_LIST_CHOICE.name, GroupType.FINALITY_180_LIST_CHOICE.name]
 

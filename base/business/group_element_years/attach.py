@@ -24,11 +24,15 @@
 #
 ##############################################################################
 import abc
+
+from django.core.exceptions import ValidationError
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
-from base.models.enums.education_group_types import TrainingType, MiniTrainingType
-from base.models.exceptions import AttachOptionException
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import MiniTrainingType, TrainingType
+from base.models.learning_unit_year import LearningUnitYear
 
 
 class AttachStrategy(metaclass=abc.ABCMeta):
@@ -38,14 +42,18 @@ class AttachStrategy(metaclass=abc.ABCMeta):
 
 
 class AttachEducationGroupYearStrategy(AttachStrategy):
-    def __init__(self, root, parent, child):
-        self.root = root
+    def __init__(self, parent: EducationGroupYear, child: EducationGroupYear):
         self.parent = parent
         self.child = child
 
+    @cached_property
+    def roots(self):
+        return EducationGroupYear.hierarchy.filter(pk=self.parent.pk).get_parents()\
+                                           .select_related('education_group_type')
+
     def is_valid(self):
-        if self.root.education_group_type.name in [TrainingType.PGRM_MASTER_120.name,
-                                                   TrainingType.PGRM_MASTER_180_240.name]:
+        if self.parent.education_group_type.name in TrainingType.finality_types() or \
+                self.roots.filter(education_group_type__name__in=TrainingType.finality_types()).exists():
             self._check_attach_options_rules()
         return True
 
@@ -54,23 +62,31 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         In context of MA/MD/MS when we add an option [or group which contains options],
         this options must exist in parent context (2m)
         """
-        options_in_2m = EducationGroupHierarchy(root=self.root).get_option_list()
         options_to_add = EducationGroupHierarchy(root=self.child).get_option_list()
         if self.child.education_group_type.name == MiniTrainingType.OPTION.name:
             options_to_add += [self.child]
 
-        missing_options = set(options_to_add) - set(options_in_2m)
-        if missing_options:
-            raise AttachOptionException(
-                errors=_("Option \"%(acronym)s\" must be present in 2M program.") % {
-                    "acronym": ', '.join(option.acronym for option in missing_options)
-                })
+        errors = []
+        for root in self.roots.filter(education_group_type__name__in=
+                                      [TrainingType.PGRM_MASTER_120.name, TrainingType.PGRM_MASTER_180_240.name]):
+            options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
+            missing_options = set(options_to_add) - set(options_in_2m)
+
+            if missing_options:
+                errors.append(
+                    ValidationError(_("Option \"%(acronym)s\" must be present in %(root_acronym)s program.") % {
+                        "acronym": ', '.join(option.acronym for option in missing_options),
+                        "root_acronym": root.acronym
+                     })
+                )
+        if errors:
+            raise ValidationError(errors)
 
 
 class AttachLearningUnitYearStrategy(AttachStrategy):
-    def __init__(self, group_element_year, education_group_year):
-        self.group_element_year = group_element_year
-        self.education_group_year = education_group_year
+    def __init__(self, parent: EducationGroupYear, child: LearningUnitYear):
+        self.parent = parent
+        self.child = child
 
     def is_valid(self):
         return True

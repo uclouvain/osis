@@ -26,6 +26,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+from base.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
 from base.business.group_element_years.management import check_authorized_relationship
 from base.models.enums import education_group_categories
 from base.models.enums.link_type import LinkTypes
@@ -83,6 +84,15 @@ class GroupElementYearForm(forms.ModelForm):
 
         else:
             self.fields.pop("access_condition")
+
+    def is_valid(self):
+        try:
+            strategy = AttachEducationGroupYearStrategy if self.instance.child_branch else \
+                AttachLearningUnitYearStrategy
+            return super().is_valid() and strategy(parent=self.instance.parent, child=self.instance.child).is_valid()
+        except ValidationError as e:
+            self.add_error(None, e)
+            return False
 
     def save(self, commit=True):
         obj = super().save(commit)
