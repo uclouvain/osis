@@ -466,8 +466,7 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
 
 
 def _is_tutor_summary_responsible_of_learning_unit_year(*, user, learning_unit_year_id, **kwargs):
-    value = _is_tutor_attributed_to_the_learning_unit(user, learning_unit_year_id)
-    if not value:
+    if not _is_tutor_attributed_to_the_learning_unit(user, learning_unit_year_id):
         raise PermissionDenied(_("You are not attributed to this learning unit."))
 
 
