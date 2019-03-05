@@ -144,14 +144,14 @@ $(document).ready(function () {
                         "label": gettext("Open all"),
                         "action": function (node) {
                             let tree = $("#panel_file_tree").jstree(true);
-                            tree.open_all(node)
+                            tree.open_all(node.reference)
                         }
                     },
                     "close_all": {
                         "label": gettext("Close all"),
                         "action": function (node) {
                             let tree = $("#panel_file_tree").jstree(true);
-                            tree.close_all(node);
+                            tree.close_all(node.reference);
                         }
                     }
                 }
