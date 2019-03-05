@@ -32,8 +32,9 @@
         </div>
 
         <div id="form-modal-body" class="modal-body">
-            {% bootstrap_form_errors form %}
             <form method="post" id="form_comment_update" action="{{ request.path }}">
+                {% bootstrap_form_errors form %}
+
                 {% csrf_token %}
                 {% bootstrap_row field_0=form.link_type form_group_class_0="col-md-4" field_1=form.is_mandatory label_1=_('Required') form_group_class_1="col-md-4" field_2=form.relative_credits form_group_class_2="col-md-4" %}
 
