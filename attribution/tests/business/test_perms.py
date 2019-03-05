@@ -32,7 +32,7 @@ from django.test import TestCase
 from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
 from attribution.tests.factories.attribution import AttributionFactory
 from base.business.learning_units.perms import _is_learning_unit_year_summary_editable, \
-    _is_calendar_opened_to_edit_educational_information
+    _is_calendar_opened_to_edit_educational_information, _is_tutor_summary_responsible_of_learning_unit_year
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from osis_common.utils.datetime import get_tzinfo
 
@@ -51,6 +51,20 @@ class TestPerms(TestCase):
                                                                    learning_unit_year_not_attributed.id))
         self.assertTrue(_is_tutor_attributed_to_the_learning_unit(self.tutor.person.user,
                                                                   self.learning_unit_year.id))
+
+    def test_is_tutor_summary_responsible_of_the_learning_unit(self):
+        learning_unit_year_not_attributed = LearningUnitYearFactory()
+
+        self.assertIsNone(
+            _is_tutor_summary_responsible_of_learning_unit_year(user=self.tutor.person.user,
+                                                                learning_unit_year_id=self.learning_unit_year.id)
+        )
+
+        with self.assertRaises(PermissionDenied):
+            _is_tutor_summary_responsible_of_learning_unit_year(
+                user=self.tutor.person.user,
+                learning_unit_year_id=learning_unit_year_not_attributed.id
+            )
 
     def test_is_learning_unit_year_summary_editable(self):
         luy_not_editable = LearningUnitYearFactory(summary_locked=True)
