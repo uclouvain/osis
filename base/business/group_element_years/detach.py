@@ -32,61 +32,71 @@ from django.utils.translation import gettext_lazy as _
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
-from base.models.learning_unit_year import LearningUnitYear
+from base.models.group_element_year import GroupElementYear
 
 
-class AttachStrategy(metaclass=abc.ABCMeta):
+class DetachStrategy(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def is_valid(self):
         pass
 
 
-class AttachEducationGroupYearStrategy(AttachStrategy):
-    def __init__(self, parent: EducationGroupYear, child: EducationGroupYear):
-        self.parent = parent
-        self.child = child
+class DetachEducationGroupYearStrategy(DetachStrategy):
+    def __init__(self, link: GroupElementYear):
+        self.parent = link.parent
+        self.child = link.child
 
     @cached_property
     def parents(self):
-        return EducationGroupYear.hierarchy.filter(pk=self.parent.pk).get_parents()\
+        return EducationGroupYear.hierarchy.filter(pk=self.child.pk).get_parents()\
                                            .select_related('education_group_type')
 
+    def _get_parents_pgrm_master(self):
+        return self.parents.filter(education_group_type__name__in=[
+            TrainingType.PGRM_MASTER_120.name, TrainingType.PGRM_MASTER_180_240.name])
+
+    def _get_parents_finality_type(self):
+        return self.parents.filter(education_group_type__name__in=TrainingType.finality_types())
+
     def is_valid(self):
-        if self.parent.education_group_type.name in TrainingType.finality_types() or \
-                self.parents.filter(education_group_type__name__in=TrainingType.finality_types()).exists():
-            self._check_attach_options_rules()
+        if not self._get_parents_finality_type().exists() and self._get_parents_pgrm_master().exists():
+            self._check_detatch_options_rules()
         return True
 
-    def _check_attach_options_rules(self):
+    def _check_detatch_options_rules(self):
         """
-        In context of MA/MD/MS when we add an option [or group which contains options],
-        this options must exist in parent context (2m)
+        In context of 2M when we detatch an option [or group which contains option], we must ensure that
+        these options are not present in MA/MD/MS
         """
-        options_to_add = EducationGroupHierarchy(root=self.child).get_option_list()
+        options_to_detatch = EducationGroupHierarchy(root=self.child).get_option_list()
         if self.child.education_group_type.name == MiniTrainingType.OPTION.name:
-            options_to_add += [self.child]
+            options_to_detatch += [self.child]
+
+        mandatory_options = {
+            finality.acronym: EducationGroupHierarchy(root=finality).get_option_list()
+            for finality in self._get_parents_finality_type()
+        }
 
         errors = []
-        for root in self.parents.filter(education_group_type__name__in=[TrainingType.PGRM_MASTER_120.name,
-                                                                        TrainingType.PGRM_MASTER_180_240.name]):
-            options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
-            missing_options = set(options_to_add) - set(options_in_2m)
-
+        for finality_acronym, options_list in mandatory_options.items():
+            missing_options = set(options_list) - set(options_to_detatch)
             if missing_options:
                 errors.append(
-                    ValidationError(_("Option \"%(acronym)s\" must be present in %(root_acronym)s program.") % {
+                    ValidationError(_("Option \"%(acronym)s\" cannot be removed because it is contained in"
+                                      " %(finality_acronym)s program.") % {
                         "acronym": ', '.join(option.acronym for option in missing_options),
-                        "root_acronym": root.acronym
+                        "finality_acronym": finality_acronym
                      })
                 )
+
         if errors:
             raise ValidationError(errors)
 
 
-class AttachLearningUnitYearStrategy(AttachStrategy):
-    def __init__(self, parent: EducationGroupYear, child: LearningUnitYear):
-        self.parent = parent
-        self.child = child
+class DetachLearningUnitYearStrategy(DetachStrategy):
+    def __init__(self, link: GroupElementYear):
+        self.parent = link.parent
+        self.child = link.child
 
     def is_valid(self):
         return True
