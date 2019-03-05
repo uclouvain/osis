@@ -48,11 +48,12 @@ from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm
 from base.models import entity_container_year, entity_version
 from base.models import proposal_learning_unit
 from base.models.enums import entity_container_year_link_type, learning_unit_year_periodicity
+from base.models.enums import learning_component_year_type
 from base.models.enums import organization_type, entity_type, \
     learning_unit_year_subtypes, proposal_type, learning_container_year_types, proposal_state
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories import academic_year as academic_year_factory, campus as campus_factory, \
     organization as organization_factory
 from base.tests.factories.academic_year import AcademicYearFakerFactory, create_current_academic_year, \
@@ -62,6 +63,7 @@ from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
@@ -79,8 +81,6 @@ from base.views.learning_units.proposal.update import update_learning_unit_propo
 from base.views.learning_units.search import PROPOSAL_SEARCH, learning_units_proposal_search, ACTION_CONSOLIDATE, \
     ACTION_BACK_TO_INITIAL, ACTION_FORCE_STATE
 from reference.tests.factories.language import LanguageFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.models.enums import learning_component_year_type
 
 LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
 
@@ -549,7 +549,7 @@ class TestLearningUnitProposalSearch(TestCase):
         self.assertEqual(response.context['learning_units_count'], 1)
 
     def test_learning_units_proposal_search_by_tutor(self):
-        proposal = _create_proposal_learning_unit("LOSIS1211")
+        proposal = _create_proposal_learning_unit("LOSIS1214")
         tutor = TutorFactory(person=self.person)
         attribution = AttributionNewFactory(tutor=tutor)
         learning_unit_component = LearningUnitComponentFactory(learning_unit_year=proposal.learning_unit_year)
