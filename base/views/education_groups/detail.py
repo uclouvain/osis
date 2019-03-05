@@ -25,7 +25,7 @@
 ##############################################################################
 import itertools
 import json
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 
 from ckeditor.widgets import CKEditorWidget
 from django import forms
@@ -447,38 +447,42 @@ class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
             'course_enrollment': get_dates(academic_calendar_type.COURSE_ENROLLMENT, self.object),
             'mandataries': mdl.mandatary.find_by_education_group_year(self.object),
             'pgm_mgrs': mdl.program_manager.find_by_education_group(self.object.education_group),
-            'exam_enrollments': get_sessions_dates(academic_calendar_type.EXAM_ENROLLMENTS, self.object),
-            'scores_exam_submission': get_sessions_dates(academic_calendar_type.SCORES_EXAM_SUBMISSION, self.object),
-            'dissertation_submission': get_sessions_dates(academic_calendar_type.DISSERTATION_SUBMISSION, self.object),
-            'deliberation': get_sessions_dates(academic_calendar_type.DELIBERATION, self.object),
-            'scores_exam_diffusion': get_sessions_dates(academic_calendar_type.SCORES_EXAM_DIFFUSION, self.object),
             "can_edit_administrative_data": can_user_edit_administrative_data(self.request.user, self.object)
         })
+        context.update(get_sessions_dates(self.object))
 
         return context
 
 
-def get_sessions_dates(an_academic_calendar_type, an_education_group_year):
-    date_dict = {}
+def get_sessions_dates(education_group_year):
+    calendar_types = (academic_calendar_type.EXAM_ENROLLMENTS, academic_calendar_type.SCORES_EXAM_SUBMISSION,
+                      academic_calendar_type.DISSERTATION_SUBMISSION, academic_calendar_type.DELIBERATION,
+                      academic_calendar_type.SCORES_EXAM_DIFFUSION)
     calendars = mdl.academic_calendar.AcademicCalendar.objects.filter(
-        reference=an_academic_calendar_type,
-        academic_year=an_education_group_year.academic_year
-    ).select_related("sessionexamcalendar").prefetch_related(
+        reference__in=calendar_types,
+        academic_year=education_group_year.academic_year
+    ).select_related(
+        "sessionexamcalendar"
+    ).prefetch_related(
         Prefetch(
             "offeryearcalendar_set",
             queryset=mdl.offer_year_calendar.OfferYearCalendar.objects.filter(
-                education_group_year=an_education_group_year
+                education_group_year=education_group_year
             ),
-            to_attr="offer_calendars")
+            to_attr="offer_calendars"
+        )
     )
+
+    sessions_dates_by_calendar_type = defaultdict(dict)
 
     for calendar in calendars:
         session = calendar.sessionexamcalendar
         offer_year_calendars = calendar.offer_calendars
         if offer_year_calendars:
-            date_dict['session{}'.format(session.number_session)] = offer_year_calendars[0]
+            sessions_dates_by_calendar_type[calendar.reference.lower()]['session{}'.format(session.number_session)] = \
+                offer_year_calendars[0]
 
-    return date_dict
+    return sessions_dates_by_calendar_type
 
 
 def get_dates(an_academic_calendar_type, an_education_group_year):

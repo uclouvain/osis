@@ -411,10 +411,12 @@ class EducationGroupViewTestCase(TestCase):
             for academic_calendar in academic_calendars]
 
         self.assertEqual(
-            get_sessions_dates(academic_calendars[0].reference, education_group_year),
+            get_sessions_dates(education_group_year),
             {
-                'session{}'.format(s + 1): offer_year_calendar
-                for s, offer_year_calendar in enumerate(offer_year_calendars)
+                academic_calendar_type.DELIBERATION.lower(): {
+                    'session{}'.format(s + 1): offer_year_calendar
+                    for s, offer_year_calendar in enumerate(offer_year_calendars)
+                }
             }
         )
 
