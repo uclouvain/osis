@@ -100,9 +100,7 @@ class HierarchyQuerySet(models.QuerySet):
                     SELECT parent_id
                     FROM base_groupelementyear
                     WHERE child_branch_id IN (%s)
-                    
                     UNION ALL
-            
                     SELECT parent.parent_id
                     FROM base_groupelementyear as parent
                     INNER JOIN group_element_year_parent AS child on child.parent_id = parent.child_branch_id

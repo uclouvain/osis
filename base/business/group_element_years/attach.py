@@ -67,8 +67,8 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
             options_to_add += [self.child]
 
         errors = []
-        for root in self.roots.filter(education_group_type__name__in=
-                                      [TrainingType.PGRM_MASTER_120.name, TrainingType.PGRM_MASTER_180_240.name]):
+        for root in self.roots.filter(education_group_type__name__in=[TrainingType.PGRM_MASTER_120.name,
+                                                                      TrainingType.PGRM_MASTER_180_240.name]):
             options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
             missing_options = set(options_to_add) - set(options_in_2m)
 
