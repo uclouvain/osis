@@ -3453,7 +3453,7 @@
     {
         "model": "auth.group",
         "fields": {
-            "name": "continuing_education_faculty_managers",
+            "name": "continuing_education_training_managers",
             "permissions": [
                 [
                     "can_access_admission",
