@@ -85,15 +85,6 @@ class GroupElementYearForm(forms.ModelForm):
         else:
             self.fields.pop("access_condition")
 
-    def is_valid(self):
-        try:
-            strategy = AttachEducationGroupYearStrategy if self.instance.child_branch else \
-                AttachLearningUnitYearStrategy
-            return super().is_valid() and strategy(parent=self.instance.parent, child=self.instance.child).is_valid()
-        except ValidationError as e:
-            self.add_error(None, e)
-            return False
-
     def save(self, commit=True):
         obj = super().save(commit)
         if self._is_education_group_year_a_minor_major_option_list_choice(obj.parent):
@@ -115,6 +106,12 @@ class GroupElementYearForm(forms.ModelForm):
         except AuthorizedRelationshipNotRespectedException as e:
             raise ValidationError(e.errors)
         return data_cleaned
+
+    def clean(self):
+        strategy = AttachEducationGroupYearStrategy if self.instance.child_branch else \
+            AttachLearningUnitYearStrategy
+        strategy(parent=self.instance.parent, child=self.instance.child).is_valid()
+        return super().clean()
 
     def _check_authorized_relationship(self, child_type):
         return self.instance.parent.education_group_type.authorized_parent_type.filter(child_type=child_type).exists()

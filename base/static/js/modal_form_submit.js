@@ -19,9 +19,8 @@ var formAjaxSubmit = function (form, modal) {
             data: $(this).serialize(),
             context: this,
             success: function (xhr, ajaxOptions, thrownError) {
-                console.log($(xhr))
                 //Stay on the form if there are errors.
-                if ($(xhr).find('.has-error').length > 0) {
+                if ($(xhr).find('.has-error,.alert-danger').length > 0) {
                     $(modal).find('.modal-content').html(xhr);
                     // Add compatibility with ckeditor and related textareas
                     bindTextArea();
