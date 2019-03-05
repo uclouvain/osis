@@ -32,7 +32,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import F, Case, When
+from django.db.models import F, Case, When, Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -460,28 +460,38 @@ class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
 
 def get_sessions_dates(an_academic_calendar_type, an_education_group_year):
     date_dict = {}
+    calendars = mdl.academic_calendar.AcademicCalendar.objects.filter(
+        reference=an_academic_calendar_type,
+        academic_year=an_education_group_year.academic_year
+    ).select_related("sessionexamcalendar").prefetch_related(
+        Prefetch(
+            "offeryearcalendar_set",
+            queryset=mdl.offer_year_calendar.OfferYearCalendar.objects.filter(
+                education_group_year=an_education_group_year
+            ),
+            to_attr="offer_calendars")
+    )
 
-    for session_number in range(NUMBER_SESSIONS):
-        session = mdl.session_exam_calendar.get_by_session_reference_and_academic_year(
-            session_number + 1,
-            an_academic_calendar_type,
-            an_education_group_year.academic_year)
-        if session:
-            dates = mdl.offer_year_calendar.get_by_education_group_year_and_academic_calendar(session.academic_calendar,
-                                                                                              an_education_group_year)
-            date_dict['session{}'.format(session_number + 1)] = dates
+    for calendar in calendars:
+        session = calendar.sessionexamcalendar
+        offer_year_calendars = calendar.offer_calendars
+        if offer_year_calendars:
+            date_dict['session{}'.format(session.number_session)] = offer_year_calendars[0]
 
     return date_dict
 
 
 def get_dates(an_academic_calendar_type, an_education_group_year):
-    ac = mdl.academic_calendar.get_by_reference_and_academic_year(an_academic_calendar_type,
-                                                                  an_education_group_year.academic_year)
-    if ac:
-        dates = mdl.offer_year_calendar.get_by_education_group_year_and_academic_calendar(ac, an_education_group_year)
-        return {'dates': dates}
-    else:
-        return {}
+    try:
+        dates = mdl.offer_year_calendar.OfferYearCalendar.objects.get(
+            education_group_year=an_education_group_year,
+            academic_calendar__reference=an_academic_calendar_type,
+            academic_calendar__academic_year=an_education_group_year.academic_year
+        )
+    except mdl.offer_year_calendar.OfferYearCalendar.DoesNotExist:
+        dates = None
+
+    return {"dates": dates} if dates else {}
 
 
 class EducationGroupContent(EducationGroupGenericDetailView):
