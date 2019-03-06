@@ -33,11 +33,11 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <label>{% trans 'Course enrollment' %}</label><br>
-            {% if course_enrollment.dates and course_enrollment.dates.start_date %}
+            {% if course_enrollment_dates and course_enrollment_dates.start_date %}
                 <label>{% trans 'From' %}</label>
-                {{ course_enrollment.dates.start_date| default_if_none:'-'|date:"d/m/Y" }}
+                {{ course_enrollment_dates.start_date| default_if_none:'-'|date:"d/m/Y" }}
                 <label>{% trans 'to' %}</label>
-                {{ course_enrollment.dates.end_date| default_if_none:'-'|date:"d/m/Y" }}
+                {{ course_enrollment_dates.end_date| default_if_none:'-'|date:"d/m/Y" }}
             {% endif %}
             <br>
             <table class="table">
@@ -164,35 +164,30 @@
             <label>{% trans 'Jury' %}</label>
         </div>
         <div class="panel-body">
-            {% if mandataries %}
-                {% for mandatary in mandataries %}
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label>{% trans mandatary.mandate.function %}</label><br>
-                            {{ mandatary.person }}
-
-                        </div>
-                        {% if mandatary.mandate.qualification %}
-                            <div class="col-md-8">
-                                <label>{% trans 'Signatory qualification' %}</label><br>
-                                {{ mandatary.mandate.qualification }}<br>
-                            </div>
-                        {% endif %}
+            {% for mandatary in mandataries %}
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>{% trans mandatary.mandate.function %}</label><br>
+                        {{ mandatary.person }}
                     </div>
-                    <br>
-                {% endfor %}
-            {% endif %}
+                    {% if mandatary.mandate.qualification %}
+                        <div class="col-md-8">
+                            <label>{% trans 'Signatory qualification' %}</label><br>
+                            {{ mandatary.mandate.qualification }}<br>
+                        </div>
+                    {% endif %}
+                </div>
+                <br>
+            {% endfor %}
         </div>
     </div>
     <br>
     <div class="panel panel-default">
         <div class="panel-heading"><label>{% trans 'Program managers' %}</label></div>
         <div class="panel-body">
-            {% if pgm_mgrs %}
-                {% for pgm_mgr in pgm_mgrs %}
-                    {{ pgm_mgr }}<br>
-                {% endfor %}
-            {% endif %}
+            {% for pgm_mgr in pgm_mgrs %}
+                {{ pgm_mgr }}<br>
+            {% endfor %}
         </div>
     </div>
 {% endblock %}

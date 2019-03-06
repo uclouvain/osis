@@ -50,6 +50,7 @@ from base.business.education_groups.general_information import PublishException,
 from base.business.education_groups.general_information_sections import SECTION_LIST, SECTION_INTRO, SECTION_DIDACTIC, \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
+from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
@@ -62,8 +63,8 @@ from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING, GROUP
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.mandatary import Mandatary
+from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.person import Person
-from base.models.program_manager import ProgramManager
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
@@ -463,8 +464,14 @@ class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
             'person__first_name'
         ).select_related("person", "mandate")
 
+        course_enrollment_dates = OfferYearCalendar.objects.filter(
+            education_group_year=self.object,
+            academic_calendar__reference=academic_calendar_type.COURSE_ENROLLMENT,
+            academic_calendar__academic_year=self.object.academic_year
+        ).first()
+
         context.update({
-            'course_enrollment': get_dates(academic_calendar_type.COURSE_ENROLLMENT, self.object),
+            'course_enrollment_dates': course_enrollment_dates,
             'mandataries': mandataries,
             'pgm_mgrs': pgm_mgrs,
             "can_edit_administrative_data": can_user_edit_administrative_data(self.request.user, self.object)
@@ -478,7 +485,7 @@ def get_sessions_dates(education_group_year):
     calendar_types = (academic_calendar_type.EXAM_ENROLLMENTS, academic_calendar_type.SCORES_EXAM_SUBMISSION,
                       academic_calendar_type.DISSERTATION_SUBMISSION, academic_calendar_type.DELIBERATION,
                       academic_calendar_type.SCORES_EXAM_DIFFUSION)
-    calendars = mdl.academic_calendar.AcademicCalendar.objects.filter(
+    calendars = AcademicCalendar.objects.filter(
         reference__in=calendar_types,
         academic_year=education_group_year.academic_year
     ).select_related(
@@ -486,7 +493,7 @@ def get_sessions_dates(education_group_year):
     ).prefetch_related(
         Prefetch(
             "offeryearcalendar_set",
-            queryset=mdl.offer_year_calendar.OfferYearCalendar.objects.filter(
+            queryset=OfferYearCalendar.objects.filter(
                 education_group_year=education_group_year
             ),
             to_attr="offer_calendars"
@@ -507,12 +514,12 @@ def get_sessions_dates(education_group_year):
 
 def get_dates(an_academic_calendar_type, an_education_group_year):
     try:
-        dates = mdl.offer_year_calendar.OfferYearCalendar.objects.get(
+        dates = OfferYearCalendar.objects.get(
             education_group_year=an_education_group_year,
             academic_calendar__reference=an_academic_calendar_type,
             academic_calendar__academic_year=an_education_group_year.academic_year
         )
-    except mdl.offer_year_calendar.OfferYearCalendar.DoesNotExist:
+    except OfferYearCalendar.DoesNotExist:
         dates = None
 
     return {"dates": dates} if dates else {}
