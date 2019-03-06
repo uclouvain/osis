@@ -56,7 +56,7 @@ from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories import academic_year as academic_year_factory, campus as campus_factory, \
     organization as organization_factory
-from base.tests.factories.academic_year import AcademicYearFakerFactory, create_current_academic_year, \
+from base.tests.factories.academic_year import create_current_academic_year, \
     get_current_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
 from base.tests.factories.campus import CampusFactory
@@ -332,8 +332,8 @@ class TestLearningUnitModificationProposal(TestCase):
         today = datetime.date(self.learning_unit_year.academic_year.year, 1, 1)
 
         self.learning_unit_year.academic_year = \
-            AcademicYearFakerFactory(year=today.year - 1, start_date=today.replace(day=1, year=today.year - 1),
-                                     end_date=today.replace(day=20, year=today.year - 1))
+            AcademicYearFactory(year=today.year - 1, start_date=today.replace(day=1, year=today.year - 1),
+                                end_date=today.replace(day=20, year=today.year - 1))
         self.learning_unit_year.save()
 
         response = self.client.get(self.url)

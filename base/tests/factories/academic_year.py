@@ -25,30 +25,16 @@
 ##############################################################################
 import datetime
 import string
-from base.models.academic_year import AcademicYear
 
 import factory.fuzzy
 from django.utils import timezone
 from factory.django import DjangoModelFactory
-from faker import Faker
 
-from osis_common.utils.datetime import get_tzinfo
-
-fake = Faker()
+from base.models.academic_year import AcademicYear
 
 
 def create_current_academic_year():
-    now = datetime.datetime.now()
-    ref_date = datetime.datetime(now.year, 9, 15)
-    if now < ref_date:
-        start_date = datetime.date(now.year - 1, 9, 15)
-    else:
-        start_date = datetime.date(now.year, 9, 15)
-
-    return AcademicYearFakerFactory(year=start_date.year,
-                                    start_date=start_date,
-                                    end_date=datetime.date(start_date.year + 1, start_date.month, 30)
-                                    )
+    return AcademicYearFactory(year=get_current_year())
 
 
 def get_current_year():
@@ -94,15 +80,3 @@ class AcademicYearFactory(DjangoModelFactory):
         current_year = base_year or get_current_year()
         acys = [AcademicYearFactory.build(year=current_year+i) for i in range(-number_past, number_future+1)]
         return AcademicYear.objects.bulk_create(acys)
-
-
-class AcademicYearFakerFactory(DjangoModelFactory):
-    class Meta:
-        model = "base.AcademicYear"
-        django_get_or_create = ('year',)
-
-    external_id = factory.Sequence(lambda n: '10000000%02d' % n)
-    changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
-    start_date = fake.date_time_this_decade(before_now=True, after_now=False, tzinfo=get_tzinfo())
-    end_date = fake.date_time_this_decade(before_now=False, after_now=True, tzinfo=get_tzinfo())
-    year = factory.SelfAttribute('start_date.year')

@@ -105,7 +105,7 @@ def academic_calendars(request):
     show_academic_events = request.GET.get('show_academic_events')
     show_project_events = request.GET.get('show_project_events') and request.user.is_superuser
     show_ad_hoc_events = request.GET.get('show_ad_hoc_events') and request.user.is_superuser
-    academic_calendar_list = mdl.academic_calendar.find_academic_calendar_by_academic_year(academic_year)
+    academic_calendar_list = AcademicCalendar.objects.filter(academic_year=academic_year).order_by('start_date')
     academic_calendar_json = _build_gantt_json(academic_calendar_list, show_academic_events, show_project_events)
     undated_calendars_list = _get_undated_calendars(academic_calendar_list)
     ad_hoc_list = {'ad_hoc_events': _build_gantt_markers_data(academic_calendar_list, show_ad_hoc_events)}
