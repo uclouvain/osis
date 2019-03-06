@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,31 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
+from django.db import models
+from osis_common.models.osis_model_admin import OsisModelAdmin
+from django.utils.translation import ugettext_lazy as _
 
-from reference.models import *
+
+class DomainIscedAdmin(OsisModelAdmin):
+    list_display = ('code', 'title_fr', 'title_en',)
+    search_fields = ['code', 'title_fr', 'title_en']
 
 
-admin.site.register(continent.Continent,
-                    continent.ContinentAdmin)
+class DomainIsced(models.Model):
+    changed = models.DateTimeField(null=True, auto_now=True)
 
-admin.site.register(currency.Currency,
-                    currency.CurrencyAdmin)
+    code = models.CharField(max_length=10, db_index=True, unique=True)
+    title_fr = models.CharField(max_length=255, db_index=True, unique=True)
+    title_en = models.CharField(max_length=255, db_index=True, unique=True)
 
-admin.site.register(country.Country,
-                    country.CountryAdmin)
+    def __str__(self):
+        return '{} {}'.format(self.code, self.title_fr)
 
-admin.site.register(decree.Decree,
-                    decree.DecreeAdmin)
-
-admin.site.register(domain.Domain,
-                    domain.DomainAdmin)
-
-admin.site.register(domain_isced.DomainIsced,
-                    domain_isced.DomainIscedAdmin)
-
-admin.site.register(grade_type.GradeType,
-                    grade_type.GradeTypeAdmin)
-
-admin.site.register(language.Language,
-                    language.LanguageAdmin)
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _("The International Standard Classification of Education (ISCED)")
