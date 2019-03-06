@@ -27,6 +27,7 @@ from datetime import datetime
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.test import TestCase, Client, RequestFactory
 
 from assessments.views import pgm_manager_administration
@@ -377,17 +378,20 @@ class TestAddSaveProgramManager(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonFactory()
-        cls.offer_year_without_equivalent_education_group_year = OfferYearFactory()
+        cls.offer_year_without_equivalent_education_group_year = OfferYearFactory(
+            corresponding_education_group_year=None
+        )
 
-        cls.offer_year = OfferYearFactory()
-        cls.education_group_year = EducationGroupYearFactory(acronym=cls.offer_year.acronym)
+        acronym = "Acronym"
+        cls.education_group_year = EducationGroupYearFactory(acronym=acronym)
+        cls.offer_year = OfferYearFactory(
+            acronym=acronym,
+            corresponding_education_group_year=cls.education_group_year
+        )
 
     def test_when_offer_year_has_no_equivalent_education_group_year(self):
-        pgm_manager = add_save_program_manager(self.offer_year_without_equivalent_education_group_year, self.person)
-        self.assertTrue(pgm_manager.id)
-        self.assertEqual(pgm_manager.person, self.person)
-        self.assertEqual(pgm_manager.offer_year, self.offer_year_without_equivalent_education_group_year)
-        self.assertIsNone(pgm_manager.education_group)
+        with self.assertRaises(IntegrityError):
+            add_save_program_manager(self.offer_year_without_equivalent_education_group_year, self.person)
 
     def test_when_offer_year_has_an_equivalent_education_group_year(self):
         pgm_manager = add_save_program_manager(self.offer_year, self.person)
