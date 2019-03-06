@@ -30,6 +30,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
+from base.business.group_element_years import management
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.group_element_year import GroupElementYear
@@ -43,8 +44,9 @@ class DetachStrategy(metaclass=abc.ABCMeta):
 
 class DetachEducationGroupYearStrategy(DetachStrategy):
     def __init__(self, link: GroupElementYear):
-        self.parent = link.parent
-        self.child = link.child
+        self.link = link
+        self.parent = self.link.parent
+        self.child = self.link.child
 
     @cached_property
     def parents(self):
@@ -53,13 +55,15 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
 
     def _get_parents_pgrm_master(self):
         return self.parents.filter(education_group_type__name__in=[
-            TrainingType.PGRM_MASTER_120.name, TrainingType.PGRM_MASTER_180_240.name])
+            TrainingType.PGRM_MASTER_120.name, TrainingType.PGRM_MASTER_180_240.name
+        ])
 
     def _get_parents_finality_type(self):
         return self.parents.filter(education_group_type__name__in=TrainingType.finality_types())
 
     def is_valid(self):
-        if not self._get_parents_finality_type().exists() and self._get_parents_pgrm_master().exists():
+        management.check_authorized_relationship(self.parent, self.link, to_delete=True)
+        if self._get_parents_finality_type().exists() and self._get_parents_pgrm_master().exists():
             self._check_detatch_options_rules()
         return True
 
@@ -79,12 +83,12 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
 
         errors = []
         for finality_acronym, options_list in mandatory_options.items():
-            missing_options = set(options_list) - set(options_to_detatch)
-            if missing_options:
+            opt_mandatory = set(options_list) & set(options_to_detatch)
+            if opt_mandatory:
                 errors.append(
                     ValidationError(_("Option \"%(acronym)s\" cannot be removed because it is contained in"
                                       " %(finality_acronym)s program.") % {
-                        "acronym": ', '.join(option.acronym for option in missing_options),
+                        "acronym": ', '.join(option.acronym for option in opt_mandatory),
                         "finality_acronym": finality_acronym
                      })
                 )
@@ -96,7 +100,13 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
 class DetachLearningUnitYearStrategy(DetachStrategy):
     def __init__(self, link: GroupElementYear):
         self.parent = link.parent
-        self.child = link.child
+        self.learning_unit_year = link.child
 
     def is_valid(self):
+        if self.learning_unit_year.has_or_is_prerequisite(self.parent):
+            raise ValidationError(
+                _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
+                    "acronym": self.learning_unit_year.acronym
+                }
+            )
         return True
