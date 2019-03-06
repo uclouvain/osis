@@ -3449,5 +3449,23 @@
                 ]
             ]
         }
+    },
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "continuing_education_training_managers",
+            "permissions": [
+                [
+                    "can_access_admission",
+                    "continuing_education",
+                    "admission"
+                ],
+                [
+                    "change_admission",
+                    "continuing_education",
+                    "admission"
+                ]
+            ]
+        }
     }
 ]
