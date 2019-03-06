@@ -61,6 +61,7 @@ from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING, GROUP
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from base.models.mandatary import Mandatary
 from base.models.person import Person
 from base.models.program_manager import ProgramManager
 from base.utils.cache import cache
@@ -452,9 +453,19 @@ class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
             "first_name"
         )
 
+        mandataries = Mandatary.objects.filter(
+            mandate__education_group=self.object.education_group,
+            start_date__lte=self.object.academic_year.start_date,
+            end_date__gte=self.object.academic_year.end_date
+        ).order_by(
+            'mandate__function',
+            'person__last_name',
+            'person__first_name'
+        ).select_related("person", "mandate")
+
         context.update({
             'course_enrollment': get_dates(academic_calendar_type.COURSE_ENROLLMENT, self.object),
-            'mandataries': mdl.mandatary.find_by_education_group_year(self.object),
+            'mandataries': mandataries,
             'pgm_mgrs': pgm_mgrs,
             "can_edit_administrative_data": can_user_edit_administrative_data(self.request.user, self.object)
         })

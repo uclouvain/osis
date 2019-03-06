@@ -68,11 +68,3 @@ class MandataryTest(TestCase):
         self.mandatary_president_egy1 = MandataryFactory(mandate=self.mandate_president,
                                                     start_date=self.start_date_ay_1,
                                                     end_date=self.end_date_ay_1)
-
-    def test_find_by_education_group_year(self):
-        self.assertListEqual(list(mandatary.find_by_education_group_year(self.education_group_year_acy1_1)),
-                             [self.mandatary_president_egy1, self.mandatary_secretary_egy1])
-
-    def test_find_by_education_group_year_function(self):
-        self.assertListEqual(list(mandatary.find_by_education_group_year_function(self.education_group_year_acy1_1, mandate_types.SECRETARY )),
-                             [self.mandatary_secretary_egy1])
