@@ -174,5 +174,6 @@ def find_by_offer_year_person(a_person, offer_yr):
 def find_by_education_group(an_education_group):
     if an_education_group:
         return ProgramManager.objects.filter(education_group=an_education_group)\
-            .order_by('person__last_name', 'person__first_name').select_related("person").distinct("person")
+            .order_by('person__last_name', 'person__first_name', 'person__id').select_related("person").\
+            distinct('person__last_name', 'person__first_name', 'person__id')
     return None

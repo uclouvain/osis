@@ -62,6 +62,7 @@ from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING, GROUP
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.person import Person
+from base.models.program_manager import ProgramManager
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
@@ -443,10 +444,18 @@ class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        pgm_mgrs = Person.objects.filter(
+            programmanager__education_group=self.object.education_group
+        ).order_by(
+            "last_name",
+            "first_name"
+        )
+
         context.update({
             'course_enrollment': get_dates(academic_calendar_type.COURSE_ENROLLMENT, self.object),
             'mandataries': mdl.mandatary.find_by_education_group_year(self.object),
-            'pgm_mgrs': mdl.program_manager.find_by_education_group(self.object.education_group),
+            'pgm_mgrs': pgm_mgrs,
             "can_edit_administrative_data": can_user_edit_administrative_data(self.request.user, self.object)
         })
         context.update(get_sessions_dates(self.object))
