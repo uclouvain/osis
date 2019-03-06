@@ -110,6 +110,7 @@
 {% hijack_notification %}
 {% analytical_body_top %}
 
+
 {% block layout_navbar_top %}
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container-fluid p0-50">
@@ -203,34 +204,37 @@
                         {% endif %}
                         {% if "partnership" in installed_apps and perms.partnership.can_access_partnerships %}
                             <li class="dropdown">
-                              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                    aria-haspopup="true"
                                    aria-expanded="false"
                                    id="lnk_home_dropdown_partnerships">{% trans 'Partnerships' %}
-                                  <span
-                                    class="caret"></span></a>
-                              <ul class="dropdown-menu">
-                                {% if perms.partnership.change_uclmanagemententity %}
-                                  <li><a href="{% url 'partnerships:ucl_management_entities:list' %}"
-                                         id="lnk_dropdown_uclmanagemententities">{% trans 'Management entity' %}</a></li>
-                                {% endif %}
-                                <li><a href="{% url 'partnerships:partners:list' %}"
-                                       id="lnk_dropdown_partners">{% trans 'Partners' %}</a></li>
-                                <li><a href="{% url 'partnerships:list' %}"
-                                       id="lnk_dropdown_partnerships">{% trans 'partnerships' %}</a></li>
-                                {% if perms.partnership.can_access_partnerships_agreements %}
-                                <li><a href="{% url 'partnerships:list' %}?agreements=1"
-                                       id="lnk_dropdown_agreements">{% trans 'agreements' %}</a></li>
-                                {% endif %}
-                                {% if perms.partnership.change_partnershipconfiguration %}
-                                  <li><a href="{% url 'partnerships:configuration_update' %}"
-                                         id="lnk_dropdown_partnerships_general_conf">{% trans 'General configuration' %}</a></li>
-                                {% endif %}
-                                {% if perms.partnership.change_financing %}
-                                  <li><a href="{% url 'partnerships:financings:list' %}"
-                                         id="lnk_dropdown_partnerships_financing_conf">{% trans 'partnerships_financing_configuration' %}</a></li>
-                                {% endif %}
-                              </ul>
+                                    <span
+                                            class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    {% if perms.partnership.change_uclmanagemententity %}
+                                        <li><a href="{% url 'partnerships:ucl_management_entities:list' %}"
+                                               id="lnk_dropdown_uclmanagemententities">{% trans 'Management entity' %}</a>
+                                        </li>
+                                    {% endif %}
+                                    <li><a href="{% url 'partnerships:partners:list' %}"
+                                           id="lnk_dropdown_partners">{% trans 'Partners' %}</a></li>
+                                    <li><a href="{% url 'partnerships:list' %}"
+                                           id="lnk_dropdown_partnerships">{% trans 'partnerships' %}</a></li>
+                                    {% if perms.partnership.can_access_partnerships_agreements %}
+                                        <li><a href="{% url 'partnerships:list' %}?agreements=1"
+                                               id="lnk_dropdown_agreements">{% trans 'agreements' %}</a></li>
+                                    {% endif %}
+                                    {% if perms.partnership.change_partnershipconfiguration %}
+                                        <li><a href="{% url 'partnerships:configuration_update' %}"
+                                               id="lnk_dropdown_partnerships_general_conf">{% trans 'General configuration' %}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if perms.partnership.change_financing %}
+                                        <li><a href="{% url 'partnerships:financings:list' %}"
+                                               id="lnk_dropdown_partnerships_financing_conf">{% trans 'partnerships_financing_configuration' %}</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
                             </li>
                         {% endif %}
                         <li>
@@ -311,7 +315,9 @@
     </div>
 {% endif %}
 
-<div class="container-fluid p0-50">
+{% block sidebar %}{% endblock %}
+
+<div class="container-fluid p0-50" id="main">
     {% if request.user.is_authenticated %}
         {% block breadcrumbarea %}
             <ol class="breadcrumb">
@@ -338,8 +344,10 @@
     {# FIXME ! It is forbidden to add something in the main layout for a specific need. Use messages instead !#}
     {% if warnings %}
         <div class="alert alert-warning" style="margin-bottom: 10px">
-            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'We detected inconsistencies in the following data :' %}
-            <button id="btn_expandButton" type="button" class="btn" data-toggle="collapse" data-target="#CollapseWarnings"
+            <i class="fa fa-exclamation-triangle"
+               aria-hidden="true"></i> {% trans 'We detected inconsistencies in the following data :' %}
+            <button id="btn_expandButton" type="button" class="btn" data-toggle="collapse"
+                    data-target="#CollapseWarnings"
                     style="background-color: transparent;">
                 <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
                       style="color:#8a6d3b"></span>
@@ -375,7 +383,7 @@
     <div class="container-fluid p0-50">
         <p class="navbar-text pull-left">
             <a href="{{ user_manual.global }}"
-                target="_blank" id="lnk_user_manual">{% trans 'Documentation' %}</a> |
+               target="_blank" id="lnk_user_manual">{% trans 'Documentation' %}</a> |
             <a href="http://uclouvain.github.io/osis/" target="_blank"
                id="lnk_osis_website">{% trans 'Website' %}</a> |
             <a href="https://github.com/uclouvain/osis" target="_blank"
