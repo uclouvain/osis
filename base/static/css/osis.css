@@ -214,4 +214,5 @@ div:target{
     max-width: 250px;
     /* If max-width does not work, try using width instead */
     width: 250px;
+    text-align: left;
 }
