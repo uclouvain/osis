@@ -1,38 +1,38 @@
 body {
-  padding-top: 70px;
+    padding-top: 70px;
 }
 
 #table_learning_units a:visited {
-    color:purple;
+    color: purple;
 }
 
 .info {
-  color:blue;
+    color: blue;
 }
 
 .success {
-  color:green;
+    color: green;
 }
 
 .warning {
-  color:orange;
+    color: orange;
 }
 
 .error {
-  color:red;
+    color: red;
 }
 
 .btn.btn-as-block {
-  display: block;
+    display: block;
 }
 
-.invisible{
-  visibility: hidden;
+.invisible {
+    visibility: hidden;
 }
 
 /* Hides the spinner of number fields. */
 input[type=number] {
-    -moz-appearance:textfield;
+    -moz-appearance: textfield;
     -webkit-appearance: none;
 }
 
@@ -49,60 +49,60 @@ input[type=number] {
     display: block;
     width: 100%;
     color: black;
- }
+}
 
-#pnl_add_manager_modal .modal-dialog  {
-    width:90%;
+#pnl_add_manager_modal .modal-dialog {
+    width: 90%;
 }
 
 div[class^="django-ckeditor-widget"],
 div[class^="django-ckeditor-widget"] > textarea,
 div[class^="django-ckeditor-widget"] > div {
-    width:100%!important;
+    width: 100% !important;
 }
 
-tbody.used_component{
+tbody.used_component {
     background-color: #ececec;
 }
 
-tbody.used_component tr.class_year{
+tbody.used_component tr.class_year {
     background-color: #ecfcfc;
 }
 
-tbody.unused_component{
+tbody.unused_component {
     background-color: #f3f3f3;
     color: #909090;
 }
 
-tbody.unused_component tr.class_year{
+tbody.unused_component tr.class_year {
     background-color: #f3fcfc;
 }
 
-tr.class_year{
+tr.class_year {
     font-size: 80%;
 }
 
-tr.class_year_head{
+tr.class_year_head {
     font-weight: bold;
 }
 
-table.volumes tbody tr th{
+table.volumes tbody tr th {
     text-align: center;
 }
 
-table.volumes tbody tr td{
+table.volumes tbody tr td {
     text-align: center;
 }
 
-table.volumes_read tbody tr td,th{
+table.volumes_read tbody tr td, th {
     text-align: left;
 }
 
-table.volumes tbody tr td input{
+table.volumes tbody tr td input {
     text-align: center;
 }
 
-table.volumes tbody{
+table.volumes tbody {
     border-top: 2px solid #c0c0c0;
     border-bottom: 2px solid #c0c0c0;
 }
@@ -110,15 +110,15 @@ table.volumes tbody{
 table.volumes tbody tr td:nth-child(1),
 table.volumes tbody tr td:nth-child(8),
 table.volumes tbody tr th:nth-child(1),
-table.volumes tbody tr th:nth-child(8){
+table.volumes tbody tr th:nth-child(8) {
     background-color: #f3f3f3;
 }
 
-table.volumes thead{
+table.volumes thead {
     border: 2px solid #ddd;
 }
 
-.badge.fixed_width{
+.badge.fixed_width {
     width: 60px;
 }
 
@@ -146,13 +146,13 @@ table.volumes thead{
     border-radius: 50%;
 }
 
-.no_label{
+.no_label {
     font-weight: normal;
 }
 
 /* Override style for trash in ajax-multi-select*/
-input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon{
-    display: none!important;
+input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
+    display: none !important;
 }
 
 .results_on_deck .ui-icon.ui-icon-trash {
@@ -173,7 +173,7 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon{
     content: "\f00d";
 }
 
-.table_header{
+.table_header {
     background-color: lightgray;
 }
 
@@ -193,18 +193,58 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon{
 .vakata-context {
     z-index: 100;
 }
+
 .navbar-fixed-bottom {
     z-index: 10;
 }
 
 /* Styles for dhtmlxGantt (calendar) */
-.projectRow{
-  	background-color: lightgray!important
+.projectRow {
+    background-color: lightgray !important
 }
 
-.releaseCol{
-    background-color: teal!important
+.releaseCol {
+    background-color: teal !important
 }
-.releaseCol a{
+
+.releaseCol a {
     color: white;
+}
+
+/*  Sidenav styles */
+.side-container {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #ffffff;
+    display: flex;
+}
+
+.sidenav {
+    height: 100%;
+    width: 100%;
+    padding-top: 60px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.sidenav #panel_file_tree {
+    padding-left: 30px;
+}
+
+@media screen and (max-height: 450px) {
+    .sidenav {
+        padding-top: 15px;
+    }
+}
+
+
+#split-bar {
+    height: 100%;
+    background-color: lightgrey;
+    width: 1px;
+    cursor: col-resize;
 }
