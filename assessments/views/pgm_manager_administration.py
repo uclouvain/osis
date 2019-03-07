@@ -34,6 +34,7 @@ from rest_framework import serializers
 from rest_framework.renderers import JSONRenderer
 
 from base import models as mdl
+from base.models.education_group import EducationGroup
 from base.models.entity_manager import is_entity_manager, has_perm_entity_manager
 
 ALL_OPTION_VALUE = "-"
@@ -240,9 +241,13 @@ def add_offer_program_manager(offer_yr, person):
 
 
 def add_save_program_manager(offer_yr, person):
-    pgm_manage = mdl.program_manager.ProgramManager(person=person,
-                                                    offer_year=offer_yr)
-    pgm_manage.save()
+    corresponding_education_group = EducationGroup.objects.filter(educationgroupyear__acronym=offer_yr.acronym).first()
+    pgm_manager = mdl.program_manager.ProgramManager.objects.create(
+        person=person,
+        offer_year=offer_yr,
+        education_group=corresponding_education_group
+    )
+    return pgm_manager
 
 
 def _convert_to_int_list(pgms_id):

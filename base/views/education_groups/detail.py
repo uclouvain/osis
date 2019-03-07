@@ -25,14 +25,14 @@
 ##############################################################################
 import itertools
 import json
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import F, Case, When
+from django.db.models import F, Case, When, Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -50,6 +50,7 @@ from base.business.education_groups.general_information import PublishException,
 from base.business.education_groups.general_information_sections import SECTION_LIST, SECTION_INTRO, SECTION_DIDACTIC, \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
+from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
@@ -61,6 +62,8 @@ from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING, GROUP
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from base.models.mandatary import Mandatary
+from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.person import Person
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys
@@ -443,45 +446,83 @@ class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        pgm_mgrs = Person.objects.filter(
+            programmanager__education_group=self.object.education_group
+        ).order_by(
+            "last_name",
+            "first_name"
+        )
+
+        mandataries = Mandatary.objects.filter(
+            mandate__education_group=self.object.education_group,
+            start_date__lte=self.object.academic_year.start_date,
+            end_date__gte=self.object.academic_year.end_date
+        ).order_by(
+            'mandate__function',
+            'person__last_name',
+            'person__first_name'
+        ).select_related("person", "mandate")
+
+        course_enrollment_dates = OfferYearCalendar.objects.filter(
+            education_group_year=self.object,
+            academic_calendar__reference=academic_calendar_type.COURSE_ENROLLMENT,
+            academic_calendar__academic_year=self.object.academic_year
+        ).first()
+
         context.update({
-            'course_enrollment': get_dates(academic_calendar_type.COURSE_ENROLLMENT, self.object),
-            'mandataries': mdl.mandatary.find_by_education_group_year(self.object),
-            'pgm_mgrs': mdl.program_manager.find_by_education_group(self.object.education_group),
-            'exam_enrollments': get_sessions_dates(academic_calendar_type.EXAM_ENROLLMENTS, self.object),
-            'scores_exam_submission': get_sessions_dates(academic_calendar_type.SCORES_EXAM_SUBMISSION, self.object),
-            'dissertation_submission': get_sessions_dates(academic_calendar_type.DISSERTATION_SUBMISSION, self.object),
-            'deliberation': get_sessions_dates(academic_calendar_type.DELIBERATION, self.object),
-            'scores_exam_diffusion': get_sessions_dates(academic_calendar_type.SCORES_EXAM_DIFFUSION, self.object),
+            'course_enrollment_dates': course_enrollment_dates,
+            'mandataries': mandataries,
+            'pgm_mgrs': pgm_mgrs,
             "can_edit_administrative_data": can_user_edit_administrative_data(self.request.user, self.object)
         })
+        context.update(get_sessions_dates(self.object))
 
         return context
 
 
-def get_sessions_dates(an_academic_calendar_type, an_education_group_year):
-    date_dict = {}
+def get_sessions_dates(education_group_year):
+    calendar_types = (academic_calendar_type.EXAM_ENROLLMENTS, academic_calendar_type.SCORES_EXAM_SUBMISSION,
+                      academic_calendar_type.DISSERTATION_SUBMISSION, academic_calendar_type.DELIBERATION,
+                      academic_calendar_type.SCORES_EXAM_DIFFUSION)
+    calendars = AcademicCalendar.objects.filter(
+        reference__in=calendar_types,
+        academic_year=education_group_year.academic_year
+    ).select_related(
+        "sessionexamcalendar"
+    ).prefetch_related(
+        Prefetch(
+            "offeryearcalendar_set",
+            queryset=OfferYearCalendar.objects.filter(
+                education_group_year=education_group_year
+            ),
+            to_attr="offer_calendars"
+        )
+    )
 
-    for session_number in range(NUMBER_SESSIONS):
-        session = mdl.session_exam_calendar.get_by_session_reference_and_academic_year(
-            session_number + 1,
-            an_academic_calendar_type,
-            an_education_group_year.academic_year)
-        if session:
-            dates = mdl.offer_year_calendar.get_by_education_group_year_and_academic_calendar(session.academic_calendar,
-                                                                                              an_education_group_year)
-            date_dict['session{}'.format(session_number + 1)] = dates
+    sessions_dates_by_calendar_type = defaultdict(dict)
 
-    return date_dict
+    for calendar in calendars:
+        session = calendar.sessionexamcalendar
+        offer_year_calendars = calendar.offer_calendars
+        if offer_year_calendars:
+            sessions_dates_by_calendar_type[calendar.reference.lower()]['session{}'.format(session.number_session)] = \
+                offer_year_calendars[0]
+
+    return sessions_dates_by_calendar_type
 
 
 def get_dates(an_academic_calendar_type, an_education_group_year):
-    ac = mdl.academic_calendar.get_by_reference_and_academic_year(an_academic_calendar_type,
-                                                                  an_education_group_year.academic_year)
-    if ac:
-        dates = mdl.offer_year_calendar.get_by_education_group_year_and_academic_calendar(ac, an_education_group_year)
-        return {'dates': dates}
-    else:
-        return {}
+    try:
+        dates = OfferYearCalendar.objects.get(
+            education_group_year=an_education_group_year,
+            academic_calendar__reference=an_academic_calendar_type,
+            academic_calendar__academic_year=an_education_group_year.academic_year
+        )
+    except OfferYearCalendar.DoesNotExist:
+        dates = None
+
+    return {"dates": dates} if dates else {}
 
 
 class EducationGroupContent(EducationGroupGenericDetailView):
