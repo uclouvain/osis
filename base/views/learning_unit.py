@@ -25,6 +25,7 @@
 ##############################################################################
 import collections
 import itertools
+from copy import deepcopy
 
 from django.conf import settings
 from django.contrib import messages
@@ -43,10 +44,9 @@ from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language, \
     get_entities_comparison_context, get_components_identification, get_organization_from_learning_unit_year
-from base.business.learning_unit import get_learning_unit_comparison_context
+from base.business.learning_unit_proposal import _get_value_from_enum
 from base.business.learning_units import perms as business_perms
-from base.business.learning_units.comparison import get_keys, compare_learning_unit_years, \
-    compare_learning_container_years, get_components_changes, get_partims_as_str, get_entity_by_type, \
+from base.business.learning_units.comparison import get_components_changes, get_entity_by_type, \
     FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON, \
     FIELDS_FOR_LEARNING_COMPONENT_COMPARISON
 from base.business.learning_units.perms import can_update_learning_achievement
@@ -56,10 +56,13 @@ from base.forms.learning_unit_specifications import LearningUnitSpecificationsFo
 from base.models import education_group_year, campus, proposal_learning_unit, entity
 from base.models import learning_component_year as mdl_learning_component_year
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
+from base.models.enums.attribution_procedure import ATTRIBUTION_PROCEDURES
+from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, EntityContainerYearLinkTypes
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
+from base.models.enums.vacant_declaration_type import DECLARATION_TYPE
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
-from base.views.common import display_warning_messages, display_error_messages
+from base.views.common import display_warning_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models import text_label
 from reference.models import language
@@ -244,31 +247,74 @@ def learning_unit_proposal_comparison(request, learning_unit_year_id):
         LearningUnitYear.objects.all().select_related('learning_unit', 'learning_container_year',
                                                       'campus', 'campus__organization'), pk=learning_unit_year_id
     )
-    current_context = get_context_proposal_comparison(learning_unit_year)
-    context = build_context_comparison(current_context, learning_unit_year, {}, {})
+    if proposal_learning_unit.is_learning_unit_year_in_proposal(learning_unit_year):
+        initial_data = proposal_learning_unit.find_by_learning_unit_year(learning_unit_year).initial_data
+        initial_learning_unit_year, learning_unit_year_fields = get_learning_unit_year_context(initial_data,
+                                                                                               learning_unit_year)
+        learning_container_year_fields = get_learning_container_year_context(initial_data, learning_unit_year)
+        context = dict({'learning_unit_year': learning_unit_year})
+        context['campus'] = [learning_unit_year._meta.get_field('campus').verbose_name,
+                             initial_learning_unit_year.campus.name, learning_unit_year.campus.name]
+        context['entities_fields'] = get_entities_context(initial_data, learning_unit_year)
+        context['learning_unit_year_fields'] = learning_unit_year_fields
+        context['learning_container_year_fields'] = learning_container_year_fields
+        components = get_components_identification(learning_unit_year)
+        context['components'] = components
     return render(request, "learning_unit/proposal_comparison.html", context)
 
 
-def get_context_proposal_comparison(learning_unit_year):
-    if proposal_learning_unit.is_learning_unit_year_in_proposal(learning_unit_year):
-        initial_data = proposal_learning_unit.find_by_learning_unit_year(learning_unit_year).initial_data
-        context = dict({'learning_unit_year': learning_unit_year})
-        context['campus'] = learning_unit_year.campus or {}
-        context['organization'] = get_organization_from_learning_unit_year(learning_unit_year)
-        context['language'] = language.find_by_id(learning_unit_year.language.id)
-        components = get_components_identification(learning_unit_year)
-        context['components'] = components.get('components')
-        for link_type in ENTITY_TYPE_LIST:
-            context[link_type] = get_entity_by_type(learning_unit_year, link_type)
-        context['learning_container_year_partims'] = [partim.subdivision for partim in
-                                                      learning_unit_year.get_partims_related()]
-        context = get_entities_comparison_context(context, learning_unit_year)
-        context['initial_data'] = initial_data
-        context['initial_data']['learning_unit_year']['language'] = language.find_by_id(
-            context['initial_data']['learning_unit_year']['language']).name
-    else:
-        context = {}
-    return context
+def get_entities_context(initial_data, learning_unit_year):
+    entities_fields = []
+    for link_type in ENTITY_TYPE_LIST:
+        link = EntityContainerYearLinkTypes[link_type].value
+        new_entity = get_entity_by_type(learning_unit_year, link_type).most_recent_acronym if get_entity_by_type(
+            learning_unit_year, link_type) else None
+        initial_entity = entity.find_by_id(
+            initial_data['entities'][link_type]).most_recent_acronym if entity.find_by_id(
+            initial_data['entities'][link_type]) else None
+        if initial_entity != new_entity:
+            entities_fields.append([link, initial_entity, new_entity])
+    return entities_fields
+
+
+def get_learning_container_year_context(initial_data, learning_unit_year):
+    initial_learning_container_year = deepcopy(learning_unit_year.learning_container_year)
+    _reinitialize_model(initial_learning_container_year, initial_data["learning_container_year"])
+    learning_container_year_fields = []
+    for field in FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON:
+        if getattr(initial_learning_container_year, field) != getattr(learning_unit_year.learning_container_year,
+                                                                      field):
+            field_name = learning_unit_year.learning_container_year._meta.get_field(field).verbose_name
+            if field == 'type_declaration_vacant':
+                initial = _get_value_from_enum(DECLARATION_TYPE,
+                                               getattr(initial_learning_container_year, field))
+                new_value = _get_value_from_enum(DECLARATION_TYPE,
+                                                 getattr(learning_unit_year.learning_container_year, field))
+            else:
+                initial = getattr(initial_learning_container_year, field)
+                new_value = getattr(learning_unit_year.learning_container_year, field)
+            learning_container_year_fields.append([field_name, initial, new_value])
+    return learning_container_year_fields
+
+
+def get_learning_unit_year_context(initial_data, learning_unit_year):
+    initial_learning_unit_year = deepcopy(learning_unit_year)
+    _reinitialize_model(initial_learning_unit_year, initial_data["learning_unit_year"])
+    learning_unit_year_fields = []
+    for field in FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON:
+        if getattr(initial_learning_unit_year, field) != getattr(learning_unit_year, field):
+            field_name = learning_unit_year._meta.get_field(field).verbose_name
+            if field == 'periodicity':
+                initial = _get_value_from_enum(PERIODICITY_TYPES, getattr(initial_learning_unit_year, field))
+                new_value = _get_value_from_enum(PERIODICITY_TYPES, getattr(learning_unit_year, field))
+            elif field == 'attribution_procedure':
+                initial = _get_value_from_enum(ATTRIBUTION_PROCEDURES, getattr(initial_learning_unit_year, field))
+                new_value = _get_value_from_enum(ATTRIBUTION_PROCEDURES, getattr(learning_unit_year, field))
+            else:
+                initial = getattr(initial_learning_unit_year, field)
+                new_value = getattr(learning_unit_year, field)
+            learning_unit_year_fields.append([field_name, initial, new_value])
+    return initial_learning_unit_year, learning_unit_year_fields
 
 
 def learning_unit_comparison(request, learning_unit_year_id):
