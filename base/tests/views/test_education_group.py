@@ -157,6 +157,7 @@ class EducationGroupGeneralInformations(TestCase):
     def test_case_common_do_not_have_double_field_prerequisite(self):
         education_group_year = EducationGroupYearCommonFactory(
             academic_year=self.current_academic_year,
+            education_group_type__name=TrainingType.AGGREGATION.name
         )
         url = reverse("education_group_general_informations",
                       args=[education_group_year.pk, education_group_year.id])
