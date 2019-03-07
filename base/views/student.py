@@ -26,6 +26,7 @@
 import requests
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import Http404
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -33,29 +34,31 @@ from requests.exceptions import RequestException
 
 from backoffice.settings.base import ESB_STUDENT_API, ESB_AUTHORIZATION
 from base import models as mdl
+from base.forms.student import StudentSearchForm
+from base.models.student import Student
 
 
 @login_required
 @permission_required('base.can_access_student', raise_exception=True)
 def students(request):
-    return render(request, "student/students.html", {'students': None})
+    form = StudentSearchForm(request.GET or None)
+    students_qs = Student.objects.none()
+    if form.is_valid():
+        students_qs = form.get_objects()
 
+    paginator = Paginator(students_qs, 25)
+    page = request.GET.get('page')
+    try:
+        students = paginator.page(page)
+    except PageNotAnInteger:
+        students = paginator.page(1)
+    except EmptyPage:
+        students = paginator.page(paginator.num_pages)
 
-@login_required
-@permission_required('base.can_access_student', raise_exception=True)
-def student_search(request):
-    students_list = name = None
-    registration_id = request.GET.get('registration_id')
-    if registration_id:
-        student = mdl.student.find_by_registration_id(registration_id)
-        if student:
-            students_list = [student]
-    else:
-        name = request.GET.get('name')
-        students_list = mdl.student.search(name)
-    return render(request, "student/students.html", {'students': students_list,
-                                                     'registration_id': registration_id,
-                                                     'name': name})
+    return render(request, "student/students.html", {
+        'students': students,
+        'form': form
+    })
 
 
 @login_required

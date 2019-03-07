@@ -55,23 +55,23 @@ class StudentViewTestCase(TestCase):
         self.assertIsNone(response.context['students'])
 
     def test_students_search(self):
-        from base.views.student import student_search
+        from base.views.student import students
 
         self.client.force_login(self.program_manager_1.person.user)
 
-        response = self.client.get(reverse(student_search),
+        response = self.client.get(reverse(students),
                                    data={'registration_id': self.students_db[0].registration_id})
 
         self.assertTemplateUsed(response, 'student/students.html')
         self.assertEqual(response.context['students'], [self.students_db[0]])
 
-        response = self.client.get(reverse(student_search), data={
+        response = self.client.get(reverse(students), data={
             'name': self.students_db[1].person.last_name[:2]}
-                                      )
+                                   )
         self.assertTemplateUsed(response, 'student/students.html')
         self.assertIn(self.students_db[1], response.context['students'])
 
-        response = self.client.get(reverse(student_search))
+        response = self.client.get(reverse(students))
 
         self.assertTemplateUsed(response, 'student/students.html')
         self.assertIsNone(response.context['students'])
