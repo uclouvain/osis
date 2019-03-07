@@ -40,8 +40,8 @@
                     <thead>
                     <tr class="table_header">
                         <th>{{ learning_unit_year }}</th>
-                        <th>{% trans 'Initial values' %}</th>
-                        <th>{% trans 'New values' %}</th>
+                        <th>{% trans 'Initial data' %}</th>
+                        <th>{% trans 'New value' %}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -76,6 +76,24 @@
                                 {% trans 'No' %}{% else %}
                                 {{ key_lcy.2|default_if_none:'-'|capfirst }}{% endif %}</td>
                         </tr>
+                    {% endfor %}
+                    {% for component in components %}
+                        {% for key, values in component.1.items %}
+                            {% if forloop.first %}
+                                <tr>
+                                    <td class="table_header" style="border-top: groove">
+                                        {{ component.0  }}
+                                    </td>
+                                    <td style="border-top: groove"></td>
+                                    <td style="border-top: groove"></td>
+                                </tr>
+                            {% endif %}
+                            <tr>
+                                <td class="table_header">&nbsp;&nbsp;{{ key }}</td>
+                                <td>{{ values.0|default_if_none:0 }}</td>
+                                <td>{{ values.1|default_if_none:0 }}</td>
+                            </tr>
+                        {% endfor %}
                     {% endfor %}
                     </tbody>
                 </table>

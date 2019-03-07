@@ -58,6 +58,7 @@ from base.models import learning_component_year as mdl_learning_component_year
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import ATTRIBUTION_PROCEDURES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, EntityContainerYearLinkTypes
+from base.models.enums.learning_component_year_type import LEARNING_COMPONENT_YEAR_TYPES
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.vacant_declaration_type import DECLARATION_TYPE
 from base.models.learning_unit_year import LearningUnitYear
@@ -259,7 +260,31 @@ def learning_unit_proposal_comparison(request, learning_unit_year_id):
         context['learning_unit_year_fields'] = learning_unit_year_fields
         context['learning_container_year_fields'] = learning_container_year_fields
         components = get_components_identification(learning_unit_year)
-        context['components'] = components
+        components_list = []
+        for component in components['components']:
+            volumes = {}
+            component_type = component['learning_component_year'].type
+            volume_total = component['volumes']['VOLUME_TOTAL'] or 0
+            volume_q1 = component['volumes']['VOLUME_Q1'] or 0
+            volume_q2 = component['volumes']['VOLUME_Q2'] or 0
+            planned_classes = component['volumes']['PLANNED_CLASSES'] or 0
+            if volume_total != initial_data['volumes'][component_type]['VOLUME_TOTAL']:
+                volumes[_('Volume total annual')] = [initial_data['volumes'][component_type]['VOLUME_TOTAL'], volume_total]
+            if planned_classes != initial_data['volumes'][component_type]['PLANNED_CLASSES']:
+                volumes[_('Planned classes')] = [initial_data['volumes'][component_type]['PLANNED_CLASSES'],
+                                                 planned_classes]
+            if volume_q1 != initial_data['volumes'][component_type]['VOLUME_Q1']:
+                volumes[_('Volume Q1')] = [initial_data['volumes'][component_type]['VOLUME_Q1'], volume_q1]
+            if volume_q2 != initial_data['volumes'][component_type]['VOLUME_Q2']:
+                volumes[_('Volume Q2')] = [initial_data['volumes'][component_type]['VOLUME_Q2'], volume_q2]
+
+            components_list.append(
+                [
+                    _get_value_from_enum(LEARNING_COMPONENT_YEAR_TYPES, component['learning_component_year'].type),
+                    volumes
+                ]
+            )
+        context['components'] = components_list
     return render(request, "learning_unit/proposal_comparison.html", context)
 
 
