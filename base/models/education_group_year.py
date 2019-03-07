@@ -25,7 +25,7 @@
 ##############################################################################
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models
+from django.db import models, connection
 from django.db.models import Count, OuterRef, Exists, Q, Min, When, Case, Max
 from django.urls import reverse
 from django.utils import translation
@@ -91,8 +91,31 @@ class EducationGroupYearManager(SerializableModelManager):
         return self.get_queryset().get_nearest_years(year)
 
 
+class HierarchyQuerySet(models.QuerySet):
+    def get_parents(self):
+        with connection.cursor() as cursor:
+            child_pks = self.values_list('pk', flat=True)
+            cmd_sql = """
+             WITH RECURSIVE group_element_year_parent AS (
+                    SELECT parent_id
+                    FROM base_groupelementyear
+                    WHERE child_branch_id IN (%s)
+                    UNION ALL
+                    SELECT parent.parent_id
+                    FROM base_groupelementyear as parent
+                    INNER JOIN group_element_year_parent AS child on child.parent_id = parent.child_branch_id
+                )
+              SELECT distinct parent_id FROM group_element_year_parent;
+            """ % ','.join(["%s"]*len(child_pks))
+            cursor.execute(cmd_sql, list(child_pks))
+            education_group_year_pks = [row[0] for row in cursor.fetchall()]
+        return EducationGroupYear.objects.filter(pk__in=education_group_year_pks)
+
+
 class EducationGroupYear(SerializableModel):
     objects = EducationGroupYearManager()
+    hierarchy = HierarchyQuerySet.as_manager()
+
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 

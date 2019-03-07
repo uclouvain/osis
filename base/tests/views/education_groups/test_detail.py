@@ -499,6 +499,7 @@ class TestUtilizationTab(TestCase):
         cls.person = PersonFactory(user=cls.user)
         cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
 
+        AcademicYearFactory(current=True)
         cls.url = reverse(
             "education_group_utilization",
             args=[
