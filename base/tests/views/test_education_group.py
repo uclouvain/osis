@@ -66,7 +66,10 @@ class EducationGroupGeneralInformations(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
-        EducationGroupYearCommonFactory(academic_year=cls.current_academic_year)
+        EducationGroupYearCommonFactory(
+            academic_year=cls.current_academic_year,
+            education_group_type__name=TrainingType.AGGREGATION.name
+        )
         cls.education_group_parent = TrainingFactory(
             acronym="Parent",
             academic_year=cls.current_academic_year
