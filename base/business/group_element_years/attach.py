@@ -47,13 +47,13 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         self.child = child
 
     @cached_property
-    def roots(self):
+    def parents(self):
         return EducationGroupYear.hierarchy.filter(pk=self.parent.pk).get_parents()\
                                            .select_related('education_group_type')
 
     def is_valid(self):
         if self.parent.education_group_type.name in TrainingType.finality_types() or \
-                self.roots.filter(education_group_type__name__in=TrainingType.finality_types()).exists():
+                self.parents.filter(education_group_type__name__in=TrainingType.finality_types()).exists():
             self._check_attach_options_rules()
         return True
 
@@ -67,8 +67,8 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
             options_to_add += [self.child]
 
         errors = []
-        for root in self.roots.filter(education_group_type__name__in=[TrainingType.PGRM_MASTER_120.name,
-                                                                      TrainingType.PGRM_MASTER_180_240.name]):
+        for root in self.parents.filter(education_group_type__name__in=[TrainingType.PGRM_MASTER_120.name,
+                                                                        TrainingType.PGRM_MASTER_180_240.name]):
             options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
             missing_options = set(options_to_add) - set(options_in_2m)
 
