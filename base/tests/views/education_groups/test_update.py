@@ -58,6 +58,7 @@ from base.tests.factories.user import SuperUserFactory
 from base.utils.cache import ElementCache
 from base.views.education_groups.update import update_education_group, _get_success_redirect_url
 from reference.tests.factories.domain import DomainFactory
+from reference.tests.factories.domain_isced import DomainIscedFactory
 from reference.tests.factories.language import LanguageFactory
 
 
@@ -231,6 +232,7 @@ class TestUpdate(TestCase):
         new_entity_version = MainEntityVersionFactory()
         PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
         list_domains = [domain.pk for domain in self.domains]
+        isced_domain = DomainIscedFactory()
         data = {
             'title': 'Cours au choix',
             'title_english': 'deaze',
@@ -243,6 +245,7 @@ class TestUpdate(TestCase):
             'main_teaching_campus': "",
             'academic_year': self.training_education_group_year.academic_year.pk,
             'secondary_domains': ['|' + ('|'.join([str(domain.pk) for domain in self.domains])) + '|'],
+            'isced_domain': isced_domain.pk,
             'active': ACTIVE,
             'schedule_type': DAILY,
             "internship": internship_presence.NO,
@@ -261,6 +264,7 @@ class TestUpdate(TestCase):
         self.assertEqual(self.training_education_group_year.partial_acronym, 'LDVLD101R')
         self.assertEqual(self.training_education_group_year.management_entity, new_entity_version.entity)
         self.assertEqual(self.training_education_group_year.administration_entity, new_entity_version.entity)
+        self.assertEqual(self.training_education_group_year.isced_domain, isced_domain)
         self.assertCountEqual(
             list(self.training_education_group_year.secondary_domains.values_list('id', flat=True)),
             list_domains
