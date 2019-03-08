@@ -23,20 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import itertools
 
 import requests
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.db.models import Prefetch
-from django.http import Http404
 from django.http import HttpResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from requests.exceptions import RequestException
 
 from backoffice.settings.base import ESB_STUDENT_API, ESB_AUTHORIZATION
-from base import models as mdl
 from base.forms.student import StudentSearchForm
 from base.models.exam_enrollment import ExamEnrollment
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
@@ -70,8 +66,7 @@ def students(request):
 @login_required
 @permission_required('base.can_access_student', raise_exception=True)
 def student_read(request, student_id):
-    student_qs = Student.objects.select_related("person")
-    student = get_object_or_404(student_qs, id=student_id)
+    student = get_object_or_404(Student.objects.select_related("person"), id=student_id)
 
     offer_enrollments = OfferEnrollment.objects.filter(
         student=student_id
@@ -104,23 +99,27 @@ def student_read(request, student_id):
         'session_exam__number_session',
         'learning_unit_enrollment__learning_unit_year__acronym'
     )
-    return render(request, "student/student.html", locals())
+
+    return render(request, "student/student.html", {
+        "student": student,
+        "offer_enrollments": offer_enrollments,
+        "learning_unit_enrollments": learning_unit_enrollments,
+        "exam_enrollments": exam_enrollments
+    })
 
 
 @login_required
 @permission_required('base.can_access_student', raise_exception=True)
 def student_picture(request, student_id):
-    student = mdl.student.find_by_id(student_id)
-    if student:
-        try:
-            url = "{url}/{registration_id}/photo".format(url=ESB_STUDENT_API, registration_id=student.registration_id)
-            response = requests.get(url, headers={"Authorization": ESB_AUTHORIZATION})
-            result = response.json()
-            if response.status_code == 200 and result.get('photo_url'):
-                return _get_image(result.get('photo_url'), student)
-        except (RequestException, ValueError):
-            return _default_image(student)
-    raise Http404()
+    student = get_object_or_404(Student.objects.select_related("person"), id=student_id)
+    try:
+        url = "{url}/{registration_id}/photo".format(url=ESB_STUDENT_API, registration_id=student.registration_id)
+        response = requests.get(url, headers={"Authorization": ESB_AUTHORIZATION})
+        result = response.json()
+        if response.status_code == 200 and result.get('photo_url'):
+            return _get_image(result.get('photo_url'), student)
+    except (RequestException, ValueError):
+        return _default_image(student)
 
 
 def _get_image(url, student):
