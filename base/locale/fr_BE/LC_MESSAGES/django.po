@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-08 11:41+0100\n"
+"POT-Creation-Date: 2019-03-08 13:47+0100\n"
 "PO-Revision-Date: 2019-02-27 15:13+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1464,7 +1464,7 @@ msgstr "Inscrits à l'UE"
 msgid "Enrollment campus"
 msgstr "Lieu d'inscription"
 
-#: models/exam_enrollment.py:85 templates/student/offers_enrollments.html:49
+#: models/exam_enrollment.py:85 templates/student/offers_enrollments.html:47
 msgid "Enrollment date"
 msgstr "Date d'inscription"
 
@@ -1744,7 +1744,7 @@ msgid "Funding international cooperation CCD/CUD direction"
 msgstr "Orientation coopération internationale CCD/CUD"
 
 #: templates/my_osis/profile.html:83 templates/student/student.html:55
-#: templates/student/students.html:74
+#: templates/student/students.html:59
 msgid "Gender"
 msgstr "Genre"
 
@@ -1818,6 +1818,7 @@ msgid "Home"
 msgstr "Page d'accueil"
 
 #: models/education_group_year.py:413
+#: templates/education_group/identification_training_details.html:86
 msgid "ISCED domain"
 msgstr "Domaine ISCED/CITE"
 
@@ -2083,7 +2084,7 @@ msgstr "Lieu d'enseignement"
 #: templates/learning_unit/breadcrumb.html:30
 #: templates/learning_unit/comparison.html:29 templates/learning_units.html:62
 #: templates/my_osis/profile.html:131
-#: templates/student/exams_enrollments.html:50
+#: templates/student/exams_enrollments.html:48
 msgid "Learning unit"
 msgstr "Unité d'enseignement"
 
@@ -2518,7 +2519,7 @@ msgstr "Mon OSIS"
 #: templates/organization/organization.html:62
 #: templates/organization/organization.html:115
 #: templates/organization/organizations.html:62
-#: templates/student/students.html:48 templates/student/students.html:73
+#: templates/student/students.html:58
 msgid "Name"
 msgstr "Nom"
 
@@ -2607,9 +2608,9 @@ msgstr "Aucune attribution n’existe pour le cours parent"
 #: business/learning_units/edition.py:506
 #: business/learning_units/edition.py:624
 #: business/learning_units/edition.py:626
-#: templates/student/exams_enrollments.html:73
-#: templates/student/learning_units_enrollments.html:61
-#: templates/student/offers_enrollments.html:64
+#: templates/student/exams_enrollments.html:70
+#: templates/student/learning_units_enrollments.html:58
+#: templates/student/offers_enrollments.html:61
 #: tests/business/learning_units/test_edition.py:165
 #: tests/business/learning_units/test_edition.py:375
 msgid "No data"
@@ -2659,7 +2660,7 @@ msgstr ""
 "Aucun type de %(child_category)s ne peut être créé comme enfant d'une "
 "%(category)s de type %(type)s"
 
-#: templates/student/exams_enrollments.html:51
+#: templates/student/exams_enrollments.html:49
 msgid "No. Session"
 msgstr "No. session"
 
@@ -3321,7 +3322,7 @@ msgid "Refused"
 msgstr "Refusé"
 
 #: templates/education_group/pdf_content.html:107
-#: templates/student/students.html:43 templates/student/students.html:72
+#: templates/student/students.html:57
 msgid "Registration ID"
 msgstr "NOMA"
 
@@ -3655,12 +3656,12 @@ msgid "Student"
 msgstr "Etudiant"
 
 #: templates/home.html:80 templates/layout.html:164
-#: templates/student/student.html:30 templates/student/students.html:30
+#: templates/student/student.html:30 templates/student/students.html:29
 #: templates/studies.html:30 templates/studies.html:34
 msgid "Student path"
 msgstr "Parcours de l'étudiant"
 
-#: templates/student/students.html:54
+#: templates/student/students.html:46
 msgid "Student search"
 msgstr "Recherche étudiants"
 
@@ -3673,7 +3674,7 @@ msgid "Student's signature"
 msgstr "Signature de l'étudiant.e"
 
 #: templates/layout.html:173 templates/student/student.html:31
-#: templates/student/students.html:31 templates/student/students.html:36
+#: templates/student/students.html:30 templates/student/students.html:35
 msgid "Students"
 msgstr "Etudiants"
 
@@ -3769,7 +3770,7 @@ msgid "Termination"
 msgstr "Terminaison"
 
 #: models/enums/academic_calendar_type.py:62
-#: tests/models/test_academic_calendar.py:147
+#: tests/models/test_academic_calendar.py:113
 msgid "Testing"
 msgstr "Essai"
 
@@ -5142,8 +5143,8 @@ msgstr "attendus du diplôme"
 #: models/education_group_year.py:350
 #: templates/learning_unit/components.html:124
 #: templates/learning_unit/formations.html:43
-#: templates/student/learning_units_enrollments.html:47
-#: templates/student/offers_enrollments.html:48
+#: templates/student/learning_units_enrollments.html:45
+#: templates/student/offers_enrollments.html:46
 #: tests/views/test_learning_unit_pedagogy.py:187 utils/send_mail.py:234
 msgid "code"
 msgstr "code"
@@ -5430,7 +5431,7 @@ msgid "reset"
 msgstr "réinitialiser"
 
 #: templates/admin/data_maintenance.html:53
-#: templates/student/exams_enrollments.html:52
+#: templates/student/exams_enrollments.html:50
 msgid "result"
 msgstr "résultat"
 
