@@ -27,7 +27,7 @@ import abc
 
 from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _, ngettext
+from django.utils.translation import ngettext
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.education_group_year import EducationGroupYear
