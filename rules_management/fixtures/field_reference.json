@@ -4258,5 +4258,22 @@
             ]
         },
         "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 265,
+        "fields": {
+            "field_name": "isced_domain",
+            "context": "TRAINING_DAILY_MANAGEMENT",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
     }
 ]
