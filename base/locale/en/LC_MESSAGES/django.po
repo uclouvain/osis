@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-08 13:47+0100\n"
+"POT-Creation-Date: 2019-03-08 13:22+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2714,15 +2714,18 @@ msgid ""
 "Option \"%(acronym)s\" cannot be detach because it is contained in "
 "%(finality_acronym)s program."
 msgid_plural ""
-"Options \"%(acronym)s\" cannot be detach because it is contained in "
+"Options \"%(acronym)s\" cannot be detach because they are contained in "
 "%(finality_acronym)s program."
 msgstr[0] ""
 msgstr[1] ""
 
-#: business/group_element_years/attach.py:77
+#: business/group_element_years/attach.py:79
 #, python-format
 msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgstr ""
+msgid_plural ""
+"Options \"%(acronym)s\" must be present in %(root_acronym)s program."
+msgstr[0] ""
+msgstr[1] ""
 
 #: models/enums/education_group_types.py:129
 msgid "Option list choice"
