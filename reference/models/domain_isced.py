@@ -37,8 +37,8 @@ class DomainIsced(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
 
     code = models.CharField(max_length=10, db_index=True, unique=True)
-    title_fr = models.CharField(max_length=255, db_index=True, unique=True)
-    title_en = models.CharField(max_length=255, db_index=True, unique=True)
+    title_fr = models.CharField(max_length=255, db_index=True)
+    title_en = models.CharField(max_length=255, db_index=True)
 
     def __str__(self):
         return '{} {}'.format(self.code, self.title_fr)
