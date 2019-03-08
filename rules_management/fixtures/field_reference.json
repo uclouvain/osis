@@ -4298,7 +4298,11 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": []
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
         },
         "model": "rules_management.fieldreference"
     }
