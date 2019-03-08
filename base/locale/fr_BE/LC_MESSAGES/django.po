@@ -3908,7 +3908,7 @@ msgstr ""
 #: templates/education_group/blocks/form/minitraining.html:62
 #: templates/education_group/blocks/form/training_tab_identification.html:54
 msgid "The field can contain only one value."
-msgstr "La zone ne peut contenir qu'une seule valeur."
+msgstr "Ce champ ne peut contenir d'autre valeur."
 
 #: forms/education_group/training.py:91
 #: tests/forms/education_group/test_training.py:118
