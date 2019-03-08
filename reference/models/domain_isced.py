@@ -45,4 +45,4 @@ class DomainIsced(models.Model):
 
     class Meta:
         ordering = ('code',)
-        verbose_name = _("The International Standard Classification of Education (ISCED)")
+        verbose_name = _("ISCED")
