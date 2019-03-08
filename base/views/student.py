@@ -23,18 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
+
 import requests
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.db.models import Prefetch
 from django.http import Http404
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from requests.exceptions import RequestException
 
 from backoffice.settings.base import ESB_STUDENT_API, ESB_AUTHORIZATION
 from base import models as mdl
 from base.forms.student import StudentSearchForm
+from base.models.exam_enrollment import ExamEnrollment
+from base.models.learning_unit_enrollment import LearningUnitEnrollment
+from base.models.offer_enrollment import OfferEnrollment
 from base.models.student import Student
 
 
@@ -64,11 +70,40 @@ def students(request):
 @login_required
 @permission_required('base.can_access_student', raise_exception=True)
 def student_read(request, student_id):
-    student = mdl.student.find_by_id(student_id)
-    if student:
-        offers_enrollments = mdl.offer_enrollment.find_by_student(student)
-        exams_enrollments = mdl.exam_enrollment.find_by_student(student)
-        lu_enrollments = mdl.learning_unit_enrollment.find_by_student(student)
+    student_qs = Student.objects.select_related("person")
+    student = get_object_or_404(student_qs, id=student_id)
+
+    offer_enrollments = OfferEnrollment.objects.filter(
+        student=student_id
+    ).select_related(
+        "offer_year",
+        "offer_year__academic_year"
+    ).order_by(
+        '-offer_year__academic_year__year',
+        'offer_year__acronym'
+    )
+
+    learning_unit_enrollments = LearningUnitEnrollment.objects.filter(
+        offer_enrollment__student=student_id
+    ).select_related(
+        "learning_unit_year",
+        "learning_unit_year__academic_year"
+    ).order_by(
+        '-learning_unit_year__academic_year__year',
+        'learning_unit_year__acronym'
+    )
+
+    exam_enrollments = ExamEnrollment.objects.filter(
+        learning_unit_enrollment__offer_enrollment__student=student_id
+    ).select_related(
+        "session_exam",
+        "learning_unit_enrollment__learning_unit_year",
+        "learning_unit_enrollment__learning_unit_year__academic_year"
+    ).order_by(
+        '-learning_unit_enrollment__learning_unit_year__academic_year__year',
+        'session_exam__number_session',
+        'learning_unit_enrollment__learning_unit_year__acronym'
+    )
     return render(request, "student/student.html", locals())
 
 

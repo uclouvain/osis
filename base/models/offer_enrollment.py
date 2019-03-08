@@ -53,9 +53,3 @@ class OfferEnrollment(SerializableModel):
             ("can_access_student_path", "Can access student path"),
             ("can_access_evaluation", "Can access evaluation"),
         )
-
-
-def find_by_student(a_student):
-    enrollments = OfferEnrollment.objects.filter(student=a_student).order_by('-offer_year__academic_year__year',
-                                                                             'offer_year__acronym')
-    return enrollments
