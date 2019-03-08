@@ -101,14 +101,6 @@ def find_by_education_group_year(education_group_year):
     return OfferYearCalendar.objects.filter(education_group_year=education_group_year)
 
 
-def get_by_education_group_year_and_academic_calendar(an_academic_calendar, an_education_group_year):
-    try:
-        return OfferYearCalendar.objects.get(academic_calendar=an_academic_calendar,
-                                             education_group_year=an_education_group_year)
-    except ObjectDoesNotExist:
-        return None
-
-
 def search(**kwargs):
 
     queryset = OfferYearCalendar.objects

@@ -41,18 +41,3 @@ class Mandatary(models.Model):
     person = models.ForeignKey('Person')
     start_date = models.DateField(auto_now=False, auto_now_add=False)
     end_date = models.DateField(auto_now=False, auto_now_add=False)
-
-
-def find_by_education_group_year(an_education_group_year):
-    return Mandatary.objects.filter(mandate__education_group=an_education_group_year.education_group,
-                                    start_date__lte=an_education_group_year.academic_year.start_date,
-                                    end_date__gte=an_education_group_year.academic_year.end_date) \
-        .order_by('mandate__function', 'person__last_name', 'person__first_name')
-
-
-def find_by_education_group_year_function(an_education_group_year, a_function):
-    return Mandatary.objects.filter(mandate__education_group=an_education_group_year.education_group,
-                                    mandate__function=a_function,
-                                    start_date__lte=an_education_group_year.academic_year.start_date,
-                                    end_date__gte=an_education_group_year.academic_year.end_date) \
-        .order_by('person__last_name', 'person__first_name')
