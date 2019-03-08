@@ -160,7 +160,7 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
     font: normal normal normal 14px/1 FontAwesome;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
-    text-indent: 0px;
+    text-indent: 0;
     float: none;
     font-size: 16px;
     background-image: none;
@@ -178,7 +178,7 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
 }
 
 .p0-50 {
-    padding: 0px 50px;
+    padding: 0 50px;
 }
 
 .education_group_year-common {
@@ -233,12 +233,6 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
 
 .sidenav #panel_file_tree {
     padding-left: 30px;
-}
-
-@media screen and (max-height: 450px) {
-    .sidenav {
-        padding-top: 15px;
-    }
 }
 
 
