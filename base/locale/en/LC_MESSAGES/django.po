@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-08 09:22+0100\n"
+"POT-Creation-Date: 2019-03-08 11:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -85,7 +85,7 @@ msgid ""
 "this element in %(academic_year)s."
 msgstr ""
 
-#: models/education_group.py:113 models/education_group_year.py:735
+#: models/education_group.py:113 models/education_group_year.py:741
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr ""
@@ -355,12 +355,12 @@ msgstr ""
 msgid "Acronym"
 msgstr ""
 
-#: models/education_group_year.py:790
+#: models/education_group_year.py:796
 #, python-format
 msgid "Acronym already exists in %(academic_year)s"
 msgstr ""
 
-#: models/education_group_year.py:797
+#: models/education_group_year.py:803
 #, python-format
 msgid "Acronym existed in %(academic_year)s"
 msgstr ""
@@ -486,8 +486,8 @@ msgstr ""
 msgid "Administration"
 msgstr ""
 
-#: models/education_group_year.py:419 models/enums/offer_year_entity_type.py:32
-#: templates/education_group/identification_training_details.html:93
+#: models/education_group_year.py:425 models/enums/offer_year_entity_type.py:32
+#: templates/education_group/identification_training_details.html:97
 msgid "Administration entity"
 msgstr ""
 
@@ -794,7 +794,7 @@ msgstr ""
 msgid "Cancel the proposal"
 msgstr ""
 
-#: business/group_element_years/detach.py:124
+#: business/group_element_years/detach.py:125
 #: tests/views/group_element_years/test_detach.py:154
 #: tests/views/group_element_years/test_detach.py:173
 #, python-format
@@ -887,12 +887,12 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: models/education_group_year.py:470 models/external_learning_unit_year.py:89
+#: models/education_group_year.py:476 models/external_learning_unit_year.py:89
 #: templates/education_group/blocks/academic_offer_info.html:46
 msgid "Co-graduation"
 msgstr ""
 
-#: models/education_group_year.py:478
+#: models/education_group_year.py:484
 #: templates/education_group/blocks/academic_offer_info.html:50
 msgid "Co-graduation coefficient"
 msgstr ""
@@ -1101,7 +1101,7 @@ msgstr ""
 msgid "Decision"
 msgstr ""
 
-#: models/education_group_year.py:443
+#: models/education_group_year.py:449
 #: templates/education_group/identification_training_details.html:52
 msgid "Decree category"
 msgstr ""
@@ -1110,7 +1110,7 @@ msgstr ""
 msgid "Deepening"
 msgstr ""
 
-#: business/education_group.py:72 models/education_group_year.py:429
+#: business/education_group.py:72 models/education_group_year.py:435
 #: templates/education_group/tab_administrative_data.html:155
 msgid "Default learning unit enrollment"
 msgstr ""
@@ -1307,12 +1307,12 @@ msgstr ""
 msgid "Education group edition"
 msgstr ""
 
-#: models/education_group_achievement.py:48 models/education_group_year.py:503
+#: models/education_group_achievement.py:48 models/education_group_year.py:509
 msgid "Education group year"
 msgstr ""
 
-#: tests/views/education_groups/test_update.py:333
-#: tests/views/education_groups/test_update.py:339
+#: tests/views/education_groups/test_update.py:337
+#: tests/views/education_groups/test_update.py:343
 #: views/education_groups/update.py:109
 #, python-format
 msgid ""
@@ -1358,7 +1358,7 @@ msgid "Elaboration and management of the formation catalogue."
 msgstr ""
 
 #: templates/education_group/identification_mini_training_details.html:39
-#: templates/education_group/identification_training_details.html:95
+#: templates/education_group/identification_training_details.html:99
 msgid "End"
 msgstr ""
 
@@ -1449,7 +1449,7 @@ msgstr ""
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
-#: forms/education_group/training.py:185
+#: forms/education_group/training.py:187
 msgid "Enter text to search"
 msgstr ""
 
@@ -1777,6 +1777,10 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
+#: models/education_group_year.py:413
+msgid "ISCED domain"
+msgstr "ISCED/CITE domain"
+
 #: templates/education_group/tabs.html:41 templates/entity/tabs.html:33
 #: templates/learning_unit/blocks/tabs.html:39
 #: templates/learning_unit/blocks/tabs.html:52
@@ -1905,7 +1909,7 @@ msgid "It is forbidden to attach an element to itself."
 msgstr ""
 
 #: models/group_element_year.py:227
-#: tests/views/education_groups/test_update.py:540
+#: tests/views/education_groups/test_update.py:544
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 
@@ -2121,7 +2125,7 @@ msgstr ""
 msgid "Link type"
 msgstr ""
 
-#: business/education_groups/shorten.py:91 models/education_group_year.py:498
+#: business/education_groups/shorten.py:91 models/education_group_year.py:504
 #: tests/business/education_groups/test_shorten.py:154
 msgid "Linked with EPC"
 msgstr ""
@@ -2215,10 +2219,10 @@ msgstr ""
 msgid "Managed programs"
 msgstr ""
 
-#: business/education_group.py:59 models/education_group_year.py:412
+#: business/education_group.py:59 models/education_group_year.py:418
 #: models/enums/offer_year_entity_type.py:33
 #: templates/education_group/identification_group_details.html:37
-#: templates/education_group/identification_training_details.html:92
+#: templates/education_group/identification_training_details.html:96
 #: templates/layout.html:216
 msgid "Management entity"
 msgstr ""
@@ -2703,7 +2707,7 @@ msgstr ""
 msgid "Option"
 msgstr ""
 
-#: business/group_element_years/detach.py:101
+#: business/group_element_years/detach.py:102
 #, python-format
 msgid ""
 "Option \"%(acronym)s\" cannot be detach because it is contained in "
@@ -2816,12 +2820,12 @@ msgstr ""
 msgid "Page not found."
 msgstr ""
 
-#: models/education_group_year.py:762
+#: models/education_group_year.py:768
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
 msgstr ""
 
-#: models/education_group_year.py:769
+#: models/education_group_year.py:775
 #, python-format
 msgid "Partial acronym existed in %(academic_year)s"
 msgstr ""
@@ -2888,7 +2892,7 @@ msgstr ""
 msgid "Platform"
 msgstr ""
 
-#: tests/views/education_groups/test_update.py:624
+#: tests/views/education_groups/test_update.py:628
 #: views/education_groups/group_element_year/create.py:58
 msgid "Please Select or Move an item before Attach it"
 msgstr ""
@@ -3155,7 +3159,7 @@ msgstr ""
 msgid "Public partner"
 msgstr ""
 
-#: models/education_group_year.py:491
+#: models/education_group_year.py:497
 msgid "Publication contact entity"
 msgstr ""
 
@@ -3199,7 +3203,7 @@ msgstr ""
 msgid "Quadrimester derogation"
 msgstr ""
 
-#: models/education_group_year.py:451
+#: models/education_group_year.py:457
 #: templates/education_group/identification_training_details.html:58
 msgid "Rate code"
 msgstr ""
@@ -3401,7 +3405,7 @@ msgstr ""
 msgid "Search type"
 msgstr ""
 
-#: forms/education_group/training.py:175
+#: forms/education_group/training.py:177
 msgid "Search..."
 msgstr ""
 
@@ -3512,10 +3516,10 @@ msgstr ""
 msgid "Specifications"
 msgstr ""
 
-#: forms/education_group/training.py:202 models/education_group.py:83
+#: forms/education_group/training.py:204 models/education_group.py:83
 #: models/education_group.py:115
 #: templates/education_group/identification_mini_training_details.html:38
-#: templates/education_group/identification_training_details.html:94
+#: templates/education_group/identification_training_details.html:98
 #: templates/learning_unit/add_charge_repartition_inner.html:35
 #: templates/learning_unit/attributions.html:36
 #: templates/learning_unit/select_attribution.html:36
@@ -4180,8 +4184,8 @@ msgstr ""
 
 #: forms/common.py:80 models/education_group_publication_contact.py:99
 #: models/education_group_publication_contact.py:100
-#: models/education_group_year.py:722 models/education_group_year.py:743
-#: models/education_group_year.py:745
+#: models/education_group_year.py:728 models/education_group_year.py:749
+#: models/education_group_year.py:751
 #: tests/views/learning_units/proposals/test_creation.py:186
 #: tests/views/learning_units/proposals/test_creation.py:187
 #: tests/views/learning_units/proposals/test_creation.py:188
@@ -4574,7 +4578,7 @@ msgstr ""
 msgid "We will fix this as soon as possible"
 msgstr ""
 
-#: models/education_group_year.py:486
+#: models/education_group_year.py:492
 msgid "Web re-registration"
 msgstr ""
 
@@ -4586,7 +4590,7 @@ msgstr ""
 msgid "Week"
 msgstr ""
 
-#: business/education_group.py:71 models/education_group_year.py:425
+#: business/education_group.py:71 models/education_group_year.py:431
 #: templates/education_group/tab_administrative_data.html:151
 msgid "Weighting"
 msgstr ""
@@ -4800,7 +4804,7 @@ msgstr ""
 msgid "You proposed a modification of type {} for the learning unit {}."
 msgstr ""
 
-#: models/education_group_year.py:728
+#: models/education_group_year.py:734
 msgid "You should precise at least minimum or maximum constraint"
 msgstr ""
 
@@ -4838,12 +4842,12 @@ msgstr ""
 "Acronym with min 2 et max 4 letters\n"
 "Number Code with 4 digit"
 
-#: templates/education_group/identification_training_details.html:138
+#: templates/education_group/identification_training_details.html:142
 #: templates/education_group/search.html:232 templates/learning_units.html:123
 msgid "activate to sort column ascending"
 msgstr ""
 
-#: templates/education_group/identification_training_details.html:139
+#: templates/education_group/identification_training_details.html:143
 #: templates/education_group/search.html:233 templates/learning_units.html:124
 msgid "activate to sort column descending"
 msgstr ""
@@ -4971,7 +4975,7 @@ msgstr ""
 msgid "comment"
 msgstr ""
 
-#: models/education_group_year.py:457
+#: models/education_group_year.py:463
 msgid "comment (internal)"
 msgstr ""
 
@@ -4982,7 +4986,7 @@ msgid "confirm"
 msgstr ""
 
 #: business/learning_units/edition.py:435 models/education_group_year.py:357
-#: models/education_group_year.py:564 models/enums/constraint_type.py:32
+#: models/education_group_year.py:570 models/enums/constraint_type.py:32
 #: models/group_element_year.py:187 models/group_element_year.py:203
 #: tests/models/test_education_group_year.py:93
 #: tests/views/education_groups/group_element_year/test_read.py:99
@@ -5127,11 +5131,11 @@ msgstr ""
 msgid "main domain"
 msgstr ""
 
-#: models/education_group_year.py:382 models/education_group_year.py:736
+#: models/education_group_year.py:382 models/education_group_year.py:742
 msgid "maximum constraint"
 msgstr ""
 
-#: models/education_group_year.py:375 models/education_group_year.py:737
+#: models/education_group_year.py:375 models/education_group_year.py:743
 msgid "minimum constraint"
 msgstr ""
 
@@ -5374,8 +5378,8 @@ msgstr ""
 
 #: templates/education_group/identification_mini_training_details.html:38
 #: templates/education_group/identification_mini_training_details.html:39
-#: templates/education_group/identification_training_details.html:94
-#: templates/education_group/identification_training_details.html:95
+#: templates/education_group/identification_training_details.html:98
+#: templates/education_group/identification_training_details.html:99
 msgid "unspecified"
 msgstr ""
 
