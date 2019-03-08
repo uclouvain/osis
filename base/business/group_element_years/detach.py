@@ -24,10 +24,11 @@
 #
 ##############################################################################
 import abc
+from collections import Counter
 
 from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.business.group_element_years import management
@@ -46,11 +47,11 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
     def __init__(self, link: GroupElementYear):
         self.link = link
         self.parent = self.link.parent
-        self.child = self.link.child
+        self.education_group_year = self.link.child
 
     @cached_property
     def parents(self):
-        return EducationGroupYear.hierarchy.filter(pk=self.child.pk).get_parents()\
+        return EducationGroupYear.hierarchy.filter(pk=self.education_group_year.pk).get_parents()\
                                            .select_related('education_group_type')
 
     def _get_parents_pgrm_master(self):
@@ -61,37 +62,52 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
     def _get_parents_finality_type(self):
         return self.parents.filter(education_group_type__name__in=TrainingType.finality_types())
 
+    def _get_options_to_detach(self):
+        options_to_detach = EducationGroupHierarchy(root=self.education_group_year).get_option_list()
+        if self.education_group_year.education_group_type.name == MiniTrainingType.OPTION.name:
+            options_to_detach += [self.education_group_year]
+        return options_to_detach
+
     def is_valid(self):
         management.check_authorized_relationship(self.parent, self.link, to_delete=True)
-        if self._get_parents_finality_type().exists() and self._get_parents_pgrm_master().exists():
+        if self._get_options_to_detach() and self._get_parents_pgrm_master().exists() \
+                and self._get_parents_finality_type().exists():
             self._check_detatch_options_rules()
         return True
 
     def _check_detatch_options_rules(self):
         """
-        In context of 2M when we detatch an option [or group which contains option], we must ensure that
+        In context of 2M when we detach an option [or group which contains option], we must ensure that
         these options are not present in MA/MD/MS
         """
-        options_to_detatch = EducationGroupHierarchy(root=self.child).get_option_list()
-        if self.child.education_group_type.name == MiniTrainingType.OPTION.name:
-            options_to_detatch += [self.child]
-
-        mandatory_options = {
-            finality.acronym: EducationGroupHierarchy(root=finality).get_option_list()
-            for finality in self._get_parents_finality_type()
-        }
+        options_to_detach = self._get_options_to_detach()
 
         errors = []
-        for finality_acronym, options_list in mandatory_options.items():
-            opt_mandatory = set(options_list) & set(options_to_detatch)
-            if opt_mandatory:
-                errors.append(
-                    ValidationError(_("Option \"%(acronym)s\" cannot be removed because it is contained in"
-                                      " %(finality_acronym)s program.") % {
-                        "acronym": ', '.join(option.acronym for option in opt_mandatory),
-                        "finality_acronym": finality_acronym
-                     })
-                )
+        for master_2m in self._get_parents_pgrm_master():
+            master_2m_tree = EducationGroupHierarchy(root=master_2m)
+            master_2m_options = Counter(master_2m_tree.get_option_list()) - Counter(options_to_detach)
+
+            finality_list = [elem.child for elem in master_2m_tree.to_list(flat=True)
+                             if isinstance(elem.child, EducationGroupYear)
+                             and elem.child.education_group_type.name in TrainingType.finality_types()]
+            for finality in finality_list:
+                mandatory_options = EducationGroupHierarchy(root=finality).get_option_list()
+                missing_options = set(mandatory_options) - set(master_2m_options.elements())
+
+                if missing_options:
+                    errors.append(
+                        ValidationError(
+                            ngettext(
+                                "Option \"%(acronym)s\" cannot be detach because it is contained in"
+                                " %(finality_acronym)s program.",
+                                "Options \"%(acronym)s\" cannot be detach because it is contained in"
+                                " %(finality_acronym)s program.",
+                                len(missing_options)
+                            ) % {
+                                "acronym": ', '.join(option.acronym for option in missing_options),
+                                "finality_acronym": finality.acronym
+                            })
+                    )
 
         if errors:
             raise ValidationError(errors)

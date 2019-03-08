@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import mock
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
@@ -32,7 +34,7 @@ from base.tests.factories.education_group_year import TrainingFactory, GroupFact
 from base.tests.factories.group_element_year import GroupElementYearFactory
 
 
-class TestDetachEducationGroupYearStrategy(TestCase):
+class TestOptionDetachEducationGroupYearStrategy(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.master_120 = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
@@ -46,6 +48,14 @@ class TestDetachEducationGroupYearStrategy(TestCase):
 
         cls.master_120_specialized = GroupFactory(education_group_type__name=TrainingType.MASTER_MS_120.name)
         GroupElementYearFactory(parent=cls.finality_group, child_branch=cls.master_120_specialized)
+
+    def setUp(self):
+        self.authorized_relationship_patcher = mock.patch(
+            "base.business.group_element_years.management.check_authorized_relationship",
+            return_value=True
+        )
+        self.mocked_perm = self.authorized_relationship_patcher.start()
+        self.addCleanup(self.authorized_relationship_patcher.stop)
 
     def test_is_valid_case_detach_option_which_are_not_within_finality_master_120(self):
         """
@@ -63,6 +73,19 @@ class TestDetachEducationGroupYearStrategy(TestCase):
         master_120_link_subgroup = GroupElementYearFactory(parent=self.master_120, child_branch=subgroup)
         GroupElementYearFactory(parent=subgroup, child_branch=self.option_in_parent)
 
+        strategy = DetachEducationGroupYearStrategy(link=master_120_link_subgroup)
+        self.assertTrue(strategy.is_valid())
+
+    def test_is_valid_case_detach_option_which_are_within_finality_master_120_but_present_more_time_in_2m(self):
+        """
+        In this test, we ensure that we can detach an option at 2m level because it is present two time in 2m and
+        it is present in one finality of this 2m but, we will detach only one link in 2m
+        """
+        subgroup = GroupFactory(education_group_type__name=GroupType.SUB_GROUP.name)
+        master_120_link_subgroup = GroupElementYearFactory(parent=self.master_120, child_branch=subgroup)
+        GroupElementYearFactory(parent=subgroup, child_branch=self.option_in_parent)
+
+        GroupElementYearFactory(parent=self.master_120_specialized, child_branch=self.option_in_parent)
         strategy = DetachEducationGroupYearStrategy(link=master_120_link_subgroup)
         self.assertTrue(strategy.is_valid())
 
