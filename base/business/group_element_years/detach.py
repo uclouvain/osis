@@ -101,7 +101,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                             ngettext(
                                 "Option \"%(acronym)s\" cannot be detach because it is contained in"
                                 " %(finality_acronym)s program.",
-                                "Options \"%(acronym)s\" cannot be detach because it is contained in"
+                                "Options \"%(acronym)s\" cannot be detach because they are contained in"
                                 " %(finality_acronym)s program.",
                                 len(missing_options)
                             ) % {

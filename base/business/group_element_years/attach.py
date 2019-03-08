@@ -27,7 +27,7 @@ import abc
 
 from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.education_group_year import EducationGroupYear
@@ -74,10 +74,15 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
 
             if missing_options:
                 errors.append(
-                    ValidationError(_("Option \"%(acronym)s\" must be present in %(root_acronym)s program.") % {
-                        "acronym": ', '.join(option.acronym for option in missing_options),
-                        "root_acronym": root.acronym
-                     })
+                    ValidationError(
+                        ngettext(
+                            "Option \"%(acronym)s\" must be present in %(root_acronym)s program.",
+                            "Options \"%(acronym)s\" must be present in %(root_acronym)s program.",
+                            len(missing_options)
+                        ) % {
+                            "acronym": ', '.join(option.acronym for option in missing_options),
+                            "root_acronym": root.acronym
+                        })
                 )
         if errors:
             raise ValidationError(errors)
