@@ -50,17 +50,18 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         self.education_group_year = self.link.child
 
     @cached_property
-    def parents(self):
-        return EducationGroupYear.hierarchy.filter(pk=self.education_group_year.pk).get_parents()\
-                                           .select_related('education_group_type')
+    def _parents(self):
+        qs = EducationGroupYear.hierarchy.filter(pk=self.parent.pk) \
+                 .get_parents() | EducationGroupYear.objects.filter(pk=self.parent.pk)
+        return qs.select_related('education_group_type')
 
-    def _get_parents_pgrm_master(self):
-        return self.parents.filter(education_group_type__name__in=[
+    def get_parents_program_master(self):
+        return self._parents.filter(education_group_type__name__in=[
             TrainingType.PGRM_MASTER_120.name, TrainingType.PGRM_MASTER_180_240.name
         ])
 
-    def _get_parents_finality_type(self):
-        return self.parents.filter(education_group_type__name__in=TrainingType.finality_types())
+    def get_parents_finality(self):
+        return self._parents.filter(education_group_type__name__in=TrainingType.finality_types())
 
     def _get_options_to_detach(self):
         options_to_detach = EducationGroupHierarchy(root=self.education_group_year).get_option_list()
@@ -70,8 +71,8 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
 
     def is_valid(self):
         management.check_authorized_relationship(self.parent, self.link, to_delete=True)
-        if self._get_options_to_detach() and self._get_parents_pgrm_master().exists() \
-                and self._get_parents_finality_type().exists():
+        if self._get_options_to_detach() and self.get_parents_program_master().exists() \
+                and not self.get_parents_finality().exists():
             self._check_detatch_options_rules()
         return True
 
@@ -83,7 +84,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         options_to_detach = self._get_options_to_detach()
 
         errors = []
-        for master_2m in self._get_parents_pgrm_master():
+        for master_2m in self.get_parents_program_master():
             master_2m_tree = EducationGroupHierarchy(root=master_2m)
             master_2m_options = Counter(master_2m_tree.get_option_list()) - Counter(options_to_detach)
 
