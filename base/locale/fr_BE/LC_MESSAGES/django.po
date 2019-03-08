@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-08 09:22+0100\n"
+"POT-Creation-Date: 2019-03-08 13:22+0100\n"
 "PO-Revision-Date: 2019-02-27 15:13+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -824,7 +824,7 @@ msgstr "Annuler"
 msgid "Cancel the proposal"
 msgstr "Annuler la proposition"
 
-#: business/group_element_years/detach.py:124
+#: business/group_element_years/detach.py:125
 #: tests/views/group_element_years/test_detach.py:154
 #: tests/views/group_element_years/test_detach.py:173
 #, python-format
@@ -2769,21 +2769,28 @@ msgstr "Opération"
 msgid "Option"
 msgstr "Option"
 
-#: business/group_element_years/detach.py:101
+#: business/group_element_years/detach.py:102
 #, python-format
 msgid ""
 "Option \"%(acronym)s\" cannot be detach because it is contained in "
 "%(finality_acronym)s program."
 msgid_plural ""
-"Options \"%(acronym)s\" cannot be detach because it is contained in "
+"Options \"%(acronym)s\" cannot be detach because they are contained in "
 "%(finality_acronym)s program."
-msgstr[0] "L'option \"%(acronym)s\" ne peut pas être détachée car elle est présente dans le programme %(finality_acronym)s"
-msgstr[1] "Les options \"%(acronym)s\" ne peuvent pas être détachées car elles sont présentes dans le programme %(finality_acronym)s"
+msgstr[0] ""
+"L'option \"%(acronym)s\" ne peut pas être détachée car elle est présente "
+"dans le programme %(finality_acronym)s"
+msgstr[1] ""
+"Les options \"%(acronym)s\" ne peuvent pas être détachées car elles sont "
+"présentes dans le programme %(finality_acronym)s"
 
-#: business/group_element_years/attach.py:77
+#: business/group_element_years/attach.py:79
 #, python-format
 msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgstr ""
+msgid_plural ""
+"Options \"%(acronym)s\" must be present in %(root_acronym)s program."
+msgstr[0] "L'option \"%(acronym)s\" doit être présente dans le programme %(root_acronym)s."
+msgstr[1] "Les options \"%(acronym)s\" doivent être présentes dans le programme %(root_acronym)s."
 
 #: models/enums/education_group_types.py:129
 msgid "Option list choice"
