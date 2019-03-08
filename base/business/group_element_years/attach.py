@@ -81,7 +81,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
                             len(missing_options)
                         ) % {
                             "acronym": ', '.join(option.acronym for option in missing_options),
-                            "finality_acronym": root.acronym
+                            "root_acronym": root.acronym
                         })
                 )
         if errors:
