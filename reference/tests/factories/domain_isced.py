@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,31 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
+import factory
 
-from reference.models import *
+from factory import DjangoModelFactory
 
 
-admin.site.register(continent.Continent,
-                    continent.ContinentAdmin)
+class DomainIscedFactory(DjangoModelFactory):
+    class Meta:
+        model = "reference.DomainIsced"
 
-admin.site.register(currency.Currency,
-                    currency.CurrencyAdmin)
-
-admin.site.register(country.Country,
-                    country.CountryAdmin)
-
-admin.site.register(decree.Decree,
-                    decree.DecreeAdmin)
-
-admin.site.register(domain.Domain,
-                    domain.DomainAdmin)
-
-admin.site.register(domain_isced.DomainIsced,
-                    domain_isced.DomainIscedAdmin)
-
-admin.site.register(grade_type.GradeType,
-                    grade_type.GradeTypeAdmin)
-
-admin.site.register(language.Language,
-                    language.LanguageAdmin)
+    code = factory.Faker('text', max_nb_chars=10)
+    title_fr = factory.Sequence(lambda n: 'Domaine ISCED %d' % n)
+    title_en = factory.Sequence(lambda n: 'ISCED domain %d' % n)
