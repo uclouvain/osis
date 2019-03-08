@@ -126,10 +126,6 @@ def find_highlight_academic_calendar():
         .order_by('end_date')
 
 
-def find_academic_calendar_by_academic_year(academic_year_id):
-    return AcademicCalendar.objects.filter(academic_year=academic_year_id).order_by('start_date')
-
-
 def find_academic_calendar_by_academic_year_with_dates(academic_year_id):
     now = timezone.now()
     return AcademicCalendar.objects.filter(academic_year=academic_year_id,
@@ -148,14 +144,6 @@ def is_academic_calendar_opened_for_specific_academic_year(an_academic_year_id, 
     return AcademicCalendar.objects.open_calendars().filter(
         academic_year=an_academic_year_id, reference=a_reference
     ).exists()
-
-
-def find_dates_for_current_academic_year(reference):
-    try:
-        return AcademicCalendar.objects.current_academic_year().filter(reference=reference).\
-            values("start_date", "end_date").get()
-    except AcademicCalendar.DoesNotExist:
-        return {}
 
 
 def is_academic_calendar_has_started(academic_year, reference, date=None):
