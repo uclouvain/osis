@@ -23,12 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import collections
 import itertools
 from copy import deepcopy
 
 from django.conf import settings
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
@@ -43,12 +41,11 @@ from attribution.models.enums.function import Functions
 from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language, \
-    get_entities_comparison_context, get_components_identification, get_organization_from_learning_unit_year
+    get_components_identification
 from base.business.learning_unit_proposal import _get_value_from_enum
 from base.business.learning_units import perms as business_perms
-from base.business.learning_units.comparison import get_components_changes, get_entity_by_type, \
-    FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON, \
-    FIELDS_FOR_LEARNING_COMPONENT_COMPARISON
+from base.business.learning_units.comparison import get_entity_by_type, \
+    FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON
 from base.business.learning_units.perms import can_update_learning_achievement
 from base.forms.learning_class import LearningClassEditForm
 from base.forms.learning_unit_component import LearningUnitComponentEditForm
@@ -248,47 +245,50 @@ def learning_unit_proposal_comparison(request, learning_unit_year_id):
         LearningUnitYear.objects.all().select_related('learning_unit', 'learning_container_year',
                                                       'campus', 'campus__organization'), pk=learning_unit_year_id
     )
-    if proposal_learning_unit.is_learning_unit_year_in_proposal(learning_unit_year):
-        initial_data = proposal_learning_unit.find_by_learning_unit_year(learning_unit_year).initial_data
-        initial_learning_unit_year, learning_unit_year_fields = get_learning_unit_year_context(initial_data,
-                                                                                               learning_unit_year)
-        learning_container_year_fields = get_learning_container_year_context(initial_data, learning_unit_year)
-        context = dict({'learning_unit_year': learning_unit_year})
-        context['campus'] = [learning_unit_year._meta.get_field('campus').verbose_name,
-                             initial_learning_unit_year.campus.name, learning_unit_year.campus.name]
-        context['entities_fields'] = get_entities_context(initial_data, learning_unit_year)
-        context['learning_unit_year_fields'] = learning_unit_year_fields
-        context['learning_container_year_fields'] = learning_container_year_fields
-        components = get_components_identification(learning_unit_year)
-        components_list = []
-        for component in components['components']:
-            volumes = {}
-            component_type = component['learning_component_year'].type
-            volume_total = component['volumes']['VOLUME_TOTAL'] or 0
-            volume_q1 = component['volumes']['VOLUME_Q1'] or 0
-            volume_q2 = component['volumes']['VOLUME_Q2'] or 0
-            planned_classes = component['volumes']['PLANNED_CLASSES'] or 0
-            if volume_total != initial_data['volumes'][component_type]['VOLUME_TOTAL']:
-                volumes[_('Volume total annual')] = [initial_data['volumes'][component_type]['VOLUME_TOTAL'], volume_total]
-            if planned_classes != initial_data['volumes'][component_type]['PLANNED_CLASSES']:
-                volumes[_('Planned classes')] = [initial_data['volumes'][component_type]['PLANNED_CLASSES'],
-                                                 planned_classes]
-            if volume_q1 != initial_data['volumes'][component_type]['VOLUME_Q1']:
-                volumes[_('Volume Q1')] = [initial_data['volumes'][component_type]['VOLUME_Q1'], volume_q1]
-            if volume_q2 != initial_data['volumes'][component_type]['VOLUME_Q2']:
-                volumes[_('Volume Q2')] = [initial_data['volumes'][component_type]['VOLUME_Q2'], volume_q2]
-
-            components_list.append(
-                [
-                    _get_value_from_enum(LEARNING_COMPONENT_YEAR_TYPES, component['learning_component_year'].type),
-                    volumes
-                ]
-            )
-        context['components'] = components_list
+    initial_data = proposal_learning_unit.find_by_learning_unit_year(learning_unit_year).initial_data
+    initial_learning_unit_year, learning_unit_year_fields = get_learning_unit_year_comparison_context(initial_data,
+                                                                                                      learning_unit_year)
+    learning_container_year_fields = get_learning_container_year_comparison_context(initial_data, learning_unit_year)
+    context = dict({'learning_unit_year': learning_unit_year})
+    context['campus'] = [learning_unit_year._meta.get_field('campus').verbose_name,
+                         initial_learning_unit_year.campus.name, learning_unit_year.campus.name]
+    context['entities_fields'] = get_all_entities_comparison_context(initial_data, learning_unit_year)
+    context['learning_unit_year_fields'] = learning_unit_year_fields
+    context['learning_container_year_fields'] = learning_container_year_fields
+    components = get_components_identification(learning_unit_year)
+    components_list = []
+    for component in components['components']:
+        volumes = get_volumes_comparison_context(component, initial_data)
+        components_list.append(
+            [
+                _get_value_from_enum(LEARNING_COMPONENT_YEAR_TYPES, component['learning_component_year'].type),
+                volumes
+            ]
+        )
+    context['components'] = components_list
     return render(request, "learning_unit/proposal_comparison.html", context)
 
 
-def get_entities_context(initial_data, learning_unit_year):
+def get_volumes_comparison_context(component, initial_data):
+    volumes = {}
+    component_type = component['learning_component_year'].type
+    volume_total = component['volumes']['VOLUME_TOTAL'] or 0
+    volume_q1 = component['volumes']['VOLUME_Q1'] or 0
+    volume_q2 = component['volumes']['VOLUME_Q2'] or 0
+    planned_classes = component['volumes']['PLANNED_CLASSES'] or 0
+    if volume_total != initial_data['volumes'][component_type]['VOLUME_TOTAL']:
+        volumes[_('Volume total annual')] = [initial_data['volumes'][component_type]['VOLUME_TOTAL'], volume_total]
+    if planned_classes != initial_data['volumes'][component_type]['PLANNED_CLASSES']:
+        volumes[_('Planned classes')] = [initial_data['volumes'][component_type]['PLANNED_CLASSES'],
+                                         planned_classes]
+    if volume_q1 != initial_data['volumes'][component_type]['VOLUME_Q1']:
+        volumes[_('Volume Q1')] = [initial_data['volumes'][component_type]['VOLUME_Q1'], volume_q1]
+    if volume_q2 != initial_data['volumes'][component_type]['VOLUME_Q2']:
+        volumes[_('Volume Q2')] = [initial_data['volumes'][component_type]['VOLUME_Q2'], volume_q2]
+    return volumes
+
+
+def get_all_entities_comparison_context(initial_data, learning_unit_year):
     entities_fields = []
     for link_type in ENTITY_TYPE_LIST:
         link = EntityContainerYearLinkTypes[link_type].value
@@ -302,7 +302,7 @@ def get_entities_context(initial_data, learning_unit_year):
     return entities_fields
 
 
-def get_learning_container_year_context(initial_data, learning_unit_year):
+def get_learning_container_year_comparison_context(initial_data, learning_unit_year):
     initial_learning_container_year = deepcopy(learning_unit_year.learning_container_year)
     _reinitialize_model(initial_learning_container_year, initial_data["learning_container_year"])
     learning_container_year_fields = []
@@ -322,7 +322,7 @@ def get_learning_container_year_context(initial_data, learning_unit_year):
     return learning_container_year_fields
 
 
-def get_learning_unit_year_context(initial_data, learning_unit_year):
+def get_learning_unit_year_comparison_context(initial_data, learning_unit_year):
     initial_learning_unit_year = deepcopy(learning_unit_year)
     _reinitialize_model(initial_learning_unit_year, initial_data["learning_unit_year"])
     learning_unit_year_fields = []
@@ -347,54 +347,98 @@ def learning_unit_comparison(request, learning_unit_year_id):
         LearningUnitYear.objects.all().select_related('learning_unit', 'learning_container_year',
                                                       'campus', 'campus__organization'), pk=learning_unit_year_id
     )
-    current_context = get_context_by_learning_unit_year(learning_unit_year)
+    current_context = get_full_context(learning_unit_year)
     previous_academic_year = mdl.academic_year.find_academic_year_by_year(learning_unit_year.academic_year.year - 1)
     previous_learning_unit_year = _get_learning_unit_year(previous_academic_year, learning_unit_year)
-    previous_context = get_context_by_learning_unit_year(
-        previous_learning_unit_year) if previous_learning_unit_year else {}
+    previous_context = get_full_context(previous_learning_unit_year) if previous_learning_unit_year else {}
     next_academic_year = mdl.academic_year.find_academic_year_by_year(learning_unit_year.academic_year.year + 1)
     next_learning_unit_year = _get_learning_unit_year(next_academic_year, learning_unit_year)
-    next_context = get_context_by_learning_unit_year(next_learning_unit_year) if next_learning_unit_year else {}
+    next_context = get_full_context(next_learning_unit_year) if next_learning_unit_year else {}
     context = build_context_comparison(current_context, learning_unit_year, next_context, previous_context)
-    context.update({'components_comparison': get_components_changes(
-        previous_context.get('components', {}),
-        current_context.get('components', {}),
-        next_context.get('components', {})
-    )})
     return render(request, "learning_unit/comparison.html", context)
 
 
-def get_context_by_learning_unit_year(learning_unit_year):
+def get_full_context(learning_unit_year):
+    context = dict({'learning_unit_year': learning_unit_year})
+    initial_data = None
+    components_list = {}
     if proposal_learning_unit.is_learning_unit_year_in_proposal(learning_unit_year):
-        initial_data = proposal_learning_unit.find_by_learning_unit_year(learning_unit_year).initial_data
-        _reinitialize_model(learning_unit_year, initial_data["learning_unit_year"])
-        _reinitialize_model(learning_unit_year.learning_unit, initial_data["learning_unit"])
-        _reinitialize_model(learning_unit_year.learning_container_year, initial_data["learning_container_year"])
-        _reinitialize_components(initial_data["learning_component_years"] or {})
-        context = dict({'learning_unit_year': learning_unit_year})
-        context['campus'] = learning_unit_year.campus or {}
-        context['organization'] = get_organization_from_learning_unit_year(learning_unit_year)
-        context['language'] = language.find_by_id(learning_unit_year.language.id)
+        initial_data = reinitialize_learning_unit_year(components_list, context, initial_data, learning_unit_year)
+    context['learning_unit_year_fields'] = get_learning_unit_context(learning_unit_year)
+    context['learning_container_year_fields'] = get_learning_container_year_context(learning_unit_year)
+    context['campus'] = learning_unit_year.campus.name
+    context['learning_container_year_partims'] = [partim.subdivision for partim in
+                                                  learning_unit_year.get_partims_related()]
+    context['entities_fields'] = get_entities_context(initial_data, learning_unit_year)
+    if 'components' not in context:
         components = get_components_identification(learning_unit_year)
-        context['components'] = components.get('components')
-        for link_type in ENTITY_TYPE_LIST:
-            context[link_type] = get_entity_by_type(learning_unit_year, link_type)
-        context['learning_container_year_partims'] = [partim.subdivision for partim in
-                                                      learning_unit_year.get_partims_related()]
-        _reinitialize_entities(context, initial_data["entities"])
-    else:
-        context = dict({'learning_unit_year': learning_unit_year})
-        context['campus'] = learning_unit_year.campus or {}
-        context['organization'] = get_organization_from_learning_unit_year(learning_unit_year)
-        context['language'] = language.find_by_id(learning_unit_year.language.id)
-        components = get_components_identification(learning_unit_year)
-        context['components'] = components.get('components')
-        for link_type in ENTITY_TYPE_LIST:
-            context[link_type] = get_entity_by_type(learning_unit_year, link_type)
-        context['learning_container_year_partims'] = [partim.subdivision for partim in
-                                                      learning_unit_year.get_partims_related()]
-        context = get_entities_comparison_context(context, learning_unit_year)
+        for component in components['components']:
+            volumes = {_('Volume total annual'): component['volumes']['VOLUME_TOTAL'] or 0,
+                       _('Planned classes'): component['volumes']['PLANNED_CLASSES'] or 0,
+                       _('Volume Q1'): component['volumes']['VOLUME_Q1'] or 0,
+                       _('Volume Q2'): component['volumes']['VOLUME_Q2'] or 0}
+            components_list[_get_value_from_enum(LEARNING_COMPONENT_YEAR_TYPES,
+                                                 component['learning_component_year'].type)] = volumes
+        context['components'] = components_list
     return context
+
+
+def reinitialize_learning_unit_year(components_list, context, initial_data, learning_unit_year):
+    initial_data = proposal_learning_unit.find_by_learning_unit_year(learning_unit_year).initial_data
+    _reinitialize_model(learning_unit_year, initial_data["learning_unit_year"])
+    _reinitialize_model(learning_unit_year.learning_container_year, initial_data["learning_container_year"])
+    _reinitialize_components(initial_data["learning_component_years"] or {})
+    for component in initial_data['learning_component_years']:
+        volumes = {_('Volume total annual'): component['hourly_volume_total_annual'] or 0,
+                   _('Planned classes'): component['planned_classes'] or 0,
+                   _('Volume Q1'): component['hourly_volume_partial_q1'] or 0,
+                   _('Volume Q2'): component['hourly_volume_partial_q2'] or 0}
+        components_list[_get_value_from_enum(LEARNING_COMPONENT_YEAR_TYPES, component['type'])] = volumes
+    context['components'] = components_list
+    return initial_data
+
+
+def get_entities_context(initial_data, learning_unit_year):
+    entities_fields = {}
+    for link_type in ENTITY_TYPE_LIST:
+        link = EntityContainerYearLinkTypes[link_type].value
+        if initial_data:
+            entity_data = entity.find_by_id(
+                initial_data['entities'][link_type]).most_recent_acronym if entity.find_by_id(
+                initial_data['entities'][link_type]) else None
+        else:
+            entity_data = get_entity_by_type(learning_unit_year, link_type).most_recent_acronym if get_entity_by_type(
+                learning_unit_year, link_type) else None
+        entities_fields[link] = entity_data
+    return entities_fields
+
+
+def get_learning_container_year_context(learning_unit_year):
+    learning_container_year_fields = {}
+    for field in FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON:
+        field_name = learning_unit_year.learning_container_year._meta.get_field(field).verbose_name
+        if field == 'type_declaration_vacant':
+            value = _get_value_from_enum(DECLARATION_TYPE, getattr(learning_unit_year.learning_container_year, field))
+        else:
+            value = getattr(learning_unit_year.learning_container_year, field)
+        learning_container_year_fields[field_name] = value
+    return learning_container_year_fields
+
+
+def get_learning_unit_context(learning_unit_year):
+    learning_unit_year_fields = {}
+    for field in FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON:
+        if field != 'internship_subtype' or field == 'internship_subtype' and learning_unit_year.learning_container_year.container_type == _(
+                "Internship"):
+            field_name = learning_unit_year._meta.get_field(field).verbose_name
+            if field == 'periodicity':
+                value = _get_value_from_enum(PERIODICITY_TYPES, getattr(learning_unit_year, field))
+            elif field == 'attribution_procedure':
+                value = _get_value_from_enum(ATTRIBUTION_PROCEDURES, getattr(learning_unit_year, field))
+            else:
+                value = getattr(learning_unit_year, field)
+            learning_unit_year_fields[field_name] = value
+    return learning_unit_year_fields
 
 
 def build_context_comparison(current_context, learning_unit_year, next_context, previous_context):
@@ -402,9 +446,6 @@ def build_context_comparison(current_context, learning_unit_year, next_context, 
     context['previous'] = previous_context or {}
     context['current'] = current_context or {}
     context['next'] = next_context or {}
-    context['learning_unit_year_fields'] = FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON
-    context['learning_container_year_fields'] = FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON
-    context['learning_component_fields'] = FIELDS_FOR_LEARNING_COMPONENT_COMPARISON
     return context
 
 
@@ -435,44 +476,12 @@ def _reinitialize_components(initial_components):
                     setattr(learning_component_year, attribute_name, cleaned_initial_value)
 
 
-def _reinitialize_entities(context, initial_entities_by_type):
-    for type_entity, id_entity in initial_entities_by_type.items():
-        initial_entity = entity.get_by_internal_id(id_entity)
-        if initial_entity:
-            context[type_entity] = initial_entity
-
-
-def _add_warnings_for_inexisting_luy(request, academic_yr, luy):
-    if not luy:
-        messages.add_message(
-            request,
-            messages.INFO,
-            _('The learning unit does not exist for the academic year %(anac)s') % {'anac': academic_yr}
-        )
-
-
 def _get_learning_unit_year(academic_yr, learning_unit_yr):
     learning_unit_years = mdl.learning_unit_year.search(learning_unit=learning_unit_yr.learning_unit,
                                                         academic_year_id=academic_yr.id)
     if learning_unit_years.exists():
         return learning_unit_years.first()
     return None
-
-
-def _get_changed_organization(context, context_prev, context_next):
-    data = {}
-    for key_value in ORGANIZATION_KEYS:
-        translated_key = _('Learning location') if key_value == "campus" else _(key_value.lower())
-        data.update({translated_key: {'prev': context_prev.get(key_value),
-                                      'current': context.get(key_value),
-                                      'next': context_next.get(key_value)}
-                     })
-
-    return collections.OrderedDict(sorted(data.items()))
-
-
-def _has_changed(data_reference, data_1, data_2, key):
-    return data_reference.get(key) != data_1.get(key) or data_reference.get(key) != data_2.get(key)
 
 
 def get_charge_repartition_warning_messages(learning_container_year):

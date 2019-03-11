@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,31 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
+from django import forms
+from django.db.models import Q
 
-from reference.models import *
+from base.models.student import Student
 
 
-admin.site.register(continent.Continent,
-                    continent.ContinentAdmin)
+class StudentSearchForm(forms.Form):
+    registration_id = forms.CharField(max_length=10, required=False)
+    name = forms.CharField(max_length=20, required=False)
 
-admin.site.register(currency.Currency,
-                    currency.CurrencyAdmin)
+    def get_objects(self):
+        registration_id = self.cleaned_data["registration_id"]
+        name = self.cleaned_data["name"]
+        qs = Student.objects.none()
+        if registration_id:
+            qs = Student.objects.filter(registration_id=registration_id)
+        elif name:
+            qs = Student.objects.all().order_by('person__last_name', 'person__first_name')
+            for word in name.split():
+                qs = qs.filter(Q(person__first_name__icontains=word) | Q(person__last_name__icontains=word))
 
-admin.site.register(country.Country,
-                    country.CountryAdmin)
-
-admin.site.register(decree.Decree,
-                    decree.DecreeAdmin)
-
-admin.site.register(domain.Domain,
-                    domain.DomainAdmin)
-
-admin.site.register(domain_isced.DomainIsced,
-                    domain_isced.DomainIscedAdmin)
-
-admin.site.register(grade_type.GradeType,
-                    grade_type.GradeTypeAdmin)
-
-admin.site.register(language.Language,
-                    language.LanguageAdmin)
+        return qs.select_related("person")

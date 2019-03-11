@@ -23,10 +23,10 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% if components_comparison %}
-    {% for component in components_comparison %}
+{% if current.components %}
+    {% for key, component in current.components.items %}
         <tr class="table_header" style="border-top: groove">
-            <td class="table_header">{% trans 'Component' %} : {{ component|get_item:'type' }}</td>
+            <td class="table_header">{% trans 'Component' %} : {{ key }}</td>
             {% if previous %}
                 <th>{{ previous.learning_unit_year.academic_year }}</th>
             {% endif %}
@@ -35,25 +35,8 @@
                 <th>{{ next.learning_unit_year.academic_year }}</th>
             {% endif %}
         </tr>
-        {% for key, values in component.items %}
-                {% if key == "planned_classes" %}
-                    {%  trans "Planned classes"|capfirst as title %}
-                {% elif key == "VOLUME_TOTAL" %}
-                    {%  trans "Volume total annual"|capfirst as title %}
-                {% elif key == "VOLUME_Q1" %}
-                    {%  trans "Volume Q1"|capfirst as title %}
-                {% elif key == "VOLUME_Q2" %}
-                    {%  trans "Volume Q2"|capfirst as title %}
-                {% elif key == "VOLUME_GLOBAL" %}
-                    {%  trans "Vol. global"|capfirst as title %}
-                {% elif key == "VOLUME_REQUIREMENT_ENTITY" %}
-                    {%  trans "Requirement entity"|capfirst as title %}
-                {% elif key == "VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1" %}
-                    {%  trans "Additional requirement entity 1"|capfirst as title %}
-                {% elif key == "VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2" %}
-                    {%  trans "Additional requirement entity 2"|capfirst as title %}
-                {% endif %}
-            {% if key != 'type' %}
+        {% for title, values in component.items %}
+            {% if title != 'type' %}
                 <tr>
                     <td class="table_header">
                         <table>
@@ -62,15 +45,13 @@
                                 <td>{{ title }}</td>
                             </tr>
                         </table>
-
-
                     </td>
                     {% if previous %}
-                        <td>{% changed_label values.0 other1=values.1 %}</td>
+                        {% changed_label previous.components|get_item:key|get_item:title|default:'-' other=values %}
                     {% endif %}
-                    <td><label>{{ values.1 | default_if_none:'-' }}</label></td>
+                    {% changed_label values|default:'-' %}
                     {% if next %}
-                        <td>{% changed_label values.2 other1=values.1 %}</td>
+                        {% changed_label next.components|get_item:key|get_item:title|default:'-' other=values %}
                     {% endif %}
                 </tr>
             {% endif %}

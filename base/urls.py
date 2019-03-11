@@ -284,7 +284,6 @@ urlpatterns = [
     url(r'^studies/$', common.studies, name='studies'),
     url(r'^students/', include([
         url(r'^$', student.students, name='students'),
-        url(r'^search$', student.student_search, name='students_search'),
         url(r'^(?P<student_id>[0-9]+)/', include([
             url(r'^$', student.student_read, name='student_read'),
             url(r'^picture$', student.student_picture, name='student_picture'),

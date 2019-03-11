@@ -50,176 +50,93 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for key in learning_unit_year_fields %}
-                        {% if key == "acronym" %}
-                            {% trans "Acronym"|capfirst as title %}
-                        {% elif key == "attribution_procedure" %}
-                            {% trans "Procedure"|capfirst as title %}
-                        {% elif key == "credits" %}
-                            {% trans "Credits"|capfirst as title %}
-                        {% elif key == "periodicity" %}
-                            {% trans "Periodicity"|capfirst as title %}
-                        {% elif key == "professional_integration" %}
-                            {% trans "professional integration"|capfirst as title %}
-                        {% elif key == "specific_title" %}
-                            {% trans "French title proper"|capfirst as title %}
-                        {% elif key == "specific_title_english" %}
-                            {% trans "English title proper"|capfirst as title %}
-                        {% elif key == "quadrimester" %}
-                            {% trans "Quadrimester"|capfirst as title %}
-                        {% elif key == "session" %}
-                            {% trans "Session derogation"|capfirst as title %}
-                        {% elif key == "status" %}
-                            {% trans "Status"|capfirst as title %}
-                        {% elif key == "internship_subtype" %}
-                            {% trans "Internship Subtype"|capfirst as title %}
-                        {% elif key == "language" %}
-                            {% trans "Language"|capfirst as title %}
+                    {% for key in current.learning_unit_year_fields %}
+                        {% if key == _('Active') %}
+                            <tr{% if forloop.first %} style="border-top: groove"{% endif %}>
+                                <td class="table_header">{{ key }}</td>
+                                {% if previous %}
+                                    {% changed_label previous.learning_unit_year_fields|get_item:key|yesno:_("yes,no")|title other=current.learning_unit_year_fields|get_item:key|yesno:_("yes,no")|title %}
+                                {% endif %}
+                                {% changed_label current.learning_unit_year_fields|get_item:key|yesno:_("yes,no")|title %}
+                                {% if next %}
+                                    {% changed_label next.learning_unit_year_fields|get_item:key|yesno:_("yes,no")|title other=current.learning_unit_year_fields|get_item:key|yesno:_("yes,no")|title %}
+                                {% endif %}
+                            </tr>
+                        {% else %}
+                            <tr{% if forloop.first %} style="border-top: groove"{% endif %}>
+                                <td class="table_header">{{ key }}</td>
+                                {% if previous %}
+                                    {% changed_label previous.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
+                                {% endif %}
+                                {% changed_label current.learning_unit_year_fields|get_item:key|default:'-' %}
+                                {% if next %}
+                                    {% changed_label next.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
+                                {% endif %}
+                            </tr>
                         {% endif %}
-                        <tr>
-                            <td class="table_header">{{ title }}</td>
-                            {% if previous %}
-                                <td>
-                                    {% if key == "attribution_procedure" %}
-                                        {% changed_label previous.learning_unit_year.get_attribution_procedure_display|default:'-' other1=current.learning_unit_year.get_attribution_procedure_display|default:'-' %}
-                                    {% elif key == "periodicity" %}
-                                        {% changed_label previous.learning_unit_year.get_periodicity_display|default:'-' other1=current.learning_unit_year.get_periodicity_display|default:'-' %}
-                                    {% elif key == "language" %}
-                                        {% changed_label previous.language.name|default:'-' other1=current.language.name|default:'-' %}
-                                    {% else %}
-                                        {% changed_label previous.learning_unit_year|get_attribute:key|default:'-' other1=current.learning_unit_year|get_attribute:key|default:'-' %}
-                                    {% endif %}
-                                </td>
-                            {% endif %}
-                            <td>
-                                <label>
-                                    {% if key == "attribution_procedure" %}
-                                        {{ current.learning_unit_year.get_attribution_procedure_display }}
-                                    {% elif key == "periodicity" %}
-                                        {{ current.learning_unit_year.get_periodicity_display|default:'-' }}
-                                    {% elif key == "language" %}
-                                        {{ current.language.name }}
-                                    {% else %}
-                                        {{ current.learning_unit_year|get_attribute:key|default:'-' }}
-                                    {% endif %}
-                                </label>
-                            </td>
-                            {% if next %}
-                                <td>
-                                    {% if key == "attribution_procedure" %}
-                                        {% changed_label next.learning_unit_year.get_attribution_procedure_display other1=current.learning_unit_year.get_attribution_procedure_display %}
-                                    {% elif key == "periodicity" %}
-                                        {% changed_label next.learning_unit_year.get_periodicity_display|default:'-' other1=current.learning_unit_year.get_periodicity_display|default:'-' %}
-                                    {% elif key == "language" %}
-                                        {% changed_label next.language.name other1=current.language.name %}
-                                    {% else %}
-                                        {% changed_label next.learning_unit_year|get_attribute:key other1=current.learning_unit_year|get_attribute:key %}
-                                    {% endif %}
-                                </td>
-                            {% endif %}
-                        </tr>
+
                     {% endfor %}
                     {% if current.learning_container_year_partims or previous.learning_container_year_partims or next.learning_container_year_partims %}
                         <tr>
                             <td class="table_header">{% trans 'Partims' %}</td>
                             {% if previous %}
-                                <td>{% for elem in previous.learning_container_year_partims %}
-                                    {{ elem }}{% endfor %}</td>
+                                <td>
+                                    <label>
+                                        {% for elem in previous.learning_container_year_partims %}
+                                            {{ elem }}
+                                        {% endfor %}
+                                    </label>
+                                </td>
                             {% endif %}
-                            <td><label>
-                                {% for elem in current.learning_container_year_partims %}{{ elem }}{% endfor %}</label>
+                            <td>
+                                <label>
+                                    {% for elem in current.learning_container_year_partims %}
+                                        {{ elem }}
+                                    {% endfor %}
+                                </label>
                             </td>
                             {% if next %}
-                                <td>{% for elem in next.learning_container_year_partims %}{{ elem }}{% endfor %}</td>
+                                <td>
+                                    <label>
+                                        {% for elem in next.learning_container_year_partims %}
+                                            {{ elem }}
+                                        {% endfor %}
+                                    </label>
+                                </td>
                             {% endif %}
                         </tr>
                     {% endif %}
                     <tr style="border-top: groove">
                         <td class="table_header">{% trans "Learning location" %}</td>
                         {% if previous %}
-                            <td>{% changed_label previous.campus.name other1=current.campus.name %}</td>
+                            {% changed_label previous.campus other=current.campus %}
                         {% endif %}
-                        <td><label>{{ current.campus.name }}</label></td>
+                        {% changed_label current.campus %}
                         {% if next %}
-                            <td>{% changed_label next.campus.name other1=current.campus.name %}</td>
+                            {% changed_label next.campus other=current.campus %}
                         {% endif %}
                     </tr>
-                    <tr>
-                        <td class="table_header">{% trans "Requirement entity" %}</td>
-                        {% if previous %}
-                            <td>{% changed_label previous.REQUIREMENT_ENTITY|default:'-' other1=current.REQUIREMENT_ENTITY|default:'-' %}</td>
-                        {% endif %}
-                        <td><label>{{ current.REQUIREMENT_ENTITY|default:'-' }}</label></td>
-                        {% if next %}
-                            <td>{% changed_label next.REQUIREMENT_ENTITY|default:'-' other1=current.REQUIREMENT_ENTITY|default:'-' %}</td>
-                        {% endif %}
-                    </tr>
-                    <tr>
-                        <td class="table_header">{% trans "Allocation entity" %}</td>
-                        {% if previous %}
-                            <td>{% changed_label previous.ALLOCATION_ENTITY|default:'-' other1=current.ALLOCATION_ENTITY|default:'-' %}</td>
-                        {% endif %}
-                        <td><label>{{ current.ALLOCATION_ENTITY|default:'-' }}</label></td>
-                        {% if next %}
-                            <td>{% changed_label next.ALLOCATION_ENTITY|default:'-' other1=current.ALLOCATION_ENTITY|default:'-' %}</td>
-                        {% endif %}
-                    </tr>
-                    <tr>
-                        <td class="table_header">{% trans "Additional requirement entity 1" %}</td>
-                        {% if previous %}
-                            <td>{% changed_label previous.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' other1=current.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' %}</td>
-                        {% endif %}
-                        <td><label>{{ current.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' }}</label></td>
-                        {% if next %}
-                            <td>{% changed_label next.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' other1=current.ADDITIONAL_REQUIREMENT_ENTITY_1|default:'-' %}</td>
-                        {% endif %}
-                    </tr>
-                    <tr>
-                        <td class="table_header">{% trans "Additional requirement entity 2" %}</td>
-                        {% if previous %}
-                            <td>{% changed_label previous.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' other1=current.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' %}</td>
-                        {% endif %}
-                        <td><label>{{ current.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' }}</label></td>
-                        {% if next %}
-                            <td>{% changed_label next.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' other1=current.ADDITIONAL_REQUIREMENT_ENTITY_2|default:'-' %}</td>
-                        {% endif %}
-                    </tr>
-                    {% for key in learning_container_year_fields %}
-                        {% if key == "is_vacant" %}
-                            ²                  {% trans "Vacant"|capfirst as title %}
-                        {% elif key == "team" %}
-                            {% trans "Team management"|capfirst as title %}
-                        {% elif key == "type_declaration_vacant" %}
-                            {% trans "Decision"|capfirst as title %}
-                        {% endif %}
+                    {% for key in current.entities_fields %}
                         <tr{% if forloop.first %} style="border-top: groove"{% endif %}>
-                            <td class="table_header">{{ title }}</td>
+                            <td class="table_header">{{ key }}</td>
                             {% if previous %}
-                                <td>
-                                    {% if key == "type_declaration_vacant" %}
-                                        {% changed_label previous.learning_unit_year.learning_container_year.get_type_declaration_vacant_display|default:'-' other1=current.learning_unit_year.learning_container_year.get_type_declaration_vacant_display|default:'-' %}
-                                    {% else %}
-                                        {% changed_label previous.learning_unit_year.learning_container_year|get_attribute:key|default:'-' other1=current.learning_unit_year.learning_container_year|get_attribute:key|default:'-' %}
-                                    {% endif %}
-                                </td>
+                                {% changed_label previous.entities_fields|get_item:key|default:'-' other=current.entities_fields|get_item:key|default:'-' %}
                             {% endif %}
-                            <td>
-                                <label>
-                                    {% if key == "type_declaration_vacant" %}
-                                        {{ current.learning_unit_year.learning_container_year.get_type_declaration_vacant_display|default:'-' }}
-                                    {% else %}
-                                        {{ current.learning_unit_year.learning_container_year|get_attribute:key|default:'-' }}
-                                    {% endif %}
-                                </label>
-                            </td>
+                            {% changed_label current.entities_fields|get_item:key|default:'-' %}
                             {% if next %}
-                                <td>
-                                    {% if key == "type_declaration_vacant" %}
-                                        {% changed_label next.learning_unit_year.learning_container_year.get_type_declaration_vacant_display|default:'-' other1=current.learning_unit_year.learning_container_year.get_type_declaration_vacant_display|default:'-' %}
-                                    {% else %}
-                                        {% changed_label next.learning_unit_year.learning_container_year|get_attribute:key|default:'-' other1=current.learning_unit_year.learning_container_year|get_attribute:key|default:'-' %}
-                                    {% endif %}
-                                </td>
+                                {% changed_label next.entities_fields|get_item:key|default:'-' other=current.entities_fields|get_item:key|default:'-' %}
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    {% for key_lcy in current.learning_container_year_fields %}
+                        <tr{% if forloop.first %} style="border-top: groove"{% endif %}>
+                            <td class="table_header">{{ key_lcy }}</td>
+                            {% if previous %}
+                                {% changed_label previous.learning_container_year_fields|get_item:key_lcy|yesno:_("yes,no")|title other=current.learning_container_year_fields|get_item:key_lcy|yesno:_("yes,no")|title %}
+                            {% endif %}
+                            {% changed_label current.learning_container_year_fields|get_item:key_lcy|yesno:_("yes,no")|title %}
+                            {% if next %}
+                                {% changed_label next.learning_container_year_fields|get_item:key_lcy|yesno:_("yes,no")|title other=current.learning_container_year_fields|get_item:key_lcy|yesno:_("yes,no")|title %}
                             {% endif %}
                         </tr>
                     {% endfor %}

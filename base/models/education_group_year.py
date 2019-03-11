@@ -404,7 +404,13 @@ class EducationGroupYear(SerializableModel):
         through="EducationGroupYearDomain",
         related_name="education_group_years",
         verbose_name=_("secondary domains")
+    )
 
+    isced_domain = models.ForeignKey(
+        "reference.DomainIsced",
+        on_delete=models.PROTECT,
+        null=True, blank=True,
+        verbose_name=_("ISCED domain"),
     )
 
     management_entity = models.ForeignKey(

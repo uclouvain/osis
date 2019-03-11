@@ -26,14 +26,14 @@
 import datetime
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
-
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
-from base.tests.factories.offer_year import OfferYearFactory
-from base.forms.academic_calendar import AcademicCalendarForm
 from django.test.utils import override_settings
+from django.utils.translation import ugettext_lazy as _
+
+from base.forms.academic_calendar import AcademicCalendarForm
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 
 
 class TestAcademicCalendarForm(TestCase):
