@@ -148,6 +148,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             "administration_entity",
             "management_entity",
             "main_domain",
+            "isced_domain",
             "secondary_domains",
             "decree_category",
             "rate_code",
@@ -164,7 +165,8 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             **EducationGroupYearModelForm.Meta.field_classes,
             **{
                 "administration_entity": MainEntitiesVersionChoiceField,
-                "main_domain": forms.ModelChoiceField
+                "main_domain": forms.ModelChoiceField,
+                "isced_domain": forms.ModelChoiceField,
             }
         }
         widgets = {

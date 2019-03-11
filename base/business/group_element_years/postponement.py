@@ -193,7 +193,6 @@ class PostponeContent:
         """
         old_luy = old_gr.child_leaf
         new_luy = old_luy.get_learning_unit_next_year()
-
         if not new_luy:
             new_luy = old_luy
             self.warnings.append(ReuseOldLearningUnitYearWarning(old_luy, self.next_academic_year))
@@ -235,7 +234,7 @@ class PostponeContent:
         return new_gr
 
     def _duplication_education_group_year(self, old_egy: EducationGroupYear):
-        if old_egy.education_group_type.category is not Categories.GROUP.name:
+        if old_egy.education_group_type.category != Categories.GROUP.name:
             if old_egy.education_group.end_year and old_egy.education_group.end_year < self.next_academic_year.year:
                 self.warnings.append(EducationGroupEndYearWarning(old_egy, self.next_academic_year))
                 return None

@@ -36,6 +36,9 @@ from base.models.tutor import Tutor
 from base.models.entity_manager import EntityManager
 from base.models.structure import Structure
 from base.models import models_signals as mdl_signals, person as mdl_person
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
 
 
 def get_or_create_user(user_infos):
@@ -148,13 +151,9 @@ class AddToGroupsSignalsTest(TestCase):
         return Tutor.objects.create(person=self.person_foo)
 
     def create_test_pgm_manager(self):
-        title = 'Test1BA'
-        acronym = 'Test1BA'
-        offer = Offer.objects.create(title=title)
-        now = timezone.now()
-        academic_year = AcademicYear.objects.create(year=now.year)
-        offer_year = OfferYear.objects.create(offer=offer, academic_year=academic_year, title=title, acronym=acronym)
-        return ProgramManager.objects.create(offer_year=offer_year, person=self.person_foo)
+        egy = EducationGroupYearFactory(academic_year__current=True)
+        offer_year = OfferYearFactory(academic_year=egy.academic_year, acronym=egy.acronym)
+        return ProgramManagerFactory(offer_year=offer_year, education_group=egy.education_group, person=self.person_foo)
 
     def create_test_entity_manager(self):
         return EntityManager.objects.create(person=self.person_foo, structure=Structure.objects.create(acronym="TEST"))

@@ -141,11 +141,10 @@ def _reinitialize_entities_before_proposal(learning_container_year, initial_enti
                 current_entity_container_year.delete()
 
 
-def delete_learning_unit_proposal(learning_unit_proposal):
-    prop_type = learning_unit_proposal.type
+def delete_learning_unit_proposal(learning_unit_proposal, delete_learning_unit):
     lu = learning_unit_proposal.learning_unit_year.learning_unit
     learning_unit_proposal.delete()
-    if prop_type == ProposalType.CREATION.name:
+    if delete_learning_unit:
         lu.delete()
 
 
@@ -325,10 +324,10 @@ def cancel_proposal(proposal):
             results = {ERROR: errors}
         else:
             results = {SUCCESS: business_deletion.delete_from_given_learning_unit_year(learning_unit_year)}
-            delete_learning_unit_proposal(proposal)
+            delete_learning_unit_proposal(proposal, True)
     else:
         reinitialize_data_before_proposal(proposal)
-        delete_learning_unit_proposal(proposal)
+        delete_learning_unit_proposal(proposal, False)
 
     return results
 
@@ -340,7 +339,7 @@ def consolidate_proposal(proposal):
     elif proposal.state == proposal_state.ProposalState.ACCEPTED.name:
         results = _consolidate_accepted_proposal(proposal)
         if not results.get(ERROR):
-            delete_learning_unit_proposal(proposal)
+            delete_learning_unit_proposal(proposal, False)
     return results
 
 

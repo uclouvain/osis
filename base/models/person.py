@@ -231,16 +231,6 @@ def search_employee(full_name):
     return None
 
 
-def search(full_name):
-    queryset = annotate_with_first_last_names()
-    if full_name:
-        return queryset.filter(Q(begin_by_first_name__iexact='{}'.format(full_name.lower())) |
-                               Q(begin_by_last_name__iexact='{}'.format(full_name.lower())) |
-                               Q(first_name__icontains=full_name) |
-                               Q(last_name__icontains=full_name))
-    return None
-
-
 def annotate_with_first_last_names():
     queryset = Person.objects.annotate(begin_by_first_name=Lower(Concat('first_name', Value(' '), 'last_name')))
     queryset = queryset.annotate(begin_by_last_name=Lower(Concat('last_name', Value(' '), 'first_name')))
