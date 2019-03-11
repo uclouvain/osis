@@ -58,6 +58,15 @@ def cache_filter(exclude_params=None, **default_values):
     return decorator
 
 
+class CacheFilterMixin:
+    def restore_filter(self, request, *args, **kwargs):
+        request_cache = RequestCache(user=self.request.user, path=self.request.path)
+        if self.request.GET:
+            request_cache.save_get_parameters(self.request)
+        self.request.GET = request_cache.restore_get_request(self.request)
+        return super().get(request, *args, **kwargs)
+
+
 class OsisCache(abc.ABC):
     PREFIX_KEY = None
 
