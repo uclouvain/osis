@@ -42,11 +42,11 @@ from osis_common.document import xls_build
 DATE_FORMAT = '%d-%m-%Y'
 DATE_TIME_FORMAT = '%d-%m-%Y %H:%M'
 DESC = "desc"
-WORKSHEET_TITLE = 'education_groups'
-XLS_FILENAME = 'education_groups_filename'
-XLS_DESCRIPTION = "list_education_groups"
+WORKSHEET_TITLE = _('Education_groups')
+XLS_FILENAME = _('Education_groups')
+XLS_DESCRIPTION = _("List education groups")
 EDUCATION_GROUP_TITLES = [str(_('Ac yr.')), str(pgettext_lazy('abbreviation', 'Acronym/Short title')),
-                          str(_('Title')), str(_('type')), str(_('Entity')), str(_('code'))]
+                          str(_('Title')), str(_('Type')), str(_('Entity')), str(_('Code'))]
 ORDER_COL = 'order_col'
 ORDER_DIRECTION = 'order_direction'
 #
