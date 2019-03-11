@@ -34,6 +34,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
+from waffle.decorators import waffle_flag
 
 from attribution.business import attribution_charge_new
 from attribution.models.attribution_charge_new import AttributionChargeNew
@@ -239,6 +240,9 @@ def learning_class_year_edit(request, learning_unit_year_id):
     context['form'] = form
     return render(request, "learning_unit/class_edit.html", context)
 
+
+@waffle_flag('learning_unit_proposal_update')
+@login_required
 
 def learning_unit_proposal_comparison(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(
