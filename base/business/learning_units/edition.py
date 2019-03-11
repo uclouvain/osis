@@ -649,12 +649,3 @@ def create_learning_unit_year_creation_message(learning_unit_year_created):
     return _("Learning Unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
              "successfuly created.") % {'link': link, 'acronym': learning_unit_year_created.acronym,
                                         'academic_year': learning_unit_year_created.academic_year}
-
-
-def create_proposal_learning_unit_year_creation_message(learning_unit_year_created):
-    link = reverse("learning_unit", kwargs={'learning_unit_year_id': learning_unit_year_created.id})
-    return _("Proposal learning unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
-             "a> successfuly created.") % {'link': link,
-                                           'acronym': learning_unit_year_created.acronym,
-                                           'academic_year': learning_unit_year_created.academic_year
-                                           }
