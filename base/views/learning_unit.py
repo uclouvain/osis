@@ -246,8 +246,10 @@ def learning_unit_proposal_comparison(request, learning_unit_year_id):
                                                       'campus', 'campus__organization'), pk=learning_unit_year_id
     )
     initial_data = proposal_learning_unit.find_by_learning_unit_year(learning_unit_year).initial_data
-    initial_learning_unit_year, learning_unit_year_fields = get_learning_unit_year_comparison_context(initial_data,
-                                                                                                      learning_unit_year)
+    initial_learning_unit_year, learning_unit_year_fields = get_learning_unit_year_comparison_context(
+        initial_data,
+        learning_unit_year
+    )
     learning_container_year_fields = get_learning_container_year_comparison_context(initial_data, learning_unit_year)
     context = dict({'learning_unit_year': learning_unit_year})
     context['campus'] = [learning_unit_year._meta.get_field('campus').verbose_name,
@@ -465,7 +467,9 @@ def _clean_attribute_initial_value(attribute_name, attribute_value):
 
 def _reinitialize_components(initial_components):
     for initial_data_by_model in initial_components:
-        learning_component_year = mdl_learning_component_year.LearningComponentYear.objects.get(pk=initial_data_by_model.get('id'))
+        learning_component_year = mdl_learning_component_year.LearningComponentYear.objects.get(
+            pk=initial_data_by_model.get('id')
+        )
         for attribute_name, attribute_value in initial_data_by_model.items():
             if attribute_name != "id":
                 cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
