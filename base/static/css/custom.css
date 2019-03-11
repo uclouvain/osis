@@ -216,19 +216,21 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
     height: 100%;
     width: 0;
     position: fixed;
-    z-index: 1;
     top: 0;
     left: 0;
-    background-color: #ffffff;
     display: flex;
+    vertical-align: central;
 }
 
 .sidenav {
+    padding-top: 100px;
     height: 100%;
     width: 100%;
-    padding-top: 60px;
+    background-color: #ffffff;
+    border-top-width: thin;
     overflow-y: auto;
     overflow-x: hidden;
+    padding-bottom: 50px;
 }
 
 .sidenav #panel_file_tree {
