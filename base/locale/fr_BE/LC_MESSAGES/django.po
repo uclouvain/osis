@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-08 13:22+0100\n"
+"POT-Creation-Date: 2019-03-11 11:52+0100\n"
 "PO-Revision-Date: 2019-02-27 15:13+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -933,10 +933,10 @@ msgstr "Coefficient de co-diplomation"
 msgid "Co-holder"
 msgstr "Co-titulaire"
 
-#: business/learning_unit.py:57 business/learning_unit_xls.py:72
-#: business/proposal_xls.py:38 business/proposal_xls.py:44
-#: forms/education_groups.py:88 forms/learning_unit/search_form.py:78
-#: models/learning_unit_year.py:105
+#: business/education_group.py:49 business/learning_unit.py:57
+#: business/learning_unit_xls.py:72 business/proposal_xls.py:38
+#: business/proposal_xls.py:44 forms/education_groups.py:88
+#: forms/learning_unit/search_form.py:78 models/learning_unit_year.py:105
 #: templates/education_group/blocks/content_default_table.html:31
 #: templates/education_group/blocks/content_minor_major_option_table.html:30
 #: templates/education_group/blocks/table_utilizations.html:30
@@ -1374,6 +1374,10 @@ msgstr "Organisations de formations"
 #: templates/learning_units.html:87
 msgid "Education information status"
 msgstr "Statut des informations pédagogiques"
+
+#: business/education_group.py:45 business/education_group.py:46
+msgid "Education_groups"
+msgstr "Formations"
 
 #: templates/learning_unit/blocks/tabs.html:62
 #: templates/learning_unit/proposal/tabs.html:55
@@ -2179,6 +2183,10 @@ msgstr "Type de lien"
 msgid "Linked with EPC"
 msgstr "Liens existants dans l'application EPC."
 
+#: business/education_group.py:47
+msgid "List education groups"
+msgstr "Liste des organisations de formations"
+
 #: business/proposal_xls.py:109
 msgid "List of comparison between proposals and UE"
 msgstr "Liste de comparaison entre les propositions et les UE"
@@ -2736,8 +2744,8 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:153
 #: forms/learning_unit/edition_volume.py:154
-#: forms/learning_unit/edition_volume.py:343
 #: forms/learning_unit/edition_volume.py:344
+#: forms/learning_unit/edition_volume.py:345
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:169
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:171
 #: tests/forms/test_edition_form.py:321 tests/forms/test_edition_form.py:322
@@ -2794,8 +2802,12 @@ msgstr[1] ""
 msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
 msgid_plural ""
 "Options \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgstr[0] "L'option \"%(acronym)s\" doit être présente dans le programme %(root_acronym)s."
-msgstr[1] "Les options \"%(acronym)s\" doivent être présentes dans le programme %(root_acronym)s."
+msgstr[0] ""
+"L'option \"%(acronym)s\" doit être présente dans le programme "
+"%(root_acronym)s."
+msgstr[1] ""
+"Les options \"%(acronym)s\" doivent être présentes dans le programme "
+"%(root_acronym)s."
 
 #: models/enums/education_group_types.py:129
 msgid "Option list choice"
@@ -3177,7 +3189,7 @@ msgstr "La proposition n'est ni acceptée ni refusée."
 msgid "Proposal isn't on current learning unit year"
 msgstr "La proposition n'est pas sur l'année en cours"
 
-#: business/learning_units/edition.py:656
+#: views/learning_units/proposal/create.py:50
 #, python-format
 msgid ""
 "Proposal learning unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
@@ -3808,7 +3820,7 @@ msgstr "Les données administratives ont été sauvées avec succès"
 
 #: forms/learning_unit/edition_volume.py:80
 #: forms/learning_unit/edition_volume.py:145
-#: forms/learning_unit/edition_volume.py:359
+#: forms/learning_unit/edition_volume.py:360
 #: models/learning_component_year.py:122
 #: templates/learning_unit/components.html:51
 #: templates/learning_unit/components_identification.html:37
@@ -4267,8 +4279,8 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:158
 #: forms/learning_unit/edition_volume.py:160
-#: forms/learning_unit/edition_volume.py:348
-#: forms/learning_unit/edition_volume.py:350
+#: forms/learning_unit/edition_volume.py:349
+#: forms/learning_unit/edition_volume.py:351
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:181
 #: tests/forms/test_edition_form.py:332 tests/forms/test_edition_form.py:342
 msgid "The volume can not be set to 0."
@@ -4482,11 +4494,12 @@ msgstr "Enseignant·e"
 msgid "Tutors"
 msgstr "Enseignant·e·s"
 
-#: business/education_group.py:61 business/learning_unit.py:60
-#: business/learning_unit_xls.py:75 business/proposal_xls.py:38
-#: business/proposal_xls.py:46 forms/education_groups.py:82
-#: forms/learning_unit/search_form.py:164 models/entity_version.py:171
-#: models/learning_container_year.py:53 models/proposal_learning_unit.py:55
+#: business/education_group.py:49 business/education_group.py:61
+#: business/learning_unit.py:60 business/learning_unit_xls.py:75
+#: business/proposal_xls.py:38 business/proposal_xls.py:46
+#: forms/education_groups.py:82 forms/learning_unit/search_form.py:164
+#: models/entity_version.py:171 models/learning_container_year.py:53
+#: models/proposal_learning_unit.py:55
 #: templates/education_group/search.html:150 templates/entities.html:68
 #: templates/entity/identification.html:62
 #: templates/entity/identification.html:117
@@ -5139,9 +5152,8 @@ msgstr "annuler"
 msgid "certificate aims"
 msgstr "attendus du diplôme"
 
-#: business/education_group.py:49 business/learning_units/xls_generator.py:48
-#: business/proposal_xls.py:79 business/proposal_xls.py:89
-#: models/abstracts/abstract_achievement.py:44
+#: business/learning_units/xls_generator.py:48 business/proposal_xls.py:79
+#: business/proposal_xls.py:89 models/abstracts/abstract_achievement.py:44
 #: models/abstracts/abstract_education_group_achievement.py:53
 #: models/education_group_year.py:350
 #: templates/learning_unit/components.html:124
@@ -5542,7 +5554,7 @@ msgstr "formation"
 msgid "training_administrative_data"
 msgstr "formations_avec_donnees_administratives"
 
-#: business/education_group.py:49 business/learning_units/edition.py:448
+#: business/learning_units/edition.py:448
 #: models/education_group_publication_contact.py:84
 #: templates/entity/versions.html:45
 #: templates/organization/organization.html:70
