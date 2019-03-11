@@ -4808,7 +4808,7 @@ msgstr ""
 #: business/learning_units/perms.py:85
 msgid "You are not allowed to change the end year for this academic year"
 msgstr ""
-"Vous n’êtes pas autorisé à changer l’année de fin de cette année scolaire"
+"Vous n’êtes pas autorisé à changer l’année de fin de cette année académique"
 
 #: business/group_element_years/postponement.py:102
 #: business/group_element_years/postponement.py:122
