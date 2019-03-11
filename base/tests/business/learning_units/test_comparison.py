@@ -106,20 +106,6 @@ class LearningUnitYearComparaisonTest(TestCase):
                                        attribution_procedure=attribution_procedure.EXTERNAL
                                        )
 
-    @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
-    def test_compare(self):
-        self.assertCountEqual(compare_learning_unit_years(self.learning_unit_year, self.previous_learning_unit_year),
-                              {'acronym': NEW_ACRONYM,
-                               'status': 'Non',
-                               'subtype': 'Partim'})
-
-    @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
-    def test_get_changed_value_wrong_fieldname(self):
-        data_obj1, data_obj2 = self.learning_unit_year.__dict__, self.previous_learning_unit_year.__dict__
-        del data_obj2['acronym']
-        with self.assertRaises(KeyError):
-            _get_changed_values(data_obj1, data_obj2, ['acronym'], LearningUnitYear)
-
     def test_compare_learning_component_year(self):
         acronym_used_twice = 'PM1'
         acronym_used_once = 'PM2'

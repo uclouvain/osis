@@ -48,16 +48,6 @@ def get_keys(list1, list2):
     return sorted(keys, key=ugettext_lazy)
 
 
-def compare_learning_unit_years(obj_ref, obj):
-    data_obj1, data_obj2 = obj_ref.__dict__, obj.__dict__
-    return _get_changed_values(data_obj1, data_obj2, FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, type(obj_ref))
-
-
-def compare_learning_container_years(obj_ref, obj):
-    data_obj1, data_obj2 = obj_ref.__dict__, obj.__dict__
-    return _get_changed_values(data_obj1, data_obj2, FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON, type(obj_ref))
-
-
 def _get_changed_values(data_obj1, data_obj2, included_keys, model):
     changed_values = {}
     for key, value in data_obj1.items():

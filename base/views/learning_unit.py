@@ -243,7 +243,6 @@ def learning_class_year_edit(request, learning_unit_year_id):
 
 @waffle_flag('learning_unit_proposal_update')
 @login_required
-
 def learning_unit_proposal_comparison(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(
         LearningUnitYear.objects.all().select_related('learning_unit', 'learning_container_year',
