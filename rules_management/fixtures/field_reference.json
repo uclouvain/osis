@@ -4275,5 +4275,35 @@
             ]
         },
         "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 266,
+        "fields": {
+            "field_name": "isced_domain",
+            "context": "TRAINING_PROPOSAL_MANAGEMENT",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": []
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 267,
+        "fields": {
+            "field_name": "isced_domain",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
     }
 ]
