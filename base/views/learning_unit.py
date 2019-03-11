@@ -465,13 +465,11 @@ def _clean_attribute_initial_value(attribute_name, attribute_value):
 
 def _reinitialize_components(initial_components):
     for initial_data_by_model in initial_components:
-        an_id = initial_data_by_model.get('id')
-        if an_id:
-            learning_component_year = mdl_learning_component_year.LearningComponentYear.objects.get(pk=an_id)
-            for attribute_name, attribute_value in initial_data_by_model.items():
-                if attribute_name != "id":
-                    cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
-                    setattr(learning_component_year, attribute_name, cleaned_initial_value)
+        learning_component_year = mdl_learning_component_year.LearningComponentYear.objects.get(pk=initial_data_by_model.get('id'))
+        for attribute_name, attribute_value in initial_data_by_model.items():
+            if attribute_name != "id":
+                cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+                setattr(learning_component_year, attribute_name, cleaned_initial_value)
 
 
 def _get_learning_unit_year(academic_yr, learning_unit_yr):

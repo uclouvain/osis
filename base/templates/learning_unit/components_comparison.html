@@ -47,11 +47,11 @@
                         </table>
                     </td>
                     {% if previous %}
-                        {% changed_label previous.components|get_item:key|get_item:title|default:'-' other=values %}
+                        {% changed_label previous.components|get_item:key|get_item:title|default:'0' other=values|default:'0' %}
                     {% endif %}
-                    {% changed_label values|default:'-' %}
+                    {% changed_label values|default:'0' %}
                     {% if next %}
-                        {% changed_label next.components|get_item:key|get_item:title|default:'-' other=values %}
+                        {% changed_label next.components|get_item:key|get_item:title|default:'0' other=values|default:'0' %}
                     {% endif %}
                 </tr>
             {% endif %}
