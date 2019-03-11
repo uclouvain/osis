@@ -28,9 +28,7 @@ from unittest import mock
 
 import factory.fuzzy
 import reversion
-from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
-from django.contrib.messages.api import get_messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden
@@ -79,20 +77,18 @@ from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_component import LearningUnitComponentFactory, \
     LecturingLearningUnitComponentFactory, PracticalLearningUnitComponentFactory
 from base.tests.factories.learning_unit_component_class import LearningUnitComponentClassFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_unit_year, \
-    LearningUnitYearPartimFactory, LearningUnitYearFullFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
+    LearningUnitYearFullFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
-from base.views.learning_unit import learning_unit_comparison, learning_unit_specifications_edit, \
-    learning_unit_proposal_comparison
 from base.views.learning_unit import learning_unit_components, learning_class_year_edit, learning_unit_specifications, \
     get_charge_repartition_warning_messages, learning_unit_attributions
+from base.views.learning_unit import learning_unit_specifications_edit
 from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.search import learning_units_service_course
