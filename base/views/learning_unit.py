@@ -428,16 +428,14 @@ def get_learning_container_year_context(learning_unit_year):
 def get_learning_unit_context(learning_unit_year):
     learning_unit_year_fields = {}
     for field in FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON:
-        if field != 'internship_subtype' or field == 'internship_subtype' and learning_unit_year.learning_container_year.container_type == _(
-                "Internship"):
-            field_name = learning_unit_year._meta.get_field(field).verbose_name
-            if field == 'periodicity':
-                value = _get_value_from_enum(PERIODICITY_TYPES, getattr(learning_unit_year, field))
-            elif field == 'attribution_procedure':
-                value = _get_value_from_enum(ATTRIBUTION_PROCEDURES, getattr(learning_unit_year, field))
-            else:
-                value = getattr(learning_unit_year, field)
-            learning_unit_year_fields[field_name] = value
+        field_name = learning_unit_year._meta.get_field(field).verbose_name
+        if field == 'periodicity':
+            value = _get_value_from_enum(PERIODICITY_TYPES, getattr(learning_unit_year, field))
+        elif field == 'attribution_procedure':
+            value = _get_value_from_enum(ATTRIBUTION_PROCEDURES, getattr(learning_unit_year, field))
+        else:
+            value = getattr(learning_unit_year, field)
+        learning_unit_year_fields[field_name] = value
     return learning_unit_year_fields
 
 
