@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-11 09:59+0100\n"
+"POT-Creation-Date: 2019-03-11 11:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -902,10 +902,10 @@ msgstr ""
 msgid "Co-holder"
 msgstr ""
 
-#: business/learning_unit.py:57 business/learning_unit_xls.py:72
-#: business/proposal_xls.py:38 business/proposal_xls.py:44
-#: forms/education_groups.py:88 forms/learning_unit/search_form.py:78
-#: models/learning_unit_year.py:105
+#: business/education_group.py:49 business/learning_unit.py:57
+#: business/learning_unit_xls.py:72 business/proposal_xls.py:38
+#: business/proposal_xls.py:44 forms/education_groups.py:88
+#: forms/learning_unit/search_form.py:78 models/learning_unit_year.py:105
 #: templates/education_group/blocks/content_default_table.html:31
 #: templates/education_group/blocks/content_minor_major_option_table.html:30
 #: templates/education_group/blocks/table_utilizations.html:30
@@ -1335,6 +1335,10 @@ msgstr ""
 
 #: templates/learning_units.html:87
 msgid "Education information status"
+msgstr ""
+
+#: business/education_group.py:45 business/education_group.py:46
+msgid "Education_groups"
 msgstr ""
 
 #: templates/learning_unit/blocks/tabs.html:62
@@ -2141,6 +2145,10 @@ msgstr ""
 msgid "Linked with EPC"
 msgstr ""
 
+#: business/education_group.py:47
+msgid "List education groups"
+msgstr ""
+
 #: business/proposal_xls.py:109
 msgid "List of comparison between proposals and UE"
 msgstr ""
@@ -2691,8 +2699,8 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:153
 #: forms/learning_unit/edition_volume.py:154
-#: forms/learning_unit/edition_volume.py:343
 #: forms/learning_unit/edition_volume.py:344
+#: forms/learning_unit/edition_volume.py:345
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:169
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:171
 #: tests/forms/test_edition_form.py:321 tests/forms/test_edition_form.py:322
@@ -3122,7 +3130,7 @@ msgstr ""
 msgid "Proposal isn't on current learning unit year"
 msgstr ""
 
-#: business/learning_units/edition.py:656
+#: views/learning_units/proposal/create.py:50
 #, python-format
 msgid ""
 "Proposal learning unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
@@ -3750,7 +3758,7 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:80
 #: forms/learning_unit/edition_volume.py:145
-#: forms/learning_unit/edition_volume.py:359
+#: forms/learning_unit/edition_volume.py:360
 #: models/learning_component_year.py:122
 #: templates/learning_unit/components.html:51
 #: templates/learning_unit/components_identification.html:37
@@ -4160,8 +4168,8 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:158
 #: forms/learning_unit/edition_volume.py:160
-#: forms/learning_unit/edition_volume.py:348
-#: forms/learning_unit/edition_volume.py:350
+#: forms/learning_unit/edition_volume.py:349
+#: forms/learning_unit/edition_volume.py:351
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:181
 #: tests/forms/test_edition_form.py:332 tests/forms/test_edition_form.py:342
 msgid "The volume can not be set to 0."
@@ -4365,11 +4373,12 @@ msgstr ""
 msgid "Tutors"
 msgstr ""
 
-#: business/education_group.py:61 business/learning_unit.py:60
-#: business/learning_unit_xls.py:75 business/proposal_xls.py:38
-#: business/proposal_xls.py:46 forms/education_groups.py:82
-#: forms/learning_unit/search_form.py:164 models/entity_version.py:171
-#: models/learning_container_year.py:53 models/proposal_learning_unit.py:55
+#: business/education_group.py:49 business/education_group.py:61
+#: business/learning_unit.py:60 business/learning_unit_xls.py:75
+#: business/proposal_xls.py:38 business/proposal_xls.py:46
+#: forms/education_groups.py:82 forms/learning_unit/search_form.py:164
+#: models/entity_version.py:171 models/learning_container_year.py:53
+#: models/proposal_learning_unit.py:55
 #: templates/education_group/search.html:150 templates/entities.html:68
 #: templates/entity/identification.html:62
 #: templates/entity/identification.html:117
@@ -4989,9 +4998,8 @@ msgstr ""
 msgid "certificate aims"
 msgstr ""
 
-#: business/education_group.py:49 business/learning_units/xls_generator.py:48
-#: business/proposal_xls.py:79 business/proposal_xls.py:89
-#: models/abstracts/abstract_achievement.py:44
+#: business/learning_units/xls_generator.py:48 business/proposal_xls.py:79
+#: business/proposal_xls.py:89 models/abstracts/abstract_achievement.py:44
 #: models/abstracts/abstract_education_group_achievement.py:53
 #: models/education_group_year.py:350
 #: templates/learning_unit/components.html:124
@@ -5383,7 +5391,7 @@ msgstr ""
 msgid "training_administrative_data"
 msgstr ""
 
-#: business/education_group.py:49 business/learning_units/edition.py:448
+#: business/learning_units/edition.py:448
 #: models/education_group_publication_contact.py:84
 #: templates/entity/versions.html:45
 #: templates/organization/organization.html:70

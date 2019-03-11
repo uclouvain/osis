@@ -290,6 +290,7 @@ class FullForm(LearningUnitBaseForm):
             },
             SimplifiedVolumeManagementForm: {
                 'data': data,
+                'proposal': proposal,
                 'queryset': LearningComponentYear.objects.filter(
                     learningunitcomponent__learning_unit_year=self.instance
                 ) if self.instance else LearningComponentYear.objects.none(),

@@ -167,7 +167,7 @@
             {% for mandatary in mandataries %}
                 <div class="row">
                     <div class="col-md-4">
-                        <label>{% trans mandatary.mandate.function %}</label><br>
+                        <label>{{ mandatary.mandate.get_function_display }}</label><br>
                         {{ mandatary.person }}
                     </div>
                     {% if mandatary.mandate.qualification %}

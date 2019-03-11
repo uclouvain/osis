@@ -307,10 +307,11 @@ class SimplifiedVolumeForm(forms.ModelForm):
     add_field = EmptyField(label="+")
     equal_field = EmptyField(label='=')
 
-    def __init__(self, component_type, index, *args, is_faculty_manager=False, **kwargs):
+    def __init__(self, component_type, index, *args, is_faculty_manager=False, proposal=False, **kwargs):
         component_type = component_type
         self.is_faculty_manager = is_faculty_manager
         self.index = index
+        self.proposal = proposal
         super().__init__(*args, **kwargs)
         self.label = component_type[1]
         self.instance.type = component_type[0]
@@ -336,7 +337,7 @@ class SimplifiedVolumeForm(forms.ModelForm):
         # FIXME Refactor this method with the clean of VolumeEditionForm
         """
         cleaned_data = super().clean()
-        if self.is_faculty_manager:
+        if self.is_faculty_manager and not self.proposal:
             if 0 in [self.instance.hourly_volume_partial_q1, self.instance.hourly_volume_partial_q2]:
                 if 0 not in [self.cleaned_data.get("hourly_volume_partial_q1"),
                              self.cleaned_data.get("hourly_volume_partial_q2")]:
@@ -414,14 +415,16 @@ class SimplifiedVolumeForm(forms.ModelForm):
 
 
 class SimplifiedVolumeFormset(forms.BaseModelFormSet):
-    def __init__(self, data, person, *args, **kwargs):
+    def __init__(self, data, person, proposal=False, *args, **kwargs):
         self.is_faculty_manager = person.is_faculty_manager and not person.is_central_manager
+        self.proposal = proposal
         super().__init__(data, *args, prefix="component", **kwargs)
 
     def get_form_kwargs(self, index):
         kwargs = super().get_form_kwargs(index)
         kwargs['component_type'] = COMPONENT_TYPES[index]
         kwargs['is_faculty_manager'] = self.is_faculty_manager
+        kwargs['proposal'] = self.proposal
         kwargs['index'] = index
         return kwargs
 
