@@ -109,11 +109,12 @@ class LearningUnitPostponementForm:
         If the learning unit is a partim, the max year is the max year of the full
         """
         if self.subtype == learning_unit_year_subtypes.PARTIM:
-            return self.learning_unit_full_instance.learningunityear_set.aggregate(
+            max_postponement_year = self.learning_unit_full_instance.learningunityear_set.aggregate(
                 Max('academic_year__year')
             )['academic_year__year__max']
+        else:
+            max_postponement_year = academic_year.compute_max_academic_year_adjournment()
 
-        max_postponement_year = academic_year.compute_max_academic_year_adjournment()
         end_year = self.end_postponement.year if self.end_postponement else None
         return min(end_year, max_postponement_year) if end_year else max_postponement_year
 
