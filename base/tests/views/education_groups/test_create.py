@@ -79,6 +79,7 @@ class TestCreate(TestCase):
                     kwargs={
                         "category": education_group_type.category,
                         "education_group_type_pk": education_group_type.pk,
+                        "root_id": cls.parent_education_group_year.id,
                         "parent_id": cls.parent_education_group_year.id,
                     }
                 )
