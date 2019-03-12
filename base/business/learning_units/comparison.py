@@ -34,7 +34,8 @@ FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON = ['acronym', 'internship_subtype', 'cred
                                           'status', 'language', 'professional_integration', 'specific_title',
                                           'specific_title_english', 'quadrimester',
                                           'session', 'attribution_procedure']
-FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant']
+FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant', 'common_title',
+                                               'common_title_english']
 FIELDS_FOR_LEARNING_COMPONENT_COMPARISON = ['acronym', 'real_classes', 'planned_classes']
 DEFAULT_VALUE_FOR_NONE = '-'
 LEARNING_COMPONENT_YEAR = 'learning_component_year'
@@ -46,18 +47,6 @@ def get_keys(list1, list2):
         if k not in keys:
             keys.append(k)
     return sorted(keys, key=ugettext_lazy)
-
-
-def _get_changed_values(data_obj1, data_obj2, included_keys, model):
-    changed_values = {}
-    for key, value in data_obj1.items():
-        if key not in included_keys:
-            continue
-        try:
-            changed_values.update({key: get_value(model, data_obj2, key)})
-        except KeyError:
-            raise KeyError('Invalid key for learning_unit_year compare')
-    return changed_values
 
 
 def get_value(model, data, field_name):
