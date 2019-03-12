@@ -10,6 +10,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-12 11:35+0100\n"
+"POT-Creation-Date: 2019-03-12 10:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2232,7 +2233,6 @@ msgstr ""
 
 #: business/education_group.py:59 models/education_group_year.py:418
 #: models/enums/offer_year_entity_type.py:33
-#: templates/blocks/navbar_top.html:144
 #: templates/education_group/identification_group_details.html:37
 #: templates/education_group/identification_training_details.html:96
 msgid "Management entity"

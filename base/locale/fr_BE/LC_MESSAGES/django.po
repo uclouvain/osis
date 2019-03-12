@@ -9,6 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-03-12 10:19+0100\n"
 "POT-Creation-Date: 2019-03-12 11:35+0100\n"
 "PO-Revision-Date: 2019-02-27 15:13+0100\n"
 "Last-Translator: \n"
@@ -423,7 +424,7 @@ msgstr "Actions"
 #: models/learning_unit_year.py:239
 #: templates/learning_unit/by_activity.html:109
 #: templates/learning_unit/by_external.html:67
-#: tests/forms/test_learning_unit_postponement.py:557
+#: tests/forms/test_learning_unit_postponement.py:556
 msgid "Active"
 msgstr "Actif"
 
@@ -5622,3 +5623,4 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:163
 msgid "yes,no"
 msgstr "oui,non"
+
