@@ -1605,5 +1605,5 @@ class TestLearningUnitComparison(TestCase):
     def test_learning_unit_comparison(self):
         response = self.client.get(reverse(learning_unit_comparison, args=[self.learning_unit_year.pk]))
         self.assertTemplateUsed(response, 'learning_unit/comparison.html')
-        self.assertEqual(response.context['previous'], [])
-        self.assertEqual(response.context['next'], [])
+        self.assertEqual(response.context['previous'], {})
+        self.assertEqual(response.context['next'], {})
