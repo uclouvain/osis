@@ -27,8 +27,9 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import get_object_or_404, render
 
+from attribution import models as mdl_attribution
 from base import models as mdl
-from base.business.learning_unit import get_no_summary_responsible_teachers, CMS_LABEL_PEDAGOGY_FR_ONLY, \
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
     get_cms_label_data, CMS_LABEL_PEDAGOGY
 from base.business.learning_units import perms
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
@@ -60,7 +61,7 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
     context['teaching_materials'] = teaching_material.find_by_learning_unit_year(learning_unit_year)
     context['can_edit_information'] = perm_to_edit
     context['can_edit_summary_locked_field'] = perms.can_edit_summary_locked_field(learning_unit_year, person)
-    context['summary_responsibles'] = find_all_summary_responsibles_by_learning_unit_year(learning_unit_year)
-    context['other_teachers'] = get_no_summary_responsible_teachers(learning_unit_year, context['summary_responsibles'])
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
+    context['teachers'] = mdl_attribution.attribution.search(learning_unit_year=learning_unit_year)\
+        .order_by('tutor__person')
     return render(request, template, context)
