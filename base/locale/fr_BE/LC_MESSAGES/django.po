@@ -3741,7 +3741,7 @@ msgstr "T=Tricherie"
 
 #: templates/learning_unit/blocks/panel/educational_informations.html:34
 msgid "Teacher(s)"
-msgstr "Autre(s) enseignant(s)"
+msgstr "Enseignant(s)"
 
 #: models/enums/academic_calendar_type.py:55
 msgid "Teaching charge application"
