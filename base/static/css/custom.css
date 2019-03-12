@@ -246,3 +246,11 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
     width: 7px;
     cursor: col-resize;
 }
+
+/* limit the max width of the username is the navbar.*/
+#bt_user {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+}
