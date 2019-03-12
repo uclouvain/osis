@@ -61,6 +61,7 @@ from base.models.enums import learning_container_year_types, organization_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.attribution_procedure import INTERNAL_TEAM, EXTERNAL
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.person import Person
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
@@ -1453,7 +1454,8 @@ class TestLearningUnitComparison(TestCase):
                 "status": self.learning_unit_year.status,
                 "language": self.learning_unit_year.language.pk,
                 "campus": self.learning_unit_year.campus.id,
-                "periodicity": self.learning_unit_year.periodicity
+                "periodicity": self.learning_unit_year.periodicity,
+                "attribution_procedure": self.learning_unit_year.attribution_procedure
             },
             "learning_unit": {
                 "id": self.learning_unit_year.learning_unit.id
@@ -1511,9 +1513,16 @@ class TestLearningUnitComparison(TestCase):
 
     def test_learning_unit_proposal_comparison_with_learning_unit_year_data_modified(self):
         self.learning_unit_year.credits = 6
+        self.learning_unit_year.periodicity = learning_unit_year_periodicity.BIENNIAL_EVEN
+        self.learning_unit_year.attribution_procedure = EXTERNAL
         self.learning_unit_year.save()
         response = self.client.get(reverse(learning_unit_proposal_comparison, args=[self.learning_unit_year.pk]))
-        self.assertEqual(response.context['learning_unit_year_fields'], [[_('Credits'), 5, 6.00]])
+        self.assertListEqual(response.context['learning_unit_year_fields'],
+                             [
+                                 [_('Credits'), 5, 6.00],
+                                 [_('Periodicity'), _("Annual"), _("biennial even")],
+                                 [_('Procedure'), "-", _("External")]
+                             ])
 
     def test_learning_unit_proposal_comparison_with_learning_container_year_data_modified(self):
         self.learning_unit_year.learning_container_year.common_title = "common title modified"
@@ -1525,8 +1534,6 @@ class TestLearningUnitComparison(TestCase):
         )
 
     def test_learning_unit_proposal_comparison_with_volumes_data_modified(self):
-        self.learning_unit_proposal.initial_data["learning_component_years"][0]["planned_classes"] = 11
-        self.learning_unit_proposal.save()
         EntityContainerYearFactory(
             learning_container_year=self.learning_unit_year.learning_container_year,
             type=entity_container_year_link_type.REQUIREMENT_ENTITY
