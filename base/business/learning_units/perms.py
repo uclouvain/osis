@@ -477,19 +477,20 @@ def _is_learning_unit_year_summary_editable(*, learning_unit_year_id, **kwargs):
         value = LearningUnitYear.objects.filter(pk=learning_unit_year_id, summary_locked=False).exists()
 
     if not value:
-        raise PermissionDenied(_("The learning unit is not summary editable."))
+        raise PermissionDenied(_("The learning unit's description fiche is not editable."))
 
 
 def _is_calendar_opened_to_edit_educational_information(*, learning_unit_year_id, **kwargs):
     submission_dates = find_educational_information_submission_dates_of_learning_unit_year(learning_unit_year_id)
+    permission_denied_msg = _("Not in period to edit description fiche.")
     if not submission_dates:
-        raise PermissionDenied(_("Not in period to edit educational information."))
+        raise PermissionDenied(permission_denied_msg)
 
     now = datetime.datetime.now(tz=get_tzinfo())
     value = convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
         convert_date_to_datetime(submission_dates["end_date"])
     if not value:
-        raise PermissionDenied(_("Not in period to edit educational information."))
+        raise PermissionDenied(permission_denied_msg)
 
 
 def find_educational_information_submission_dates_of_learning_unit_year(learning_unit_year_id):
