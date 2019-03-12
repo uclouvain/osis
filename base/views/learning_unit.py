@@ -241,7 +241,6 @@ def learning_class_year_edit(request, learning_unit_year_id):
     return render(request, "learning_unit/class_edit.html", context)
 
 
-@waffle_flag('learning_unit_proposal_update')
 @login_required
 def learning_unit_proposal_comparison(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(
