@@ -70,7 +70,7 @@ from base.tests.factories.learning_unit_component import LearningUnitComponentFa
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
@@ -990,12 +990,7 @@ class TestLearningUnitProposalDisplay(TestCase):
 class TestCreationProposalCancel(TestCase):
 
     def setUp(self):
-        a_user_central = UserFactory()
-        permission = Permission.objects.get(codename='can_propose_learningunit')
-        a_user_central.user_permissions.add(permission)
-        a_user_central.user_permissions.add(Permission.objects.get(codename='can_access_learningunit'))
-        self.a_person_central_manager = PersonFactory(user=a_user_central)
-        self.a_person_central_manager.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
+        self.a_person_central_manager = CentralManagerFactory('can_propose_learningunit', 'can_access_learningunit')
         self.client.force_login(self.a_person_central_manager.user)
 
     @mock.patch('base.views.learning_units.perms.business_perms.is_eligible_for_cancel_of_proposal',
