@@ -1409,7 +1409,8 @@ class TestLearningUnitComparison(TestCase):
             subtype=learning_unit_year_subtypes.FULL,
             academic_year=current_academic_year,
             learning_container_year=learning_container_year,
-            campus=CampusFactory(organization=an_organization, is_administration=True)
+            campus=CampusFactory(organization=an_organization, is_administration=True),
+            periodicity=learning_unit_year_periodicity.BIENNIAL_ODD
         )
 
         today = datetime.date.today()
@@ -1520,7 +1521,7 @@ class TestLearningUnitComparison(TestCase):
         self.assertListEqual(response.context['learning_unit_year_fields'],
                              [
                                  [_('Credits'), 5, 6.00],
-                                 [_('Periodicity'), _("Annual"), _("biennial even")],
+                                 [_('Periodicity'), _("biennial odd"), _("biennial even")],
                                  [_('Procedure'), "-", _("External")]
                              ])
 
