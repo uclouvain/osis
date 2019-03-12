@@ -1558,50 +1558,6 @@ class TestLearningUnitProposalComparison(TestCase):
         self.assertEqual(response.context['components'][1][1][_('Volume Q1')], [10, 0])
         self.assertEqual(response.context['components'][1][1][_('Volume Q2')], [10, 0])
 
-
-class TestLearningUnitComparison(TestCase):
-    def setUp(self):
-        self.user = UserFactory()
-        PersonFactory(user=self.user)
-        self.client.force_login(self.user)
-        current_academic_year = create_current_academic_year()
-        an_organization = OrganizationFactory(type=organization_type.MAIN)
-        learning_container_year = LearningContainerYearFactory(
-            academic_year=current_academic_year,
-            container_type=learning_container_year_types.COURSE,
-            common_title="common_title"
-        )
-        self.learning_unit_year = LearningUnitYearFakerFactory(
-            credits=5,
-            subtype=learning_unit_year_subtypes.FULL,
-            academic_year=current_academic_year,
-            learning_container_year=learning_container_year,
-            campus=CampusFactory(organization=an_organization, is_administration=True),
-            periodicity=learning_unit_year_periodicity.BIENNIAL_ODD
-        )
-
-        today = datetime.date.today()
-
-        an_entity = EntityFactory(organization=an_organization)
-        self.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL, start_date=today,
-                                                   end_date=today.replace(year=today.year + 1))
-        self.learning_component_year_lecturing = LearningComponentYearFactory(
-            type=learning_component_year_type.LECTURING,
-            acronym="TP",
-            learning_container_year=learning_container_year
-        )
-        self.learning_component_year_practical = LearningComponentYearFactory(
-            type=learning_component_year_type.PRACTICAL_EXERCISES,
-            acronym="PP",
-            learning_container_year=learning_container_year
-        )
-        self.learning_unit_component_lecturing = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year,
-            learning_component_year=self.learning_component_year_lecturing)
-        self.learning_unit_component_practical = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year,
-            learning_component_year=self.learning_component_year_practical)
-
     def test_learning_unit_comparison(self):
         response = self.client.get(reverse(learning_unit_comparison, args=[self.learning_unit_year.pk]))
         self.assertTemplateUsed(response, 'learning_unit/comparison.html')
