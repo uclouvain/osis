@@ -28,9 +28,7 @@ from unittest import mock
 
 import factory.fuzzy
 import reversion
-from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
-from django.contrib.messages.api import get_messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden
@@ -55,14 +53,17 @@ from base.forms.learning_unit_specifications import LearningUnitSpecificationsFo
 from base.models import learning_unit_component
 from base.models import learning_unit_component_class
 from base.models.academic_year import AcademicYear
-from base.models.enums import entity_container_year_link_type, active_status, education_group_categories
+from base.models.enums import entity_container_year_link_type, active_status, education_group_categories, \
+    learning_component_year_type, proposal_type, proposal_state
 from base.models.enums import entity_type
 from base.models.enums import internship_subtypes
 from base.models.enums import learning_container_year_types, organization_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
+from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.person import Person
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -79,19 +80,20 @@ from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_component import LearningUnitComponentFactory, \
     LecturingLearningUnitComponentFactory, PracticalLearningUnitComponentFactory
 from base.tests.factories.learning_unit_component_class import LearningUnitComponentClassFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_unit_year, \
-    LearningUnitYearPartimFactory, LearningUnitYearFullFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
+    LearningUnitYearFullFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
-from base.views.learning_unit import learning_unit_comparison, learning_unit_specifications_edit
 from base.views.learning_unit import learning_unit_components, learning_class_year_edit, learning_unit_specifications, \
-    get_charge_repartition_warning_messages, learning_unit_attributions
+    get_charge_repartition_warning_messages, learning_unit_attributions, learning_unit_comparison, \
+    learning_unit_proposal_comparison
+from base.views.learning_unit import learning_unit_specifications_edit
 from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.search import learning_units_service_course
@@ -366,7 +368,7 @@ class LearningUnitViewTestCase(TestCase):
 
         context = response.context
         self.assertTemplateUsed(response, 'learning_units.html')
-        self.assertEqual(context['academic_years'].count(), len(self.academic_years)+1)
+        self.assertEqual(context['academic_years'].count(), len(self.academic_years) + 1)
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
         self.assertEqual(len(context['types']),
                          len(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES))
@@ -1158,110 +1160,6 @@ class LearningUnitViewTestCase(TestCase):
                                        kwargs={'learning_unit_year_id': learning_unit_year.id})
         self.assertRedirects(response, expected_redirection, fetch_redirect_response=False)
 
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_learning_unit_comparison(self, mock_program_manager):
-        mock_program_manager.return_value = True
-        learning_unit = LearningUnitFactory()
-        learning_unit_year_1 = create_learning_unit_year(self.current_academic_year,
-                                                         'title', learning_unit)
-        previous_academic_yr = AcademicYearFactory(year=self.current_academic_year.year - 1)
-        previous_learning_unit_year = create_learning_unit_year(previous_academic_yr,
-                                                                'previous title',
-                                                                learning_unit)
-        next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year + 1)
-
-        next_learning_unit_year = create_learning_unit_year(next_academic_yr,
-                                                            'next title',
-                                                            learning_unit)
-
-        response = self.client.get(reverse(learning_unit_comparison, args=[learning_unit_year_1.pk]))
-
-        self.assertTemplateUsed(response, 'learning_unit/comparison.html')
-        self.assertEqual(response.context['previous_academic_yr'], previous_academic_yr)
-        self.assertEqual(response.context['next_academic_yr'], next_academic_yr)
-        self.assertEqual(response.context['fields'], ['specific_title'])
-        self.assertEqual(response.context['previous_values'],
-                         {'specific_title': previous_learning_unit_year.specific_title})
-        self.assertEqual(response.context['next_values'], {'specific_title': next_learning_unit_year.specific_title})
-
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_learning_unit_no_comparison_possible(self, mock_program_manager):
-        mock_program_manager.return_value = True
-        learning_unit_year_1 = create_learning_unit_year(self.current_academic_year,
-                                                         'title', LearningUnitFactory())
-        AcademicYearFactory(year=self.current_academic_year.year - 1)
-        AcademicYearFactory(year=self.current_academic_year.year + 1)
-
-        response = self.client.get(reverse(learning_unit_comparison, args=[learning_unit_year_1.pk]))
-
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.ERROR, msg_level)
-
-        self.assertIn(_('Comparison impossible! No learning unit to compare to'), msg)
-
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_learning_unit_comparison_no_previous_luy(self, mock_program_manager):
-        mock_program_manager.return_value = True
-        learning_unit = LearningUnitFactory()
-        learning_unit_year_1 = create_learning_unit_year(self.current_academic_year,
-                                                         'title', learning_unit)
-        previous_academic_yr = AcademicYearFactory(year=self.current_academic_year.year - 1)
-
-        next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year + 1)
-        next_learning_unit_year = create_learning_unit_year(next_academic_yr,
-                                                            'next title',
-                                                            learning_unit)
-
-        response = self.client.get(reverse(learning_unit_comparison, args=[learning_unit_year_1.pk]))
-
-        self.assertTemplateUsed(response, 'learning_unit/comparison.html')
-        self.assertEqual(response.context['previous_academic_yr'], previous_academic_yr)
-        self.assertEqual(response.context['next_academic_yr'], next_academic_yr)
-        self.assertEqual(response.context['fields'], ['specific_title'])
-        self.assertEqual(response.context['next_values'], {'specific_title': next_learning_unit_year.specific_title})
-
-        msgs = list(response.context['messages'])
-        self.assertEqual(len(msgs), 1)
-        msg = msgs[0]
-        self.assertEqual(
-            str(msg),
-            _("The learning unit does not exist for the academic year %(anac)s") % {'anac': str(previous_academic_yr)}
-        )
-        self.assertEqual(msg.level, messages.INFO)
-
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_learning_unit_comparison_no_next_luy(self, mock_program_manager):
-        mock_program_manager.return_value = True
-        learning_unit = LearningUnitFactory()
-        learning_unit_year_1 = create_learning_unit_year(self.current_academic_year,
-                                                         'title', learning_unit)
-        previous_academic_yr = AcademicYearFactory(year=self.current_academic_year.year - 1)
-        previous_learning_unit_year = create_learning_unit_year(previous_academic_yr, 'previous title', learning_unit)
-
-        next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year + 1)
-
-        response = self.client.get(reverse(learning_unit_comparison, args=[learning_unit_year_1.pk]))
-
-        self.assertTemplateUsed(response, 'learning_unit/comparison.html')
-        self.assertEqual(response.context['previous_academic_yr'], previous_academic_yr)
-        self.assertEqual(response.context['next_academic_yr'], next_academic_yr)
-        self.assertEqual(response.context['fields'], ['specific_title'])
-        self.assertEqual(
-            response.context['previous_values'],
-            {'specific_title': previous_learning_unit_year.specific_title}
-        )
-
-        msgs = list(response.context['messages'])
-        self.assertEqual(len(msgs), 1)
-        msg = msgs[0]
-        self.assertEqual(
-            str(msg),
-            _("The learning unit does not exist for the academic year %(anac)s") % {'anac': str(next_academic_yr)}
-        )
-        self.assertEqual(msg.level, messages.INFO)
-
 
 class TestCreateXls(TestCase):
     def setUp(self):
@@ -1472,3 +1370,221 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
         self.assertListEqual(msgs, [_("The sum of volumes for the partims for professor %(tutor)s is superior to the "
                                       "volume of parent learning unit for this professor") % {
                                         "tutor": tutor_name_with_function}])
+
+
+class TestLearningUnitProposalComparison(TestCase):
+    def setUp(self):
+        self.user = SuperUserFactory()
+        PersonFactory(user=self.user)
+        self.client.force_login(self.user)
+        self.current_academic_year = create_current_academic_year()
+        an_organization = OrganizationFactory(type=organization_type.MAIN)
+        learning_container_year = LearningContainerYearFactory(
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            common_title="common_title",
+            type_declaration_vacant=DO_NOT_ASSIGN
+        )
+        self.learning_unit_year = LearningUnitYearFakerFactory(
+            credits=5,
+            subtype=learning_unit_year_subtypes.FULL,
+            academic_year=self.current_academic_year,
+            learning_container_year=learning_container_year,
+            campus=CampusFactory(organization=an_organization, is_administration=True),
+            periodicity=learning_unit_year_periodicity.BIENNIAL_ODD
+        )
+
+        self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
+        self.previous_learning_container_year = LearningContainerYearFactory(
+            academic_year=self.previous_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            common_title="previous_common_title",
+            type_declaration_vacant=DO_NOT_ASSIGN,
+            learning_container=self.learning_unit_year.learning_container_year.learning_container
+        )
+        self.previous_learning_unit_year = LearningUnitYearFakerFactory(
+            credits=5,
+            subtype=learning_unit_year_subtypes.FULL,
+            academic_year=self.previous_academic_year,
+            learning_container_year=self.previous_learning_container_year,
+            periodicity=learning_unit_year_periodicity.BIENNIAL_ODD,
+            learning_unit=self.learning_unit_year.learning_unit
+        )
+        self.next_academic_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
+        self.next_learning_container_year = LearningContainerYearFactory(
+            academic_year=self.next_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            common_title="next_common_title",
+            type_declaration_vacant=DO_NOT_ASSIGN,
+            learning_container=self.learning_unit_year.learning_container_year.learning_container
+        )
+        self.next_learning_unit_year = LearningUnitYearFakerFactory(
+            credits=5,
+            subtype=learning_unit_year_subtypes.FULL,
+            academic_year=self.next_academic_year,
+            learning_container_year=self.next_learning_container_year,
+            periodicity=learning_unit_year_periodicity.BIENNIAL_ODD,
+            learning_unit=self.learning_unit_year.learning_unit
+        )
+        today = datetime.date.today()
+
+        an_entity = EntityFactory(organization=an_organization)
+        self.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL, start_date=today,
+                                                   end_date=today.replace(year=today.year + 1))
+        self.learning_component_year_lecturing = LearningComponentYearFactory(
+            type=learning_component_year_type.LECTURING,
+            acronym="TP",
+            learning_container_year=learning_container_year
+        )
+        self.learning_component_year_practical = LearningComponentYearFactory(
+            type=learning_component_year_type.PRACTICAL_EXERCISES,
+            acronym="PP",
+            learning_container_year=learning_container_year
+        )
+        self.learning_unit_component_lecturing = LearningUnitComponentFactory(
+            learning_unit_year=self.learning_unit_year,
+            learning_component_year=self.learning_component_year_lecturing)
+        self.learning_unit_component_practical = LearningUnitComponentFactory(
+            learning_unit_year=self.learning_unit_year,
+            learning_component_year=self.learning_component_year_practical)
+
+        self.entity_container_year = EntityContainerYearFactory(
+            learning_container_year=self.learning_unit_year.learning_container_year,
+            type=entity_container_year_link_type.REQUIREMENT_ENTITY
+        )
+
+        initial_data_expected = {
+            "learning_container_year": {
+                "id": self.learning_unit_year.learning_container_year.id,
+                "acronym": self.learning_unit_year.acronym,
+                "common_title": self.learning_unit_year.learning_container_year.common_title,
+                "common_title_english": self.learning_unit_year.learning_container_year.common_title_english,
+                "container_type": self.learning_unit_year.learning_container_year.container_type,
+                "in_charge": self.learning_unit_year.learning_container_year.in_charge,
+                "type_declaration_vacant": self.learning_unit_year.learning_container_year.type_declaration_vacant
+            },
+            "learning_unit_year": {
+                "id": self.learning_unit_year.id,
+                "acronym": self.learning_unit_year.acronym,
+                "specific_title": self.learning_unit_year.specific_title,
+                "specific_title_english": self.learning_unit_year.specific_title_english,
+                "internship_subtype": self.learning_unit_year.internship_subtype,
+                "credits": self.learning_unit_year.credits,
+                "quadrimester": self.learning_unit_year.quadrimester,
+                "status": self.learning_unit_year.status,
+                "language": self.learning_unit_year.language.pk,
+                "campus": self.learning_unit_year.campus.id,
+                "periodicity": self.learning_unit_year.periodicity,
+                "attribution_procedure": self.learning_unit_year.attribution_procedure
+            },
+            "learning_unit": {
+                "id": self.learning_unit_year.learning_unit.id
+            },
+            "entities": {
+                entity_container_year_link_type.REQUIREMENT_ENTITY: self.entity_container_year.id,
+                entity_container_year_link_type.ALLOCATION_ENTITY: None,
+                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
+                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
+            },
+            "learning_component_years": [
+                {"id": self.learning_component_year_lecturing.id,
+                 "type": "LECTURING",
+                 "planned_classes": self.learning_component_year_lecturing.planned_classes,
+                 "hourly_volume_partial_q1": self.learning_component_year_lecturing.hourly_volume_partial_q1,
+                 "hourly_volume_partial_q2": self.learning_component_year_lecturing.hourly_volume_partial_q2,
+                 "hourly_volume_total_annual": self.learning_component_year_lecturing.hourly_volume_total_annual
+                 },
+                {"id": self.learning_component_year_practical.id,
+                 "type": "PRACTICAL_EXERCISES",
+                 "planned_classes": self.learning_component_year_practical.planned_classes,
+                 "hourly_volume_partial_q1": self.learning_component_year_practical.hourly_volume_partial_q1,
+                 "hourly_volume_partial_q2": self.learning_component_year_practical.hourly_volume_partial_q2,
+                 "hourly_volume_total_annual": self.learning_component_year_practical.hourly_volume_total_annual
+                 }
+            ],
+            "volumes": {
+                'LECTURING': {
+                    'VOLUME_Q1': self.learning_component_year_lecturing.hourly_volume_partial_q1,
+                    'VOLUME_Q2': self.learning_component_year_lecturing.hourly_volume_partial_q2,
+                    'REAL_CLASSES': 1,
+                    'VOLUME_TOTAL': self.learning_component_year_practical.hourly_volume_total_annual,
+                    'PLANNED_CLASSES': self.learning_component_year_lecturing.planned_classes,
+                    'VOLUME_REQUIREMENT_ENTITY': 120.0,
+                    'VOLUME_TOTAL_REQUIREMENT_ENTITIES': 120.0,
+                    'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0,
+                    'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0
+                },
+                'PRACTICAL_EXERCISES': {
+                    'VOLUME_Q1': 10, 'VOLUME_Q2': 10, 'REAL_CLASSES': 0, 'VOLUME_TOTAL': 20,
+                    'PLANNED_CLASSES': 0, 'VOLUME_REQUIREMENT_ENTITY': 0,
+                    'VOLUME_TOTAL_REQUIREMENT_ENTITIES': 0,
+                    'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0,
+                    'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0
+                }
+            }
+        }
+        self.learning_unit_proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year,
+                                                                  initial_data=initial_data_expected,
+                                                                  type=proposal_type.ProposalType.MODIFICATION.name,
+                                                                  state=proposal_state.ProposalState.FACULTY.name)
+
+    def test_learning_unit_proposal_comparison_without_data_modified(self):
+        response = self.client.get(reverse(learning_unit_proposal_comparison, args=[self.learning_unit_year.pk]))
+        self.assertTemplateUsed(response, 'learning_unit/proposal_comparison.html')
+        self.assertEqual(response.context['learning_unit_year_fields'], [])
+
+    def test_learning_unit_proposal_comparison_with_learning_unit_year_data_modified(self):
+        self.learning_unit_year.credits = 6
+        self.learning_unit_year.periodicity = learning_unit_year_periodicity.BIENNIAL_EVEN
+        self.learning_unit_year.attribution_procedure = EXTERNAL
+        self.learning_unit_year.save()
+        response = self.client.get(reverse(learning_unit_proposal_comparison, args=[self.learning_unit_year.pk]))
+        self.assertListEqual(response.context['learning_unit_year_fields'],
+                             [
+                                 [_('Credits'), 5, 6.00],
+                                 [_('Periodicity'), _("biennial odd"), _("biennial even")],
+                                 [_('Procedure'), "-", _("External")]
+                             ])
+
+    def test_learning_unit_proposal_comparison_with_learning_container_year_data_modified(self):
+        self.learning_unit_year.learning_container_year.common_title = "common title modified"
+        self.learning_unit_year.learning_container_year.type_declaration_vacant = VACANT_NOT_PUBLISH
+        self.learning_unit_year.learning_container_year.save()
+        response = self.client.get(reverse(learning_unit_proposal_comparison, args=[self.learning_unit_year.pk]))
+        self.assertEqual(
+            response.context['learning_container_year_fields'],
+            [
+                [_('Decision'), _("Do not assign"), _("Vacant not publish")],
+                [_('Common title'), "common_title", "common title modified"]
+            ]
+        )
+
+    def test_learning_unit_proposal_comparison_with_volumes_data_modified(self):
+        EntityContainerYearFactory(
+            learning_container_year=self.learning_unit_year.learning_container_year,
+            type=entity_container_year_link_type.ALLOCATION_ENTITY
+        )
+        response = self.client.get(reverse(learning_unit_proposal_comparison, args=[self.learning_unit_year.pk]))
+        self.assertEqual(response.context['components'][1][0], _("Practical exercises"))
+        self.assertEqual(response.context['components'][1][1][_('Volume total annual')], [20, 0])
+        self.assertEqual(response.context['components'][1][1][_('Planned classes')], [0, 1])
+        self.assertEqual(response.context['components'][1][1][_('Volume Q1')], [10, 0])
+        self.assertEqual(response.context['components'][1][1][_('Volume Q2')], [10, 0])
+
+    def test_learning_unit_comparison_whitout_previous_and_next(self):
+        self.previous_learning_unit_year.delete()
+        response = self.client.get(reverse(learning_unit_comparison, args=[self.learning_unit_year.pk]))
+        self.assertTemplateUsed(response, 'learning_unit/comparison.html')
+        self.assertEqual(response.context['previous'], {})
+        self.assertNotEqual(response.context['next'], {})
+        self.next_learning_unit_year.delete()
+        response = self.client.get(reverse(learning_unit_comparison, args=[self.learning_unit_year.pk]))
+        self.assertTemplateUsed(response, 'learning_unit/comparison.html')
+        self.assertEqual(response.context['previous'], {})
+        self.assertEqual(response.context['next'], {})
+
+    def test_learning_unit_comparison(self):
+        response = self.client.get(reverse(learning_unit_comparison, args=[self.learning_unit_year.pk]))
+        self.assertTemplateUsed(response, 'learning_unit/comparison.html')
+        self.assertNotEqual(response.context['previous'], {})
+        self.assertNotEqual(response.context['next'], {})

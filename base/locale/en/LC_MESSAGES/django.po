@@ -387,17 +387,18 @@ msgstr ""
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:36
 #: templates/education_group/tab_admission_conditions.html:123
 #: templates/education_group/tab_admission_conditions.html:172
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:46
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:40
 msgid "Actions"
 msgstr ""
 
 #: business/learning_unit.py:72 business/learning_unit_proposal.py:69
-#: business/learning_units/comparison.py:89
+#: business/learning_units/comparison.py:67
 #: business/learning_units/xls_comparison.py:177 business/proposal_xls.py:47
 #: models/enums/active_status.py:34 models/learning_unit_year.py:121
 #: models/learning_unit_year.py:239
 #: templates/learning_unit/by_activity.html:109
 #: templates/learning_unit/by_external.html:67
+#: templates/learning_unit/comparison.html:54
 #: tests/forms/test_learning_unit_postponement.py:557
 msgid "Active"
 msgstr ""
@@ -569,7 +570,7 @@ msgstr ""
 msgid "Apply postponement on learning unit year"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:130
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:136
 msgid "Are you certain that you want to cancel the learning unit proposal ?"
 msgstr ""
 
@@ -790,7 +791,7 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:105
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:111
 msgid "Cancel the proposal"
 msgstr ""
 
@@ -880,7 +881,7 @@ msgstr ""
 msgid "Clinical internship"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:133
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:139
 #: templates/learning_unit/class_edit.html:34
 #: templates/learning_unit/component_edit.html:33
 #: templates/my_osis/my_message.html:60
@@ -944,11 +945,8 @@ msgstr ""
 #: business/learning_units/edition.py:449 business/proposal_xls.py:55
 #: models/learning_container_year.py:59
 #: tests/business/learning_units/test_edition.py:247
+#: tests/views/test_learning_unit.py:1558
 msgid "Common title"
-msgstr ""
-
-#: tests/views/test_learning_unit.py:1202 views/learning_unit.py:302
-msgid "Comparison impossible! No learning unit to compare to"
 msgstr ""
 
 #: business/learning_units/xls_comparison.py:61
@@ -997,7 +995,7 @@ msgstr ""
 msgid "Consolidate"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:107
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:113
 msgid "Consolidate the proposal"
 msgstr ""
 
@@ -1067,6 +1065,7 @@ msgstr ""
 #: models/learning_unit_year.py:115 templates/learning_unit/by_activity.html:85
 #: templates/learning_unit/by_external.html:49
 #: templates/learning_unit/identification.html:84
+#: tests/views/test_learning_unit.py:1544
 msgid "Credits"
 msgstr ""
 
@@ -1101,7 +1100,7 @@ msgid "Day"
 msgstr ""
 
 #: business/proposal_xls.py:40 business/proposal_xls.py:72
-#: models/learning_container_year.py:67
+#: models/learning_container_year.py:67 tests/views/test_learning_unit.py:1557
 msgid "Decision"
 msgstr ""
 
@@ -1121,7 +1120,7 @@ msgstr ""
 
 #: templates/education_group/blocks/contacts_general_informations_ul.html:46
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:94
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:114
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:120
 #: templates/organization/organization_address.html:72
 #: templates/organization/organization_address.html:74
 msgid "Delete"
@@ -1229,6 +1228,7 @@ msgid "Dissertation submission"
 msgstr ""
 
 #: models/enums/vacant_declaration_type.py:41
+#: tests/views/test_learning_unit.py:1557
 msgid "Do not assign"
 msgstr ""
 
@@ -1307,7 +1307,7 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:99
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:105
 msgid "Edit the proposal"
 msgstr ""
 
@@ -1530,6 +1530,7 @@ msgstr ""
 #: forms/learning_unit/external_learning_unit.py:52
 #: models/enums/attribution_procedure.py:35
 #: models/enums/learning_container_year_types.py:44
+#: tests/views/test_learning_unit.py:1546
 msgid "External"
 msgstr ""
 
@@ -1642,6 +1643,7 @@ msgstr ""
 #: templates/learning_unit/comparison.html:27
 #: templates/learning_unit/external/create.html:28
 #: templates/learning_unit/learning_unit_layout.html:10
+#: templates/learning_unit/proposal_comparison.html:27
 #: templates/learning_unit/simple/creation.html:29
 #: templates/learning_unit/volumes_management.html:30
 #: templates/learning_units.html:31 templates/offer/breadcrumb.html:27
@@ -1821,7 +1823,7 @@ msgid "In proposal"
 msgstr ""
 
 #: business/learning_unit_proposal.py:70
-#: business/learning_units/comparison.py:89
+#: business/learning_units/comparison.py:67
 #: business/learning_units/xls_comparison.py:179
 #: models/enums/active_status.py:35 models/learning_unit_year.py:239
 #: templates/learning_unit/by_activity.html:113
@@ -1838,6 +1840,7 @@ msgid "Industrial partner"
 msgstr ""
 
 #: business/learning_units/xls_comparison.py:392
+#: templates/learning_unit/proposal_comparison.html:43
 msgid "Initial data"
 msgstr ""
 
@@ -1984,7 +1987,7 @@ msgstr ""
 msgid "LU"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:202 tests/views/test_learning_unit.py:413
+#: forms/learning_unit/search_form.py:202 tests/views/test_learning_unit.py:415
 msgid "LU_ERRORS_INVALID_REGEX_SYNTAX"
 msgstr ""
 
@@ -2038,15 +2041,16 @@ msgid "Learning achievements"
 msgstr ""
 
 #: business/proposal_xls.py:65 models/education_group_year.py:224
-#: models/learning_unit_year.py:138
+#: models/learning_unit_year.py:138 templates/learning_unit/comparison.html:110
 #: templates/learning_unit/external/read.html:59
-#: templates/learning_unit/identification.html:191 views/learning_unit.py:327
+#: templates/learning_unit/identification.html:191
 msgid "Learning location"
 msgstr ""
 
 #: templates/learning_unit/breadcrumb.html:30
-#: templates/learning_unit/comparison.html:29 templates/learning_units.html:62
-#: templates/my_osis/profile.html:131
+#: templates/learning_unit/comparison.html:31
+#: templates/learning_unit/proposal_comparison.html:31
+#: templates/learning_units.html:62 templates/my_osis/profile.html:131
 #: templates/student/exams_enrollments.html:48
 msgid "Learning unit"
 msgstr ""
@@ -2075,6 +2079,7 @@ msgstr ""
 #: templates/learning_unit/comparison.html:28
 #: templates/learning_unit/external/create.html:29
 #: templates/learning_unit/learning_unit_layout.html:11
+#: templates/learning_unit/proposal_comparison.html:28
 #: templates/learning_unit/simple/creation.html:30
 #: templates/learning_unit/summary_list.html:70
 #: templates/learning_unit/volumes_management.html:31
@@ -2083,9 +2088,9 @@ msgstr ""
 msgid "Learning units"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:40
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:80
 #: templates/learning_unit/blocks/modal/modal_comparison.html:30
-#: templates/learning_unit/comparison.html:30
+#: templates/learning_unit/comparison.html:32
 msgid "Learning units comparison"
 msgstr ""
 
@@ -2095,6 +2100,11 @@ msgstr ""
 
 #: business/learning_unit.py:53 business/learning_unit.py:55
 msgid "Learning units list"
+msgstr ""
+
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:85
+#: templates/learning_unit/proposal_comparison.html:32
+msgid "Learning units proposal comparison"
 msgstr ""
 
 #: business/learning_unit.py:54
@@ -2432,13 +2442,13 @@ msgstr ""
 
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:85
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:75
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:69
 #: templatetags/education_group.py:150
 #: tests/templatetags/test_education_group.py:431
 msgid "Modify"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:80
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:74
 msgid "Modify end date"
 msgstr ""
 
@@ -2516,10 +2526,14 @@ msgstr ""
 msgid "New learning unit"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:55
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:49
 #: templates/learning_unit/simple/creation.html:37
 #: templates/learning_unit/simple/creation_partim.html:4
 msgid "New partim"
+msgstr ""
+
+#: templates/learning_unit/proposal_comparison.html:44
+msgid "New value"
 msgstr ""
 
 #: templates/home.html:62
@@ -2534,6 +2548,10 @@ msgstr ""
 #: business/learning_units/xls_comparison.py:413
 #: business/learning_units/xls_comparison.py:418
 #: business/learning_units/xls_comparison.py:419
+#: templates/learning_unit/proposal_comparison.html:52
+#: templates/learning_unit/proposal_comparison.html:54
+#: templates/learning_unit/proposal_comparison.html:73
+#: templates/learning_unit/proposal_comparison.html:76
 #: tests/business/learning_units/test_xls_comparison.py:104
 #: tests/business/learning_units/test_xls_comparison.py:114
 #: tests/business/learning_units/test_xls_comparison.py:115
@@ -2568,7 +2586,8 @@ msgstr ""
 msgid "No data"
 msgstr ""
 
-#: templates/learning_unit/comparison.html:107
+#: templates/learning_unit/comparison.html:149
+#: templates/learning_unit/proposal_comparison.html:103
 msgid "No difference"
 msgstr ""
 
@@ -2844,7 +2863,7 @@ msgstr ""
 msgid "Partim"
 msgstr ""
 
-#: business/proposal_xls.py:76 templates/learning_unit/comparison.html:65
+#: business/proposal_xls.py:76 templates/learning_unit/comparison.html:81
 #: templates/learning_unit/identification.html:57
 msgid "Partims"
 msgstr ""
@@ -2867,6 +2886,7 @@ msgstr ""
 
 #: business/learning_unit.py:71 business/proposal_xls.py:40
 #: business/proposal_xls.py:52 models/learning_unit_year.py:143
+#: tests/views/test_learning_unit.py:1545
 msgid "Periodicity"
 msgstr ""
 
@@ -2891,6 +2911,8 @@ msgstr ""
 #: business/proposal_xls.py:84 business/proposal_xls.py:94
 #: forms/learning_unit/edition_volume.py:87
 #: forms/learning_unit/edition_volume.py:107
+#: tests/views/test_learning_unit.py:1570 views/learning_unit.py:286
+#: views/learning_unit.py:385 views/learning_unit.py:401
 msgid "Planned classes"
 msgstr ""
 
@@ -2919,6 +2941,7 @@ msgstr ""
 
 #: models/enums/component_type.py:33
 #: models/enums/learning_component_year_type.py:33
+#: tests/views/test_learning_unit.py:1568
 msgid "Practical exercises"
 msgstr ""
 
@@ -2977,6 +3000,7 @@ msgid "Printable title"
 msgstr ""
 
 #: business/proposal_xls.py:73 models/learning_unit_year.py:130
+#: tests/views/test_learning_unit.py:1546
 msgid "Procedure"
 msgstr ""
 
@@ -3169,11 +3193,11 @@ msgstr ""
 msgid "Publication contact entity"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:89
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:95
 msgid "Put in proposal"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:92
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:98
 msgid "Put in proposal for ending date"
 msgstr ""
 
@@ -3426,7 +3450,7 @@ msgid "Sector"
 msgstr ""
 
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:55
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:66
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:60
 msgid "Select"
 msgstr ""
 
@@ -3924,12 +3948,6 @@ msgid ""
 "year %(academic_year)s"
 msgstr ""
 
-#: tests/views/test_learning_unit.py:1230
-#: tests/views/test_learning_unit.py:1261 views/learning_unit.py:311
-#, python-format
-msgid "The learning unit does not exist for the academic year %(anac)s"
-msgstr ""
-
 #: forms/learning_unit/learning_unit_postponement.py:322
 #: views/learning_units/update.py:184
 #, python-format
@@ -4077,7 +4095,7 @@ msgstr ""
 msgid "The start date must be equals or lower than the end date"
 msgstr ""
 
-#: tests/views/test_learning_unit.py:1472 views/learning_unit.py:372
+#: tests/views/test_learning_unit.py:1370 views/learning_unit.py:525
 #, python-format
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
@@ -4473,6 +4491,7 @@ msgid "Vacant"
 msgstr ""
 
 #: models/enums/vacant_declaration_type.py:40
+#: tests/views/test_learning_unit.py:1557
 msgid "Vacant not publish"
 msgstr ""
 
@@ -4540,16 +4559,22 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:66
 #: forms/learning_unit/edition_volume.py:84
+#: tests/views/test_learning_unit.py:1571 views/learning_unit.py:289
+#: views/learning_unit.py:386 views/learning_unit.py:402
 msgid "Volume Q1"
 msgstr ""
 
 #: forms/learning_unit/edition_volume.py:73
 #: forms/learning_unit/edition_volume.py:84
+#: tests/views/test_learning_unit.py:1572 views/learning_unit.py:291
+#: views/learning_unit.py:387 views/learning_unit.py:403
 msgid "Volume Q2"
 msgstr ""
 
 #: forms/learning_unit/edition_volume.py:84
 #: forms/learning_unit/edition_volume.py:106
+#: tests/views/test_learning_unit.py:1569 views/learning_unit.py:284
+#: views/learning_unit.py:384 views/learning_unit.py:400
 msgid "Volume total annual"
 msgstr ""
 
@@ -4633,6 +4658,10 @@ msgstr ""
 #: business/learning_units/xls_comparison.py:413
 #: business/learning_units/xls_comparison.py:418
 #: business/learning_units/xls_comparison.py:419
+#: templates/learning_unit/proposal_comparison.html:51
+#: templates/learning_unit/proposal_comparison.html:53
+#: templates/learning_unit/proposal_comparison.html:72
+#: templates/learning_unit/proposal_comparison.html:75
 #: tests/business/learning_units/test_xls_comparison.py:104
 #: tests/business/learning_units/test_xls_comparison.py:114
 #: tests/business/learning_units/test_xls_comparison.py:115
@@ -4902,10 +4931,12 @@ msgid "bibliography"
 msgstr ""
 
 #: models/enums/learning_unit_year_periodicity.py:34
+#: tests/views/test_learning_unit.py:1545
 msgid "biennial even"
 msgstr ""
 
 #: models/enums/learning_unit_year_periodicity.py:35
+#: tests/views/test_learning_unit.py:1545
 msgid "biennial odd"
 msgstr ""
 
@@ -4982,7 +5013,7 @@ msgstr ""
 msgid "comment (internal)"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:134
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:140
 #: templates/learning_unit/blocks/modal/modal_confirm_delete.html:37
 #: templates/learning_unit/teaching_material/modal_delete.html:34
 msgid "confirm"
@@ -5142,7 +5173,7 @@ msgstr ""
 msgid "minimum constraint"
 msgstr ""
 
-#: business/learning_units/comparison.py:85
+#: business/learning_units/comparison.py:63
 #: business/learning_units/edition.py:478 business/xls.py:37
 #: forms/learning_unit/learning_unit_postponement.py:402
 #: models/enums/activity_presence.py:35 models/enums/internship_presence.py:35
@@ -5400,7 +5431,7 @@ msgstr ""
 msgid "volume total global"
 msgstr ""
 
-#: business/learning_units/comparison.py:85
+#: business/learning_units/comparison.py:63
 #: business/learning_units/edition.py:478 business/xls.py:37
 #: forms/learning_unit/learning_unit_postponement.py:402
 #: models/enums/activity_presence.py:34 models/enums/internship_presence.py:34
@@ -5422,6 +5453,12 @@ msgstr ""
 #: templates/education_group/blocks/content_minor_major_option_table.html:43
 #: templates/education_group/blocks/table_utilizations.html:59
 #: templates/education_group/blocks/table_utilizations.html:75
+#: templates/learning_unit/comparison.html:58
+#: templates/learning_unit/comparison.html:60
+#: templates/learning_unit/comparison.html:62
+#: templates/learning_unit/comparison.html:135
+#: templates/learning_unit/comparison.html:137
+#: templates/learning_unit/comparison.html:139
 #: templates/learning_unit/identification.html:103
 #: templates/learning_unit/identification.html:160
 #: templates/learning_unit/identification.html:163
