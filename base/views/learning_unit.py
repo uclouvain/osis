@@ -357,11 +357,11 @@ def learning_unit_comparison(request, learning_unit_year_id):
     previous_academic_year = mdl.academic_year.find_academic_year_by_year(learning_unit_year.academic_year.year - 1)
     if previous_academic_year:
         previous_learning_unit_year = _get_learning_unit_year(previous_academic_year, learning_unit_year)
-        previous_context = get_full_context(previous_learning_unit_year)
+        previous_context = get_full_context(previous_learning_unit_year) if previous_learning_unit_year else {}
     next_academic_year = mdl.academic_year.find_academic_year_by_year(learning_unit_year.academic_year.year + 1)
     if next_academic_year:
         next_learning_unit_year = _get_learning_unit_year(next_academic_year, learning_unit_year)
-        next_context = get_full_context(next_learning_unit_year)
+        next_context = get_full_context(next_learning_unit_year) if next_learning_unit_year else {}
     context = build_context_comparison(current_context, learning_unit_year, next_context, previous_context)
     return render(request, "learning_unit/comparison.html", context)
 

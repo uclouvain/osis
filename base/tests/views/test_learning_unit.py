@@ -368,7 +368,7 @@ class LearningUnitViewTestCase(TestCase):
 
         context = response.context
         self.assertTemplateUsed(response, 'learning_units.html')
-        self.assertEqual(context['academic_years'].count(), len(self.academic_years)+1)
+        self.assertEqual(context['academic_years'].count(), len(self.academic_years) + 1)
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
         self.assertEqual(len(context['types']),
                          len(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES))
@@ -1377,10 +1377,10 @@ class TestLearningUnitProposalComparison(TestCase):
         self.user = SuperUserFactory()
         PersonFactory(user=self.user)
         self.client.force_login(self.user)
-        current_academic_year = create_current_academic_year()
+        self.current_academic_year = create_current_academic_year()
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         learning_container_year = LearningContainerYearFactory(
-            academic_year=current_academic_year,
+            academic_year=self.current_academic_year,
             container_type=learning_container_year_types.COURSE,
             common_title="common_title",
             type_declaration_vacant=DO_NOT_ASSIGN
@@ -1388,12 +1388,44 @@ class TestLearningUnitProposalComparison(TestCase):
         self.learning_unit_year = LearningUnitYearFakerFactory(
             credits=5,
             subtype=learning_unit_year_subtypes.FULL,
-            academic_year=current_academic_year,
+            academic_year=self.current_academic_year,
             learning_container_year=learning_container_year,
             campus=CampusFactory(organization=an_organization, is_administration=True),
             periodicity=learning_unit_year_periodicity.BIENNIAL_ODD
         )
 
+        self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
+        self.previous_learning_container_year = LearningContainerYearFactory(
+            academic_year=self.previous_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            common_title="previous_common_title",
+            type_declaration_vacant=DO_NOT_ASSIGN,
+            learning_container=self.learning_unit_year.learning_container_year.learning_container
+        )
+        self.previous_learning_unit_year = LearningUnitYearFakerFactory(
+            credits=5,
+            subtype=learning_unit_year_subtypes.FULL,
+            academic_year=self.previous_academic_year,
+            learning_container_year=self.previous_learning_container_year,
+            periodicity=learning_unit_year_periodicity.BIENNIAL_ODD,
+            learning_unit=self.learning_unit_year.learning_unit
+        )
+        self.next_academic_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
+        self.next_learning_container_year = LearningContainerYearFactory(
+            academic_year=self.next_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            common_title="next_common_title",
+            type_declaration_vacant=DO_NOT_ASSIGN,
+            learning_container=self.learning_unit_year.learning_container_year.learning_container
+        )
+        self.next_learning_unit_year = LearningUnitYearFakerFactory(
+            credits=5,
+            subtype=learning_unit_year_subtypes.FULL,
+            academic_year=self.next_academic_year,
+            learning_container_year=self.next_learning_container_year,
+            periodicity=learning_unit_year_periodicity.BIENNIAL_ODD,
+            learning_unit=self.learning_unit_year.learning_unit
+        )
         today = datetime.date.today()
 
         an_entity = EntityFactory(organization=an_organization)
@@ -1456,12 +1488,14 @@ class TestLearningUnitProposalComparison(TestCase):
             },
             "learning_component_years": [
                 {"id": self.learning_component_year_lecturing.id,
+                 "type": "LECTURING",
                  "planned_classes": self.learning_component_year_lecturing.planned_classes,
                  "hourly_volume_partial_q1": self.learning_component_year_lecturing.hourly_volume_partial_q1,
                  "hourly_volume_partial_q2": self.learning_component_year_lecturing.hourly_volume_partial_q2,
                  "hourly_volume_total_annual": self.learning_component_year_lecturing.hourly_volume_total_annual
                  },
                 {"id": self.learning_component_year_practical.id,
+                 "type": "PRACTICAL_EXERCISES",
                  "planned_classes": self.learning_component_year_practical.planned_classes,
                  "hourly_volume_partial_q1": self.learning_component_year_practical.hourly_volume_partial_q1,
                  "hourly_volume_partial_q2": self.learning_component_year_practical.hourly_volume_partial_q2,
@@ -1537,8 +1571,20 @@ class TestLearningUnitProposalComparison(TestCase):
         self.assertEqual(response.context['components'][1][1][_('Volume Q1')], [10, 0])
         self.assertEqual(response.context['components'][1][1][_('Volume Q2')], [10, 0])
 
-    def test_learning_unit_comparison(self):
+    def test_learning_unit_comparison_whitout_previous_and_next(self):
+        self.previous_learning_unit_year.delete()
+        response = self.client.get(reverse(learning_unit_comparison, args=[self.learning_unit_year.pk]))
+        self.assertTemplateUsed(response, 'learning_unit/comparison.html')
+        self.assertEqual(response.context['previous'], {})
+        self.assertNotEqual(response.context['next'], {})
+        self.next_learning_unit_year.delete()
         response = self.client.get(reverse(learning_unit_comparison, args=[self.learning_unit_year.pk]))
         self.assertTemplateUsed(response, 'learning_unit/comparison.html')
         self.assertEqual(response.context['previous'], {})
         self.assertEqual(response.context['next'], {})
+
+    def test_learning_unit_comparison(self):
+        response = self.client.get(reverse(learning_unit_comparison, args=[self.learning_unit_year.pk]))
+        self.assertTemplateUsed(response, 'learning_unit/comparison.html')
+        self.assertNotEqual(response.context['previous'], {})
+        self.assertNotEqual(response.context['next'], {})

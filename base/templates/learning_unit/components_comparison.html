@@ -46,11 +46,11 @@
                             </tr>
                         </table>
                     </td>
-                    {% if previous %}
+                    {% if previous.components %}
                         {% changed_label previous.components|get_item:key|get_item:title|default:'0' other=values|default:'0' %}
                     {% endif %}
                     {% changed_label values|default:'0' %}
-                    {% if next %}
+                    {% if next.components %}
                         {% changed_label next.components|get_item:key|get_item:title|default:'0' other=values|default:'0' %}
                     {% endif %}
                 </tr>
