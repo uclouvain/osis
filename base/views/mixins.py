@@ -73,6 +73,7 @@ class RulesRequiredMixin(UserPassesTestMixin):
 
 class AjaxTemplateMixin:
     ajax_template_suffix = "_inner"
+    partial_reload = None
 
     def get_template_names(self):
         template_names = super().get_template_names()
@@ -105,12 +106,14 @@ class AjaxTemplateMixin:
 
     def _ajax_response(self):
         # When the form is saved, we return only the url, not all the template
-        if self.request.is_ajax():
-            response = {"success": True}
-            url = self.get_success_url()
-            if url:
-                response['success_url'] = url
-            return JsonResponse(response)
+        # if self.request.is_ajax():
+        response = {"success": True}
+        url = self.get_success_url()
+        if url:
+            response['success_url'] = url
+        if self.partial_reload:
+            response['partial_reload'] = self.partial_reload
+        return JsonResponse(response)
 
 
 class DeleteViewWithDependencies(FlagMixin, RulesRequiredMixin, AjaxTemplateMixin, DeleteView):

@@ -1,6 +1,9 @@
 function redirect_after_success(modal, xhr) {
     $(modal).modal('toggle');
-    if (xhr.hasOwnProperty('success_url')) {
+    if(xhr.hasOwnProperty('partial_reload')) {
+        $(xhr["partial_reload"]).load(xhr["success_url"]);
+    }
+    else if (xhr.hasOwnProperty('success_url')) {
         window.location.href = xhr["success_url"];
     }
     else {
@@ -9,7 +12,7 @@ function redirect_after_success(modal, xhr) {
 }
 
 var formAjaxSubmit = function (form, modal) {
-    $(form).submit(function (e) {
+    form.submit(function (e) {
         // Added preventDefaut so as to not add anchor "href" to address bar
         e.preventDefault();
 
@@ -62,6 +65,8 @@ $(".trigger_modal").click(function () {
 
     $('#form-modal-ajax-content').load(url, function () {
         bindTextArea();
-        formAjaxSubmit('#form-modal-body form', '#form-ajax-modal');
+        // Make the template more flexible to find the first form
+        let form = $(this).find('form').first()
+        formAjaxSubmit(form, '#form-ajax-modal');
     });
 });
