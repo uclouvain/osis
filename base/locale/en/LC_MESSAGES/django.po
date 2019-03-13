@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-13 13:12+0100\n"
+"POT-Creation-Date: 2019-03-13 13:34+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -888,14 +888,13 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: models/education_group_year.py:476 models/external_learning_unit_year.py:89
-#: templates/education_group/blocks/academic_offer_info.html:46
+#: models/external_learning_unit_year.py:89
 msgid "Co-graduation"
 msgstr ""
 
 #: models/education_group_year.py:484
 #: templates/education_group/blocks/academic_offer_info.html:50
-msgid "Co-graduation coefficient"
+msgid "Co-graduation total coefficient"
 msgstr ""
 
 #: tests/business/test_learning_unit_xls.py:171
@@ -918,6 +917,11 @@ msgstr ""
 #: templates/learning_unit/identification.html:47
 #: templates/learning_unit/summary_list.html:77
 msgid "Code"
+msgstr ""
+
+#: models/education_group_year.py:476
+#: templates/education_group/blocks/academic_offer_info.html:46
+msgid "Code co-graduation inter CfB"
 msgstr ""
 
 #: templates/education_group/blocks/content_default_table.html:76
