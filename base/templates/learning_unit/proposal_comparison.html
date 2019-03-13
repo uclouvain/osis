@@ -68,11 +68,13 @@
                             </td>
                         </tr>
                     {% endfor %}
-                    <tr style="border-top: groove">
-                        <td class="table_header">{{ campus.0 }}</td>
-                        <td>{{ campus.1|default_if_none:'-' }}</td>
-                        <td>{{ campus.2|default_if_none:'-' }}</td>
-                    </tr>
+                    {% if campus %}
+                        <tr style="border-top: groove">
+                            <td class="table_header">{{ campus.0 }}</td>
+                            <td>{{ campus.1|default_if_none:'-' }}</td>
+                            <td>{{ campus.2|default_if_none:'-' }}</td>
+                        </tr>
+                    {% endif %}
                     {% for entity in entities_fields %}
                         <tr {% if forloop.first %} style="border-top: groove"{% endif %}>
                             <td class="table_header">{{ entity.0 }}</td>

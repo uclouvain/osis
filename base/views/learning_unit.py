@@ -255,8 +255,11 @@ def learning_unit_proposal_comparison(request, learning_unit_year_id):
     context = dict({'learning_unit_year': learning_unit_year})
     context['learning_container_year_fields'] = get_learning_container_year_comparison_context(initial_data,
                                                                                                learning_unit_year)
-    context['campus'] = [learning_unit_year._meta.get_field('campus').verbose_name,
-                         initial_learning_unit_year.campus.name, learning_unit_year.campus.name]
+    context['campus'] = [
+        learning_unit_year._meta.get_field('campus').verbose_name,
+        initial_learning_unit_year.campus.name,
+        learning_unit_year.campus.name]\
+        if initial_learning_unit_year.campus.name != learning_unit_year.campus.name else []
     context['entities_fields'] = get_all_entities_comparison_context(initial_data, learning_unit_year)
     context['learning_unit_year_fields'] = learning_unit_year_fields
     components = get_components_identification(learning_unit_year)
