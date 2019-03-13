@@ -223,13 +223,13 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
 }
 
 .sidenav {
-    padding-top: 100px;
+    padding-top: 70px;
     height: 100%;
     width: 100%;
     background-color: #ffffff;
     border-top-width: thin;
     overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: auto;
     padding-bottom: 50px;
 }
 
@@ -240,7 +240,17 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
 
 #split-bar {
     height: 100%;
-    background-color: lightgrey;
-    width: 1px;
+    border-left-color: lightgrey;
+    border-left-style: solid;
+    border-left-width: 1px;
+    width: 7px;
     cursor: col-resize;
+}
+
+/* limit the max width of the username is the navbar.*/
+#bt_user {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
 }

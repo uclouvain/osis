@@ -86,7 +86,7 @@ from base.tests.factories.learning_unit_component_class import LearningUnitCompo
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
     LearningUnitYearFullFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
@@ -107,14 +107,14 @@ from reference.tests.factories.language import LanguageFactory
 
 @override_flag('learning_unit_create', active=True)
 class LearningUnitViewCreateFullTestCase(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         LanguageFactory(code='FR')
-        self.current_academic_year = create_current_academic_year()
-        self.url = reverse('learning_unit_create', kwargs={'academic_year_id': self.current_academic_year.id})
-        self.user = UserFactory()
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
-        PersonFactory(user=self.user)
+        cls.current_academic_year = create_current_academic_year()
+        cls.url = reverse('learning_unit_create', kwargs={'academic_year_id': cls.current_academic_year.id})
+        cls.user = PersonWithPermissionsFactory("can_access_learningunit", "can_create_learningunit").user
+
+    def setUp(self):
         self.client.force_login(self.user)
 
     def test_create_full_form_when_user_not_logged(self):
@@ -320,68 +320,47 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         self.assertRedirects(response, url_to_redirect)
 
 
+# TODO Split this test based on functionality
 class LearningUnitViewTestCase(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         today = datetime.date.today()
-        self.academic_year_1 = AcademicYearFactory.build(start_date=today.replace(year=today.year + 1),
-                                                         end_date=today.replace(year=today.year + 2),
-                                                         year=today.year + 1)
-        self.academic_year_2 = AcademicYearFactory.build(start_date=today.replace(year=today.year + 2),
-                                                         end_date=today.replace(year=today.year + 3),
-                                                         year=today.year + 2)
-        self.academic_year_3 = AcademicYearFactory.build(start_date=today.replace(year=today.year + 3),
-                                                         end_date=today.replace(year=today.year + 4),
-                                                         year=today.year + 3)
-        self.academic_year_4 = AcademicYearFactory.build(start_date=today.replace(year=today.year + 4),
-                                                         end_date=today.replace(year=today.year + 5),
-                                                         year=today.year + 4)
-        self.academic_year_5 = AcademicYearFactory.build(start_date=today.replace(year=today.year + 5),
-                                                         end_date=today.replace(year=today.year + 6),
-                                                         year=today.year + 5)
-        self.academic_year_6 = AcademicYearFactory.build(start_date=today.replace(year=today.year + 6),
-                                                         end_date=today.replace(year=today.year + 7),
-                                                         year=today.year + 6)
-        self.current_academic_year = AcademicYearFactory(start_date=today,
-                                                         end_date=today.replace(year=today.year + 1),
-                                                         year=today.year)
-        super(AcademicYear, self.academic_year_1).save()
-        super(AcademicYear, self.academic_year_2).save()
-        super(AcademicYear, self.academic_year_3).save()
-        super(AcademicYear, self.academic_year_4).save()
-        super(AcademicYear, self.academic_year_5).save()
-        super(AcademicYear, self.academic_year_6).save()
-        self.learning_container_yr = LearningContainerYearFactory(academic_year=self.current_academic_year)
-        self.learning_component_yr = LearningComponentYearFactory(learning_container_year=self.learning_container_yr,
-                                                                  hourly_volume_total_annual=10,
-                                                                  hourly_volume_partial_q1=5,
-                                                                  hourly_volume_partial_q2=5)
-        self.organization = OrganizationFactory(type=organization_type.MAIN)
-        self.country = CountryFactory()
-        self.entity = EntityFactory(country=self.country, organization=self.organization)
-        self.entity_2 = EntityFactory(country=self.country, organization=self.organization)
-        self.entity_3 = EntityFactory(country=self.country, organization=self.organization)
-        self.entity_container_yr = EntityContainerYearFactory(learning_container_year=self.learning_container_yr,
-                                                              type=entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                                              entity=self.entity)
-        self.entity_version = EntityVersionFactory(entity=self.entity, entity_type=entity_type.SCHOOL,
-                                                   start_date=today - datetime.timedelta(days=1),
-                                                   end_date=today.replace(year=today.year + 1))
-        self.entity_version_2 = EntityVersionFactory(entity=self.entity_2, entity_type=entity_type.INSTITUTE,
-                                                     start_date=today - datetime.timedelta(days=20),
-                                                     end_date=today.replace(year=today.year + 1))
-        self.entity_version_3 = EntityVersionFactory(entity=self.entity_3, entity_type=entity_type.FACULTY,
-                                                     start_date=today - datetime.timedelta(days=50),
-                                                     end_date=today.replace(year=today.year + 1))
+        cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
 
-        self.campus = CampusFactory(organization=self.organization, is_administration=True)
-        self.language = LanguageFactory(code='FR')
-        self.a_superuser = SuperUserFactory()
-        self.person = PersonFactory(user=self.a_superuser)
-        self.user = UserFactory()
-        PersonFactory(user=self.user)
-        PersonEntityFactory(person=self.person, entity=self.entity)
-        PersonEntityFactory(person=self.person, entity=self.entity_2)
-        PersonEntityFactory(person=self.person, entity=self.entity_3)
+        cls.learning_container_yr = LearningContainerYearFactory(academic_year=cls.current_academic_year)
+        cls.learning_component_yr = LearningComponentYearFactory(learning_container_year=cls.learning_container_yr,
+                                                                 hourly_volume_total_annual=10,
+                                                                 hourly_volume_partial_q1=5,
+                                                                 hourly_volume_partial_q2=5)
+        cls.organization = OrganizationFactory(type=organization_type.MAIN)
+        cls.country = CountryFactory()
+
+        cls.entities = EntityFactory.create_batch(3, country=cls.country, organization=cls.organization)
+
+        cls.entity_container_yr = EntityContainerYearFactory(
+            learning_container_year=cls.learning_container_yr,
+            type=entity_container_year_link_type.REQUIREMENT_ENTITY,
+            entity=cls.entities[0]
+        )
+        cls.entity_version = EntityVersionFactory(entity=cls.entities[0], entity_type=entity_type.SCHOOL,
+                                                  start_date=today - datetime.timedelta(days=1),
+                                                  end_date=today.replace(year=today.year + 1))
+        cls.entity_version_2 = EntityVersionFactory(entity=cls.entities[1], entity_type=entity_type.INSTITUTE,
+                                                    start_date=today - datetime.timedelta(days=20),
+                                                    end_date=today.replace(year=today.year + 1))
+        cls.entity_version_3 = EntityVersionFactory(entity=cls.entities[2], entity_type=entity_type.FACULTY,
+                                                    start_date=today - datetime.timedelta(days=50),
+                                                    end_date=today.replace(year=today.year + 1))
+
+        cls.campus = CampusFactory(organization=cls.organization, is_administration=True)
+        cls.language = LanguageFactory(code='FR')
+        cls.a_superuser = SuperUserFactory()
+        cls.person = PersonFactory(user=cls.a_superuser)
+
+        for entity in cls.entities:
+            PersonEntityFactory(person=cls.person, entity=entity)
+
+    def setUp(self):
         self.client.force_login(self.a_superuser)
 
     def test_learning_units_search(self):
@@ -389,7 +368,7 @@ class LearningUnitViewTestCase(TestCase):
 
         context = response.context
         self.assertTemplateUsed(response, 'learning_units.html')
-        self.assertEqual(context['academic_years'].count(), 7)
+        self.assertEqual(context['academic_years'].count(), len(self.academic_years)+1)
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
         self.assertEqual(len(context['types']),
                          len(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES))
