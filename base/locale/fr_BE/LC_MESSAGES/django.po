@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-13 10:42+0100\n"
+"POT-Creation-Date: 2019-03-13 13:34+0100\n"
 "PO-Revision-Date: 2019-02-27 15:13+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -423,7 +423,7 @@ msgstr "Actions"
 #: models/learning_unit_year.py:239
 #: templates/learning_unit/by_activity.html:109
 #: templates/learning_unit/by_external.html:67
-#: tests/forms/test_learning_unit_postponement.py:556
+#: tests/forms/test_learning_unit_postponement.py:557
 msgid "Active"
 msgstr "Actif"
 
@@ -919,15 +919,14 @@ msgstr "Stage clinique"
 msgid "Close"
 msgstr "Fermer"
 
-#: models/education_group_year.py:476 models/external_learning_unit_year.py:89
-#: templates/education_group/blocks/academic_offer_info.html:46
+#: models/external_learning_unit_year.py:89
 msgid "Co-graduation"
 msgstr "Co-diplomation"
 
 #: models/education_group_year.py:484
 #: templates/education_group/blocks/academic_offer_info.html:50
-msgid "Co-graduation coefficient"
-msgstr "Coefficient de co-diplomation"
+msgid "Co-graduation total coefficient"
+msgstr "Coefficient total de co-diplômation"
 
 #: tests/business/test_learning_unit_xls.py:171
 msgid "Co-holder"
@@ -950,6 +949,11 @@ msgstr "Co-titulaire"
 #: templates/learning_unit/summary_list.html:77
 msgid "Code"
 msgstr "Code"
+
+#: models/education_group_year.py:476
+#: templates/education_group/blocks/academic_offer_info.html:46
+msgid "Code co-graduation inter CfB"
+msgstr "Code co-diplômation intra CfB"
 
 #: templates/education_group/blocks/content_default_table.html:76
 #: templates/learning_unit/blocks/comment.html:6
@@ -2337,11 +2341,6 @@ msgstr ""
 "Permet d'administrer la liste des responsables de notes qui ont accès à "
 "l'encodage en ligne"
 
-#: templates/academic_actors.html:58
-msgid "Management of the summary responsibles"
-msgstr ""
-"Permet d'administrer la liste des enseignants responsables des fiches descriptives"
-
 #: templates/mandates.html:30 templates/mandates.html:34
 msgid "Mandates"
 msgstr "Mandates"
@@ -3438,6 +3437,8 @@ msgstr "Commande SQL"
 #: templates/education_group/tab_edit_administrative_data.html:92
 #: templates/entity/blocks/educational_summary_calendar_widget.html:39
 #: templates/learning_unit/blocks/save_cancel_buttons.html:11
+#: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:14
+#: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:18
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -3526,8 +3527,7 @@ msgstr "Élément sélectionné"
 
 #: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:60
 msgid "Sent email to remind to update description fiche"
-msgstr ""
-"Envoyer un email de rappel pour la mise à jour des fiches descriptives"
+msgstr "Envoyer un email de rappel pour la mise à jour des fiches descriptives"
 
 #: models/enums/diploma_coorganization.py:36
 msgid "Separate"
@@ -4042,7 +4042,8 @@ msgstr "L'unité d'enseignement a été modifiée."
 #: business/learning_units/perms.py:480
 msgid "The learning unit's description fiche is not editable."
 msgstr ""
-"La mise-à-jour des fiches descriptives est bloquée pour cette unité d'enseignement."
+"La mise-à-jour des fiches descriptives est bloquée pour cette unité "
+"d'enseignement."
 
 #: templates/learning_unit/by_proposal.html:61
 #: templates/learning_unit/by_proposal.html:69
@@ -5460,8 +5461,6 @@ msgstr "rôle (français)"
 #: templates/learning_unit/attribution_inner.html:67
 #: templates/learning_unit/blocks/form/volumes_management_form.html:80
 #: templates/learning_unit/blocks/modal/modal_pedagogy_edit.html:45
-#: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:14
-#: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:18
 #: templates/learning_unit/class_edit.html:53
 #: templates/learning_unit/component_edit.html:53
 #: templates/learning_unit/specifications_edit.html:41
@@ -5616,3 +5615,7 @@ msgstr "oui"
 msgid "yes,no"
 msgstr "oui,non"
 
+#~ msgid "Management of the summary responsibles"
+#~ msgstr ""
+#~ "Permet d'administrer la liste des enseignants responsables des fiches "
+#~ "descriptives"
