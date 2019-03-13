@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-13 10:42+0100\n"
+"POT-Creation-Date: 2019-03-13 13:34+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -887,14 +887,13 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: models/education_group_year.py:476 models/external_learning_unit_year.py:89
-#: templates/education_group/blocks/academic_offer_info.html:46
+#: models/external_learning_unit_year.py:89
 msgid "Co-graduation"
 msgstr ""
 
 #: models/education_group_year.py:484
 #: templates/education_group/blocks/academic_offer_info.html:50
-msgid "Co-graduation coefficient"
+msgid "Co-graduation total coefficient"
 msgstr ""
 
 #: tests/business/test_learning_unit_xls.py:171
@@ -917,6 +916,11 @@ msgstr ""
 #: templates/learning_unit/identification.html:47
 #: templates/learning_unit/summary_list.html:77
 msgid "Code"
+msgstr ""
+
+#: models/education_group_year.py:476
+#: templates/education_group/blocks/academic_offer_info.html:46
+msgid "Code co-graduation inter CfB"
 msgstr ""
 
 #: templates/education_group/blocks/content_default_table.html:76
@@ -2232,6 +2236,7 @@ msgstr ""
 
 #: business/education_group.py:59 models/education_group_year.py:418
 #: models/enums/offer_year_entity_type.py:33
+#: templates/blocks/navbar_top.html:144
 #: templates/education_group/identification_group_details.html:37
 #: templates/education_group/identification_training_details.html:96
 msgid "Management entity"
@@ -2278,10 +2283,6 @@ msgstr ""
 
 #: templates/academic_actors.html:50
 msgid "Management of the scores responsibles managers"
-msgstr ""
-
-#: templates/academic_actors.html:58
-msgid "Management of the summary responsibles"
 msgstr ""
 
 #: templates/mandates.html:30 templates/mandates.html:34
@@ -3357,6 +3358,8 @@ msgstr ""
 #: templates/education_group/tab_edit_administrative_data.html:92
 #: templates/entity/blocks/educational_summary_calendar_widget.html:39
 #: templates/learning_unit/blocks/save_cancel_buttons.html:11
+#: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:14
+#: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:18
 msgid "Save"
 msgstr ""
 
@@ -5271,8 +5274,6 @@ msgstr ""
 #: templates/learning_unit/attribution_inner.html:67
 #: templates/learning_unit/blocks/form/volumes_management_form.html:80
 #: templates/learning_unit/blocks/modal/modal_pedagogy_edit.html:45
-#: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:14
-#: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:18
 #: templates/learning_unit/class_edit.html:53
 #: templates/learning_unit/component_edit.html:53
 #: templates/learning_unit/specifications_edit.html:41
