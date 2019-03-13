@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-19 15:20+0100\n"
+"POT-Creation-Date: 2019-03-12 11:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -87,6 +87,20 @@ msgstr "Suppléant sabbatique"
 msgid "Deputy temporary"
 msgstr "Suppléant temporaire"
 
+#: templates/manage_my_courses/educational_information.html:32
+msgid "Description fiche"
+msgstr "Fiche descriptive"
+
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:12
+#: templates/manage_my_courses/blocks/submission_dates.html:34
+msgid "Description fiche ending"
+msgstr "Fermeture fiches descriptives"
+
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:11
+#: templates/manage_my_courses/blocks/submission_dates.html:29
+msgid "Description fiche opening"
+msgstr "Ouverture fiches descriptives"
+
 #: templates/summary_responsible.html:109
 msgid "Display all tutors for this learning unit"
 msgstr "Afficher tous les enseignants pour ce cours"
@@ -99,20 +113,6 @@ msgstr "Durée"
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:39
 msgid "Editable"
 msgstr "Modifiable"
-
-#: templates/manage_my_courses/educational_information.html:32
-msgid "Educational information"
-msgstr "Infos pédagogiques"
-
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:12
-#: templates/manage_my_courses/blocks/submission_dates.html:34
-msgid "Educational information ending"
-msgstr "Fermeture informations pédagoqiques"
-
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:11
-#: templates/manage_my_courses/blocks/submission_dates.html:29
-msgid "Educational information opening"
-msgstr "Ouverture informations pédagoqiques"
 
 #: templates/summary_responsible.html:86
 msgid "Entity"
@@ -152,8 +152,8 @@ msgstr "Intitulé du cours"
 #: templates/manage_my_courses/educational_information.html:30
 #: templates/manage_my_courses/list_my_courses_summary_editable.html:31
 #: templates/manage_my_courses/list_my_courses_summary_editable.html:36
-msgid "Manage educational information"
-msgstr "Gérer les informations pédagogiques"
+msgid "Manage description fiche"
+msgstr "Gérer les fiches descriptives"
 
 #: templates/summary_responsible.html:80
 msgid "No result"
@@ -216,17 +216,16 @@ msgstr "Sous-type"
 #: templates/summary_responsible_edit.html:31
 #: templates/summary_responsible_edit.html:47
 msgid "Summary responsible"
-msgstr "Responsable des infos pédagogiques"
+msgstr "Responsable des fiches descriptives"
 
 #: templates/summary_responsible.html:32 templates/summary_responsible.html:36
 msgid "Summary responsibles"
-msgstr "Responsables des infos pédagogiques"
+msgstr "Responsables des fiches descriptives"
 
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:48
-msgid "There is no course for which you can edit educational information"
+msgid "There is no course for which you can edit description fiche"
 msgstr ""
-"Il n'existe aucun cours dont vous pouvez modifier les informations "
-"pédagogiques."
+"Il n'existe aucun cours dont vous pouvez modifier les fiches descriptives."
 
 #: business/xls_build.py:44
 #: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:9

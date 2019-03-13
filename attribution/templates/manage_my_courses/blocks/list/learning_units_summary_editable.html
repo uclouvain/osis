@@ -8,8 +8,8 @@
                 <th>{% trans 'Courses' %}</th>
                 <th>{% trans 'Title' %}</th>
                 <th>{% trans 'Requirement entity' %}</th>
-                <th>{% trans 'Educational information opening' %}</th>
-                <th>{% trans 'Educational information ending' %}</th>
+                <th>{% trans 'Description fiche opening' %}</th>
+                <th>{% trans 'Description fiche ending' %}</th>
                 <th>{% trans 'Summary responsible' %}</th>
                 <th>{% trans 'Editable' %}</th>
             </tr>
@@ -20,7 +20,7 @@
                 <tr data-id="{{luy.id}}" data-value="{{luy.acronym}}">
                     <td>{{ luy.academic_year }}</td>
                     <td>
-                        <a href="{% url "view_educational_information" learning_unit_year_id=luy.id %}" title="{% trans 'Manage educational information' %}">
+                        <a href="{% url "view_educational_information" learning_unit_year_id=luy.id %}" title="{% trans 'Manage description fiche' %}">
                             {{ luy.acronym }}
                         </a>
                     </td>
@@ -45,6 +45,6 @@
     </table>
 {% else %}
     <div id="no_attribution_warning_message" class="alert alert-warning" role="alert">
-        {% trans 'There is no course for which you can edit educational information' %}
+        {% trans 'There is no course for which you can edit description fiche' %}
     </div>
 {% endif %}
