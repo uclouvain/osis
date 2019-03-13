@@ -10,6 +10,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-12 10:19+0100\n"
+"POT-Creation-Date: 2019-03-12 11:35+0100\n"
 "PO-Revision-Date: 2019-02-27 15:13+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -423,7 +424,7 @@ msgstr "Actions"
 #: models/learning_unit_year.py:239
 #: templates/learning_unit/by_activity.html:109
 #: templates/learning_unit/by_external.html:67
-#: tests/forms/test_learning_unit_postponement.py:557
+#: tests/forms/test_learning_unit_postponement.py:556
 msgid "Active"
 msgstr "Actif"
 
@@ -1183,6 +1184,19 @@ msgstr "Délibération"
 msgid "Description"
 msgstr "Description"
 
+#: templates/learning_unit/blocks/tabs.html:62
+#: templates/learning_unit/proposal/tabs.html:55
+msgid "Description fiche"
+msgstr "Fiche descriptive"
+
+#: templates/learning_units.html:87
+msgid "Description fiche status"
+msgstr "Statut des fiches descriptives"
+
+#: views/institution.py:92
+msgid "Description fiche submission dates updated"
+msgstr "Date de soumission des fiches descriptives mis à jour"
+
 #: templates/education_group/blocks/content_actions.html:43
 #: tests/templatetags/test_education_group.py:219
 #: tests/templatetags/test_education_group.py:220
@@ -1371,18 +1385,9 @@ msgstr ""
 msgid "Education groups"
 msgstr "Organisations de formations"
 
-#: templates/learning_units.html:87
-msgid "Education information status"
-msgstr "Statut des informations pédagogiques"
-
 #: business/education_group.py:45 business/education_group.py:46
 msgid "Education_groups"
 msgstr "Formations"
-
-#: templates/learning_unit/blocks/tabs.html:62
-#: templates/learning_unit/proposal/tabs.html:55
-msgid "Educational information"
-msgstr "Infos pédagogiques"
 
 #: forms/entity_calendar.py:47
 msgid "Educational information ending"
@@ -1391,10 +1396,6 @@ msgstr "Fermeture informations pédagoqiques"
 #: forms/entity_calendar.py:42
 msgid "Educational information opening"
 msgstr "Ouverture informations pédagoqiques"
-
-#: views/institution.py:92
-msgid "Educational information submission dates updated"
-msgstr "Date de soumission des informations pédagogiques mis à jour"
 
 #: templates/home.html:74
 msgid "Elaboration and management of the formation catalogue."
@@ -2337,6 +2338,11 @@ msgstr ""
 "Permet d'administrer la liste des responsables de notes qui ont accès à "
 "l'encodage en ligne"
 
+#: templates/academic_actors.html:58
+msgid "Management of the summary responsibles"
+msgstr ""
+"Permet d'administrer la liste des enseignants responsables des fiches descriptives"
+
 #: templates/mandates.html:30 templates/mandates.html:34
 msgid "Mandates"
 msgstr "Mandates"
@@ -2477,7 +2483,7 @@ msgstr "Modification"
 msgid "Modification made"
 msgstr "Modification apportée"
 
-#: business/learning_units/perms.py:525
+#: business/learning_units/perms.py:526
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
@@ -2693,9 +2699,9 @@ msgstr "Vous ne pouvez pas supprimer cette unité d'enseignement"
 msgid "Not enrolled"
 msgstr "Pas inscrit"
 
-#: business/learning_units/perms.py:486 business/learning_units/perms.py:492
-msgid "Not in period to edit educational information."
-msgstr "Vous n'êtes pas en période d'édition des informations pédagogiques."
+#: business/learning_units/perms.py:485
+msgid "Not in period to edit description fiche."
+msgstr "Vous n'êtes pas en période d'édition des fiches descriptives."
 
 #: business/learning_units/perms.py:72
 msgid "Not in range of years which can be edited by you"
@@ -3519,10 +3525,10 @@ msgstr "Sélectionner tous les messages"
 msgid "Selected element"
 msgstr "Élément sélectionné"
 
-#: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:59
-msgid "Sent email to remind to update educational information"
+#: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:60
+msgid "Sent email to remind to update description fiche"
 msgstr ""
-"Envoyer un email de rappel pour la mise à jour des informations pédagogiques"
+"Envoyer un email de rappel pour la mise à jour des fiches descriptives"
 
 #: models/enums/diploma_coorganization.py:36
 msgid "Separate"
@@ -3718,7 +3724,7 @@ msgstr "Succès"
 msgid "Summary course submission"
 msgstr "Résumé du cours"
 
-#: forms/learning_unit/search_form.py:88
+#: forms/learning_unit/search_form.py:88 templates/academic_actors.html:57
 msgid "Summary responsible(s)"
 msgstr "Responsable(s) des informations"
 
@@ -4043,10 +4049,9 @@ msgid "The learning unit has been updated."
 msgstr "L'unité d'enseignement a été modifiée."
 
 #: business/learning_units/perms.py:480
-msgid "The learning unit is not summary editable."
+msgid "The learning unit's description fiche is not editable."
 msgstr ""
-"La mise-à-jour des informations pédagogiques est bloqué pour cette unité "
-"d'enseignement."
+"La mise-à-jour des fiches descriptives est bloquée pour cette unité d'enseignement."
 
 #: templates/learning_unit/by_proposal.html:61
 #: templates/learning_unit/by_proposal.html:69
@@ -4348,7 +4353,7 @@ msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
 
-#: business/learning_units/perms.py:557
+#: business/learning_units/perms.py:558
 msgid "This learning unit is not eligible for proposal creation/modification"
 msgstr ""
 "Cette unité d'enseignement n'est pas éligible pour une création/modification "
@@ -4917,7 +4922,7 @@ msgstr ""
 msgid "You can't modify learning unit of a previous year"
 msgstr "Vous ne pouvez pas modifier la date de fin pour une année précédente"
 
-#: business/learning_units/perms.py:523
+#: business/learning_units/perms.py:524
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
@@ -5115,7 +5120,7 @@ msgstr "mise-à-jour bloquée pour l'enseignant"
 #: templates/learning_unit/blocks/modal/modal_confirm_delete.html:36
 #: templates/learning_unit/blocks/modal/modal_consolidate.html:40
 #: templates/learning_unit/blocks/modal/modal_force_state.html:41
-#: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:62
+#: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:63
 #: templates/learning_unit/blocks/modal/modal_modification_ask_to_report.html:38
 #: templates/learning_unit/blocks/modal/modal_pedagogy_edit.html:47
 #: templates/learning_unit/blocks/modal/modal_warning_state_modification.html:38
@@ -5599,7 +5604,7 @@ msgstr "volume total global"
 #: templates/learning_unit/blocks/modal/modal_back_to_initial.html:39
 #: templates/learning_unit/blocks/modal/modal_consolidate.html:39
 #: templates/learning_unit/blocks/modal/modal_force_state.html:40
-#: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:60
+#: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:61
 #: templates/learning_unit/blocks/modal/modal_modification_ask_to_report.html:37
 #: templates/learning_unit/blocks/modal/modal_warning_state_modification.html:37
 #: tests/business/learning_units/test_edition.py:186
@@ -5619,10 +5624,3 @@ msgstr "oui"
 msgid "yes,no"
 msgstr "oui,non"
 
-#~ msgid "Management of the summary responsibles"
-#~ msgstr ""
-#~ "Permet d'administrer la liste des enseignants responsables des infos "
-#~ "pédagogiques"
-
-#~ msgid "None"
-#~ msgstr "Aucun"

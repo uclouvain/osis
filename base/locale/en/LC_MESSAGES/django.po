@@ -9,6 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-03-12 11:35+0100\n"
 "POT-Creation-Date: 2019-03-12 10:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
@@ -1149,6 +1150,19 @@ msgstr ""
 msgid "Description"
 msgstr ""
 
+#: templates/learning_unit/blocks/tabs.html:62
+#: templates/learning_unit/proposal/tabs.html:55
+msgid "Description fiche"
+msgstr ""
+
+#: templates/learning_units.html:87
+msgid "Description fiche status"
+msgstr ""
+
+#: views/institution.py:92
+msgid "Description fiche submission dates updated"
+msgstr ""
+
 #: templates/education_group/blocks/content_actions.html:43
 #: tests/templatetags/test_education_group.py:219
 #: tests/templatetags/test_education_group.py:220
@@ -1332,17 +1346,8 @@ msgstr ""
 msgid "Education groups"
 msgstr ""
 
-#: templates/learning_units.html:87
-msgid "Education information status"
-msgstr ""
-
 #: business/education_group.py:45 business/education_group.py:46
 msgid "Education_groups"
-msgstr ""
-
-#: templates/learning_unit/blocks/tabs.html:62
-#: templates/learning_unit/proposal/tabs.html:55
-msgid "Educational information"
 msgstr ""
 
 #: forms/entity_calendar.py:47
@@ -1351,10 +1356,6 @@ msgstr ""
 
 #: forms/entity_calendar.py:42
 msgid "Educational information opening"
-msgstr ""
-
-#: views/institution.py:92
-msgid "Educational information submission dates updated"
 msgstr ""
 
 #: templates/home.html:74
@@ -2232,7 +2233,6 @@ msgstr ""
 
 #: business/education_group.py:59 models/education_group_year.py:418
 #: models/enums/offer_year_entity_type.py:33
-#: templates/blocks/navbar_top.html:144
 #: templates/education_group/identification_group_details.html:37
 #: templates/education_group/identification_training_details.html:96
 msgid "Management entity"
@@ -2279,6 +2279,10 @@ msgstr ""
 
 #: templates/academic_actors.html:50
 msgid "Management of the scores responsibles managers"
+msgstr ""
+
+#: templates/academic_actors.html:58
+msgid "Management of the summary responsibles"
 msgstr ""
 
 #: templates/mandates.html:30 templates/mandates.html:34
@@ -2421,7 +2425,7 @@ msgstr ""
 msgid "Modification made"
 msgstr ""
 
-#: business/learning_units/perms.py:525
+#: business/learning_units/perms.py:526
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr ""
@@ -2633,8 +2637,8 @@ msgstr ""
 msgid "Not enrolled"
 msgstr ""
 
-#: business/learning_units/perms.py:486 business/learning_units/perms.py:492
-msgid "Not in period to edit educational information."
+#: business/learning_units/perms.py:485
+msgid "Not in period to edit description fiche."
 msgstr ""
 
 #: business/learning_units/perms.py:72
@@ -3440,8 +3444,8 @@ msgstr ""
 msgid "Selected element"
 msgstr ""
 
-#: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:59
-msgid "Sent email to remind to update educational information"
+#: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:60
+msgid "Sent email to remind to update description fiche"
 msgstr ""
 
 #: models/enums/diploma_coorganization.py:36
@@ -3638,7 +3642,7 @@ msgstr ""
 msgid "Summary course submission"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:88
+#: forms/learning_unit/search_form.py:88 templates/academic_actors.html:57
 msgid "Summary responsible(s)"
 msgstr ""
 
@@ -3943,7 +3947,7 @@ msgid "The learning unit has been updated."
 msgstr ""
 
 #: business/learning_units/perms.py:480
-msgid "The learning unit is not summary editable."
+msgid "The learning unit's description fiche is not editable."
 msgstr ""
 
 #: templates/learning_unit/by_proposal.html:61
@@ -4213,7 +4217,7 @@ msgstr ""
 msgid "This label %s does not exist"
 msgstr ""
 
-#: business/learning_units/perms.py:557
+#: business/learning_units/perms.py:558
 msgid "This learning unit is not eligible for proposal creation/modification"
 msgstr ""
 
@@ -4754,7 +4758,7 @@ msgstr ""
 msgid "You can't modify learning unit of a previous year"
 msgstr ""
 
-#: business/learning_units/perms.py:523
+#: business/learning_units/perms.py:524
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
@@ -4936,7 +4940,7 @@ msgstr ""
 #: templates/learning_unit/blocks/modal/modal_confirm_delete.html:36
 #: templates/learning_unit/blocks/modal/modal_consolidate.html:40
 #: templates/learning_unit/blocks/modal/modal_force_state.html:41
-#: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:62
+#: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:63
 #: templates/learning_unit/blocks/modal/modal_modification_ask_to_report.html:38
 #: templates/learning_unit/blocks/modal/modal_pedagogy_edit.html:47
 #: templates/learning_unit/blocks/modal/modal_warning_state_modification.html:38
@@ -5411,7 +5415,7 @@ msgstr ""
 #: templates/learning_unit/blocks/modal/modal_back_to_initial.html:39
 #: templates/learning_unit/blocks/modal/modal_consolidate.html:39
 #: templates/learning_unit/blocks/modal/modal_force_state.html:40
-#: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:60
+#: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:61
 #: templates/learning_unit/blocks/modal/modal_modification_ask_to_report.html:37
 #: templates/learning_unit/blocks/modal/modal_warning_state_modification.html:37
 #: tests/business/learning_units/test_edition.py:186
