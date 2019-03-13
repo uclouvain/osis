@@ -48,10 +48,24 @@
                     {% for key in learning_unit_year_fields %}
                         <tr {% if forloop.first %} style="border-top: groove"{% endif %}>
                             <td class="table_header">{{ key.0 }}</td>
-                            <td>{% if key.1 == True %}{% trans 'Yes' %}{% elif key.1 == False %}
-                                {% trans 'No' %}{% else %}{{ key.1|default_if_none:'-'|capfirst }}{% endif %}</td>
-                            <td>{% if key.2 == True %}{% trans 'Yes' %}{% elif key.2 == False %}
-                                {% trans 'No' %}{% else %}{{ key.2|default_if_none:'-'|capfirst }}{% endif %}</td>
+                            <td>
+                                {% if key.1 == True %}
+                                    {% trans 'Yes' %}
+                                {% elif key.1 == False %}
+                                    {% trans 'No' %}
+                                {% else %}
+                                    {{ key.1|default_if_none:'-'|capfirst }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if key.2 == True %}
+                                    {% trans 'Yes' %}
+                                {% elif key.2 == False %}
+                                    {% trans 'No' %}
+                                {% else %}
+                                    {{ key.2|default_if_none:'-'|capfirst }}
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                     <tr style="border-top: groove">
@@ -69,12 +83,24 @@
                     {% for key_lcy in learning_container_year_fields %}
                         <tr {% if forloop.first %} style="border-top: groove"{% endif %}>
                             <td class="table_header">{{ key_lcy.0 }}</td>
-                            <td>{% if key_lcy.1 == True %}{% trans 'Yes' %}{% elif key_lcy.1 == False %}
-                                {% trans 'No' %}{% else %}
-                                {{ key_lcy.1|default_if_none:'-'|capfirst }}{% endif %}</td>
-                            <td>{% if key_lcy.2 == True %}{% trans 'Yes' %}{% elif key_lcy.2 == False %}
-                                {% trans 'No' %}{% else %}
-                                {{ key_lcy.2|default_if_none:'-'|capfirst }}{% endif %}</td>
+                            <td>
+                                {% if key_lcy.1 == True %}
+                                    {% trans 'Yes' %}
+                                {% elif key_lcy.1 == False %}
+                                    {% trans 'No' %}
+                                {% else %}
+                                    {{ key_lcy.1|default_if_none:'-'|capfirst }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if key_lcy.2 == True %}
+                                    {% trans 'Yes' %}
+                                {% elif key_lcy.2 == False %}
+                                    {% trans 'No' %}
+                                {% else %}
+                                    {{ key_lcy.2|default_if_none:'-'|capfirst }}
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                     {% for component in components %}

@@ -76,12 +76,12 @@
                         {% endif %}
                     {% endflag %}
                     {% url "learning_unit_comparison" learning_unit_year_id=learning_unit_year.id as url_lus_comparison %}
-                    <li class="" id="link_lus_comparison">
+                    <li id="link_lus_comparison">
                         <a href="{{ url_lus_comparison }}" data-toggle="tooltip">{% trans 'Learning units comparison' %}</a>
                     </li>
                     {% if proposal %}
                         {% url "learning_unit_proposal_comparison" learning_unit_year_id=learning_unit_year.id as url_proposal_comparison %}
-                        <li class="" id="link_proposal_comparison">
+                        <li id="link_proposal_comparison">
                             <a href="{{ url_proposal_comparison }}" data-toggle="tooltip">{% trans 'Learning units proposal comparison' %}</a>
                         </li>
                     {% endif %}
