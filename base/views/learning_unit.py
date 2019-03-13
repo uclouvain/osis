@@ -252,16 +252,6 @@ def learning_unit_proposal_comparison(request, learning_unit_year_id):
         initial_data,
         learning_unit_year
     )
-    context = dict({'learning_unit_year': learning_unit_year})
-    context['learning_container_year_fields'] = get_learning_container_year_comparison_context(initial_data,
-                                                                                               learning_unit_year)
-    context['campus'] = [
-        learning_unit_year._meta.get_field('campus').verbose_name,
-        initial_learning_unit_year.campus.name,
-        learning_unit_year.campus.name]\
-        if initial_learning_unit_year.campus.name != learning_unit_year.campus.name else []
-    context['entities_fields'] = get_all_entities_comparison_context(initial_data, learning_unit_year)
-    context['learning_unit_year_fields'] = learning_unit_year_fields
     components = get_components_identification(learning_unit_year)
     components_list = []
     for component in components['components']:
@@ -272,7 +262,21 @@ def learning_unit_proposal_comparison(request, learning_unit_year_id):
                 volumes
             ]
         )
-    context['components'] = components_list
+    context = {
+        'learning_unit_year': learning_unit_year,
+        'learning_container_year_fields': get_learning_container_year_comparison_context(
+            initial_data,
+            learning_unit_year
+        ),
+        'campus': [
+            learning_unit_year._meta.get_field('campus').verbose_name,
+            initial_learning_unit_year.campus.name,
+            learning_unit_year.campus.name] \
+            if initial_learning_unit_year.campus.name != learning_unit_year.campus.name else [],
+        'entities_fields': get_all_entities_comparison_context(initial_data, learning_unit_year),
+        'learning_unit_year_fields': learning_unit_year_fields,
+        'components': components_list
+    }
     return render(request, "learning_unit/proposal_comparison.html", context)
 
 
@@ -370,7 +374,7 @@ def learning_unit_comparison(request, learning_unit_year_id):
 
 
 def get_full_context(learning_unit_year):
-    context = dict({'learning_unit_year': learning_unit_year})
+    context = {'learning_unit_year': learning_unit_year}
     initial_data = None
     components_list = {}
     if proposal_learning_unit.is_learning_unit_year_in_proposal(learning_unit_year):
@@ -451,11 +455,12 @@ def get_learning_unit_context(learning_unit_year):
 
 
 def build_context_comparison(current_context, learning_unit_year, next_context, previous_context):
-    context = dict({'learning_unit_year': learning_unit_year})
-    context['previous'] = previous_context or {}
-    context['current'] = current_context or {}
-    context['next'] = next_context or {}
-    return context
+    return {
+        'learning_unit_year': learning_unit_year,
+        'previous': previous_context or {},
+        'current': current_context or {},
+        'next': next_context or {}
+    }
 
 
 def _reinitialize_model(obj_model, attribute_initial_values):
