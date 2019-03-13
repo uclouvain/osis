@@ -9,8 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-12 11:35+0100\n"
-"POT-Creation-Date: 2019-03-12 10:19+0100\n"
+"POT-Creation-Date: 2019-03-13 10:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -544,7 +543,7 @@ msgstr ""
 
 #: business/learning_unit.py:66 business/learning_unit_xls.py:81
 #: business/proposal_xls.py:41 business/proposal_xls.py:60
-#: forms/learning_unit/search_form.py:93 forms/learning_unit/search_form.py:185
+#: forms/learning_unit/search_form.py:88 forms/learning_unit/search_form.py:180
 #: templates/learning_unit/by_activity.html:84
 msgid "Alloc. Ent."
 msgstr ""
@@ -853,7 +852,7 @@ msgstr ""
 msgid "Choose academic years"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:393
+#: forms/learning_unit/search_form.py:388
 #: templates/organization/organization_address.html:58
 #: templates/organization/organization_address_form.html:66
 msgid "City"
@@ -944,7 +943,7 @@ msgstr ""
 msgid "Common title"
 msgstr ""
 
-#: tests/views/test_learning_unit.py:1223 views/learning_unit.py:302
+#: tests/views/test_learning_unit.py:1202 views/learning_unit.py:302
 msgid "Comparison impossible! No learning unit to compare to"
 msgstr ""
 
@@ -1018,7 +1017,7 @@ msgstr ""
 #: forms/education_group/coorganization.py:40
 #: forms/learning_unit/entity_form.py:69
 #: forms/learning_unit/external_learning_unit.py:65
-#: forms/learning_unit/search_form.py:390
+#: forms/learning_unit/search_form.py:385
 #: templates/learning_unit/external/read.html:58
 #: templates/organization/organization_address.html:62
 #: templates/organization/organization_address_form.html:70
@@ -1551,7 +1550,7 @@ msgstr ""
 msgid "Faculty"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:190
+#: forms/learning_unit/search_form.py:185
 msgid "Faculty borrowing"
 msgstr ""
 
@@ -1843,7 +1842,7 @@ msgid "Institute"
 msgstr ""
 
 #: business/proposal_xls.py:64 forms/education_group/coorganization.py:46
-#: forms/learning_unit/search_form.py:392 templates/academic_actors.html:30
+#: forms/learning_unit/search_form.py:387 templates/academic_actors.html:30
 #: templates/blocks/navbar_top.html:101
 #: templates/education_group/blocks/coorganization.html:35
 #: templates/entities.html:30 templates/entity/breadcrumb.html:28
@@ -1981,7 +1980,7 @@ msgstr ""
 msgid "LU"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:207 tests/views/test_learning_unit.py:434
+#: forms/learning_unit/search_form.py:202 tests/views/test_learning_unit.py:413
 msgid "LU_ERRORS_INVALID_REGEX_SYNTAX"
 msgstr ""
 
@@ -2587,7 +2586,7 @@ msgstr ""
 msgid "No print"
 msgstr ""
 
-#: tests/views/test_learning_unit_proposal.py:580
+#: tests/views/test_learning_unit_proposal.py:429
 #: views/learning_units/search.py:205
 msgid "No proposals was selected."
 msgstr ""
@@ -3075,7 +3074,7 @@ msgstr ""
 msgid "Proposal %(acronym)s (%(academic_year)s) cannot be changed state."
 msgstr ""
 
-#: tests/views/test_learning_unit_proposal.py:702
+#: tests/views/test_learning_unit_proposal.py:551
 #, python-format
 msgid "Proposal %(acronym)s (%(academic_year)s) successfully canceled."
 msgstr ""
@@ -3561,7 +3560,7 @@ msgid "State"
 msgstr ""
 
 #: business/learning_units/edition.py:437
-#: forms/learning_unit/search_form.py:174 models/education_group_year.py:159
+#: forms/learning_unit/search_form.py:169 models/education_group_year.py:159
 #: templates/learning_unit/by_activity.html:86
 #: templates/learning_unit/by_external.html:50
 #: templates/learning_unit/summary_list.html:81
@@ -3628,7 +3627,7 @@ msgstr ""
 
 #: business/learning_unit.py:61 business/learning_unit_xls.py:76
 #: business/learning_units/edition.py:434 business/proposal_xls.py:48
-#: forms/learning_unit/search_form.py:169
+#: forms/learning_unit/search_form.py:164
 #: templates/learning_unit/by_activity.html:82
 #: templates/learning_unit/summary_list.html:80
 msgid "Subtype"
@@ -3640,10 +3639,6 @@ msgstr ""
 
 #: models/enums/academic_calendar_type.py:57
 msgid "Summary course submission"
-msgstr ""
-
-#: forms/learning_unit/search_form.py:88 templates/academic_actors.html:57
-msgid "Summary responsible(s)"
 msgstr ""
 
 #: models/enums/proposal_type.py:37
@@ -3661,10 +3656,6 @@ msgstr ""
 
 #: models/exam_enrollment.py:225
 msgid "T=Cheating"
-msgstr ""
-
-#: templates/learning_unit/blocks/panel/educational_informations.html:34
-msgid "Teacher(s)"
 msgstr ""
 
 #: models/enums/academic_calendar_type.py:55
@@ -3930,8 +3921,8 @@ msgid ""
 "year %(academic_year)s"
 msgstr ""
 
-#: tests/views/test_learning_unit.py:1251
-#: tests/views/test_learning_unit.py:1282 views/learning_unit.py:311
+#: tests/views/test_learning_unit.py:1230
+#: tests/views/test_learning_unit.py:1261 views/learning_unit.py:311
 #, python-format
 msgid "The learning unit does not exist for the academic year %(anac)s"
 msgstr ""
@@ -4083,7 +4074,7 @@ msgstr ""
 msgid "The start date must be equals or lower than the end date"
 msgstr ""
 
-#: tests/views/test_learning_unit.py:1493 views/learning_unit.py:372
+#: tests/views/test_learning_unit.py:1472 views/learning_unit.py:372
 #, python-format
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
@@ -4250,7 +4241,7 @@ msgstr ""
 #: business/education_group.py:49 business/learning_unit.py:59
 #: business/learning_unit_xls.py:74 business/learning_units/xls_generator.py:49
 #: business/proposal_xls.py:38 forms/education_groups.py:86 forms/entity.py:38
-#: forms/learning_unit/search_form.py:180
+#: forms/learning_unit/search_form.py:175
 #: templates/academic_calendar/academic_calendar.html:48
 #: templates/academic_calendar/academic_calendar_form.html:65
 #: templates/education_group/blocks/content_default_table.html:32
@@ -4337,13 +4328,14 @@ msgstr ""
 #: forms/learning_unit/search_form.py:83
 #: templates/learning_unit/add_charge_repartition_inner.html:33
 #: templates/learning_unit/attribution_inner.html:41
-#: templates/learning_unit/attributions.html:34
 #: templates/learning_unit/select_attribution.html:34
 #: tests/forms/learning_unit/test_search_form.py:64
 msgid "Tutor"
 msgstr ""
 
+#: templates/learning_unit/attributions.html:34
 #: templates/learning_unit/blocks/modal/modal_xls_with_parameters.html:39
+#: templates/learning_unit/blocks/panel/educational_informations.html:34
 #: templates/learning_unit/blocks/tabs.html:78
 #: templates/learning_unit/proposal/tabs.html:65
 msgid "Tutors"
@@ -4352,7 +4344,7 @@ msgstr ""
 #: business/education_group.py:49 business/education_group.py:61
 #: business/learning_unit.py:60 business/learning_unit_xls.py:75
 #: business/proposal_xls.py:38 business/proposal_xls.py:46
-#: forms/education_groups.py:82 forms/learning_unit/search_form.py:164
+#: forms/education_groups.py:82 forms/learning_unit/search_form.py:159
 #: models/entity_version.py:171 models/learning_container_year.py:53
 #: models/proposal_learning_unit.py:55
 #: templates/education_group/search.html:150 templates/entities.html:68
@@ -4614,7 +4606,7 @@ msgstr ""
 msgid "Which type of %(category)s do you want to create ?"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:96
+#: forms/learning_unit/search_form.py:91
 #: templates/education_group/search.html:86
 msgid "With subord. ent."
 msgstr ""
@@ -4806,8 +4798,8 @@ msgstr ""
 msgid "You must either set the common title or the specific title"
 msgstr ""
 
-#: tests/views/test_learning_unit_proposal.py:255
-#: tests/views/test_learning_unit_proposal.py:514
+#: tests/views/test_learning_unit_proposal.py:241
+#: tests/views/test_learning_unit_proposal.py:367
 #: views/learning_units/proposal/update.py:82
 #: views/learning_units/proposal/update.py:113
 msgid "You proposed a modification of type {} for the learning unit {}."
