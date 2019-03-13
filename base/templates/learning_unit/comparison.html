@@ -132,28 +132,22 @@
                         <tr{% if forloop.first %} style="border-top: groove"{% endif %}>
                             <td class="table_header">{{ key_lcy }}</td>
                             {% if previous %}
-                                {% if previous.learning_container_year_fields|get_item:key_lcy == True %}
-                                    {% changed_label _('True') %}
-                                {% elif previous.learning_container_year_fields|get_item:key_lcy == False %}
-                                    {% changed_label _('No') %}
+                                {% if previous.learning_container_year_fields|get_item:key_lcy == True or previous.learning_container_year_fields|get_item:key_lcy == False %}
+                                    {% changed_label previous.learning_container_year_fields|get_item:key_lcy|yesno:_("yes,no")|title other=current.learning_container_year_fields|get_item:key_lcy|yesno:_("yes,no")|title %}
                                 {% else %}
-                                    {% changed_label previous.learning_container_year_fields|get_item:key_lcy|title other=current.learning_container_year_fields|get_item:key_lcy|title %}
+                                    {% changed_label previous.learning_container_year_fields|get_item:key_lcy|title|default_if_none:'-' other=current.learning_container_year_fields|get_item:key_lcy|title|default_if_none:'-' %}
                                 {% endif %}
                             {% endif %}
-                            {% if current.learning_container_year_fields|get_item:key_lcy == True %}
-                                {% changed_label _('True') %}
-                            {% elif current.learning_container_year_fields|get_item:key_lcy == False %}
-                                {% changed_label _('No') %}
+                            {% if previous.learning_container_year_fields|get_item:key_lcy == True or previous.learning_container_year_fields|get_item:key_lcy == False %}
+                                {% changed_label current.learning_container_year_fields|get_item:key_lcy|yesno:_("yes,no")|title %}
                             {% else %}
-                                {% changed_label current.learning_container_year_fields|get_item:key_lcy|title %}
+                                {% changed_label current.learning_container_year_fields|get_item:key_lcy|title|default_if_none:'-' %}
                             {% endif %}
                             {% if next %}
-                                {% if next.learning_container_year_fields|get_item:key_lcy == True %}
-                                    {% changed_label _('True') %}
-                                {% elif next.learning_container_year_fields|get_item:key_lcy == False %}
-                                    {% changed_label _('No') %}
+                                {% if next.learning_container_year_fields|get_item:key_lcy == True or next.learning_container_year_fields|get_item:key_lcy == False %}
+                                    {% changed_label next.learning_container_year_fields|get_item:key_lcy|yesno:_("yes,no")|title other=current.learning_container_year_fields|get_item:key_lcy|yesno:_("yes,no")|title %}
                                 {% else %}
-                                    {% changed_label next.learning_container_year_fields|get_item:key_lcy|title other=current.learning_container_year_fields|get_item:key_lcy|title %}
+                                    {% changed_label next.learning_container_year_fields|get_item:key_lcy|title|default_if_none:'-' other=current.learning_container_year_fields|get_item:key_lcy|title|default_if_none:'-' %}
                                 {% endif %}
                             {% endif %}
                         </tr>
