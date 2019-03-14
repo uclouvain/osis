@@ -59,6 +59,7 @@ def cache_filter(exclude_params=None, **default_values):
 
 
 class CacheFilterMixin:
+    # Mixin that keep the cache for cbv.
     def restore_filter(self, request, *args, **kwargs):
         request_cache = RequestCache(user=self.request.user, path=self.request.path)
         if self.request.GET:
