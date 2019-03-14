@@ -294,7 +294,6 @@ def _apply_action_on_proposals_and_send_report(proposals, author, action_method,
                 "msg_detail": error_msg_id
             })
         else:
-            print(success_msg_id)
             messages_by_level[SUCCESS].append("%(proposal)s %(acronym)s (%(academic_year)s) %(msg_detail)s." % {
                 "proposal": _('Proposal'),
                 "acronym": proposal.learning_unit_year.acronym,
