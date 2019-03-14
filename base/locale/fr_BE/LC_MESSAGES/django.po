@@ -3055,7 +3055,7 @@ msgstr "Prérequis enregistrés."
 
 #: models/enums/mandate_type.py:34
 msgid "President"
-msgstr "Président"
+msgstr "Président·e"
 
 #: templates/home.html:58
 msgid "Previous"
