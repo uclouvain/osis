@@ -168,6 +168,29 @@ class TestGetOptionList(TestCase):
 
         self.assertListEqual(node.get_option_list(), [option_1])
 
+    def test_get_option_list_case_reference_link(self):
+        """
+          This test ensure that the tree will not be pruned when the link of child is reference
+        """
+        reference_group_child = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__name=GroupType.SUB_GROUP.name
+        )
+        GroupElementYearFactory(
+            parent=self.root,
+            child_branch=reference_group_child,
+            link_type=LinkTypes.REFERENCE.name,
+        )
+
+        option_1 = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__name=MiniTrainingType.OPTION.name
+        )
+        GroupElementYearFactory(parent=reference_group_child, child_branch=option_1)
+        node = EducationGroupHierarchy(self.root)
+
+        self.assertListEqual(node.get_option_list(), [option_1])
+
     def test_get_option_list_case_multiple_result_found_on_different_children(self):
         list_option = []
         for _ in range(5):

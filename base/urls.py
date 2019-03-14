@@ -205,6 +205,8 @@ urlpatterns = [
                     name="teaching_material_delete")
             ])),
             url(r'^comparison/$', learning_unit.learning_unit_comparison, name="learning_unit_comparison"),
+            url(r'^proposal_comparison/$', learning_unit.learning_unit_proposal_comparison,
+                name="learning_unit_proposal_comparison"),
         ])),
         url(r'^check/(?P<subtype>[A-Z]+)$', base.views.learning_units.common.check_acronym, name="check_acronym"),
         url(r'^email_educational_information_update/$',

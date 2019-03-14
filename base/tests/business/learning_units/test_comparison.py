@@ -24,26 +24,26 @@
 #
 ##############################################################################
 
+from decimal import Decimal
+
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils.translation import gettext
 
-from base.models.learning_unit_year import LearningUnitYear
-from base.business.learning_units.comparison import get_keys, _get_changed_values, get_value, \
-    compare_learning_unit_years, compare_learning_component_year, compare_volumes, get_entity_by_type
-from base.tests.factories.learning_unit_year import create_learning_unit_year
+from base.business.learning_units.comparison import get_keys, get_value, \
+    compare_learning_component_year, compare_volumes, get_entity_by_type
 from base.models.enums import entity_container_year_link_type
-from base.models.enums import quadrimesters, learning_unit_year_session, attribution_procedure
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums import quadrimesters, learning_unit_year_session, attribution_procedure
+from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.learning_class_year import LearningClassYearFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.learning_class_year import LearningClassYearFactory
-from decimal import Decimal
+from base.tests.factories.learning_unit_year import create_learning_unit_year
 
 TITLE = 'Intitulé'
 OTHER_TITLE = 'title 1'
@@ -105,20 +105,6 @@ class LearningUnitYearComparaisonTest(TestCase):
                                        session=learning_unit_year_session.SESSION_123,
                                        attribution_procedure=attribution_procedure.EXTERNAL
                                        )
-
-    @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
-    def test_compare(self):
-        self.assertCountEqual(compare_learning_unit_years(self.learning_unit_year, self.previous_learning_unit_year),
-                              {'acronym': NEW_ACRONYM,
-                               'status': 'Non',
-                               'subtype': 'Partim'})
-
-    @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
-    def test_get_changed_value_wrong_fieldname(self):
-        data_obj1, data_obj2 = self.learning_unit_year.__dict__, self.previous_learning_unit_year.__dict__
-        del data_obj2['acronym']
-        with self.assertRaises(KeyError):
-            _get_changed_values(data_obj1, data_obj2, ['acronym'], LearningUnitYear)
 
     def test_compare_learning_component_year(self):
         acronym_used_twice = 'PM1'

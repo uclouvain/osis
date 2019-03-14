@@ -473,7 +473,7 @@ class EducationGroupYear(SerializableModel):
     co_graduation = models.CharField(
         max_length=8,
         db_index=True,
-        verbose_name=_("Co-graduation"),
+        verbose_name=_("Code co-graduation inter CfB"),
         blank=True,
         null=True,
     )
@@ -481,7 +481,7 @@ class EducationGroupYear(SerializableModel):
     co_graduation_coefficient = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        verbose_name=_('Co-graduation coefficient'),
+        verbose_name=_('Co-graduation total coefficient'),
         blank=True,
         null=True,
         validators=[MinValueValidator(1), MaxValueValidator(9999)],

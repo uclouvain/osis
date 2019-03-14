@@ -160,7 +160,7 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
     font: normal normal normal 14px/1 FontAwesome;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
-    text-indent: 0px;
+    text-indent: 0;
     float: none;
     font-size: 16px;
     background-image: none;
@@ -178,7 +178,7 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
 }
 
 .p0-50 {
-    padding: 0px 50px;
+    padding: 0 50px;
 }
 
 .education_group_year-common {
@@ -216,35 +216,41 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
     height: 100%;
     width: 0;
     position: fixed;
-    z-index: 1;
     top: 0;
     left: 0;
-    background-color: #ffffff;
     display: flex;
+    vertical-align: central;
 }
 
 .sidenav {
+    padding-top: 70px;
     height: 100%;
     width: 100%;
-    padding-top: 60px;
+    background-color: #ffffff;
+    border-top-width: thin;
     overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: auto;
+    padding-bottom: 50px;
 }
 
 .sidenav #panel_file_tree {
     padding-left: 30px;
 }
 
-@media screen and (max-height: 450px) {
-    .sidenav {
-        padding-top: 15px;
-    }
-}
-
 
 #split-bar {
     height: 100%;
-    background-color: lightgrey;
-    width: 1px;
+    border-left-color: lightgrey;
+    border-left-style: solid;
+    border-left-width: 1px;
+    width: 7px;
     cursor: col-resize;
+}
+
+/* limit the max width of the username is the navbar.*/
+#bt_user {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
 }
