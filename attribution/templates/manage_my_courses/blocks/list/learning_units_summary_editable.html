@@ -10,7 +10,6 @@
                 <th>{% trans 'Requirement entity' %}</th>
                 <th>{% trans 'Description fiche opening' %}</th>
                 <th>{% trans 'Description fiche ending' %}</th>
-                <th>{% trans 'Summary responsible' %}</th>
                 <th>{% trans 'Editable' %}</th>
             </tr>
         </thead>
@@ -35,7 +34,6 @@
                         <td>-</td>
                         <td>-</td>
                     {% endif %}
-                    <td>{{ score_responsibles|get_item:luy.id|join:", " }}</td>
                     {% trans 'Editable' as title_status_true %}
                     <td>{% include "blocks/span/span_status.html" with status=error.is_valid title_status_false=error.as_ul %}</td>
                 </tr>
