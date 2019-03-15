@@ -37,7 +37,7 @@ from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
 from osis_common.models.serializable_model import SerializableModel, \
     SerializableModelAdmin
 
-LEARNING_UNIT_ACRONYM_REGEX_MODEL = "^[BGLMTWX][A-Z]{2,4}\d{4}"
+LEARNING_UNIT_ACRONYM_REGEX_MODEL = "^[BEGLMTWX][A-Z]{2,4}\d{4}"
 LEARNING_UNIT_ACRONYM_REGEX_BASE = "^[BLMWX][A-Z]{2,4}\d{4}"
 LEARNING_UNIT_ACRONYM_REGEX_EXTERNAL = "^[EGLMTW][A-Z]{2,4}\d{4}$"
 LETTER_OR_DIGIT = "[A-Z0-9]"
