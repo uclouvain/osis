@@ -26,7 +26,8 @@
 from django.db.models import QuerySet
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 
-BLANK_CHOICE = [(None, "---------")]
+BLANK_CHOICE_DISPLAY = "---------"
+BLANK_CHOICE = [(None, BLANK_CHOICE_DISPLAY)]
 ALL_CHOICE = [("all", pgettext_lazy("plural", "All"))]
 
 
