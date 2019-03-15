@@ -509,3 +509,29 @@ class TestFetchGroupElementsBehindHierarchy(TestCase):
         wrong_queryset_model = EducationGroupYear.objects.all()
         with self.assertRaises(AttributeError):
             group_element_year.fetch_all_group_elements_in_tree(self.root, wrong_queryset_model)
+
+
+class TestValidationOnEducationGroupYearBlockField(TestCase):
+
+    def setUp(self):
+        self.group_element_year = GroupElementYearFactory()
+
+    def test_when_value_is_higher_than_max_authorized(self):
+        self.group_element_year.block = '7'
+        with self.assertRaises(ValidationError):
+            self.group_element_year.full_clean()
+
+    def test_when_values_are_not_integers(self):
+        self.group_element_year.block = 'test'
+        with self.assertRaises(ValidationError):
+            self.group_element_year.full_clean()
+
+    def test_when_values_are_duplicated(self):
+        self.group_element_year.block = '146'
+        with self.assertRaises(ValidationError):
+            self.group_element_year.full_clean()
+
+    def test_when_values_are_not_ordered(self):
+        self.group_element_year.block = '54'
+        with self.assertRaises(ValidationError):
+            self.group_element_year.full_clean()

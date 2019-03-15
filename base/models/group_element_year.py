@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import itertools
+from collections import Counter
 
 from django.core.exceptions import ValidationError
 from django.db import models, connection
@@ -82,6 +83,77 @@ SELECT * FROM group_element_year_parent ;
 """
 
 
+def validate_block_value(value):
+    max_authorized_value = 6
+    _check_chars_are_integers(value)
+    _check_chars_max_authorized_value(value, max_authorized_value)
+    _check_chars_duplications(value)
+    _check_chars_orders(value)
+    # msg = "N'enregistrez qu'un nombre de 6 chiffres au maximum, avec les chiffres de 1 à 6 toujours dans l'ordre croissant. Exemple: 12, 23"
+    # msg = _("Please register a maximum of 6 digits in ascending order. "
+    #         "Authorized values are from 1 to 6. Examples: 12, 23, 46")
+
+
+# def _check_chars_are_integers(value):
+#     try:
+#         [int(char) for char in value]
+#     except ValueError:
+#         return False
+#
+#
+# def _check_chars_max_authorized_value(value, max_authorized_value):
+#     return all(int(char) <= max_authorized_value for char in value)
+#
+#
+# def _check_chars_duplications(value):
+#     freq_count = Counter(value)
+#     return all(count for count in freq_count.values() if count <= 1)
+#
+#
+# def _check_chars_orders(value):
+#     int_values = [int(char) for char in value]
+#     return all(int_values[i] <= int_values[i+1] for i in range(len(int_values)-1))
+
+
+
+
+
+
+def _check_chars_are_integers(value):
+    try:
+        [int(char) for char in value]
+    except ValueError:
+        raise ValidationError(
+            _('Values must be integers')
+        )
+
+
+def _check_chars_max_authorized_value(value, max_authorized_value):
+    if any(int(char) > max_authorized_value for char in value):
+        raise ValidationError(
+            _('Maximum value authorized is %(max_authorized_value)s'),
+            params={'max_authorized_value': max_authorized_value},
+        )
+
+
+def _check_chars_duplications(value):
+    freq_count = Counter(value)
+    occurences_gt_1 = [char for char, occurence in freq_count.items() if occurence > 1]
+    if occurences_gt_1:
+        raise ValidationError(
+            _('Following values are duplicated : %(occurences)s'),
+            params={'occurences': occurences_gt_1},
+        )
+
+
+def _check_chars_orders(value):
+    int_values = [int(char) for char in value]
+    if list(sorted(int_values)) != int_values:
+        raise ValidationError(
+            _('Values must be ascending ordered')
+        )
+
+
 class GroupElementYearManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(
@@ -137,10 +209,11 @@ class GroupElementYear(OrderedModel):
     )
 
     block = models.CharField(
-        max_length=7,
+        max_length=6,
         blank=True,
         null=True,
-        verbose_name=_("Block")
+        verbose_name=_("Block"),
+        validators=[validate_block_value]
     )
 
     access_condition = models.BooleanField(
