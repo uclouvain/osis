@@ -25,6 +25,7 @@
 ##############################################################################
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
+from django.db.models import Prefetch, Case, When, Value, IntegerField
 from django.shortcuts import get_object_or_404, render
 
 from attribution import models as mdl_attribution
@@ -36,8 +37,12 @@ from base.business.learning_units.perms import is_eligible_to_update_learning_un
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm
 from base.models import teaching_material
 from base.models.person import Person
+from base.models.teaching_material import TeachingMaterial
 from base.models.tutor import find_all_summary_responsibles_by_learning_unit_year
 from base.views.learning_units.common import get_common_context_learning_unit_year
+from cms.enums.entity_name import LEARNING_UNIT_YEAR
+from cms.models.translated_text import TranslatedText
+from cms.models.translated_text_label import TranslatedTextLabel
 
 
 @login_required
@@ -50,15 +55,48 @@ def learning_unit_pedagogy(request, learning_unit_year_id):
 def read_learning_unit_pedagogy(request, learning_unit_year_id, context, template):
     person = get_object_or_404(Person, user=request.user)
     context.update(get_common_context_learning_unit_year(learning_unit_year_id, person))
+
     learning_unit_year = context['learning_unit_year']
     perm_to_edit = is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person)
     user_language = mdl.person.get_user_interface_language(request.user)
-    context['cms_labels_translated'] = get_cms_label_data(CMS_LABEL_PEDAGOGY, user_language)
-    context['form_french'] = LearningUnitPedagogyForm(learning_unit_year=learning_unit_year,
-                                                      language_code=settings.LANGUAGE_CODE_FR)
-    context['form_english'] = LearningUnitPedagogyForm(learning_unit_year=learning_unit_year,
-                                                       language_code=settings.LANGUAGE_CODE_EN)
-    context['teaching_materials'] = teaching_material.find_by_learning_unit_year(learning_unit_year)
+
+    translated_labels_with_text = TranslatedTextLabel.objects.filter(
+        language=user_language,
+        text_label__label__in=CMS_LABEL_PEDAGOGY
+    ).prefetch_related(
+        Prefetch(
+            "text_label__translatedtext_set",
+            queryset=TranslatedText.objects.filter(
+                language=settings.LANGUAGE_CODE_FR,
+                entity=LEARNING_UNIT_YEAR,
+                reference=learning_unit_year_id
+            ),
+            to_attr="text_fr"
+        ),
+        Prefetch(
+            "text_label__translatedtext_set",
+            queryset=TranslatedText.objects.filter(
+                language=settings.LANGUAGE_CODE_EN,
+                entity=LEARNING_UNIT_YEAR,
+                reference=learning_unit_year_id
+            ),
+            to_attr="text_en"
+        )
+    ).annotate(
+        label_ordering=Case(
+            *[When(text_label__label=label, then=Value(i)) for i, label in enumerate(CMS_LABEL_PEDAGOGY)],
+            default=Value(len(CMS_LABEL_PEDAGOGY)),
+            output_field=IntegerField()
+        )
+    ).select_related(
+        "text_label"
+    ).order_by(
+        "label_ordering"
+    )
+    teaching_materials = TeachingMaterial.objects.filter(learning_unit_year=learning_unit_year).order_by('order')
+
+    context['cms_labels_translated'] = translated_labels_with_text
+    context['teaching_materials'] = teaching_materials
     context['can_edit_information'] = perm_to_edit
     context['can_edit_summary_locked_field'] = perms.can_edit_summary_locked_field(learning_unit_year, person)
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY

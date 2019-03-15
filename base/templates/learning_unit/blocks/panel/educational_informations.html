@@ -47,39 +47,39 @@
         <thead>
         <tr>
             <th class="col-md-2" style="padding: 20px;">{% trans 'Language' %}</th>
-            <th class="col-md-5" style="padding: 20px;">{{ form_french.language.1 }}</th>
-            <th class="col-md-5" style="padding: 20px;">{{ form_english.language.1 }}</th>
+            <th class="col-md-5" style="padding: 20px;">{% trans 'French' %}</th>
+            <th class="col-md-5" style="padding: 20px;">{% trans 'English' %}</th>
         </tr>
         </thead>
         <tbody>
-        {% for label_key, label_translated in cms_labels_translated.items %}
-            {% if label_key != "mobility" %}
+        {% for translated_label in cms_labels_translated %}
+            {% if translated_label.text_label.label != "mobility" %}
                 <tr>
                     <td style="padding: 20px;">
-                        <label>{{ label_translated }}</label>
+                        <label>{{ translated_label.label }}</label>
                     </td>
-                    <td style="padding: 20px;" {% if label_key in cms_label_pedagogy_fr_only %}colspan="2"{% endif %}>
+                    <td style="padding: 20px;" {% if translated_label.text_label.label in cms_label_pedagogy_fr_only %}colspan="2"{% endif %}>
                         {% if can_edit_information %}
                             <a class="trigger_modal pull-right"
-                               data-url="{{ post_url }}?language={{ form_french.language.0 }}&label={{ label_key }}"
+                               data-url="{{ post_url }}?language=fr-be&label={{ translated_label.text_label.label }}"
                                data-modal_class="modal-lg"
                                title="{% trans 'Edit' %}">
                                 <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                             </a>
                         {% endif %}
-                        {{ form_french|getattr:label_key }}
+                        {{ translated_label.text_label.text_fr.0.text|default_if_none:""|safe }}
                     </td>
-                    {% if label_key not in cms_label_pedagogy_fr_only %}
+                    {% if translated_label.text_label.label not in cms_label_pedagogy_fr_only %}
                         <td style="padding: 20px;">
                             {% if can_edit_information %}
                                 <a class="trigger_modal pull-right"
-                                   data-url="{{ post_url }}?language={{ form_english.language.0 }}&label={{ label_key }}"
+                                   data-url="{{ post_url }}?language=en&label={{ translated_label.text_label.label }}"
                                    data-modal_class="modal-lg"
                                    title="{% trans 'Edit' %}">
                                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                                 </a>
                             {% endif %}
-                            {{ form_english|getattr:label_key }}
+                            {{ translated_label.text_label.text_en.0.text|default_if_none:""|safe }}
                         </td>
                     {% endif %}
                 </tr>
@@ -131,7 +131,7 @@
             <label>{% trans "Mobility" %}</label>
             {% if can_edit_information %}
                 <a class="trigger_modal pull-right"
-                   data-url="{{ post_url }}?language={{ form_french.language.0 }}&label=mobility"
+                   data-url="{{ post_url }}?language=fr-be&label=mobility"
                    data-modal_class="modal-lg">
                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                 </a>
@@ -141,7 +141,11 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-12">
-                    {{ form_french|getattr:"mobility" }}
+                    {% for translated_label in  cms_labels_translated%}
+                        {% if translated_label.text_label.label == "mobility" %}
+                            {{ translated_label.text_label.text_fr.0.text|default_if_none:"" }}
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </div>
