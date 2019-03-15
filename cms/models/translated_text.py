@@ -26,13 +26,14 @@
 from ckeditor.fields import RichTextField
 from django.conf import settings
 from django.db import models
+from reversion.admin import VersionAdmin
 
 from cms.enums.entity_name import ENTITY_NAME
 from osis_common.models import osis_model_admin
 from .text_label import TextLabel
 
 
-class TranslatedTextAdmin(osis_model_admin.OsisModelAdmin):
+class TranslatedTextAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
     actions = None  # Remove ability to delete in Admin Interface
     list_display = ('text_label', 'entity', 'reference', 'language', 'text')
     ordering = ('text_label',)
