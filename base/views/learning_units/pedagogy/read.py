@@ -23,10 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Prefetch, Case, When, Value, IntegerField
 from django.shortcuts import get_object_or_404, render
+from reversion.models import Version
 
 from base import models as mdl
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
@@ -95,10 +99,32 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
         "person"
     ).order_by("person")
 
+    translated_text_ids = itertools.chain.from_iterable(
+        (*translated_label.text_label.text_fr, *translated_label.text_label.text_en)
+        for translated_label in translated_labels_with_text
+    )
+
+    reversion = Version.objects.filter(
+        content_type=ContentType.objects.get_for_model(TranslatedText),
+        object_id__in=map(lambda obj: obj.id, translated_text_ids)
+    ).select_related(
+        "revision",
+        "revision__user"
+    ).prefetch_related(
+        Prefetch(
+            "revision__user__person",
+            to_attr="persona"
+        )
+
+    ).latest(
+        "revision__date_created"
+    )
+
     context['cms_labels_translated'] = translated_labels_with_text
     context['teaching_materials'] = teaching_materials
     context['can_edit_information'] = perm_to_edit
     context['can_edit_summary_locked_field'] = perms.can_edit_summary_locked_field(learning_unit_year, person)
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
     context['tutors'] = tutors
+    context["version"] = reversion
     return render(request, template, context)
