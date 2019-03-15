@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-15 11:02+0100\n"
+"POT-Creation-Date: 2019-03-15 15:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -270,7 +270,7 @@ msgstr ""
 msgid "Academic calendars"
 msgstr ""
 
-#: forms/learning_unit/edition.py:39
+#: forms/learning_unit/edition.py:40
 msgid "Academic end year"
 msgstr ""
 
@@ -320,7 +320,7 @@ msgstr ""
 msgid "Access"
 msgstr ""
 
-#: models/group_element_year.py:148
+#: models/group_element_year.py:189
 #: templates/education_group/blocks/content_minor_major_option_table.html:33
 msgid "Access condition"
 msgstr ""
@@ -533,7 +533,7 @@ msgstr ""
 
 #: forms/education_groups.py:68 forms/education_groups.py:73
 #: forms/education_groups.py:81 forms/learning_unit/search_form.py:62
-#: forms/learning_unit/search_form.py:68 forms/utils/choice_field.py:30
+#: forms/learning_unit/search_form.py:68 forms/utils/choice_field.py:31
 msgctxt "plural"
 msgid "All"
 msgstr ""
@@ -739,7 +739,7 @@ msgstr ""
 msgid "Birth Date"
 msgstr ""
 
-#: models/group_element_year.py:143
+#: models/group_element_year.py:183
 #: templates/education_group/blocks/content_default_table.html:35
 #: templates/education_group/blocks/table_utilizations.html:37
 #: templates/learning_unit/formations.html:46
@@ -915,7 +915,7 @@ msgstr ""
 #: templates/learning_unit/components_identification.html:33
 #: templates/learning_unit/external/read.html:8
 #: templates/learning_unit/identification.html:47
-#: templates/learning_unit/summary_list.html:77
+#: templates/learning_unit/summary_list.html:77 utils/send_mail.py:234
 msgid "Code"
 msgstr ""
 
@@ -1920,16 +1920,16 @@ msgstr ""
 msgid "Isolated classes"
 msgstr ""
 
-#: models/group_element_year.py:224
+#: models/group_element_year.py:265
 msgid "It is forbidden to attach an element to itself."
 msgstr ""
 
-#: models/group_element_year.py:227
+#: models/group_element_year.py:268
 #: tests/views/education_groups/test_update.py:544
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 
-#: models/group_element_year.py:221
+#: models/group_element_year.py:262
 msgid ""
 "It is forbidden to save a GroupElementYear with a child branch and a child "
 "leaf."
@@ -2143,7 +2143,7 @@ msgstr ""
 msgid "Legend"
 msgstr ""
 
-#: models/group_element_year.py:173
+#: models/group_element_year.py:214
 #: templates/education_group/blocks/content_default_table.html:37
 msgid "Link type"
 msgstr ""
@@ -2190,7 +2190,7 @@ msgstr ""
 msgid "Location"
 msgstr ""
 
-#: templates/learning_unit/blocks/summary_locked.html:15
+#: templates/learning_unit/blocks/summary_locked.html:16
 msgid "Lock"
 msgstr ""
 
@@ -2301,7 +2301,7 @@ msgstr ""
 msgid "Mandates"
 msgstr ""
 
-#: models/group_element_year.py:136
+#: models/group_element_year.py:176
 #: templates/education_group/blocks/content_default_table.html:34
 #: templates/education_group/blocks/table_utilizations.html:36
 msgid "Mandatory"
@@ -2362,7 +2362,7 @@ msgstr ""
 msgid "Masters"
 msgstr ""
 
-#: models/group_element_year.py:131
+#: models/group_element_year.py:171
 #: templates/education_group/blocks/table_utilizations.html:35
 msgid "Max. credits"
 msgstr ""
@@ -2384,7 +2384,7 @@ msgstr ""
 msgid "Method not allowed"
 msgstr ""
 
-#: models/group_element_year.py:125
+#: models/group_element_year.py:165
 #: templates/education_group/blocks/table_utilizations.html:34
 msgid "Min. credits"
 msgstr ""
@@ -2442,7 +2442,7 @@ msgstr ""
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr ""
 
-#: templates/learning_unit/blocks/summary_locked.html:33
+#: templates/learning_unit/blocks/summary_locked.html:34
 msgid "Modified by"
 msgstr ""
 
@@ -2931,6 +2931,14 @@ msgstr ""
 msgid "Please Select or Move an item before Attach it"
 msgstr ""
 
+#: models/group_element_year.py:95
+#, python-format
+msgid ""
+"Please register a maximum of %(max_authorized_value)s digits in ascending "
+"order, without any duplication. Authorized values are from 1 to 6. Examples: "
+"12, 23, 46"
+msgstr ""
+
 #: models/learning_unit_year.py:60
 #, python-format
 msgid "Please select an academic year lower than %(academic_year_max)d."
@@ -3094,6 +3102,8 @@ msgstr ""
 msgid "Prolong"
 msgstr ""
 
+#: business/learning_unit_proposal.py:291
+#: business/learning_unit_proposal.py:298
 #: business/learning_units/xls_comparison.py:498
 #: templates/learning_unit/blocks/panel/proposal.html:6
 #: tests/business/learning_units/test_xls_comparison.py:171
@@ -3115,7 +3125,7 @@ msgstr ""
 msgid "Proposal for modification"
 msgstr ""
 
-#: business/learning_unit_proposal.py:338
+#: business/learning_unit_proposal.py:340
 #: tests/business/test_learning_unit_proposal.py:285
 msgid "Proposal is neither accepted nor refused."
 msgstr ""
@@ -3224,7 +3234,7 @@ msgstr ""
 msgid "Quadrimester"
 msgstr ""
 
-#: models/group_element_year.py:167
+#: models/group_element_year.py:208
 #: templates/education_group/blocks/table_utilizations.html:38
 msgid "Quadrimester derogation"
 msgstr ""
@@ -4371,7 +4381,7 @@ msgstr ""
 #: templates/learning_unit/by_activity.html:81
 #: templates/learning_unit/by_proposal.html:85
 #: templates/learning_unit/summary_list.html:79
-#: tests/forms/learning_unit/test_search_form.py:77
+#: tests/forms/learning_unit/test_search_form.py:77 utils/send_mail.py:234
 msgid "Type"
 msgstr ""
 
@@ -4455,11 +4465,11 @@ msgstr ""
 msgid "Update entity"
 msgstr ""
 
-#: templates/learning_unit/blocks/summary_locked.html:22
+#: templates/learning_unit/blocks/summary_locked.html:23
 msgid "Update for teacher locked"
 msgstr ""
 
-#: templates/learning_unit/blocks/summary_locked.html:24
+#: templates/learning_unit/blocks/summary_locked.html:25
 msgid "Update for teacher unlocked"
 msgstr ""
 
@@ -4702,7 +4712,7 @@ msgid ""
 "You are not allowed to copy the content of this kind of education group."
 msgstr ""
 
-#: models/group_element_year.py:231
+#: models/group_element_year.py:272
 #: tests/forms/education_group/test_groupElementYearForm.py:57
 msgid "You are not allowed to create a reference with a learning unit"
 msgstr ""
@@ -5009,11 +5019,11 @@ msgstr ""
 #: templates/learning_unit/formations.html:43
 #: templates/student/learning_units_enrollments.html:45
 #: templates/student/offers_enrollments.html:46
-#: tests/views/test_learning_unit_pedagogy.py:187 utils/send_mail.py:234
+#: tests/views/test_learning_unit_pedagogy.py:187
 msgid "code"
 msgstr ""
 
-#: models/group_element_year.py:154
+#: models/group_element_year.py:195
 msgid "comment"
 msgstr ""
 
@@ -5029,7 +5039,7 @@ msgstr ""
 
 #: business/learning_units/edition.py:435 models/education_group_year.py:357
 #: models/education_group_year.py:570 models/enums/constraint_type.py:32
-#: models/group_element_year.py:187 models/group_element_year.py:203
+#: models/group_element_year.py:228 models/group_element_year.py:244
 #: tests/models/test_education_group_year.py:93
 #: tests/views/education_groups/group_element_year/test_read.py:99
 #: tests/views/education_groups/group_element_year/test_read.py:113
@@ -5087,7 +5097,7 @@ msgstr ""
 msgid "end"
 msgstr ""
 
-#: models/group_element_year.py:159
+#: models/group_element_year.py:200
 #: templates/education_group/blocks/content_default_table.html:86
 msgid "english comment"
 msgstr ""
@@ -5161,7 +5171,7 @@ msgstr ""
 msgid "list of required teaching materials"
 msgstr ""
 
-#: templates/learning_unit/blocks/summary_locked.html:14
+#: templates/learning_unit/blocks/summary_locked.html:15
 msgid "lock update for teacher"
 msgstr ""
 
@@ -5196,8 +5206,7 @@ msgstr ""
 msgid "no"
 msgstr ""
 
-#: forms/learning_unit/edition.py:38 templatetags/learning_unit.py:54
-#: tests/models/test_learning_unit.py:86
+#: templatetags/learning_unit.py:54 tests/models/test_learning_unit.py:86
 msgid "no planned end"
 msgstr ""
 
@@ -5269,7 +5278,7 @@ msgstr ""
 msgid "regex rule"
 msgstr ""
 
-#: models/group_element_year.py:119
+#: models/group_element_year.py:159
 msgid "relative credits"
 msgstr ""
 
@@ -5376,7 +5385,7 @@ msgstr ""
 msgid "text in French"
 msgstr ""
 
-#: templates/learning_unit/blocks/summary_locked.html:33
+#: templates/learning_unit/blocks/summary_locked.html:34
 msgid "the"
 msgstr ""
 
@@ -5412,7 +5421,7 @@ msgstr ""
 #: models/education_group_publication_contact.py:84
 #: templates/entity/versions.html:45
 #: templates/organization/organization.html:70
-#: templates/organization/organizations.html:63 utils/send_mail.py:234
+#: templates/organization/organizations.html:63
 msgid "type"
 msgstr ""
 
@@ -5424,11 +5433,11 @@ msgstr ""
 msgid "unknown"
 msgstr ""
 
-#: templates/learning_unit/blocks/summary_locked.html:12
+#: templates/learning_unit/blocks/summary_locked.html:13
 msgid "unlock"
 msgstr ""
 
-#: templates/learning_unit/blocks/summary_locked.html:11
+#: templates/learning_unit/blocks/summary_locked.html:12
 msgid "unlock update for teacher"
 msgstr ""
 
