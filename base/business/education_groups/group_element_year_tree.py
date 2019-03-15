@@ -29,8 +29,10 @@ from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, L
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
+from base.models.enums.proposal_type import ProposalType
 from base.models.group_element_year import GroupElementYear, fetch_all_group_elements_in_tree
 from base.models.prerequisite_item import PrerequisiteItem
+from base.models.proposal_learning_unit import ProposalLearningUnit
 
 
 class EducationGroupHierarchy:
@@ -91,6 +93,7 @@ class EducationGroupHierarchy:
                             'child_branch__education_group_type',
                             'child_leaf__academic_year',
                             'child_leaf__learning_container_year',
+                            'child_leaf__proposallearningunit',
                             'parent')
 
     def to_json(self):
@@ -203,10 +206,22 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         return "jstree-file"
 
     def _get_acronym(self) -> str:
-        """ When the LU year is different than its education group, we have to display the year in the title. """
+        """
+            When the LU year is different than its education group, we have to display the year in the title.
+            Also, when the LU is in proposal we must display the type.
+        """
+        try:
+            proposal = self.learning_unit_year.proposallearningunit
+        except ProposalLearningUnit.DoesNotExist:
+            proposal = None
+
+        text = self.learning_unit_year.acronym
         if self.learning_unit_year.academic_year != self.root.academic_year:
-            return "|{}| {}".format(self.learning_unit_year.academic_year.year, self.learning_unit_year.acronym)
-        return self.learning_unit_year.acronym
+            text = "|{}| {}".format(self.learning_unit_year.academic_year.year, self.learning_unit_year.acronym)
+        if proposal:
+            proposal_abbreviation = getattr(ProposalType, proposal.type).abbreviation()
+            text = "({}) {}".format(proposal_abbreviation, text)
+        return text
 
     def get_url(self):
         url = reverse('learning_unit_utilization', args=[self.root.pk, self.learning_unit_year.pk])

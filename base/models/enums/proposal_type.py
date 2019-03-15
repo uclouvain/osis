@@ -35,3 +35,8 @@ class ProposalType(ChoiceEnum):
     TRANSFORMATION = _("Transformation")
     TRANSFORMATION_AND_MODIFICATION = _("Transformation and modification")
     SUPPRESSION = _("Suppression")
+
+    def abbreviation(self):
+        if self.name == ProposalType.TRANSFORMATION_AND_MODIFICATION.name:
+            return "TM"
+        return self.name[0]
