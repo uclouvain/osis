@@ -2499,7 +2499,7 @@ msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
 #: templates/learning_unit/blocks/summary_locked.html:33
 #| msgid "Modify"
 msgid "Modified by"
-msgstr "Modifier par"
+msgstr "Modifié par"
 
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:85
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88

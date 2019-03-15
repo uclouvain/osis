@@ -2,6 +2,7 @@
 {% load i18n %}
 
 <div class="col-md-6">
+    <div class="row">
     {% if can_edit_summary_locked_field %}
         <form method="POST"
               action="{% url 'learning_unit_pedagogy_toggle_summary_locked' learning_unit_year_id=learning_unit_year.pk %}">
@@ -17,20 +18,21 @@
             </button>
         </form>
     {% else %}
-        <span class="pull-right">
+        <p class="pull-right">
             {% if learning_unit_year.summary_locked %}
                 {% trans 'Update for teacher locked' %}
             {% else %}
                 {% trans 'Update for teacher unlocked' %}
             {% endif %}
-        </span>
+        </p>
     {% endif %}
-
+    </div>
     {% if version %}
-    <br>
-    <br>
-    <span class="pull-right">
-        {% trans "Modified by" %} <strong>{{ version.revision.user.persona }}</strong> {% trans "the" %} <strong>{{ version.revision.date_created|date:"d/m/Y" }}</strong>
-    </span>
+
+    <div class="row">
+        <p class="small pull-right">
+            {% trans "Modified by" %} <strong>{{ version.revision.user.author }}</strong> {% trans "the" %} <strong>{{ version.revision.date_created|date:"d/m/Y" }}</strong>
+        </p>
+    </div>
     {% endif %}
 </div>

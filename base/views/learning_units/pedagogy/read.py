@@ -112,7 +112,7 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
     ).prefetch_related(
         Prefetch(
             "revision__user__person",
-            to_attr="persona"
+            to_attr="author"
         )
 
     ).order_by(
