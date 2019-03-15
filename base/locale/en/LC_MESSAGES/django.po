@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-14 09:03+0100\n"
+"POT-Creation-Date: 2019-03-15 11:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -945,7 +945,7 @@ msgstr ""
 #: business/learning_units/edition.py:449 business/proposal_xls.py:55
 #: models/learning_container_year.py:59
 #: tests/business/learning_units/test_edition.py:247
-#: tests/views/test_learning_unit.py:1558
+#: tests/views/test_learning_unit.py:1555
 msgid "Common title"
 msgstr ""
 
@@ -1065,7 +1065,7 @@ msgstr ""
 #: models/learning_unit_year.py:115 templates/learning_unit/by_activity.html:85
 #: templates/learning_unit/by_external.html:49
 #: templates/learning_unit/identification.html:84
-#: tests/views/test_learning_unit.py:1544
+#: tests/views/test_learning_unit.py:1541
 msgid "Credits"
 msgstr ""
 
@@ -1100,7 +1100,7 @@ msgid "Day"
 msgstr ""
 
 #: business/proposal_xls.py:40 business/proposal_xls.py:72
-#: models/learning_container_year.py:67 tests/views/test_learning_unit.py:1557
+#: models/learning_container_year.py:67 tests/views/test_learning_unit.py:1554
 msgid "Decision"
 msgstr ""
 
@@ -1228,7 +1228,7 @@ msgid "Dissertation submission"
 msgstr ""
 
 #: models/enums/vacant_declaration_type.py:41
-#: tests/views/test_learning_unit.py:1557
+#: tests/views/test_learning_unit.py:1554
 msgid "Do not assign"
 msgstr ""
 
@@ -1403,6 +1403,7 @@ msgstr ""
 #: forms/education_group/achievement.py:85
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:40
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:36
+#: templates/learning_unit/blocks/panel/educational_informations.html:51
 msgid "English"
 msgstr ""
 
@@ -1530,7 +1531,7 @@ msgstr ""
 #: forms/learning_unit/external_learning_unit.py:52
 #: models/enums/attribution_procedure.py:35
 #: models/enums/learning_container_year_types.py:44
-#: tests/views/test_learning_unit.py:1546
+#: tests/views/test_learning_unit.py:1543
 msgid "External"
 msgstr ""
 
@@ -1659,6 +1660,7 @@ msgstr ""
 #: forms/education_group/achievement.py:79
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:39
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:35
+#: templates/learning_unit/blocks/panel/educational_informations.html:50
 msgid "French"
 msgstr ""
 
@@ -1987,7 +1989,7 @@ msgstr ""
 msgid "LU"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:202 tests/views/test_learning_unit.py:415
+#: forms/learning_unit/search_form.py:202 tests/views/test_learning_unit.py:414
 msgid "LU_ERRORS_INVALID_REGEX_SYNTAX"
 msgstr ""
 
@@ -2440,6 +2442,10 @@ msgstr ""
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr ""
 
+#: templates/learning_unit/blocks/summary_locked.html:33
+msgid "Modified by"
+msgstr ""
+
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:85
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:69
@@ -2886,7 +2892,7 @@ msgstr ""
 
 #: business/learning_unit.py:71 business/proposal_xls.py:40
 #: business/proposal_xls.py:52 models/learning_unit_year.py:143
-#: tests/views/test_learning_unit.py:1545
+#: tests/views/test_learning_unit.py:1542
 msgid "Periodicity"
 msgstr ""
 
@@ -2911,7 +2917,7 @@ msgstr ""
 #: business/proposal_xls.py:84 business/proposal_xls.py:94
 #: forms/learning_unit/edition_volume.py:87
 #: forms/learning_unit/edition_volume.py:107
-#: tests/views/test_learning_unit.py:1570 views/learning_unit.py:293
+#: tests/views/test_learning_unit.py:1567 views/learning_unit.py:293
 #: views/learning_unit.py:392 views/learning_unit.py:408
 msgid "Planned classes"
 msgstr ""
@@ -2941,7 +2947,7 @@ msgstr ""
 
 #: models/enums/component_type.py:33
 #: models/enums/learning_component_year_type.py:33
-#: tests/views/test_learning_unit.py:1568
+#: tests/views/test_learning_unit.py:1565
 msgid "Practical exercises"
 msgstr ""
 
@@ -3000,7 +3006,7 @@ msgid "Printable title"
 msgstr ""
 
 #: business/proposal_xls.py:73 models/learning_unit_year.py:130
-#: tests/views/test_learning_unit.py:1546
+#: tests/views/test_learning_unit.py:1543
 msgid "Procedure"
 msgstr ""
 
@@ -4085,7 +4091,7 @@ msgstr ""
 msgid "The start date must be equals or lower than the end date"
 msgstr ""
 
-#: tests/views/test_learning_unit.py:1370 views/learning_unit.py:533
+#: tests/views/test_learning_unit.py:1367 views/learning_unit.py:533
 #, python-format
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
@@ -4481,7 +4487,7 @@ msgid "Vacant"
 msgstr ""
 
 #: models/enums/vacant_declaration_type.py:40
-#: tests/views/test_learning_unit.py:1557
+#: tests/views/test_learning_unit.py:1554
 msgid "Vacant not publish"
 msgstr ""
 
@@ -4549,21 +4555,21 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:66
 #: forms/learning_unit/edition_volume.py:84
-#: tests/views/test_learning_unit.py:1571 views/learning_unit.py:296
+#: tests/views/test_learning_unit.py:1568 views/learning_unit.py:296
 #: views/learning_unit.py:393 views/learning_unit.py:409
 msgid "Volume Q1"
 msgstr ""
 
 #: forms/learning_unit/edition_volume.py:73
 #: forms/learning_unit/edition_volume.py:84
-#: tests/views/test_learning_unit.py:1572 views/learning_unit.py:298
+#: tests/views/test_learning_unit.py:1569 views/learning_unit.py:298
 #: views/learning_unit.py:394 views/learning_unit.py:410
 msgid "Volume Q2"
 msgstr ""
 
 #: forms/learning_unit/edition_volume.py:84
 #: forms/learning_unit/edition_volume.py:106
-#: tests/views/test_learning_unit.py:1569 views/learning_unit.py:291
+#: tests/views/test_learning_unit.py:1566 views/learning_unit.py:291
 #: views/learning_unit.py:391 views/learning_unit.py:407
 msgid "Volume total annual"
 msgstr ""
@@ -4921,12 +4927,12 @@ msgid "bibliography"
 msgstr ""
 
 #: models/enums/learning_unit_year_periodicity.py:34
-#: tests/views/test_learning_unit.py:1545
+#: tests/views/test_learning_unit.py:1542
 msgid "biennial even"
 msgstr ""
 
 #: models/enums/learning_unit_year_periodicity.py:35
-#: tests/views/test_learning_unit.py:1545
+#: tests/views/test_learning_unit.py:1542
 msgid "biennial odd"
 msgstr ""
 
@@ -5368,6 +5374,10 @@ msgstr ""
 
 #: models/abstracts/abstract_education_group_achievement.py:56
 msgid "text in French"
+msgstr ""
+
+#: templates/learning_unit/blocks/summary_locked.html:33
+msgid "the"
 msgstr ""
 
 #: tests/views/test_learning_unit_pedagogy.py:239
