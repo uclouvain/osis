@@ -25,7 +25,7 @@
 ##############################################################################
 from django import forms
 from django.http import QueryDict
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.utils.model import merge_two_dicts
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm

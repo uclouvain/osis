@@ -30,11 +30,12 @@ from django.utils.translation import ugettext_lazy as _
 from base.models import entity_container_year as mdl_entity_container_year
 from base.models.enums import learning_component_year_type
 
-FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON = ['acronym', 'subtype', 'internship_subtype', 'credits', 'periodicity',
+FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON = ['acronym', 'internship_subtype', 'credits', 'periodicity',
                                           'status', 'language', 'professional_integration', 'specific_title',
                                           'specific_title_english', 'quadrimester',
                                           'session', 'attribution_procedure']
-FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant']
+FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant', 'common_title',
+                                               'common_title_english']
 FIELDS_FOR_LEARNING_COMPONENT_COMPARISON = ['acronym', 'real_classes', 'planned_classes']
 DEFAULT_VALUE_FOR_NONE = '-'
 LEARNING_COMPONENT_YEAR = 'learning_component_year'
@@ -46,29 +47,6 @@ def get_keys(list1, list2):
         if k not in keys:
             keys.append(k)
     return sorted(keys, key=ugettext_lazy)
-
-
-def compare_learning_unit_years(obj_ref, obj):
-    data_obj1, data_obj2 = obj_ref.__dict__, obj.__dict__
-    return _get_changed_values(data_obj1, data_obj2, FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, type(obj_ref))
-
-
-def compare_learning_container_years(obj_ref, obj):
-    data_obj1, data_obj2 = obj_ref.__dict__, obj.__dict__
-    return _get_changed_values(data_obj1, data_obj2, FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON, type(obj_ref))
-
-
-def _get_changed_values(data_obj1, data_obj2, included_keys, model):
-    changed_values = {}
-    for key, value in data_obj1.items():
-        if key not in included_keys:
-            continue
-        try:
-            if value != data_obj2[key]:
-                changed_values.update({key: get_value(model, data_obj2, key)})
-        except KeyError:
-            raise KeyError('Invalid key for learning_unit_year compare')
-    return changed_values
 
 
 def get_value(model, data, field_name):

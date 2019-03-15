@@ -59,6 +59,13 @@ class TrainingType(ChoiceEnum):
     INTERNSHIP = pgettext_lazy("Internship for education group", "Internship")
 
     @classmethod
+    def finality_types(cls):
+        return [
+            cls.MASTER_MA_120.name, cls.MASTER_MD_120.name, cls.MASTER_MS_120.name,
+            cls.MASTER_MA_180_240.name, cls.MASTER_MD_180_240.name, cls.MASTER_MS_180_240.name
+        ]
+
+    @classmethod
     def with_diploma_values_set_initially_as_true(cls):
         return [
             cls.AGGREGATION.name, cls.BACHELOR.name, cls.FORMATION_PHD.name, cls.PHD.name, cls.MASTER_MA_120.name,

@@ -112,6 +112,76 @@ class GetAllTrainingTestCase(APITestCase):
             self.assertEqual(response.data['results'], serializer.data)
 
 
+class FilterTrainingTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.url = reverse('education_group_api_v1:training-list')
+
+        for year in [2018, 2019, 2020]:
+            academic_year = AcademicYearFactory(year=year)
+            TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year)
+            TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=academic_year)
+            TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=academic_year)
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_training_case_filter_from_year_params(self):
+        query_string = {'from_year': 2020}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        trainings = EducationGroupYear.objects.filter(
+            education_group_type__category=education_group_categories.TRAINING,
+            academic_year__year__gte=query_string['from_year']
+        ).order_by('-academic_year__year', 'acronym')
+
+        serializer = TrainingListSerializer(
+            trainings,
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_training_case_filter_to_year_params(self):
+        query_string = {'to_year': 2019}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        trainings = EducationGroupYear.objects.filter(
+            education_group_type__category=education_group_categories.TRAINING,
+            academic_year__year__lte=query_string['to_year']
+        ).order_by('-academic_year__year', 'acronym')
+
+        serializer = TrainingListSerializer(
+            trainings,
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_training_case_filter_type_params(self):
+        query_string = {'in_type': 'continue'}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        trainings = EducationGroupYear.objects.filter(
+            education_group_type__category=education_group_categories.TRAINING,
+            education_group_type__name__contains=query_string['in_type']
+        )
+
+        serializer = TrainingListSerializer(
+            trainings,
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
+
 class GetTrainingTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):

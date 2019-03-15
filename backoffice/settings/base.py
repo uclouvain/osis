@@ -197,7 +197,10 @@ EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 25))
 SEND_BROKEN_LINK_EMAILS = os.environ.get('SEND_BROKEN_LINK_EMAILS', 'True').lower() == 'true'
 INTERNAL_EMAIL_SUFFIX = os.environ.get('INTERNAL_EMAIL_SUFFIX', 'osis.org')
-MAIL_SENDER_CLASS = os.environ.get('MAIL_SENDER_CLASS', 'osis_common.messaging.mail_sender_classes.FallbackMailSender')
+MAIL_SENDER_CLASSES = os.environ.get(
+    'MAIL_SENDER_CLASSES',
+    'osis_common.messaging.mail_sender_classes.MessageHistorySender'
+).split()
 
 # Authentication settings
 LOGIN_URL = os.environ.get('LOGIN_URL', reverse_lazy('login'))
@@ -274,7 +277,8 @@ CKEDITOR_CONFIGS = {
             ['Link', 'Unlink'],
             ['CreateDiv'],
             {'name': 'insert', 'items': ['Table']},
-        ]
+        ],
+        'autoParagraph': False
     },
     'default': {
         "removePlugins": "stylesheetparser",
@@ -300,6 +304,7 @@ CKEDITOR_CONFIGS = {
             {'name': 'about', 'items': ['About']},
         ],
         'stylesSet': REDDOT_STYLES,
+        'autoParagraph': False
     },
     'minimal': {
         'toolbar': 'Custom',
@@ -309,7 +314,8 @@ CKEDITOR_CONFIGS = {
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList'],
             ['Link', 'Unlink']
-        ]
+        ],
+        'autoParagraph': False
     },
     'minimal_plus_headers': {
         'toolbar': 'Custom',
@@ -320,7 +326,8 @@ CKEDITOR_CONFIGS = {
             ['Bold', 'Italic', 'Underline'],
             ['Link', 'Unlink'],
             ['NumberedList', 'BulletedList']
-        ]
+        ],
+        'autoParagraph': False
     },
 }
 

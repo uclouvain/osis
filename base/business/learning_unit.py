@@ -307,11 +307,6 @@ def get_achievements_group_by_language(learning_unit_year):
     return achievement_grouped
 
 
-def get_no_summary_responsible_teachers(learning_unit_yr, summary_responsibles):
-    tutors = find_all_tutors_by_learning_unit_year(learning_unit_yr, "-summary_responsible")
-    return [tutor[0] for tutor in tutors if tutor[0] not in summary_responsibles]
-
-
 def get_learning_unit_comparison_context(learning_unit_year):
     context = dict({'learning_unit_year': learning_unit_year})
     context['campus'] = learning_unit_year.campus

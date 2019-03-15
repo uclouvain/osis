@@ -42,6 +42,7 @@ from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_Y
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from reference.models import language
+from base.models.enums.proposal_type import ProposalType
 
 FULL_READ_ONLY_FIELDS = {"acronym", "academic_year", "container_type"}
 FULL_PROPOSAL_READ_ONLY_FIELDS = {"academic_year", "container_type"}
@@ -216,7 +217,8 @@ class FullForm(LearningUnitBaseForm):
     subtype = learning_unit_year_subtypes.FULL
 
     def __init__(self, person, academic_year, learning_unit_instance=None, data=None, start_year=None, proposal=False,
-                 postposal=None, *args, **kwargs):
+                 postposal=None, proposal_type=None, *args, **kwargs):
+
         if not learning_unit_instance and not start_year:
             raise AttributeError("Should set at least learning_unit_instance or start_year instance.")
         self.academic_year = academic_year
@@ -225,15 +227,16 @@ class FullForm(LearningUnitBaseForm):
         self.proposal = proposal
         self.data = data
         self.start_year = self.instance.learning_unit.start_year if self.instance else start_year
+        self.proposal_type = proposal_type
 
         instances_data = self._build_instance_data(self.data, academic_year, proposal)
         super().__init__(instances_data, *args, **kwargs)
         if self.instance:
             self._disable_fields()
         else:
-            self._restrict_academic_years_choice(postposal)
+            self._restrict_academic_years_choice(postposal, proposal_type)
 
-    def _restrict_academic_years_choice(self, postposal):
+    def _restrict_academic_years_choice(self, postposal, proposal_type):
         if postposal:
             starting_academic_year = academic_year.starting_academic_year()
             end_year_range = MAX_ACADEMIC_YEAR_FACULTY if self.person.is_faculty_manager \
@@ -243,6 +246,8 @@ class FullForm(LearningUnitBaseForm):
                 start_year=starting_academic_year.year,
                 end_year=starting_academic_year.year + end_year_range
             )
+        else:
+            self._restrict_academic_years_choice_for_proposal_creation_suppression(proposal_type)
 
     def _disable_fields(self):
         if self.person.is_faculty_manager and not self.person.is_central_manager:
@@ -285,6 +290,7 @@ class FullForm(LearningUnitBaseForm):
             },
             SimplifiedVolumeManagementForm: {
                 'data': data,
+                'proposal': proposal,
                 'queryset': LearningComponentYear.objects.filter(
                     learningunitcomponent__learning_unit_year=self.instance
                 ) if self.instance else LearningComponentYear.objects.none(),
@@ -363,3 +369,18 @@ class FullForm(LearningUnitBaseForm):
         )
 
         return learning_unit_yr
+
+    def _restrict_academic_years_choice_for_proposal_creation_suppression(self, proposal_type):
+        if proposal_type in (ProposalType.CREATION.name, ProposalType.SUPPRESSION):
+            if self.person.is_faculty_manager and proposal_type == ProposalType.CREATION.name:
+                starting_academic_year = academic_year.current_academic_year().next()
+            else:
+                starting_academic_year = academic_year.starting_academic_year()
+
+            end_year_range = MAX_ACADEMIC_YEAR_CENTRAL - 1 if self.person.is_faculty_manager \
+                else MAX_ACADEMIC_YEAR_CENTRAL
+
+            self.fields["academic_year"].queryset = academic_year.find_academic_years(
+                start_year=starting_academic_year.year,
+                end_year=starting_academic_year.year + end_year_range
+            )

@@ -28,7 +28,7 @@ from collections import OrderedDict
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 from base.templatetags.learning_unit import get_difference_css, has_proposal, get_previous_acronym, value_label, \
-    DIFFERENCE_CSS, volume_format, get_component_volume_css, dl_component_tooltip
+    DIFFERENCE_CSS, volume_format, get_component_volume_css, dl_component_tooltip, changed_label
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -163,6 +163,19 @@ class LearningUnitTagTest(TestCase):
         self.assertEqual(
             dl_component_tooltip({'differences': {'components_initial_data': {}}}, "VOLUME_Q1", value=VOLUME),
             VOLUME
+        )
+
+    def test_changed_label_with_no_other(self):
+        self.assertEqual(changed_label("value", other=None), '<td><label>value</label></td>')
+
+    def test_changed_label_with_other(self):
+        self.assertEqual(
+            changed_label("value1", other="value1"), "<td><label>value1</label></td>"
+        )
+
+    def test_changed_label_with_other_different(self):
+        self.assertEqual(
+            changed_label("value1", other="value2"), "<td><label style='color:#5CB85C;'>value1</label></td>"
         )
 
     def test_dl_component_tooltip(self):

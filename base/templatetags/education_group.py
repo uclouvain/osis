@@ -33,11 +33,9 @@ from django.utils.translation import ugettext as _
 from base.business.education_group import can_user_edit_administrative_data
 from base.business.education_groups.perms import is_eligible_to_delete_education_group, \
     is_eligible_to_change_education_group, is_eligible_to_add_training, \
-    is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_change_achievement, \
-    is_eligible_to_delete_achievement, is_eligible_to_postpone_education_group
+    is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_postpone_education_group
 from base.models.academic_year import AcademicYear
 from base.models.utils.utils import get_verbose_field_value
-
 
 # TODO Use inclusion tags instead
 BUTTON_ORDER_TEMPLATE = """
@@ -260,7 +258,7 @@ def dl_with_parent(context, key, obj=None, parent=None,  dl_title="", class_dl="
     value = get_verbose_field_value(obj, key)
 
     if not dl_title:
-        dl_title = obj._meta.get_field(key).verbose_name.capitalize()
+        dl_title = obj._meta.get_field(key).verbose_name
 
     if value is None or value == "":
         parent_value = get_verbose_field_value(parent, key)

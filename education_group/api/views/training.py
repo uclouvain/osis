@@ -24,10 +24,21 @@
 #
 ##############################################################################
 from rest_framework import generics
+from django_filters import rest_framework as filters
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
+
+
+class TrainingFilter(filters.FilterSet):
+    from_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='gte')
+    to_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='lte')
+    in_type = filters.CharFilter(field_name="education_group_type__name", lookup_expr='contains')
+
+    class Meta:
+        model = EducationGroupYear
+        fields = ['acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year']
 
 
 class TrainingList(generics.ListAPIView):
@@ -35,19 +46,15 @@ class TrainingList(generics.ListAPIView):
        Return a list of all the training with optional filtering.
     """
     name = 'training-list'
-    queryset = EducationGroupYear.objects.filter(education_group_type__category=education_group_categories.TRAINING)\
-                                         .select_related('education_group_type', 'academic_year')\
-                                         .prefetch_related(
-                                                'administration_entity__entityversion_set',
-                                                'management_entity__entityversion_set'
-                                         )
-    serializer_class = TrainingListSerializer
-    filter_fields = (
-        'acronym',
-        'partial_acronym',
-        'title',
-        'title_english',
+    queryset = EducationGroupYear.objects.filter(
+        education_group_type__category=education_group_categories.TRAINING
+    ).select_related('education_group_type', 'academic_year')\
+        .prefetch_related(
+        'administration_entity__entityversion_set',
+        'management_entity__entityversion_set'
     )
+    serializer_class = TrainingListSerializer
+    filter_class = TrainingFilter
     search_fields = (
         'acronym',
         'partial_acronym',
@@ -71,17 +78,18 @@ class TrainingDetail(generics.RetrieveAPIView):
         Return the detail of the training
     """
     name = 'training-detail'
-    queryset = EducationGroupYear.objects.filter(education_group_type__category=education_group_categories.TRAINING)\
-                                         .select_related(
-                                            'education_group_type',
-                                            'academic_year',
-                                            'main_teaching_campus',
-                                            'enrollment_campus',
-                                            'primary_language',
-                                         ).prefetch_related(
-                                            'administration_entity__entityversion_set',
-                                            'management_entity__entityversion_set',
-                                         )
+    queryset = EducationGroupYear.objects.filter(
+        education_group_type__category=education_group_categories.TRAINING
+    ).select_related(
+        'education_group_type',
+        'academic_year',
+        'main_teaching_campus',
+        'enrollment_campus',
+        'primary_language',
+    ).prefetch_related(
+        'administration_entity__entityversion_set',
+        'management_entity__entityversion_set',
+    )
     serializer_class = TrainingDetailSerializer
     lookup_field = 'uuid'
     pagination_class = None

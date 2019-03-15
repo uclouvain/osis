@@ -76,7 +76,9 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
     maxDiff = None
 
     def setUp(self):
-        self.education_group_year = EducationGroupYearMasterFactory()
+        self.education_group_year = EducationGroupYearMasterFactory(
+            academic_year__year=1992
+        )
         common_master_education_group_year = EducationGroupYearCommonMasterFactory(
             academic_year=self.education_group_year.academic_year
         )

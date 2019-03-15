@@ -30,33 +30,14 @@
 <div role="tabpanel" class="tab-pane active" id="pedagogy">
     <div class="row well">
         <div class="col-md-6">
-            <label>{% trans 'Summary responsible(s)' %} : </label>
-            {% if summary_responsibles %}
+            {% if teachers %}
+                <label>{% trans 'Tutors' %} : </label>
+                <br>
                 <ul>
-                    {% for summary_responsible in summary_responsibles %}
-                        <li>{{ summary_responsible }}</li>
+                    {% for teacher in teachers %}
+                        <li>{{ teacher.tutor.person }}</li>
                     {% endfor %}
                 </ul>
-            {% else %}
-                <ul>
-                    <li>{% trans 'None' %}</li>
-                </ul>
-            {% endif %}
-            {% if other_teachers %}
-                <label>{% trans 'Other teacher(s)' %} : </label>
-                <a role="button" data-toggle="collapse" href="#CollapseTeachers" aria-expanded="false"
-                   aria-controls="collapse_classes" style="border:0;padding:0;">
-                <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
-                      style="color:#8a6d3b"></span>
-                </a>
-                <br>
-                <div class="collapse" id="CollapseTeachers">
-                    <ul>
-                        {% for teacher in other_teachers %}
-                            <li>{{ teacher.person }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
             {% endif %}
         </div>
         {% include "learning_unit/blocks/summary_locked.html" %}

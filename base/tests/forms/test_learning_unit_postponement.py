@@ -185,11 +185,12 @@ class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMi
 
         next_learning_unit_year = LearningUnitYear.objects.get(
             learning_unit=self.learn_unit_structure.learning_unit_full,
-            academic_year__year=self.current_academic_year.year+1
+            academic_year__year=self.current_academic_year.year + 1
         )
 
         ProposalLearningUnitFactory(learning_unit_year=next_learning_unit_year)
-        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.faculty_manager)
+        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full,
+                                                                      self.faculty_manager)
         form = _instanciate_postponement_form(self.faculty_manager, self.learning_unit_year_full.academic_year,
                                               learning_unit_instance=instance_luy_base_form.learning_unit_instance,
                                               data=instance_luy_base_form.data)

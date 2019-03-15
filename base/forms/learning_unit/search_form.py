@@ -83,11 +83,6 @@ class LearningUnitSearchForm(BaseSearchForm):
         label=_('Tutor')
     )
 
-    summary_responsible = forms.CharField(
-        max_length=20,
-        label=_('Summary responsible(s)')
-    )
-
     allocation_entity_acronym = forms.CharField(
         max_length=20,
         label=_('Alloc. Ent.')

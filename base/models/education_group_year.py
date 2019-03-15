@@ -25,8 +25,8 @@
 ##############################################################################
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models
-from django.db.models import Count, OuterRef, Exists
+from django.db import models, connection
+from django.db.models import Count, OuterRef, Exists, Q, Min, When, Case, Max
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -43,10 +43,11 @@ from base.models.enums import education_group_categories
 from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
 from base.models.enums.funding_codes import FundingCodes
-from base.models.exceptions import MaximumOneParentAllowedException
+from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
 from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
-from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin
+from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
+    SerializableQuerySet
 
 
 class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
@@ -64,23 +65,64 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
     ]
 
 
+class EducationGroupYearQueryset(SerializableQuerySet):
+    def get_nearest_years(self, year):
+        return self.aggregate(
+            futur=Min(
+                Case(When(academic_year__year__gte=year, then='academic_year__year'))
+            ),
+            past=Max(
+                Case(When(academic_year__year__lt=year, then='academic_year__year'))
+            )
+        )
+
+
 class EducationGroupYearManager(SerializableModelManager):
+    def get_queryset(self):
+        return EducationGroupYearQueryset(self.model, using=self._db)
+
     def look_for_common(self, **kwargs):
         return self.filter(acronym__startswith='common', **kwargs)
 
     def get_common(self, **kwargs):
         return self.get(acronym='common', **kwargs)
 
+    def get_nearest_years(self, year):
+        return self.get_queryset().get_nearest_years(year)
+
+
+class HierarchyQuerySet(models.QuerySet):
+    def get_parents(self):
+        with connection.cursor() as cursor:
+            child_pks = self.values_list('pk', flat=True)
+            cmd_sql = """
+             WITH RECURSIVE group_element_year_parent AS (
+                    SELECT parent_id
+                    FROM base_groupelementyear
+                    WHERE child_branch_id IN (%s)
+                    UNION ALL
+                    SELECT parent.parent_id
+                    FROM base_groupelementyear as parent
+                    INNER JOIN group_element_year_parent AS child on child.parent_id = parent.child_branch_id
+                )
+              SELECT distinct parent_id FROM group_element_year_parent;
+            """ % ','.join(["%s"]*len(child_pks))
+            cursor.execute(cmd_sql, list(child_pks))
+            education_group_year_pks = [row[0] for row in cursor.fetchall()]
+        return EducationGroupYear.objects.filter(pk__in=education_group_year_pks)
+
 
 class EducationGroupYear(SerializableModel):
     objects = EducationGroupYearManager()
+    hierarchy = HierarchyQuerySet.as_manager()
+
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
     acronym = models.CharField(
         max_length=40,
         db_index=True,
-        verbose_name=_("Acronym"),
+        verbose_name=_("Acronym/Short title"),
     )
 
     title = models.CharField(
@@ -362,7 +404,13 @@ class EducationGroupYear(SerializableModel):
         through="EducationGroupYearDomain",
         related_name="education_group_years",
         verbose_name=_("secondary domains")
+    )
 
+    isced_domain = models.ForeignKey(
+        "reference.DomainIsced",
+        on_delete=models.PROTECT,
+        null=True, blank=True,
+        verbose_name=_("ISCED domain"),
     )
 
     management_entity = models.ForeignKey(
@@ -395,7 +443,7 @@ class EducationGroupYear(SerializableModel):
 
     decree_category = models.CharField(
         max_length=40,
-        choices=decree_category.DECREE_CATEGORY,
+        choices=decree_category.DecreeCategories.choices(),
         blank=True,
         null=True,
         verbose_name=_('Decree category')
@@ -425,7 +473,7 @@ class EducationGroupYear(SerializableModel):
     co_graduation = models.CharField(
         max_length=8,
         db_index=True,
-        verbose_name=_("Co-graduation"),
+        verbose_name=_("Code co-graduation inter CfB"),
         blank=True,
         null=True,
     )
@@ -433,7 +481,7 @@ class EducationGroupYear(SerializableModel):
     co_graduation_coefficient = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        verbose_name=_('Co-graduation coefficient'),
+        verbose_name=_('Co-graduation total coefficient'),
         blank=True,
         null=True,
         validators=[MinValueValidator(1), MaxValueValidator(9999)],
@@ -459,7 +507,10 @@ class EducationGroupYear(SerializableModel):
     class Meta:
         ordering = ("academic_year",)
         verbose_name = _("Education group year")
-        unique_together = ('education_group', 'academic_year')
+        unique_together = (
+            ('education_group', 'academic_year'),
+            ('partial_acronym', 'academic_year')
+        )
 
     def __str__(self):
         return "{} - {} - {}".format(
@@ -623,9 +674,10 @@ class EducationGroupYear(SerializableModel):
         return self.educationgrouporganization_set.all().order_by('all_students')
 
     def is_training(self):
-        if self.education_group_type:
-            return self.education_group_type.category == education_group_categories.TRAINING
-        return False
+        return self.education_group_type.category == education_group_categories.TRAINING
+
+    def is_mini_training(self):
+        return self.education_group_type.category == education_group_categories.MINI_TRAINING
 
     def delete(self, using=None, keep_parents=False):
         result = super().delete(using, keep_parents)
@@ -662,6 +714,8 @@ class EducationGroupYear(SerializableModel):
         return True
 
     def clean(self):
+        self.clean_acronym()
+        self.clean_partial_acronym()
         if not self.constraint_type:
             self.clean_constraint_type()
         else:
@@ -695,6 +749,61 @@ class EducationGroupYear(SerializableModel):
             raise ValidationError({'duration': _("This field is required.")})
         elif self.duration is not None and self.duration_unit is None:
             raise ValidationError({'duration_unit': _("This field is required.")})
+
+    @staticmethod
+    def format_year_to_academic_year(year):
+        return "{}-{}".format(str(year), str(year + 1)[-2:])
+
+    def clean_partial_acronym(self, raise_warnings=False):
+        if not self.partial_acronym:
+            return
+
+        egy_using_same_partial_acronym = EducationGroupYear.objects.\
+            filter(partial_acronym=self.partial_acronym.upper()).\
+            exclude(education_group=self.education_group_id).\
+            get_nearest_years(self.academic_year.year)
+
+        if egy_using_same_partial_acronym["futur"]:
+            raise ValidationError({
+                'partial_acronym': _("Partial acronym already exists in %(academic_year)s") % {
+                    "academic_year": self.format_year_to_academic_year(egy_using_same_partial_acronym["futur"])
+                }
+            })
+
+        if raise_warnings and egy_using_same_partial_acronym["past"]:
+            raise ValidationWarning({
+                'partial_acronym': _("Partial acronym existed in %(academic_year)s") % {
+                    "academic_year": self.format_year_to_academic_year(egy_using_same_partial_acronym["past"])
+                }
+            })
+
+    def clean_acronym(self, raise_warnings=False):
+        if not self.acronym:
+            return
+
+        egy_using_same_acronym = EducationGroupYear.objects. \
+            filter(acronym=self.acronym.upper()).exclude(education_group=self.education_group_id)
+
+        # Groups can reuse acronym of other groups
+        if self.education_group_type.category == education_group_categories.GROUP:
+            egy_using_same_acronym = egy_using_same_acronym.\
+                exclude(education_group_type__category=education_group_categories.GROUP)
+
+        egy_using_same_acronym = egy_using_same_acronym.get_nearest_years(self.academic_year.year)
+
+        if egy_using_same_acronym["futur"]:
+            raise ValidationError({
+                'acronym': _("Acronym already exists in %(academic_year)s") % {
+                    "academic_year": self.format_year_to_academic_year(egy_using_same_acronym["futur"])
+                }
+            })
+
+        if raise_warnings and egy_using_same_acronym["past"]:
+            raise ValidationWarning({
+                'acronym': _("Acronym existed in %(academic_year)s") % {
+                    "academic_year": self.format_year_to_academic_year(egy_using_same_acronym["past"])
+                }
+            })
 
     def next_year(self):
         try:

@@ -101,7 +101,8 @@ class ProposalBaseForm:
             learning_unit = learning_unit_year.learning_unit if learning_unit_year else None
             start_year = default_ac_year.year if default_ac_year else None
             self.learning_unit_form_container = FullForm(person, ac_year, learning_unit_instance=learning_unit,
-                                                         data=data, start_year=start_year, proposal=True)
+                                                         data=data, start_year=start_year, proposal=True,
+                                                         proposal_type=proposal_type)
         else:
             self.learning_unit_form_container = PartimForm(person,
                                                            learning_unit_year.parent.learning_unit,
@@ -159,9 +160,9 @@ class CreationProposalBaseForm(ProposalBaseForm):
 
     def __init__(self, data, person, default_ac_year=None):
         if not default_ac_year:
-            default_ac_year = current_academic_year()
+            default_ac_year = current_academic_year().next()
 
-        super().__init__(data, person, default_ac_year=default_ac_year)
+        super().__init__(data, person, default_ac_year=default_ac_year, proposal_type=ProposalType.CREATION.name)
 
     @transaction.atomic
     def save(self):

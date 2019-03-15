@@ -24,7 +24,10 @@
 #
 ##############################################################################
 from django import forms
-from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, permission_required
+from django.core.exceptions import ValidationError
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -35,15 +38,16 @@ from base.forms.education_group.common import EducationGroupModelForm, Education
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
 from base.forms.education_group.training import TrainingForm
-from base.models.academic_year import current_academic_year
+from base.models.academic_year import current_academic_year, AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.exceptions import ValidationWarning
 from base.utils.cache import RequestCache
-from base.views import layout
 from base.views.common import display_success_messages
 from base.views.education_groups.perms import can_create_education_group
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
+from osis_common.decorators.ajax import ajax_required
 
 FORMS_BY_CATEGORY = {
     education_group_categories.GROUP: GroupForm,
@@ -149,3 +153,38 @@ def _get_success_message_for_creation_education_group_year(parent_id, education_
         "acronym": education_group_year.acronym,
         "academic_year": education_group_year.academic_year,
     }
+
+
+@ajax_required
+@login_required
+@permission_required("base.add_educationgroup", raise_exception=True)
+def validate_field(request, category, education_group_year_pk=None):
+    accepted_fields = ["partial_acronym", "acronym"]
+
+    academic_year = AcademicYear.objects.get(pk=request.GET["academic_year"])
+    acronym = request.GET.get("acronym")
+    partial_acronym = request.GET.get("partial_acronym")
+
+    egy = EducationGroupYear(academic_year=academic_year, acronym=acronym, partial_acronym=partial_acronym,
+                             education_group_type=EducationGroupType(category=category))
+
+    # This is an update
+    if education_group_year_pk:
+        egy = get_object_or_404(EducationGroupYear, pk=education_group_year_pk)
+        egy.acronym = acronym
+        egy.partial_acronym = partial_acronym
+
+    response = {}
+
+    for field in accepted_fields:
+        try:
+            attr_name = 'clean_{field_name}'.format(field_name=field)
+            clean_field_func = getattr(egy, attr_name)
+            if clean_field_func:
+                clean_field_func(raise_warnings=True)
+        except ValidationWarning as w:
+            response[field] = {'msg': w.message_dict[field][0], 'level': messages.DEFAULT_TAGS[messages.WARNING]}
+        except ValidationError as e:
+            response[field] = {'msg': e.message_dict[field][0], 'level': messages.DEFAULT_TAGS[messages.ERROR]}
+
+    return JsonResponse(response)

@@ -114,8 +114,8 @@
     "pk": 11,
     "fields": {
         "reference": "educational_information_update_txt",
-        "subject": "Les informations pédagogiques doivent être mises à jour",
-        "template": "<p>Bonjour,</p>\r\n\r\n<p>Pourriez-vous valider ou compléter les informations pédagogiques relatives aux unités d’enseignement ci-dessous ?</p><p>{{learning_unit_years}}}</p>\r\n\r\n<p>En vous remerciant,</p>\r\n\r\n<p>{{ enrollments }}</p>\r\n\r\n<p>Votre gestionnaire facultaire</p>",
+        "subject": "Les fiches descriptives doivent être mises à jour",
+        "template": "<p>Bonjour,</p>\r\n\r\n<p>Pourriez-vous valider ou compléter les fiches descriptives relatives aux unités d’enseignement ci-dessous ?</p><p>{{learning_unit_years}}}</p>\r\n\r\n<p>En vous remerciant,</p>\r\n\r\n<p>{{ enrollments }}</p>\r\n\r\n<p>Votre gestionnaire facultaire</p>",
         "format": "PLAIN",
         "language": "fr-be"
     }
@@ -125,8 +125,8 @@
     "pk": 12,
     "fields": {
         "reference": "educational_information_update_html",
-        "subject": "Les informations pédagogiques doivent être mises à jour",
-        "template": "<p>{% autoescape off %}</p><p>Bonjour,</p>\r\n\r\n<p>Pourriez-vous valider ou compléter les informations pédagogiques relatives aux unités d’enseignement ci-dessous ?</p><p>{{learning_unit_years}}}</p>\r\n\r\n<p>En vous remerciant,</p>\r\n\r\n<p>{{ enrollments }}</p>\r\n\r\n<p>Votre gestionnaire facultaire</p><p>{% endautoescape %}</p>",
+        "subject": "Les fiches descriptives doivent être mises à jour",
+        "template": "<p>{% autoescape off %}</p><p>Bonjour,</p>\r\n\r\n<p>Pourriez-vous valider ou compléter les fiches descriptives relatives aux unités d’enseignement ci-dessous ?</p><p>{{learning_unit_years}}}</p>\r\n\r\n<p>En vous remerciant,</p>\r\n\r\n<p>{{ enrollments }}</p>\r\n\r\n<p>Votre gestionnaire facultaire</p><p>{% endautoescape %}</p>",
         "format": "PLAIN",
         "language": "fr-be"
     }

@@ -123,15 +123,6 @@ def find_by_session_and_academic_year(nb_session, an_academic_year):
     )
 
 
-def get_by_session_reference_and_academic_year(nb_session, a_reference, an_academic_year):
-    try:
-        return SessionExamCalendar.objects.get(number_session=nb_session,
-                                               academic_calendar__reference=a_reference,
-                                               academic_calendar__academic_year=an_academic_year)
-    except SessionExamCalendar.DoesNotExist:
-        return None
-
-
 def get_number_session_by_academic_calendar(academic_calendar):
     session = getattr(academic_calendar, 'sessionexamcalendar', None)
     return session.number_session if session else None

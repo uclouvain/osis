@@ -387,7 +387,9 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": []
+            "groups": [
+                ["central_managers"]
+            ]
         },
         "model": "rules_management.fieldreference"
     },
@@ -413,7 +415,10 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": []
+            "groups": [
+                ["central_managers"],
+                ["faculty_managers"]
+            ]
         },
         "model": "rules_management.fieldreference"
     },
@@ -2610,6 +2615,9 @@
             "groups": [
                 [
                     "central_managers"
+                ],
+                [
+                    "faculty_managers"
                 ]
             ]
         },
@@ -2951,7 +2959,10 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": []
+            "groups": [
+                ["central_managers"],
+                ["faculty_managers"]
+            ]
         },
         "model": "rules_management.fieldreference"
     },
@@ -3864,7 +3875,11 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": []
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
         },
         "model": "rules_management.fieldreference"
     },
@@ -3890,7 +3905,10 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": []
+            "groups": [
+                ["central_managers"],
+                ["faculty_managers"]
+            ]
         },
         "model": "rules_management.fieldreference"
     },
@@ -4228,6 +4246,53 @@
         "pk": 264,
         "fields": {
             "field_name": "certificate_aims",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 265,
+        "fields": {
+            "field_name": "isced_domain",
+            "context": "TRAINING_DAILY_MANAGEMENT",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 266,
+        "fields": {
+            "field_name": "isced_domain",
+            "context": "TRAINING_PROPOSAL_MANAGEMENT",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": []
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 267,
+        "fields": {
+            "field_name": "isced_domain",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",

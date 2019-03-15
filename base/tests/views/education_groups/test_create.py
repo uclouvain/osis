@@ -25,6 +25,8 @@
 ##############################################################################
 from unittest import mock
 
+from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
@@ -33,10 +35,13 @@ from base.forms.education_group.group import GroupYearModelForm
 from base.forms.education_group.mini_training import MiniTrainingYearModelForm
 from base.forms.education_group.training import TrainingEducationGroupYearForm
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_categories import TRAINING, Categories
+from base.models.exceptions import ValidationWarning
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 
 
 @override_flag('education_group_create', active=True)
@@ -109,7 +114,7 @@ class TestCreate(TestCase):
                 education_group_type = next(eg_type for eg_type in self.education_group_types
                                             if eg_type.category == category)
                 self.client.get(url)
-                self.mocked_perm.assert_called_with(self.person, None, category,
+                self.mocked_perm.assert_called_with(self.person, None, Categories[category],
                                                     education_group_type=education_group_type,
                                                     raise_exception=True)
 
@@ -142,3 +147,55 @@ class TestCreate(TestCase):
                 response = self.client.get(self.urls_without_parent_by_category.get(category))
                 form_education_group_year = response.context["form_education_group_year"]
                 self.assertIsInstance(form_education_group_year, expected_forms_by_category.get(category))
+
+
+class TestValidateField(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
+
+        cls.person = PersonWithPermissionsFactory("add_educationgroup")
+        cls.url = reverse('validate_education_group_field', args=[TRAINING])
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+
+        mock_clean_acronym = mock.patch(
+            "base.models.education_group_year.EducationGroupYear.clean_acronym",
+            return_value=None
+        )
+        self.mocked_clean_acronym = mock_clean_acronym.start()
+        self.addCleanup(mock_clean_acronym.stop)
+
+        mock_clean_partial_acronym = mock.patch(
+            "base.models.education_group_year.EducationGroupYear.clean_partial_acronym",
+            return_value=None
+        )
+        self.mocked_clean_partial_acronym = mock_clean_partial_acronym.start()
+        self.addCleanup(mock_clean_partial_acronym.stop)
+
+    def test_response_should_be_empty_when_fields_are_valid(self):
+        response = self.client.get(
+            self.url,
+            data={"academic_year": self.academic_year.pk, "acronym": "TEST"},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {}
+        )
+
+    def test_response_should_contain_error_message_when_field_not_valid(self):
+        self.mocked_clean_acronym.side_effect = ValidationError({"acronym": "error acronym"})
+        self.mocked_clean_partial_acronym.side_effect = ValidationWarning({"partial_acronym": "error partial"})
+
+        response = self.client.get(
+            self.url,
+            data={"academic_year": self.academic_year.pk, "acronym": "TEST"},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {"acronym": {"msg": "error acronym", "level": messages.DEFAULT_TAGS[messages.ERROR]},
+             "partial_acronym": {"msg": "error partial", "level": messages.DEFAULT_TAGS[messages.WARNING]}}
+        )

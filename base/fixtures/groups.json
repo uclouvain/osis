@@ -3131,6 +3131,11 @@
                 "can_manage_attribution",
                 "base",
                 "person"
+            ],
+            [
+                "can_consolidate_learningunit_proposal",
+                "base",
+                "learningunit"
             ]
         ]
     }
@@ -3439,6 +3444,24 @@
                 ],
                 [
                     "can_validate_registration",
+                    "continuing_education",
+                    "admission"
+                ]
+            ]
+        }
+    },
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "continuing_education_training_managers",
+            "permissions": [
+                [
+                    "can_access_admission",
+                    "continuing_education",
+                    "admission"
+                ],
+                [
+                    "change_admission",
                     "continuing_education",
                     "admission"
                 ]

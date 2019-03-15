@@ -65,7 +65,7 @@
                         </td>
                         <td>
                             {% if coorganization.diploma %}
-                                {% trans coorganization.diploma %}
+                                {{ coorganization.get_diploma_display }}
                             {% endif %}
                         </td>
                         <td>
@@ -116,7 +116,7 @@
                         </td>
                         <td>
                             {% if coorganization.diploma %}
-                                {% trans coorganization.diploma %}
+                                {{ coorganization.get_diploma_display }}
                             {% endif %}
                         </td>
                         <td>

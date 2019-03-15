@@ -31,7 +31,9 @@ from django.test import TestCase
 from rest_framework.reverse import reverse
 from waffle.testutils import override_flag
 
-from base.models.enums import proposal_state, entity_container_year_link_type, learning_unit_year_subtypes
+from base.models.enums import proposal_state, entity_container_year_link_type, learning_unit_year_subtypes, \
+    proposal_type
+import base.models as mdl_base
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -44,13 +46,13 @@ from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFact
 class TestConsolidate(TestCase):
     @classmethod
     def setUpTestData(cls):
-        current_academic_year = create_current_academic_year()
+        cls.current_academic_year = create_current_academic_year()
 
         cls.proposal = ProposalLearningUnitFactory(
             state=proposal_state.ProposalState.ACCEPTED.name,
             learning_unit_year__subtype=learning_unit_year_subtypes.FULL,
-            learning_unit_year__academic_year=current_academic_year,
-            learning_unit_year__learning_container_year__academic_year=current_academic_year
+            learning_unit_year__academic_year=cls.current_academic_year,
+            learning_unit_year__learning_container_year__academic_year=cls.current_academic_year
         )
         cls.learning_unit_year = cls.proposal.learning_unit_year
 
@@ -112,3 +114,16 @@ class TestConsolidate(TestCase):
         expected_redirect_url = reverse('learning_unit', args=[self.learning_unit_year.id])
         self.assertRedirects(response, expected_redirect_url)
         mock_consolidate.assert_called_once_with([self.proposal], self.person, {})
+
+    @mock.patch("base.business.learning_units.perms.is_eligible_to_consolidate_proposal", return_value=True)
+    def test_creation_proposal_consolidation(self, mock_perms):
+        creation_proposal = ProposalLearningUnitFactory(
+            type=proposal_type.ProposalType.CREATION,
+            state=proposal_state.ProposalState.ACCEPTED.name,
+            learning_unit_year__subtype=learning_unit_year_subtypes.FULL,
+            learning_unit_year__academic_year=self.current_academic_year,
+            learning_unit_year__learning_container_year__academic_year=self.current_academic_year
+        )
+        lu_id = creation_proposal.learning_unit_year.learning_unit.id
+        self.client.post(self.url, data={"learning_unit_year_id": creation_proposal.learning_unit_year.id}, follow=False)
+        self.assertTrue(mdl_base.learning_unit.LearningUnit.objects.filter(pk=lu_id).exists())
