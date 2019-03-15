@@ -2497,7 +2497,6 @@ msgid "Modifications should be made in EPC for year %(year)d"
 msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
 
 #: templates/learning_unit/blocks/summary_locked.html:33
-#, fuzzy
 #| msgid "Modify"
 msgid "Modified by"
 msgstr "Modifier par"
@@ -5558,7 +5557,6 @@ msgid "text in French"
 msgstr "texte en français"
 
 #: templates/learning_unit/blocks/summary_locked.html:33
-#, fuzzy
 #| msgid "The"
 msgid "the"
 msgstr "Le"
