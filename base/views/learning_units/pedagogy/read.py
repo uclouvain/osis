@@ -52,7 +52,6 @@ def learning_unit_pedagogy(request, learning_unit_year_id):
     return read_learning_unit_pedagogy(request, learning_unit_year_id, {}, "learning_unit/pedagogy.html")
 
 
-# @TODO: Supprimer form_french/form_english et utiliser une liste pour l'affichage à la place des formulaires
 def read_learning_unit_pedagogy(request, learning_unit_year_id, context, template):
     person = get_object_or_404(Person, user=request.user)
     context.update(get_common_context_learning_unit_year(learning_unit_year_id, person))
@@ -116,9 +115,9 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
             to_attr="persona"
         )
 
-    ).latest(
-        "revision__date_created"
-    )
+    ).order_by(
+        "-revision__date_created"
+    ).first()
 
     context['cms_labels_translated'] = translated_labels_with_text
     context['teaching_materials'] = teaching_materials

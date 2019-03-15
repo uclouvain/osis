@@ -25,9 +25,12 @@
             {% endif %}
         </span>
     {% endif %}
+
+    {% if version %}
     <br>
     <br>
     <span class="pull-right">
         {% trans "Modified by" %} <strong>{{ version.revision.user.persona }}</strong> {% trans "the" %} <strong>{{ version.revision.date_created|date:"d/m/Y" }}</strong>
     </span>
+    {% endif %}
 </div>

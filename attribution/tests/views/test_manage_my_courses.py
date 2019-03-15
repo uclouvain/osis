@@ -153,7 +153,7 @@ class TestViewEducationalInformation(TestCase):
         context = response.context
         self.assertEqual(context["learning_unit_year"], self.attribution.learning_unit_year)
         self.assertTrue("teaching_materials" in context)
-        self.assertTrue(context["cms_labels_translated"])
+        self.assertFalse(context["cms_labels_translated"])
         self.assertFalse(context["can_edit_information"])
         self.assertFalse(context["can_edit_summary_locked_field"])
         self.assertFalse(context["submission_dates"])
