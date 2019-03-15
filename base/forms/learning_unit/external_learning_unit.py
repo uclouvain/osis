@@ -148,6 +148,9 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
         super().__init__(instances_data, *args, **kwargs)
         self.learning_unit_year_form.fields['acronym'] = ExternalAcronymField()
+        if not learning_unit_instance or learning_unit_instance.acronym[0] == "E":
+            self.learning_unit_year_form.fields['acronym'].initial = "E"
+            self.learning_unit_year_form.fields['acronym'].widget.widgets[0].attrs['readonly'] = True
         self.start_year = self.instance.learning_unit.start_year if self.instance else start_year
 
     @property
