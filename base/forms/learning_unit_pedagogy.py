@@ -28,36 +28,12 @@ from django import forms
 from django.conf import settings
 from django.db.transaction import atomic
 
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_ONLY
-from reference.models.language import find_language_in_settings
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.business.learning_units.pedagogy import is_pedagogy_data_must_be_postponed, save_teaching_material
-from base.forms.common import set_trans_txt
 from base.models import learning_unit_year
-from base.models.learning_unit_year import LearningUnitYear
 from base.models.teaching_material import TeachingMaterial
 from cms.enums import entity_name
 from cms.models import translated_text
-
-
-class LearningUnitPedagogyForm(forms.Form):
-    def __init__(self, *args, learning_unit_year=None, language_code=None, **kwargs):
-        self.learning_unit_year = learning_unit_year
-        self.language = find_language_in_settings(language_code)
-
-        self.load_initial()
-        super().__init__(*args, **kwargs)
-
-    def load_initial(self):
-        translated_texts_list = self._get_all_translated_text_related()
-        set_trans_txt(self, translated_texts_list)
-
-    def _get_all_translated_text_related(self):
-        language_iso = self.language[0]
-
-        return translated_text.search(entity=entity_name.LEARNING_UNIT_YEAR,
-                                      reference=self.learning_unit_year.id,
-                                      language=language_iso,
-                                      text_labels_name=CMS_LABEL_PEDAGOGY)
 
 
 class LearningUnitPedagogyEditForm(forms.Form):
