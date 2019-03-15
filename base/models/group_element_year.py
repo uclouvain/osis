@@ -27,6 +27,7 @@ import itertools
 from collections import Counter
 
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator
 from django.db import models, connection
 from django.db.models import Q, F, Case, When
 from django.utils import translation
@@ -86,40 +87,32 @@ SELECT * FROM group_element_year_parent ;
 def validate_block_value(value):
     max_authorized_value = 6
     if not all([
-        _check_chars_are_integers(value),
-        _check_chars_max_authorized_value(value, max_authorized_value),
-        _check_chars_duplications(value),
-        _check_chars_orders(value),
+        _check_integers_max_authorized_value(value, max_authorized_value),
+        _check_integers_duplications(value),
+        _check_integers_orders(value),
+        value != 0,
+        len(str(value)) <= max_authorized_value
     ]):
         raise ValidationError(
-            _("Please register a maximum of %(max_authorized_value)s digits in ascending order, without any duplication. "
-              "Authorized values are from 1 to 6. Examples: 12, 23, 46"),
+            _("Please register a maximum of %(max_authorized_value)s digits in ascending order, "
+              "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46"),
             params={'max_authorized_value': max_authorized_value},
         )
 
 
-def _check_chars_are_integers(value):
-    try:
-        [int(char) for char in value]
-    except ValueError:
+def _check_integers_max_authorized_value(value, max_authorized_value):
+    return all(int(char) <= max_authorized_value for char in str(value))
+
+
+def _check_integers_duplications(value):
+    if any(integer for integer, occurence in Counter(str(value)).items() if occurence > 1):
         return False
     return True
 
 
-def _check_chars_max_authorized_value(value, max_authorized_value):
-    return all(int(char) <= max_authorized_value for char in value)
-
-
-def _check_chars_duplications(value):
-    freq_count = Counter(value)
-    if any(char for char, occurence in freq_count.items() if occurence > 1):
-        return False
-    return True
-
-
-def _check_chars_orders(value):
-    int_values = [int(char) for char in value]
-    return list(sorted(int_values)) == int_values
+def _check_integers_orders(value):
+    digit_values = [int(char) for char in str(value)]
+    return list(sorted(digit_values)) == digit_values
 
 
 class GroupElementYearManager(models.Manager):
@@ -176,8 +169,7 @@ class GroupElementYear(OrderedModel):
         verbose_name=_("Mandatory"),
     )
 
-    block = models.CharField(
-        max_length=6,
+    block = models.PositiveIntegerField(
         blank=True,
         null=True,
         verbose_name=_("Block"),
