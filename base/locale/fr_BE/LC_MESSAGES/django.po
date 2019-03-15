@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-13 13:34+0100\n"
+"POT-Creation-Date: 2019-03-15 11:02+0100\n"
 "PO-Revision-Date: 2019-02-27 15:13+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -423,6 +423,7 @@ msgstr "Actions"
 #: models/learning_unit_year.py:239
 #: templates/learning_unit/by_activity.html:109
 #: templates/learning_unit/by_external.html:67
+#: templates/learning_unit/comparison.html:54
 #: tests/forms/test_learning_unit_postponement.py:557
 msgid "Active"
 msgstr "Actif"
@@ -976,7 +977,7 @@ msgstr "Partie de base (Tronc commun)"
 #: business/learning_units/edition.py:449 business/proposal_xls.py:55
 #: models/learning_container_year.py:59
 #: tests/business/learning_units/test_edition.py:247
-#: tests/views/test_learning_unit.py:1558
+#: tests/views/test_learning_unit.py:1555
 msgid "Common title"
 msgstr "Intitulé commun"
 
@@ -1096,7 +1097,7 @@ msgstr "Créd. rel./abs."
 #: models/learning_unit_year.py:115 templates/learning_unit/by_activity.html:85
 #: templates/learning_unit/by_external.html:49
 #: templates/learning_unit/identification.html:84
-#: tests/views/test_learning_unit.py:1544
+#: tests/views/test_learning_unit.py:1541
 msgid "Credits"
 msgstr "Crédits"
 
@@ -1131,7 +1132,7 @@ msgid "Day"
 msgstr "Jour"
 
 #: business/proposal_xls.py:40 business/proposal_xls.py:72
-#: models/learning_container_year.py:67 tests/views/test_learning_unit.py:1557
+#: models/learning_container_year.py:67 tests/views/test_learning_unit.py:1554
 msgid "Decision"
 msgstr "Décision"
 
@@ -1259,7 +1260,7 @@ msgid "Dissertation submission"
 msgstr "Remise du mémoire"
 
 #: models/enums/vacant_declaration_type.py:41
-#: tests/views/test_learning_unit.py:1557
+#: tests/views/test_learning_unit.py:1554
 msgid "Do not assign"
 msgstr "Ne pas attribuer"
 
@@ -1439,6 +1440,7 @@ msgstr "Fin inscription aux examens"
 #: forms/education_group/achievement.py:85
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:40
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:36
+#: templates/learning_unit/blocks/panel/educational_informations.html:51
 msgid "English"
 msgstr "Anglais"
 
@@ -1567,7 +1569,7 @@ msgstr "Exporter"
 #: forms/learning_unit/external_learning_unit.py:52
 #: models/enums/attribution_procedure.py:35
 #: models/enums/learning_container_year_types.py:44
-#: tests/views/test_learning_unit.py:1546
+#: tests/views/test_learning_unit.py:1543
 msgid "External"
 msgstr "Externe"
 
@@ -1696,6 +1698,7 @@ msgstr "Anciennement"
 #: forms/education_group/achievement.py:79
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:39
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:35
+#: templates/learning_unit/blocks/panel/educational_informations.html:50
 msgid "French"
 msgstr "Français"
 
@@ -2029,7 +2032,7 @@ msgstr "Partie magistrale"
 msgid "LU"
 msgstr "UE"
 
-#: forms/learning_unit/search_form.py:202 tests/views/test_learning_unit.py:415
+#: forms/learning_unit/search_form.py:202 tests/views/test_learning_unit.py:414
 msgid "LU_ERRORS_INVALID_REGEX_SYNTAX"
 msgstr "Expression régulière incorrecte!"
 
@@ -2493,6 +2496,12 @@ msgstr "Modification apportée"
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
 
+#: templates/learning_unit/blocks/summary_locked.html:33
+#, fuzzy
+#| msgid "Modify"
+msgid "Modified by"
+msgstr "Modifier par"
+
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:85
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:69
@@ -2601,10 +2610,10 @@ msgstr "Suivant"
 #: business/learning_units/xls_comparison.py:413
 #: business/learning_units/xls_comparison.py:418
 #: business/learning_units/xls_comparison.py:419
-#: templates/learning_unit/proposal_comparison.html:52
-#: templates/learning_unit/proposal_comparison.html:54
-#: templates/learning_unit/proposal_comparison.html:73
-#: templates/learning_unit/proposal_comparison.html:76
+#: templates/learning_unit/proposal_comparison.html:55
+#: templates/learning_unit/proposal_comparison.html:64
+#: templates/learning_unit/proposal_comparison.html:92
+#: templates/learning_unit/proposal_comparison.html:101
 #: tests/business/learning_units/test_xls_comparison.py:104
 #: tests/business/learning_units/test_xls_comparison.py:114
 #: tests/business/learning_units/test_xls_comparison.py:115
@@ -2639,8 +2648,8 @@ msgstr "Aucune attribution n’existe pour le cours parent"
 msgid "No data"
 msgstr "Pas de données"
 
-#: templates/learning_unit/comparison.html:149
-#: templates/learning_unit/proposal_comparison.html:103
+#: templates/learning_unit/comparison.html:161
+#: templates/learning_unit/proposal_comparison.html:131
 msgid "No difference"
 msgstr "Aucune différence"
 
@@ -2955,7 +2964,7 @@ msgstr "En attente"
 
 #: business/learning_unit.py:71 business/proposal_xls.py:40
 #: business/proposal_xls.py:52 models/learning_unit_year.py:143
-#: tests/views/test_learning_unit.py:1545
+#: tests/views/test_learning_unit.py:1542
 msgid "Periodicity"
 msgstr "Périodicité"
 
@@ -2980,8 +2989,8 @@ msgstr "Doctorat"
 #: business/proposal_xls.py:84 business/proposal_xls.py:94
 #: forms/learning_unit/edition_volume.py:87
 #: forms/learning_unit/edition_volume.py:107
-#: tests/views/test_learning_unit.py:1570 views/learning_unit.py:286
-#: views/learning_unit.py:385 views/learning_unit.py:401
+#: tests/views/test_learning_unit.py:1567 views/learning_unit.py:293
+#: views/learning_unit.py:392 views/learning_unit.py:408
 msgid "Planned classes"
 msgstr "Classes prévues"
 
@@ -3012,7 +3021,7 @@ msgstr "Code postal"
 
 #: models/enums/component_type.py:33
 #: models/enums/learning_component_year_type.py:33
-#: tests/views/test_learning_unit.py:1568
+#: tests/views/test_learning_unit.py:1565
 msgid "Practical exercises"
 msgstr "Partie pratique"
 
@@ -3071,7 +3080,7 @@ msgid "Printable title"
 msgstr "Titre imprimable"
 
 #: business/proposal_xls.py:73 models/learning_unit_year.py:130
-#: tests/views/test_learning_unit.py:1546
+#: tests/views/test_learning_unit.py:1543
 msgid "Procedure"
 msgstr "Procédure"
 
@@ -4211,7 +4220,7 @@ msgstr ""
 msgid "The start date must be equals or lower than the end date"
 msgstr "La date de début doit être égale ou inférieure à la date de fin"
 
-#: tests/views/test_learning_unit.py:1370 views/learning_unit.py:525
+#: tests/views/test_learning_unit.py:1367 views/learning_unit.py:533
 #, python-format
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
@@ -4627,7 +4636,7 @@ msgid "Vacant"
 msgstr "Vacant"
 
 #: models/enums/vacant_declaration_type.py:40
-#: tests/views/test_learning_unit.py:1557
+#: tests/views/test_learning_unit.py:1554
 msgid "Vacant not publish"
 msgstr "Vacant pas publier"
 
@@ -4695,22 +4704,22 @@ msgstr "Volume 2"
 
 #: forms/learning_unit/edition_volume.py:66
 #: forms/learning_unit/edition_volume.py:84
-#: tests/views/test_learning_unit.py:1571 views/learning_unit.py:289
-#: views/learning_unit.py:386 views/learning_unit.py:402
+#: tests/views/test_learning_unit.py:1568 views/learning_unit.py:296
+#: views/learning_unit.py:393 views/learning_unit.py:409
 msgid "Volume Q1"
 msgstr "Volume Q1"
 
 #: forms/learning_unit/edition_volume.py:73
 #: forms/learning_unit/edition_volume.py:84
-#: tests/views/test_learning_unit.py:1572 views/learning_unit.py:291
-#: views/learning_unit.py:387 views/learning_unit.py:403
+#: tests/views/test_learning_unit.py:1569 views/learning_unit.py:298
+#: views/learning_unit.py:394 views/learning_unit.py:410
 msgid "Volume Q2"
 msgstr "Volume Q2"
 
 #: forms/learning_unit/edition_volume.py:84
 #: forms/learning_unit/edition_volume.py:106
-#: tests/views/test_learning_unit.py:1569 views/learning_unit.py:284
-#: views/learning_unit.py:384 views/learning_unit.py:400
+#: tests/views/test_learning_unit.py:1566 views/learning_unit.py:291
+#: views/learning_unit.py:391 views/learning_unit.py:407
 msgid "Volume total annual"
 msgstr "Volume total annuel"
 
@@ -4794,10 +4803,10 @@ msgstr "Xls avec les propositions"
 #: business/learning_units/xls_comparison.py:413
 #: business/learning_units/xls_comparison.py:418
 #: business/learning_units/xls_comparison.py:419
-#: templates/learning_unit/proposal_comparison.html:51
 #: templates/learning_unit/proposal_comparison.html:53
-#: templates/learning_unit/proposal_comparison.html:72
-#: templates/learning_unit/proposal_comparison.html:75
+#: templates/learning_unit/proposal_comparison.html:62
+#: templates/learning_unit/proposal_comparison.html:90
+#: templates/learning_unit/proposal_comparison.html:99
 #: tests/business/learning_units/test_xls_comparison.py:104
 #: tests/business/learning_units/test_xls_comparison.py:114
 #: tests/business/learning_units/test_xls_comparison.py:115
@@ -5104,12 +5113,12 @@ msgid "bibliography"
 msgstr "bibliographie"
 
 #: models/enums/learning_unit_year_periodicity.py:34
-#: tests/views/test_learning_unit.py:1545
+#: tests/views/test_learning_unit.py:1542
 msgid "biennial even"
 msgstr "bisannuelle paire"
 
 #: models/enums/learning_unit_year_periodicity.py:35
-#: tests/views/test_learning_unit.py:1545
+#: tests/views/test_learning_unit.py:1542
 msgid "biennial odd"
 msgstr "bisannuelle impaire"
 
@@ -5536,6 +5545,12 @@ msgstr "texte en anglais"
 msgid "text in French"
 msgstr "texte en français"
 
+#: templates/learning_unit/blocks/summary_locked.html:33
+#, fuzzy
+#| msgid "The"
+msgid "the"
+msgstr "Le"
+
 #: tests/views/test_learning_unit_pedagogy.py:239
 #: views/learning_units/educational_information.py:106
 msgid "the list to generate is empty."
@@ -5636,9 +5651,9 @@ msgstr "oui"
 #: templates/learning_unit/comparison.html:58
 #: templates/learning_unit/comparison.html:60
 #: templates/learning_unit/comparison.html:62
-#: templates/learning_unit/comparison.html:135
-#: templates/learning_unit/comparison.html:137
-#: templates/learning_unit/comparison.html:139
+#: templates/learning_unit/comparison.html:136
+#: templates/learning_unit/comparison.html:142
+#: templates/learning_unit/comparison.html:148
 #: templates/learning_unit/identification.html:103
 #: templates/learning_unit/identification.html:160
 #: templates/learning_unit/identification.html:163
