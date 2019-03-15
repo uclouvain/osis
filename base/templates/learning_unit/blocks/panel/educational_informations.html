@@ -30,12 +30,12 @@
 <div role="tabpanel" class="tab-pane active" id="pedagogy">
     <div class="row well">
         <div class="col-md-6">
-            {% if teachers %}
+            {% if tutors %}
                 <label>{% trans 'Tutors' %} : </label>
                 <br>
                 <ul>
-                    {% for teacher in teachers %}
-                        <li>{{ teacher.tutor.person }}</li>
+                    {% for tutor in tutors %}
+                        <li>{{ tutor.person }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}

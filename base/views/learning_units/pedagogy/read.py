@@ -28,17 +28,14 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Prefetch, Case, When, Value, IntegerField
 from django.shortcuts import get_object_or_404, render
 
-from attribution import models as mdl_attribution
 from base import models as mdl
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
-    get_cms_label_data, CMS_LABEL_PEDAGOGY
+    CMS_LABEL_PEDAGOGY
 from base.business.learning_units import perms
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
-from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm
-from base.models import teaching_material
 from base.models.person import Person
 from base.models.teaching_material import TeachingMaterial
-from base.models.tutor import find_all_summary_responsibles_by_learning_unit_year
+from base.models.tutor import Tutor
 from base.views.learning_units.common import get_common_context_learning_unit_year
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
@@ -94,12 +91,14 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
         "label_ordering"
     )
     teaching_materials = TeachingMaterial.objects.filter(learning_unit_year=learning_unit_year).order_by('order')
+    tutors = Tutor.objects.filter(attribution__learning_unit_year=learning_unit_year).select_related(
+        "person"
+    ).order_by("person")
 
     context['cms_labels_translated'] = translated_labels_with_text
     context['teaching_materials'] = teaching_materials
     context['can_edit_information'] = perm_to_edit
     context['can_edit_summary_locked_field'] = perms.can_edit_summary_locked_field(learning_unit_year, person)
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
-    context['teachers'] = mdl_attribution.attribution.search(learning_unit_year=learning_unit_year)\
-        .order_by('tutor__person')
+    context['tutors'] = tutors
     return render(request, template, context)
