@@ -24,16 +24,16 @@
 #
 ##############################################################################
 from ckeditor.widgets import CKEditorWidget
-from django import forms
 from django.conf import settings
 from django.db.transaction import atomic
+from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_ONLY
 from reference.models.language import find_language_in_settings
 from base.business.learning_units.pedagogy import is_pedagogy_data_must_be_postponed, save_teaching_material
 from base.forms.common import set_trans_txt
 from base.models import learning_unit_year
-from base.models.learning_unit_year import LearningUnitYear
 from base.models.teaching_material import TeachingMaterial
 from cms.enums import entity_name
 from cms.models import translated_text
@@ -116,6 +116,14 @@ class LearningUnitPedagogyEditForm(forms.Form):
 
 
 class TeachingMaterialModelForm(forms.ModelForm):
+    mandatory = forms.ChoiceField(widget=forms.RadioSelect,
+                                  choices=[
+                                      (True, _('Mandatory')),
+                                      (False, _('No mandatory'))
+                                  ],
+                                  label=_('Mandatory'),
+                                  required=True)
+
     class Meta:
         model = TeachingMaterial
         fields = ['title', 'mandatory']
