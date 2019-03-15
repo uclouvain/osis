@@ -105,7 +105,6 @@ class ManageMyCoursesViewTestCase(TestCase):
 
         context = response.context
         self.assertIsInstance(context['entity_calendars'], dict)
-        self.assertIsInstance(context['score_responsibles'], dict)
         self.assertTrue("learning_unit_years_with_errors" in context)
         # Ensure that we only see UE of current year + 1
         for luy, error in context["learning_unit_years_with_errors"]:

@@ -51,7 +51,6 @@ def list_my_attributions_summary_editable(request):
         academic_year=current_ac.next(),
         tutor=tutor
     )
-    score_responsibles = find_all_summary_responsibles_by_learning_unit_years(learning_unit_years)
 
     entity_calendars = entity_calendar.build_calendar_by_entities(
         ac_year=current_ac,
@@ -62,7 +61,6 @@ def list_my_attributions_summary_editable(request):
     context = {
         'learning_unit_years_with_errors': zip(learning_unit_years, errors),
         'entity_calendars': entity_calendars,
-        'score_responsibles': score_responsibles,
     }
     return render(request, 'manage_my_courses/list_my_courses_summary_editable.html', context)
 

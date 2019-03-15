@@ -3100,19 +3100,9 @@ msgstr ""
 msgid "Proposal"
 msgstr ""
 
-#: business/learning_unit_proposal.py:240
-#, python-format
-msgid "Proposal %(acronym)s (%(academic_year)s) cannot be changed state."
-msgstr ""
-
 #: tests/views/test_learning_unit_proposal.py:551
 #, python-format
 msgid "Proposal %(acronym)s (%(academic_year)s) successfully canceled."
-msgstr ""
-
-#: business/learning_unit_proposal.py:239
-#, python-format
-msgid "Proposal %(acronym)s (%(academic_year)s) successfully changed state."
 msgstr ""
 
 #: tests/business/test_learning_unit_proposal.py:262
@@ -3125,7 +3115,7 @@ msgstr ""
 msgid "Proposal for modification"
 msgstr ""
 
-#: business/learning_unit_proposal.py:336
+#: business/learning_unit_proposal.py:338
 #: tests/business/test_learning_unit_proposal.py:285
 msgid "Proposal is neither accepted nor refused."
 msgstr ""
@@ -4994,6 +4984,18 @@ msgstr ""
 msgid "cancel"
 msgstr ""
 
+#: business/learning_unit_proposal.py:259
+msgid "cannot be canceled"
+msgstr ""
+
+#: business/learning_unit_proposal.py:240
+msgid "cannot be changed state"
+msgstr ""
+
+#: business/learning_unit_proposal.py:272
+msgid "cannot be consolidated"
+msgstr ""
+
 #: templates/education_group/blocks/form/training_tab_diploma.html:35
 #: templates/education_group/tab_diplomas.html:48
 msgid "certificate aims"
@@ -5342,6 +5344,18 @@ msgstr ""
 
 #: templates/education_group/tabs.html:88
 msgid "skills and achievements"
+msgstr ""
+
+#: business/learning_unit_proposal.py:258
+msgid "successfully canceled"
+msgstr ""
+
+#: business/learning_unit_proposal.py:239
+msgid "successfully changed state"
+msgstr ""
+
+#: business/learning_unit_proposal.py:271
+msgid "successfully consolidated"
 msgstr ""
 
 #: business/learning_units/xls_generator.py:52 models/teaching_material.py:43

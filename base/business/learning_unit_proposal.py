@@ -236,8 +236,8 @@ def force_state_of_proposals(proposals, author, new_state):
         proposals,
         author,
         change_state,
-        _("Proposal %(acronym)s (%(academic_year)s) successfully changed state."),
-        _("Proposal %(acronym)s (%(academic_year)s) cannot be changed state."),
+        _("successfully changed state"),
+        _("cannot be changed state"),
         None,
         None,
         perms.is_eligible_to_edit_proposal
@@ -255,8 +255,8 @@ def cancel_proposals_and_send_report(proposals, author, research_criteria):
         proposals,
         author,
         cancel_proposal,
-        "Proposal %(acronym)s (%(academic_year)s) successfully canceled.",
-        "Proposal %(acronym)s (%(academic_year)s) cannot be canceled.",
+        _("successfully canceled"),
+        _("cannot be canceled"),
         send_mail_util.send_mail_cancellation_learning_unit_proposals,
         research_criteria,
         perms.is_eligible_for_cancel_of_proposal
@@ -268,8 +268,8 @@ def consolidate_proposals_and_send_report(proposals, author, research_criteria):
         proposals,
         author,
         consolidate_proposal,
-        "Proposal %(acronym)s (%(academic_year)s) successfully consolidated.",
-        "Proposal %(acronym)s (%(academic_year)s) cannot be consolidated.",
+        _('successfully consolidated'),
+        _('cannot be consolidated'),
         send_mail_util.send_mail_consolidation_learning_unit_proposal,
         research_criteria,
         perms.is_eligible_to_consolidate_proposal
@@ -287,14 +287,18 @@ def _apply_action_on_proposals_and_send_report(proposals, author, action_method,
 
     for proposal, results in proposals_with_results:
         if ERROR in results:
-            messages_by_level[ERROR].append(_(error_msg_id) % {
+            messages_by_level[ERROR].append("%(proposal)s %(acronym)s (%(academic_year)s) %(msg_detail)s." % {
+                "proposal": _('Proposal'),
                 "acronym": proposal.learning_unit_year.acronym,
-                "academic_year": proposal.learning_unit_year.academic_year
+                "academic_year": proposal.learning_unit_year.academic_year,
+                "msg_detail": error_msg_id
             })
         else:
-            messages_by_level[SUCCESS].append(_(success_msg_id) % {
+            messages_by_level[SUCCESS].append("%(proposal)s %(acronym)s (%(academic_year)s) %(msg_detail)s." % {
+                "proposal": _('Proposal'),
                 "acronym": proposal.learning_unit_year.acronym,
-                "academic_year": proposal.learning_unit_year.academic_year
+                "academic_year": proposal.learning_unit_year.academic_year,
+                "msg_detail": success_msg_id
             })
     return messages_by_level
 

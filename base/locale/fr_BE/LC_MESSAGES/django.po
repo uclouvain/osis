@@ -3175,22 +3175,10 @@ msgstr "Prolonger"
 msgid "Proposal"
 msgstr "Proposition"
 
-#: business/learning_unit_proposal.py:240
-#, python-format
-msgid "Proposal %(acronym)s (%(academic_year)s) cannot be changed state."
-msgstr ""
-"Proposition %(acronym)s (%(academic_year)s) ne peut pas changer d'état."
-
 #: tests/views/test_learning_unit_proposal.py:551
 #, python-format
 msgid "Proposal %(acronym)s (%(academic_year)s) successfully canceled."
 msgstr "Proposition %(acronym)s (%(academic_year)s) annulée avec succès."
-
-#: business/learning_unit_proposal.py:239
-#, python-format
-msgid "Proposal %(acronym)s (%(academic_year)s) successfully changed state."
-msgstr ""
-"Proposition %(acronym)s (%(academic_year)s) a changé d'état avec succès."
 
 #: tests/business/test_learning_unit_proposal.py:262
 #, python-format
@@ -3202,7 +3190,7 @@ msgstr "Proposition %(acronym)s (%(academic_year)s) consolidée avec succès."
 msgid "Proposal for modification"
 msgstr "Proposition de modification"
 
-#: business/learning_unit_proposal.py:336
+#: business/learning_unit_proposal.py:338
 #: tests/business/test_learning_unit_proposal.py:285
 msgid "Proposal is neither accepted nor refused."
 msgstr "La proposition n'est ni acceptée ni refusée."
@@ -5170,6 +5158,18 @@ msgstr "mise-à-jour bloquée pour l'enseignant"
 msgid "cancel"
 msgstr "annuler"
 
+#: business/learning_unit_proposal.py:259
+msgid "cannot be canceled"
+msgstr "ne peut pas être annulé"
+
+#: business/learning_unit_proposal.py:240
+msgid "cannot be changed state"
+msgstr "ne peut pas changer d'état"
+
+#: business/learning_unit_proposal.py:272
+msgid "cannot be consolidated"
+msgstr "ne peut pas être consolidé"
+
 #: templates/education_group/blocks/form/training_tab_diploma.html:35
 #: templates/education_group/tab_diplomas.html:48
 msgid "certificate aims"
@@ -5526,6 +5526,18 @@ msgstr "rubrique"
 #: templates/education_group/tabs.html:88
 msgid "skills and achievements"
 msgstr "compétences et acquis"
+
+#: business/learning_unit_proposal.py:258
+msgid "successfully canceled"
+msgstr "annulée avec succès"
+
+#: business/learning_unit_proposal.py:239
+msgid "successfully changed state"
+msgstr "a changé d'état avec succès"
+
+#: business/learning_unit_proposal.py:271
+msgid "successfully consolidated"
+msgstr "consolidée avec succès"
 
 #: business/learning_units/xls_generator.py:52 models/teaching_material.py:43
 #: models/teaching_material.py:44
