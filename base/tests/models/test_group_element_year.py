@@ -540,3 +540,8 @@ class TestValidationOnEducationGroupYearBlockField(TestCase):
         self.group_element_year.block = 0
         with self.assertRaises(ValidationError):
             self.group_element_year.full_clean()
+
+    def test_when_value_is_negative(self):
+        self.group_element_year.block = -124
+        with self.assertRaises(ValidationError):
+            self.group_element_year.full_clean()
