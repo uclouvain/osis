@@ -42,6 +42,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_year_entity import OfferYearEntityFactory
 from base.forms.search.search_form import get_research_criteria
+from base.views.learning_units.search import SUMMARY_LIST, BORROWED_COURSE
 
 
 class TestSearchForm(TestCase):
@@ -163,3 +164,44 @@ def generate_learning_unit_year_with_associated_education_group(academic_year, s
                             parent=offer_year_entity.education_group_year)
 
     return luy
+
+class TestFilterDescriptiveficheLearningUnitYear(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+
+        cls.luys_not_in_education_group = [
+            LearningUnitYearFactory(academic_year=cls.academic_year,
+                                    learning_container_year__academic_year=cls.academic_year) for _ in range(3)
+            ]
+
+        cls.luys_with_same_entity_as_education_group = [
+            generate_learning_unit_year_with_associated_education_group(cls.academic_year)
+        ]
+
+        cls.luys_in_same_faculty_as_education_group = [
+            generate_learning_unit_year_with_associated_education_group(cls.academic_year, same_entity=False)
+            for _ in range(3)
+            ]
+
+        cls.luys_in_different_faculty_than_education_group = [
+            generate_learning_unit_year_with_associated_education_group(cls.academic_year, same_faculty=False)
+            for _ in range(3)
+            ]
+
+    def test_init_with_entity_subordinated_search_form(self):
+        search_type = SUMMARY_LIST
+
+        form = LearningUnitYearForm(
+            None,
+            descriptive_fiche_search=search_type == SUMMARY_LIST,
+        )
+        self.assertTrue(form.fields['with_entity_subordinated'].initial)
+
+        search_type = BORROWED_COURSE
+
+        form = LearningUnitYearForm(
+            None,
+            borrowed_course_search=search_type == BORROWED_COURSE,
+        )
+        self.assertTrue(form.fields['with_entity_subordinated'].initial)
