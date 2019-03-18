@@ -52,8 +52,8 @@ class AcademicCalendarFactory(factory.DjangoModelFactory):
 
 
 class OpenAcademicCalendarFactory(AcademicCalendarFactory):
-    start_date = factory.LazyAttribute(lambda obj: datetime.date.today() - datetime.timedelta(days=3))
-    end_date = factory.LazyAttribute(lambda obj: datetime.date.today() + datetime.timedelta(days=3))
+    start_date = factory.Faker('past_date')
+    end_date = factory.Faker('future_date')
 
 
 class CloseAcademicCalendarFactory(AcademicCalendarFactory):

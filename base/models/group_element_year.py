@@ -24,13 +24,16 @@
 #
 ##############################################################################
 import itertools
+from collections import Counter
 
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, BaseValidator
 from django.db import models, connection
 from django.db.models import Q, F, Case, When
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
+from openpyxl.descriptors import Min
 from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
@@ -38,7 +41,7 @@ from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import education_group_type, education_group_year
 from base.models.education_group_type import GROUP_TYPE_OPTION
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories, link_type, quadrimesters
+from base.models.enums import education_group_categories, quadrimesters
 from base.models.enums.link_type import LinkTypes
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.models.learning_unit_year import LearningUnitYear
@@ -80,6 +83,36 @@ WITH RECURSIVE group_element_year_parent AS (
 
 SELECT * FROM group_element_year_parent ;
 """
+
+
+def validate_block_value(value):
+    max_authorized_value = 6
+    _error_msg = _("Please register a maximum of %(max_authorized_value)s digits in ascending order, "
+                   "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46") %\
+        {'max_authorized_value': max_authorized_value}
+
+    MinValueValidator(1, message=_error_msg)(value)
+    if not all([
+        _check_integers_max_authorized_value(value, max_authorized_value),
+        _check_integers_duplications(value),
+        _check_integers_orders(value),
+    ]):
+        raise ValidationError(_error_msg)
+
+
+def _check_integers_max_authorized_value(value, max_authorized_value):
+    return all(int(char) <= max_authorized_value for char in str(value))
+
+
+def _check_integers_duplications(value):
+    if any(integer for integer, occurence in Counter(str(value)).items() if occurence > 1):
+        return False
+    return True
+
+
+def _check_integers_orders(value):
+    digit_values = [int(char) for char in str(value)]
+    return list(sorted(digit_values)) == digit_values
 
 
 class GroupElementYearManager(models.Manager):
@@ -136,11 +169,11 @@ class GroupElementYear(OrderedModel):
         verbose_name=_("Mandatory"),
     )
 
-    block = models.CharField(
-        max_length=7,
+    block = models.IntegerField(
         blank=True,
         null=True,
-        verbose_name=_("Block")
+        verbose_name=_("Block"),
+        validators=[validate_block_value]
     )
 
     access_condition = models.BooleanField(

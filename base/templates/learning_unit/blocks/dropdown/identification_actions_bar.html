@@ -30,17 +30,11 @@
 {% if "base" in perms %}
     <!-- Dropdown to select actions to apply on learning unit -->
     {% url "edit_proposal" learning_unit_year_id=learning_unit_year.id as url_edit_proposal %}
-    {% url "learning_unit_comparison" learning_unit_year_id=learning_unit_year.id as url_lus_comparison %}
     {% features_or "learning_unit_create" "learning_unit_update" "learning_unit_delete" "learning_unit_external_create" "learning_unit_proposal_create" "learning_unit_proposal_update" "learning_unit_proposal_delete" as show_button %}
 
     {% if show_button %}
         <div class="row">
-            <div class="col-md-10">
-                <a href="{{ url_lus_comparison }}" class="btn btn-default" role="button">
-                    {% trans 'Learning units comparison' %}
-                </a>
-            </div>
-            <div class="col-md-2">
+            <div class="col-md-2 pull-right">
                 <div class="dropdown {{ dropdirection }}">
                     <button id="dLabel" class="btn btn-default" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {% trans 'Actions' %}
@@ -81,7 +75,19 @@
                             <li class="divider"></li>
                         {% endif %}
                     {% endflag %}
-
+                    {% url "learning_unit_comparison" learning_unit_year_id=learning_unit_year.id as url_lus_comparison %}
+                    <li id="link_lus_comparison">
+                        <a href="{{ url_lus_comparison }}" data-toggle="tooltip">{% trans 'Learning units comparison' %}</a>
+                    </li>
+                    {% if proposal %}
+                        {% url "learning_unit_proposal_comparison" learning_unit_year_id=learning_unit_year.id as url_proposal_comparison %}
+                        <li id="link_proposal_comparison">
+                            <a href="{{ url_proposal_comparison }}" data-toggle="tooltip">{% trans 'Learning units proposal comparison' %}</a>
+                        </li>
+                    {% endif %}
+                </a>
+                    <li class="divider"></li>
+                </a>
                     {% if "base.can_propose_learningunit" in perms %}
                         {% flag "learning_unit_proposal_create" %}
 
@@ -104,7 +110,7 @@
                         {% url "learning_unit_cancel_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_cancel_proposal_url%}
                         {% li_cancel_proposal learning_unit_cancel_proposal_url _('Cancel the proposal') 'link_cancel_proposal' %}
 
-                        {% li_consolidate_proposal '#' _('Consolidate the proposal') 'link_consolidate_proposal' 'document.getElementById(\"form_consolidate\").submit();' %}
+                        {% li_consolidate_proposal '#' _('Consolidate the proposal') 'link_consolidate_proposal' 'document.getElementById(\'form_consolidate\').submit();' %}
                         <li class="divider"></li>
                         {% endflag %}
                     {% endif %}

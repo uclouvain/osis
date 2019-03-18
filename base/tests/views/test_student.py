@@ -32,85 +32,95 @@ from django.test import TestCase, RequestFactory
 from requests.exceptions import RequestException
 
 from base.tests.factories.student import StudentFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 
 
-class StudentViewTestCase(TestCase):
+class StudentsViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.program_manager = ProgramManagerFactory(
+            person=PersonWithPermissionsFactory("can_access_student")
+        )
+
+        cls.students_db = StudentFactory.create_batch(10)
+        cls.url = reverse("students")
 
     def setUp(self):
-        self.program_manager_1 = ProgramManagerFactory()
-        # Add permission
-        user = self.program_manager_1.person.user
-        permission = Permission.objects.get(name='Can access student')
-        user.user_permissions.add(permission)
-        self.students_db = [StudentFactory() for i in range(10)]
+        self.client.force_login(self.program_manager.person.user)
 
-    def test_students(self):
-        self.client.force_login(self.program_manager_1.person.user)
-
-        response = self.client.get(reverse('students'))
+    def test_without_research_criteria(self):
+        response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, 'student/students.html')
-        self.assertIsNone(response.context['students'])
+        self.assertFalse(response.context['students'].object_list)
 
-    def test_students_search(self):
-        from base.views.student import student_search
-
-        self.client.force_login(self.program_manager_1.person.user)
-
-        response = self.client.get(reverse(student_search),
-                                   data={'registration_id': self.students_db[0].registration_id})
+    def test_search_by_registration_id(self):
+        response = self.client.get(self.url, data={'registration_id': self.students_db[0].registration_id})
 
         self.assertTemplateUsed(response, 'student/students.html')
-        self.assertEqual(response.context['students'], [self.students_db[0]])
+        self.assertEqual(response.context['students'].object_list, [self.students_db[0]])
 
-        response = self.client.get(reverse(student_search), data={
-            'name': self.students_db[1].person.last_name[:2]}
-                                      )
-        self.assertTemplateUsed(response, 'student/students.html')
-        self.assertIn(self.students_db[1], response.context['students'])
-
-        response = self.client.get(reverse(student_search))
+    def test_search_by_name(self):
+        response = self.client.get(self.url, data={'name': self.students_db[1].person.last_name[:2]})
 
         self.assertTemplateUsed(response, 'student/students.html')
-        self.assertIsNone(response.context['students'])
+        self.assertIn(self.students_db[1], response.context['students'].object_list)
+
+
+class TestStudentRead(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.program_manager = ProgramManagerFactory(
+            person=PersonWithPermissionsFactory("can_access_student")
+        )
+
+    def setUp(self):
+        self.client.force_login(self.program_manager.person.user)
 
     def test_student_read(self):
-        student = StudentFactory(person=PersonFactory(last_name='Durant', first_name='Thomas'))
-        self.client.force_login(self.program_manager_1.person.user)
-
+        student = StudentFactory()
         response = self.client.get(reverse('student_read', args=[student.id]))
 
         self.assertTemplateUsed(response, 'student/student.html')
         self.assertEqual(response.context['student'], student)
 
+
+class TestStudentPicture(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.program_manager = ProgramManagerFactory(
+            person=PersonWithPermissionsFactory("can_access_student")
+        )
+
+        cls.student_m = StudentFactory(person=PersonFactory(last_name='Durant', first_name='Thomas', gender='M'))
+        cls.student_f = StudentFactory(person=PersonFactory(last_name='Durant', first_name='Alice', gender='F'))
+        cls.url = reverse("students")
+
+    def setUp(self):
+        self.client.force_login(self.program_manager.person.user)
+
     @mock.patch('requests.get', side_effect=RequestException)
     def test_student_picture_unknown(self, mock_request_get):
-        student_m = StudentFactory(person=PersonFactory(last_name='Durant', first_name='Thomas', gender='M'))
-        student_f = StudentFactory(person=PersonFactory(last_name='Durant', first_name='Alice', gender='F'))
-
         from base.views.student import student_picture
         from django.contrib.staticfiles.storage import staticfiles_storage
 
-        request = RequestFactory().get(reverse(student_picture, args=[student_m.id]))
-        request.user = self.program_manager_1.person.user
-        response = student_picture(request, student_m.id)
+        request = RequestFactory().get(reverse(student_picture, args=[self.student_m.id]))
+        request.user = self.program_manager.person.user
+        response = student_picture(request, self.student_m.id)
 
         self.assertTrue(mock_request_get.called)
         self.assertEqual(response.url, staticfiles_storage.url('img/men_unknown.png'))
 
-        request = RequestFactory().get(reverse(student_picture, args=[student_f.id]))
-        request.user = self.program_manager_1.person.user
-        response = student_picture(request, student_f.id)
+        request = RequestFactory().get(reverse(student_picture, args=[self.student_f.id]))
+        request.user = self.program_manager.person.user
+        response = student_picture(request, self.student_f.id)
 
         self.assertTrue(mock_request_get.called)
         self.assertEqual(response.url, staticfiles_storage.url('img/women_unknown.png'))
 
     @mock.patch('requests.get')
     def test_student_picture(self, mock_request_get):
-        student_m = StudentFactory(person=PersonFactory(last_name='Durant', first_name='Thomas', gender='M'))
-
         from base.views.student import student_picture
 
         mock_response = Mock()
@@ -119,9 +129,9 @@ class StudentViewTestCase(TestCase):
         mock_response.status_code = 200
         mock_request_get.return_value = mock_response
 
-        request = RequestFactory().get(reverse(student_picture, args=[student_m.id]))
-        request.user = self.program_manager_1.person.user
-        response = student_picture(request, student_m.id)
+        request = RequestFactory().get(reverse(student_picture, args=[self.student_m.id]))
+        request.user = self.program_manager.person.user
+        response = student_picture(request, self.student_m.id)
 
         self.assertTrue(mock_request_get.called)
         self.assertEqual(response.content, b'an image')
@@ -129,7 +139,7 @@ class StudentViewTestCase(TestCase):
     def test_student_picture_for_non_existent_student(self):
         non_existent_student_id = 666
         request = RequestFactory().get(reverse('student_picture', args=[non_existent_student_id]))
-        request.user = self.program_manager_1.person.user
+        request.user = self.program_manager.person.user
 
         from base.views.student import student_picture
         from django.http import Http404

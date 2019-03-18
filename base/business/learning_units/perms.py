@@ -30,6 +30,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext_lazy as _
 from waffle.models import Flag
 
+from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models import proposal_learning_unit, tutor
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, \
@@ -37,7 +38,6 @@ from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YE
 from base.models.entity import Entity
 from base.models.entity_version import find_last_entity_version_by_learning_unit_year_id
 from base.models.enums import learning_container_year_types, entity_container_year_link_type
-from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
@@ -466,10 +466,8 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
 
 
 def _is_tutor_summary_responsible_of_learning_unit_year(*, user, learning_unit_year_id, **kwargs):
-    value = LearningUnitYear.objects.filter(pk=learning_unit_year_id, attribution__summary_responsible=True,
-                                            attribution__tutor__person__user=user).exists()
-    if not value:
-        raise PermissionDenied(_("You are not summary responsible for this learning unit."))
+    if not _is_tutor_attributed_to_the_learning_unit(user, learning_unit_year_id):
+        raise PermissionDenied(_("You are not attributed to this learning unit."))
 
 
 def _is_learning_unit_year_summary_editable(*, learning_unit_year_id, **kwargs):
@@ -479,19 +477,20 @@ def _is_learning_unit_year_summary_editable(*, learning_unit_year_id, **kwargs):
         value = LearningUnitYear.objects.filter(pk=learning_unit_year_id, summary_locked=False).exists()
 
     if not value:
-        raise PermissionDenied(_("The learning unit is not summary editable."))
+        raise PermissionDenied(_("The learning unit's description fiche is not editable."))
 
 
 def _is_calendar_opened_to_edit_educational_information(*, learning_unit_year_id, **kwargs):
     submission_dates = find_educational_information_submission_dates_of_learning_unit_year(learning_unit_year_id)
+    permission_denied_msg = _("Not in period to edit description fiche.")
     if not submission_dates:
-        raise PermissionDenied(_("Not in period to edit educational information."))
+        raise PermissionDenied(permission_denied_msg)
 
     now = datetime.datetime.now(tz=get_tzinfo())
     value = convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
         convert_date_to_datetime(submission_dates["end_date"])
     if not value:
-        raise PermissionDenied(_("Not in period to edit educational information."))
+        raise PermissionDenied(permission_denied_msg)
 
 
 def find_educational_information_submission_dates_of_learning_unit_year(learning_unit_year_id):
