@@ -527,7 +527,7 @@ class TestValidationOnEducationGroupYearBlockField(TestCase):
             self.group_element_year.full_clean()
 
     def test_when_values_are_duplicated(self):
-        self.group_element_year.block = 146
+        self.group_element_year.block = 1446
         with self.assertRaises(ValidationError):
             self.group_element_year.full_clean()
 
