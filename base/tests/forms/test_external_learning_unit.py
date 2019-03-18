@@ -64,7 +64,7 @@ def get_valid_external_learning_unit_form_data(academic_year, person, learning_u
     if not learning_unit_year:
         container_year = LearningContainerYearFactory(academic_year=academic_year)
         learning_unit_year = LearningUnitYearFactory.build(
-            acronym='GOSIS1111',
+            acronym='EOSIS1111',
             academic_year=academic_year,
             learning_container_year=container_year,
             subtype=learning_unit_year_subtypes.FULL,
