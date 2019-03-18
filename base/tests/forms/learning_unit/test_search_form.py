@@ -29,7 +29,8 @@ from django.http import QueryDict
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
-from base.forms.learning_unit.search_form import filter_is_borrowed_learning_unit_year, LearningUnitSearchForm, LearningUnitYearForm
+from base.forms.learning_unit.search_form import filter_is_borrowed_learning_unit_year, LearningUnitSearchForm, \
+    LearningUnitYearForm
 from base.models.enums import entity_container_year_link_type, entity_type, learning_container_year_types
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -163,3 +164,11 @@ def generate_learning_unit_year_with_associated_education_group(academic_year, s
                             parent=offer_year_entity.education_group_year)
 
     return luy
+
+
+class TestFilterDescriptiveficheLearningUnitYear(TestCase):
+    def test_init_with_entity_subordinated_search_form(self):
+        form = LearningUnitYearForm(
+            None,
+        )
+        self.assertTrue(form.fields['with_entity_subordinated'].initial)

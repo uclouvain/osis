@@ -35,6 +35,7 @@ from base.models.campus import find_main_campuses
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, EXTERNAL
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_WITHOUT_EXTERNAL, INTERNSHIP
+from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
 from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit, REGEX_BY_SUBTYPE
@@ -129,8 +130,12 @@ class LearningUnitYearModelForm(forms.ModelForm):
         }
 
     def clean_acronym(self):
-        if self.external and not re.match(REGEX_BY_SUBTYPE[EXTERNAL], self.cleaned_data["acronym"]):
-            raise ValidationError(_('Invalid code'))
+        if self.external:
+            if "acronym" not in self.initial or self.initial["acronym"][0] == LearningUnitExternalSite.E.value:
+                self.data["acronym_0"] = LearningUnitExternalSite.E.value
+                self.cleaned_data['acronym'] = LearningUnitExternalSite.E.value+self.data["acronym_1"]
+            if not re.match(REGEX_BY_SUBTYPE[EXTERNAL], self.cleaned_data["acronym"]):
+                raise ValidationError(_('Invalid code'))
         elif not self.external and not re.match(REGEX_BY_SUBTYPE[self.instance.subtype], self.cleaned_data["acronym"]):
             raise ValidationError(_('Invalid code'))
         return self.cleaned_data["acronym"]

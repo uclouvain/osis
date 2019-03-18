@@ -32,3 +32,4 @@ class LearningUnitExternalSite(ChoiceEnum):
     M = "M"
     T = "T"
     W = "W"
+    E = "E"
