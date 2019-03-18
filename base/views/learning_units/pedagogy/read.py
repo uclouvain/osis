@@ -28,7 +28,7 @@ import itertools
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Prefetch, Case, When, Value, IntegerField
+from django.db.models import Prefetch, Case, When, Value, IntegerField, Q
 from django.shortcuts import get_object_or_404, render
 from reversion.models import Version
 
@@ -104,8 +104,13 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
     )
 
     reversion = Version.objects.filter(
-        content_type=ContentType.objects.get_for_model(TranslatedText),
-        object_id__in=map(lambda obj: obj.id, translated_text_ids)
+        Q(
+            content_type=ContentType.objects.get_for_model(TranslatedText),
+            object_id__in=map(lambda obj: obj.id, translated_text_ids)
+        ) | Q(
+            content_type=ContentType.objects.get_for_model(TeachingMaterial),
+            object_id__in=map(lambda obj: obj.id, teaching_materials)
+        )
     ).select_related(
         "revision",
         "revision__user"
