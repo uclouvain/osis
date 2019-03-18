@@ -27,12 +27,13 @@ from django.db import models
 from django.utils.translation import pgettext_lazy as _
 from ordered_model.admin import OrderedModelAdmin
 from ordered_model.models import OrderedModel
+from reversion.admin import VersionAdmin
 
 from base.business.learning_units.pedagogy import update_bibliography_changed_field_in_cms
 from base.models.learning_unit_year import LearningUnitYear
 
 
-class TeachingMaterialAdmin(OrderedModelAdmin):
+class TeachingMaterialAdmin(VersionAdmin, OrderedModelAdmin):
     list_display = ('title', 'mandatory', 'learning_unit_year', 'order', 'move_up_down_links')
     readonly_fields = ['order']
     search_fields = ['title', 'learning_unit_year']
