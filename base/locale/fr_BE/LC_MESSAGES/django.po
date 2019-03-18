@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-15 11:02+0100\n"
+"POT-Creation-Date: 2019-03-18 08:49+0100\n"
 "PO-Revision-Date: 2019-02-27 15:13+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -295,7 +295,7 @@ msgstr "Gestion du calendrier académique"
 msgid "Academic calendars"
 msgstr "Calendriers académique"
 
-#: forms/learning_unit/edition.py:39
+#: forms/learning_unit/edition.py:40
 msgid "Academic end year"
 msgstr "Anac de fin"
 
@@ -558,7 +558,7 @@ msgstr "Message d'alerte"
 
 #: forms/education_groups.py:68 forms/education_groups.py:73
 #: forms/education_groups.py:81 forms/learning_unit/search_form.py:62
-#: forms/learning_unit/search_form.py:68 forms/utils/choice_field.py:30
+#: forms/learning_unit/search_form.py:68 forms/utils/choice_field.py:31
 msgctxt "plural"
 msgid "All"
 msgstr "Tous"
@@ -818,6 +818,7 @@ msgstr ""
 #: templates/learning_unit/proposal/create_suppression.html:20
 #: templates/learning_unit/proposal/update_suppression.html:20
 #: templates/learning_unit/simple/update_end_date.html:14
+#: templates/learning_unit/teaching_material/modal_edit.html:44
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -947,7 +948,7 @@ msgstr "Co-titulaire"
 #: templates/learning_unit/components_identification.html:33
 #: templates/learning_unit/external/read.html:8
 #: templates/learning_unit/identification.html:47
-#: templates/learning_unit/summary_list.html:77
+#: templates/learning_unit/summary_list.html:77 utils/send_mail.py:234
 msgid "Code"
 msgstr "Code"
 
@@ -2236,7 +2237,7 @@ msgstr "Crédits locaux"
 msgid "Location"
 msgstr "Localité"
 
-#: templates/learning_unit/blocks/summary_locked.html:15
+#: templates/learning_unit/blocks/summary_locked.html:16
 msgid "Lock"
 msgstr "Bloquer"
 
@@ -2355,7 +2356,8 @@ msgstr ""
 msgid "Mandates"
 msgstr "Mandates"
 
-#: models/group_element_year.py:136
+#: forms/learning_unit_pedagogy.py:98 forms/learning_unit_pedagogy.py:101
+#: models/group_element_year.py:136 models/teaching_material.py:44
 #: templates/education_group/blocks/content_default_table.html:34
 #: templates/education_group/blocks/table_utilizations.html:36
 msgid "Mandatory"
@@ -2496,8 +2498,7 @@ msgstr "Modification apportée"
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
 
-#: templates/learning_unit/blocks/summary_locked.html:33
-#| msgid "Modify"
+#: templates/learning_unit/blocks/summary_locked.html:34
 msgid "Modified by"
 msgstr "Modifié par"
 
@@ -2655,6 +2656,10 @@ msgstr "Aucune différence"
 #: templates/learning_unit/formations.html:128
 msgid "No enrollment for this learning unit"
 msgstr "Il n'y a aucune inscription pour cette unité d'enseignement"
+
+#: forms/learning_unit_pedagogy.py:99
+msgid "No mandatory"
+msgstr "Non-obligatoire"
 
 #: forms/prerequisite.py:113
 #: tests/views/education_groups/learning_unit/test_update.py:203
@@ -3168,6 +3173,8 @@ msgstr "Interdiction de supprimer une unité d'enseignement avant 2015."
 msgid "Prolong"
 msgstr "Prolonger"
 
+#: business/learning_unit_proposal.py:291
+#: business/learning_unit_proposal.py:298
 #: business/learning_units/xls_comparison.py:498
 #: templates/learning_unit/blocks/panel/proposal.html:6
 #: tests/business/learning_units/test_xls_comparison.py:171
@@ -3189,7 +3196,7 @@ msgstr "Proposition %(acronym)s (%(academic_year)s) consolidée avec succès."
 msgid "Proposal for modification"
 msgstr "Proposition de modification"
 
-#: business/learning_unit_proposal.py:338
+#: business/learning_unit_proposal.py:340
 #: tests/business/test_learning_unit_proposal.py:285
 msgid "Proposal is neither accepted nor refused."
 msgstr "La proposition n'est ni acceptée ni refusée."
@@ -3456,6 +3463,7 @@ msgstr "Commande SQL"
 #: templates/learning_unit/blocks/save_cancel_buttons.html:11
 #: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:14
 #: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:18
+#: templates/learning_unit/teaching_material/modal_edit.html:43
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -4393,7 +4401,7 @@ msgstr "La formation n'a pas de contenu à reporter."
 #: business/education_group.py:49 business/learning_unit.py:59
 #: business/learning_unit_xls.py:74 business/learning_units/xls_generator.py:49
 #: business/proposal_xls.py:38 forms/education_groups.py:86 forms/entity.py:38
-#: forms/learning_unit/search_form.py:175
+#: forms/learning_unit/search_form.py:175 models/teaching_material.py:43
 #: templates/academic_calendar/academic_calendar.html:48
 #: templates/academic_calendar/academic_calendar_form.html:65
 #: templates/education_group/blocks/content_default_table.html:32
@@ -4506,7 +4514,7 @@ msgstr "Enseignant·e·s"
 #: templates/learning_unit/by_activity.html:81
 #: templates/learning_unit/by_proposal.html:85
 #: templates/learning_unit/summary_list.html:79
-#: tests/forms/learning_unit/test_search_form.py:77
+#: tests/forms/learning_unit/test_search_form.py:77 utils/send_mail.py:234
 msgid "Type"
 msgstr "Type"
 
@@ -4591,11 +4599,11 @@ msgstr "Mise-à-jour contact"
 msgid "Update entity"
 msgstr "Mise-à-jour entité"
 
-#: templates/learning_unit/blocks/summary_locked.html:22
+#: templates/learning_unit/blocks/summary_locked.html:23
 msgid "Update for teacher locked"
 msgstr "Mise-à-jour bloquée pour l'enseignant"
 
-#: templates/learning_unit/blocks/summary_locked.html:24
+#: templates/learning_unit/blocks/summary_locked.html:25
 msgid "Update for teacher unlocked"
 msgstr "Mise-à-jour débloquée pour l'enseignant"
 
@@ -5148,7 +5156,6 @@ msgstr "mise-à-jour bloquée pour l'enseignant"
 #: templates/learning_unit/select_attribution.html:73
 #: templates/learning_unit/specifications_edit.html:42
 #: templates/learning_unit/teaching_material/modal_delete.html:35
-#: templates/learning_unit/teaching_material/modal_edit.html:43
 #: templates/organization/organization_address_form.html:85
 #: templates/organization/organization_address_form.html:86
 #: templates/organization/organization_address_form.html:89
@@ -5182,7 +5189,7 @@ msgstr "attendus du diplôme"
 #: templates/learning_unit/formations.html:43
 #: templates/student/learning_units_enrollments.html:45
 #: templates/student/offers_enrollments.html:46
-#: tests/views/test_learning_unit_pedagogy.py:187 utils/send_mail.py:234
+#: tests/views/test_learning_unit_pedagogy.py:187
 msgid "code"
 msgstr "code"
 
@@ -5337,7 +5344,7 @@ msgstr "unités d'enseignement"
 msgid "list of required teaching materials"
 msgstr "liste des supports de cours obligatoires"
 
-#: templates/learning_unit/blocks/summary_locked.html:14
+#: templates/learning_unit/blocks/summary_locked.html:15
 msgid "lock update for teacher"
 msgstr "bloquer la mise à jour pour l'enseignant"
 
@@ -5372,8 +5379,7 @@ msgstr "contrainte minimum"
 msgid "no"
 msgstr "non"
 
-#: forms/learning_unit/edition.py:38 templatetags/learning_unit.py:54
-#: tests/models/test_learning_unit.py:86
+#: templatetags/learning_unit.py:54 tests/models/test_learning_unit.py:86
 msgid "no planned end"
 msgstr "pas de fin prévue"
 
@@ -5496,7 +5502,6 @@ msgstr "rôle (français)"
 #: templates/learning_unit/class_edit.html:53
 #: templates/learning_unit/component_edit.html:53
 #: templates/learning_unit/specifications_edit.html:41
-#: templates/learning_unit/teaching_material/modal_edit.html:42
 #: templates/my_osis/profile.html:181 templates/my_osis/profile.html:182
 #: templates/organization/organization_address_form.html:80
 #: templates/organization/organization_address_form.html:81
@@ -5538,8 +5543,7 @@ msgstr "a changé d'état avec succès"
 msgid "successfully consolidated"
 msgstr "consolidée avec succès"
 
-#: business/learning_units/xls_generator.py:52 models/teaching_material.py:43
-#: models/teaching_material.py:44
+#: business/learning_units/xls_generator.py:52
 #: tests/views/test_learning_unit_pedagogy.py:191
 msgid "teaching materials"
 msgstr "supports de cours"
@@ -5556,8 +5560,7 @@ msgstr "texte en anglais"
 msgid "text in French"
 msgstr "texte en français"
 
-#: templates/learning_unit/blocks/summary_locked.html:33
-#| msgid "The"
+#: templates/learning_unit/blocks/summary_locked.html:34
 msgid "the"
 msgstr "Le"
 
@@ -5593,7 +5596,7 @@ msgstr "formations_avec_donnees_administratives"
 #: models/education_group_publication_contact.py:84
 #: templates/entity/versions.html:45
 #: templates/organization/organization.html:70
-#: templates/organization/organizations.html:63 utils/send_mail.py:234
+#: templates/organization/organizations.html:63
 msgid "type"
 msgstr "type"
 
@@ -5605,11 +5608,11 @@ msgstr "type de contrainte"
 msgid "unknown"
 msgstr "indéfini"
 
-#: templates/learning_unit/blocks/summary_locked.html:12
+#: templates/learning_unit/blocks/summary_locked.html:13
 msgid "unlock"
 msgstr "débloquer"
 
-#: templates/learning_unit/blocks/summary_locked.html:11
+#: templates/learning_unit/blocks/summary_locked.html:12
 msgid "unlock update for teacher"
 msgstr "débloquer la mise à jour pour l'enseignant"
 
