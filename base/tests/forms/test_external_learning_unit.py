@@ -140,7 +140,7 @@ class TestExternalLearningUnitForm(TestCase):
 
         self.assertIsInstance(luy, LearningUnitYear)
         self.assertEqual(luy.learning_container_year.container_type, EXTERNAL)
-        self.assertEqual(luy.acronym[0], 'G')
+        self.assertEqual(luy.acronym[0], 'E')
         self.assertEqual(luy.externallearningunityear.author, self.person)
         self.assertEqual(luy.learning_unit.start_year, self.academic_year.year)
 
