@@ -56,8 +56,8 @@ function CKupdate() {
         CKEDITOR.instances[instance].updateElement();
 }
 
-
-$(".trigger_modal").click(function () {
+function bind_trigger_modal() {
+  $(".trigger_modal").click(function () {
     let url = $(this).data("url");
     let modal_class = $(this).data("modal_class");
     $('#modal_dialog_id').attr("class", "modal-dialog").addClass(modal_class);
@@ -69,4 +69,8 @@ $(".trigger_modal").click(function () {
         let form = $(this).find('form').first()
         formAjaxSubmit(form, '#form-ajax-modal');
     });
-});
+  });
+}
+
+bind_trigger_modal();
+
