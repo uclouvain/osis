@@ -72,7 +72,6 @@ def learning_units_search(request, search_type):
         request.GET or None,
         service_course_search=service_course_search,
         borrowed_course_search=borrowed_course_search,
-        descriptive_fiche_search=search_type == SUMMARY_LIST,
         initial={'academic_year_id': starting_academic_year()}
     )
     found_learning_units = LearningUnitYear.objects.none()
