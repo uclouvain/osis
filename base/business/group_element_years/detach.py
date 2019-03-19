@@ -85,14 +85,19 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         errors = []
         for master_2m in self.get_parents_program_master():
             master_2m_tree = EducationGroupHierarchy(root=master_2m)
-            master_2m_options = Counter(master_2m_tree.get_option_list()) - Counter(options_to_detach)
+
+            counter_options = Counter(master_2m_tree.get_option_list())
+            counter_options.subtract(options_to_detach)
+            options_to_check = [opt for opt, count in counter_options.items() if count <= 0]
+            if not options_to_check:
+                continue
 
             finality_list = [elem.child for elem in master_2m_tree.to_list(flat=True)
                              if isinstance(elem.child, EducationGroupYear)
                              and elem.child.education_group_type.name in TrainingType.finality_types()]
             for finality in finality_list:
                 mandatory_options = EducationGroupHierarchy(root=finality).get_option_list()
-                missing_options = set(mandatory_options) - set(master_2m_options.elements())
+                missing_options = set(options_to_check) & set(mandatory_options)
 
                 if missing_options:
                     errors.append(
