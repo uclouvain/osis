@@ -45,20 +45,23 @@ class TestValidationRuleMixin(TestCase):
             field_reference="reference_country.name",
             status_field=DISABLED,
             initial_value="LalaLand",
+            placeholder="LalaLand"
         )
 
         ValidationRule.objects.create(
             field_reference="reference_country.iso_code",
             status_field=REQUIRED,
             initial_value="LA",
-            regex_rule="^(LA|LB)$"
+            regex_rule="^(LA|LB)$",
+            placeholder="LA"
         )
 
         ValidationRule.objects.create(
             field_reference="reference_country.cref_code",
             status_field=ALERT,
             initial_value="LA",
-            regex_rule="^(LA|LB)$"
+            regex_rule="^(LA|LB)$",
+            placeholder="LA"
         )
 
     def test_init(self):
@@ -66,16 +69,19 @@ class TestValidationRuleMixin(TestCase):
         self.assertFalse(form.fields["name"].required)
         self.assertTrue(form.fields["name"].disabled)
         self.assertEqual(form.fields["name"].initial, "LalaLand")
+        self.assertEqual(form.fields["name"].widget.attrs['placeholder'], "LalaLand")
 
         self.assertTrue(form.fields["iso_code"].required)
         self.assertFalse(form.fields["iso_code"].disabled)
         self.assertEqual(form.fields["iso_code"].initial, "LA")
+        self.assertEqual(form.fields["iso_code"].widget.attrs['placeholder'], "LA")
         self.assertIsInstance(form.fields["iso_code"].validators[1], RegexValidator)
 
         self.assertFalse(form.fields["cref_code"].required)
         self.assertFalse(form.fields["cref_code"].disabled)
         self.assertTrue(form.fields["cref_code"].warning)
         self.assertEqual(form.fields["cref_code"].initial, "LA")
+        self.assertEqual(form.fields["cref_code"].widget.attrs['placeholder'], "LA")
         self.assertIsInstance(form.fields["cref_code"].validators[1], RegexValidator)
 
     def test_is_valid(self):
@@ -98,3 +104,9 @@ class TestValidationRuleMixin(TestCase):
             }
         )
         self.assertFalse(form.is_valid())
+
+    def test_placeholder(self):
+        form = TestForm()
+        self.assertFalse(form.fields["name"].required)
+        self.assertTrue(form.fields["name"].disabled)
+        self.assertEqual(form.fields["name"].initial, "LalaLand")
