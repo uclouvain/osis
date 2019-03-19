@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 10:54+0100\n"
+"POT-Creation-Date: 2019-03-18 11:43+0100\n"
 "PO-Revision-Date: 2019-02-27 15:13+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1250,6 +1250,10 @@ msgstr "Mineure complément disciplinaire"
 msgid "Dissertation"
 msgstr "Mémoire"
 
+#: templates/academic_actors.html:62
+msgid "Dissertation Managers"
+msgstr "Gestionnaire de programme pour Dissertation"
+
 #: business/education_group.py:68
 msgid "Dissertation presentation"
 msgstr "Remise du mémoire"
@@ -2336,11 +2340,15 @@ msgstr ""
 msgid "Management of the annualized program."
 msgstr "Gestion du programme annualisé."
 
+#: templates/academic_actors.html:63
+msgid "Management of the dissertation managers"
+msgstr "Permet d'administrer la liste des gestionnaires qui ont accès à Dissertation"
+
 #: templates/home.html:93
 msgid "Management of the institution."
 msgstr "Gestion de l'institution."
 
-#: templates/academic_actors.html:45
+#: templates/academic_actors.html:45 templates/academic_actors.html:58
 msgid "Management of the program managers"
 msgstr ""
 "Permet d'administrer la liste des gestionnaires qui ont accès à l'encodage "
@@ -3013,7 +3021,9 @@ msgid ""
 "Please register a maximum of %(max_authorized_value)s digits in ascending "
 "order, without any duplication. Authorized values are from 1 to 6. Examples: "
 "12, 23, 46"
-msgstr "Veuillez entrer des chiffres compris entre 1 et %(max_authorized_value)s dans un ordre croissant, sans duplications. Exemples: 12, 23, 46"
+msgstr ""
+"Veuillez entrer des chiffres compris entre 1 et %(max_authorized_value)s "
+"dans un ordre croissant, sans duplications. Exemples: 12, 23, 46"
 
 #: models/learning_unit_year.py:60
 #, python-format
@@ -3141,7 +3151,8 @@ msgstr "Titre professionnel"
 msgid "Profile"
 msgstr "Profil"
 
-#: templates/academic_actors.html:44 templates/offer/tabs.html:47
+#: templates/academic_actors.html:44 templates/academic_actors.html:57
+#: templates/offer/tabs.html:47
 msgid "Program Managers"
 msgstr "Gestionnaires de programme"
 

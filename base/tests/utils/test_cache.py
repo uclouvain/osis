@@ -23,10 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import mock
+from unittest.mock import Mock
+
 from django.test import TestCase, RequestFactory
+from django.views.generic import TemplateView
+from django.views.generic.base import View
 
 from base.tests.factories.user import UserFactory
-from base.utils.cache import cache, RequestCache
+from base.utils.cache import cache, RequestCache, CacheFilterMixin
 
 
 class TestRequestCache(TestCase):
@@ -35,7 +40,6 @@ class TestRequestCache(TestCase):
         cls.user = UserFactory()
         cls.path = 'dummy_url'
         cls.request_cache = RequestCache(cls.user, cls.path)
-
         cls.request_data = {"name": "Axandre", "city": "City25"}
 
     def setUp(self):
@@ -76,3 +80,13 @@ class TestRequestCache(TestCase):
             self.request_cache.cached_data,
             expected_result
         )
+
+    @mock.patch('base.utils.cache.RequestCache.restore_get_request')
+    def test_cache_filter_mixin(self, mock_restore_get_request):
+        class DummyClass(CacheFilterMixin, TemplateView):
+            template_name = 'test.html'
+
+        self.request.user = self.user
+        obj = DummyClass(request=self.request)
+        obj.get(self.request)
+        self.assertTrue(mock_restore_get_request.called)
