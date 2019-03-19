@@ -29,6 +29,12 @@
 <tr>
     <td style="padding: 20px;">
         <label>{{ translated_label.label }}</label>
+        {% if translated_label.text_label.text_fr.0.text or translated_label.text_label.text_en.0.text %}
+            <span id="span_collapse_{{ translated_label.id }}"
+                  class="glyphicon glyphicon-chevron-down collapse_div pull-right"
+                  title="{% trans 'Expand text box' %}">
+            </span>
+        {% endif %}
     </td>
     <td style="padding: 20px;" {% if translated_label.text_label.label in cms_label_pedagogy_fr_only %}colspan="2"{% endif %}>
         {% if can_edit_information %}
@@ -39,7 +45,13 @@
                 <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
             </a>
         {% endif %}
-        {{ translated_label.text_label.text_fr.0.text|default_if_none:""|safe }}
+        {% if translated_label.text_label.text_fr.0.text %}
+            <div id="fr_{{ translated_label.id }}"
+                 style="resize: vertical; text-overflow:ellipsis;overflow: hidden;"
+                 class="resizable_div">
+                {{ translated_label.text_label.text_fr.0.text|default_if_none:""|safe }}
+            </div>
+        {% endif %}
     </td>
     {% if translated_label.text_label.label not in cms_label_pedagogy_fr_only %}
         <td style="padding: 20px;">
@@ -51,7 +63,13 @@
                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                 </a>
             {% endif %}
-            {{ translated_label.text_label.text_en.0.text|default_if_none:""|safe }}
+            {% if translated_label.text_label.text_en.0.text %}
+                 <div id="en_{{ translated_label.id }}"
+                     style="resize: vertical; text-overflow:ellipsis;overflow: hidden;"
+                     class="resizable_div">
+                    {{ translated_label.text_label.text_en.0.text|default_if_none:""|safe }}
+                </div>
+            {% endif %}
         </td>
     {% endif %}
 </tr>
