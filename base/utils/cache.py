@@ -58,6 +58,16 @@ def cache_filter(exclude_params=None, **default_values):
     return decorator
 
 
+class CacheFilterMixin:
+    # Mixin that keep the cache for cbv.
+    def get(self, request, *args, **kwargs):
+        request_cache = RequestCache(user=request.user, path=request.path)
+        if request.GET:
+            request_cache.save_get_parameters(request)
+        request.GET = request_cache.restore_get_request(request)
+        return super().get(request, *args, **kwargs)
+
+
 class OsisCache(abc.ABC):
     PREFIX_KEY = None
 

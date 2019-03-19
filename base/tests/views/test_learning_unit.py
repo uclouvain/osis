@@ -48,7 +48,6 @@ from base.business import learning_unit as learning_unit_business
 from base.business.learning_unit import LEARNING_UNIT_TITLES_PART1, LEARNING_UNIT_TITLES_PART2
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit.search_form import LearningUnitYearForm
-from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models import learning_unit_component
 from base.models import learning_unit_component_class
@@ -1110,8 +1109,6 @@ class LearningUnitViewTestCase(TestCase):
         response = self.client.get(reverse(learning_unit_pedagogy, args=[learning_unit_year.pk]))
 
         self.assertTemplateUsed(response, 'learning_unit/pedagogy.html')
-        self.assertIsInstance(response.context['form_french'], LearningUnitPedagogyForm)
-        self.assertIsInstance(response.context['form_english'], LearningUnitPedagogyForm)
 
     def test_learning_unit_specification(self):
         learning_unit_year = LearningUnitYearFactory()
