@@ -39,12 +39,19 @@ from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
+from cms.enums.entity_name import OFFER_YEAR
+from cms.models.translated_text import TranslatedText
+from cms.tests.factories.translated_text import TranslatedTextFactory
 
 
 class TestFetchEducationGroupToPostpone(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_year = get_current_year()
+        cls.academic_years = [AcademicYearFactory(year=i) for i in range(cls.current_year, cls.current_year + 7)]
+
     def setUp(self):
-        current_year = get_current_year()
-        self.academic_years = [AcademicYearFactory(year=i) for i in range(current_year, current_year + 7)]
         self.education_group = EducationGroupFactory(end_year=None)
 
     def test_fetch_education_group_to_postpone_to_N6(self):
@@ -56,15 +63,26 @@ class TestFetchEducationGroupToPostpone(TestCase):
             education_group=self.education_group,
             academic_year=self.academic_years[-3],
         )
+        TranslatedTextFactory(
+            entity=OFFER_YEAR, reference=str(education_group_to_postpone.pk),
+            text="It is our choices, Harry, that show what we truly are, far more than our abilities."
+        )
+
         self.assertEqual(EducationGroupYear.objects.count(), 2)
 
         result, errors = EducationGroupAutomaticPostponement().postpone()
 
         self.assertEqual(len(result), 2)
         self.assertEqual(EducationGroupYear.objects.count(), 4)
-        self.assertEqual(result[-1].academic_year.year, get_current_year()+6)
+
+        self.assertEqual(result[-1].academic_year.year, self.current_year + 6)
         self.assertEqual(result[-1].education_group, education_group_to_postpone.education_group)
         self.assertFalse(errors)
+
+        self.assertEqual(
+            TranslatedText.objects.get(entity=OFFER_YEAR, reference=str(result[-1].pk)).text,
+            "It is our choices, Harry, that show what we truly are, far more than our abilities."
+        )
 
     def test_if_structure_is_postponed(self):
         parent = EducationGroupYearFactory(
@@ -97,7 +115,7 @@ class TestFetchEducationGroupToPostpone(TestCase):
         self.assertEqual(len(result), 1)
         self.assertFalse(errors)
 
-        self.assertEqual(result[0].education_group,self.education_group)
+        self.assertEqual(result[0].education_group, self.education_group)
         self.assertEqual(result[0].groupelementyear_set.count(), 1)
 
     def test_egy_to_not_duplicated(self):
