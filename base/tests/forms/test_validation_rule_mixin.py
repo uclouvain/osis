@@ -104,9 +104,3 @@ class TestValidationRuleMixin(TestCase):
             }
         )
         self.assertFalse(form.is_valid())
-
-    def test_placeholder(self):
-        form = TestForm()
-        self.assertFalse(form.fields["name"].required)
-        self.assertTrue(form.fields["name"].disabled)
-        self.assertEqual(form.fields["name"].initial, "LalaLand")
