@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 10:54+0100\n"
+"POT-Creation-Date: 2019-03-18 11:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1218,6 +1218,10 @@ msgstr ""
 msgid "Dissertation"
 msgstr ""
 
+#: templates/academic_actors.html:62
+msgid "Dissertation Managers"
+msgstr ""
+
 #: business/education_group.py:68
 msgid "Dissertation presentation"
 msgstr ""
@@ -2286,11 +2290,15 @@ msgstr ""
 msgid "Management of the annualized program."
 msgstr ""
 
+#: templates/academic_actors.html:63
+msgid "Management of the dissertation managers"
+msgstr ""
+
 #: templates/home.html:93
 msgid "Management of the institution."
 msgstr ""
 
-#: templates/academic_actors.html:45
+#: templates/academic_actors.html:45 templates/academic_actors.html:58
 msgid "Management of the program managers"
 msgstr ""
 
@@ -3068,7 +3076,8 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: templates/academic_actors.html:44 templates/offer/tabs.html:47
+#: templates/academic_actors.html:44 templates/academic_actors.html:57
+#: templates/offer/tabs.html:47
 msgid "Program Managers"
 msgstr ""
 

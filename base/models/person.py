@@ -33,7 +33,7 @@ from django.db.models import Q
 from django.db.models import Value
 from django.db.models.functions import Concat, Lower
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models.entity import Entity
 from base.models.entity_version import find_pedagogical_entities_version
@@ -80,6 +80,7 @@ class Person(SerializableModel):
     source = models.CharField(max_length=25, blank=True, null=True, choices=person_source_type.CHOICES,
                               default=person_source_type.BASE)
     employee = models.BooleanField(default=False)
+    managed_entities = models.ManyToManyField("Entity", through="EntityManager")
 
     def save(self, **kwargs):
         # When person is created by another application this rule can be applied.

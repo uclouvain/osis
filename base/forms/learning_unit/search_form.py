@@ -188,12 +188,14 @@ class LearningUnitYearForm(LearningUnitSearchForm):
     def __init__(self, *args, **kwargs):
         self.service_course_search = kwargs.pop('service_course_search', False)
         self.borrowed_course_search = kwargs.pop('borrowed_course_search', False)
+
         super().__init__(*args, **kwargs)
 
         if self.borrowed_course_search:
-            self.fields["with_entity_subordinated"].initial = True
             self.fields["academic_year_id"].required = True
             self.fields["academic_year_id"].empty_label = None
+
+        self.fields["with_entity_subordinated"].initial = True
 
     def clean_acronym(self):
         acronym = self.cleaned_data.get('acronym')
