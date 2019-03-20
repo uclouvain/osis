@@ -157,7 +157,7 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
         GroupElementYearFactory(parent=another_finality_group, child_branch=another_master_120_didactic)
         GroupElementYearFactory(parent=another_master_120_didactic, child_branch=self.option_in_parent)
 
-        # We try to detach OPT1 from GROUP1
+        # We try to detach OPT1 from GROUP1 but it is not allowed because another 2M structure won't be valid anymore
         strategy = DetachEducationGroupYearStrategy(link=group1_link_opt1)
         with self.assertRaises(ValidationError):
             strategy.is_valid()
