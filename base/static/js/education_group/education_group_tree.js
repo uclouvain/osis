@@ -125,7 +125,7 @@ $(document).ready(function () {
                                 if (status === "success") {
                                     $('#form-ajax-modal').modal('toggle');
 
-                                    let form = $(this).find('form').first(); //$("#form-modal-ajax-content form");
+                                    let form = $(this).find('form').first();
                                     formAjaxSubmit(form, '#form-ajax-modal');
                                 } else {
                                     window.location.href = __ret.detach_url
