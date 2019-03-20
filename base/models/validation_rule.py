@@ -33,7 +33,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class ValidationRuleAdmin(OsisModelAdmin):
-    list_display = ('field_reference', 'status_field', 'initial_value', 'regex_rule')
+    list_display = ('field_reference', 'status_field', 'initial_value', 'regex_rule', 'placeholder')
     search_fields = ['field_reference']
 
 
@@ -77,6 +77,8 @@ class ValidationRule(models.Model):
         blank=True,
         verbose_name=_("french help text")
     )
+
+    placeholder = models.CharField(max_length=15, verbose_name=_('Placeholder'), blank=True,)
 
     class Meta:
         verbose_name = _("validation rule")
