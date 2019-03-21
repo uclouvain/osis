@@ -49,7 +49,7 @@ BUTTON_ORDER_TEMPLATE = """
 ICONS = {
     "up": "fa-arrow-up",
     "down": "fa-arrow-down",
-    "detach": "fa-close",
+    "detach": "fa-times",
     "edit": "fa-edit",
 }
 
