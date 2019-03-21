@@ -1,9 +1,13 @@
+from datetime import datetime, date
+
 from celery.schedules import crontab
 
 from backoffice.celery import app as celery_app
 from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponementToN6, \
     ReddotEducationGroupAutomaticPostponement
 from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponementToN6
+from base.models.academic_calendar import AcademicCalendar
+from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 
 celery_app.conf.beat_schedule.update({
     'Extend learning units': {
@@ -14,9 +18,9 @@ celery_app.conf.beat_schedule.update({
         'task': 'base.tasks.extend_education_groups',
         'schedule': crontab(minute=0, hour=2, day_of_month=15, month_of_year=7)
     },
-    'Extend reddot data': {
-        'task': 'base.tasks.extend_reddot_data',
-        'schedule': crontab(minute=0, hour=1, day_of_month=1, month_of_year=7)
+    'Check academic calendar': {
+        'task': 'base.tasks.check_academic_calendar',
+        'schedule': crontab(minute=0, hour=1)
     },
 })
 
@@ -36,7 +40,13 @@ def extend_education_groups():
 
 
 @celery_app.task
-def extend_reddot_data():
-    process = ReddotEducationGroupAutomaticPostponement()
-    process.postpone()
-    return process.serialize_postponement_results()
+def check_academic_calendar() -> dict:
+    open_calendar = AcademicCalendar.objects.filter(start_date=datetime.now().date()).first()
+    if open_calendar:
+
+        if open_calendar.reference == EDUCATION_GROUP_EDITION:
+            process = ReddotEducationGroupAutomaticPostponement()
+            process.postpone()
+            return {"Copy of Reddot data ": process.serialize_postponement_results()}
+
+    return {}

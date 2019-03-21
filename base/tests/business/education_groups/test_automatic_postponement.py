@@ -199,7 +199,14 @@ class TestReddotEducationGroupAutomaticPostponement(TestCase):
             education_group_achievement__education_group_year=self.previous_education_group_year
         )
         AdmissionConditionLineFactory(
-            admission_condition__education_group_year=self.previous_education_group_year
+            admission_condition__education_group_year=self.previous_education_group_year,
+            section="nothing else matters"
+        )
+
+        # this object will be removed during the copy.
+        AdmissionConditionLineFactory(
+            admission_condition__education_group_year=self.current_education_group_year,
+            section="the world is dying."
         )
 
         postponer = ReddotEducationGroupAutomaticPostponement()
@@ -217,8 +224,9 @@ class TestReddotEducationGroupAutomaticPostponement(TestCase):
         self.assertTrue(EducationGroupDetailedAchievement.objects.filter(
             education_group_achievement__education_group_year=self.current_education_group_year).exists())
 
-        self.assertTrue(AdmissionConditionLine.objects.filter(
-            admission_condition__education_group_year=self.current_education_group_year).exists())
+        self.assertTrue(AdmissionConditionLine.objects.get(
+            admission_condition__education_group_year=self.current_education_group_year).section,
+                        "nothing else matters")
 
     def test_no_previous_education_group(self):
         postponer = ReddotEducationGroupAutomaticPostponement()
