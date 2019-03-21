@@ -191,37 +191,43 @@ class NodeLeafJsTree(EducationGroupHierarchy):
                 'is_prerequisite': self.group_element_year.is_prerequisite,
                 'detach_url': reverse('group_element_year_delete', args=[
                     self.root.pk, self.group_element_year.parent.pk, self.group_element_year.pk
-                ]) if self.group_element_year else '#'
+                ]) if self.group_element_year else '#',
+                'class': self._get_class()
             },
             'id': 'id_{}_{}'.format(self.learning_unit_year.pk, group_element_year_pk),
         }
 
     def _get_icon(self):
         if self.group_element_year.has_prerequisite and self.group_element_year.is_prerequisite:
-            return "fa fa-exchange"
+            return "fa fa-exchange-alt"
         elif self.group_element_year.has_prerequisite:
             return "fa fa-arrow-right"
         elif self.group_element_year.is_prerequisite:
             return "fa fa-arrow-left"
-        return "jstree-file"
+        return "far fa-file"
 
     def _get_acronym(self) -> str:
         """
             When the LU year is different than its education group, we have to display the year in the title.
-            Also, when the LU is in proposal we must display the type.
         """
+        if self.learning_unit_year.academic_year != self.root.academic_year:
+            return "|{}| {}".format(self.learning_unit_year.academic_year.year, self.learning_unit_year.acronym)
+        return self.learning_unit_year.acronym
+
+    def _get_class(self):
         try:
             proposal = self.learning_unit_year.proposallearningunit
         except ProposalLearningUnit.DoesNotExist:
             proposal = None
 
-        text = self.learning_unit_year.acronym
-        if self.learning_unit_year.academic_year != self.root.academic_year:
-            text = "|{}| {}".format(self.learning_unit_year.academic_year.year, self.learning_unit_year.acronym)
-        if proposal:
-            proposal_abbreviation = getattr(ProposalType, proposal.type).abbreviation()
-            text = "({}) {}".format(proposal_abbreviation, text)
-        return text
+        class_by_proposal_type = {
+            ProposalType.CREATION.name: "proposal proposal_creation",
+            ProposalType.MODIFICATION.name: "proposal proposal_modification",
+            ProposalType.TRANSFORMATION.name: "proposal proposal_transformation",
+            ProposalType.TRANSFORMATION_AND_MODIFICATION.name: "proposal proposal_transformation_modification",
+            ProposalType.SUPPRESSION.name: "proposal proposal_suppression"
+        }
+        return class_by_proposal_type[proposal.type] if proposal else ""
 
     def get_url(self):
         url = reverse('learning_unit_utilization', args=[self.root.pk, self.learning_unit_year.pk])
