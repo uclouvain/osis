@@ -221,13 +221,13 @@ div:target{
     width: auto;
 }
 
-[id^=div_cms_] pre.collapse[aria-expanded="false"] {
+[id^=div_cms_] div.collapse[aria-expanded="false"] {
     display: block;
     height: 40px !important;
     overflow: hidden;
 }
 
-[id^=div_cms_] pre.collapsing[aria-expanded="false"] {
+[id^=div_cms_] div.collapsing[aria-expanded="false"] {
     height: 40px !important;
 }
 
@@ -242,10 +242,4 @@ div:target{
 
 [id^=div_cms_] a:not(.collapsed):after {
     content: "\f077";
-}
-
-.html_code_like_txt{
-    background-color: transparent;
-    border: none;
-    font-family: 'Armata', sans-serif;
 }

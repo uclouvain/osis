@@ -41,11 +41,11 @@
         {% endif %}
         {% if translated_label.text_label.text_fr.0.text %}
             <div id="div_cms_fr_{{ translated_label.id }}" >
-                <pre class="collapse html_code_like_txt"
+                <div class="collapse"
                      id="cms_text_fr_{{ translated_label.id }}"
                      aria-expanded="false">
                     {{ translated_label.text_label.text_fr.0.text|default_if_none:""|safe }}
-                </pre>
+                </div>
                 <a role="button"
                    class="collapsed"
                    data-toggle="collapse"
@@ -68,11 +68,11 @@
             {% endif %}
             {% if translated_label.text_label.text_en.0.text %}
                  <div id="div_cms_en_{{ translated_label.id }}">
-                     <pre class="collapse html_code_like_txt"
+                     <div class="collapse "
                           id="cms_text_en_{{ translated_label.id }}"
                           aria-expanded="false">
                          {{ translated_label.text_label.text_en.0.text|default_if_none:""|safe }}
-                     </pre>
+                     </div>
                      <a role="button"
                         class="collapsed"
                         data-toggle="collapse"
