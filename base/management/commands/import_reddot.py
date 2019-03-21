@@ -286,7 +286,7 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_FR, 'mineures', 'Mineures'),
     (settings.LANGUAGE_CODE_FR, 'majeures', 'Majeures'),
     (settings.LANGUAGE_CODE_FR, 'finalites', 'Introduction - liste des finalités'),
-    (settings.LANGUAGE_CODE_FR, 'options', 'Introduction - option list'),
+    (settings.LANGUAGE_CODE_FR, 'options', 'Introduction - liste des options'),
     (settings.LANGUAGE_CODE_FR, 'finalites_didactiques-commun', 'Finalités Didactique'),
     (settings.LANGUAGE_CODE_FR, 'agregation', 'Agrégation'),
     (settings.LANGUAGE_CODE_FR, 'prerequis', 'Prérequis'),
