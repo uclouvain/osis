@@ -91,7 +91,10 @@ class LearningComponentYear(SerializableModel):
 
     @cached_property
     def learning_unit_year(self):
-        return self.learningunityear_set.get()
+        try:
+            return self.learningunityear_set.get()
+        except:
+            return None
 
     @property
     def real_classes(self):
@@ -114,8 +117,10 @@ class LearningComponentYear(SerializableModel):
         vol_q1 = self.hourly_volume_partial_q1 or 0
         vol_q2 = self.hourly_volume_partial_q2 or 0
         planned_classes = self.planned_classes or 0
-
-        inconsistent_msg = _('Volumes of {} are inconsistent').format(self.complete_acronym)
+        if self.learning_unit_year:
+            inconsistent_msg = _('Volumes of {} are inconsistent').format(self.complete_acronym)
+        else:
+            inconsistent_msg = _('Volumes are inconsistent')
         if vol_q1 + vol_q2 != vol_total_annual:
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
