@@ -35,7 +35,7 @@ from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
     LearningContainerModelForm, LearningContainerYearModelForm
 from base.models import academic_year
-from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL
+from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, AcademicYear
 from base.models.campus import Campus
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY
@@ -242,9 +242,8 @@ class FullForm(LearningUnitBaseForm):
             end_year_range = MAX_ACADEMIC_YEAR_FACULTY if self.person.is_faculty_manager \
                 else MAX_ACADEMIC_YEAR_CENTRAL
 
-            self.fields["academic_year"].queryset = academic_year.find_academic_years(
-                start_year=starting_academic_year.year,
-                end_year=starting_academic_year.year + end_year_range
+            self.fields["academic_year"].queryset = AcademicYear.objects.min_max_years(
+                starting_academic_year.year, starting_academic_year.year + end_year_range
             )
         else:
             self._restrict_academic_years_choice_for_proposal_creation_suppression(proposal_type)

@@ -39,12 +39,34 @@ class AcademicYearAdmin(SerializableModelAdmin):
     list_display = ('name', 'start_date', 'end_date')
 
 
+class AcademicYearQuerySet(models.QuerySet):
+    def min_max_years(self, min_year, max_year):
+        return self.filter(year__gte=min_year, year__lte=max_year)
+
+    def currents(self, date=None):
+        if not date:
+            date = timezone.now()
+
+        return self.filter(start_date__lte=date, end_date__gte=date)
+
+    def current(self, date=None):
+        """ If we have two academic year [2015-2016] [2016-2017]. It will return [2016-2017] """
+        return self.currents(date).last()
+
+    def max_adjournment(self, delta=0):
+        date = timezone.now()
+        max_date = date.replace(year=date.year + LEARNING_UNIT_CREATION_SPAN_YEARS + delta)
+        return self.current(max_date)
+
+
 class AcademicYear(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     year = models.IntegerField(unique=True)
     start_date = models.DateField(default=timezone.now, blank=True, null=True)
     end_date = models.DateField(default=timezone.now, blank=True, null=True)
+
+    objects = AcademicYearQuerySet.as_manager()
 
     @property
     def name(self):
@@ -120,8 +142,7 @@ def find_academic_years(start_date=None, end_date=None, start_year=None, end_yea
 
 
 def current_academic_years():
-    now = timezone.now()
-    return find_academic_years(start_date=now, end_date=now)
+    return AcademicYear.objects.currents()
 
 
 def current_academic_year():
@@ -141,4 +162,4 @@ def compute_max_academic_year_adjournment():
 def get_last_academic_years(last_years=10):
     today = datetime.date.today()
     date_ten_years_before = today.replace(year=today.year - last_years)
-    return find_academic_years().filter(start_date__gte=date_ten_years_before)
+    return AcademicYear.objects.filter(start_date__gte=date_ten_years_before)

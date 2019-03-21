@@ -43,10 +43,10 @@ class EducationGroupAdmin(VersionAdmin, SerializableModelAdmin):
 
     def apply_education_group_year_postponement(self, request, queryset):
         # Potential circular imports
-        from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponement
+        from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponementToN6
         from base.views.common import display_success_messages, display_error_messages
 
-        result, errors = EducationGroupAutomaticPostponement(queryset).postpone()
+        result, errors = EducationGroupAutomaticPostponementToN6(queryset).postpone()
         count = len(result)
         display_success_messages(
             request, ngettext(

@@ -138,8 +138,10 @@ class LearningUnitPostponementForm:
                 .order_by('academic_year__year')
         else:
             max_postponement_year = self._compute_max_postponement_year()
-            ac_year_postponement_range = academic_year.find_academic_years(start_year=self.start_postponement.year,
-                                                                           end_year=max_postponement_year)
+            ac_year_postponement_range = AcademicYear.objects.min_max_years(
+                self.start_postponement.year,
+                max_postponement_year
+            )
             existing_learn_unit_years = LearningUnitYear.objects.filter(
                 academic_year__year__gte=self.start_postponement.year,
                 learning_unit=self.learning_unit_instance,
