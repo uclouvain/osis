@@ -216,3 +216,30 @@ div:target{
     width: 250px;
     text-align: left;
 }
+
+[id^=div_cms_]{
+    width: auto;
+}
+
+[id^=div_cms_] div.collapse[aria-expanded="false"] {
+    display: block;
+    height: 40px !important;
+    overflow: hidden;
+}
+
+[id^=div_cms_] div.collapsing[aria-expanded="false"] {
+    height: 40px !important;
+}
+
+[id^=div_cms_] a {
+    font-family: 'Font Awesome\ 5 Free';
+    font-weight: 900;
+}
+
+[id^=div_cms_] a.collapsed:after {
+    content: "\f078";
+}
+
+[id^=div_cms_] a:not(.collapsed):after {
+    content: "\f077";
+}
