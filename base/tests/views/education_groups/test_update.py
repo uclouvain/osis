@@ -246,6 +246,13 @@ class TestUpdate(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "education_group/blocks/form/training_certificate.html")
 
+        certificate_aims = [CertificateAimFactory(code=code) for code in range(100, 103)]
+        response = self.client.post(reverse(update_education_group,
+                                            args=[self.previous_training_education_group_year.pk,
+                                                  self.previous_training_education_group_year.pk]),
+                                    data={'certificate_aims': str(certificate_aims[0].id)})
+        self.assertEqual(response.status_code, 302)
+
     def test_post_training(self):
         old_domain = DomainFactory()
         EducationGroupYearDomainFactory(
