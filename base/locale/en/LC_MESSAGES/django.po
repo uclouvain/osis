@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-21 10:15+0100\n"
+"POT-Creation-Date: 2019-03-21 13:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1339,6 +1339,13 @@ msgstr ""
 #, python-format
 msgid ""
 "Education group year %(acronym)s (%(academic_year)s) successfuly deleted."
+msgstr ""
+
+#: views/education_groups/create.py:150
+#, python-format
+msgid ""
+"Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
+"a> successfully created."
 msgstr ""
 
 #: views/education_groups/update.py:101
@@ -3515,14 +3522,14 @@ msgstr ""
 #: templates/education_group/tab_administrative_data.html:47
 #: templates/education_group/tab_administrative_data.html:48
 #: templates/education_group/tab_administrative_data.html:49
+#: templates/education_group/tab_edit_administrative_data.html:56
+#: templates/education_group/tab_edit_administrative_data.html:57
+#: templates/education_group/tab_edit_administrative_data.html:58
 msgid "Session"
 msgstr ""
 
 #: business/learning_unit.py:82 business/learning_units/edition.py:438
 #: business/proposal_xls.py:54 models/learning_unit_year.py:124
-#: templates/education_group/tab_edit_administrative_data.html:56
-#: templates/education_group/tab_edit_administrative_data.html:57
-#: templates/education_group/tab_edit_administrative_data.html:58
 msgid "Session derogation"
 msgstr ""
 
