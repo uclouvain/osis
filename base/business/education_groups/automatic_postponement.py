@@ -70,6 +70,8 @@ class ReddotEducationGroupAutomaticPostponement(AutomaticPostponement):
         EducationGroupPublicationContact
         EducationGroupsAchievements
         AdmissionCondition
+
+    We'll override the data so if there are some data in N, there'll be deleted before the copy of the N-1 data.
     """
     model = EducationGroupYear
 
@@ -96,20 +98,26 @@ class ReddotEducationGroupAutomaticPostponement(AutomaticPostponement):
             except (Error, ObjectDoesNotExist, MultipleObjectsReturned, ConsistencyError):
                 self.errors.append(obj)
 
-        return self.result
+        return self.result, self.errors
 
     @staticmethod
     def _postpone_cms(old_egy, new_egy):
+        TranslatedText.objects.filter(entity=entity_name.OFFER_YEAR, reference=str(new_egy.pk)).delete()
+
         for text in TranslatedText.objects.filter(entity=entity_name.OFFER_YEAR, reference=str(old_egy.pk)):
             update_related_object(text, "reference", str(new_egy.pk))
 
     @staticmethod
     def _postpone_publication(old_egy: EducationGroupYear, new_egy: EducationGroupYear):
+        new_egy.educationgrouppublicationcontact_set.all().delete()
+
         for publication in old_egy.educationgrouppublicationcontact_set.all():
             update_related_object(publication, "education_group_year", new_egy)
 
     @staticmethod
     def _postpone_achievement(old_egy: EducationGroupYear, new_egy: EducationGroupYear):
+        new_egy.educationgroupachievement_set.all().delete()
+
         for achievement in old_egy.educationgroupachievement_set.all():
             new_achievement = update_related_object(achievement, "education_group_year", new_egy)
 
@@ -118,8 +126,13 @@ class ReddotEducationGroupAutomaticPostponement(AutomaticPostponement):
 
     @staticmethod
     def _postpone_admission(old_egy: EducationGroupYear, new_egy: EducationGroupYear):
-        if hasattr(old_egy, "admissioncondition"):
-            new_admission = update_related_object(old_egy.admissioncondition, "education_group_year", new_egy)
+        if hasattr(new_egy, "admissioncondition"):
+            new_egy.admissioncondition.delete()
 
-            for line in old_egy.admissioncondition.admissionconditionline_set.all():
-                update_related_object(line, "admission_condition", new_admission)
+        if not hasattr(old_egy, "admissioncondition"):
+            return
+
+        new_admission = update_related_object(old_egy.admissioncondition, "education_group_year", new_egy)
+
+        for line in old_egy.admissioncondition.admissionconditionline_set.all():
+            update_related_object(line, "admission_condition", new_admission)
