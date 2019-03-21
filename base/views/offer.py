@@ -27,6 +27,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import get_object_or_404, render
 
 from base import models as mdl
+from base.models.academic_year import AcademicYear
 from base.models.offer_year_calendar import OfferYearCalendar
 
 
@@ -34,7 +35,7 @@ from base.models.offer_year_calendar import OfferYearCalendar
 @permission_required('base.can_access_offer', raise_exception=True)
 def offers(request):
     academic_yr = None
-    academic_years = mdl.academic_year.find_academic_years()
+    academic_years = AcademicYear.objects.all()
 
     academic_year_calendar = mdl.academic_year.current_academic_year()
     if academic_year_calendar:
@@ -55,7 +56,7 @@ def offers_search(request):
         academic_yr = int(request.GET['academic_year'])
     acronym = request.GET['code']
 
-    academic_years = mdl.academic_year.find_academic_years()
+    academic_years = AcademicYear.objects.all()
 
     offer_years = mdl.offer_year.search(entity=entity, academic_yr=academic_yr, acronym=acronym) \
         .select_related("entity_management", "academic_year")

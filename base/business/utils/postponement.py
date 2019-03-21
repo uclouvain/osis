@@ -31,7 +31,7 @@ from django.db.models import Max, Q, F
 from django.utils.translation import ugettext as _
 
 from base.business.education_groups.postponement import ConsistencyError
-from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment, current_academic_year
+from base.models.academic_year import AcademicYear
 
 
 class AutomaticPostponement(ABC):
@@ -55,8 +55,8 @@ class AutomaticPostponement(ABC):
 
     def __init__(self, queryset=None):
         # Fetch the N and N+6 academic_years
-        self.last_academic_year = AcademicYear.objects.get(year=compute_max_academic_year_adjournment())
-        self.current_year = current_academic_year()
+        self.last_academic_year = AcademicYear.objects.max_adjournment()
+        self.current_year = AcademicYear.objects.current()
 
         self.queryset = self.get_queryset(queryset)
 
