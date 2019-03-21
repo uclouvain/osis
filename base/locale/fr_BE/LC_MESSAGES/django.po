@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-19 10:54+0100\n"
+"POT-Creation-Date: 2019-03-21 10:15+0100\n"
 "PO-Revision-Date: 2019-02-27 15:13+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -826,7 +826,7 @@ msgstr "Annuler"
 msgid "Cancel the proposal"
 msgstr "Annuler la proposition"
 
-#: business/group_element_years/detach.py:125
+#: business/group_element_years/detach.py:129
 #: tests/views/group_element_years/test_detach.py:154
 #: tests/views/group_element_years/test_detach.py:173
 #, python-format
@@ -1334,8 +1334,8 @@ msgstr "Durée"
 #: templates/education_group/blocks/panel/panel_additional_info_skills.html:50
 #: templates/education_group/blocks/panel/panel_program_aims.html:50
 #: templates/education_group/blocks/row_label_general_informations.html:36
-#: templates/learning_unit/blocks/panel/cms_informations.html:44
-#: templates/learning_unit/blocks/panel/cms_informations.html:62
+#: templates/learning_unit/blocks/panel/cms_informations.html:38
+#: templates/learning_unit/blocks/panel/cms_informations.html:65
 #: templates/learning_unit/specifications_all.html:50
 #: templates/learning_unit/specifications_all.html:62
 #: templates/learning_unit/specifications_all.html:143
@@ -1564,11 +1564,6 @@ msgstr "Sigle déjà existant"
 #: business/learning_units/perms.py:57
 msgid "Existing proposal in epc"
 msgstr "Il existe des propositions dans EPC"
-
-#: templates/learning_unit/blocks/panel/cms_informations.html:35
-#: templates/learning_unit/blocks/panel/educational_informations.html:175
-msgid "Expand text box"
-msgstr "Agrandir le champ text"
 
 #: templates/education_group/search.html:116
 #: templates/learning_unit/by_activity.html:45
@@ -2821,7 +2816,7 @@ msgstr "Opération"
 msgid "Option"
 msgstr "Option"
 
-#: business/group_element_years/detach.py:102
+#: business/group_element_years/detach.py:106
 #, python-format
 msgid ""
 "Option \"%(acronym)s\" cannot be detach because it is contained in "
@@ -3003,6 +2998,12 @@ msgstr "Ph.D"
 msgctxt "Ph.D for education group"
 msgid "Ph.D"
 msgstr "Doctorat"
+
+#: models/validation_rule.py:81
+#, fuzzy
+#| msgid "Co-holder"
+msgid "Placeholder"
+msgstr "Co-titulaire"
 
 #: business/proposal_xls.py:84 business/proposal_xls.py:94
 #: forms/learning_unit/edition_volume.py:87
@@ -3354,10 +3355,6 @@ msgstr "Classes effectives/prévues"
 #: templates/my_osis/my_message.html:44 templates/my_osis/my_messages.html:67
 msgid "Received on"
 msgstr "Reçu le"
-
-#: templates/learning_unit/blocks/panel/educational_informations.html:171
-msgid "Reduce text box"
-msgstr "Reduire le champ texte"
 
 #: templates/education_group/tab_admission_conditions.html:85
 #: templates/education_group/tab_admission_conditions.html:87
@@ -3980,7 +3977,7 @@ msgstr ""
 msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
-#: forms/common.py:133 forms/education_group/common.py:191
+#: forms/common.py:134 forms/education_group/common.py:191
 #: templates/education_group/blocks/form/group.html:61
 #: templates/education_group/blocks/form/minitraining.html:62
 #: templates/education_group/blocks/form/training_tab_identification.html:54
@@ -4201,7 +4198,7 @@ msgstr ""
 "Les prérequis %(prerequisites)s pour l'unité d'enseignement "
 "%(learning_unit)s ne sont pas dans la formation sélectionnée %(root)s"
 
-#: views/education_groups/detail.py:433
+#: views/education_groups/detail.py:434
 #, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr "Le programme %(acronym)s sera publié sous peu"
@@ -4388,7 +4385,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 
-#: views/education_groups/detail.py:394
+#: views/education_groups/detail.py:395
 #, python-format
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
@@ -5652,7 +5649,7 @@ msgstr "débloquer la mise à jour pour l'enseignant"
 msgid "unspecified"
 msgstr "indéterminé"
 
-#: models/validation_rule.py:82
+#: models/validation_rule.py:84
 msgid "validation rule"
 msgstr "règle de validation"
 
