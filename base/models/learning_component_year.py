@@ -93,7 +93,7 @@ class LearningComponentYear(SerializableModel):
     def learning_unit_year(self):
         try:
             return self.learningunityear_set.get()
-        except:
+        except LearningComponentYear.DoesNotExist:
             return None
 
     @property
@@ -117,10 +117,7 @@ class LearningComponentYear(SerializableModel):
         vol_q1 = self.hourly_volume_partial_q1 or 0
         vol_q2 = self.hourly_volume_partial_q2 or 0
         planned_classes = self.planned_classes or 0
-        if self.learning_unit_year:
-            inconsistent_msg = _('Volumes of {} are inconsistent').format(self.complete_acronym)
-        else:
-            inconsistent_msg = _('Volumes are inconsistent')
+        inconsistent_msg = self._get_basic_inconsistent_msg()
         if vol_q1 + vol_q2 != vol_total_annual:
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
@@ -138,6 +135,13 @@ class LearningComponentYear(SerializableModel):
                 inconsistent_msg,
                 _('planned classes cannot be greather than 0 while volume is equal to 0')))
         return _warnings
+
+    def _get_basic_inconsistent_msg(self):
+        if self.learning_unit_year:
+            inconsistent_msg = _('Volumes of {} are inconsistent').format(self.complete_acronym)
+        else:
+            inconsistent_msg = _('Volumes are inconsistent')
+        return inconsistent_msg
 
 
 def volume_total_verbose(learning_component_years):
