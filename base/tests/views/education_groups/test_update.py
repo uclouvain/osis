@@ -100,7 +100,7 @@ class TestUpdate(TestCase):
         self.client.force_login(self.person.user)
         permission = Permission.objects.get(codename='change_educationgroup')
         self.person.user.user_permissions.add(permission)
-        self.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
+        self.perm_patcher = mock.patch("base.business.education_groups.perms._is_eligible_certificate_aims",
                                        return_value=True)
         self.mocked_perm = self.perm_patcher.start()
 
@@ -172,12 +172,6 @@ class TestUpdate(TestCase):
         response = self.client.get(self.url)
 
         self.assertRedirects(response, '/login/?next={}'.format(self.url))
-
-    def test_permission_required(self):
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-
-        self.mocked_perm.assert_called_once_with(self.person, self.education_group_year, raise_exception=True)
 
     def test_template_used(self):
         response = self.client.get(self.url)
