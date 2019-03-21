@@ -10,6 +10,14 @@ celery_app.conf.beat_schedule.update({
         'task': 'base.tasks.extend_learning_units',
         'schedule': crontab(minute=0, hour=0, day_of_month=15, month_of_year=7)
     },
+    'Extend education groups': {
+        'task': 'base.tasks.extend_education_groups',
+        'schedule': crontab(minute=0, hour=2, day_of_month=15, month_of_year=7)
+    },
+    'Extend reddot data': {
+        'task': 'base.tasks.extend_reddot_data',
+        'schedule': crontab(minute=0, hour=1, day_of_month=1, month_of_year=7)
+    },
 })
 
 
@@ -20,14 +28,6 @@ def extend_learning_units():
     return process.serialize_postponement_results()
 
 
-celery_app.conf.beat_schedule.update({
-    'Extend education groups': {
-        'task': 'base.tasks.extend_education_groups',
-        'schedule': crontab(minute=0, hour=2, day_of_month=15, month_of_year=7)
-    },
-})
-
-
 @celery_app.task
 def extend_education_groups():
     process = EducationGroupAutomaticPostponementToN6()
@@ -35,19 +35,8 @@ def extend_education_groups():
     return process.serialize_postponement_results()
 
 
-
-celery_app.conf.beat_schedule.update({
-    'Extend reddot data': {
-        'task': 'base.tasks.exytend_reddot_data',
-        'schedule': crontab(minute=0, hour=1, day_of_month=1, month_of_year=7)
-    },
-})
-
-
 @celery_app.task
-def exytend_reddot_data():
+def extend_reddot_data():
     process = ReddotEducationGroupAutomaticPostponement()
     process.postpone()
     return process.serialize_postponement_results()
-
-
