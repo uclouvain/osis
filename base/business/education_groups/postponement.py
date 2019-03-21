@@ -26,12 +26,10 @@ from django.db import Error
 from django.utils.translation import ugettext as _
 
 from base.business.education_groups import create
-from base.business.utils.model import model_to_dict_fk, compare_objects, update_object, update_related_object
+from base.business.utils.model import model_to_dict_fk, compare_objects, update_object
 from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.hops import Hops
-from cms.enums import entity_name
-from cms.models.translated_text import TranslatedText
 
 EDUCATION_GROUP_MAX_POSTPONE_YEARS = 6
 FIELD_TO_EXCLUDE = ['id', 'uuid', 'external_id', 'academic_year', 'linked_with_epc', 'publication_contact_entity']
@@ -85,8 +83,6 @@ def _postpone_m2m(education_group_year, postponed_egy, hops_values):
     if hops_values and any(elem in HOPS_FIELDS and hops_values[elem] for elem in hops_values):
         _postpone_hops(hops_values, postponed_egy)
 
-    _postpone_cms(education_group_year, postponed_egy)
-
 
 def duplicate_education_group_year(old_education_group_year, new_academic_year, dict_initial_egy=None,
                                    hops_values=None):
@@ -127,11 +123,6 @@ def _postpone_hops(hops_values, postponed_egy):
                                   defaults={'ares_study': hops_values['ares_study'],
                                             'ares_graca': hops_values['ares_graca'],
                                             'ares_ability': hops_values['ares_ability']})
-
-
-def _postpone_cms(education_group_year, postponed_egy):
-    for text in TranslatedText.objects.filter(entity=entity_name.OFFER_YEAR, reference=str(education_group_year.pk)):
-        update_related_object(text, "reference", str(postponed_egy.pk))
 
 
 class PostponementEducationGroupYearMixin:

@@ -64,10 +64,10 @@ class LearningUnitAdmin(VersionAdmin, SerializableModelAdmin):
 
     def apply_learning_unit_year_postponement(self, request, queryset):
         # Potential circular imports
-        from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponement
+        from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponementToN6
         from base.views.common import display_success_messages, display_error_messages
 
-        result, errors = LearningUnitAutomaticPostponement(queryset).postpone()
+        result, errors = LearningUnitAutomaticPostponementToN6(queryset).postpone()
         count = len(result)
         display_success_messages(
             request, ngettext(

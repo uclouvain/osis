@@ -35,6 +35,54 @@ from base.models.academic_year import AcademicYear
 
 
 class AutomaticPostponement(ABC):
+    # The model must have annualized data with a FK to AcademicYear
+    model = None
+
+    msg_result = _("%(number_extended)s object(s) extended and %(number_error)s error(s)")
+
+    def __init__(self, queryset=None):
+        self.current_year = AcademicYear.objects.current()
+
+        self.queryset = self.get_queryset(queryset)
+
+        self.already_duplicated = self.get_already_duplicated()
+        self.to_not_duplicate = self.get_to_not_duplicated()
+
+        if self.already_duplicated and self.to_not_duplicate:
+            self.to_duplicate = self.queryset.difference(self.already_duplicated, self.to_not_duplicate)
+        else:
+            self.to_duplicate = self.queryset
+
+        self.result = []  # Contains the list of postponed objects.
+        self.errors = []
+
+    def postpone(self):
+        raise NotImplementedError
+
+    def get_queryset(self, queryset=None):
+        """ Override if you need to add additional filters"""
+        if not queryset:
+            queryset = self.model.objects.all()
+        return queryset
+
+    def get_already_duplicated(self):
+        return self.model.objects.none()
+
+    def get_to_not_duplicated(self):
+        return self.model.objects.none()
+
+    def serialize_postponement_results(self):
+        return {
+            "msg": self.msg_result % {'number_extended': len(self.result), 'number_error': len(self.errors)},
+            "errors": [str(obj) for obj in self.errors]
+        }
+
+    def post_extend(self, original_object, list_postponed_objects):
+        """ Allow the user to add actions to execute after the postponement of an object """
+        pass
+
+
+class AutomaticPostponementToN6(AutomaticPostponement):
     """
     Abstract class:
         This class manages the postponement of annualized objects from N to N+6
@@ -42,30 +90,22 @@ class AutomaticPostponement(ABC):
     """
 
     # The model must have annualized data with a FK to AcademicYear
-    model = None
     annualized_set = ""
 
     # Callbacks
     # They should be call with __func__ to be staticmethod
+    extend_method = None
     send_before = None
     send_after = None
-    extend_method = None
-
-    msg_result = _("%(number_extended)s object(s) extended and %(number_error)s error(s)")
 
     def __init__(self, queryset=None):
         # Fetch the N and N+6 academic_years
         self.last_academic_year = AcademicYear.objects.max_adjournment()
         self.current_year = AcademicYear.objects.current()
 
+        super().__init__(queryset)
+
         self.queryset = self.get_queryset(queryset)
-
-        self.already_duplicated = self.get_already_duplicated()
-        self.to_not_duplicate = self.get_to_not_duplicated()
-        self.to_duplicate = self.queryset.difference(self.already_duplicated, self.to_not_duplicate)
-
-        self.result = []  # Contains the list of postponed objects.
-        self.errors = []
 
     def postpone(self):
         # send statistics to the managers
@@ -88,7 +128,6 @@ class AutomaticPostponement(ABC):
                     obj_to_copy = getattr(obj, self.annualized_set + "_set").latest('academic_year__year')
                     copied_objs = []
                     for year in range(obj.last_year + 1, last_year + 1):
-
                         new_obj = self.extend_obj(obj_to_copy, AcademicYear.objects.get(year=year))
                         copied_objs.append(new_obj)
 
@@ -105,8 +144,8 @@ class AutomaticPostponement(ABC):
 
     def get_queryset(self, queryset=None):
         """ Override if you need to add additional filters"""
-        if not queryset:
-            queryset = self.model.objects.all()
+        queryset = super().get_queryset(queryset)
+
         # Annotate the latest year with an annualized data.
         return queryset.annotate(
             last_year=Max(self.annualized_set + '__academic_year__year')
@@ -120,13 +159,3 @@ class AutomaticPostponement(ABC):
     def get_to_not_duplicated(self):
         """ We cannot postpone an education_group in the past """
         return self.queryset.filter(last_year__lt=self.current_year.year)
-
-    def serialize_postponement_results(self):
-        return {
-            "msg": self.msg_result % {'number_extended': len(self.result), 'number_error': len(self.errors)},
-            "errors": [str(obj) for obj in self.errors]
-        }
-
-    def post_extend(self, original_object, list_postponed_objects):
-        """ Allow the user to add actions to execute after the postponement of an object """
-        pass
