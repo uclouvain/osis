@@ -318,6 +318,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             sections_list = SECTION_INTRO
             if self.is_didactic_offer:
                 sections_list = sections_list + SECTION_DIDACTIC
+            sections_to_display = []  # TODO: Remove eligibleFiles dependency (Planned)
         else:
             sections_list = SECTION_LIST
         for section in sections_list:

@@ -39,7 +39,22 @@
                 <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
             </a>
         {% endif %}
-        {{ translated_label.text_label.text_fr.0.text|default_if_none:""|safe }}
+        {% if translated_label.text_label.text_fr.0.text %}
+            <div id="div_cms_fr_{{ translated_label.id }}" >
+                <div class="collapse"
+                     id="cms_text_fr_{{ translated_label.id }}"
+                     aria-expanded="false">
+                    {{ translated_label.text_label.text_fr.0.text|default_if_none:""|safe }}
+                </div>
+                <a role="button"
+                   class="collapsed"
+                   data-toggle="collapse"
+                   href="#cms_text_fr_{{ translated_label.id }}"
+                   aria-expanded="false"
+                   aria-controls="cms_text_fr_{{ translated_label.id }}">
+                </a>
+            </div>
+        {% endif %}
     </td>
     {% if translated_label.text_label.label not in cms_label_pedagogy_fr_only %}
         <td style="padding: 20px;">
@@ -51,7 +66,22 @@
                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                 </a>
             {% endif %}
-            {{ translated_label.text_label.text_en.0.text|default_if_none:""|safe }}
+            {% if translated_label.text_label.text_en.0.text %}
+                 <div id="div_cms_en_{{ translated_label.id }}">
+                     <div class="collapse "
+                          id="cms_text_en_{{ translated_label.id }}"
+                          aria-expanded="false">
+                         {{ translated_label.text_label.text_en.0.text|default_if_none:""|safe }}
+                     </div>
+                     <a role="button"
+                        class="collapsed"
+                        data-toggle="collapse"
+                        href="#cms_text_en_{{ translated_label.id }}"
+                        aria-expanded="false"
+                        aria-controls="cms_text_en_{{ translated_label.id }}">
+                     </a>
+                </div>
+            {% endif %}
         </td>
     {% endif %}
 </tr>

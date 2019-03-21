@@ -120,6 +120,7 @@ class ValidationRuleMixin(WarningFormMixin):
 
                 field.initial = rule.initial_value
                 field.help_text = rule.help_text
+                field.widget.attrs["placeholder"] = rule.placeholder
 
                 field.validators.append(
                     RegexValidator(rule.regex_rule, rule.regex_error_message or None)

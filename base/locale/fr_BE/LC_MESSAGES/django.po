@@ -183,12 +183,12 @@ msgstr ""
 "opérateurs valides sont OU et ET.</li><li>L'opérateur doit être le même à "
 "l'intérieur de toutes les parenthèses (groupes).</li><li>L'opérateur qui "
 "unit les groupes doit être différent de celui qui unit les UEs dans un "
-"groupe (parenthèses).</li><li>Le code de l'UE ne peut pas comporté d'espaces "
-"(ex: LDROI1001 et non LDROI&nbsp;1001).</li></ul></p><p><b>Exemples</b>:"
-"<ul><li>A OU B OU C: valide</li><li>A ET B ET C : valide</li><li>A ET (B OU "
-"C) ET (D OU E): valide</li><li>A ET (B OU C) OU (D OU E): non valide</"
-"li><li>A ET (B ET C) ET (D ET E): non valide</li><li>A ET (B OU C) ET (D ET "
-"E): non valide</li></ul>"
+"groupe (parenthèses).</li><li>Le code de l'UE ne peut pas comporter "
+"d'espaces (ex: LDROI1001 et non LDROI&nbsp;1001).</li></ul></"
+"p><p><b>Exemples</b>:<ul><li>A OU B OU C: valide</li><li>A ET B ET C : "
+"valide</li><li>A ET (B OU C) ET (D OU E): valide</li><li>A ET (B OU C) OU (D "
+"OU E): non valide</li><li>A ET (B ET C) ET (D ET E): non valide</li><li>A ET "
+"(B OU C) ET (D ET E): non valide</li></ul>"
 
 #: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:19
 msgid "<b>create</b> a new learning unit using that acronym"
@@ -831,7 +831,7 @@ msgstr "Annuler"
 msgid "Cancel the proposal"
 msgstr "Annuler la proposition"
 
-#: business/group_element_years/detach.py:125
+#: business/group_element_years/detach.py:129
 #: tests/views/group_element_years/test_detach.py:154
 #: tests/views/group_element_years/test_detach.py:173
 #, python-format
@@ -1259,6 +1259,10 @@ msgstr "Mineure complément disciplinaire"
 msgid "Dissertation"
 msgstr "Mémoire"
 
+#: templates/academic_actors.html:62
+msgid "Dissertation Managers"
+msgstr "Gestionnaire de programme pour Dissertation"
+
 #: business/education_group.py:68
 msgid "Dissertation presentation"
 msgstr "Remise du mémoire"
@@ -1380,6 +1384,14 @@ msgid ""
 msgstr ""
 "Organisation de formations %(acronym)s (%(academic_year)s) supprimée avec "
 "succès."
+
+#: views/education_groups/create.py:150
+msgid ""
+"Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
+"a> successfully created."
+msgstr ""
+"Organisation de formations <a href='%(link)s'> %(acronym)s "
+"(%(academic_year)s) </a> créée avec succès."
 
 #: views/education_groups/update.py:101
 #, python-format
@@ -2345,11 +2357,16 @@ msgstr ""
 msgid "Management of the annualized program."
 msgstr "Gestion du programme annualisé."
 
+#: templates/academic_actors.html:63
+msgid "Management of the dissertation managers"
+msgstr ""
+"Permet d'administrer la liste des gestionnaires qui ont accès à Dissertation"
+
 #: templates/home.html:93
 msgid "Management of the institution."
 msgstr "Gestion de l'institution."
 
-#: templates/academic_actors.html:45
+#: templates/academic_actors.html:45 templates/academic_actors.html:58
 msgid "Management of the program managers"
 msgstr ""
 "Permet d'administrer la liste des gestionnaires qui ont accès à l'encodage "
@@ -2816,7 +2833,7 @@ msgstr "Opération"
 msgid "Option"
 msgstr "Option"
 
-#: business/group_element_years/detach.py:102
+#: business/group_element_years/detach.py:106
 #, python-format
 msgid ""
 "Option \"%(acronym)s\" cannot be detach because it is contained in "
@@ -2999,6 +3016,10 @@ msgctxt "Ph.D for education group"
 msgid "Ph.D"
 msgstr "Doctorat"
 
+#: models/validation_rule.py:81
+msgid "Placeholder"
+msgstr ""
+
 #: business/proposal_xls.py:84 business/proposal_xls.py:94
 #: forms/learning_unit/edition_volume.py:87
 #: forms/learning_unit/edition_volume.py:107
@@ -3152,7 +3173,8 @@ msgstr "Titre professionnel"
 msgid "Profile"
 msgstr "Profil"
 
-#: templates/academic_actors.html:44 templates/offer/tabs.html:47
+#: templates/academic_actors.html:44 templates/academic_actors.html:57
+#: templates/offer/tabs.html:47
 msgid "Program Managers"
 msgstr "Gestionnaires de programme"
 
@@ -3588,14 +3610,14 @@ msgstr "Partenaire de service"
 #: templates/education_group/tab_administrative_data.html:47
 #: templates/education_group/tab_administrative_data.html:48
 #: templates/education_group/tab_administrative_data.html:49
+#: templates/education_group/tab_edit_administrative_data.html:56
+#: templates/education_group/tab_edit_administrative_data.html:57
+#: templates/education_group/tab_edit_administrative_data.html:58
 msgid "Session"
 msgstr "Session"
 
 #: business/learning_unit.py:82 business/learning_units/edition.py:438
 #: business/proposal_xls.py:54 models/learning_unit_year.py:124
-#: templates/education_group/tab_edit_administrative_data.html:56
-#: templates/education_group/tab_edit_administrative_data.html:57
-#: templates/education_group/tab_edit_administrative_data.html:58
 msgid "Session derogation"
 msgstr "Session dérogation"
 
@@ -3970,7 +3992,7 @@ msgstr ""
 msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
-#: forms/common.py:133 forms/education_group/common.py:191
+#: forms/common.py:134 forms/education_group/common.py:191
 #: templates/education_group/blocks/form/group.html:61
 #: templates/education_group/blocks/form/minitraining.html:62
 #: templates/education_group/blocks/form/training_tab_identification.html:54
@@ -5642,7 +5664,7 @@ msgstr "débloquer la mise à jour pour l'enseignant"
 msgid "unspecified"
 msgstr "indéterminé"
 
-#: models/validation_rule.py:82
+#: models/validation_rule.py:84
 msgid "validation rule"
 msgstr "règle de validation"
 
