@@ -198,6 +198,44 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
     z-index: 10;
 }
 
+/* Style for jstree */
+.proposal>i::after {
+    position:relative;
+    bottom:-6px;
+    left:-5px;
+    font-style: normal;
+    font-size: 10px;
+    color: black;
+    font-weight: normal;
+    border-radius: 50%;
+    padding: 2px;
+}
+.proposal_creation>i::after {
+    content: 'C';
+    background: #ff7979;
+}
+
+.proposal_modification>i::after {
+    content: 'M';
+    background: #7ed6df;
+}
+
+.proposal_transformation>i::after {
+    content: 'T';
+    background: #7ed6df;
+}
+
+.proposal_suppression>i::after {
+    content: 'S';
+    background: #ff7979;
+}
+
+.proposal_transformation_modification>i::after {
+    content: 'MT';
+    background: #7ed6df;
+}
+
+
 /* Styles for dhtmlxGantt (calendar) */
 .projectRow {
     background-color: lightgray !important
