@@ -56,7 +56,7 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory
 from base.utils.cache import ElementCache
-from base.views.education_groups.update import update_education_group, _get_success_redirect_url
+from base.views.education_groups.update import update_education_group_year, _get_success_redirect_url
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory
 from reference.tests.factories.language import LanguageFactory
@@ -92,7 +92,7 @@ class TestUpdate(TestCase):
             child_type=self.education_group_year.education_group_type
         )
 
-        self.url = reverse(update_education_group, args=[self.education_group_year.pk, self.education_group_year.pk])
+        self.url = reverse(update_education_group_year, args=[self.education_group_year.pk, self.education_group_year.pk])
         self.person = PersonFactory()
 
         self.client.force_login(self.person.user)
@@ -138,7 +138,7 @@ class TestUpdate(TestCase):
         )
 
         self.training_url = reverse(
-            update_education_group,
+            update_education_group_year,
             args=[self.training_education_group_year.pk, self.training_education_group_year.pk]
         )
 
@@ -153,7 +153,7 @@ class TestUpdate(TestCase):
         )
 
         self.mini_training_url = reverse(
-            update_education_group,
+            update_education_group_year,
             args=[self.mini_training_education_group_year.pk, self.mini_training_education_group_year.pk]
         )
 
