@@ -145,36 +145,4 @@
             prefix: 'teachingmaterial_set'
         });
     </script>
-    <script>
-        const minHeight = 100;
-
-        $(document).ready(function()
-        {
-            var elts = $( ".resizable_div");
-            for(var i=0; i<elts.length;i++){
-                var id_elt = "#" + elts[i].id;
-                if(elts[i].offsetHeight > minHeight){
-                    $(id_elt).css('height', minHeight + 'px');
-                }else{
-                    $(id_elt).css('height', elts[i].offsetHeight + 'px');
-                }
-            }
-        });
-
-        $(function () {
-            $('.collapse_div').on('click', function () {
-                $(this).toggleClass('glyphicon-chevron-up').toggleClass('glyphicon-chevron-down');
-                var id_rec = (this.id).replace('span_collapse_', '');
-                if ($('#fr_'+id_rec).css("height") <= (minHeight+"px") || $('#en_'+id_rec).css("height") <= (minHeight+"px")){
-                    $('#fr_'+id_rec).css('height', 'auto');
-                    $('#en_'+id_rec).css('height', 'auto');
-                    $(this).attr("title","{%  trans 'Reduce text box' %}");
-                }else{
-                    $('#fr_'+id_rec).css('height', minHeight + 'px');
-                    $('#en_'+id_rec).css('height', minHeight + 'px');
-                    $(this).attr("title","{%  trans 'Expand text box' %}");
-                }
-            });
-        });
-    </script>
 {% endif %}
