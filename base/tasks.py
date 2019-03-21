@@ -47,6 +47,6 @@ def check_academic_calendar() -> dict:
         if open_calendar.reference == EDUCATION_GROUP_EDITION:
             process = ReddotEducationGroupAutomaticPostponement()
             process.postpone()
-            return {"Copy of Reddot data ": process.serialize_postponement_results()}
+            return {"Copy of Reddot data": process.serialize_postponement_results()}
 
     return {}
