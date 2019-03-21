@@ -49,9 +49,6 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
-from cms.enums.entity_name import OFFER_YEAR
-from cms.models.translated_text import TranslatedText
-from cms.tests.factories.translated_text import TranslatedTextFactory
 
 
 class EducationGroupPostponementTestCase(TestCase):
@@ -250,10 +247,6 @@ class TestPostpone(TestCase):
                          _("You are not allowed to copy the content of this kind of education group."))
 
     def test_postpone_with_child_branch(self):
-        TranslatedTextFactory(
-            entity=OFFER_YEAR, reference=str(self.current_group_element_year.child_branch.pk),
-            text="It is our choices, Harry, that show what we truly are, far more than our abilities."
-        )
         self.postponer = PostponeContent(self.current_education_group_year)
 
         new_root = self.postponer.postpone()
@@ -262,10 +255,6 @@ class TestPostpone(TestCase):
         new_child_branch = new_root.groupelementyear_set.get().child_branch
         self.assertEqual(new_child_branch.acronym, self.current_group_element_year.child_branch.acronym)
         self.assertEqual(new_child_branch.academic_year, self.next_academic_year)
-        self.assertEqual(
-            TranslatedText.objects.get(entity=OFFER_YEAR, reference=str(new_child_branch.pk)).text,
-            "It is our choices, Harry, that show what we truly are, far more than our abilities."
-        )
 
     def test_postpone_with_child_branch_existing_in_N1(self):
         n1_child_branch = EducationGroupYearFactory(

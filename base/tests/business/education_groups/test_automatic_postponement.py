@@ -29,14 +29,19 @@ from unittest.mock import Mock
 from django.db import Error
 from django.test import TestCase
 
-from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponementToN6
+from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponementToN6, \
+    ReddotEducationGroupAutomaticPostponement
+from base.models.admission_condition import AdmissionConditionLine
+from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import MINI_TRAINING
 from base.models.enums.education_group_types import MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
+from base.tests.factories.admission_condition import AdmissionConditionLineFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group import EducationGroupFactory
+from base.tests.factories.education_group_detailed_achievement import EducationGroupDetailedAchievementFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory
@@ -65,13 +70,6 @@ class TestFetchEducationGroupToPostpone(TestCase):
             education_group=self.education_group,
             academic_year=self.academic_years[-3],
         )
-        # TranslatedTextFactory(
-        #     entity=OFFER_YEAR, reference=str(education_group_to_postpone.pk),
-        #     text="It is our choices, Harry, that show what we truly are, far more than our abilities."
-        # )
-        # EducationGroupPublicationContactFactory(
-        #     education_group_year=education_group_to_postpone
-        # )
 
         self.assertEqual(EducationGroupYear.objects.count(), 2)
 
@@ -84,12 +82,6 @@ class TestFetchEducationGroupToPostpone(TestCase):
         self.assertEqual(latest_postponed_egy.academic_year.year, self.current_year + 6)
         self.assertEqual(latest_postponed_egy.education_group, education_group_to_postpone.education_group)
         self.assertFalse(errors)
-
-        # self.assertEqual(
-        #     TranslatedText.objects.get(entity=OFFER_YEAR, reference=str(latest_postponed_egy.pk)).text,
-        #     "It is our choices, Harry, that show what we truly are, far more than our abilities."
-        # )
-        # self.assertTrue(EducationGroupPublicationContact.objects.filter(education_group_year=latest_postponed_egy).exists())
 
     def test_if_structure_is_postponed(self):
         parent = EducationGroupYearFactory(
@@ -153,7 +145,8 @@ class TestFetchEducationGroupToPostpone(TestCase):
         self.assertEqual(len(result), 0)
         self.assertFalse(errors)
 
-    @mock.patch('base.business.education_groups.automatic_postponement.EducationGroupAutomaticPostponementToN6.extend_obj')
+    @mock.patch(
+        'base.business.education_groups.automatic_postponement.EducationGroupAutomaticPostponementToN6.extend_obj')
     def test_egy_to_duplicate_with_error(self, mock_method):
         mock_method.side_effect = Mock(side_effect=Error("test error"))
 
@@ -178,6 +171,60 @@ class TestFetchEducationGroupToPostpone(TestCase):
         queryset = EducationGroupAutomaticPostponementToN6().get_queryset()
 
         self.assertQuerysetEqual(queryset, [])
+
+
+class TestReddotEducationGroupAutomaticPostponement(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_year = AcademicYearFactory(year=get_current_year())
+        cls.previous_year = AcademicYearFactory(year=get_current_year() - 1)
+        cls.current_education_group_year = EducationGroupYearFactory(academic_year=cls.current_year)
+
+    def test_postpone(self):
+        self.previous_education_group_year = EducationGroupYearFactory(
+            academic_year=self.previous_year,
+            education_group=self.current_education_group_year.education_group
+        )
+
+        TranslatedTextFactory(
+            entity=OFFER_YEAR, reference=str(self.previous_education_group_year.pk),
+            text="It is our choices, Harry, that show what we truly are, far more than our abilities."
+        )
+        EducationGroupPublicationContactFactory(
+            education_group_year=self.previous_education_group_year
+        )
+
+        EducationGroupDetailedAchievementFactory(
+            education_group_achievement__education_group_year=self.previous_education_group_year
+        )
+        AdmissionConditionLineFactory(
+            admission_condition__education_group_year=self.previous_education_group_year
+        )
+
+        postponer = ReddotEducationGroupAutomaticPostponement()
+        postponer.postpone()
+
+        self.assertEqual(len(postponer.result), 1)
+        self.assertEqual(len(postponer.errors), 0)
+        self.assertEqual(
+            TranslatedText.objects.get(entity=OFFER_YEAR, reference=str(self.current_education_group_year.pk)).text,
+            "It is our choices, Harry, that show what we truly are, far more than our abilities."
+        )
+        self.assertTrue(EducationGroupPublicationContact.objects.filter(
+            education_group_year=self.current_education_group_year).exists())
+
+        self.assertTrue(EducationGroupDetailedAchievement.objects.filter(
+            education_group_achievement__education_group_year=self.current_education_group_year).exists())
+
+        self.assertTrue(AdmissionConditionLine.objects.filter(
+            admission_condition__education_group_year=self.current_education_group_year).exists())
+
+    def test_no_previous_education_group(self):
+        postponer = ReddotEducationGroupAutomaticPostponement()
+        postponer.postpone()
+        self.assertEqual(len(postponer.result), 0)
+        self.assertEqual(len(postponer.errors), 0)
 
 
 class TestSerializePostponement(TestCase):

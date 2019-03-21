@@ -90,11 +90,13 @@ class ReddotEducationGroupAutomaticPostponement(AutomaticPostponement):
                     self._postpone_achievement(old_obj, obj)
                     self._postpone_admission(old_obj, obj)
 
-                    self.result.extend(obj)
+                    self.result.append(obj)
 
             # General catch to be sure to not stop the rest of the duplication
             except (Error, ObjectDoesNotExist, MultipleObjectsReturned, ConsistencyError):
                 self.errors.append(obj)
+
+        return self.result
 
     @staticmethod
     def _postpone_cms(old_egy, new_egy):
@@ -104,19 +106,20 @@ class ReddotEducationGroupAutomaticPostponement(AutomaticPostponement):
     @staticmethod
     def _postpone_publication(old_egy: EducationGroupYear, new_egy: EducationGroupYear):
         for publication in old_egy.educationgrouppublicationcontact_set.all():
-            update_related_object(publication, "education_group_year", new_egy.pk)
+            update_related_object(publication, "education_group_year", new_egy)
 
     @staticmethod
     def _postpone_achievement(old_egy: EducationGroupYear, new_egy: EducationGroupYear):
         for achievement in old_egy.educationgroupachievement_set.all():
-            new_achievement = update_related_object(achievement, "education_group_year", new_egy.pk)
+            new_achievement = update_related_object(achievement, "education_group_year", new_egy)
 
             for detail in achievement.educationgroupdetailedachievement_set.all():
-                update_related_object(detail, "education_group_achievement", new_achievement.pk)
+                update_related_object(detail, "education_group_achievement", new_achievement)
 
     @staticmethod
     def _postpone_admission(old_egy: EducationGroupYear, new_egy: EducationGroupYear):
-        new_admission = update_related_object(old_egy.admissioncondition, "education_group_year", new_egy.pk)
+        if hasattr(old_egy, "admissioncondition"):
+            new_admission = update_related_object(old_egy.admissioncondition, "education_group_year", new_egy)
 
-        for line in new_admission.admissionconditionline_set.all():
-            update_related_object(line, "education_group_achievement", new_admission.pk)
+            for line in old_egy.admissioncondition.admissionconditionline_set.all():
+                update_related_object(line, "admission_condition", new_admission)
