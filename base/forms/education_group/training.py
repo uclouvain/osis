@@ -241,9 +241,10 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
 
 class CertificateAimsForm(forms.ModelForm):
     section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False)
+
     class Meta:
         model = EducationGroupYear
-        fields = ["certificate_aims",]
+        fields = ["certificate_aims"]
         widgets = {
             'certificate_aims': autocomplete.ModelSelect2Multiple(
                 url='certificate_aim_autocomplete',

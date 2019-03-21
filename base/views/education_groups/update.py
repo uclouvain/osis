@@ -46,8 +46,6 @@ from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.education_groups.detail import EducationGroupGenericDetailView
-from base.views.education_groups.perms import can_change_education_group
-from base.views.learning_units.perms import PermissionDecoratorWithUser
 from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 
 
