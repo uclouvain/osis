@@ -35,6 +35,7 @@ from django.views.generic import DeleteView
 from base import models as mdl
 from base.forms.academic_calendar import AcademicCalendarForm
 from base.models.academic_calendar import AcademicCalendar
+from base.models.academic_year import AcademicYear
 from base.models.enums import academic_calendar_type
 from base.models.enums.academic_calendar_type import ACADEMIC_CATEGORY, PROJECT_CATEGORY, AD_HOC_CATEGORY
 from base.models.utils.utils import get_object_or_none
@@ -100,7 +101,7 @@ def academic_calendars(request):
     # TODO :: Use a Django form instead of hardcoded form in template academic_calendars.html
     academic_year = request.GET.get('academic_year') or mdl.academic_year.starting_academic_year().pk
     academic_year = int(academic_year)
-    academic_years = mdl.academic_year.find_academic_years()
+    academic_years = AcademicYear.objects.all()
 
     show_academic_events = request.GET.get('show_academic_events')
     show_project_events = request.GET.get('show_project_events') and request.user.is_superuser

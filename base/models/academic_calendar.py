@@ -110,7 +110,7 @@ class AcademicCalendar(SerializableModel):
         return ''
 
     def __str__(self):
-        return u"%s %s" % (self.academic_year, self.title)
+        return "{} {}".format(self.academic_year, self.title)
 
     class Meta:
         permissions = (
