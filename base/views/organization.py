@@ -100,6 +100,7 @@ def organization_address_edit(request, organization_address_id):
     )
 
 
+# FIXME Use modelform
 @login_required
 @permission_required('base.can_access_organization', raise_exception=True)
 def organization_address_save(request, organization_address_id):
