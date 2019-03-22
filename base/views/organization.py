@@ -33,6 +33,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 from django_filters.views import FilterView
 
@@ -112,6 +113,7 @@ def organization_address_edit(request, organization_address_id):
 
 
 @login_required
+@require_POST
 @permission_required('base.can_access_organization', raise_exception=True)
 def organization_address_delete(request, organization_address_id):
     organization_address = get_object_or_404(
