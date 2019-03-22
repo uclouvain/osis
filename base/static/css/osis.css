@@ -217,10 +217,6 @@ div:target{
     text-align: left;
 }
 
-[id^=div_cms_]{
-    width: auto;
-}
-
 [id^=div_cms_] div.collapse[aria-expanded="false"] {
     display: block;
     height: 40px !important;
