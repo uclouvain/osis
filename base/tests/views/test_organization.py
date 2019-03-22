@@ -26,6 +26,7 @@
 import json
 from unittest import mock
 
+import factory
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -45,42 +46,20 @@ from reference.tests.factories.country import CountryFactory
 
 
 class OrganizationViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.entity = EntityFactory(organization=cls.organization)
+        cls.entity_version = EntityVersionFactory(entity=cls.entity)
+        cls.a_superuser = SuperUserFactory()
 
     def setUp(self):
-        self.organization = OrganizationFactory()
-        self.entity = EntityFactory(organization=self.organization)
-        self.entity_version = EntityVersionFactory(entity=self.entity)
-        self.a_superuser = SuperUserFactory()
         self.client.force_login(self.a_superuser)
-
-    def test_organization_address_save(self):
-        from base.views.organization import organization_address_save
-
-        address = OrganizationAddressFactory(organization=self.organization)
-        country = address.country
-        url = reverse(organization_address_save, args=[address.id])
-        response = self.client.post(url, data=get_form_organization_address_save())
-        self.assertEqual(response.status_code, 302)
-
-        address.refresh_from_db()
-        self.assertEqual(address.location, "476 5th Ave")
-        self.assertEqual(address.postal_code, "10018")
-        self.assertEqual(address.city, "New York")
-        self.assertEqual(address.country, country)
-
-    def test_organization_address_create(self):
-        from base.views.organization import organization_address_create
-
-        response = self.client.get(reverse(organization_address_create, args=[self.organization.id]))
-
-        self.assertTemplateUsed(response, "organization/organization_address_form.html")
-        self.assertIsInstance(response.context.get("organization_address"), OrganizationAddress)
-        self.assertEqual(response.context.get("organization_id"), self.organization.id)
 
     def test_organization_address_delete(self):
         address = OrganizationAddressFactory(organization=self.organization)
 
-        response = self.client.get(reverse(organization_address_delete, args=[address.id]))
+        response = self.client.post(reverse(organization_address_delete, args=[address.id]))
         self.assertRedirects(response, reverse("organization_read", args=[self.organization.pk]))
         with self.assertRaises(ObjectDoesNotExist):
             organization_address.OrganizationAddress.objects.get(id=address.id)
@@ -92,21 +71,6 @@ class OrganizationViewTestCase(TestCase):
 
         self.assertTemplateUsed(response, "organization/organization_address_form.html")
         self.assertEqual(response.context.get("organization_address"), address)
-        self.assertEqual(response.context.get("organization_id"), self.organization.id)
-
-    def test_organization_address_new_empty(self):
-        from base.views.organization import organization_address_new
-        from django.contrib.messages.storage.fallback import FallbackStorage
-
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse(organization_address_new))
-        request.user = mock.Mock()
-        # Need session in order to store messages
-        setattr(request, 'session', {})
-        setattr(request, '_messages', FallbackStorage(request))
-
-        organization_address_new(request)
-        self.assertEqual(str(request._messages._queued_messages[0]), _("Impossible to save the organization address"))
 
     def test_organizations_search(self):
         response = self.client.get(reverse('organizations_search'), data={
@@ -115,15 +79,6 @@ class OrganizationViewTestCase(TestCase):
 
         self.assertTemplateUsed(response, "organization/organizations.html")
         self.assertEqual(response.context["object_list"][0], self.organization)
-
-
-def get_form_organization_address_save():
-    return {
-        "organization_address_label": "Building",
-        "organization_address_location": "476 5th Ave",
-        "organization_address_postal_code": "10018",
-        "organization_address_city": "New York"
-    }
 
 
 class TestOrganizationAutocomplete(TestCase):
