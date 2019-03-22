@@ -83,7 +83,7 @@ class OrganizationViewTestCase(TestCase):
         response = self.client.get(reverse(organization_address_delete, args=[address.id]))
         self.assertRedirects(response, reverse("organization_read", args=[self.organization.pk]))
         with self.assertRaises(ObjectDoesNotExist):
-            organization_address.find_by_id(address.id)
+            organization_address.OrganizationAddress.objects.get(id=address.id)
 
     def test_organization_address_edit(self):
         from base.views.organization import organization_address_edit

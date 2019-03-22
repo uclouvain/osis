@@ -28,22 +28,19 @@
 {% block breadcrumb %}
   <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'Institution' %}</a></li>
   <li><a href="{% url 'organizations' %}" id="lnk_organizations">{% trans 'Organizations' %}</a></li>
-  <li><a href="{% url 'organization_read' organization_id=organization_id %}" id="lnk_organization">{% trans 'Organization' %}</a></li>
+  <li><a href="{% url 'organization_read' organization_id=organization_address.organization.id %}" id="lnk_organization">{% trans 'Organization' %}</a></li>
   <li class="active">{% trans 'Organization address' %}</li>
 {% endblock %}
 {% block content %}
+
 <div class="page-header">
-  {% if organization_address.id%}
   <h2>{{ organization_address.label }}</h2>
-  {% endif %}
 </div>
+
 <div class="panel panel-default">
     <div class="panel-body">
-        <form method="post" action="{% if organization_address.id%}{% url 'organization_address_save' organization_address.id %}{%else%}{% url 'organization_address_save_new'%}{%endif%}">
+        <form method="post" action="{% url 'organization_address_edit' organization_address.id %}">
             {% csrf_token %}
-            <input type="hidden" value="{{ organization_address.id }}" name="organization_address_id"/>
-            <input type="hidden" value="{{ organization_id }}" name="organization_id"/>
-
             <div class="row">
                 {% bootstrap_field form.label form_group_class="col-md-6" %}
                 {% bootstrap_field form.location form_group_class="col-md-6" %}
@@ -59,15 +56,10 @@
                 <button type="submit" class="btn btn-primary" title="{% trans 'save'%}" id="bt_organization_organization_save">
                     <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save'%}
                 </button>
-                {%if organization_address.id %}
-                    <a href="{% url 'organization_address_read' organization_address_id=organization_address.id %}"
-                       id="lnk_organization_address_read_{{organization_address.id}}"  title="{%trans 'cancel'%}"
-                       class="btn btn-default" role="button">{% trans 'cancel'%}</a>
-                {%else%}
-                    <a href="{% url 'organization_read' organization_id=organization_id %}"
-                       id="lnk_organization_read_{{organization_address.organization.id}}"  title="{%trans 'cancel'%}"
-                       class="btn btn-default" role="button">{% trans 'cancel'%}</a>
-                {%endif%}
+                <a href="{% url 'organization_address_read' organization_address_id=organization_address.id %}"
+                   id="lnk_organization_address_read_{{organization_address.id}}"  title="{%trans 'cancel'%}"
+                   class="btn btn-default" role="button">{% trans 'cancel'%}</a>
+
             </div>
     </form>
   </div>
