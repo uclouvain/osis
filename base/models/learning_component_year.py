@@ -139,10 +139,8 @@ class LearningComponentYear(SerializableModel):
 
     def _get_basic_inconsistent_msg(self):
         if self.learning_unit_year:
-            inconsistent_msg = _('Volumes of {} are inconsistent').format(self.complete_acronym)
-        else:
-            inconsistent_msg = _('Volumes are inconsistent')
-        return inconsistent_msg
+            return _('Volumes of {} are inconsistent').format(self.complete_acronym)
+        return _('Volumes are inconsistent')
 
 
 def volume_total_verbose(learning_component_years):
