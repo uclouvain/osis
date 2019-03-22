@@ -36,7 +36,6 @@ from base.business.education_groups.perms import is_eligible_to_delete_education
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_postpone_education_group, \
     _is_eligible_certificate_aims
 from base.models.academic_year import AcademicYear, current_academic_year
-from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.utils.utils import get_verbose_field_value
 
 # TODO Use inclusion tags instead
