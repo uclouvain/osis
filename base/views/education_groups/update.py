@@ -54,7 +54,7 @@ from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 def update_education_group(request, root_id, education_group_year_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and\
-            education_group_year.academic_year.year <= current_academic_year().year:
+            education_group_year.academic_year.year < current_academic_year().year:
         return update_certificate_aims(request, root_id, education_group_year)
     return update_education_group_year(request, root_id, education_group_year)
 
