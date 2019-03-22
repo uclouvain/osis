@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-21 16:49+0100\n"
-"PO-Revision-Date: 2019-03-21 16:51+0100\n"
+"PO-Revision-Date: 2019-03-22 10:25+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_BE\n"
@@ -1051,7 +1051,7 @@ msgstr "Co-organisation"
 
 #: models/education_group_year.py:87
 msgid "Copy Reddot data from previous academic year."
-msgstr "Copier les données Reddot de l’année précédante."
+msgstr "Copier les données Reddot de l’année précédente."
 
 #: templatetags/education_group.py:94
 #, python-format
