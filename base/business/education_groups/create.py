@@ -153,9 +153,6 @@ def _get_validation_rule(field_name, education_group_type):
 
 
 def _generate_child_partial_acronym(parent, child_initial_value, child_type):
-
-
-
     previous_grp_ele = utils.get_object_or_none(
         GroupElementYear,
         parent__education_group=parent.education_group,
