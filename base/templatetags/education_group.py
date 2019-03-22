@@ -33,8 +33,9 @@ from django.utils.translation import ugettext as _
 from base.business.education_group import can_user_edit_administrative_data
 from base.business.education_groups.perms import is_eligible_to_delete_education_group, \
     is_eligible_to_change_education_group, is_eligible_to_add_training, \
-    is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_postpone_education_group
-from base.models.academic_year import AcademicYear
+    is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_postpone_education_group, \
+    _is_eligible_certificate_aims
+from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.utils.utils import get_verbose_field_value
 
 # TODO Use inclusion tags instead
@@ -62,6 +63,8 @@ def li_with_deletion_perm(context, url, message, url_id="link_delete"):
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_update_perm(context, url, message, url_id="link_update"):
+    if context['education_group_year'].academic_year.year < current_academic_year().year:
+        return li_with_permission(context, _is_eligible_certificate_aims, url, message, url_id, True)
     return li_with_permission(context, is_eligible_to_change_education_group, url, message, url_id)
 
 
@@ -107,7 +110,6 @@ def li_with_permission(context, permission, url, message, url_id, load_modal=Fal
     else:
         href = "#"
         load_modal = False
-
     return {
         "class_li": disabled,
         "load_modal": load_modal,
@@ -243,7 +245,7 @@ def link_pdf_content_education_group(url):
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=True)
-def dl_with_parent(context, key, obj=None, parent=None,  dl_title="", class_dl="", default_value=None):
+def dl_with_parent(context, key, obj=None, parent=None, dl_title="", class_dl="", default_value=None):
     """
     Tag to render <dl> for details of education_group.
     If the fetched value does not exist for the current education_group_year,

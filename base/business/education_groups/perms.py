@@ -130,6 +130,10 @@ def _is_eligible_education_group(person, education_group, raise_exception):
             (person.is_central_manager or is_education_group_edit_period_opened(education_group, raise_exception)))
 
 
+def _is_eligible_certificate_aims(person, education_group, raise_exception):
+    return check_link_to_management_entity(education_group, person, raise_exception)
+
+
 def _is_eligible_to_add_education_group_with_category(person, category, raise_exception):
     # TRAINING/MINI_TRAINING can only be added by central managers | Faculty manager must make a proposition of creation
     # based on US OSIS-2592, Faculty manager can add a MINI-TRAINING
