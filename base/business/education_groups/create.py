@@ -171,7 +171,11 @@ def _generate_child_partial_acronym(parent, child_initial_value, child_type):
 
     reg_child_initial_value = re.compile(REGEX_GROUP_PARTIAL_ACRONYM_INITIAL_VALUE)
     match_result = reg_child_initial_value.search(child_initial_value)
-    cnum, subdivision = match_result.group("cnum", "subdivision")
+    if match_result:
+        cnum, subdivision = match_result.group("cnum", "subdivision")
+    else:
+        cnum = None
+        subdivision = None
 
     partial_acronym = "{}{}{}".format(sigle_ele, cnum, subdivision)
     while EducationGroupYear.objects.filter(partial_acronym=partial_acronym).exists():
