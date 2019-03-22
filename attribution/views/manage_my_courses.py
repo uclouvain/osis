@@ -80,7 +80,7 @@ def view_educational_information(request, learning_unit_year_id):
     template = 'manage_my_courses/educational_information.html'
     query_set = LearningUnitYear.objects.all().select_related('learning_unit', 'learning_container_year')
     learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
-    context.update(get_specifications_context( learning_unit_year, request))
+    context.update(get_specifications_context(learning_unit_year, request))
     context.update(get_achievements_group_by_language(learning_unit_year))
     context.update(get_languages_settings())
     context['div_class'] = 'collapse'
