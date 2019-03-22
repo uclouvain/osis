@@ -30,7 +30,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMix
 from django.db.models import Q
 from django.db.utils import IntegrityError
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView
@@ -38,8 +38,10 @@ from django_filters.views import FilterView
 
 from base import models as mdl
 from base.forms.organization import OrganizationFilter
+from base.forms.organization_address import OrganizationAddressForm
 from base.models.campus import Campus
 from base.models.organization import Organization
+from base.models.organization_address import OrganizationAddress
 from reference import models as mdlref
 from reference.models.country import Country
 
@@ -87,15 +89,18 @@ def organization_address_read(request, organization_address_id):
 @login_required
 @permission_required('base.can_access_organization', raise_exception=True)
 def organization_address_edit(request, organization_address_id):
-    organization_address = mdl.organization_address.find_by_id(organization_address_id)
-    organization_id = organization_address.organization.id
-    countries = mdlref.country.find_all()
+    organization_address = get_object_or_404(
+        OrganizationAddress.objects.select_related('organization'),
+        id=organization_address_id
+    )
+    organization_id = organization_address.organization.id  # TODO Remove
+    form = OrganizationAddressForm(instance=organization_address)
     return render(
         request, "organization/organization_address_form.html",
         {
             'organization_address': organization_address,
             'organization_id': organization_id,
-            'countries': countries
+            'form': form
         }
     )
 
