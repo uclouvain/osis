@@ -27,7 +27,7 @@ from dal import autocomplete
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.db.models import Q
+from django.db.models import Q, Prefetch, F
 from django.db.utils import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render, get_object_or_404
@@ -68,6 +68,15 @@ class DetailOrganization(PermissionRequiredMixin, DetailView):
     permission_required = 'base.can_access_organization'
     raise_exception = True
     pk_url_kwarg = "organization_id"
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related(
+            Prefetch(
+                "organizationaddress_set",
+                queryset=OrganizationAddress.objects.select_related("country")
+            ),
+            "campus_set",
+        )
 
 
 @login_required
