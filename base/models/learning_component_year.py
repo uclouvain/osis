@@ -33,7 +33,7 @@ from base.models import learning_class_year
 from base.models.enums import learning_component_year_type, learning_container_year_types
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
-from django.core.exceptions import  ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class LearningComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
