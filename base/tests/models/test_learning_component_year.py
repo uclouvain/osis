@@ -24,8 +24,11 @@
 #
 ##############################################################################
 import datetime
+
+from django.utils.translation import ugettext_lazy as _
 from django.test import TestCase
 from django.utils import timezone
+
 from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_component_year import LearningComponentYear
@@ -80,3 +83,20 @@ class LearningComponentYearTest(TestCase):
 
         self.assertEqual(learning_unit_component.learning_component_year,
                          learning_class_year.learning_component_year)
+
+    def test_get_basic_inconsistent_msg_no_luy(self):
+        learning_container = LearningContainer()
+        learning_container.save()
+
+        learning_container_year = LearningContainerYear(common_title="Biology",
+                                                        acronym="LBIO1212",
+                                                        academic_year=self.current_academic_year,
+                                                        learning_container=learning_container)
+        learning_container_year.save()
+        #Composant annualisé est associé à son composant et à son conteneur annualisé
+        learning_component_year = LearningComponentYear(learning_container_year=learning_container_year,
+                                                        acronym="/C",
+                                                        comment="TEST")
+        learning_component_year.save()
+        self.assertEqual(learning_component_year._get_basic_inconsistent_msg(), _('Volumes are inconsistent'))
+

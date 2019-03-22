@@ -3,6 +3,8 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:192
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:193
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
@@ -1344,7 +1346,7 @@ msgstr "Durée"
 #: templates/education_group/blocks/panel/panel_program_aims.html:50
 #: templates/education_group/blocks/row_label_general_informations.html:36
 #: templates/learning_unit/blocks/panel/cms_informations.html:38
-#: templates/learning_unit/blocks/panel/cms_informations.html:50
+#: templates/learning_unit/blocks/panel/cms_informations.html:65
 #: templates/learning_unit/specifications_all.html:50
 #: templates/learning_unit/specifications_all.html:62
 #: templates/learning_unit/specifications_all.html:143
@@ -1386,6 +1388,7 @@ msgstr ""
 "succès."
 
 #: views/education_groups/create.py:150
+#, python-format
 msgid ""
 "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
 "a> successfully created."
@@ -3874,7 +3877,7 @@ msgstr "Les données administratives ont été sauvées avec succès"
 #: forms/learning_unit/edition_volume.py:80
 #: forms/learning_unit/edition_volume.py:145
 #: forms/learning_unit/edition_volume.py:360
-#: models/learning_component_year.py:122
+#: models/learning_component_year.py:125
 #: templates/learning_unit/components.html:51
 #: templates/learning_unit/components_identification.html:37
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:195
@@ -4213,7 +4216,7 @@ msgstr ""
 "Les prérequis %(prerequisites)s pour l'unité d'enseignement "
 "%(learning_unit)s ne sont pas dans la formation sélectionnée %(root)s"
 
-#: views/education_groups/detail.py:431
+#: views/education_groups/detail.py:432
 #, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr "Le programme %(acronym)s sera publié sous peu"
@@ -4400,7 +4403,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 
-#: views/education_groups/detail.py:393
+#: views/education_groups/detail.py:394
 #, python-format
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
@@ -4716,7 +4719,7 @@ msgstr "Vol. annuel"
 msgid "Vol. global"
 msgstr "Vol. global"
 
-#: models/learning_component_year.py:126
+#: models/learning_component_year.py:129
 #: tests/models/test_learning_unit_year.py:364
 #: tests/models/test_learning_unit_year.py:381
 msgid "Vol_global is not equal to Vol_tot * planned_classes"
@@ -4759,7 +4762,8 @@ msgstr "Volume Q2"
 msgid "Volume total annual"
 msgstr "Volume total annuel"
 
-#: business/learning_container_year.py:44
+#: business/learning_container_year.py:44 models/learning_component_year.py:144
+#: tests/models/test_learning_component_year.py:101
 #: tests/models/test_learning_unit_year.py:442
 #: tests/models/test_learning_unit_year.py:476
 msgid "Volumes are inconsistent"
@@ -4770,7 +4774,7 @@ msgstr "Les volumes sont incohérents"
 msgid "Volumes management"
 msgstr "Gestion des volumes"
 
-#: models/learning_component_year.py:118
+#: models/learning_component_year.py:142
 #: tests/models/test_learning_unit_year.py:346
 #: tests/models/test_learning_unit_year.py:363
 #: tests/models/test_learning_unit_year.py:380
@@ -5351,15 +5355,15 @@ msgstr "texte d'aide en français"
 msgid "has the following prerequisites"
 msgstr "dispose des prérequis suivants"
 
-#: models/learning_component_year.py:56
+#: models/learning_component_year.py:57
 msgid "hourly volume partial q1"
 msgstr "volume horaire partiel q1"
 
-#: models/learning_component_year.py:58
+#: models/learning_component_year.py:59
 msgid "hourly volume partial q2"
 msgstr "volume horaire partiel q2"
 
-#: models/learning_component_year.py:54
+#: models/learning_component_year.py:55
 #: tests/forms/test_learning_unit_postponement.py:633
 msgid "hourly volume total annual"
 msgstr "volume horaire total annuel"
@@ -5459,13 +5463,13 @@ msgstr ""
 msgid "person"
 msgstr "personne"
 
-#: models/learning_component_year.py:130
+#: models/learning_component_year.py:133
 #: tests/models/test_learning_unit_year.py:630
 msgid "planned classes cannot be 0 while volume is greater than 0"
 msgstr ""
 "le nombre de classes prévues ne peut être 0 si le volume est supérieur à 0"
 
-#: models/learning_component_year.py:134
+#: models/learning_component_year.py:137
 #: tests/models/test_learning_unit_year.py:648
 msgid "planned classes cannot be greather than 0 while volume is equal to 0"
 msgstr ""
@@ -5672,7 +5676,7 @@ msgstr "règle de validation"
 msgid "validity"
 msgstr "validité"
 
-#: models/learning_component_year.py:60
+#: models/learning_component_year.py:61
 msgid "volume declared vacant"
 msgstr "volume déclaré vacant"
 

@@ -33,6 +33,7 @@ from base.models import learning_class_year
 from base.models.enums import learning_component_year_type, learning_container_year_types
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class LearningComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
@@ -91,7 +92,10 @@ class LearningComponentYear(SerializableModel):
 
     @cached_property
     def learning_unit_year(self):
-        return self.learningunityear_set.get()
+        try:
+            return self.learningunityear_set.get()
+        except ObjectDoesNotExist:
+            return None
 
     @property
     def real_classes(self):
@@ -114,8 +118,7 @@ class LearningComponentYear(SerializableModel):
         vol_q1 = self.hourly_volume_partial_q1 or 0
         vol_q2 = self.hourly_volume_partial_q2 or 0
         planned_classes = self.planned_classes or 0
-
-        inconsistent_msg = _('Volumes of {} are inconsistent').format(self.complete_acronym)
+        inconsistent_msg = self._get_basic_inconsistent_msg()
         if vol_q1 + vol_q2 != vol_total_annual:
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
@@ -133,6 +136,11 @@ class LearningComponentYear(SerializableModel):
                 inconsistent_msg,
                 _('planned classes cannot be greather than 0 while volume is equal to 0')))
         return _warnings
+
+    def _get_basic_inconsistent_msg(self):
+        if self.learning_unit_year:
+            return _('Volumes of {} are inconsistent').format(self.complete_acronym)
+        return _('Volumes are inconsistent')
 
 
 def volume_total_verbose(learning_component_years):
