@@ -25,10 +25,12 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-
+<div class="panel panel-default">
+    <div class="panel-body" id="div_tab_diploma">
 {% bootstrap_field form_education_group_year.joint_diploma %}
 
 {% bootstrap_field form_education_group_year.diploma_printing_title %}
+
 
 {% bootstrap_field form_education_group_year.professional_title %}
 
@@ -48,7 +50,8 @@
 </div>
 
 {{ form_education_group_year.media }}
-
+    </div>
+</div>
 <style>
 
     .select2-container--default .select2-selection--multiple .select2-selection__rendered {
