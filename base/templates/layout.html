@@ -134,7 +134,7 @@
 
 {% if subject %}
     <div class="container-fluid p0-50">
-        <div class="alert alert-warning" role="alert"><b>{{ subject }}</b><br>{% autoescape off %}{{ notice }}{% endautoescape %}</div>
+        <div class="alert alert-warning" role="alert"><b>{{ subject }}</b><br>{{ notice|safe }}</div>
     </div>
 {% endif %}
 
