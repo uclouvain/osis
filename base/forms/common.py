@@ -119,11 +119,11 @@ class ValidationRuleMixin(WarningFormMixin):
                 self.change_status(field, rule)
 
                 # Because the initial value would be shown in place of the help text
-                if rule.help_text:
-                    field.help_text = rule.help_text
+                field.help_text = rule.help_text
+                if rule.placeholder:
+                    field.widget.attrs["placeholder"] = rule.placeholder
                 else:
                     field.initial = rule.initial_value
-                field.widget.attrs["placeholder"] = rule.placeholder
 
                 field.validators.append(
                     RegexValidator(rule.regex_rule, rule.regex_error_message or None)
