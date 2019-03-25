@@ -59,9 +59,10 @@
 
                     {{ text_fr }}
                 </div>
-                {% if div_class and text_fr%}
-                    <a role="button"
-                       class="collapsed"
+                {% if div_class and text_fr %}
+                    <a id="a_collapse_{{ forloop.counter0 }}"
+                       role="button"
+                       class="collapsed show_collapse"
                        data-toggle="{{ div_class }}"
                        href="#cms_text_fr_{{ forloop.counter0 }}"
                        aria-expanded="false"
@@ -89,7 +90,7 @@
                     </div>
                     {% if div_class and text_en %}
                         <a role="button"
-                           class="collapsed"
+                           class="collapsed show_collapse"
                            data-toggle="{{ div_class }}"
                            href="#cms_text_en_{{ forloop.counter0 }}"
                            aria-expanded="false"
@@ -172,7 +173,7 @@
                             </div>
                             {% if div_class %}
                                 <a role="button"
-                                   class="collapsed"
+                                   class="collapsed show_collapse"
                                    data-toggle="{{ div_class }}"
                                    href="#cms_text_fr_achievement_{{ forloop.counter0 }}"
                                    aria-expanded="false"
@@ -200,7 +201,7 @@
                                     </div>
                                     {% if  div_class %}
                                         <a role="button"
-                                           class="collapsed"
+                                           class="collapsed show_collapse"
                                            data-toggle="collapse"
                                            href="#cms_text_en_achievement_{{ forloop.counter0 }}"
                                            aria-expanded="false"

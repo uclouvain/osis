@@ -47,7 +47,7 @@
                     {{ translated_label.text_label.text_fr.0.text|default_if_none:""|safe }}
                 </div>
                 <a role="button"
-                   class="collapsed"
+                   class="collapsed show_collapse"
                    data-toggle="collapse"
                    href="#cms_text_fr_{{ translated_label.id }}"
                    aria-expanded="false"
@@ -74,7 +74,7 @@
                          {{ translated_label.text_label.text_en.0.text|default_if_none:""|safe }}
                      </div>
                      <a role="button"
-                        class="collapsed"
+                        class="collapsed show_collapse"
                         data-toggle="collapse"
                         href="#cms_text_en_{{ translated_label.id }}"
                         aria-expanded="false"

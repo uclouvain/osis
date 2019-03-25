@@ -236,6 +236,6 @@ div:target{
     content: "\f078";
 }
 
-[id^=div_cms_] a:not(.collapsed):after {
+[id^=div_cms_] a.show_collapse:not(.collapsed):after {
     content: "\f077";
 }
