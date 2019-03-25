@@ -40,14 +40,15 @@
             </a>
         {% endif %}
         {% if translated_label.text_label.text_fr.0.text %}
-            <div id="div_cms_fr_{{ translated_label.id }}" >
+            dddddddddddd
+            <div id="div_cms_fr_{{ translated_label.id }}" class="show_collapse">
                 <div class="collapse"
                      id="cms_text_fr_{{ translated_label.id }}"
                      aria-expanded="false">
                     {{ translated_label.text_label.text_fr.0.text|default_if_none:""|safe }}
                 </div>
                 <a role="button"
-                   class="collapsed"
+                   class="collapsed a_show_collapse"
                    data-toggle="collapse"
                    href="#cms_text_fr_{{ translated_label.id }}"
                    aria-expanded="false"
@@ -67,14 +68,14 @@
                 </a>
             {% endif %}
             {% if translated_label.text_label.text_en.0.text %}
-                 <div id="div_cms_en_{{ translated_label.id }}">
+                 <div id="div_cms_en_{{ translated_label.id }}"  class="show_collapse">
                      <div class="collapse "
                           id="cms_text_en_{{ translated_label.id }}"
                           aria-expanded="false">
                          {{ translated_label.text_label.text_en.0.text|default_if_none:""|safe }}
                      </div>
                      <a role="button"
-                        class="collapsed"
+                        class="collapsed a_show_collapse"
                         data-toggle="collapse"
                         href="#cms_text_en_{{ translated_label.id }}"
                         aria-expanded="false"

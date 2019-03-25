@@ -42,7 +42,7 @@
             <div class="col-md-2">
                 <label> {{ label_translated }}</label>
             </div>
-            <div class="col-md-5" id="div_cms_fr_{{ forloop.counter0 }}">
+            <div class="col-md-5 show_collapse" id="div_cms_fr_{{ forloop.counter0 }}">
                 {% with text_fr=form_french|getattr:label_key %}
 
                 <div class="{{ div_class }}"
@@ -59,9 +59,9 @@
 
                     {{ text_fr }}
                 </div>
-                {% if div_class and text_fr%}
+                {% if div_class and text_fr %}
                     <a role="button"
-                       class="collapsed"
+                       class="collapsed a_show_collapse"
                        data-toggle="{{ div_class }}"
                        href="#cms_text_fr_{{ forloop.counter0 }}"
                        aria-expanded="false"
@@ -71,7 +71,7 @@
 
                 {% endwith %}
             </div>
-            <div class="col-md-5" id="div_cms_en_{{ forloop.counter0 }}">
+            <div class="col-md-5 show_collapse" id="div_cms_en_{{ forloop.counter0 }}">
                 {% with text_en=form_english|getattr:label_key %}
                     <div class="{{ div_class }}"
                          id="cms_text_en_{{ forloop.counter0 }}"
@@ -89,7 +89,7 @@
                     </div>
                     {% if div_class and text_en %}
                         <a role="button"
-                           class="collapsed"
+                           class="collapsed a_show_collapse"
                            data-toggle="{{ div_class }}"
                            href="#cms_text_en_{{ forloop.counter0 }}"
                            aria-expanded="false"
@@ -166,13 +166,13 @@
                 </div>
                 <div class="col-md-10" >
                     <div class="row" style="margin-top:10px;">
-                        <div class="col-md-5" id="div_cms_fr_achievement_{{ forloop.counter0 }}" aria-expanded="false">
+                        <div class="col-md-5 show_collapse" id="div_cms_fr_achievement_{{ forloop.counter0 }}" aria-expanded="false">
                             <div class="{{ div_class }}" id="cms_text_fr_achievement_{{ forloop.counter0 }}">
                             {{ achievement.text| default_if_none:''|safe }}
                             </div>
                             {% if div_class %}
                                 <a role="button"
-                                   class="collapsed"
+                                   class="collapsed a_show_collapse"
                                    data-toggle="{{ div_class }}"
                                    href="#cms_text_fr_achievement_{{ forloop.counter0 }}"
                                    aria-expanded="false"
@@ -191,7 +191,7 @@
 
                             {% endif %}
                         </div>
-                        <div class="col-md-5" id="div_cms_en_achievement_{{ forloop.counter0 }}" aria-expanded="false">
+                        <div class="col-md-5 show_collapse" id="div_cms_en_achievement_{{ forloop.counter0 }}" aria-expanded="false">
                             {% with achievement_en=achievements_EN|index:forloop.counter0 %}
                                 {% if achievement_en %}
                                     <div class="{{ div_class }}" id="cms_text_en_achievement_{{ forloop.counter0 }}">
@@ -200,7 +200,7 @@
                                     </div>
                                     {% if  div_class %}
                                         <a role="button"
-                                           class="collapsed"
+                                           class="collapsed a_show_collapse"
                                            data-toggle="collapse"
                                            href="#cms_text_en_achievement_{{ forloop.counter0 }}"
                                            aria-expanded="false"

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,22 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
+from django import forms
 
-from base.models.enums import field_status
+from base.models.organization_address import OrganizationAddress
 
 
-class ValidationRuleFactory(factory.DjangoModelFactory):
+class OrganizationAddressForm(forms.ModelForm):
     class Meta:
-        model = 'base.ValidationRule'
-        django_get_or_create = ('field_reference', )
-
-    field_reference = "base.validationrule,base_educationgroupyear.title." \
-                      "osis.education_group_type_finality120listchoice"
-    status_field = field_status.REQUIRED
-    initial_value = None
-    regex_rule = ""
-    regex_error_message = ""
-    help_text_fr = ""
-    help_text_en = ""
-    placeholder = ""
+        model = OrganizationAddress
+        fields = [
+            "label",
+            "location",
+            "postal_code",
+            "city",
+            "country",
+        ]
