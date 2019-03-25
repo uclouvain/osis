@@ -262,16 +262,11 @@ urlpatterns = [
     ])),
 
     url(r'^organization_address/', include([
-        url(r'^save/$', organization.organization_address_new, name='organization_address_save_new'),
         url(r'^(?P<organization_address_id>[0-9]+)/', include([
             url(r'^read/$', organization.organization_address_read,
                 name='organization_address_read'),
             url(r'^edit/$', organization.organization_address_edit,
                 name='organization_address_edit'),
-            url(r'^save/$', organization.organization_address_save,
-                name='organization_address_save'),
-            url(r'^create/$', organization.organization_address_create,
-                name='organization_address_create'),
             url(r'^delete/$', organization.organization_address_delete,
                 name='organization_address_delete')
         ]))
