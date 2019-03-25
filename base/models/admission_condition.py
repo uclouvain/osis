@@ -100,7 +100,9 @@ class AdmissionConditionLineQuerySet(models.QuerySet):
 
 
 class AdmissionConditionLine(OrderedModel):
-    admission_condition = models.ForeignKey(AdmissionCondition)
+    admission_condition = models.ForeignKey(
+        AdmissionCondition, on_delete=models.CASCADE
+    )
 
     section = models.CharField(max_length=32)
     # this external_id is used just for the import, once reddot is dead, we could remove it.

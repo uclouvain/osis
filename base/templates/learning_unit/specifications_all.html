@@ -37,34 +37,66 @@
         </div>
     </div>
     <hr/>
-    {% for label_key, label_translated in cms_labels_translated.items %}
+    {% for label_key, label_translated in cms_specification_labels_translated.items %}
         <div class="row" style="margin-top:10px;">
             <div class="col-md-2">
                 <label> {{ label_translated }}</label>
             </div>
-            <div class="col-md-5">
-                {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
-                    <a class="trigger_modal pull-right"
-                       data-url="{% url 'learning_unit_specifications_edit' learning_unit_year_id=learning_unit_year.id %}?language={{ form_french.language.0 }}&label={{ label_key }}"
-                       data-modal_class="modal-lg"
-                       title="{% trans 'Edit' %}">
-                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+            <div class="col-md-5 show_collapse" id="div_cms_fr_{{ forloop.counter0 }}">
+                {% with text_fr=form_french|getattr:label_key %}
+
+                <div class="{{ div_class }}"
+                     id="cms_text_fr_{{ forloop.counter0 }}"
+                     aria-expanded="false">
+                    {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
+                        <a class="trigger_modal pull-right"
+                           data-url="{% url 'learning_unit_specifications_edit' learning_unit_year_id=learning_unit_year.id %}?language={{ form_french.language.0 }}&label={{ label_key }}"
+                           data-modal_class="modal-lg"
+                           title="{% trans 'Edit' %}">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                        </a>
+                    {% endif %}
+
+                    {{ text_fr }}
+                </div>
+                {% if div_class and text_fr %}
+                    <a role="button"
+                       class="collapsed a_show_collapse"
+                       data-toggle="{{ div_class }}"
+                       href="#cms_text_fr_{{ forloop.counter0 }}"
+                       aria-expanded="false"
+                       aria-controls="cms_text_fr_{{ forloop.counter0 }}">
                     </a>
                 {% endif %}
 
-                {{ form_french|getattr:label_key }}
+                {% endwith %}
             </div>
-            <div class="col-md-5">
-                {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
-                    <a class="trigger_modal pull-right" href="#"
-                       data-url="{% url 'learning_unit_specifications_edit' learning_unit_year_id=learning_unit_year.id %}?language={{ form_english.language.0 }}&label={{ label_key }}"
-                       data-modal_class="modal-lg"
-                       title="{% trans 'Edit' %}">
-                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                    </a>
-                {% endif %}
+            <div class="col-md-5 show_collapse" id="div_cms_en_{{ forloop.counter0 }}">
+                {% with text_en=form_english|getattr:label_key %}
+                    <div class="{{ div_class }}"
+                         id="cms_text_en_{{ forloop.counter0 }}"
+                         aria-expanded="false">
+                        {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
+                            <a class="trigger_modal pull-right" href="#"
+                               data-url="{% url 'learning_unit_specifications_edit' learning_unit_year_id=learning_unit_year.id %}?language={{ form_english.language.0 }}&label={{ label_key }}"
+                               data-modal_class="modal-lg"
+                               title="{% trans 'Edit' %}">
+                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                            </a>
+                        {% endif %}
 
-                {{ form_english|getattr:label_key }}
+                        {{ text_en }}
+                    </div>
+                    {% if div_class and text_en %}
+                        <a role="button"
+                           class="collapsed a_show_collapse"
+                           data-toggle="{{ div_class }}"
+                           href="#cms_text_en_{{ forloop.counter0 }}"
+                           aria-expanded="false"
+                           aria-controls="cms_text_en_{{ forloop.counter0 }}">
+                        </a>
+                    {%  endif %}
+                {% endwith %}
             </div>
         </div>
         <hr/>
@@ -132,9 +164,22 @@
                         {{ achievement.code_name }}
                     {% endif %}
                 </div>
-                <div class="col-md-10">
+                <div class="col-md-10" >
                     <div class="row" style="margin-top:10px;">
-                        <div class="col-md-5">{{ achievement.text| default_if_none:''|safe }}</div>
+                        <div class="col-md-5 show_collapse" id="div_cms_fr_achievement_{{ forloop.counter0 }}" aria-expanded="false">
+                            <div class="{{ div_class }}" id="cms_text_fr_achievement_{{ forloop.counter0 }}">
+                            {{ achievement.text| default_if_none:''|safe }}
+                            </div>
+                            {% if div_class %}
+                                <a role="button"
+                                   class="collapsed a_show_collapse"
+                                   data-toggle="{{ div_class }}"
+                                   href="#cms_text_fr_achievement_{{ forloop.counter0 }}"
+                                   aria-expanded="false"
+                                   aria-controls="cms_text_fr_achievement_{{ forloop.counter0 }}">
+                                </a>
+                            {% endif %}
+                        </div>
                         <div class="col-md-1">
                             {% if can_update_learning_achievement %}
                                 <a class="trigger_modal pull-right"
@@ -146,11 +191,22 @@
 
                             {% endif %}
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-5 show_collapse" id="div_cms_en_achievement_{{ forloop.counter0 }}" aria-expanded="false">
                             {% with achievement_en=achievements_EN|index:forloop.counter0 %}
                                 {% if achievement_en %}
+                                    <div class="{{ div_class }}" id="cms_text_en_achievement_{{ forloop.counter0 }}">
                                     <a id="anchor_{{ achievement_en.id }}"></a>
                                     {{ achievement_en.text| default_if_none:''|safe }}
+                                    </div>
+                                    {% if  div_class %}
+                                        <a role="button"
+                                           class="collapsed a_show_collapse"
+                                           data-toggle="collapse"
+                                           href="#cms_text_en_achievement_{{ forloop.counter0 }}"
+                                           aria-expanded="false"
+                                           aria-controls="cms_text_en_achievement_{{ forloop.counter0 }}">
+                                        </a>
+                                    {% endif %}
                                 {% endif %}
                             {% endwith %}
                         </div>
@@ -171,6 +227,7 @@
                             {% endif %}
                         </div>
                     </div>
+
                 </div>
             </div>
 

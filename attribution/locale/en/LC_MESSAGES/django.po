@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-15 14:56+0100\n"
+"POT-Creation-Date: 2019-03-22 12:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,7 +88,7 @@ msgid "Deputy temporary"
 msgstr ""
 
 #: templates/manage_my_courses/educational_information.html:32
-#: templates/manage_my_courses/educational_information.html:52
+#: templates/manage_my_courses/educational_information.html:54
 msgid "Description fiche"
 msgstr ""
 
@@ -127,11 +127,11 @@ msgstr ""
 msgid "Holder"
 msgstr ""
 
-#: templates/manage_my_courses/educational_information.html:46
-msgid "Informations reserved to Commission Programme"
+#: templates/manage_my_courses/educational_information.html:47
+msgid "Information approved and updatable by the Commission of Program"
 msgstr ""
 
-#: templates/manage_my_courses/educational_information.html:52
+#: templates/manage_my_courses/educational_information.html:54
 msgid "Informations updatable by teachers"
 msgstr ""
 
@@ -198,10 +198,6 @@ msgstr ""
 
 #: templates/summary_responsible.html:75
 msgid "Search"
-msgstr ""
-
-#: templates/manage_my_courses/educational_information.html:46
-msgid "Specifications"
 msgstr ""
 
 #: models/attribution_new.py:60

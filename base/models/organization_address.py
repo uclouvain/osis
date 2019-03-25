@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
@@ -40,20 +41,16 @@ class OrganizationAddress(models.Model):
     # TODO is_main and label are similar.
     # TODO rename label to type
     # FIXME Create a FK directly between Organization and Address for main address.
-    label = models.CharField(max_length=20)
-    location = models.CharField(max_length=255)
-    postal_code = models.CharField(max_length=20, blank=True, null=True)
-    city = models.CharField(max_length=255)
-    country = models.ForeignKey('reference.Country')
+    label = models.CharField(max_length=20, verbose_name=_("Label"))
+    location = models.CharField(max_length=255, verbose_name=_("Location"))
+    postal_code = models.CharField(max_length=20, blank=True, null=True, verbose_name=_("Postal code"))
+    city = models.CharField(max_length=255, verbose_name=_("City"))
+    country = models.ForeignKey('reference.Country', verbose_name=_("Country"))
     is_main = models.BooleanField(default=False)
 
 
 def find_by_organization(organization):
     return OrganizationAddress.objects.filter(organization=organization).order_by('label')
-
-
-def find_by_id(organization_address_id):
-    return OrganizationAddress.objects.get(pk=organization_address_id)
 
 
 def find_distinct_by_country(a_country):

@@ -26,6 +26,8 @@
 
 import factory.fuzzy
 
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+
 
 class AdmissionConditionFactory(factory.DjangoModelFactory):
     class Meta:
@@ -36,6 +38,8 @@ class AdmissionConditionFactory(factory.DjangoModelFactory):
         nb_sentences=1,
         variable_nb_sentences=True
     )
+
+    education_group_year = factory.SubFactory(EducationGroupYearFactory)
 
     text_free = factory.Faker('sentence', nb_words=2)
 
@@ -86,3 +90,11 @@ class AdmissionConditionFactory(factory.DjangoModelFactory):
     text_ca_maitrise_fr_en = factory.Faker('sentence', nb_words=2)
     text_ca_allegement_en = factory.Faker('sentence', nb_words=2)
     text_ca_ouv_adultes_en = factory.Faker('sentence', nb_words=2)
+
+
+class AdmissionConditionLineFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = "base.AdmissionConditionLine"
+
+    admission_condition = factory.SubFactory(AdmissionConditionFactory)
+    section = factory.Faker('sentence', nb_words=2)

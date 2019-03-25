@@ -39,7 +39,10 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
     def setUpTestData(cls):
         cls.master_120 = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
 
-        cls.option_in_parent = MiniTrainingFactory(education_group_type__name=MiniTrainingType.OPTION.name)
+        cls.option_in_parent = MiniTrainingFactory(
+            acronym="OPT1",
+            education_group_type__name=MiniTrainingType.OPTION.name,
+        )
         cls.master_120_link_option = GroupElementYearFactory(parent=cls.master_120, child_branch=cls.option_in_parent)
 
         # Create finality structure
@@ -108,7 +111,7 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
     def test_is_not_valid_case_detach_group_which_contains_option_which_are_within_finality_master_120(self):
         """
         In this test, we ensure that we CANNOT detach a group which contains options at 2m level because
-        this options are not present in one finality of this 2m
+        this options are present in one finality of this 2m
         """
         subgroup = GroupFactory(education_group_type__name=GroupType.SUB_GROUP.name)
         GroupElementYearFactory(parent=self.master_120_specialized, child_branch=subgroup)
@@ -118,5 +121,43 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
         master_120_link_option = GroupElementYearFactory(parent=self.master_120, child_branch=option)
 
         strategy = DetachEducationGroupYearStrategy(link=master_120_link_option)
+        with self.assertRaises(ValidationError):
+            strategy.is_valid()
+
+    def test_is_not_valid_case_detach_group_which_contains_option_which_are_reused_in_multiple_2M(self):
+        """
+        In this test, we ensure that we CANNOT detach a group which are reused in two 2m because, one of
+        those 2m structure will not be valid anymore
+        """
+        # Create first 2M
+        #   2M
+        #   |--OPT1
+        #   |--GROUP1
+        #      |--OPT1
+        #   |--FINALITY_LIST
+        #      |--2MS
+        #         |--OPT1
+        subgroup = GroupFactory(acronym='GROUP1', education_group_type__name=GroupType.SUB_GROUP.name)
+        GroupElementYearFactory(parent=self.master_120, child_branch=subgroup)
+        group1_link_opt1 = GroupElementYearFactory(parent=subgroup, child_branch=self.option_in_parent)
+        GroupElementYearFactory(parent=self.master_120_specialized, child_branch=self.option_in_parent)
+
+        # Create another 2M
+        #   2M
+        #   |--GROUP1
+        #      |--OPT1
+        #   |--FINALITY_LIST
+        #      |--2MD
+        #         |--OPT1
+        another_master_120 = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        GroupElementYearFactory(parent=another_master_120, child_branch=subgroup)
+        another_finality_group = GroupFactory(education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name)
+        GroupElementYearFactory(parent=another_master_120, child_branch=another_finality_group)
+        another_master_120_didactic = GroupFactory(education_group_type__name=TrainingType.MASTER_MD_120.name)
+        GroupElementYearFactory(parent=another_finality_group, child_branch=another_master_120_didactic)
+        GroupElementYearFactory(parent=another_master_120_didactic, child_branch=self.option_in_parent)
+
+        # We try to detach OPT1 from GROUP1 but it is not allowed because another 2M structure won't be valid anymore
+        strategy = DetachEducationGroupYearStrategy(link=group1_link_opt1)
         with self.assertRaises(ValidationError):
             strategy.is_valid()

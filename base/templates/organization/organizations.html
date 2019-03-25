@@ -69,7 +69,7 @@
                             <td>{{ organization.logo_tag }}</td>
                             <td>
                                 <a href="{% url 'organization_read' organization_id=organization.id %}"
-                                   id="lnk_organization_read_{{organization.id}}">{{ organization.acronym | default_if_none:'-' }}</a></td>
+                                   id="lnk_organization_read_{{organization.id}}">{{ organization.acronym | default:'-' }}</a></td>
                             <td>{{ organization.name }}</td>
                             <td>{{ organization.get_type_display }}</td>
                         </tr>

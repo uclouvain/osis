@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -23,10 +22,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+import re
 from django.test import TestCase
 
-from base.business.education_groups.create import create_initial_group_element_year_structure
+from base.business.education_groups.create import create_initial_group_element_year_structure, \
+    _get_cnum_subdivision
 from base.models.enums import education_group_types, education_group_categories
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
@@ -265,3 +265,21 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
             current_child.partial_acronym,
             children_egys[self.egy_next_year.id][0].child_branch.partial_acronym
         )
+
+    def test_get_cnum_subdivision(self):
+        cnum, subdivision = _get_cnum_subdivision("100T", re.compile('^(?P<cnum>\\d{3})(?P<subdivision>[A-Z])$'))
+        self.assertEqual(cnum, "100")
+        self.assertEqual(subdivision, "T")
+
+    def test_no_cnum_subdivision(self):
+        cnum, subdivision = _get_cnum_subdivision("", re.compile('^(?P<cnum>\\d{3})(?P<subdivision>[A-Z])$'))
+        self.assertIsNone(cnum)
+        self.assertIsNone(subdivision)
+
+        cnum, subdivision = _get_cnum_subdivision("100", re.compile('^(?P<cnum>\\d{3})(?P<subdivision>[A-Z])$'))
+        self.assertIsNone(cnum)
+        self.assertIsNone(subdivision)
+
+        cnum, subdivision = _get_cnum_subdivision("T", re.compile('^(?P<cnum>\\d{3})(?P<subdivision>[A-Z])$'))
+        self.assertIsNone(cnum)
+        self.assertIsNone(subdivision)
