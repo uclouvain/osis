@@ -31,7 +31,6 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext_lazy as _
 
-from base import models as mdl
 from base.business.education_group import create_xls, ORDER_COL, ORDER_DIRECTION, create_xls_administrative_data
 from base.forms.education_groups import EducationGroupFilter
 from base.forms.search.search_form import get_research_criteria
@@ -46,44 +45,35 @@ from base.views.common import paginate_queryset
 @cache_filter(exclude_params=['xls_status', 'xls_order_col'])
 def education_groups(request):
     person = get_object_or_404(Person, user=request.user)
-    current_academic_year = mdl.academic_year.current_academic_year()
+    filter_form = EducationGroupFilter(request.GET or None)
 
-    form = EducationGroupFilter(
-        request.GET or None,
-        initial={
-            'academic_year': current_academic_year,
-            'category': education_group_categories.TRAINING
-        }
-    )
-
-    object_list = _get_object_list(form, request) if form.is_valid() else []
+    object_list = _get_object_list(filter_form, request) if filter_form.form.is_valid() else []
 
     if request.GET.get('xls_status') == "xls":
-        return create_xls(request.user, object_list, _get_filter_keys(form),
+        return create_xls(request.user, object_list, _get_filter_keys(filter_form.form),
                           {ORDER_COL: request.GET.get('xls_order_col'), ORDER_DIRECTION: request.GET.get('xls_order')})
 
     if request.GET.get('xls_status') == "xls_administrative":
         return create_xls_administrative_data(
             request.user,
             object_list,
-            _get_filter_keys(form),
+            _get_filter_keys(filter_form.form),
             {ORDER_COL: request.GET.get('xls_order_col'), ORDER_DIRECTION: request.GET.get('xls_order')}
         )
 
     context = {
-        'form': form,
-        'object_list': paginate_queryset(object_list, request.GET),
-        'object_list_count': len(object_list),
+        'filter': filter_form,
+        'object_list': paginate_queryset(filter_form.qs, request.GET),
+        'object_list_count': filter_form.qs.count(),
         'experimental_phase': True,
         'enums': education_group_categories,
         'person': person
     }
-
     return render(request, "education_group/search.html", context)
 
 
-def _get_object_list(form, request):
-    object_list = form.get_object_list()
+def _get_object_list(filter, request):
+    object_list = filter.qs
     if not _check_if_display_message(request, object_list):
         object_list = []
     return object_list

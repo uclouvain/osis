@@ -51,30 +51,31 @@
 
     <div class="panel panel-default">
         <div class="panel-body">
-            <form method="get" action="{% url 'education_groups' %}" id="search_form">
+
+            <form id="search_form">
                 <div class="row">
                     <div class="col-md-2">
-                        {% bootstrap_field form.academic_year %}
+                       {% bootstrap_field filter.form.academic_year %}
                     </div>
                     <div class="col-md-2">
-                        {% bootstrap_field form.acronym %}
+                       {% bootstrap_field filter.form.acronym %}
                     </div>
                     <div class="col-md-2">
-                        {% bootstrap_field form.partial_acronym %}
+                       {% bootstrap_field filter.form.partial_acronym %}
                     </div>
                     <div class="col-md-6">
-                        {% bootstrap_field form.title %}
+                        {% bootstrap_field filter.form.title %}
                     </div>
                 </div>
                 <div class="row" style="margin-top:10px;">
                     <div class="col-md-2">
-                        {% bootstrap_field form.category %}
+                        {% bootstrap_field filter.form.category %}
                     </div>
                     <div class="col-md-4">
-                        {% bootstrap_field form.education_group_type %}
+                        {% bootstrap_field filter.form.education_group_type %}
                     </div>
                     <div class="col-md-2">
-                        {% bootstrap_field form.requirement_entity_acronym %}
+                        {% bootstrap_field filter.form.management_entity %}
                     </div>
                     <div class="col-md-2">
                         <div style="display:inline-block;">
@@ -101,6 +102,7 @@
                 <input type="hidden" id="xls_order_col" name="xls_order_col">
                 <input type="hidden" id="xls_order" name="xls_order">
             </form>
+
             {% include 'learning_unit/blocks/form/search_form_reset.html' %}
             <hr style="margin:10px -15px 10px -15px;">
             <div class="row">
