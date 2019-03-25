@@ -135,19 +135,9 @@ def learning_unit_specifications(request, learning_unit_year_id):
     context = get_common_context_learning_unit_year(learning_unit_year_id, person)
     learning_unit_year = context['learning_unit_year']
 
-    user_language = mdl.person.get_user_interface_language(request.user)
-    context['cms_labels_translated'] = get_cms_label_data(CMS_LABEL_SPECIFICATIONS, user_language)
-
-    fr_language = find_language_in_settings(settings.LANGUAGE_CODE_FR)
-    en_language = find_language_in_settings(settings.LANGUAGE_CODE_EN)
-
-    context.update({
-        'form_french': LearningUnitSpecificationsForm(learning_unit_year, fr_language),
-        'form_english': LearningUnitSpecificationsForm(learning_unit_year, en_language)
-    })
-
+    context.update(get_specifications_context(learning_unit_year, request))
     context.update(get_achievements_group_by_language(learning_unit_year))
-    context.update({'LANGUAGE_CODE_FR': settings.LANGUAGE_CODE_FR, 'LANGUAGE_CODE_EN': settings.LANGUAGE_CODE_EN})
+    context.update(get_languages_settings())
     context['can_update_learning_achievement'] = can_update_learning_achievement(learning_unit_year, person)
     context['experimental_phase'] = True
     return render(request, "learning_unit/specifications.html", context)
@@ -534,3 +524,21 @@ def get_charge_repartition_warning_messages(learning_container_year):
                     "volume of parent learning unit for this professor") % {"tutor": tutor_name_with_function}
             msgs.append(msg)
     return msgs
+
+
+def get_specifications_context(learning_unit_year, request):
+    user_language = mdl.person.get_user_interface_language(request.user)
+    fr_language = find_language_in_settings(settings.LANGUAGE_CODE_FR)
+    en_language = find_language_in_settings(settings.LANGUAGE_CODE_EN)
+    return {
+        'cms_specification_labels_translated': get_cms_label_data(CMS_LABEL_SPECIFICATIONS, user_language),
+        'form_french': LearningUnitSpecificationsForm(learning_unit_year, fr_language),
+        'form_english': LearningUnitSpecificationsForm(learning_unit_year, en_language)
+    }
+
+
+def get_languages_settings():
+    return {
+        'LANGUAGE_CODE_FR': settings.LANGUAGE_CODE_FR,
+        'LANGUAGE_CODE_EN': settings.LANGUAGE_CODE_EN
+    }
