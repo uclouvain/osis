@@ -29,7 +29,6 @@ from django.test import TestCase
 
 from base.forms.common import ValidationRuleMixin
 from base.models.enums.field_status import DISABLED, REQUIRED, ALERT
-from base.models.validation_rule import ValidationRule
 from base.tests.factories.validation_rule import ValidationRuleFactory
 from reference.models.country import Country
 
