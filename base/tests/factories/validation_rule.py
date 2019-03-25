@@ -39,3 +39,6 @@ class ValidationRuleFactory(factory.DjangoModelFactory):
     initial_value = None
     regex_rule = ""
     regex_error_message = ""
+    help_text_fr = ""
+    help_text_en = ""
+    placeholder = ""
