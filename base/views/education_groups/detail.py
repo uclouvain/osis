@@ -623,9 +623,11 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
 def get_appropriate_common_admission_condition(edy):
     if not edy.is_common and \
             any([edy.is_bachelor, edy.is_master60, edy.is_master120, edy.is_aggregation, edy.is_specialized_master]):
-        return EducationGroupYear.objects.look_for_common(
+        common_egy = EducationGroupYear.objects.look_for_common(
             education_group_type__name=TrainingType.PGRM_MASTER_120.name if edy.is_master60
             else edy.education_group_type.name,
             academic_year=edy.academic_year
-        ).select_related('admissioncondition').get().admissioncondition
+        ).get()
+        common_admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=common_egy)
+        return common_admission_condition
     return None
