@@ -116,9 +116,9 @@ def is_education_group_edit_period_opened(education_group, raise_exception=False
 
     qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION).open_calendars()
     if not qs.exists():
-        error_msg = "The education group edition period is not open."
+        error_msg = _("The education group edition period is not open.")
     elif education_group and not qs.filter(academic_year=education_group.academic_year).exists():
-        error_msg = "This education group is not editable during this period."
+        error_msg = _("This education group is not editable during this period.")
 
     result = error_msg is None
     can_raise_exception(raise_exception, result, error_msg)

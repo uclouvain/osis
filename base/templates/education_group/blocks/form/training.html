@@ -33,7 +33,7 @@
     <div class="panel panel-default">
 
         <div class="panel-heading">
-            {% include "education_group/blocks/form/create_cancel_buttons.html" %}
+            {% include "education_group/blocks/form/create_cancel_buttons.html" with btn_submit_name="btn_submit_UpdateTrainingForm" %}
         </div>
 
         <div class="panel-body">
@@ -41,10 +41,40 @@
         </div>
 
         <div class="panel-footer text-right">
-            {% include "education_group/blocks/form/create_cancel_buttons.html" %}
+            {% include "education_group/blocks/form/create_cancel_buttons.html" with btn_submit_name="btn_submit_UpdateTrainingForm"  %}
         </div>
 
     </div>
     <script type="text/javascript" src="{% static 'js/education_group/validation.js' %}"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('button[name="btn_submit_UpdateTrainingForm"]').click(function (e) {
+                $("#spn_identification_errors").empty();
+                $("#spn_diploma_errors").empty();
+            });
+
+            var form = document.getElementById("UpdateTrainingForm");
+
+            form.addEventListener('invalid', (e)=>{
+                var el = e.target;
+                while (el && el.parentNode) {
+                    el = el.parentNode;
+
+                    if(el.parentNode.id == "tab_identification"){
+                        $("#spn_identification_errors").append('<i class="fa fa-circle" aria-hidden="true"></i>');
+                        return false;
+                    }
+                    if(el.parentNode.id == "div_tab_diploma"){
+                        $("#spn_diploma_errors").append('<i class="fa fa-circle" aria-hidden="true"></i>');
+                        return false;
+                    }
+
+                }
+
+        },true)
+        });
+
+    </script>
     {% include "blocks/modal/confirmation_modal.html" %}
 </form>

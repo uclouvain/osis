@@ -27,11 +27,12 @@ from django import forms
 from django.db.models import Q
 
 from base.models.student import Student
+from django.utils.translation import ugettext_lazy as _
 
 
 class StudentSearchForm(forms.Form):
-    registration_id = forms.CharField(max_length=10, required=False)
-    name = forms.CharField(max_length=20, required=False)
+    registration_id = forms.CharField(max_length=10, required=False, label=_('Registration Id'))
+    name = forms.CharField(max_length=20, required=False, label=_('Name'))
 
     def get_objects(self):
         registration_id = self.cleaned_data["registration_id"]
