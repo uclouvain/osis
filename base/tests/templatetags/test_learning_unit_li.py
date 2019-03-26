@@ -69,12 +69,12 @@ class LearningUnitTagLiEditTest(TestCase):
         self.learning_unit = LearningUnitFactory()
         self.previous_learning_unit = LearningUnitFactory(existing_proposal_in_epc=False)
         self.current_academic_year = create_current_academic_year()
-        self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year-1)
-        self.next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year+1)
-        AcademicYearFactory(year=self.current_academic_year.year+2)
-        AcademicYearFactory(year=self.current_academic_year.year+3)
-        AcademicYearFactory(year=self.current_academic_year.year+4)
-        self.later_academic_year = AcademicYearFactory(year=self.current_academic_year.year+5)
+        self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
+        self.next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year + 1)
+        AcademicYearFactory(year=self.current_academic_year.year + 2)
+        AcademicYearFactory(year=self.current_academic_year.year + 3)
+        AcademicYearFactory(year=self.current_academic_year.year + 4)
+        self.later_academic_year = AcademicYearFactory(year=self.current_academic_year.year + 5)
         self.lcy = LearningContainerYearFactory(academic_year=self.next_academic_yr,
                                                 container_type=learning_container_year_types.COURSE)
         self.learning_unit_year = LearningUnitYearFactory(
@@ -104,7 +104,8 @@ class LearningUnitTagLiEditTest(TestCase):
         self.requirement_entity = self.person_entity.entity
         self.proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year,
                                                     initial_data={
-                                                        'learning_container_year': {'common_title': self.lcy.common_title},
+                                                        'learning_container_year': {
+                                                            'common_title': self.lcy.common_title},
                                                         'entities': {'REQUIREMENT_ENTITY': self.requirement_entity.id}
                                                     },
                                                     )
@@ -145,10 +146,10 @@ class LearningUnitTagLiEditTest(TestCase):
                 'load_modal': False,
                 'id_li': ID_LINK_EDIT_LU,
                 'url': "#",
-                'title': "{}.  {}".format ("You can't modify learning unit under year : %(year)d" %
-                         {"year": settings.YEAR_LIMIT_LUE_MODIFICATION},
-                                         "Modifications should be made in EPC for year %(year)d" %
-                                         {"year": self.previous_learning_unit_year.academic_year.year}),
+                'title': "{}.  {}".format("You can't modify learning unit under year : %(year)d" %
+                                          {"year": settings.YEAR_LIMIT_LUE_MODIFICATION},
+                                          "Modifications should be made in EPC for year %(year)d" %
+                                          {"year": self.previous_learning_unit_year.academic_year.year}),
                 'class_li': DISABLED,
                 'text': "",
                 'data_target': ""
@@ -186,7 +187,7 @@ class LearningUnitTagLiEditTest(TestCase):
         result = li_modification_proposal(self.context, self.url_edit, "")
 
         self.assertEqual(
-            result, self._get_result_data_expected("link_proposal_modification", MSG_EXISTING_PROPOSAL_IN_EPC,)
+            result, self._get_result_data_expected("link_proposal_modification", MSG_EXISTING_PROPOSAL_IN_EPC, )
         )
 
     def test_li_edit_lu_year_is_learning_unit_year_not_in_range_to_be_modified(self):
@@ -383,7 +384,7 @@ class LearningUnitTagLiEditTest(TestCase):
                                                                      MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY, DISABLED))
 
     def test_li_consolidate_proposal(self):
-        self.central_manager_person.user.user_permissions\
+        self.central_manager_person.user.user_permissions \
             .add(Permission.objects.get(codename="can_consolidate_learningunit_proposal"))
         self.context['user'] = self.central_manager_person.user
         self.proposal.state = ProposalState.ACCEPTED.name
@@ -414,10 +415,15 @@ class LearningUnitTagLiEditTest(TestCase):
     def test_li_delete_all_lu_everything_ok(self):
         result = li_delete_all_lu(self.context, self.url_edit, '', "#modalDeleteLuy")
 
-        expected = self._get_result_data_expected_delete("link_delete_lus",
-                                                         load_modal=True,
-                                                         data_target="#modalDeleteLuy",
-                                                         url=self.url_edit)
+        expected = {
+            'class_li': 'disabled',
+            'load_modal': False,
+            'url': '#',
+            'id_li': 'link_delete_lus',
+            'title': "Vous ne pouvez pas supprimer une unité d'enseignement existant avant 2018",
+            'text': '',
+            'data_target': ''
+        }
 
         self.assertEqual(result, expected)
 
