@@ -42,16 +42,16 @@
     <div class="panel-body" id="tabs">
         {% include "manage_my_courses/blocks/tabs.html" %}
         <br>
-        <div class="panel panel-default" style="background-color: #a8c8d8">
+        <div class="panel panel-default" style="background-color: #f5f5f5">
             <div class="panel-heading">
-                {% trans 'Information approved and updatable by the Commission of Program' %})
+                <label style="font-size: larger">{% trans 'Information approved and updatable by the Commission of Program' %}</label>
             </div>
             <div class="panel-body">
                 {% include "learning_unit/specifications_all.html" %}
             </div>
         </div>
         <div class="panel panel-default">
-            <div class="panel-heading">{% trans 'Description fiche' %} ({% trans 'Informations updatable by teachers' %})</div>
+            <div class="panel-heading"><label style="font-size: larger">{% trans 'Informations updatable by teachers' %}</label></div>
 
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="educational_information">
