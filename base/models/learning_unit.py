@@ -37,9 +37,9 @@ from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
 from osis_common.models.serializable_model import SerializableModel, \
     SerializableModelAdmin
 
-LEARNING_UNIT_ACRONYM_REGEX_MODEL = "^[BGLMTWX][A-Z]{2,4}\d{4}"
+LEARNING_UNIT_ACRONYM_REGEX_MODEL = "^[BEGLMTWX][A-Z]{2,4}\d{4}"
 LEARNING_UNIT_ACRONYM_REGEX_BASE = "^[BLMWX][A-Z]{2,4}\d{4}"
-LEARNING_UNIT_ACRONYM_REGEX_EXTERNAL = "^[GLMTW][A-Z]{2,4}\d{4}$"
+LEARNING_UNIT_ACRONYM_REGEX_EXTERNAL = "^[EGLMTW][A-Z]{2,4}\d{4}$"
 LETTER_OR_DIGIT = "[A-Z0-9]"
 STRING_END = "$"
 LEARNING_UNIT_ACRONYM_REGEX_ALL = LEARNING_UNIT_ACRONYM_REGEX_BASE + LETTER_OR_DIGIT + "{0,1}" + STRING_END
@@ -64,10 +64,10 @@ class LearningUnitAdmin(VersionAdmin, SerializableModelAdmin):
 
     def apply_learning_unit_year_postponement(self, request, queryset):
         # Potential circular imports
-        from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponement
+        from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponementToN6
         from base.views.common import display_success_messages, display_error_messages
 
-        result, errors = LearningUnitAutomaticPostponement(queryset).postpone()
+        result, errors = LearningUnitAutomaticPostponementToN6(queryset).postpone()
         count = len(result)
         display_success_messages(
             request, ngettext(

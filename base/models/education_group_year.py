@@ -26,11 +26,11 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, connection
-from django.db.models import Count, OuterRef, Exists, Q, Min, When, Case, Max
+from django.db.models import Count, OuterRef, Exists, Min, When, Case, Max
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext
 from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
@@ -62,7 +62,29 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
 
     actions = [
         'resend_messages_to_queue',
+        'copy_reddot_data'
     ]
+
+    def copy_reddot_data(self, request, queryset):
+        # Potential circular imports
+        from base.business.education_groups.automatic_postponement import ReddotEducationGroupAutomaticPostponement
+        from base.views.common import display_success_messages, display_error_messages
+
+        result, errors = ReddotEducationGroupAutomaticPostponement(queryset).postpone()
+        count = len(result)
+        display_success_messages(
+            request, ngettext(
+                "%(count)d education group has been updated with success.",
+                "%(count)d education groups have been updated with success.", count
+            ) % {'count': count}
+        )
+        if errors:
+            display_error_messages(request, "{} : {}".format(
+                _("The following education groups ended with error"),
+                ", ".join([str(error) for error in errors])
+            ))
+
+    copy_reddot_data.short_description = _("Copy Reddot data from previous academic year.")
 
 
 class EducationGroupYearQueryset(SerializableQuerySet):
@@ -106,7 +128,7 @@ class HierarchyQuerySet(models.QuerySet):
                     INNER JOIN group_element_year_parent AS child on child.parent_id = parent.child_branch_id
                 )
               SELECT distinct parent_id FROM group_element_year_parent;
-            """ % ','.join(["%s"]*len(child_pks))
+            """ % ','.join(["%s"] * len(child_pks))
             cursor.execute(cmd_sql, list(child_pks))
             education_group_year_pks = [row[0] for row in cursor.fetchall()]
         return EducationGroupYear.objects.filter(pk__in=education_group_year_pks)
@@ -404,7 +426,13 @@ class EducationGroupYear(SerializableModel):
         through="EducationGroupYearDomain",
         related_name="education_group_years",
         verbose_name=_("secondary domains")
+    )
 
+    isced_domain = models.ForeignKey(
+        "reference.DomainIsced",
+        on_delete=models.PROTECT,
+        null=True, blank=True,
+        verbose_name=_("ISCED domain"),
     )
 
     management_entity = models.ForeignKey(
@@ -467,7 +495,7 @@ class EducationGroupYear(SerializableModel):
     co_graduation = models.CharField(
         max_length=8,
         db_index=True,
-        verbose_name=_("Co-graduation"),
+        verbose_name=_("Code co-graduation inter CfB"),
         blank=True,
         null=True,
     )
@@ -475,7 +503,7 @@ class EducationGroupYear(SerializableModel):
     co_graduation_coefficient = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        verbose_name=_('Co-graduation coefficient'),
+        verbose_name=_('Co-graduation total coefficient'),
         blank=True,
         null=True,
         validators=[MinValueValidator(1), MaxValueValidator(9999)],
@@ -752,9 +780,9 @@ class EducationGroupYear(SerializableModel):
         if not self.partial_acronym:
             return
 
-        egy_using_same_partial_acronym = EducationGroupYear.objects.\
-            filter(partial_acronym=self.partial_acronym.upper()).\
-            exclude(education_group=self.education_group_id).\
+        egy_using_same_partial_acronym = EducationGroupYear.objects. \
+            filter(partial_acronym=self.partial_acronym.upper()). \
+            exclude(education_group=self.education_group_id). \
             get_nearest_years(self.academic_year.year)
 
         if egy_using_same_partial_acronym["futur"]:
@@ -780,7 +808,7 @@ class EducationGroupYear(SerializableModel):
 
         # Groups can reuse acronym of other groups
         if self.education_group_type.category == education_group_categories.GROUP:
-            egy_using_same_acronym = egy_using_same_acronym.\
+            egy_using_same_acronym = egy_using_same_acronym. \
                 exclude(education_group_type__category=education_group_categories.GROUP)
 
         egy_using_same_acronym = egy_using_same_acronym.get_nearest_years(self.academic_year.year)

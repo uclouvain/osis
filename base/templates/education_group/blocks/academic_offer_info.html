@@ -43,11 +43,11 @@
         <br>
         <div class="row">
             <div class="col-md-4">
-                <label>{% trans 'Co-graduation' %}</label><br>
+                <label>{% trans 'Code co-graduation inter CfB' %}</label><br>
                 {{ education_group_year.co_graduation | default_if_none:'' }}
             </div>
             <div class="col-md-4">
-                <label>{% trans 'Co-graduation coefficient' %}</label><br>
+                <label>{% trans 'Co-graduation total coefficient' %}</label><br>
                 {{ education_group_year.co_graduation_coefficient | default_if_none:'' }}
             </div>
         </div>

@@ -101,7 +101,7 @@ def extend_learning_unit(learning_unit_to_edit, new_academic_year):
     _check_extend_partim(last_learning_unit_year, new_academic_year)
 
     if not new_academic_year:  # If there is no selected academic_year, we take the maximal value
-        new_academic_year = AcademicYear.objects.get(year=compute_max_academic_year_adjournment())
+        new_academic_year = AcademicYear.objects.max_adjournment()
 
     with transaction.atomic():
         for ac_year in get_next_academic_years(learning_unit_to_edit, new_academic_year.year):
@@ -113,7 +113,7 @@ def extend_learning_unit(learning_unit_to_edit, new_academic_year):
 
 def _check_extend_partim(last_learning_unit_year, new_academic_year):
     if not new_academic_year:  # If there is no selected academic_year, we take the maximal value
-        new_academic_year = AcademicYear.objects.get(year=compute_max_academic_year_adjournment() + 1)
+        new_academic_year = AcademicYear.objects.max_adjournment(delta=1)
 
     lu_parent = last_learning_unit_year.parent
     if last_learning_unit_year.is_partim() and lu_parent:
@@ -649,12 +649,3 @@ def create_learning_unit_year_creation_message(learning_unit_year_created):
     return _("Learning Unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
              "successfuly created.") % {'link': link, 'acronym': learning_unit_year_created.acronym,
                                         'academic_year': learning_unit_year_created.academic_year}
-
-
-def create_proposal_learning_unit_year_creation_message(learning_unit_year_created):
-    link = reverse("learning_unit", kwargs={'learning_unit_year_id': learning_unit_year_created.id})
-    return _("Proposal learning unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
-             "a> successfuly created.") % {'link': link,
-                                           'acronym': learning_unit_year_created.acronym,
-                                           'academic_year': learning_unit_year_created.academic_year
-                                           }

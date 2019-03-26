@@ -43,6 +43,9 @@ admin.site.register(decree.Decree,
 admin.site.register(domain.Domain,
                     domain.DomainAdmin)
 
+admin.site.register(domain_isced.DomainIsced,
+                    domain_isced.DomainIscedAdmin)
+
 admin.site.register(grade_type.GradeType,
                     grade_type.GradeTypeAdmin)
 

@@ -82,6 +82,10 @@
                             {% endif %}
                             <br>
                         </div>
+                        <dl>
+                            <dt>{% trans 'ISCED domain' %}</dt>
+                            <dd>{{ education_group_year.isced_domain | default_if_none:'' }}</dd>
+                        </dl>
                         {% dl_with_parent 'internal_comment' %}
                     </div>
                 </div>

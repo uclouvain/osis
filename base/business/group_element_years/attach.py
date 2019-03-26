@@ -27,7 +27,7 @@ import abc
 
 from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.education_group_year import EducationGroupYear
@@ -47,13 +47,13 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         self.child = child
 
     @cached_property
-    def roots(self):
+    def parents(self):
         return EducationGroupYear.hierarchy.filter(pk=self.parent.pk).get_parents()\
                                            .select_related('education_group_type')
 
     def is_valid(self):
         if self.parent.education_group_type.name in TrainingType.finality_types() or \
-                self.roots.filter(education_group_type__name__in=TrainingType.finality_types()).exists():
+                self.parents.filter(education_group_type__name__in=TrainingType.finality_types()).exists():
             self._check_attach_options_rules()
         return True
 
@@ -67,17 +67,22 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
             options_to_add += [self.child]
 
         errors = []
-        for root in self.roots.filter(education_group_type__name__in=[TrainingType.PGRM_MASTER_120.name,
-                                                                      TrainingType.PGRM_MASTER_180_240.name]):
+        for root in self.parents.filter(education_group_type__name__in=[TrainingType.PGRM_MASTER_120.name,
+                                                                        TrainingType.PGRM_MASTER_180_240.name]):
             options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
             missing_options = set(options_to_add) - set(options_in_2m)
 
             if missing_options:
                 errors.append(
-                    ValidationError(_("Option \"%(acronym)s\" must be present in %(root_acronym)s program.") % {
-                        "acronym": ', '.join(option.acronym for option in missing_options),
-                        "root_acronym": root.acronym
-                     })
+                    ValidationError(
+                        ngettext(
+                            "Option \"%(acronym)s\" must be present in %(root_acronym)s program.",
+                            "Options \"%(acronym)s\" must be present in %(root_acronym)s program.",
+                            len(missing_options)
+                        ) % {
+                            "acronym": ', '.join(option.acronym for option in missing_options),
+                            "root_acronym": root.acronym
+                        })
                 )
         if errors:
             raise ValidationError(errors)

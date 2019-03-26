@@ -118,8 +118,13 @@ class ValidationRuleMixin(WarningFormMixin):
 
                 self.change_status(field, rule)
 
-                field.initial = rule.initial_value
                 field.help_text = rule.help_text
+
+                # Because the initial value would be shown in place of the placeholder
+                if rule.placeholder:
+                    field.widget.attrs["placeholder"] = rule.placeholder
+                else:
+                    field.initial = rule.initial_value
 
                 field.validators.append(
                     RegexValidator(rule.regex_rule, rule.regex_error_message or None)
@@ -130,7 +135,7 @@ class ValidationRuleMixin(WarningFormMixin):
         if rule.status_field in (DISABLED, FIXED):
             field.disabled = True
             field.required = False
-            field.widget.attrs["title"] = _("You don't have sufficient rights to edit the field.")
+            field.widget.attrs["title"] = _("The field can contain only one value.")
 
         elif rule.status_field == REQUIRED:
             if not isinstance(field, forms.BooleanField):

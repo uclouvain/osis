@@ -75,10 +75,10 @@ class TestPersonAutoComplete(TestCase):
     def test_get_result_label(self):
         self.assertEqual(
             EmployeeAutocomplete().get_result_label(self.jean),
-            "Dupont Jean"
+            "DUPONT Jean"
         )
 
         self.assertEqual(
             EmployeeAutocomplete().get_result_label(self.henry),
-            "Arkin Henry"
+            "ARKIN Henry"
         )

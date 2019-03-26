@@ -82,6 +82,7 @@ urlpatterns = [
 
         url(r'^identification/$', detail.EducationGroupRead.as_view(), name='education_group_read'),
         url(r'^update/$', update.update_education_group, name="update_education_group"),
+        url(r'^update_certificate_aims/$', update.update_certificate_aims, name="update_certificate_aims"),
 
         url(r'^diplomas/$', detail.EducationGroupDiplomas.as_view(),
             name='education_group_diplomas'),

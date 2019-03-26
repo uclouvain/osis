@@ -110,7 +110,7 @@ class AcademicCalendar(SerializableModel):
         return ''
 
     def __str__(self):
-        return u"%s %s" % (self.academic_year, self.title)
+        return "{} {}".format(self.academic_year, self.title)
 
     class Meta:
         permissions = (
@@ -124,10 +124,6 @@ def find_highlight_academic_calendar():
         .exclude(highlight_description__isnull=True).exclude(highlight_description__exact='') \
         .exclude(highlight_shortcut__isnull=True).exclude(highlight_shortcut__exact='') \
         .order_by('end_date')
-
-
-def find_academic_calendar_by_academic_year(academic_year_id):
-    return AcademicCalendar.objects.filter(academic_year=academic_year_id).order_by('start_date')
 
 
 def find_academic_calendar_by_academic_year_with_dates(academic_year_id):
@@ -148,14 +144,6 @@ def is_academic_calendar_opened_for_specific_academic_year(an_academic_year_id, 
     return AcademicCalendar.objects.open_calendars().filter(
         academic_year=an_academic_year_id, reference=a_reference
     ).exists()
-
-
-def find_dates_for_current_academic_year(reference):
-    try:
-        return AcademicCalendar.objects.current_academic_year().filter(reference=reference).\
-            values("start_date", "end_date").get()
-    except AcademicCalendar.DoesNotExist:
-        return {}
 
 
 def is_academic_calendar_has_started(academic_year, reference, date=None):

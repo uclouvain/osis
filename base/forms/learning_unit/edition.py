@@ -27,15 +27,16 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units.edition import filter_biennial, edit_learning_unit_end_date
+from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
 from base.models import academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 
 
 # TODO Convert it in ModelForm
 class LearningUnitEndDateForm(forms.Form):
-    academic_year = forms.ModelChoiceField(required=False,
+    academic_year = forms.ModelChoiceField(required=True,
                                            queryset=AcademicYear.objects.none(),
-                                           empty_label=_('no planned end'),
+                                           empty_label=BLANK_CHOICE_DISPLAY,
                                            label=_('Academic end year')
                                            )
 
@@ -83,7 +84,7 @@ class LearningUnitEndDateForm(forms.Form):
         if min_year > max_year:
             raise ValueError('Learning_unit {} cannot be modify'.format(self.learning_unit))
 
-        return academic_year.find_academic_years(start_year=min_year, end_year=max_year)
+        return AcademicYear.objects.min_max_years(min_year, max_year)
 
     def save(self, update_learning_unit_year=True):
         return edit_learning_unit_end_date(self.learning_unit, self.cleaned_data['academic_year'],

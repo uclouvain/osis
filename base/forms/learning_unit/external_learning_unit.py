@@ -41,6 +41,7 @@ from base.models import entity_version
 from base.models.entity_version import get_last_version, EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import EXTERNAL
+from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from reference.models import language
 from reference.models.country import Country
@@ -148,6 +149,10 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
         super().__init__(instances_data, *args, **kwargs)
         self.learning_unit_year_form.fields['acronym'] = ExternalAcronymField()
+        if not self.instance or self.instance.acronym[0] == LearningUnitExternalSite.E.value:
+            self.learning_unit_year_form.fields['acronym'].initial = LearningUnitExternalSite.E.value
+            self.learning_unit_year_form.fields['acronym'].widget.widgets[0].attrs['disabled'] = True
+            self.learning_unit_year_form.fields['acronym'].required = False
         self.start_year = self.instance.learning_unit.start_year if self.instance else start_year
 
     @property

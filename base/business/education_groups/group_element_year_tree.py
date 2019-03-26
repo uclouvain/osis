@@ -29,8 +29,10 @@ from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, L
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
+from base.models.enums.proposal_type import ProposalType
 from base.models.group_element_year import GroupElementYear, fetch_all_group_elements_in_tree
 from base.models.prerequisite_item import PrerequisiteItem
+from base.models.proposal_learning_unit import ProposalLearningUnit
 
 
 class EducationGroupHierarchy:
@@ -91,6 +93,7 @@ class EducationGroupHierarchy:
                             'child_branch__education_group_type',
                             'child_leaf__academic_year',
                             'child_leaf__learning_container_year',
+                            'child_leaf__proposallearningunit',
                             'parent')
 
     def to_json(self):
@@ -150,7 +153,7 @@ class EducationGroupHierarchy:
 
     def get_option_list(self):
         def pruning_function(node):
-            return not node.reference and node.group_element_year.child_branch and \
+            return node.group_element_year.child_branch and \
                    node.group_element_year.child_branch.education_group_type.name not in \
                    [GroupType.FINALITY_120_LIST_CHOICE.name, GroupType.FINALITY_180_LIST_CHOICE.name]
 
@@ -188,25 +191,43 @@ class NodeLeafJsTree(EducationGroupHierarchy):
                 'is_prerequisite': self.group_element_year.is_prerequisite,
                 'detach_url': reverse('group_element_year_delete', args=[
                     self.root.pk, self.group_element_year.parent.pk, self.group_element_year.pk
-                ]) if self.group_element_year else '#'
+                ]) if self.group_element_year else '#',
+                'class': self._get_class()
             },
             'id': 'id_{}_{}'.format(self.learning_unit_year.pk, group_element_year_pk),
         }
 
     def _get_icon(self):
         if self.group_element_year.has_prerequisite and self.group_element_year.is_prerequisite:
-            return "fa fa-exchange"
+            return "fa fa-exchange-alt"
         elif self.group_element_year.has_prerequisite:
             return "fa fa-arrow-right"
         elif self.group_element_year.is_prerequisite:
             return "fa fa-arrow-left"
-        return "jstree-file"
+        return "far fa-file"
 
     def _get_acronym(self) -> str:
-        """ When the LU year is different than its education group, we have to display the year in the title. """
+        """
+            When the LU year is different than its education group, we have to display the year in the title.
+        """
         if self.learning_unit_year.academic_year != self.root.academic_year:
             return "|{}| {}".format(self.learning_unit_year.academic_year.year, self.learning_unit_year.acronym)
         return self.learning_unit_year.acronym
+
+    def _get_class(self):
+        try:
+            proposal = self.learning_unit_year.proposallearningunit
+        except ProposalLearningUnit.DoesNotExist:
+            proposal = None
+
+        class_by_proposal_type = {
+            ProposalType.CREATION.name: "proposal proposal_creation",
+            ProposalType.MODIFICATION.name: "proposal proposal_modification",
+            ProposalType.TRANSFORMATION.name: "proposal proposal_transformation",
+            ProposalType.TRANSFORMATION_AND_MODIFICATION.name: "proposal proposal_transformation_modification",
+            ProposalType.SUPPRESSION.name: "proposal proposal_suppression"
+        }
+        return class_by_proposal_type[proposal.type] if proposal else ""
 
     def get_url(self):
         url = reverse('learning_unit_utilization', args=[self.root.pk, self.learning_unit_year.pk])

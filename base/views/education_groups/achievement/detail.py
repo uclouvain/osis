@@ -46,7 +46,7 @@ class EducationGroupSkillsAchievements(EducationGroupGenericDetailView):
             text_labels = [CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION]
             self.cms_translated_texts = translated_text.search(
                 entity=entity_name.OFFER_YEAR,
-                reference=self.get_object().id,
+                reference=self.object.pk,
                 text_labels_name=text_labels
             ).select_related('text_label')
         return next(

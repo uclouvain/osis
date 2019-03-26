@@ -1,0 +1,133 @@
+{% extends "layout.html" %}
+{% load i18n learning_unit dictionnary model_field index %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+{% block breadcrumb %}
+    <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+    <li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></li>
+    <li><a href="{% url 'learning_unit' learning_unit_year.id %}">
+        {% if learning_unit_year.id %}{{ learning_unit_year.acronym }}{% else %}
+            {% trans 'Learning unit' %}{% endif %}</a></li>
+    <li class="active">{% trans 'Learning units proposal comparison' %}</li>
+{% endblock %}
+
+{% block content %}
+    {% if learning_unit_year %}
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <table class="table">
+                    <thead>
+                    <tr class="table_header">
+                        <th>{{ learning_unit_year }}</th>
+                        <th>{% trans 'Initial data' %}</th>
+                        <th>{% trans 'New value' %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for key in learning_unit_year_fields %}
+                        <tr {% if forloop.first %} style="border-top: groove"{% endif %}>
+                            <td class="table_header">{{ key.0 }}</td>
+                            <td>
+                                {% if key.1 == True %}
+                                    {% trans 'Yes' %}
+                                {% elif key.1 == False %}
+                                    {% trans 'No' %}
+                                {% else %}
+                                    {{ key.1|default_if_none:'-'|capfirst }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if key.2 == True %}
+                                    {% trans 'Yes' %}
+                                {% elif key.2 == False %}
+                                    {% trans 'No' %}
+                                {% else %}
+                                    {{ key.2|default_if_none:'-'|capfirst }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    {% if campus %}
+                        <tr style="border-top: groove">
+                            <td class="table_header">{{ campus.0 }}</td>
+                            <td>{{ campus.1|default_if_none:'-' }}</td>
+                            <td>{{ campus.2|default_if_none:'-' }}</td>
+                        </tr>
+                    {% endif %}
+                    {% for entity in entities_fields %}
+                        <tr {% if forloop.first %} style="border-top: groove"{% endif %}>
+                            <td class="table_header">{{ entity.0 }}</td>
+                            <td>{{ entity.1|default_if_none:'-'|capfirst }}</td>
+                            <td>{{ entity.2|default_if_none:'-'|capfirst }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for key_lcy in learning_container_year_fields %}
+                        <tr {% if forloop.first %} style="border-top: groove"{% endif %}>
+                            <td class="table_header">{{ key_lcy.0 }}</td>
+                            <td>
+                                {% if key_lcy.1 == True %}
+                                    {% trans 'Yes' %}
+                                {% elif key_lcy.1 == False %}
+                                    {% trans 'No' %}
+                                {% else %}
+                                    {{ key_lcy.1|default_if_none:'-'|capfirst }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if key_lcy.2 == True %}
+                                    {% trans 'Yes' %}
+                                {% elif key_lcy.2 == False %}
+                                    {% trans 'No' %}
+                                {% else %}
+                                    {{ key_lcy.2|default_if_none:'-'|capfirst }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    {% for component in components %}
+                        {% for key, values in component.1.items %}
+                            {% if forloop.first %}
+                                <tr>
+                                    <td class="table_header" style="border-top: groove">
+                                        {{ component.0  }}
+                                    </td>
+                                    <td style="border-top: groove"></td>
+                                    <td style="border-top: groove"></td>
+                                </tr>
+                            {% endif %}
+                            <tr>
+                                <td class="table_header">&nbsp;&nbsp;{{ key }}</td>
+                                <td>{{ values.0|default_if_none:0 }}</td>
+                                <td>{{ values.1|default_if_none:0 }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">{% trans 'No difference' %}!</div>
+    {% endif %}
+{% endblock %}

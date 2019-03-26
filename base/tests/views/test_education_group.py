@@ -66,7 +66,10 @@ class EducationGroupGeneralInformations(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
-        EducationGroupYearCommonFactory(academic_year=cls.current_academic_year)
+        EducationGroupYearCommonFactory(
+            academic_year=cls.current_academic_year,
+            education_group_type__name=TrainingType.AGGREGATION.name
+        )
         cls.education_group_parent = TrainingFactory(
             acronym="Parent",
             academic_year=cls.current_academic_year
@@ -157,6 +160,7 @@ class EducationGroupGeneralInformations(TestCase):
     def test_case_common_do_not_have_double_field_prerequisite(self):
         education_group_year = EducationGroupYearCommonFactory(
             academic_year=self.current_academic_year,
+            education_group_type__name=TrainingType.AGGREGATION.name
         )
         url = reverse("education_group_general_informations",
                       args=[education_group_year.pk, education_group_year.id])
@@ -411,10 +415,12 @@ class EducationGroupViewTestCase(TestCase):
             for academic_calendar in academic_calendars]
 
         self.assertEqual(
-            get_sessions_dates(academic_calendars[0].reference, education_group_year),
+            get_sessions_dates(education_group_year),
             {
-                'session{}'.format(s + 1): offer_year_calendar
-                for s, offer_year_calendar in enumerate(offer_year_calendars)
+                academic_calendar_type.DELIBERATION.lower(): {
+                    'session{}'.format(s + 1): offer_year_calendar
+                    for s, offer_year_calendar in enumerate(offer_year_calendars)
+                }
             }
         )
 

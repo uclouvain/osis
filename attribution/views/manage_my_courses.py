@@ -28,7 +28,6 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
-from attribution.models.attribution import find_all_summary_responsibles_by_learning_unit_years
 from attribution.views.perms import tutor_can_view_educational_information
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
     find_educational_information_submission_dates_of_learning_unit_year, can_user_edit_educational_information
@@ -38,6 +37,8 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.learning_unit_year import find_learning_unit_years_by_academic_year_tutor_attributions
 from base.models.tutor import Tutor
 from base.views import teaching_material
+from base.views.learning_unit import get_specifications_context, get_achievements_group_by_language, \
+    get_languages_settings
 from base.views.learning_units.pedagogy.read import read_learning_unit_pedagogy
 from base.views.learning_units.pedagogy.update import edit_learning_unit_pedagogy
 from base.views.learning_units.perms import PermissionDecorator
@@ -51,7 +52,6 @@ def list_my_attributions_summary_editable(request):
         academic_year=current_ac.next(),
         tutor=tutor
     )
-    score_responsibles = find_all_summary_responsibles_by_learning_unit_years(learning_unit_years)
 
     entity_calendars = entity_calendar.build_calendar_by_entities(
         ac_year=current_ac,
@@ -62,7 +62,6 @@ def list_my_attributions_summary_editable(request):
     context = {
         'learning_unit_years_with_errors': zip(learning_unit_years, errors),
         'entity_calendars': entity_calendars,
-        'score_responsibles': score_responsibles,
     }
     return render(request, 'manage_my_courses/list_my_courses_summary_editable.html', context)
 
@@ -79,6 +78,12 @@ def view_educational_information(request, learning_unit_year_id):
         'update_mobility_modality_urlname': 'tutor_mobility_modality_update'
     }
     template = 'manage_my_courses/educational_information.html'
+    query_set = LearningUnitYear.objects.all().select_related('learning_unit', 'learning_container_year')
+    learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
+    context.update(get_specifications_context(learning_unit_year, request))
+    context.update(get_achievements_group_by_language(learning_unit_year))
+    context.update(get_languages_settings())
+    context['div_class'] = 'collapse'
     return read_learning_unit_pedagogy(request, learning_unit_year_id, context, template)
 
 

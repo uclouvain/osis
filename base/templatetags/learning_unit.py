@@ -27,10 +27,10 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
+from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
 from base.business.utils.convert import volume_format
 from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
 from base.models.utils.utils import get_verbose_field_value
 
 register = template.Library()
@@ -171,12 +171,12 @@ def _get_label(data, key_comp, val):
 
 
 @register.simple_tag
-def changed_label(value, other1=None):
-    if value != other1:
+def changed_label(value, other=None):
+    if value != other and other:
         return mark_safe(
-            "<label {}>{}</label>".format(DIFFERENCE_CSS, DEFAULT_VALUE_FOR_NONE if value is None else value))
+            "<td><label {}>{}</label></td>".format(DIFFERENCE_CSS, DEFAULT_VALUE_FOR_NONE if value is None else value))
     else:
-        return mark_safe("{}".format(DEFAULT_VALUE_FOR_NONE if value is None else value))
+        return mark_safe("<td><label>{}</label></td>".format(DEFAULT_VALUE_FOR_NONE if value is None else value))
 
 
 @register.simple_tag(takes_context=True)

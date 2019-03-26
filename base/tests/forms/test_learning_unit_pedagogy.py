@@ -121,7 +121,8 @@ class TestTeachingMaterialForm(LearningUnitPedagogyContextMixin):
     def test_save_without_postponement(self, mock_postpone_teaching_materials):
         """In this test, we ensure that if we modify UE of N or N-... => The postponement is not done for teaching
            materials"""
-        teaching_material = TeachingMaterialFactory.build(learning_unit_year=self.current_luy)
+        teaching_material = TeachingMaterialFactory.build(learning_unit_year=self.current_luy,
+                                                          mandatory=True)
         post_data = _get_valid_teaching_material_form_data(teaching_material)
         teaching_material_form = TeachingMaterialModelForm(post_data)
         self.assertTrue(teaching_material_form.is_valid(), teaching_material_form.errors)
@@ -196,8 +197,8 @@ def _get_valid_cms_form_data(cms_translated_text):
 def _get_valid_teaching_material_form_data(teaching_material):
     """Valid data for teaching material form"""
     data = {
-        'title': teaching_material.title,
+        'title': teaching_material.title
     }
     if getattr(teaching_material, 'mandatory', False):
-        data['mandatory'] = 'on'
+        data['mandatory'] = True
     return data

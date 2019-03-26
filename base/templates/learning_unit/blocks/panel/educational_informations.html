@@ -28,35 +28,16 @@
 
 
 <div role="tabpanel" class="tab-pane active" id="pedagogy">
-    <div class="row well">
+    <div class="row well" style="margin-left: 10px;margin-right: 10px">
         <div class="col-md-6">
-            <label>{% trans 'Summary responsible(s)' %} : </label>
-            {% if summary_responsibles %}
+            {% if tutors %}
+                <label>{% trans 'Tutors' %} : </label>
+                <br>
                 <ul>
-                    {% for summary_responsible in summary_responsibles %}
-                        <li>{{ summary_responsible }}</li>
+                    {% for tutor in tutors %}
+                        <li>{{ tutor.person }}</li>
                     {% endfor %}
                 </ul>
-            {% else %}
-                <ul>
-                    <li>{% trans 'None' %}</li>
-                </ul>
-            {% endif %}
-            {% if other_teachers %}
-                <label>{% trans 'Other teacher(s)' %} : </label>
-                <a role="button" data-toggle="collapse" href="#CollapseTeachers" aria-expanded="false"
-                   aria-controls="collapse_classes" style="border:0;padding:0;">
-                <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
-                      style="color:#8a6d3b"></span>
-                </a>
-                <br>
-                <div class="collapse" id="CollapseTeachers">
-                    <ul>
-                        {% for teacher in other_teachers %}
-                            <li>{{ teacher.person }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
             {% endif %}
         </div>
         {% include "learning_unit/blocks/summary_locked.html" %}
@@ -66,48 +47,20 @@
         <thead>
         <tr>
             <th class="col-md-2" style="padding: 20px;">{% trans 'Language' %}</th>
-            <th class="col-md-5" style="padding: 20px;">{{ form_french.language.1 }}</th>
-            <th class="col-md-5" style="padding: 20px;">{{ form_english.language.1 }}</th>
+            <th class="col-md-5" style="padding: 20px;">{% trans 'French' %}</th>
+            <th class="col-md-5" style="padding: 20px;">{% trans 'English' %}</th>
         </tr>
         </thead>
         <tbody>
-        {% for label_key, label_translated in cms_labels_translated.items %}
-            {% if label_key != "mobility" %}
-                <tr>
-                    <td style="padding: 20px;">
-                        <label>{{ label_translated }}</label>
-                    </td>
-                    <td style="padding: 20px;" {% if label_key in cms_label_pedagogy_fr_only %}colspan="2"{% endif %}>
-                        {% if can_edit_information %}
-                            <a class="trigger_modal pull-right"
-                               data-url="{{ post_url }}?language={{ form_french.language.0 }}&label={{ label_key }}"
-                               data-modal_class="modal-lg"
-                               title="{% trans 'Edit' %}">
-                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                            </a>
-                        {% endif %}
-                        {{ form_french|getattr:label_key }}
-                    </td>
-                    {% if label_key not in cms_label_pedagogy_fr_only %}
-                        <td style="padding: 20px;">
-                            {% if can_edit_information %}
-                                <a class="trigger_modal pull-right"
-                                   data-url="{{ post_url }}?language={{ form_english.language.0 }}&label={{ label_key }}"
-                                   data-modal_class="modal-lg"
-                                   title="{% trans 'Edit' %}">
-                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                                </a>
-                            {% endif %}
-                            {{ form_english|getattr:label_key }}
-                        </td>
-                    {% endif %}
-                </tr>
+        {% for translated_label in cms_labels_translated %}
+            {% if translated_label.text_label.label not in cms_label_pedagogy_fr_only %}
+                {% include 'learning_unit/blocks/panel/cms_informations.html' %}
             {% endif %}
         {% endfor %}
         </tbody>
     </table>
 
-    <div class="panel" style="border-bottom: 1px solid #ddd;box-shadow: none;">
+    <div class="panel" style="box-shadow: none;">
         <div class="panel-heading"><label>{% trans 'Teaching material' %}</label></div>
 
         <div class="panel-body" style="padding-top:0px;">
@@ -144,13 +97,22 @@
         </div>
     </div>
 
+    <table class="table" style="border-bottom: 1px solid #ddd">
+        <tbody>
+        {% for translated_label in cms_labels_translated %}
+            {% if translated_label.text_label.label == 'bibliography' %}
+                {% include 'learning_unit/blocks/panel/cms_informations.html' %}
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
 
     <div class="panel">
         <div class="panel-heading">
             <label>{% trans "Mobility" %}</label>
             {% if can_edit_information %}
                 <a class="trigger_modal pull-right"
-                   data-url="{{ post_url }}?language={{ form_french.language.0 }}&label=mobility"
+                   data-url="{{ post_url }}?language=fr-be&label=mobility"
                    data-modal_class="modal-lg">
                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                 </a>
@@ -160,7 +122,11 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-12">
-                    {{ form_french|getattr:"mobility" }}
+                    {% for translated_label in  cms_labels_translated%}
+                        {% if translated_label.text_label.label == "mobility" %}
+                            {{ translated_label.text_label.text_fr.0.text|default_if_none:"" }}
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </div>
