@@ -76,7 +76,13 @@ class ReddotEducationGroupAutomaticPostponement(AutomaticPostponement):
     model = EducationGroupYear
 
     def get_queryset(self, queryset=None):
-        return super().get_queryset(queryset).filter(academic_year=self.current_year)
+        """ By default, we can copy the data only for the current academic_year,
+        but it is possible to override that behavior if a query is given.
+        """
+        if not queryset:
+            queryset = self.model.objects.filter(academic_year=self.current_year)
+
+        return queryset
 
     def postpone(self):
 
@@ -85,6 +91,7 @@ class ReddotEducationGroupAutomaticPostponement(AutomaticPostponement):
                 with transaction.atomic():
                     old_obj = obj.previous_year()
                     if not old_obj:
+                        # If old obj is empty, there are no data in the past.
                         continue
 
                     self._postpone_cms(old_obj, obj)

@@ -28,7 +28,7 @@ from abc import ABC
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import transaction, Error
 from django.db.models import Max, Q, F
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from base.business.education_groups.postponement import ConsistencyError
 from base.models.academic_year import AcademicYear
