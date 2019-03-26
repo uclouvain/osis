@@ -56,7 +56,7 @@
 
             var form = document.getElementById("UpdateTrainingForm");
 
-            form.addEventListener('invalid', (e)=>{
+            form.addEventListener('invalid', (let e)=>{
                 var el = e.target;
                 while (el && el.parentNode) {
                     el = el.parentNode;
