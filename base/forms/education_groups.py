@@ -24,10 +24,10 @@
 #
 ##############################################################################
 from django import forms
-from django.forms import ModelChoiceField
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
+from django_filters.widgets import BooleanWidget
 
 from base.business.entity import get_entities_ids
 from base.models.academic_year import AcademicYear, current_academic_year
@@ -35,11 +35,6 @@ from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
-
-
-class EntityManagementModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return obj.acronym
 
 
 class SelectWithData(forms.Select):
@@ -79,12 +74,14 @@ class EducationGroupFilter(FilterSet):
         widget=SelectWithData
     )
     management_entity = filters.CharFilter(
-        field_name="management_entity__entityversion__acronym",
-        lookup_expr='icontains',
         method='filter_with_entity_subordinated',
         label=_('Entity')
     )
-    with_entity_subordinated = filters.BooleanFilter(method=lambda queryset, *args, **kwargs: queryset)
+    with_entity_subordinated = filters.BooleanFilter(
+        method=lambda queryset, *args, **kwargs: queryset,
+        label=_('With subord. ent.'),
+        widget=forms.CheckboxInput
+    )
     acronym = filters.CharFilter(
         field_name="acronym",
         lookup_expr='icontains',

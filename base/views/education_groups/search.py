@@ -62,7 +62,7 @@ def education_groups(request):
         )
 
     context = {
-        'filter': filter_form,
+        'form': filter_form.form,
         'object_list': paginate_queryset(filter_form.qs, request.GET),
         'object_list_count': filter_form.qs.count(),
         'experimental_phase': True,
