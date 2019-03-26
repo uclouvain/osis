@@ -922,7 +922,9 @@ msgstr ""
 #: templates/learning_unit/components_identification.html:33
 #: templates/learning_unit/external/read.html:8
 #: templates/learning_unit/identification.html:47
-#: templates/learning_unit/summary_list.html:77 utils/send_mail.py:234
+#: templates/learning_unit/summary_list.html:77
+#: templates/student/learning_units_enrollments.html:45
+#: templates/student/offers_enrollments.html:46 utils/send_mail.py:234
 msgid "Code"
 msgstr ""
 
@@ -2504,7 +2506,7 @@ msgstr ""
 msgid "My OSIS"
 msgstr ""
 
-#: forms/organization.py:34 forms/search/search_tutor.py:35
+#: forms/organization.py:34 forms/search/search_tutor.py:35 forms/student.py:35
 #: templates/education_group/pdf_content.html:101
 #: templates/organization/organization.html:62
 #: templates/organization/organization.html:115
@@ -2698,10 +2700,6 @@ msgstr ""
 
 #: models/enums/field_status.py:38
 msgid "Not required"
-msgstr ""
-
-#: templates/student/student.html:51
-msgid "Number ID"
 msgstr ""
 
 #: models/enums/constraint_type.py:33
@@ -3311,8 +3309,12 @@ msgid "Refused"
 msgstr ""
 
 #: templates/education_group/pdf_content.html:107
-#: templates/student/students.html:57
 msgid "Registration ID"
+msgstr ""
+
+#: forms/student.py:34 templates/student/student.html:51
+#: templates/student/students.html:57
+msgid "Registration Id"
 msgstr ""
 
 #: templates/education_group/pdf_content.html:69
@@ -3406,6 +3408,10 @@ msgstr ""
 
 #: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:41
 msgid "Responsible"
+msgstr ""
+
+#: templates/student/exams_enrollments.html:50
+msgid "Result"
 msgstr ""
 
 #: templates/admin/data_maintenance.html:42
@@ -5060,8 +5066,6 @@ msgstr ""
 #: models/education_group_year.py:372
 #: templates/learning_unit/components.html:124
 #: templates/learning_unit/formations.html:43
-#: templates/student/learning_units_enrollments.html:45
-#: templates/student/offers_enrollments.html:46
 #: tests/views/test_learning_unit_pedagogy.py:187
 msgid "code"
 msgstr ""
@@ -5339,7 +5343,6 @@ msgid "reset"
 msgstr ""
 
 #: templates/admin/data_maintenance.html:53
-#: templates/student/exams_enrollments.html:50
 msgid "result"
 msgstr ""
 
