@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-26 10:14+0100\n"
+"POT-Creation-Date: 2019-03-26 11:37+0100\n"
 "PO-Revision-Date: 2019-03-22 10:25+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -132,7 +132,7 @@ msgstr "%(number_notifications)s notification(s) non lu(s)"
 #: business/learning_units/simple/deletion.py:116
 #: tests/business/test_learning_unit_deletion.py:117
 #: tests/views/test_learning_unit_deletion.py:220
-#: tests/views/test_learning_unit_deletion.py:287
+#: tests/views/test_learning_unit_deletion.py:285
 #, python-format
 msgid "%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s"
 msgstr "%(subtype)s %(acronym)s est attribué(e) à %(tutor)s l’année %(year)s"
@@ -853,7 +853,7 @@ msgstr "Impossible de mettre la fin à %(end_year)s :"
 #: forms/education_groups.py:75 models/education_group_type.py:75
 #: templates/education_group/blocks/form/group.html:58
 #: templates/education_group/blocks/form/minitraining.html:59
-#: templates/education_group/blocks/form/training_tab_identification.html:51
+#: templates/education_group/blocks/form/training_tab_identification.html:67
 msgid "Category"
 msgstr "Catégorie"
 
@@ -1240,6 +1240,7 @@ msgstr "Diplôme"
 msgid "Diploma title"
 msgstr "Intitulé du diplôme/du certificat"
 
+#: templates/education_group/blocks/form/training_tab_identification.html:35
 #: templates/education_group/tabs.html:48
 msgid "Diplomas /  Certificates"
 msgstr "Diplômes /  Certificats"
@@ -1858,6 +1859,7 @@ msgstr "Page d'accueil"
 msgid "ISCED domain"
 msgstr "Domaine ISCED/CITE"
 
+#: templates/education_group/blocks/form/training_tab_identification.html:30
 #: templates/education_group/tabs.html:41 templates/entity/tabs.html:33
 #: templates/learning_unit/blocks/tabs.html:39
 #: templates/learning_unit/blocks/tabs.html:52
@@ -3999,7 +4001,7 @@ msgstr ""
 #: forms/common.py:138 forms/education_group/common.py:191
 #: templates/education_group/blocks/form/group.html:61
 #: templates/education_group/blocks/form/minitraining.html:62
-#: templates/education_group/blocks/form/training_tab_identification.html:54
+#: templates/education_group/blocks/form/training_tab_identification.html:70
 msgid "The field can contain only one value."
 msgstr "Ce champ ne peut contenir d'autre valeur."
 
@@ -4034,9 +4036,9 @@ msgstr ""
 
 #: business/learning_units/simple/deletion.py:225
 #: tests/business/test_learning_unit_deletion.py:175
-#: tests/views/test_learning_unit_deletion.py:181
+#: tests/views/test_learning_unit_deletion.py:182
 #: tests/views/test_learning_unit_deletion.py:219
-#: tests/views/test_learning_unit_deletion.py:286
+#: tests/views/test_learning_unit_deletion.py:284
 msgid "The learning unit"
 msgstr "L'unité d'enseignement"
 
@@ -4192,9 +4194,9 @@ msgstr "Le parent doit au moins avoir un enfant de type(s) \"%(types)s\"."
 #: tests/business/test_learning_unit_deletion.py:123
 #: tests/business/test_learning_unit_deletion.py:132
 #: tests/business/test_learning_unit_deletion.py:138
-#: tests/views/test_learning_unit_deletion.py:181
+#: tests/views/test_learning_unit_deletion.py:182
 #: tests/views/test_learning_unit_deletion.py:219
-#: tests/views/test_learning_unit_deletion.py:286
+#: tests/views/test_learning_unit_deletion.py:284
 msgid "The partim"
 msgstr "Le partim"
 
@@ -4217,7 +4219,7 @@ msgstr ""
 "Les prérequis %(prerequisites)s pour l'unité d'enseignement "
 "%(learning_unit)s ne sont pas dans la formation sélectionnée %(root)s"
 
-#: views/education_groups/detail.py:432
+#: views/education_groups/detail.py:435
 #, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr "Le programme %(acronym)s sera publié sous peu"
@@ -4343,7 +4345,7 @@ msgstr "Il y a des avertissements dans le formulaire."
 
 #: business/learning_units/simple/deletion.py:240
 #: tests/business/test_learning_unit_deletion.py:110
-#: tests/views/test_learning_unit_deletion.py:182
+#: tests/views/test_learning_unit_deletion.py:183
 #, python-format
 msgid ""
 "There is %(count)d enrollments in %(subtype)s %(acronym)s for the year "
@@ -4375,7 +4377,8 @@ msgstr "Il n'existe pas d'unité d'enseigmenent %(acronym)s - %(next_year)s"
 #: business/education_groups/perms.py:121
 msgid "This education group is not editable during this period."
 msgstr ""
-"La période de modification d'organisation de formation n'est pas ouverte durant cette période."
+"La période de modification d'organisation de formation n'est pas ouverte "
+"durant cette période."
 
 #: templates/layout.html:162
 msgid "This feature is in testing phase"
@@ -4409,7 +4412,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 
-#: views/education_groups/detail.py:394
+#: views/education_groups/detail.py:397
 #, python-format
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
@@ -5235,7 +5238,7 @@ msgid "cannot be consolidated"
 msgstr "ne peut pas être consolidé"
 
 #: templates/education_group/blocks/form/training_certificate.html:29
-#: templates/education_group/blocks/form/training_tab_diploma.html:35
+#: templates/education_group/blocks/form/training_tab_diploma.html:37
 #: templates/education_group/tab_diplomas.html:48
 msgid "certificate aims"
 msgstr "attendus du diplôme"
@@ -5348,7 +5351,7 @@ msgid "field reference"
 msgstr "référence de champ"
 
 #: templates/education_group/blocks/form/training_certificate.html:39
-#: templates/education_group/blocks/form/training_tab_diploma.html:40
+#: templates/education_group/blocks/form/training_tab_diploma.html:42
 msgid "filter by section"
 msgstr "préfiltrer par rubrique"
 

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-26 10:14+0100\n"
+"POT-Creation-Date: 2019-03-26 11:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -122,7 +122,7 @@ msgstr ""
 #: business/learning_units/simple/deletion.py:116
 #: tests/business/test_learning_unit_deletion.py:117
 #: tests/views/test_learning_unit_deletion.py:220
-#: tests/views/test_learning_unit_deletion.py:287
+#: tests/views/test_learning_unit_deletion.py:285
 #, python-format
 msgid "%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s"
 msgstr ""
@@ -821,7 +821,7 @@ msgstr ""
 #: forms/education_groups.py:75 models/education_group_type.py:75
 #: templates/education_group/blocks/form/group.html:58
 #: templates/education_group/blocks/form/minitraining.html:59
-#: templates/education_group/blocks/form/training_tab_identification.html:51
+#: templates/education_group/blocks/form/training_tab_identification.html:67
 msgid "Category"
 msgstr ""
 
@@ -1208,6 +1208,7 @@ msgstr ""
 msgid "Diploma title"
 msgstr ""
 
+#: templates/education_group/blocks/form/training_tab_identification.html:35
 #: templates/education_group/tabs.html:48
 msgid "Diplomas /  Certificates"
 msgstr ""
@@ -1818,6 +1819,7 @@ msgstr ""
 msgid "ISCED domain"
 msgstr "ISCED/CITE domain"
 
+#: templates/education_group/blocks/form/training_tab_identification.html:30
 #: templates/education_group/tabs.html:41 templates/entity/tabs.html:33
 #: templates/learning_unit/blocks/tabs.html:39
 #: templates/learning_unit/blocks/tabs.html:52
@@ -3912,7 +3914,7 @@ msgstr ""
 #: forms/common.py:138 forms/education_group/common.py:191
 #: templates/education_group/blocks/form/group.html:61
 #: templates/education_group/blocks/form/minitraining.html:62
-#: templates/education_group/blocks/form/training_tab_identification.html:54
+#: templates/education_group/blocks/form/training_tab_identification.html:70
 msgid "The field can contain only one value."
 msgstr ""
 
@@ -3943,9 +3945,9 @@ msgstr ""
 
 #: business/learning_units/simple/deletion.py:225
 #: tests/business/test_learning_unit_deletion.py:175
-#: tests/views/test_learning_unit_deletion.py:181
+#: tests/views/test_learning_unit_deletion.py:182
 #: tests/views/test_learning_unit_deletion.py:219
-#: tests/views/test_learning_unit_deletion.py:286
+#: tests/views/test_learning_unit_deletion.py:284
 msgid "The learning unit"
 msgstr ""
 
@@ -4080,9 +4082,9 @@ msgstr ""
 #: tests/business/test_learning_unit_deletion.py:123
 #: tests/business/test_learning_unit_deletion.py:132
 #: tests/business/test_learning_unit_deletion.py:138
-#: tests/views/test_learning_unit_deletion.py:181
+#: tests/views/test_learning_unit_deletion.py:182
 #: tests/views/test_learning_unit_deletion.py:219
-#: tests/views/test_learning_unit_deletion.py:286
+#: tests/views/test_learning_unit_deletion.py:284
 msgid "The partim"
 msgstr ""
 
@@ -4101,7 +4103,7 @@ msgid ""
 "are not inside the selected training %(root)s"
 msgstr ""
 
-#: views/education_groups/detail.py:432
+#: views/education_groups/detail.py:435
 #, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr ""
@@ -4214,7 +4216,7 @@ msgstr ""
 
 #: business/learning_units/simple/deletion.py:240
 #: tests/business/test_learning_unit_deletion.py:110
-#: tests/views/test_learning_unit_deletion.py:182
+#: tests/views/test_learning_unit_deletion.py:183
 #, python-format
 msgid ""
 "There is %(count)d enrollments in %(subtype)s %(acronym)s for the year "
@@ -4273,7 +4275,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
-#: views/education_groups/detail.py:394
+#: views/education_groups/detail.py:397
 #, python-format
 msgid "This label %s does not exist"
 msgstr ""
@@ -5055,7 +5057,7 @@ msgid "cannot be consolidated"
 msgstr ""
 
 #: templates/education_group/blocks/form/training_certificate.html:29
-#: templates/education_group/blocks/form/training_tab_diploma.html:35
+#: templates/education_group/blocks/form/training_tab_diploma.html:37
 #: templates/education_group/tab_diplomas.html:48
 msgid "certificate aims"
 msgstr ""
@@ -5166,7 +5168,7 @@ msgid "field reference"
 msgstr ""
 
 #: templates/education_group/blocks/form/training_certificate.html:39
-#: templates/education_group/blocks/form/training_tab_diploma.html:40
+#: templates/education_group/blocks/form/training_tab_diploma.html:42
 msgid "filter by section"
 msgstr ""
 
