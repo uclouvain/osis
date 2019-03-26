@@ -63,6 +63,8 @@ MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY = _("You can only modify a learning unit whe
                                         "entity")
 MSG_LEARNING_UNIT_IS_OR_HAS_PREREQUISITE = _("You cannot delete a learning unit which is prerequisite or has "
                                              "prerequisite(s)")
+MSG_LEARNING_UNIT_EXIST_IN_PAST = _("You cannot delete a learning unit which is existing before %(limit_year)s") % {
+                "limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION,}
 MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE = _("Person not in accordance with proposal state")
 MSG_NOT_PROPOSAL_STATE_FACULTY = _("You are faculty manager and the proposal state is not 'Faculty', so you can't edit")
 MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL = _("You are not eligible to cancel proposal")
@@ -225,6 +227,9 @@ def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_e
         msg = MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY
     elif learning_unit_year.is_prerequisite():
         msg = MSG_LEARNING_UNIT_IS_OR_HAS_PREREQUISITE
+    elif LearningUnitYear.objects.filter(learning_unit=learning_unit_year.learning_unit,
+                                         academic_year__year__lte=settings.YEAR_LIMIT_LUE_MODIFICATION):
+        msg = MSG_LEARNING_UNIT_EXIST_IN_PAST
 
     result = False if msg else True
     can_raise_exception(
