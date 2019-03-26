@@ -64,7 +64,7 @@ MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY = _("You can only modify a learning unit whe
 MSG_LEARNING_UNIT_IS_OR_HAS_PREREQUISITE = _("You cannot delete a learning unit which is prerequisite or has "
                                              "prerequisite(s)")
 MSG_LEARNING_UNIT_EXIST_IN_PAST = _("You cannot delete a learning unit which is existing before %(limit_year)s") % {
-                "limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION,}
+                "limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION}
 MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE = _("Person not in accordance with proposal state")
 MSG_NOT_PROPOSAL_STATE_FACULTY = _("You are faculty manager and the proposal state is not 'Faculty', so you can't edit")
 MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL = _("You are not eligible to cancel proposal")

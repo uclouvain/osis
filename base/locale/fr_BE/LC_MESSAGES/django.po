@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-26 09:48+0100\n"
+"POT-Creation-Date: 2019-03-26 10:14+0100\n"
 "PO-Revision-Date: 2019-03-22 10:25+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3943,6 +3943,7 @@ msgstr ""
 msgid "The credits value should be an integer"
 msgstr "La valeur du champ crédits doit être un entier"
 
+#: business/education_groups/perms.py:119
 #: tests/templatetags/test_education_group.py:48
 #: tests/templatetags/test_education_group.py:325
 msgid "The education group edition period is not open."
@@ -4364,6 +4365,11 @@ msgstr ""
 #, python-format
 msgid "There is not the learning unit %(acronym)s - %(next_year)s"
 msgstr "Il n'existe pas d'unité d'enseigmenent %(acronym)s - %(next_year)s"
+
+#: business/education_groups/perms.py:121
+msgid "This education group is not editable during this period."
+msgstr ""
+"La période de modification d'organisation de formation n'est pas ouverte durant cette période."
 
 #: templates/layout.html:162
 msgid "This feature is in testing phase"
@@ -5012,10 +5018,12 @@ msgstr ""
 "\"%(parent_type)s\")"
 
 #: business/learning_units/perms.py:66
+#, python-format
 msgid ""
 "You cannot delete a learning unit which is existing before %(limit_year)s"
 msgstr ""
-"Vous ne pouvez pas supprimer une unité d'enseignement existant avant %(limit_year)s"
+"Vous ne pouvez pas supprimer une unité d'enseignement existant avant "
+"%(limit_year)s"
 
 #: business/learning_units/perms.py:64
 msgid ""
