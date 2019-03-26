@@ -366,8 +366,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             translations = self.get_content_translations_for_label(label, user_language, 'specific')
         return translations
 
-    @staticmethod
-    def get_content_translations_for_label(label, user_language, type):
+    def get_content_translations_for_label(self, label, user_language, type):
         # FIXME: Change contacts ==> contact_intro in sections
         if label == CONTACTS_KEY:
             label = CONTACT_INTRO_KEY
@@ -382,7 +381,11 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         # fetch the translations for the both languages
         french, english = 'fr-be', 'en'
 
-        qs = TranslatedText.objects.filter(entity=entity_name.OFFER_YEAR, text_label__label=label)
+        qs = TranslatedText.objects.filter(
+            entity=entity_name.OFFER_YEAR,
+            reference=str(self.object.pk),
+            text_label__label=label
+        )
 
         fr_translated_text = qs.filter(language=french).first()
         en_translated_text = qs.filter(language=english).first()
