@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime
 
 from celery.schedules import crontab
 
@@ -7,6 +7,7 @@ from base.business.education_groups.automatic_postponement import EducationGroup
     ReddotEducationGroupAutomaticPostponement
 from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponementToN6
 from base.models.academic_calendar import AcademicCalendar
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 
 celery_app.conf.beat_schedule.update({
@@ -45,7 +46,10 @@ def check_academic_calendar() -> dict:
     if open_calendar:
 
         if open_calendar.reference == EDUCATION_GROUP_EDITION:
-            process = ReddotEducationGroupAutomaticPostponement()
+            # Copy the education group data of the open academic year.
+            process = ReddotEducationGroupAutomaticPostponement(
+                EducationGroupYear.objects.filter(academic_year=open_calendar.academic_year)
+            )
             process.postpone()
             return {"Copy of Reddot data": process.serialize_postponement_results()}
 

@@ -24,19 +24,36 @@
 from datetime import datetime
 
 from django.test import TestCase
+from django.utils.translation import gettext
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.tasks import check_academic_calendar
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 
 
 class TestCheckAcademicCalendar(TestCase):
 
     def test_check_academic_calendar(self):
+        current_egy = EducationGroupYearFactory()
+        old_year = AcademicYearFactory(year=current_egy.academic_year.year - 1)
+
+        EducationGroupYearFactory(academic_year=old_year, education_group=current_egy.education_group)
+
         now = datetime.now().date()
-        AcademicCalendarFactory(start_date=now, end_date=now,
-                                reference=EDUCATION_GROUP_EDITION)
+        AcademicCalendarFactory(
+            start_date=now, end_date=now,
+            reference=EDUCATION_GROUP_EDITION,
+            academic_year=current_egy.academic_year
+        )
 
         result = check_academic_calendar()
 
         self.assertTrue("Copy of Reddot data" in result)
+        self.assertEqual(
+            result["Copy of Reddot data"]["msg"],
+            gettext("%(number_extended)s object(s) extended and %(number_error)s error(s)") % {
+                "number_extended": 1,
+                "number_error": 0
+            })
