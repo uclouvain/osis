@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-26 09:48+0100\n"
+"POT-Creation-Date: 2019-03-26 10:14+0100\n"
 "PO-Revision-Date: 2019-03-22 10:25+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -804,7 +804,7 @@ msgstr "Calendrier des programmes"
 msgid "Campus"
 msgstr "Campus"
 
-#: business/learning_units/perms.py:76
+#: business/learning_units/perms.py:78
 msgid "Can delete according to the type of the learning unit"
 msgstr ""
 "Vous ne pouvez pas supprimer cette unité d'enseignement en raison de son type"
@@ -2518,7 +2518,7 @@ msgstr "Modification"
 msgid "Modification made"
 msgstr "Modification apportée"
 
-#: business/learning_units/perms.py:526
+#: business/learning_units/perms.py:531
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
@@ -2743,7 +2743,7 @@ msgstr "Bacheliers non universitaires"
 msgid "Not concerned"
 msgstr "Non concerné"
 
-#: business/learning_units/perms.py:77
+#: business/learning_units/perms.py:79
 msgid "Not eligible to delete learning units"
 msgstr "Vous ne pouvez pas supprimer cette unité d'enseignement"
 
@@ -2751,11 +2751,11 @@ msgstr "Vous ne pouvez pas supprimer cette unité d'enseignement"
 msgid "Not enrolled"
 msgstr "Pas inscrit"
 
-#: business/learning_units/perms.py:485
+#: business/learning_units/perms.py:490
 msgid "Not in period to edit description fiche."
 msgstr "Vous n'êtes pas en période d'édition des fiches descriptives."
 
-#: business/learning_units/perms.py:72
+#: business/learning_units/perms.py:74
 msgid "Not in range of years which can be edited by you"
 msgstr ""
 "L'unité d'enseignement n'est pas dans la fourchette d'années que vous pouvez "
@@ -2993,7 +2993,7 @@ msgstr "En attente"
 msgid "Periodicity"
 msgstr "Périodicité"
 
-#: business/learning_units/perms.py:66
+#: business/learning_units/perms.py:68
 msgid "Person not in accordance with proposal state"
 msgstr "Personne qui ne peut pas travailler avec une proposition dans cet état"
 
@@ -3255,7 +3255,7 @@ msgstr ""
 msgid "Proposal management"
 msgstr "Gestion de la proposition"
 
-#: business/learning_units/perms.py:75
+#: business/learning_units/perms.py:77
 msgid "Proposal not in eligible state for consolidation"
 msgstr "La proposition n'est pas dans un état éligible à la consolidation"
 
@@ -3949,6 +3949,7 @@ msgstr ""
 msgid "The credits value should be an integer"
 msgstr "La valeur du champ crédits doit être un entier"
 
+#: business/education_groups/perms.py:119
 #: tests/templatetags/test_education_group.py:48
 #: tests/templatetags/test_education_group.py:325
 msgid "The education group edition period is not open."
@@ -4102,7 +4103,7 @@ msgstr "L'unité d'enseignement a été modifiée jusqu'en %(year)s."
 msgid "The learning unit has been updated."
 msgstr "L'unité d'enseignement a été modifiée."
 
-#: business/learning_units/perms.py:480
+#: business/learning_units/perms.py:485
 msgid "The learning unit's description fiche is not editable."
 msgstr ""
 "La mise-à-jour des fiches descriptives est bloquée pour cette unité "
@@ -4371,6 +4372,11 @@ msgstr ""
 msgid "There is not the learning unit %(acronym)s - %(next_year)s"
 msgstr "Il n'existe pas d'unité d'enseigmenent %(acronym)s - %(next_year)s"
 
+#: business/education_groups/perms.py:121
+msgid "This education group is not editable during this period."
+msgstr ""
+"La période de modification d'organisation de formation n'est pas ouverte durant cette période."
+
 #: templates/layout.html:162
 msgid "This feature is in testing phase"
 msgstr "Cette fonctionnalité est en phase expérimentale"
@@ -4408,13 +4414,13 @@ msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
 
-#: business/learning_units/perms.py:558
+#: business/learning_units/perms.py:563
 msgid "This learning unit is not eligible for proposal creation/modification"
 msgstr ""
 "Cette unité d'enseignement n'est pas éligible pour une création/modification "
 "de proposition"
 
-#: business/learning_units/perms.py:80
+#: business/learning_units/perms.py:82
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr "Cette unité d'enseignement n'est pas éligible en raison de son type"
 
@@ -4873,7 +4879,7 @@ msgstr "Oui"
 msgid "Yes, I confirm."
 msgstr "Oui, je confirme."
 
-#: business/learning_units/perms.py:67
+#: business/learning_units/perms.py:69
 msgid ""
 "You are faculty manager and the proposal state is not 'Faculty', so you "
 "can't edit"
@@ -4881,7 +4887,7 @@ msgstr ""
 "Vous êtes gestionnaire facultaire et le proposition n'est pas en état "
 "'faculté' donc vous ne pouvez pas éditer"
 
-#: business/learning_units/perms.py:85
+#: business/learning_units/perms.py:87
 msgid "You are not allowed to change the end year for this academic year"
 msgstr ""
 "Vous n’êtes pas autorisé à changer l’année de fin de cette année académique"
@@ -4910,12 +4916,12 @@ msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le futur."
 msgid "You are not allowed to postpone this training in the past."
 msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le passé."
 
-#: business/learning_units/perms.py:86
+#: business/learning_units/perms.py:88
 msgid "You are not allowed to put in proposal for this academic year"
 msgstr ""
 "Vous n'êtes pas autorisé à mettre en proposition pour cette année académique"
 
-#: business/learning_units/perms.py:70
+#: business/learning_units/perms.py:72
 msgid ""
 "You are not attached to initial or current requirement entity, so you can't "
 "edit proposal"
@@ -4923,23 +4929,23 @@ msgstr ""
 "Vous n'êtes pas rattaché à l'entity de charges (initiale ou courante), donc "
 "vous ne pouvez pas éditer la proposition"
 
-#: business/learning_units/perms.py:470
+#: business/learning_units/perms.py:475
 msgid "You are not attributed to this learning unit."
 msgstr "Vous n'êtes pas attribué à cette unité d'enseignement."
 
-#: business/learning_units/perms.py:68
+#: business/learning_units/perms.py:70
 msgid "You are not eligible to cancel proposal"
 msgstr "Vous ne pouvez pas consolider les propositions"
 
-#: business/learning_units/perms.py:73
+#: business/learning_units/perms.py:75
 msgid "You are not eligible to consolidate proposal"
 msgstr "Vous ne pouvez pas consolider les propositions"
 
-#: business/learning_units/perms.py:78
+#: business/learning_units/perms.py:80
 msgid "You are not eligible to create/modify proposal"
 msgstr "Vous ne pouvez pas créer/modifier les propositions"
 
-#: business/learning_units/perms.py:69
+#: business/learning_units/perms.py:71
 msgid "You are not eligible to edit proposal"
 msgstr "Vous ne pouvez pas modifier les propositions"
 
@@ -4964,7 +4970,7 @@ msgstr ""
 "Vous ne pouvez pas supprimer cet objet car certaines dépendances sont "
 "protégées"
 
-#: business/learning_units/perms.py:82
+#: business/learning_units/perms.py:84
 msgid "You can only edit co-graduation external learning units"
 msgstr ""
 "Vous pouvez seulement modifier les unités d'enseignement externes de type co-"
@@ -4978,7 +4984,7 @@ msgstr ""
 "Vous ne pouvez modifier une unité d'enseignement qui si vous êtes attaché à "
 "son entité responsable du cahier des charges"
 
-#: business/learning_units/perms.py:83
+#: business/learning_units/perms.py:85
 msgid "You can't edit because the learning unit has proposal"
 msgstr ""
 "Vous ne pouvez pas modifier l'unité d'enseignement car elle est en "
@@ -4988,14 +4994,14 @@ msgstr ""
 msgid "You can't modify learning unit of a previous year"
 msgstr "Vous ne pouvez pas modifier la date de fin pour une année précédente"
 
-#: business/learning_units/perms.py:524
+#: business/learning_units/perms.py:529
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
 "Vous ne pouvez pas modifier une unité d'enseignement dont l'année est "
 "inférieure à %(year)d"
 
-#: business/learning_units/perms.py:79
+#: business/learning_units/perms.py:81
 msgid "You can't modify proposal which is on an other year"
 msgstr "Vous ne pouvez pas modifier les propositions liées à une autre année"
 
@@ -5017,6 +5023,14 @@ msgstr ""
 "Vous ne pouvez pas attacher \"%(child_types)s\" à \"%(parent)s\" (de type "
 "\"%(parent_type)s\")"
 
+#: business/learning_units/perms.py:66
+#, python-format
+msgid ""
+"You cannot delete a learning unit which is existing before %(limit_year)s"
+msgstr ""
+"Vous ne pouvez pas supprimer une unité d'enseignement existant avant "
+"%(limit_year)s"
+
 #: business/learning_units/perms.py:64
 msgid ""
 "You cannot delete a learning unit which is prerequisite or has "
@@ -5030,7 +5044,7 @@ msgstr ""
 msgid "You cannot modify content for %(education_group_types)s"
 msgstr "Vous ne pouvez pas modifier le contenu pour %(education_group_types)s"
 
-#: business/learning_units/perms.py:74
+#: business/learning_units/perms.py:76
 msgid "You don't have the rights to consolidate"
 msgstr "Vous n'avez pas le droit de consolider"
 
