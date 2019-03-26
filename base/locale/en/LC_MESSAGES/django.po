@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-26 09:48+0100\n"
+"POT-Creation-Date: 2019-03-26 10:49+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -821,7 +821,7 @@ msgstr ""
 #: forms/education_groups.py:75 models/education_group_type.py:75
 #: templates/education_group/blocks/form/group.html:58
 #: templates/education_group/blocks/form/minitraining.html:59
-#: templates/education_group/blocks/form/training_tab_identification.html:51
+#: templates/education_group/blocks/form/training_tab_identification.html:67
 msgid "Category"
 msgstr ""
 
@@ -1208,6 +1208,7 @@ msgstr ""
 msgid "Diploma title"
 msgstr ""
 
+#: templates/education_group/blocks/form/training_tab_identification.html:35
 #: templates/education_group/tabs.html:48
 msgid "Diplomas /  Certificates"
 msgstr ""
@@ -1818,6 +1819,7 @@ msgstr ""
 msgid "ISCED domain"
 msgstr "ISCED/CITE domain"
 
+#: templates/education_group/blocks/form/training_tab_identification.html:30
 #: templates/education_group/tabs.html:41 templates/entity/tabs.html:33
 #: templates/learning_unit/blocks/tabs.html:39
 #: templates/learning_unit/blocks/tabs.html:52
@@ -3911,7 +3913,7 @@ msgstr ""
 #: forms/common.py:138 forms/education_group/common.py:191
 #: templates/education_group/blocks/form/group.html:61
 #: templates/education_group/blocks/form/minitraining.html:62
-#: templates/education_group/blocks/form/training_tab_identification.html:54
+#: templates/education_group/blocks/form/training_tab_identification.html:70
 msgid "The field can contain only one value."
 msgstr ""
 
@@ -5044,7 +5046,7 @@ msgid "cannot be consolidated"
 msgstr ""
 
 #: templates/education_group/blocks/form/training_certificate.html:29
-#: templates/education_group/blocks/form/training_tab_diploma.html:35
+#: templates/education_group/blocks/form/training_tab_diploma.html:37
 #: templates/education_group/tab_diplomas.html:48
 msgid "certificate aims"
 msgstr ""
@@ -5155,7 +5157,7 @@ msgid "field reference"
 msgstr ""
 
 #: templates/education_group/blocks/form/training_certificate.html:39
-#: templates/education_group/blocks/form/training_tab_diploma.html:40
+#: templates/education_group/blocks/form/training_tab_diploma.html:42
 msgid "filter by section"
 msgstr ""
 
