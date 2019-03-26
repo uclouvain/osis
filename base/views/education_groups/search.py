@@ -28,16 +28,19 @@ from collections import OrderedDict
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_group import create_xls, ORDER_COL, ORDER_DIRECTION, create_xls_administrative_data
 from base.forms.education_groups import EducationGroupFilter
 from base.forms.search.search_form import get_research_criteria
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.person import Person
 from base.utils.cache import cache_filter
 from base.views.common import paginate_queryset
+from education_group.api.serializers.education_group import EducationGroupSerializer
 
 
 @login_required
@@ -47,44 +50,40 @@ def education_groups(request):
     person = get_object_or_404(Person, user=request.user)
     filter_form = EducationGroupFilter(request.GET or None)
 
-    object_list = _get_object_list(filter_form, request) if filter_form.form.is_valid() else []
+    objects_qs = EducationGroupYear.objects.none()
+    if filter_form.is_valid():
+        objects_qs = filter_form.qs
+        if not objects_qs.exists():
+            messages.add_message(request, messages.WARNING, _('No result!'))
 
+    # TODO: use ordering args in filter_form! Remove xls_order_col/xls_order property
     if request.GET.get('xls_status') == "xls":
-        return create_xls(request.user, object_list, _get_filter_keys(filter_form.form),
+        return create_xls(request.user, objects_qs, _get_filter_keys(filter_form.form),
                           {ORDER_COL: request.GET.get('xls_order_col'), ORDER_DIRECTION: request.GET.get('xls_order')})
 
+    # TODO: use ordering args in filter_form! Remove xls_order_col/xls_order property
     if request.GET.get('xls_status') == "xls_administrative":
         return create_xls_administrative_data(
             request.user,
-            object_list,
+            objects_qs,
             _get_filter_keys(filter_form.form),
             {ORDER_COL: request.GET.get('xls_order_col'), ORDER_DIRECTION: request.GET.get('xls_order')}
         )
 
-    context = {
-        'form': filter_form.form,
-        'object_list': paginate_queryset(filter_form.qs, request.GET),
-        'object_list_count': filter_form.qs.count(),
-        'experimental_phase': True,
-        'enums': education_group_categories,
-        'person': person
-    }
-    return render(request, "education_group/search.html", context)
-
-
-def _get_object_list(filter, request):
-    object_list = filter.qs
-    if not _check_if_display_message(request, object_list):
-        object_list = []
-    return object_list
-
-
-def _check_if_display_message(request, an_education_groups):
-    if not an_education_groups:
-        messages.add_message(request, messages.WARNING, _('No result!'))
-
-        return False
-    return True
+    object_list_paginated = paginate_queryset(objects_qs, request.GET)
+    if request.is_ajax():
+        serializer = EducationGroupSerializer(object_list_paginated, context={'request': request}, many=True)
+        return JsonResponse({'object_list': serializer.data})
+    else:
+        context = {
+            'form': filter_form.form,
+            'object_list': object_list_paginated,
+            'object_list_count': objects_qs.count(),
+            'experimental_phase': True,
+            'enums': education_group_categories,
+            'person': person
+        }
+        return render(request, "education_group/search.html", context)
 
 
 def _get_filter_keys(form):

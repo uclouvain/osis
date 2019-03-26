@@ -94,12 +94,14 @@
                 <input type="hidden" id="xls_status" name="xls_status">
                 <input type="hidden" id="xls_order_col" name="xls_order_col">
                 <input type="hidden" id="xls_order" name="xls_order">
+
+                {% bootstrap_field form.ordering %}
             </form>
 
             {% include 'learning_unit/blocks/form/search_form_reset.html' %}
             <hr style="margin:10px -15px 10px -15px;">
             <div class="row">
-                {% if object_list %}
+                {% if object_list_count %}
                     <div class="row">
                         <div class="col-md-6">
                             <strong style="margin-left:10px;color:grey;"> {{ object_list_count }} {% trans 'Education groups'|lower %} </strong>
@@ -138,32 +140,15 @@
 
                     <table id="table_education_groups" class="table table-striped table-hover">
                         <thead>
-                        <tr>
-                            <th id="th_0_academic_year.year">{% trans 'Ac yr.' %}</th>
-                            <th id="th_1_acronym">{% trans 'Acronym/Short title' context "abbreviation" %}</th>
-                            <th id="th_2_title">{% trans 'Title' %}</th>
-                            <th id="th_3_education_group_type.name">{% trans 'Type' %}</th>
-                            <th id="th_4_management_entity_version.acronym">{% trans 'Entity' %}</th>
-                            <th id="th_5_partial_acronym">{% trans 'Code' %}</th>
-                        </tr>
-                        </thead>
-                        {% for education_group_year in object_list %}
                             <tr>
-                                <td>{{ education_group_year.academic_year }}</td>
-                                <td>
-                                    <a href="{% url 'education_group_read' education_group_year.id education_group_year.id %}"
-                                       id="lnk_offer_{education_group_year.id}}">{{ education_group_year.acronym }}</a>
-                                </td>
-                                <td>{{ education_group_year.title }}</td>
-                                <td>
-                                    {% if education_group_year.education_group_type %}
-                                        {% trans education_group_year.education_group_type.get_name_display %}
-                                    {% endif %}
-                                </td>
-                                <td>{{ education_group_year.management_entity_version.acronym }}</td>
-                                <td>{{ education_group_year.partial_acronym | default_if_none:"" }}</td>
+                                <th id="th_0_academic_year.year">{% trans 'Ac yr.' %}</th>
+                                <th id="th_1_acronym">{% trans 'Acronym/Short title' context "abbreviation" %}</th>
+                                <th id="th_2_title">{% trans 'Title' %}</th>
+                                <th id="th_3_education_group_type.name">{% trans 'Type' %}</th>
+                                <th id="th_4_management_entity_version.acronym">{% trans 'Entity' %}</th>
+                                <th id="th_5_partial_acronym">{% trans 'Code' %}</th>
                             </tr>
-                        {% endfor %}
+                        </thead>
                     </table>
                     <div class="text-center">
                         {% bootstrap_pagination object_list extra=request.GET.urlencode %}
@@ -212,27 +197,64 @@
         };
 
         $(document).ready(function () {
-            $('#table_education_groups').DataTable(
-                {
-                    columnDefs: [
-                        {targets: 2, type: 'diacritics-neutralise'}
-                    ],
-                    "stateSave": true,
-                    "paging": false,
-                    "ordering": true,
-                    "info": false,
-                    "searching": false,
-                    "language": {
-                        "oAria": {
-                            "sSortAscending": "{% trans 'activate to sort column ascending'%}",
-                            "sSortDescending": "{% trans 'activate to sort column descending'%}",
+            let domTable = $('#table_education_groups');
+            domTable.DataTable({
+                columnDefs: [
+                    {"name": "academic_year", "targets": 0, "data": "academic_year"},
+                    {
+                        "name": "acronym",
+                        "targets": 1,
+                        "data": "acronym",
+                        "render": function ( data, type, row, meta ) {
+                            return '<a href="'+ row['url'] +'">'+ data + '</a>';
                         }
-                    }
-                });
+                    },
+                    {"name": "title", "targets": 2, "data": "title"},
+                    {"name": "type", "targets": 3,  "data": "education_group_type_text"},
+                    {"name": "management_entity", "targets": 4, "data": "management_entity"},
+                    {"name": "code", "targets": 5, "data": "code"}
+                ],
+                "stateSave": true,
+                "paging": false,
+                "orderMulti": false,
+                "ordering": true,
+                "serverSide": true,
+                "ajax" : {
+                    "url": "{% url 'education_groups' %}",
+                    "type": "GET",
+                    "dataSrc": "object_list",
+                    "data": function (d){
+                        let formdata = $('#search_form').serializeArray();
+                        let queryString = {};
+                        $(formdata).each(function(index, obj){
+                            queryString[obj.name] = obj.value;
+                        });
 
-            $('#id_education_group_type').filterTypeByCategory($('#id_category'));
+                        // Append ordering to querystring
+                        let columnName = domTable.DataTable().settings().init().columnDefs[d.order[0]['column']].name;
+                        let direction = (d.order[0]['dir'] == 'asc') ? '' : '-';
+                        let ordering = direction + columnName;
+                        queryString['ordering'] = ordering;
+                        $('#id_ordering').val(ordering);
+
+                        // Append page to querystring
+                        queryString['page'] = {{ object_list.number }}
+                        return queryString;
+                    }
+                },
+                "info": false,
+                "searching": false,
+                "language": {
+                    "oAria": {
+                        "sSortAscending": "{% trans 'activate to sort column ascending'%}",
+                        "sSortDescending": "{% trans 'activate to sort column descending'%}"
+                    }
+                }
+            });
+           $('#id_education_group_type').filterTypeByCategory($('#id_category'));
         });
 
+        // TODO remove xls_order_col / xls_order ==> USE ordering params
         $("#btn_produce_xls").click(function (e) {
             e.preventDefault();
             var status = $("#xls_status");
@@ -247,7 +269,7 @@
             $("#xls_order_col").val('');
         });
 
-
+         // TODO remove xls_order_col / xls_order ==> USE ordering params
         $("#btn_produce_xls_administrative_data").click(function (e) {
             e.preventDefault();
             var status = $("#xls_status");
@@ -262,7 +284,7 @@
             $("#xls_order_col").val('');
         });
 
-
+        // TODO remove xls_order_col / xls_order ==> USE ordering params
         function get_ordering_column(order) {
             var id_search = 'th_' + order[0][0] + '_';
             var id_string = '[id^=' + id_search + ']';

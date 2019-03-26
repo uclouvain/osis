@@ -27,7 +27,6 @@ from django import forms
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
-from django_filters.widgets import BooleanWidget
 
 from base.business.entity import get_entities_ids
 from base.models.academic_year import AcademicYear, current_academic_year
@@ -109,11 +108,12 @@ class EducationGroupFilter(FilterSet):
         fields=(
             ('acronym', 'acronym'),
             ('partial_acronym', 'code'),
-            ('academic_year__year', 'year'),
+            ('academic_year__year', 'academic_year'),
             ('title', 'title'),
             ('education_group_type__name', 'type'),
             ('management_entity__entityversion__acronym', 'management_entity')
         ),
+        widget=forms.HiddenInput
     )
 
     class Meta:
