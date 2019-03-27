@@ -68,6 +68,7 @@ class ReddotEducationGroupAutomaticPostponement(AutomaticPostponement):
     That copy included :
         Related data from CMS
         EducationGroupPublicationContact
+        publication_contact_entity
         EducationGroupsAchievements
         AdmissionCondition
 
@@ -120,6 +121,9 @@ class ReddotEducationGroupAutomaticPostponement(AutomaticPostponement):
 
         for publication in old_egy.educationgrouppublicationcontact_set.all():
             update_related_object(publication, "education_group_year", new_egy)
+
+        new_egy.publication_contact_entity = old_egy.publication_contact_entity
+        new_egy.save()
 
     @staticmethod
     def _postpone_achievement(old_egy: EducationGroupYear, new_egy: EducationGroupYear):

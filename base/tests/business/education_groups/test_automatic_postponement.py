@@ -45,6 +45,7 @@ from base.tests.factories.education_group_detailed_achievement import EducationG
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
@@ -179,12 +180,15 @@ class TestReddotEducationGroupAutomaticPostponement(TestCase):
     def setUpTestData(cls):
         cls.current_year = AcademicYearFactory(year=get_current_year())
         cls.previous_year = AcademicYearFactory(year=get_current_year() - 1)
-        cls.current_education_group_year = EducationGroupYearFactory(academic_year=cls.current_year)
 
     def test_postpone(self):
+        self.current_education_group_year = EducationGroupYearFactory(academic_year=self.current_year)
+
+        publication_contact_entity = EntityFactory()
         self.previous_education_group_year = EducationGroupYearFactory(
             academic_year=self.previous_year,
-            education_group=self.current_education_group_year.education_group
+            education_group=self.current_education_group_year.education_group,
+            publication_contact_entity=publication_contact_entity,
         )
 
         TranslatedTextFactory(
@@ -220,6 +224,8 @@ class TestReddotEducationGroupAutomaticPostponement(TestCase):
         )
         self.assertTrue(EducationGroupPublicationContact.objects.filter(
             education_group_year=self.current_education_group_year).exists())
+        self.current_education_group_year.refresh_from_db()
+        self.assertEqual(self.current_education_group_year.publication_contact_entity, publication_contact_entity)
 
         self.assertTrue(EducationGroupDetailedAchievement.objects.filter(
             education_group_achievement__education_group_year=self.current_education_group_year).exists())
