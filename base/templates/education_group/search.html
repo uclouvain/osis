@@ -254,7 +254,7 @@
            $('#id_education_group_type').filterTypeByCategory($('#id_category'));
         });
 
-        // TODO remove xls_order_col / xls_order ==> USE ordering params
+        // FIXME remove xls_order_col / xls_order ==> USE ordering params
         $("#btn_produce_xls").click(function (e) {
             e.preventDefault();
             var status = $("#xls_status");
@@ -269,7 +269,7 @@
             $("#xls_order_col").val('');
         });
 
-         // TODO remove xls_order_col / xls_order ==> USE ordering params
+         // FIXME remove xls_order_col / xls_order ==> USE ordering params
         $("#btn_produce_xls_administrative_data").click(function (e) {
             e.preventDefault();
             var status = $("#xls_status");
@@ -284,7 +284,7 @@
             $("#xls_order_col").val('');
         });
 
-        // TODO remove xls_order_col / xls_order ==> USE ordering params
+        // FIXME remove xls_order_col / xls_order ==> USE ordering params
         function get_ordering_column(order) {
             var id_search = 'th_' + order[0][0] + '_';
             var id_string = '[id^=' + id_search + ']';

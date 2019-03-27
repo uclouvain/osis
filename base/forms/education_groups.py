@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django import forms
-from django.utils.functional import cached_property
+from django.utils.functional import cached_property, lazy
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
 
@@ -66,7 +66,7 @@ class EducationGroupFilter(FilterSet):
         empty_label=pgettext_lazy("plural", "All")
     )
     education_group_type = filters.ModelChoiceFilter(
-        queryset=EducationGroupType.objects.all().order_by_translated_name(),
+        queryset=EducationGroupType.objects.none(),
         required=False,
         empty_label=pgettext_lazy("plural", "All"),
         label=_('Type'),
@@ -129,6 +129,7 @@ class EducationGroupFilter(FilterSet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.form.fields['education_group_type'].queryset = EducationGroupType.objects.all().order_by_translated_name()
         self.form.fields['academic_year'].initial = current_academic_year()
         self.form.fields['category'].initial = education_group_categories.TRAINING
 

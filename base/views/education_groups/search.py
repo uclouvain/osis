@@ -56,12 +56,12 @@ def education_groups(request):
         if not objects_qs.exists():
             messages.add_message(request, messages.WARNING, _('No result!'))
 
-    # TODO: use ordering args in filter_form! Remove xls_order_col/xls_order property
+    # FIXME: use ordering args in filter_form! Remove xls_order_col/xls_order property
     if request.GET.get('xls_status') == "xls":
         return create_xls(request.user, objects_qs, _get_filter_keys(filter_form.form),
                           {ORDER_COL: request.GET.get('xls_order_col'), ORDER_DIRECTION: request.GET.get('xls_order')})
 
-    # TODO: use ordering args in filter_form! Remove xls_order_col/xls_order property
+    # FIXME: use ordering args in filter_form! Remove xls_order_col/xls_order property
     if request.GET.get('xls_status') == "xls_administrative":
         return create_xls_administrative_data(
             request.user,
@@ -74,16 +74,16 @@ def education_groups(request):
     if request.is_ajax():
         serializer = EducationGroupSerializer(object_list_paginated, context={'request': request}, many=True)
         return JsonResponse({'object_list': serializer.data})
-    else:
-        context = {
-            'form': filter_form.form,
-            'object_list': object_list_paginated,
-            'object_list_count': objects_qs.count(),
-            'experimental_phase': True,
-            'enums': education_group_categories,
-            'person': person
-        }
-        return render(request, "education_group/search.html", context)
+
+    context = {
+        'form': filter_form.form,
+        'object_list': object_list_paginated,
+        'object_list_count': objects_qs.count(),
+        'experimental_phase': True,
+        'enums': education_group_categories,
+        'person': person
+    }
+    return render(request, "education_group/search.html", context)
 
 
 def _get_filter_keys(form):
