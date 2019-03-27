@@ -38,13 +38,14 @@ class TestEducationGroupTypeOrderingForm(TestCase):
         self.educ_grp_type_A = EducationGroupTypeFactory(name='A label')
 
     def test_ordering(self):
-        self.form = EducationGroupFilter()
-        self.assertEqual(list(self.form.fields["education_group_type"].queryset),
+        filter = EducationGroupFilter()
+        self.assertEqual(list(filter.form.fields["education_group_type"].queryset),
                          [self.educ_grp_type_A, self.educ_grp_type_B, self.educ_grp_type_D])
 
         educ_grp_type_C = EducationGroupTypeFactory(name='C label')
-        self.form = EducationGroupFilter()
+
+        filter = EducationGroupFilter()
         self.assertEqual(
-            list(self.form.fields["education_group_type"].queryset),
+            list(filter.form.fields["education_group_type"].queryset),
             [self.educ_grp_type_A, self.educ_grp_type_B, educ_grp_type_C, self.educ_grp_type_D]
         )

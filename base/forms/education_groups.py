@@ -24,24 +24,19 @@
 #
 ##############################################################################
 from django import forms
-from django.forms import ModelChoiceField
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
+from django_filters import OrderingFilter, filters, FilterSet
 
 from base.business.entity import get_entities_ids
-from base.models import education_group_year
-from base.models.academic_year import AcademicYear
+from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.education_group_type import EducationGroupType
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
 
 
-class EntityManagementModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return obj.acronym
-
-
 class SelectWithData(forms.Select):
-    data_attrs = None
-
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         label = _(label)
         option_dict = super().create_option(name, value, label, selected, index,
@@ -51,69 +46,96 @@ class SelectWithData(forms.Select):
             option_dict['attrs']['data-category'] = group_type.category
         return option_dict
 
-
-class ModelChoiceFieldWithData(forms.ModelChoiceField):
-    widget = SelectWithData
-
-    def set_data_attrs(self):
-        # Lazy load of the attrs
-        self.widget.data_attrs = self.queryset.in_bulk()
+    @cached_property
+    def data_attrs(self):
+        return {obj.pk: obj for obj in self.choices.queryset}
 
 
-class EducationGroupFilter(forms.Form):
-
-    academic_year = forms.ModelChoiceField(
+class EducationGroupFilter(FilterSet):
+    academic_year = filters.ModelChoiceFilter(
         queryset=AcademicYear.objects.all(),
         required=False,
         empty_label=pgettext_lazy("plural", "All"),
         label=_('Ac yr.')
     )
-
-    category = forms.ChoiceField(
-        choices=[("", pgettext_lazy("plural", "All"))] + list(Categories.choices()),
+    category = filters.ChoiceFilter(
+        choices=list(Categories.choices()),
         required=False,
-        label=_('Category')
+        label=_('Category'),
+        field_name='education_group_type__category',
+        empty_label=pgettext_lazy("plural", "All")
     )
-
-    education_group_type = ModelChoiceFieldWithData(
+    education_group_type = filters.ModelChoiceFilter(
         queryset=EducationGroupType.objects.none(),
         required=False,
         empty_label=pgettext_lazy("plural", "All"),
-        label=_('Type')
+        label=_('Type'),
+        widget=SelectWithData
+    )
+    management_entity = filters.CharFilter(
+        method='filter_with_entity_subordinated',
+        label=_('Entity')
+    )
+    with_entity_subordinated = filters.BooleanFilter(
+        method=lambda queryset, *args, **kwargs: queryset,
+        label=_('With subord. ent.'),
+        widget=forms.CheckboxInput
+    )
+    acronym = filters.CharFilter(
+        field_name="acronym",
+        lookup_expr='icontains',
+        max_length=40,
+        required=False,
+        label=_('Acronym/Short title'),
+    )
+    title = filters.CharFilter(
+        field_name="title",
+        lookup_expr='icontains',
+        max_length=255,
+        required=False,
+        label=_('Title')
+    )
+    partial_acronym = filters.CharFilter(
+        field_name="partial_acronym",
+        lookup_expr='icontains',
+        max_length=15,
+        required=False,
+        label=_('Code'),
     )
 
-    acronym = forms.CharField(max_length=40, required=False, label=_('Acronym/Short title'))
-    title = forms.CharField(max_length=255, required=False, label=_('Title'))
-    requirement_entity_acronym = forms.CharField(max_length=20, required=False, label=_('Entity'))
-    partial_acronym = forms.CharField(max_length=15, required=False, label=_('Code'))
-    with_entity_subordinated = forms.BooleanField(required=False)
+    order_by_field = 'ordering'
+    ordering = OrderingFilter(
+        fields=(
+            ('acronym', 'acronym'),
+            ('partial_acronym', 'code'),
+            ('academic_year__year', 'academic_year'),
+            ('title', 'title'),
+            ('education_group_type__name', 'type'),
+            ('management_entity__entityversion__acronym', 'management_entity')
+        ),
+        widget=forms.HiddenInput
+    )
+
+    class Meta:
+        model = EducationGroupYear
+        fields = [
+            'acronym',
+            'partial_acronym',
+            'title',
+            'education_group_type__name',
+            'management_entity',
+            'with_entity_subordinated',
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["education_group_type"].queryset = EducationGroupType.objects.all().order_by_translated_name()
-        self.fields["education_group_type"].set_data_attrs()
+        self.form.fields['education_group_type'].queryset = EducationGroupType.objects.all().order_by_translated_name()
+        self.form.fields['academic_year'].initial = current_academic_year()
+        self.form.fields['category'].initial = education_group_categories.TRAINING
 
-    def clean_category(self):
-        data_cleaned = self.cleaned_data.get('category')
-        if data_cleaned:
-            return data_cleaned
-
-    def get_object_list(self):
-        clean_data = {key: value for key, value in self.cleaned_data.items() if value is not None}
-
-        result = education_group_year.search(**clean_data)
-
-        if clean_data.get('requirement_entity_acronym'):
-            result = _get_filter_entity_management(
-                result,
-                clean_data['requirement_entity_acronym'],
-                clean_data.get('with_entity_subordinated', False)
-            )
-
-        # TODO User should choice the order
-        return result.order_by('acronym')
-
-
-def _get_filter_entity_management(qs, requirement_entity_acronym, with_entity_subordinated):
-    entity_ids = get_entities_ids(requirement_entity_acronym, with_entity_subordinated)
-    return qs.filter(management_entity__in=entity_ids)
+    def filter_with_entity_subordinated(self, queryset, name, value):
+        with_subordinated = self.form.cleaned_data['with_entity_subordinated']
+        if value:
+            entity_ids = get_entities_ids(value, with_subordinated)
+            queryset = queryset.filter(management_entity__in=entity_ids)
+        return queryset
