@@ -54,7 +54,7 @@ urlpatterns = [
         name='new_education_group'
     ),
     url(
-        r'^new/(?P<category>[A-Z_]+)/(?P<education_group_type_pk>[0-9]+)/(?P<parent_id>[0-9]+)/$',
+        r'^new/(?P<category>[A-Z_]+)/(?P<education_group_type_pk>[0-9]+)/(?P<root_id>[0-9]+)/(?P<parent_id>[0-9]+)/$',
         create.create_education_group,
         name='new_education_group'
     ),
@@ -72,7 +72,7 @@ urlpatterns = [
         name='select_education_group_type'
     ),
     url(
-        r'^select_type/(?P<category>[A-Z_]+)/(?P<parent_id>[0-9]+)/$',
+        r'^select_type/(?P<category>[A-Z_]+)/(?P<root_id>[0-9]+)/(?P<parent_id>[0-9]+)/$',
         create.SelectEducationGroupTypeView.as_view(),
         name='select_education_group_type'
     ),
