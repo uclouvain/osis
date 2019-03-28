@@ -54,7 +54,7 @@
             <td width="6%">{{ group.is_mandatory | yesno }}</td>
             <td width="6%">{{ group.block | default_if_none:'-' }}</td>
             <td width="14%">{{ group.get_link_type_display|default_if_none:'-' }}</td>
-            <td width="15%">
+            <td width="20%">
                 {% include "education_group/blocks/content_actions.html" %}
             </td>
         </tr>
