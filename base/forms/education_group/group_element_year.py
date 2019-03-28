@@ -41,7 +41,6 @@ class GroupElementYearForm(forms.ModelForm):
             "relative_credits",
             "is_mandatory",
             "block",
-            "quadrimester_derogation",
             "link_type",
             "comment",
             "comment_english",

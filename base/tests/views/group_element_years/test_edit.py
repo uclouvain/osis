@@ -99,8 +99,6 @@ class TestEdit(TestCase):
             "comment_english": """It's a dangerous business, Frodo, 
             going out your door. You step onto the road, and if you don't keep your feet,
              there's no knowing where you might be swept off to.""",
-
-            "quadrimester_derogation": quadrimesters.Q1,
         }
         response = self.client.post(self.url, data=data)
 
@@ -109,4 +107,3 @@ class TestEdit(TestCase):
         self.group_element_year.refresh_from_db()
         self.assertEqual(self.group_element_year.comment, data['comment'])
         self.assertEqual(self.group_element_year.comment_english, data['comment_english'])
-        self.assertEqual(self.group_element_year.quadrimester_derogation, data['quadrimester_derogation'])
