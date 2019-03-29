@@ -180,6 +180,9 @@ class MultiFormMixin(ContextMixin):
             form_valid_method = '{form_name}_valid'.format(form_name=form_name)
             if hasattr(self, form_valid_method):
                 getattr(self, form_valid_method)(form)
+            else:
+                # If no method has been declared, we just save the form.
+                form.save()
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_invalid(self, forms):

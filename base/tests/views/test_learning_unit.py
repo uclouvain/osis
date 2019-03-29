@@ -62,6 +62,7 @@ from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.person import Person
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
@@ -371,8 +372,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
         self.assertEqual(len(context['types']),
                          len(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES))
-        self.assertEqual(len(context['container_types']),
-                         len(learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES))
+        self.assertEqual(len(context['container_types']), len(LearningContainerYearType.choices()))
         self.assertTrue(context['experimental_phase'])
         self.assertEqual(context['learning_units_count'], 0)
 
