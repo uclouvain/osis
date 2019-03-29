@@ -38,7 +38,7 @@ import base.views.learning_units.proposal.delete
 import base.views.learning_units.search
 import base.views.learning_units.update
 from attribution.views import attribution, tutor_application
-from base.views import learning_achievement, search, education_groups, test
+from base.views import learning_achievement, search, education_groups
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, notifications
 from base.views import teaching_material
@@ -56,8 +56,6 @@ from base.views.organization import OrganizationAutocomplete, CountryAutocomplet
 from base.views.person import EmployeeAutocomplete
 
 urlpatterns = [
-    url(r'^test$', test.test, name='test'),
-    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     url(r'^$', common.home, name='home'),
     url(r'^entity_autocomplete/$', base.views.learning_units.update.EntityAutocomplete.as_view(),
         name='entity_autocomplete'),
