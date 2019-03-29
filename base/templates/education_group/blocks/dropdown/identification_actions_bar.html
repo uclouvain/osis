@@ -39,9 +39,9 @@
 
             <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
                 {% flag "education_group_create" %}
-                    {% url 'select_education_group_type' category=enums.GROUP parent_id=education_group_year.id as create_group_url %}
-                    {% url 'select_education_group_type' category=enums.TRAINING parent_id=education_group_year.id as create_training_url %}
-                    {% url 'select_education_group_type' category=enums.MINI_TRAINING parent_id=education_group_year.id as create_mini_training_url %}
+                    {% url 'select_education_group_type' enums.GROUP root.pk education_group_year.pk as create_group_url %}
+                    {% url 'select_education_group_type' enums.TRAINING root.pk education_group_year.pk as create_training_url %}
+                    {% url 'select_education_group_type' enums.MINI_TRAINING root.pk education_group_year.pk as create_mini_training_url %}
 
                     {% li_with_create_perm_group create_group_url _('New Education Group') %}
                     {% li_with_create_perm_training create_training_url _('New Training') %}

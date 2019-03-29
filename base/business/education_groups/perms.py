@@ -116,9 +116,9 @@ def is_education_group_edit_period_opened(education_group, raise_exception=False
 
     qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION).open_calendars()
     if not qs.exists():
-        error_msg = "The education group edition period is not open."
+        error_msg = _("The education group edition period is not open.")
     elif education_group and not qs.filter(academic_year=education_group.academic_year).exists():
-        error_msg = "This education group is not editable during this period."
+        error_msg = _("This education group is not editable during this period.")
 
     result = error_msg is None
     can_raise_exception(raise_exception, result, error_msg)
@@ -128,6 +128,10 @@ def is_education_group_edit_period_opened(education_group, raise_exception=False
 def _is_eligible_education_group(person, education_group, raise_exception):
     return (check_link_to_management_entity(education_group, person, raise_exception) and
             (person.is_central_manager or is_education_group_edit_period_opened(education_group, raise_exception)))
+
+
+def _is_eligible_certificate_aims(person, education_group, raise_exception):
+    return check_link_to_management_entity(education_group, person, raise_exception)
 
 
 def _is_eligible_to_add_education_group_with_category(person, category, raise_exception):

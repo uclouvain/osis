@@ -24,15 +24,16 @@
 #
 ##############################################################################
 from django.db import models
-from django.utils.translation import pgettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 from ordered_model.admin import OrderedModelAdmin
 from ordered_model.models import OrderedModel
+from reversion.admin import VersionAdmin
 
 from base.business.learning_units.pedagogy import update_bibliography_changed_field_in_cms
 from base.models.learning_unit_year import LearningUnitYear
 
 
-class TeachingMaterialAdmin(OrderedModelAdmin):
+class TeachingMaterialAdmin(VersionAdmin, OrderedModelAdmin):
     list_display = ('title', 'mandatory', 'learning_unit_year', 'order', 'move_up_down_links')
     readonly_fields = ['order']
     search_fields = ['title', 'learning_unit_year']
@@ -40,8 +41,8 @@ class TeachingMaterialAdmin(OrderedModelAdmin):
 
 
 class TeachingMaterial(OrderedModel):
-    title = models.CharField(max_length=255, verbose_name=_('teaching materials', 'title'))
-    mandatory = models.BooleanField(verbose_name=_('teaching materials', 'mandatory'))
+    title = models.CharField(max_length=255, verbose_name=_('Title'))
+    mandatory = models.BooleanField(verbose_name=_('Mandatory'))
     learning_unit_year = models.ForeignKey(LearningUnitYear, on_delete=models.CASCADE)
     order_with_respect_to = 'learning_unit_year'
 

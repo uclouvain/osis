@@ -27,4 +27,5 @@ class Command(BaseCommand):
                 obj.regex_error_message = row[5].strip()
                 obj.help_text_en = row[6].strip()
                 obj.help_text_fr = row[7].strip()
+                obj.placeholder = row[8].strip()
                 obj.save()

@@ -41,7 +41,6 @@ class GroupElementYearForm(forms.ModelForm):
             "relative_credits",
             "is_mandatory",
             "block",
-            "quadrimester_derogation",
             "link_type",
             "comment",
             "comment_english",
@@ -50,7 +49,7 @@ class GroupElementYearForm(forms.ModelForm):
         widgets = {
             "comment": forms.Textarea(attrs={'rows': 5}),
             "comment_english": forms.Textarea(attrs={'rows': 5}),
-
+            "block": forms.TextInput()
         }
 
     def __init__(self, *args, parent=None, child_branch=None, child_leaf=None, **kwargs):

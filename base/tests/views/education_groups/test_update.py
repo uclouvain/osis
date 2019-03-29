@@ -27,7 +27,7 @@ import json
 from http import HTTPStatus
 from unittest import mock
 
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.test import TestCase, Client
@@ -54,9 +54,10 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.user import SuperUserFactory
+from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.utils.cache import ElementCache
-from base.views.education_groups.update import update_education_group, _get_success_redirect_url
+from base.views.education_groups.update import _get_success_redirect_url, \
+    update_education_group
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory
 from reference.tests.factories.language import LanguageFactory
@@ -68,6 +69,7 @@ class TestUpdate(TestCase):
         self.current_academic_year = create_current_academic_year()
         self.start_date_ay_1 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 1)
         self.end_date_ay_1 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 2)
+        self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
         academic_year_1 = AcademicYearFactory.build(start_date=self.start_date_ay_1,
                                                     end_date=self.end_date_ay_1,
                                                     year=self.current_academic_year.year + 1)
@@ -92,17 +94,30 @@ class TestUpdate(TestCase):
             child_type=self.education_group_year.education_group_type
         )
 
-        self.url = reverse(update_education_group, args=[self.education_group_year.pk, self.education_group_year.pk])
+        self.url = reverse(update_education_group, kwargs={"root_id": self.education_group_year.pk,
+                                                           "education_group_year_id": self.education_group_year.pk})
         self.person = PersonFactory()
 
         self.client.force_login(self.person.user)
         permission = Permission.objects.get(codename='change_educationgroup')
         self.person.user.user_permissions.add(permission)
-        self.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
+        self.perm_patcher = mock.patch("base.business.education_groups.perms._is_eligible_certificate_aims",
                                        return_value=True)
         self.mocked_perm = self.perm_patcher.start()
 
         self.an_training_education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
+
+        self.previous_training_education_group_year = TrainingFactory(
+            academic_year=self.previous_academic_year,
+            education_group_type=self.an_training_education_group_type,
+            education_group__start_year=1968
+        )
+
+        EntityVersionFactory(entity=self.previous_training_education_group_year.management_entity,
+                             start_date=self.previous_training_education_group_year.academic_year.start_date)
+
+        EntityVersionFactory(entity=self.previous_training_education_group_year.administration_entity,
+                             start_date=self.previous_training_education_group_year.academic_year.start_date)
 
         self.training_education_group_year = TrainingFactory(
             academic_year=self.current_academic_year,
@@ -171,12 +186,6 @@ class TestUpdate(TestCase):
 
         self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
-    def test_permission_required(self):
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-
-        self.mocked_perm.assert_called_once_with(self.person, self.education_group_year, raise_exception=True)
-
     def test_template_used(self):
         response = self.client.get(self.url)
 
@@ -221,6 +230,28 @@ class TestUpdate(TestCase):
         response = self.client.get(self.training_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "education_group/update_trainings.html")
+
+    def test_template_used_for_certificate_edition(self):
+        faculty_managers_group = Group.objects.get(name='faculty_managers')
+        self.faculty_user = UserFactory()
+        self.faculty_user.groups.add(faculty_managers_group)
+        self.faculty_person = PersonFactory(user=self.faculty_user)
+        self.client.force_login(self.faculty_user)
+        permission = Permission.objects.get(codename='change_educationgroup')
+        self.faculty_user.user_permissions.add(permission)
+        response = self.client.get(reverse(
+            update_education_group,
+            args=[self.previous_training_education_group_year.pk, self.previous_training_education_group_year.pk]
+        ))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "education_group/blocks/form/training_certificate.html")
+
+        certificate_aims = [CertificateAimFactory(code=code) for code in range(100, 103)]
+        response = self.client.post(reverse(update_education_group,
+                                            args=[self.previous_training_education_group_year.pk,
+                                                  self.previous_training_education_group_year.pk]),
+                                    data={'certificate_aims': str(certificate_aims[0].id)})
+        self.assertEqual(response.status_code, 302)
 
     def test_post_training(self):
         old_domain = DomainFactory()
@@ -457,7 +488,7 @@ class TestSelectAttach(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertDictEqual(
             data_cached,
-            {'modelname': management.EDUCATION_GROUP_YEAR, 'id':self.child_education_group_year.id}
+            {'modelname': management.EDUCATION_GROUP_YEAR, 'id': self.child_education_group_year.id}
         )
 
     def test_select_ajax_case_learning_unit_year(self):

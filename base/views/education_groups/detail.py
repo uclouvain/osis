@@ -318,6 +318,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             sections_list = SECTION_INTRO
             if self.is_didactic_offer:
                 sections_list = sections_list + SECTION_DIDACTIC
+            sections_to_display = []  # TODO: Remove eligibleFiles dependency (Planned)
         else:
             sections_list = SECTION_LIST
         for section in sections_list:
@@ -344,8 +345,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         for selector in selectors.split(','):
             translations = None
             if selector == 'specific':
-                translations = self.get_content_translations_for_label(
-                    self.object, label, user_language, 'specific')
+                translations = self.get_content_translations_for_label(label, user_language, 'specific')
 
             elif selector == 'common':
                 translations = self._get_common_selector(common_education_group_year, label, user_language)
@@ -360,33 +360,36 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         # common_education_group_year is None if education_group_year is common
         # if not common, translation must be non-editable in non common offer
         if common_education_group_year is not None:
-            translations = self.get_content_translations_for_label(
-                common_education_group_year, label, user_language, 'common')
+            translations = self.get_content_translations_for_label(label, user_language, 'common')
         # if is common and a label in COMMON_PARAGRAPH, must be editable in common offer
         elif label in COMMON_PARAGRAPH:
-            translations = self.get_content_translations_for_label(
-                self.object, label, user_language, 'specific')
+            translations = self.get_content_translations_for_label(label, user_language, 'specific')
         return translations
 
-    def get_content_translations_for_label(self, education_group_year, label, user_language, type):
-        # FIX ME: Change contacts ==> contact_intro in sections
+    def get_content_translations_for_label(self, label, user_language, type):
+        # FIXME: Change contacts ==> contact_intro in sections
         if label == CONTACTS_KEY:
             label = CONTACT_INTRO_KEY
 
         # fetch the translation for the current user
-        translated_label = TranslatedTextLabel.objects.filter(text_label__entity=entity_name.OFFER_YEAR,
-                                                              text_label__label=label,
-                                                              language=user_language).first()
+        translated_label = TranslatedTextLabel.objects.filter(
+            text_label__entity=entity_name.OFFER_YEAR,
+            text_label__label=label,
+            language=user_language
+        ).first()
+
         # fetch the translations for the both languages
         french, english = 'fr-be', 'en'
-        fr_translated_text = TranslatedText.objects.filter(entity=entity_name.OFFER_YEAR,
-                                                           text_label__label=label,
-                                                           reference=str(education_group_year.id),
-                                                           language=french).first()
-        en_translated_text = TranslatedText.objects.filter(entity=entity_name.OFFER_YEAR,
-                                                           text_label__label=label,
-                                                           reference=str(education_group_year.id),
-                                                           language=english).first()
+
+        qs = TranslatedText.objects.filter(
+            entity=entity_name.OFFER_YEAR,
+            reference=str(self.object.pk),
+            text_label__label=label
+        )
+
+        fr_translated_text = qs.filter(language=french).first()
+        en_translated_text = qs.filter(language=english).first()
+
         return {
             'label': label,
             'type': type,
@@ -406,7 +409,6 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
     def get_contacts_section(self):
         introduction = self.get_content_translations_for_label(
-            self.object,
             CONTACT_INTRO_KEY,
             self.user_language_code,
             'specific'
@@ -621,9 +623,11 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
 def get_appropriate_common_admission_condition(edy):
     if not edy.is_common and \
             any([edy.is_bachelor, edy.is_master60, edy.is_master120, edy.is_aggregation, edy.is_specialized_master]):
-        return EducationGroupYear.objects.look_for_common(
+        common_egy = EducationGroupYear.objects.look_for_common(
             education_group_type__name=TrainingType.PGRM_MASTER_120.name if edy.is_master60
             else edy.education_group_type.name,
             academic_year=edy.academic_year
-        ).select_related('admissioncondition').get().admissioncondition
+        ).get()
+        common_admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=common_egy)
+        return common_admission_condition
     return None

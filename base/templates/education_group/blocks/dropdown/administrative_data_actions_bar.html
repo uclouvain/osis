@@ -27,8 +27,9 @@
 
 {% if "base" in perms %}
     {% features_or "education_group_update" as show_button %}
+    {% features_or "education_group_administrative_data_update" as show_button_administrative_data %}
 
-    {% if show_button %}
+    {% if show_button and show_button_administrative_data%}
         <div class="dropdown {{ dropdirection }}">
 
             <button id="dLabel" class="btn btn-default" type="button" data-toggle="dropdown" aria-haspopup="true"

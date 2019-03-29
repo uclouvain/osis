@@ -37,7 +37,6 @@ from waffle.testutils import override_flag
 
 from attribution.tests.factories.attribution import AttributionFactory
 from attribution.views.manage_my_courses import list_my_attributions_summary_editable, view_educational_information
-from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm
 from base.models.enums import academic_calendar_type
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.entity_type import FACULTY
@@ -153,9 +152,7 @@ class TestViewEducationalInformation(TestCase):
         context = response.context
         self.assertEqual(context["learning_unit_year"], self.attribution.learning_unit_year)
         self.assertTrue("teaching_materials" in context)
-        self.assertTrue(context["cms_labels_translated"])
-        self.assertIsInstance(context["form_french"], LearningUnitPedagogyForm)
-        self.assertIsInstance(context["form_english"], LearningUnitPedagogyForm)
+        self.assertFalse(context["cms_labels_translated"])
         self.assertFalse(context["can_edit_information"])
         self.assertFalse(context["can_edit_summary_locked_field"])
         self.assertFalse(context["submission_dates"])

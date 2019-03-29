@@ -38,6 +38,7 @@ from base.forms.education_group.common import CommonBaseForm, EducationGroupMode
 from base.forms.utils.choice_field import add_blank
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
+from base.models.education_group_year import EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.entity_version import get_last_version
 from base.models.enums import education_group_categories, rate_code, decree_category
@@ -189,7 +190,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         if getattr(self.instance, 'administration_entity', None):
             self.initial['administration_entity'] = get_last_version(self.instance.administration_entity).pk
 
-        self.fields['decree_category'].choices = sorted(decree_category.DecreeCategories.choices(),
+        self.fields['decree_category'].choices = sorted(add_blank(decree_category.DecreeCategories.choices()),
                                                         key=lambda c: c[1])
         self.fields['rate_code'].choices = sorted(rate_code.RATE_CODE, key=lambda c: c[1])
         self.fields['main_domain'].queryset = Domain.objects.filter(type=domain_type.UNIVERSITY)\
@@ -230,6 +231,33 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             )
 
     def save_certificate_aims(self):
+        self.instance.certificate_aims.clear()
+        for certificate_aim in self.cleaned_data["certificate_aims"]:
+            EducationGroupCertificateAim.objects.get_or_create(
+                education_group_year=self.instance,
+                certificate_aim=certificate_aim,
+            )
+
+
+class CertificateAimsForm(forms.ModelForm):
+    section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False)
+
+    class Meta:
+        model = EducationGroupYear
+        fields = ["certificate_aims"]
+        widgets = {
+            'certificate_aims': autocomplete.ModelSelect2Multiple(
+                url='certificate_aim_autocomplete',
+                attrs={
+                    'data-html': True,
+                    'data-placeholder': _('Search...'),
+                    'data-width': '100%',
+                },
+                forward=['section'],
+            )
+        }
+
+    def save(self, commit=True):
         self.instance.certificate_aims.clear()
         for certificate_aim in self.cleaned_data["certificate_aims"]:
             EducationGroupCertificateAim.objects.get_or_create(

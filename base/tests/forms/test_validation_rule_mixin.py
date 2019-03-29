@@ -29,7 +29,7 @@ from django.test import TestCase
 
 from base.forms.common import ValidationRuleMixin
 from base.models.enums.field_status import DISABLED, REQUIRED, ALERT
-from base.models.validation_rule import ValidationRule
+from base.tests.factories.validation_rule import ValidationRuleFactory
 from reference.models.country import Country
 
 
@@ -41,24 +41,27 @@ class TestForm(ValidationRuleMixin, forms.ModelForm):
 
 class TestValidationRuleMixin(TestCase):
     def setUp(self):
-        ValidationRule.objects.create(
+        ValidationRuleFactory(
             field_reference="reference_country.name",
             status_field=DISABLED,
             initial_value="LalaLand",
+            placeholder=""
         )
 
-        ValidationRule.objects.create(
+        ValidationRuleFactory(
             field_reference="reference_country.iso_code",
             status_field=REQUIRED,
-            initial_value="LA",
-            regex_rule="^(LA|LB)$"
+            initial_value="",
+            regex_rule="^(LA|LB)$",
+            placeholder="LA"
         )
 
-        ValidationRule.objects.create(
+        ValidationRuleFactory(
             field_reference="reference_country.cref_code",
             status_field=ALERT,
             initial_value="LA",
-            regex_rule="^(LA|LB)$"
+            regex_rule="^(LA|LB)$",
+            placeholder=""
         )
 
     def test_init(self):
@@ -66,10 +69,13 @@ class TestValidationRuleMixin(TestCase):
         self.assertFalse(form.fields["name"].required)
         self.assertTrue(form.fields["name"].disabled)
         self.assertEqual(form.fields["name"].initial, "LalaLand")
+        with self.assertRaises(KeyError):
+            form.fields["name"].widget.attrs['placeholder']
 
         self.assertTrue(form.fields["iso_code"].required)
         self.assertFalse(form.fields["iso_code"].disabled)
-        self.assertEqual(form.fields["iso_code"].initial, "LA")
+        self.assertIsNone(form.fields["iso_code"].initial)
+        self.assertEqual(form.fields["iso_code"].widget.attrs['placeholder'], "LA")
         self.assertIsInstance(form.fields["iso_code"].validators[1], RegexValidator)
 
         self.assertFalse(form.fields["cref_code"].required)

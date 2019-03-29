@@ -37,25 +37,48 @@ from base.business.group_element_years.postponement import PostponeContent, NotP
 from base.forms.education_group.common import EducationGroupModelForm
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
-from base.forms.education_group.training import TrainingForm
+from base.forms.education_group.training import TrainingForm, CertificateAimsForm
+from base.models.academic_year import current_academic_year
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.education_groups.detail import EducationGroupGenericDetailView
-from base.views.education_groups.perms import can_change_education_group
-from base.views.learning_units.perms import PermissionDecoratorWithUser
 from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 
 
 @login_required
 @waffle_flag("education_group_update")
-@PermissionDecoratorWithUser(can_change_education_group, "education_group_year_id", EducationGroupYear)
 def update_education_group(request, root_id, education_group_year_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    root = get_object_or_404(EducationGroupYear, pk=root_id)
+    if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and\
+            education_group_year.academic_year.year < current_academic_year().year:
+        return update_certificate_aims(request, root_id, education_group_year)
+    return update_education_group_year(request, root_id, education_group_year)
 
+
+@login_required
+@waffle_flag("education_group_update")
+def update_certificate_aims(request, root_id, education_group_year):
+    root = get_object_or_404(EducationGroupYear, pk=root_id)
+    form_certificate_aims = CertificateAimsForm(request.POST or None, instance=education_group_year)
+    if form_certificate_aims.is_valid():
+        form_certificate_aims.save()
+        url = _get_success_redirect_url(root, education_group_year)
+        return redirect(url)
+
+    return render(request, "education_group/blocks/form/training_certificate.html", {
+        "education_group_year": education_group_year,
+        "form_certificate_aims": form_certificate_aims
+    })
+
+
+@login_required
+@waffle_flag("education_group_update")
+def update_education_group_year(request, root_id, education_group_year):
+    root = get_object_or_404(EducationGroupYear, pk=root_id)
     view_function = _get_view(education_group_year.education_group_type.category)
     return view_function(request, education_group_year, root)
 
@@ -228,9 +251,9 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
             display_error_messages(request, str(e))
 
         return redirect(reverse(
-                "education_group_read",
-                args=[
-                    kwargs["root_id"],
-                    kwargs["education_group_year_id"]
-                ]
-            ))
+            "education_group_read",
+            args=[
+                kwargs["root_id"],
+                kwargs["education_group_year_id"]
+            ]
+        ))

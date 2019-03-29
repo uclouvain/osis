@@ -424,25 +424,6 @@ class EducationGroupViewTestCase(TestCase):
             }
         )
 
-    @mock.patch('base.business.education_group.can_user_edit_administrative_data')
-    def test_education_edit_administrative_data(self, mock_can_user_edit_administrative_data):
-        from base.views.education_group import education_group_edit_administrative_data
-        self.client.force_login(SuperUserFactory())
-
-        education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
-        mock_can_user_edit_administrative_data.return_value = True
-
-        response = self.client.get(reverse(education_group_edit_administrative_data, kwargs={
-            'root_id': education_group_year.id,
-            'education_group_year_id': education_group_year.id
-        }))
-
-        self.assertTemplateUsed(response, 'education_group/tab_edit_administrative_data.html')
-        self.assertEqual(response.context['education_group_year'], education_group_year)
-        self.assertEqual(response.context['course_enrollment_validity'], False)
-        self.assertEqual(response.context['formset_session_validity'], False)
-        self.assertIn('additional_info_form', response.context)
-
     def test_education_content(self):
         an_education_group = EducationGroupYearFactory()
         self.initialize_session()
@@ -550,12 +531,18 @@ class EducationGroupAdministrativedata(TestCase):
 
 
 @override_flag('education_group_update', active=True)
+@override_flag('education_group_administrative_data_update', active=True)
 class EducationGroupEditAdministrativeData(TestCase):
     def setUp(self):
+        today = datetime.date.today()
         self.person = PersonFactory()
 
         self.permission = Permission.objects.get(codename='can_edit_education_group_administrative_data')
         self.person.user.user_permissions.add(self.permission)
+
+        self.academic_year = AcademicYearFactory(start_date=today,
+                                                 end_date=today.replace(year=today.year + 1),
+                                                 year=today.year)
 
         self.education_group_year = EducationGroupYearFactory()
         self.program_manager = ProgramManagerFactory(person=self.person,
@@ -614,6 +601,25 @@ class EducationGroupEditAdministrativeData(TestCase):
 
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    @mock.patch('base.business.education_group.can_user_edit_administrative_data')
+    def test_education_edit_administrative_data(self, mock_can_user_edit_administrative_data):
+        from base.views.education_group import education_group_edit_administrative_data
+        self.client.force_login(SuperUserFactory())
+
+        education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
+        mock_can_user_edit_administrative_data.return_value = True
+
+        response = self.client.get(reverse(education_group_edit_administrative_data, kwargs={
+            'root_id': education_group_year.id,
+            'education_group_year_id': education_group_year.id
+        }))
+
+        self.assertTemplateUsed(response, 'education_group/tab_edit_administrative_data.html')
+        self.assertEqual(response.context['education_group_year'], education_group_year)
+        self.assertEqual(response.context['course_enrollment_validity'], False)
+        self.assertEqual(response.context['formset_session_validity'], False)
+        self.assertIn('additional_info_form', response.context)
 
 
 class AdmissionConditionEducationGroupYearTest(TestCase):

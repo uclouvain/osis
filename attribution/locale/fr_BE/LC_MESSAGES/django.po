@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-12 11:35+0100\n"
+"POT-Creation-Date: 2019-03-22 12:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,6 +88,7 @@ msgid "Deputy temporary"
 msgstr "Suppléant temporaire"
 
 #: templates/manage_my_courses/educational_information.html:32
+#: templates/manage_my_courses/educational_information.html:54
 msgid "Description fiche"
 msgstr "Fiche descriptive"
 
@@ -109,8 +110,8 @@ msgstr "Afficher tous les enseignants pour ce cours"
 msgid "Duration"
 msgstr "Durée"
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:14
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:39
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:13
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:37
 msgid "Editable"
 msgstr "Modifiable"
 
@@ -125,6 +126,14 @@ msgstr "Fonction"
 #: models/enums/function.py:44
 msgid "Holder"
 msgstr "Titulaire"
+
+#: templates/manage_my_courses/educational_information.html:47
+msgid "Information approved and updatable by the Commission of Program"
+msgstr "Informations avalisées et modifiables via la Commision de Programme"
+
+#: templates/manage_my_courses/educational_information.html:54
+msgid "Informations updatable by teachers"
+msgstr "Informations modifiables par les enseignants"
 
 #: templates/summary_responsible.html:30
 #: templates/summary_responsible_edit.html:29
@@ -147,7 +156,7 @@ msgstr ""
 msgid "Learning unit title"
 msgstr "Intitulé du cours"
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:23
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:22
 #: templates/manage_my_courses/blocks/tabs.html:32
 #: templates/manage_my_courses/educational_information.html:30
 #: templates/manage_my_courses/list_my_courses_summary_editable.html:31
@@ -211,7 +220,6 @@ msgstr "Suppléé"
 msgid "Subtype"
 msgstr "Sous-type"
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:13
 #: templates/summary_responsible.html:69
 #: templates/summary_responsible_edit.html:31
 #: templates/summary_responsible_edit.html:47
@@ -222,7 +230,7 @@ msgstr "Responsable des fiches descriptives"
 msgid "Summary responsibles"
 msgstr "Responsables des fiches descriptives"
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:48
+#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:46
 msgid "There is no course for which you can edit description fiche"
 msgstr ""
 "Il n'existe aucun cours dont vous pouvez modifier les fiches descriptives."

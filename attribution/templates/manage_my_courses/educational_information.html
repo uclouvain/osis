@@ -41,17 +41,42 @@
 <div class="panel panel-default">
     <div class="panel-body" id="tabs">
         {% include "manage_my_courses/blocks/tabs.html" %}
-        <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="educational_information">
-                <br>
-                {% include "manage_my_courses/blocks/submission_dates.html" %}
-                <br>
-                {% url 'tutor_edit_educational_information' learning_unit_year_id=learning_unit_year.id as post_url%}
+        <br>
+        <div class="panel panel-default" style="background-color: #f5f5f5">
+            <div class="panel-heading">
+                <label style="font-size: larger">{% trans 'Information approved and updatable by the Commission of Program' %}</label>
+            </div>
+            <div class="panel-body">
+                {% include "learning_unit/specifications_all.html" %}
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading"><label style="font-size: larger">{% trans 'Informations updatable by teachers' %}</label></div>
 
-                {% include "learning_unit/blocks/panel/educational_informations.html" %}
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="educational_information">
+                    <br>
+                    {% include "manage_my_courses/blocks/submission_dates.html" %}
+                    <br>
+                    {% url 'tutor_edit_educational_information' learning_unit_year_id=learning_unit_year.id as post_url%}
+
+                    {% include "learning_unit/blocks/panel/educational_informations.html" %}
+                </div>
             </div>
         </div>
     </div>
 </div>
 <div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
+{% endblock %}
+{% block script %}
+    <script>
+        function changeOrientation(button) {
+            if (button.className == "glyphicon glyphicon-collapse-down") {
+                button.className = "glyphicon glyphicon-expand"
+            }
+            else if (button.className == "glyphicon glyphicon-expand") {
+                button.className = "glyphicon glyphicon-collapse-down"
+            }
+        }
+    </script>
 {% endblock %}

@@ -25,7 +25,6 @@
 ##############################################################################
 from django.conf.urls import url
 
-
 from education_group.api.views.training import TrainingList, TrainingDetail
 
 urlpatterns = [

@@ -216,3 +216,26 @@ div:target{
     width: 250px;
     text-align: left;
 }
+
+.show_collapse .collapse[aria-expanded="false"] {
+    display: block;
+    height: 40px !important;
+    overflow: hidden;
+}
+
+.show_collapse .collapsing[aria-expanded="false"] {
+    height: 40px !important;
+}
+
+.show_collapse a {
+    font-family: 'Font Awesome\ 5 Free';
+    font-weight: 900;
+}
+
+.show_collapse a.collapsed:after {
+    content: "\f078";
+}
+
+.show_collapse a.a_show_collapse:not(.collapsed):after {
+    content: "\f077";
+}

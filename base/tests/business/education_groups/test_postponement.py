@@ -54,11 +54,14 @@ from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 class EducationGroupPostponementTestCase(TestCase):
     """This mixin is used in this test file in order to setup an environment for testing EGY POSTPONEMENT"""
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Create several academic year
-        self.current_academic_year = create_current_academic_year()
-        self.generated_ac_years = GenerateAcademicYear(self.current_academic_year.year + 1,
-                                                       self.current_academic_year.year + 10)
+        cls.current_academic_year = create_current_academic_year()
+        cls.generated_ac_years = GenerateAcademicYear(cls.current_academic_year.year + 1,
+                                                      cls.current_academic_year.year + 10)
+
+    def setUp(self):
         # Create small entities
         self.entity = EntityFactory(organization__type=organization_type.MAIN)
         self.entity_version = EntityVersionFactory(
@@ -148,10 +151,13 @@ class TestComputeEndPostponement(EducationGroupPostponementTestCase):
 
 
 class TestPostpone(TestCase):
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        self.next_academic_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        cls.next_academic_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
+
+    def setUp(self):
         self.education_group = EducationGroupFactory(end_year=self.next_academic_year.year)
 
         self.current_education_group_year = TrainingFactory(

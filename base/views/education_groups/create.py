@@ -43,6 +43,7 @@ from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.exceptions import ValidationWarning
+from base.models.utils.utils import get_object_or_none
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
 from base.views.education_groups.perms import can_create_education_group
@@ -89,8 +90,8 @@ class SelectEducationGroupTypeView(FlagMixin, AjaxTemplateMixin, FormView):
 @login_required
 @waffle_flag("education_group_create")
 @can_create_education_group
-def create_education_group(request, category, education_group_type_pk, parent_id=None):
-    parent = get_object_or_404(EducationGroupYear, id=parent_id) if parent_id is not None else None
+def create_education_group(request, category, education_group_type_pk, root_id=None, parent_id=None):
+    parent = get_object_or_none(EducationGroupYear, pk=parent_id)
     education_group_type = get_object_or_404(EducationGroupType, pk=education_group_type_pk)
 
     request_cache = RequestCache(request.user, reverse('education_groups'))
@@ -110,7 +111,7 @@ def create_education_group(request, category, education_group_type_pk, parent_id
     )
 
     if form_education_group_year.is_valid():
-        return _common_success_redirect(request, form_education_group_year, parent)
+        return _common_success_redirect(request, form_education_group_year, root_id)
 
     data = {
         "form_education_group_year": form_education_group_year.forms[forms.ModelForm],
@@ -128,11 +129,10 @@ def create_education_group(request, category, education_group_type_pk, parent_id
     return render(request, TEMPLATES_BY_CATEGORY.get(category), data)
 
 
-def _common_success_redirect(request, form, parent=None):
+def _common_success_redirect(request, form, root_id=None):
     education_group_year = form.save()
-    parent_id = parent.pk if parent else education_group_year.pk
 
-    success_msg = [_get_success_message_for_creation_education_group_year(parent_id, education_group_year)]
+    success_msg = [_get_success_message_for_creation_education_group_year(root_id, education_group_year)]
     if hasattr(form, 'education_group_year_postponed'):
         success_msg += [
             _get_success_message_for_creation_education_group_year(egy.id, egy)
@@ -141,15 +141,13 @@ def _common_success_redirect(request, form, parent=None):
     display_success_messages(request, success_msg, extra_tags='safe')
 
     # Redirect
-    url = reverse("education_group_read", args=[parent_id, education_group_year.pk])
+    url = reverse("education_group_read", args=[root_id, education_group_year.pk])
     return redirect(url)
 
 
-def _get_success_message_for_creation_education_group_year(parent_id, education_group_year):
-    msg_key = "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly created."
-    link = reverse("education_group_read", args=[parent_id, education_group_year.id])
-    return _(msg_key) % {
-        "link": link,
+def _get_success_message_for_creation_education_group_year(root_id, education_group_year):
+    return _("Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully created.") % {
+        "link": reverse("education_group_read", args=[root_id, education_group_year.pk]),
         "acronym": education_group_year.acronym,
         "academic_year": education_group_year.academic_year,
     }

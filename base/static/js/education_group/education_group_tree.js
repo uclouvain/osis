@@ -100,7 +100,8 @@ $(document).ready(function () {
                             $('#form-modal-ajax-content').load(__ret.attach_url, function (response, status, xhr) {
                                 if (status === "success") {
                                     $('#form-ajax-modal').modal('toggle');
-                                    formAjaxSubmit('#form-modal-ajax-content form', '#form-ajax-modal');
+                                    let form = $(this).find('form').first();
+                                    formAjaxSubmit(form, '#form-ajax-modal');
                                 } else {
                                     window.location.href = __ret.attach_url
                                 }
@@ -123,7 +124,9 @@ $(document).ready(function () {
                             $('#form-modal-ajax-content').load(__ret.detach_url, function (response, status, xhr) {
                                 if (status === "success") {
                                     $('#form-ajax-modal').modal('toggle');
-                                    formAjaxSubmit('#form-modal-ajax-content form', '#form-ajax-modal');
+
+                                    let form = $(this).find('form').first();
+                                    formAjaxSubmit(form, '#form-ajax-modal');
                                 } else {
                                     window.location.href = __ret.detach_url
                                 }
