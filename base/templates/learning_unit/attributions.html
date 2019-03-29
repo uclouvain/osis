@@ -89,7 +89,11 @@
                role="button"
                data-url="{% url "add_attribution" learning_unit_year.id %}"
                data-modal_class="modal-lg">
-                {% trans "Add attribution" %}
+                {% if learning_unit_year.learning_container_year.is_type_for_faculty %}
+                    {% trans "Add current year attribution" %}
+                {% else %}
+                    {% trans "Add attribution" %}
+                {% endif %}
             </a>
         {% endif %}
         {% if learning_unit_year.is_partim %}

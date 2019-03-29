@@ -50,3 +50,7 @@ class Functions(ChoiceEnum):
     PROFESSOR = _("Professor")
     INTERNSHIP_SUPERVISOR = _("Internship supervisor")
     INTERNSHIP_CO_SUPERVISOR = _("Internship co-supervisor")
+
+    @classmethod
+    def choices_without_professor(cls):
+        return tuple((x.name, x.value) for x in cls if x != cls.PROFESSOR)

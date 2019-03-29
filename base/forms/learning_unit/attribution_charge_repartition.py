@@ -30,6 +30,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
+from attribution.models.enums.function import Functions
 from base.models.enums import learning_component_year_type
 from base.models.learning_component_year import LearningComponentYear
 from base.models.person import Person
@@ -50,6 +51,7 @@ class AttributionForm(forms.ModelForm):
         if self.learning_unit_year.is_for_faculty_or_partim():
             del self.fields["start_year"]
             del self.fields["duration"]
+            self.fields["function"].choices = Functions.choices_without_professor()
 
     def save(self, commit=True):
         instance = super().save(commit=False)
