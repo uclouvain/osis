@@ -60,7 +60,8 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     """ This class will test the tag as central manager """
 
     def setUp(self):
-        self.education_group_year = TrainingFactory()
+        academic_year = AcademicYearFactory(year=2020)
+        self.education_group_year = TrainingFactory(academic_year=academic_year)
         self.person = CentralManagerFactory("delete_educationgroup", "change_educationgroup", "add_educationgroup")
         PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
 
@@ -90,10 +91,9 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         result = button_with_permission(self.context, "title", "edit", "#")
         self.assertDictEqual(
             result, {
-                'title': _("You cannot change a education group before %(limit_year)s") % {
-                    "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION},
-                'class_button': 'btn-default btn-sm disabled',
-                'load_modal': False,
+                'title': 'title',
+                'class_button': 'btn-default btn-sm ',
+                'load_modal': True,
                 'url': '#',
                 'icon': 'fa-edit'
             }
@@ -334,10 +334,9 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         self.assertDictEqual(
             result,
             {
-                'load_modal': False,
-                'title': _("You cannot change a education group before %(limit_year)s") % {
-                    "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION},
-                'class_button': 'btn-default btn-sm disabled',
+                'title': 'title',
+                'class_button': 'btn-default btn-sm ',
+                'load_modal': True,
                 'url': '#',
                 'icon': 'fa-edit'
             }
