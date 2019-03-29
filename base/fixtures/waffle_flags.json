@@ -358,5 +358,25 @@
         "groups": [],
         "users": []
     }
+},
+{
+    "model": "waffle.flag",
+    "pk": 20,
+    "fields": {
+        "name": "education_group_administrative_data_update",
+        "everyone": false,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": false,
+        "authenticated": false,
+        "languages": "",
+        "rollout": false,
+        "note": "Used in \"/educationgroups/XXX/XXX/administrative/?group_to_parent=0\" -> \"base/views/education_group.py\" education_group_edit_administrative_data\r\n\r\nUsed in \"base/templates/education_group/blocks/dropdown/administrative_data_actions_bar.html\"",
+        "created": "2019-03-28T15:19:18",
+        "modified": "2019-03-28T15:40:16.786",
+        "groups": [],
+        "users": []
+    }
 }
 ]
