@@ -424,7 +424,6 @@ class EducationGroupViewTestCase(TestCase):
             }
         )
 
-
     def test_education_content(self):
         an_education_group = EducationGroupYearFactory()
         self.initialize_session()
@@ -535,10 +534,15 @@ class EducationGroupAdministrativedata(TestCase):
 @override_flag('education_group_administrative_data_update', active=True)
 class EducationGroupEditAdministrativeData(TestCase):
     def setUp(self):
+        today = datetime.date.today()
         self.person = PersonFactory()
 
         self.permission = Permission.objects.get(codename='can_edit_education_group_administrative_data')
         self.person.user.user_permissions.add(self.permission)
+
+        self.academic_year = AcademicYearFactory(start_date=today,
+                                                 end_date=today.replace(year=today.year + 1),
+                                                 year=today.year)
 
         self.education_group_year = EducationGroupYearFactory()
         self.program_manager = ProgramManagerFactory(person=self.person,
