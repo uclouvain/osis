@@ -5028,7 +5028,7 @@ msgstr ""
 #: business/education_groups/perms.py:80
 msgid "You cannot change a education group before %(limit_year)s"
 msgstr ""
-"Vous ne pouvez pas modifier une oganisation de formation datant d'avant "
+"Vous ne pouvez pas modifier une organisation de formation datant d'avant "
 "%(limit_year)s"
 
 #: business/learning_units/perms.py:66
