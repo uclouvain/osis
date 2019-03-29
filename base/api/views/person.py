@@ -33,7 +33,7 @@ class PersonRoles(generics.RetrieveAPIView):
     """
        Return the roles of a Person.
     """
-    name = 'person-detail'
+    name = 'person-roles'
     queryset = Person.objects.all()
 
     serializer_class = PersonRolesSerializer

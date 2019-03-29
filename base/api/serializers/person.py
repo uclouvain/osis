@@ -57,7 +57,7 @@ class PersonRolesSerializer(serializers.ModelSerializer):
         entities_acronym = set()
         for person_entity in obj.personentity_set.all():
             if not person_entity.with_child:
-                acronyms = {person_entity.entity.most_recent_acronymp}
+                acronyms = {person_entity.entity.most_recent_acronym}
             else:
                 acronyms = set(row['acronym'] for row in EntityVersion.objects.get_tree(person_entity.entity))
             entities_acronym |= acronyms
