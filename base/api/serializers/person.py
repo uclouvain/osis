@@ -26,6 +26,7 @@
 from rest_framework import serializers
 
 from base.models.entity_version import EntityVersion
+from base.models.enums.entity_type import FACULTY
 from base.models.person import Person
 
 
@@ -59,7 +60,11 @@ class PersonRolesSerializer(serializers.ModelSerializer):
             if not person_entity.with_child:
                 acronyms = {person_entity.entity.most_recent_acronym}
             else:
-                acronyms = set(row['acronym'] for row in EntityVersion.objects.get_tree(person_entity.entity))
+                acronyms = set(
+                    row['acronym']
+                    for row in EntityVersion.objects.get_tree(person_entity.entity)
+                    if EntityVersion.objects.filter(acronym=row['acronym']).first().entity_type == FACULTY
+                )
             entities_acronym |= acronyms
 
         return entities_acronym
