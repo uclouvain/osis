@@ -132,90 +132,52 @@
         </table>
         <br><br><br><br>
         <div class="container" style="font-size: 11px;margin-left: 15%">
-            {% if language == "en" %}
-                <table width="100%" padding="0px"
-                       style="visibility: visible; display: block; border-style: solid; border-width: 0px;" id="legende">
-                    <tbody>
-                        <tr style="padding-top:0px;">
-                            <td colspan="4" style="padding-top:0px;padding-bottom:3px;">Legend</td>
-                        </tr>
-                        <tr>
-                            <td style="padding:0px;border: solid white 1px;"><img
-                                    src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/obligatoire.gif" width="12"
-                                    height="12"></td>
-                            <td style="padding:0px;border: solid white 1px; font-size: 10px;">Mandatory</td>
-                            <td style="padding:0px;border: solid white 1px;"><img
-                                    src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/optionnel.gif" width="12"
-                                    height="12"></td>
-                            <td style="padding:0px;border: solid white 1px; font-size: 10px;">Optional</td>
-                        </tr>
-                        <tr>
-                            <td style="padding:0px;border: solid white 1px;"><img
-                                    src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/cours_non_dispense.gif" width="12"
-                                    height="12"></td>
-                            <td style="padding:0px;border: solid white 1px; font-size: 10px;">Courses not taught</td>
-                            <td style="padding:0px;border: solid white 1px;"><img
-                                    src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/cours_cyclique_non_dispense.gif"
-                                    width="12" height="12"></td>
-                            <td style="padding:0px;border: solid white 1px; font-size: 10px;">Periodic courses not taught during
-                                {{ root.academic_year }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding:0px;border: solid white 1px;"><img
-                                    src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/cours_cyclique_dispense.gif"
-                                    width="12" height="12"></td>
-                            <td style="padding:0px;border: solid white 1px; font-size: 10px;">Periodic courses taught during
-                                {{ root.academic_year }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding:0px;border: solid white 1px; font-size: 10px;"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            {% else %}
-                <table width="100%" padding="0px"
-                       style="visibility: visible; display: block; border-style: solid; border-width: 0px;"
-                       id="legende">
-                    <tbody>
-                    <tr style="padding-top:0px;">
-                        <td colspan="4" style="padding-top:0px;padding-bottom:3px;">Légende</td>
-                    </tr>
-                    <tr>
-                        <td width="3%" style="padding:0px;border: solid white 1px;"><img
-                                src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/obligatoire.gif" width="12"
-                                height="12"></td>
-                        <td width="47%" style="padding:0px;border: solid white 1px; font-size: 10px;">Obligatoire</td>
-                        <td width="3%" style="padding:0px;border: solid white 1px;"><img
-                                src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/optionnel.gif" width="12"
-                                height="12"></td>
-                        <td width="47%" style="padding:0px;border: solid white 1px; font-size: 10px;">Au choix</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:0px;border: solid white 1px;"><img
-                                src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/cours_non_dispense.gif" width="12"
-                                height="12"></td>
-                        <td style="padding:0px;border: solid white 1px; font-size: 10px;">Activité non dispensée en {{ root.academic_year }}
-                        </td>
-                        <td style="padding:0px;border: solid white 1px;"><img
-                                src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/cours_cyclique_non_dispense.gif"
-                                width="12" height="12"></td>
-                        <td style="padding:0px;border: solid white 1px; font-size: 10px;">Activité cyclique non dispensée en
-                            2019-2020
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding:0px;border: solid white 1px;"><img
-                                src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/cours_cyclique_dispense.gif"
-                                width="12" height="12"></td>
-                        <td style="padding:0px;border: solid white 1px; font-size: 10px;">Activité cyclique dispensée en
-                            {{ root.academic_year }}
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            {% endif %}
+            <table>
+                <tbody>
+                <tr style="padding-top:0;">
+                    <td colspan="4" style="padding-top:0;padding-bottom:3px;">{% trans 'Legend' %}</td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <img src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/obligatoire.gif" width="12"
+                            height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">{% trans 'Mandatory' %}</td>
+                    <td style="padding:0;">
+                        <img src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/optionnel.gif" width="12"
+                            height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">{% trans 'Optional' %}</td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <img src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/cours_non_dispense.gif"
+                            width="12" height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">
+                        {% trans 'Courses not taught' %} {{ root.academic_year }}
+                    </td>
+                    <td style="padding:0;">
+                        <img src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/cours_cyclique_non_dispense.gif"
+                            width="12" height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">{% trans 'Periodic courses not taught' %} {{ root.academic_year }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <img src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/cours_cyclique_dispense.gif"
+                            width="12" height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">{% trans 'Periodic courses taught during' %}
+                        {{ root.academic_year }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0;font-size: 10px;"></td>
+                </tr>
+                </tbody>
+            </table>
         </div>
         <br>
         <div class="container" style="font-size: 11px;">
