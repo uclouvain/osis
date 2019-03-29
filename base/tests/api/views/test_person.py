@@ -40,12 +40,13 @@ class GetPersonRolesTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonFactory(global_id=4215)
-        entity = EntityFactory()
-        EntityVersionFactory(entity=entity)
-        PersonEntityFactory(
-            person=cls.person,
-            entity=entity
-        )
+        for i in range(2):
+            entity = EntityFactory()
+            EntityVersionFactory(entity=entity)
+            PersonEntityFactory(
+                person=cls.person,
+                entity=entity
+            )
 
         cls.user = UserFactory()
         cls.url = reverse('base_api_v1:person-roles', kwargs={'global_id': cls.person.global_id})
