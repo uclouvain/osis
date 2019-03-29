@@ -44,6 +44,20 @@ class TestGroupElementYearForm(TestCase):
         self.child_leaf = LearningUnitYearFactory()
         self.child_branch = MiniTrainingFactory()
 
+    def test_fields_relevant(self):
+        form = GroupElementYearForm()
+
+        expected_fields = {
+            "relative_credits",
+            "is_mandatory",
+            "block",
+            "link_type",
+            "comment",
+            "comment_english",
+            "access_condition"
+        }
+        self.assertFalse(expected_fields.symmetric_difference(set(form.fields.keys())))
+
     def test_clean_link_type_reference_between_eg_lu(self):
         form = GroupElementYearForm(
             data={'link_type': LinkTypes.REFERENCE.name},

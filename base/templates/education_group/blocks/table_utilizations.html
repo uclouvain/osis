@@ -35,7 +35,6 @@
         <th>{% trans 'Max. credits' %}</th>
         <th>{% trans 'Mandatory' %}</th>
         <th>{% trans 'Block' %}</th>
-        <th>{% trans 'Quadrimester derogation' %}</th>
     </tr>
     </thead>
     <tbody>
@@ -58,7 +57,6 @@
                 <td>{{ group_element_year.max_credits | default_if_none:'-' }}</td>
                 <td>{{ group_element_year.is_mandatory | yesno:_("yes,no") | title }}</td>
                 <td>{{ group_element_year.block | default_if_none:'-' }}</td>
-                <td>{{ group_element_year.quadrimester_derogation | default_if_none:'-' }}</td>
             </tr>
             {% if ref_parent %}
                 <tr>
@@ -74,7 +72,6 @@
                     <td>{{ ref_parent.max_credits | default_if_none:'-' }}</td>
                     <td>{{ ref_parent.is_mandatory | yesno:_("yes,no") | title }}</td>
                     <td>{{ ref_parent.block | default_if_none:'-' }}</td>
-                    <td>{{ ref_parent.quadrimester_derogation | default_if_none:'-' }}</td>
                 </tr>
             {% endif %}
         {% endwith %}

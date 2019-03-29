@@ -33,7 +33,6 @@
         <th>{% trans 'Cred. rel./abs.' %}</th>
         <th>{% trans 'Mandatory' %}</th>
         <th>{% trans 'Block' %}</th>
-        <th>{% trans 'Quad. derog.' %}</th>
         <th>{% trans 'Link type' %}</th>
         <th></th>
     </tr>
@@ -54,9 +53,8 @@
                 /{{ group.child.credits|floatformat | default_if_none:'-' }}</td>
             <td width="6%">{{ group.is_mandatory | yesno }}</td>
             <td width="6%">{{ group.block | default_if_none:'-' }}</td>
-            <td width="5%">{{ group.get_quadrimester_derogation_display|default_if_none:'-' }}</td>
             <td width="14%">{{ group.get_link_type_display|default_if_none:'-' }}</td>
-            <td width="15%">
+            <td width="20%">
                 {% include "education_group/blocks/content_actions.html" %}
             </td>
         </tr>
