@@ -360,6 +360,7 @@ class EducationGroupPublishViewTestCase(TestCase):
 
 
 @override_flag('education_group_update', active=True)
+@override_flag('education_group_administrative_data_update', active=True)
 class EducationGroupViewTestCase(TestCase):
     def setUp(self):
         today = datetime.date.today()
@@ -550,6 +551,7 @@ class EducationGroupAdministrativedata(TestCase):
 
 
 @override_flag('education_group_update', active=True)
+@override_flag('education_group_administrative_data_update', active=True)
 class EducationGroupEditAdministrativeData(TestCase):
     def setUp(self):
         self.person = PersonFactory()
