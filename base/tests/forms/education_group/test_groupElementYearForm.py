@@ -77,8 +77,8 @@ class TestGroupElementYearForm(TestCase):
             parent_type=self.parent.education_group_type,
             child_type=self.child_branch.education_group_type,
         )
-        ref_group = GroupElementYearFactory(parent=self.child_branch)
-
+        ref_group = GroupElementYearFactory(parent=self.child_branch,
+                                            child_branch=EducationGroupYearFactory(academic_year=self.academic_year))
         form = GroupElementYearForm(
             data={'link_type': LinkTypes.REFERENCE.name},
             parent=self.parent,
@@ -102,7 +102,8 @@ class TestGroupElementYearForm(TestCase):
             parent_type=self.parent.education_group_type,
             child_type=self.child_branch.education_group_type,
         )
-        ref_group = GroupElementYearFactory(parent=self.child_branch)
+        ref_group = GroupElementYearFactory(parent=self.child_branch,
+                                            child_branch=EducationGroupYearFactory(academic_year=self.academic_year))
         AuthorizedRelationshipFactory(
             parent_type=self.parent.education_group_type,
             child_type=ref_group.child_branch.education_group_type,
@@ -118,13 +119,16 @@ class TestGroupElementYearForm(TestCase):
 
     def test_reorder_children_by_partial_acronym(self):
         group_element_1 = GroupElementYearFactory(
-            child_branch__partial_acronym="SECOND",
-            order=1
+            # child_branch__partial_acronym="SECOND",
+            order=1,
+            parent=EducationGroupYearFactory(academic_year=self.academic_year),
+            child_branch=EducationGroupYearFactory(academic_year=self.academic_year, partial_acronym="SECOND")
         )
         group_element_2 = GroupElementYearFactory(
             parent=group_element_1.parent,
-            child_branch__partial_acronym="FIRST",
-            order=2
+            # child_branch__partial_acronym="FIRST",
+            order=2,
+            child_branch=EducationGroupYearFactory(academic_year=self.academic_year, partial_acronym="FIRST")
         )
         GroupElementYearForm._reorder_children_by_partial_acronym(group_element_1.parent)
 
@@ -204,7 +208,8 @@ class TestGroupElementYearForm(TestCase):
             max_count_authorized=1,
         )
 
-        ref_group = GroupElementYearFactory(parent=self.child_branch)
+        ref_group = GroupElementYearFactory(parent=self.child_branch,
+                                            child_branch=EducationGroupYearFactory(academic_year=self.academic_year))
         AuthorizedRelationshipFactory(
             parent_type=self.parent.education_group_type,
             child_type=ref_group.child_branch.education_group_type,
