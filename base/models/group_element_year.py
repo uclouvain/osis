@@ -264,6 +264,9 @@ class GroupElementYear(OrderedModel):
                 {'link_type': _("You are not allowed to create a reference with a learning unit")}
             )
 
+        if not self.parent.academic_year == self.child_branch.academic_year:
+            raise ValidationError(_("It is forbidden to attach an element to one of another academic year."))
+
     @cached_property
     def child(self):
         return self.child_branch or self.child_leaf

@@ -40,9 +40,10 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 class TestGroupElementYearForm(TestCase):
     def setUp(self):
-        self.parent = TrainingFactory()
+        self.academic_year = AcademicYearFactory()
+        self.parent = TrainingFactory(academic_year=self.academic_year)
         self.child_leaf = LearningUnitYearFactory()
-        self.child_branch = MiniTrainingFactory()
+        self.child_branch = MiniTrainingFactory(academic_year=self.academic_year)
 
     def test_fields_relevant(self):
         form = GroupElementYearForm()
@@ -190,7 +191,7 @@ class TestGroupElementYearForm(TestCase):
         )
 
     def test_referenced_child_with_max_limit(self):
-        child = EducationGroupYearFactory()
+        child = EducationGroupYearFactory(academic_year=self.academic_year)
 
         GroupElementYearFactory(
             parent=self.parent,
