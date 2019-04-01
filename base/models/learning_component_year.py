@@ -25,7 +25,6 @@
 ##############################################################################
 from django.db import models
 from django.db.models import Sum
-from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
@@ -33,7 +32,6 @@ from base.models import learning_class_year
 from base.models.enums import learning_component_year_type, learning_container_year_types
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
-from django.core.exceptions import ObjectDoesNotExist
 
 
 class LearningComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
@@ -46,6 +44,7 @@ class LearningComponentYear(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     learning_container_year = models.ForeignKey('LearningContainerYear')
+    learning_unit_year = models.ForeignKey('LearningUnitYear', null=True)  # TODO :: remove null=True when populated
     acronym = models.CharField(max_length=4, blank=True, null=True)
     type = models.CharField(max_length=30, choices=learning_component_year_type.LEARNING_COMPONENT_YEAR_TYPES,
                             blank=True, null=True)
@@ -89,13 +88,6 @@ class LearningComponentYear(SerializableModel):
             return '{}/PM'.format(self.learning_unit_year.acronym)
         else:
             return '{}/{}'.format(self.learning_unit_year.acronym, self.acronym)
-
-    @cached_property
-    def learning_unit_year(self):
-        try:
-            return self.learningunityear_set.get()
-        except ObjectDoesNotExist:
-            return None
 
     @property
     def real_classes(self):
