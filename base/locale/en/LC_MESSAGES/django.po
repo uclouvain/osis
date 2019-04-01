@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-29 12:52+0100\n"
+"POT-Creation-Date: 2019-04-01 15:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -414,6 +414,10 @@ msgstr ""
 msgid "Activities on other campus"
 msgstr ""
 
+#: templates/education_group/pdf_content.html:146
+msgid "Activities with prerequisites (in preparation)"
+msgstr ""
+
 #: models/enums/schedule_type.py:35
 msgid "Adapted"
 msgstr ""
@@ -435,7 +439,7 @@ msgstr ""
 msgid "Add attribution"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:211
+#: templates/education_group/pdf_content.html:189
 msgid "Add potential courses"
 msgstr ""
 
@@ -1049,7 +1053,7 @@ msgstr ""
 msgid "Course enrollment"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:156
+#: templates/education_group/pdf_content.html:125
 msgid "Courses not taught"
 msgstr ""
 
@@ -1644,7 +1648,7 @@ msgstr ""
 msgid "For all students"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:220
+#: templates/education_group/pdf_content.html:198
 msgid "For approval,"
 msgstr ""
 
@@ -2163,8 +2167,7 @@ msgid "Lecturing vol."
 msgstr ""
 
 #: business/learning_unit_xls.py:180 business/learning_unit_xls.py:188
-#: templates/education_group/pdf_content.html:140
-#: templates/education_group/pdf_content.html:182
+#: templates/education_group/pdf_content.html:105
 #: tests/business/test_learning_unit_xls.py:187
 #: tests/business/test_learning_unit_xls.py:195
 msgid "Legend"
@@ -2237,7 +2240,7 @@ msgstr ""
 msgid "Logout"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:215
+#: templates/education_group/pdf_content.html:193
 msgid "Made in"
 msgstr ""
 
@@ -2336,7 +2339,7 @@ msgstr ""
 #: models/group_element_year.py:169 models/teaching_material.py:45
 #: templates/education_group/blocks/content_default_table.html:34
 #: templates/education_group/blocks/table_utilizations.html:36
-#: templates/education_group/pdf_content.html:146
+#: templates/education_group/pdf_content.html:112
 msgid "Mandatory"
 msgstr ""
 
@@ -2524,7 +2527,7 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:230
+#: templates/education_group/pdf_content.html:208
 msgid "Name of the teacher responsible"
 msgstr ""
 
@@ -2795,7 +2798,7 @@ msgstr[1] ""
 msgid "Option list choice"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:150
+#: templates/education_group/pdf_content.html:117
 msgid "Optional"
 msgstr ""
 
@@ -2927,11 +2930,11 @@ msgstr ""
 msgid "Pending"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:160
+#: templates/education_group/pdf_content.html:131
 msgid "Periodic courses not taught"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:167
+#: templates/education_group/pdf_content.html:139
 msgid "Periodic courses taught during"
 msgstr ""
 
@@ -3682,7 +3685,7 @@ msgstr ""
 msgid "Student's contact information"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:226
+#: templates/education_group/pdf_content.html:204
 msgid "Student's signature"
 msgstr ""
 
@@ -5273,7 +5276,7 @@ msgstr ""
 msgid "no planned end"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:216
+#: templates/education_group/pdf_content.html:194
 msgid "on"
 msgstr ""
 
