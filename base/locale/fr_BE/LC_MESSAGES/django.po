@@ -5774,20 +5774,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:163
 msgid "yes,no"
 msgstr "oui,non"
-
-#, fuzzy
-#~| msgid "Tutor"
-#~ msgid "Tutor "
-#~ msgstr "Enseignant·e"
-
-#~ msgid "Quad. derog."
-#~ msgstr "Quad. dérog."
-
-#~ msgid "Quad. derog."
-#~ msgstr "Quad. dérog."
-
-#~ msgid "Number ID"
-#~ msgstr "Matricule"
-
-#~ msgid "Impossible to save the organization address"
-#~ msgstr "Impossible d'enregistrer l'adresse de l'organisation"
