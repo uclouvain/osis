@@ -32,6 +32,7 @@ from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.models.enums import education_group_categories
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -43,7 +44,8 @@ from base.tests.factories.person import PersonFactory
 class TestSelectEducationGroupTypeView(TestCase):
 
     def setUp(self):
-        self.parent_education_group_year = EducationGroupYearFactory()
+        self.academic_year = AcademicYearFactory()
+        self.parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
 
         self.test_categories = [
             education_group_categories.GROUP,
@@ -121,7 +123,8 @@ class TestSelectEducationGroupTypeView(TestCase):
     def test_post_invalid_when_max_limit_reached(self):
         GroupElementYearFactory(
             parent=self.parent_education_group_year,
-            child_branch__education_group_type=self.education_group_types[0]
+            child_branch=EducationGroupYearFactory(academic_year=self.academic_year,
+                                                   education_group_type=self.education_group_types[0])
         )
         expected_error_msg = _("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
                                "has already reached the limit.") % {

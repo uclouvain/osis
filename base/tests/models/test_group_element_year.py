@@ -403,10 +403,13 @@ class TestManager(TestCase):
 
 
 class TestSaveGroupElementYear(TestCase):
+    def setUp(self):
+        self.academic_year = AcademicYearFactory()
+
     def test_simple_saves_ok(self):
-        egy1 = EducationGroupYearFactory()
-        egy2 = EducationGroupYearFactory()
-        egy3 = EducationGroupYearFactory()
+        egy1 = EducationGroupYearFactory(academic_year=self.academic_year)
+        egy2 = EducationGroupYearFactory(academic_year=self.academic_year)
+        egy3 = EducationGroupYearFactory(academic_year=self.academic_year)
 
         GroupElementYearFactory(
             parent=egy2,
@@ -426,9 +429,9 @@ class TestSaveGroupElementYear(TestCase):
             )
 
     def test_loop_save_ko(self):
-        egy1 = EducationGroupYearFactory()
-        egy2 = EducationGroupYearFactory()
-        egy3 = EducationGroupYearFactory()
+        egy1 = EducationGroupYearFactory(academic_year=self.academic_year)
+        egy2 = EducationGroupYearFactory(academic_year=self.academic_year)
+        egy3 = EducationGroupYearFactory(academic_year=self.academic_year)
 
         GroupElementYearFactory(
             parent=egy2,
@@ -446,7 +449,7 @@ class TestSaveGroupElementYear(TestCase):
             )
 
     def test_save_with_child_branch_and_child_leaf_ko(self):
-        egy = EducationGroupYearFactory()
+        egy = EducationGroupYearFactory(academic_year=self.academic_year)
         luy = LearningUnitYearFactory()
         with self.assertRaises(ValidationError):
             GroupElementYearFactory(
@@ -460,32 +463,44 @@ class TestFetchGroupElementsBehindHierarchy(TestCase):
     """Unit tests on fetch_all_group_elements_behind_hierarchy()"""
 
     def setUp(self):
+        self.academic_year = AcademicYearFactory()
         formation_master_type = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING,
             name=education_group_types.TrainingType.PGRM_MASTER_120,
         )
-        self.root = EducationGroupYearFactory(acronym='DROI2M', education_group_type=formation_master_type)
+        self.root = EducationGroupYearFactory(acronym='DROI2M',
+                                              education_group_type=formation_master_type,
+                                              academic_year=self.academic_year)
 
         finality_list_type = EducationGroupTypeFactory(
             category=education_group_categories.GROUP,
             name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE,
         )
-        finality_list = EducationGroupYearFactory(acronym='LIST FINALITIES', education_group_type=finality_list_type)
+        finality_list = EducationGroupYearFactory(acronym='LIST FINALITIES',
+                                                  education_group_type=finality_list_type,
+                                                  academic_year=self.academic_year)
 
         formation_master_md_type = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING,
             name=education_group_types.TrainingType.MASTER_MD_120,
         )
-        formation_master_md = EducationGroupYearFactory(acronym='DROI2MD', education_group_type=formation_master_md_type)
+        formation_master_md = EducationGroupYearFactory(acronym='DROI2MD',
+                                                        education_group_type=formation_master_md_type,
+                                                        academic_year=self.academic_year)
 
         common_core_type = EducationGroupTypeFactory(
             category=education_group_categories.GROUP,
             name=education_group_types.GroupType.COMMON_CORE,
         )
-        common_core = EducationGroupYearFactory(acronym='TC DROI2MD', education_group_type=common_core_type)
+        common_core = EducationGroupYearFactory(acronym='TC DROI2MD',
+                                                education_group_type=common_core_type,
+                                                academic_year=self.academic_year)
 
         self.link_1 = GroupElementYearFactory(parent=self.root, child_branch=finality_list, child_leaf=None)
-        self.link_1_bis = GroupElementYearFactory(parent=self.root, child_branch=EducationGroupYearFactory(), child_leaf=None)
+        self.link_1_bis = GroupElementYearFactory(parent=self.root,
+                                                  child_branch=EducationGroupYearFactory(
+                                                      academic_year=self.academic_year),
+                                                  child_leaf=None)
         self.link_2 = GroupElementYearFactory(parent=finality_list, child_branch=formation_master_md, child_leaf=None)
         self.link_3 = GroupElementYearFactory(parent=formation_master_md, child_branch=common_core, child_leaf=None)
         self.link_4 = GroupElementYearFactory(parent=common_core, child_leaf=LearningUnitYearFactory(), child_branch=None)
@@ -514,7 +529,8 @@ class TestFetchGroupElementsBehindHierarchy(TestCase):
 class TestValidationOnEducationGroupYearBlockField(TestCase):
 
     def setUp(self):
-        self.group_element_year = GroupElementYearFactory()
+        self.academic_year = AcademicYearFactory()
+        self.group_element_year = GroupElementYearFactory(parent=EducationGroupYearFactory(academic_year=self.academic_year), child_branch=EducationGroupYearFactory(academic_year=self.academic_year))
 
     def test_when_value_is_higher_than_max_authorized(self):
         self.group_element_year.block = 7

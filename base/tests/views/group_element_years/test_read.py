@@ -34,6 +34,7 @@ from django.urls import reverse
 from waffle.testutils import override_flag
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import CentralManagerFactory
@@ -43,8 +44,11 @@ from base.tests.factories.person import CentralManagerFactory
 class TestRead(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.education_group_year = EducationGroupYearFactory()
-        cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year)
+        cls.academic_year = AcademicYearFactory()
+        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
+        cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
+                                                         child_branch=EducationGroupYearFactory(
+                                                             academic_year=cls.academic_year))
         cls.person = CentralManagerFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
         cls.url = reverse(

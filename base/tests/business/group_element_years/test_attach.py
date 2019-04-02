@@ -28,6 +28,7 @@ from django.test import TestCase
 
 from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 
@@ -35,16 +36,21 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 class TestAttachEducationGroupYearStrategy(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.master_120 = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        cls.academic_year = AcademicYearFactory()
+        cls.master_120 = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+                                         academic_year=cls.academic_year)
 
-        cls.option_in_parent = MiniTrainingFactory(education_group_type__name=MiniTrainingType.OPTION.name)
+        cls.option_in_parent = MiniTrainingFactory(education_group_type__name=MiniTrainingType.OPTION.name,
+                                                   academic_year=cls.academic_year)
         GroupElementYearFactory(parent=cls.master_120, child_branch=cls.option_in_parent)
 
         # Create finality and attach some options
-        cls.finality_group = GroupFactory(education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name)
+        cls.finality_group = GroupFactory(education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
+                                          academic_year=cls.academic_year)
         GroupElementYearFactory(parent=cls.master_120, child_branch=cls.finality_group)
 
-        cls.master_120_specialized = GroupFactory(education_group_type__name=TrainingType.MASTER_MS_120.name)
+        cls.master_120_specialized = GroupFactory(education_group_type__name=TrainingType.MASTER_MS_120.name,
+                                                  academic_year=cls.academic_year)
         GroupElementYearFactory(parent=cls.finality_group, child_branch=cls.master_120_specialized)
 
     def test_is_valid_case_attach_option_which_are_within_master_120(self):
@@ -63,7 +69,7 @@ class TestAttachEducationGroupYearStrategy(TestCase):
         In this test, we ensure that we can add a groups which contains options at specialized finality because
         this options are present in root master 2m level
         """
-        subgroup = GroupFactory(education_group_type__name=GroupType.SUB_GROUP.name)
+        subgroup = GroupFactory(education_group_type__name=GroupType.SUB_GROUP.name, academic_year=self.academic_year)
         GroupElementYearFactory(parent=subgroup, child_branch=self.option_in_parent)
 
         strategy = AttachEducationGroupYearStrategy(
@@ -77,7 +83,8 @@ class TestAttachEducationGroupYearStrategy(TestCase):
         In this test, we ensure that we CANNOT add an option at specialized finality because
         it is not present in root master 2m level
         """
-        option_which_are_not_in_2m = MiniTrainingFactory(education_group_type__name=MiniTrainingType.OPTION.name)
+        option_which_are_not_in_2m = MiniTrainingFactory(education_group_type__name=MiniTrainingType.OPTION.name,
+                                                         academic_year=self.academic_year)
         strategy = AttachEducationGroupYearStrategy(
             parent=self.master_120_specialized,
             child=option_which_are_not_in_2m
@@ -91,8 +98,9 @@ class TestAttachEducationGroupYearStrategy(TestCase):
         In this test, we ensure that we CANNOT add a groups which contains options at specialized finality because
         this options are not present in root master 2m level
         """
-        subgroup = GroupFactory(education_group_type__name=GroupType.SUB_GROUP.name)
-        option_which_are_not_in_2m = MiniTrainingFactory(education_group_type__name=MiniTrainingType.OPTION.name)
+        subgroup = GroupFactory(education_group_type__name=GroupType.SUB_GROUP.name, academic_year=self.academic_year)
+        option_which_are_not_in_2m = MiniTrainingFactory(education_group_type__name=MiniTrainingType.OPTION.name,
+                                                         academic_year=self.academic_year)
         # Error case
         GroupElementYearFactory(parent=subgroup, child_branch=option_which_are_not_in_2m)
         # Good case (present in 2M)

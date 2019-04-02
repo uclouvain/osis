@@ -372,7 +372,7 @@ class EducationGroupViewTestCase(TestCase):
         self.type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
 
     def test_education_administrative_data(self):
-        an_education_group = EducationGroupYearFactory()
+        an_education_group = EducationGroupYearFactory(academic_year=self.academic_year)
         self.initialize_session()
         url = reverse("education_group_administrative", args=[an_education_group.id, an_education_group.id])
         response = self.client.get(url)
@@ -381,7 +381,10 @@ class EducationGroupViewTestCase(TestCase):
         self.assertEqual(response.context['parent'], an_education_group)
 
     def test_education_administrative_data_with_root_set(self):
-        a_group_element_year = GroupElementYearFactory()
+        a_group_element_year = GroupElementYearFactory(parent=EducationGroupYearFactory(
+                                                           academic_year=self.academic_year),
+                                                       child_branch=EducationGroupYearFactory(
+                                                           academic_year=self.academic_year))
         self.initialize_session()
         url = reverse("education_group_administrative",
                       args=[a_group_element_year.parent.id, a_group_element_year.child_branch.id])

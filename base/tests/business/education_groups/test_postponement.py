@@ -188,7 +188,8 @@ class TestPostpone(TestCase):
         self.assertEqual(str(cm.exception), _("The root does not exist in the next academic year."))
 
     def test_init_already_postponed_content(self):
-        gr = GroupElementYearFactory(parent=self.next_education_group_year)
+        gr = GroupElementYearFactory(parent=self.next_education_group_year,
+                                     child_branch__academic_year=self.next_education_group_year.academic_year)
 
         with self.assertRaises(NotPostponeError) as cm:
             self.postponer = PostponeContent(self.current_education_group_year)
@@ -202,7 +203,7 @@ class TestPostpone(TestCase):
 
         self.postponer = PostponeContent(self.current_education_group_year)
 
-        GroupElementYearFactory(parent=gr.child_branch)
+        GroupElementYearFactory(parent=gr.child_branch, child_branch__academic_year=gr.child_branch.academic_year)
 
         with self.assertRaises(NotPostponeError) as cm:
             self.postponer = PostponeContent(self.current_education_group_year)

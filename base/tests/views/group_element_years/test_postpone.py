@@ -31,7 +31,7 @@ from waffle.testutils import override_flag
 
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
-from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
@@ -62,7 +62,8 @@ class TestPostpone(TestCase):
 
         PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
 
-        self.group_element_year = GroupElementYearFactory(parent=self.education_group_year)
+        self.group_element_year = GroupElementYearFactory(parent=self.education_group_year,
+                                                          child_branch=EducationGroupYearFactory(academic_year=self.education_group_year.academic_year))
         self.url = reverse(
             "postpone_education_group",
             kwargs={

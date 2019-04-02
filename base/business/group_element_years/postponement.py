@@ -173,7 +173,7 @@ class PostponeContent:
             ).first()
 
         if not new_gr:
-            new_gr = update_related_object(gr, "parent", next_instance)
+            new_gr = update_related_object(gr, "parent", next_instance, commit_save=False)
 
         if new_gr.child_leaf:
             return self._postpone_child_leaf(gr, new_gr)
