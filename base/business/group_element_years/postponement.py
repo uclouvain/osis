@@ -46,10 +46,13 @@ class ReuseOldLearningUnitYearWarning(CopyWarning):
         self.learning_unit_year = obj
         self.academic_year = academic_year
 
+    # TODO Modify message
     def __str__(self):
-        return _("The learning unit %(learning_unit_year)s does not exist in %(academic_year)s.") % {
+        return _("Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
+                 "Learning unit is postponed with academic year of %(learning_unit_academic_year)s.") % {
             "learning_unit_year": self.learning_unit_year.acronym,
-            "academic_year": self.academic_year
+            "academic_year": self.academic_year,
+            "learning_unit_academic_year": self.learning_unit_year.academic_year
         }
 
 
@@ -73,6 +76,7 @@ class EducationGroupEndYearWarning(CopyWarning):
         self.education_group_year = obj
         self.academic_year = academic_year
 
+    # TODO Modify warning message
     def __str__(self):
         return _("%(education_group_year)s is closed in %(end_year)s, there is no more link to this "
                  "element in %(academic_year)s.") % {
@@ -156,6 +160,7 @@ class PostponeContent:
         after that, we'll postponement recursively all the child branches and child leafs.
         """
 
+        # TODO Stop postponement if OF is not empty or if OF is reference link and empty (of exist in N+1)
         for gr in instance.groupelementyear_set.select_related('child_branch__academic_year',
                                                                'child_branch__education_group'):
             new_gr = self._postpone_child(gr, next_instance)
@@ -209,6 +214,8 @@ class PostponeContent:
         """
         old_egy = old_gr.child_branch
         new_egy = old_egy.next_year()
+
+        # TODO Check if link is reference and do not copy content and display message
 
         if new_egy:
             # In the case of technical group, we have to postpone the content even if the group already

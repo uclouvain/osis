@@ -426,9 +426,11 @@ class TestPostpone(TestCase):
         self.assertIsInstance(self.postponer.warnings[0], ReuseOldLearningUnitYearWarning)
         self.assertEqual(
             str(self.postponer.warnings[0]),
-            _("The learning unit %(learning_unit_year)s does not exist in %(academic_year)s.") % {
+            _("Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
+              "Learning unit is postponed with academic year of %(learning_unit_academic_year)s.") % {
                 "learning_unit_year": prerequisite.learning_unit_year.acronym,
                 "academic_year": self.next_academic_year,
+                "learning_unit_academic_year": prerequisite.learning_unit_year.academic_year
             }
         )
         self.assertFalse(new_root.prerequisite_set.all())
