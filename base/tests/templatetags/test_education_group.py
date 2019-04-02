@@ -31,6 +31,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, pgettext
 
+from django.conf import settings
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
 from base.templatetags.education_group import li_with_deletion_perm, button_with_permission, \
@@ -38,7 +39,7 @@ from base.templatetags.education_group import li_with_deletion_perm, button_with
     li_with_create_perm_mini_training, li_with_create_perm_group, link_detach_education_group, \
     link_pdf_content_education_group, button_edit_administrative_data, dl_with_parent
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
@@ -59,7 +60,8 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     """ This class will test the tag as central manager """
 
     def setUp(self):
-        self.education_group_year = TrainingFactory()
+        academic_year = AcademicYearFactory(year=2020)
+        self.education_group_year = TrainingFactory(academic_year=academic_year)
         self.person = CentralManagerFactory("delete_educationgroup", "change_educationgroup", "add_educationgroup")
         PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
 
@@ -289,8 +291,8 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
     """ This class will test the tag as faculty manager """
 
     def setUp(self):
-        current_ac = create_current_academic_year()
-        self.education_group_year = TrainingFactory(academic_year=current_ac)
+        academic_year = AcademicYearFactory(year=2020)
+        self.education_group_year = TrainingFactory(academic_year=academic_year)
         self.person = FacultyManagerFactory("delete_educationgroup", "change_educationgroup", "add_educationgroup")
         PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
 
@@ -299,7 +301,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             reference=EDUCATION_GROUP_EDITION,
             start_date=timezone.now(),
             end_date=timezone.now() + timedelta(weeks=+1),
-            academic_year=current_ac,
+            academic_year=academic_year,
         )
 
         self.client.force_login(user=self.person.user)
@@ -332,9 +334,9 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         self.assertDictEqual(
             result,
             {
-                'load_modal': True,
                 'title': 'title',
                 'class_button': 'btn-default btn-sm ',
+                'load_modal': True,
                 'url': '#',
                 'icon': 'fa-edit'
             }

@@ -106,26 +106,26 @@
                 </tr>
                 <tr>
                     <td style="padding:0;">
-                        <img src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/obligatoire.gif" width="12"
+                        <img src="{% static "img/education_group_year/mandatory.png" %}" width="12"
                              height="12">
                     </td>
                     <td style="padding:0;font-size: 10px;">{% trans 'Mandatory' %}</td>
                     <td style="padding-left:5px;">
-                        <img src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/optionnel.gif" width="12"
+                        <img src="{% static "img/education_group_year/optional.png" %}" width="12"
                              height="12">
                     </td>
                     <td style="padding:0;font-size: 10px;">{% trans 'Optional' %}</td>
                 </tr>
                 <tr>
                     <td style="padding:0;">
-                        <img src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/cours_non_dispense.gif"
+                        <img src="{% static "img/education_group_year/delta.png" %}"
                              width="12" height="12">
                     </td>
                     <td style="padding:0;font-size: 10px;">
                         {% trans 'Courses not taught' %} {{ root.academic_year }}
                     </td>
                     <td style="padding-left:5px;">
-                        <img src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/cours_cyclique_non_dispense.gif"
+                        <img src="{% static "img/education_group_year/bisannual_odd.png" %}"
                              width="12" height="12">
                     </td>
                     <td style="padding:0;font-size: 10px;">{% trans 'Periodic courses not taught' %} {{ root.academic_year }}
@@ -133,14 +133,14 @@
                 </tr>
                 <tr>
                     <td style="padding:0;">
-                        <img src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/cours_cyclique_dispense.gif"
+                        <img src="{% static "img/education_group_year/bisannual_even.png" %}"
                              width="12" height="12">
                     </td>
                     <td style="padding:0;font-size: 10px;">{% trans 'Periodic courses taught during' %}
                         {{ root.academic_year }}
                     </td>
                     <td style="padding-left:5px;">
-                        <img src="https://cdn.uclouvain.be/reddot/doc/cursusOnWeb/images/avec_prerequis.gif"
+                        <img src="{% static "img/education_group_year/prerequis.gif" %}"
                              width="6" height="6">
                     </td>
                     <td style="padding:0;font-size: 10px;">{% trans 'Activities with prerequisites (in preparation)' %}</td>
