@@ -51,11 +51,3 @@ class LearningunitComponentClassTest(TestCase):
                 .build(learning_unit_component=self.learning_unit_components[0],
                        learning_class_year=self.learning_class_years[1])
             learning_unit_component_class.save()
-
-    def test_find_by_learning_class_year(self):
-        learning_unit_component_class = LearningUnitComponentClassFactory\
-            .build(learning_unit_component=self.learning_unit_components[0],
-                   learning_class_year=self.learning_class_years[0])
-        learning_unit_component_class.save()
-        self.assertEqual(mdl.learning_unit_component_class.find_by_learning_class_year(self.learning_class_years[0])[0],
-                         learning_unit_component_class)

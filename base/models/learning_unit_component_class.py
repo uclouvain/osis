@@ -51,10 +51,6 @@ class LearningUnitComponentClass(models.Model):
         )
 
 
-def find_by_learning_class_year(learning_class_year):
-    return LearningUnitComponentClass.objects.filter(learning_class_year=learning_class_year)
-
-
 def search(learning_unit_component=None, learning_class_year=None):
     queryset = LearningUnitComponentClass.objects
 
