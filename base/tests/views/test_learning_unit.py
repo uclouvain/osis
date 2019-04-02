@@ -327,11 +327,11 @@ class LearningUnitViewTestCase(TestCase):
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
 
         cls.learning_container_yr = LearningContainerYearFactory(academic_year=cls.current_academic_year)
-        luy = LearningUnitYearFactory(
+        cls.luy = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
             learning_container_year=cls.learning_container_yr
         )
-        cls.learning_component_yr = LearningComponentYearFactory(learning_unit_year=luy,
+        cls.learning_component_yr = LearningComponentYearFactory(learning_unit_year=cls.luy,
                                                                  hourly_volume_total_annual=10,
                                                                  hourly_volume_partial_q1=5,
                                                                  hourly_volume_partial_q2=5)

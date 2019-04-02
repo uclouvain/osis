@@ -42,7 +42,6 @@ from base.models.enums import academic_calendar_type
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
-from base.models.learning_class_year import LearningClassYear
 from base.models.utils.utils import get_object_or_none
 from cms import models as mdl_cms
 from cms.enums import entity_name
@@ -95,16 +94,12 @@ CMS_LABEL_SUMMARY = ['resume']
 COLORED = 'COLORED_ROW'
 
 
-# FIXME :: Feature to remove? Reusage of components and classes (LearningUnitComponent) is not pertinent anymore.
 def get_same_container_year_components(learning_unit_year):
+    learning_container_year = learning_unit_year.learning_container_year
     components = []
 
-    learning_components_year = learning_unit_year.learningcomponentyear_set.prefetch_related(
-        Prefetch(
-            'learningclassyear_set',
-            queryset=LearningClassYear.objects.select_related('learning_component_year__learning_unit_year'),
-            to_attr="classes"
-        ),
+    learning_components_year = learning_container_year.learningcomponentyear_set.prefetch_related(
+        Prefetch('learningclassyear_set', to_attr="classes"),
         'learningunityear_set'
     ).select_related('learning_unit_year').order_by('type', 'acronym')
 
