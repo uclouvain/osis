@@ -191,7 +191,7 @@ class AddAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSucc
 
 class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView):
     rules = [lambda luy, person: perms.is_eligible_to_manage_charge_repartition(luy, person)
-                                 or perms.is_eligible_to_manage_attributions(luy, person)]
+             or perms.is_eligible_to_manage_attributions(luy, person)]
     model = AttributionNew
     template_name = "learning_unit/remove_charge_repartition_confirmation_inner.html"
     pk_url_kwarg = "attribution_id"
