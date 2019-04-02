@@ -101,7 +101,7 @@ def get_same_container_year_components(learning_unit_year):
     learning_components_year = learning_container_year.learningcomponentyear_set.prefetch_related(
         Prefetch('learningclassyear_set', to_attr="classes"),
         'learningunityear_set'
-    ).order_by('type', 'acronym')
+    ).select_related('learning_unit_year').order_by('type', 'acronym')
 
     additionnal_entities = {}
 
@@ -112,7 +112,7 @@ def get_same_container_year_components(learning_unit_year):
                 learning_class_year.is_used_by_full_learning_unit_year = _is_used_by_full_learning_unit_year(
                     learning_class_year)
 
-        used_by_learning_unit = mdl_base.learning_unit_component.search(learning_component_year, learning_unit_year)
+        used_by_learning_unit = learning_component_year.learning_unit_year == learning_unit_year
 
         entity_components_yr = learning_component_year.entitycomponentyear_set.all()
         if indx == 0:
