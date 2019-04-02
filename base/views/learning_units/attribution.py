@@ -136,6 +136,9 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
             else None
         }.get(form_name)
 
+    def attribution_form_valid(self, attribution_form):
+        attribution_form.save()
+
     def lecturing_charge_form_valid(self, lecturing_charge_form):
         lecturing_charge_form.save(attribution=self.attribution)
 
@@ -167,6 +170,11 @@ class AddAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSucc
             del form_classes["practical_charge_form"]
         return form_classes
 
+    def forms_valid(self, forms):
+        attribution_form = forms["attribution_form"]
+        attribution_form.save()
+        return super().forms_valid(forms)
+
     def lecturing_charge_form_valid(self, lecturing_charge_form):
         attribution_form = self.instantiated_forms["attribution_form"]
         lecturing_charge_form.save(attribution=attribution_form.instance)
@@ -183,7 +191,7 @@ class AddAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSucc
 
 class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView):
     rules = [lambda luy, person: perms.is_eligible_to_manage_charge_repartition(luy, person)
-             or perms.is_eligible_to_manage_attributions(luy, person)]
+                                 or perms.is_eligible_to_manage_attributions(luy, person)]
     model = AttributionNew
     template_name = "learning_unit/remove_charge_repartition_confirmation_inner.html"
     pk_url_kwarg = "attribution_id"
