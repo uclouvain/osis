@@ -122,7 +122,7 @@ def get_same_container_year_components(learning_unit_year):
             {
                 'learning_component_year': learning_component_year,
                 'volumes': volume_learning_component_year(learning_component_year, entity_components_yr),
-                'learning_unit_usage': _learning_unit_usage(learning_component_year),
+                'learning_unit_usage': _learning_unit_usage(learning_component_year.learning_unit_year),
                 'used_by_learning_unit': used_by_learning_unit
             }
         )
@@ -163,12 +163,11 @@ def get_cms_label_data(cms_label, user_language):
     return cms_label_data
 
 
-def _learning_unit_usage(a_learning_component_year):
-    components = mdl_base.learning_unit_component.find_by_learning_component_year(a_learning_component_year)
-    return ", ".join(["{} ({})".format(
-        c.learning_unit_year.acronym,
-        _(c.learning_unit_year.quadrimester) if c.learning_unit_year.quadrimester else '?'
-    ) for c in components])
+def _learning_unit_usage(learning_unit_year):
+    return "{} ({})".format(
+        learning_unit_year.acronym,
+        _(learning_unit_year.quadrimester) if learning_unit_year.quadrimester else '?'
+    )
 
 
 def _learning_unit_usage_by_class(a_learning_class_year):

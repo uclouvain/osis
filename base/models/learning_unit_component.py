@@ -54,11 +54,6 @@ def find_by_learning_unit_year(a_learning_unit_year):
         .order_by('learning_component_year__acronym')
 
 
-def find_by_learning_component_year(a_learning_component_year):
-    return LearningUnitComponent.objects.filter(learning_component_year=a_learning_component_year)\
-        .order_by('learning_unit_year__acronym')
-
-
 def search(a_learning_component_year=None, a_learning_unit_year=None):
     queryset = LearningUnitComponent.objects
     if a_learning_component_year:

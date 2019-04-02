@@ -749,28 +749,6 @@ class LearningUnitViewTestCase(TestCase):
     def _assert_group_elements_ordered_by_partial_acronym(self, context, expected_order):
         self.assertListEqual(list(context['group_elements_years']), expected_order)
 
-    def test_learning_unit_usage_two_usages(self):
-        learning_container_yr = LearningContainerYearFactory(academic_year=self.current_academic_year,
-                                                             acronym='LBIOL')
-
-        learning_unit_yr_1 = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     acronym='LBIOLA',
-                                                     quadrimester='Q1',
-                                                     learning_container_year=learning_container_yr)
-        learning_unit_yr_2 = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     acronym='LBIOLB',
-                                                     learning_container_year=learning_container_yr,
-                                                     quadrimester=None)
-
-        learning_component_yr = LearningComponentYearFactory(learning_container_year=learning_container_yr)
-
-        LearningUnitComponentFactory(learning_unit_year=learning_unit_yr_1,
-                                     learning_component_year=learning_component_yr)
-        LearningUnitComponentFactory(learning_unit_year=learning_unit_yr_2,
-                                     learning_component_year=learning_component_yr)
-
-        self.assertEqual(learning_unit_business._learning_unit_usage(learning_component_yr), 'LBIOLA (Q1), LBIOLB (?)')
-
     def test_learning_unit_usage_with_complete_LU(self):
         learning_container_yr = LearningContainerYearFactory(academic_year=self.current_academic_year,
                                                              acronym='LBIOL')
@@ -779,12 +757,10 @@ class LearningUnitViewTestCase(TestCase):
                                                      acronym='LBIOL', quadrimester='Q1&2',
                                                      learning_container_year=learning_container_yr)
 
-        learning_component_yr = LearningComponentYearFactory(learning_container_year=learning_container_yr)
+        learning_component_yr = LearningComponentYearFactory(learning_unit_year=learning_unit_yr_1)
 
-        LearningUnitComponentFactory(learning_unit_year=learning_unit_yr_1,
-                                     learning_component_year=learning_component_yr)
-
-        self.assertEqual(learning_unit_business._learning_unit_usage(learning_component_yr), 'LBIOL (Q1&2)')
+        result = learning_unit_business._learning_unit_usage(learning_component_yr.learning_unit_year)
+        self.assertEqual(result, 'LBIOL (Q1&2)')
 
     def test_learning_unit_usage_by_class_with_complete_LU(self):
         academic_year = AcademicYearFactory(year=2016)
@@ -827,16 +803,6 @@ class LearningUnitViewTestCase(TestCase):
         response = self.client.post('{}?{}'.format(url, qs), data={"planned_classes": "1"})
         with self.assertRaises(ObjectDoesNotExist):
             learning_unit_component.LearningUnitComponent.objects.filter(pk=learning_unit_compnt.id).get()
-
-    def test_component_save_create_link(self):
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                   learning_container_year=self.learning_container_yr)
-        url = reverse('learning_unit_component_edit', args=[learning_unit_yr.id])
-        qs = 'learning_component_year_id={}'.format(self.learning_component_yr.id)
-
-        response = self.client.post('{}?{}'.format(url, qs), data={"planned_classes": "1", "used_by": "on"})
-
-        self.assertTrue(learning_unit_component.find_by_learning_component_year(self.learning_component_yr).exists())
 
     def _prepare_context_learning_units_search(self):
         # Create a structure [Entity / Entity version]
