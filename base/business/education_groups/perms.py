@@ -27,6 +27,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext
 
+from django.conf import settings
 from base.business.group_element_years import management
 from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.models.academic_calendar import AcademicCalendar
@@ -69,7 +70,19 @@ def _is_eligible_to_add_education_group(person, education_group, category, educa
 
 def is_eligible_to_change_education_group(person, education_group, raise_exception=False):
     return check_permission(person, "base.change_educationgroup", raise_exception) and \
-           _is_eligible_education_group(person, education_group, raise_exception)
+           _is_eligible_education_group(person, education_group, raise_exception) and \
+           _is_year_editable(education_group, raise_exception)
+
+
+def _is_year_editable(education_group, raise_exception):
+    error_msg = None
+    if education_group.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION:
+        error_msg = _("You cannot change a education group before %(limit_year)s") % {
+                "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}
+
+    result = error_msg is None
+    can_raise_exception(raise_exception, result, error_msg)
+    return result
 
 
 def is_eligible_to_change_coorganization(person, education_group, raise_exception=False):
