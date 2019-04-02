@@ -435,8 +435,12 @@ msgstr ""
 msgid "Add another"
 msgstr ""
 
-#: templates/learning_unit/attributions.html:88
+#: templates/learning_unit/attributions.html:95
 msgid "Add attribution"
+msgstr ""
+
+#: templates/learning_unit/attributions.html:93
+msgid "Add current year attribution"
 msgstr ""
 
 #: templates/education_group/pdf_content.html:189
@@ -676,7 +680,7 @@ msgstr ""
 msgid "Attrib. vol2"
 msgstr ""
 
-#: views/learning_units/attribution.py:178
+#: views/learning_units/attribution.py:180
 #, python-format
 msgid "Attribution added for %(tutor)s (%(function)s)"
 msgstr ""
@@ -692,12 +696,12 @@ msgstr ""
 msgid "Attribution entity"
 msgstr ""
 
-#: views/learning_units/attribution.py:139
+#: views/learning_units/attribution.py:146
 #, python-format
 msgid "Attribution modified for %(tutor)s (%(function)s)"
 msgstr ""
 
-#: views/learning_units/attribution.py:202
+#: views/learning_units/attribution.py:204
 #, python-format
 msgid "Attribution removed for %(tutor)s (%(function)s)"
 msgstr ""
@@ -757,7 +761,7 @@ msgstr ""
 msgid "Block"
 msgstr ""
 
-#: templates/learning_units.html:72 views/learning_units/search.py:231
+#: templates/learning_units.html:72 views/learning_units/search.py:232
 msgid "Borrowed courses"
 msgstr ""
 
@@ -947,7 +951,7 @@ msgid "Commerce partner"
 msgstr ""
 
 #: business/learning_units/edition.py:450 business/proposal_xls.py:57
-#: models/learning_container_year.py:61
+#: models/learning_container_year.py:60
 msgid "Common English title"
 msgstr ""
 
@@ -956,7 +960,7 @@ msgid "Common core"
 msgstr ""
 
 #: business/learning_units/edition.py:449 business/proposal_xls.py:55
-#: models/learning_container_year.py:59
+#: models/learning_container_year.py:58
 #: tests/business/learning_units/test_edition.py:247
 #: tests/views/test_learning_unit.py:1555
 msgid "Common title"
@@ -1042,7 +1046,7 @@ msgstr ""
 msgid "Country"
 msgstr ""
 
-#: models/enums/learning_container_year_types.py:38
+#: models/enums/learning_container_year_types.py:47
 #: tests/forms/learning_unit/test_search_form.py:78
 msgid "Course"
 msgstr ""
@@ -1120,7 +1124,7 @@ msgid "Day"
 msgstr ""
 
 #: business/proposal_xls.py:40 business/proposal_xls.py:72
-#: models/learning_container_year.py:67 tests/views/test_learning_unit.py:1554
+#: models/learning_container_year.py:66 tests/views/test_learning_unit.py:1554
 msgid "Decision"
 msgstr ""
 
@@ -1233,7 +1237,7 @@ msgstr ""
 msgid "Disciplinary complement minor"
 msgstr ""
 
-#: models/enums/learning_container_year_types.py:40
+#: models/enums/learning_container_year_types.py:49
 #: models/enums/person_source_type.py:33
 msgid "Dissertation"
 msgstr ""
@@ -1302,11 +1306,11 @@ msgstr ""
 msgid "Down"
 msgstr ""
 
-#: forms/learning_unit/attribution_charge_repartition.py:40
+#: forms/learning_unit/attribution_charge_repartition.py:41
 #: models/education_group_year.py:350
 #: templates/education_group/identification_training_details.html:42
 #: templates/learning_unit/add_charge_repartition_inner.html:36
-#: templates/learning_unit/attributions.html:37
+#: templates/learning_unit/attributions.html:38
 #: templates/learning_unit/select_attribution.html:37
 msgid "Duration"
 msgstr ""
@@ -1546,7 +1550,7 @@ msgstr ""
 msgid "Execute selected action"
 msgstr ""
 
-#: models/learning_unit_year.py:303
+#: models/learning_unit_year.py:306
 msgid "Existing acronym"
 msgstr ""
 
@@ -1562,7 +1566,7 @@ msgstr ""
 
 #: forms/learning_unit/external_learning_unit.py:53
 #: models/enums/attribution_procedure.py:35
-#: models/enums/learning_container_year_types.py:44
+#: models/enums/learning_container_year_types.py:53
 #: tests/views/test_learning_unit.py:1543
 msgid "External"
 msgstr ""
@@ -1862,7 +1866,7 @@ msgstr ""
 msgid "Inactive"
 msgstr ""
 
-#: forms/learning_unit/attribution_charge_repartition.py:69
+#: forms/learning_unit/attribution_charge_repartition.py:75
 msgid "Indicate the name or the FGS"
 msgstr ""
 
@@ -1907,7 +1911,7 @@ msgid "International title"
 msgstr ""
 
 #: models/education_group_year.py:259
-#: models/enums/learning_container_year_types.py:39
+#: models/enums/learning_container_year_types.py:48
 msgid "Internship"
 msgstr ""
 
@@ -1964,7 +1968,7 @@ msgid ""
 "leaf."
 msgstr ""
 
-#: models/learning_unit_year.py:337
+#: models/learning_unit_year.py:340
 msgid "It is necessary to indicate the internship subtype."
 msgstr ""
 
@@ -2115,7 +2119,7 @@ msgstr ""
 #: templates/learning_unit/summary_list.html:70
 #: templates/learning_unit/volumes_management.html:31
 #: templates/learning_units.html:32 templates/learning_units.html:49
-#: views/learning_units/search.py:232
+#: views/learning_units/search.py:233
 msgid "Learning units"
 msgstr ""
 
@@ -2264,7 +2268,7 @@ msgstr ""
 msgid "Male"
 msgstr ""
 
-#: templates/learning_unit/attributions.html:95
+#: templates/learning_unit/attributions.html:103
 msgid "Manage repartition"
 msgstr ""
 
@@ -2389,8 +2393,8 @@ msgstr ""
 msgid "Master of specialist"
 msgstr ""
 
-#: models/enums/learning_container_year_types.py:43
-#: models/enums/learning_container_year_types.py:50
+#: models/enums/learning_container_year_types.py:42
+#: models/enums/learning_container_year_types.py:52
 msgid "Master thesis"
 msgstr ""
 
@@ -2653,7 +2657,7 @@ msgid "No print"
 msgstr ""
 
 #: tests/views/test_learning_unit_proposal.py:429
-#: views/learning_units/search.py:205
+#: views/learning_units/search.py:206
 msgid "No proposals was selected."
 msgstr ""
 
@@ -2845,8 +2849,8 @@ msgstr ""
 msgid "Other academic responsibles"
 msgstr ""
 
-#: models/enums/learning_container_year_types.py:41
-#: models/enums/learning_container_year_types.py:48
+#: models/enums/learning_container_year_types.py:40
+#: models/enums/learning_container_year_types.py:50
 msgid "Other collective"
 msgstr ""
 
@@ -2858,8 +2862,8 @@ msgstr ""
 msgid "Other contacts"
 msgstr ""
 
-#: models/enums/learning_container_year_types.py:42
-#: models/enums/learning_container_year_types.py:49
+#: models/enums/learning_container_year_types.py:41
+#: models/enums/learning_container_year_types.py:51
 msgid "Other individual"
 msgstr ""
 
@@ -3224,7 +3228,7 @@ msgid "Proposal type"
 msgstr ""
 
 #: business/proposal_xls.py:34 business/proposal_xls.py:35
-#: templates/learning_units.html:77 views/learning_units/search.py:229
+#: templates/learning_units.html:77 views/learning_units/search.py:230
 msgid "Proposals"
 msgstr ""
 
@@ -3496,7 +3500,7 @@ msgstr ""
 msgid "Search of annual programs"
 msgstr ""
 
-#: views/learning_units/search.py:223
+#: views/learning_units/search.py:224
 msgid "Search type"
 msgstr ""
 
@@ -3541,7 +3545,7 @@ msgstr ""
 msgid "Separate"
 msgstr ""
 
-#: templates/learning_units.html:67 views/learning_units/search.py:230
+#: templates/learning_units.html:67 views/learning_units/search.py:231
 msgid "Service courses"
 msgstr ""
 
@@ -3616,7 +3620,7 @@ msgstr ""
 #: templates/education_group/identification_mini_training_details.html:38
 #: templates/education_group/identification_training_details.html:98
 #: templates/learning_unit/add_charge_repartition_inner.html:35
-#: templates/learning_unit/attributions.html:36
+#: templates/learning_unit/attributions.html:37
 #: templates/learning_unit/select_attribution.html:36
 msgid "Start"
 msgstr ""
@@ -3708,7 +3712,7 @@ msgstr ""
 
 #: business/learning_unit_xls.py:219
 #: templates/learning_unit/add_charge_repartition_inner.html:39
-#: templates/learning_unit/attributions.html:40
+#: templates/learning_unit/attributions.html:42
 #: templates/learning_unit/select_attribution.html:40
 #: tests/business/test_learning_unit_xls.py:171
 #: tests/business/test_learning_unit_xls.py:323
@@ -3767,7 +3771,7 @@ msgid "Teaching profile"
 msgstr ""
 
 #: business/learning_units/edition.py:452 business/proposal_xls.py:70
-#: models/learning_container_year.py:64
+#: models/learning_container_year.py:63
 msgid "Team management"
 msgstr ""
 
@@ -3869,7 +3873,7 @@ msgstr ""
 msgid "The coorganization modifications has been saved"
 msgstr ""
 
-#: models/learning_unit_year.py:328
+#: models/learning_unit_year.py:331
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:232
 #, python-format
 msgid ""
@@ -3878,7 +3882,7 @@ msgid ""
 msgstr ""
 
 #: forms/learning_unit/learning_unit_create.py:164
-#: models/learning_unit_year.py:323
+#: models/learning_unit_year.py:326
 #: tests/forms/learning_unit/test_learningUnitYearModelForm.py:89
 #: tests/models/test_learning_unit_year.py:598
 msgid "The credits value should be an integer"
@@ -4077,14 +4081,14 @@ msgid ""
 "already reached the limit."
 msgstr ""
 
-#: models/learning_unit_year.py:360 tests/models/test_learning_unit_year.py:560
+#: models/learning_unit_year.py:363 tests/models/test_learning_unit_year.py:560
 #, python-format
 msgid ""
 "The parent is %(parent_periodicty)s and there is at least one partim which "
 "is not %(parent_periodicty)s"
 msgstr ""
 
-#: models/learning_unit_year.py:347
+#: models/learning_unit_year.py:350
 msgid "The parent is inactive and there is at least one partim active"
 msgstr ""
 
@@ -4305,13 +4309,13 @@ msgstr ""
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr ""
 
-#: models/learning_unit_year.py:354 tests/models/test_learning_unit_year.py:576
+#: models/learning_unit_year.py:357 tests/models/test_learning_unit_year.py:576
 #, python-format
 msgid ""
 "This partim is %(partim_periodicity)s and the parent is %(parent_periodicty)s"
 msgstr ""
 
-#: models/learning_unit_year.py:344
+#: models/learning_unit_year.py:347
 msgid "This partim is active and the parent is inactive"
 msgstr ""
 
@@ -4413,7 +4417,7 @@ msgstr ""
 msgid "Trimester"
 msgstr ""
 
-#: forms/learning_unit/attribution_charge_repartition.py:72
+#: forms/learning_unit/attribution_charge_repartition.py:78
 #: forms/learning_unit/search_form.py:83
 #: templates/learning_unit/add_charge_repartition_inner.html:33
 #: templates/learning_unit/attribution_inner.html:41
@@ -4434,7 +4438,7 @@ msgstr ""
 #: business/learning_unit.py:60 business/learning_unit_xls.py:75
 #: business/proposal_xls.py:38 business/proposal_xls.py:46
 #: forms/education_groups.py:72 forms/learning_unit/search_form.py:159
-#: models/entity_version.py:171 models/learning_container_year.py:53
+#: models/entity_version.py:171 models/learning_container_year.py:52
 #: models/proposal_learning_unit.py:55
 #: templates/education_group/search.html:147 templates/entities.html:68
 #: templates/entity/identification.html:62
@@ -4554,7 +4558,7 @@ msgstr ""
 msgid "Utilizations"
 msgstr ""
 
-#: business/proposal_xls.py:71 models/learning_container_year.py:65
+#: business/proposal_xls.py:71 models/learning_container_year.py:64
 msgid "Vacant"
 msgstr ""
 
@@ -4615,13 +4619,13 @@ msgstr ""
 msgid "Volume"
 msgstr ""
 
-#: forms/learning_unit/attribution_charge_repartition.py:121
-#: templates/learning_unit/attributions.html:38
+#: forms/learning_unit/attribution_charge_repartition.py:131
+#: templates/learning_unit/attributions.html:40
 msgid "Volume 1"
 msgstr ""
 
-#: forms/learning_unit/attribution_charge_repartition.py:130
-#: templates/learning_unit/attributions.html:39
+#: forms/learning_unit/attribution_charge_repartition.py:140
+#: templates/learning_unit/attributions.html:41
 msgid "Volume 2"
 msgstr ""
 
@@ -5040,7 +5044,7 @@ msgstr ""
 #: templates/education_group/tab_edit_administrative_data.html:96
 #: templates/learning_unit/achievement_edit.html:53
 #: templates/learning_unit/add_charge_repartition_inner.html:57
-#: templates/learning_unit/attribution_inner.html:66
+#: templates/learning_unit/attribution_inner.html:68
 #: templates/learning_unit/blocks/form/volumes_management_form.html:84
 #: templates/learning_unit/blocks/modal/modal_back_to_initial.html:40
 #: templates/learning_unit/blocks/modal/modal_confirm_delete.html:36
@@ -5390,7 +5394,7 @@ msgstr ""
 #: templates/education_group/organization_edit_inner.html:43
 #: templates/learning_unit/achievement_edit.html:51
 #: templates/learning_unit/add_charge_repartition_inner.html:58
-#: templates/learning_unit/attribution_inner.html:67
+#: templates/learning_unit/attribution_inner.html:69
 #: templates/learning_unit/blocks/form/volumes_management_form.html:80
 #: templates/learning_unit/blocks/modal/modal_pedagogy_edit.html:45
 #: templates/learning_unit/class_edit.html:53

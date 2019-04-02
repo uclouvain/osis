@@ -45,6 +45,8 @@ from base.views.mixins import AjaxTemplateMixin, RulesRequiredMixin, MultiFormsV
 
 
 class AttributionBaseViewMixin(RulesRequiredMixin):
+    """ Generic Mixin for the update/create of Attribution """
+
     rules = [perms.is_eligible_to_manage_charge_repartition]
 
     def _call_rule(self, rule):
@@ -86,6 +88,11 @@ class AttributionBaseViewMixin(RulesRequiredMixin):
     def get_success_url(self):
         return reverse("learning_unit_attributions", args=[self.kwargs["learning_unit_year_id"]])
 
+    def get_form_kwargs(self, form_name):
+        kwargs = super().get_form_kwargs(form_name)
+        kwargs["learning_unit_year"] = self.luy
+        return kwargs
+
 
 class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSuccessMessageMixin, MultiFormsView):
     rules = [perms.is_eligible_to_manage_attributions]
@@ -107,6 +114,9 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
             del form_classes["practical_charge_form"]
         return form_classes
 
+    def get_attribution_form_initial(self):
+        return {"duration": self.attribution.duration}
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["attribution"] = self.attribution
@@ -114,7 +124,7 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
 
     def get_form_kwargs(self, form_name):
         form_kwargs = super().get_form_kwargs(form_name)
-        form_kwargs.update({"instance": self.get_instance_form(form_name)})
+        form_kwargs["instance"] = self.get_instance_form(form_name)
         return form_kwargs
 
     def get_instance_form(self, form_name):
@@ -130,10 +140,10 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
         attribution_form.save()
 
     def lecturing_charge_form_valid(self, lecturing_charge_form):
-        lecturing_charge_form.save(attribution=self.attribution, learning_unit_year=self.luy)
+        lecturing_charge_form.save(attribution=self.attribution)
 
     def practical_charge_form_valid(self, practical_charge_form):
-        practical_charge_form.save(attribution=self.attribution, learning_unit_year=self.luy)
+        practical_charge_form.save(attribution=self.attribution)
 
     def get_success_message(self, forms):
         return _("Attribution modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
@@ -162,16 +172,16 @@ class AddAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSucc
 
     def forms_valid(self, forms):
         attribution_form = forms["attribution_form"]
-        attribution_form.save(learning_unit_year=self.luy)
+        attribution_form.save()
         return super().forms_valid(forms)
 
     def lecturing_charge_form_valid(self, lecturing_charge_form):
         attribution_form = self.instantiated_forms["attribution_form"]
-        lecturing_charge_form.save(attribution=attribution_form.instance, learning_unit_year=self.luy)
+        lecturing_charge_form.save(attribution=attribution_form.instance)
 
     def practical_charge_form_valid(self, practical_charge_form):
         attribution_form = self.instantiated_forms["attribution_form"]
-        practical_charge_form.save(attribution=attribution_form.instance, learning_unit_year=self.luy)
+        practical_charge_form.save(attribution=attribution_form.instance)
 
     def get_success_message(self, forms):
         attribution = forms["attribution_form"].instance
@@ -199,6 +209,6 @@ class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView)
         return response
 
     def get_success_message(self):
-        return _("Attribution removed for %(tutor)s (%(function)s)") %\
-                        {"tutor": self.attribution.tutor.person,
-                         "function": _(self.attribution.get_function_display())}
+        return _("Attribution removed for %(tutor)s (%(function)s)") % \
+               {"tutor": self.attribution.tutor.person,
+                "function": _(self.attribution.get_function_display())}

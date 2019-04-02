@@ -30,6 +30,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
+from attribution.models.enums.function import Functions
 from base.models.enums import learning_component_year_type
 from base.models.learning_component_year import LearningComponentYear
 from base.models.person import Person
@@ -44,14 +45,19 @@ class AttributionForm(forms.ModelForm):
         fields = ["function", "start_year"]
 
     def __init__(self, *args, **kwargs):
+        self.learning_unit_year = kwargs.pop("learning_unit_year")
         super().__init__(*args, **kwargs)
-        self.fields["start_year"].required = True
-        if self.instance:
-            self.fields["duration"].initial = self.instance.duration
+
+        if self.learning_unit_year.is_for_faculty_or_partim():
+            del self.fields["start_year"]
+            del self.fields["duration"]
+            self.fields["function"].choices = Functions.choices_without_professor()
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.end_year = instance.start_year + self.cleaned_data["duration"] - 1
+        if not self.learning_unit_year.is_for_faculty_or_partim():
+            instance.end_year = instance.start_year + self.cleaned_data["duration"] - 1
+
         if commit:
             instance.save()
         return instance
@@ -81,10 +87,9 @@ class AttributionCreationForm(AttributionForm):
             'all': ('css/select2-bootstrap.css',)
         }
 
-    def save(self, commit=True, **kwargs):
-        luy = kwargs.pop("learning_unit_year")
+    def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.learning_container_year = luy.learning_container_year
+        instance.learning_container_year = self.learning_unit_year.learning_container_year
         tutor, create = Tutor.objects.get_or_create(person=self.cleaned_data["person"])
         instance.tutor = tutor
         if commit:
@@ -99,11 +104,16 @@ class AttributionChargeForm(forms.ModelForm):
         model = AttributionChargeNew
         fields = ["allocation_charge"]
 
+    def __init__(self, *args, **kwargs):
+        self.learning_unit_year = kwargs.pop("learning_unit_year")
+        super().__init__(*args, **kwargs)
+
     def save(self, commit=True, **kwargs):
         attribution_new_obj = kwargs.pop("attribution")
-        luy_obj = kwargs.pop("learning_unit_year")
-        learning_component_year = LearningComponentYear.objects.get(Q(type=self.component_type) | Q(type__isnull=True),
-                                                                    learningunitcomponent__learning_unit_year=luy_obj)
+        learning_component_year = LearningComponentYear.objects.get(
+            Q(type=self.component_type) | Q(type__isnull=True),
+            learningunitcomponent__learning_unit_year=self.learning_unit_year
+        )
 
         attribution_charge_obj = super().save(commit=False)
         attribution_charge_obj.attribution = attribution_new_obj

@@ -3,8 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:192
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:193
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
@@ -460,11 +458,15 @@ msgstr "Ajouter"
 msgid "Add another"
 msgstr "Ajouter un autre"
 
-#: templates/learning_unit/attributions.html:88
+#: templates/learning_unit/attributions.html:95
 msgid "Add attribution"
 msgstr "Ajouter attribution"
 
-#: templates/education_group/pdf_content.html:189
+#: templates/learning_unit/attributions.html:93
+msgid "Add current year attribution"
+msgstr "Ajouter attribution année en cours"
+
+#: templates/education_group/pdf_content.html:149
 msgid "Add potential courses"
 msgstr "Ajouts de cours éventuels"
 
@@ -705,7 +707,7 @@ msgstr "Attrib. vol1"
 msgid "Attrib. vol2"
 msgstr "Attrib. vol2"
 
-#: views/learning_units/attribution.py:178
+#: views/learning_units/attribution.py:180
 #, python-format
 msgid "Attribution added for %(tutor)s (%(function)s)"
 msgstr "Attribution ajoutée pour %(tutor)s (%(function)s)"
@@ -721,12 +723,12 @@ msgstr "Durée attribution"
 msgid "Attribution entity"
 msgstr "Entité d'attribution"
 
-#: views/learning_units/attribution.py:139
+#: views/learning_units/attribution.py:146
 #, python-format
 msgid "Attribution modified for %(tutor)s (%(function)s)"
 msgstr "Attribution modifiée pour %(tutor)s (%(function)s)"
 
-#: views/learning_units/attribution.py:202
+#: views/learning_units/attribution.py:204
 #, python-format
 msgid "Attribution removed for %(tutor)s (%(function)s)"
 msgstr "Attribution supprimée pour %(tutor)s (%(function)s)"
@@ -786,7 +788,7 @@ msgstr "Date de naissance"
 msgid "Block"
 msgstr "Bloc"
 
-#: templates/learning_units.html:72 views/learning_units/search.py:231
+#: templates/learning_units.html:72 views/learning_units/search.py:232
 msgid "Borrowed courses"
 msgstr "Cours empruntés"
 
@@ -979,7 +981,7 @@ msgid "Commerce partner"
 msgstr "Partenaire commercial"
 
 #: business/learning_units/edition.py:450 business/proposal_xls.py:57
-#: models/learning_container_year.py:61
+#: models/learning_container_year.py:60
 msgid "Common English title"
 msgstr "Intitulé commun en anglais"
 
@@ -988,7 +990,7 @@ msgid "Common core"
 msgstr "Partie de base (Tronc commun)"
 
 #: business/learning_units/edition.py:449 business/proposal_xls.py:55
-#: models/learning_container_year.py:59
+#: models/learning_container_year.py:58
 #: tests/business/learning_units/test_edition.py:247
 #: tests/views/test_learning_unit.py:1555
 msgid "Common title"
@@ -1074,7 +1076,7 @@ msgstr "Recopier le contenu de %(previous_anac)s à %(current_anac)s"
 msgid "Country"
 msgstr "Pays"
 
-#: models/enums/learning_container_year_types.py:38
+#: models/enums/learning_container_year_types.py:47
 #: tests/forms/learning_unit/test_search_form.py:78
 msgid "Course"
 msgstr "Cours"
@@ -1152,7 +1154,7 @@ msgid "Day"
 msgstr "Jour"
 
 #: business/proposal_xls.py:40 business/proposal_xls.py:72
-#: models/learning_container_year.py:67 tests/views/test_learning_unit.py:1554
+#: models/learning_container_year.py:66 tests/views/test_learning_unit.py:1554
 msgid "Decision"
 msgstr "Décision"
 
@@ -1265,7 +1267,7 @@ msgstr "Désactivé"
 msgid "Disciplinary complement minor"
 msgstr "Mineure complément disciplinaire"
 
-#: models/enums/learning_container_year_types.py:40
+#: models/enums/learning_container_year_types.py:49
 #: models/enums/person_source_type.py:33
 msgid "Dissertation"
 msgstr "Mémoire"
@@ -1335,11 +1337,11 @@ msgstr "Documentation"
 msgid "Down"
 msgstr "Descendre"
 
-#: forms/learning_unit/attribution_charge_repartition.py:40
+#: forms/learning_unit/attribution_charge_repartition.py:41
 #: models/education_group_year.py:350
 #: templates/education_group/identification_training_details.html:42
 #: templates/learning_unit/add_charge_repartition_inner.html:36
-#: templates/learning_unit/attributions.html:37
+#: templates/learning_unit/attributions.html:38
 #: templates/learning_unit/select_attribution.html:37
 msgid "Duration"
 msgstr "Durée"
@@ -1586,7 +1588,7 @@ msgstr "Exécuter"
 msgid "Execute selected action"
 msgstr "Exécuter l'action sélectionnée"
 
-#: models/learning_unit_year.py:303
+#: models/learning_unit_year.py:306
 msgid "Existing acronym"
 msgstr "Sigle déjà existant"
 
@@ -1602,7 +1604,7 @@ msgstr "Exporter"
 
 #: forms/learning_unit/external_learning_unit.py:53
 #: models/enums/attribution_procedure.py:35
-#: models/enums/learning_container_year_types.py:44
+#: models/enums/learning_container_year_types.py:53
 #: tests/views/test_learning_unit.py:1543
 msgid "External"
 msgstr "Externe"
@@ -1902,7 +1904,7 @@ msgstr "En proposition"
 msgid "Inactive"
 msgstr "Inactif"
 
-#: forms/learning_unit/attribution_charge_repartition.py:69
+#: forms/learning_unit/attribution_charge_repartition.py:75
 msgid "Indicate the name or the FGS"
 msgstr "Indiquer le nom ou le FGS"
 
@@ -1947,7 +1949,7 @@ msgid "International title"
 msgstr "Titre international"
 
 #: models/education_group_year.py:259
-#: models/enums/learning_container_year_types.py:39
+#: models/enums/learning_container_year_types.py:48
 msgid "Internship"
 msgstr "Stage"
 
@@ -2007,7 +2009,7 @@ msgstr ""
 "Il est interdit de sauvegarder un GroupElementYear avec un Child branch et "
 "un child leaf."
 
-#: models/learning_unit_year.py:337
+#: models/learning_unit_year.py:340
 msgid "It is necessary to indicate the internship subtype."
 msgstr "Il est nécessaire d'indiquer le sous-type de stage."
 
@@ -2163,7 +2165,7 @@ msgstr "Recherche d'unités d'enseignement"
 #: templates/learning_unit/summary_list.html:70
 #: templates/learning_unit/volumes_management.html:31
 #: templates/learning_units.html:32 templates/learning_units.html:49
-#: views/learning_units/search.py:232
+#: views/learning_units/search.py:233
 msgid "Learning units"
 msgstr "Unités d'enseignement"
 
@@ -2312,7 +2314,7 @@ msgstr "Liste au choix Majeures"
 msgid "Male"
 msgstr "Masculin"
 
-#: templates/learning_unit/attributions.html:95
+#: templates/learning_unit/attributions.html:103
 msgid "Manage repartition"
 msgstr "Gérer la répartition"
 
@@ -2446,8 +2448,8 @@ msgstr "Master en 60 crédits"
 msgid "Master of specialist"
 msgstr "Master de spécialisation"
 
-#: models/enums/learning_container_year_types.py:43
-#: models/enums/learning_container_year_types.py:50
+#: models/enums/learning_container_year_types.py:42
+#: models/enums/learning_container_year_types.py:52
 msgid "Master thesis"
 msgstr "Thèse de master"
 
@@ -2712,7 +2714,7 @@ msgid "No print"
 msgstr "Pas d’impression"
 
 #: tests/views/test_learning_unit_proposal.py:429
-#: views/learning_units/search.py:205
+#: views/learning_units/search.py:206
 msgid "No proposals was selected."
 msgstr "Aucune proposition n'a été sélectionnée."
 
@@ -2918,8 +2920,8 @@ msgstr "Autre responsable académique"
 msgid "Other academic responsibles"
 msgstr "Autres responsables académique"
 
-#: models/enums/learning_container_year_types.py:41
-#: models/enums/learning_container_year_types.py:48
+#: models/enums/learning_container_year_types.py:40
+#: models/enums/learning_container_year_types.py:50
 msgid "Other collective"
 msgstr "Autre collectif"
 
@@ -2931,8 +2933,8 @@ msgstr "Autre contact"
 msgid "Other contacts"
 msgstr "Autres contacts"
 
-#: models/enums/learning_container_year_types.py:42
-#: models/enums/learning_container_year_types.py:49
+#: models/enums/learning_container_year_types.py:41
+#: models/enums/learning_container_year_types.py:51
 msgid "Other individual"
 msgstr "Autre individuel"
 
@@ -3304,7 +3306,7 @@ msgid "Proposal type"
 msgstr "Type proposition"
 
 #: business/proposal_xls.py:34 business/proposal_xls.py:35
-#: templates/learning_units.html:77 views/learning_units/search.py:229
+#: templates/learning_units.html:77 views/learning_units/search.py:230
 msgid "Proposals"
 msgstr "Propositions"
 
@@ -3576,7 +3578,7 @@ msgstr "Recherche d'organisations"
 msgid "Search of annual programs"
 msgstr "Recherche des programmes annualisés"
 
-#: views/learning_units/search.py:223
+#: views/learning_units/search.py:224
 msgid "Search type"
 msgstr "Type de recherche"
 
@@ -3621,7 +3623,7 @@ msgstr "Envoyer un email de rappel pour la mise à jour des fiches descriptives"
 msgid "Separate"
 msgstr "Séparer"
 
-#: templates/learning_units.html:67 views/learning_units/search.py:230
+#: templates/learning_units.html:67 views/learning_units/search.py:231
 msgid "Service courses"
 msgstr "Cours de service"
 
@@ -3696,7 +3698,7 @@ msgstr "Cahier des charges"
 #: templates/education_group/identification_mini_training_details.html:38
 #: templates/education_group/identification_training_details.html:98
 #: templates/learning_unit/add_charge_repartition_inner.html:35
-#: templates/learning_unit/attributions.html:36
+#: templates/learning_unit/attributions.html:37
 #: templates/learning_unit/select_attribution.html:36
 msgid "Start"
 msgstr "Début"
@@ -3788,7 +3790,7 @@ msgstr "Souscrit"
 
 #: business/learning_unit_xls.py:219
 #: templates/learning_unit/add_charge_repartition_inner.html:39
-#: templates/learning_unit/attributions.html:40
+#: templates/learning_unit/attributions.html:42
 #: templates/learning_unit/select_attribution.html:40
 #: tests/business/test_learning_unit_xls.py:171
 #: tests/business/test_learning_unit_xls.py:323
@@ -3847,7 +3849,7 @@ msgid "Teaching profile"
 msgstr "Profil d'enseignement"
 
 #: business/learning_units/edition.py:452 business/proposal_xls.py:70
-#: models/learning_container_year.py:64
+#: models/learning_container_year.py:63
 msgid "Team management"
 msgstr "Gestion par équipe"
 
@@ -3951,7 +3953,7 @@ msgstr "La nouvelle coorganisation a bien été créee"
 msgid "The coorganization modifications has been saved"
 msgstr "Les données de la coorganisation ont été sauvegardées"
 
-#: models/learning_unit_year.py:328
+#: models/learning_unit_year.py:331
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:232
 #, python-format
 msgid ""
@@ -3962,7 +3964,7 @@ msgstr ""
 "l'unité d'enseignement parent."
 
 #: forms/learning_unit/learning_unit_create.py:164
-#: models/learning_unit_year.py:323
+#: models/learning_unit_year.py:326
 #: tests/forms/learning_unit/test_learningUnitYearModelForm.py:89
 #: tests/models/test_learning_unit_year.py:598
 msgid "The credits value should be an integer"
@@ -4187,7 +4189,7 @@ msgstr ""
 "Le nombre d'enfants de type(s) \"%(child_types)s\" pour \"%(parent)s\" a "
 "atteint la limite maximum."
 
-#: models/learning_unit_year.py:360 tests/models/test_learning_unit_year.py:560
+#: models/learning_unit_year.py:363 tests/models/test_learning_unit_year.py:560
 #, python-format
 msgid ""
 "The parent is %(parent_periodicty)s and there is at least one partim which "
@@ -4196,7 +4198,7 @@ msgstr ""
 "L'UE parent est %(parent_periodicty)s et au moins un partim n'est pas "
 "%(parent_periodicty)s"
 
-#: models/learning_unit_year.py:347
+#: models/learning_unit_year.py:350
 msgid "The parent is inactive and there is at least one partim active"
 msgstr "L'UE parent est inactive et au moins un partim est actif"
 
@@ -4444,7 +4446,7 @@ msgstr ""
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr "Cette unité d'enseignement n'est pas éligible en raison de son type"
 
-#: models/learning_unit_year.py:354 tests/models/test_learning_unit_year.py:576
+#: models/learning_unit_year.py:357 tests/models/test_learning_unit_year.py:576
 #, python-format
 msgid ""
 "This partim is %(partim_periodicity)s and the parent is %(parent_periodicty)s"
@@ -4452,7 +4454,7 @@ msgstr ""
 "Ce partim est %(partim_periodicity)s alors que l'UE parent est "
 "%(parent_periodicty)s"
 
-#: models/learning_unit_year.py:344
+#: models/learning_unit_year.py:347
 msgid "This partim is active and the parent is inactive"
 msgstr "Ce partim est actif alors que l'UE parent est inactive"
 
@@ -4554,7 +4556,7 @@ msgstr "Proposition de transformation/modification"
 msgid "Trimester"
 msgstr "Trimestre"
 
-#: forms/learning_unit/attribution_charge_repartition.py:72
+#: forms/learning_unit/attribution_charge_repartition.py:78
 #: forms/learning_unit/search_form.py:83
 #: templates/learning_unit/add_charge_repartition_inner.html:33
 #: templates/learning_unit/attribution_inner.html:41
@@ -4575,7 +4577,7 @@ msgstr "Enseignant·e·s"
 #: business/learning_unit.py:60 business/learning_unit_xls.py:75
 #: business/proposal_xls.py:38 business/proposal_xls.py:46
 #: forms/education_groups.py:72 forms/learning_unit/search_form.py:159
-#: models/entity_version.py:171 models/learning_container_year.py:53
+#: models/entity_version.py:171 models/learning_container_year.py:52
 #: models/proposal_learning_unit.py:55
 #: templates/education_group/search.html:147 templates/entities.html:68
 #: templates/entity/identification.html:62
@@ -4696,7 +4698,7 @@ msgstr "Langue de l'interface utilisateur"
 msgid "Utilizations"
 msgstr "Utilisations"
 
-#: business/proposal_xls.py:71 models/learning_container_year.py:65
+#: business/proposal_xls.py:71 models/learning_container_year.py:64
 msgid "Vacant"
 msgstr "Vacant"
 
@@ -4757,13 +4759,13 @@ msgstr ""
 msgid "Volume"
 msgstr "Volume"
 
-#: forms/learning_unit/attribution_charge_repartition.py:121
-#: templates/learning_unit/attributions.html:38
+#: forms/learning_unit/attribution_charge_repartition.py:131
+#: templates/learning_unit/attributions.html:40
 msgid "Volume 1"
 msgstr "Volume 1"
 
-#: forms/learning_unit/attribution_charge_repartition.py:130
-#: templates/learning_unit/attributions.html:39
+#: forms/learning_unit/attribution_charge_repartition.py:140
+#: templates/learning_unit/attributions.html:41
 msgid "Volume 2"
 msgstr "Volume 2"
 
@@ -5222,7 +5224,7 @@ msgstr "mise-à-jour bloquée pour l'enseignant"
 #: templates/education_group/tab_edit_administrative_data.html:96
 #: templates/learning_unit/achievement_edit.html:53
 #: templates/learning_unit/add_charge_repartition_inner.html:57
-#: templates/learning_unit/attribution_inner.html:66
+#: templates/learning_unit/attribution_inner.html:68
 #: templates/learning_unit/blocks/form/volumes_management_form.html:84
 #: templates/learning_unit/blocks/modal/modal_back_to_initial.html:40
 #: templates/learning_unit/blocks/modal/modal_confirm_delete.html:36
@@ -5579,7 +5581,7 @@ msgstr "rôle (français)"
 #: templates/education_group/organization_edit_inner.html:43
 #: templates/learning_unit/achievement_edit.html:51
 #: templates/learning_unit/add_charge_repartition_inner.html:58
-#: templates/learning_unit/attribution_inner.html:67
+#: templates/learning_unit/attribution_inner.html:69
 #: templates/learning_unit/blocks/form/volumes_management_form.html:80
 #: templates/learning_unit/blocks/modal/modal_pedagogy_edit.html:45
 #: templates/learning_unit/class_edit.html:53
