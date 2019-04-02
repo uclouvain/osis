@@ -60,6 +60,7 @@ from osis_common.decorators.ajax import ajax_required
 
 @login_required
 @waffle_flag("education_group_update")
+@waffle_flag("education_group_administrative_data_update")
 def education_group_edit_administrative_data(request, root_id, education_group_year_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
 

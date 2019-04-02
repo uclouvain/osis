@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-29 12:06+0100\n"
+"POT-Creation-Date: 2019-03-28 16:22+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2659,7 +2659,7 @@ msgstr ""
 msgid "No result!"
 msgstr ""
 
-#: business/education_groups/perms.py:189
+#: business/education_groups/perms.py:202
 #, python-format
 msgctxt "female"
 msgid ""
@@ -3871,7 +3871,7 @@ msgstr ""
 msgid "The credits value should be an integer"
 msgstr ""
 
-#: business/education_groups/perms.py:119
+#: business/education_groups/perms.py:132
 #: tests/templatetags/test_education_group.py:48
 #: tests/templatetags/test_education_group.py:325
 msgid "The education group edition period is not open."
@@ -3902,16 +3902,16 @@ msgstr ""
 msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr ""
 
-#: business/education_groups/perms.py:312
+#: business/education_groups/perms.py:325
 msgid "The faculty manager cannot modify admission which are lower than N"
 msgstr ""
 
-#: business/education_groups/perms.py:280
+#: business/education_groups/perms.py:293
 msgid ""
 "The faculty manager cannot modify general information which are lower than N"
 msgstr ""
 
-#: business/education_groups/perms.py:314
+#: business/education_groups/perms.py:327
 msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
@@ -4153,15 +4153,15 @@ msgid ""
 "the volume of parent learning unit for this professor"
 msgstr ""
 
-#: business/education_groups/perms.py:243
+#: business/education_groups/perms.py:256
 msgid "The user cannot modify data which are greater than N+1"
 msgstr ""
 
-#: business/education_groups/perms.py:292
+#: business/education_groups/perms.py:305
 msgid "The user doesn't have right to update admission condition"
 msgstr ""
 
-#: business/education_groups/perms.py:260
+#: business/education_groups/perms.py:273
 msgid "The user doesn't have right to update general information"
 msgstr ""
 
@@ -4177,14 +4177,14 @@ msgctxt "female"
 msgid "The user has not permission to create a %(category)s."
 msgstr ""
 
-#: business/education_groups/perms.py:144
+#: business/education_groups/perms.py:157
 #, python-format
 msgctxt "male"
 msgid "The user has not permission to create a %(category)s."
 msgstr ""
 
-#: business/education_groups/perms.py:158
-#: business/education_groups/perms.py:245
+#: business/education_groups/perms.py:171
+#: business/education_groups/perms.py:258
 msgid "The user is not attached to the management entity"
 msgstr ""
 
@@ -4245,7 +4245,7 @@ msgstr ""
 msgid "There is not the learning unit %(acronym)s - %(next_year)s"
 msgstr ""
 
-#: business/education_groups/perms.py:121
+#: business/education_groups/perms.py:134
 msgid "This education group is not editable during this period."
 msgstr ""
 
@@ -4858,6 +4858,11 @@ msgstr ""
 msgid ""
 "You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type "
 "\"%(parent_type)s\")"
+msgstr ""
+
+#: business/education_groups/perms.py:80
+#, python-format
+msgid "You cannot change a education group before %(limit_year)s"
 msgstr ""
 
 #: business/learning_units/perms.py:66

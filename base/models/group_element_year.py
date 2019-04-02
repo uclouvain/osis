@@ -58,7 +58,7 @@ class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
         'parent__acronym',
         'parent__partial_acronym'
     ]
-    list_filter = ('is_mandatory', 'access_condition', 'quadrimester_derogation', 'parent__academic_year')
+    list_filter = ('is_mandatory', 'access_condition', 'parent__academic_year')
 
 
 SQL_RECURSIVE_QUERY_EDUCATION_GROUP = """\

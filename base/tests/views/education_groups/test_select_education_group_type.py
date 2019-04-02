@@ -105,7 +105,7 @@ class TestSelectEducationGroupTypeView(TestCase):
         response = self.client.post(
             reverse(
                 "select_education_group_type",
-                args=[self.test_categories[0], self.parent_education_group_year.pk]
+                args=[self.test_categories[0], self.parent_education_group_year.pk, self.parent_education_group_year.pk]
             ), data={"name": self.education_group_types[0].pk}
         )
 
@@ -113,7 +113,8 @@ class TestSelectEducationGroupTypeView(TestCase):
             response,
             reverse(
                 "new_education_group",
-                args=[self.test_categories[0], self.education_group_types[0].pk, self.parent_education_group_year.pk]
+                args=[self.test_categories[0], self.education_group_types[0].pk, self.parent_education_group_year.pk,
+                      self.parent_education_group_year.pk]
             )
         )
 
@@ -130,7 +131,7 @@ class TestSelectEducationGroupTypeView(TestCase):
         response = self.client.post(
             reverse(
                 "select_education_group_type",
-                args=[self.test_categories[0], self.parent_education_group_year.pk]
+                args=[self.test_categories[0], self.parent_education_group_year.pk, self.parent_education_group_year.pk]
             ), data={"name": self.education_group_types[0].pk}
         )
         self.assertEqual(response.status_code, HttpResponse.status_code)
