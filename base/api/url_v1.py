@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,38 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from django.conf.urls import url
 
-from base.api.serializers.person import PersonDetailSerializer, PersonRolesSerializer
-from base.tests.factories.person import PersonFactory
+from base.api.views.person import PersonRoles
 
-
-class PersonDetailSerializerTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.person = PersonFactory()
-        cls.serializer = PersonDetailSerializer(cls.person)
-
-    def test_contains_expected_fields(self):
-        expected_fields = [
-            'first_name',
-            'last_name',
-            'email',
-            'gender',
-            'uuid'
-        ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
-
-
-class PersonRolesSerializerTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.person = PersonFactory()
-        cls.serializer = PersonRolesSerializer(cls.person)
-
-    def test_contains_expected_fields(self):
-        expected_fields = [
-            'global_id',
-            'roles'
-        ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+urlpatterns = [
+    url(r'^person/(?P<global_id>[0-9]+)/roles$', PersonRoles.as_view(), name=PersonRoles.name),
+]

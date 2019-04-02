@@ -47,6 +47,13 @@ if 'continuing_education' in settings.INSTALLED_APPS:
             include(continuing_education.api.url_v1.urlpatterns, namespace='continuing_education_api_v1'))
     )
 
+if 'base' in settings.INSTALLED_APPS:
+    import base.api.url_v1
+    url_api_v1.append(
+        url(r'^base/',
+            include(base.api.url_v1.urlpatterns, namespace='base_api_v1'))
+    )
+
 urlpatterns = [
     url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/common$',
         ws_catalog_common_offer,
