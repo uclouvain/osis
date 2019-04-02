@@ -414,6 +414,10 @@ msgstr ""
 msgid "Activities on other campus"
 msgstr ""
 
+#: templates/education_group/pdf_content.html:146
+msgid "Activities with prerequisites (in preparation)"
+msgstr ""
+
 #: models/enums/schedule_type.py:35
 msgid "Adapted"
 msgstr ""
@@ -443,7 +447,7 @@ msgstr ""
 msgid "Add over the current year"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:149
+#: templates/education_group/pdf_content.html:189
 msgid "Add potential courses"
 msgstr ""
 
@@ -1058,6 +1062,10 @@ msgstr ""
 msgid "Course enrollment"
 msgstr ""
 
+#: templates/education_group/pdf_content.html:125
+msgid "Courses not taught"
+msgstr ""
+
 #: templates/education_group/blocks/contacts_general_informations.html:54
 #: templates/education_group/blocks/coorganization.html:156
 #: templates/education_group/blocks/panel/panel_achievements.html:99
@@ -1613,7 +1621,7 @@ msgstr ""
 msgid "Finality 180 list choice"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:95
+#: templates/education_group/pdf_content.html:81
 #: templates/my_osis/profile.html:72 templates/search/search.html:45
 msgid "Firstname"
 msgstr ""
@@ -1649,7 +1657,7 @@ msgstr ""
 msgid "For all students"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:158
+#: templates/education_group/pdf_content.html:198
 msgid "For approval,"
 msgstr ""
 
@@ -2168,6 +2176,7 @@ msgid "Lecturing vol."
 msgstr ""
 
 #: business/learning_unit_xls.py:180 business/learning_unit_xls.py:188
+#: templates/education_group/pdf_content.html:105
 #: tests/business/test_learning_unit_xls.py:187
 #: tests/business/test_learning_unit_xls.py:195
 msgid "Legend"
@@ -2240,7 +2249,7 @@ msgstr ""
 msgid "Logout"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:153
+#: templates/education_group/pdf_content.html:193
 msgid "Made in"
 msgstr ""
 
@@ -2339,6 +2348,7 @@ msgstr ""
 #: models/group_element_year.py:169 models/teaching_material.py:45
 #: templates/education_group/blocks/content_default_table.html:34
 #: templates/education_group/blocks/table_utilizations.html:36
+#: templates/education_group/pdf_content.html:112
 msgid "Mandatory"
 msgstr ""
 
@@ -2440,7 +2450,7 @@ msgstr ""
 msgid "Minor list choice"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:91
+#: templates/education_group/pdf_content.html:77
 #: templates/my_osis/profile.html:98
 msgid "Mobile phone"
 msgstr ""
@@ -2518,7 +2528,7 @@ msgid "My OSIS"
 msgstr ""
 
 #: forms/organization.py:34 forms/search/search_tutor.py:35 forms/student.py:35
-#: templates/education_group/pdf_content.html:101
+#: templates/education_group/pdf_content.html:87
 #: templates/organization/organization.html:62
 #: templates/organization/organization.html:115
 #: templates/organization/organizations.html:62
@@ -2526,7 +2536,7 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:168
+#: templates/education_group/pdf_content.html:208
 msgid "Name of the teacher responsible"
 msgstr ""
 
@@ -2797,6 +2807,10 @@ msgstr[1] ""
 msgid "Option list choice"
 msgstr ""
 
+#: templates/education_group/pdf_content.html:117
+msgid "Optional"
+msgstr ""
+
 #: models/enums/prerequisite_operator.py:33
 msgid "Or"
 msgstr ""
@@ -2923,6 +2937,14 @@ msgstr ""
 
 #: models/enums/offer_enrollment_state.py:37
 msgid "Pending"
+msgstr ""
+
+#: templates/education_group/pdf_content.html:131
+msgid "Periodic courses not taught"
+msgstr ""
+
+#: templates/education_group/pdf_content.html:139
+msgid "Periodic courses taught during"
 msgstr ""
 
 #: business/learning_unit.py:71 business/proposal_xls.py:40
@@ -3314,7 +3336,7 @@ msgstr ""
 msgid "Refused"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:107
+#: templates/education_group/pdf_content.html:93
 msgid "Registration ID"
 msgstr ""
 
@@ -3323,7 +3345,7 @@ msgstr ""
 msgid "Registration Id"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:69
+#: templates/education_group/pdf_content.html:55
 msgid "Registration form for the content of"
 msgstr ""
 
@@ -3669,11 +3691,11 @@ msgstr ""
 msgid "Student search"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:84
+#: templates/education_group/pdf_content.html:70
 msgid "Student's contact information"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:164
+#: templates/education_group/pdf_content.html:204
 msgid "Student's signature"
 msgstr ""
 
@@ -4117,7 +4139,7 @@ msgstr ""
 msgid "The program aim has been updated"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:76
+#: templates/education_group/pdf_content.html:62
 msgid "The registration form is available at the Secretariat of"
 msgstr ""
 
@@ -4270,13 +4292,13 @@ msgstr ""
 msgid "This field is required."
 msgstr ""
 
-#: templates/education_group/pdf_content.html:79
+#: templates/education_group/pdf_content.html:65
 msgid ""
 "This form must be signed by the designated authority and delivered to the "
 "secretariat of your faculty."
 msgstr ""
 
-#: templates/education_group/pdf_content.html:74
+#: templates/education_group/pdf_content.html:60
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
@@ -5155,7 +5177,7 @@ msgid "duration unit"
 msgstr ""
 
 #: models/education_group_publication_contact.py:72
-#: templates/education_group/pdf_content.html:97
+#: templates/education_group/pdf_content.html:83
 #: templates/my_osis/profile.html:90
 msgid "email"
 msgstr ""
@@ -5177,7 +5199,7 @@ msgstr ""
 msgid "fac. level"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:103
+#: templates/education_group/pdf_content.html:89
 msgid "faculty number"
 msgstr ""
 
@@ -5278,7 +5300,7 @@ msgstr ""
 msgid "no planned end"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:154
+#: templates/education_group/pdf_content.html:194
 msgid "on"
 msgstr ""
 
@@ -5293,7 +5315,7 @@ msgid "online resources"
 msgstr ""
 
 #: models/enums/activity_presence.py:36 models/enums/internship_presence.py:36
-#: templates/education_group/pdf_content.html:109
+#: templates/education_group/pdf_content.html:95
 msgid "optional"
 msgstr ""
 
@@ -5474,7 +5496,7 @@ msgstr ""
 msgid "to"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:89
+#: templates/education_group/pdf_content.html:75
 msgid "training"
 msgstr ""
 
