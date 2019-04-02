@@ -664,19 +664,19 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(response.context["can_edit_date"], False)
 
     def test_get_components_no_learning_container_yr(self):
-        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year)
-        components_dict = learning_unit_business.get_same_container_year_components(learning_unit_year)
+        luy_without_components = LearningUnitYearFactory(academic_year=self.current_academic_year)
+        components_dict = learning_unit_business.get_same_container_year_components(luy_without_components)
         self.assertEqual(len(components_dict.get('components')), 0)
 
     def test_get_components_with_classes(self):
         l_container = LearningContainerFactory()
         l_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year,
                                                         common_title="LC-98998", learning_container=l_container)
-        l_component_year = LearningComponentYearFactory(learning_container_year=l_container_year)
-        LearningClassYearFactory(learning_component_year=l_component_year)
-        LearningClassYearFactory(learning_component_year=l_component_year)
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=l_container_year)
+        l_component_year = LearningComponentYearFactory(learning_unit_year=learning_unit_year)
+        LearningClassYearFactory(learning_component_year=l_component_year)
+        LearningClassYearFactory(learning_component_year=l_component_year)
 
         components_dict = learning_unit_business.get_same_container_year_components(learning_unit_year)
         self.assertEqual(len(components_dict.get('components')), 1)
@@ -761,24 +761,6 @@ class LearningUnitViewTestCase(TestCase):
 
         result = learning_unit_business._learning_unit_usage(learning_component_yr.learning_unit_year)
         self.assertEqual(result, 'LBIOL (Q1&2)')
-
-    def test_learning_unit_usage_by_class_with_complete_LU(self):
-        academic_year = AcademicYearFactory(year=2016)
-        learning_container_yr = LearningContainerYearFactory(academic_year=academic_year,
-                                                             acronym='LBIOL')
-
-        learning_unit_yr_1 = LearningUnitYearFactory(academic_year=academic_year,
-                                                     acronym='LBIOL',
-                                                     learning_container_year=learning_container_yr)
-
-        learning_component_yr = LearningComponentYearFactory(learning_container_year=learning_container_yr)
-
-        learning_unit_compo = LearningUnitComponentFactory(learning_unit_year=learning_unit_yr_1,
-                                                           learning_component_year=learning_component_yr)
-        learning_class_year = LearningClassYearFactory(learning_component_year=learning_component_yr)
-        LearningUnitComponentClassFactory(learning_unit_component=learning_unit_compo,
-                                          learning_class_year=learning_class_year)
-        self.assertEqual(learning_unit_business._learning_unit_usage_by_class(learning_class_year), 'LBIOL')
 
     def test_component_save(self):
         learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,

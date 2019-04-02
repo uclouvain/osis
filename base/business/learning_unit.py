@@ -42,6 +42,7 @@ from base.models.enums import academic_calendar_type
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
+from base.models.learning_class_year import LearningClassYear
 from base.models.utils.utils import get_object_or_none
 from cms import models as mdl_cms
 from cms.enums import entity_name
@@ -94,12 +95,16 @@ CMS_LABEL_SUMMARY = ['resume']
 COLORED = 'COLORED_ROW'
 
 
+# FIXME :: Feature to remove? Reusage of components and classes (LearningUnitComponent) is not pertinent anymore.
 def get_same_container_year_components(learning_unit_year):
-    learning_container_year = learning_unit_year.learning_container_year
     components = []
 
-    learning_components_year = learning_container_year.learningcomponentyear_set.prefetch_related(
-        Prefetch('learningclassyear_set', to_attr="classes"),
+    learning_components_year = learning_unit_year.learningcomponentyear_set.prefetch_related(
+        Prefetch(
+            'learningclassyear_set',
+            queryset=LearningClassYear.objects.select_related('learning_component_year__learning_unit_year'),
+            to_attr="classes"
+        ),
         'learningunityear_set'
     ).select_related('learning_unit_year').order_by('type', 'acronym')
 
@@ -108,7 +113,7 @@ def get_same_container_year_components(learning_unit_year):
     for indx, learning_component_year in enumerate(learning_components_year):
         if learning_component_year.classes:
             for learning_class_year in learning_component_year.classes:
-                learning_class_year.used_by_learning_units_year = _learning_unit_usage_by_class(learning_class_year)
+                learning_class_year.used_by_learning_units_year = learning_unit_year.acronym
                 learning_class_year.is_used_by_full_learning_unit_year = _is_used_by_full_learning_unit_year(
                     learning_class_year)
 
@@ -170,13 +175,6 @@ def _learning_unit_usage(learning_unit_year):
     )
 
 
-def _learning_unit_usage_by_class(a_learning_class_year):
-    queryset = a_learning_class_year.learningunitcomponentclass_set \
-        .order_by('learning_unit_component__learning_unit_year__acronym') \
-        .values_list('learning_unit_component__learning_unit_year__acronym', flat=True)
-    return ", ".join(list(queryset))
-
-
 def get_components_identification(learning_unit_yr):
     components = []
     additional_entities = {}
@@ -206,11 +204,7 @@ def get_components_identification(learning_unit_yr):
 
 
 def _is_used_by_full_learning_unit_year(a_learning_class_year):
-    for l in mdl_base.learning_unit_component_class.find_by_learning_class_year(a_learning_class_year):
-        if l.learning_unit_component.learning_unit_year.subdivision is None:
-            return True
-
-    return False
+    return a_learning_class_year.learning_component_year.learning_unit_year.is_full()
 
 
 def prepare_xls_content(found_learning_units):
