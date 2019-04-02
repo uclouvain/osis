@@ -3,12 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:192
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:193
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-01 15:08+0200\n"
-"PO-Revision-Date: 2019-03-22 10:25+0100\n"
+"POT-Creation-Date: 2019-04-02 11:59+0200\n"
+"PO-Revision-Date: 2019-04-02 09:24+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_BE\n"
@@ -396,9 +398,9 @@ msgid "Acronym existed in %(academic_year)s"
 msgstr "Code a déjà existé en %(academic_year)s"
 
 #: forms/education_groups.py:89 models/education_group_year.py:147
-#: tests/templatetags/test_education_group.py:446
-#: tests/templatetags/test_education_group.py:453
-#: tests/templatetags/test_education_group.py:462
+#: tests/templatetags/test_education_group.py:448
+#: tests/templatetags/test_education_group.py:455
+#: tests/templatetags/test_education_group.py:464
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
 
@@ -448,7 +450,7 @@ msgstr "Horaire adapté"
 #: templates/blocks/forms/create_cancel_buttons.html:31
 #: templates/blocks/forms/create_cancel_buttons_modal.html:29
 #: templates/learning_unit/blocks/panel/educational_informations.html:93
-#: templates/learning_unit/select_attribution.html:59
+#: templates/learning_unit/select_attribution.html:68
 msgid "Add"
 msgstr "Ajouter"
 
@@ -466,7 +468,11 @@ msgstr "Ajouter attribution"
 msgid "Add current year attribution"
 msgstr "Ajouter attribution année en cours"
 
-#: templates/education_group/pdf_content.html:149
+#: templates/learning_unit/select_attribution.html:70
+msgid "Add over the current year"
+msgstr "Ajouter sur l’année en cours"
+
+#: templates/education_group/pdf_content.html:189
 msgid "Add potential courses"
 msgstr "Ajouts de cours éventuels"
 
@@ -707,7 +713,7 @@ msgstr "Attrib. vol1"
 msgid "Attrib. vol2"
 msgstr "Attrib. vol2"
 
-#: views/learning_units/attribution.py:180
+#: views/learning_units/attribution.py:188
 #, python-format
 msgid "Attribution added for %(tutor)s (%(function)s)"
 msgstr "Attribution ajoutée pour %(tutor)s (%(function)s)"
@@ -723,12 +729,12 @@ msgstr "Durée attribution"
 msgid "Attribution entity"
 msgstr "Entité d'attribution"
 
-#: views/learning_units/attribution.py:146
+#: views/learning_units/attribution.py:149
 #, python-format
 msgid "Attribution modified for %(tutor)s (%(function)s)"
 msgstr "Attribution modifiée pour %(tutor)s (%(function)s)"
 
-#: views/learning_units/attribution.py:204
+#: views/learning_units/attribution.py:212
 #, python-format
 msgid "Attribution removed for %(tutor)s (%(function)s)"
 msgstr "Attribution supprimée pour %(tutor)s (%(function)s)"
@@ -824,6 +830,7 @@ msgstr ""
 #: templates/education_group/group_element_year_comment_inner.html:62
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:45
 #: templates/education_group/organization_edit_inner.html:51
+#: templates/learning_unit/add_charge_repartition_inner.html:68
 #: templates/learning_unit/blocks/modal/modal_comparison.html:43
 #: templates/learning_unit/blocks/modal/modal_xls_with_parameters.html:42
 #: templates/learning_unit/blocks/save_cancel_buttons.html:7
@@ -1220,12 +1227,12 @@ msgid "Description fiche submission dates updated"
 msgstr "Date de soumission des fiches descriptives mis à jour"
 
 #: templates/education_group/blocks/content_actions.html:43
-#: tests/templatetags/test_education_group.py:219
-#: tests/templatetags/test_education_group.py:220
-#: tests/templatetags/test_education_group.py:231
-#: tests/templatetags/test_education_group.py:242
-#: tests/templatetags/test_education_group.py:243
-#: tests/templatetags/test_education_group.py:257
+#: tests/templatetags/test_education_group.py:221
+#: tests/templatetags/test_education_group.py:222
+#: tests/templatetags/test_education_group.py:233
+#: tests/templatetags/test_education_group.py:244
+#: tests/templatetags/test_education_group.py:245
+#: tests/templatetags/test_education_group.py:259
 msgid "Detach"
 msgstr "Détacher"
 
@@ -1340,9 +1347,9 @@ msgstr "Descendre"
 #: forms/learning_unit/attribution_charge_repartition.py:41
 #: models/education_group_year.py:350
 #: templates/education_group/identification_training_details.html:42
-#: templates/learning_unit/add_charge_repartition_inner.html:36
+#: templates/learning_unit/add_charge_repartition_inner.html:44
 #: templates/learning_unit/attributions.html:38
-#: templates/learning_unit/select_attribution.html:37
+#: templates/learning_unit/select_attribution.html:42
 msgid "Duration"
 msgstr "Durée"
 
@@ -1766,9 +1773,9 @@ msgid "Full name"
 msgstr "Nom complet"
 
 #: business/learning_unit_xls.py:217
-#: templates/learning_unit/add_charge_repartition_inner.html:34
+#: templates/learning_unit/add_charge_repartition_inner.html:41
 #: templates/learning_unit/attributions.html:35
-#: templates/learning_unit/select_attribution.html:35
+#: templates/learning_unit/select_attribution.html:39
 #: tests/business/test_learning_unit_xls.py:170
 #: tests/business/test_learning_unit_xls.py:321
 msgid "Function"
@@ -1811,8 +1818,8 @@ msgid "General informations"
 msgstr "Infos générales"
 
 #: templatetags/education_group.py:236
-#: tests/templatetags/test_education_group.py:267
 #: tests/templatetags/test_education_group.py:269
+#: tests/templatetags/test_education_group.py:271
 msgid "Generate pdf"
 msgstr "Générer le pdf"
 
@@ -2014,12 +2021,12 @@ msgid "It is necessary to indicate the internship subtype."
 msgstr "Il est nécessaire d'indiquer le sous-type de stage."
 
 #: templatetags/education_group.py:213
-#: tests/templatetags/test_education_group.py:242
+#: tests/templatetags/test_education_group.py:244
 #, python-format
 msgid "It is not possible to %(action)s the root element."
 msgstr "Il n'est pas possible de %(action)s l'élément racine."
 
-#: tests/templatetags/test_education_group.py:255
+#: tests/templatetags/test_education_group.py:257
 msgid "It is not possible to detach the root element."
 msgstr "Il n'est pas possible de détacher l'élément racine."
 
@@ -2545,7 +2552,7 @@ msgstr "Modifié par"
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:69
 #: templatetags/education_group.py:153
-#: tests/templatetags/test_education_group.py:431
+#: tests/templatetags/test_education_group.py:433
 msgid "Modify"
 msgstr "Modifier"
 
@@ -2670,9 +2677,9 @@ msgstr "Pas de messages"
 msgid "No additional fees"
 msgstr "Pas de frais supplémentaires"
 
-#: templates/learning_unit/select_attribution.html:69
+#: templates/learning_unit/select_attribution.html:81
 msgid "No attributions exist for the parent learning unit"
-msgstr "Aucune attribution n’existe pour le cours parent"
+msgstr "Aucune attribution n'existe pour l'UE parent"
 
 #: business/learning_units/edition.py:476
 #: business/learning_units/edition.py:504
@@ -2813,7 +2820,7 @@ msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
 
 #: templatetags/education_group.py:147
-#: tests/templatetags/test_education_group.py:427 views/education_group.py:70
+#: tests/templatetags/test_education_group.py:429 views/education_group.py:70
 msgid ""
 "Only program managers of the education group OR central manager linked to "
 "entity can edit."
@@ -3044,8 +3051,8 @@ msgstr ""
 #: business/proposal_xls.py:84 business/proposal_xls.py:94
 #: forms/learning_unit/edition_volume.py:87
 #: forms/learning_unit/edition_volume.py:107
-#: tests/views/test_learning_unit.py:1567 views/learning_unit.py:283
-#: views/learning_unit.py:382 views/learning_unit.py:398
+#: tests/views/test_learning_unit.py:1567 views/learning_unit.py:284
+#: views/learning_unit.py:383 views/learning_unit.py:399
 msgid "Planned classes"
 msgstr "Classes prévues"
 
@@ -3525,6 +3532,7 @@ msgstr "Commande SQL"
 #: templates/education_group/organization_edit_inner.html:52
 #: templates/education_group/tab_edit_administrative_data.html:92
 #: templates/entity/blocks/educational_summary_calendar_widget.html:39
+#: templates/learning_unit/add_charge_repartition_inner.html:69
 #: templates/learning_unit/blocks/save_cancel_buttons.html:11
 #: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:14
 #: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:18
@@ -3697,9 +3705,9 @@ msgstr "Cahier des charges"
 #: models/education_group.py:115
 #: templates/education_group/identification_mini_training_details.html:38
 #: templates/education_group/identification_training_details.html:98
-#: templates/learning_unit/add_charge_repartition_inner.html:35
+#: templates/learning_unit/add_charge_repartition_inner.html:43
 #: templates/learning_unit/attributions.html:37
-#: templates/learning_unit/select_attribution.html:36
+#: templates/learning_unit/select_attribution.html:41
 msgid "Start"
 msgstr "Début"
 
@@ -3789,9 +3797,9 @@ msgid "Subscribed"
 msgstr "Souscrit"
 
 #: business/learning_unit_xls.py:219
-#: templates/learning_unit/add_charge_repartition_inner.html:39
+#: templates/learning_unit/add_charge_repartition_inner.html:48
 #: templates/learning_unit/attributions.html:42
-#: templates/learning_unit/select_attribution.html:40
+#: templates/learning_unit/select_attribution.html:46
 #: tests/business/test_learning_unit_xls.py:171
 #: tests/business/test_learning_unit_xls.py:323
 msgid "Substitute"
@@ -3971,8 +3979,8 @@ msgid "The credits value should be an integer"
 msgstr "La valeur du champ crédits doit être un entier"
 
 #: business/education_groups/perms.py:132
-#: tests/templatetags/test_education_group.py:48
-#: tests/templatetags/test_education_group.py:325
+#: tests/templatetags/test_education_group.py:49
+#: tests/templatetags/test_education_group.py:327
 msgid "The education group edition period is not open."
 msgstr ""
 "La période de modification d'organisation de formation n'est pas ouverte."
@@ -4281,7 +4289,7 @@ msgstr ""
 msgid "The start date must be equals or lower than the end date"
 msgstr "La date de début doit être égale ou inférieure à la date de fin"
 
-#: tests/views/test_learning_unit.py:1367 views/learning_unit.py:523
+#: tests/views/test_learning_unit.py:1367 views/learning_unit.py:524
 #, python-format
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
@@ -4305,12 +4313,12 @@ msgstr ""
 "L’utilisateur n’a pas le droit de mettre à jour les informations générales"
 
 #: templatetags/education_group.py:211
-#: tests/templatetags/test_education_group.py:230
-#: tests/templatetags/test_education_group.py:254
+#: tests/templatetags/test_education_group.py:232
+#: tests/templatetags/test_education_group.py:256
 msgid "The user has not permission to change education groups."
 msgstr "L'utilisateur n'a pas la permission de modifier les formations."
 
-#: tests/templatetags/test_education_group.py:399
+#: tests/templatetags/test_education_group.py:401
 #, python-format
 msgctxt "female"
 msgid "The user has not permission to create a %(category)s."
@@ -4558,12 +4566,17 @@ msgstr "Trimestre"
 
 #: forms/learning_unit/attribution_charge_repartition.py:78
 #: forms/learning_unit/search_form.py:83
-#: templates/learning_unit/add_charge_repartition_inner.html:33
+#: templates/learning_unit/add_charge_repartition_inner.html:37
 #: templates/learning_unit/attribution_inner.html:41
-#: templates/learning_unit/select_attribution.html:34
+#: templates/learning_unit/select_attribution.html:35
 #: tests/forms/learning_unit/test_search_form.py:65
 msgid "Tutor"
 msgstr "Enseignant·e"
+
+#: templates/learning_unit/add_charge_repartition_inner.html:39
+#: templates/learning_unit/select_attribution.html:37
+msgid "Tutor for parent LU"
+msgstr "Enseignant·e UE parent"
 
 #: templates/learning_unit/attributions.html:34
 #: templates/learning_unit/blocks/modal/modal_xls_with_parameters.html:39
@@ -4698,6 +4711,11 @@ msgstr "Langue de l'interface utilisateur"
 msgid "Utilizations"
 msgstr "Utilisations"
 
+#: templates/learning_unit/add_charge_repartition_inner.html:27
+#, python-format
+msgid "VOL1/VOL2 of %(acronym)s"
+msgstr "VOL1/VOL2 de %(acronym)s"
+
 #: business/proposal_xls.py:71 models/learning_container_year.py:64
 msgid "Vacant"
 msgstr "Vacant"
@@ -4771,22 +4789,22 @@ msgstr "Volume 2"
 
 #: forms/learning_unit/edition_volume.py:66
 #: forms/learning_unit/edition_volume.py:84
-#: tests/views/test_learning_unit.py:1568 views/learning_unit.py:286
-#: views/learning_unit.py:383 views/learning_unit.py:399
+#: tests/views/test_learning_unit.py:1568 views/learning_unit.py:287
+#: views/learning_unit.py:384 views/learning_unit.py:400
 msgid "Volume Q1"
 msgstr "Volume Q1"
 
 #: forms/learning_unit/edition_volume.py:73
 #: forms/learning_unit/edition_volume.py:84
-#: tests/views/test_learning_unit.py:1569 views/learning_unit.py:288
-#: views/learning_unit.py:384 views/learning_unit.py:400
+#: tests/views/test_learning_unit.py:1569 views/learning_unit.py:289
+#: views/learning_unit.py:385 views/learning_unit.py:401
 msgid "Volume Q2"
 msgstr "Volume Q2"
 
 #: forms/learning_unit/edition_volume.py:84
 #: forms/learning_unit/edition_volume.py:106
-#: tests/views/test_learning_unit.py:1566 views/learning_unit.py:281
-#: views/learning_unit.py:381 views/learning_unit.py:397
+#: tests/views/test_learning_unit.py:1566 views/learning_unit.py:282
+#: views/learning_unit.py:382 views/learning_unit.py:398
 msgid "Volume total annual"
 msgstr "Volume total annuel"
 
@@ -5045,6 +5063,7 @@ msgstr ""
 "\"%(parent_type)s\")"
 
 #: business/education_groups/perms.py:80
+#, python-format
 msgid "You cannot change a education group before %(limit_year)s"
 msgstr ""
 "Vous ne pouvez pas modifier une organisation de formation datant d'avant "
@@ -5223,7 +5242,6 @@ msgstr "mise-à-jour bloquée pour l'enseignant"
 #: templates/education_group/protect_delete_inner.html:24
 #: templates/education_group/tab_edit_administrative_data.html:96
 #: templates/learning_unit/achievement_edit.html:53
-#: templates/learning_unit/add_charge_repartition_inner.html:57
 #: templates/learning_unit/attribution_inner.html:68
 #: templates/learning_unit/blocks/form/volumes_management_form.html:84
 #: templates/learning_unit/blocks/modal/modal_back_to_initial.html:40
@@ -5240,7 +5258,7 @@ msgstr "mise-à-jour bloquée pour l'enseignant"
 #: templates/learning_unit/component_edit.html:54
 #: templates/learning_unit/deletion_msg.html:54
 #: templates/learning_unit/remove_charge_repartition_confirmation_inner.html:41
-#: templates/learning_unit/select_attribution.html:73
+#: templates/learning_unit/select_attribution.html:85
 #: templates/learning_unit/specifications_edit.html:42
 #: templates/learning_unit/teaching_material/modal_delete.html:35
 #: templates/organization/organization_address_form.html:60
@@ -5331,7 +5349,7 @@ msgstr "jours"
 msgid "delete"
 msgstr "supprimer"
 
-#: tests/templatetags/test_education_group.py:47
+#: tests/templatetags/test_education_group.py:48
 msgid "delete education group"
 msgstr "supprimer l'oganisation de formation"
 
@@ -5580,7 +5598,6 @@ msgstr "rôle (français)"
 #: templates/education_group/blocks/modal/modal_publication_contact_entity_edit_inner.html:39
 #: templates/education_group/organization_edit_inner.html:43
 #: templates/learning_unit/achievement_edit.html:51
-#: templates/learning_unit/add_charge_repartition_inner.html:58
 #: templates/learning_unit/attribution_inner.html:69
 #: templates/learning_unit/blocks/form/volumes_management_form.html:80
 #: templates/learning_unit/blocks/modal/modal_pedagogy_edit.html:45
@@ -5757,12 +5774,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:163
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Quad. derog."
-#~ msgstr "Quad. dérog."
-
-#~ msgid "Number ID"
-#~ msgstr "Matricule"
-
-#~ msgid "Impossible to save the organization address"
-#~ msgstr "Impossible d'enregistrer l'adresse de l'organisation"
