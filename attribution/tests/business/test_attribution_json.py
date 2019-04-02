@@ -38,7 +38,6 @@ from base.models.learning_component_year import LearningComponentYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.tutor import TutorFactory
@@ -168,8 +167,6 @@ def _create_learning_unit_year_with_components(academic_year, l_container, acron
 
 
 def _create_attribution_charge(academic_year, attribution, l_acronym, volume_cm=None, volume_tp=None):
-    from base.models.learning_unit_component import LearningUnitComponent
-
     component_qs = LearningComponentYear.objects.filter(
         learning_unit_year__acronym=l_acronym,
         learning_unit_year__academic_year=academic_year
