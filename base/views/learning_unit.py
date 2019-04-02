@@ -34,7 +34,6 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from waffle.decorators import waffle_flag
 
 from attribution.business import attribution_charge_new
 from attribution.models.attribution_charge_new import AttributionChargeNew
