@@ -268,7 +268,8 @@ class GroupElementYear(OrderedModel):
         self._clean_link_type()
 
     def _clean_link_type(self):
-        if self.parent.type in [GroupType.MINOR_LIST_CHOICE.name, GroupType.MAJOR_LIST_CHOICE.name] and \
+        if getattr(self.parent, 'type', None) in [GroupType.MINOR_LIST_CHOICE.name,
+                                                  GroupType.MAJOR_LIST_CHOICE.name] and \
            isinstance(self.child, EducationGroupYear) and self.child.type in MiniTrainingType.minors() + \
                 [MiniTrainingType.FSA_SPECIALITY.name, MiniTrainingType.DEEPENING.name]:
             self.link_type = LinkTypes.REFERENCE.name
