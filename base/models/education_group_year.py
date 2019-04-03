@@ -542,16 +542,20 @@ class EducationGroupYear(SerializableModel):
         )
 
     @property
+    def type(self):
+        return self.education_group_type.name
+
+    @property
     def is_minor(self):
-        return self.education_group_type.name in MiniTrainingType.minors()
+        return self.type in MiniTrainingType.minors()
 
     @property
     def is_deepening(self):
-        return self.education_group_type.name == MiniTrainingType.DEEPENING.name
+        return self.type == MiniTrainingType.DEEPENING.name
 
     @property
     def is_minor_major_option_list_choice(self):
-        return self.education_group_type.name in GroupType.minor_major_option_list_choice()
+        return self.type in GroupType.minor_major_option_list_choice()
 
     @property
     def is_common(self):
@@ -563,23 +567,23 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def is_master120(self):
-        return self.education_group_type.name == TrainingType.PGRM_MASTER_120.name
+        return self.type == TrainingType.PGRM_MASTER_120.name
 
     @property
     def is_master60(self):
-        return self.education_group_type.name == TrainingType.MASTER_M1.name
+        return self.type == TrainingType.MASTER_M1.name
 
     @property
     def is_aggregation(self):
-        return self.education_group_type.name == TrainingType.AGGREGATION.name
+        return self.type == TrainingType.AGGREGATION.name
 
     @property
     def is_specialized_master(self):
-        return self.education_group_type.name == TrainingType.MASTER_MC.name
+        return self.type == TrainingType.MASTER_MC.name
 
     @property
     def is_bachelor(self):
-        return self.education_group_type.name == TrainingType.BACHELOR.name
+        return self.type == TrainingType.BACHELOR.name
 
     @property
     def verbose(self):
