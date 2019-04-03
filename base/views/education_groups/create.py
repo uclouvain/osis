@@ -132,7 +132,7 @@ def create_education_group(request, category, education_group_type_pk, root_id=N
 def _common_success_redirect(request, form, root_id=None):
     education_group_year = form.save()
     if not root_id:
-        root_id = education_group_year.id
+        root_id = education_group_year.pk
     success_msg = [_get_success_message_for_creation_education_group_year(root_id, education_group_year)]
     if hasattr(form, 'education_group_year_postponed'):
         success_msg += [
