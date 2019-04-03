@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load staticfiles bootstrap3 %}
 {% load i18n %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -42,9 +42,17 @@
     </div>
     <div class="modal-footer">
         <button class="btn btn-primary" type="submit">
-            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}
+            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
         </button>
-        <button type="submit" class="btn" data-dismiss="modal">{% trans 'cancel' %} </button>
+        <button type="submit" class="btn" data-dismiss="modal">{% trans 'Cancel' %} </button>
     </div>
 </form>
+
+<script>
+    $(function () {
+        var richText = $('#id_trans_text');
+        var config = richText.data('config');
+        CKEDITOR.replace('id_trans_text', config);
+    });
+</script>
 

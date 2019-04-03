@@ -149,6 +149,12 @@ class TestCreate(TestCase):
                 form_education_group_year = response.context["form_education_group_year"]
                 self.assertIsInstance(form_education_group_year, expected_forms_by_category.get(category))
 
+    def test_redirect_after_creation(self):
+        url = reverse('new_education_group', args=[self.education_group_types[1].category,
+                                                   self.education_group_types[1].id])
+        response = self.client.post(url, data={})
+        self.assertTemplateUsed(response, "")
+
 
 class TestValidateField(TestCase):
     @classmethod
