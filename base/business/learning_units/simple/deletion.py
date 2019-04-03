@@ -166,8 +166,8 @@ def delete_from_given_learning_unit_year(learning_unit_year):
     if learning_unit_year.learning_container_year and learning_unit_year.is_full():
         msg.extend(_delete_learning_container_year(learning_unit_year.learning_container_year))
 
-    for component in learning_unit_component.find_by_learning_unit_year(learning_unit_year):
-        msg.extend(_delete_learning_unit_component(component))
+    for component in learning_unit_year.learningcomponentyear_set.all():
+        msg.extend(_delete_learning_component_year(component))
 
     _delete_cms_data(learning_unit_year)
 
@@ -195,15 +195,6 @@ def _delete_learning_container_year(learning_unit_container):
     for partim in learning_unit_container.get_partims_related():
         msg.extend(delete_from_given_learning_unit_year(partim))
     learning_unit_container.delete()
-
-    return msg
-
-
-def _delete_learning_unit_component(l_unit_component):
-    msg = []
-
-    msg.extend(_delete_learning_component_year(l_unit_component.learning_component_year))
-    l_unit_component.delete()
 
     return msg
 

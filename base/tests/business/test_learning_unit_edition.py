@@ -45,6 +45,7 @@ from base.models.enums import learning_unit_year_subtypes, learning_unit_year_pe
     learning_container_year_types, attribution_procedure, internship_subtypes, learning_unit_year_session, \
     quadrimesters, vacant_declaration_type, entity_container_year_link_type
 from base.models.learning_class_year import LearningClassYear
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_component import LearningUnitComponent
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer
@@ -578,9 +579,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         ]
         self._assert_entity_component_year_correctly_duplicated(expected_entities, last_container)
 
-        last_generated_luc = LearningUnitComponent.objects.filter(learning_unit_year=last_generated_luy).last()
-        last_generated_component = last_generated_luc.learning_component_year
-        self.assertEqual(last_generated_luy.learning_container_year, last_generated_component.learning_container_year)
+        last_generated_component = LearningComponentYear.objects.filter(learning_unit_year=last_generated_luy).last()
+        self.assertEqual(last_generated_luy.learning_container_year, last_generated_component.learning_unit_year.learning_container_year)
 
         self._assert_learning_classes_correctly_duplicated(
             last_generated_component,

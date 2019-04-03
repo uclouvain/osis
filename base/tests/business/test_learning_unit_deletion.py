@@ -42,6 +42,7 @@ from base.models.enums import entity_type
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_class_year import LearningClassYear
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_component import LearningUnitComponent
 from base.models.learning_unit_year import LearningUnitYear
@@ -227,10 +228,7 @@ class LearningUnitYearDeletion(TestCase):
         for x in range(number_classes):
             LearningClassYearFactory(learning_component_year=learning_component_year)
 
-        # Association du conteneur et de son composant dont les années académiques diffèrent l'une de l'autre
-        learning_unit_component = LearningUnitComponentFactory(learning_component_year=learning_component_year)
-
-        learning_unit_year = learning_unit_component.learning_unit_year
+        learning_unit_year = learning_component_year.learning_unit_year
         learning_unit_year.learning_unit.start_year = 1900
         learning_unit_year.subtype = learning_unit_year_subtypes.PARTIM
         learning_unit_year.save()
@@ -247,10 +245,7 @@ class LearningUnitYearDeletion(TestCase):
 
         self.assertEqual(len(msg), number_classes)
         with self.assertRaises(ObjectDoesNotExist):
-            LearningUnitComponent.objects.get(id=learning_component_year.id)
-
-        with self.assertRaises(ObjectDoesNotExist):
-            LearningUnitComponent.objects.get(id=learning_unit_component.id)
+            LearningComponentYear.objects.get(id=learning_component_year.id)
 
         # The learning_unit_container won't be deleted because the learning_unit_year is a partim
         self.assertEqual(learning_container_year, LearningContainerYear.objects.get(id=learning_container_year.id))

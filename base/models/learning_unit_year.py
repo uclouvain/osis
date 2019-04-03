@@ -363,9 +363,10 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     def _check_learning_component_year_warnings(self):
         _warnings = []
-        components_queryset = self.learning_container_year.learningcomponentyear_set
-        all_components = components_queryset.order_by('learningunityear__acronym').prefetch_related(
-            'learningunityear_set').annotate(vol_global=Sum('entitycomponentyear__repartition_volume'))
+        components_queryset = LearningComponentYear.objects.filter(learning_unit_year__learning_container_year=self.learning_container_year)
+        all_components = components_queryset.order_by('acronym')\
+            .select_related('learning_unit_year')\
+            .annotate(vol_global=Sum('entitycomponentyear__repartition_volume'))
         for learning_component_year in all_components:
             _warnings.extend(learning_component_year.warnings)
 

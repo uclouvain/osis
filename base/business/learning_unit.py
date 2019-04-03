@@ -42,6 +42,7 @@ from base.models.enums import academic_calendar_type
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
+from base.models.learning_component_year import LearningComponentYear
 from base.models.utils.utils import get_object_or_none
 from cms import models as mdl_cms
 from cms.enums import entity_name
@@ -98,7 +99,9 @@ def get_same_container_year_components(learning_unit_year):
     learning_container_year = learning_unit_year.learning_container_year
     components = []
 
-    learning_components_year = learning_container_year.learningcomponentyear_set.prefetch_related(
+    learning_components_year = LearningComponentYear.objects.filter(
+        learning_unit_year__learning_container_year=learning_container_year
+    ).prefetch_related(
         Prefetch('learningclassyear_set', to_attr="classes"),
         'learningunityear_set'
     ).select_related('learning_unit_year').order_by('type', 'acronym')

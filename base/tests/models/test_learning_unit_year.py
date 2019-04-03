@@ -325,7 +325,7 @@ class LearningUnitYearWarningsTest(TestCase):
         self.luy_full = self.generated_container.generated_container_years[0].learning_unit_year_full
         self.learning_component_year_full_lecturing = LearningComponentYear.objects.filter(
             type=LECTURING,
-            learningunitcomponent__learning_unit_year=self.luy_full
+            learning_unit_year=self.luy_full
         ).first()
         self.entity_component_year_full_lecturing_requirement = EntityComponentYear.objects.get(
             learning_component_year=self.learning_component_year_full_lecturing,
@@ -415,7 +415,7 @@ class LearningUnitYearWarningsTest(TestCase):
         luy_partim = self.generated_container.generated_container_years[0].learning_unit_year_partim
         learning_component_year_partim_lecturing = LearningComponentYear.objects.filter(
             type=LECTURING,
-            learningunitcomponent__learning_unit_year=luy_partim
+            learning_unit_year=luy_partim
         ).first()
         entity_component_year_partim_lecturing_requirement = EntityComponentYear.objects.get(
             learning_component_year=learning_component_year_partim_lecturing,
@@ -449,7 +449,7 @@ class LearningUnitYearWarningsTest(TestCase):
         luy_partim = self.generated_container.generated_container_years[0].learning_unit_year_partim
         learning_component_year_partim_lecturing = LearningComponentYear.objects.filter(
             type=LECTURING,
-            learningunitcomponent__learning_unit_year=luy_partim
+            learning_unit_year=luy_partim
         ).first()
         entity_component_year_partim_lecturing_requirement = EntityComponentYear.objects.get(
             learning_component_year=learning_component_year_partim_lecturing,
@@ -487,7 +487,7 @@ class LearningUnitYearWarningsTest(TestCase):
 
         learning_component_year_partim_lecturing = LearningComponentYear.objects.filter(
             type=LECTURING,
-            learningunitcomponent__learning_unit_year=luy_partim
+            learning_unit_year=luy_partim
         ).first()
         entity_component_year_partim_lecturing_requirement = EntityComponentYear.objects.get(
             learning_component_year=learning_component_year_partim_lecturing,
@@ -496,7 +496,7 @@ class LearningUnitYearWarningsTest(TestCase):
 
         learning_component_year_partim_practical = LearningComponentYear.objects.filter(
             type=PRACTICAL_EXERCISES,
-            learningunitcomponent__learning_unit_year=luy_partim
+            learning_unit_year=luy_partim
         ).first()
         entity_component_year_partim_lecturing_practical = EntityComponentYear.objects.get(
             learning_component_year=learning_component_year_partim_practical,
@@ -505,7 +505,7 @@ class LearningUnitYearWarningsTest(TestCase):
 
         learning_component_year_full_practical = LearningComponentYear.objects.filter(
             type=PRACTICAL_EXERCISES,
-            learningunitcomponent__learning_unit_year=self.luy_full
+            learning_unit_year=self.luy_full
         ).first()
         entity_component_year_full_practical = EntityComponentYear.objects.get(
             learning_component_year=learning_component_year_full_practical,
