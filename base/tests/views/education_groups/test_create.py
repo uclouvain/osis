@@ -148,7 +148,7 @@ class TestCreate(TestCase):
                 response = self.client.get(self.urls_without_parent_by_category.get(category))
                 form_education_group_year = response.context["form_education_group_year"]
                 self.assertIsInstance(form_education_group_year, expected_forms_by_category.get(category))
-                
+
 
 class TestValidateField(TestCase):
     @classmethod
