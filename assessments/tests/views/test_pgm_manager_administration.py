@@ -23,28 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import datetime
 
-from django.contrib.auth.models import Permission
+from unittest import mock
+
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.db import IntegrityError
-from django.test import TestCase, Client, RequestFactory
+from django.test import TestCase, RequestFactory
 
 from assessments.views import pgm_manager_administration
-from assessments.views.pgm_manager_administration import add_save_program_manager
 from base.models import program_manager
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.group import ProgramManagerGroupFactory
-
-from base.tests.factories.program_manager import ProgramManagerFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.structure import StructureFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.offer_type import OfferTypeFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
-from unittest import mock
-from django.core.urlresolvers import reverse
+from base.tests.factories.group import ProgramManagerGroupFactory
+from base.tests.factories.offer_type import OfferTypeFactory
+from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.person import PersonFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.structure import StructureFactory
 
 
 class PgmManagerAdministrationTest(TestCase):
