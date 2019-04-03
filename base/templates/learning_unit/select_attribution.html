@@ -31,10 +31,16 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th>{% trans 'Tutor' %}</th>
+                    {% if not learning_unit_year.is_partim %}
+                        <th>{% trans 'Tutor' %}</th>
+                    {% else %}
+                        <th>{% trans 'Tutor for parent LU' %}</th>
+                    {% endif %}
                     <th>{% trans 'Function' %}</th>
-                    <th>{% trans 'Start' %}</th>
-                    <th>{% trans 'Duration' %}</th>
+                    {% if not learning_unit_year.is_partim %}
+                        <th>{% trans 'Start' %}</th>
+                        <th>{% trans 'Duration' %}</th>
+                    {% endif %}
                     <th>Volume 1</th>
                     <th>Volume 2</th>
                     <th>{% trans 'Substitute' %}</th>
@@ -46,8 +52,10 @@
                     <tr>
                         <td>{{ attribution.tutor.person }}</td>
                         <td>{{ attribution.get_function_display }}</td>
-                        <td>{{ attribution.start_year | default_if_none:'' }}</td>
-                        <td>{{ attribution.duration | default_if_none:'' }}</td>
+                        {% if not learning_unit_year.is_partim %}
+                            <td>{{ attribution.start_year | default_if_none:'' }}</td>
+                            <td>{{ attribution.duration | default_if_none:'' }}</td>
+                        {% endif %}
                         <td>{{ attribution.lecturing_charges.0.allocation_charge | floatformat:2 }}</td>
                         <td>{{ attribution.practical_charges.0.allocation_charge | floatformat:2 }}</td>
                         <td>{{ attribution.substitute | default_if_none:'' }}</td>
@@ -56,7 +64,11 @@
                                role="button"
                                data-url="{% url 'add_charge_repartition' learning_unit_year.id attribution.id %}"
                                data-modal_class="modal-lg">
-                                {% trans "Add" %}
+                                {% if not learning_unit_year.is_partim %}
+                                    {% trans "Add" %}
+                                {% else %}
+                                    {% trans "Add over the current year" %}
+                                {% endif %}
                             </a>
                         </td>
                     </tr>
@@ -69,7 +81,8 @@
                 <strong>{% trans "No attributions exist for the parent learning unit" %}</strong>
             </p>
         {% endif %}
-        <a href="{% url 'learning_unit_attributions' learning_unit_year_id=learning_unit_year.id %}"
-           class="btn btn-default" role="button">{% trans "cancel" %}</a>
+        <a href="{% url 'learning_unit_attributions' learning_unit_year.id %}" class="btn btn-default" role="button">
+            {% trans "cancel" %}
+        </a>
     </div>
 {% endblock %}

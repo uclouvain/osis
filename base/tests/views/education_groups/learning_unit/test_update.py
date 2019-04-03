@@ -42,7 +42,7 @@ from base.tests.factories.person_entity import PersonEntityFactory
 class TestUpdateLearningUnitPrerequisite(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
+        cls.academic_year = AcademicYearFactory(year=2020)
         cls.education_group_year_parents = [TrainingFactory(academic_year=cls.academic_year) for _ in range(0, 2)]
         cls.learning_unit_year_child = LearningUnitYearFakerFactory(
             learning_container_year__academic_year=cls.academic_year
