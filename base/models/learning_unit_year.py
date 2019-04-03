@@ -283,6 +283,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def is_partim(self):
         return self.subtype == learning_unit_year_subtypes.PARTIM
 
+    def is_for_faculty_or_partim(self) -> bool:
+        return self.learning_container_year.is_type_for_faculty() or self.is_partim()
+
     def get_entity(self, entity_type):
         # @TODO: Remove this condition when classes will be removed from learning unit year
         if self.learning_container_year:
