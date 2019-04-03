@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,34 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
+from rest_framework import generics
 
-from base.models.utils.utils import ChoiceEnum
-
-COORDINATOR = "COORDINATOR"
-HOLDER = "HOLDER"
-CO_HOLDER = "CO_HOLDER"
-DEPUTY = "DEPUTY"
-DEPUTY_AUTHORITY = "DEPUTY_AUTHORITY"
-DEPUTY_SABBATICAL = "DEPUTY_SABBATICAL"
-DEPUTY_TEMPORARY = "DEPUTY_TEMPORARY"
-PROFESSOR = "PROFESSOR"  # To remove afterwards.
-INTERNSHIP_SUPERVISOR = "INTERNSHIP_SUPERVISOR"
-INTERNSHIP_CO_SUPERVISOR = "INTERNSHIP_CO_SUPERVISOR"
+from base.api.serializers.person import PersonRolesSerializer
+from base.models.person import Person
 
 
-class Functions(ChoiceEnum):
-    COORDINATOR = _("Coordinator")
-    HOLDER = _("Holder")
-    CO_HOLDER = _("Co-holder")
-    DEPUTY = _("Deputy")
-    DEPUTY_AUTHORITY = _("Deputy authority")
-    DEPUTY_SABBATICAL = _("Deputy sabbatical")
-    DEPUTY_TEMPORARY = _("Deputy temporary")
-    PROFESSOR = _("Professor")
-    INTERNSHIP_SUPERVISOR = _("Internship supervisor")
-    INTERNSHIP_CO_SUPERVISOR = _("Internship co-supervisor")
+class PersonRoles(generics.RetrieveAPIView):
+    """
+       Return the roles of a Person.
+    """
+    name = 'person-roles'
+    queryset = Person.objects.all()
 
-    @classmethod
-    def choices_without_professor(cls):
-        return tuple((x.name, x.value) for x in cls if x != cls.PROFESSOR)
+    serializer_class = PersonRolesSerializer
+    lookup_field = 'global_id'

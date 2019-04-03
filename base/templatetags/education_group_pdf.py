@@ -158,9 +158,9 @@ def append_output(item, output, padding, sublist):
                               value=force_text(item.verbose),
                               comment=comment,
                               sublist=sublist,
-                              an_1=check_block(item, "1"),
-                              an_2=check_block(item, "2"),
-                              an_3=check_block(item, "3")
+                              an_1=check_block(item, 1),
+                              an_2=check_block(item, 2),
+                              an_3=check_block(item, 3)
                               )
         )
     else:
@@ -211,4 +211,4 @@ def get_case_picture(item):
 
 
 def check_block(item, value):
-    return "X" if item.block and value in item.block else ""
+    return "X" if item.block and value == item.block else ""
