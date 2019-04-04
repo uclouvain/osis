@@ -56,7 +56,7 @@ class ProgramManager(models.Model):
     class Meta:
         unique_together = ('person', 'offer_year',)
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+    def save(self, **kwargs):
         if not hasattr(self, "education_group"):
             corresponding_education_group = EducationGroup.objects.filter(
                 educationgroupyear__acronym=self.offer_year.acronym
@@ -65,7 +65,7 @@ class ProgramManager(models.Model):
                 raise IntegrityError("The program manager has no education group.")
             self.education_group = corresponding_education_group
 
-        super().save(force_insert, force_update, using, update_fields)
+        super().save(**kwargs)
 
 
 def find_by_person(a_person):
