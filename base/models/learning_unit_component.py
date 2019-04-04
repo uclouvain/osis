@@ -49,11 +49,6 @@ class LearningUnitComponent(SerializableModel):
         return u"%s - %s" % (self.learning_component_year.type, self.learning_unit_year)
 
 
-def find_by_learning_unit_year(a_learning_unit_year):
-    return LearningUnitComponent.objects.filter(learning_unit_year=a_learning_unit_year)\
-        .order_by('learning_component_year__acronym')
-
-
 def search(a_learning_component_year=None, a_learning_unit_year=None):
     queryset = LearningUnitComponent.objects
     if a_learning_component_year:
