@@ -70,12 +70,24 @@ class PrerequisiteItemWarning(CopyWarning):
                }
 
 
+class EducationGroupYearNotEmptyWarning(CopyWarning):
+    def __init__(self, obj: EducationGroupYear, academic_year):
+        self.education_group_year = obj
+        self.academic_year = academic_year
+
+    def __str__(self):
+        return _("%(education_group_year)s has already been copied in %(academic_year)s in another program. "
+                 "It may have been already modified.") % {
+                    "education_group_year": self.education_group_year.acronym,
+                    "academic_year": self.academic_year
+                }
+
+
 class EducationGroupEndYearWarning(CopyWarning):
     def __init__(self, obj: EducationGroupYear, academic_year):
         self.education_group_year = obj
         self.academic_year = academic_year
 
-    # TODO Modify warning message
     def __str__(self):
         return _("%(education_group_year)s is closed in %(end_year)s. This element will not be copied "
                  "in %(academic_year)s.") % {
@@ -226,6 +238,8 @@ class PostponeContent:
             if relationship and relationship.min_count_authorized > 0 and not new_egy.groupelementyear_set.all():
                 # We postpone data only if the mandatory group is empty.
                 self._postpone(old_egy, new_egy)
+            else:
+                self.warnings.append(EducationGroupYearNotEmptyWarning(new_egy, self.next_academic_year))
 
         else:
             # If the education group does not exists for the next year, we have to postpone.

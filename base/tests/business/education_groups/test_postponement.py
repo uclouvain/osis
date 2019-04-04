@@ -369,6 +369,14 @@ class TestPostpone(TestCase):
         new_mandatory_child = new_root.groupelementyear_set.first().child_branch
         self.assertEqual(new_mandatory_child, n1_mandatory_egy)
         self.assertEqual(new_mandatory_child.groupelementyear_set.first(), n1_child_gr)
+        self.assertEqual(
+            str(self.postponer.warnings[0]),
+            _("%(education_group_year)s has already been copied in %(academic_year)s in another program. "
+              "It may have been already modified.") % {
+                "education_group_year": n1_mandatory_egy.acronym,
+                "academic_year": n1_mandatory_egy.academic_year
+            }
+        )
 
     def test_postpone_with_child_branches(self):
         sub_group = GroupElementYearFactory(
