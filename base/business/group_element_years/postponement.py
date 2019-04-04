@@ -31,6 +31,7 @@ from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType
+from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
@@ -80,6 +81,16 @@ class EducationGroupYearNotEmptyWarning(CopyWarning):
                  "It may have been already modified.") % {
                     "education_group_year": self.education_group_year.acronym,
                     "academic_year": self.academic_year
+                }
+
+
+class ReferenceLinkEmptyWarning(CopyWarning):
+    def __init__(self, obj: EducationGroupYear, ):
+        self.education_group_year = obj
+
+    def __str__(self):
+        return _("%(education_group_year)s (reference link) is empty.") % {
+                    "education_group_year": self.education_group_year.acronym,
                 }
 
 
@@ -235,9 +246,12 @@ class PostponeContent:
                 parent_type=new_gr.parent.education_group_type,
                 child_type=new_egy.education_group_type
             ).first()
-            if relationship and relationship.min_count_authorized > 0 and not new_egy.groupelementyear_set.all():
+            if new_gr.link_type == LinkTypes.REFERENCE.name and not new_egy.groupelementyear_set.all():
+                self.warnings.append(ReferenceLinkEmptyWarning(new_egy))
+            elif relationship and relationship.min_count_authorized > 0 and not new_egy.groupelementyear_set.all():
                 # We postpone data only if the mandatory group is empty.
                 self._postpone(old_egy, new_egy)
+            # TODO Add warning if relationship not authorized
             else:
                 self.warnings.append(EducationGroupYearNotEmptyWarning(new_egy, self.next_academic_year))
 

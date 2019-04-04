@@ -36,6 +36,7 @@ from base.models.enums import entity_type
 from base.models.enums import organization_type
 from base.models.enums.education_group_categories import GROUP, MINI_TRAINING
 from base.models.enums.education_group_types import MiniTrainingType
+from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
@@ -559,3 +560,27 @@ class TestPostpone(TestCase):
                 "academic_year": self.next_academic_year,
             }
         )
+
+    def test_when_education_group_year_exists_in_n1_has_no_child_and_is_reference_link(self):
+        self.current_group_element_year.link_type = LinkTypes.REFERENCE.name
+        self.current_group_element_year.save()
+
+        n1_referenced_egy = EducationGroupYearFactory(
+            academic_year=self.next_academic_year,
+            education_group=self.current_group_element_year.child_branch.education_group,
+            education_group_type=self.current_education_group_year.education_group_type,
+        )
+
+        self.postponer = PostponeContent(self.current_education_group_year)
+
+        new_root = self.postponer.postpone()
+        new_referenced_egy = new_root.groupelementyear_set.first().child_branch
+        self.assertEqual(new_referenced_egy, n1_referenced_egy)
+        self.assertFalse(new_referenced_egy.groupelementyear_set.all())
+        self.assertEqual(
+            str(self.postponer.warnings[0]),
+            _("%(education_group_year)s (reference link) is empty.") % {
+                "education_group_year": n1_referenced_egy.acronym,
+            }
+        )
+
