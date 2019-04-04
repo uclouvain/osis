@@ -579,8 +579,29 @@ class TestPostpone(TestCase):
         self.assertFalse(new_referenced_egy.groupelementyear_set.all())
         self.assertEqual(
             str(self.postponer.warnings[0]),
-            _("%(education_group_year)s (reference link) is empty.") % {
-                "education_group_year": n1_referenced_egy.acronym,
+            _("%(education_group_year)s (reference link) has not been copied. Its content is empty.") % {
+                "education_group_year": new_referenced_egy.acronym
             }
         )
 
+    def test_when_education_group_year_does_not_exist_in_n1_and_is_reference_link(self):
+        self.current_group_element_year.link_type = LinkTypes.REFERENCE.name
+        self.current_group_element_year.save()
+
+        self.postponer = PostponeContent(self.current_education_group_year)
+
+        new_root = self.postponer.postpone()
+        new_referenced_egy = new_root.groupelementyear_set.first().child_branch
+        self.assertEqual(
+            new_referenced_egy.acronym,
+            new_referenced_egy.acronym)
+        self.assertEqual(
+            new_referenced_egy.academic_year,
+            self.next_academic_year
+        )
+        self.assertEqual(
+            str(self.postponer.warnings[0]),
+            _("%(education_group_year)s (reference link) has not been copied. Its content is empty.") % {
+                "education_group_year": new_referenced_egy.acronym
+            }
+        )

@@ -89,8 +89,8 @@ class ReferenceLinkEmptyWarning(CopyWarning):
         self.education_group_year = obj
 
     def __str__(self):
-        return _("%(education_group_year)s (reference link) is empty.") % {
-                    "education_group_year": self.education_group_year.acronym,
+        return _("%(education_group_year)s (reference link) has not been copied. Its content is empty.") % {
+                    "education_group_year": self.education_group_year.acronym
                 }
 
 
@@ -237,8 +237,6 @@ class PostponeContent:
         old_egy = old_gr.child_branch
         new_egy = old_egy.next_year()
 
-        # TODO Check if link is reference and do not copy content and display message
-
         if new_egy:
             # In the case of technical group, we have to postpone the content even if the group already
             # exists in N+1
@@ -257,7 +255,7 @@ class PostponeContent:
 
         else:
             # If the education group does not exists for the next year, we have to postpone.
-            new_egy = self._duplication_education_group_year(old_egy)
+            new_egy = self._duplication_education_group_year(old_gr, old_egy)
 
         if new_egy:
             new_gr.child_branch = new_egy
@@ -265,7 +263,7 @@ class PostponeContent:
 
         return new_gr
 
-    def _duplication_education_group_year(self, old_egy: EducationGroupYear):
+    def _duplication_education_group_year(self, old_gr: GroupElementYear, old_egy: EducationGroupYear):
         if old_egy.education_group_type.category != Categories.GROUP.name:
             if old_egy.education_group.end_year and old_egy.education_group.end_year < self.next_academic_year.year:
                 self.warnings.append(EducationGroupEndYearWarning(old_egy, self.next_academic_year))
@@ -273,8 +271,11 @@ class PostponeContent:
 
         new_egy = duplicate_education_group_year(old_egy, self.next_academic_year)
 
-        # Copy its children
-        self._postpone(old_egy, new_egy)
+        if old_gr.link_type != LinkTypes.REFERENCE.name:
+            # Copy its children
+            self._postpone(old_egy, new_egy)
+        else:
+            self.warnings.append(ReferenceLinkEmptyWarning(new_egy))
 
         return new_egy
 
