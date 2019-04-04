@@ -66,6 +66,10 @@ class TrainingType(ChoiceEnum):
         ]
 
     @classmethod
+    def root_master_2m_types(cls):
+        return [cls.PGRM_MASTER_120.name, cls.PGRM_MASTER_180_240.name]
+
+    @classmethod
     def with_diploma_values_set_initially_as_true(cls):
         return [
             cls.AGGREGATION.name, cls.BACHELOR.name, cls.FORMATION_PHD.name, cls.PHD.name, cls.MASTER_MA_120.name,

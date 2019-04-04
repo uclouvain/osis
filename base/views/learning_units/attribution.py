@@ -120,6 +120,12 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["attribution"] = self.attribution
+
+        if self.luy.is_partim():
+            qs_partim = self.luy.learning_component_years.all()
+            context['partim_vol1'] = qs_partim.filter(type=learning_component_year_type.LECTURING).first()
+            context['partim_vol2'] = qs_partim.filter(type=learning_component_year_type.PRACTICAL_EXERCISES).first()
+
         return context
 
     def get_form_kwargs(self, form_name):

@@ -295,12 +295,17 @@ class TestCommonBaseFormSave(TestCase):
 
     @patch('base.forms.education_group.common.find_authorized_types', return_value=EducationGroupType.objects.all())
     def test_update_with_parent_when_existing_group_element_year(self, mock_find_authorized_types):
-        parent = EducationGroupYearFactory(academic_year=self.expected_educ_group_year.academic_year)
+        parent = EducationGroupYearFactory(
+            academic_year=self.expected_educ_group_year.academic_year,
+            education_group__end_year=None
+        )
 
         entity_version = MainEntityVersionFactory()
-        initial_educ_group_year = EducationGroupYearFactory(management_entity=entity_version.entity,
-                                                            academic_year=self.expected_educ_group_year.academic_year,
-                                                            education_group__start_year=current_academic_year().year)
+        initial_educ_group_year = EducationGroupYearFactory(
+            management_entity=entity_version.entity,
+            academic_year=self.expected_educ_group_year.academic_year,
+            education_group__start_year=current_academic_year().year
+        )
 
         GroupElementYearFactory(parent=parent, child_branch=initial_educ_group_year)
         initial_count = GroupElementYear.objects.all().count()
