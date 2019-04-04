@@ -3446,6 +3446,11 @@
                     "can_validate_registration",
                     "continuing_education",
                     "admission"
+                ],
+                [
+                    "can_create_json",
+                    "continuing_education",
+                    "admission"
                 ]
             ]
         }

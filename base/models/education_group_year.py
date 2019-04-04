@@ -133,6 +133,26 @@ class HierarchyQuerySet(models.QuerySet):
             education_group_year_pks = [row[0] for row in cursor.fetchall()]
         return EducationGroupYear.objects.filter(pk__in=education_group_year_pks)
 
+    def get_children(self):
+        with connection.cursor() as cursor:
+            parent_pks = self.values_list('pk', flat=True)
+            cmd_sql = """
+                WITH RECURSIVE group_element_year_children AS (
+                    SELECT child_branch_id
+                    FROM base_groupelementyear
+                    WHERE parent_id IN (%s)
+                    UNION ALL
+                    SELECT child.child_branch_id
+                    FROM base_groupelementyear AS child
+                    INNER JOIN group_element_year_children AS parent on parent.child_branch_id = child.parent_id
+                    WHERE child.child_branch_id is not null
+                )
+                SELECT distinct child_branch_id FROM group_element_year_children;
+            """ % ','.join(["%s"] * len(parent_pks))
+            cursor.execute(cmd_sql, list(parent_pks))
+            education_group_year_pks = [row[0] for row in cursor.fetchall()]
+        return EducationGroupYear.objects.filter(pk__in=education_group_year_pks)
+
 
 class EducationGroupYear(SerializableModel):
     objects = EducationGroupYearManager()
@@ -542,16 +562,20 @@ class EducationGroupYear(SerializableModel):
         )
 
     @property
+    def type(self):
+        return self.education_group_type.name
+
+    @property
     def is_minor(self):
-        return self.education_group_type.name in MiniTrainingType.minors()
+        return self.type in MiniTrainingType.minors()
 
     @property
     def is_deepening(self):
-        return self.education_group_type.name == MiniTrainingType.DEEPENING.name
+        return self.type == MiniTrainingType.DEEPENING.name
 
     @property
     def is_minor_major_option_list_choice(self):
-        return self.education_group_type.name in GroupType.minor_major_option_list_choice()
+        return self.type in GroupType.minor_major_option_list_choice()
 
     @property
     def is_common(self):
@@ -563,23 +587,23 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def is_master120(self):
-        return self.education_group_type.name == TrainingType.PGRM_MASTER_120.name
+        return self.type == TrainingType.PGRM_MASTER_120.name
 
     @property
     def is_master60(self):
-        return self.education_group_type.name == TrainingType.MASTER_M1.name
+        return self.type == TrainingType.MASTER_M1.name
 
     @property
     def is_aggregation(self):
-        return self.education_group_type.name == TrainingType.AGGREGATION.name
+        return self.type == TrainingType.AGGREGATION.name
 
     @property
     def is_specialized_master(self):
-        return self.education_group_type.name == TrainingType.MASTER_MC.name
+        return self.type == TrainingType.MASTER_MC.name
 
     @property
     def is_bachelor(self):
-        return self.education_group_type.name == TrainingType.BACHELOR.name
+        return self.type == TrainingType.BACHELOR.name
 
     @property
     def verbose(self):

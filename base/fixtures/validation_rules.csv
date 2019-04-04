@@ -7,7 +7,7 @@ Examples: <i>ARKE2A, BIOL2A, HIST2A</i>","Sigle d’une Aggégation est composé
 <ul>
 <li>2-4 lettres + <b>2A</b></li>
 </ul>
-Exemples: <i>ARKE2A, BIOL2A, HIST2A</i>",Ex: ARKE2A
+Exemples: <i>ARKE2A, BIOL2A, HIST2A</i>",Ex: BIOL2A
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_8FC,REQUIRED,8FC,"^([A-Za-z]{2,4})(8)([Ff])([Cc])$",,"Acronym of Certificate of Participation is composed of:
 <ul>
 <li>2-4 letters + <b>8FC</b></li>
@@ -25,25 +25,25 @@ Examples: <i>ANIM7FC, ECPO7FC, FITN7FC</i>","Sigle d’une Attestation de réuss
 <ul>
 <li>2-4 lettres + <b>7FC</b></li>
 </ul>
-Exemples: <i>ANIM7FC, ECPO7FC, FITN7FC</i>",Ex: ANIM7FC
+Exemples: <i>ANIM7FC, ECPO7FC, FITN7FC</i>",Ex: FITN7FC
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_9FC,REQUIRED,9FC,"^([A-Za-z]{2,4})(9)([Ff])([Cc])$",,"Acronym of Certificate of holding credits is composed of:
 <ul>
 <li>2-4 letters + <b>9FC</b></li>
 </ul>
-Examples: <i>APHE9FC, FRTB9FC, SIMU9FC</i>","Sigle d’une Attestation d’obtention de crédits est composé de:
+Examples: <i>PCDI9FC, FRTB9FC, SIMU9FC</i>","Sigle d’une Attestation d’obtention de crédits est composé de:
 <ul>
 <li>2-4 lettres + <b>9FC</b></li>
 </ul>
-Exemples: <i>APHE9FC, FRTB9FC, SIMU9FC</i>",Ex: APHE9FC
+Exemples: <i>PCDI9FC, FRTB9FC, SIMU9FC</i>",Ex: PCDI9FC
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_1BA,REQUIRED,1BA,"^([A-Za-z]{2,4})(1)([Bb])([Aa])$",,"Acronym of Bachelor credits is composed of:
 <ul>
 <li>2-4 letters + <b>1BA</b></li>
 </ul>
-Examples: <i>SINF1BA, DROI1BA, ECGE1BA</i>","Sigle d’un Bachelier est composé de:
+Examples: <i>BIOL1BA, DROI1BA, ECGE1BA</i>","Sigle d’un Bachelier est composé de:
 <ul>
 <li>2-4 lettres + <b>1BA</b></li>
 </ul>
-Exemples: <i>SINF1BA, DROI1BA, ECGE1BA</i>",Ex: SINF1BA
+Exemples: <i>BIOL1BA, DROI1BA, ECGE1BA</i>",Ex: BIOL1BA
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2CE,REQUIRED,CE,"^([A-Za-z]{2,4})([2|9])([Cc])([Ee])$",,"Acronym of Certificate is composed of:
 <ul>
 <li>2-4 letters + 1 number among 2 and 9 + <b>CE</b></li>
@@ -52,7 +52,7 @@ Examples: <i>CAPA2CE, COIN9CE, ETES9CE</i>","Sigle d’une Certificat est compos
 <ul>
 <li>2-4 lettres + 1 chiffre parmis 2 et 9 + <b>CE</b></li>
 </ul>
-Exemples: <i>CAPA2CE, COIN9CE, ETES9CE</i>",Ex: CAPA2CE
+Exemples: <i>CAPA2CE, COIN9CE, ETES9CE</i>",Ex: ETES9CE
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_CE,REQUIRED,2CE,"^([A-Za-z]{2,4})(2)([Cc])([Ee])$",,"Acronym of CAPAES is composed of:
 <ul>
 <li>2-4 letters + <b>2CE</b></li>
@@ -66,10 +66,10 @@ base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3C
 <ul>
 <li>2-4 letters + <b>3CE</b></li>
 </ul>
-Examples: <i>AGRO3CE, FIAL3CE, ESPO3CE</i>","Sigle d’un Certificat de recherche est composé de:
+Examples: <i>DROI3CE, FIAL3CE, ESPO3CE</i>","Sigle d’un Certificat de recherche est composé de:
 <li>2-4 lettres + <b>3CE</b></li>
 </ul>
-Exemples: <i>AGRO3CE, FIAL3CE, ESPO3CE</i>",Ex: AGRO3CE
+Exemples: <i>DROI3CE, FIAL3CE, ESPO3CE</i>",Ex: DROI3CE
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_1FC,REQUIRED,1FC,"^([A-Za-z]{2,4})(1)([Ff])([Cc])$",,"Acronym of University first cycle certificate is composed of:
 <ul>
 <li>2-4 letters + <b>1FC</b></li>
@@ -78,16 +78,16 @@ Examples: <i>RESE1FC, DICI1FC, PACC1FC</i>","Sigle d’un Certificat d’univers
 <ul>
 <li>2-4 lettres + <b>1FC</b></li>
 </ul>
-Exemples: <i>RESE1FC, DICI1FC, PACC1FC</i>",Ex: RESE1FC
+Exemples: <i>RESE1FC, DICI1FC, PACC1FC</i>",Ex: DICI1FC
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2FC,REQUIRED,2FC,"^([A-Za-z]{2,4})(2)([Ff])([Cc])$",,"Acronym of University second cycle certificate is composed of:
 <ul>
 <li>2-4 letters + <b>12FC</b></li>
 </ul>
-Examples: <i>ABUS2FC,JDAN2FC, MAIN2FC</i>","Sigle d’un Certificat d’université 2ème cycle est composé de:
+Examples: <i>ANSO2FC,JDAN2FC, MAIN2FC</i>","Sigle d’un Certificat d’université 2ème cycle est composé de:
 <ul>
 <li>2-4 lettres + <b>12FC</b></li>
 </ul>
-Exemples: <i>ABUS2FC,JDAN2FC, MAIN2FC</i>",Ex: ABUS2FC
+Exemples: <i>ANSO2FC,JDAN2FC, MAIN2FC</i>",Ex: ANSO2FC
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_CA,REQUIRED,CA,"^([A-Za-z]{2,4})([Cc])([Aa])$",,"Acronym of Access contest is composed of:
 <ul>
 <li>2-4 letters + <b>CA</b></li>
@@ -101,11 +101,11 @@ base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_LV
 <ul>
 <li>2-4 letters + <b>LV</b></li>
 </ul>
-Examples: <i>ALLELV, JAPOLV, RUSSLV</i>","Sigle d’un Cours de langue est composé de:
+Examples: <i>ALLELV, JAPOLV, FRANLV</i>","Sigle d’un Cours de langue est composé de:
 <ul>
 <li>2-4 lettres + <b>LV</b></li>
 </ul>
-Exemples: <i>ALLELV, JAPOLV, RUSSLV</i>",Ex: ALLELV
+Exemples: <i>ALLELV, JAPOLV, FRANLV</i>",Ex: FRANLV
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_IS,REQUIRED,IS,"^([A-Za-z]{2,4})([Ii])([Ss])$",,"Acronym of Isolated class is composed of:
 <ul>
 <li>2-4 letters + <b>IS</b></li>
@@ -123,16 +123,16 @@ Examples: <i>AGRO3DP, ART3DP, ESP3DP</i>","Sigle d’un PhD est composé de:
 <ul>
 <li>2-4 lettres + <b>3DP</b></li>
 </ul>
-Exemples: <i>AGRO3DP, ART3DP, ESP3DP</i>",Ex: AGRO3DP
+Exemples: <i>AGRO3DP, ART3DP, ESP3DP</i>",Ex: ART3DP
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3FP,REQUIRED,3FP,"^([A-Za-z]{2,4})(3)([Ff])([Pp])$",,"Acronym of Formation PhD is composed of:
 <ul>
 <li>2-4 letters + <b>3FP</b></li>
 </ul>
-Examples: <i>ALLELV, JAPOLV, RUSSLV</i>","Sigle d’une Formation doctorale est composé de:
+Examples: <i>ART3FD</i>","Sigle d’une Formation doctorale est composé de:
 <ul>
 <li>2-4 lettres + <b>3FP</b></li>
 </ul>
-Exemples: <i>ALLELV, JAPOLV, RUSSLV</i>",Ex: ALLELV
+Exemples: <i>ART3FD</i>",Ex: ART3FD
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_JY,REQUIRED,JY,"^([A-Za-z]{2,4})([Jj])([Yy])$",,"Acronym of Junior year is composed of:
 <ul>
 <li>2-4 letters + <b>JY</b></li>
@@ -146,38 +146,38 @@ base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2M
 <ul>
 <li>2-4 letters + <b>2M</b></li>
 </ul>
-Examples: <i>ACTU2M, GBIO2M, TIS2M</i>","Sigle d’un Master en 120 crédits (programme) est composé de:
+Examples: <i>ACTU2M, GBIO2M, BBMC2M</i>","Sigle d’un Master en 120 crédits (programme) est composé de:
 <ul>
 <li>2-4 lettres + <b>2M</b></li>
 </ul>
-Exemples: <i>ACTU2M, GBIO2M, TIS2M</i>",Ex: ACTU2M
+Exemples: <i>ACTU2M, GBIO2M, BBMC2M</i>",Ex: BBMC2M
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MA120,REQUIRED,2MA,"^([A-Za-z]{2,4})(2)([Mm])([Aa])$",,"Acronym of Master MA 120 is composed of:
 <ul>
 <li>2-4 letters + <b>2MA</b></li>
 </ul>
-Examples: <i>ANTR2MA, FILO2MA, INGE2MA</i>","Sigle d’un Master en 120 crédits à finalité approfondie est composé de:
+Examples: <i>BBMC2MA, FILO2MA, INGE2MA</i>","Sigle d’un Master en 120 crédits à finalité approfondie est composé de:
 <ul>
 <li>2-4 lettres + <b>2MA</b></li>
 </ul>
-Exemples: <i>ANTR2MA, FILO2MA, INGE2MA</i>",Ex: ANTR2MA
+Exemples: <i>BBMC2MA, FILO2MA, INGE2MA</i>",Ex: BBMC2MA
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MD120,REQUIRED,2MD,"^([A-Za-z]{2,4})(2)([Mm])([Dd])$",,"Acronym of Master MD 120 is composed of:
 <ul>
 <li>2-4 letters + <b>2MD</b></li>
 </ul>
-Examples: <i>ANTRMD, SOCMD, TRAD2MD</i>","Sigle d’un Master en 120 crédits à finalité didactique est composé de:
+Examples: <i>BBMC2MD, SOC2MD, TRAD2MD</i>","Sigle d’un Master en 120 crédits à finalité didactique est composé de:
 <ul>
 <li>2-4 lettres + <b>2MD</b></li>
 </ul>
-Exemples: <i>ANTRMD, SOCMD, TRAD2MD</i>",Ex: ANTRMD
+Exemples: <i>BBMC2MD, SOC2MD, TRAD2MD</i>",Ex: BBMC2MD
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MS120,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.*)$",,"Acronym of Master MS 120 is composed of:
 <ul>
 <li>2-4 letters + <b>2MS/</b> + letters</li>
 </ul>
-Examples: <i>ACTU2MS/SA, ESP2MS/G, FYAP2MS/G</i>","Sigle d’un Master en 120 crédits à finalité spécialisée est composé de:
+Examples: <i>ACTU2MS/SA, BBMC2MS/BT, FYAP2MS/G</i>","Sigle d’un Master en 120 crédits à finalité spécialisée est composé de:
 <ul>
 <li>2-4 lettres + <b>2MS/</b> + lettres</li>
 </ul>
-Exemples: <i>ACTU2MS/SA, ESP2MS/G, FYAP2MS/G</i>",Ex: ACTU2MS/SA
+Exemples: <i>ACTU2MS/SA,BBMC2MS/BT, FYAP2MS/G</i>",Ex: BBMC2MS/BT
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2M180,REQUIRED,2M,"^([A-Za-z]{2,4})(2)([Mm])$",,"Acronym of Program master 180-240 is composed of:
 <ul>
 <li>2-4 letters + <b>2M</b></li>
@@ -218,29 +218,29 @@ base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2M
 <ul>
 <li>2-4 letters + <b>2M1</b></li>
 </ul>
-Examples: <i>ARKE2M1, GEST2M1, ROGE2M1</i>","Sigle d’un Master en 60 crédits est composé de:
+Examples: <i>BIOL2M1, GEST2M1, ROGE2M1</i>","Sigle d’un Master en 60 crédits est composé de:
 <ul>
 <li>2-4 lettres + <b>2M1</b></li>
 </ul>
-Exemples: <i>ARKE2M1, GEST2M1, ROGE2M1</i>",Ex: ARKE2M1
+Exemples: <i>BIOL2M1, GEST2M1, ROGE2M1</i>",Ex: BIOL2M1
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MC,REQUIRED,2MC,"^([A-Za-z]{2,4})(2)([Mm])([Cc])$",,"Acronym of Master of specialist is composed of:
 <ul>
 <li>2-4 letters + <b>2MC</b></li>
 </ul>
-Examples: <i>BICL2MC, DRIF2MC, EDUC2MC</i>","Sigle d’un Master de spécialisation est composé de:
+Examples: <i>BRAS2MC, DRIF2MC, EDUC2MC</i>","Sigle d’un Master de spécialisation est composé de:
 <ul>
 <li>2-4 lettres + <b>2MC</b></li>
 </ul>
-Exemples: <i>BICL2MC, DRIF2MC, EDUC2MC</i>",Ex: BICL2MC
+Exemples: <i>BRAS2MC, DRIF2MC, EDUC2MC</i>",Ex: BRAS2MC
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_ST,REQUIRED,ST,"^([A-Za-z]{2,4})([Ss])([Tt])$",,"Acronym of Internship is composed of:
 <ul>
 <li>2-4 letters + <b>ST</b></li>
 </ul>
-Examples: <i>DRTST, FSAST, STATST</i>","Sigle d’un Stagiaire est composé de:
+Examples: <i>DRTST, AGROST, STATST</i>","Sigle d’un Stagiaire est composé de:
 <ul>
 <li>2-4 lettres + <b>ST</b></li>
 </ul>
-Exemples: <i>DRTST, FSAST, STATST</i>",Ex: DRTST
+Exemples: <i>DRTST, AGROST, STATST</i>",Ex: AGROST
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2A,REQUIRED,200E,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ee])$",,"Code of Aggregation is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -248,14 +248,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>E</b></li>
 </ul>
-Examples: <i>LHIST888E, LEDPH200E, LPSP200E</i>","Code d’une Aggrégation est composée de:
+Examples: <i>LHIST200E, LEDPH200E, LPSP200E</i>","Code d’une Aggrégation est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>E</b></li>
 </ul>
-Exemples: <i>LHIST888E, LEDPH200E, LPSP200E</i>",Ex: LHIST888E
+Exemples: <i>LHIST200E, LEDPH200E, LPSP200E</i>",Ex: LBIOL200E
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_8FC,REQUIRED,100Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([QwqW])$",,"Code of Certificate of participation is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -270,7 +270,7 @@ Examples: <i>WHDCO100Q, LFLES100Q, WHCON100Q</i>","Code d’une Attestation de p
 <li>partie numérique: 3 chiffres</li>
 <li><b>Q</b></li>
 </ul>
-Exemples: <i>WHDCO100Q, LFLES100Q, WHCON100Q</i>",Ex: WHDCO100Q
+Exemples: <i>WHDCO100Q, LFLES100Q, WHCON100Q</i>",Ex: LACHA100Q
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_7FC,REQUIRED,100W,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ww])$",,"Code of Certificate of success is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -278,14 +278,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>W</b></li>
 </ul>
-Examples: <i>LHIST888E, LEDPH200E, LPSP200E</i>","Code d’une Attestation de réussite est composée de:
+Examples: <i>LFITN100W</i>","Code d’une Attestation de réussite est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>Q</b></li>
 </ul>
-Exemples: <i>LHIST888E, LEDPH200E, LPSP200E</i>",Ex: LHIST888E
+Exemples: <i>LFITN100W</i>",Ex: LFITN100W
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_9FC,REQUIRED,100Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([QwqW])$",,"Code of Certificate of holding credits is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -300,7 +300,7 @@ Examples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>","Code d’une Attestation d’
 <li>partie numérique: 3 chiffres</li>
 <li><b>Q</b> or <b>>W</b></li>
 </ul>
-Exemples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>",Ex: LPCDI100W
+Exemples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>",Ex: LFRTB100Q
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_1BA,REQUIRED,100B,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Bb])$",,"Code of Bachelor is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -308,14 +308,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>B</b></li>
 </ul>
-Examples: <i>LHIST888E, LEDPH200E, LPSP200E</i>","Code d’un bachelier est composé de:
+Examples: <i>LBIOL100B</i>","Code d’un bachelier est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>B</b></li>
 </ul>
-Exemples: <i>LHIST888E, LEDPH200E, LPSP200E</i>",Ex: LHIST888E
+Exemples: <i>LBIOL100B</i>",Ex: LBIOL100B
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2CE,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of Certificate is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -323,14 +323,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>Q</b></li>
 </ul>
-Examples: <i>LCAPA300Q, MGESM304Q, LEBIB230Q</i>","Code of Certificate is composed of:
+Examples: <i>LETES300Q, MGESM304Q, LEBIB230Q</i>","Code of Certificate is composed of:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>Q</b></li>
 </ul>
-Exemples: <i>LCAPA300Q, MGESM304Q, LEBIB230Q</i>",Ex: LCAPA300Q
+Exemples: <i>LETES300Q, MGESM304Q, LEBIB230Q</i>",Ex: LETES300Q
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_CE,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of CAPAES is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -338,14 +338,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>Q</b></li>
 </ul>
-Examples: <i>LCAPA100Q</i>","Code d’un CAPAES est composé de:
+Examples: <i>LCAPA300Q</i>","Code d’un CAPAES est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>Q</b></li>
 </ul>
-Exemples: <i>LCAPA100Q</i>",Ex: LCAPA100Q
+Exemples: <i>LCAPA300Q</i>",Ex: LCAPA300Q
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_3CE,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of Research certificate is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -443,14 +443,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>D</b></li>
 </ul>
-Examples: <i>LBAUR320D, MCOMM320D, LAGRO300D</i>","Code d’un PhD est composé de:
+Examples: <i>LBAUR300D, MCOMM300D, LAGRO300D</i>","Code d’un PhD est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>D</b></li>
 </ul>
-Exemples: <i>LBAUR320D, MCOMM320D, LAGRO300D</i>",Ex: LBAUR320D
+Exemples: <i>LBAUR300D, MCOMM300D, LAGRO300D</i>",Ex: LAGRO300D
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_3FP,REQUIRED,330D,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Dd])$",,"Code of Formation PhD is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -458,14 +458,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>D</b></li>
 </ul>
-Examples: <i>LBAUR331D, LCRIM330D, WBIFA350D</i>","Code d’une Formation doctorale est composée de:
+Examples: <i>LBAUR330D, LCRIM330D, WBIFA330D</i>","Code d’une Formation doctorale est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>D</b></li>
 </ul>
-Exemples: <i>LBAUR331D, LCRIM330D, WBIFA350D</i>",Ex: LBAUR331D
+Exemples: <i>LBAUR330D, LCRIM330D, WBIFA330D</i>",Ex: LBAUR330D
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_JY,REQUIRED,100Y,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Yy])$",,"Code of Junior Year is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -488,14 +488,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>M</b></li>
 </ul>
-Examples: <i>LBBMC200M, MINGM220M, LGESE200M</i>","Code d’un Master en 120 crédits (programme) est composé de:
+Examples: <i>LBBMC200M, MINGM200M, LGESE200M</i>","Code d’un Master en 120 crédits (programme) est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>M</b></li>
 </ul>
-Exemples: <i>LBBMC200M, MINGM220M, LGESE200M</i>",Ex: LBBMC200M
+Exemples: <i>LBBMC200M, MINGM200M, LGESE200M</i>",Ex: LBBMC200M
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2MA120,REQUIRED,200A,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Aa])$",,"Code of Master MA 120 is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -518,14 +518,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>D</b></li>
 </ul>
-Examples: <i>LEBIB201D, LGEOG200D, LTHEO201D</i>","Code d’un Master en 120 crédits à finalité didactique est composé de:
+Examples: <i>LEBIB200D, LGEOG200D, LTHEO200D</i>","Code d’un Master en 120 crédits à finalité didactique est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>D</b></li>
 </ul>
-Exemples: <i>LEBIB201D, LGEOG200D, LTHEO201D</i>",Ex: LEBIB201D
+Exemples: <i>LEBIB200D, LGEOG200D, LTHEO200D</i>",Ex: LEBIB200D
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2MS120,REQUIRED,200S,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ss])(.*)$",,"Code of Master MS 120 is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -533,14 +533,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>S</b></li>
 </ul>
-Examples: <i>MAPHM280S, LARKE201S, LROGE821S</i>","Code d’un Master en 120 crédits à finalité spécialisé est composé de:
+Examples: <i>MAPHM200S, LARKE200S, LROGE200S</i>","Code d’un Master en 120 crédits à finalité spécialisé est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>S</b></li>
 </ul>
-Exemples: <i>MAPHM280S, LARKE201S, LROGE821S</i>",Ex: MAPHM280S
+Exemples: <i>MAPHM200S, LARKE200S, LROGE200S</i>",Ex: MAPHM200S
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2M180,REQUIRED,200M,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Mm])$",,"Code of Program master 180-240 is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -563,14 +563,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>A</b></li>
 </ul>
-Examples: <i>WMED202A</i>","Code d’un Master en 180-240 crédits à finalité approfondie est composé de:
+Examples: <i>WMED200A</i>","Code d’un Master en 180-240 crédits à finalité approfondie est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>A</b></li>
 </ul>
-Exemples: <i>WMED202A</i>",Ex: WMED202A
+Exemples: <i>WMED200A</i>",Ex: LBBMC200A
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2MD180,REQUIRED,200D,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Dd])$",,"Code of Master MD 180-240 is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -578,14 +578,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>D</b></li>
 </ul>
-Examples: <i>WMED100D</i>","Code d’un Master en 180-240 crédits à finalité didactique est composé de:
+Examples: <i>WMED200D</i>","Code d’un Master en 180-240 crédits à finalité didactique est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>D</b></li>
 </ul>
-Exemples: <i>WMED100D</i>",Ex: WMED100D
+Exemples: <i>WMED200D</i>",Ex: LBBMC200D
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2MS180,REQUIRED,200S,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ss])$",,"Code of Master MS 180-240 is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -600,7 +600,7 @@ Examples: <i>WMD200S</i>","Code d’un Master en 180-240 crédits à finalité s
 <li>partie numérique: 3 chiffres</li>
 <li><b>S</b></li>
 </ul>
-Exemples: <i>WMD200S</i>",Ex: WMD200S
+Exemples: <i>WMD200S</i>",Ex: LBBMC200S
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2M1,REQUIRED,200U,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Uu])$",,"Code of Master 60 is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -608,14 +608,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>U</b></li>
 </ul>
-Examples: <i>LHIST200U, LCHIM200U, MSPOM220U</i>","Code d’un Master en 60 crédits est composé de:
+Examples: <i>LHIST200U, LCHIM200U, MSPOM200U</i>","Code d’un Master en 60 crédits est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>U</b></li>
 </ul>
-Exemples: <i>LHIST200U, LCHIM200U, MSPOM220U</i>",Ex: LHIST200U
+Exemples: <i>LHIST200U, LCHIM200U, MSPOM200U</i>",Ex: LHIST200U
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2MC,REQUIRED,200C,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Cc])$",,"Code of Master of specialist is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -1227,7 +1227,7 @@ Examples: <i>LDRIN201T, LPSAD310T, LKINE800T</i>","Code d’une Partie de base (
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>T</b></li>
 </ul>
-Exemples: <i>LDRIN201T, LPSAD310T, LKINE800T</i>",Ex: LDRIN201T
+Exemples: <i>LDRIN201T, LPSAD310T, LKINE800T</i>",Ex: LARKE100T
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_complementarymodule,REQUIRED,100K,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Kk])$",,"Code of Complementary module is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -1235,14 +1235,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3-6 numbers</li>
 <li><b>K</b></li>
 </ul>
-Examples: <i>MAPHM280K, LDATI111K, LMATH1000K</i>","Code d’un Module complémentaire est composé de:
+Examples: <i>MAPHM280K, LDATI111K, LMATH100K</i>","Code d’un Module complémentaire est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>K</b></li>
 </ul>
-Exemples: <i>MAPHM280K, LDATI111K, LMATH1000K</i>",Ex: MAPHM280K
+Exemples: <i>MAPHM280K, LDATI111K, LMATH100K</i>",Ex: LBIOL100K
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_minorlistchoice,REQUIRED,100G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Minor list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -1257,7 +1257,7 @@ Examples: <i>LBARC913G, WFARM436G, WDENT318G</i>","Code d’une Liste au choix m
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>G</b></li>
 </ul>
-Exemples: <i>LBARC913G, WFARM436G, WDENT318G</i>",Ex: LBARC913G
+Exemples: <i>LBARC913G, WFARM436G, WDENT318G</i>",Ex: LBIOL100G
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_majorlistchoice,REQUIRED,200G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Major list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -1272,7 +1272,7 @@ Examples: <i>LMAJ400G</i>","Code d’une Liste au choix majeures est composée d
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>G</b></li>
 </ul>
-Exemples: <i>LMAJ400G</i>",Ex: LMAJ400G
+Exemples: <i>LMAJ400G</i>",Ex: LBIOL200G
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_optionlistchoice,REQUIRED,300G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Option list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -1287,7 +1287,7 @@ Examples: <i>LADPU801G, MCOMM614G, LFILO922G</i>","Code d’une Liste au choix O
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>G</b></li>
 </ul>
-Exemples: <i>LADPU801G, MCOMM614G, LFILO922G</i>",Ex: LADPU801G
+Exemples: <i>LADPU801G, MCOMM614G, LFILO922G</i>",Ex: LBIOL300G
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_finality120listchoice,REQUIRED,400G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Finality 120 list choice  is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -1302,7 +1302,7 @@ Examples: <i>LCHIM900G, WSBIM900G, MGESM400G</i>","Code d’une Liste au choix d
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>G</b></li>
 </ul>
-Exemples: <i>LCHIM900G, WSBIM900G, MGESM400G</i>",Ex: LCHIM900G
+Exemples: <i>LCHIM900G, WSBIM900G, MGESM400G</i>",Ex: LBIOL400G
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_finality180listchoice,REQUIRED,400G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Finality 180 list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -1317,7 +1317,7 @@ Examples: <i>TCOMU900G, WMED900G, WMD400G</i>","Code d’une Liste au choix de f
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>G</b></li>
 </ul>
-Exemples: <i>TCOMU900G, WMED900G, WMD400G</i>",Ex: TCOMU900G
+Exemples: <i>TCOMU900G, WMED900G, WMD400G</i>",Ex: LBIOL400G
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,500G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Mobility partnership list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -1332,7 +1332,7 @@ Examples: <i>LGENT500G</i>","Code d’une Liste au choix partenariat mobilité e
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>G</b></li>
 </ul>
-Exemples: <i>LGENT500G</i>",Ex: LGENT500G
+Exemples: <i>LGENT500G</i>",Ex: LBIOL500G
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_subgroup,REQUIRED,R,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Rr])$",,"Code of Sub group is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -1347,7 +1347,7 @@ Examples: <i>LTEMP712R, LSPOL914R, LARKE803R</i>","Code d’un Sous-groupe est c
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>R</b></li>
 </ul>
-Exemples: <i>LTEMP712R, LSPOL914R, LARKE803R</i>",Ex: LTEMP712R
+Exemples: <i>LTEMP712R, LSPOL914R, LARKE803R</i>",Ex: LACTU900R
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_commoncore,REQUIRED,,,,,,
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_complementarymodule,REQUIRED,,,,,,
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_minorlistchoice,REQUIRED,,,,,,
@@ -1464,7 +1464,7 @@ Examples: <i>LMAJ103J, LMAJ102J, LPSP100J</i>","Code d’une Spécialité FSA (m
 <li>partie numérique: 3 chiffres</li>
 <li><b>J</b></li>
 </ul>
-Exemples: <i>LMAJ103J, LMAJ102J, LPSP100J</i>",Ex: LMAJ103J
+Exemples: <i>LMAJ103J, LMAJ102J, LPSP100J</i>",Ex: LPSP100J
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_option,REQUIRED,100O,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Oo])$",,"Code of Option is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -1472,14 +1472,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>O</b></li>
 </ul>
-Examples: <i>LFYAP952O, MCOMM210O, LENVI203O</i>","Code d’une Option est composée de:
+Examples: <i>LFYAP132O, MCOMM110O, LENVI103O</i>","Code d’une Option est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>O</b></li>
 </ul>
-Exemples: <i>LFYAP952O, MCOMM210O, LENVI203O</i>",Ex: LFYAP952O
+Exemples: <i>LFYAP132O, MCOMM110O, LENVI103O</i>",Ex: LFYAP100O
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_mobilitypartnership,REQUIRED,100V,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Vv])$",,"Code of Mobility partnership is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -1487,14 +1487,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>V</b></li>
 </ul>
-Examples: <i>LAGRO10068V, LDRT10025V, LFIAL10177V</i>","Code d’un Parternariat de mobilité est composé de:
+Examples: <i>LAGRO114V, LDRT100V, LFIAL100V</i>","Code d’un Parternariat de mobilité est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>V</b></li>
 </ul>
-Exemples: <i>LAGRO10068V, LDRT10025V, LFIAL10177V</i>",Ex: LAGRO10068V
+Exemples: <i>LAGRO114V, LDRT100V, LFIAL100V</i>",Ex: LAGRO100V
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_deepening,REQUIRED,,,,,,
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_sociatyminor,REQUIRED,,,,,,
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_accessminor,REQUIRED,,,,,,

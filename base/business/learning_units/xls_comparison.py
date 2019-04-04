@@ -26,30 +26,30 @@
 from django.utils.translation import ugettext_lazy as _
 from openpyxl.utils import get_column_letter
 
+from base.business import learning_unit_year_with_context
+from base.business.entity import build_entity_container_prefetch
+from base.business.learning_unit import get_organization_from_learning_unit_year
+from base.business.learning_unit_year_with_context import append_latest_entities, append_components, \
+    get_learning_component_prefetch
+from base.business.learning_units.comparison import get_partims_as_str
 from base.business.proposal_xls import BLANK_VALUE, XLS_DESCRIPTION_COMPARISON, XLS_COMPARISON_FILENAME, \
     COMPARISON_PROPOSAL_TITLES, COMPARISON_WORKSHEET_TITLE, BASIC_TITLES, COMPONENTS_TITLES
+from base.business.utils.convert import volume_format
+from base.business.xls import get_name_or_username
+from base.models.academic_year import current_academic_year
 from base.models.campus import find_by_id as find_campus_by_id
 from base.models.entity import find_by_id
-from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES
+from base.models.enums import entity_container_year_link_type as entity_types, vacant_declaration_type, \
+    attribution_procedure
+from base.models.enums import learning_component_year_type
+from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from base.models.learning_unit_year import LearningUnitYear, get_by_id
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_common.document import xls_build
-from base.business.xls import get_name_or_username
-from base.business.learning_unit_year_with_context import append_latest_entities, append_components, \
-    get_learning_component_prefetch
-from base.business.entity import build_entity_container_prefetch
-from base.models.enums import entity_container_year_link_type as entity_types, vacant_declaration_type, \
-    attribution_procedure
-from base.models.enums import learning_component_year_type
-from base.business.learning_unit import get_organization_from_learning_unit_year
-from base.business.learning_units.comparison import get_partims_as_str
-from base.models.academic_year import current_academic_year
-from base.business.utils.convert import volume_format
-from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
-from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
-from base.business import learning_unit_year_with_context
 from reference.models.language import find_by_id as find_language_by_id
 
 EMPTY_VALUE = ''
@@ -392,7 +392,7 @@ def _get_data_from_initial_data(initial_data):
         str(_('Initial data')),
         luy_initial['acronym'],
         learning_unit_yr.academic_year.name,
-        dict(LEARNING_CONTAINER_YEAR_TYPES)[lcy_initial['container_type']] if
+        dict(LearningContainerYearType.choices())[lcy_initial['container_type']] if
         lcy_initial['container_type'] else '-',
         translate_status(luy_initial['status']),
         learning_unit_yr.get_subtype_display(),

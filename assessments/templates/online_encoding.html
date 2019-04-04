@@ -227,7 +227,7 @@
                         <td id="enrollment_justification_{{ enrollment.id }}">
                             {% if is_program_manager %}
                                 {% if enrollment.justification_final %}
-                                    {% trans enrollment.justification_final %}
+                                    {% trans enrollment.get_justification_final_display %}
                                 {% else %}
                                     -
                                 {% endif %}
