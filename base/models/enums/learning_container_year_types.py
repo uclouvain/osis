@@ -54,7 +54,7 @@ class LearningContainerYearType(ChoiceEnum):
 
     @classmethod
     def for_faculty(cls) -> tuple:
-        return cls.OTHER_COLLECTIVE.name, cls.OTHER_INDIVIDUAL.name, cls.MASTER_THESIS.name
+        return cls.OTHER_COLLECTIVE.name, cls.OTHER_INDIVIDUAL.name, cls.MASTER_THESIS.name, cls.INTERNSHIP.name
 
 
 LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY = [COURSE, INTERNSHIP, DISSERTATION]
