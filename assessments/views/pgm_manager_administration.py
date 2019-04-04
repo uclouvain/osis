@@ -26,14 +26,14 @@
 import json
 
 from dal import autocomplete
+from django import forms
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db.models import Q
-from django.forms import ModelForm
-from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DeleteView, FormView
+from django.views.generic.edit import BaseUpdateView
 
 from base import models as mdl
 from base.models.entity_manager import is_entity_manager, has_perm_entity_manager
@@ -47,7 +47,7 @@ ALL_OPTION_VALUE_ENTITY = "all_"
 
 
 class ProgramManagerListView(ListView):
-    model = Person
+    model = ProgramManager
     template_name = "admin/programmanager_list.html"
 
     def get_queryset(self):
@@ -56,10 +56,9 @@ class ProgramManagerListView(ListView):
         if not offer_years:
             return qs.none()
 
-        for offer_year in offer_years:
-            qs = qs.filter(programmanager__offer_year=offer_year)
-
-        return qs.distinct()
+        return qs.filter(offer_year__in=offer_years).order_by(
+            'person__last_name', 'person__first_name', 'pk'
+        ).select_related('person', 'offer_year__academic_year')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -89,26 +88,14 @@ class ProgramManagerMixin(UserPassesTestMixin, AjaxTemplateMixin):
 class ProgramManagerDeleteView(ProgramManagerMixin, DeleteView):
     template_name = 'admin/programmanager_confirm_delete_inner.html'
 
-    def get_object(self, queryset=None):
-        return self.model.objects.filter(
-            person__pk=self.kwargs['pk'],
-            offer_year__in=self.offer_years
-        )
-
-    def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        for obj in self.object.all():
-            obj.delete()
-        return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        manager = Person.objects.get(pk=self.kwargs['pk'])
-        context['manager'] = manager
-        context['offer_years'] = OfferYear.objects.filter(pk__in=self.offer_years)
-        context['other_offer_years'] = OfferYear.objects.filter(programmanager__person=manager) \
-            .exclude(pk__in=self.offer_years)
+        context['other_programs'] = self.object.person.programmanager_set.exclude(pk=self.object.pk)
         return context
+
+
+class MainProgramManagerUpdateView(ProgramManagerMixin, BaseUpdateView):
+    fields = 'is_main',
 
 
 class PersonAutocomplete(autocomplete.Select2QuerySetView):
@@ -122,7 +109,7 @@ class PersonAutocomplete(autocomplete.Select2QuerySetView):
         return qs.order_by('last_name', 'first_name')
 
 
-class ProgramManagerForm(ModelForm):
+class ProgramManagerForm(forms.ModelForm):
     class Meta:
         model = ProgramManager
         fields = ('person',)
@@ -144,6 +131,7 @@ class ProgramManagerCreateView(ProgramManagerMixin, FormView):
         person = form.cleaned_data['person']
         for oy in offer_years:
             ProgramManager.objects.get_or_create(person=person, offer_year=oy)
+
         return super().form_valid(form)
 
 

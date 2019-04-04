@@ -1,9 +1,10 @@
-{% load i18n %}
+{% load i18n static %}
 
 <table class="table table-striped table-hover" id="tb_managers">
     <thead>
     <tr>
         <th>{% trans 'Manager' %}</th>
+        <th></th>
         <th></th>
     </tr>
     </thead>
@@ -12,6 +13,13 @@
     {% for obj in object_list %}
         <tr>
             <td>{{ obj }}</td>
+            <td>
+                <label>
+                    <input type="checkbox" name="is_main" {% if obj.is_main %}checked{% endif %}
+                           data-url="{% url 'update_main' obj.pk %}?offer_year={{ offer_years|join:',' }}">
+                    {% trans "Main" %}
+                </label>
+            </td>
             <td>
                 <a class="btn btn-default pull-right trigger_modal"
                    data-url="{% url 'delete_manager' obj.pk %}?offer_year={{ offer_years|join:',' }}">
@@ -33,5 +41,13 @@
 <script>
     $(document).ready(function () {
         bind_trigger_modal();
+
+        $("input[name='is_main']").click(function () {
+            $.post($(this).data('url'), {'is_main': $(this).is(':checked')}).done(
+                function (data) {
+                    redirect_after_success(null, data)
+                });
+            $(this).replaceWith("<img src=\"{% static 'img/loading.gif' %}\" alt=\"Loading...\" width='12px' />")
+        })
     });
 </script>

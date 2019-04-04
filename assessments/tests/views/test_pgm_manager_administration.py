@@ -95,23 +95,6 @@ class PgmManagerAdministrationTest(TestCase):
         managers = program_manager.ProgramManager.objects.all()
         self.assertEqual(len(managers), 0)
 
-    def test_add_pgm_manager_to_one_pgm(self):
-        self.client.force_login(self.user)
-        offer_year1 = OfferYearFactory(academic_year=self.academic_year_current)
-        list_offer_id = [offer_year1]
-        pgm_manager_administration.add_program_managers(list_offer_id, self.person)
-        managers = program_manager.find_by_offer_year_list([offer_year1])
-        self.assertEqual(len(managers), 1)
-
-    def test_add_pgm_manager_to_two_pgm(self):
-        self.client.force_login(self.user)
-        offer_year1 = OfferYearFactory(academic_year=self.academic_year_current)
-        offer_year2 = OfferYearFactory(academic_year=self.academic_year_current)
-        list_offer_id = [offer_year1, offer_year2]
-        pgm_manager_administration.add_program_managers(list_offer_id, self.person)
-        managers = program_manager.find_by_offer_year_list([offer_year1, offer_year2])
-        self.assertEqual(len(managers), 2)
-
     def test_remove_pgm_manager_from_one_pgm(self):
         self.client.force_login(self.user)
         offer_year1 = OfferYearFactory(academic_year=self.academic_year_current)

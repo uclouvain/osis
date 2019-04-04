@@ -24,6 +24,8 @@
 #
 ##############################################################################
 from django.db import models
+from django.utils.translation import gettext_lazy
+
 from .learning_unit_enrollment import LearningUnitEnrollment
 from django.core.exceptions import ObjectDoesNotExist
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -39,16 +41,17 @@ class ProgramManagerAdmin(OsisModelAdmin):
 class ProgramManager(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    person = models.ForeignKey('Person')
-    offer_year = models.ForeignKey('OfferYear')
-    education_group = models.ForeignKey('EducationGroup')
+    person = models.ForeignKey('Person', on_delete=models.CASCADE, verbose_name=gettext_lazy("person"))
+    offer_year = models.ForeignKey('OfferYear', on_delete=models.CASCADE)
+    education_group = models.ForeignKey('EducationGroup', on_delete=models.CASCADE)
+    is_main = models.BooleanField(default=False, verbose_name=gettext_lazy('Main'))
 
     @property
     def name(self):
         return self.__str__()
 
     def __str__(self):
-        return u"%s - %s" % (self.person, self.offer_year)
+        return "{} - {}".format(self.person, self.offer_year)
 
     class Meta:
         unique_together = ('person', 'offer_year',)
@@ -75,7 +78,7 @@ def is_program_manager(user, offer_year=None, learning_unit_year=None, education
         return ProgramManager.objects.filter(person__user=user, offer_year=offer_year).exists()
     elif learning_unit_year:
         offers_user = ProgramManager.objects.filter(person__user=user).values('offer_year')
-        return LearningUnitEnrollment.objects.filter(learning_unit_year=learning_unit_year)\
+        return LearningUnitEnrollment.objects.filter(learning_unit_year=learning_unit_year) \
             .filter(offer_enrollment__offer_year__in=offers_user).exists()
     elif education_group:
         return ProgramManager.objects.filter(person__user=user, education_group=education_group).exists()
@@ -84,8 +87,8 @@ def is_program_manager(user, offer_year=None, learning_unit_year=None, education
 
 
 def find_by_offer_year(offer_yr):
-    return ProgramManager.objects.filter(offer_year=offer_yr)\
-                                 .order_by('person__last_name', 'person__first_name')
+    return ProgramManager.objects.filter(offer_year=offer_yr) \
+        .order_by('person__last_name', 'person__first_name')
 
 
 def find_by_user(user, academic_year=None):
@@ -96,84 +99,12 @@ def find_by_user(user, academic_year=None):
     return queryset.filter(person__user=user)
 
 
-def find_by_id(an_id):
-    try:
-        return ProgramManager.objects.get(pk=an_id)
-    except ObjectDoesNotExist:
-        return None
-
-
 def find_by_management_entity(administration_entity, academic_yr):
     if administration_entity and academic_yr:
-        return ProgramManager.objects\
-            .filter(offer_year__entity_management__in=administration_entity, offer_year__academic_year=academic_yr)\
+        return ProgramManager.objects \
+            .filter(offer_year__entity_management__in=administration_entity, offer_year__academic_year=academic_yr) \
             .select_related('person') \
             .order_by('person__last_name', 'person__first_name') \
             .distinct('person__last_name', 'person__first_name')
 
-    return None
-
-
-def delete_by_id(an_id):
-    pgm_manager = ProgramManager.objects.get(pk=an_id)
-    if pgm_manager:
-        pgm_manager.delete()
-
-
-def find_by_offer_year_list(offer_yr_list):
-    return ProgramManager.objects.filter(offer_year__in=offer_yr_list) \
-        .select_related('offer_year', 'person') \
-        .order_by('person__last_name', 'person__first_name', 'person__id')
-
-
-def find_by_person_list(person_list):
-    return ProgramManager.objects.filter(person__in=person_list)\
-                         .select_related('offer_year', 'person')\
-                         .order_by('person__last_name', 'person__first_name')
-
-
-def find_by_offer_year_list_person(a_person, offer_yr_list):
-    return ProgramManager.objects.select_related("person").filter(person=a_person, offer_year__in=offer_yr_list)
-
-
-def find_by_person_exclude_offer_list(a_person, offer_yr_list, academic_yr):
-    return ProgramManager.objects.filter(person=a_person, offer_year__academic_year=academic_yr)\
-        .exclude(offer_year__in=offer_yr_list)\
-        .select_related('person').select_related('offer_year')
-
-
-def find_by_person_academic_year(a_person=None, an_academic_yr=None, entity_list=None, an_offer_type=None):
-    queryset = ProgramManager.objects
-
-    if a_person:
-        queryset = queryset.filter(person=a_person)
-
-    if an_academic_yr:
-        queryset = queryset.filter(offer_year__academic_year=an_academic_yr)
-
-    if entity_list:
-        queryset = queryset.filter(offer_year__entity_management__in=entity_list)
-
-    if an_offer_type:
-        queryset = queryset.filter(offer_year__offer_type=an_offer_type)
-    else:
-        queryset = queryset.filter(offer_year__offer_type__isnull=False)
-
-    return queryset.select_related(
-        "offer_year",
-        "offer_year__entity_management",
-        "offer_year__offer_type")
-
-
-def find_by_offer_year_person(a_person, offer_yr):
-    return ProgramManager.objects.select_related("person")\
-                                 .select_related("offer_year")\
-                                 .filter(person=a_person, offer_year=offer_yr)
-
-
-def find_by_education_group(an_education_group):
-    if an_education_group:
-        return ProgramManager.objects.filter(education_group=an_education_group)\
-            .order_by('person__last_name', 'person__first_name', 'person__id').select_related("person").\
-            distinct('person__last_name', 'person__first_name', 'person__id')
     return None

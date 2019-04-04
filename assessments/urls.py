@@ -29,7 +29,7 @@ from django.views.i18n import javascript_catalog
 from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration, score_sheet
 from assessments.views import scores_responsible
 from assessments.views.pgm_manager_administration import ProgramManagerListView, ProgramManagerDeleteView, \
-    ProgramManagerCreateView, PersonAutocomplete
+    ProgramManagerCreateView, PersonAutocomplete, MainProgramManagerUpdateView
 
 js_info_dict = {
     'packages': ('assessments', )
@@ -81,6 +81,7 @@ urlpatterns = [
         url(r'^$', pgm_manager_administration.pgm_manager_administration, name='pgm_manager'),
         url(r'^search$', pgm_manager_administration.pgm_manager_search, name='pgm_manager_search'),
         url(r'^manager_list/$', ProgramManagerListView.as_view(), name='manager_list'),
+        url(r'^update_main/(?P<pk>[0-9]+)/$', MainProgramManagerUpdateView.as_view(), name='update_main'),
         url(r'^delete_manager/(?P<pk>[0-9]+)/$', ProgramManagerDeleteView.as_view(), name='delete_manager'),
         url(r'^create$', ProgramManagerCreateView.as_view(), name='create_manager_person'),
         url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),

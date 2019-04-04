@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-02 11:59+0200\n"
+"POT-Creation-Date: 2019-04-04 13:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -92,7 +92,7 @@ msgid ""
 "this element in %(academic_year)s."
 msgstr ""
 
-#: models/education_group.py:113 models/education_group_year.py:763
+#: models/education_group.py:113 models/education_group_year.py:767
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr ""
@@ -327,7 +327,7 @@ msgstr ""
 msgid "Access"
 msgstr ""
 
-#: models/group_element_year.py:181
+#: models/group_element_year.py:182
 #: templates/education_group/blocks/content_minor_major_option_table.html:33
 msgid "Access condition"
 msgstr ""
@@ -362,12 +362,12 @@ msgstr ""
 msgid "Acronym"
 msgstr ""
 
-#: models/education_group_year.py:818
+#: models/education_group_year.py:822
 #, python-format
 msgid "Acronym already exists in %(academic_year)s"
 msgstr ""
 
-#: models/education_group_year.py:825
+#: models/education_group_year.py:829
 #, python-format
 msgid "Acronym existed in %(academic_year)s"
 msgstr ""
@@ -758,7 +758,7 @@ msgstr ""
 msgid "Birth Date"
 msgstr ""
 
-#: models/group_element_year.py:175
+#: models/group_element_year.py:176
 #: templates/education_group/blocks/content_default_table.html:35
 #: templates/education_group/blocks/table_utilizations.html:37
 #: templates/learning_unit/formations.html:46
@@ -1958,16 +1958,16 @@ msgstr ""
 msgid "Isolated classes"
 msgstr ""
 
-#: models/group_element_year.py:257
+#: models/group_element_year.py:258
 msgid "It is forbidden to attach an element to itself."
 msgstr ""
 
-#: models/group_element_year.py:260
+#: models/group_element_year.py:261
 #: tests/views/education_groups/test_update.py:575
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 
-#: models/group_element_year.py:254
+#: models/group_element_year.py:255
 msgid ""
 "It is forbidden to save a GroupElementYear with a child branch and a child "
 "leaf."
@@ -2182,7 +2182,7 @@ msgstr ""
 msgid "Legend"
 msgstr ""
 
-#: models/group_element_year.py:206
+#: models/group_element_year.py:207
 #: templates/education_group/blocks/content_default_table.html:36
 msgid "Link type"
 msgstr ""
@@ -2257,7 +2257,14 @@ msgstr ""
 msgid "Mail to remind educational information update"
 msgstr ""
 
+#: models/program_manager.py:47
+#: templates/education_group/tab_administrative_data.html:191
+#: templates/offer/tab_program_managers.html:54
+msgid "Main"
+msgstr ""
+
 #: models/enums/organization_type.py:36
+msgctxt "female"
 msgid "Main"
 msgstr ""
 
@@ -2345,7 +2352,7 @@ msgid "Mandates"
 msgstr ""
 
 #: forms/learning_unit_pedagogy.py:98 forms/learning_unit_pedagogy.py:101
-#: models/group_element_year.py:169 models/teaching_material.py:45
+#: models/group_element_year.py:170 models/teaching_material.py:45
 #: templates/education_group/blocks/content_default_table.html:34
 #: templates/education_group/blocks/table_utilizations.html:36
 #: templates/education_group/pdf_content.html:112
@@ -2407,7 +2414,7 @@ msgstr ""
 msgid "Masters"
 msgstr ""
 
-#: models/group_element_year.py:164
+#: models/group_element_year.py:165
 #: templates/education_group/blocks/table_utilizations.html:35
 msgid "Max. credits"
 msgstr ""
@@ -2429,7 +2436,7 @@ msgstr ""
 msgid "Method not allowed"
 msgstr ""
 
-#: models/group_element_year.py:158
+#: models/group_element_year.py:159
 #: templates/education_group/blocks/table_utilizations.html:34
 msgid "Min. credits"
 msgstr ""
@@ -2900,12 +2907,12 @@ msgstr ""
 msgid "Page not found."
 msgstr ""
 
-#: models/education_group_year.py:790
+#: models/education_group_year.py:794
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
 msgstr ""
 
-#: models/education_group_year.py:797
+#: models/education_group_year.py:801
 #, python-format
 msgid "Partial acronym existed in %(academic_year)s"
 msgstr ""
@@ -2953,6 +2960,10 @@ msgstr ""
 msgid "Periodicity"
 msgstr ""
 
+#: templates/offer/tab_program_managers.html:47
+msgid "Person"
+msgstr ""
+
 #: business/learning_units/perms.py:68
 msgid "Person not in accordance with proposal state"
 msgstr ""
@@ -2992,7 +3003,7 @@ msgstr ""
 msgid "Please Select or Move an item before Attach it"
 msgstr ""
 
-#: models/group_element_year.py:90
+#: models/group_element_year.py:91
 #, python-format
 msgid ""
 "Please register a maximum of %(max_authorized_value)s digits in ascending "
@@ -3292,7 +3303,7 @@ msgstr ""
 msgid "Quadrimester"
 msgstr ""
 
-#: models/group_element_year.py:200
+#: models/group_element_year.py:201
 msgid "Quadrimester derogation"
 msgstr ""
 
@@ -4130,7 +4141,7 @@ msgid ""
 "are not inside the selected training %(root)s"
 msgstr ""
 
-#: views/education_groups/detail.py:435
+#: views/education_groups/detail.py:436
 #, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr ""
@@ -4282,8 +4293,8 @@ msgstr ""
 
 #: forms/common.py:80 models/education_group_publication_contact.py:99
 #: models/education_group_publication_contact.py:100
-#: models/education_group_year.py:750 models/education_group_year.py:771
-#: models/education_group_year.py:773
+#: models/education_group_year.py:754 models/education_group_year.py:775
+#: models/education_group_year.py:777
 #: tests/views/learning_units/proposals/test_creation.py:186
 #: tests/views/learning_units/proposals/test_creation.py:187
 #: tests/views/learning_units/proposals/test_creation.py:188
@@ -4302,7 +4313,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
-#: views/education_groups/detail.py:397
+#: views/education_groups/detail.py:398
 #, python-format
 msgid "This label %s does not exist"
 msgstr ""
@@ -4794,7 +4805,7 @@ msgid ""
 "You are not allowed to copy the content of this kind of education group."
 msgstr ""
 
-#: models/group_element_year.py:264
+#: models/group_element_year.py:265
 #: tests/forms/education_group/test_groupElementYearForm.py:71
 msgid "You are not allowed to create a reference with a learning unit"
 msgstr ""
@@ -4936,7 +4947,7 @@ msgstr ""
 msgid "You proposed a modification of type {} for the learning unit {}."
 msgstr ""
 
-#: models/education_group_year.py:756
+#: models/education_group_year.py:760
 msgid "You should precise at least minimum or maximum constraint"
 msgstr ""
 
@@ -5112,7 +5123,7 @@ msgstr ""
 msgid "code"
 msgstr ""
 
-#: models/group_element_year.py:187
+#: models/group_element_year.py:188
 msgid "comment"
 msgstr ""
 
@@ -5127,8 +5138,8 @@ msgid "confirm"
 msgstr ""
 
 #: business/learning_units/edition.py:435 models/education_group_year.py:379
-#: models/education_group_year.py:592 models/enums/constraint_type.py:32
-#: models/group_element_year.py:220 models/group_element_year.py:236
+#: models/education_group_year.py:596 models/enums/constraint_type.py:32
+#: models/group_element_year.py:221 models/group_element_year.py:237
 #: tests/models/test_education_group_year.py:93
 #: tests/views/education_groups/group_element_year/test_read.py:99
 #: tests/views/education_groups/group_element_year/test_read.py:113
@@ -5186,7 +5197,7 @@ msgstr ""
 msgid "end"
 msgstr ""
 
-#: models/group_element_year.py:192
+#: models/group_element_year.py:193
 #: templates/education_group/blocks/content_default_table.html:84
 msgid "english comment"
 msgstr ""
@@ -5273,11 +5284,11 @@ msgstr ""
 msgid "main domain"
 msgstr ""
 
-#: models/education_group_year.py:404 models/education_group_year.py:764
+#: models/education_group_year.py:404 models/education_group_year.py:768
 msgid "maximum constraint"
 msgstr ""
 
-#: models/education_group_year.py:397 models/education_group_year.py:765
+#: models/education_group_year.py:397 models/education_group_year.py:769
 msgid "minimum constraint"
 msgstr ""
 
@@ -5331,7 +5342,7 @@ msgstr ""
 msgid "partnerships_financing_configuration"
 msgstr ""
 
-#: templates/offer/tab_program_managers.html:47
+#: models/program_manager.py:44
 msgid "person"
 msgstr ""
 
@@ -5368,7 +5379,7 @@ msgstr ""
 msgid "regex rule"
 msgstr ""
 
-#: models/group_element_year.py:152
+#: models/group_element_year.py:153
 msgid "relative credits"
 msgstr ""
 
