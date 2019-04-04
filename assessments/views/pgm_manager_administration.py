@@ -46,20 +46,6 @@ ALL_OPTION_VALUE = "-"
 ALL_OPTION_VALUE_ENTITY = "all_"
 
 
-@login_required
-@user_passes_test(has_perm_entity_manager)
-def pgm_manager_administration(request):
-    administrator_entities = get_administrator_entities(request.user)
-    current_academic_yr = mdl.academic_year.current_academic_year()
-    return render(request, "admin/pgm_manager.html", {
-        'academic_year': current_academic_yr,
-        'administrator_entities_string': _get_administrator_entities_acronym_list(administrator_entities),
-        'entities_managed_root': administrator_entities,
-        'offer_types': mdl.offer_type.find_all(),
-        'managers': _get_entity_program_managers(administrator_entities, current_academic_yr),
-        'init': '1'})
-
-
 class ProgramManagerListView(ListView):
     model = Person
     template_name = "admin/programmanager_list.html"
@@ -159,6 +145,20 @@ class ProgramManagerCreateView(ProgramManagerMixin, FormView):
         for oy in offer_years:
             ProgramManager.objects.get_or_create(person=person, offer_year=oy)
         return super().form_valid(form)
+
+
+@login_required
+@user_passes_test(has_perm_entity_manager)
+def pgm_manager_administration(request):
+    administrator_entities = get_administrator_entities(request.user)
+    current_academic_yr = mdl.academic_year.current_academic_year()
+    return render(request, "admin/pgm_manager.html", {
+        'academic_year': current_academic_yr,
+        'administrator_entities_string': _get_administrator_entities_acronym_list(administrator_entities),
+        'entities_managed_root': administrator_entities,
+        'offer_types': mdl.offer_type.find_all(),
+        'managers': _get_entity_program_managers(administrator_entities, current_academic_yr),
+        'init': '1'})
 
 
 @login_required

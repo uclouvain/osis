@@ -10,18 +10,16 @@
         <h4 class="modal-title">{% trans 'Confirm delete for : ' %}{{ manager }}</h4>
     </div>
     <div class="modal-body">
-        <dl id="pnl_pgm_off">
-            <dt>{% trans 'Are you sure you want to remove the following manager ?' %}</dt>
-            {% for offer_prop in offer_years %}
-                <dd>{{ offer_prop }}</dd>
-            {% endfor %}
-        </dl>
-        <dl id="pnl_pgm_on">
-            <dt>{% trans 'The manager will keep the following programs : ' %}</dt>
+        <p id="pnl_pgm_off">{% trans 'Are you sure you want to remove the following manager ?' %} </p>
+        <p>{{ manager }}</p>
+
+        <p id="pnl_pgm_on">{% trans 'The manager will keep the following programs : ' %}</p>
+        <p>
             {% for obj in other_offer_years %}
-                <dd>{{ obj.acronym }}</dd>
+                {% if not forloop.first %}, {% endif %}
+                {{ obj.acronym }}
             {% endfor %}
-        </dl>
+        </p>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal" id="bt_cancel_remove_manager_modal">
