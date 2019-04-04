@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-04 09:00+0200\n"
+"POT-Creation-Date: 2019-04-04 11:44+0200\n"
 "PO-Revision-Date: 2019-04-02 09:24+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1814,6 +1814,10 @@ msgstr "Conditions Générales"
 #: templates/blocks/navbar_top.html:157
 msgid "General configuration"
 msgstr "Configuration générale"
+
+#: api/serializers/person.py:73
+msgid "General information and Admission condition"
+msgstr "Informations générales et Conditions d'admission"
 
 #: templates/education_group/tabs.html:80
 msgid "General informations"

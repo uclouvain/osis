@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-04 09:00+0200\n"
+"POT-Creation-Date: 2019-04-04 11:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1773,6 +1773,10 @@ msgstr ""
 
 #: templates/blocks/navbar_top.html:157
 msgid "General configuration"
+msgstr ""
+
+#: api/serializers/person.py:73
+msgid "General information and Admission condition"
 msgstr ""
 
 #: templates/education_group/tabs.html:80
