@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from base.models.entity_version import EntityVersion
@@ -55,6 +56,15 @@ class PersonRolesSerializer(serializers.ModelSerializer):
         )
 
     def get_roles(self, obj):
+        roles = {
+            'reddot': {
+                'description': _('General information and Admission condition'),
+                'scope': self.roles_for_reddot(obj)
+            }
+        }
+        return roles
+
+    def roles_for_reddot(self, obj):
         entities_acronym = set()
         for person_entity in obj.personentity_set.all():
             if not person_entity.with_child:
@@ -66,5 +76,4 @@ class PersonRolesSerializer(serializers.ModelSerializer):
                     if EntityVersion.objects.filter(acronym=row['acronym']).first().entity_type == FACULTY
                 )
             entities_acronym |= acronyms
-
         return entities_acronym

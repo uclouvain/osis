@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-04 09:00+0200\n"
+"POT-Creation-Date: 2019-04-04 11:44+0200\n"
 "PO-Revision-Date: 2019-04-02 09:24+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1814,6 +1814,10 @@ msgstr "Conditions Générales"
 #: templates/blocks/navbar_top.html:157
 msgid "General configuration"
 msgstr "Configuration générale"
+
+#: api/serializers/person.py:73
+msgid "General information and Admission condition"
+msgstr "Informations générales et Conditions d'admission"
 
 #: templates/education_group/tabs.html:80
 msgid "General informations"
@@ -3992,12 +3996,12 @@ msgstr ""
 #: models/education_group.py:166
 #, python-format
 msgid "The end date must be greater or equals to the finality %(acronym)s"
-msgstr "La date de fin doit être plus grand ou égal à la finalité %(acronym)s"
+msgstr "La date de fin doit être plus grande ou égale à la finalité %(acronym)s"
 
 #: models/education_group.py:151
 #, python-format
 msgid "The end date must be less or equals to the root %(acronym)s"
-msgstr "La date de fin doit être plus petite ou égal à la racine %(acronym)s"
+msgstr "La date de fin doit être plus petite ou égale à la racine %(acronym)s"
 
 #: business/group_element_years/postponement.py:129
 #: tests/business/education_groups/test_postponement.py:227
