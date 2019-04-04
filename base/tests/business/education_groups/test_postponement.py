@@ -544,8 +544,8 @@ class TestPostpone(TestCase):
         self.assertTrue(self.postponer.warnings)
         self.assertEqual(
             str(self.postponer.warnings[0]),
-            _("%(education_group_year)s is closed in %(end_year)s, there is no more link to this "
-              "element in %(academic_year)s.") % {
+            _("%(education_group_year)s is closed in %(end_year)s. This element will not be copied "
+              "in %(academic_year)s.") % {
                 "education_group_year": sub_group.child_branch.acronym,
                 "end_year": sub_group.child_branch.education_group.end_year,
                 "academic_year": self.next_academic_year,

@@ -250,6 +250,7 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
         except NotPostponeError as e:
             display_error_messages(request, str(e))
 
+        # TODO Display warning and error messages by adding messages in template
         return redirect(reverse(
             "education_group_read",
             args=[

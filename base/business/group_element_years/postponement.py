@@ -46,7 +46,6 @@ class ReuseOldLearningUnitYearWarning(CopyWarning):
         self.learning_unit_year = obj
         self.academic_year = academic_year
 
-    # TODO Modify message
     def __str__(self):
         return _("Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
                  "Learning unit is postponed with academic year of %(learning_unit_academic_year)s.") % {
@@ -78,8 +77,8 @@ class EducationGroupEndYearWarning(CopyWarning):
 
     # TODO Modify warning message
     def __str__(self):
-        return _("%(education_group_year)s is closed in %(end_year)s, there is no more link to this "
-                 "element in %(academic_year)s.") % {
+        return _("%(education_group_year)s is closed in %(end_year)s. This element will not be copied "
+                 "in %(academic_year)s.") % {
                    "education_group_year": self.education_group_year.acronym,
                    "end_year": self.education_group_year.education_group.end_year,
                    "academic_year": self.academic_year
