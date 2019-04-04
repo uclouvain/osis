@@ -38,7 +38,11 @@
     </div>
     <div class="modal-footer">
         <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-floppy-save"
-                                                            aria-hidden="true"></span> {% trans 'save' %}</button>
-        <button type="submit" class="btn" data-dismiss="modal">{% trans 'cancel' %} </button>
+                                                            aria-hidden="true"></span> {% trans 'Save' %}</button>
+        <button type="submit" class="btn" data-dismiss="modal">{% trans 'Cancel' %} </button>
     </div>
 </form>
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'js/learning_unit/ckeditor.js' %}"></script>
+{% endblock script %}
