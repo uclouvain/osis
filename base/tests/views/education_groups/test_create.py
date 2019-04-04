@@ -176,7 +176,7 @@ class TestCreate(TestCase):
             'schedule_type': 'DAILY',
             'credits': '180',
             'title': 'Bachelier en',
-            'academic_year': self.parent_education_group_year.academic_year.id,
+            'academic_year': self.current_academic_year.id,
             'management_entity': self.entity_version.id,
             'administration_entity': self.entity_version.id,
             'internship': ['NO'],
