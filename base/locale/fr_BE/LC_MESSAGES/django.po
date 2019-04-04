@@ -3992,12 +3992,12 @@ msgstr ""
 #: models/education_group.py:166
 #, python-format
 msgid "The end date must be greater or equals to the finality %(acronym)s"
-msgstr "La date de fin doit être plus grand ou égal à la finalité %(acronym)s"
+msgstr "La date de fin doit être plus grande ou égale à la finalité %(acronym)s"
 
 #: models/education_group.py:151
 #, python-format
 msgid "The end date must be less or equals to the root %(acronym)s"
-msgstr "La date de fin doit être plus petite ou égal à la racine %(acronym)s"
+msgstr "La date de fin doit être plus petite ou égale à la racine %(acronym)s"
 
 #: business/group_element_years/postponement.py:129
 #: tests/business/education_groups/test_postponement.py:227
