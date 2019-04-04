@@ -60,7 +60,7 @@ def pgm_manager_administration(request):
         'init': '1'})
 
 
-class ProgramManagerList(ListView):
+class ProgramManagerListView(ListView):
     model = Person
     template_name = "admin/programmanager_list.html"
 
@@ -81,10 +81,9 @@ class ProgramManagerList(ListView):
         return context
 
 
-class ProgramManagerDeleteView(UserPassesTestMixin, AjaxTemplateMixin, DeleteView):
+class ProgramManagerMixin(UserPassesTestMixin, AjaxTemplateMixin):
     model = ProgramManager
     success_url = reverse_lazy('manager_list')
-    template_name = 'admin/programmanager_confirm_delete_inner.html'
     partial_reload = '#pnl_managers'
 
     def test_func(self):
@@ -99,6 +98,10 @@ class ProgramManagerDeleteView(UserPassesTestMixin, AjaxTemplateMixin, DeleteVie
         for oy in self.offer_years:
             url += "offer_year={}&".format(oy)
         return url
+
+
+class ProgramManagerDeleteView(ProgramManagerMixin, DeleteView):
+    template_name = 'admin/programmanager_confirm_delete_inner.html'
 
     def get_object(self, queryset=None):
         return self.model.objects.filter(
@@ -140,24 +143,9 @@ class ProgramManagerForm(ModelForm):
         widgets = {'person': autocomplete.ModelSelect2(url='person-autocomplete', attrs={'style': 'width:100%'})}
 
 
-class ProgramManagerCreateView(UserPassesTestMixin, AjaxTemplateMixin, FormView):
+class ProgramManagerCreateView(ProgramManagerMixin, FormView):
     form_class = ProgramManagerForm
-    success_url = reverse_lazy('manager_list')
     template_name = 'admin/manager_add_inner.html'
-    partial_reload = '#pnl_managers'
-
-    def test_func(self):
-        return is_entity_manager(self.request.user)
-
-    @property
-    def offer_years(self) -> list:
-        return self.request.GET['offer_year'].split(',')
-
-    def get_success_url(self):
-        url = super().get_success_url() + "?"
-        for oy in self.offer_years:
-            url += "offer_year={}&".format(oy)
-        return url
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -165,15 +153,11 @@ class ProgramManagerCreateView(UserPassesTestMixin, AjaxTemplateMixin, FormView)
         return context
 
     def form_valid(self, form):
-        offer_years = OfferYear.objects.filter(
-            pk__in=self.request.GET['offer_year'].split(',')
-        )
+        offer_years = OfferYear.objects.filter(pk__in=self.offer_years)
+
         person = form.cleaned_data['person']
         for oy in offer_years:
-            ProgramManager.objects.get_or_create(
-                person=person,
-                offer_year=oy
-            )
+            ProgramManager.objects.get_or_create(person=person, offer_year=oy)
         return super().form_valid(form)
 
 
