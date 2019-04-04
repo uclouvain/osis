@@ -47,7 +47,6 @@ from base.business.learning_units import perms as business_perms
 from base.business.learning_units.comparison import get_entity_by_type, \
     FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON
 from base.business.learning_units.perms import can_update_learning_achievement
-from base.forms.learning_class import LearningClassEditForm
 from base.forms.learning_unit_component import LearningUnitComponentEditForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models import education_group_year, campus, proposal_learning_unit, entity
@@ -196,39 +195,6 @@ def learning_unit_component_edit(request, learning_unit_year_id):
     form.load_initial()  # Load data from database
     context['form'] = form
     return render(request, "learning_unit/component_edit.html", context)
-
-
-@login_required
-@permission_required('base.change_learningclassyear', raise_exception=True)
-@require_http_methods(["GET", "POST"])
-def learning_class_year_edit(request, learning_unit_year_id):
-    context = get_common_context_learning_unit_year(learning_unit_year_id,
-                                                    get_object_or_404(Person, user=request.user))
-    context.update(
-        {'learning_class_year': mdl.learning_class_year.find_by_id(request.GET.get('learning_class_year_id')),
-         'learning_component_year':
-             mdl.learning_component_year.find_by_id(request.GET.get('learning_component_year_id'))})
-
-    if request.method == 'POST':
-        form = LearningClassEditForm(
-            request.POST,
-            instance=context['learning_class_year'],
-            learning_unit_year=context['learning_unit_year'],
-            learning_component_year=context['learning_component_year']
-        )
-        if form.is_valid():
-            form.save()
-        return HttpResponseRedirect(reverse("learning_unit_components",
-                                            kwargs={'learning_unit_year_id': learning_unit_year_id}))
-
-    form = LearningClassEditForm(
-        instance=context['learning_class_year'],
-        learning_unit_year=context['learning_unit_year'],
-        learning_component_year=context['learning_component_year']
-    )
-    form.load_initial()  # Load data from database
-    context['form'] = form
-    return render(request, "learning_unit/class_edit.html", context)
 
 
 @login_required

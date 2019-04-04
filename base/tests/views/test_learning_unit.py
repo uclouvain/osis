@@ -90,7 +90,7 @@ from base.tests.factories.person import PersonFactory, PersonWithPermissionsFact
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
-from base.views.learning_unit import learning_unit_components, learning_class_year_edit, learning_unit_specifications, \
+from base.views.learning_unit import learning_unit_components, learning_unit_specifications, \
     get_charge_repartition_warning_messages, learning_unit_attributions, learning_unit_comparison, \
     learning_unit_proposal_comparison
 from base.views.learning_unit import learning_unit_specifications_edit
@@ -879,53 +879,6 @@ class LearningUnitViewTestCase(TestCase):
                                    type=entity_container_year_link_type.ALLOCATION_ENTITY)
         LearningUnitYearFactory(acronym="LOGO1200", learning_container_year=l_container_yr_5,
                                 academic_year=self.current_academic_year, subtype=learning_unit_year_subtypes.FULL)
-
-    def test_class_save(self):
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                   learning_container_year=self.learning_container_yr)
-        LearningUnitComponentFactory(learning_unit_year=learning_unit_yr,
-                                     learning_component_year=self.learning_component_yr)
-        learning_class_yr = LearningClassYearFactory(learning_component_year=self.learning_component_yr)
-
-        response = self.client.post('{}?{}&{}'.format(reverse(learning_class_year_edit, args=[learning_unit_yr.id]),
-                                                      'learning_component_year_id={}'.format(
-                                                          self.learning_component_yr.id),
-                                                      'learning_class_year_id={}'.format(learning_class_yr.id)),
-                                    data={"used_by": "on"})
-        self.learning_component_yr.refresh_from_db()
-        self.assertEqual(response.status_code, 302)
-
-    def test_class_save_create_link(self):
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                   learning_container_year=self.learning_container_yr)
-        learning_unit_compnt = LearningUnitComponentFactory(learning_unit_year=learning_unit_yr,
-                                                            learning_component_year=self.learning_component_yr)
-        learning_class_yr = LearningClassYearFactory(learning_component_year=self.learning_component_yr)
-
-        response = self.client.post('{}?{}&{}'.format(reverse(learning_class_year_edit, args=[learning_unit_yr.id]),
-                                                      'learning_component_year_id={}'.format(
-                                                          self.learning_component_yr.id),
-                                                      'learning_class_year_id={}'.format(learning_class_yr.id)),
-                                    data={"used_by": "on"})
-
-        self.assertTrue(learning_unit_component_class.search(learning_unit_compnt, learning_class_yr).exists())
-
-    def test_class_save_delete_link(self):
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                   learning_container_year=self.learning_container_yr)
-        learning_unit_compnt = LearningUnitComponentFactory(learning_unit_year=learning_unit_yr,
-                                                            learning_component_year=self.learning_component_yr)
-        learning_class_yr = LearningClassYearFactory(learning_component_year=self.learning_component_yr)
-        a_link = LearningUnitComponentClassFactory(learning_unit_component=learning_unit_compnt,
-                                                   learning_class_year=learning_class_yr)
-
-        response = self.client.post('{}?{}&{}'.format(reverse(learning_class_year_edit, args=[learning_unit_yr.id]),
-                                                      'learning_component_year_id={}'.format(
-                                                          self.learning_component_yr.id),
-                                                      'learning_class_year_id={}'.format(learning_class_yr.id)),
-                                    data={})
-
-        self.assertFalse(learning_unit_component_class.LearningUnitComponentClass.objects.filter(pk=a_link.id).exists())
 
     def get_base_form_data(self):
         data = self.get_common_data()
