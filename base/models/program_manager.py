@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
+from django.db import models, IntegrityError
 from django.utils.translation import gettext_lazy
 
-from .learning_unit_enrollment import LearningUnitEnrollment
-from django.core.exceptions import ObjectDoesNotExist
+from base.models.education_group import EducationGroup
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from .learning_unit_enrollment import LearningUnitEnrollment
 
 
 class ProgramManagerAdmin(OsisModelAdmin):
@@ -43,7 +43,7 @@ class ProgramManager(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     person = models.ForeignKey('Person', on_delete=models.CASCADE, verbose_name=gettext_lazy("person"))
     offer_year = models.ForeignKey('OfferYear', on_delete=models.CASCADE)
-    education_group = models.ForeignKey('EducationGroup', on_delete=models.CASCADE)
+    education_group = models.ForeignKey(EducationGroup, on_delete=models.CASCADE)
     is_main = models.BooleanField(default=False, verbose_name=gettext_lazy('Main'))
 
     @property
@@ -55,6 +55,17 @@ class ProgramManager(models.Model):
 
     class Meta:
         unique_together = ('person', 'offer_year',)
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if not hasattr(self, "education_group"):
+            corresponding_education_group = EducationGroup.objects.filter(
+                educationgroupyear__acronym=self.offer_year.acronym
+            ).first()
+            if not corresponding_education_group:
+                raise IntegrityError("The program manager has no education group.")
+            self.education_group = corresponding_education_group
+
+        super().save(force_insert, force_update, using, update_fields)
 
 
 def find_by_person(a_person):
