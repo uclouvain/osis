@@ -25,7 +25,7 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.api.serializers.person import PersonDetailSerializer
+from base.api.serializers.person import PersonDetailSerializer, PersonRolesSerializer
 from base.tests.factories.person import PersonFactory
 
 
@@ -42,5 +42,19 @@ class PersonDetailSerializerTestCase(TestCase):
             'email',
             'gender',
             'uuid'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+
+class PersonRolesSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonFactory()
+        cls.serializer = PersonRolesSerializer(cls.person)
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'global_id',
+            'roles'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

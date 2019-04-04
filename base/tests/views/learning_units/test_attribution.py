@@ -34,6 +34,9 @@ from attribution.models.attribution_new import AttributionNew
 from attribution.models.enums.function import COORDINATOR
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
+from base.models.enums.learning_container_year_types import LearningContainerYearType
+from base.models.enums.learning_unit_year_subtypes import PARTIM
+from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_component import LecturingLearningUnitComponentFactory, \
     PracticalLearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
@@ -45,12 +48,20 @@ from base.views.mixins import RulesRequiredMixin
 class TestEditAttribution(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.learning_unit_year = LearningUnitYearFullFactory()
-        cls.lecturing_unit_component = LecturingLearningUnitComponentFactory(learning_unit_year=cls.learning_unit_year)
-        cls.practical_unit_component = PracticalLearningUnitComponentFactory(learning_unit_year=cls.learning_unit_year)
         cls.person = PersonWithPermissionsFactory('can_access_learningunit')
+        cls.learning_container_year = LearningContainerYearFactory(
+            container_type=LearningContainerYearType.COURSE.name
+        )
 
     def setUp(self):
+
+        self.learning_unit_year = LearningUnitYearFullFactory(
+            learning_container_year = self.learning_container_year
+        )
+        self.lecturing_unit_component = LecturingLearningUnitComponentFactory(
+            learning_unit_year=self.learning_unit_year)
+        self.practical_unit_component = PracticalLearningUnitComponentFactory(
+            learning_unit_year=self.learning_unit_year)
         self.attribution = AttributionNewFactory(
             learning_container_year=self.learning_unit_year.learning_container_year
         )
@@ -76,7 +87,7 @@ class TestEditAttribution(TestCase):
         self.client.logout()
 
         response = self.client.get(self.url)
-        self.assertRedirects(response,  '/login/?next={}'.format(self.url))
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
     def test_template_used_with_get(self):
         response = self.client.get(self.url)
@@ -107,6 +118,25 @@ class TestEditAttribution(TestCase):
         self.assertRedirects(response,
                              reverse("learning_unit_attributions", args=[self.learning_unit_year.id]))
 
+    def test_post_partim(self):
+        self.learning_unit_year.subtype = PARTIM
+        self.learning_unit_year.save()
+        data = {
+            'attribution_form-function': COORDINATOR,
+            'lecturing_form-allocation_charge': 50,
+            'practical_form-allocation_charge': 10
+        }
+        response = self.client.post(self.url, data=data)
+
+        self.attribution.refresh_from_db()
+        self.charge_lecturing.refresh_from_db()
+        self.charge_practical.refresh_from_db()
+        self.assertEqual(self.charge_lecturing.allocation_charge, 50)
+        self.assertEqual(self.charge_practical.allocation_charge, 10)
+
+        self.assertRedirects(response,
+                             reverse("learning_unit_attributions", args=[self.learning_unit_year.id]))
+
 
 class TestAddAttribution(TestCase):
     @classmethod
@@ -131,7 +161,7 @@ class TestAddAttribution(TestCase):
         self.client.logout()
 
         response = self.client.get(self.url)
-        self.assertRedirects(response,  '/login/?next={}'.format(self.url))
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
     def test_template_used_with_get(self):
         response = self.client.get(self.url)
