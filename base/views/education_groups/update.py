@@ -167,7 +167,13 @@ def _update_group(request, education_group_year, root):
 def _update_training(request, education_group_year, root):
     # TODO :: IMPORTANT :: Fix urls patterns to get the GroupElementYear_id and the root_id in the url path !
     # TODO :: IMPORTANT :: Need to update form to filter on list of parents, not only on the first direct parent
-    form_education_group_year = TrainingForm(request.POST or None, user=request.user, instance=education_group_year)
+
+    form_education_group_year = TrainingForm(
+        request.POST or None,
+        user=request.user,
+        instance=education_group_year,
+        education_group_type=education_group_year.education_group_type if education_group_year else None
+    )
     if form_education_group_year.is_valid():
         return _common_success_redirect(request, form_education_group_year, root)
 
