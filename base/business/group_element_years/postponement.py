@@ -25,7 +25,7 @@ from django.db import Error, transaction
 from django.utils.translation import gettext as _
 
 from base.business.education_groups.postponement import duplicate_education_group_year
-from base.business.utils.model import update_related_object, duplicate_object
+from base.business.utils.model import update_related_object
 from base.models.academic_year import starting_academic_year
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group_year import EducationGroupYear
