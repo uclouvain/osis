@@ -77,7 +77,8 @@ from base.tests.factories.external_learning_unit_year import ExternalLearningUni
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory, \
+    LecturingLearningComponentYearFactory, PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_component import LearningUnitComponentFactory, \
@@ -762,30 +763,6 @@ class LearningUnitViewTestCase(TestCase):
         result = learning_unit_business._learning_unit_usage(learning_component_yr.learning_unit_year)
         self.assertEqual(result, 'LBIOL (Q1&2)')
 
-    def test_component_save(self):
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                   learning_container_year=self.learning_container_yr)
-        learning_unit_compnt = LearningUnitComponentFactory(learning_unit_year=learning_unit_yr,
-                                                            learning_component_year=self.learning_component_yr)
-        url = reverse('learning_unit_component_edit', args=[learning_unit_yr.id])
-        qs = 'learning_component_year_id={}'.format(self.learning_component_yr.id)
-
-        response = self.client.post('{}?{}'.format(url, qs), data={"used_by": "on"})
-        self.learning_component_yr.refresh_from_db()
-        self.assertEqual(response.status_code, 302)
-
-    def test_component_save_delete_link(self):
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                   learning_container_year=self.learning_container_yr)
-        learning_unit_compnt = LearningUnitComponentFactory(learning_unit_year=learning_unit_yr,
-                                                            learning_component_year=self.learning_component_yr)
-        url = reverse('learning_unit_component_edit', args=[learning_unit_yr.id])
-        qs = 'learning_component_year_id={}'.format(self.learning_component_yr.id)
-
-        response = self.client.post('{}?{}'.format(url, qs), data={"planned_classes": "1"})
-        with self.assertRaises(ObjectDoesNotExist):
-            learning_unit_component.LearningUnitComponent.objects.filter(pk=learning_unit_compnt.id).get()
-
     def _prepare_context_learning_units_search(self):
         # Create a structure [Entity / Entity version]
         ssh_entity = EntityFactory(country=self.country)
@@ -1184,27 +1161,27 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
         cls.attribution_full = AttributionNewFactory(
             learning_container_year=cls.full_luy.learning_container_year
         )
-        cls.full_lecturing_unit_component = LecturingLearningUnitComponentFactory(learning_unit_year=cls.full_luy)
-        cls.full_practical_unit_component = PracticalLearningUnitComponentFactory(learning_unit_year=cls.full_luy)
+        cls.full_lecturing_component = LecturingLearningComponentYearFactory(learning_unit_year=cls.full_luy)
+        cls.full_practical_component = PracticalLearningComponentYearFactory(learning_unit_year=cls.full_luy)
 
-        cls.partim_1_lecturing_unit_component = \
-            LecturingLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_1)
-        cls.partim_1_practical_unit_component = \
-            PracticalLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_1)
+        cls.partim_1_lecturing_component = \
+            LecturingLearningComponentYearFactory(learning_unit_year=cls.partim_luy_1)
+        cls.partim_1_practical_component = \
+            PracticalLearningComponentYearFactory(learning_unit_year=cls.partim_luy_1)
 
-        cls.partim_2_lecturing_unit_component = \
-            LecturingLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_2)
-        cls.partim_2_practical_unit_component = \
-            PracticalLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_2)
+        cls.partim_2_lecturing_component = \
+            LecturingLearningComponentYearFactory(learning_unit_year=cls.partim_luy_2)
+        cls.partim_2_practical_component = \
+            PracticalLearningComponentYearFactory(learning_unit_year=cls.partim_luy_2)
 
         cls.charge_lecturing = AttributionChargeNewFactory(
             attribution=cls.attribution_full,
-            learning_component_year=cls.full_lecturing_unit_component.learning_component_year,
+            learning_component_year=cls.full_lecturing_component,
             allocation_charge=20
         )
         cls.charge_practical = AttributionChargeNewFactory(
             attribution=cls.attribution_full,
-            learning_component_year=cls.full_practical_unit_component.learning_component_year,
+            learning_component_year=cls.full_practical_component,
             allocation_charge=20
         )
 
@@ -1219,23 +1196,23 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
     def setUp(self):
         self.charge_lecturing_1 = AttributionChargeNewFactory(
             attribution=self.attribution_partim_1,
-            learning_component_year=self.partim_1_lecturing_unit_component.learning_component_year,
+            learning_component_year=self.partim_1_lecturing_component,
             allocation_charge=10
         )
         self.charge_practical_1 = AttributionChargeNewFactory(
             attribution=self.attribution_partim_1,
-            learning_component_year=self.partim_1_practical_unit_component.learning_component_year,
+            learning_component_year=self.partim_1_practical_component,
             allocation_charge=10
         )
 
         self.charge_lecturing_2 = AttributionChargeNewFactory(
             attribution=self.attribution_partim_2,
-            learning_component_year=self.partim_2_lecturing_unit_component.learning_component_year,
+            learning_component_year=self.partim_2_lecturing_component,
             allocation_charge=10
         )
         self.charge_practical_2 = AttributionChargeNewFactory(
             attribution=self.attribution_partim_2,
-            learning_component_year=self.partim_2_practical_unit_component.learning_component_year,
+            learning_component_year=self.partim_2_practical_component,
             allocation_charge=10
         )
 
