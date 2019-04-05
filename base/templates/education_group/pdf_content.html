@@ -39,20 +39,6 @@
                 font-size: 11px;
             }
 
-            @bottom-center {
-                background:
-                {% if language == "en" %}
-                    url("{% static 'img/education_group_year/legend_en.png' %}")
-                {% else %}
-                    url("{% static 'img/education_group_year/legend_fr.png' %}")
-                {% endif %}
-                no-repeat;
-                width: 400px;
-                content: "";
-                text-align: center;
-                margin: 0;
-                padding: 0;
-            }
         }
 
         td, th, tr {
@@ -111,6 +97,60 @@
                 </tbody>
             </table>
         </div>
+        <br>
+        <div class="container" style="font-size: 11px;margin-left: 15%">
+            <table style="border: 1px solid;">
+                <tbody>
+                <tr style="padding-top:0;">
+                    <td colspan="4" style="padding-top:0;padding-bottom:3px;">{% trans 'Legend' %}</td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <img src="{% static "img/education_group_year/mandatory.png" %}" width="12"
+                             height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">{% trans 'Mandatory' %}</td>
+                    <td style="padding-left:5px;">
+                        <img src="{% static "img/education_group_year/optional.png" %}" width="12"
+                             height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">{% trans 'Optional' %}</td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <img src="{% static "img/education_group_year/delta.png" %}"
+                             width="12" height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">
+                        {% trans 'Courses not taught' %} {{ root.academic_year }}
+                    </td>
+                    <td style="padding-left:5px;">
+                        <img src="{% static "img/education_group_year/bisannual_odd.png" %}"
+                             width="12" height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">{% trans 'Periodic courses not taught' %} {{ root.academic_year }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <img src="{% static "img/education_group_year/bisannual_even.png" %}"
+                             width="12" height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">{% trans 'Periodic courses taught during' %}
+                        {{ root.academic_year }}
+                    </td>
+                    <td style="padding-left:5px;">
+                        <img src="{% static "img/education_group_year/prerequis.gif" %}"
+                             width="6" height="6">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">{% trans 'Activities with prerequisites (in preparation)' %}</td>
+                </tr>
+                <tr>
+                    <td style="padding:0;font-size: 10px;"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         <table>
             <thead>
             <tr>
@@ -122,13 +162,13 @@
             </thead>
             <tbody>
             {% if root.constraint_type %}
-            <tr>
-                <td>
-                    <div style="font-style: italic;font-size: 11px;">
-                        {{ root.verbose_constraint }}
-                    </div>
-                </td>
-            </tr>
+                <tr>
+                    <td>
+                        <div style="font-style: italic;font-size: 11px;">
+                            {{ root.verbose_constraint }}
+                        </div>
+                    </td>
+                </tr>
             {% endif %}
             <tr>
                 <td>
@@ -161,11 +201,11 @@
             <br>&emsp;
             <br>
             <div style="display: inline;margin-left: 50px;">
-                {% trans "Student's signature"  %}
+                {% trans "Student's signature" %}
             </div>
             {% if root.is_minor %}
                 <div style="display: inline;margin-left: 227px;">
-                    {% trans "Name of the teacher responsible"  %}
+                    {% trans "Name of the teacher responsible" %}
                 </div>
             {% endif %}
         </div>

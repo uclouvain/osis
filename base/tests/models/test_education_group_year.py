@@ -391,3 +391,10 @@ class EducationGroupYearVerboseTest(TestCase):
 
         expected = ''
         self.assertEqual(self.education_group_year.verbose_duration, expected)
+
+
+class EducationGroupYearTypeTest(TestCase):
+    def test_type_property(self):
+        education_group_year = EducationGroupYearFactory()
+        self.assertEqual(education_group_year.type, education_group_year.education_group_type.name)
+

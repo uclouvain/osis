@@ -42,6 +42,7 @@ from base.models import education_group_type, education_group_year
 from base.models.education_group_type import GROUP_TYPE_OPTION
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, quadrimesters
+from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.models.learning_unit_year import LearningUnitYear
@@ -269,6 +270,15 @@ class GroupElementYear(OrderedModel):
         if (self.parent and self.child_branch) and\
                 (not self.parent.academic_year.year == self.child_branch.academic_year.year):
             raise ValidationError(_("It is forbidden to attach an element to one of another academic year."))
+
+        self._clean_link_type()
+
+    def _clean_link_type(self):
+        if getattr(self.parent, 'type', None) in [GroupType.MINOR_LIST_CHOICE.name,
+                                                  GroupType.MAJOR_LIST_CHOICE.name] and \
+           isinstance(self.child, EducationGroupYear) and self.child.type in MiniTrainingType.minors() + \
+                [MiniTrainingType.FSA_SPECIALITY.name, MiniTrainingType.DEEPENING.name]:
+            self.link_type = LinkTypes.REFERENCE.name
 
     @cached_property
     def child(self):
