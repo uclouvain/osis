@@ -44,7 +44,6 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_class_year import LearningClassYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
-from base.models.learning_unit_component import LearningUnitComponent
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
@@ -55,7 +54,6 @@ from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
@@ -218,7 +216,7 @@ class LearningUnitYearDeletion(TestCase):
         with self.assertRaises(ObjectDoesNotExist):
             LearningUnitYear.objects.get(id=l_unit_partim_2.id)
 
-    def test_delete_learning_unit_component_class(self):
+    def test_delete_learning_component_class(self):
         # Composant annualisé est associé à son composant et à son conteneur annualisé
         learning_component_year = LearningComponentYearFactory(acronym="/C",
                                                                comment="TEST")
@@ -246,6 +244,10 @@ class LearningUnitYearDeletion(TestCase):
         self.assertEqual(len(msg), number_classes)
         with self.assertRaises(ObjectDoesNotExist):
             LearningComponentYear.objects.get(id=learning_component_year.id)
+
+        for classe in learning_component_year.learningclassyear_set.all():
+            with self.assertRaises(ObjectDoesNotExist):
+                LearningClassYear.objects.get(id=classe.id)
 
         # The learning_unit_container won't be deleted because the learning_unit_year is a partim
         self.assertEqual(learning_container_year, LearningContainerYear.objects.get(id=learning_container_year.id))
