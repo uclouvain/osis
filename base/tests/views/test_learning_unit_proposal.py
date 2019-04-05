@@ -401,9 +401,9 @@ class TestLearningUnitProposalSearch(TestCase):
         proposal = _create_proposal_learning_unit("LOSIS1214")
         tutor = TutorFactory(person=self.person)
         attribution = AttributionNewFactory(tutor=tutor)
-        learning_unit_component = LearningUnitComponentFactory(learning_unit_year=proposal.learning_unit_year)
+        learning_unit_component = LearningComponentYearFactory(learning_unit_year=proposal.learning_unit_year)
         AttributionChargeNewFactory(attribution=attribution,
-                                    learning_component_year=learning_unit_component.learning_component_year)
+                                    learning_component_year=learning_unit_component)
         url = reverse(learning_units_proposal_search)
         response = self.client.get(url, data={'tutor': self.person.first_name})
         self.assertEqual(response.context['learning_units_count'], 1)
