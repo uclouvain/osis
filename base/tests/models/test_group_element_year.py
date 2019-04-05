@@ -132,6 +132,20 @@ class TestFindBuildParentListByEducationGroupYearId(TestCase):
             }
             self.assertEqual(result, expected_result)
 
+        def test_with_filters_case_direct_parent_academic_year_is_different(self):
+            current_academic_year = create_current_academic_year()
+            root_group_type = EducationGroupTypeFactory(name='Bachelor', category=education_group_categories.TRAINING)
+            self.root = EducationGroupYearFactory(academic_year=current_academic_year,
+                                                  education_group_type=root_group_type)
+            child_branch = EducationGroupYearFactory(
+                academic_year=AcademicYearFactory(year=current_academic_year.year - 1),
+                education_group_type=EducationGroupTypeFactory(category=education_group_categories.GROUP)
+            )
+            GroupElementYearFactory(parent=self.root, child_branch=child_branch)
+            GroupElementYearFactory(parent=child_branch, child_branch=None, child_leaf=self.child_leaf)
+            result = group_element_year._find_related_formations([self.child_leaf], self.filters)
+            self.assertEqual(result[self.child_leaf.id], [self.root.id])
+
         def test_with_filters_case_childs_with_different_academic_years(self):
             child_leaf_other_ac_year = LearningUnitYearFactory(
                 academic_year=AcademicYearFactory(year=self.current_academic_year.year - 1)
