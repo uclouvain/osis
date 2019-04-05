@@ -23,17 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-from base.tests.models import test_person
-from base.models import program_manager
-from base.tests.factories.program_manager import ProgramManagerFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.user import UserFactory
-from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.structure import StructureFactory
-from base.tests.factories.education_group import EducationGroupFactory
 from django.test import TestCase
+
+from base.models import program_manager
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group import EducationGroupFactory
+from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.person import PersonFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.structure import StructureFactory
+from base.tests.factories.user import UserFactory
 
 
 class FindByOfferYearTest(TestCase):
@@ -93,21 +92,3 @@ class FindByOfferYearTest(TestCase):
                                     entity_management=a_management_entity)
         ProgramManagerFactory(offer_year=offer_yr, person=PersonFactory())
         self.assertEqual(len(program_manager.find_by_management_entity([a_management_entity], self.academic_year)), 1)
-
-    def test_find_by_person_exclude_offer_list(self):
-        a_person = PersonFactory(first_name="Yannick", last_name="Leblanc")
-
-        previous_academic_year = AcademicYearFactory(year=self.academic_year.year-1)
-        offer_yr_previous = OfferYearFactory(academic_year=previous_academic_year)
-        ProgramManagerFactory(offer_year=offer_yr_previous,
-                              person=a_person)
-
-        offer_yr1 = OfferYearFactory(academic_year=self.academic_year)
-        offer_yr2 = OfferYearFactory(academic_year=self.academic_year)
-        ProgramManagerFactory(offer_year=offer_yr1,
-                              person=a_person)
-        ProgramManagerFactory(offer_year=offer_yr2,
-                              person=a_person)
-        self.assertEqual(len(program_manager.find_by_person_exclude_offer_list(a_person,
-                                                                               [offer_yr1],
-                                                                               self.academic_year)), 1)

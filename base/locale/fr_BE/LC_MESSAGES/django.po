@@ -3,14 +3,12 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:192
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:193
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-04 11:44+0200\n"
-"PO-Revision-Date: 2019-04-02 09:24+0200\n"
+"POT-Creation-Date: 2019-04-04 13:57+0200\n"
+"PO-Revision-Date: 2019-04-04 13:59+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_BE\n"
@@ -2311,7 +2309,14 @@ msgstr "Fait à"
 msgid "Mail to remind educational information update"
 msgstr "Mail de rappel résumés"
 
+#: models/program_manager.py:47
+#: templates/education_group/tab_administrative_data.html:191
+#: templates/offer/tab_program_managers.html:54
+msgid "Main"
+msgstr "Principal"
+
 #: models/enums/organization_type.py:36
+msgctxt "female"
 msgid "Main"
 msgstr "Principale"
 
@@ -3031,6 +3036,10 @@ msgstr "Activité cyclique dispensée en "
 #: tests/views/test_learning_unit.py:1542
 msgid "Periodicity"
 msgstr "Périodicité"
+
+#: templates/offer/tab_program_managers.html:47
+msgid "Person"
+msgstr "Personne"
 
 #: business/learning_units/perms.py:68
 msgid "Person not in accordance with proposal state"
@@ -4264,7 +4273,7 @@ msgstr ""
 "Les prérequis %(prerequisites)s pour l'unité d'enseignement "
 "%(learning_unit)s ne sont pas dans la formation sélectionnée %(root)s"
 
-#: views/education_groups/detail.py:435
+#: views/education_groups/detail.py:436
 #, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr "Le programme %(acronym)s sera publié sous peu"
@@ -4457,7 +4466,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 
-#: views/education_groups/detail.py:397
+#: views/education_groups/detail.py:398
 #, python-format
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
@@ -5528,7 +5537,7 @@ msgstr "partenariats"
 msgid "partnerships_financing_configuration"
 msgstr ""
 
-#: templates/offer/tab_program_managers.html:47
+#: models/program_manager.py:44
 msgid "person"
 msgstr "personne"
 
@@ -5673,7 +5682,7 @@ msgstr "texte en français"
 
 #: templates/learning_unit/blocks/summary_locked.html:34
 msgid "the"
-msgstr "Le"
+msgstr "le"
 
 #: tests/views/test_learning_unit_pedagogy.py:239
 #: views/learning_units/educational_information.py:106
