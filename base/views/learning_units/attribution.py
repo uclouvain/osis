@@ -39,7 +39,6 @@ from base.forms.learning_unit.attribution_charge_repartition import AttributionF
     PracticalAttributionChargeForm, AttributionCreationForm
 from base.models.enums import learning_component_year_type
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_component import LearningUnitComponent
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views.mixins import AjaxTemplateMixin, RulesRequiredMixin, MultiFormsView, MultiFormsSuccessMessageMixin
@@ -111,7 +110,7 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
 
     def get_form_classes(self):
         form_classes = self.form_classes.copy()
-        if LearningUnitComponent.objects.filter(learning_unit_year=self.luy, type=None).exists():
+        if LearningComponentYear.objects.filter(learning_unit_year=self.luy, type=None).exists():
             del form_classes["practical_charge_form"]
         return form_classes
 

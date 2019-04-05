@@ -55,7 +55,6 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit
-from base.models.learning_unit_component import LearningUnitComponent
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -480,7 +479,6 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
             LearningUnitYear: self._count_records(LearningUnitYear),
             EntityContainerYear: self._count_records(EntityContainerYear),
             LearningComponentYear: self._count_records(LearningComponentYear),
-            LearningUnitComponent: self._count_records(LearningUnitComponent),
             EntityComponentYear: self._count_records(EntityComponentYear),
         })
 
