@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-05 11:56+0200\n"
+"POT-Creation-Date: 2019-04-05 13:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: templates/offer/score_sheet_address_tab.html:52
+#, python-format
 msgid ""
 "\n"
 "                                    If you customize one of the field below, "
@@ -28,12 +29,14 @@ msgid ""
 "                                    pre-fill in the form.\n"
 "                                "
 msgstr ""
+"\n"
 "Si vous personnalisez l'un des champs ci-dessous, cela ne changera que "
 "l'adresse affichée sur les pages d'encodage de notes pour le programme "
 "%(program)s. Cela ne changera jamais l'adresse d'une structure. La liste ci-"
 "dessous vous aidera à pré-remplir le formulaire."
 
 #: templates/online_encoding.html:287
+#, python-format
 msgid ""
 "\n"
 "                        You will submit %(draft_scores_not_submitted)s notes "
@@ -41,6 +44,7 @@ msgid ""
 "b>\n"
 "                    "
 msgstr ""
+"\n"
 "Vous soumettrez %(draft_scores_not_submitted)s notes au(x) faculté(s). "
 "Attention : les notes soumises <b>ne peuvent plus être modifiées.</b>"
 
@@ -77,7 +81,7 @@ msgstr "Parcours académique"
 msgid "Academic year"
 msgstr "Année académique"
 
-#: business/score_encoding_export.py:172
+#: business/score_encoding_export.py:173
 #, python-format
 msgid "Accepted value: %(justification_label_authorized)s "
 msgstr "Valeur acceptée: %(justification_label_authorized)s "
@@ -220,14 +224,14 @@ msgstr "Tri descendant de la table de données"
 msgid "Deadline reached"
 msgstr "Date d'échéance atteinte"
 
-#: business/score_encoding_export.py:195
+#: business/score_encoding_export.py:198
 #: templates/online_double_encoding_form.html:104
 #: templates/online_encoding_form.html:103
 #: tests/functionals/test_score_encoding.py:375
 msgid "Decimal values in scores are NOT accepted."
 msgstr "Les valeurs décimales dans les notes ne sont PAS acceptées."
 
-#: business/score_encoding_export.py:193
+#: business/score_encoding_export.py:196
 #: templates/online_double_encoding_form.html:102
 #: templates/online_encoding_form.html:101
 msgid "Decimal values in scores are accepted."
@@ -284,11 +288,7 @@ msgstr "Encoder les notes"
 msgid "Encoding"
 msgstr "Encodage"
 
-#: templates/blocks/legend.html:30
-msgid "Enrolled after session starts"
-msgstr "Inscrit après l'ouverture de la session"
-
-#: business/score_encoding_export.py:177
+#: business/score_encoding_export.py:179 templates/blocks/legend.html:30
 msgid "Enrolled lately"
 msgstr "Inscrit tardivement"
 
@@ -363,7 +363,7 @@ msgstr "Institution"
 msgid "Invalid justification value"
 msgstr "Valeur de justification invalide"
 
-#: business/score_encoding_export.py:171
+#: business/score_encoding_export.py:172
 #: templates/online_double_encoding_form.html:124
 #: templates/online_double_encoding_validation.html:118
 #: templates/online_double_encoding_validation.html:120
@@ -423,7 +423,7 @@ msgstr "Ligne"
 msgid "Location"
 msgstr "Location"
 
-#: business/score_encoding_export.py:201
+#: business/score_encoding_export.py:204
 msgid "M=Justified Absence"
 msgstr "M=Absence Justifiée"
 
@@ -508,7 +508,7 @@ msgstr "Non communiquée"
 msgid "Number of enrollments"
 msgstr "Nombre d'inscriptions"
 
-#: business/score_encoding_export.py:189
+#: business/score_encoding_export.py:192
 msgid "Numbered scores"
 msgstr "Note chiffrée"
 
@@ -549,7 +549,8 @@ msgstr "Encodage en ligne des notes"
 msgid "Other tutors"
 msgstr "Autre tuteurs"
 
-#: business/score_encoding_export.py:181
+#: business/score_encoding_export.py:183
+#, python-format
 msgid ""
 "Other values reserved to administration: %(justification_other_values)s "
 msgstr ""
@@ -675,7 +676,7 @@ msgstr ""
 msgid "Row"
 msgstr "Ligne"
 
-#: business/score_encoding_export.py:200
+#: business/score_encoding_export.py:203
 msgid "S=Unjustified Absence"
 msgstr "S=Absence Injustifiée"
 
@@ -702,7 +703,7 @@ msgstr "Note"
 msgid "Score already submitted"
 msgstr "Note déjà soumise"
 
-#: business/score_encoding_export.py:190
+#: business/score_encoding_export.py:193
 #, python-format
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr "Valeur acceptée: %(score_legend)s (0=Note de présence)"
@@ -811,7 +812,7 @@ msgstr "Status"
 msgid "Student not registered for exam"
 msgstr "L'étudiant n'est plus inscrit à l'examen"
 
-#: business/score_encoding_export.py:165
+#: business/score_encoding_export.py:166
 msgid "Students deliberated are not shown"
 msgstr "Les étudiants délibérés ne sont pas montrés"
 
@@ -835,7 +836,7 @@ msgstr "Date d'échéance de l'enseignant"
 msgid "Temporary save (not submitted to the faculty yet)"
 msgstr "Enregistrement temporaire (non soumis à la faculté pour le moment)"
 
-#: business/score_encoding_export.py:159
+#: business/score_encoding_export.py:160
 #, python-format
 msgid ""
 "The data presented on this document correspond to the state of the system "
@@ -918,11 +919,7 @@ msgstr "Type"
 msgid "Unjustified absence"
 msgstr "Absence injustifiée"
 
-#: templates/blocks/legend.html:35
-msgid "Unsubscribed after the opening of the session"
-msgstr "Désinscrit après l'ouverture de la session"
-
-#: business/score_encoding_export.py:186
+#: business/score_encoding_export.py:189 templates/blocks/legend.html:35
 msgid "Unsubscribed lately"
 msgstr "Désinscrit tardivement"
 
@@ -997,7 +994,7 @@ msgstr ""
 "Votre fichier excel n'est pas bien structuré. Veuillez suivre la structure "
 "du ficheir excel à fournir (bouton '%(button_value)s')"
 
-#: business/score_encoding_export.py:154 business/score_encoding_export.py:205
+#: business/score_encoding_export.py:155 business/score_encoding_export.py:208
 #: business/score_encoding_sheet.py:104 tests/views/test_score_encoding.py:353
 #: views/score_encoding.py:75
 msgid "date_format"
