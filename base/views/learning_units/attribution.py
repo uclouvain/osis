@@ -122,7 +122,7 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
         context["attribution"] = self.attribution
 
         if self.luy.is_partim():
-            qs_partim = self.luy.learning_component_years.all()
+            qs_partim = self.luy.learningcomponentyear_set.all()
             context['partim_vol1'] = qs_partim.filter(type=learning_component_year_type.LECTURING).first()
             context['partim_vol2'] = qs_partim.filter(type=learning_component_year_type.PRACTICAL_EXERCISES).first()
 

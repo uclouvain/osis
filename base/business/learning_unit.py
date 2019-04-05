@@ -103,7 +103,6 @@ def get_same_container_year_components(learning_unit_year):
         learning_unit_year__learning_container_year=learning_container_year
     ).prefetch_related(
         Prefetch('learningclassyear_set', to_attr="classes"),
-        'learningunityear_set'
     ).select_related('learning_unit_year').order_by('type', 'acronym')
 
     additionnal_entities = {}

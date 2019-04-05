@@ -95,12 +95,6 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     learning_container_year = models.ForeignKey('LearningContainerYear', null=True)
 
-    learning_component_years = models.ManyToManyField(
-        LearningComponentYear,
-        through="base.LearningUnitComponent",
-        verbose_name=_("Components"),
-    )
-
     changed = models.DateTimeField(null=True, auto_now=True)
     acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('Code'),
                                validators=[RegexValidator(LEARNING_UNIT_ACRONYM_REGEX_MODEL)])
