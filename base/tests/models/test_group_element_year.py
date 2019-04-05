@@ -554,6 +554,16 @@ class TestValidationOnEducationGroupYearBlockField(TestCase):
         with self.assertRaises(ValidationError):
             self.group_element_year.full_clean()
 
+    def test_when_academic_year_diff_of_2_education_group(self):
+            egy1 = EducationGroupYearFactory(academic_year=self.academic_year)
+            egy2 = EducationGroupYearFactory(academic_year__year=self.academic_year.year + 1)
+            with self.assertRaises(ValidationError):
+                GroupElementYearFactory(
+                    parent=egy1,
+                    child_branch=egy2,
+                    child_leaf=None,
+                )
+
 
 class TestLinkTypeGroupElementYear(TestCase):
     def test_when_link_minor_to_minor_list_choice(self):
