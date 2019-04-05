@@ -488,7 +488,7 @@ def find_summary_responsible_by_name(queryset, name):
 
 
 def _build_tutor_filter(name_type):
-    return '__'.join(['learningunitcomponent', 'learning_component_year', 'attributionchargenew', 'attribution',
+    return '__'.join(['learningcomponentyear', 'attributionchargenew', 'attribution',
                       'tutor', 'person', name_type, 'iregex'])
 
 
