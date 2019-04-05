@@ -24,26 +24,21 @@
 #
 ##############################################################################
 from dal import autocomplete
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.db.models import Q, Prefetch, F
-from django.db.utils import IntegrityError
+from django.db.models import Q, Prefetch
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 from django_filters.views import FilterView
 
-from base import models as mdl
 from base.forms.organization import OrganizationFilter
 from base.forms.organization_address import OrganizationAddressForm
 from base.models.campus import Campus
 from base.models.organization import Organization
 from base.models.organization_address import OrganizationAddress
-from reference import models as mdlref
 from reference.models.country import Country
 
 

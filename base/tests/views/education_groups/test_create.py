@@ -166,6 +166,35 @@ class TestCreate(TestCase):
                 form_education_group_year = response.context["form_education_group_year"]
                 self.assertIsInstance(form_education_group_year, expected_forms_by_category.get(category))
 
+
+@override_flag('education_group_create', active=True)
+class TestCreateForm(TestCase):
+    def setUp(self):
+        self.current_academic_year = create_current_academic_year()
+        self.generated_ac_years = GenerateAcademicYear(self.current_academic_year.year + 1,
+                                                       self.current_academic_year.year + 10)
+        self.parent_education_group_year = EducationGroupYearFactory(academic_year=self.current_academic_year)
+        self.test_categories = [
+            education_group_categories.GROUP,
+            education_group_categories.TRAINING,
+            education_group_categories.MINI_TRAINING,
+        ]
+        self.education_group_types = [
+            EducationGroupTypeFactory(category=category)
+            for category in self.test_categories
+        ]
+
+        self.organization = OrganizationFactory(type=organization_type.MAIN)
+        self.entity = EntityFactory(organization=self.organization)
+        self.entity_version = EntityVersionFactory(entity=self.entity, entity_type=FACULTY, start_date=datetime.now())
+        self.language = LanguageFactory()
+        self.person = PersonFactory()
+        PersonEntityFactory(person=self.person, entity=self.entity)
+        self.client.force_login(self.person.user)
+        self.perm_patcher = mock.patch("base.business.education_groups.perms._is_eligible_to_add_education_group",
+                                       return_value=True)
+        self.mocked_perm = self.perm_patcher.start()
+
     def test_redirect_after_creation(self):
         url = reverse('new_education_group', args=[self.education_group_types[1].category,
                                                    self.education_group_types[1].id])
@@ -176,11 +205,12 @@ class TestCreate(TestCase):
             'schedule_type': 'DAILY',
             'credits': '180',
             'title': 'Bachelier en',
-            'academic_year': self.parent_education_group_year.academic_year.id,
+            'academic_year': self.current_academic_year.id,
             'management_entity': self.entity_version.id,
             'administration_entity': self.entity_version.id,
             'internship': ['NO'],
-            'primary_language': self.language.id
+            'primary_language': self.language.id,
+            'diploma_printing_title': "title",
         }
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
