@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-04 11:44+0200\n"
+"POT-Creation-Date: 2019-04-04 13:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2263,7 +2263,14 @@ msgstr ""
 msgid "Mail to remind educational information update"
 msgstr ""
 
+#: models/program_manager.py:47
+#: templates/education_group/tab_administrative_data.html:191
+#: templates/offer/tab_program_managers.html:54
+msgid "Main"
+msgstr ""
+
 #: models/enums/organization_type.py:36
+msgctxt "female"
 msgid "Main"
 msgstr ""
 
@@ -2957,6 +2964,10 @@ msgstr ""
 #: business/proposal_xls.py:52 models/learning_unit_year.py:143
 #: tests/views/test_learning_unit.py:1542
 msgid "Periodicity"
+msgstr ""
+
+#: templates/offer/tab_program_managers.html:47
+msgid "Person"
 msgstr ""
 
 #: business/learning_units/perms.py:68
@@ -4148,7 +4159,7 @@ msgid ""
 "are not inside the selected training %(root)s"
 msgstr ""
 
-#: views/education_groups/detail.py:435
+#: views/education_groups/detail.py:436
 #, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr ""
@@ -4320,7 +4331,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
-#: views/education_groups/detail.py:397
+#: views/education_groups/detail.py:398
 #, python-format
 msgid "This label %s does not exist"
 msgstr ""
@@ -5342,7 +5353,7 @@ msgstr ""
 msgid "partnerships_financing_configuration"
 msgstr ""
 
-#: templates/offer/tab_program_managers.html:47
+#: models/program_manager.py:44
 msgid "person"
 msgstr ""
 

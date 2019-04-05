@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
 MAIN = "MAIN"
 ACADEMIC_PARTNER = "ACADEMIC_PARTNER"
@@ -33,7 +33,7 @@ COMMERCE_PARTNER = "COMMERCE_PARTNER"
 PUBLIC_PARTNER = "PUBLIC_PARTNER"
 
 ORGANIZATION_TYPE = (
-    (MAIN, _("Main")),
+    (MAIN, pgettext_lazy("female", "Main")),
     (ACADEMIC_PARTNER, _("Academic partner")),
     (INDUSTRIAL_PARTNER, _("Industrial partner")),
     (SERVICE_PARTNER, _("Service partner")),
