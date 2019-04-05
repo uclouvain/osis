@@ -50,20 +50,7 @@ FIRST_ROW_LEGEND_ENROLLMENT_STATUS = 7
 def export_xls(exam_enrollments):
     workbook = Workbook()
     worksheet = workbook.active
-    ue = exam_enrollments[0].learning_unit_enrollment.learning_unit_year
-    worksheet.append([str(ue) + " " + ue.specific_title if ue.specific_title else str(ue)])
-    worksheet.append([str('Session: %s' % exam_enrollments[0].session_exam.number_session)])
-    worksheet.append([str('')])
-    __display_creation_date_with_message_about_state(worksheet, row_number=4)
-    __display_warning_about_students_deliberated(worksheet, row_number=5)
-    worksheet.append([str('')])
-    show_decimal = ue.decimal_scores
-    __display_legends(worksheet, show_decimal)
-    _color_legend(worksheet)
-    worksheet.append([str('')])
-    __columns_resizing(worksheet)
-    header_translate_list = [str(_(elem)) for elem in HEADER]
-    worksheet.append(header_translate_list)
+    _add_header_and_legend_to_file(exam_enrollments, worksheet)
 
     row_number = 11
     for exam_enroll in exam_enrollments:
@@ -106,6 +93,23 @@ def export_xls(exam_enrollments):
     response = HttpResponse(save_virtual_workbook(workbook), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
+
+
+def _add_header_and_legend_to_file(exam_enrollments, worksheet):
+    ue = exam_enrollments[0].learning_unit_enrollment.learning_unit_year
+    worksheet.append([str(ue) + " " + ue.specific_title if ue.specific_title else str(ue)])
+    worksheet.append([str('Session: %s' % exam_enrollments[0].session_exam.number_session)])
+    worksheet.append([str('')])
+    __display_creation_date_with_message_about_state(worksheet, row_number=4)
+    __display_warning_about_students_deliberated(worksheet, row_number=5)
+    worksheet.append([str('')])
+    show_decimal = ue.decimal_scores
+    __display_legends(worksheet, show_decimal)
+    _color_legend(worksheet)
+    worksheet.append([str('')])
+    __columns_resizing(worksheet)
+    header_translate_list = [str(_(elem)) for elem in HEADER]
+    worksheet.append(header_translate_list)
 
 
 def __columns_resizing(ws):
