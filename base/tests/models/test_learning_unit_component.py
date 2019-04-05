@@ -25,22 +25,14 @@
 ##############################################################################
 import datetime
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 
-from base.models.learning_class_year import LearningClassYear
 from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.learning_unit_component import LearningUnitComponent
 from base.models.academic_year import AcademicYear
-from base.tests.factories.learning_class_year import LearningClassYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.learning_container import LearningContainerFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 now = datetime.datetime.now()
 
