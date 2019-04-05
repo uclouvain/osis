@@ -65,7 +65,8 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         In context of 2M, when we add a finality [or group which contains finality], we must ensure that
         the end date of all 2M is greater or equals of all finalities
         """
-        finalities_to_add_qs = EducationGroupYear.objects.filter(pk=self.child.pk) | EducationGroupYear.hierarchy.filter(pk=self.child.pk).get_children()
+        finalities_to_add_qs = EducationGroupYear.objects.filter(pk=self.child.pk) | \
+            EducationGroupYear.hierarchy.filter(pk=self.child.pk).get_children()
         finalities_to_add_qs = finalities_to_add_qs.filter(education_group_type__name__in=TrainingType.finality_types())
 
         root_2m_qs = self.parents | EducationGroupYear.objects.filter(pk=self.parent.pk)
