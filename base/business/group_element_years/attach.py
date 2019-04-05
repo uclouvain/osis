@@ -49,7 +49,8 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
 
     @cached_property
     def parents(self):
-        return EducationGroupYear.hierarchy.filter(pk=self.parent.pk).get_parents()
+        return EducationGroupYear.hierarchy.filter(pk=self.parent.pk).get_parents() \
+                                           .select_related('education_group_type')
 
     def is_valid(self):
         if self.parent.education_group_type.name in TrainingType.finality_types() or \
