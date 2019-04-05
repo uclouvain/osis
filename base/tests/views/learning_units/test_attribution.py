@@ -39,8 +39,6 @@ from base.models.enums.learning_unit_year_subtypes import PARTIM
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_component import LecturingLearningUnitComponentFactory, \
-    PracticalLearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.tutor import TutorFactory
