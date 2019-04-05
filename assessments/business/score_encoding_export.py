@@ -58,7 +58,7 @@ def export_xls(exam_enrollments):
     __display_creation_date_with_message_about_state(worksheet, row_number=4)
     __display_warning_about_students_deliberated(worksheet, row_number=5)
     worksheet.append([str('')])
-    show_decimal = exam_enrollments[0].learning_unit_enrollment.learning_unit_year.decimal_scores
+    show_decimal = ue.decimal_scores
     __display_legends(worksheet, show_decimal)
     _color_legend(worksheet)
     worksheet.append([str('')])
