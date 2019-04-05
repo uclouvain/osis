@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-05 09:12+0200\n"
-"PO-Revision-Date: 2019-04-05 09:16+0200\n"
+"POT-Creation-Date: 2019-04-04 13:57+0200\n"
+"PO-Revision-Date: 2019-04-04 13:59+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_BE\n"
@@ -50,7 +50,7 @@ msgstr ""
 "{%(current_value)s})"
 
 #: models/education_group.py:56 tests/models/test_education_group.py:137
-#: tests/views/group_element_years/test_postpone.py:109
+#: tests/views/group_element_years/test_postpone.py:108
 #: views/education_groups/update.py:244
 #, python-format
 msgid "%(count)d education group has been postponed with success."
@@ -74,7 +74,7 @@ msgstr[1] "%(count)d unités d'enseignement ont été reportées avec succès"
 
 #: business/education_groups/shorten.py:79
 #: tests/business/education_groups/test_shorten.py:135
-#: tests/views/education_groups/test_delete.py:115
+#: tests/views/education_groups/test_delete.py:113
 #, python-format
 msgid "%(count_enrollment)d student is enrolled in the offer."
 msgid_plural "%(count_enrollment)d students are enrolled in the offer."
@@ -87,7 +87,7 @@ msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
 msgstr "%(date)s doit être comprise entre %(start_date)s et %(end_date)s"
 
 #: business/group_element_years/postponement.py:77
-#: tests/business/education_groups/test_postponement.py:547
+#: tests/business/education_groups/test_postponement.py:545
 #, python-format
 msgid ""
 "%(education_group_year)s is closed in %(end_year)s, there is no more link to "
@@ -652,7 +652,7 @@ msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours?"
 msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr "Êtes-vous sûr·e de vouloir détacher %(acronym)s ?"
 
-#: tests/views/group_element_years/test_postpone.py:89
+#: tests/views/group_element_years/test_postpone.py:88
 #: views/education_groups/update.py:233
 #, python-format
 msgid "Are you sure you want to postpone the content in %(root)s?"
@@ -847,8 +847,8 @@ msgid "Cancel the proposal"
 msgstr "Annuler la proposition"
 
 #: business/group_element_years/detach.py:129
-#: tests/views/group_element_years/test_detach.py:160
-#: tests/views/group_element_years/test_detach.py:179
+#: tests/views/group_element_years/test_detach.py:154
+#: tests/views/group_element_years/test_detach.py:173
 #, python-format
 msgid ""
 "Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a "
@@ -1241,8 +1241,8 @@ msgstr "Détacher"
 msgid "Detailed program"
 msgstr "Programme détaillé"
 
-#: templates/academic_calendar/academic_calendars.html:187
-#: templates/academic_calendar/academic_calendars.html:222
+#: templates/academic_calendar/academic_calendars.html:169
+#: templates/academic_calendar/academic_calendars.html:204
 msgid "Details"
 msgstr "Détails"
 
@@ -1405,7 +1405,7 @@ msgstr ""
 "Organisation de formations %(acronym)s (%(academic_year)s) supprimée avec "
 "succès."
 
-#: views/education_groups/create.py:150
+#: views/education_groups/create.py:149
 #, python-format
 msgid ""
 "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
@@ -1813,7 +1813,7 @@ msgstr "Conditions Générales"
 msgid "General configuration"
 msgstr "Configuration générale"
 
-#: api/serializers/person.py:61
+#: api/serializers/person.py:73
 msgid "General information and Admission condition"
 msgstr "Informations générales et Conditions d'admission"
 
@@ -2006,14 +2006,8 @@ msgstr "Cours isolés"
 msgid "It is forbidden to attach an element to itself."
 msgstr "Il est interdit d’attacher un élément à lui-même."
 
-#: models/group_element_year.py:272
-msgid "It is forbidden to attach an element to one of another academic year."
-msgstr ""
-"Il est interdit d’attacher un élément à un élément d'une autre année "
-"académique."
-
 #: models/group_element_year.py:261
-#: tests/views/education_groups/test_update.py:577
+#: tests/views/education_groups/test_update.py:575
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 "Il est interdit d'attacher un élement à un autre élement y étant inclus."
@@ -2315,7 +2309,14 @@ msgstr "Fait à"
 msgid "Mail to remind educational information update"
 msgstr "Mail de rappel résumés"
 
+#: models/program_manager.py:47
+#: templates/education_group/tab_administrative_data.html:191
+#: templates/offer/tab_program_managers.html:54
+msgid "Main"
+msgstr "Principal"
+
 #: models/enums/organization_type.py:36
+msgctxt "female"
 msgid "Main"
 msgstr "Principale"
 
@@ -3036,6 +3037,10 @@ msgstr "Activité cyclique dispensée en "
 msgid "Periodicity"
 msgstr "Périodicité"
 
+#: templates/offer/tab_program_managers.html:47
+msgid "Person"
+msgstr "Personne"
+
 #: business/learning_units/perms.py:68
 msgid "Person not in accordance with proposal state"
 msgstr "Personne qui ne peut pas travailler avec une proposition dans cet état"
@@ -3070,7 +3075,7 @@ msgstr "Classes prévues"
 msgid "Platform"
 msgstr "Plateforme"
 
-#: tests/views/education_groups/test_update.py:661
+#: tests/views/education_groups/test_update.py:659
 #: views/education_groups/group_element_year/create.py:58
 msgid "Please Select or Move an item before Attach it"
 msgstr "Veuillez Sélectionner ou Déplacer un élément avant d'Attacher"
@@ -3954,14 +3959,14 @@ msgid "The contacts modifications has been saved"
 msgstr "Les données de contact ont été sauvegardées"
 
 #: business/group_element_years/postponement.py:143
-#: tests/business/education_groups/test_postponement.py:197
-#: tests/business/education_groups/test_postponement.py:211
-#: tests/business/education_groups/test_postponement.py:220
+#: tests/business/education_groups/test_postponement.py:195
+#: tests/business/education_groups/test_postponement.py:209
+#: tests/business/education_groups/test_postponement.py:218
 msgid "The content has already been postponed."
 msgstr "Le contenu a déjà été reporté."
 
 #: business/education_groups/shorten.py:88
-#: tests/views/education_groups/test_delete.py:119
+#: tests/views/education_groups/test_delete.py:117
 msgid "The content of the education group is not empty."
 msgstr "Le contenu du programme type n'est pas vide."
 
@@ -4000,8 +4005,7 @@ msgstr ""
 #: models/education_group.py:166
 #, python-format
 msgid "The end date must be greater or equals to the finality %(acronym)s"
-msgstr ""
-"La date de fin doit être plus grande ou égale à la finalité %(acronym)s"
+msgstr "La date de fin doit être plus grande ou égale à la finalité %(acronym)s"
 
 #: models/education_group.py:151
 #, python-format
@@ -4009,7 +4013,7 @@ msgid "The end date must be less or equals to the root %(acronym)s"
 msgstr "La date de fin doit être plus petite ou égale à la racine %(acronym)s"
 
 #: business/group_element_years/postponement.py:129
-#: tests/business/education_groups/test_postponement.py:229
+#: tests/business/education_groups/test_postponement.py:227
 msgid ""
 "The end date of the education group is smaller than the year of postponement."
 msgstr "La date de fin de la formation est plus petite que l'année de report."
@@ -4125,7 +4129,7 @@ msgstr ""
 "année de fin plus grande que %(year)s"
 
 #: business/group_element_years/postponement.py:50
-#: tests/business/education_groups/test_postponement.py:431
+#: tests/business/education_groups/test_postponement.py:429
 #, python-format
 msgid ""
 "The learning unit %(learning_unit_year)s does not exist in %(academic_year)s."
@@ -4201,7 +4205,7 @@ msgid "The messages sent by the application to you"
 msgstr "La liste des messages qui vous ont été envoyés par l'application"
 
 #: forms/education_group/common.py:335
-#: tests/views/education_groups/test_select_education_group_type.py:129
+#: tests/views/education_groups/test_select_education_group_type.py:126
 #, python-format
 msgid ""
 "The number of children of type \"%(child_type)s\" for \"%(parent)s\" has "
@@ -4211,7 +4215,7 @@ msgstr ""
 "la limite maximum."
 
 #: business/group_element_years/management.py:107
-#: tests/forms/education_group/test_groupElementYearForm.py:230
+#: tests/forms/education_group/test_groupElementYearForm.py:224
 #, python-format
 msgid ""
 "The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" has "
@@ -4251,7 +4255,7 @@ msgid "The partim"
 msgstr "Le partim"
 
 #: business/group_element_years/postponement.py:63
-#: tests/business/education_groups/test_postponement.py:484
+#: tests/business/education_groups/test_postponement.py:482
 #, python-format
 msgid ""
 "The postponed learning unit %(learning_unit)s has a prerequisite %(item)s "
@@ -4269,7 +4273,7 @@ msgstr ""
 "Les prérequis %(prerequisites)s pour l'unité d'enseignement "
 "%(learning_unit)s ne sont pas dans la formation sélectionnée %(root)s"
 
-#: views/education_groups/detail.py:435
+#: views/education_groups/detail.py:436
 #, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr "Le programme %(acronym)s sera publié sous peu"
@@ -4293,7 +4297,7 @@ msgstr ""
 "({%(new_value)s} a la place de {%(current_value)s})"
 
 #: business/group_element_years/postponement.py:140
-#: tests/business/education_groups/test_postponement.py:189
+#: tests/business/education_groups/test_postponement.py:188
 msgid "The root does not exist in the next academic year."
 msgstr "La racine n'existe pas dans l'anné academique suivante."
 
@@ -4462,7 +4466,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 
-#: views/education_groups/detail.py:397
+#: views/education_groups/detail.py:398
 #, python-format
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
@@ -4951,8 +4955,8 @@ msgstr ""
 
 #: business/group_element_years/postponement.py:100
 #: business/group_element_years/postponement.py:120
-#: tests/business/education_groups/test_postponement.py:239
-#: tests/business/education_groups/test_postponement.py:249
+#: tests/business/education_groups/test_postponement.py:237
+#: tests/business/education_groups/test_postponement.py:247
 msgid ""
 "You are not allowed to copy the content of this kind of education group."
 msgstr ""
@@ -4960,7 +4964,7 @@ msgstr ""
 "formation."
 
 #: models/group_element_year.py:265
-#: tests/forms/education_group/test_groupElementYearForm.py:72
+#: tests/forms/education_group/test_groupElementYearForm.py:71
 msgid "You are not allowed to create a reference with a learning unit"
 msgstr ""
 "Vous n'êtes pas autorisé de créer une référence avec une unité d’enseignement"
@@ -5070,8 +5074,8 @@ msgstr ""
 "d'enseignement sous"
 
 #: business/group_element_years/management.py:115
-#: tests/forms/education_group/test_groupElementYearForm.py:92
-#: tests/forms/education_group/test_groupElementYearForm.py:190
+#: tests/forms/education_group/test_groupElementYearForm.py:91
+#: tests/forms/education_group/test_groupElementYearForm.py:185
 #, python-format
 msgid ""
 "You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type "
@@ -5329,8 +5333,8 @@ msgstr "confirmer"
 #: models/education_group_year.py:616 models/enums/constraint_type.py:32
 #: models/group_element_year.py:221 models/group_element_year.py:237
 #: tests/models/test_education_group_year.py:93
-#: tests/views/education_groups/group_element_year/test_read.py:101
-#: tests/views/education_groups/group_element_year/test_read.py:115
+#: tests/views/education_groups/group_element_year/test_read.py:99
+#: tests/views/education_groups/group_element_year/test_read.py:113
 msgid "credits"
 msgstr "crédits"
 
@@ -5344,11 +5348,11 @@ msgstr "%d/%m/%Y"
 msgid "date_format_string"
 msgstr "d/m/Y"
 
-#: templates/academic_calendar/academic_calendars.html:177
+#: templates/academic_calendar/academic_calendars.html:159
 msgid "day"
 msgstr "jour"
 
-#: templates/academic_calendar/academic_calendars.html:180
+#: templates/academic_calendar/academic_calendars.html:162
 msgid "days"
 msgstr "jours"
 
@@ -5533,7 +5537,7 @@ msgstr "partenariats"
 msgid "partnerships_financing_configuration"
 msgstr ""
 
-#: templates/offer/tab_program_managers.html:47
+#: models/program_manager.py:44
 msgid "person"
 msgstr "personne"
 
@@ -5678,7 +5682,7 @@ msgstr "texte en français"
 
 #: templates/learning_unit/blocks/summary_locked.html:34
 msgid "the"
-msgstr "Le"
+msgstr "le"
 
 #: tests/views/test_learning_unit_pedagogy.py:239
 #: views/learning_units/educational_information.py:106
