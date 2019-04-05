@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-05 13:30+0200\n"
+"POT-Creation-Date: 2019-04-05 14:07+0200\n"
 "PO-Revision-Date: 2019-04-04 13:59+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1655,6 +1655,17 @@ msgstr "Echec"
 msgid "Female"
 msgstr "Féminin"
 
+#: business/group_element_years/attach.py:89
+#, python-format
+msgid ""
+"Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
+"program."
+msgid_plural ""
+"Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s "
+"program."
+msgstr[0] "La finalité \"%(acronym)s\" a une date de fin plus grande que le programme %(root_acronym)s"
+msgstr[1] "Les finalités \"%(acronym)s\" ont une date de fin plus grande que le programme %(root_acronym)s"
+
 #: models/enums/education_group_types.py:134
 msgid "Finality 120 list choice"
 msgstr "Liste au choix de Finalités (120)"
@@ -2885,7 +2896,7 @@ msgstr[1] ""
 "Les options \"%(acronym)s\" ne peuvent pas être détachées car elles sont "
 "présentes dans le programme %(finality_acronym)s"
 
-#: business/group_element_years/attach.py:79
+#: business/group_element_years/attach.py:121
 #, python-format
 msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
 msgid_plural ""

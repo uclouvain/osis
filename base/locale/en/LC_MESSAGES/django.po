@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-05 13:30+0200\n"
+"POT-Creation-Date: 2019-04-05 14:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1615,6 +1615,17 @@ msgstr ""
 msgid "Female"
 msgstr ""
 
+#: business/group_element_years/attach.py:89
+#, python-format
+msgid ""
+"Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
+"program."
+msgid_plural ""
+"Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s "
+"program."
+msgstr[0] ""
+msgstr[1] ""
+
 #: models/enums/education_group_types.py:134
 msgid "Finality 120 list choice"
 msgstr ""
@@ -2812,7 +2823,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: business/group_element_years/attach.py:79
+#: business/group_element_years/attach.py:121
 #, python-format
 msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
 msgid_plural ""
