@@ -51,7 +51,8 @@ def export_xls(exam_enrollments):
     workbook = Workbook()
     worksheet = workbook.active
     ue = exam_enrollments[0].learning_unit_enrollment.learning_unit_year
-    worksheet.append([str(ue + ue.specific_title)])
+
+    worksheet.append([str(ue) + " " + ue.specific_title if ue.specific_title else str(ue)])
     worksheet.append([str('Session: %s' % exam_enrollments[0].session_exam.number_session)])
     worksheet.append([str('')])
     __display_creation_date_with_message_about_state(worksheet, row_number=4)
