@@ -27,14 +27,14 @@ from collections import defaultdict
 
 from django.db.models import Subquery, OuterRef
 from django.template.defaultfilters import yesno
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
 from openpyxl.utils import get_column_letter
 
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import Functions
 from base import models as mdl_base
-from base.business.learning_unit import LEARNING_UNIT_TITLES_PART2, XLS_DESCRIPTION, XLS_FILENAME, \
+from base.business.learning_unit import learning_unit_titles_part2, XLS_DESCRIPTION, XLS_FILENAME, \
     WORKSHEET_TITLE
 from base.business.xls import get_name_or_username
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -68,19 +68,21 @@ WRAP_TEXT_STYLE = Style(alignment=Alignment(wrapText=True, vertical="top"), )
 WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
 
-LEARNING_UNIT_TITLES_PART1 = [
-    str(_('Code')),
-    str(_('Ac yr.')),
-    str(_('Title')),
-    str(_('Type')),
-    str(_('Subtype')),
-    "{} ({})".format(_('Req. Entity'), _('fac. level')),
-    str(_('Proposal type')),
-    str(_('Proposal status')),
-    str(_('Credits')),
-    str(_('Alloc. Ent.')),
-    str(_('Title in English')),
-]
+
+def learning_unit_titles_part1():
+    return [
+        str(_('Code')),
+        str(_('Ac yr.')),
+        str(_('Title')),
+        str(_('Type')),
+        str(_('Subtype')),
+        "{} ({})".format(_('Req. Entity'), _('fac. level')),
+        str(_('Proposal type')),
+        str(_('Proposal status')),
+        str(_('Credits')),
+        str(_('Alloc. Ent.')),
+        str(_('Title in English')),
+    ]
 
 
 def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=False):
@@ -129,8 +131,8 @@ def extract_xls_data_from_learning_unit(learning_unit_yr, with_grp, with_attribu
 def create_xls_with_parameters(user, learning_units, filters, extra_configuration):
     with_grp = extra_configuration.get(WITH_GRP)
     with_attributions = extra_configuration.get(WITH_ATTRIBUTIONS)
-    titles_part1 = LEARNING_UNIT_TITLES_PART1.copy()
-    titles_part2 = LEARNING_UNIT_TITLES_PART2.copy()
+    titles_part1 = learning_unit_titles_part1()
+    titles_part2 = learning_unit_titles_part2()
 
     if with_grp:
         titles_part2.append(str(HEADER_PROGRAMS))
