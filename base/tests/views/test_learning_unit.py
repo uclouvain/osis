@@ -49,8 +49,6 @@ from base.business.learning_unit import LEARNING_UNIT_TITLES_PART1, LEARNING_UNI
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit.search_form import LearningUnitYearForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
-from base.models import learning_unit_component
-from base.models import learning_unit_component_class
 from base.models.academic_year import AcademicYear
 from base.models.enums import entity_container_year_link_type, active_status, education_group_categories, \
     learning_component_year_type, proposal_type, proposal_state
@@ -81,9 +79,6 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
     LecturingLearningComponentYearFactory, PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory, \
-    LecturingLearningUnitComponentFactory, PracticalLearningUnitComponentFactory
-from base.tests.factories.learning_unit_component_class import LearningUnitComponentClassFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
     LearningUnitYearFullFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -526,7 +521,7 @@ class LearningUnitViewTestCase(TestCase):
         learning_unit_year = LearningUnitYearFullFactory(
             academic_year=self.current_academic_year,
         )
-        LearningUnitComponentFactory(learning_unit_year=learning_unit_year)
+        LearningComponentYearFactory(learning_unit_year=learning_unit_year)
 
         response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
         self.assertEqual(len(response.context['versions']), 0)
@@ -538,7 +533,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(len(response.context['versions']), 1)
 
         with reversion.create_revision():
-            learning_unit_year.learning_component_years.first().save()
+            learning_unit_year.learningcomponentyear_set.first().save()
 
         response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
         self.assertEqual(len(response.context['versions']), 2)
@@ -1313,20 +1308,13 @@ class TestLearningUnitProposalComparison(TestCase):
         self.learning_component_year_lecturing = LearningComponentYearFactory(
             type=learning_component_year_type.LECTURING,
             acronym="TP",
-            learning_container_year=learning_container_year
+            learning_unit_year=self.learning_unit_year
         )
         self.learning_component_year_practical = LearningComponentYearFactory(
             type=learning_component_year_type.PRACTICAL_EXERCISES,
             acronym="PP",
-            learning_container_year=learning_container_year
+            learning_unit_year=self.learning_unit_year
         )
-        self.learning_unit_component_lecturing = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year,
-            learning_component_year=self.learning_component_year_lecturing)
-        self.learning_unit_component_practical = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year,
-            learning_component_year=self.learning_component_year_practical)
-
         self.entity_container_year = EntityContainerYearFactory(
             learning_container_year=self.learning_unit_year.learning_container_year,
             type=entity_container_year_link_type.REQUIREMENT_ENTITY
