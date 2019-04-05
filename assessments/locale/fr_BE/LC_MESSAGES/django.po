@@ -510,7 +510,7 @@ msgstr "Nombre d'inscriptions"
 
 #: business/score_encoding_export.py:192
 msgid "Numbered scores"
-msgstr "Note chiffrée"
+msgstr "Notes chiffrées"
 
 #: templates/online_double_encoding_form.html:119
 #: templates/online_double_encoding_validation.html:113
@@ -554,7 +554,7 @@ msgstr "Autre tuteurs"
 msgid ""
 "Other values reserved to administration: %(justification_other_values)s "
 msgstr ""
-"Autre valeurs réservées à l'administration : %(justification_other_values)s "
+"Autres valeurs réservées à l'administration : %(justification_other_values)s "
 
 #: templates/admin/modal/add_manager.html:10
 msgid "Person search"
