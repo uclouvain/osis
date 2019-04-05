@@ -94,7 +94,7 @@ class TestRead(TestCase):
         self.assertEqual(self.group_element_year_1.verbose, verbose_branch)
 
         components = LearningComponentYear.objects.filter(
-            learningunitcomponent__learning_unit_year=self.group_element_year_2.child_leaf).annotate(
+            learning_unit_year=self.group_element_year_2.child_leaf).annotate(
             total=Case(When(hourly_volume_total_annual=None, then=0),
                        default=F('hourly_volume_total_annual'))).values('type', 'total')
 

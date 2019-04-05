@@ -121,9 +121,6 @@ admin.site.register(learning_container_year.LearningContainerYear,
 admin.site.register(learning_unit.LearningUnit,
                     learning_unit.LearningUnitAdmin)
 
-admin.site.register(learning_unit_component.LearningUnitComponent,
-                    learning_unit_component.LearningUnitComponentAdmin)
-
 admin.site.register(learning_unit_enrollment.LearningUnitEnrollment,
                     learning_unit_enrollment.LearningUnitEnrollmentAdmin)
 

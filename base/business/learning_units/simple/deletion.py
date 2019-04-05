@@ -95,7 +95,7 @@ def _check_attribution_deletion(learning_unit_year):
 
     for attribution_new in AttributionNew.objects.filter(
             learning_container_year=learning_unit_year.learning_container_year,
-            attributionchargenew__learning_component_year__learningunitcomponent__learning_unit_year=learning_unit_year
+            attributionchargenew__learning_component_year__learning_unit_year=learning_unit_year
     ):
         msg[attribution_new] = _(error_attribution) % {
             'subtype': _str_partim_or_full(learning_unit_year),
