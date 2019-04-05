@@ -90,16 +90,16 @@ class LearningUnitYearDeletion(TestCase):
         group_1 = GroupElementYearFactory(child_branch=None, child_leaf=l_unit_2)
         group_2 = GroupElementYearFactory(child_branch=None, child_leaf=l_unit_2)
 
-        component = LearningUnitComponentFactory(learning_unit_year=l_unit_2)
+        component = LearningComponentYearFactory(learning_unit_year=l_unit_2)
 
         attribution_1 = AttributionNewFactory(learning_container_year=l_unit_2.learning_container_year)
         attribution_2 = AttributionNewFactory(learning_container_year=l_unit_2.learning_container_year)
 
-        AttributionChargeNewFactory(learning_component_year=component.learning_component_year,
+        AttributionChargeNewFactory(learning_component_year=component,
                                     attribution=attribution_1)
-        AttributionChargeNewFactory(learning_component_year=component.learning_component_year,
+        AttributionChargeNewFactory(learning_component_year=component,
                                     attribution=attribution_1)
-        AttributionChargeNewFactory(learning_component_year=component.learning_component_year,
+        AttributionChargeNewFactory(learning_component_year=component,
                                     attribution=attribution_2)
 
         msg = deletion._check_related_partims_deletion(l_container_year)
