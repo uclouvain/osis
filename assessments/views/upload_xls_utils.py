@@ -49,7 +49,7 @@ col_offer = HEADER.index('Program')
 col_registration_id = HEADER.index('Registration number')
 col_email = HEADER.index('Email')
 col_score = HEADER.index('Numbered scores')
-col_justification = HEADER.index('Justification')
+col_justification = HEADER.index('Justification (A,T)')
 
 REGISTRATION_ID_LENGTH = 8
 

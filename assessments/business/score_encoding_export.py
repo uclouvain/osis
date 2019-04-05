@@ -35,7 +35,7 @@ from base import models as mdl
 from base.models.enums import exam_enrollment_justification_type
 
 HEADER = ['Academic year', 'Session', 'Learning unit', 'Program', 'Registration number', 'Lastname',
-          'Firstname', 'Email', 'Numbered scores', 'Justification', 'End date Prof']
+          'Firstname', 'Email', 'Numbered scores', 'Justification (A,T)', 'End date Prof']
 
 JUSTIFICATION_ALIASES = {
     exam_enrollment_justification_type.ABSENCE_JUSTIFIED: "M",
@@ -43,15 +43,15 @@ JUSTIFICATION_ALIASES = {
     exam_enrollment_justification_type.CHEATING: "T",
 }
 
-FIRST_COL_LEGEND_ENROLLMENT_STATUS = 6
+FIRST_COL_LEGEND_ENROLLMENT_STATUS = 7
 FIRST_ROW_LEGEND_ENROLLMENT_STATUS = 7
 
 
 def export_xls(exam_enrollments):
     workbook = Workbook()
     worksheet = workbook.active
-
-    worksheet.append([str(exam_enrollments[0].learning_unit_enrollment.learning_unit_year)])
+    ue = exam_enrollments[0].learning_unit_enrollment.learning_unit_year
+    worksheet.append([str(ue + ue.specific_title)])
     worksheet.append([str('Session: %s' % exam_enrollments[0].session_exam.number_session)])
     worksheet.append([str('')])
     __display_creation_date_with_message_about_state(worksheet, row_number=4)
@@ -174,16 +174,18 @@ def __display_legends(ws, decimal):
         str(''),
         str(''),
         str(''),
-        str(_('Enrolled after session starts')),
+        str(''),
+        str(_('Enrolled lately')),
     ])
     ws.append([
         str(''),
-        str(_("Other values: %(justification_other_values)s ") % {
+        str(_("Other values reserved to administration: %(justification_other_values)s ") % {
             'justification_other_values': justification_other_values()}),
         str(''),
         str(''),
         str(''),
-        str(_('Unsubscribed after the opening of the session')),
+        str(''),
+        str(_('Unsubscribed lately')),
     ])
     ws.append([
         str(_('Numbered scores')),
@@ -237,4 +239,3 @@ def __apply_style_to_cells(ws, color_style, row):
     style_enrollment_state = Style(fill=PatternFill(patternType='solid',
                                                     fgColor=Color(color_style.lstrip("#"))))
     ws.cell(row=row, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).style = style_enrollment_state
-    ws.cell(row=row, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS+1).style = style_enrollment_state

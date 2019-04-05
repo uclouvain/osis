@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-26 11:00+0100\n"
+"POT-Creation-Date: 2019-04-05 11:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +16,24 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: templates/offer/score_sheet_address_tab.html:52
+msgid ""
+"\n"
+"                                    If you customize one of the field below, "
+"it only change the address displayed on the\n"
+"                                    score encodings sheets for the program "
+"%(program)s.\n"
+"                                    It will never change the address of any "
+"structure. The list below will help you to\n"
+"                                    pre-fill in the form.\n"
+"                                "
+msgstr ""
+"Si vous personnalisez l'un des champs ci-dessous, cela ne changera que "
+"l'adresse affichée sur les pages d'encodage de notes pour le programme "
+"%(program)s. Cela ne changera jamais l'adresse d'une structure. La liste ci-"
+"dessous vous aidera à pré-remplir le formulaire."
+
 #: templates/online_encoding.html:287
-#, fuzzy, python-format
 msgid ""
 "\n"
 "                        You will submit %(draft_scores_not_submitted)s notes "
@@ -98,15 +113,11 @@ msgid "All hierarchy of "
 msgstr "Toute la hiérarchie de "
 
 #: templates/online_encoding.html:147
-#, fuzzy
-#| msgid ""
-#| "All the scores were submitted. It is not possible inject excell file "
-#| "anymore."
 msgid ""
 "All the scores were submitted. It is not possible inject Excel file anymore."
 msgstr ""
 "Toues les notes ont été soumises. Il n'est plus possible d'injecter un "
-"fichier excell."
+"fichier Excel."
 
 #: templates/online_encoding.html:125
 msgid ""
@@ -154,6 +165,7 @@ msgstr "Annuler"
 #: templates/online_encoding_form.html:223
 #: templates/scores_encoding_by_specific_criteria.html:66
 #: templates/scores_encoding_by_specific_criteria.html:158
+#: tests/functionals/test_score_encoding.py:599
 msgid "Cheating"
 msgstr "Tricherie"
 
@@ -211,6 +223,7 @@ msgstr "Date d'échéance atteinte"
 #: business/score_encoding_export.py:195
 #: templates/online_double_encoding_form.html:104
 #: templates/online_encoding_form.html:103
+#: tests/functionals/test_score_encoding.py:375
 msgid "Decimal values in scores are NOT accepted."
 msgstr "Les valeurs décimales dans les notes ne sont PAS acceptées."
 
@@ -247,10 +260,11 @@ msgstr "Double encodage"
 
 #: templates/online_encoding.html:142 templates/scores_encoding.html:227
 #: templates/scores_encoding_by_learning_unit.html:284
-#, fuzzy
-#| msgid "Download the excel file"
 msgid "Download the Excel file"
-msgstr "Télécharger le fichier excel"
+msgstr "Télécharger le fichier Excel"
+
+msgid "End date Prof"
+msgstr "Echéance Prof"
 
 #: models/score_sheet_address.py:55 templates/admin/modal/add_manager.html:51
 msgid "Email"
@@ -270,12 +284,13 @@ msgstr "Encoder les notes"
 msgid "Encoding"
 msgstr "Encodage"
 
-msgid "End date Prof"
-msgstr "Echéance Prof"
-
-#: business/score_encoding_export.py:177 templates/blocks/legend.html:30
+#: templates/blocks/legend.html:30
 msgid "Enrolled after session starts"
 msgstr "Inscrit après l'ouverture de la session"
+
+#: business/score_encoding_export.py:177
+msgid "Enrolled lately"
+msgstr "Inscrit tardivement"
 
 #: views/score_sheet.py:118
 msgid "Enter a valid email address."
@@ -311,8 +326,6 @@ msgstr "Final"
 #: templates/scores_encoding_by_specific_criteria.html:57
 #: templates/scores_encoding_by_specific_criteria.html:58
 #: templates/scores_encoding_by_specific_criteria.html:107
-#, fuzzy
-#| msgid "firstname"
 msgid "Firstname"
 msgstr "Prénom"
 
@@ -322,20 +335,9 @@ msgstr "Prénom"
 msgid "Get Excel file"
 msgstr "Récupérer le fichier Excel"
 
-#: templates/offer/score_sheet_address_tab.html:51
-msgid ""
-"If you customize one of the field below, it only change the address "
-"displayed on the score encodings sheets for the program %%(program)s. It "
-"will never change the address of any structure. The list below will help you "
-"to pre-fill in the form."
-msgstr ""
-"Si vous personnalisez l'un des champs ci-dessous, cela ne changera que "
-"l'adresse affichée sur les pages d'encodage de notes pour le programme "
-"%(program)s. Cela ne changera jamais l'adresse d'une structure. La liste ci-"
-"dessous vous aidera à pré-remplir le formulaire."
-
 #: templates/online_double_encoding_form.html:104
 #: templates/online_encoding_form.html:103
+#: tests/functionals/test_score_encoding.py:376
 msgid "If you try to put decimal values, it will be ignored."
 msgstr ""
 "Si vous tentez d'introduire des valeurs décimales,elles seront ignorées."
@@ -396,8 +398,6 @@ msgstr "Dernière synchronisation"
 #: templates/scores_encoding_by_specific_criteria.html:53
 #: templates/scores_encoding_by_specific_criteria.html:54
 #: templates/scores_encoding_by_specific_criteria.html:106
-#, fuzzy
-#| msgid "lastname"
 msgid "Lastname"
 msgstr "Nom"
 
@@ -550,9 +550,10 @@ msgid "Other tutors"
 msgstr "Autre tuteurs"
 
 #: business/score_encoding_export.py:181
-#, python-format
-msgid "Other values: %(justification_other_values)s "
-msgstr "Autre valeurs: %(justification_other_values)s "
+msgid ""
+"Other values reserved to administration: %(justification_other_values)s "
+msgstr ""
+"Autre valeurs réservées à l'administration : %(justification_other_values)s "
 
 #: templates/admin/modal/add_manager.html:10
 msgid "Person search"
@@ -867,6 +868,7 @@ msgstr ""
 "La période d'encodage de notre %(session_number)s est fermée depuis "
 "%(str_date)s"
 
+#: tests/functionals/test_score_encoding.py:235
 #: tests/views/test_score_encoding.py:382 views/score_encoding.py:90
 #, python-format
 msgid ""
@@ -912,12 +914,17 @@ msgstr "Type"
 #: templates/online_encoding_form.html:200
 #: templates/scores_encoding_by_specific_criteria.html:64
 #: templates/scores_encoding_by_specific_criteria.html:156
+#: tests/functionals/test_score_encoding.py:599
 msgid "Unjustified absence"
 msgstr "Absence injustifiée"
 
-#: business/score_encoding_export.py:186 templates/blocks/legend.html:35
+#: templates/blocks/legend.html:35
 msgid "Unsubscribed after the opening of the session"
 msgstr "Désinscrit après l'ouverture de la session"
+
+#: business/score_encoding_export.py:186
+msgid "Unsubscribed lately"
+msgstr "Désinscrit tardivement"
 
 #: templates/admin/modal/add_manager.html:52
 msgid "Username"
@@ -996,7 +1003,7 @@ msgstr ""
 msgid "date_format"
 msgstr "%d%m%Y"
 
-#: views/pgm_manager_administration.py:229
+#: views/pgm_manager_administration.py:230
 msgid "is already program manager for"
 msgstr "est déjà gestionnaire de programme pour"
 
