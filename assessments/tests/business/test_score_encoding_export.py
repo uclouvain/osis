@@ -151,7 +151,10 @@ class XlsTests(TestCase):
 
         )
         self.assertEqual(
-            self.worksheet.cell(row=7, column=7).value,
+            self.worksheet.cell(
+                row=FIRST_ROW_LEGEND_ENROLLMENT_STATUS,
+                column=FIRST_COL_LEGEND_ENROLLMENT_STATUS
+            ).value,
             str(_('Enrolled lately'))
         )
         self.assertEqual(
@@ -163,7 +166,10 @@ class XlsTests(TestCase):
             ),
         )
         self.assertEqual(
-            self.worksheet.cell(row=8, column=7).value,
+            self.worksheet.cell(
+                row=FIRST_ROW_LEGEND_ENROLLMENT_STATUS + 1,
+                column=FIRST_COL_LEGEND_ENROLLMENT_STATUS
+            ).value,
             str(_('Unsubscribed lately')),
         )
         self.assertEqual(
