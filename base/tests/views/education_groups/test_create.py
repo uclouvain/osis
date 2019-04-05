@@ -209,7 +209,8 @@ class TestCreateForm(TestCase):
             'management_entity': self.entity_version.id,
             'administration_entity': self.entity_version.id,
             'internship': ['NO'],
-            'primary_language': self.language.id
+            'primary_language': self.language.id,
+            'diploma_printing_title': "title",
         }
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
