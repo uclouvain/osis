@@ -26,6 +26,7 @@
 import abc
 
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.utils.functional import cached_property
 from django.utils.translation import ngettext
 
@@ -48,14 +49,55 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
 
     @cached_property
     def parents(self):
-        return EducationGroupYear.hierarchy.filter(pk=self.parent.pk).get_parents()\
-                                           .select_related('education_group_type')
+        return EducationGroupYear.hierarchy.filter(pk=self.parent.pk).get_parents()
 
     def is_valid(self):
         if self.parent.education_group_type.name in TrainingType.finality_types() or \
                 self.parents.filter(education_group_type__name__in=TrainingType.finality_types()).exists():
             self._check_attach_options_rules()
+        if self.parent.education_group_type.name in TrainingType.root_master_2m_types() or \
+                self.parents.filter(education_group_type__name__in=TrainingType.root_master_2m_types()).exists():
+            self._check_end_year_constraints_on_2m()
         return True
+
+    def _check_end_year_constraints_on_2m(self):
+        """
+        In context of 2M, when we add a finality [or group which contains finality], we must ensure that
+        the end date of all 2M is greater or equals of all finalities
+        """
+        finalities_to_add_qs = EducationGroupYear.objects.filter(pk=self.child.pk) | EducationGroupYear.hierarchy.filter(pk=self.child.pk).get_children()
+        finalities_to_add_qs = finalities_to_add_qs.filter(education_group_type__name__in=TrainingType.finality_types())
+
+        root_2m_qs = self.parents | EducationGroupYear.objects.filter(pk=self.parent.pk)
+        root_2m_qs = root_2m_qs.filter(
+            education_group_type__name__in=TrainingType.root_master_2m_types(),
+            education_group__end_year__isnull=False,
+        ).order_by('education_group__end_year')
+
+        errors = []
+        if finalities_to_add_qs.exists() and root_2m_qs.exists():
+            root_2m_early_end_date = root_2m_qs.first()
+            invalid_finalities_acronyms = finalities_to_add_qs.filter(
+                Q(education_group__end_year__gt=root_2m_early_end_date.education_group.end_year) |
+                Q(education_group__end_year__isnull=True)
+            ).values_list('acronym', flat=True)
+
+            if invalid_finalities_acronyms:
+                errors.append(
+                    ValidationError(
+                        ngettext(
+                            "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s program.",
+                            "Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s program.",
+                            len(invalid_finalities_acronyms)
+                        ) % {
+                            "acronym": ', '.join(invalid_finalities_acronyms),
+                            "root_acronym": root_2m_early_end_date.acronym
+                        }
+                    )
+                )
+
+        if errors:
+            raise ValidationError(errors)
 
     def _check_attach_options_rules(self):
         """
