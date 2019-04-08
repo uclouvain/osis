@@ -174,7 +174,8 @@ class TestPostpone(TestCase):
 
         self.next_education_group_year = TrainingFactory(
             education_group=self.education_group,
-            academic_year=self.next_academic_year
+            academic_year=self.next_academic_year,
+            education_group_type=self.current_education_group_year.education_group_type
         )
 
     def test_init_postponement(self):
@@ -189,7 +190,8 @@ class TestPostpone(TestCase):
         self.assertEqual(str(cm.exception), _("The root does not exist in the next academic year."))
 
     def test_init_already_postponed_content(self):
-        gr = GroupElementYearFactory(parent=self.next_education_group_year)
+        gr = GroupElementYearFactory(parent=self.next_education_group_year,
+                                     child_branch__academic_year=self.next_education_group_year.academic_year)
 
         with self.assertRaises(NotPostponeError) as cm:
             self.postponer = PostponeContent(self.current_education_group_year)
@@ -203,7 +205,7 @@ class TestPostpone(TestCase):
 
         self.postponer = PostponeContent(self.current_education_group_year)
 
-        GroupElementYearFactory(parent=gr.child_branch)
+        GroupElementYearFactory(parent=gr.child_branch, child_branch__academic_year=gr.child_branch.academic_year)
 
         with self.assertRaises(NotPostponeError) as cm:
             self.postponer = PostponeContent(self.current_education_group_year)
@@ -276,11 +278,11 @@ class TestPostpone(TestCase):
         n1_child_branch = EducationGroupYearFactory(
             academic_year=self.next_academic_year,
             education_group=self.current_group_element_year.child_branch.education_group,
-
         )
         n_child_branch = GroupElementYearFactory(
             parent=self.current_group_element_year.child_branch,
-            child_branch__academic_year=self.current_academic_year
+            child_branch__academic_year=self.current_academic_year,
+            child_branch__education_group__end_year=None
         )
 
         GroupElementYearFactory(

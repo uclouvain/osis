@@ -200,11 +200,14 @@ class PostponeContent:
             ).first()
 
         if not new_gr:
-            new_gr = update_related_object(gr, "parent", next_instance)
+            new_gr = update_related_object(gr, "parent", next_instance, commit_save=False)
 
         if new_gr.child_leaf:
-            return self._postpone_child_leaf(gr, new_gr)
-        return self._postpone_child_branch(gr, new_gr)
+            new_gr = self._postpone_child_leaf(gr, new_gr)
+        else:
+            new_gr = self._postpone_child_branch(gr, new_gr)
+        new_gr.save()
+        return new_gr
 
     def _post_postponement(self):
         # Postpone the prerequisite only at the end to be sure to have all learning units and education groups
@@ -227,7 +230,6 @@ class PostponeContent:
             self.postponed_luy.append((old_luy, new_luy))
 
         new_gr.child_leaf = new_luy
-        new_gr.save()
         return new_gr
 
     def _postpone_child_branch(self, old_gr: GroupElementYear, new_gr: GroupElementYear) -> GroupElementYear:
@@ -236,7 +238,6 @@ class PostponeContent:
         """
         old_egy = old_gr.child_branch
         new_egy = old_egy.next_year()
-
         if new_egy:
             # In the case of technical group, we have to postpone the content even if the group already
             # exists in N+1
@@ -257,10 +258,7 @@ class PostponeContent:
             # If the education group does not exists for the next year, we have to postpone.
             new_egy = self._duplication_education_group_year(old_gr, old_egy)
 
-        if new_egy:
-            new_gr.child_branch = new_egy
-            new_gr.save()
-
+        new_gr.child_branch = new_egy
         return new_gr
 
     def _duplication_education_group_year(self, old_gr: GroupElementYear, old_egy: EducationGroupYear):

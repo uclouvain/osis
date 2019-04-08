@@ -39,10 +39,11 @@ def update_instance_model_from_data(instance, fields_to_update, exclude=()):
     instance.save()
 
 
-def update_related_object(obj, attribute_name, new_value):
+def update_related_object(obj, attribute_name, new_value, commit_save=True):
     duplicated_obj = duplicate_object(obj)
     setattr(duplicated_obj, attribute_name, new_value)
-    duplicated_obj.save()
+    if commit_save:
+        duplicated_obj.save()
     return duplicated_obj
 
 
