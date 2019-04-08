@@ -218,7 +218,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = int(os.environ.get('DATA_UPLOAD_MAX_NUMBER_FIELD
 # Ex : LOGO_INSTITUTION_URL = 'https://www.google.be/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png'
 # A relative URL will work on local , but not out of the box on the servers.
 LOGO_INSTITUTION_URL = os.environ.get('LOGO_INSTITUTION_URL',
-                                      os.path.join(BASE_DIR, "base/static/img/logo_institution.jpg"))
+                                      os.path.join(BASE_DIR, "base/static/img/logo_uclouvain.png"))
 LOGO_OSIS_URL = os.environ.get('LOGO_OSIS_URL', '')
 
 # The Queues are optional
