@@ -105,12 +105,14 @@ class TestComputeNumberChildrenByEducationGroupType(TestCase):
         GroupElementYearFactory.create_batch(
             3,
             parent=cls.parent_egy,
-            child_branch__education_group_type=cls.education_group_types[0]
+            child_branch__education_group_type=cls.education_group_types[0],
+            child_branch__academic_year=cls.parent_egy.academic_year
         )
         GroupElementYearFactory.create_batch(
             2,
             parent=cls.parent_egy,
-            child_branch__education_group_type=cls.education_group_types[1]
+            child_branch__education_group_type=cls.education_group_types[1],
+            child_branch__academic_year=cls.parent_egy.academic_year
         )
         GroupElementYearChildLeafFactory.create_batch(
             2,
@@ -120,23 +122,27 @@ class TestComputeNumberChildrenByEducationGroupType(TestCase):
         cls.reference_group_element_year_children = GroupElementYearFactory(
             parent=cls.parent_egy,
             child_branch__education_group_type=cls.education_group_types[0],
+            child_branch__academic_year=cls.parent_egy.academic_year,
             link_type=LinkTypes.REFERENCE.name
         )
         GroupElementYearFactory.create_batch(
             2,
             parent=cls.reference_group_element_year_children.child_branch,
-            child_branch__education_group_type=cls.education_group_types[1]
+            child_branch__education_group_type=cls.education_group_types[1],
+            child_branch__academic_year=cls.reference_group_element_year_children.child_branch.academic_year
         )
         GroupElementYearFactory(
             parent=cls.reference_group_element_year_children.child_branch,
-            child_branch__education_group_type=cls.education_group_types[2]
+            child_branch__education_group_type=cls.education_group_types[2],
+            child_branch__academic_year=cls.reference_group_element_year_children.child_branch.academic_year
         )
 
         cls.child = EducationGroupYearFactory(education_group_type=cls.education_group_types[0])
         GroupElementYearFactory.create_batch(
             2,
             parent=cls.child,
-            child_branch__education_group_type=cls.education_group_types[2]
+            child_branch__education_group_type=cls.education_group_types[2],
+            child_branch__academic_year=cls.child.academic_year,
         )
 
     def test_when_no_children(self):
