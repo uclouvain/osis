@@ -223,6 +223,9 @@ class CommonBaseForm:
     education_group_year_deleted = []
 
     def __init__(self, data, instance=None, parent=None, user=None, education_group_type=None, **kwargs):
+        if education_group_type is None:
+            education_group_type = instance.education_group_type if instance else None
+
         self.education_group_year_form = self.education_group_year_form_class(
             data,
             instance=instance,

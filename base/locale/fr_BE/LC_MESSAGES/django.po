@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-08 08:17+0200\n"
+"POT-Creation-Date: 2019-04-08 10:37+0200\n"
 "PO-Revision-Date: 2019-04-04 13:59+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2026,7 +2026,7 @@ msgstr "Il est interdit d’attacher un élément à lui-même."
 #: models/group_element_year.py:272
 msgid "It is forbidden to attach an element to one of another academic year."
 msgstr ""
-"Il est interdit d'attacher un élement à un autre élement y étant inclus."
+"Il est interdit d'attacher un élement à un autre élement d'une autre année académique."
 
 #: models/group_element_year.py:261
 #: tests/views/education_groups/test_update.py:577
@@ -3646,7 +3646,7 @@ msgstr "Secteur"
 msgid "Select"
 msgstr "Sélectionner"
 
-#: forms/education_group/common.py:346
+#: forms/education_group/common.py:349
 msgid "Select a language"
 msgstr "Sélectionnez une langue"
 
@@ -4227,8 +4227,8 @@ msgstr ""
 msgid "The messages sent by the application to you"
 msgstr "La liste des messages qui vous ont été envoyés par l'application"
 
-#: forms/education_group/common.py:335
-#: tests/views/education_groups/test_select_education_group_type.py:129
+#: forms/education_group/common.py:338
+#: tests/views/education_groups/test_select_education_group_type.py:126
 #, python-format
 msgid ""
 "The number of children of type \"%(child_type)s\" for \"%(parent)s\" has "
@@ -4661,7 +4661,7 @@ msgstr "Type de contrainte"
 msgid "Type of event"
 msgstr "Type d'événement"
 
-#: forms/education_group/common.py:315 models/education_group_type.py:81
+#: forms/education_group/common.py:318 models/education_group_type.py:81
 #: models/education_group_year.py:194
 msgid "Type of training"
 msgstr "Type de formation"
@@ -4905,7 +4905,7 @@ msgstr "Pondération par crédit"
 msgid "Welcome"
 msgstr "Accueil"
 
-#: forms/education_group/common.py:327
+#: forms/education_group/common.py:330
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
 msgstr "Quel type de %(category)s voulez-vous créer ?"

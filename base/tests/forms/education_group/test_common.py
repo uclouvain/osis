@@ -42,7 +42,7 @@ from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.campus import CampusFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory, MiniTrainingEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_version import MainEntityVersionFactory, EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -233,9 +233,11 @@ class TestCommonBaseFormSave(TestCase):
 
     def test_update_without_parent(self):
         entity_version = MainEntityVersionFactory()
+        education_group_type = MiniTrainingEducationGroupTypeFactory()
         initial_educ_group_year = EducationGroupYearFactory(academic_year=current_academic_year(),
                                                             management_entity=entity_version.entity,
-                                                            education_group__start_year=current_academic_year().year)
+                                                            education_group__start_year=current_academic_year().year,
+                                                            education_group_type=education_group_type)
 
         initial_educ_group = initial_educ_group_year.education_group
 
