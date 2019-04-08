@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0442_programmanager_is_main'),
+        ('base', '0444_populate_learning_unit_year'),
     ]
 
     operations = [
@@ -32,11 +32,6 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name='learningunityear',
             name='learning_component_years',
-        ),
-        migrations.AddField(
-            model_name='learningcomponentyear',
-            name='learning_unit_year',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnitYear'),
         ),
         migrations.AlterField(
             model_name='learningcomponentyear',
