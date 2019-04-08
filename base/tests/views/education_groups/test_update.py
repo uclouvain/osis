@@ -283,6 +283,7 @@ class TestUpdate(TestCase):
             "primary_language": LanguageFactory().pk,
             "start_year": 2010,
             "constraint_type": "",
+            "diploma_printing_title": "Diploma Title",
         }
         response = self.client.post(self.training_url, data=data)
         self.assertEqual(response.status_code, 302)
