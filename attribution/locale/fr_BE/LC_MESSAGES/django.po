@@ -129,7 +129,7 @@ msgstr "Titulaire"
 
 #: templates/manage_my_courses/educational_information.html:47
 msgid "Information approved and updatable by the Commission of Program"
-msgstr "Informations avalisées et modifiables via la Commision de Programme"
+msgstr "Informations avalisées et modifiables via la Commission de Programme"
 
 #: templates/manage_my_courses/educational_information.html:54
 msgid "Informations updatable by teachers"

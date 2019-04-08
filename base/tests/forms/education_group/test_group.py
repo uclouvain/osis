@@ -39,7 +39,8 @@ from base.models.validation_rule import ValidationRule
 from base.tests.factories.academic_calendar import AcademicCalendarEducationGroupEditionFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import GroupFactory
+from base.tests.factories.education_group_year import GroupFactory, EducationGroupYearFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin, _get_valid_post_data
@@ -183,6 +184,7 @@ class TestGroupPostponedList(EducationGroupYearModelFormMixin):
         super(TestGroupPostponedList, self).setUp(education_group_type=self.education_group_type)
 
     def test_group_doesnt_have_post_save_method(self):
+        self.parent_education_group_year.education_group_type = self.education_group_type
         instance = self.parent_education_group_year
         form = GroupForm(data={}, user=self.user, instance=instance)
         self.assertFalse(hasattr(form, '_post_save'))
