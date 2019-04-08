@@ -103,12 +103,12 @@ def _split_attribution_by_learning_unit_year(attribution):
     attribution_splitted = {}
 
     for attrib_charge in attribution.attribution_charges:
-        lunit_year = attrib_charge.learning_component_year.learning_unit_year
+        component = attrib_charge.learning_component_year
+        lunit_year = component.learning_unit_year
 
         # if lunit_year.learning_container_year.in_charge:
 
-        allocation_charge_key = attrib_charge.learning_component_year.type if attrib_charge.learning_component_year.type\
-                                else 'OTHER_CHARGE'
+        allocation_charge_key = component.type if component.type else 'OTHER_CHARGE'
 
         attribution_splitted.setdefault(lunit_year.id, {
                 'acronym': lunit_year.acronym,

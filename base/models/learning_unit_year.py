@@ -360,7 +360,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     def _check_learning_component_year_warnings(self):
         _warnings = []
-        components_queryset = LearningComponentYear.objects.filter(learning_unit_year__learning_container_year=self.learning_container_year)
+        components_queryset = LearningComponentYear.objects.filter(
+            learning_unit_year__learning_container_year=self.learning_container_year
+        )
         all_components = components_queryset.order_by('acronym')\
             .select_related('learning_unit_year')\
             .annotate(vol_global=Sum('entitycomponentyear__repartition_volume'))
