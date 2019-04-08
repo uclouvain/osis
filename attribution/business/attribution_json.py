@@ -106,8 +106,6 @@ def _split_attribution_by_learning_unit_year(attribution):
         component = attrib_charge.learning_component_year
         lunit_year = component.learning_unit_year
 
-        # if lunit_year.learning_container_year.in_charge:
-
         allocation_charge_key = component.type if component.type else 'OTHER_CHARGE'
 
         attribution_splitted.setdefault(lunit_year.id, {
