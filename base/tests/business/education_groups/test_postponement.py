@@ -155,8 +155,7 @@ class TestPostpone(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.current_academic_year = create_current_academic_year()
-        cls.next_academic_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
+        cls.previous_academic_year, cls.current_academic_year, cls.next_academic_year = AcademicYearFactory.produce()
 
     def setUp(self):
         self.education_group = EducationGroupFactory(end_year=self.next_academic_year.year)
@@ -405,8 +404,12 @@ class TestPostpone(TestCase):
 
     def test_postpone_with_old_child_leaf(self):
         prerequisite = PrerequisiteFactory(
-            learning_unit_year__academic_year=self.current_academic_year,
+            learning_unit_year__academic_year=self.previous_academic_year,
             education_group_year=self.current_education_group_year,
+        )
+        n_luy = LearningUnitYearFactory(
+            learning_unit=prerequisite.learning_unit_year.learning_unit,
+            academic_year=self.current_academic_year
         )
 
         n1_item_luy = LearningUnitYearFactory(academic_year=self.next_academic_year)
@@ -426,7 +429,7 @@ class TestPostpone(TestCase):
         new_child_leaf = new_root.groupelementyear_set.last().child_leaf
         self.assertEqual(new_child_leaf.acronym, group_leaf.child_leaf.acronym)
         # If the luy does not exist in N+1, it should attach N instance
-        self.assertEqual(new_child_leaf.academic_year, self.current_academic_year)
+        self.assertEqual(new_child_leaf.academic_year, self.previous_academic_year)
         new_prerequisite = new_child_leaf.prerequisite_set.first()
 
         self.assertEqual(new_prerequisite.education_group_year.education_group,

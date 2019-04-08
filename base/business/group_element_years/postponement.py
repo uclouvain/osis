@@ -220,7 +220,7 @@ class PostponeContent:
         but if it does not exist for N+1, we will attach the current instance.
         """
         old_luy = old_gr.child_leaf
-        new_luy = old_luy.get_learning_unit_next_year()
+        new_luy = old_luy.learning_unit.learningunityear_set.filter(academic_year=new_gr.parent.academic_year).first()
         if not new_luy:
             new_luy = old_luy
             self.warnings.append(ReuseOldLearningUnitYearWarning(old_luy, self.next_academic_year))

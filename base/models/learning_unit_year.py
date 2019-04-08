@@ -219,6 +219,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         except LearningUnitYear.DoesNotExist:
             return None
 
+
     @property
     def in_charge(self):
         return self.learning_container_year and self.learning_container_year.in_charge
