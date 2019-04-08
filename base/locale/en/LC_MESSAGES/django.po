@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-04 13:57+0200\n"
+"POT-Creation-Date: 2019-04-05 14:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1211,8 +1211,8 @@ msgstr ""
 msgid "Detailed program"
 msgstr ""
 
-#: templates/academic_calendar/academic_calendars.html:169
-#: templates/academic_calendar/academic_calendars.html:204
+#: templates/academic_calendar/academic_calendars.html:187
+#: templates/academic_calendar/academic_calendars.html:222
 msgid "Details"
 msgstr ""
 
@@ -1372,7 +1372,7 @@ msgid ""
 "Education group year %(acronym)s (%(academic_year)s) successfuly deleted."
 msgstr ""
 
-#: views/education_groups/create.py:149
+#: views/education_groups/create.py:150
 #, python-format
 msgid ""
 "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
@@ -1615,6 +1615,17 @@ msgstr ""
 msgid "Female"
 msgstr ""
 
+#: business/group_element_years/attach.py:89
+#, python-format
+msgid ""
+"Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
+"program."
+msgid_plural ""
+"Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s "
+"program."
+msgstr[0] ""
+msgstr[1] ""
+
 #: models/enums/education_group_types.py:134
 msgid "Finality 120 list choice"
 msgstr ""
@@ -1775,7 +1786,7 @@ msgstr ""
 msgid "General configuration"
 msgstr ""
 
-#: api/serializers/person.py:73
+#: api/serializers/person.py:61
 msgid "General information and Admission condition"
 msgstr ""
 
@@ -2808,7 +2819,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: business/group_element_years/attach.py:79
+#: business/group_element_years/attach.py:121
 #, python-format
 msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
 msgid_plural ""
@@ -5165,11 +5176,11 @@ msgstr "%m/%d/%Y"
 msgid "date_format_string"
 msgstr "m/d/Y"
 
-#: templates/academic_calendar/academic_calendars.html:159
+#: templates/academic_calendar/academic_calendars.html:177
 msgid "day"
 msgstr ""
 
-#: templates/academic_calendar/academic_calendars.html:162
+#: templates/academic_calendar/academic_calendars.html:180
 msgid "days"
 msgstr ""
 

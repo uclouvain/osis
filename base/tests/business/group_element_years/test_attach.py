@@ -28,14 +28,18 @@ from django.test import TestCase
 
 from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 
 
-class TestAttachEducationGroupYearStrategy(TestCase):
+class TestAttachOptionEducationGroupYearStrategy(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.master_120 = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        cls.master_120 = TrainingFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            education_group__end_year=None
+        )
 
         cls.option_in_parent = MiniTrainingFactory(education_group_type__name=MiniTrainingType.OPTION.name)
         GroupElementYearFactory(parent=cls.master_120, child_branch=cls.option_in_parent)
@@ -44,7 +48,7 @@ class TestAttachEducationGroupYearStrategy(TestCase):
         cls.finality_group = GroupFactory(education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name)
         GroupElementYearFactory(parent=cls.master_120, child_branch=cls.finality_group)
 
-        cls.master_120_specialized = GroupFactory(education_group_type__name=TrainingType.MASTER_MS_120.name)
+        cls.master_120_specialized = TrainingFactory(education_group_type__name=TrainingType.MASTER_MS_120.name)
         GroupElementYearFactory(parent=cls.finality_group, child_branch=cls.master_120_specialized)
 
     def test_is_valid_case_attach_option_which_are_within_master_120(self):
@@ -104,3 +108,90 @@ class TestAttachEducationGroupYearStrategy(TestCase):
         )
         with self.assertRaises(ValidationError):
             strategy.is_valid()
+
+
+class TestAttachFinalityEducationGroupYearStrategy(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.master_120 = TrainingFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            academic_year=cls.academic_year,
+            education_group__end_year=2020
+        )
+
+        cls.finality_group = GroupFactory(
+            education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
+            academic_year=cls.academic_year
+        )
+        GroupElementYearFactory(parent=cls.master_120, child_branch=cls.finality_group)
+
+        cls.master_120_specialized = TrainingFactory(
+            education_group_type__name=TrainingType.MASTER_MS_120.name,
+            academic_year=cls.academic_year,
+            education_group__end_year=2020
+        )
+        GroupElementYearFactory(parent=cls.finality_group, child_branch=cls.master_120_specialized)
+
+    def test_is_valid_case_attach_finality_which_have_end_year_lower_than_root(self):
+        master_120_didactic = TrainingFactory(
+            education_group_type__name=TrainingType.MASTER_MD_120.name,
+            academic_year=self.academic_year,
+            education_group__end_year=self.master_120.education_group.end_year - 1
+        )
+
+        strategy = AttachEducationGroupYearStrategy(
+            parent=self.finality_group,
+            child=master_120_didactic
+        )
+        self.assertTrue(strategy.is_valid())
+
+    def test_is_not_valid_case_attach_finality_which_have_end_year_greater_than_root(self):
+        master_120_didactic = TrainingFactory(
+            education_group_type__name=TrainingType.MASTER_MD_120.name,
+            academic_year=self.academic_year,
+            education_group__end_year=self.master_120.education_group.end_year + 1
+        )
+
+        strategy = AttachEducationGroupYearStrategy(
+            parent=self.finality_group,
+            child=master_120_didactic
+        )
+        with self.assertRaises(ValidationError):
+            self.assertTrue(strategy.is_valid())
+
+    def test_is_not_valid_case_attach_finality_which_have_end_year_undetermined(self):
+        master_120_didactic = TrainingFactory(
+            education_group_type__name=TrainingType.MASTER_MD_120.name,
+            academic_year=self.academic_year,
+            education_group__end_year=None
+        )
+
+        strategy = AttachEducationGroupYearStrategy(
+            parent=self.finality_group,
+            child=master_120_didactic
+        )
+        with self.assertRaises(ValidationError):
+            self.assertTrue(strategy.is_valid())
+
+    def test_is_not_valid_case_attach_groups_which_contains_finalities_which_have_end_year_greater_than_root(self):
+        subgroup = GroupFactory(education_group_type__name=GroupType.SUB_GROUP.name)
+        master_120_didactic = TrainingFactory(
+            education_group_type__name=TrainingType.MASTER_MD_120.name,
+            academic_year=self.academic_year,
+            education_group__end_year=self.master_120.education_group.end_year + 1
+        )
+        GroupElementYearFactory(parent=subgroup, child_branch=master_120_didactic)
+        master_120_deepening = TrainingFactory(
+            education_group_type__name=TrainingType.MASTER_MA_120.name,
+            academic_year=self.academic_year,
+            education_group__end_year=None
+        )
+        GroupElementYearFactory(parent=subgroup, child_branch=master_120_deepening)
+
+        strategy = AttachEducationGroupYearStrategy(
+            parent=self.finality_group,
+            child=subgroup
+        )
+        with self.assertRaises(ValidationError):
+            self.assertTrue(strategy.is_valid())

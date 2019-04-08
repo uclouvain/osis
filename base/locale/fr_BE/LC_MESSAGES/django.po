@@ -3,11 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:192
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:193
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-04 13:57+0200\n"
+"POT-Creation-Date: 2019-04-05 14:07+0200\n"
 "PO-Revision-Date: 2019-04-04 13:59+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1241,8 +1243,8 @@ msgstr "Détacher"
 msgid "Detailed program"
 msgstr "Programme détaillé"
 
-#: templates/academic_calendar/academic_calendars.html:169
-#: templates/academic_calendar/academic_calendars.html:204
+#: templates/academic_calendar/academic_calendars.html:187
+#: templates/academic_calendar/academic_calendars.html:222
 msgid "Details"
 msgstr "Détails"
 
@@ -1405,7 +1407,7 @@ msgstr ""
 "Organisation de formations %(acronym)s (%(academic_year)s) supprimée avec "
 "succès."
 
-#: views/education_groups/create.py:149
+#: views/education_groups/create.py:150
 #, python-format
 msgid ""
 "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
@@ -1653,6 +1655,17 @@ msgstr "Echec"
 msgid "Female"
 msgstr "Féminin"
 
+#: business/group_element_years/attach.py:89
+#, python-format
+msgid ""
+"Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
+"program."
+msgid_plural ""
+"Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s "
+"program."
+msgstr[0] "La finalité \"%(acronym)s\" a une date de fin plus grande que le programme %(root_acronym)s"
+msgstr[1] "Les finalités \"%(acronym)s\" ont une date de fin plus grande que le programme %(root_acronym)s"
+
 #: models/enums/education_group_types.py:134
 msgid "Finality 120 list choice"
 msgstr "Liste au choix de Finalités (120)"
@@ -1813,7 +1826,7 @@ msgstr "Conditions Générales"
 msgid "General configuration"
 msgstr "Configuration générale"
 
-#: api/serializers/person.py:73
+#: api/serializers/person.py:61
 msgid "General information and Admission condition"
 msgstr "Informations générales et Conditions d'admission"
 
@@ -2875,7 +2888,7 @@ msgstr[1] ""
 "Les options \"%(acronym)s\" ne peuvent pas être détachées car elles sont "
 "présentes dans le programme %(finality_acronym)s"
 
-#: business/group_element_years/attach.py:79
+#: business/group_element_years/attach.py:121
 #, python-format
 msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
 msgid_plural ""
@@ -4005,7 +4018,8 @@ msgstr ""
 #: models/education_group.py:166
 #, python-format
 msgid "The end date must be greater or equals to the finality %(acronym)s"
-msgstr "La date de fin doit être plus grande ou égale à la finalité %(acronym)s"
+msgstr ""
+"La date de fin doit être plus grande ou égale à la finalité %(acronym)s"
 
 #: models/education_group.py:151
 #, python-format
@@ -5348,11 +5362,11 @@ msgstr "%d/%m/%Y"
 msgid "date_format_string"
 msgstr "d/m/Y"
 
-#: templates/academic_calendar/academic_calendars.html:159
+#: templates/academic_calendar/academic_calendars.html:177
 msgid "day"
 msgstr "jour"
 
-#: templates/academic_calendar/academic_calendars.html:162
+#: templates/academic_calendar/academic_calendars.html:180
 msgid "days"
 msgstr "jours"
 
