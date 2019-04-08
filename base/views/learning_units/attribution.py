@@ -192,7 +192,7 @@ class AddAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSucc
     def get_success_message(self, forms):
         attribution = forms["attribution_form"].instance
         return _("Attribution added for %(tutor)s (%(function)s)") % {"tutor": attribution.tutor.person,
-                                                                      "function": _(attribution.function)}
+                                                                      "function": _(attribution.get_function_display())}
 
 
 class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView):
