@@ -190,7 +190,6 @@ class TestAddAttribution(TestCase):
             start_year=start_year,
             end_year=start_year+2
         )
-        import pdb; pdb.set_trace()
         self.assertTrue(attribution_qs.exists())
         attribution = attribution_qs.get()
         self.assertTrue(AttributionChargeNew.objects.filter(
