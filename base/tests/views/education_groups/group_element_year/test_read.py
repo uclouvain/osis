@@ -30,6 +30,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
@@ -41,10 +42,11 @@ from base.tests.factories.user import SuperUserFactory
 class TestRead(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
         cls.person = PersonFactory()
-        cls.education_group_year_1 = EducationGroupYearFactory(title_english="")
-        cls.education_group_year_2 = EducationGroupYearFactory(title_english="")
-        cls.education_group_year_3 = EducationGroupYearFactory(title_english="")
+        cls.education_group_year_1 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
+        cls.education_group_year_2 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
+        cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
         cls.learning_unit_year_1 = LearningUnitYearFactory(specific_title_english="")
         cls.learning_unit_year_2 = LearningUnitYearFactory(specific_title_english="")
         cls.learning_component_year_1 = LearningComponentYearFactory(

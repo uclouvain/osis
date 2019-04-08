@@ -41,10 +41,11 @@ from base.tests.factories.user import UserFactory
 class TestDetail(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
         cls.person = PersonFactory()
-        cls.education_group_year_1 = EducationGroupYearFactory(title_english="")
-        cls.education_group_year_2 = EducationGroupYearFactory(title_english="")
-        cls.education_group_year_3 = EducationGroupYearFactory(title_english="")
+        cls.education_group_year_1 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
+        cls.education_group_year_2 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
+        cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
         cls.learning_unit_year_1 = LearningUnitYearFactory(specific_title_english="")
         cls.learning_unit_year_2 = LearningUnitYearFactory(specific_title_english="")
         cls.learning_component_year_1 = LearningComponentYearFactory(

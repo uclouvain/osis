@@ -40,15 +40,19 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 class TestBuildTree(TestCase):
     def setUp(self):
-        self.parent = EducationGroupYearFactory()
+        self.academic_year = AcademicYearFactory()
+        self.parent = EducationGroupYearFactory(academic_year=self.academic_year)
         self.group_element_year_1 = GroupElementYearFactory(
-            parent=self.parent
+            parent=self.parent,
+            child_branch=EducationGroupYearFactory(academic_year=self.academic_year)
         )
         self.group_element_year_1_1 = GroupElementYearFactory(
-            parent=self.group_element_year_1.child_branch
+            parent=self.group_element_year_1.child_branch,
+            child_branch=EducationGroupYearFactory(academic_year=self.academic_year)
         )
         self.group_element_year_2 = GroupElementYearFactory(
-            parent=self.parent
+            parent=self.parent,
+            child_branch=EducationGroupYearFactory(academic_year=self.academic_year)
         )
         self.group_element_year_2_1 = GroupElementYearFactory(
             parent=self.group_element_year_2.child_branch,

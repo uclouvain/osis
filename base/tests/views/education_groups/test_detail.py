@@ -466,10 +466,11 @@ class EducationGroupDiplomas(TestCase):
 class TestUtilizationTab(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
         cls.person = PersonFactory()
-        cls.education_group_year_1 = EducationGroupYearFactory(title_english="")
-        cls.education_group_year_2 = EducationGroupYearFactory(title_english="")
-        cls.education_group_year_3 = EducationGroupYearFactory(title_english="")
+        cls.education_group_year_1 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
+        cls.education_group_year_2 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
+        cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
         cls.learning_unit_year_1 = LearningUnitYearFactory(specific_title_english="")
         cls.learning_unit_year_2 = LearningUnitYearFactory(specific_title_english="")
         cls.learning_component_year_1 = LearningComponentYearFactory(
@@ -517,9 +518,9 @@ class TestContent(TestCase):
     def setUp(self):
         self.current_academic_year = create_current_academic_year()
         self.person = PersonFactory()
-        self.education_group_year_1 = EducationGroupYearFactory()
-        self.education_group_year_2 = EducationGroupYearFactory()
-        self.education_group_year_3 = EducationGroupYearFactory()
+        self.education_group_year_1 = EducationGroupYearFactory(academic_year=self.current_academic_year)
+        self.education_group_year_2 = EducationGroupYearFactory(academic_year=self.current_academic_year)
+        self.education_group_year_3 = EducationGroupYearFactory(academic_year=self.current_academic_year)
         self.learning_unit_year_1 = LearningUnitYearFactory()
 
         self.learning_component_year_1 = LearningComponentYearFactory(

@@ -176,6 +176,7 @@ class TestPostponementEducationGroupYear(TestCase):
             "primary_language": LanguageFactory().pk,
             "start_year": 2010,
             "constraint_type": "",
+            "diploma_printing_title": 'Diploma title'
         }
 
         # Create user and attached it to management entity
