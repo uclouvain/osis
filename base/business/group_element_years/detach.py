@@ -88,7 +88,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
 
             counter_options = Counter(master_2m_tree.get_option_list())
             counter_options.subtract(options_to_detach)
-            options_to_check = [opt for opt, count in counter_options.items() if count <= 0]
+            options_to_check = [opt for opt, count in counter_options.items() if count == 0]
             if not options_to_check:
                 continue
 
