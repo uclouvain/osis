@@ -402,8 +402,9 @@ def _generate_xls_administrative_data_build_parameter(xls_data, user):
 
 
 class EducationGroupGetEligibleEntities(TestCase):
-    def setUp(self) -> None:
-        self.academic_year = AcademicYearFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
 
     def test_case_one_egy(self):
         education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
