@@ -29,7 +29,6 @@ from operator import itemgetter
 from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
 
-from attribution.models.attribution import find_all_tutors_by_learning_unit_year
 from base import models as mdl_base
 from base.business.entity import get_entity_calendar
 from base.business.learning_unit_year_with_context import volume_learning_component_year
@@ -53,35 +52,7 @@ from osis_common.utils.datetime import convert_date_to_datetime
 WORKSHEET_TITLE = _('Learning units list')
 XLS_FILENAME = _('LearningUnitsList')
 XLS_DESCRIPTION = _('Learning units list')
-LEARNING_UNIT_TITLES_PART1 = [
-    str(_('Code')),
-    str(_('Ac yr.')),
-    str(_('Title')),
-    str(_('Type')),
-    str(_('Subtype')),
-    str(_('Req. Entity')),
-    str(_('Proposal type')),
-    str(_('Proposal status')),
-    str(_('Credits')),
-    str(_('Alloc. Ent.')),
-    str(_('Title in English')),
-]
 
-LEARNING_UNIT_TITLES_PART2 = [
-    str(_('Periodicity')),
-    str(_('Active')),
-    "{} - {}".format(_('Lecturing vol.'), _('Annual')),
-    "{} - {}".format(_('Lecturing vol.'), _('1st quadri')),
-    "{} - {}".format(_('Lecturing vol.'), _('2nd quadri')),
-    "{}".format(_('Lecturing planned classes')),
-    "{} - {}".format(_('Practical vol.'), _('Annual')),
-    "{} - {}".format(_('Practical vol.'), _('1st quadri')),
-    "{} - {}".format(_('Practical vol.'), _('2nd quadri')),
-    "{}".format(_('Practical planned classes')),
-    str(_('Quadrimester')),
-    str(_('Session derogation')),
-    str(_('Language')),
-]
 CMS_LABEL_SPECIFICATIONS = ['themes_discussed', 'prerequisite']
 
 CMS_LABEL_PEDAGOGY_FR_AND_EN = ['resume', 'teaching_methods', 'evaluation_methods', 'other_informations',
@@ -92,6 +63,40 @@ CMS_LABEL_PEDAGOGY = CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_PEDAGOGY_FR_ONLY
 CMS_LABEL_SUMMARY = ['resume']
 
 COLORED = 'COLORED_ROW'
+
+
+def learning_unit_titles_part2():
+    return [
+        str(_('Periodicity')),
+        str(_('Active')),
+        "{} - {}".format(_('Lecturing vol.'), _('Annual')),
+        "{} - {}".format(_('Lecturing vol.'), _('1st quadri')),
+        "{} - {}".format(_('Lecturing vol.'), _('2nd quadri')),
+        "{}".format(_('Lecturing planned classes')),
+        "{} - {}".format(_('Practical vol.'), _('Annual')),
+        "{} - {}".format(_('Practical vol.'), _('1st quadri')),
+        "{} - {}".format(_('Practical vol.'), _('2nd quadri')),
+        "{}".format(_('Practical planned classes')),
+        str(_('Quadrimester')),
+        str(_('Session derogation')),
+        str(_('Language')),
+    ]
+
+
+def learning_unit_titles_part1():
+    return [
+        str(_('Code')),
+        str(_('Ac yr.')),
+        str(_('Title')),
+        str(_('Type')),
+        str(_('Subtype')),
+        str(_('Req. Entity')),
+        str(_('Proposal type')),
+        str(_('Proposal status')),
+        str(_('Credits')),
+        str(_('Alloc. Ent.')),
+        str(_('Title in English')),
+    ]
 
 
 def get_same_container_year_components(learning_unit_year):
@@ -236,7 +241,7 @@ def get_entity_acronym(an_entity):
 
 
 def create_xls(user, found_learning_units, filters):
-    titles = LEARNING_UNIT_TITLES_PART1 + LEARNING_UNIT_TITLES_PART2
+    titles = learning_unit_titles_part1() + learning_unit_titles_part2()
     working_sheets_data = prepare_xls_content(found_learning_units)
     parameters = {xls_build.DESCRIPTION: XLS_DESCRIPTION,
                   xls_build.USER: get_name_or_username(user),

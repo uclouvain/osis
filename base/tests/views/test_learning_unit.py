@@ -45,7 +45,7 @@ import reference.models.language
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit as learning_unit_business
-from base.business.learning_unit import LEARNING_UNIT_TITLES_PART1, LEARNING_UNIT_TITLES_PART2
+from base.business.learning_unit import learning_unit_titles_part1, learning_unit_titles_part2
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit.search_form import LearningUnitYearForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
@@ -1193,8 +1193,8 @@ class TestCreateXls(TestCase):
 
 
 def _generate_xls_build_parameter(xls_data, user):
-    titles = LEARNING_UNIT_TITLES_PART1.copy()
-    titles.extend(LEARNING_UNIT_TITLES_PART2.copy())
+    titles = learning_unit_titles_part1()
+    titles.extend(learning_unit_titles_part2())
     return {
         xls_build.LIST_DESCRIPTION_KEY: _(learning_unit_business.XLS_DESCRIPTION),
         xls_build.FILENAME_KEY: _(learning_unit_business.XLS_FILENAME),
