@@ -1,3 +1,17 @@
+#: templates/offer/score_sheet_address_tab.html:52
+#, python-format
+msgid ""
+"\n"
+"                                    If you customize one of the field below, "
+"it only change the address displayed on the\n"
+"                                    score encodings sheets for the program "
+"%(program)s.\n"
+"                                    It will never change the address of any "
+"structure. The list below will help you to\n"
+"                                    pre-fill in the form.\n"
+"                                "
+msgstr ""
+
 #: templates/online_encoding.html:287
 #, python-format
 msgid ""
@@ -40,7 +54,7 @@ msgstr ""
 msgid "Academic year"
 msgstr ""
 
-#: business/score_encoding_export.py:172
+#: business/score_encoding_export.py:173
 #, python-format
 msgid "Accepted value: %(justification_label_authorized)s "
 msgstr ""
@@ -122,6 +136,7 @@ msgstr ""
 #: templates/online_encoding_form.html:223
 #: templates/scores_encoding_by_specific_criteria.html:66
 #: templates/scores_encoding_by_specific_criteria.html:158
+#: tests/functionals/test_score_encoding.py:599
 msgid "Cheating"
 msgstr ""
 
@@ -176,13 +191,14 @@ msgstr ""
 msgid "Deadline reached"
 msgstr ""
 
-#: business/score_encoding_export.py:195
+#: business/score_encoding_export.py:198
 #: templates/online_double_encoding_form.html:104
 #: templates/online_encoding_form.html:103
+#: tests/functionals/test_score_encoding.py:375
 msgid "Decimal values in scores are NOT accepted."
 msgstr ""
 
-#: business/score_encoding_export.py:193
+#: business/score_encoding_export.py:196
 #: templates/online_double_encoding_form.html:102
 #: templates/online_encoding_form.html:101
 msgid "Decimal values in scores are accepted."
@@ -236,11 +252,8 @@ msgstr ""
 msgid "Encoding"
 msgstr ""
 
-msgid "End date Prof"
-msgstr ""
-
-#: business/score_encoding_export.py:177 templates/blocks/legend.html:30
-msgid "Enrolled after session starts"
+#: business/score_encoding_export.py:179 templates/blocks/legend.html:30
+msgid "Enrolled lately"
 msgstr ""
 
 #: views/score_sheet.py:118
@@ -286,17 +299,9 @@ msgstr ""
 msgid "Get Excel file"
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:51
-#, python-format
-msgid ""
-"If you customize one of the field below, it only change the address "
-"displayed on the score encodings sheets for the program %%(program)s. It "
-"will never change the address of any structure. The list below will help you "
-"to pre-fill in the form."
-msgstr ""
-
 #: templates/online_double_encoding_form.html:104
 #: templates/online_encoding_form.html:103
+#: tests/functionals/test_score_encoding.py:376
 msgid "If you try to put decimal values, it will be ignored."
 msgstr ""
 
@@ -321,7 +326,7 @@ msgstr ""
 msgid "Invalid justification value"
 msgstr ""
 
-#: business/score_encoding_export.py:171
+#: business/score_encoding_export.py:172
 #: templates/online_double_encoding_form.html:124
 #: templates/online_double_encoding_validation.html:118
 #: templates/online_double_encoding_validation.html:120
@@ -380,7 +385,7 @@ msgstr ""
 msgid "Location"
 msgstr ""
 
-#: business/score_encoding_export.py:201
+#: business/score_encoding_export.py:204
 msgid "M=Justified Absence"
 msgstr ""
 
@@ -461,7 +466,7 @@ msgstr ""
 msgid "Number of enrollments"
 msgstr ""
 
-#: business/score_encoding_export.py:189
+#: business/score_encoding_export.py:192
 msgid "Numbered scores"
 msgstr ""
 
@@ -502,9 +507,10 @@ msgstr ""
 msgid "Other tutors"
 msgstr ""
 
-#: business/score_encoding_export.py:181
+#: business/score_encoding_export.py:183
 #, python-format
-msgid "Other values: %(justification_other_values)s "
+msgid ""
+"Other values reserved to administration: %(justification_other_values)s "
 msgstr ""
 
 #: templates/admin/modal/add_manager.html:10
@@ -622,7 +628,7 @@ msgstr ""
 msgid "Row"
 msgstr ""
 
-#: business/score_encoding_export.py:200
+#: business/score_encoding_export.py:203
 msgid "S=Unjustified Absence"
 msgstr ""
 
@@ -649,7 +655,7 @@ msgstr ""
 msgid "Score already submitted"
 msgstr ""
 
-#: business/score_encoding_export.py:190
+#: business/score_encoding_export.py:193
 #, python-format
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr ""
@@ -758,7 +764,7 @@ msgstr ""
 msgid "Student not registered for exam"
 msgstr ""
 
-#: business/score_encoding_export.py:165
+#: business/score_encoding_export.py:166
 msgid "Students deliberated are not shown"
 msgstr ""
 
@@ -782,7 +788,7 @@ msgstr ""
 msgid "Temporary save (not submitted to the faculty yet)"
 msgstr ""
 
-#: business/score_encoding_export.py:159
+#: business/score_encoding_export.py:160
 #, python-format
 msgid ""
 "The data presented on this document correspond to the state of the system "
@@ -811,6 +817,7 @@ msgid ""
 "%(str_date)s"
 msgstr ""
 
+#: tests/functionals/test_score_encoding.py:235
 #: tests/views/test_score_encoding.py:382 views/score_encoding.py:90
 #, python-format
 msgid ""
@@ -853,11 +860,12 @@ msgstr ""
 #: templates/online_encoding_form.html:200
 #: templates/scores_encoding_by_specific_criteria.html:64
 #: templates/scores_encoding_by_specific_criteria.html:156
+#: tests/functionals/test_score_encoding.py:599
 msgid "Unjustified absence"
 msgstr ""
 
-#: business/score_encoding_export.py:186 templates/blocks/legend.html:35
-msgid "Unsubscribed after the opening of the session"
+#: business/score_encoding_export.py:189 templates/blocks/legend.html:35
+msgid "Unsubscribed lately"
 msgstr ""
 
 #: templates/admin/modal/add_manager.html:52
@@ -921,13 +929,13 @@ msgid ""
 "excel file provided (button '%(button_value)s')"
 msgstr ""
 
-#: business/score_encoding_export.py:154 business/score_encoding_export.py:205
+#: business/score_encoding_export.py:155 business/score_encoding_export.py:208
 #: business/score_encoding_sheet.py:104 tests/views/test_score_encoding.py:353
 #: views/score_encoding.py:75
 msgid "date_format"
 msgstr ""
 
-#: views/pgm_manager_administration.py:229
+#: views/pgm_manager_administration.py:230
 msgid "is already program manager for"
 msgstr ""
 
