@@ -29,29 +29,28 @@ from unittest import mock
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
-from base.business.proposal_xls import XLS_DESCRIPTION, XLS_FILENAME, WORKSHEET_TITLE
-from base.models.enums import entity_container_year_link_type
-from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.entity import EntityFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.learning_unit import LearningUnitFactory
-from osis_common.document import xls_build
 from base.business import proposal_xls
-from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.models.enums import learning_unit_year_subtypes
-from base.tests.factories.user import UserFactory
-from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.business.learning_unit_year_with_context import append_latest_entities
-from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm
-from base.tests.factories.organization import OrganizationFactory
-from base.models.enums.organization_type import MAIN
-from base.models.enums import entity_type
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.business.learning_units.xls_comparison import prepare_xls_content_for_comparison
+from base.business.proposal_xls import XLS_DESCRIPTION, XLS_FILENAME, WORKSHEET_TITLE, basic_titles_part_1, \
+    basic_titles_part_2, components_titles, basic_titles
+from base.models.enums import entity_container_year_link_type
+from base.models.enums import entity_type
+from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
+from base.models.enums.organization_type import MAIN
+from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.organization import OrganizationFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from base.tests.factories.user import UserFactory
 from base.tests.forms.test_learning_unit_proposal import build_initial_data
-
+from osis_common.document import xls_build
 
 ACRONYM_ALLOCATION = 'INFO'
 ACRONYM_REQUIREMENT = 'DRT'
@@ -99,6 +98,81 @@ class TestProposalXls(TestCase):
         self.proposal_1.save()
         proposals_data = prepare_xls_content_for_comparison([self.l_unit_yr_1])
         self.assertEqual(len(proposals_data['data']), 2)
+
+    def test_basic_titles_part_1(self):
+        self.assertEqual(
+            basic_titles_part_1(),
+            [
+                str(_('Code')),
+                str(_('Ac yr.')),
+                str(_('Type')),
+                str(_('Active')),
+                str(_('Subtype')),
+                str(_('Internship subtype')),
+                str(_('Credits')),
+                str(_('Language')),
+                str(_('Periodicity')),
+                str(_('Quadrimester')),
+                str(_('Session derogation')),
+                str(_('Common title')),
+                str(_('English title proper')),
+                str(_('Common English title')),
+                str(_('English title proper')),
+                str(_('Req. Entities')),
+                str(_('Alloc. Ent.')),
+                str(_('Add. requ. ent. 1')),
+                str(_('Add. requ. ent. 2')),
+                str(_('Profes. integration')),
+                str(_('Institution')),
+                str(_('Learning location')),
+            ]
+        )
+
+    def test_basic_titles_part_2(self):
+        self.assertEqual(
+            basic_titles_part_2(),
+            [
+                str(_("Faculty remark")),
+                str(_("Other remark")),
+                str(_("Team management")),
+                str(_("Vacant")),
+                str(_("Decision")),
+                str(_("Procedure")),
+            ]
+        )
+
+    def test_components_titles(self):
+        self.assertEqual(
+            components_titles(),
+            [
+                "PM {}".format(_('code')),
+                "PM {}".format(_('Vol. Q1')),
+                "PM {}".format(_('Vol. Q2')),
+                "PM {}".format(_('Vol. annual')),
+                "PM {}".format(_('Real classes')),
+                "PM {}".format(_('Planned classes')),
+                "PM {}".format(_('Vol. global')),
+                "PM {}".format(_('Req. Entities')),
+                "PM {}".format(_('Add. requ. ent. 1')),
+                "PM {}".format(_('Add. requ. ent. 2')),
+                "PP {}".format(_('code')),
+                "PP {}".format(_('Vol. Q1')),
+                "PP {}".format(_('Vol. Q2')),
+                "PP {}".format(_('Vol. annual')),
+                "PM {}".format(_('Real classes')),
+                "PM {}".format(_('Planned classes')),
+                "PP {}".format(_('Vol. global')),
+                "PP {}".format(_('Req. Entities')),
+                "PM {}".format(_('Add. requ. ent. 1')),
+                "PM {}".format(_('Add. requ. ent. 2'))
+            ]
+        )
+
+    def test_basic_titles(self):
+        self.assertEqual(
+            basic_titles(),
+            basic_titles_part_1() + [str(_('Partims'))] + basic_titles_part_2()
+        )
 
     def _get_xls_data(self):
         return [self.l_unit_yr_1.entity_requirement,
