@@ -53,12 +53,10 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
                                            .select_related('education_group_type')
 
     def is_valid(self):
-        if self.parent.education_group_type.name in TrainingType.finality_types() or \
-                self.parents.filter(education_group_type__name__in=TrainingType.finality_types()).exists():
-            self._check_attach_options_rules()
         if self.parent.education_group_type.name in TrainingType.root_master_2m_types() or \
                 self.parents.filter(education_group_type__name__in=TrainingType.root_master_2m_types()).exists():
             self._check_end_year_constraints_on_2m()
+            self._check_attach_options_rules()
         return True
 
     def _check_end_year_constraints_on_2m(self):
@@ -110,9 +108,11 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         if self.child.education_group_type.name == MiniTrainingType.OPTION.name:
             options_to_add += [self.child]
 
+        root_2m_qs = self.parents | EducationGroupYear.objects.filter(pk=self.parent.pk)
+        root_2m_qs = root_2m_qs.filter(education_group_type__name__in=TrainingType.root_master_2m_types())
+
         errors = []
-        for root in self.parents.filter(education_group_type__name__in=[TrainingType.PGRM_MASTER_120.name,
-                                                                        TrainingType.PGRM_MASTER_180_240.name]):
+        for root in root_2m_qs:
             options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
             missing_options = set(options_to_add) - set(options_in_2m)
 
