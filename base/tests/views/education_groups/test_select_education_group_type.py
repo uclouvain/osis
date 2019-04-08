@@ -42,9 +42,11 @@ from base.tests.factories.person import PersonFactory
 
 @override_flag('education_group_create', active=True)
 class TestSelectEducationGroupTypeView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
 
     def setUp(self):
-        self.academic_year = AcademicYearFactory()
         self.parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
 
         self.test_categories = [
@@ -123,8 +125,8 @@ class TestSelectEducationGroupTypeView(TestCase):
     def test_post_invalid_when_max_limit_reached(self):
         GroupElementYearFactory(
             parent=self.parent_education_group_year,
-            child_branch=EducationGroupYearFactory(academic_year=self.academic_year,
-                                                   education_group_type=self.education_group_types[0])
+            child_branch__academic_year=self.academic_year,
+            child_branch__education_group_type=self.education_group_types[0]
         )
         expected_error_msg = _("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
                                "has already reached the limit.") % {

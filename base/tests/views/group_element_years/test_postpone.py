@@ -63,7 +63,8 @@ class TestPostpone(TestCase):
         PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
 
         self.group_element_year = GroupElementYearFactory(parent=self.education_group_year,
-                                                          child_branch=EducationGroupYearFactory(academic_year=self.education_group_year.academic_year))
+                                                          child_branch__academic_year=
+                                                          self.education_group_year.academic_year)
         self.url = reverse(
             "postpone_education_group",
             kwargs={

@@ -48,14 +48,11 @@ class TestUp(TestCase):
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         # Create contents of education group years [3 elements]
         cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year,
-                                                           child_branch=EducationGroupYearFactory(
-                                                               academic_year=cls.academic_year))
+                                                           child_branch__academic_year=cls.academic_year)
         cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year,
-                                                           child_branch=EducationGroupYearFactory(
-                                                               academic_year=cls.academic_year))
+                                                           child_branch__academic_year=cls.academic_year)
         cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year,
-                                                           child_branch=EducationGroupYearFactory(
-                                                               academic_year=cls.academic_year))
+                                                           child_branch__academic_year=cls.academic_year)
 
         cls.person = CentralManagerFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
@@ -119,14 +116,11 @@ class TestDown(TestCase):
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.current_academic_year)
         # Create contents of education group years [3 elements]
         cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year,
-                                                           child_branch=EducationGroupYearFactory(
-                                                               academic_year=cls.current_academic_year))
+                                                           child_branch__academic_year=cls.current_academic_year)
         cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year,
-                                                           child_branch=EducationGroupYearFactory(
-                                                               academic_year=cls.current_academic_year))
+                                                           child_branch__academic_year=cls.current_academic_year)
         cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year,
-                                                           child_branch=EducationGroupYearFactory(
-                                                               academic_year=cls.current_academic_year))
+                                                           child_branch__academic_year=cls.current_academic_year)
 
         cls.person = CentralManagerFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))

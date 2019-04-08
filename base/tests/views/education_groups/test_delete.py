@@ -106,9 +106,9 @@ class TestDeleteGroupEducationView(TestCase):
         # Create protected data
         OfferEnrollmentFactory(education_group_year=self.education_group_year1)
         GroupElementYearFactory(parent=self.education_group_year1,
-                                child_branch=EducationGroupYearFactory(academic_year=self.current_ac))
+                                child_branch__academic_year=self.current_ac)
         GroupElementYearFactory(parent=self.education_group_year1,
-                                child_branch=EducationGroupYearFactory(academic_year=self.current_ac))
+                                child_branch__academic_year=self.current_ac)
 
         count_enrollment = 1
         msg_offer_enrollment = ngettext_lazy(

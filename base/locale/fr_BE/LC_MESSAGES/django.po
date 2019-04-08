@@ -2024,9 +2024,6 @@ msgid "It is forbidden to attach an element to itself."
 msgstr "Il est interdit d’attacher un élément à lui-même."
 
 #: models/group_element_year.py:272
-#, fuzzy
-#| msgid ""
-#| "It is forbidden to attach an element to one of its included elements."
 msgid "It is forbidden to attach an element to one of another academic year."
 msgstr ""
 "Il est interdit d'attacher un élement à un autre élement y étant inclus."

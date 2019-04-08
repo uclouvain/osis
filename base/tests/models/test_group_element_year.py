@@ -396,8 +396,9 @@ class TestManager(TestCase):
 
 
 class TestSaveGroupElementYear(TestCase):
-    def setUp(self):
-        self.academic_year = AcademicYearFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
 
     def test_simple_saves_ok(self):
         egy1 = EducationGroupYearFactory(academic_year=self.academic_year)
@@ -455,8 +456,11 @@ class TestSaveGroupElementYear(TestCase):
 class TestFetchGroupElementsBehindHierarchy(TestCase):
     """Unit tests on fetch_all_group_elements_behind_hierarchy()"""
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
+
     def setUp(self):
-        self.academic_year = AcademicYearFactory()
         formation_master_type = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING,
             name=education_group_types.TrainingType.PGRM_MASTER_120,
@@ -520,9 +524,13 @@ class TestFetchGroupElementsBehindHierarchy(TestCase):
 
 
 class TestValidationOnEducationGroupYearBlockField(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
+
     def setUp(self):
-        self.academic_year = AcademicYearFactory()
-        self.group_element_year = GroupElementYearFactory(parent=EducationGroupYearFactory(academic_year=self.academic_year), child_branch=EducationGroupYearFactory(academic_year=self.academic_year))
+        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.academic_year,
+                                                          child_branch__academic_year=self.academic_year)
 
     def test_when_value_is_higher_than_max_authorized(self):
         self.group_element_year.block = 7

@@ -152,8 +152,11 @@ def _add_to_group(user, group_name):
 
 
 class EducationGroupXlsTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+
     def setUp(self):
-        self.academic_year = create_current_academic_year()
         self.education_group_type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
         self.education_group_year_1 = EducationGroupYearFactory(academic_year=self.academic_year, acronym="PREMIER")
         self.education_group_year_1.management_entity_version = EntityVersionFactory()

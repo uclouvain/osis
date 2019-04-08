@@ -46,8 +46,7 @@ class TestEdit(TestCase):
         cls.academic_year = AcademicYearFactory()
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
-                                                         child_branch=EducationGroupYearFactory(
-                                                             academic_year=cls.academic_year))
+                                                         child_branch__academic_year=cls.academic_year)
         AuthorizedRelationshipFactory(
             parent_type=cls.education_group_year.education_group_type,
             child_type=cls.group_element_year.child_branch.education_group_type,

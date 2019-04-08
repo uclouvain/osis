@@ -381,10 +381,8 @@ class EducationGroupViewTestCase(TestCase):
         self.assertEqual(response.context['parent'], an_education_group)
 
     def test_education_administrative_data_with_root_set(self):
-        a_group_element_year = GroupElementYearFactory(parent=EducationGroupYearFactory(
-                                                           academic_year=self.academic_year),
-                                                       child_branch=EducationGroupYearFactory(
-                                                           academic_year=self.academic_year))
+        a_group_element_year = GroupElementYearFactory(parent__academic_year=self.academic_year,
+                                                       child_branch__academic_year=self.academic_year)
         self.initialize_session()
         url = reverse("education_group_administrative",
                       args=[a_group_element_year.parent.id, a_group_element_year.child_branch.id])

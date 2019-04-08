@@ -51,8 +51,7 @@ class TestDetach(TestCase):
         cls.academic_year = AcademicYearFactory()
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
-                                                         child_branch=EducationGroupYearFactory(
-                                                            academic_year=cls.academic_year))
+                                                         child_branch__academic_year=cls.academic_year)
         cls.person = CentralManagerFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
         cls.url = reverse("group_element_year_delete", args=[
@@ -118,7 +117,7 @@ class TestDetachLearningUnitPrerequisite(TestCase):
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.luy = LearningUnitYearFactory()
         cls.group_element_year_root = GroupElementYearFactory(
-            parent=EducationGroupYearFactory(academic_year=cls.academic_year),
+            parent__academic_year=cls.academic_year,
             child_branch=cls.education_group_year
         )
         cls.group_element_year = GroupElementYearFactory(
