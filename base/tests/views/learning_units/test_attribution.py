@@ -139,23 +139,22 @@ class TestEditAttribution(TestCase):
 
 
 class TestAddAttribution(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.learning_unit_year = LearningUnitYearFullFactory()
-        cls.lecturing_unit_component = LecturingLearningUnitComponentFactory(learning_unit_year=cls.learning_unit_year)
-        cls.practical_unit_component = PracticalLearningUnitComponentFactory(learning_unit_year=cls.learning_unit_year)
-        cls.person = PersonWithPermissionsFactory('can_access_learningunit')
-        cls.tutor = TutorFactory(person=cls.person)
 
     def setUp(self):
+        self.learning_unit_year = LearningUnitYearFullFactory(
+            learning_container_year__container_type=LearningContainerYearType.COURSE.name)
+        self.lecturing_unit_component = LecturingLearningUnitComponentFactory(
+            learning_unit_year=self.learning_unit_year)
+        self.practical_unit_component = PracticalLearningUnitComponentFactory(
+            learning_unit_year=self.learning_unit_year)
+        self.person = PersonWithPermissionsFactory('can_access_learningunit')
+        self.tutor = TutorFactory(person=self.person)
         self.client.force_login(self.person.user)
         self.url = reverse("add_attribution", args=[self.learning_unit_year.id])
 
         self.patcher = patch.object(RulesRequiredMixin, "test_func", return_value=True)
         self.mocked_permission_function = self.patcher.start()
-
-    def tearDown(self):
-        self.patcher.stop()
+        self.addCleanup(self.patcher.stop)
 
     def test_login_required(self):
         self.client.logout()

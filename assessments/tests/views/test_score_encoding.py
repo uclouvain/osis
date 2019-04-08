@@ -493,7 +493,7 @@ class UploadXLSTest(TestCase):
         from assessments.business.score_encoding_export import HEADER
         header_expected_list = ['Academic year', 'Session', 'Learning unit', 'Program',
                                 'Registration number', 'Lastname', 'Firstname', 'Email', 'Numbered scores',
-                                'Justification', 'End date Prof']
+                                'Justification (A,T)', 'End date Prof']
         self.assertListEqual(HEADER, header_expected_list)
 
 
