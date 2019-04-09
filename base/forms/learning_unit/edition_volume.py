@@ -45,11 +45,6 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_component import LearningUnitComponent
 
 
-class StepHalfIntegerWidget(forms.NumberInput):
-    def __init__(self):
-        super().__init__(attrs={'step': STEP_HALF_INTEGER, 'min': 0})
-
-
 class VolumeField(forms.DecimalField):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, max_digits=6, decimal_places=2, min_value=0, **kwargs)
@@ -64,21 +59,21 @@ class VolumeEditionForm(forms.Form):
     volume_q1 = VolumeField(
         label=_('Q1'),
         help_text=_('Volume Q1'),
-        widget=StepHalfIntegerWidget(),
+        widget=forms.TextInput(),
         required=False,
     )
     add_field = EmptyField(label='+')
     volume_q2 = VolumeField(
         label=_('Q2'),
         help_text=_('Volume Q2'),
-        widget=StepHalfIntegerWidget(),
+        widget=forms.TextInput(),
         required=False,
     )
     equal_field_1 = EmptyField(label='=')
     volume_total = VolumeField(
         label=_('Vol. annual'),
         help_text=_('The annual volume must be equal to the sum of the volumes Q1 and Q2'),
-        widget=StepHalfIntegerWidget(),
+        widget=forms.TextInput(),
         required=False,
     )
     help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('Volume Q1'), _('Volume Q2'))
@@ -113,7 +108,7 @@ class VolumeEditionForm(forms.Form):
             self.fields["volume_" + key.lower()] = VolumeField(
                 label=entity.acronym,
                 help_text=entity.title,
-                widget=StepHalfIntegerWidget(),
+                widget=forms.TextInput(),
             )
             if i != len(entities_to_add) - 1:
                 self.fields["add" + key.lower()] = EmptyField(label='+')
@@ -325,9 +320,9 @@ class SimplifiedVolumeForm(forms.ModelForm):
             'hourly_volume_partial_q2'
         )
         widgets = {
-            'hourly_volume_total_annual': StepHalfIntegerWidget,
-            'hourly_volume_partial_q1': StepHalfIntegerWidget,
-            'hourly_volume_partial_q2': StepHalfIntegerWidget,
+            'hourly_volume_total_annual': forms.TextInput(),
+            'hourly_volume_partial_q1': forms.TextInput(),
+            'hourly_volume_partial_q2': forms.TextInput(),
         }
 
     def clean(self):
