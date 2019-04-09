@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-09 11:22+0200\n"
+"POT-Creation-Date: 2019-04-09 13:03+0200\n"
 "PO-Revision-Date: 2019-04-04 13:59+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2041,15 +2041,16 @@ msgstr "Ce n'est pas une proposition"
 msgid "Isolated classes"
 msgstr "Cours isolés"
 
+#: models/group_element_year.py:272
+msgid ""
+"It is forbidden to attach an element to an element of another academic year."
+msgstr ""
+"Il est interdit d'attacher un élément à un élément d'une autre année "
+"académique."
+
 #: models/group_element_year.py:258
 msgid "It is forbidden to attach an element to itself."
 msgstr "Il est interdit d’attacher un élément à lui-même."
-
-#: models/group_element_year.py:272
-msgid "It is forbidden to attach an element to one of another academic year."
-msgstr ""
-"Il est interdit d'attacher un élement à un autre élement d'une autre année "
-"académique."
 
 #: models/group_element_year.py:261
 #: tests/views/education_groups/test_update.py:580
