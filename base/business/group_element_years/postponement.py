@@ -33,7 +33,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType
 from base.models.enums.link_type import LinkTypes
-from base.models.group_element_year import GroupElementYear
+from base.models.group_element_year import GroupElementYear, _fetch_row_sql
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
@@ -58,18 +58,19 @@ class ReuseOldLearningUnitYearWarning(CopyWarning):
 
 
 class PrerequisiteItemWarning(CopyWarning):
-    def __init__(self, prerequisite: Prerequisite, item: PrerequisiteItem, academic_year):
+    def __init__(self, prerequisite: Prerequisite, item: PrerequisiteItem, egy: EducationGroupYear):
         self.prerequisite = prerequisite
         self.item = item
-        self.academic_year = academic_year
+        self.egy = egy
 
     def __str__(self):
-        return _("The postponed learning unit %(learning_unit)s has a "
-                 "prerequisite %(item)s which does not exist in %(academic_year)s.") % {
-                   "learning_unit": self.prerequisite.learning_unit_year.acronym,
-                   "item": self.item.learning_unit.acronym,
-                   "academic_year": self.academic_year
-               }
+        return _("%(prerequisite_item)s is not anymore contained in %(education_group_year)s "
+                 "=> the prerequisite for %(learning_unit_year)s "
+                 "having %(prerequisite_item)s as prerequisite is not copied.") % {
+            "education_group_year": self.egy.acronym,
+            "learning_unit_year": self.prerequisite.learning_unit_year.acronym,
+            "prerequisite_item": self.item.learning_unit.acronym
+        }
 
 
 class EducationGroupYearNotEmptyWarning(CopyWarning):
@@ -226,9 +227,7 @@ class PostponeContent:
             new_luy = old_luy
             self.warnings.append(ReuseOldLearningUnitYearWarning(old_luy, self.next_academic_year))
 
-        else:
-            # postponed_luy will be used for prerequisites. But if we use the old learning unit, we do not need it.
-            self.postponed_luy.append((old_luy, new_luy))
+        self.postponed_luy.append((old_luy, new_luy))
 
         new_gr.child_leaf = new_luy
         return new_gr
@@ -254,6 +253,7 @@ class PostponeContent:
         new_gr.child_branch = new_egy
         return new_gr
 
+    # TODO Move method to model education group year
     def _is_empty(self, egy: EducationGroupYear):
         """
         An education group year is empty if:
@@ -310,8 +310,10 @@ class PostponeContent:
 
     def _postpone_prerequisite(self, old_luy: LearningUnitYear, new_luy: LearningUnitYear):
         """ Copy the prerequisite of a learning unit and its items """
+        grps = _fetch_row_sql([self.instance_n1.id])
+        luys = set(item["child_leaf_id"] for item in grps)
         for prerequisite in old_luy.prerequisite_set.filter(education_group_year=self.instance):
-            if not self._check_prerequisite_item_existing_n1(prerequisite):
+            if not self._check_prerequisite_item_existing_n1(prerequisite, luys):
                 continue
 
             new_prerequisite, _ = Prerequisite.objects.get_or_create(
@@ -331,14 +333,13 @@ class PostponeContent:
                     }
                 )
 
-    def _check_prerequisite_item_existing_n1(self, old_prerequisite: Prerequisite) -> bool:
+    def _check_prerequisite_item_existing_n1(self, old_prerequisite: Prerequisite, luys: [int]) -> bool:
         """ Check if the prerequisite's items exist in the next academic year.
         In the case, we have to add a warning message and skip the copy.
         """
-        # TODO Check prerequiste after having creating content and check if present
         result = True
         for item in old_prerequisite.prerequisiteitem_set.all():
-            if not item.learning_unit.learningunityear_set.filter(academic_year=self.next_academic_year):
-                self.warnings.append(PrerequisiteItemWarning(old_prerequisite, item, self.next_academic_year))
+            if not item.learning_unit.learningunityear_set.filter(id__in=luys):
+                self.warnings.append(PrerequisiteItemWarning(old_prerequisite, item, self.instance_n1))
                 result = False
         return result
