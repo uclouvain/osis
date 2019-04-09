@@ -92,7 +92,7 @@
                         {% flag "learning_unit_proposal_create" %}
 
                         {% url "learning_unit_modification_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_modification_proposal_url%}
-                        {% li_modification_proposal learning_unit_modification_proposal_url _('Put in proposal') 'link_proposal_modification' %}
+                        {% li_modification_proposal learning_unit_modification_proposal_url _('Put in proposal in modification') 'link_proposal_modification' %}
 
                         {% url "learning_unit_suppression_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_suppression_proposal_url%}
                         {% li_suppression_proposal learning_unit_suppression_proposal_url _('Put in proposal for ending date') 'link_proposal_suppression' %}
@@ -117,7 +117,7 @@
 
                     {% flag "learning_unit_delete" %}
                         {% if "base.can_delete_learningunit" in perms %}
-                            {% li_delete_all_lu "#" _('Delete') '#modalDeleteLuy' 'link_delete_lus'  %}
+                            {% li_delete_all_lu "#" _('Delete learning unit year definitively') '#modalDeleteLuy' 'link_delete_lus'  %}
                         {% endif %}
                     {% endflag %}
                     </ul>

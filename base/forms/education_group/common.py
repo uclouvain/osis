@@ -123,9 +123,9 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
         }
         fields = []
         widgets = {
-            "duration": forms.NumberInput(attrs={'min': 1}),
-            "min_constraint": forms.NumberInput(attrs={'min': 1}),
-            "max_constraint": forms.NumberInput(attrs={'min': 1}),
+            "duration": forms.TextInput(),
+            "min_constraint": forms.TextInput(),
+            "max_constraint": forms.TextInput(),
         }
 
     def __init__(self, *args, education_group_type=None, user=None, **kwargs):
