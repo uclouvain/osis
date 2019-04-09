@@ -22,6 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from django.db import Error, transaction
+from django.db.models import Q
 from django.utils.translation import gettext as _
 
 from base.business.education_groups.postponement import duplicate_education_group_year
@@ -182,7 +183,6 @@ class PostponeContent:
         after that, we'll postponement recursively all the child branches and child leafs.
         """
 
-        # TODO Stop postponement if OF is not empty or if OF is reference link and empty (of exist in N+1)
         for gr in instance.groupelementyear_set.select_related('child_branch__academic_year',
                                                                'child_branch__education_group'):
             new_gr = self._postpone_child(gr, next_instance)
@@ -211,6 +211,7 @@ class PostponeContent:
 
     def _post_postponement(self):
         # Postpone the prerequisite only at the end to be sure to have all learning units and education groups
+        # TODO Check options
         for old_luy, new_luy in self.postponed_luy:
             self._postpone_prerequisite(old_luy, new_luy)
 
@@ -239,27 +240,34 @@ class PostponeContent:
         old_egy = old_gr.child_branch
         new_egy = old_egy.next_year()
         if new_egy:
-            # In the case of technical group, we have to postpone the content even if the group already
-            # exists in N+1
-            relationship = AuthorizedRelationship.objects.filter(
-                parent_type=new_gr.parent.education_group_type,
-                child_type=new_egy.education_group_type
-            ).first()
-            if new_gr.link_type == LinkTypes.REFERENCE.name and not new_egy.groupelementyear_set.all():
+            is_empty = self._is_empty(new_egy)
+            if new_gr.link_type == LinkTypes.REFERENCE.name and is_empty:
                 self.warnings.append(ReferenceLinkEmptyWarning(new_egy))
-            elif relationship and relationship.min_count_authorized > 0 and not new_egy.groupelementyear_set.all():
-                # We postpone data only if the mandatory group is empty.
-                self._postpone(old_egy, new_egy)
-            # TODO Add warning if relationship not authorized
-            else:
+            elif not is_empty:
                 self.warnings.append(EducationGroupYearNotEmptyWarning(new_egy, self.next_academic_year))
-
+            else:
+                self._postpone(old_egy, new_egy)
         else:
             # If the education group does not exists for the next year, we have to postpone.
             new_egy = self._duplication_education_group_year(old_gr, old_egy)
 
         new_gr.child_branch = new_egy
         return new_gr
+
+    def _is_empty(self, egy: EducationGroupYear):
+        """
+        An education group year is empty if:
+            - it has no children
+            - all of his children are mandatory groups and they are empty
+        """
+        mandatory_groups = AuthorizedRelationship.objects.filter(
+            parent_type=egy.education_group_type,
+            min_count_authorized=1
+        )
+        return not GroupElementYear.objects.filter(
+            (Q(parent=egy) & ~ Q(child_branch__education_group_type__authorized_child_type__in=mandatory_groups))
+            | Q(parent__child_branch__parent=egy)
+        ).exists()
 
     def _duplication_education_group_year(self, old_gr: GroupElementYear, old_egy: EducationGroupYear):
         if old_egy.education_group_type.category != Categories.GROUP.name:
@@ -327,6 +335,7 @@ class PostponeContent:
         """ Check if the prerequisite's items exist in the next academic year.
         In the case, we have to add a warning message and skip the copy.
         """
+        # TODO Check prerequiste after having creating content and check if present
         result = True
         for item in old_prerequisite.prerequisiteitem_set.all():
             if not item.learning_unit.learningunityear_set.filter(academic_year=self.next_academic_year):
