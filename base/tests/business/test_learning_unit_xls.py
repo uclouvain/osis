@@ -36,7 +36,7 @@ from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPO
     _get_significant_volume, _prepare_legend_ws_data, _get_wrapped_cells, \
     _get_colored_rows, _get_attribution_line, _get_col_letter, _get_trainings_by_educ_group_year, _add_training_data, \
     _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
-    _get_data_part2, prepare_xls_content, annotate_qs
+    _get_data_part2, annotate_qs, learning_unit_titles_part1
 from base.models.enums import education_group_categories
 from base.models.enums import entity_type, organization_type
 from base.models.enums import learning_component_year_type
@@ -309,6 +309,24 @@ class TestLearningUnitXls(TestCase):
                 expected_common,
                 luy
             )
+        )
+
+    def test_learning_unit_titles_part1(self):
+        self.assertEqual(
+            learning_unit_titles_part1(),
+            [
+                str(_('Code')),
+                str(_('Ac yr.')),
+                str(_('Title')),
+                str(_('Type')),
+                str(_('Subtype')),
+                "{} ({})".format(_('Req. Entity'), _('fac. level')),
+                str(_('Proposal type')),
+                str(_('Proposal status')),
+                str(_('Credits')),
+                str(_('Alloc. Ent.')),
+                str(_('Title in English')),
+            ]
         )
 
 

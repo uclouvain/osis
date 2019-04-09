@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-22 12:30+0100\n"
+"POT-Creation-Date: 2019-04-08 10:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,7 +88,6 @@ msgid "Deputy temporary"
 msgstr "Suppléant temporaire"
 
 #: templates/manage_my_courses/educational_information.html:32
-#: templates/manage_my_courses/educational_information.html:54
 msgid "Description fiche"
 msgstr "Fiche descriptive"
 
@@ -129,7 +128,7 @@ msgstr "Titulaire"
 
 #: templates/manage_my_courses/educational_information.html:47
 msgid "Information approved and updatable by the Commission of Program"
-msgstr "Informations avalisées et modifiables via la Commision de Programme"
+msgstr "Informations avalisées et modifiables via la Commission de Programme"
 
 #: templates/manage_my_courses/educational_information.html:54
 msgid "Informations updatable by teachers"

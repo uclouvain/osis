@@ -83,7 +83,6 @@ def learning_units_search(request, search_type):
 
     except TooManyResultsException:
         display_error_messages(request, 'too_many_results')
-
     if request.POST.get('xls_status') == "xls":
         return create_xls(request.user, found_learning_units, _get_filter(form, search_type))
 

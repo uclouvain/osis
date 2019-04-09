@@ -51,8 +51,13 @@ class AttributionJsonTest(TestCase):
         # Creation Container / UE and components related
         self.l_container = LearningContainerYearFactory(academic_year=self.academic_year, acronym="LBIR1210",
                                                         in_charge=True)
-        _create_learning_unit_year_with_components(academic_year=self.academic_year, l_container=self.l_container,
-                                                   acronym="LBIR1210",subtype=learning_unit_year_subtypes.FULL)
+        self.learning_unit_yr = _create_learning_unit_year_with_components(
+            academic_year=self.academic_year,
+            l_container=self.l_container,
+            acronym="LBIR1210",
+            subtype=learning_unit_year_subtypes.FULL
+        )
+
         _create_learning_unit_year_with_components(academic_year=self.academic_year, l_container=self.l_container,
                                                    acronym="LBIR1210A", subtype=learning_unit_year_subtypes.PARTIM)
         _create_learning_unit_year_with_components(academic_year=self.academic_year, l_container=self.l_container,
@@ -148,6 +153,16 @@ class AttributionJsonTest(TestCase):
         )
         self.assertFalse(attribution_data['attributions'])
 
+    def test_get_title_next_luyr(self):
+        self.assertIsNone(attribution_json._get_title_next_luyr(self.learning_unit_yr))
+
+        next_academic_year = AcademicYearFactory(year=self.academic_year.year+1)
+        self.assertIsNone(attribution_json._get_title_next_luyr(self.learning_unit_yr))
+
+        next_luy = LearningUnitYearFactory(learning_unit=self.learning_unit_yr.learning_unit,
+                                           academic_year=next_academic_year)
+        self.assertEqual(attribution_json._get_title_next_luyr(self.learning_unit_yr), next_luy.complete_title)
+
 
 def _create_learning_unit_year_with_components(academic_year, l_container, acronym, subtype):
     l_unit_year = LearningUnitYearFactory(academic_year=academic_year, learning_container_year=l_container,
@@ -157,11 +172,13 @@ def _create_learning_unit_year_with_components(academic_year, l_container, acron
     l_component_cm = LearningComponentYearFactory(learning_container_year=l_container,
                                  type=learning_component_year_type.LECTURING, acronym="PM")
     l_component_tp = LearningComponentYearFactory(learning_container_year=l_container,
-                                 type=learning_component_year_type.PRACTICAL_EXERCISES, acronym="PP")
+                                                  type=learning_component_year_type.PRACTICAL_EXERCISES,
+                                                  acronym="PP")
 
     # Create Link between UE and component
     LearningUnitComponentFactory(learning_unit_year=l_unit_year, learning_component_year=l_component_cm)
     LearningUnitComponentFactory(learning_unit_year=l_unit_year, learning_component_year=l_component_tp)
+    return l_unit_year
 
 
 def _create_attribution_charge(academic_year, attribution, l_acronym, volume_cm=None, volume_tp=None):
@@ -173,8 +190,8 @@ def _create_attribution_charge(academic_year, attribution, l_acronym, volume_cm=
             learning_unit_year__academic_year=academic_year,
             learning_component_year__type=learning_component_year_type.LECTURING).first()
         AttributionChargeNewFactory(attribution=attribution,
-                                 learning_component_year=l_unit_component.learning_component_year,
-                                 allocation_charge=volume_cm)
+                                    learning_component_year=l_unit_component.learning_component_year,
+                                    allocation_charge=volume_cm)
 
     if volume_tp is not None:
         l_unit_component = LearningUnitComponent.objects.filter(
@@ -182,5 +199,5 @@ def _create_attribution_charge(academic_year, attribution, l_acronym, volume_cm=
             learning_unit_year__academic_year=academic_year,
             learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES).first()
         AttributionChargeNewFactory(attribution=attribution,
-                                 learning_component_year=l_unit_component.learning_component_year,
-                                 allocation_charge=volume_tp)
+                                    learning_component_year=l_unit_component.learning_component_year,
+                                    allocation_charge=volume_tp)
