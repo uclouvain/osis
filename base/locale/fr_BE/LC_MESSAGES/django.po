@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-08 16:17+0200\n"
+"POT-Creation-Date: 2019-04-09 11:22+0200\n"
 "PO-Revision-Date: 2019-04-04 13:59+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1198,11 +1198,14 @@ msgstr "Inscription par défaut aux cours"
 
 #: templates/education_group/blocks/contacts_general_informations_ul.html:46
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:94
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:120
 #: templates/organization/organization_address.html:78
 #: templates/organization/organization_address.html:80
 msgid "Delete"
 msgstr "Supprimer"
+
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:120
+msgid "Delete learning unit year definitively"
+msgstr "Supprimer l'UE définitivement"
 
 #: templates/my_osis/my_message.html:62
 msgid "Delete message"
@@ -1673,7 +1676,7 @@ msgstr "Echec"
 msgid "Female"
 msgstr "Féminin"
 
-#: business/group_element_years/attach.py:91
+#: business/group_element_years/attach.py:89
 #, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
@@ -3408,13 +3411,13 @@ msgstr "Partenaire public"
 msgid "Publication contact entity"
 msgstr "Entité de contact de publication"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:95
-msgid "Put in proposal"
-msgstr "Mettre en proposition"
-
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:98
 msgid "Put in proposal for ending date"
 msgstr "Mettre en proposition de fin d'enseignement"
+
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:95
+msgid "Put in proposal in modification"
+msgstr "Mettre en proposition de modification"
 
 #: forms/learning_unit/edition_volume.py:65
 msgid "Q1"
