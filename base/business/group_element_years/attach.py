@@ -109,14 +109,14 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
             options_to_add += [self.child]
 
         finalities_qs = self.parents | EducationGroupYear.objects.filter(pk=self.parent.pk)
-        finalities_qs = finalities_qs.filter(education_group_type__name__in=TrainingType.finality_types())
-
-        errors = []
-        for finality in finalities_qs:
-            root_2m_qs = EducationGroupYear.hierarchy.filter(pk=finality.pk).get_parents().filter(
+        finalities_pks = finalities_qs.filter(education_group_type__name__in=TrainingType.finality_types())\
+                                      .values_list('pk', flat=True)
+        if finalities_pks:
+            root_2m_qs = EducationGroupYear.hierarchy.filter(pk__in=finalities_pks).get_parents().filter(
                 education_group_type__name__in=TrainingType.root_master_2m_types()
             )
 
+            errors = []
             for root in root_2m_qs:
                 options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
                 missing_options = set(options_to_add) - set(options_in_2m)
