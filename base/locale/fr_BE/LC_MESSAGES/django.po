@@ -3409,7 +3409,7 @@ msgid "Publication contact entity"
 msgstr "Entité de contact de publication"
 
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:95
-msgid "Put in proposal"
+msgid "Put in proposal in modification"
 msgstr "Mettre en proposition de modification"
 
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:98
