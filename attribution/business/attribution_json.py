@@ -49,7 +49,7 @@ def publish_to_portal(global_ids=None):
         try:
             queue_sender.send_message(queue_name, attribution_list)
         except (RuntimeError, pika.exceptions.ConnectionClosed, pika.exceptions.ChannelClosed,
-                 pika.exceptions.AMQPError):
+                pika.exceptions.AMQPError):
             logger.exception('Could not recompute attributions for portal...')
             return False
         return True
@@ -116,7 +116,7 @@ def _split_attribution_by_learning_unit_year(attribution):
             attribution_splitted.setdefault(lunit_year.id, {
                     'acronym': lunit_year.acronym,
                     'title': lunit_year.complete_title,
-                    'title_next_yr': _get_next_luyr_title(learning_component),
+                    'title_next_yr': _get_title_next_luyr(learning_component.learning_unit_year),
                     'start_year': attribution.start_year,
                     'end_year': attribution.end_year,
                     'function': attribution.function,
@@ -130,11 +130,12 @@ def _split_attribution_by_learning_unit_year(attribution):
     return attribution_splitted.values()
 
 
-def _get_next_luyr_title(learning_component):
+def _get_title_next_luyr(learning_unit_yr):
     next_academic_year = mdl_base.academic_year.find_academic_year_by_year(
-        learning_component.learning_unit_year.academic_year.year + 1)
+        learning_unit_yr.academic_year.year + 1)
     if next_academic_year:
-        next_lunit_year = mdl_base.learning_unit_year.search(academic_year_id=next_academic_year.id,
-                                                             learning_unit=learning_component.learning_unit_year.learning_unit).first()
+        next_lunit_year = mdl_base.learning_unit_year.search(
+            academic_year_id=next_academic_year.id,
+            learning_unit=learning_unit_yr.learning_unit).first()
         return next_lunit_year.complete_title if next_lunit_year else None
     return None
