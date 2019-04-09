@@ -126,7 +126,7 @@ class LearningUnitYearModelForm(forms.ModelForm):
             }
         }
         widgets = {
-            'credits': forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
+            'credits': forms.TextInput(),
         }
 
     def clean_acronym(self):

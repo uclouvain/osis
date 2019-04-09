@@ -73,6 +73,9 @@ class ProposalLearningUnitForm(forms.ModelForm):
     class Meta:
         model = ProposalLearningUnit
         fields = ['entity', 'folder_id', 'state', 'type']
+        widgets = {
+            'folder_id': forms.TextInput(),
+        }
 
     def save(self, commit=True):
         if hasattr(self.instance, 'learning_unit_year'):
