@@ -20,7 +20,11 @@
                       data-target=".{{ person|slugify }}"></span>
             </td>
             <td>
-                <strong>{{ person }}</strong>
+                {% if offer_years|length == object_list|length %}
+                    <strong>{{ person }}</strong>
+                {% else %}
+                    {{ person }}
+                {% endif %}
             </td>
             <td>
                 <input type="checkbox" name="all_main"
