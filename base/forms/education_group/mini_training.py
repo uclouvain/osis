@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django import forms
+
 from base.business.education_groups import shorten
 from base.business.education_groups.postponement import PostponementEducationGroupYearMixin
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, EducationGroupYearModelForm
@@ -46,6 +48,11 @@ class MiniTrainingYearModelForm(EducationGroupYearModelForm):
             "min_constraint", "max_constraint", "constraint_type",
             "schedule_type", "management_entity", "keywords"
         )
+        widgets = {
+            "credits": forms.TextInput(),
+            "min_constraint": forms.TextInput(),
+            "max_constraint": forms.TextInput(),
+        }
 
 
 class MiniTrainingModelForm(EducationGroupModelForm):
