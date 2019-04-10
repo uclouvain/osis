@@ -23,6 +23,7 @@
 # ############################################################################
 from django.db import Error, transaction
 from django.db.models import Q
+from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
 from base.business.education_groups.postponement import duplicate_education_group_year
@@ -34,6 +35,7 @@ from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear, _fetch_row_sql
+from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
@@ -70,6 +72,19 @@ class PrerequisiteItemWarning(CopyWarning):
             "education_group_year": self.egy.acronym,
             "learning_unit_year": self.prerequisite.learning_unit_year.acronym,
             "prerequisite_item": self.item.learning_unit.acronym
+        }
+
+
+class PrerequisiteWarning(CopyWarning):
+    def __init__(self, luy: LearningUnitYear, egy: EducationGroupYear):
+        self.luy = luy
+        self.egy = egy
+
+    def __str__(self):
+        return _("%(learning_unit_year)s is not anymore contained in %(education_group_year)s "
+                 "=> the prerequisite for %(learning_unit_year)s is not copied.") % {
+            "education_group_year": self.egy.acronym,
+            "learning_unit_year": self.luy.acronym,
         }
 
 
@@ -213,6 +228,17 @@ class PostponeContent:
     def _post_postponement(self):
         # Postpone the prerequisite only at the end to be sure to have all learning units and education groups
         # TODO Check options
+
+        luys_not_postponed = LearningUnitYear.objects.filter(
+            id__in=self._learning_units_id_in_n_instance
+        ).exclude(
+            learning_unit__in=LearningUnit.objects.filter(
+                learningunityear__id__in=self._learning_units_id_in_n1_instance
+            )
+        )
+        for luy in luys_not_postponed:
+            self.warnings.append(PrerequisiteWarning(luy, self.instance_n1))
+
         for old_luy, new_luy in self.postponed_luy:
             self._postpone_prerequisite(old_luy, new_luy)
 
@@ -310,10 +336,8 @@ class PostponeContent:
 
     def _postpone_prerequisite(self, old_luy: LearningUnitYear, new_luy: LearningUnitYear):
         """ Copy the prerequisite of a learning unit and its items """
-        grps = _fetch_row_sql([self.instance_n1.id])
-        luys = set(item["child_leaf_id"] for item in grps)
         for prerequisite in old_luy.prerequisite_set.filter(education_group_year=self.instance):
-            if not self._check_prerequisite_item_existing_n1(prerequisite, luys):
+            if not self._check_prerequisite_item_existing_n1(prerequisite):
                 continue
 
             new_prerequisite, _ = Prerequisite.objects.get_or_create(
@@ -333,13 +357,23 @@ class PostponeContent:
                     }
                 )
 
-    def _check_prerequisite_item_existing_n1(self, old_prerequisite: Prerequisite, luys: [int]) -> bool:
+    def _check_prerequisite_item_existing_n1(self, old_prerequisite: Prerequisite) -> bool:
         """ Check if the prerequisite's items exist in the next academic year.
         In the case, we have to add a warning message and skip the copy.
         """
         result = True
         for item in old_prerequisite.prerequisiteitem_set.all():
-            if not item.learning_unit.learningunityear_set.filter(id__in=luys):
+            if not item.learning_unit.learningunityear_set.filter(id__in=self._learning_units_id_in_n1_instance):
                 self.warnings.append(PrerequisiteItemWarning(old_prerequisite, item, self.instance_n1))
                 result = False
         return result
+
+    @cached_property
+    def _learning_units_id_in_n_instance(self):
+        grps_old = _fetch_row_sql([self.instance.id])
+        return set(item["child_leaf_id"] for item in grps_old)
+
+    @cached_property
+    def _learning_units_id_in_n1_instance(self):
+        grps = _fetch_row_sql([self.instance_n1.id])
+        return set(item["child_leaf_id"] for item in grps)
