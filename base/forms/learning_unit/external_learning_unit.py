@@ -86,7 +86,8 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
             'campus': autocomplete.ModelSelect2(
                 url='campus-autocomplete',
                 forward=["country"]
-            )
+            ),
+            'credits': forms.TextInput(),
         }
 
 
@@ -110,6 +111,9 @@ class ExternalLearningUnitModelForm(forms.ModelForm):
     class Meta:
         model = ExternalLearningUnitYear
         fields = ('external_acronym', 'external_credits', 'url', 'requesting_entity', 'co_graduation', 'mobility')
+        widgets = {
+            'external_credits': forms.TextInput(),
+        }
 
     def post_clean(self, start_date):
         entity = self.cleaned_data.get('requesting_entity')

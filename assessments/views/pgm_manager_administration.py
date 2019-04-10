@@ -24,12 +24,14 @@
 #
 ##############################################################################
 import json
+from collections import OrderedDict
 
 from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db.models import Q
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DeleteView, FormView
@@ -63,6 +65,12 @@ class ProgramManagerListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['offer_years'] = self.request.GET.getlist('offer_year')
+
+        result = OrderedDict()
+        for i in self.object_list:
+            result.setdefault(i.person, []).append(i)
+
+        context["by_person"] = result
         return context
 
 
@@ -79,7 +87,7 @@ class ProgramManagerMixin(UserPassesTestMixin, AjaxTemplateMixin):
         return self.request.GET['offer_year'].split(',')
 
     def get_success_url(self):
-        url = super().get_success_url() + "?"
+        url = reverse_lazy('manager_list') + "?"
         for oy in self.offer_years:
             url += "offer_year={}&".format(oy)
         return url
@@ -90,12 +98,50 @@ class ProgramManagerDeleteView(ProgramManagerMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['manager'] = self.object.person
         context['other_programs'] = self.object.person.programmanager_set.exclude(pk=self.object.pk)
+        return context
+
+
+class ProgramManagerPersonDeleteView(ProgramManagerMixin, DeleteView):
+    template_name = 'admin/programmanager_confirm_delete_inner.html'
+
+    def get_object(self, queryset=None):
+        return self.model.objects.filter(
+            person__pk=self.kwargs['pk'],
+            offer_year__in=self.offer_years
+        )
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        for obj in self.object.all():
+            obj.delete()
+        return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        manager = Person.objects.get(pk=self.kwargs['pk'])
+        context['manager'] = manager
+        context['other_programs'] = manager.programmanager_set.exclude(offer_year__in=self.offer_years)
         return context
 
 
 class MainProgramManagerUpdateView(ProgramManagerMixin, BaseUpdateView):
     fields = 'is_main',
+
+
+class MainProgramManagerPersonUpdateView(ProgramManagerMixin, ListView):
+    def get_queryset(self):
+        return self.model.objects.filter(
+            person=self.kwargs["pk"],
+            offer_year__in=self.offer_years
+        )
+
+    def post(self, *args, **kwargs):
+        """ Update column is_main for selected offer_years"""
+        val = json.loads(self.request.POST.get('is_main'))
+        self.get_queryset().update(is_main=val)
+        return super()._ajax_response() or HttpResponseRedirect(self.get_success_url())
 
 
 class PersonAutocomplete(autocomplete.Select2QuerySetView):

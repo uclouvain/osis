@@ -122,11 +122,6 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
             "education_group_type": EducationGroupTypeModelChoiceField,
         }
         fields = []
-        widgets = {
-            "duration": forms.TextInput(),
-            "min_constraint": forms.TextInput(),
-            "max_constraint": forms.TextInput(),
-        }
 
     def __init__(self, *args, education_group_type=None, user=None, **kwargs):
         self.user = user
@@ -207,6 +202,10 @@ class EducationGroupModelForm(PermissionFieldEducationGroupMixin, forms.ModelFor
     class Meta:
         model = EducationGroup
         fields = ("start_year", "end_year")
+        widgets = {
+            "start_year": forms.TextInput(),
+            "end_year": forms.TextInput(),
+        }
 
     def save(self, *args, start_year=None, **kwargs):
         if start_year:
