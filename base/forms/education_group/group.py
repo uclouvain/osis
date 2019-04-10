@@ -23,10 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django import forms
+
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, EducationGroupYearModelForm
 from base.models.enums import education_group_categories
-from django.utils.translation import ugettext_lazy as _
-
 from base.models.enums.education_group_categories import Categories
 
 
@@ -51,6 +51,11 @@ class GroupYearModelForm(EducationGroupYearModelForm):
             "constraint_type",
             "management_entity"
         )
+        widgets = {
+            "credits": forms.TextInput(),
+            "min_constraint": forms.TextInput(),
+            "max_constraint": forms.TextInput(),
+        }
 
 
 class GroupModelForm(EducationGroupModelForm):
