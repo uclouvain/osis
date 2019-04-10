@@ -141,7 +141,7 @@ class MainProgramManagerPersonUpdateView(ProgramManagerMixin, ListView):
         """ Update column is_main for selected offer_years"""
         val = json.loads(self.request.POST.get('is_main'))
         self.get_queryset().update(is_main=val)
-        return super()._ajax_response()
+        return super()._ajax_response() or HttpResponseRedirect(self.get_success_url())
 
 
 class PersonAutocomplete(autocomplete.Select2QuerySetView):
