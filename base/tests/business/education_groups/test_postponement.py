@@ -34,8 +34,8 @@ from base.business.utils.model import model_to_dict_fk
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import entity_type
 from base.models.enums import organization_type
-from base.models.enums.education_group_categories import GROUP, MINI_TRAINING
-from base.models.enums.education_group_types import MiniTrainingType
+from base.models.enums.education_group_categories import GROUP, MINI_TRAINING, Categories
+from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
@@ -644,5 +644,66 @@ class TestPostpone(TestCase):
             str(self.postponer.warnings[0]),
             _("%(education_group_year)s (reference link) has not been copied. Its content is empty.") % {
                 "education_group_year": new_referenced_egy.acronym
+            }
+        )
+
+    def test_when_options_in_finalities_are_not_consistent(self):
+        root = GroupElementYearFactory(
+            parent=EducationGroupYearFactory(
+                education_group_type__category=Categories.TRAINING.name,
+                education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+                academic_year=self.current_academic_year,
+                education_group__end_year=None
+            ),
+            child_branch=EducationGroupYearFactory(
+                education_group_type__category=Categories.TRAINING.name,
+                education_group_type__name=TrainingType.MASTER_MA_120.name,
+                academic_year=self.current_academic_year,
+                education_group__end_year=None
+            )
+        )
+
+        child_root = GroupElementYearFactory(
+            parent=root.child_branch,
+            child_branch=EducationGroupYearFactory(
+                education_group_type__category=Categories.GROUP.name,
+                education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
+                academic_year=self.current_academic_year,
+                education_group__end_year=None
+            )
+        )
+
+        child_child_root = GroupElementYearFactory(
+            parent=child_root.child_branch,
+            child_branch=EducationGroupYearFactory(
+                education_group_type__category=Categories.MINI_TRAINING.name,
+                education_group_type__name=MiniTrainingType.OPTION.name,
+                academic_year=self.current_academic_year,
+                education_group__end_year=None
+            )
+        )
+
+        parent_root_n1 = EducationGroupYearFactory(
+            education_group_type=root.parent.education_group_type,
+            education_group=root.parent.education_group,
+            academic_year=self.next_academic_year
+        )
+        child_root_n1 = EducationGroupYearFactory(
+            education_group_type=root.child_branch.education_group_type,
+            education_group=root.child_branch.education_group,
+            academic_year=self.next_academic_year,
+        )
+
+        self.postponer = PostponeContent(root.parent)
+        self.postponer.postpone()
+
+        self.assertEqual(
+            str(self.postponer.warnings[0]),
+            _("The option %(education_group_year_option)s is not anymore accessible in %(education_group_year_root)s "
+              "in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
+                "education_group_year_option": child_child_root.child_branch.acronym,
+                "education_group_year_root": parent_root_n1.acronym,
+                "education_group_year_finality": child_root.child_branch.acronym,
+                "academic_year": self.next_academic_year
             }
         )
