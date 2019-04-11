@@ -28,6 +28,7 @@ from itertools import chain
 
 from django import forms
 from django.db import transaction
+from django.utils.functional import cached_property
 
 from base.business.learning_unit_proposal import compute_proposal_type, \
     compute_proposal_state, copy_learning_unit_data
@@ -60,6 +61,8 @@ class ProposalLearningUnitForm(forms.ModelForm):
             self.enable_field('state')
         else:
             self.disable_field('state')
+            field = self.fields['entity']
+            field.queryset = person.find_main_entities_version
         self.disable_field('type')
 
     def disable_field(self, field):
