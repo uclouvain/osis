@@ -318,12 +318,14 @@ class SimplifiedVolumeForm(forms.ModelForm):
         fields = (
             'hourly_volume_total_annual',
             'hourly_volume_partial_q1',
-            'hourly_volume_partial_q2'
+            'hourly_volume_partial_q2',
+            'planned_classes'
         )
         widgets = {
             'hourly_volume_total_annual': forms.TextInput(),
             'hourly_volume_partial_q1': forms.TextInput(),
             'hourly_volume_partial_q2': forms.TextInput(),
+            'planned_classes': forms.TextInput()
         }
 
     def clean(self):
@@ -377,8 +379,7 @@ class SimplifiedVolumeForm(forms.ModelForm):
 
         if self.instance.hourly_volume_total_annual is None or self.instance.hourly_volume_total_annual == 0:
             self.instance.planned_classes = 0
-        else:
-            self.instance.planned_classes = 1
+
         instance = super().save(commit)
 
         LearningUnitComponent.objects.update_or_create(
