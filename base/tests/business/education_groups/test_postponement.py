@@ -648,7 +648,7 @@ class TestPostpone(TestCase):
         )
 
     def test_when_options_in_finalities_are_not_consistent(self):
-        root = GroupElementYearFactory(
+        root_grp = GroupElementYearFactory(
             parent=EducationGroupYearFactory(
                 education_group_type__category=Categories.TRAINING.name,
                 education_group_type__name=TrainingType.PGRM_MASTER_120.name,
@@ -663,8 +663,8 @@ class TestPostpone(TestCase):
             )
         )
 
-        child_root = GroupElementYearFactory(
-            parent=root.child_branch,
+        child_grp = GroupElementYearFactory(
+            parent=root_grp.child_branch,
             child_branch=EducationGroupYearFactory(
                 education_group_type__category=Categories.GROUP.name,
                 education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
@@ -673,8 +673,8 @@ class TestPostpone(TestCase):
             )
         )
 
-        child_child_root = GroupElementYearFactory(
-            parent=child_root.child_branch,
+        child_child_grp = GroupElementYearFactory(
+            parent=child_grp.child_branch,
             child_branch=EducationGroupYearFactory(
                 education_group_type__category=Categories.MINI_TRAINING.name,
                 education_group_type__name=MiniTrainingType.OPTION.name,
@@ -683,27 +683,27 @@ class TestPostpone(TestCase):
             )
         )
 
-        parent_root_n1 = EducationGroupYearFactory(
-            education_group_type=root.parent.education_group_type,
-            education_group=root.parent.education_group,
+        root_egy_n1 = EducationGroupYearFactory(
+            education_group_type=root_grp.parent.education_group_type,
+            education_group=root_grp.parent.education_group,
             academic_year=self.next_academic_year
         )
-        child_root_n1 = EducationGroupYearFactory(
-            education_group_type=root.child_branch.education_group_type,
-            education_group=root.child_branch.education_group,
+        child_egy_n1 = EducationGroupYearFactory(
+            education_group_type=root_grp.child_branch.education_group_type,
+            education_group=root_grp.child_branch.education_group,
             academic_year=self.next_academic_year,
         )
 
-        self.postponer = PostponeContent(root.parent)
+        self.postponer = PostponeContent(root_grp.parent)
         self.postponer.postpone()
 
         self.assertEqual(
             str(self.postponer.warnings[0]),
             _("The option %(education_group_year_option)s is not anymore accessible in %(education_group_year_root)s "
               "in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
-                "education_group_year_option": child_child_root.child_branch.acronym,
-                "education_group_year_root": parent_root_n1.acronym,
-                "education_group_year_finality": child_root.child_branch.acronym,
+                "education_group_year_option": child_child_grp.child_branch.acronym,
+                "education_group_year_root": root_egy_n1.acronym,
+                "education_group_year_finality": child_grp.child_branch.acronym,
                 "academic_year": self.next_academic_year
             }
         )
