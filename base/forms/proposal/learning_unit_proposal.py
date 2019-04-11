@@ -24,16 +24,15 @@
 #
 ##############################################################################
 from django import forms
-from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl
+from base.business.learning_unit_year_with_context import append_latest_entities
 from base.forms.learning_unit.search_form import LearningUnitSearchForm
 from base.models.entity import Entity
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.business.learning_unit_year_with_context import append_latest_entities, append_components
 
 
 def _get_sorted_choices(tuple_of_choices):
