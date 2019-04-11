@@ -72,6 +72,10 @@ class LearningUnitProposalForm(LearningUnitSearchForm):
         required=False
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['entity_folder_id'].queryset = self.person.find_main_entities_version
+
     def get_proposal_learning_units(self):
         learning_units = self.get_queryset().filter(proposallearningunit__isnull=False)
 
