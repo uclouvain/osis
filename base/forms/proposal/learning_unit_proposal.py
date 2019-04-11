@@ -63,8 +63,8 @@ class LearningUnitProposalForm(LearningUnitSearchForm):
         required=False
     )
 
-    def __init__(self, data, person, *args, initial=None, **kwargs):
-        super().__init__(data, *args, initial=initial, **kwargs)
+    def __init__(self, data, person, *args, **kwargs):
+        super().__init__(data, *args, **kwargs)
         self._get_entity_folder_id_linked_ordered_by_acronym(person)
 
     def _get_entity_folder_id_linked_ordered_by_acronym(self, person):
