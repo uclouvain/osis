@@ -76,9 +76,11 @@ class LearningUnitProposalForm(LearningUnitSearchForm):
     def __init__(self, data, person, *args, initial=None, **kwargs):
         super().__init__(data, *args, initial=initial, **kwargs)
         entities = Entity.objects.filter(proposallearningunit__isnull=False).distinct()
-        entities_sorted_by_acronym = sorted(list(entities.filter(id__in=person.linked_entities)), key=lambda t: t.most_recent_acronym)
-        self.fields['entity_folder_id'].choices = [LearningUnitSearchForm.ALL_LABEL] + [(ent.pk, ent.most_recent_acronym)
-                                                     for ent in entities_sorted_by_acronym]
+        entities_sorted_by_acronym = sorted(list(entities.filter(id__in=person.linked_entities)),
+                                            key=lambda t: t.most_recent_acronym)
+        self.fields['entity_folder_id'].choices = [LearningUnitSearchForm.ALL_LABEL] + \
+                                                  [(ent.pk, ent.most_recent_acronym)
+                                                   for ent in entities_sorted_by_acronym]
 
     def get_proposal_learning_units(self):
         learning_units = self.get_queryset().filter(proposallearningunit__isnull=False)
