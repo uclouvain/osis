@@ -28,7 +28,6 @@ from itertools import chain
 
 from django import forms
 from django.db import transaction
-from django.utils.functional import cached_property
 
 from base.business.learning_unit_proposal import compute_proposal_type, \
     compute_proposal_state, copy_learning_unit_data

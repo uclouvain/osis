@@ -36,15 +36,6 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.business.learning_unit_year_with_context import append_latest_entities, append_components
 
 
-def _get_entity_folder_id_ordered_by_acronym():
-
-    entities = Entity.objects.filter(proposallearningunit__isnull=False).distinct()
-    entities_sorted_by_acronym = sorted(list(entities), key=lambda t: t.most_recent_acronym)
-
-    return [LearningUnitSearchForm.ALL_LABEL] + [(ent.pk, ent.most_recent_acronym)
-                                                 for ent in entities_sorted_by_acronym]
-
-
 def _get_sorted_choices(tuple_of_choices):
     return LearningUnitSearchForm.ALL_CHOICES + tuple(sorted(tuple_of_choices, key=lambda item: item[1]))
 
@@ -53,7 +44,6 @@ class LearningUnitProposalForm(LearningUnitSearchForm):
 
     entity_folder_id = forms.ChoiceField(
         label=_('Folder entity'),
-        choices=lazy(_get_entity_folder_id_ordered_by_acronym, list),
         required=False
     )
 
@@ -75,6 +65,9 @@ class LearningUnitProposalForm(LearningUnitSearchForm):
 
     def __init__(self, data, person, *args, initial=None, **kwargs):
         super().__init__(data, *args, initial=initial, **kwargs)
+        self._get_entity_folder_id_linked_ordered_by_acronym(person)
+
+    def _get_entity_folder_id_linked_ordered_by_acronym(self, person):
         entities = Entity.objects.filter(proposallearningunit__isnull=False).distinct()
         entities_sorted_by_acronym = sorted(list(entities.filter(id__in=person.linked_entities)),
                                             key=lambda t: t.most_recent_acronym)
