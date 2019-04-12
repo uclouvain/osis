@@ -107,6 +107,7 @@ table.volumes tbody {
     border-bottom: 2px solid #c0c0c0;
 }
 
+table.volumes_simplified tbody tr th:nth-child(1),
 table.volumes tbody tr td:nth-child(1),
 table.volumes tbody tr td:nth-child(8),
 table.volumes tbody tr th:nth-child(1),
