@@ -14,15 +14,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            """
-                with all_learning_unit_components AS (
-                    select learning_unit_year_id, learning_component_year_id from base_learningunitcomponent
-                )
-                
+            """               
                 update base_learningcomponentyear
-                set learning_unit_year_id = all_learning_unit_components.learning_unit_year_id 
-                from base_learningcomponentyear as lcy
-                join all_learning_unit_components on all_learning_unit_components.learning_component_year_id = lcy.id
+                set learning_unit_year_id = luc.learning_unit_year_id 
+                from base_learningunitcomponent as luc
+                where luc.learning_component_year_id = base_learningcomponentyear.id
             """
         ),
     ]
