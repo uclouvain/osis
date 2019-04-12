@@ -151,11 +151,12 @@ def learning_units_borrowed_course(request):
 @permission_required('base.can_access_learningunit', raise_exception=True)
 @cache_filter()
 def learning_units_proposal_search(request):
+    user_person = get_object_or_404(Person, user=request.user)
     search_form = LearningUnitProposalForm(
         request.GET or None,
-        initial={'academic_year_id': current_academic_year()}
+        person=user_person,
+        initial={'academic_year_id': current_academic_year()},
     )
-    user_person = get_object_or_404(Person, user=request.user)
     found_learning_units = LearningUnitYear.objects.none()
 
     if search_form.is_valid():

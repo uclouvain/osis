@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-11 11:43+0200\n"
+"POT-Creation-Date: 2019-04-12 09:48+0200\n"
 "PO-Revision-Date: 2019-04-04 13:59+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -803,7 +803,7 @@ msgstr "Date de naissance"
 msgid "Block"
 msgstr "Bloc"
 
-#: templates/learning_units.html:72 views/learning_units/search.py:231
+#: templates/learning_units.html:72 views/learning_units/search.py:232
 msgid "Borrowed courses"
 msgstr "Cours empruntés"
 
@@ -1723,11 +1723,11 @@ msgstr "Finalités"
 msgid "Folder"
 msgstr "Dossier"
 
-#: forms/proposal/learning_unit_proposal.py:54
+#: forms/proposal/learning_unit_proposal.py:45
 msgid "Folder entity"
 msgstr "Sigle dossier"
 
-#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:61
+#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:51
 msgid "Folder num."
 msgstr "N° dossier"
 
@@ -2034,6 +2034,10 @@ msgstr "Action invalide"
 msgid "Invalid code"
 msgstr "Code non valide"
 
+#: forms/learning_unit_pedagogy.py:101 models/teaching_material.py:45
+msgid "Is this teaching material mandatory?"
+msgstr "Ce support de cours est-il obligatoire ?"
+
 #: templatetags/learning_unit_li.py:40
 msgid "Isn't a proposal"
 msgstr "Ce n'est pas une proposition"
@@ -2225,7 +2229,7 @@ msgstr "Recherche d'unités d'enseignement"
 #: templates/learning_unit/summary_list.html:70
 #: templates/learning_unit/volumes_management.html:31
 #: templates/learning_units.html:32 templates/learning_units.html:49
-#: views/learning_units/search.py:232
+#: views/learning_units/search.py:233
 msgid "Learning units"
 msgstr "Unités d'enseignement"
 
@@ -2461,8 +2465,7 @@ msgstr ""
 msgid "Mandates"
 msgstr "Mandates"
 
-#: forms/learning_unit_pedagogy.py:98 forms/learning_unit_pedagogy.py:101
-#: models/group_element_year.py:170 models/teaching_material.py:45
+#: models/group_element_year.py:170
 #: templates/education_group/blocks/content_default_table.html:34
 #: templates/education_group/blocks/table_utilizations.html:36
 #: templates/education_group/pdf_content.html:112
@@ -2716,6 +2719,7 @@ msgstr "Suivant"
 #: business/learning_units/xls_comparison.py:413
 #: business/learning_units/xls_comparison.py:418
 #: business/learning_units/xls_comparison.py:419
+#: forms/learning_unit_pedagogy.py:99
 #: templates/learning_unit/proposal_comparison.html:55
 #: templates/learning_unit/proposal_comparison.html:64
 #: templates/learning_unit/proposal_comparison.html:92
@@ -2763,10 +2767,6 @@ msgstr "Aucune différence"
 msgid "No enrollment for this learning unit"
 msgstr "Il n'y a aucune inscription pour cette unité d'enseignement"
 
-#: forms/learning_unit_pedagogy.py:99
-msgid "No mandatory"
-msgstr "Non-obligatoire"
-
 #: forms/prerequisite.py:113
 #: tests/views/education_groups/learning_unit/test_update.py:203
 #: tests/views/education_groups/learning_unit/test_update.py:207
@@ -2781,7 +2781,7 @@ msgid "No print"
 msgstr "Pas d’impression"
 
 #: tests/views/test_learning_unit_proposal.py:429
-#: views/learning_units/search.py:205
+#: views/learning_units/search.py:206
 msgid "No proposals was selected."
 msgstr "Aucune proposition n'a été sélectionnée."
 
@@ -3367,21 +3367,21 @@ msgid "Proposal of creation"
 msgstr "Proposition de création"
 
 #: business/learning_unit.py:95 business/learning_unit_xls.py:81
-#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:70
+#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:60
 #: templates/learning_unit/by_proposal.html:88
 #: tests/business/test_learning_unit_xls.py:325 utils/send_mail.py:235
 msgid "Proposal status"
 msgstr "Etat proposition"
 
 #: business/learning_unit.py:94 business/learning_unit_xls.py:80
-#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:64
+#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:54
 #: templates/learning_unit/by_proposal.html:87
 #: tests/business/test_learning_unit_xls.py:324
 msgid "Proposal type"
 msgstr "Type proposition"
 
 #: business/proposal_xls.py:34 business/proposal_xls.py:35
-#: templates/learning_units.html:77 views/learning_units/search.py:229
+#: templates/learning_units.html:77 views/learning_units/search.py:230
 msgid "Proposals"
 msgstr "Propositions"
 
@@ -3662,7 +3662,7 @@ msgstr "Recherche d'organisations"
 msgid "Search of annual programs"
 msgstr "Recherche des programmes annualisés"
 
-#: views/learning_units/search.py:223
+#: views/learning_units/search.py:224
 msgid "Search type"
 msgstr "Type de recherche"
 
@@ -3707,7 +3707,7 @@ msgstr "Envoyer un email de rappel pour la mise à jour des fiches descriptives"
 msgid "Separate"
 msgstr "Séparer"
 
-#: templates/learning_units.html:67 views/learning_units/search.py:230
+#: templates/learning_units.html:67 views/learning_units/search.py:231
 msgid "Service courses"
 msgstr "Cours de service"
 
@@ -4986,6 +4986,7 @@ msgstr "Xls avec les propositions"
 #: business/learning_units/xls_comparison.py:413
 #: business/learning_units/xls_comparison.py:418
 #: business/learning_units/xls_comparison.py:419
+#: forms/learning_unit_pedagogy.py:98
 #: templates/learning_unit/proposal_comparison.html:53
 #: templates/learning_unit/proposal_comparison.html:62
 #: templates/learning_unit/proposal_comparison.html:90
@@ -5871,6 +5872,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:163
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "P.C."
-#~ msgstr "C.P."
