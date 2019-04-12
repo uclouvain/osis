@@ -25,8 +25,7 @@
 ##############################################################################
 from django.urls import reverse_lazy
 
-import base.business.education_groups.delete
-from base.business.education_groups import shorten
+from base.business.education_groups import delete
 from base.models.education_group import EducationGroup
 from base.views.education_groups.perms import can_delete_all_education_group
 from base.views.mixins import DeleteViewWithDependencies
@@ -54,10 +53,10 @@ class DeleteGroupEducationView(DeleteViewWithDependencies):
 
     def get_protected_messages(self):
         """This function will return all protected message ordered by year"""
-        self.education_group_years = self.get_object().educationgroupyear_set.all().order_by('academic_year__year')
+        self.education_group_years = delete.get_education_group_years_to_delete(self.get_object())
         protected_messages = []
         for education_group_year in self.education_group_years:
-            protected_message = base.business.education_groups.delete.get_protected_messages_by_education_group_year(education_group_year)
+            protected_message = delete.get_protected_messages_by_education_group_year(education_group_year)
             if protected_message:
                 protected_messages.append({
                     'education_group_year': education_group_year,

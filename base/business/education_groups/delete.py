@@ -25,6 +25,8 @@
 ##############################################################################
 from django.utils.translation import ngettext_lazy, ugettext_lazy as _
 
+from base.models.authorized_relationship import AuthorizedRelationship
+from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
 from base.models.offer_enrollment import OfferEnrollment
 
@@ -53,5 +55,32 @@ def get_protected_messages_by_education_group_year(education_group_year):
     return protected_message
 
 
+def get_education_group_years_to_delete(education_group, end_year=None):
+    """
+    Return all education group year to delete + all children which are mandatory groups
+    :param education_group:
+    :param end_year: If no end year specified, it mean that we want to remove all education_group_year
+    :return: education group year queryset
+    """
+    qs = EducationGroupYear.objects.filter(education_group=education_group)
+    if end_year is not None:
+        qs = qs.filter(academic_year__year__gt=end_year)
+    return qs.order_by('academic_year__year')
+
+
 def _have_contents(education_group_year):
-    return GroupElementYear.objects.filter(parent=education_group_year).exists()
+    """
+    An education group year is empty if:
+        - it has no children
+        - all of his children are mandatory groups and they are empty
+    """
+    mandatory_groups_qs = AuthorizedRelationship.objects.filter(
+        parent_type=education_group_year.education_group_type,
+        min_count_authorized=1
+    ).values('pk')
+
+    qs = GroupElementYear.objects\
+        .filter(parent=education_group_year)\
+        .exclude(child_branch__education_group_type__authorized_child_type__in=mandatory_groups_qs)
+
+    return qs.exists()

@@ -28,14 +28,13 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_groups import delete
-from base.models.education_group_year import EducationGroupYear
 
 
 def start(education_group, until_year):
     """
     This function will delete all education group year
     """
-    education_group_years_to_delete = _get_education_group_years_to_delete(education_group, until_year)
+    education_group_years_to_delete = delete.get_education_group_years_to_delete(education_group, end_year=until_year)
     egy_deleted = []
     for education_group_year in education_group_years_to_delete:
         egy_deleted.append(education_group_year)
@@ -44,7 +43,7 @@ def start(education_group, until_year):
 
 
 def check_education_group_end_date(education_group, end_year):
-    education_group_years_to_delete = _get_education_group_years_to_delete(education_group, end_year)
+    education_group_years_to_delete = delete.get_education_group_years_to_delete(education_group, end_year=end_year)
     protected_messages = _get_protected_messages(education_group_years_to_delete)
     if protected_messages:
         error_msg = _get_formated_error_msg(end_year, protected_messages)
@@ -65,13 +64,6 @@ def _get_formated_error_msg(end_year, protected_messages):
         )
     error_msg += "</ul>"
     return mark_safe(error_msg)
-
-
-def _get_education_group_years_to_delete(education_group, end_year):
-    return EducationGroupYear.objects.filter(
-        education_group=education_group,
-        academic_year__year__gt=end_year
-    ).order_by('academic_year__year')
 
 
 def _get_protected_messages(education_group_years):
