@@ -283,6 +283,7 @@ class TestUpdate(TestCase):
             "primary_language": LanguageFactory().pk,
             "start_year": 2010,
             "constraint_type": "",
+            "diploma_printing_title": "Diploma Title",
         }
         response = self.client.post(self.training_url, data=data)
         self.assertEqual(response.status_code, 302)
@@ -326,6 +327,7 @@ class TestUpdate(TestCase):
             "primary_language": LanguageFactory().pk,
             "start_year": 2010,
             "constraint_type": "",
+            "diploma_printing_title": "Diploma Title",
         }
         response = self.client.post(self.mini_training_url, data=data)
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
@@ -360,6 +362,7 @@ class TestUpdate(TestCase):
             "start_year": 2010,
             "end_year": 2018,
             "constraint_type": "",
+            "diploma_printing_title": "Diploma Title",
         }
         response = self.client.post(self.training_url, data=data)
         messages = [m.message for m in get_messages(response.wsgi_request)]
@@ -451,7 +454,9 @@ class TestSelectAttach(TestCase):
             "learning_unit_select",
             args=[self.learning_unit_year.id]
         )
-        group_above_new_parent = GroupElementYearFactory(child_branch=self.new_parent_education_group_year)
+        group_above_new_parent = GroupElementYearFactory(parent=EducationGroupYearFactory(
+                                                                    academic_year=self.academic_year),
+                                                         child_branch=self.new_parent_education_group_year)
 
         self.url_management = reverse("education_groups_management")
         self.select_data = {

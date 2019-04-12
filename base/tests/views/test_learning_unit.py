@@ -45,7 +45,7 @@ import reference.models.language
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit as learning_unit_business
-from base.business.learning_unit import LEARNING_UNIT_TITLES_PART1, LEARNING_UNIT_TITLES_PART2
+from base.business.learning_unit import learning_unit_titles_part1, learning_unit_titles_part2
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit.search_form import LearningUnitYearForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
@@ -62,6 +62,7 @@ from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.person import Person
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
@@ -371,8 +372,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
         self.assertEqual(len(context['types']),
                          len(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES))
-        self.assertEqual(len(context['container_types']),
-                         len(learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES))
+        self.assertEqual(len(context['container_types']), len(LearningContainerYearType.choices()))
         self.assertTrue(context['experimental_phase'])
         self.assertEqual(context['learning_units_count'], 0)
 
@@ -1193,8 +1193,8 @@ class TestCreateXls(TestCase):
 
 
 def _generate_xls_build_parameter(xls_data, user):
-    titles = LEARNING_UNIT_TITLES_PART1.copy()
-    titles.extend(LEARNING_UNIT_TITLES_PART2.copy())
+    titles = learning_unit_titles_part1()
+    titles.extend(learning_unit_titles_part2())
     return {
         xls_build.LIST_DESCRIPTION_KEY: _(learning_unit_business.XLS_DESCRIPTION),
         xls_build.FILENAME_KEY: _(learning_unit_business.XLS_FILENAME),

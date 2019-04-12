@@ -26,6 +26,7 @@
 import abc
 
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.utils.functional import cached_property
 from django.utils.translation import ngettext
 
@@ -48,14 +49,55 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
 
     @cached_property
     def parents(self):
-        return EducationGroupYear.hierarchy.filter(pk=self.parent.pk).get_parents()\
+        return EducationGroupYear.hierarchy.filter(pk=self.parent.pk).get_parents() \
                                            .select_related('education_group_type')
 
     def is_valid(self):
-        if self.parent.education_group_type.name in TrainingType.finality_types() or \
-                self.parents.filter(education_group_type__name__in=TrainingType.finality_types()).exists():
+        if self.parent.education_group_type.name in TrainingType.root_master_2m_types() or \
+                self.parents.filter(education_group_type__name__in=TrainingType.root_master_2m_types()).exists():
+            self._check_end_year_constraints_on_2m()
             self._check_attach_options_rules()
         return True
+
+    def _check_end_year_constraints_on_2m(self):
+        """
+        In context of 2M, when we add a finality [or group which contains finality], we must ensure that
+        the end date of all 2M is greater or equals of all finalities
+        """
+        finalities_to_add_qs = EducationGroupYear.objects.filter(pk=self.child.pk) | \
+            EducationGroupYear.hierarchy.filter(pk=self.child.pk).get_children()
+        finalities_to_add_qs = finalities_to_add_qs.filter(education_group_type__name__in=TrainingType.finality_types())
+
+        root_2m_qs = self.parents | EducationGroupYear.objects.filter(pk=self.parent.pk)
+        root_2m_qs = root_2m_qs.filter(
+            education_group_type__name__in=TrainingType.root_master_2m_types(),
+            education_group__end_year__isnull=False,
+        ).order_by('education_group__end_year')
+
+        errors = []
+        if finalities_to_add_qs.exists() and root_2m_qs.exists():
+            root_2m_early_end_date = root_2m_qs.first()
+            invalid_finalities_acronyms = finalities_to_add_qs.filter(
+                Q(education_group__end_year__gt=root_2m_early_end_date.education_group.end_year) |
+                Q(education_group__end_year__isnull=True)
+            ).values_list('acronym', flat=True)
+
+            if invalid_finalities_acronyms:
+                errors.append(
+                    ValidationError(
+                        ngettext(
+                            "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s program.",
+                            "Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s program.",
+                            len(invalid_finalities_acronyms)
+                        ) % {
+                            "acronym": ', '.join(invalid_finalities_acronyms),
+                            "root_acronym": root_2m_early_end_date.acronym
+                        }
+                    )
+                )
+
+        if errors:
+            raise ValidationError(errors)
 
     def _check_attach_options_rules(self):
         """
@@ -66,26 +108,33 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         if self.child.education_group_type.name == MiniTrainingType.OPTION.name:
             options_to_add += [self.child]
 
-        errors = []
-        for root in self.parents.filter(education_group_type__name__in=[TrainingType.PGRM_MASTER_120.name,
-                                                                        TrainingType.PGRM_MASTER_180_240.name]):
-            options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
-            missing_options = set(options_to_add) - set(options_in_2m)
+        finalities_qs = self.parents | EducationGroupYear.objects.filter(pk=self.parent.pk)
+        finalities_pks = finalities_qs.filter(education_group_type__name__in=TrainingType.finality_types())\
+                                      .values_list('pk', flat=True)
+        if finalities_pks:
+            root_2m_qs = EducationGroupYear.hierarchy.filter(pk__in=finalities_pks).get_parents().filter(
+                education_group_type__name__in=TrainingType.root_master_2m_types()
+            )
 
-            if missing_options:
-                errors.append(
-                    ValidationError(
-                        ngettext(
-                            "Option \"%(acronym)s\" must be present in %(root_acronym)s program.",
-                            "Options \"%(acronym)s\" must be present in %(root_acronym)s program.",
-                            len(missing_options)
-                        ) % {
-                            "acronym": ', '.join(option.acronym for option in missing_options),
-                            "root_acronym": root.acronym
-                        })
-                )
-        if errors:
-            raise ValidationError(errors)
+            errors = []
+            for root in root_2m_qs:
+                options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
+                missing_options = set(options_to_add) - set(options_in_2m)
+
+                if missing_options:
+                    errors.append(
+                        ValidationError(
+                            ngettext(
+                                "Option \"%(acronym)s\" must be present in %(root_acronym)s program.",
+                                "Options \"%(acronym)s\" must be present in %(root_acronym)s program.",
+                                len(missing_options)
+                            ) % {
+                                "acronym": ', '.join(option.acronym for option in missing_options),
+                                "root_acronym": root.acronym
+                            })
+                    )
+            if errors:
+                raise ValidationError(errors)
 
 
 class AttachLearningUnitYearStrategy(AttachStrategy):

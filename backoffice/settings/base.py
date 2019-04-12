@@ -117,6 +117,7 @@ APPS_TO_TEST = (
 TEST_RUNNER = os.environ.get('TEST_RUNNER', 'osis_common.tests.runner.InstalledAppsTestRunner')
 SKIP_QUEUES_TESTS = os.environ.get('SKIP_QUEUES_TESTS', 'False').lower() == 'true'
 QUEUES_TESTING_TIMEOUT = float(os.environ.get('QUEUES_TESTING_TIMEOUT', 0.1))
+TESTS_TYPES = os.environ.get('TESTS_TYPES', 'UNIT')
 
 TEMPLATES = [
     {
@@ -217,7 +218,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = int(os.environ.get('DATA_UPLOAD_MAX_NUMBER_FIELD
 # Ex : LOGO_INSTITUTION_URL = 'https://www.google.be/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png'
 # A relative URL will work on local , but not out of the box on the servers.
 LOGO_INSTITUTION_URL = os.environ.get('LOGO_INSTITUTION_URL',
-                                      os.path.join(BASE_DIR, "base/static/img/logo_institution.jpg"))
+                                      os.path.join(BASE_DIR, "base/static/img/logo_uclouvain.png"))
 LOGO_OSIS_URL = os.environ.get('LOGO_OSIS_URL', '')
 
 # The Queues are optional
@@ -459,3 +460,4 @@ URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/pr
 GET_SECTION_PARAM = os.environ.get("GET_SECTION_PARAM", "")
 
 YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 2018))
+YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 2019))

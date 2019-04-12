@@ -58,9 +58,8 @@ class SelectAttributionView(AttributionBaseViewMixin, TemplateView):
             .annotate(id_text=Concat("attribution__tutor__person__global_id", "attribution__function")) \
             .values_list("id_text", flat=True)
 
-        parent_luc = LearningUnitComponent.objects.filter(learning_unit_year=self.parent_luy)
         parent_attributions = AttributionNew.objects \
-            .filter(attributionchargenew__learning_component_year__learningunitcomponent__in=parent_luc) \
+            .filter(attributionchargenew__learning_component_year__learningunityear=self.parent_luy) \
             .distinct("id") \
             .annotate(id_text=Concat("tutor__person__global_id", "function")) \
             .exclude(id_text__in=attributions_to_exclude) \
@@ -105,10 +104,10 @@ class AddChargeRepartition(EditAttributionView):
         return copy_attribution
 
     def lecturing_charge_form_valid(self, lecturing_charge_form):
-        lecturing_charge_form.save(attribution=self.get_copy_attribution, learning_unit_year=self.luy)
+        lecturing_charge_form.save(attribution=self.get_copy_attribution)
 
     def practical_charge_form_valid(self, practical_charge_form):
-        practical_charge_form.save(attribution=self.get_copy_attribution, learning_unit_year=self.luy)
+        practical_charge_form.save(attribution=self.get_copy_attribution)
 
     def get_lecturing_charge_form_initial(self):
         lecturing_allocation_charge = self.attribution.lecturing_charges[0].allocation_charge \

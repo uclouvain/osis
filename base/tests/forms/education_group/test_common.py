@@ -42,7 +42,7 @@ from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.campus import CampusFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory, MiniTrainingEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_version import MainEntityVersionFactory, EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -233,9 +233,11 @@ class TestCommonBaseFormSave(TestCase):
 
     def test_update_without_parent(self):
         entity_version = MainEntityVersionFactory()
+        education_group_type = MiniTrainingEducationGroupTypeFactory()
         initial_educ_group_year = EducationGroupYearFactory(academic_year=current_academic_year(),
                                                             management_entity=entity_version.entity,
-                                                            education_group__start_year=current_academic_year().year)
+                                                            education_group__start_year=current_academic_year().year,
+                                                            education_group_type=education_group_type)
 
         initial_educ_group = initial_educ_group_year.education_group
 
@@ -295,12 +297,17 @@ class TestCommonBaseFormSave(TestCase):
 
     @patch('base.forms.education_group.common.find_authorized_types', return_value=EducationGroupType.objects.all())
     def test_update_with_parent_when_existing_group_element_year(self, mock_find_authorized_types):
-        parent = EducationGroupYearFactory(academic_year=self.expected_educ_group_year.academic_year)
+        parent = EducationGroupYearFactory(
+            academic_year=self.expected_educ_group_year.academic_year,
+            education_group__end_year=None
+        )
 
         entity_version = MainEntityVersionFactory()
-        initial_educ_group_year = EducationGroupYearFactory(management_entity=entity_version.entity,
-                                                            academic_year=self.expected_educ_group_year.academic_year,
-                                                            education_group__start_year=current_academic_year().year)
+        initial_educ_group_year = EducationGroupYearFactory(
+            management_entity=entity_version.entity,
+            academic_year=self.expected_educ_group_year.academic_year,
+            education_group__start_year=current_academic_year().year
+        )
 
         GroupElementYearFactory(parent=parent, child_branch=initial_educ_group_year)
         initial_count = GroupElementYear.objects.all().count()

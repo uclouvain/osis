@@ -44,7 +44,8 @@ from base.forms.learning_unit.search_form import LearningUnitYearForm, ExternalL
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm, ProposalStateModelForm
 from base.forms.search.search_form import get_research_criteria
 from base.models.academic_year import current_academic_year, get_last_academic_years, starting_academic_year
-from base.models.enums import learning_container_year_types, learning_unit_year_subtypes
+from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -82,7 +83,6 @@ def learning_units_search(request, search_type):
 
     except TooManyResultsException:
         display_error_messages(request, 'too_many_results')
-
     if request.POST.get('xls_status') == "xls":
         return create_xls(request.user, found_learning_units, _get_filter(form, search_type))
 
@@ -110,7 +110,7 @@ def learning_units_search(request, search_type):
     context = {
         'form': form,
         'academic_years': get_last_academic_years(),
-        'container_types': learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES,
+        'container_types': LearningContainerYearType.choices(),
         'types': learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
         'learning_units_count': len(found_learning_units)
         if isinstance(found_learning_units, list) else
@@ -151,11 +151,12 @@ def learning_units_borrowed_course(request):
 @permission_required('base.can_access_learningunit', raise_exception=True)
 @cache_filter()
 def learning_units_proposal_search(request):
+    user_person = get_object_or_404(Person, user=request.user)
     search_form = LearningUnitProposalForm(
         request.GET or None,
-        initial={'academic_year_id': current_academic_year()}
+        person=user_person,
+        initial={'academic_year_id': current_academic_year()},
     )
-    user_person = get_object_or_404(Person, user=request.user)
     found_learning_units = LearningUnitYear.objects.none()
 
     if search_form.is_valid():

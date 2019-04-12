@@ -44,12 +44,14 @@
                     <table class="table table-striped table-hover">
                         <thead>
                         <tr>
-                            <td>{% trans 'person' %}</td>
+                            <th>{% trans 'Person' %}</th>
+                            <th></th>
                         </tr>
                         </thead>
                         {% for program_manager in program_managers %}
                             <tr>
                                 <td>{{ program_manager.person }}</td>
+                                <td>{% if program_manager.is_main %}{% trans "Main" %}{% endif %}</td>
                             </tr>
                         {% endfor %}
                     </table>

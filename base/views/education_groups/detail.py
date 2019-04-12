@@ -65,6 +65,7 @@ from base.models.enums.education_group_types import TrainingType, GroupType, Min
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.person import Person
+from base.models.program_manager import ProgramManager
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
@@ -449,12 +450,9 @@ class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        pgm_mgrs = Person.objects.filter(
-            programmanager__education_group=self.object.education_group
-        ).order_by(
-            "last_name",
-            "first_name"
-        )
+        pgm_mgrs = ProgramManager.objects.filter(
+            education_group=self.object.education_group
+        ).order_by("person__last_name", "person__first_name")
 
         mandataries = Mandatary.objects.filter(
             mandate__education_group=self.object.education_group,

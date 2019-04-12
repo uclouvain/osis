@@ -122,11 +122,6 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
             "education_group_type": EducationGroupTypeModelChoiceField,
         }
         fields = []
-        widgets = {
-            "duration": forms.NumberInput(attrs={'min': 1}),
-            "min_constraint": forms.NumberInput(attrs={'min': 1}),
-            "max_constraint": forms.NumberInput(attrs={'min': 1}),
-        }
 
     def __init__(self, *args, education_group_type=None, user=None, **kwargs):
         self.user = user
@@ -207,6 +202,10 @@ class EducationGroupModelForm(PermissionFieldEducationGroupMixin, forms.ModelFor
     class Meta:
         model = EducationGroup
         fields = ("start_year", "end_year")
+        widgets = {
+            "start_year": forms.TextInput(),
+            "end_year": forms.TextInput(),
+        }
 
     def save(self, *args, start_year=None, **kwargs):
         if start_year:
@@ -223,6 +222,9 @@ class CommonBaseForm:
     education_group_year_deleted = []
 
     def __init__(self, data, instance=None, parent=None, user=None, education_group_type=None, **kwargs):
+        if education_group_type is None:
+            education_group_type = instance.education_group_type if instance else None
+
         self.education_group_year_form = self.education_group_year_form_class(
             data,
             instance=instance,

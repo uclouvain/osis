@@ -23,10 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import datetime
 from unittest import mock
 
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.http import HttpResponseRedirect
 from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
@@ -34,21 +36,31 @@ from waffle.testutils import override_flag
 from base.forms.education_group.group import GroupYearModelForm
 from base.forms.education_group.mini_training import MiniTrainingYearModelForm
 from base.forms.education_group.training import TrainingEducationGroupYearForm
-from base.models.enums import education_group_categories
+from base.models.enums import education_group_categories, organization_type
 from base.models.enums.education_group_categories import TRAINING, Categories
+from base.models.enums.entity_type import FACULTY
 from base.models.exceptions import ValidationWarning
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
+from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
+from base.tests.factories.person_entity import PersonEntityFactory
+from reference.tests.factories.language import LanguageFactory
 
 
 @override_flag('education_group_create', active=True)
 class TestCreate(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.parent_education_group_year = EducationGroupYearFactory()
+        cls.current_academic_year = create_current_academic_year()
+        cls.generated_ac_years = GenerateAcademicYear(cls.current_academic_year.year + 1,
+                                                      cls.current_academic_year.year + 10)
+        cls.parent_education_group_year = EducationGroupYearFactory(academic_year=cls.current_academic_year)
 
         cls.test_categories = [
             education_group_categories.GROUP,
@@ -91,7 +103,12 @@ class TestCreate(TestCase):
             education_group_categories.TRAINING: "education_group/create_trainings.html",
             education_group_categories.MINI_TRAINING: "education_group/create_mini_trainings.html",
         }
+        cls.organization = OrganizationFactory(type=organization_type.MAIN)
+        cls.entity = EntityFactory(organization=cls.organization)
+        cls.entity_version = EntityVersionFactory(entity=cls.entity, entity_type=FACULTY, start_date=datetime.now())
+        cls.language = LanguageFactory()
         cls.person = PersonFactory()
+        PersonEntityFactory(person=cls.person, entity=cls.entity)
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -148,6 +165,55 @@ class TestCreate(TestCase):
                 response = self.client.get(self.urls_without_parent_by_category.get(category))
                 form_education_group_year = response.context["form_education_group_year"]
                 self.assertIsInstance(form_education_group_year, expected_forms_by_category.get(category))
+
+
+@override_flag('education_group_create', active=True)
+class TestCreateForm(TestCase):
+    def setUp(self):
+        self.current_academic_year = create_current_academic_year()
+        self.generated_ac_years = GenerateAcademicYear(self.current_academic_year.year + 1,
+                                                       self.current_academic_year.year + 10)
+        self.parent_education_group_year = EducationGroupYearFactory(academic_year=self.current_academic_year)
+        self.test_categories = [
+            education_group_categories.GROUP,
+            education_group_categories.TRAINING,
+            education_group_categories.MINI_TRAINING,
+        ]
+        self.education_group_types = [
+            EducationGroupTypeFactory(category=category)
+            for category in self.test_categories
+        ]
+
+        self.organization = OrganizationFactory(type=organization_type.MAIN)
+        self.entity = EntityFactory(organization=self.organization)
+        self.entity_version = EntityVersionFactory(entity=self.entity, entity_type=FACULTY, start_date=datetime.now())
+        self.language = LanguageFactory()
+        self.person = PersonFactory()
+        PersonEntityFactory(person=self.person, entity=self.entity)
+        self.client.force_login(self.person.user)
+        self.perm_patcher = mock.patch("base.business.education_groups.perms._is_eligible_to_add_education_group",
+                                       return_value=True)
+        self.mocked_perm = self.perm_patcher.start()
+
+    def test_redirect_after_creation(self):
+        url = reverse('new_education_group', args=[self.education_group_types[1].category,
+                                                   self.education_group_types[1].id])
+        data = {
+            'acronym': 'YOLO1BA',
+            'partial_acronym': 'LYOLO1B',
+            'active': 'ACTIVE',
+            'schedule_type': 'DAILY',
+            'credits': '180',
+            'title': 'Bachelier en',
+            'academic_year': self.current_academic_year.id,
+            'management_entity': self.entity_version.id,
+            'administration_entity': self.entity_version.id,
+            'internship': ['NO'],
+            'primary_language': self.language.id,
+            'diploma_printing_title': "title",
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
 
 class TestValidateField(TestCase):

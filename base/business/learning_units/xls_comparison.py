@@ -26,30 +26,30 @@
 from django.utils.translation import ugettext_lazy as _
 from openpyxl.utils import get_column_letter
 
+from base.business import learning_unit_year_with_context
+from base.business.entity import build_entity_container_prefetch
+from base.business.learning_unit import get_organization_from_learning_unit_year
+from base.business.learning_unit_year_with_context import append_latest_entities, append_components, \
+    get_learning_component_prefetch
+from base.business.learning_units.comparison import get_partims_as_str
 from base.business.proposal_xls import BLANK_VALUE, XLS_DESCRIPTION_COMPARISON, XLS_COMPARISON_FILENAME, \
-    COMPARISON_PROPOSAL_TITLES, COMPARISON_WORKSHEET_TITLE, BASIC_TITLES, COMPONENTS_TITLES
+    COMPARISON_PROPOSAL_TITLES, COMPARISON_WORKSHEET_TITLE, basic_titles, components_titles
+from base.business.utils.convert import volume_format
+from base.business.xls import get_name_or_username
+from base.models.academic_year import current_academic_year
 from base.models.campus import find_by_id as find_campus_by_id
 from base.models.entity import find_by_id
-from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES
+from base.models.enums import entity_container_year_link_type as entity_types, vacant_declaration_type, \
+    attribution_procedure
+from base.models.enums import learning_component_year_type
+from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from base.models.learning_unit_year import LearningUnitYear, get_by_id
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_common.document import xls_build
-from base.business.xls import get_name_or_username
-from base.business.learning_unit_year_with_context import append_latest_entities, append_components, \
-    get_learning_component_prefetch
-from base.business.entity import build_entity_container_prefetch
-from base.models.enums import entity_container_year_link_type as entity_types, vacant_declaration_type, \
-    attribution_procedure
-from base.models.enums import learning_component_year_type
-from base.business.learning_unit import get_organization_from_learning_unit_year
-from base.business.learning_units.comparison import get_partims_as_str
-from base.models.academic_year import current_academic_year
-from base.business.utils.convert import volume_format
-from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
-from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
-from base.business import learning_unit_year_with_context
 from reference.models.language import find_by_id as find_language_by_id
 
 EMPTY_VALUE = ''
@@ -60,14 +60,15 @@ WORKSHEET_TITLE = 'learning_units_comparison'
 XLS_FILENAME = 'learning_units_comparison'
 XLS_DESCRIPTION = _("Comparison of learning units")
 
-
-LEARNING_UNIT_TITLES = BASIC_TITLES + COMPONENTS_TITLES
-
 ACRONYM_COL_NUMBER = 0
 ACADEMIC_COL_NUMBER = 1
 CELLS_MODIFIED_NO_BORDER = 'modifications'
 CELLS_TOP_BORDER = 'border_not_modified'
 DATA = 'data'
+
+
+def learning_unit_titles():
+    return basic_titles() + components_titles()
 
 
 def create_xls_comparison(user, learning_unit_years, filters, academic_yr_comparison):
@@ -81,12 +82,11 @@ def create_xls_comparison(user, learning_unit_years, filters, academic_yr_compar
         working_sheets_data = data.get('data')
         cells_modified_with_green_font = data.get(CELLS_MODIFIED_NO_BORDER)
         cells_with_top_border = data.get(CELLS_TOP_BORDER)
-
     parameters = {
         xls_build.DESCRIPTION: XLS_DESCRIPTION,
         xls_build.USER: get_name_or_username(user),
         xls_build.FILENAME: XLS_FILENAME,
-        xls_build.HEADER_TITLES: LEARNING_UNIT_TITLES,
+        xls_build.HEADER_TITLES: learning_unit_titles(),
         xls_build.WS_TITLE: WORKSHEET_TITLE,
     }
     dict_styled_cells = {}
@@ -297,7 +297,7 @@ def _check_changes_other_than_code_and_year(first_data, second_data, line_index)
 
 def get_border_columns(line):
     style = []
-    for col_index, obj in enumerate(LEARNING_UNIT_TITLES, start=1):
+    for col_index, obj in enumerate(learning_unit_titles(), start=1):
         style.append('{}{}'.format(get_column_letter(col_index), line))
     return style
 
@@ -392,7 +392,7 @@ def _get_data_from_initial_data(initial_data):
         str(_('Initial data')),
         luy_initial['acronym'],
         learning_unit_yr.academic_year.name,
-        dict(LEARNING_CONTAINER_YEAR_TYPES)[lcy_initial['container_type']] if
+        dict(LearningContainerYearType.choices())[lcy_initial['container_type']] if
         lcy_initial['container_type'] else '-',
         translate_status(luy_initial['status']),
         learning_unit_yr.get_subtype_display(),
