@@ -59,7 +59,7 @@
 
     {% as_messages_warning as messages_warning %}
     {% if messages_warning %}
-        <div id="pnl_warning_messages" class="alert alert-warning" role="alert">
+        <div id="pnl_warning_messages" class="alert alert-warning" role="alert" style="max-height: 250px; overflow: auto;">
             <ul>
                 {% for message in messages %}
                     {% if 'warning' in message.tags %}
