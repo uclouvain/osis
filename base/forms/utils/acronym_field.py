@@ -143,7 +143,9 @@ def split_acronym(value, subtype=learning_unit_year_subtypes.PARTIM):
     Index 2 :  Subdivision
     """
     last_digit_position = re.match('.+([0-9])[^0-9]*$', value).start(1)
-    base_acronym = [value[0], value[1:last_digit_position + 1]]
     if subtype == learning_unit_year_subtypes.PARTIM:
-        base_acronym.append(value[last_digit_position + 1] if len(value) > last_digit_position + 1 else '')
+        base_acronym = [value[0], value[1:len(value) - 1]]
+        base_acronym.append(value[len(value) - 1])
+    else:
+        base_acronym = [value[0], value[1:last_digit_position + 1]]
     return base_acronym
