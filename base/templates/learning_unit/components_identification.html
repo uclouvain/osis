@@ -79,8 +79,6 @@
     {% endfor %}
     </tbody>
 </table>
-{% if not form_end_date %}
-    <div class="text-right">
-        {% include "learning_unit/blocks/manage_volumes_button.html" with form_type="simple" %}
-    </div>
-{% endif %}
+<div class="text-right">
+    {% include "learning_unit/blocks/manage_volumes_button.html" with form_type="simple" %}
+</div>
