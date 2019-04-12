@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-11 11:43+0200\n"
+"POT-Creation-Date: 2019-04-12 09:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -774,7 +774,7 @@ msgstr ""
 msgid "Block"
 msgstr ""
 
-#: templates/learning_units.html:72 views/learning_units/search.py:231
+#: templates/learning_units.html:72 views/learning_units/search.py:232
 msgid "Borrowed courses"
 msgstr ""
 
@@ -1679,11 +1679,11 @@ msgstr ""
 msgid "Folder"
 msgstr ""
 
-#: forms/proposal/learning_unit_proposal.py:54
+#: forms/proposal/learning_unit_proposal.py:45
 msgid "Folder entity"
 msgstr ""
 
-#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:61
+#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:51
 msgid "Folder num."
 msgstr ""
 
@@ -1990,6 +1990,10 @@ msgstr ""
 msgid "Invalid code"
 msgstr ""
 
+#: forms/learning_unit_pedagogy.py:101 models/teaching_material.py:45
+msgid "Is this teaching material mandatory?"
+msgstr ""
+
 #: templatetags/learning_unit_li.py:40
 msgid "Isn't a proposal"
 msgstr ""
@@ -2171,7 +2175,7 @@ msgstr ""
 #: templates/learning_unit/summary_list.html:70
 #: templates/learning_unit/volumes_management.html:31
 #: templates/learning_units.html:32 templates/learning_units.html:49
-#: views/learning_units/search.py:232
+#: views/learning_units/search.py:233
 msgid "Learning units"
 msgstr ""
 
@@ -2398,8 +2402,7 @@ msgstr ""
 msgid "Mandates"
 msgstr ""
 
-#: forms/learning_unit_pedagogy.py:98 forms/learning_unit_pedagogy.py:101
-#: models/group_element_year.py:170 models/teaching_material.py:45
+#: models/group_element_year.py:170
 #: templates/education_group/blocks/content_default_table.html:34
 #: templates/education_group/blocks/table_utilizations.html:36
 #: templates/education_group/pdf_content.html:112
@@ -2653,6 +2656,7 @@ msgstr ""
 #: business/learning_units/xls_comparison.py:413
 #: business/learning_units/xls_comparison.py:418
 #: business/learning_units/xls_comparison.py:419
+#: forms/learning_unit_pedagogy.py:99
 #: templates/learning_unit/proposal_comparison.html:55
 #: templates/learning_unit/proposal_comparison.html:64
 #: templates/learning_unit/proposal_comparison.html:92
@@ -2700,10 +2704,6 @@ msgstr ""
 msgid "No enrollment for this learning unit"
 msgstr ""
 
-#: forms/learning_unit_pedagogy.py:99
-msgid "No mandatory"
-msgstr ""
-
 #: forms/prerequisite.py:113
 #: tests/views/education_groups/learning_unit/test_update.py:203
 #: tests/views/education_groups/learning_unit/test_update.py:207
@@ -2716,7 +2716,7 @@ msgid "No print"
 msgstr ""
 
 #: tests/views/test_learning_unit_proposal.py:429
-#: views/learning_units/search.py:205
+#: views/learning_units/search.py:206
 msgid "No proposals was selected."
 msgstr ""
 
@@ -3281,21 +3281,21 @@ msgid "Proposal of creation"
 msgstr ""
 
 #: business/learning_unit.py:95 business/learning_unit_xls.py:81
-#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:70
+#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:60
 #: templates/learning_unit/by_proposal.html:88
 #: tests/business/test_learning_unit_xls.py:325 utils/send_mail.py:235
 msgid "Proposal status"
 msgstr ""
 
 #: business/learning_unit.py:94 business/learning_unit_xls.py:80
-#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:64
+#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:54
 #: templates/learning_unit/by_proposal.html:87
 #: tests/business/test_learning_unit_xls.py:324
 msgid "Proposal type"
 msgstr ""
 
 #: business/proposal_xls.py:34 business/proposal_xls.py:35
-#: templates/learning_units.html:77 views/learning_units/search.py:229
+#: templates/learning_units.html:77 views/learning_units/search.py:230
 msgid "Proposals"
 msgstr ""
 
@@ -3576,7 +3576,7 @@ msgstr ""
 msgid "Search of annual programs"
 msgstr ""
 
-#: views/learning_units/search.py:223
+#: views/learning_units/search.py:224
 msgid "Search type"
 msgstr ""
 
@@ -3621,7 +3621,7 @@ msgstr ""
 msgid "Separate"
 msgstr ""
 
-#: templates/learning_units.html:67 views/learning_units/search.py:230
+#: templates/learning_units.html:67 views/learning_units/search.py:231
 msgid "Service courses"
 msgstr ""
 
@@ -4837,6 +4837,7 @@ msgstr ""
 #: business/learning_units/xls_comparison.py:413
 #: business/learning_units/xls_comparison.py:418
 #: business/learning_units/xls_comparison.py:419
+#: forms/learning_unit_pedagogy.py:98
 #: templates/learning_unit/proposal_comparison.html:53
 #: templates/learning_unit/proposal_comparison.html:62
 #: templates/learning_unit/proposal_comparison.html:90
