@@ -47,6 +47,7 @@ class ProposalLearningUnitForm(forms.ModelForm):
 
     def __init__(self, data, person, *args, initial=None, **kwargs):
         super().__init__(data, *args, initial=initial, **kwargs)
+        self.fields['entity'].queryset = person.find_main_entities_version
 
         if initial:
             for key, value in initial.items():
