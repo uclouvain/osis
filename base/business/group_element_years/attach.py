@@ -126,7 +126,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
 
     def _check_attach_options_rules(self):
         errors = []
-        for root, missing_options in self._get_missing_options():
+        for root, missing_options in self._get_missing_options().items():
             if missing_options:
                 errors.append(
                     ValidationError(

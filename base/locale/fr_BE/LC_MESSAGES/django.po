@@ -108,7 +108,6 @@ msgstr "%(education_group_year)s a déjà été recopié en  %(academic_year)s d
 
 #: business/group_element_years/postponement.py:124
 #: tests/business/education_groups/test_postponement.py:597
-#, fuzzy, python-format
 #| msgid ""
 #| "%(education_group_year)s is closed in %(end_year)s, there is no more link "
 #| "to this element in %(academic_year)s."
@@ -2253,7 +2252,6 @@ msgstr "Unité d'enseignement %(acronym)s mise à jour avec succès."
 
 #: business/group_element_years/postponement.py:58
 #: tests/business/education_groups/test_postponement.py:431
-#, fuzzy, python-format
 #| msgid ""
 #| "The learning unit %(learning_unit_year)s does not exist in "
 #| "%(academic_year)s."
@@ -5925,10 +5923,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:163
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid ""
-#~ "The postponed learning unit %(learning_unit)s has a prerequisite %(item)s "
-#~ "which does not exist in %(academic_year)s."
-#~ msgstr ""
-#~ "L'unité d'enseignement reportée %(learning_unit)s a un prerequis %(item)s "
-#~ "qui n’existe pas en %(academic_year)s."

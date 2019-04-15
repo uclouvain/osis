@@ -37,7 +37,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.enums.link_type import LinkTypes
-from base.models.group_element_year import GroupElementYear, _fetch_row_sql
+from base.models.group_element_year import GroupElementYear, fetch_row_sql
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
@@ -417,10 +417,10 @@ class PostponeContent:
 
     @cached_property
     def _learning_units_id_in_n_instance(self):
-        grps_old = _fetch_row_sql([self.instance.id])
+        grps_old = fetch_row_sql([self.instance.id])
         return set(item["child_leaf_id"] for item in grps_old)
 
     @cached_property
     def _learning_units_id_in_n1_instance(self):
-        grps = _fetch_row_sql([self.instance_n1.id])
+        grps = fetch_row_sql([self.instance_n1.id])
         return set(item["child_leaf_id"] for item in grps)
