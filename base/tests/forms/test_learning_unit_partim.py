@@ -118,10 +118,9 @@ class TestPartimFormInit(LearningUnitPartimFormContextMixin):
         expected_initials = {
             LearningUnitPartimModelForm: {},
             LearningUnitYearModelForm: {
-                'acronym': ['L', 'BIR1200', ''],
+                'acronym': ['L', 'BIR1200'],
                 'acronym_0': 'L',  # Multiwidget decomposition
                 'acronym_1': 'BIR1200',
-                'acronym_2': '',
                 'academic_year': self.learning_unit_year_full.academic_year.id,
                 'internship_subtype': self.learning_unit_year_full.internship_subtype,
                 'attribution_procedure': self.learning_unit_year_full.attribution_procedure,
