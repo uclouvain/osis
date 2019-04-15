@@ -359,6 +359,9 @@ class SimplifiedVolumeForm(forms.ModelForm):
             self.add_error("hourly_volume_partial_q1", "")
             self.add_error("hourly_volume_partial_q2", "")
 
+        if not self.cleaned_data.get("hourly_volume_total_annual") and self.cleaned_data.get("planned_classes"):
+            self.add_error("planned_classes", _("The planned classes cannot be set if the annual volume is not set."))
+
         return cleaned_data
 
     def save(self, commit=True):

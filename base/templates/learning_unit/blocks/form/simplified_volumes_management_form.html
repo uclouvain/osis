@@ -28,7 +28,7 @@
 {% for form in simplified_volume_management_form %}
         {% bootstrap_field form.id %}
 {% endfor %}
-<table class="table volumes">
+<table class="table volumes_simplified">
     <thead>
     <tr>
         <th>{% trans 'Components' %}&nbsp;&nbsp;</th>
@@ -46,9 +46,9 @@
     <tbody>
     {% for form in simplified_volume_management_form %}
         <tr>
-            <td>
+            <th>
                 <label class="inline-group">{{ form.label }}</label>
-            </td>
+            </th>
             <td>(</td>
             <td>{% bootstrap_field form.hourly_volume_total_annual show_label=False %}</td>
             <td>{{ form.equal_field.label }}</td>
