@@ -28,7 +28,6 @@ from django.db.models import Q
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
-from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.business.education_groups.postponement import duplicate_education_group_year
 from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from base.business.utils.model import update_related_object
