@@ -80,7 +80,7 @@ class VolumeEditionForm(forms.Form):
     closing_parenthesis_field = EmptyField(label=')')
     mult_field = EmptyField(label='*')
     planned_classes = forms.IntegerField(label=_('Classes'), help_text=_('Planned classes'), min_value=0,
-                                         widget=forms.TextInput())
+                                         widget=forms.TextInput(), required=False)
     equal_field_2 = EmptyField(label='=')
 
     _post_errors = []
@@ -110,6 +110,7 @@ class VolumeEditionForm(forms.Form):
                 label=entity.acronym,
                 help_text=entity.title,
                 widget=forms.TextInput(),
+                required=False
             )
             if i != len(entities_to_add) - 1:
                 self.fields["add" + key.lower()] = EmptyField(label='+')
@@ -136,8 +137,7 @@ class VolumeEditionForm(forms.Form):
         volume_q2 = self.cleaned_data.get("volume_q2") or 0
         volume_total = self.cleaned_data.get("volume_total") or 0
 
-        if (self.cleaned_data.get("volume_q1") is not None or self.cleaned_data.get(
-                "volume_q2") is not None) and volume_total != volume_q1 + volume_q2:
+        if (volume_q1 or volume_q2) and volume_total != volume_q1 + volume_q2:
             self.add_error("volume_total", _('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
             self.add_error("volume_q1", "")
             self.add_error("volume_q2", "")
@@ -376,9 +376,6 @@ class SimplifiedVolumeForm(forms.ModelForm):
 
     def _create_structure_components(self, commit):
         self.instance.learning_container_year = self._learning_unit_year.learning_container_year
-
-        if not self.instance.hourly_volume_total_annual:
-            self.instance.planned_classes = 0
 
         instance = super().save(commit)
 
