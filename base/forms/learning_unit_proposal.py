@@ -37,6 +37,7 @@ from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.models.academic_year import current_academic_year
 from base.models.entity_version import find_pedagogical_entities_version, get_last_version
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.entity_type import FACULTY
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import get_by_id
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -47,7 +48,7 @@ class ProposalLearningUnitForm(forms.ModelForm):
 
     def __init__(self, data, person, *args, initial=None, **kwargs):
         super().__init__(data, *args, initial=initial, **kwargs)
-        self.fields['entity'].queryset = person.find_main_entities_version
+        self.fields['entity'].queryset = person.find_main_entities_version.filter(entity_type=FACULTY)
 
         if initial:
             for key, value in initial.items():
