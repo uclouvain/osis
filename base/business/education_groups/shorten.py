@@ -38,7 +38,7 @@ def start(education_group, until_year):
     egy_deleted = []
     for education_group_year in education_group_years_to_delete:
         egy_deleted.append(education_group_year)
-        education_group_year.delete()
+        delete.start(education_group_year)
     return egy_deleted
 
 
