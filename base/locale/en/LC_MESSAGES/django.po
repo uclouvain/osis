@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-12 09:48+0200\n"
+"POT-Creation-Date: 2019-04-15 08:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -895,6 +895,7 @@ msgid "Classe"
 msgstr ""
 
 #: forms/learning_unit/edition_volume.py:82
+#: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:43
 #: templates/learning_unit/components.html:56
 #: templates/learning_unit/components.html:122
 #: templates/learning_unit/components_identification.html:42
@@ -2335,7 +2336,7 @@ msgstr ""
 msgid "Manage repartition"
 msgstr ""
 
-#: templates/learning_unit/blocks/manage_volumes_button.html:8
+#: templates/learning_unit/blocks/manage_volumes_button.html:9
 msgid "Manage volumes"
 msgstr ""
 
@@ -2802,8 +2803,8 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:149
 #: forms/learning_unit/edition_volume.py:150
-#: forms/learning_unit/edition_volume.py:340
-#: forms/learning_unit/edition_volume.py:341
+#: forms/learning_unit/edition_volume.py:342
+#: forms/learning_unit/edition_volume.py:343
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:169
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:171
 #: tests/forms/test_edition_form.py:321 tests/forms/test_edition_form.py:322
@@ -3898,7 +3899,7 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:75
 #: forms/learning_unit/edition_volume.py:141
-#: forms/learning_unit/edition_volume.py:356
+#: forms/learning_unit/edition_volume.py:358
 #: models/learning_component_year.py:125
 #: templates/learning_unit/components.html:51
 #: templates/learning_unit/components_identification.html:37
@@ -4198,6 +4199,10 @@ msgstr ""
 msgid "The partim"
 msgstr ""
 
+#: forms/learning_unit/edition_volume.py:363
+msgid "The planned classes cannot be set if the annual volume is not set."
+msgstr ""
+
 #: business/group_element_years/postponement.py:63
 #: tests/business/education_groups/test_postponement.py:484
 #, python-format
@@ -4313,8 +4318,8 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:154
 #: forms/learning_unit/edition_volume.py:156
-#: forms/learning_unit/edition_volume.py:345
 #: forms/learning_unit/edition_volume.py:347
+#: forms/learning_unit/edition_volume.py:349
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:181
 #: tests/forms/test_edition_form.py:332 tests/forms/test_edition_form.py:342
 msgid "The volume can not be set to 0."
@@ -4680,7 +4685,7 @@ msgid "Versions"
 msgstr ""
 
 #: business/proposal_xls.py:90 business/proposal_xls.py:100
-#: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:37
+#: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:38
 #: templates/learning_unit/components.html:48
 #: templates/learning_unit/components_identification.html:34
 #: tests/business/test_proposal_xls.py:149
@@ -4689,7 +4694,7 @@ msgid "Vol. Q1"
 msgstr ""
 
 #: business/proposal_xls.py:91 business/proposal_xls.py:101
-#: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:39
+#: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:40
 #: templates/learning_unit/components.html:49
 #: templates/learning_unit/components_identification.html:35
 #: tests/business/test_proposal_xls.py:150
@@ -4722,7 +4727,7 @@ msgstr ""
 "The overall volume must be equal to the annual volume multiplied by the "
 "number of classes"
 
-#: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:35
+#: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:36
 msgid "Volume"
 msgstr ""
 
