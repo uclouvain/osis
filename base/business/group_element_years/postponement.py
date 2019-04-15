@@ -302,7 +302,7 @@ class PostponeContent:
         new_gr.child_branch = new_egy
         if new_egy and new_egy.education_group_type.name == MiniTrainingType.OPTION.name:
             self.postponed_options[new_egy.id] = new_gr
-        if new_gr.parent.education_group_type.name in TrainingType.finality_types():
+        if new_egy and new_gr.parent.education_group_type.name in TrainingType.finality_types():
             self.postponed_finalities.append(new_gr)
         return new_gr
 
