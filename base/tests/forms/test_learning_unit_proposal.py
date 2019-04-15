@@ -273,13 +273,13 @@ class TestSave(TestCase):
         self.entity_version.entity_type = SCHOOL
         self.entity_version.save()
         form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
-        self.assertFalse('entity' in form.errors)
+        self.assertTrue('entity' in form.errors[0])
 
     def test_creation_proposal_learning_unit_with_not_linked_entity(self):
         self.person_entity.entity = self.an_entity_school
         self.person_entity.save()
         form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
-        self.assertFalse('entity' in form.errors)
+        self.assertTrue('entity' in form.errors[1])
 
 
 def build_initial_data(learning_unit_year, entity_container_yr):
