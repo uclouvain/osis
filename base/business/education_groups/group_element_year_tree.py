@@ -151,14 +151,14 @@ class EducationGroupHierarchy:
         url = reverse('education_group_read', args=[self.root.pk, self.education_group_year.pk])
         return url + self.url_group_to_parent()
 
-    def get_option_list(self):
+    def get_option_list(self, with_pruning=True):
         def pruning_function(node):
             return node.group_element_year.child_branch and \
                    node.group_element_year.child_branch.education_group_type.name not in \
                    [GroupType.FINALITY_120_LIST_CHOICE.name, GroupType.FINALITY_180_LIST_CHOICE.name]
 
         return [
-            element.child_branch for element in self.to_list(flat=True, pruning_function=pruning_function)
+            element.child_branch for element in self.to_list(flat=True, pruning_function=pruning_function if with_pruning else None)
             if element.child_branch.education_group_type.name == MiniTrainingType.OPTION.name
         ]
 

@@ -99,6 +99,32 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         if errors:
             raise ValidationError(errors)
 
+    def _get_missing_options(self):
+        """
+            In context of MA/MD/MS when we add an option [or group which contains options],
+            this options must exist in parent context (2m)
+        """
+        options_missing_by_finality = {}
+
+        options_to_add = EducationGroupHierarchy(root=self.child).get_option_list(with_pruning=False)
+        if self.child.education_group_type.name == MiniTrainingType.OPTION.name:
+            options_to_add += [self.child]
+
+        finalities_qs = self.parents | EducationGroupYear.objects.filter(pk=self.parent.pk)
+        finalities_pks = finalities_qs.filter(
+            education_group_type__name__in=TrainingType.finality_types()
+        ).values_list('pk', flat=True)
+        if finalities_pks:
+            root_2m_qs = EducationGroupYear.hierarchy.filter(pk__in=finalities_pks).get_parents().filter(
+                education_group_type__name__in=TrainingType.root_master_2m_types()
+            )
+
+            for root in root_2m_qs:
+                options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
+                missing_options = set(options_to_add) - set(options_in_2m)
+                options_missing_by_finality[root] = missing_options
+        return options_missing_by_finality
+
     def _check_attach_options_rules(self):
         """
         In context of MA/MD/MS when we add an option [or group which contains options],

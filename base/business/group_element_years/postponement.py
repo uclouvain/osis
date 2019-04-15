@@ -21,6 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import itertools
+
 from django.db import Error, transaction
 from django.db.models import Q
 from django.utils.functional import cached_property
@@ -28,12 +30,13 @@ from django.utils.translation import gettext as _
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.business.education_groups.postponement import duplicate_education_group_year
+from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from base.business.utils.model import update_related_object
 from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import MiniTrainingType
+from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear, _fetch_row_sql
 from base.models.learning_unit import LearningUnit
@@ -172,7 +175,8 @@ class PostponeContent:
         self.instance_n1 = self.get_instance_n1(self.instance)
 
         self.postponed_luy = []
-        self.postponed_options = []
+        self.postponed_options = {}
+        self.postponed_finalities = []
 
     def check_instance(self):
         if self.instance.is_training():
@@ -216,7 +220,7 @@ class PostponeContent:
     def _postpone(self, instance: EducationGroupYear, next_instance: EducationGroupYear):
         """
         We'll postpone first the group_element_years of the root,
-        after that, we'll postponement recursively all the child branches and child leafs.
+        after that, we'll postpone recursively all the child branches and child leafs.
         """
 
         for gr in instance.groupelementyear_set.select_related('child_branch__academic_year',
@@ -247,7 +251,6 @@ class PostponeContent:
 
     def _post_postponement(self):
         # Postpone the prerequisite only at the end to be sure to have all learning units and education groups
-        # TODO Check options
         self._check_options()
 
         luys_not_postponed = LearningUnitYear.objects.filter(
@@ -299,7 +302,9 @@ class PostponeContent:
 
         new_gr.child_branch = new_egy
         if new_egy and new_egy.education_group_type.name == MiniTrainingType.OPTION.name:
-            self.postponed_options.append(new_gr)
+            self.postponed_options[new_egy.id] = new_gr
+        if new_gr.parent.education_group_type.name in TrainingType.finality_types():
+            self.postponed_finalities.append(new_gr)
         return new_gr
 
     # TODO Move method to model education group year
@@ -358,18 +363,24 @@ class PostponeContent:
         return False
 
     def _check_options(self):
-        root_options = set(EducationGroupHierarchy(root=self.instance_n1).get_option_list())
-        for grp_option in self.postponed_options:
-            if grp_option.child_branch not in root_options:
-                self.warnings.append(
-                    FinalityOptionNotValidWarning(
-                        grp_option.child_branch,
-                        self.instance_n1,
-                        grp_option.parent,
-                        self.next_academic_year
+        missing_options = {}
+        for finality in self.postponed_finalities:
+            missing_options[finality] = list(itertools.chain.from_iterable(AttachEducationGroupYearStrategy(
+                finality.parent, finality.child_branch
+            )._get_missing_options().values()))
+
+        for finality, options in missing_options.items():
+            for option in options:
+                if option.id in self.postponed_options:
+                    self.warnings.append(
+                        FinalityOptionNotValidWarning(
+                            option,
+                            self.instance_n1,
+                            finality.parent,
+                            self.next_academic_year
+                        )
                     )
-                )
-                grp_option.delete()
+                    self.postponed_options[option.id].delete()
 
     def _postpone_prerequisite(self, old_luy: LearningUnitYear, new_luy: LearningUnitYear):
         """ Copy the prerequisite of a learning unit and its items """

@@ -689,8 +689,15 @@ class TestPostpone(TestCase):
             academic_year=self.next_academic_year
         )
         child_egy_n1 = EducationGroupYearFactory(
+            acronym=root_grp.child_branch.acronym,
             education_group_type=root_grp.child_branch.education_group_type,
             education_group=root_grp.child_branch.education_group,
+            academic_year=self.next_academic_year,
+        )
+        child_child_egy_n1 = EducationGroupYearFactory(
+            acronym=child_child_grp.child_branch.acronym,
+            education_group_type=child_child_grp.child_branch.education_group_type,
+            education_group=child_child_grp.child_branch.education_group,
             academic_year=self.next_academic_year,
         )
 
@@ -703,7 +710,7 @@ class TestPostpone(TestCase):
               "in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
                 "education_group_year_option": child_child_grp.child_branch.acronym,
                 "education_group_year_root": root_egy_n1.acronym,
-                "education_group_year_finality": child_grp.child_branch.acronym,
+                "education_group_year_finality": root_grp.child_branch.acronym,
                 "academic_year": self.next_academic_year
             }
         )
