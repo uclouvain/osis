@@ -59,6 +59,28 @@ class TestHaveContents(TestCase):
             GroupElementYearFactory(parent=education_group_year, child_branch=child)
         self.assertFalse(delete._have_contents(education_group_year))
 
+    def test_have_contents_case_have_contents_which_because_mandatory_structure_is_present_multiple_times(self):
+        """
+        In this test, we ensure that we have two elements of one type which are mandatory in the basic structure.
+        ==> We must consider as it have contents
+        """
+        education_group_year = TrainingFactory(academic_year=self.academic_year)
+        subgroup_1 = GroupFactory(academic_year=self.academic_year, education_group_type__name=GroupType.SUB_GROUP.name)
+        GroupElementYearFactory(parent=education_group_year, child_branch=subgroup_1)
+
+        subgroup_2 = GroupFactory(
+            academic_year=self.academic_year,
+            education_group_type=subgroup_1.education_group_type,
+        )
+        GroupElementYearFactory(parent=education_group_year, child_branch=subgroup_2)
+
+        AuthorizedRelationshipFactory(
+            parent_type=education_group_year.education_group_type,
+            child_type=subgroup_1.education_group_type,
+            min_count_authorized=1,
+        )
+        self.assertTrue(delete._have_contents(education_group_year))
+
     def test_have_contents_case_contents(self):
         """
         In this test, we ensure that at least one children are not mandatory groups so they must not be considered

@@ -23,6 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import Counter
+
+from django.db.models import Count
 from django.utils.translation import ngettext_lazy, ugettext_lazy as _
 
 from base.models.authorized_relationship import AuthorizedRelationship
@@ -72,15 +75,17 @@ def _have_contents(education_group_year):
     """
     An education group year is empty if:
         - it has no children
-        - all of his children are mandatory groups and they are empty
+        - all of his children are mandatory groups and they are empty [=> Min 1]
     """
-    mandatory_groups_qs = AuthorizedRelationship.objects.filter(
+    mandatory_groups = AuthorizedRelationship.objects.filter(
         parent_type=education_group_year.education_group_type,
         min_count_authorized=1
-    ).values('pk')
+    ).values_list('child_type', 'min_count_authorized')
 
-    qs = GroupElementYear.objects\
-        .filter(parent=education_group_year)\
-        .exclude(child_branch__education_group_type__authorized_child_type__in=mandatory_groups_qs)
+    children_count = GroupElementYear.objects\
+                                     .filter(parent=education_group_year)\
+                                     .values('child_branch__education_group_type')\
+                                     .annotate(count=Count('child_branch__education_group_type'))\
+                                     .values_list('child_branch__education_group_type', 'count')
 
-    return qs.exists()
+    return bool(Counter(children_count) - Counter(mandatory_groups))
