@@ -28,6 +28,7 @@ from itertools import chain
 
 from django import forms
 from django.db import transaction
+from django.db.models import Q
 
 from base.business.learning_unit_proposal import compute_proposal_type, \
     compute_proposal_state, copy_learning_unit_data
@@ -48,7 +49,8 @@ class ProposalLearningUnitForm(forms.ModelForm):
 
     def __init__(self, data, person, *args, initial=None, **kwargs):
         super().__init__(data, *args, initial=initial, **kwargs)
-        self.fields['entity'].queryset = person.find_main_entities_version.filter(entity_type=FACULTY)
+        self.fields['entity'].queryset = person.find_main_entities_version.filter(Q(entity_type=FACULTY)
+                                                                                  | Q(acronym="ILV"))
 
         if initial:
             for key, value in initial.items():
