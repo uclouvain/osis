@@ -102,7 +102,7 @@
                             </td>
                             <td>{{ learning_unit.entity_requirement|default_if_none:'-' }}</td>
                             <td>{{ learning_unit.entity_allocation|default_if_none:'-' }}</td>
-                            <td>{% if learning_unit.credits %}{{ learning_unit.credits }}{% endif %}</td>
+                            <td>{% if learning_unit.credits %}{{ learning_unit.credits|floatformat }}{% endif %}</td>
                             <td>
                                 {% if learning_unit.status %}
                                     <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:green;"
