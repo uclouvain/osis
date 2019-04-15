@@ -24,24 +24,15 @@
 #
 ##############################################################################
 from django import forms
-from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl
+from base.business.learning_unit_year_with_context import append_latest_entities
 from base.forms.learning_unit.search_form import LearningUnitSearchForm
 from base.models.entity import Entity
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.business.learning_unit_year_with_context import append_latest_entities, append_components
-
-
-def _get_entity_folder_id_ordered_by_acronym():
-    entities = Entity.objects.filter(proposallearningunit__isnull=False).distinct()
-    entities_sorted_by_acronym = sorted(list(entities), key=lambda t: t.most_recent_acronym)
-
-    return [LearningUnitSearchForm.ALL_LABEL] + [(ent.pk, ent.most_recent_acronym)
-                                                 for ent in entities_sorted_by_acronym]
 
 
 def _get_sorted_choices(tuple_of_choices):
@@ -52,7 +43,6 @@ class LearningUnitProposalForm(LearningUnitSearchForm):
 
     entity_folder_id = forms.ChoiceField(
         label=_('Folder entity'),
-        choices=lazy(_get_entity_folder_id_ordered_by_acronym, list),
         required=False
     )
 
@@ -71,6 +61,18 @@ class LearningUnitProposalForm(LearningUnitSearchForm):
         choices=_get_sorted_choices(ProposalState.choices()),
         required=False
     )
+
+    def __init__(self, data, person, *args, **kwargs):
+        super().__init__(data, *args, **kwargs)
+        self._get_entity_folder_id_linked_ordered_by_acronym(person)
+
+    def _get_entity_folder_id_linked_ordered_by_acronym(self, person):
+        entities = Entity.objects.filter(proposallearningunit__isnull=False).distinct()
+        entities_sorted_by_acronym = sorted(list(entities.filter(id__in=person.linked_entities)),
+                                            key=lambda t: t.most_recent_acronym)
+        self.fields['entity_folder_id'].choices = [LearningUnitSearchForm.ALL_LABEL] + \
+                                                  [(ent.pk, ent.most_recent_acronym)
+                                                   for ent in entities_sorted_by_acronym]
 
     def get_proposal_learning_units(self):
         learning_units = self.get_queryset().filter(proposallearningunit__isnull=False)
