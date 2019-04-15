@@ -306,7 +306,7 @@ class PostponeContent:
             self.postponed_finalities.append(new_gr)
         return new_gr
 
-    # TODO Move method to model education group year
+    # FIXME Should be moved to education group year. But cannot because of cyclic import.
     def _is_empty(self, egy: EducationGroupYear):
         """
         An education group year is empty if:
