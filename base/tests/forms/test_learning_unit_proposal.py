@@ -36,9 +36,10 @@ from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import organization_type, proposal_type, proposal_state, entity_type, \
     learning_container_year_types, quadrimesters, entity_container_year_link_type, \
     learning_unit_year_periodicity, internship_subtypes, learning_unit_year_subtypes
+from base.models.enums.entity_type import SCHOOL
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
@@ -269,6 +270,12 @@ class TestSave(TestCase):
                                             type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1)
 
     def test_creation_proposal_learning_unit_with_school_entity(self):
+        self.entity_version.entity_type = SCHOOL
+        self.entity_version.save()
+        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
+        self.assertFalse('entity' in form.errors)
+
+    def test_creation_proposal_learning_unit_with_not_linked_entity(self):
         self.person_entity.entity = self.an_entity_school
         self.person_entity.save()
         form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
