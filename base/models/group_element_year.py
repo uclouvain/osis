@@ -412,7 +412,7 @@ def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict
     if queryset.model != GroupElementYear:
         raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
 
-    elements = _fetch_row_sql([root.id])
+    elements = fetch_row_sql([root.id])
 
     distinct_group_elem_ids = {elem['id'] for elem in elements}
     queryset = queryset.filter(pk__in=distinct_group_elem_ids)
@@ -424,7 +424,7 @@ def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict
     return group_elems_by_parent_id
 
 
-def _fetch_row_sql(root_ids):
+def fetch_row_sql(root_ids):
     with connection.cursor() as cursor:
         cursor.execute(SQL_RECURSIVE_QUERY_EDUCATION_GROUP, root_ids)
         return [

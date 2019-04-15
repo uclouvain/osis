@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-15 08:33+0200\n"
+"POT-Creation-Date: 2019-04-15 11:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -49,7 +49,7 @@ msgstr ""
 
 #: models/education_group.py:56 tests/models/test_education_group.py:137
 #: tests/views/group_element_years/test_postpone.py:110
-#: views/education_groups/update.py:244
+#: views/education_groups/update.py:246
 #, python-format
 msgid "%(count)d education group has been postponed with success."
 msgid_plural "%(count)d education groups have been postponed with success."
@@ -84,12 +84,37 @@ msgstr[1] ""
 msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
 msgstr ""
 
-#: business/group_element_years/postponement.py:77
-#: tests/business/education_groups/test_postponement.py:547
+#: business/group_element_years/postponement.py:113
+#: tests/business/education_groups/test_postponement.py:623
+#: tests/business/education_groups/test_postponement.py:645
 #, python-format
 msgid ""
-"%(education_group_year)s is closed in %(end_year)s, there is no more link to "
-"this element in %(academic_year)s."
+"%(education_group_year)s (reference link) has not been copied. Its content "
+"is empty."
+msgstr ""
+
+#: business/group_element_years/postponement.py:101
+#: tests/business/education_groups/test_postponement.py:376
+#, python-format
+msgid ""
+"%(education_group_year)s has already been copied in %(academic_year)s in "
+"another program. It may have been already modified."
+msgstr ""
+
+#: business/group_element_years/postponement.py:124
+#: tests/business/education_groups/test_postponement.py:597
+#, python-format
+msgid ""
+"%(education_group_year)s is closed in %(end_year)s. This element will not be "
+"copied in %(academic_year)s."
+msgstr ""
+
+#: business/group_element_years/postponement.py:88
+#: tests/business/education_groups/test_postponement.py:487
+#, python-format
+msgid ""
+"%(learning_unit_year)s is not anymore contained in %(education_group_year)s "
+"=> the prerequisite for %(learning_unit_year)s is not copied."
 msgstr ""
 
 #: models/education_group.py:116 models/education_group_year.py:787
@@ -117,6 +142,15 @@ msgstr ""
 #: templates/blocks/notifications_inner.html:8
 #, python-format
 msgid "%(number_notifications)s unread notification(s)"
+msgstr ""
+
+#: business/group_element_years/postponement.py:73
+#: tests/business/education_groups/test_postponement.py:524
+#, python-format
+msgid ""
+"%(prerequisite_item)s is not anymore contained in %(education_group_year)s "
+"=> the prerequisite for %(learning_unit_year)s having %(prerequisite_item)s "
+"as prerequisite is not copied."
 msgstr ""
 
 #: business/learning_units/simple/deletion.py:116
@@ -404,7 +438,7 @@ msgstr ""
 #: business/learning_units/comparison.py:67
 #: business/learning_units/xls_comparison.py:177 business/proposal_xls.py:54
 #: models/enums/active_status.py:34 models/learning_unit_year.py:121
-#: models/learning_unit_year.py:239
+#: models/learning_unit_year.py:240
 #: templates/learning_unit/by_activity.html:109
 #: templates/learning_unit/by_external.html:67
 #: templates/learning_unit/comparison.html:54
@@ -637,7 +671,7 @@ msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr ""
 
 #: tests/views/group_element_years/test_postpone.py:90
-#: views/education_groups/update.py:233
+#: views/education_groups/update.py:235
 #, python-format
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr ""
@@ -1386,7 +1420,7 @@ msgstr ""
 
 #: tests/views/education_groups/test_update.py:371
 #: tests/views/education_groups/test_update.py:377
-#: views/education_groups/update.py:132
+#: views/education_groups/update.py:134
 #, python-format
 msgid ""
 "Education group year %(acronym)s (%(academic_year)s) successfuly deleted."
@@ -1399,7 +1433,7 @@ msgid ""
 "a> successfully created."
 msgstr ""
 
-#: views/education_groups/update.py:124
+#: views/education_groups/update.py:126
 #, python-format
 msgid ""
 "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
@@ -1579,7 +1613,7 @@ msgstr ""
 msgid "Execute selected action"
 msgstr ""
 
-#: models/learning_unit_year.py:306
+#: models/learning_unit_year.py:307
 msgid "Existing acronym"
 msgstr ""
 
@@ -1905,7 +1939,7 @@ msgstr ""
 #: business/learning_unit_proposal.py:70
 #: business/learning_units/comparison.py:67
 #: business/learning_units/xls_comparison.py:179
-#: models/enums/active_status.py:35 models/learning_unit_year.py:239
+#: models/enums/active_status.py:35 models/learning_unit_year.py:240
 #: templates/learning_unit/by_activity.html:113
 #: templates/learning_unit/by_external.html:71
 msgid "Inactive"
@@ -2023,7 +2057,7 @@ msgid ""
 "leaf."
 msgstr ""
 
-#: models/learning_unit_year.py:340
+#: models/learning_unit_year.py:341
 msgid "It is necessary to indicate the internship subtype."
 msgstr ""
 
@@ -2156,6 +2190,15 @@ msgstr ""
 #: business/learning_units/edition.py:133
 #, python-format
 msgid "Learning unit %(acronym)s successfully updated."
+msgstr ""
+
+#: business/group_element_years/postponement.py:58
+#: tests/business/education_groups/test_postponement.py:431
+#, python-format
+msgid ""
+"Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
+"Learning unit is postponed with academic year of "
+"%(learning_unit_academic_year)s."
 msgstr ""
 
 #: templates/blocks/forms/search_form.html:44
@@ -2850,7 +2893,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: business/group_element_years/attach.py:128
+#: business/group_element_years/attach.py:154
 #, python-format
 msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
 msgid_plural ""
@@ -3933,7 +3976,7 @@ msgstr ""
 msgid "The contacts modifications has been saved"
 msgstr ""
 
-#: business/group_element_years/postponement.py:143
+#: business/group_element_years/postponement.py:210
 #: tests/business/education_groups/test_postponement.py:197
 #: tests/business/education_groups/test_postponement.py:211
 #: tests/business/education_groups/test_postponement.py:220
@@ -3953,7 +3996,7 @@ msgstr ""
 msgid "The coorganization modifications has been saved"
 msgstr ""
 
-#: models/learning_unit_year.py:331
+#: models/learning_unit_year.py:332
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:232
 #, python-format
 msgid ""
@@ -3962,7 +4005,7 @@ msgid ""
 msgstr ""
 
 #: forms/learning_unit/learning_unit_create.py:164
-#: models/learning_unit_year.py:326
+#: models/learning_unit_year.py:327
 #: tests/forms/learning_unit/test_learningUnitYearModelForm.py:89
 #: tests/models/test_learning_unit_year.py:598
 msgid "The credits value should be an integer"
@@ -3984,7 +4027,7 @@ msgstr ""
 msgid "The end date must be less or equals to the root %(acronym)s"
 msgstr ""
 
-#: business/group_element_years/postponement.py:129
+#: business/group_element_years/postponement.py:196
 #: tests/business/education_groups/test_postponement.py:229
 msgid ""
 "The end date of the education group is smaller than the year of postponement."
@@ -4089,13 +4132,6 @@ msgid ""
 "greater than %(year)s"
 msgstr ""
 
-#: business/group_element_years/postponement.py:50
-#: tests/business/education_groups/test_postponement.py:431
-#, python-format
-msgid ""
-"The learning unit %(learning_unit_year)s does not exist in %(academic_year)s."
-msgstr ""
-
 #: business/learning_units/edition.py:483
 #: forms/learning_unit/learning_unit_postponement.py:339
 #: tests/business/test_learning_unit_edition.py:958
@@ -4171,14 +4207,23 @@ msgid ""
 "already reached the limit."
 msgstr ""
 
-#: models/learning_unit_year.py:363 tests/models/test_learning_unit_year.py:560
+#: business/group_element_years/postponement.py:141
+#: tests/business/education_groups/test_postponement.py:709
+#, python-format
+msgid ""
+"The option %(education_group_year_option)s is not anymore accessible in "
+"%(education_group_year_root)s in %(academic_year)s => It is retired of the "
+"finality %(education_group_year_finality)s."
+msgstr ""
+
+#: models/learning_unit_year.py:364 tests/models/test_learning_unit_year.py:560
 #, python-format
 msgid ""
 "The parent is %(parent_periodicty)s and there is at least one partim which "
 "is not %(parent_periodicty)s"
 msgstr ""
 
-#: models/learning_unit_year.py:350
+#: models/learning_unit_year.py:351
 msgid "The parent is inactive and there is at least one partim active"
 msgstr ""
 
@@ -4200,15 +4245,8 @@ msgid "The partim"
 msgstr ""
 
 #: forms/learning_unit/edition_volume.py:363
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:207
 msgid "The planned classes cannot be set if the annual volume is not set."
-msgstr ""
-
-#: business/group_element_years/postponement.py:63
-#: tests/business/education_groups/test_postponement.py:484
-#, python-format
-msgid ""
-"The postponed learning unit %(learning_unit)s has a prerequisite %(item)s "
-"which does not exist in %(academic_year)s."
 msgstr ""
 
 #: views/education_groups/learning_unit/detail.py:125
@@ -4239,7 +4277,7 @@ msgid ""
 "({%(new_value)s} instead of {%(current_value)s})"
 msgstr ""
 
-#: business/group_element_years/postponement.py:140
+#: business/group_element_years/postponement.py:207
 #: tests/business/education_groups/test_postponement.py:189
 msgid "The root does not exist in the next academic year."
 msgstr ""
@@ -4403,13 +4441,13 @@ msgstr ""
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr ""
 
-#: models/learning_unit_year.py:357 tests/models/test_learning_unit_year.py:576
+#: models/learning_unit_year.py:358 tests/models/test_learning_unit_year.py:576
 #, python-format
 msgid ""
 "This partim is %(partim_periodicity)s and the parent is %(parent_periodicty)s"
 msgstr ""
 
-#: models/learning_unit_year.py:347
+#: models/learning_unit_year.py:348
 msgid "This partim is active and the parent is inactive"
 msgstr ""
 
@@ -4421,7 +4459,7 @@ msgstr ""
 msgid "This process helps tutors while scores encoding."
 msgstr ""
 
-#: business/group_element_years/postponement.py:132
+#: business/group_element_years/postponement.py:199
 msgid "This training has no content to postpone."
 msgstr ""
 
@@ -4467,7 +4505,7 @@ msgstr ""
 msgid "Title proper to the partim"
 msgstr ""
 
-#: models/learning_unit_year.py:245
+#: models/learning_unit_year.py:246
 msgid "To complete"
 msgstr ""
 
@@ -4883,8 +4921,8 @@ msgstr ""
 msgid "You are not allowed to change the end year for this academic year"
 msgstr ""
 
-#: business/group_element_years/postponement.py:100
-#: business/group_element_years/postponement.py:120
+#: business/group_element_years/postponement.py:165
+#: business/group_element_years/postponement.py:187
 #: tests/business/education_groups/test_postponement.py:239
 #: tests/business/education_groups/test_postponement.py:249
 msgid ""
@@ -4896,11 +4934,11 @@ msgstr ""
 msgid "You are not allowed to create a reference with a learning unit"
 msgstr ""
 
-#: business/group_element_years/postponement.py:125
+#: business/group_element_years/postponement.py:192
 msgid "You are not allowed to postpone this training in the future."
 msgstr ""
 
-#: business/group_element_years/postponement.py:123
+#: business/group_element_years/postponement.py:190
 msgid "You are not allowed to postpone this training in the past."
 msgstr ""
 

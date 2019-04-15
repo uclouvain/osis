@@ -25,7 +25,9 @@
 ##############################################################################
 from dal import autocomplete
 from django import forms
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.html import format_html
@@ -250,10 +252,11 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
         except NotPostponeError as e:
             display_error_messages(request, str(e))
 
-        return redirect(reverse(
-            "education_group_read",
-            args=[
-                kwargs["root_id"],
-                kwargs["education_group_year_id"]
-            ]
-        ))
+        return JsonResponse({
+            'success_url': reverse(
+                "education_group_read",
+                args=[
+                    kwargs["root_id"],
+                    kwargs["education_group_year_id"]
+                ]
+            )})

@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.contrib.auth.models import Permission
+from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import ugettext as _, ngettext
@@ -94,16 +95,13 @@ class TestPostpone(TestCase):
         self.group_element_year.delete()
         self.education_group_year.delete()
         response = self.client.post(self.url, follow=True)
-        self.assertRedirects(response, self.redirect_url)
-
-        message = list(response.context.get('messages'))[0]
+        message = list(get_messages(response.wsgi_request))[0]
         self.assertEqual(message.tags, "error")
 
     def test_post_with_success(self):
         response = self.client.post(self.url, follow=True)
-        self.assertRedirects(response, self.redirect_url)
 
-        message = list(response.context.get('messages'))[0]
+        message = list(get_messages(response.wsgi_request))[0]
 
         count = 1
         msg = ngettext(
