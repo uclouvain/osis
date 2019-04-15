@@ -193,3 +193,15 @@ class TestSimplifiedVolumeForm(TestCase):
         self.assertEqual(form.errors["hourly_volume_partial_q2"][0], gettext(""))
         self.assertEqual(form.errors["hourly_volume_total_annual"][0],
                          gettext('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
+
+    def test_with_incorrect_planned_classes(self):
+        form = SimplifiedVolumeForm(
+            data={'hourly_volume_total_annual': 0, 'planned_classes': 1},
+            is_faculty_manager=True,
+            instance=self.instance,
+            index=0,
+            component_type=COMPONENT_TYPES[0]
+        )
+        form.is_valid()
+        self.assertEqual(form.errors["planned_classes"][0],
+                         gettext('The planned classes cannot be set if the annual volume is not set.'))
