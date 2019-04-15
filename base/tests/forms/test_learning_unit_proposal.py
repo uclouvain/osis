@@ -269,18 +269,6 @@ class TestSave(TestCase):
             EntityContainerYear.objects.get(learning_container_year=self.learning_unit_year.learning_container_year,
                                             type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1)
 
-    def test_creation_proposal_learning_unit_with_school_entity(self):
-        self.entity_version.entity_type = SCHOOL
-        self.entity_version.save()
-        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
-        self.assertFalse('entity' in form.errors)
-
-    def test_creation_proposal_learning_unit_with_not_linked_entity(self):
-        self.person_entity.entity = self.an_entity_school
-        self.person_entity.save()
-        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
-        self.assertFalse('entity' in form.errors)
-
 
 def build_initial_data(learning_unit_year, entity_container_yr):
     initial_data_expected = {
