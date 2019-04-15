@@ -121,46 +121,26 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
 
             for root in root_2m_qs:
                 options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
-                missing_options = set(options_to_add) - set(options_in_2m)
-                options_missing_by_finality[root] = missing_options
+                options_missing_by_finality[root] = set(options_to_add) - set(options_in_2m)
         return options_missing_by_finality
 
     def _check_attach_options_rules(self):
-        """
-        In context of MA/MD/MS when we add an option [or group which contains options],
-        this options must exist in parent context (2m)
-        """
-        options_to_add = EducationGroupHierarchy(root=self.child).get_option_list()
-        if self.child.education_group_type.name == MiniTrainingType.OPTION.name:
-            options_to_add += [self.child]
-
-        finalities_qs = self.parents | EducationGroupYear.objects.filter(pk=self.parent.pk)
-        finalities_pks = finalities_qs.filter(education_group_type__name__in=TrainingType.finality_types())\
-                                      .values_list('pk', flat=True)
-        if finalities_pks:
-            root_2m_qs = EducationGroupYear.hierarchy.filter(pk__in=finalities_pks).get_parents().filter(
-                education_group_type__name__in=TrainingType.root_master_2m_types()
-            )
-
-            errors = []
-            for root in root_2m_qs:
-                options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
-                missing_options = set(options_to_add) - set(options_in_2m)
-
-                if missing_options:
-                    errors.append(
-                        ValidationError(
-                            ngettext(
-                                "Option \"%(acronym)s\" must be present in %(root_acronym)s program.",
-                                "Options \"%(acronym)s\" must be present in %(root_acronym)s program.",
-                                len(missing_options)
-                            ) % {
-                                "acronym": ', '.join(option.acronym for option in missing_options),
-                                "root_acronym": root.acronym
-                            })
-                    )
-            if errors:
-                raise ValidationError(errors)
+        errors = []
+        for root, missing_options in self._get_missing_options():
+            if missing_options:
+                errors.append(
+                    ValidationError(
+                        ngettext(
+                            "Option \"%(acronym)s\" must be present in %(root_acronym)s program.",
+                            "Options \"%(acronym)s\" must be present in %(root_acronym)s program.",
+                            len(missing_options)
+                        ) % {
+                            "acronym": ', '.join(option.acronym for option in missing_options),
+                            "root_acronym": root.acronym
+                        })
+                )
+        if errors:
+            raise ValidationError(errors)
 
 
 class AttachLearningUnitYearStrategy(AttachStrategy):
