@@ -656,8 +656,8 @@ class TestPostpone(TestCase):
                 education_group__end_year=None
             ),
             child_branch=EducationGroupYearFactory(
-                education_group_type__category=Categories.TRAINING.name,
-                education_group_type__name=TrainingType.MASTER_MA_120.name,
+                education_group_type__category=Categories.GROUP.name,
+                education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
                 academic_year=self.current_academic_year,
                 education_group__end_year=None
             )
@@ -666,8 +666,8 @@ class TestPostpone(TestCase):
         child_grp = GroupElementYearFactory(
             parent=root_grp.child_branch,
             child_branch=EducationGroupYearFactory(
-                education_group_type__category=Categories.GROUP.name,
-                education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
+                education_group_type__category=Categories.TRAINING.name,
+                education_group_type__name=TrainingType.MASTER_MA_120.name,
                 academic_year=self.current_academic_year,
                 education_group__end_year=None
             )
@@ -689,9 +689,9 @@ class TestPostpone(TestCase):
             academic_year=self.next_academic_year
         )
         child_egy_n1 = EducationGroupYearFactory(
-            acronym=root_grp.child_branch.acronym,
-            education_group_type=root_grp.child_branch.education_group_type,
-            education_group=root_grp.child_branch.education_group,
+            acronym=child_grp.child_branch.acronym,
+            education_group_type=child_grp.child_branch.education_group_type,
+            education_group=child_grp.child_branch.education_group,
             academic_year=self.next_academic_year,
         )
         child_child_egy_n1 = EducationGroupYearFactory(
@@ -710,7 +710,7 @@ class TestPostpone(TestCase):
               "in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
                 "education_group_year_option": child_child_grp.child_branch.acronym,
                 "education_group_year_root": root_egy_n1.acronym,
-                "education_group_year_finality": root_grp.child_branch.acronym,
+                "education_group_year_finality": child_grp.child_branch.acronym,
                 "academic_year": self.next_academic_year
             }
         )

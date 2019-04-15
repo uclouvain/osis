@@ -106,7 +106,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         """
         options_missing_by_finality = {}
 
-        options_to_add = EducationGroupHierarchy(root=self.child).get_option_list(with_pruning=False)
+        options_to_add = EducationGroupHierarchy(root=self.child).get_option_list()
         if self.child.education_group_type.name == MiniTrainingType.OPTION.name:
             options_to_add += [self.child]
 
