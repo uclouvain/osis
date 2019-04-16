@@ -142,7 +142,7 @@ class FinalityOptionNotValidWarning(CopyWarning):
 
     def __str__(self):
         return _("The option %(education_group_year_option)s is not anymore accessible in "
-                 "%(education_group_year_root_acronym)s - %(education_group_year_root_partial_acronym)s"
+                 "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s"
                  " in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
             "education_group_year_option": self.education_group_year_option.acronym,
             "education_group_year_root_acronym": self.education_group_year_root.acronym,

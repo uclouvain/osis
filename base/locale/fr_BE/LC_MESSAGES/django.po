@@ -121,11 +121,7 @@ msgstr ""
 
 #: business/group_element_years/postponement.py:89
 #: tests/business/education_groups/test_postponement.py:487
-#, fuzzy, python-format
-#| msgid ""
-#| "%(learning_unit_year)s is not anymore contained in "
-#| "%(education_group_year)s => the prerequisite for %(learning_unit_year)s "
-#| "is not copied."
+#, python-format
 msgid ""
 "%(learning_unit_year)s is not anymore contained in "
 "%(education_group_year_root_partial_acronym)s - "
@@ -169,11 +165,7 @@ msgstr "%(number_notifications)s notification(s) non lu(s)"
 
 #: business/group_element_years/postponement.py:72
 #: tests/business/education_groups/test_postponement.py:526
-#, fuzzy, python-format
-#| msgid ""
-#| "%(prerequisite_item)s is not anymore contained in "
-#| "%(education_group_year)s => the prerequisite for %(learning_unit_year)s "
-#| "having %(prerequisite_item)s as prerequisite is not copied."
+#, python-format
 msgid ""
 "%(prerequisite_item)s is not anymore contained in "
 "%(education_group_year_root_partial_acronym)s - "
@@ -4351,29 +4343,8 @@ msgstr ""
 "Le nombre d'enfants de type(s) \"%(child_types)s\" pour \"%(parent)s\" a "
 "atteint la limite maximum."
 
-#: business/group_element_years/postponement.py:144
-#, fuzzy, python-format
-#| msgid ""
-#| "The option %(education_group_year_option)s is not anymore accessible in "
-#| "%(education_group_year_root)s in %(academic_year)s => It is retired of "
-#| "the finality %(education_group_year_finality)s."
-msgid ""
-"The option %(education_group_year_option)s is not anymore accessible in "
-"%(education_group_year_root_acronym)s - "
-"%(education_group_year_root_partial_acronym)s in %(academic_year)s => It is "
-"retired of the finality %(education_group_year_finality)s."
-msgstr ""
-"L'option %(education_group_year_option)s  n'est plus accessible dans "
-"%(education_group_year_root_acronym)s - "
-"%(education_group_year_root_partial_acronym)s en %(academic_year)s => elle "
-"est retiré de la finalité %(education_group_year_finality)s."
-
 #: tests/business/education_groups/test_postponement.py:713
-#, fuzzy, python-format
-#| msgid ""
-#| "The option %(education_group_year_option)s is not anymore accessible in "
-#| "%(education_group_year_root)s in %(academic_year)s => It is retired of "
-#| "the finality %(education_group_year_finality)s."
+#, python-format
 msgid ""
 "The option %(education_group_year_option)s is not anymore accessible in "
 "%(education_group_year_root_partial_acronym)s - "
