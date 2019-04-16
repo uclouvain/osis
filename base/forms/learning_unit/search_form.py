@@ -175,11 +175,6 @@ class LearningUnitSearchForm(BaseSearchForm):
         return qs
 
 
-def _get_choices():
-    return LearningContainerYearType.choices() + LearningUnitSearchForm.MOBILITY_CHOICE
-
-
-
 class LearningUnitYearForm(LearningUnitSearchForm):
     MAX_RECORDS = 2000
     container_type = forms.ChoiceField(
