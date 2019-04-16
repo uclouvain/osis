@@ -61,7 +61,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.person import Person
@@ -84,29 +84,6 @@ SECTIONS_WITH_TEXT = (
 )
 
 NUMBER_SESSIONS = 3
-
-COMMON_PARAGRAPH = (
-    'agregation',
-    'finalites_didactiques-commun',
-    'prerequis'
-)
-
-INTRO_OFFER = (
-    TrainingType.MASTER_MS_120.name,
-    TrainingType.MASTER_MS_180_240.name,
-    TrainingType.MASTER_MD_120.name,
-    TrainingType.MASTER_MD_180_240.name,
-    TrainingType.MASTER_MA_120.name,
-    TrainingType.MASTER_MA_180_240.name,
-    GroupType.COMMON_CORE.name,
-    GroupType.SUB_GROUP.name,
-    MiniTrainingType.OPTION.name
-)
-
-DIDACTIC_OFFERS = (
-    TrainingType.MASTER_MD_120.name,
-    TrainingType.MASTER_MD_180_240.name,
-)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -156,9 +133,6 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
             education_group=context['object'],
         )
         context['enums'] = mdl.enums.education_group_categories
-
-        self.is_intro_offer = self.object.education_group_type.name in INTRO_OFFER
-        self.is_didactic_offer = self.object.education_group_type.name in DIDACTIC_OFFERS
 
         context["show_identification"] = self.show_identification()
         context["show_diploma"] = self.show_diploma()
