@@ -29,6 +29,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
 from base.business.utils.convert import volume_format
+from base.models.enums.learning_unit_year_subtypes import PARTIM
 from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.utils import get_verbose_field_value
@@ -105,7 +106,7 @@ def dl_tooltip(context, instance, key, **kwargs):
     if url:
         value = "<a href='{url}'>{value}</a>".format(value=_(str(value)), url=url)
 
-    if inherited == "PARTIM":
+    if inherited == PARTIM:
         label_text = get_style_of_label_text(label_text, "color:grey",
                                              "The value of this attribute is inherited from the parent UE")
         value = get_style_of_value("color:grey", "The value of this attribute is inherited from the parent UE", value)
