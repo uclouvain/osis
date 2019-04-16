@@ -92,13 +92,13 @@ class TestDeleteGroupEducationView(TestCase):
 
     def test_delete_post(self):
         response = self.client.post(self.url)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertFalse(EducationGroupYear.objects.filter(pk=self.education_group_year1.pk).exists())
         self.assertTrue(EducationGroupYear.objects.filter(pk=self.education_group_year2.pk).exists())
         self.assertFalse(EducationGroup.objects.filter(pk=self.education_group1.pk).exists())
         self.assertTrue(EducationGroup.objects.filter(pk=self.education_group2.pk).exists())
         response = self.client.post(self.url2)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertFalse(EducationGroupYear.objects.filter(pk=self.education_group_year2.pk).exists())
         self.assertFalse(EducationGroup.objects.filter(pk=self.education_group2.pk).exists())
 
