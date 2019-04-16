@@ -143,6 +143,14 @@ class GroupType(ChoiceEnum):
             cls.MINOR_LIST_CHOICE.name, cls.MAJOR_LIST_CHOICE.name, cls.OPTION_LIST_CHOICE.name
         ]
 
+    @classmethod
+    def ordered(cls):
+        return [
+            cls.COMMON_CORE.name, cls.FINALITY_120_LIST_CHOICE.name, cls.FINALITY_180_LIST_CHOICE.name,
+            cls.OPTION_LIST_CHOICE.name, cls.MINOR_LIST_CHOICE.name, cls.MAJOR_LIST_CHOICE.name,
+            cls.MOBILITY_PARTNERSHIP_LIST_CHOICE.name, cls.COMPLEMENTARY_MODULE.name, cls.SUB_GROUP.name
+        ]
+
 
 AllTypes = ChoiceEnum('AllTypes', [(t.name, t.value) for t in TrainingType] +
                       [(t.name, t.value) for t in MiniTrainingType] +

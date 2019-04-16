@@ -26,11 +26,14 @@
 import re
 from collections import defaultdict
 
+from django.db.models import Case, When, Value, IntegerField
+
 from base.business.utils import model
 from base.forms.common import ValidationRuleMixin
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import GroupType
 from base.models.group_element_year import GroupElementYear
 from base.models.utils import utils
 from base.models.utils.utils import get_object_or_none
@@ -53,6 +56,14 @@ def create_initial_group_element_year_structure(parent_egys):
     auth_rels = AuthorizedRelationship.objects.filter(
         parent_type=first_parent.education_group_type,
         min_count_authorized=1
+    ).annotate(
+        rels_ordering=Case(
+            *[When(child_type__name=type_name, then=Value(i)) for i, type_name in enumerate(GroupType.ordered())],
+            default=Value(len(GroupType.ordered())),
+            output_field=IntegerField()
+        )
+    ).order_by(
+        "rels_ordering"
     ).only('child_type').select_related('child_type')
 
     for relationship in auth_rels:
