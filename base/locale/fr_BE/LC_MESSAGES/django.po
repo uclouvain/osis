@@ -96,7 +96,7 @@ msgid ""
 "%(education_group_year)s (reference link) has not been copied. Its content "
 "is empty."
 msgstr ""
-"%(education_group_year)s (reference link) n'a pas été encore recopié. Son "
+"%(education_group_year)s (lien de référence) n'a pas été encore recopié. Son "
 "contenu est encore vide."
 
 #: business/group_element_years/postponement.py:100
