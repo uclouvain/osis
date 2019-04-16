@@ -29,7 +29,7 @@ from django.utils.translation import ugettext_lazy as _
 
 # This all text_label which are related to "general information" for education group year
 # The key MUST be in french because it depend on Webservice (filtering)
-from base.models.enums.education_group_types import TrainingType
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 
 PEDAGOGY = 'pedagogie'
 MOBILITY = 'mobilite'
@@ -63,60 +63,61 @@ Section = namedtuple('Section', 'title labels')
 SECTION_LIST = [
     Section(title=_('Welcome'),
             labels=[
-                (WELCOME_INTRODUCTION, 'specific'),
-                (WELCOME_PROFIL, 'specific'),
-                (WELCOME_JOB, 'specific'),
-                (WELCOME_PROGRAM, 'specific'),
-                (WELCOME_PATH, 'specific'),
+                WELCOME_INTRODUCTION,
+                WELCOME_PROFIL,
+                WELCOME_JOB,
+                WELCOME_PROGRAM,
+                WELCOME_PATH,
+                INTRODUCTION,
             ]),
     Section(title=_('Teaching profile'),
             labels=[
-                (STRUCTURE, 'specific')
+                STRUCTURE
             ]),
     Section(title=_('Detailed program'),
             labels=[
-                (MINORS, 'specific'),
-                (MAJORS, 'specific'),
-                (DETAILED_PROGRAM, 'specific'),
-                (PURPOSES, 'specific'),
-                (OPTIONS, 'specific'),
-                (COMMON_DIDACTIC_PURPOSES, 'common'),
-                (CAAP, 'common,specific'),
-                (AGREGATION, 'common'),
-                (PREREQUISITE, 'common,specific'),
+                MINORS,
+                MAJORS,
+                DETAILED_PROGRAM,
+                PURPOSES,
+                OPTIONS,
+                COMMON_DIDACTIC_PURPOSES,
+                CAAP,
+                AGREGATION,
+                PREREQUISITE,
             ]),
     Section(title=_('Admission'),
             labels=[
-                (ACCESS_TO_PROFESSIONS, 'specific'),
-                (BACHELOR_CONCERNED, 'specific'),
-                (COMPLEMENTARY_MODULE, 'common,specific')
+                ACCESS_TO_PROFESSIONS,
+                BACHELOR_CONCERNED,
+                COMPLEMENTARY_MODULE
             ]),
     Section(title=_('Benefits and organization'),
             labels=[
-                (PEDAGOGY, 'specific'),
-                (EVALUATION, 'common,specific'),
-                (MOBILITY, 'specific'),
-                (FURTHER_TRAININGS, 'specific'),
-                (CERTIFICATES, 'specific'),
+                PEDAGOGY,
+                EVALUATION,
+                MOBILITY,
+                FURTHER_TRAININGS,
+                CERTIFICATES,
             ]),
     Section(title=_('In practice'),
             labels=[
-                (PRACTICAL_INFO, 'specific'),
-                (CONTACTS, 'specific'),
+                PRACTICAL_INFO,
+                CONTACTS,
             ]),
 ]
 
 SECTION_INTRO = [
     Section(title=_('Welcome'),
             labels=[
-                (INTRODUCTION, 'specific'),
+                INTRODUCTION,
             ])
 ]
 
 SECTION_DIDACTIC = [
     Section(title=_('Detailed program'),
             labels=[
-                (COMMON_DIDACTIC_PURPOSES, 'common'),
+                COMMON_DIDACTIC_PURPOSES,
             ])
 ]
 
@@ -144,3 +145,251 @@ COMMON_TYPE_ADMISSION_CONDITIONS = {
 }
 
 MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION = 2017
+
+
+SECTIONS_PER_OFFER_TYPE = {
+    TrainingType.AGGREGATION.name: {
+        'common': [AGREGATION, CAAP, EVALUATION, ],
+        'specific': [
+            EVALUATION,
+            ACCESS_TO_PROFESSIONS,
+            PRACTICAL_INFO,
+            PEDAGOGY,
+            DETAILED_PROGRAM,
+            STRUCTURE,
+            WELCOME_INTRODUCTION,
+            WELCOME_JOB,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+        ]
+    },
+    TrainingType.CERTIFICATE_OF_PARTICIPATION.name: {
+        'common': [],
+        'specific': [WELCOME_INTRODUCTION, ]
+    },
+    TrainingType.CERTIFICATE_OF_SUCCESS.name: {
+        'common': [],
+        'specific': [WELCOME_INTRODUCTION, ]
+    },
+    TrainingType.BACHELOR.name: {
+        'common': [CAAP, EVALUATION, PREREQUISITE, ],
+        'specific': [
+            EVALUATION,
+            ACCESS_TO_PROFESSIONS,
+            CONTACTS,
+            FURTHER_TRAININGS,
+            MINORS,
+            MOBILITY,
+            PEDAGOGY,
+            DETAILED_PROGRAM,
+            STRUCTURE,
+            WELCOME_INTRODUCTION,
+            WELCOME_JOB,
+            WELCOME_PATH,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+        ]
+    },
+    TrainingType.CERTIFICATE.name: {
+        'common': [CAAP, EVALUATION, PREREQUISITE, ],
+        'specific': [
+            EVALUATION,
+            CONTACTS,
+            MOBILITY,
+            PEDAGOGY,
+            DETAILED_PROGRAM,
+            STRUCTURE,
+            WELCOME_INTRODUCTION,
+            WELCOME_PATH,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+        ]
+    },
+    TrainingType.RESEARCH_CERTIFICATE.name: {
+        'common': [CAAP, EVALUATION, PREREQUISITE, ],
+        'specific': [EVALUATION, PEDAGOGY, DETAILED_PROGRAM, STRUCTURE, ]
+    },
+    TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name: {
+        'common': [],
+        'specific': [WELCOME_INTRODUCTION, ]
+    },
+    TrainingType.PGRM_MASTER_120.name: {
+        'common': [CAAP, EVALUATION, COMMON_DIDACTIC_PURPOSES, COMPLEMENTARY_MODULE, PREREQUISITE, ],
+        'specific': [
+            EVALUATION,
+            COMPLEMENTARY_MODULE,
+            PREREQUISITE,
+            ACCESS_TO_PROFESSIONS,
+            CERTIFICATES,
+            CONTACTS,
+            PURPOSES,
+            FURTHER_TRAININGS,
+            MOBILITY,
+            OPTIONS,
+            PEDAGOGY,
+            DETAILED_PROGRAM,
+            STRUCTURE,
+            WELCOME_INTRODUCTION,
+            WELCOME_JOB,
+            WELCOME_PATH,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM
+        ]
+    },
+    TrainingType.MASTER_MA_120.name: {
+        'common': [],
+        'specific': [INTRODUCTION, ]
+    },
+    TrainingType.MASTER_MD_120.name: {
+        'common': [COMMON_DIDACTIC_PURPOSES, ],
+        'specific': [INTRODUCTION, ]
+    },
+    TrainingType.MASTER_MS_120.name: {
+        'common': [],
+        'specific': [INTRODUCTION, ]
+    },
+    TrainingType.PGRM_MASTER_180_240.name: {
+        'common': [CAAP, EVALUATION, PREREQUISITE, ],
+        'specific': [
+            EVALUATION,
+            ACCESS_TO_PROFESSIONS,
+            CERTIFICATES,
+            FURTHER_TRAININGS,
+            MOBILITY,
+            PEDAGOGY,
+            STRUCTURE,
+            WELCOME_INTRODUCTION,
+            WELCOME_JOB,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+        ]
+    },
+    TrainingType.MASTER_MA_180_240.name: {
+        'common': [],
+        'specific': [INTRODUCTION, ]
+    },
+    TrainingType.MASTER_MD_180_240.name: {
+        'common': [COMMON_DIDACTIC_PURPOSES, ],
+        'specific': [INTRODUCTION, ]
+    },
+    TrainingType.MASTER_MS_180_240.name: {
+        'common': [],
+        'specific': [INTRODUCTION, ]
+    },
+    TrainingType.MASTER_M1.name: {
+        'common': [CAAP, EVALUATION, COMPLEMENTARY_MODULE, ],
+        'specific': [
+            EVALUATION,
+            ACCESS_TO_PROFESSIONS,
+            CERTIFICATES,
+            CONTACTS,
+            FURTHER_TRAININGS,
+            MOBILITY,
+            OPTIONS,
+            PEDAGOGY,
+            STRUCTURE,
+            WELCOME_INTRODUCTION,
+            WELCOME_JOB,
+            WELCOME_PATH,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+        ]
+    },
+    TrainingType.MASTER_MC.name: {
+        'common': [CAAP, EVALUATION, COMPLEMENTARY_MODULE, ],
+        'specific': [
+            EVALUATION,
+            ACCESS_TO_PROFESSIONS,
+            CONTACTS,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            MOBILITY,
+            PEDAGOGY,
+            DETAILED_PROGRAM,
+            STRUCTURE,
+            WELCOME_INTRODUCTION,
+            WELCOME_JOB,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+        ]
+    },
+
+    MiniTrainingType.DEEPENING.name: {
+        'common': [EVALUATION, ],
+        'specific': [
+            EVALUATION,
+            ACCESS_TO_PROFESSIONS,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            PEDAGOGY,
+            DETAILED_PROGRAM,
+            WELCOME_INTRODUCTION,
+            WELCOME_PROGRAM,
+        ]
+    },
+    MiniTrainingType.SOCIETY_MINOR.name: {
+        'common': [EVALUATION, ],
+        'specific': [EVALUATION, BACHELOR_CONCERNED, FURTHER_TRAININGS, PRACTICAL_INFO, PEDAGOGY, WELCOME_INTRODUCTION, ]
+    },
+    MiniTrainingType.ACCESS_MINOR.name: {
+        'common': [EVALUATION, ],
+        'specific': [
+            EVALUATION,
+            BACHELOR_CONCERNED,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            PEDAGOGY,
+            DETAILED_PROGRAM,
+            STRUCTURE,
+            WELCOME_INTRODUCTION,
+            WELCOME_PROGRAM,
+        ]
+    },
+    MiniTrainingType.OPEN_MINOR.name: {
+        'common': [EVALUATION, ],
+        'specific': [
+            EVALUATION,
+            BACHELOR_CONCERNED,
+            CONTACTS,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            PEDAGOGY,
+            DETAILED_PROGRAM,
+            STRUCTURE,
+            WELCOME_INTRODUCTION,
+            WELCOME_PATH,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+        ]
+    },
+    MiniTrainingType.DISCIPLINARY_COMPLEMENT_MINOR.name: {
+        'common': [EVALUATION, ],
+        'specific': [
+            EVALUATION,
+            BACHELOR_CONCERNED,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            PEDAGOGY,
+            WELCOME_INTRODUCTION,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+        ]
+    },
+    MiniTrainingType.FSA_SPECIALITY.name: {
+        'common': [],
+        'specific': [INTRODUCTION, BACHELOR_CONCERNED, ]
+    },
+    MiniTrainingType.OPTION.name: {
+        'common': [],
+        'specific': [INTRODUCTION, ]
+    },
+    MiniTrainingType.MOBILITY_PARTNERSHIP.name: {
+        'common': [],
+        'specific': []
+    },
+
+    GroupType.COMMON_CORE.name: {
+        'common': [],
+        'specific': [INTRODUCTION, ]
+    },
+}

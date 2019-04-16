@@ -47,8 +47,8 @@ from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
 from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException, RelevantSectionException
-from base.business.education_groups.general_information_sections import SECTION_LIST, SECTION_INTRO, SECTION_DIDACTIC, \
-    MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
+from base.business.education_groups.general_information_sections import SECTION_LIST, \
+    MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year
@@ -60,7 +60,7 @@ from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year import EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
-from base.models.enums.education_group_categories import TRAINING, GROUP
+from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
@@ -184,8 +184,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
     def show_general_information(self):
         return not self.object.acronym.startswith('common-') and \
                self.is_general_info_and_condition_admission_in_display_range() and \
-               (self.object.education_group_type.category != GROUP or
-                self.object.education_group_type.name == GroupType.COMMON_CORE.name)
+               self.object.education_group_type.name in SECTIONS_PER_OFFER_TYPE.keys()
 
     def show_administrative(self):
         return self.object.education_group_type.category == "TRAINING" and \
@@ -286,8 +285,9 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         is_common_education_group_year = self.object.acronym.startswith('common')
-        sections_to_display = self.get_appropriate_sections()
-        show_contacts = (not sections_to_display or CONTACTS_KEY in sections_to_display) and not self.is_intro_offer
+        # sections_to_display = self.get_appropriate_sections()
+        sections_to_display = SECTIONS_PER_OFFER_TYPE[self.object.education_group_type.name]
+        show_contacts = CONTACTS_KEY in sections_to_display['specific']
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(
@@ -315,21 +315,36 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         # Load the labels
         Section = namedtuple('Section', 'title labels')
         sections_with_translated_labels = []
-        if self.is_intro_offer:
-            sections_list = SECTION_INTRO
-            if self.is_didactic_offer:
-                sections_list = sections_list + SECTION_DIDACTIC
-            sections_to_display = []  # TODO: Remove eligibleFiles dependency (Planned)
-        else:
-            sections_list = SECTION_LIST
-        for section in sections_list:
-            translated_labels = self.get_translated_labels_and_content(section,
-                                                                       self.user_language_code,
-                                                                       common_education_group_year,
-                                                                       sections_to_display)
+        # if self.is_intro_offer:
+        #     sections_list = SECTION_INTRO
+        #     if self.is_didactic_offer:
+        #         sections_list = sections_list + SECTION_DIDACTIC
+        #     sections_to_display = []  # TODO: Remove eligibleFiles dependency (Planned)
+        # else:
+        #     sections_list = SECTION_LIST
+        for section in SECTION_LIST:
+            translated_labels = self.get_temp(
+                section,
+                self.user_language_code,
+                common_education_group_year,
+                sections_to_display
+            )
             if translated_labels:
                 sections_with_translated_labels.append(Section(section.title, translated_labels))
         return sections_with_translated_labels
+
+    def get_temp(self, section, user_language, common_education_group_year, sections_list):
+        records = []
+        for label in section.labels:
+            if label in sections_list['common']:
+                records.append(
+                    self.get_content_translations_for_label(label, user_language, common_education_group_year)
+                )
+            if label in sections_list['specific']:
+                records.append(
+                    self.get_content_translations_for_label(label, user_language)
+                )
+        return records
 
     def get_translated_labels_and_content(self, section, user_language, common_education_group_year, sections_list):
         records = []
@@ -367,7 +382,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             translations = self.get_content_translations_for_label(label, user_language, 'specific')
         return translations
 
-    def get_content_translations_for_label(self, label, user_language, type):
+    def get_content_translations_for_label(self, label, user_language, common_edy=None):
         # FIXME: Change contacts ==> contact_intro in sections
         if label == CONTACTS_KEY:
             label = CONTACT_INTRO_KEY
@@ -378,22 +393,20 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             text_label__label=label,
             language=user_language
         ).first()
-
         # fetch the translations for the both languages
         french, english = 'fr-be', 'en'
 
         qs = TranslatedText.objects.filter(
             entity=entity_name.OFFER_YEAR,
-            reference=str(self.object.pk),
+            reference=str(common_edy.pk) if common_edy else str(self.object.pk),
             text_label__label=label
         )
 
         fr_translated_text = qs.filter(language=french).first()
         en_translated_text = qs.filter(language=english).first()
-
         return {
             'label': label,
-            'type': type,
+            'type': 'common' if common_edy else 'specific',
             'translation': translated_label.label if translated_label else
             (_('This label %s does not exist') % label),
             french: fr_translated_text.text if fr_translated_text else None,
@@ -411,8 +424,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_contacts_section(self):
         introduction = self.get_content_translations_for_label(
             CONTACT_INTRO_KEY,
-            self.user_language_code,
-            'specific'
+            self.user_language_code
         )
         return {
             'contact_intro': introduction,
