@@ -327,4 +327,3 @@ def _get_data_part1(learning_unit_yr):
         learning_unit_yr.complete_title_english,
     ]
     return lu_data_part1
-

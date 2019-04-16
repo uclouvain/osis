@@ -115,7 +115,7 @@ class LearningUnitSearchForm(BaseSearchForm):
         ).values('acronym')[:1]
 
         queryset = mdl.learning_unit_year.search(**self.cleaned_data)
-        
+
         queryset = self._filter_external_learning_units(queryset)
 
         queryset = queryset.select_related(
