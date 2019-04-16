@@ -57,6 +57,7 @@ PREREQUISITE = 'prerequis'
 OPTIONS = 'options'
 INTRODUCTION = 'intro'
 CONTACTS = 'contacts'
+CONTACT_INTRO = 'contact_intro'
 
 Section = namedtuple('Section', 'title labels')
 
@@ -103,7 +104,7 @@ SECTION_LIST = [
     Section(title=_('In practice'),
             labels=[
                 PRACTICAL_INFO,
-                CONTACTS,
+                CONTACT_INTRO,
             ]),
 ]
 
@@ -176,7 +177,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             EVALUATION,
             ACCESS_TO_PROFESSIONS,
-            CONTACTS,
+            CONTACT_INTRO,
             FURTHER_TRAININGS,
             MINORS,
             MOBILITY,
@@ -194,7 +195,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'common': [CAAP, EVALUATION, PREREQUISITE, ],
         'specific': [
             EVALUATION,
-            CONTACTS,
+            CONTACT_INTRO,
             MOBILITY,
             PEDAGOGY,
             DETAILED_PROGRAM,
@@ -221,7 +222,7 @@ SECTIONS_PER_OFFER_TYPE = {
             PREREQUISITE,
             ACCESS_TO_PROFESSIONS,
             CERTIFICATES,
-            CONTACTS,
+            CONTACT_INTRO,
             PURPOSES,
             FURTHER_TRAININGS,
             MOBILITY,
@@ -282,7 +283,7 @@ SECTIONS_PER_OFFER_TYPE = {
             EVALUATION,
             ACCESS_TO_PROFESSIONS,
             CERTIFICATES,
-            CONTACTS,
+            CONTACT_INTRO,
             FURTHER_TRAININGS,
             MOBILITY,
             OPTIONS,
@@ -300,7 +301,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             EVALUATION,
             ACCESS_TO_PROFESSIONS,
-            CONTACTS,
+            CONTACT_INTRO,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             MOBILITY,
@@ -329,7 +330,14 @@ SECTIONS_PER_OFFER_TYPE = {
     },
     MiniTrainingType.SOCIETY_MINOR.name: {
         'common': [EVALUATION, ],
-        'specific': [EVALUATION, BACHELOR_CONCERNED, FURTHER_TRAININGS, PRACTICAL_INFO, PEDAGOGY, WELCOME_INTRODUCTION, ]
+        'specific': [
+            EVALUATION,
+            BACHELOR_CONCERNED,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            PEDAGOGY,
+            WELCOME_INTRODUCTION,
+        ]
     },
     MiniTrainingType.ACCESS_MINOR.name: {
         'common': [EVALUATION, ],
@@ -350,7 +358,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             EVALUATION,
             BACHELOR_CONCERNED,
-            CONTACTS,
+            CONTACT_INTRO,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             PEDAGOGY,

@@ -72,7 +72,7 @@ from base.views.common import display_error_messages, display_success_messages
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-from webservices.business import CONTACTS_KEY, CONTACT_INTRO_KEY
+from webservices.business import CONTACT_INTRO_KEY
 
 SECTIONS_WITH_TEXT = (
     'ucl_bachelors',
@@ -287,7 +287,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         is_common_education_group_year = self.object.acronym.startswith('common')
         # sections_to_display = self.get_appropriate_sections()
         sections_to_display = SECTIONS_PER_OFFER_TYPE[self.object.education_group_type.name]
-        show_contacts = CONTACTS_KEY in sections_to_display['specific']
+        show_contacts = CONTACT_INTRO_KEY in sections_to_display['specific']
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(
@@ -315,15 +315,8 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         # Load the labels
         Section = namedtuple('Section', 'title labels')
         sections_with_translated_labels = []
-        # if self.is_intro_offer:
-        #     sections_list = SECTION_INTRO
-        #     if self.is_didactic_offer:
-        #         sections_list = sections_list + SECTION_DIDACTIC
-        #     sections_to_display = []  # TODO: Remove eligibleFiles dependency (Planned)
-        # else:
-        #     sections_list = SECTION_LIST
         for section in SECTION_LIST:
-            translated_labels = self.get_temp(
+            translated_labels = self.get_translated_labels_and_content(
                 section,
                 self.user_language_code,
                 common_education_group_year,
@@ -333,7 +326,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
                 sections_with_translated_labels.append(Section(section.title, translated_labels))
         return sections_with_translated_labels
 
-    def get_temp(self, section, user_language, common_education_group_year, sections_list):
+    def get_translated_labels_and_content(self, section, user_language, common_education_group_year, sections_list):
         records = []
         for label in section.labels:
             if label in sections_list['common']:
@@ -346,47 +339,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
                 )
         return records
 
-    def get_translated_labels_and_content(self, section, user_language, common_education_group_year, sections_list):
-        records = []
-        for label, selectors in section.labels:
-            if not sections_list or label in sections_list:
-                records.extend(
-                    self.get_selectors(common_education_group_year, label, selectors, user_language)
-                )
-        return records
-
-    def get_selectors(self, common_education_group_year, label, selectors, user_language):
-        records = []
-
-        for selector in selectors.split(','):
-            translations = None
-            if selector == 'specific':
-                translations = self.get_content_translations_for_label(label, user_language, 'specific')
-
-            elif selector == 'common':
-                translations = self._get_common_selector(common_education_group_year, label, user_language)
-
-            if translations and translations not in records:
-                records.append(translations)
-
-        return records
-
-    def _get_common_selector(self, common_education_group_year, label, user_language):
-        translations = None
-        # common_education_group_year is None if education_group_year is common
-        # if not common, translation must be non-editable in non common offer
-        if common_education_group_year is not None:
-            translations = self.get_content_translations_for_label(label, user_language, 'common')
-        # if is common and a label in COMMON_PARAGRAPH, must be editable in common offer
-        elif label in COMMON_PARAGRAPH:
-            translations = self.get_content_translations_for_label(label, user_language, 'specific')
-        return translations
-
     def get_content_translations_for_label(self, label, user_language, common_edy=None):
-        # FIXME: Change contacts ==> contact_intro in sections
-        if label == CONTACTS_KEY:
-            label = CONTACT_INTRO_KEY
-
         # fetch the translation for the current user
         translated_label = TranslatedTextLabel.objects.filter(
             text_label__entity=entity_name.OFFER_YEAR,
