@@ -70,7 +70,7 @@ class PrerequisiteItemWarning(CopyWarning):
 
     def __str__(self):
         return _("%(prerequisite_item)s is not anymore contained in "
-                 "%(education_group_year_root_acronym)s - %(education_group_year_root_partial_acronym)s "
+                 "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s "
                  "=> the prerequisite for %(learning_unit_year)s "
                  "having %(prerequisite_item)s as prerequisite is not copied.") % {
             "education_group_year_root_acronym": self.egy.acronym,
@@ -87,7 +87,7 @@ class PrerequisiteWarning(CopyWarning):
 
     def __str__(self):
         return _("%(learning_unit_year)s is not anymore contained in "
-                 "%(education_group_year_root_acronym)s - %(education_group_year_root_partial_acronym)s "
+                 "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s "
                  "=> the prerequisite for %(learning_unit_year)s is not copied.") % {
             "education_group_year_root_acronym": self.egy.acronym,
             "education_group_year_root_partial_acronym": self.egy.partial_acronym,
