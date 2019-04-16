@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-16 11:01+0200\n"
+"POT-Creation-Date: 2019-04-16 15:30+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -128,8 +128,9 @@ msgid ""
 "%(education_group_year_root_acronym)s => the prerequisite for "
 "%(learning_unit_year)s is not copied."
 msgstr ""
-"%(learning_unit_year)s n'est plus dans %(education_group_year_root_partial_acronym)s "
-"-%(education_group_year_root_acronym)s => le prérequis de "
+"%(learning_unit_year)s n'est plus dans "
+"%(education_group_year_root_partial_acronym)s -"
+"%(education_group_year_root_acronym)s => le prérequis de "
 "%(learning_unit_year)s n'est pas copié."
 
 #: models/education_group.py:116 models/education_group_year.py:787
@@ -173,8 +174,9 @@ msgid ""
 "%(learning_unit_year)s having %(prerequisite_item)s as prerequisite is not "
 "copied."
 msgstr ""
-"%(prerequisite_item)s n'est plus dans %(education_group_year_root_partial_acronym)s "
-"- %(education_group_year_root_acronym)s => le prérequis de "
+"%(prerequisite_item)s n'est plus dans "
+"%(education_group_year_root_partial_acronym)s - "
+"%(education_group_year_root_acronym)s => le prérequis de "
 "%(learning_unit_year)s contenant %(prerequisite_item)s n'est pas copié."
 
 #: business/learning_units/simple/deletion.py:116
@@ -975,7 +977,7 @@ msgid "Classe"
 msgstr "Classe"
 
 #: forms/learning_unit/edition_volume.py:82
-#: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:43
+#: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:35
 #: templates/learning_unit/components.html:56
 #: templates/learning_unit/components.html:122
 #: templates/learning_unit/components_identification.html:42
@@ -4343,6 +4345,7 @@ msgstr ""
 "Le nombre d'enfants de type(s) \"%(child_types)s\" pour \"%(parent)s\" a "
 "atteint la limite maximum."
 
+#: business/group_element_years/postponement.py:144
 #: tests/business/education_groups/test_postponement.py:713
 #, python-format
 msgid ""
@@ -4353,8 +4356,8 @@ msgid ""
 msgstr ""
 "L'option %(education_group_year_option)s  n'est plus accessible dans "
 "%(education_group_year_root_partial_acronym)s - "
-"%(education_group_year_root_acronym)s en %(academic_year)s => elle "
-"est retiré de la finalité %(education_group_year_finality)s."
+"%(education_group_year_root_acronym)s en %(academic_year)s => elle est "
+"retiré de la finalité %(education_group_year_finality)s."
 
 #: models/learning_unit_year.py:363 tests/models/test_learning_unit_year.py:560
 #, python-format
@@ -4930,10 +4933,6 @@ msgstr ""
 "Le volume global doit être égal au volume annuel multiplié par le nombre de "
 "classes"
 
-#: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:36
-msgid "Volume"
-msgstr "Volume"
-
 #: forms/learning_unit/attribution_charge_repartition.py:134
 #: templates/learning_unit/attributions.html:40
 msgid "Volume 1"
@@ -4957,6 +4956,12 @@ msgstr "Volume Q1"
 #: views/learning_unit.py:385 views/learning_unit.py:401
 msgid "Volume Q2"
 msgstr "Volume Q2"
+
+#: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:43
+#, fuzzy
+#| msgid "Volume total annual"
+msgid "Volume annuel"
+msgstr "Volume total annuel"
 
 #: forms/learning_unit/edition_volume.py:79
 #: forms/learning_unit/edition_volume.py:102
@@ -5931,3 +5936,6 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:163
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "Volume"
+#~ msgstr "Volume"
