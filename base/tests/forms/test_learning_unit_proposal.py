@@ -36,9 +36,10 @@ from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import organization_type, proposal_type, proposal_state, entity_type, \
     learning_container_year_types, quadrimesters, entity_container_year_link_type, \
     learning_unit_year_periodicity, internship_subtypes, learning_unit_year_subtypes
+from base.models.enums.entity_type import SCHOOL
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
@@ -77,15 +78,19 @@ class TestSave(TestCase):
 
         today = datetime.date.today()
         an_entity = EntityFactory(organization=an_organization)
-        self.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL,
+        self.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
                                                    start_date=today.replace(year=1900),
                                                    end_date=None)
+        self.an_entity_school = EntityFactory(organization=an_organization)
+        self.entity_version_school = EntityVersionFactory(entity=self.an_entity_school, entity_type=entity_type.SCHOOL,
+                                                          start_date=today.replace(year=1900),
+                                                          end_date=None)
         self.entity_container_year = EntityContainerYearFactory(
             learning_container_year=self.learning_unit_year.learning_container_year,
             type=entity_container_year_link_type.REQUIREMENT_ENTITY,
             entity=self.entity_version.entity
         )
-        PersonEntityFactory(person=self.person, entity=an_entity)
+        self.person_entity = PersonEntityFactory(person=self.person, entity=an_entity)
         self.language = LanguageFactory(code="EN")
         self.campus = CampusFactory(name="OSIS Campus", organization=OrganizationFactory(type=organization_type.MAIN),
                                     is_administration=True)
@@ -141,7 +146,7 @@ class TestSave(TestCase):
         proposal = ProposalLearningUnitFactory(
             learning_unit_year=self.learning_unit_year, state=ProposalState.FACULTY.name,
             entity=self.entity_version.entity)
-        form = ProposalBaseForm(self.form_data, self.person,  self.learning_unit_year, proposal=proposal)
+        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year, proposal=proposal)
         self.assertFalse(form.fields['state'].disabled)
         self.assertEqual(form.fields['state'].initial, ProposalState.FACULTY.name)
 
@@ -263,6 +268,18 @@ class TestSave(TestCase):
         with self.assertRaises(ObjectDoesNotExist):
             EntityContainerYear.objects.get(learning_container_year=self.learning_unit_year.learning_container_year,
                                             type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1)
+
+    def test_creation_proposal_learning_unit_with_school_entity(self):
+        self.entity_version.entity_type = SCHOOL
+        self.entity_version.save()
+        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
+        self.assertTrue('entity' in form.errors[0])
+
+    def test_creation_proposal_learning_unit_with_not_linked_entity(self):
+        self.person_entity.entity = self.an_entity_school
+        self.person_entity.save()
+        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
+        self.assertTrue('entity' in form.errors[1])
 
 
 def build_initial_data(learning_unit_year, entity_container_yr):

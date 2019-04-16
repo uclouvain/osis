@@ -110,7 +110,7 @@ class TestLearningUnitModificationProposal(TestCase):
         )
 
         an_entity = EntityFactory(organization=an_organization)
-        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL,
+        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
                                                   start_date=current_academic_year.start_date,
                                                   end_date=current_academic_year.end_date)
         cls.requirement_entity = EntityContainerYearFactory(
@@ -306,7 +306,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         )
 
         an_entity = EntityFactory(organization=an_organization)
-        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL,
+        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
                                                   start_date=current_academic_year.start_date,
                                                   end_date=current_academic_year.end_date)
         cls.requirement_entity = EntityContainerYearFactory(
@@ -697,7 +697,7 @@ class TestEditProposal(TestCase):
         cls.organization = organization_factory.OrganizationFactory(type=organization_type.MAIN)
         cls.campus = campus_factory.CampusFactory(organization=cls.organization, is_administration=True)
         cls.entity = EntityFactory(organization=cls.organization)
-        cls.entity_version = EntityVersionFactory(entity=cls.entity, entity_type=entity_type.SCHOOL,
+        cls.entity_version = EntityVersionFactory(entity=cls.entity, entity_type=entity_type.FACULTY,
                                                   start_date=today.replace(year=1900),
                                                   end_date=None)
 
