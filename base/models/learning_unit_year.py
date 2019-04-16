@@ -240,6 +240,14 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def is_external_of_mobility(self):
         return self.is_external() and self.externallearningunityear.mobility
 
+    def get_container_type_display(self):
+        # FIXME :: Condition to remove when the LearningUnitYear.learning_container_year_id will be null=false
+        if not self.learning_container_year:
+            return ''
+        if self.is_external_of_mobility():
+            return _('Mobility')
+        return self.learning_container_year.get_container_type_display()
+
     @property
     def status_verbose(self):
         return _("Active") if self.status else _("Inactive")

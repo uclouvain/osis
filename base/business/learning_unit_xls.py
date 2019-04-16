@@ -317,9 +317,7 @@ def _get_data_part1(learning_unit_yr):
         learning_unit_yr.acronym,
         learning_unit_yr.academic_year.name,
         learning_unit_yr.complete_title,
-        learning_unit_yr.learning_container_year.get_container_type_display()
-        # FIXME Condition to remove when the LearningUnitYear.learning_container_year_id will be null=false
-        if learning_unit_yr.learning_container_year else "",
+        learning_unit_yr.get_container_type_display(),
         learning_unit_yr.get_subtype_display(),
         requirement_acronym,
         proposal.get_type_display() if proposal else '',
