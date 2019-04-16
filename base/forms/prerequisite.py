@@ -76,10 +76,16 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
         self.instance.main_operator = self.main_operator or AND
         self.instance.save()
 
+        self._delete_old_items()
         _create_prerequisite_items(
             grouped_items=grouped_items,
             prerequisite=self.instance
         )
+
+    def _delete_old_items(self):
+        items = self.instance.prerequisiteitem_set.all()
+        for item in items:
+            item.delete()
 
     def get_grouped_items_from_string(self, prerequisite_string, main_operator):
         main_operator_splitter = ' ET ' if main_operator == AND else ' OU '
