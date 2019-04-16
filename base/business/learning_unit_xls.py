@@ -307,17 +307,11 @@ def _get_data_part1(learning_unit_yr):
 
     requirement_acronym = getattr(learning_unit_yr, 'entity_requirement', None)
     if not requirement_acronym:
-        requirement_acronym = _get_entity_faculty_acronym(
-            learning_unit_yr.entities.get('REQUIREMENT_ENTITY'),
-            learning_unit_yr.academic_year
-        )
+        requirement_acronym = learning_unit_yr.entity_requirement
 
     allocation_acronym = getattr(learning_unit_yr, 'entity_allocation', None)
     if not allocation_acronym:
-        allocation_acronym = _get_entity_faculty_acronym(
-            learning_unit_yr.entities.get('ALLOCATION_ENTITY'),
-            learning_unit_yr.academic_year
-        )
+        allocation_acronym = learning_unit_yr.entity_allocation
 
     lu_data_part1 = [
         learning_unit_yr.acronym,
@@ -336,9 +330,3 @@ def _get_data_part1(learning_unit_yr):
     ]
     return lu_data_part1
 
-
-def _get_entity_faculty_acronym(an_entity, academic_yr):
-    if an_entity:
-        faculty_entity = an_entity.find_faculty_version(academic_yr)
-        return faculty_entity.acronym if faculty_entity else None
-    return None
