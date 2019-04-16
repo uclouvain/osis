@@ -23,19 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import json
 import logging
 from threading import Thread
 
 import requests
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 
-from base.business.education_groups.general_information_sections import COMMON_GENERAL_INFO_SECTIONS
 from base.models.group_element_year import find_learning_unit_formations
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -54,21 +50,6 @@ def publish(education_group_year):
     t = Thread(target=_bulk_publish, args=(education_groups_to_publish,))
     t.start()
     return _get_portal_url(education_group_year)
-
-
-def get_relevant_sections(education_group_year):
-    if not all([settings.URL_TO_PORTAL_UCL, settings.GET_SECTION_PARAM]):
-        raise ImproperlyConfigured('URL_TO_PORTAL_UCL / GET_SECTION_PARAM must be set in configuration')
-
-    if education_group_year.is_common:
-        return COMMON_GENERAL_INFO_SECTIONS
-
-    relevant_sections_url = _get_portal_url(education_group_year) + "?" + settings.GET_SECTION_PARAM
-    try:
-        response = requests.get(relevant_sections_url, timeout=settings.REQUESTS_TIMEOUT).json()
-    except (json.JSONDecodeError, requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-        raise RelevantSectionException(_("Unable to retrieve appropriate sections for this programs"))
-    return response.get('sections') or []
 
 
 def _bulk_publish(education_group_years):
@@ -127,9 +108,4 @@ def _get_code_according_type(education_group_year):
 
 class PublishException(Exception):
     """Some kind of problem with a publish to ESB. """
-    pass
-
-
-class RelevantSectionException(Exception):
-    """Some kind of problem with get relevant section from ESB. """
     pass

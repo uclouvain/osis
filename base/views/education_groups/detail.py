@@ -46,7 +46,7 @@ from reversion.models import Version
 from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
 from base.business.education_groups import perms, general_information
-from base.business.education_groups.general_information import PublishException, RelevantSectionException
+from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
@@ -285,7 +285,6 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         is_common_education_group_year = self.object.acronym.startswith('common')
-        # sections_to_display = self.get_appropriate_sections()
         sections_to_display = SECTIONS_PER_OFFER_TYPE[self.object.education_group_type.name]
         show_contacts = CONTACT_INTRO_KEY in sections_to_display['specific']
         context.update({
@@ -365,14 +364,6 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             french: fr_translated_text.text if fr_translated_text else None,
             english: en_translated_text.text if en_translated_text else None,
         }
-
-    def get_appropriate_sections(self):
-        sections = []
-        try:
-            sections = general_information.get_relevant_sections(self.object)
-        except RelevantSectionException as e:
-            display_error_messages(self.request, str(e))
-        return sections
 
     def get_contacts_section(self):
         introduction = self.get_content_translations_for_label(

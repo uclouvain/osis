@@ -61,7 +61,7 @@ from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
 
 
-@override_settings(URL_TO_PORTAL_UCL="http://portal-url.com", GET_SECTION_PARAM="sectionsParams")
+@override_settings(URL_TO_PORTAL_UCL="http://portal-url.com")
 class EducationGroupGeneralInformations(TestCase):
     @classmethod
     def setUpTestData(cls):
