@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-16 08:30+0200\n"
+"POT-Creation-Date: 2019-04-16 10:29+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -88,9 +88,9 @@ msgstr[1] "%(count_enrollment)d étudiants sont inscrits à l'offre."
 msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
 msgstr "%(date)s doit être comprise entre %(start_date)s et %(end_date)s"
 
-#: business/group_element_years/postponement.py:112
-#: tests/business/education_groups/test_postponement.py:623
-#: tests/business/education_groups/test_postponement.py:645
+#: business/group_element_years/postponement.py:116
+#: tests/business/education_groups/test_postponement.py:627
+#: tests/business/education_groups/test_postponement.py:649
 #, python-format
 msgid ""
 "%(education_group_year)s (reference link) has not been copied. Its content "
@@ -99,7 +99,7 @@ msgstr ""
 "%(education_group_year)s (lien de référence) n'a pas été encore recopié. Son "
 "contenu est encore vide."
 
-#: business/group_element_years/postponement.py:100
+#: business/group_element_years/postponement.py:104
 #: tests/business/education_groups/test_postponement.py:376
 #, python-format
 msgid ""
@@ -109,8 +109,8 @@ msgstr ""
 "%(education_group_year)s a déjà été recopié en  %(academic_year)s dans un "
 "autre programme. Il pourrait donc avoir déjà été modifié."
 
-#: business/group_element_years/postponement.py:123
-#: tests/business/education_groups/test_postponement.py:597
+#: business/group_element_years/postponement.py:127
+#: tests/business/education_groups/test_postponement.py:601
 #, python-format
 msgid ""
 "%(education_group_year)s is closed in %(end_year)s. This element will not be "
@@ -119,15 +119,22 @@ msgstr ""
 "%(education_group_year)s est clôturé en %(end_year)s. Cet élément n'est pas "
 "recopié en %(academic_year)s."
 
-#: business/group_element_years/postponement.py:87
+#: business/group_element_years/postponement.py:89
 #: tests/business/education_groups/test_postponement.py:487
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "%(learning_unit_year)s is not anymore contained in "
+#| "%(education_group_year)s => the prerequisite for %(learning_unit_year)s "
+#| "is not copied."
 msgid ""
-"%(learning_unit_year)s is not anymore contained in %(education_group_year)s "
-"=> the prerequisite for %(learning_unit_year)s is not copied."
+"%(learning_unit_year)s is not anymore contained in "
+"%(education_group_year_root_acronym)s - "
+"%(education_group_year_root_partial_acronym)s => the prerequisite for "
+"%(learning_unit_year)s is not copied."
 msgstr ""
-"%(learning_unit_year)s n'est plus dans %(education_group_year)s => le "
-"prérequis de %(learning_unit_year)s n'est pas copié."
+"%(learning_unit_year)s n'est plus dans %(education_group_year_root_acronym)s -"
+"%(education_group_year_root_partial_acronym)s "
+"=> le prérequis de %(learning_unit_year)s n'est pas copié."
 
 #: models/education_group.py:116 models/education_group_year.py:787
 #, python-format
@@ -161,14 +168,21 @@ msgid "%(number_notifications)s unread notification(s)"
 msgstr "%(number_notifications)s notification(s) non lu(s)"
 
 #: business/group_element_years/postponement.py:72
-#: tests/business/education_groups/test_postponement.py:524
-#, python-format
+#: tests/business/education_groups/test_postponement.py:526
+#, fuzzy, python-format
+#| msgid ""
+#| "%(prerequisite_item)s is not anymore contained in "
+#| "%(education_group_year)s => the prerequisite for %(learning_unit_year)s "
+#| "having %(prerequisite_item)s as prerequisite is not copied."
 msgid ""
-"%(prerequisite_item)s is not anymore contained in %(education_group_year)s "
-"=> the prerequisite for %(learning_unit_year)s having %(prerequisite_item)s "
-"as prerequisite is not copied."
+"%(prerequisite_item)s is not anymore contained in "
+"%(education_group_year_root_acronym)s - "
+"%(education_group_year_root_partial_acronym)s => the prerequisite for "
+"%(learning_unit_year)s having %(prerequisite_item)s as prerequisite is not "
+"copied."
 msgstr ""
-"%(prerequisite_item)s n'est plus dans %(education_group_year)s => le "
+"%(prerequisite_item)s n'est plus dans "
+"%(education_group_year_root_acronym)s - %(education_group_year_root_partial_acronym)s => le "
 "prérequis de %(learning_unit_year)s contenant %(prerequisite_item)s n'est "
 "pas copié."
 
@@ -4076,7 +4090,7 @@ msgstr "Le contact a bien été créee"
 msgid "The contacts modifications has been saved"
 msgstr "Les données de contact ont été sauvegardées"
 
-#: business/group_element_years/postponement.py:209
+#: business/group_element_years/postponement.py:215
 #: tests/business/education_groups/test_postponement.py:197
 #: tests/business/education_groups/test_postponement.py:211
 #: tests/business/education_groups/test_postponement.py:220
@@ -4135,7 +4149,7 @@ msgstr ""
 msgid "The end date must be less or equals to the root %(acronym)s"
 msgstr "La date de fin doit être plus petite ou égale à la racine %(acronym)s"
 
-#: business/group_element_years/postponement.py:195
+#: business/group_element_years/postponement.py:201
 #: tests/business/education_groups/test_postponement.py:229
 msgid ""
 "The end date of the education group is smaller than the year of postponement."
@@ -4338,16 +4352,22 @@ msgstr ""
 "Le nombre d'enfants de type(s) \"%(child_types)s\" pour \"%(parent)s\" a "
 "atteint la limite maximum."
 
-#: business/group_element_years/postponement.py:140
-#: tests/business/education_groups/test_postponement.py:709
-#, python-format
+#: business/group_element_years/postponement.py:144
+#: tests/business/education_groups/test_postponement.py:713
+#, fuzzy, python-format
+#| msgid ""
+#| "The option %(education_group_year_option)s is not anymore accessible in "
+#| "%(education_group_year_root)s in %(academic_year)s => It is retired of "
+#| "the finality %(education_group_year_finality)s."
 msgid ""
 "The option %(education_group_year_option)s is not anymore accessible in "
-"%(education_group_year_root)s in %(academic_year)s => It is retired of the "
-"finality %(education_group_year_finality)s."
+"%(education_group_year_root_acronym)s - "
+"%(education_group_year_root_partial_acronym)s in %(academic_year)s => It is "
+"retired of the finality %(education_group_year_finality)s."
 msgstr ""
 "L'option %(education_group_year_option)s  n'est plus accessible dans "
-"%(education_group_year_root)s en %(academic_year)s => elle est retiré de la "
+"%(education_group_year_root_acronym)s - %(education_group_year_root_partial_acronym)s "
+"en %(academic_year)s => elle est retiré de la "
 "finalité %(education_group_year_finality)s."
 
 #: models/learning_unit_year.py:363 tests/models/test_learning_unit_year.py:560
@@ -4412,7 +4432,7 @@ msgstr ""
 "La répartition de volume de %(col_name)s a déjà été modifiée. "
 "({%(new_value)s} a la place de {%(current_value)s})"
 
-#: business/group_element_years/postponement.py:206
+#: business/group_element_years/postponement.py:212
 #: tests/business/education_groups/test_postponement.py:189
 msgid "The root does not exist in the next academic year."
 msgstr "La racine n'existe pas dans l'anné academique suivante."
@@ -4617,7 +4637,7 @@ msgstr "Gestion des stages des étudiants."
 msgid "This process helps tutors while scores encoding."
 msgstr "Processus visant à aider les enseignants pour l'encodage des notes."
 
-#: business/group_element_years/postponement.py:198
+#: business/group_element_years/postponement.py:204
 msgid "This training has no content to postpone."
 msgstr "La formation n'a pas de contenu à reporter."
 
@@ -5083,8 +5103,8 @@ msgid "You are not allowed to change the end year for this academic year"
 msgstr ""
 "Vous n’êtes pas autorisé à changer l’année de fin de cette année académique"
 
-#: business/group_element_years/postponement.py:164
-#: business/group_element_years/postponement.py:186
+#: business/group_element_years/postponement.py:170
+#: business/group_element_years/postponement.py:192
 #: tests/business/education_groups/test_postponement.py:239
 #: tests/business/education_groups/test_postponement.py:249
 msgid ""
@@ -5099,11 +5119,11 @@ msgid "You are not allowed to create a reference with a learning unit"
 msgstr ""
 "Vous n'êtes pas autorisé de créer une référence avec une unité d’enseignement"
 
-#: business/group_element_years/postponement.py:191
+#: business/group_element_years/postponement.py:197
 msgid "You are not allowed to postpone this training in the future."
 msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le futur."
 
-#: business/group_element_years/postponement.py:189
+#: business/group_element_years/postponement.py:195
 msgid "You are not allowed to postpone this training in the past."
 msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le passé."
 

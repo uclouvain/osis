@@ -69,10 +69,12 @@ class PrerequisiteItemWarning(CopyWarning):
         self.egy = egy
 
     def __str__(self):
-        return _("%(prerequisite_item)s is not anymore contained in %(education_group_year)s "
+        return _("%(prerequisite_item)s is not anymore contained in "
+                 "%(education_group_year_root_acronym)s - %(education_group_year_root_partial_acronym)s "
                  "=> the prerequisite for %(learning_unit_year)s "
                  "having %(prerequisite_item)s as prerequisite is not copied.") % {
-            "education_group_year": self.egy.acronym,
+            "education_group_year_root_acronym": self.egy.acronym,
+            "education_group_year_root_partial_acronym": self.egy.partial_acronym,
             "learning_unit_year": self.prerequisite.learning_unit_year.acronym,
             "prerequisite_item": self.item.learning_unit.acronym
         }
@@ -84,9 +86,11 @@ class PrerequisiteWarning(CopyWarning):
         self.egy = egy
 
     def __str__(self):
-        return _("%(learning_unit_year)s is not anymore contained in %(education_group_year)s "
+        return _("%(learning_unit_year)s is not anymore contained in "
+                 "%(education_group_year_root_acronym)s - %(education_group_year_root_partial_acronym)s "
                  "=> the prerequisite for %(learning_unit_year)s is not copied.") % {
-            "education_group_year": self.egy.acronym,
+            "education_group_year_root_acronym": self.egy.acronym,
+            "education_group_year_root_partial_acronym": self.egy.partial_acronym,
             "learning_unit_year": self.luy.acronym,
         }
 
@@ -137,10 +141,12 @@ class FinalityOptionNotValidWarning(CopyWarning):
         self.academic_year = academic_year
 
     def __str__(self):
-        return _("The option %(education_group_year_option)s is not anymore accessible in %(education_group_year_root)s"
+        return _("The option %(education_group_year_option)s is not anymore accessible in "
+                 "%(education_group_year_root_acronym)s - %(education_group_year_root_partial_acronym)s"
                  " in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
             "education_group_year_option": self.education_group_year_option.acronym,
-            "education_group_year_root": self.education_group_year_root.acronym,
+            "education_group_year_root_acronym": self.education_group_year_root.acronym,
+            "education_group_year_root_partial_acronym": self.education_group_year_root.partial_acronym,
             "education_group_year_finality": self.education_group_year_finality.acronym,
             "academic_year": self.academic_year
         }
