@@ -108,29 +108,6 @@ SECTION_LIST = [
             ]),
 ]
 
-SECTION_INTRO = [
-    Section(title=_('Welcome'),
-            labels=[
-                INTRODUCTION,
-            ])
-]
-
-SECTION_DIDACTIC = [
-    Section(title=_('Detailed program'),
-            labels=[
-                COMMON_DIDACTIC_PURPOSES,
-            ])
-]
-
-COMMON_GENERAL_INFO_SECTIONS = [
-    AGREGATION,
-    CAAP,
-    PREREQUISITE,
-    COMMON_DIDACTIC_PURPOSES,
-    COMPLEMENTARY_MODULE,
-    EVALUATION
-]
-
 # Common type which have admission conditions sections + relevant sections
 COMMON_TYPE_ADMISSION_CONDITIONS = {
     TrainingType.BACHELOR.name:
