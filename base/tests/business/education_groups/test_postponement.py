@@ -485,7 +485,7 @@ class TestPostpone(TestCase):
 
         self.assertIn(
             _("%(learning_unit_year)s is not anymore contained in "
-              "%(education_group_year_root_acronym)s - %(education_group_year_root_partial_acronym)s "
+              "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s "
               "=> the prerequisite for %(learning_unit_year)s is not copied.") % {
                 "education_group_year_root_acronym": new_root.acronym,
                 "education_group_year_root_partial_acronym": new_root.partial_acronym,
@@ -524,7 +524,7 @@ class TestPostpone(TestCase):
         self.assertEqual(
             str(self.postponer.warnings[0]),
             _("%(prerequisite_item)s is not anymore contained in "
-              "%(education_group_year_root_acronym)s - %(education_group_year_root_partial_acronym)s "
+              "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s "
               "=> the prerequisite for %(learning_unit_year)s "
               "having %(prerequisite_item)s as prerequisite is not copied.") % {
                 "education_group_year_root_acronym": new_root.acronym,
@@ -711,7 +711,7 @@ class TestPostpone(TestCase):
         self.assertEqual(
             str(self.postponer.warnings[0]),
             _("The option %(education_group_year_option)s is not anymore accessible in "
-              "%(education_group_year_root_acronym)s - %(education_group_year_root_partial_acronym)s "
+              "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s "
               "in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
                 "education_group_year_option": child_child_grp.child_branch.acronym,
                 "education_group_year_root_acronym": root_egy_n1.acronym,
