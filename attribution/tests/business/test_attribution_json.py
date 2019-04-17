@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -51,8 +51,13 @@ class AttributionJsonTest(TestCase):
         # Creation Container / UE and components related
         self.l_container = LearningContainerYearFactory(academic_year=self.academic_year, acronym="LBIR1210",
                                                         in_charge=True)
-        _create_learning_unit_year_with_components(academic_year=self.academic_year, l_container=self.l_container,
-                                                   acronym="LBIR1210",subtype=learning_unit_year_subtypes.FULL)
+        self.learning_unit_yr = _create_learning_unit_year_with_components(
+            academic_year=self.academic_year,
+            l_container=self.l_container,
+            acronym="LBIR1210",
+            subtype=learning_unit_year_subtypes.FULL
+        )
+
         _create_learning_unit_year_with_components(academic_year=self.academic_year, l_container=self.l_container,
                                                    acronym="LBIR1210A", subtype=learning_unit_year_subtypes.PARTIM)
         _create_learning_unit_year_with_components(academic_year=self.academic_year, l_container=self.l_container,
@@ -148,6 +153,16 @@ class AttributionJsonTest(TestCase):
         )
         self.assertFalse(attribution_data['attributions'])
 
+    def test_get_title_next_luyr(self):
+        self.assertIsNone(attribution_json._get_title_next_luyr(self.learning_unit_yr))
+
+        next_academic_year = AcademicYearFactory(year=self.academic_year.year+1)
+        self.assertIsNone(attribution_json._get_title_next_luyr(self.learning_unit_yr))
+
+        next_luy = LearningUnitYearFactory(learning_unit=self.learning_unit_yr.learning_unit,
+                                           academic_year=next_academic_year)
+        self.assertEqual(attribution_json._get_title_next_luyr(self.learning_unit_yr), next_luy.complete_title)
+
 
 def _create_learning_unit_year_with_components(academic_year, l_container, acronym, subtype):
     l_unit_year = LearningUnitYearFactory(academic_year=academic_year, learning_container_year=l_container,
@@ -164,6 +179,7 @@ def _create_learning_unit_year_with_components(academic_year, l_container, acron
         type=learning_component_year_type.PRACTICAL_EXERCISES,
         acronym="PP"
     )
+    return l_unit_year
 
 
 def _create_attribution_charge(academic_year, attribution, l_acronym, volume_cm=None, volume_tp=None):

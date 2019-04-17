@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ from base.business.learning_unit_year_with_context import append_latest_entities
     get_learning_component_prefetch
 from base.business.learning_units.comparison import get_partims_as_str
 from base.business.proposal_xls import BLANK_VALUE, XLS_DESCRIPTION_COMPARISON, XLS_COMPARISON_FILENAME, \
-    COMPARISON_PROPOSAL_TITLES, COMPARISON_WORKSHEET_TITLE, BASIC_TITLES, COMPONENTS_TITLES
+    COMPARISON_PROPOSAL_TITLES, COMPARISON_WORKSHEET_TITLE, basic_titles, components_titles
 from base.business.utils.convert import volume_format
 from base.business.xls import get_name_or_username
 from base.models.academic_year import current_academic_year
@@ -60,14 +60,15 @@ WORKSHEET_TITLE = 'learning_units_comparison'
 XLS_FILENAME = 'learning_units_comparison'
 XLS_DESCRIPTION = _("Comparison of learning units")
 
-
-LEARNING_UNIT_TITLES = BASIC_TITLES + COMPONENTS_TITLES
-
 ACRONYM_COL_NUMBER = 0
 ACADEMIC_COL_NUMBER = 1
 CELLS_MODIFIED_NO_BORDER = 'modifications'
 CELLS_TOP_BORDER = 'border_not_modified'
 DATA = 'data'
+
+
+def learning_unit_titles():
+    return basic_titles() + components_titles()
 
 
 def create_xls_comparison(user, learning_unit_years, filters, academic_yr_comparison):
@@ -81,12 +82,11 @@ def create_xls_comparison(user, learning_unit_years, filters, academic_yr_compar
         working_sheets_data = data.get('data')
         cells_modified_with_green_font = data.get(CELLS_MODIFIED_NO_BORDER)
         cells_with_top_border = data.get(CELLS_TOP_BORDER)
-
     parameters = {
         xls_build.DESCRIPTION: XLS_DESCRIPTION,
         xls_build.USER: get_name_or_username(user),
         xls_build.FILENAME: XLS_FILENAME,
-        xls_build.HEADER_TITLES: LEARNING_UNIT_TITLES,
+        xls_build.HEADER_TITLES: learning_unit_titles(),
         xls_build.WS_TITLE: WORKSHEET_TITLE,
     }
     dict_styled_cells = {}
@@ -297,7 +297,7 @@ def _check_changes_other_than_code_and_year(first_data, second_data, line_index)
 
 def get_border_columns(line):
     style = []
-    for col_index, obj in enumerate(LEARNING_UNIT_TITLES, start=1):
+    for col_index, obj in enumerate(learning_unit_titles(), start=1):
         style.append('{}{}'.format(get_column_letter(col_index), line))
     return style
 

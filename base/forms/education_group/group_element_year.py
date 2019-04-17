@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -49,7 +49,8 @@ class GroupElementYearForm(forms.ModelForm):
         widgets = {
             "comment": forms.Textarea(attrs={'rows': 5}),
             "comment_english": forms.Textarea(attrs={'rows': 5}),
-            "block": forms.TextInput()
+            "block": forms.TextInput(),
+            "relative_credits": forms.TextInput()
         }
 
     def __init__(self, *args, parent=None, child_branch=None, child_leaf=None, **kwargs):

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -53,12 +53,10 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
                                            .select_related('education_group_type')
 
     def is_valid(self):
-        if self.parent.education_group_type.name in TrainingType.finality_types() or \
-                self.parents.filter(education_group_type__name__in=TrainingType.finality_types()).exists():
-            self._check_attach_options_rules()
         if self.parent.education_group_type.name in TrainingType.root_master_2m_types() or \
                 self.parents.filter(education_group_type__name__in=TrainingType.root_master_2m_types()).exists():
             self._check_end_year_constraints_on_2m()
+            self._check_attach_options_rules()
         return True
 
     def _check_end_year_constraints_on_2m(self):
@@ -101,21 +99,34 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         if errors:
             raise ValidationError(errors)
 
-    def _check_attach_options_rules(self):
+    def _get_missing_options(self):
         """
-        In context of MA/MD/MS when we add an option [or group which contains options],
-        this options must exist in parent context (2m)
+            In context of MA/MD/MS when we add an option [or group which contains options],
+            this options must exist in parent context (2m)
         """
+        options_missing_by_finality = {}
+
         options_to_add = EducationGroupHierarchy(root=self.child).get_option_list()
         if self.child.education_group_type.name == MiniTrainingType.OPTION.name:
             options_to_add += [self.child]
 
-        errors = []
-        for root in self.parents.filter(education_group_type__name__in=[TrainingType.PGRM_MASTER_120.name,
-                                                                        TrainingType.PGRM_MASTER_180_240.name]):
-            options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
-            missing_options = set(options_to_add) - set(options_in_2m)
+        finalities_qs = self.parents | EducationGroupYear.objects.filter(pk=self.parent.pk)
+        finalities_pks = finalities_qs.filter(
+            education_group_type__name__in=TrainingType.finality_types()
+        ).values_list('pk', flat=True)
+        if finalities_pks:
+            root_2m_qs = EducationGroupYear.hierarchy.filter(pk__in=finalities_pks).get_parents().filter(
+                education_group_type__name__in=TrainingType.root_master_2m_types()
+            )
 
+            for root in root_2m_qs:
+                options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
+                options_missing_by_finality[root] = set(options_to_add) - set(options_in_2m)
+        return options_missing_by_finality
+
+    def _check_attach_options_rules(self):
+        errors = []
+        for root, missing_options in self._get_missing_options().items():
             if missing_options:
                 errors.append(
                     ValidationError(

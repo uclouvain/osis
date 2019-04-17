@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -86,7 +86,8 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
             'campus': autocomplete.ModelSelect2(
                 url='campus-autocomplete',
                 forward=["country"]
-            )
+            ),
+            'credits': forms.TextInput(),
         }
 
 
@@ -110,6 +111,9 @@ class ExternalLearningUnitModelForm(forms.ModelForm):
     class Meta:
         model = ExternalLearningUnitYear
         fields = ('external_acronym', 'external_credits', 'url', 'requesting_entity', 'co_graduation', 'mobility')
+        widgets = {
+            'external_credits': forms.TextInput(),
+        }
 
     def post_clean(self, start_date):
         entity = self.cleaned_data.get('requesting_entity')

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -133,7 +133,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'base.views.common.common_context_processor',
-                'base.context_processors.user_manual.user_manual_url'
+                'base.context_processors.user_manual.user_manual_url',
+                'django.template.context_processors.i18n',
             ],
         },
     },
@@ -171,6 +172,7 @@ TIME_ZONE = os.environ.get('TIME_ZONE', 'Europe/Brussels')
 # Static files (CSS, JavaScript, Images) and Media
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = os.environ.get('STATIC_URL', '/static/')
+STATICI18N_ROOT = os.path.join(BASE_DIR, os.environ.get('STATICI18N', 'base/static'))
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(BASE_DIR, "uploads"))
 MEDIA_URL = os.environ.get('MEDIA_URL',  '/media/')
 CONTENT_TYPES = ['application/csv', 'application/doc', 'application/pdf', 'application/xls', 'application/xml',
@@ -218,7 +220,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = int(os.environ.get('DATA_UPLOAD_MAX_NUMBER_FIELD
 # Ex : LOGO_INSTITUTION_URL = 'https://www.google.be/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png'
 # A relative URL will work on local , but not out of the box on the servers.
 LOGO_INSTITUTION_URL = os.environ.get('LOGO_INSTITUTION_URL',
-                                      os.path.join(BASE_DIR, "base/static/img/logo_institution.jpg"))
+                                      os.path.join(BASE_DIR, "base/static/img/logo_uclouvain.png"))
 LOGO_OSIS_URL = os.environ.get('LOGO_OSIS_URL', '')
 
 # The Queues are optional
@@ -457,7 +459,6 @@ REQUESTS_TIMEOUT = 20
 
 # PEDAGOGY INFORMATION
 URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/prog-{year}-{code}")
-GET_SECTION_PARAM = os.environ.get("GET_SECTION_PARAM", "")
 
 YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 2018))
 YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 2019))

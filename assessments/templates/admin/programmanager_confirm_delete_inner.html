@@ -7,11 +7,11 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="bt_close_remove_manager_modal">
             <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">{% trans 'Confirm delete for : ' %}{{ object.person }}</h4>
+        <h4 class="modal-title">{% trans 'Confirm delete for : ' %}{{ manager }}</h4>
     </div>
     <div class="modal-body">
         <p id="pnl_pgm_off">{% trans 'Are you sure you want to remove the following manager ?' %} </p>
-        <p>{{ object.person }}</p>
+        <p>{{ manager }}</p>
 
         {% if other_programs %}
             <p id="pnl_pgm_on">{% trans 'The manager will keep the following programs : ' %}</p>

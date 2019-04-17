@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -62,6 +62,11 @@ class HopsEducationGroupYearModelForm(forms.ModelForm):
             'ares_graca',
             'ares_ability',
         ]
+        widgets = {
+            "ares_study": forms.TextInput(),
+            "ares_graca": forms.TextInput(),
+            "ares_ability": forms.TextInput(),
+        }
 
     def is_valid(self):
         return super(HopsEducationGroupYearModelForm, self).is_valid() and self._valid_hops()
@@ -179,7 +184,12 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
                     'data-width': '100%',
                 },
                 forward=['section'],
-            )
+            ),
+            "co_graduation_coefficient": forms.TextInput(),
+            "credits": forms.TextInput(),
+            "duration": forms.TextInput(),
+            "min_constraint": forms.TextInput(),
+            "max_constraint": forms.TextInput(),
         }
 
     def __init__(self, *args, **kwargs):

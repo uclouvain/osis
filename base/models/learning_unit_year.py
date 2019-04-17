@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -219,14 +219,28 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     @property
     def container_type_verbose(self):
-        container_type = ''
-        if self.learning_container_year:
-            container_type = _(self.learning_container_year.get_container_type_display())
+        verbose_type = ''
+        if self.learning_container_year:  # FIXME :: remove this 'if' when classes will be remoed from LearningUnitYear
+            verbose_type = _(self.learning_container_year.get_container_type_display())
+
+            if self.is_external_of_mobility():
+                verbose_type = _('Mobility')
 
             if self.learning_container_year.container_type in (COURSE, INTERNSHIP):
-                container_type += " ({subtype})".format(subtype=self.get_subtype_display())
+                verbose_type += " ({subtype})".format(subtype=self.get_subtype_display())
 
-        return container_type
+        return verbose_type
+
+    def is_external_of_mobility(self):
+        return self.is_external() and self.externallearningunityear.mobility
+
+    def get_container_type_display(self):
+        # FIXME :: Condition to remove when the LearningUnitYear.learning_container_year_id will be null=false
+        if not self.learning_container_year:
+            return ''
+        if self.is_external_of_mobility():
+            return _('Mobility')
+        return self.learning_container_year.get_container_type_display()
 
     @property
     def status_verbose(self):

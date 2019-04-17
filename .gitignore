@@ -8,6 +8,7 @@ sys
 !base/fixtures/*.csv
 venv/
 __pycache__/
+jsi18n/
 backoffice/server_settings.py
 /base/tests/sent_mails
 /base/tests/functional

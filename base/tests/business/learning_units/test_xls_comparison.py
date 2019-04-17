@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,30 +25,28 @@
 ##############################################################################
 import datetime
 from unittest import mock
+
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
-from base.tests.factories.user import UserFactory
+
 from base.business.learning_units.xls_comparison import prepare_xls_content, \
     _get_learning_unit_yrs_on_2_different_years, translate_status, create_xls_comparison, \
-    XLS_FILENAME, XLS_DESCRIPTION, LEARNING_UNIT_TITLES, WORKSHEET_TITLE, CELLS_MODIFIED_NO_BORDER, DATA, \
+    XLS_FILENAME, XLS_DESCRIPTION, learning_unit_titles, WORKSHEET_TITLE, CELLS_MODIFIED_NO_BORDER, DATA, \
     _check_changes_other_than_code_and_year, CELLS_TOP_BORDER, _check_changes, _get_proposal_data, \
     get_representing_string
-from osis_common.document import xls_build
-from base.tests.factories.business.learning_units import GenerateContainer
-from base.models.enums import entity_container_year_link_type
+from base.business.proposal_xls import components_titles, basic_titles
 from base.models.entity_container_year import EntityContainerYear
-from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from base.tests.factories.entity_version import EntityVersionFactory
-from base.models.enums import entity_type, organization_type
-from base.models.learning_component_year import LearningComponentYear
-from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
-from base.models.entity_version import get_last_version
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
-    ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
+from base.models.enums import entity_container_year_link_type
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
-from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
-    PracticalLearningComponentYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
+    ADDITIONAL_REQUIREMENT_ENTITY_1
+from base.models.learning_component_year import LearningComponentYear
+from base.tests.factories.business.learning_units import GenerateContainer
+from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from base.tests.factories.user import UserFactory
+from osis_common.document import xls_build
 
 
 class TestComparisonXls(TestCase):
@@ -134,6 +132,12 @@ class TestComparisonXls(TestCase):
                 learning_unit_yr_data[1],
                 2),
             ['A2', 'C2'])
+
+    def test_learning_unit_titles(self):
+        self.assertEqual(
+            learning_unit_titles(),
+            basic_titles() + components_titles()
+        )
 
 
 class TestPropositionComparisonXls(TestCase):
@@ -222,7 +226,7 @@ class TestPropositionComparisonXls(TestCase):
     def test_check_changes(self):
         line_number = 0
         #First 2 columns are unmutable
-        self.assertEqual(_check_changes(['elt1','elt2', 'elt3', 'elt4'],
+        self.assertEqual(_check_changes(['elt1', 'elt2', 'elt3', 'elt4'],
                                         ['elt1', 'elt2 bis', 'elt3 bis', 'elt4'],
                                         line_number), ['C{}'.format(line_number)])
 
@@ -239,7 +243,7 @@ def _generate_xls_build_parameter(xls_data, user):
         xls_build.USER_KEY: user.username,
         xls_build.WORKSHEETS_DATA: [{
             xls_build.CONTENT_KEY: xls_data,
-            xls_build.HEADER_TITLES_KEY: LEARNING_UNIT_TITLES,
+            xls_build.HEADER_TITLES_KEY: learning_unit_titles(),
             xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
             xls_build.STYLED_CELLS: None,
             xls_build.COLORED_ROWS: None,

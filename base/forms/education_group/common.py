@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -122,11 +122,6 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
             "education_group_type": EducationGroupTypeModelChoiceField,
         }
         fields = []
-        widgets = {
-            "duration": forms.NumberInput(attrs={'min': 1}),
-            "min_constraint": forms.NumberInput(attrs={'min': 1}),
-            "max_constraint": forms.NumberInput(attrs={'min': 1}),
-        }
 
     def __init__(self, *args, education_group_type=None, user=None, **kwargs):
         self.user = user
@@ -207,6 +202,10 @@ class EducationGroupModelForm(PermissionFieldEducationGroupMixin, forms.ModelFor
     class Meta:
         model = EducationGroup
         fields = ("start_year", "end_year")
+        widgets = {
+            "start_year": forms.TextInput(),
+            "end_year": forms.TextInput(),
+        }
 
     def save(self, *args, start_year=None, **kwargs):
         if start_year:

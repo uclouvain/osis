@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -304,28 +304,13 @@ def _get_data_part2(learning_unit_yr, with_attributions):
 
 def _get_data_part1(learning_unit_yr):
     proposal = getattr(learning_unit_yr, "proposallearningunit", None)
-
-    requirement_acronym = getattr(learning_unit_yr, 'entity_requirement', None)
-    if not requirement_acronym:
-        requirement_acronym = _get_entity_faculty_acronym(
-            learning_unit_yr.entities.get('REQUIREMENT_ENTITY'),
-            learning_unit_yr.academic_year
-        )
-
-    allocation_acronym = getattr(learning_unit_yr, 'entity_allocation', None)
-    if not allocation_acronym:
-        allocation_acronym = _get_entity_faculty_acronym(
-            learning_unit_yr.entities.get('ALLOCATION_ENTITY'),
-            learning_unit_yr.academic_year
-        )
-
+    requirement_acronym = learning_unit_yr.entity_requirement
+    allocation_acronym = learning_unit_yr.entity_allocation
     lu_data_part1 = [
         learning_unit_yr.acronym,
         learning_unit_yr.academic_year.name,
         learning_unit_yr.complete_title,
-        learning_unit_yr.learning_container_year.get_container_type_display()
-        # FIXME Condition to remove when the LearningUnitYear.learning_container_year_id will be null=false
-        if learning_unit_yr.learning_container_year else "",
+        learning_unit_yr.get_container_type_display(),
         learning_unit_yr.get_subtype_display(),
         requirement_acronym,
         proposal.get_type_display() if proposal else '',
@@ -335,10 +320,3 @@ def _get_data_part1(learning_unit_yr):
         learning_unit_yr.complete_title_english,
     ]
     return lu_data_part1
-
-
-def _get_entity_faculty_acronym(an_entity, academic_yr):
-    if an_entity:
-        faculty_entity = an_entity.find_faculty_version(academic_yr)
-        return faculty_entity.acronym if faculty_entity else None
-    return None
