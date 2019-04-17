@@ -36,7 +36,7 @@ from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
-from django.test import TestCase, RequestFactory, override_settings
+from django.test import TestCase, RequestFactory
 from waffle.testutils import override_flag
 
 from base.business.education_groups.general_information import PublishException
@@ -61,7 +61,6 @@ from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
 
 
-@override_settings(URL_TO_PORTAL_UCL="http://portal-url.com")
 class EducationGroupGeneralInformations(TestCase):
     @classmethod
     def setUpTestData(cls):

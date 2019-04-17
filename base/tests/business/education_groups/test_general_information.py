@@ -32,14 +32,14 @@ from django.test import TestCase, override_settings
 from requests import Timeout
 
 from base.business.education_groups import general_information
-from base.business.education_groups.general_information import PublishException, _get_portal_url, _bulk_publish, \
+from base.business.education_groups.general_information import PublishException, _bulk_publish, \
     _get_url_to_publish
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory, \
     EducationGroupYearCommonBachelorFactory
 
 
-@override_settings(URL_TO_PORTAL_UCL="http://portal-url.com", ESB_API_URL="api.esb.com",
+@override_settings(ESB_API_URL="api.esb.com",
                    ESB_AUTHORIZATION="Basic dummy:1234", ESB_REFRESH_PEDAGOGY_ENDPOINT="offer/{year}/{code}/refresh",
                    ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT='offer/{year}/common/refresh',
                    ESB_REFRESH_COMMON_ADMISSION_ENDPOINT='offer/{year}/common_admission/refresh')
@@ -76,18 +76,6 @@ class TestPublishGeneralInformation(TestCase):
         response = general_information._publish(self.training)
         self.assertIsInstance(response, bool)
         self.assertTrue(response)
-
-
-@override_settings(URL_TO_PORTAL_UCL="http://portal-url.com/prog-{year}-{code}")
-class TestGetPortalUrl(TestCase):
-    def test_get_portal_url_case_training(self):
-        training = TrainingFactory()
-
-        url_expected = settings.URL_TO_PORTAL_UCL.format(
-            year=training.academic_year.year,
-            code=training.acronym
-        )
-        self.assertEqual(_get_portal_url(training), url_expected)
 
 
 class TestBulkPublish(TestCase):

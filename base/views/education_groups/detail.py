@@ -66,7 +66,6 @@ from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.person import Person
 from base.models.program_manager import ProgramManager
-from base.models.utils.utils import get_object_or_none
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
@@ -260,19 +259,26 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         is_common_education_group_year = self.object.acronym.startswith('common')
+        common_education_group_year = None
+        if not is_common_education_group_year:
+            common_education_group_year = EducationGroupYear.objects.get_common(
+                academic_year=self.object.academic_year,
+            )
         sections_to_display = SECTIONS_PER_OFFER_TYPE.get(
             'common' if is_common_education_group_year
             else self.object.education_group_type.name,
             {'specific': [], 'common': []}
         )
+        texts = self.get_translated_texts(sections_to_display, common_education_group_year, self.user_language_code)
+
         show_contacts = CONTACT_INTRO_KEY in sections_to_display['specific']
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(
                 sections_to_display,
-                is_common_education_group_year,
+                texts
             ),
-            'contacts': self.get_contacts_section(),
+            'contacts': self.get_contacts_section(sections_to_display, texts),
             'show_contacts': show_contacts,
             'can_edit_information': perms.is_eligible_to_edit_general_information(context['person'], context['object'])
         })
@@ -282,99 +288,98 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def user_language_code(self):
         return mdl.person.get_user_interface_language(self.request.user)
 
-    def get_sections_with_translated_labels(self, sections_to_display, is_common_education_group_year=None):
-        # Load the info from the common education group year
-        common_education_group_year = None
-        if not is_common_education_group_year:
-            common_education_group_year = EducationGroupYear.objects.get_common(
-                academic_year=self.object.academic_year,
-            )
-
+    def get_sections_with_translated_labels(self, sections_to_display, texts):
         # Load the labels
-
         Section = namedtuple('Section', 'title labels')
         sections_with_translated_labels = []
-        texts = self.get_translated_texts(sections_to_display, common_education_group_year, self.user_language_code)
         for section in SECTION_LIST:
             translated_labels = []
             for label in section.labels:
-                translated_label = get_object_or_none(texts['labels'], text_label__label=label)
-                if label in sections_to_display['common']:
-                    translated_labels.append(self.fill_with_common_texts(
-                        label,
-                        texts,
-                        translated_label
-                    ))
-                if label in sections_to_display['specific']:
-                    translated_labels.append(self.fill_with_specific_texts(
-                        label,
-                        texts,
-                        translated_label
-                    ))
+                translated_labels += (self.get_texts_for_label(label, sections_to_display, texts))
 
             if translated_labels:
                 sections_with_translated_labels.append(Section(section.title, translated_labels))
         return sections_with_translated_labels
 
-    def fill_with_specific_texts(self, label, texts, translated_label):
+    def get_texts_for_label(self, label, sections_to_display, texts):
         french, english = 'fr-be', 'en'
-        text_fr = get_object_or_none(texts['specific'], text_label__label=label, language=french)
-        text_en = get_object_or_none(texts['specific'], text_label__label=label, language=english)
-        return {
-            'label': label,
-            'type': 'specific',
-            'translation': translated_label if translated_label else
-            (_('This label %s does not exist') % label),
-            french: text_fr.text if text_fr else None,
-            english: text_en.text if text_en else None,
-        }
-
-    def fill_with_common_texts(self, label, texts, translated_label):
-        french, english = 'fr-be', 'en'
-        common_fr = get_object_or_none(texts['common'], text_label__label=label, language=french)
-        common_en = get_object_or_none(texts['common'], text_label__label=label, language=english)
-
-        return {
-            'label': label,
-            'type': 'common',
-            'translation': translated_label if translated_label else
-            (_('This label %s does not exist') % label),
-            french: common_fr.text if common_fr else None,
-            english: common_en.text if common_en else None,
-        }
+        translated_labels = []
+        translated_label = next((text for text in texts['labels'] if text.text_label.label == label), None)
+        if label in sections_to_display['common']:
+            common_fr = next(
+                (
+                    text.text for text in texts['common']
+                    if text.text_label.label == label and text.language == french
+                ),
+                None
+            )
+            common_en = next(
+                (
+                    text.text for text in texts['common']
+                    if text.text_label.label == label and text.language == english
+                ),
+                None
+            )
+            translated_labels.append(
+                {
+                    'label': label,
+                    'type': 'common',
+                    'translation': translated_label if translated_label else
+                    (_('This label %s does not exist') % label),
+                    french: common_fr,
+                    english: common_en,
+                }
+            )
+        if label in sections_to_display['specific']:
+            text_fr = next(
+                (
+                    text.text for text in texts['specific']
+                    if text.text_label.label == label and text.language == french
+                ),
+                None
+            )
+            text_en = next(
+                (
+                    text.text for text in texts['specific']
+                    if text.text_label.label == label and text.language == english
+                ),
+                None
+            )
+            translated_labels.append(
+                {
+                    'label': label,
+                    'type': 'specific',
+                    'translation': translated_label if translated_label else
+                    (_('This label %s does not exist') % label),
+                    french: text_fr,
+                    english: text_en,
+                }
+            )
+        return translated_labels
 
     def get_translated_texts(self, sections_to_display, common_edy, user_language):
         specific_texts = TranslatedText.objects.filter(
             text_label__label__in=sections_to_display['specific'],
             entity=entity_name.OFFER_YEAR,
             reference=str(self.object.pk)
-        )
+        ).select_related("text_label")
 
         common_texts = TranslatedText.objects.filter(
             text_label__label__in=sections_to_display['common'],
             entity=entity_name.OFFER_YEAR,
             reference=str(common_edy.pk)
-        ) if common_edy else None
+        ).select_related("text_label") if common_edy else None
 
         labels = TranslatedTextLabel.objects.filter(
             text_label__label__in=sections_to_display['common']+sections_to_display['specific'],
             text_label__entity=entity_name.OFFER_YEAR,
             language=user_language
-        )
+        ).select_related("text_label")
+
         return {'common': common_texts, 'specific': specific_texts, 'labels': labels}
 
-    def get_contacts_section(self):
-        translated_label = TranslatedTextLabel.objects.filter(
-            text_label__entity=entity_name.OFFER_YEAR,
-            text_label__label=CONTACT_INTRO_KEY,
-            language=self.user_language_code
-        )
-        texts = TranslatedText.objects.filter(
-            entity=entity_name.OFFER_YEAR,
-            reference=str(self.object.pk),
-            text_label__label=CONTACT_INTRO_KEY
-        )
-        introduction = self.fill_with_specific_texts(CONTACT_INTRO_KEY, {'specific': texts}, translated_label)
+    def get_contacts_section(self, sections_to_display, texts):
+        introduction = self.get_texts_for_label(CONTACT_INTRO_KEY, sections_to_display, texts)
         return {
             'contact_intro': introduction,
             'contacts_grouped': self._get_publication_contacts_group_by_type()

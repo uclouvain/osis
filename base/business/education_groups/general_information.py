@@ -38,10 +38,10 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 def publish(education_group_year):
     if not all([settings.ESB_API_URL, settings.ESB_AUTHORIZATION, settings.ESB_REFRESH_PEDAGOGY_ENDPOINT,
-                settings.URL_TO_PORTAL_UCL, settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT,
+                settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT,
                 settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT]):
         raise ImproperlyConfigured('ESB_API_URL / ESB_AUTHORIZATION / ESB_REFRESH_PEDAGOGY_ENDPOINT / '
-                                   'URL_TO_PORTAL_UCL / ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT /  '
+                                   'ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT /  '
                                    'ESB_REFRESH_COMMON_ADMISSION_ENDPOINT must be set in configuration')
 
     trainings = find_learning_unit_formations([education_group_year], parents_as_instances=True)
@@ -49,7 +49,7 @@ def publish(education_group_year):
     education_groups_to_publish = [education_group_year] + trainings.get(education_group_year.pk, [])
     t = Thread(target=_bulk_publish, args=(education_groups_to_publish,))
     t.start()
-    return _get_portal_url(education_group_year)
+    return True
 
 
 def _bulk_publish(education_group_years):
@@ -88,14 +88,6 @@ def _get_url_to_publish(education_group_year):
             code=code
         )
     return "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=endpoint)
-
-
-def _get_portal_url(education_group_year):
-    code = _get_code_according_type(education_group_year)
-    return settings.URL_TO_PORTAL_UCL.format(
-        year=education_group_year.academic_year.year,
-        code=code
-    )
 
 
 def _get_code_according_type(education_group_year):
