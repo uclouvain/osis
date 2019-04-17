@@ -97,7 +97,7 @@ def export_xls(exam_enrollments):
 
 def _add_header_and_legend_to_file(exam_enrollments, worksheet):
     ue = exam_enrollments[0].learning_unit_enrollment.learning_unit_year
-    worksheet.append([str(ue) + " " + ue.specific_title if ue.specific_title else str(ue)])
+    worksheet.append([str(ue) + " " + ue.complete_title if ue.complete_title else str(ue)])
     worksheet.append([str('Session: %s' % exam_enrollments[0].session_exam.number_session)])
     worksheet.append([str('')])
     __display_creation_date_with_message_about_state(worksheet, row_number=4)

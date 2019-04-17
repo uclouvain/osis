@@ -119,7 +119,7 @@ class XlsTests(TestCase):
         _add_header_and_legend_to_file([exam_enrollment], self.worksheet)
         self.assertEqual(
             self.worksheet.cell(row=1, column=1).value,
-            str(ue) + " " + ue.specific_title if ue.specific_title else str(ue)
+            str(ue) + " " + ue.complete_title if ue.complete_title else str(ue)
         )
         self.assertEqual(
             self.worksheet.cell(row=2, column=1).value,
