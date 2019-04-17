@@ -89,7 +89,7 @@ class TestSearchForm(TestCase):
         })
         ExternalLearningUnitYearFactory(
             learning_unit_year__academic_year=academic_year,
-            learning_unit_year__learning_container_year__container_type=LearningUnitSearchForm.MOBILITY,
+            learning_unit_year__learning_container_year__container_type=learning_container_year_types.EXTERNAL,
             mobility=True,
             co_graduation=False,
         )
@@ -106,7 +106,7 @@ class TestSearchForm(TestCase):
         })
         ExternalLearningUnitYearFactory(
             learning_unit_year__academic_year=academic_year,
-            learning_unit_year__learning_container_year__container_type=LearningUnitSearchForm.MOBILITY,
+            learning_unit_year__learning_container_year__container_type=learning_container_year_types.EXTERNAL,
             mobility=True,
             co_graduation=False,
         )

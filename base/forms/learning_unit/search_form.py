@@ -138,11 +138,12 @@ class LearningUnitSearchForm(BaseSearchForm):
         return container_type
 
     def _filter_external_learning_units(self, qs):
-        container_type = self.cleaned_data['container_type']
-        if self._search_mobility:
-            qs = qs.filter(externallearningunityear__mobility=True)
-        elif container_type == learning_container_year_types.EXTERNAL:
-            qs = qs.filter(externallearningunityear__co_graduation=True)
+        container_type = self.cleaned_data.get('container_type')
+        if container_type:
+            if self._search_mobility:
+                qs = qs.filter(externallearningunityear__mobility=True)
+            elif container_type == learning_container_year_types.EXTERNAL:
+                qs = qs.filter(externallearningunityear__co_graduation=True)
         return qs
 
     def get_filter_learning_container_ids(self, qs):
