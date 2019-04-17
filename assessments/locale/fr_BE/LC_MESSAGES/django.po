@@ -1019,24 +1019,3 @@ msgstr "programme(s)"
 #: views/score_encoding.py:324
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
-
-#~ msgid "Confirm"
-#~ msgstr "Confirmer"
-
-#~ msgid "End date Prof"
-#~ msgstr "Echéance Prof"
-
-#~ msgid "Middlename"
-#~ msgstr "Deuxième prénom"
-
-#~ msgid "Please enter a lastname, and optionnally a firstname"
-#~ msgstr "Veuillez entrer un nom de famille, et optionnellement un prénom"
-
-#~ msgid "Username"
-#~ msgstr "Nom d'utilisateur"
-
-#~ msgid "is already program manager for"
-#~ msgstr "est déjà gestionnaire de programme pour"
-
-#~ msgid "Not enrolled"
-#~ msgstr "Pas inscrit"
