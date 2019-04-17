@@ -181,8 +181,8 @@ class XlsTests(TestCase):
             str(_('Score legend: %(score_legend)s (0=Score of presence)') % {"score_legend": "0 - 20"}),
         )
         self.assertEqual(
-            self.worksheet.cell(row=10, column=1).value,
-            str(_('Decimal values in scores are accepted.'))
+            self.worksheet.cell(row=10, column=2).value,
+            str(_('Decimals authorized for this learning unit'))
             if ue.decimal_scores else
-            str(_('Decimal values in scores are NOT accepted.'))
+            str(_('Unauthorized decimal for this learning unit'))
         )

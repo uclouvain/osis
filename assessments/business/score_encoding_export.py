@@ -80,7 +80,7 @@ def export_xls(exam_enrollments):
                           str(justification),
                           end_date])
 
-        row_number += 1
+        row_number += 2
         __coloring_non_editable(worksheet, row_number, score, exam_enroll.justification_final)
         _coloring_enrollment_state(worksheet, row_number, exam_enroll)
 
@@ -196,9 +196,10 @@ def __display_legends(ws, decimal):
         str(_('Score legend: %(score_legend)s (0=Score of presence)') % {"score_legend": "0 - 20"}),
     ])
     ws.append([
-            str(_('Decimal values in scores are accepted.'))
+            str(''),
+            str(_('Decimals authorized for this learning unit'))
             if decimal else
-            str(_('Decimal values in scores are NOT accepted.'))
+            str(_('Unauthorized decimal for this learning unit'))
     ])
 
 
@@ -237,6 +238,7 @@ def _coloring_enrollment_state(ws, row_number, exam_enroll):
 def _color_legend(ws):
     __apply_style_to_cells(ws, ENROLLED_LATE_COLOR, FIRST_ROW_LEGEND_ENROLLMENT_STATUS)
     __apply_style_to_cells(ws, NOT_ENROLLED_COLOR, FIRST_ROW_LEGEND_ENROLLMENT_STATUS + 1)
+    ws.cell(row=10, column=2).font = Font(color=colors.RED)
 
 
 def __apply_style_to_cells(ws, color_style, row):
