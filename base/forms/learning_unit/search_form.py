@@ -444,7 +444,8 @@ class ExternalLearningUnitYearForm(LearningUnitYearForm):
 
     def get_queryset(self):
         learning_units = super().get_queryset().filter(
-            externallearningunityear__isnull=False
+            externallearningunityear__co_graduation=True,
+            externallearningunityear__mobility=False,
         ).select_related(
             'campus__organization'
         )
