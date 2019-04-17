@@ -75,7 +75,8 @@ class EducationGroupGeneralInformations(TestCase):
         )
         cls.education_group_child = TrainingFactory(
             acronym="Child_1",
-            academic_year=cls.current_academic_year
+            academic_year=cls.current_academic_year,
+            education_group_type__name=TrainingType.CERTIFICATE_OF_PARTICIPATION.name
         )
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
 
@@ -85,6 +86,7 @@ class EducationGroupGeneralInformations(TestCase):
         )
 
         cls.person = PersonWithPermissionsFactory("can_access_education_group")
+
         cls.url = reverse(
             "education_group_general_informations",
             args=[cls.education_group_parent.pk, cls.education_group_child.pk]
