@@ -304,15 +304,8 @@ def _get_data_part2(learning_unit_yr, with_attributions):
 
 def _get_data_part1(learning_unit_yr):
     proposal = getattr(learning_unit_yr, "proposallearningunit", None)
-
-    requirement_acronym = getattr(learning_unit_yr, 'entity_requirement', None)
-    if not requirement_acronym:
-        requirement_acronym = learning_unit_yr.entity_requirement
-
-    allocation_acronym = getattr(learning_unit_yr, 'entity_allocation', None)
-    if not allocation_acronym:
-        allocation_acronym = learning_unit_yr.entity_allocation
-
+    requirement_acronym = learning_unit_yr.entity_requirement
+    allocation_acronym = learning_unit_yr.entity_allocation
     lu_data_part1 = [
         learning_unit_yr.acronym,
         learning_unit_yr.academic_year.name,
