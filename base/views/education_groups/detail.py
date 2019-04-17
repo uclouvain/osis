@@ -66,6 +66,7 @@ from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.person import Person
 from base.models.program_manager import ProgramManager
+from base.models.utils.utils import get_object_or_none
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
@@ -259,10 +260,11 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         is_common_education_group_year = self.object.acronym.startswith('common')
-        sections_to_display = SECTIONS_PER_OFFER_TYPE[
+        sections_to_display = SECTIONS_PER_OFFER_TYPE.get(
             'common' if is_common_education_group_year
-            else self.object.education_group_type.name
-        ]
+            else self.object.education_group_type.name,
+            {'specific': [], 'common': []}
+        )
         show_contacts = CONTACT_INTRO_KEY in sections_to_display['specific']
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
@@ -289,18 +291,65 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             )
 
         # Load the labels
+        french, english = 'fr-be', 'en'
         Section = namedtuple('Section', 'title labels')
         sections_with_translated_labels = []
+        texts = self.get_translated_texts(sections_to_display, common_education_group_year, self.user_language_code)
         for section in SECTION_LIST:
-            translated_labels = self.get_translated_labels_and_content(
-                section,
-                self.user_language_code,
-                common_education_group_year,
-                sections_to_display
-            )
+            translated_labels = []
+            for label in section.labels:
+                translated_label = get_object_or_none(texts['labels'], text_label__label=label)
+                if label in sections_to_display['common']:
+                    common_fr = get_object_or_none(texts['common'], text_label__label=label, language=french)
+                    common_en = get_object_or_none(texts['common'], text_label__label=label, language=english)
+
+                    translated_labels.append(
+                        {
+                            'label': label,
+                            'type': 'common',
+                            'translation': translated_label if translated_label else
+                            (_('This label %s does not exist') % label),
+                            french: common_fr.text if common_fr else None,
+                            english: common_en.text if common_en else None,
+                        }
+                    )
+                if label in sections_to_display['specific']:
+                    text_fr = get_object_or_none(texts['specific'], text_label__label=label, language=french)
+                    text_en = get_object_or_none(texts['specific'], text_label__label=label, language=english)
+                    translated_labels.append(
+                        {
+                            'label': label,
+                            'type': 'specific',
+                            'translation': translated_label if translated_label else
+                            (_('This label %s does not exist') % label),
+                            french: text_fr.text if text_fr else None,
+                            english: text_en.text if text_en else None,
+                        }
+                    )
+
             if translated_labels:
                 sections_with_translated_labels.append(Section(section.title, translated_labels))
         return sections_with_translated_labels
+
+    def get_translated_texts(self, sections_to_display, common_edy, user_language):
+        specific_texts = TranslatedText.objects.filter(
+            text_label__label__in=sections_to_display['specific'],
+            entity=entity_name.OFFER_YEAR,
+            reference=str(self.object.pk)
+        )
+
+        common_texts = TranslatedText.objects.filter(
+            text_label__label__in=sections_to_display['common'],
+            entity=entity_name.OFFER_YEAR,
+            reference=str(common_edy.pk)
+        ) if common_edy else None
+
+        labels = TranslatedTextLabel.objects.filter(
+            text_label__label__in=sections_to_display['common']+sections_to_display['specific'],
+            text_label__entity=entity_name.OFFER_YEAR,
+            language=user_language
+        )
+        return {'common': common_texts, 'specific': specific_texts, 'labels': labels}
 
     def get_translated_labels_and_content(self, section, user_language, common_education_group_year, sections_list):
         records = []
@@ -342,6 +391,34 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             english: en_translated_text.text if en_translated_text else None,
         }
 
+    # records = []
+    # for label in section.labels:
+    #     if label in sections_to_display['common']:
+    #         common_fr = texts['common'].filter(text_label__label=label, language=french).first()
+    #         common_en = texts['common'].filter(text_label__label=label, language=english).first()
+    #         records.append(
+    #             {
+    #                 'label': label,
+    #                 'type': 'common',
+    #                 'translation': common_fr.text_label.translated_text_labels[0].label if common_fr else
+    #                 (_('This label %s does not exist') % label),
+    #                 french: common_fr.text if common_fr else None,
+    #                 english: common_en.text if common_en else None,
+    #             }
+    #         )
+    #     if label in sections_to_display['specific']:
+    #         text_fr = texts['specific'].filter(text_label__label=label, language=french).first()
+    #         text_en = texts['specific'].filter(text_label__label=label, language=english).first()
+    #         records.append(
+    #             {
+    #                 'label': label,
+    #                 'type': 'specific',
+    #                 'translation': text_fr.text_label.translated_text_labels[0].label if text_fr else
+    #                 (_('This label %s does not exist') % label),
+    #                 french: text_fr.text if text_fr else None,
+    #                 english: text_en.text if text_en else None,
+    #             }
+    #         )
     def get_contacts_section(self):
         introduction = self.get_content_translations_for_label(
             CONTACT_INTRO_KEY,
