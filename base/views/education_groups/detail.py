@@ -259,7 +259,10 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         is_common_education_group_year = self.object.acronym.startswith('common')
-        sections_to_display = SECTIONS_PER_OFFER_TYPE[self.object.education_group_type.name]
+        sections_to_display = SECTIONS_PER_OFFER_TYPE[
+            'common' if is_common_education_group_year
+            else self.object.education_group_type.name
+        ]
         show_contacts = CONTACT_INTRO_KEY in sections_to_display['specific']
         context.update({
             'is_common_education_group_year': is_common_education_group_year,

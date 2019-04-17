@@ -377,4 +377,9 @@ SECTIONS_PER_OFFER_TYPE = {
         'common': [],
         'specific': [INTRODUCTION, ]
     },
+
+    'common': {
+        'common': [],
+        'specific': [AGREGATION, CAAP, PREREQUISITE, COMMON_DIDACTIC_PURPOSES, COMPLEMENTARY_MODULE, EVALUATION, ]
+    }
 }
