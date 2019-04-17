@@ -133,7 +133,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'base.views.common.common_context_processor',
-                'base.context_processors.user_manual.user_manual_url'
+                'base.context_processors.user_manual.user_manual_url',
+                'django.template.context_processors.i18n',
             ],
         },
     },
@@ -171,6 +172,7 @@ TIME_ZONE = os.environ.get('TIME_ZONE', 'Europe/Brussels')
 # Static files (CSS, JavaScript, Images) and Media
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = os.environ.get('STATIC_URL', '/static/')
+STATICI18N_ROOT = os.path.join(BASE_DIR, os.environ.get('STATICI18N', 'base/static'))
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(BASE_DIR, "uploads"))
 MEDIA_URL = os.environ.get('MEDIA_URL',  '/media/')
 CONTENT_TYPES = ['application/csv', 'application/doc', 'application/pdf', 'application/xls', 'application/xml',

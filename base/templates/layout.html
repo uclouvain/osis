@@ -1,6 +1,6 @@
 <!doctype html>
 {% load staticfiles i18n %}
-{% load analytical hijack_tags %}
+{% load statici18n analytical hijack_tags %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -82,7 +82,7 @@
     <script type="text/javascript" src="{% static 'js/jquery-validation/jquery.validate.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/diacritics-sort.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jstree.min.js' %}"></script>
-    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+    <script src="{% statici18n LANGUAGE_CODE %}"></script>
 
     {% block header %}
         <noscript>
