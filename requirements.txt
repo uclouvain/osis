@@ -9,7 +9,7 @@ psycopg2-binary==2.7.5
 reportlab==3.5.5
 django-analytical==2.4.0
 django-localflavor==1.6
-django-statici18n==1.8.2
+django-statici18n==1.8.3
 factory_boy==2.8.1
 django-dotenv==1.4.2
 pendulum==1.2.0
