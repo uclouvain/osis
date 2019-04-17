@@ -113,8 +113,8 @@ class TestLearningUnitXls(TestCase):
                 entity__organization__type=organization_type.MAIN
             ) for _ in range(4)
         ]
-        self.learning_unit_year_with_entities.entities = {'REQUIREMENT_ENTITY': entities[0],
-                                                          'ALLOCATION_ENTITY': entities[1]}
+        self.learning_unit_year_with_entities.entity_requirement = entities[0]
+        self.learning_unit_year_with_entities.entity_allocation = entities[1]
         self.proposal_creation_3 = ProposalLearningUnitFactory(
             learning_unit_year=self.learning_unit_year_with_entities,
             state=proposal_state.ProposalState.ACCEPTED.name,

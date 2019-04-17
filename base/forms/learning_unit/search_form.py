@@ -46,7 +46,8 @@ from base.models.academic_year import AcademicYear
 from base.models.campus import Campus
 from base.models.entity_container_year import EntityContainerYear
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
-from base.models.enums import entity_container_year_link_type, learning_unit_year_subtypes, active_status, entity_type
+from base.models.enums import entity_container_year_link_type, learning_unit_year_subtypes, active_status, entity_type,\
+    learning_container_year_types
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import convert_status_bool
@@ -61,6 +62,10 @@ from reference.models.country import Country
 class LearningUnitSearchForm(BaseSearchForm):
     ALL_LABEL = (None, pgettext_lazy("plural", "All"))
     ALL_CHOICES = (ALL_LABEL,)
+
+    MOBILITY = 'mobility'
+    MOBILITY_CHOICE = ((MOBILITY, _('Mobility')),)
+    _search_mobility = False
 
     academic_year_id = forms.ModelChoiceField(
         label=_('Ac yr.'),
@@ -109,19 +114,37 @@ class LearningUnitSearchForm(BaseSearchForm):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
-        learning_units = mdl.learning_unit_year.search(**self.cleaned_data)
+        queryset = mdl.learning_unit_year.search(**self.cleaned_data)
 
-        learning_units = learning_units.select_related(
+        queryset = self._filter_external_learning_units(queryset)
+
+        queryset = queryset.select_related(
             'academic_year', 'learning_container_year__academic_year',
-            'language', 'proposallearningunit'
+            'language', 'proposallearningunit', 'externallearningunityear'
         ).order_by('academic_year__year', 'acronym').annotate(
             has_proposal=Exists(has_proposal),
             entity_requirement=Subquery(entity_requirement),
             entity_allocation=Subquery(entity_allocation),
         )
-        learning_units = self.get_filter_learning_container_ids(learning_units)
+        queryset = self.get_filter_learning_container_ids(queryset)
 
-        return learning_units
+        return queryset
+
+    def clean_container_type(self):
+        container_type = self.cleaned_data['container_type']
+        if container_type == LearningUnitSearchForm.MOBILITY:
+            self._search_mobility = True
+            return learning_container_year_types.EXTERNAL
+        return container_type
+
+    def _filter_external_learning_units(self, qs):
+        container_type = self.cleaned_data.get('container_type')
+        if container_type:
+            if self._search_mobility:
+                qs = qs.filter(externallearningunityear__mobility=True)
+            elif container_type == learning_container_year_types.EXTERNAL:
+                qs = qs.filter(externallearningunityear__co_graduation=True)
+        return qs
 
     def get_filter_learning_container_ids(self, qs):
         """
@@ -157,7 +180,8 @@ class LearningUnitYearForm(LearningUnitSearchForm):
     MAX_RECORDS = 2000
     container_type = forms.ChoiceField(
         label=_('Type'),
-        choices=LearningUnitSearchForm.ALL_CHOICES + LearningContainerYearType.choices(),
+        choices=LearningUnitSearchForm.ALL_CHOICES + LearningContainerYearType.choices()
+        + LearningUnitSearchForm.MOBILITY_CHOICE,
     )
 
     subtype = forms.ChoiceField(
