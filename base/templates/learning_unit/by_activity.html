@@ -95,7 +95,7 @@
                             </td>
                             <td>{{ learning_unit.complete_title|default_if_none:'' }}</td>
                             <td>
-                                {{ learning_unit.learning_container_year.get_container_type_display|default_if_none:'-' }}
+                                {{ learning_unit.get_container_type_display|default_if_none:'-' }}
                             </td>
                             <td>
                                 {{ learning_unit.get_subtype_display |default_if_none:'-' }}
