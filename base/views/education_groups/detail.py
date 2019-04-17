@@ -295,67 +295,48 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         for section in SECTION_LIST:
             translated_labels = []
             for label in section.labels:
-                translated_labels += (self.get_texts_for_label(label, sections_to_display, texts))
-
+                translated_labels += self.get_texts_for_label(label, sections_to_display, texts)
             if translated_labels:
                 sections_with_translated_labels.append(Section(section.title, translated_labels))
         return sections_with_translated_labels
 
     def get_texts_for_label(self, label, sections_to_display, texts):
-        french, english = 'fr-be', 'en'
         translated_labels = []
         translated_label = next((text for text in texts['labels'] if text.text_label.label == label), None)
         if label in sections_to_display['common']:
-            common_fr = next(
-                (
-                    text.text for text in texts['common']
-                    if text.text_label.label == label and text.language == french
-                ),
-                None
-            )
-            common_en = next(
-                (
-                    text.text for text in texts['common']
-                    if text.text_label.label == label and text.language == english
-                ),
-                None
-            )
-            translated_labels.append(
-                {
-                    'label': label,
-                    'type': 'common',
-                    'translation': translated_label if translated_label else
-                    (_('This label %s does not exist') % label),
-                    french: common_fr,
-                    english: common_en,
-                }
-            )
+            common_text = self.get_text_structure_for_display(label, texts['common'], translated_label)
+            common_text.update({'type': 'common'})
+            translated_labels.append(common_text)
         if label in sections_to_display['specific']:
-            text_fr = next(
-                (
-                    text.text for text in texts['specific']
-                    if text.text_label.label == label and text.language == french
-                ),
-                None
-            )
-            text_en = next(
-                (
-                    text.text for text in texts['specific']
-                    if text.text_label.label == label and text.language == english
-                ),
-                None
-            )
-            translated_labels.append(
-                {
-                    'label': label,
-                    'type': 'specific',
-                    'translation': translated_label if translated_label else
-                    (_('This label %s does not exist') % label),
-                    french: text_fr,
-                    english: text_en,
-                }
-            )
+            text = self.get_text_structure_for_display(label, texts['specific'], translated_label)
+            text.update({'type': 'specific'})
+            translated_labels.append(text)
         return translated_labels
+
+    def get_text_structure_for_display(self, label, texts, translated_label):
+        french, english = 'fr-be', 'en'
+        text_fr = next(
+            (
+                text.text for text in texts
+                if text.text_label.label == label and text.language == french
+            ),
+            None
+        )
+        text_en = next(
+            (
+                text.text for text in texts
+                if text.text_label.label == label and text.language == english
+            ),
+            None
+        )
+
+        return {
+            'label': label,
+            'translation': translated_label if translated_label else
+            (_('This label %s does not exist') % label),
+            french: text_fr,
+            english: text_en,
+        }
 
     def get_translated_texts(self, sections_to_display, common_edy, user_language):
         specific_texts = TranslatedText.objects.filter(
