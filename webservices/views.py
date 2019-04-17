@@ -37,6 +37,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 from base.business.education_groups import general_information_sections
+from base.business.education_groups.general_information_sections import SECTIONS_PER_OFFER_TYPE
 from base.management.commands.import_reddot import COMMON_OFFER
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_year import EducationGroupYear
@@ -127,12 +128,12 @@ def ws_catalog_offer(request, year, language, acronym):
 def ws_catalog_common_offer(request, year, language):
     # Validation
     common_education_group, iso_language, year = parameters_validation('common', language, year)
-    response = dict.fromkeys(general_information_sections.COMMON_GENERAL_INFO_SECTIONS, None)
+    response = dict.fromkeys(SECTIONS_PER_OFFER_TYPE['common'], None)
 
     qs = TranslatedText.objects.filter(
         reference=str(common_education_group.pk),
         language=iso_language,
-        text_label__label__in=general_information_sections.COMMON_GENERAL_INFO_SECTIONS
+        text_label__label__in=SECTIONS_PER_OFFER_TYPE['common']
     ).exclude(Q(text__isnull=True) | Q(text__exact='')).select_related('text_label')
 
     for translated_text in qs:
