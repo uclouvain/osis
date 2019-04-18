@@ -192,7 +192,8 @@ def scores_sheet_data(exam_enrollments, tutor=None):
                     "last_name": student.person.last_name,
                     "first_name": student.person.first_name,
                     "score": score,
-                    "justification": _(exam_enrol.get_justification_final_display()) if exam_enrol.justification_final else '',
+                    "justification": _(exam_enrol.get_justification_final_display())
+                    if exam_enrol.justification_final else '',
                     "deadline": deadline if deadline else '',
                     "enrollment_state_color": get_line_color(exam_enrol),
                 })
