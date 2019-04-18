@@ -52,7 +52,7 @@ def export_xls(exam_enrollments):
     worksheet = workbook.active
     _add_header_and_legend_to_file(exam_enrollments, worksheet)
 
-    row_number = 11
+    row_number = 12
     for exam_enroll in exam_enrollments:
         student = exam_enroll.learning_unit_enrollment.student
         offer = exam_enroll.learning_unit_enrollment.offer
@@ -80,7 +80,7 @@ def export_xls(exam_enrollments):
                           str(justification),
                           end_date])
 
-        row_number += 2
+        row_number += 1
         __coloring_non_editable(worksheet, row_number, score, exam_enroll.justification_final)
         _coloring_enrollment_state(worksheet, row_number, exam_enroll)
 
