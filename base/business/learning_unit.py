@@ -182,7 +182,7 @@ def get_components_identification(learning_unit_yr):
     additional_entities = {}
 
     learning_component_year_list_from_luy = LearningComponentYear.objects.filter(
-        learning_unit_year__learning_container_year=learning_unit_yr.learning_container_year
+        learning_unit_year=learning_unit_yr
     ).order_by('type', 'acronym').prefetch_related('entitycomponentyear_set')
 
     for learning_component_year in learning_component_year_list_from_luy:
