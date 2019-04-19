@@ -181,13 +181,6 @@ class PostponeContent:
         self.postponed_finalities = []
 
     def check_instance(self):
-        if self.instance.is_training():
-            pass
-        elif self.instance.education_group_type.name in MiniTrainingType.to_postpone():
-            pass
-        else:
-            raise NotPostponeError(_('You are not allowed to copy the content of this kind of education group.'))
-
         if self.instance.academic_year.year < self.current_year.year:
             raise NotPostponeError(_("You are not allowed to postpone this training in the past."))
         if self.instance.academic_year.year > self.current_year.year:

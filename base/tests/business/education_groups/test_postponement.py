@@ -230,25 +230,6 @@ class TestPostpone(TestCase):
             _("The end date of the education group is smaller than the year of postponement.")
         )
 
-    def test_init_wrong_instance(self):
-        self.current_education_group_year.education_group_type.category = GROUP
-        self.current_education_group_year.education_group_type.save()
-
-        with self.assertRaises(NotPostponeError) as cm:
-            self.postponer = PostponeContent(self.current_education_group_year)
-        self.assertEqual(str(cm.exception),
-                         _('You are not allowed to copy the content of this kind of education group.'))
-
-    # def test_init_wrong_instance_minitraining(self):
-    #     self.current_education_group_year.education_group_type.category = MINI_TRAINING
-    #     self.current_education_group_year.education_group_type.name = MiniTrainingType.OPTION.name
-    #     self.current_education_group_year.education_group_type.save()
-    #
-    #     with self.assertRaises(NotPostponeError) as cm:
-    #         self.postponer = PostponeContent(self.current_education_group_year)
-    #     self.assertEqual(str(cm.exception),
-    #                      _("You are not allowed to copy the content of this kind of education group."))
-
     def test_postpone_with_child_branch(self):
         self.postponer = PostponeContent(self.current_education_group_year)
 
