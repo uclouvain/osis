@@ -24,7 +24,7 @@
 import itertools
 
 from django.db import Error, transaction
-from django.db.models import Q
+from django.db.models import Q, Exists, OuterRef
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
@@ -264,9 +264,17 @@ class PostponeContent:
             learning_unit__in=LearningUnit.objects.filter(
                 learningunityear__id__in=self._learning_units_id_in_n1_instance
             )
+        ).annotate(
+            has_prerequisite=Exists(
+                PrerequisiteItem.objects.filter(
+                    prerequisite__education_group_year__id=self.instance.id,
+                    prerequisite__learning_unit_year__id=OuterRef("id"),
+                )
+            )
         )
         for luy in luys_not_postponed:
-            self.warnings.append(PrerequisiteWarning(luy, self.instance_n1))
+            if luy.has_prerequisite:
+                self.warnings.append(PrerequisiteWarning(luy, self.instance_n1))
 
         for old_luy, new_luy in self.postponed_luy:
             self._postpone_prerequisite(old_luy, new_luy)
