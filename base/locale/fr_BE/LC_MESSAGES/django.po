@@ -124,13 +124,11 @@ msgstr ""
 #, python-format
 msgid ""
 "%(learning_unit_year)s is not anymore contained in "
-"%(education_group_year_root_partial_acronym)s - "
-"%(education_group_year_root_acronym)s => the prerequisite for "
+"%(education_group_year_root)s => the prerequisite for "
 "%(learning_unit_year)s is not copied."
 msgstr ""
 "%(learning_unit_year)s n'est plus dans "
-"%(education_group_year_root_partial_acronym)s -"
-"%(education_group_year_root_acronym)s => le prérequis de "
+"%(education_group_year_root)s => le prérequis de "
 "%(learning_unit_year)s n'est pas copié."
 
 #: models/education_group.py:116 models/education_group_year.py:787
@@ -169,14 +167,12 @@ msgstr "%(number_notifications)s notification(s) non lu(s)"
 #, python-format
 msgid ""
 "%(prerequisite_item)s is not anymore contained in "
-"%(education_group_year_root_partial_acronym)s - "
-"%(education_group_year_root_acronym)s => the prerequisite for "
+"%(education_group_year_root)s => the prerequisite for "
 "%(learning_unit_year)s having %(prerequisite_item)s as prerequisite is not "
 "copied."
 msgstr ""
 "%(prerequisite_item)s n'est plus dans "
-"%(education_group_year_root_partial_acronym)s - "
-"%(education_group_year_root_acronym)s => le prérequis de "
+"%(education_group_year_root)s => le prérequis de "
 "%(learning_unit_year)s contenant %(prerequisite_item)s n'est pas copié."
 
 #: business/learning_units/simple/deletion.py:116
@@ -4350,13 +4346,11 @@ msgstr ""
 #, python-format
 msgid ""
 "The option %(education_group_year_option)s is not anymore accessible in "
-"%(education_group_year_root_partial_acronym)s - "
-"%(education_group_year_root_acronym)s in %(academic_year)s => It is retired "
+"%(education_group_year_root)s in %(academic_year)s => It is retired "
 "of the finality %(education_group_year_finality)s."
 msgstr ""
 "L'option %(education_group_year_option)s  n'est plus accessible dans "
-"%(education_group_year_root_partial_acronym)s - "
-"%(education_group_year_root_acronym)s en %(academic_year)s => elle est "
+"%(education_group_year_root)s en %(academic_year)s => elle est "
 "retiré de la finalité %(education_group_year_finality)s."
 
 #: models/learning_unit_year.py:363 tests/models/test_learning_unit_year.py:560
