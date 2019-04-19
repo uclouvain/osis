@@ -296,7 +296,7 @@ class PostponeContent:
             if new_gr.link_type == LinkTypes.REFERENCE.name and is_empty:
                 self.warnings.append(ReferenceLinkEmptyWarning(new_egy))
             elif not is_empty:
-                if not (new_egy.is_training() or new_egy.education_group_type.name in MiniTrainingType.to_postpone()):
+                if not (new_egy.is_training() or new_egy.is_mini_training()):
                     self.warnings.append(EducationGroupYearNotEmptyWarning(new_egy, self.next_academic_year))
             else:
                 self._postpone(old_egy, new_egy)
@@ -432,6 +432,6 @@ class PostponeContent:
 
 
 def _display_education_group_year(egy: EducationGroupYear):
-    if egy.is_training() or egy.education_group_type.name in MiniTrainingType.to_postpone():
+    if egy.is_training() or egy.is_mini_training():
         return "{} - {}".format(egy.acronym, egy.partial_acronym)
     return egy.partial_acronym
