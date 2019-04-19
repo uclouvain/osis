@@ -218,8 +218,11 @@ class PostponeContent:
         after that, we'll postpone recursively all the child branches and child leafs.
         """
 
-        for gr in instance.groupelementyear_set.select_related('child_branch__academic_year',
-                                                               'child_branch__education_group').order_by("order"):
+        children = instance.groupelementyear_set.select_related(
+            'child_branch__academic_year',
+            'child_branch__education_group'
+        ).order_by("order", "parent__partial_acronym")
+        for gr in children:
             new_gr = self._postpone_child(gr, next_instance)
             self.result.append(new_gr)
 
@@ -433,5 +436,5 @@ class PostponeContent:
 
 def _display_education_group_year(egy: EducationGroupYear):
     if egy.is_training() or egy.is_mini_training():
-        return "{} - {}".format(egy.acronym, egy.partial_acronym)
+        return egy.verbose
     return egy.partial_acronym

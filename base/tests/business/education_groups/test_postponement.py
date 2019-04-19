@@ -470,7 +470,7 @@ class TestPostpone(TestCase):
             _("%(learning_unit_year)s is not anymore contained in "
               "%(education_group_year_root)s "
               "=> the prerequisite for %(learning_unit_year)s is not copied.") % {
-                "education_group_year_root": "{} - {}".format(new_root.acronym, new_root.partial_acronym),
+                "education_group_year_root": "{} - {}".format(new_root.partial_acronym, new_root.acronym),
                 "learning_unit_year": prerequisite.learning_unit_year.acronym,
             },
             [str(warning) for warning in self.postponer.warnings]
@@ -508,7 +508,7 @@ class TestPostpone(TestCase):
               "%(education_group_year_root)s "
               "=> the prerequisite for %(learning_unit_year)s "
               "having %(prerequisite_item)s as prerequisite is not copied.") % {
-                "education_group_year_root": "{} - {}".format(new_root.acronym, new_root.partial_acronym),
+                "education_group_year_root": "{} - {}".format(new_root.partial_acronym, new_root.acronym),
                 "learning_unit_year": prerequisite.learning_unit_year.acronym,
                 "prerequisite_item": item_luy.acronym
             },
@@ -580,8 +580,8 @@ class TestPostpone(TestCase):
         self.assertEqual(
             _("%(education_group_year)s is closed in %(end_year)s. This element will not be copied "
               "in %(academic_year)s.") % {
-                "education_group_year": "{} - {}".format(sub_group.child_branch.acronym,
-                                                         sub_group.child_branch.partial_acronym),
+                "education_group_year": "{} - {}".format(sub_group.child_branch.partial_acronym,
+                                                         sub_group.child_branch.acronym),
                 "end_year": sub_group.child_branch.education_group.end_year,
                 "academic_year": self.next_academic_year,
             },
@@ -606,8 +606,8 @@ class TestPostpone(TestCase):
         self.assertFalse(new_referenced_egy.groupelementyear_set.all())
         self.assertEqual(
             _("%(education_group_year)s (reference link) has not been copied. Its content is empty.") % {
-                "education_group_year": "{} - {}".format(new_referenced_egy.acronym,
-                                                         new_referenced_egy.partial_acronym)
+                "education_group_year": "{} - {}".format(new_referenced_egy.partial_acronym,
+                                                         new_referenced_egy.acronym)
             },
             str(self.postponer.warnings[0]),
         )
@@ -629,8 +629,8 @@ class TestPostpone(TestCase):
         )
         self.assertEqual(
             _("%(education_group_year)s (reference link) has not been copied. Its content is empty.") % {
-                "education_group_year": "{} - {}".format(new_referenced_egy.acronym,
-                                                         new_referenced_egy.partial_acronym)
+                "education_group_year": "{} - {}".format(new_referenced_egy.partial_acronym,
+                                                         new_referenced_egy.acronym)
             },
             str(self.postponer.warnings[0]),
         )
@@ -698,11 +698,11 @@ class TestPostpone(TestCase):
             _("The option %(education_group_year_option)s is not anymore accessible in "
               "%(education_group_year_root)s "
               "in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
-                "education_group_year_option": "{} - {}".format(child_child_grp.child_branch.acronym,
-                                                                child_child_grp.child_branch.partial_acronym),
-                "education_group_year_root": "{} - {}".format(root_egy_n1.acronym, root_egy_n1.partial_acronym),
-                "education_group_year_finality": "{} - {}".format(child_grp.child_branch.acronym,
-                                                                  child_grp.child_branch.partial_acronym),
+                "education_group_year_option": "{} - {}".format(child_child_grp.child_branch.partial_acronym,
+                                                                child_child_grp.child_branch.acronym),
+                "education_group_year_root": "{} - {}".format(root_egy_n1.partial_acronym, root_egy_n1.acronym),
+                "education_group_year_finality": "{} - {}".format(child_grp.child_branch.partial_acronym,
+                                                                  child_grp.child_branch.acronym),
                 "academic_year": self.next_academic_year
             },
             str(self.postponer.warnings[0])
