@@ -229,7 +229,7 @@ class PostponeContent:
         """
 
         for gr in instance.groupelementyear_set.select_related('child_branch__academic_year',
-                                                               'child_branch__education_group'):
+                                                               'child_branch__education_group').order_by("order"):
             new_gr = self._postpone_child(gr, next_instance)
             self.result.append(new_gr)
 
@@ -306,7 +306,8 @@ class PostponeContent:
             if new_gr.link_type == LinkTypes.REFERENCE.name and is_empty:
                 self.warnings.append(ReferenceLinkEmptyWarning(new_egy))
             elif not is_empty:
-                self.warnings.append(EducationGroupYearNotEmptyWarning(new_egy, self.next_academic_year))
+                if not (new_egy.is_training and new_egy.education_group_type.name in MiniTrainingType.to_postpone()):
+                    self.warnings.append(EducationGroupYearNotEmptyWarning(new_egy, self.next_academic_year))
             else:
                 self._postpone(old_egy, new_egy)
         else:
