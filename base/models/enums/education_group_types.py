@@ -112,7 +112,7 @@ class MiniTrainingType(ChoiceEnum):
 
     @classmethod
     def to_postpone(cls):
-        return cls.minors() + [cls.DEEPENING.name]
+        return cls.minors() + [cls.DEEPENING.name, cls.FSA_SPECIALITY.name, cls.OPTION.name, cls.MOBILITY_PARTNERSHIP]
 
     @classmethod
     def with_admission_condition(cls):

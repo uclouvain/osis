@@ -70,11 +70,10 @@ class PrerequisiteItemWarning(CopyWarning):
 
     def __str__(self):
         return _("%(prerequisite_item)s is not anymore contained in "
-                 "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s "
+                 "%(education_group_year_root)s "
                  "=> the prerequisite for %(learning_unit_year)s "
                  "having %(prerequisite_item)s as prerequisite is not copied.") % {
-            "education_group_year_root_acronym": self.egy.acronym,
-            "education_group_year_root_partial_acronym": self.egy.partial_acronym,
+            "education_group_year_root": _display_education_group_year(self.egy),
             "learning_unit_year": self.prerequisite.learning_unit_year.acronym,
             "prerequisite_item": self.item.learning_unit.acronym
         }
@@ -87,10 +86,9 @@ class PrerequisiteWarning(CopyWarning):
 
     def __str__(self):
         return _("%(learning_unit_year)s is not anymore contained in "
-                 "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s "
+                 "%(education_group_year_root)s "
                  "=> the prerequisite for %(learning_unit_year)s is not copied.") % {
-            "education_group_year_root_acronym": self.egy.acronym,
-            "education_group_year_root_partial_acronym": self.egy.partial_acronym,
+            "education_group_year_root": _display_education_group_year(self.egy),
             "learning_unit_year": self.luy.acronym,
         }
 
@@ -103,7 +101,7 @@ class EducationGroupYearNotEmptyWarning(CopyWarning):
     def __str__(self):
         return _("%(education_group_year)s has already been copied in %(academic_year)s in another program. "
                  "It may have been already modified.") % {
-                    "education_group_year": self.education_group_year.acronym,
+                    "education_group_year": _display_education_group_year(self.education_group_year),
                     "academic_year": self.academic_year
                 }
 
@@ -114,7 +112,7 @@ class ReferenceLinkEmptyWarning(CopyWarning):
 
     def __str__(self):
         return _("%(education_group_year)s (reference link) has not been copied. Its content is empty.") % {
-                    "education_group_year": self.education_group_year.acronym
+                    "education_group_year": _display_education_group_year(self.education_group_year)
                 }
 
 
@@ -126,7 +124,7 @@ class EducationGroupEndYearWarning(CopyWarning):
     def __str__(self):
         return _("%(education_group_year)s is closed in %(end_year)s. This element will not be copied "
                  "in %(academic_year)s.") % {
-                   "education_group_year": self.education_group_year.acronym,
+                   "education_group_year": _display_education_group_year(self.education_group_year),
                    "end_year": self.education_group_year.education_group.end_year,
                    "academic_year": self.academic_year
                }
@@ -142,12 +140,11 @@ class FinalityOptionNotValidWarning(CopyWarning):
 
     def __str__(self):
         return _("The option %(education_group_year_option)s is not anymore accessible in "
-                 "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s"
-                 " in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
-            "education_group_year_option": self.education_group_year_option.acronym,
-            "education_group_year_root_acronym": self.education_group_year_root.acronym,
-            "education_group_year_root_partial_acronym": self.education_group_year_root.partial_acronym,
-            "education_group_year_finality": self.education_group_year_finality.acronym,
+                 "%(education_group_year_root)s "
+                 "in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
+            "education_group_year_option": _display_education_group_year(self.education_group_year_option),
+            "education_group_year_root": _display_education_group_year(self.education_group_year_root),
+            "education_group_year_finality": _display_education_group_year(self.education_group_year_finality),
             "academic_year": self.academic_year
         }
 
@@ -306,7 +303,7 @@ class PostponeContent:
             if new_gr.link_type == LinkTypes.REFERENCE.name and is_empty:
                 self.warnings.append(ReferenceLinkEmptyWarning(new_egy))
             elif not is_empty:
-                if not (new_egy.is_training and new_egy.education_group_type.name in MiniTrainingType.to_postpone()):
+                if not (new_egy.is_training() or new_egy.education_group_type.name in MiniTrainingType.to_postpone()):
                     self.warnings.append(EducationGroupYearNotEmptyWarning(new_egy, self.next_academic_year))
             else:
                 self._postpone(old_egy, new_egy)
@@ -439,3 +436,9 @@ class PostponeContent:
     def _learning_units_id_in_n1_instance(self):
         grps = fetch_row_sql([self.instance_n1.id])
         return set(item["child_leaf_id"] for item in grps)
+
+
+def _display_education_group_year(egy: EducationGroupYear):
+    if egy.is_training() or egy.education_group_type.name in MiniTrainingType.to_postpone():
+        return "{} - {}".format(egy.acronym, egy.partial_acronym)
+    return egy.partial_acronym
