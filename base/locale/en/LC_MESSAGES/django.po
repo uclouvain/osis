@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-19 14:47+0200\n"
+"POT-Creation-Date: 2019-04-23 13:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -648,6 +648,10 @@ msgstr ""
 #: templates/education_group/delete_inner.html:33
 #, python-format
 msgid "Are you sure you want to delete %(education_group_year)s?"
+msgstr ""
+
+#: templates/learning_unit/specifications_all.html:261
+msgid "Are you sure you want to delete the achievement?"
 msgstr ""
 
 #: templates/education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html:8
