@@ -24,7 +24,7 @@
 import itertools
 
 from django.db import Error, transaction
-from django.db.models import Q
+from django.db.models import Q, Exists, OuterRef
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
@@ -70,11 +70,10 @@ class PrerequisiteItemWarning(CopyWarning):
 
     def __str__(self):
         return _("%(prerequisite_item)s is not anymore contained in "
-                 "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s "
+                 "%(education_group_year_root)s "
                  "=> the prerequisite for %(learning_unit_year)s "
                  "having %(prerequisite_item)s as prerequisite is not copied.") % {
-            "education_group_year_root_acronym": self.egy.acronym,
-            "education_group_year_root_partial_acronym": self.egy.partial_acronym,
+            "education_group_year_root": _display_education_group_year(self.egy),
             "learning_unit_year": self.prerequisite.learning_unit_year.acronym,
             "prerequisite_item": self.item.learning_unit.acronym
         }
@@ -87,10 +86,9 @@ class PrerequisiteWarning(CopyWarning):
 
     def __str__(self):
         return _("%(learning_unit_year)s is not anymore contained in "
-                 "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s "
+                 "%(education_group_year_root)s "
                  "=> the prerequisite for %(learning_unit_year)s is not copied.") % {
-            "education_group_year_root_acronym": self.egy.acronym,
-            "education_group_year_root_partial_acronym": self.egy.partial_acronym,
+            "education_group_year_root": _display_education_group_year(self.egy),
             "learning_unit_year": self.luy.acronym,
         }
 
@@ -103,7 +101,7 @@ class EducationGroupYearNotEmptyWarning(CopyWarning):
     def __str__(self):
         return _("%(education_group_year)s has already been copied in %(academic_year)s in another program. "
                  "It may have been already modified.") % {
-                    "education_group_year": self.education_group_year.acronym,
+                    "education_group_year": _display_education_group_year(self.education_group_year),
                     "academic_year": self.academic_year
                 }
 
@@ -114,7 +112,7 @@ class ReferenceLinkEmptyWarning(CopyWarning):
 
     def __str__(self):
         return _("%(education_group_year)s (reference link) has not been copied. Its content is empty.") % {
-                    "education_group_year": self.education_group_year.acronym
+                    "education_group_year": _display_education_group_year(self.education_group_year)
                 }
 
 
@@ -126,7 +124,7 @@ class EducationGroupEndYearWarning(CopyWarning):
     def __str__(self):
         return _("%(education_group_year)s is closed in %(end_year)s. This element will not be copied "
                  "in %(academic_year)s.") % {
-                   "education_group_year": self.education_group_year.acronym,
+                   "education_group_year": _display_education_group_year(self.education_group_year),
                    "end_year": self.education_group_year.education_group.end_year,
                    "academic_year": self.academic_year
                }
@@ -142,12 +140,11 @@ class FinalityOptionNotValidWarning(CopyWarning):
 
     def __str__(self):
         return _("The option %(education_group_year_option)s is not anymore accessible in "
-                 "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s"
-                 " in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
-            "education_group_year_option": self.education_group_year_option.acronym,
-            "education_group_year_root_acronym": self.education_group_year_root.acronym,
-            "education_group_year_root_partial_acronym": self.education_group_year_root.partial_acronym,
-            "education_group_year_finality": self.education_group_year_finality.acronym,
+                 "%(education_group_year_root)s "
+                 "in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
+            "education_group_year_option": _display_education_group_year(self.education_group_year_option),
+            "education_group_year_root": _display_education_group_year(self.education_group_year_root),
+            "education_group_year_finality": _display_education_group_year(self.education_group_year_finality),
             "academic_year": self.academic_year
         }
 
@@ -184,13 +181,6 @@ class PostponeContent:
         self.postponed_finalities = []
 
     def check_instance(self):
-        if self.instance.is_training():
-            pass
-        elif self.instance.education_group_type.name in MiniTrainingType.to_postpone():
-            pass
-        else:
-            raise NotPostponeError(_('You are not allowed to copy the content of this kind of education group.'))
-
         if self.instance.academic_year.year < self.current_year.year:
             raise NotPostponeError(_("You are not allowed to postpone this training in the past."))
         if self.instance.academic_year.year > self.current_year.year:
@@ -228,8 +218,11 @@ class PostponeContent:
         after that, we'll postpone recursively all the child branches and child leafs.
         """
 
-        for gr in instance.groupelementyear_set.select_related('child_branch__academic_year',
-                                                               'child_branch__education_group'):
+        children = instance.groupelementyear_set.select_related(
+            'child_branch__academic_year',
+            'child_branch__education_group'
+        ).order_by("order", "parent__partial_acronym")
+        for gr in children:
             new_gr = self._postpone_child(gr, next_instance)
             self.result.append(new_gr)
 
@@ -264,9 +257,17 @@ class PostponeContent:
             learning_unit__in=LearningUnit.objects.filter(
                 learningunityear__id__in=self._learning_units_id_in_n1_instance
             )
+        ).annotate(
+            has_prerequisite=Exists(
+                PrerequisiteItem.objects.filter(
+                    prerequisite__education_group_year__id=self.instance.id,
+                    prerequisite__learning_unit_year__id=OuterRef("id"),
+                )
+            )
         )
         for luy in luys_not_postponed:
-            self.warnings.append(PrerequisiteWarning(luy, self.instance_n1))
+            if luy.has_prerequisite:
+                self.warnings.append(PrerequisiteWarning(luy, self.instance_n1))
 
         for old_luy, new_luy in self.postponed_luy:
             self._postpone_prerequisite(old_luy, new_luy)
@@ -298,7 +299,8 @@ class PostponeContent:
             if new_gr.link_type == LinkTypes.REFERENCE.name and is_empty:
                 self.warnings.append(ReferenceLinkEmptyWarning(new_egy))
             elif not is_empty:
-                self.warnings.append(EducationGroupYearNotEmptyWarning(new_egy, self.next_academic_year))
+                if not (new_egy.is_training() or new_egy.is_mini_training()):
+                    self.warnings.append(EducationGroupYearNotEmptyWarning(new_egy, self.next_academic_year))
             else:
                 self._postpone(old_egy, new_egy)
         else:
@@ -430,3 +432,9 @@ class PostponeContent:
     def _learning_units_id_in_n1_instance(self):
         grps = fetch_row_sql([self.instance_n1.id])
         return set(item["child_leaf_id"] for item in grps)
+
+
+def _display_education_group_year(egy: EducationGroupYear):
+    if egy.is_training() or egy.is_mini_training():
+        return egy.verbose
+    return egy.partial_acronym

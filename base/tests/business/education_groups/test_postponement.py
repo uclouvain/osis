@@ -42,6 +42,7 @@ from base.tests.factories.authorized_relationship import AuthorizedRelationshipF
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_language import EducationGroupLanguageFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory, GroupEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory
 from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
 from base.tests.factories.entity import EntityFactory
@@ -229,25 +230,6 @@ class TestPostpone(TestCase):
             _("The end date of the education group is smaller than the year of postponement.")
         )
 
-    def test_init_wrong_instance(self):
-        self.current_education_group_year.education_group_type.category = GROUP
-        self.current_education_group_year.education_group_type.save()
-
-        with self.assertRaises(NotPostponeError) as cm:
-            self.postponer = PostponeContent(self.current_education_group_year)
-        self.assertEqual(str(cm.exception),
-                         _('You are not allowed to copy the content of this kind of education group.'))
-
-    def test_init_wrong_instance_minitraining(self):
-        self.current_education_group_year.education_group_type.category = MINI_TRAINING
-        self.current_education_group_year.education_group_type.name = MiniTrainingType.OPTION.name
-        self.current_education_group_year.education_group_type.save()
-
-        with self.assertRaises(NotPostponeError) as cm:
-            self.postponer = PostponeContent(self.current_education_group_year)
-        self.assertEqual(str(cm.exception),
-                         _("You are not allowed to copy the content of this kind of education group."))
-
     def test_postpone_with_child_branch(self):
         self.postponer = PostponeContent(self.current_education_group_year)
 
@@ -351,13 +333,14 @@ class TestPostpone(TestCase):
             min_count_authorized=1
         )
         self.current_group_element_year.child_branch.acronym = "mandatory_child_n"
+        self.current_group_element_year.child_branch.education_group_type = GroupEducationGroupTypeFactory()
         self.current_group_element_year.child_branch.save()
 
         n1_mandatory_egy = EducationGroupYearFactory(
             academic_year=self.next_academic_year,
             acronym='mandatory_child_n1',
             education_group=self.current_group_element_year.child_branch.education_group,
-            education_group_type=self.current_education_group_year.education_group_type,
+            education_group_type=self.current_group_element_year.child_branch.education_group_type,
         )
 
         n1_child_gr = GroupElementYearFactory(
@@ -372,12 +355,12 @@ class TestPostpone(TestCase):
         self.assertEqual(new_mandatory_child, n1_mandatory_egy)
         self.assertEqual(new_mandatory_child.groupelementyear_set.first(), n1_child_gr)
         self.assertEqual(
-            str(self.postponer.warnings[0]),
             _("%(education_group_year)s has already been copied in %(academic_year)s in another program. "
               "It may have been already modified.") % {
-                "education_group_year": n1_mandatory_egy.acronym,
+                "education_group_year": n1_mandatory_egy.partial_acronym,
                 "academic_year": n1_mandatory_egy.academic_year
-            }
+            },
+            str(self.postponer.warnings[0])
         )
 
     def test_postpone_with_child_branches(self):
@@ -485,10 +468,9 @@ class TestPostpone(TestCase):
 
         self.assertIn(
             _("%(learning_unit_year)s is not anymore contained in "
-              "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s "
+              "%(education_group_year_root)s "
               "=> the prerequisite for %(learning_unit_year)s is not copied.") % {
-                "education_group_year_root_acronym": new_root.acronym,
-                "education_group_year_root_partial_acronym": new_root.partial_acronym,
+                "education_group_year_root": "{} - {}".format(new_root.partial_acronym, new_root.acronym),
                 "learning_unit_year": prerequisite.learning_unit_year.acronym,
             },
             [str(warning) for warning in self.postponer.warnings]
@@ -522,16 +504,15 @@ class TestPostpone(TestCase):
         new_root = self.postponer.postpone()
 
         self.assertEqual(
-            str(self.postponer.warnings[0]),
             _("%(prerequisite_item)s is not anymore contained in "
-              "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s "
+              "%(education_group_year_root)s "
               "=> the prerequisite for %(learning_unit_year)s "
               "having %(prerequisite_item)s as prerequisite is not copied.") % {
-                "education_group_year_root_acronym": new_root.acronym,
-                "education_group_year_root_partial_acronym": new_root.partial_acronym,
+                "education_group_year_root": "{} - {}".format(new_root.partial_acronym, new_root.acronym),
                 "learning_unit_year": prerequisite.learning_unit_year.acronym,
                 "prerequisite_item": item_luy.acronym
-            }
+            },
+            str(self.postponer.warnings[0]),
         )
 
     def test_postpone_with_prerequisite(self):
@@ -597,13 +578,14 @@ class TestPostpone(TestCase):
 
         self.assertTrue(self.postponer.warnings)
         self.assertEqual(
-            str(self.postponer.warnings[0]),
             _("%(education_group_year)s is closed in %(end_year)s. This element will not be copied "
               "in %(academic_year)s.") % {
-                "education_group_year": sub_group.child_branch.acronym,
+                "education_group_year": "{} - {}".format(sub_group.child_branch.partial_acronym,
+                                                         sub_group.child_branch.acronym),
                 "end_year": sub_group.child_branch.education_group.end_year,
                 "academic_year": self.next_academic_year,
-            }
+            },
+            str(self.postponer.warnings[0])
         )
 
     def test_when_education_group_year_exists_in_n1_has_no_child_and_is_reference_link(self):
@@ -623,10 +605,11 @@ class TestPostpone(TestCase):
         self.assertEqual(new_referenced_egy, n1_referenced_egy)
         self.assertFalse(new_referenced_egy.groupelementyear_set.all())
         self.assertEqual(
-            str(self.postponer.warnings[0]),
             _("%(education_group_year)s (reference link) has not been copied. Its content is empty.") % {
-                "education_group_year": new_referenced_egy.acronym
-            }
+                "education_group_year": "{} - {}".format(new_referenced_egy.partial_acronym,
+                                                         new_referenced_egy.acronym)
+            },
+            str(self.postponer.warnings[0]),
         )
 
     def test_when_education_group_year_does_not_exist_in_n1_and_is_reference_link(self):
@@ -645,10 +628,11 @@ class TestPostpone(TestCase):
             self.next_academic_year
         )
         self.assertEqual(
-            str(self.postponer.warnings[0]),
             _("%(education_group_year)s (reference link) has not been copied. Its content is empty.") % {
-                "education_group_year": new_referenced_egy.acronym
-            }
+                "education_group_year": "{} - {}".format(new_referenced_egy.partial_acronym,
+                                                         new_referenced_egy.acronym)
+            },
+            str(self.postponer.warnings[0]),
         )
 
     def test_when_options_in_finalities_are_not_consistent(self):
@@ -694,12 +678,14 @@ class TestPostpone(TestCase):
         )
         child_egy_n1 = EducationGroupYearFactory(
             acronym=child_grp.child_branch.acronym,
+            partial_acronym=child_grp.child_branch.partial_acronym,
             education_group_type=child_grp.child_branch.education_group_type,
             education_group=child_grp.child_branch.education_group,
             academic_year=self.next_academic_year,
         )
         child_child_egy_n1 = EducationGroupYearFactory(
             acronym=child_child_grp.child_branch.acronym,
+            partial_acronym=child_child_grp.child_branch.partial_acronym,
             education_group_type=child_child_grp.child_branch.education_group_type,
             education_group=child_child_grp.child_branch.education_group,
             academic_year=self.next_academic_year,
@@ -709,14 +695,15 @@ class TestPostpone(TestCase):
         self.postponer.postpone()
 
         self.assertEqual(
-            str(self.postponer.warnings[0]),
             _("The option %(education_group_year_option)s is not anymore accessible in "
-              "%(education_group_year_root_partial_acronym)s - %(education_group_year_root_acronym)s "
+              "%(education_group_year_root)s "
               "in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
-                "education_group_year_option": child_child_grp.child_branch.acronym,
-                "education_group_year_root_acronym": root_egy_n1.acronym,
-                "education_group_year_root_partial_acronym": root_egy_n1.partial_acronym,
-                "education_group_year_finality": child_grp.child_branch.acronym,
+                "education_group_year_option": "{} - {}".format(child_child_grp.child_branch.partial_acronym,
+                                                                child_child_grp.child_branch.acronym),
+                "education_group_year_root": "{} - {}".format(root_egy_n1.partial_acronym, root_egy_n1.acronym),
+                "education_group_year_finality": "{} - {}".format(child_grp.child_branch.partial_acronym,
+                                                                  child_grp.child_branch.acronym),
                 "academic_year": self.next_academic_year
-            }
+            },
+            str(self.postponer.warnings[0])
         )
