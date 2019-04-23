@@ -122,7 +122,7 @@ TESTS_TYPES = os.environ.get('TESTS_TYPES', 'UNIT')
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'debug': DEBUG,
@@ -269,7 +269,7 @@ CKEDITOR_CONFIGS = {
     'reddot': {
         "removePlugins": "stylesheetparser",
         'extraAllowedContent': 'div(reddot_*,contacts_*)',
-        'extraPlugins': ','.join(['reddot', 'pastefromword']),
+        'extraPlugins': ','.join(['pastefromword']),
         'stylesSet': REDDOT_STYLES,
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
@@ -287,7 +287,7 @@ CKEDITOR_CONFIGS = {
         "removePlugins": "stylesheetparser",
         'allowedContent': True,
         'extraAllowedContent': 'div(reddot_*,contacts_*)',
-        'extraPlugins': ','.join(['reddot', 'pastefromword']),
+        'extraPlugins': ','.join(['pastefromword']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [

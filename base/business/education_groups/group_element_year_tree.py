@@ -94,7 +94,7 @@ class EducationGroupHierarchy:
                             'child_leaf__academic_year',
                             'child_leaf__learning_container_year',
                             'child_leaf__proposallearningunit',
-                            'parent')
+                            'parent').order_by("order", "parent__partial_acronym")
 
     def to_json(self):
         group_element_year_pk = self.group_element_year.pk if self.group_element_year else '#'
