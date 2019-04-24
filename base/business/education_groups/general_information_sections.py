@@ -296,12 +296,17 @@ SECTIONS_PER_OFFER_TYPE = {
         'common': [EVALUATION, ],
         'specific': [
             EVALUATION,
+            BACHELOR_CONCERNED,
             ACCESS_TO_PROFESSIONS,
+            CONTACT_INTRO,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             PEDAGOGY,
             DETAILED_PROGRAM,
+            STRUCTURE,
             WELCOME_INTRODUCTION,
+            WELCOME_PATH,
+            WELCOME_PROFIL,
             WELCOME_PROGRAM,
         ]
     },
@@ -310,10 +315,17 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             EVALUATION,
             BACHELOR_CONCERNED,
+            ACCESS_TO_PROFESSIONS,
+            CONTACT_INTRO,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             PEDAGOGY,
+            DETAILED_PROGRAM,
+            STRUCTURE,
             WELCOME_INTRODUCTION,
+            WELCOME_PATH,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
         ]
     },
     MiniTrainingType.ACCESS_MINOR.name: {
@@ -321,12 +333,16 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             EVALUATION,
             BACHELOR_CONCERNED,
+            ACCESS_TO_PROFESSIONS,
+            CONTACT_INTRO,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             PEDAGOGY,
             DETAILED_PROGRAM,
             STRUCTURE,
             WELCOME_INTRODUCTION,
+            WELCOME_PATH,
+            WELCOME_PROFIL,
             WELCOME_PROGRAM,
         ]
     },
@@ -335,6 +351,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             EVALUATION,
             BACHELOR_CONCERNED,
+            ACCESS_TO_PROFESSIONS,
             CONTACT_INTRO,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
@@ -352,17 +369,36 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             EVALUATION,
             BACHELOR_CONCERNED,
+            ACCESS_TO_PROFESSIONS,
+            CONTACT_INTRO,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             PEDAGOGY,
+            DETAILED_PROGRAM,
+            STRUCTURE,
             WELCOME_INTRODUCTION,
+            WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
         ]
     },
     MiniTrainingType.FSA_SPECIALITY.name: {
-        'common': [],
-        'specific': [INTRODUCTION, BACHELOR_CONCERNED, ]
+        'common': [EVALUATION, ],
+        'specific': [
+            EVALUATION,
+            BACHELOR_CONCERNED,
+            ACCESS_TO_PROFESSIONS,
+            CONTACT_INTRO,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            PEDAGOGY,
+            DETAILED_PROGRAM,
+            STRUCTURE,
+            INTRODUCTION,
+            WELCOME_PATH,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+        ]
     },
     MiniTrainingType.OPTION.name: {
         'common': [],
