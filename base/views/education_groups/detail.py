@@ -180,7 +180,10 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
                and self.is_general_info_and_condition_admission_in_display_range()
 
     def show_skills_and_achievements(self):
-        return self.show_admission_conditions() and not self.object.is_common
+        return not self.object.is_common and \
+               self.object.education_group_type.name in itertools.chain(TrainingType.with_skills_achievements(),
+                                                                        MiniTrainingType.with_admission_condition()) \
+               and self.is_general_info_and_condition_admission_in_display_range()
 
     def is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.object.academic_year.year < \
