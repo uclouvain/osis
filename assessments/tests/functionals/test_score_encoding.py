@@ -974,7 +974,10 @@ class FunctionalTest(SeleniumTestCase, BusinessMixin):
 
         self.click_on('lnk_notes_printing_{}'.format(learning_unit_year_1.id))
         time.sleep(1)
-        filename = 'Feuille de notes.pdf'
+        filename = "session_%s_%s_%s.pdf" % (
+            learning_unit_year_1.academic_year.year,
+            1,
+            learning_unit_year_1.acronym)
         full_path = os.path.join(self.full_path_temp_dir, filename)
 
         self.assertTrue(os.path.exists(full_path))
