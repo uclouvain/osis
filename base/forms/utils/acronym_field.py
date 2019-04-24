@@ -145,7 +145,6 @@ def split_acronym(value, subtype=learning_unit_year_subtypes.PARTIM, instance=No
     if subtype == learning_unit_year_subtypes.PARTIM:
         if instance and instance.pk:
             base_acronym = [value[0], value[1:-1], value[-1]]
-            base_acronym.append(value[len(value) - 1])
         else:
             base_acronym = [value[0], value[1:]]
     else:
