@@ -142,8 +142,9 @@ def find_by_id(learning_component_year_id):
 
 
 def find_by_learning_container_year(learning_container_year, with_classes=False):
-    queryset = LearningComponentYear.objects.filter(learning_unit_year__learning_container_year=learning_container_year) \
-        .order_by('type', 'acronym')
+    queryset = LearningComponentYear.objects.filter(
+        learning_unit_year__learning_container_year=learning_container_year
+    ).order_by('type', 'acronym')
     if with_classes:
         queryset = queryset.prefetch_related(
             models.Prefetch('learningclassyear_set', to_attr="classes")
