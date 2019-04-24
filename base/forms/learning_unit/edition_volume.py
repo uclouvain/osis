@@ -391,7 +391,8 @@ class SimplifiedVolumeForm(forms.ModelForm):
         for component_year in learning_components:
             EntityComponentYear.objects.update_or_create(
                 entity_container_year=requirement_entity_container,
-                learning_component_year=component_year
+                learning_component_year=component_year,
+                repartition_volume=component_year.hourly_volume_total_annual
             )
 
     def _get_requirement_entity_container(self):
