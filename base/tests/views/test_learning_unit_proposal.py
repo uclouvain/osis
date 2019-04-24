@@ -605,11 +605,11 @@ def _create_proposal_learning_unit(acronym):
         entity=an_entity
     )
     learning_component_lecturing = LearningComponentYearFactory(
-        learning_container_year=a_learning_unit_year.learning_container_year,
+        learning_unit_year=a_learning_unit_year,
         type=learning_component_year_type.LECTURING
     )
     learning_component_practical = LearningComponentYearFactory(
-        learning_container_year=a_learning_unit_year.learning_container_year,
+        learning_unit_year=a_learning_unit_year,
         type=learning_component_year_type.PRACTICAL_EXERCISES)
 
     initial_data = {

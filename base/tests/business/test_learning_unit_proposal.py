@@ -89,12 +89,12 @@ class TestLearningUnitProposalCancel(TestCase):
         self.learning_component_year_lecturing = LearningComponentYearFactory(
             type=learning_component_year_type.LECTURING,
             acronym="TP",
-            learning_container_year=learning_container_year
+            learning_unit_year=self.learning_unit_year
         )
         self.learning_component_year_practical = LearningComponentYearFactory(
             type=learning_component_year_type.PRACTICAL_EXERCISES,
             acronym="PP",
-            learning_container_year=learning_container_year
+            learning_unit_year=self.learning_unit_year
         )
 
     def test_cancel_proposal_of_type_suppression_case_success(self):
