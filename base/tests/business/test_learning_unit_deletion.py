@@ -220,7 +220,7 @@ class LearningUnitYearDeletion(TestCase):
         # Composant annualisé est associé à son composant et à son conteneur annualisé
         learning_component_year = LearningComponentYearFactory(acronym="/C",
                                                                comment="TEST")
-        learning_container_year = learning_component_year.learning_container_year
+        learning_container_year = learning_component_year.learning_unit_year.learning_container_year
 
         number_classes = 10
         for x in range(number_classes):
