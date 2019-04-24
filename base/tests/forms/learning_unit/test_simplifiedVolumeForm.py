@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -64,10 +64,8 @@ class TestSimplifiedVolumeManagementForm(TestCase):
         cm_component = learning_component_years[0]
         tp_component = learning_component_years[1]
 
-        self.assertEqual(cm_component.learningunitcomponent_set.get().learning_unit_year,
-                         self.learning_unit_year)
-        self.assertEqual(tp_component.learningunitcomponent_set.get().learning_unit_year,
-                         self.learning_unit_year)
+        self.assertEqual(cm_component.learning_unit_year, self.learning_unit_year)
+        self.assertEqual(tp_component.learning_unit_year, self.learning_unit_year)
 
         self.assertEqual(cm_component.type, LECTURING)
         self.assertEqual(tp_component.type, PRACTICAL_EXERCISES)
@@ -85,10 +83,8 @@ class TestSimplifiedVolumeManagementForm(TestCase):
         cm_component = learning_component_years[0]
         tp_component = learning_component_years[1]
 
-        self.assertEqual(cm_component.learningunitcomponent_set.get().learning_unit_year,
-                         self.learning_unit_year)
-        self.assertEqual(tp_component.learningunitcomponent_set.get().learning_unit_year,
-                         self.learning_unit_year)
+        self.assertEqual(cm_component.learning_unit_year, self.learning_unit_year)
+        self.assertEqual(tp_component.learning_unit_year, self.learning_unit_year)
 
         self.assertEqual(cm_component.type, LECTURING)
         self.assertEqual(tp_component.type, PRACTICAL_EXERCISES)
@@ -99,9 +95,7 @@ class TestSimplifiedVolumeManagementForm(TestCase):
     def test_save_update(self):
         formset = SimplifiedVolumeManagementForm(
             self.data, self.person,
-            queryset=LearningComponentYear.objects.filter(
-                learningunitcomponent__learning_unit_year=self.learning_unit_year
-            )
+            queryset=LearningComponentYear.objects.filter(learning_unit_year=self.learning_unit_year)
         )
 
         self.assertEqual(len(formset.forms), 2)
@@ -112,10 +106,8 @@ class TestSimplifiedVolumeManagementForm(TestCase):
         cm_component = learning_component_years[0]
         tp_component = learning_component_years[1]
 
-        self.assertEqual(cm_component.learningunitcomponent_set.get().learning_unit_year,
-                         self.learning_unit_year)
-        self.assertEqual(tp_component.learningunitcomponent_set.get().learning_unit_year,
-                         self.learning_unit_year)
+        self.assertEqual(cm_component.learning_unit_year, self.learning_unit_year)
+        self.assertEqual(tp_component.learning_unit_year, self.learning_unit_year)
 
         self.assertEqual(cm_component.type, LECTURING)
         self.assertEqual(tp_component.type, PRACTICAL_EXERCISES)

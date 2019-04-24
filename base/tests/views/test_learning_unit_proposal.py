@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -54,11 +54,11 @@ from base.models.enums import organization_type, entity_type, \
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
-from base.tests.factories import academic_year as academic_year_factory, campus as campus_factory, \
+from base.tests.factories import campus as campus_factory, \
     organization as organization_factory
 from base.tests.factories.academic_year import create_current_academic_year, \
     get_current_year, AcademicYearFactory
-from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
+from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
@@ -66,7 +66,6 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -74,7 +73,6 @@ from base.tests.factories.person import PersonFactory, PersonWithPermissionsFact
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
-from base.tests.factories.user import UserFactory
 from base.views.learning_units.proposal.update import update_learning_unit_proposal, \
     learning_unit_modification_proposal, \
     learning_unit_suppression_proposal
@@ -110,7 +108,7 @@ class TestLearningUnitModificationProposal(TestCase):
         )
 
         an_entity = EntityFactory(organization=an_organization)
-        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL,
+        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
                                                   start_date=current_academic_year.start_date,
                                                   end_date=current_academic_year.end_date)
         cls.requirement_entity = EntityContainerYearFactory(
@@ -306,7 +304,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         )
 
         an_entity = EntityFactory(organization=an_organization)
-        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL,
+        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
                                                   start_date=current_academic_year.start_date,
                                                   end_date=current_academic_year.end_date)
         cls.requirement_entity = EntityContainerYearFactory(
@@ -401,9 +399,9 @@ class TestLearningUnitProposalSearch(TestCase):
         proposal = _create_proposal_learning_unit("LOSIS1214")
         tutor = TutorFactory(person=self.person)
         attribution = AttributionNewFactory(tutor=tutor)
-        learning_unit_component = LearningUnitComponentFactory(learning_unit_year=proposal.learning_unit_year)
+        learning_unit_component = LearningComponentYearFactory(learning_unit_year=proposal.learning_unit_year)
         AttributionChargeNewFactory(attribution=attribution,
-                                    learning_component_year=learning_unit_component.learning_component_year)
+                                    learning_component_year=learning_unit_component)
         url = reverse(learning_units_proposal_search)
         response = self.client.get(url, data={'tutor': self.person.first_name})
         self.assertEqual(response.context['learning_units_count'], 1)
@@ -697,7 +695,7 @@ class TestEditProposal(TestCase):
         cls.organization = organization_factory.OrganizationFactory(type=organization_type.MAIN)
         cls.campus = campus_factory.CampusFactory(organization=cls.organization, is_administration=True)
         cls.entity = EntityFactory(organization=cls.organization)
-        cls.entity_version = EntityVersionFactory(entity=cls.entity, entity_type=entity_type.SCHOOL,
+        cls.entity_version = EntityVersionFactory(entity=cls.entity, entity_type=entity_type.FACULTY,
                                                   start_date=today.replace(year=1900),
                                                   end_date=None)
 

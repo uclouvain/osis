@@ -8,7 +8,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -32,14 +32,13 @@
     <thead>
     <tr>
         <th>{% trans 'Components' %}&nbsp;&nbsp;</th>
-        <th></th>
-        <th class="text-center">{% trans 'Volume' %}</th>
-        <th></th>
+        <th>(</th>
         <th class="text-center">{% trans 'Vol. Q1' %}</th>
-        <th></th>
+        <th>+</th>
         <th class="text-center">{% trans 'Vol. Q2' %}</th>
-        <th></th>
-        <th></th>
+        <th>)</th>
+        <th>=</th>
+        <th class="text-center">{% trans 'Volume annuel' %}</th>
         <th class="text-center">{% trans 'Classes' %}</th>
     </tr>
     </thead>
@@ -49,14 +48,13 @@
             <th>
                 <label class="inline-group">{{ form.label }}</label>
             </th>
-            <td>(</td>
-            <td>{% bootstrap_field form.hourly_volume_total_annual show_label=False %}</td>
-            <td>{{ form.equal_field.label }}</td>
+            <td></td>
             <td>{% bootstrap_field form.hourly_volume_partial_q1 show_label=False %}</td>
-            <td>{{ form.add_field.label }}</td>
+            <td></td>
             <td>{% bootstrap_field form.hourly_volume_partial_q2 show_label=False %}</td>
-            <td>)</td>
-            <td>*</td>
+            <td></td>
+            <td></td>
+            <td>{% bootstrap_field form.hourly_volume_total_annual show_label=False %}</td>
             <td>{% bootstrap_field form.planned_classes show_label=False %}</td>
         </tr>
     {% endfor %}

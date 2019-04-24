@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -268,6 +268,18 @@ class TestSave(TestCase):
         with self.assertRaises(ObjectDoesNotExist):
             EntityContainerYear.objects.get(learning_container_year=self.learning_unit_year.learning_container_year,
                                             type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1)
+
+    def test_creation_proposal_learning_unit_with_school_entity(self):
+        self.entity_version.entity_type = SCHOOL
+        self.entity_version.save()
+        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
+        self.assertTrue('entity' in form.errors[0])
+
+    def test_creation_proposal_learning_unit_with_not_linked_entity(self):
+        self.person_entity.entity = self.an_entity_school
+        self.person_entity.save()
+        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
+        self.assertTrue('entity' in form.errors[1])
 
 
 def build_initial_data(learning_unit_year, entity_container_yr):
