@@ -29,13 +29,14 @@ import factory.fuzzy
 
 from base.models.enums import learning_component_year_type
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class LearningComponentYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.LearningComponentYear"
 
-    learning_container_year = factory.SubFactory(LearningContainerYearFactory)
+    learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
     acronym = factory.Sequence(lambda n: '%d' % n)
     type = factory.Iterator(learning_component_year_type.LEARNING_COMPONENT_YEAR_TYPES,
                             getter=operator.itemgetter(0))
