@@ -149,7 +149,7 @@ class PartimForm(LearningUnitBaseForm):
             SimplifiedVolumeManagementForm: {
                 'data': data,
                 'queryset': LearningComponentYear.objects.filter(
-                    learningunitcomponent__learning_unit_year=self.instance)
+                    learning_unit_year=self.instance)
                 if self.instance else LearningComponentYear.objects.none(),
                 'person': self.person,
             }
@@ -195,7 +195,7 @@ class PartimForm(LearningUnitBaseForm):
             'campus': self.learning_unit_year_full.campus,
             'periodicity': self.learning_unit_year_full.periodicity
         }
-        acronym_splited = split_acronym(acronym)
+        acronym_splited = split_acronym(acronym, instance=self.instance)
         initial_learning_unit_year.update({
             "acronym_{}".format(idx): acronym_part for idx, acronym_part in enumerate(acronym_splited)
         })
