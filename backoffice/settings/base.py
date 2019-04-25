@@ -249,7 +249,7 @@ CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
     'reddot': {
         "removePlugins": "stylesheetparser",
-        'extraPlugins': ','.join(['pastefromword']),
+        'extraPlugins': ','.join(['pastefromword', 'cdn']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
@@ -259,6 +259,7 @@ CKEDITOR_CONFIGS = {
             ['Link', 'Unlink'],
             ['CreateDiv'],
             {'name': 'insert', 'items': ['Table']},
+            {'name': 'cdn_integration', 'items': ['CDN']},
         ],
         'autoParagraph': False
     },
