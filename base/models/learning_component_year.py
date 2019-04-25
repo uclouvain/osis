@@ -141,6 +141,14 @@ def find_by_id(learning_component_year_id):
     return LearningComponentYear.objects.get(pk=learning_component_year_id)
 
 
+def find_lecturing_by_learning_unit_year(learning_unit_year):
+    return LearningComponentYear.objects.get(learning_unit_year=learning_unit_year, type=LECTURING)
+
+
+def find_practical_by_learning_unit_year(learning_unit_year):
+    return LearningComponentYear.objects.get(learning_unit_year=learning_unit_year, type=PRACTICAL_EXERCISES)
+
+
 def find_by_learning_container_year(learning_container_year, with_classes=False):
     queryset = LearningComponentYear.objects.filter(
         learning_unit_year__learning_container_year=learning_container_year
