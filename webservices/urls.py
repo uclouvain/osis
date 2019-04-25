@@ -54,6 +54,13 @@ if 'base' in settings.INSTALLED_APPS:
             include(base.api.url_v1.urlpatterns, namespace='base_api_v1'))
     )
 
+if 'partnership' in settings.INSTALLED_APPS:
+    import partnership.api.url_v1
+    url_api_v1.append(
+        url(r'^partnerships/',
+            include(partnership.api.url_v1.urlpatterns, namespace='partnerships_api_v1'))
+    )
+
 urlpatterns = [
     url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/common$',
         ws_catalog_common_offer,
