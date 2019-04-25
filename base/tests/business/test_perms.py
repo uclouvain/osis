@@ -26,8 +26,7 @@
 import datetime
 from unittest import mock
 
-from django.contrib.auth.models import Permission, Group
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Permission
 from django.test import TestCase
 
 from base.business.learning_units import perms
@@ -44,7 +43,6 @@ from base.models.enums.learning_container_year_types import OTHER_COLLECTIVE, OT
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.enums.proposal_type import ProposalType
 from base.models.person import Person
-from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
@@ -52,10 +50,10 @@ from base.tests.factories.external_learning_unit_year import ExternalLearningUni
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
-from base.tests.factories.person import PersonFactory, FacultyManagerFactory, CentralManagerFactory
+from base.tests.factories.person import PersonFactory, FacultyManagerFactory, CentralManagerFactory, \
+    PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from base.tests.factories.user import UserFactory
 
 TYPES_PROPOSAL_NEEDED_TO_EDIT = (learning_container_year_types.COURSE,
                                  learning_container_year_types.DISSERTATION,
@@ -362,14 +360,7 @@ class PermsTestCase(TestCase):
 
 
 def create_person_with_permission_and_group(group_name=None, permission_name='can_edit_learning_unit_proposal'):
-    a_user = UserFactory()
-    permission, created = Permission.objects.get_or_create(
-        codename=permission_name, content_type=ContentType.objects.get_for_model(ProposalLearningUnit))
-    a_user.user_permissions.add(permission)
-    a_person = PersonFactory(user=a_user)
-    if group_name:
-        a_person.user.groups.add(Group.objects.get(name=group_name))
-    return a_person
+    return PersonWithPermissionsFactory(permission_name, groups=None if not group_name else [group_name])
 
 
 class TestIsEligibleToCreateModificationProposal(TestCase):
@@ -447,7 +438,6 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
 
         self.assertFalse(_check_proposal_edition(
             self.luy,
-            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP),
             False)
         )
 
@@ -457,11 +447,10 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
             learning_container_year__academic_year=self.past_academic_year,
             learning_unit=self.luy.learning_unit
         )
-
         ProposalLearningUnitFactory(learning_unit_year=self.luy)
+
         self.assertTrue(_check_proposal_edition(
             past_luy,
-            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP),
             False)
         )
 
