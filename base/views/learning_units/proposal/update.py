@@ -113,7 +113,7 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
 
             display_success_messages(
                 request, _("You proposed a modification of type %(type)s for the learning unit %(acronym)s." % {
-                    'type': _(proposal_type), 'acronym': learning_unit_year.acronym
+                    'type': ProposalType.SUPPRESSION.value, 'acronym': learning_unit_year.acronym
                 })
             )
 
