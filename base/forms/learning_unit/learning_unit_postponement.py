@@ -173,13 +173,34 @@ class LearningUnitPostponementForm:
                         data_to_insert = None
                         if data and existing_learn_unit_years:
                             data_to_insert = data.copy()
-                            data_to_insert["acronym_0"] = existing_learn_unit_years[0].acronym[0]
-                            data_to_insert["acronym_1"] = existing_learn_unit_years[0].acronym[1:]
-                            data_to_insert["container_type"] = \
-                                existing_learn_unit_years[0].learning_container_year.container_type
-                            data_to_insert["academic_year"] = str(ac_year.id)
+                            data_to_insert["acronym_0"] = data.get("acronym_0",
+                                                                   existing_learn_unit_years[0].acronym[0])
+                            data_to_insert["acronym_1"] = data.get("acronym_1",
+                                                                   existing_learn_unit_years[0].acronym[1:])
+                            data_to_insert["container_type"] = data.get("container_type",
+                                                                        existing_learn_unit_years[0].
+                                                                        learning_container_year.container_type)
+                            data_to_insert["academic_year"] = data.get("academic_year", str(ac_year.id))
                             # FIXME: component-initial_forms must be 0 for the insert in DB
-                            data_to_insert["component-INITIAL_FORMS"] = 0
+                            data_to_insert["component-INITIAL_FORMS"] = data.get("component-INITIAL_FORMS", 0)
+                            data_to_insert["credits"] = data.get("credits",
+                                                                 existing_learn_unit_years[0].creditsperiodicity)
+                            data_to_insert["periodicity"] = data.get("periodicity",
+                                                                     existing_learn_unit_years[0].periodicity)
+                            data_to_insert["language"] = data.get("language", existing_learn_unit_years[0].language.id)
+                            data_to_insert["common_title"] = data.get("common_title",
+                                                                      existing_learn_unit_years[0].
+                                                                      learning_container_year.common_title)
+                            data_to_insert["specific_title"] = data.get("specific_title",
+                                                                        existing_learn_unit_years[0].specific_title)
+                            data_to_insert["type_declaration_vacant"] = data.get("type_declaration_vacant",
+                                                                                 existing_learn_unit_years[0].
+                                                                                 learning_container_year.
+                                                                                 type_declaration_vacant)
+                            data_to_insert["attribution_procedure"] = data.get("attribution_procedure",
+                                                                               existing_learn_unit_years[0].
+                                                                               attribution_procedure)
+                            data_to_insert["campus"] = data.get("campus", existing_learn_unit_years[0].campus.id)
                             to_insert.append(self._instantiate_base_form_as_insert(ac_year, data_to_insert))
                         else:
                             to_insert.append(self._instantiate_base_form_as_insert(ac_year, data))
