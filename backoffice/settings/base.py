@@ -244,33 +244,12 @@ CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'django-db')
 LOCALE_PATHS = ()
 
 
-def define_style_sheet(name, class_name):
-    return {'name': name, 'element': 'div', 'attributes': {'class': class_name}}
-
-
-REDDOT_STYLES = [
-    define_style_sheet('Intro', 'reddot_intro'),
-    define_style_sheet('Teaser', 'reddot_teaser'),
-    define_style_sheet('Collapse', 'reddot_collapse'),
-    define_style_sheet('Extra', 'reddot_extra'),
-    define_style_sheet('Body', 'reddot_body'),
-    define_style_sheet('Part1', 'reddot_part1'),
-    define_style_sheet('Part2', 'reddot_part2'),
-    define_style_sheet('Contact Responsible', 'contacts_responsible'),
-    define_style_sheet('Contact Other Responsibles', 'contacts_responsibles'),
-    define_style_sheet('Contact Jury', 'contacts_jury'),
-    define_style_sheet('Contact Contact', 'contacts_contact'),
-    define_style_sheet('Contact Introduction', 'contacts_introduction'),
-]
-
 # Apps Settings
 CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
     'reddot': {
         "removePlugins": "stylesheetparser",
-        'extraAllowedContent': 'div(reddot_*,contacts_*)',
         'extraPlugins': ','.join(['pastefromword']),
-        'stylesSet': REDDOT_STYLES,
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
@@ -286,7 +265,6 @@ CKEDITOR_CONFIGS = {
     'default': {
         "removePlugins": "stylesheetparser",
         'allowedContent': True,
-        'extraAllowedContent': 'div(reddot_*,contacts_*)',
         'extraPlugins': ','.join(['pastefromword']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
@@ -306,7 +284,6 @@ CKEDITOR_CONFIGS = {
                        'HiddenField']},
             {'name': 'about', 'items': ['About']},
         ],
-        'stylesSet': REDDOT_STYLES,
         'autoParagraph': False
     },
     'minimal': {
