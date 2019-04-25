@@ -32,7 +32,6 @@ from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.urlresolvers import reverse
-from django.db import IntegrityError, transaction
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.test import TestCase, RequestFactory
 from django.utils.translation import ugettext_lazy as _
@@ -236,9 +235,10 @@ class TestLearningUnitModificationProposal(TestCase):
 
         messages_list = [str(message) for message in get_messages(response.wsgi_request)]
         self.assertIn(
-            _("You proposed a modification of type {} for the learning unit {}.").format(
-                _(proposal_type.ProposalType.MODIFICATION.name),
-                self.learning_unit_year.acronym),
+            _("You proposed a modification of type %(type)s for the learning unit %(acronym)s." % {
+                'type': proposal_type.ProposalType.MODIFICATION.value,
+                'acronym': self.learning_unit_year.acronym
+            }),
             list(messages_list))
 
     def test_initial_data_fields(self):
@@ -362,9 +362,10 @@ class TestLearningUnitSuppressionProposal(TestCase):
 
         messages = [str(message) for message in get_messages(response.wsgi_request)]
         self.assertIn(
-            _("You proposed a modification of type {} for the learning unit {}.").format(
-                _(proposal_type.ProposalType.SUPPRESSION.name),
-                self.learning_unit_year.acronym),
+            _("You proposed a modification of type %(type)s for the learning unit %(acronym)s." % {
+                'type': proposal_type.ProposalType.SUPPRESSION.value,
+                'acronym': self.learning_unit_year.acronym
+            }),
             list(messages)
         )
 
