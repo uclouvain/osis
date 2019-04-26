@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -223,7 +223,7 @@ class GroupElementYear(OrderedModel):
 
         else:
             components = LearningComponentYear.objects.filter(
-                learningunitcomponent__learning_unit_year=self.child_leaf).annotate(
+                learning_unit_year=self.child_leaf).annotate(
                 total=Case(When(hourly_volume_total_annual=None, then=0),
                            default=F('hourly_volume_total_annual'))).values('type', 'total')
 
@@ -269,7 +269,7 @@ class GroupElementYear(OrderedModel):
     def _check_same_academic_year_parent_child_branch(self):
         if (self.parent and self.child_branch) and\
                 (self.parent.academic_year.year != self.child_branch.academic_year.year):
-            raise ValidationError(_("It is forbidden to attach an element to one of another academic year."))
+            raise ValidationError(_("It is forbidden to attach an element to an element of another academic year."))
 
         self._clean_link_type()
 
@@ -412,7 +412,7 @@ def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict
     if queryset.model != GroupElementYear:
         raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
 
-    elements = _fetch_row_sql([root.id])
+    elements = fetch_row_sql([root.id])
 
     distinct_group_elem_ids = {elem['id'] for elem in elements}
     queryset = queryset.filter(pk__in=distinct_group_elem_ids)
@@ -424,7 +424,7 @@ def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict
     return group_elems_by_parent_id
 
 
-def _fetch_row_sql(root_ids):
+def fetch_row_sql(root_ids):
     with connection.cursor() as cursor:
         cursor.execute(SQL_RECURSIVE_QUERY_EDUCATION_GROUP, root_ids)
         return [

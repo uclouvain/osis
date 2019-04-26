@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, connection
-from django.db.models import Count, OuterRef, Exists, Min, When, Case, Max
+from django.db.models import Count, Min, When, Case, Max
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -44,7 +44,6 @@ from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
-from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
     SerializableQuerySet
@@ -614,6 +613,10 @@ class EducationGroupYear(SerializableModel):
         return self.type == TrainingType.BACHELOR.name
 
     @property
+    def is_master180(self):
+        return self.type == TrainingType.PGRM_MASTER_180_240.name
+
+    @property
     def verbose(self):
         return "{} - {}".format(self.partial_acronym or "", self.acronym)
 
@@ -715,13 +718,6 @@ class EducationGroupYear(SerializableModel):
     def group_element_year_leaves(self):
         return self.groupelementyear_set.filter(child_leaf__isnull=False). \
             select_related("child_leaf", "child_leaf__learning_container_year")
-
-    def group_element_year_leaves_with_annotate_on_prerequisites(self, root_id):
-        has_prerequisite = Prerequisite.objects.filter(
-            education_group_year__id=root_id,
-            learning_unit_year__id=OuterRef("child_leaf__id"),
-        ).exclude(prerequisite__exact='')
-        return self.group_element_year_leaves.annotate(has_prerequisites=Exists(has_prerequisite))
 
     @cached_property
     def coorganizations(self):

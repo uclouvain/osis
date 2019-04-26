@@ -1,5 +1,5 @@
 {% load staticfiles %}
-{% load i18n bootstrap3 %}
+{% load statici18n i18n bootstrap3 %}
 {% load getattr %}
 
 {% comment "License" %}
@@ -9,7 +9,7 @@
     * The core business involves the administration of students, teachers,
     * courses, programs and so on.
     *
-    * Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
     *
     * This program is free software: you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+{% get_current_language as LANGUAGE_CODE %}
 
 <div role="tabpanel" class="tab-pane active" id="pedagogy">
     <div class="row well" style="margin-left: 10px;margin-right: 10px">
@@ -134,7 +135,7 @@
 </div>
 
 {% if perms.base.can_edit_learningunit_pedagogy %}
-    <script src="{% url 'javascript-catalog' %}"></script>
+    <script src="{% statici18n LANGUAGE_CODE %}"></script>
     <script src="{% static 'js/jquery.formset.js' %}"></script>
     <script>
         $('.link-formset').formset({

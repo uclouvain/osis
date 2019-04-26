@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -291,7 +291,7 @@ class FullForm(LearningUnitBaseForm):
                 'data': data,
                 'proposal': proposal,
                 'queryset': LearningComponentYear.objects.filter(
-                    learningunitcomponent__learning_unit_year=self.instance
+                    learning_unit_year=self.instance
                 ) if self.instance else LearningComponentYear.objects.none(),
                 'person': self.person
             }
@@ -349,7 +349,7 @@ class FullForm(LearningUnitBaseForm):
             commit=commit
         )
 
-        # Save learning unit year (learning_unit_component +  learning_component_year + entity_component_year)
+        # Save learning unit year (learning_component_year + entity_component_year)
         learning_unit_yr = self.learning_unit_year_form.save(
             learning_container_year=container_year,
             learning_unit=learning_unit,

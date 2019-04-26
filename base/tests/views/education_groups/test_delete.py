@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -92,13 +92,13 @@ class TestDeleteGroupEducationView(TestCase):
 
     def test_delete_post(self):
         response = self.client.post(self.url)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertFalse(EducationGroupYear.objects.filter(pk=self.education_group_year1.pk).exists())
         self.assertTrue(EducationGroupYear.objects.filter(pk=self.education_group_year2.pk).exists())
         self.assertFalse(EducationGroup.objects.filter(pk=self.education_group1.pk).exists())
         self.assertTrue(EducationGroup.objects.filter(pk=self.education_group2.pk).exists())
         response = self.client.post(self.url2)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertFalse(EducationGroupYear.objects.filter(pk=self.education_group_year2.pk).exists())
         self.assertFalse(EducationGroup.objects.filter(pk=self.education_group2.pk).exists())
 

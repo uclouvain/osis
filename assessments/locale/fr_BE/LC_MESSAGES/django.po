@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-05 13:14+0200\n"
+"POT-Creation-Date: 2019-04-17 16:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -60,7 +60,7 @@ msgstr ""
 msgid "Absent"
 msgstr "Absent"
 
-#: templates/admin/pgm_manager.html:31 templates/scores_responsible.html:31
+#: templates/admin/pgm_manager.html:30 templates/scores_responsible.html:31
 #: templates/scores_responsible_edit.html:30
 msgid "Academic actors"
 msgstr "Acteurs académique"
@@ -81,7 +81,8 @@ msgstr "Parcours académique"
 msgid "Academic year"
 msgstr "Année académique"
 
-#: business/score_encoding_export.py:173
+#: business/score_encoding_export.py:176
+#: tests/business/test_score_encoding_export.py:148
 #, python-format
 msgid "Accepted value: %(justification_label_authorized)s "
 msgstr "Valeur acceptée: %(justification_label_authorized)s "
@@ -99,11 +100,11 @@ msgstr "Acronyme"
 msgid "Add"
 msgstr "Ajouter"
 
-#: templates/admin/pgm_manager.html:153
+#: templates/admin/programmanager_list.html:66
 msgid "Add manager"
 msgstr "Ajouter un gestionnaire"
 
-#: templates/admin/pgm_manager.html:62 templates/admin/pgm_manager.html:75
+#: templates/admin/pgm_manager.html:64 templates/admin/pgm_manager.html:77
 #: templates/scores_encoding.html:66
 #: templates/scores_encoding_by_learning_unit.html:63
 #: templates/scores_encoding_by_learning_unit.html:73
@@ -112,7 +113,7 @@ msgstr "Ajouter un gestionnaire"
 msgid "All"
 msgstr "Tous"
 
-#: templates/admin/pgm_manager.html:48
+#: templates/admin/pgm_manager.html:50
 msgid "All hierarchy of "
 msgstr "Toute la hiérarchie de "
 
@@ -138,7 +139,7 @@ msgstr ""
 "Toutes les notes ont été soumises. Il n'est plus possible d'encoder des "
 "notes."
 
-#: templates/admin/modal/remove_manager_confirm.html:21
+#: templates/admin/programmanager_confirm_delete_inner.html:13
 msgid "Are you sure you want to remove the following manager ?"
 msgstr "Êtes-vous sûr de vouloir supprimer le gestionnaire suivant ?"
 
@@ -152,8 +153,8 @@ msgstr "Par unité d'apprentissage"
 msgid "By specific criteria"
 msgstr "Par critère spécifique"
 
-#: templates/admin/modal/add_manager.html:62
-#: templates/admin/modal/remove_manager_confirm.html:29
+#: templates/admin/manager_add_inner.html:24
+#: templates/admin/programmanager_confirm_delete_inner.html:29
 #: templates/online_double_encoding_form.html:114
 #: templates/online_double_encoding_form.html:191
 #: templates/online_double_encoding_validation.html:252
@@ -196,9 +197,9 @@ msgstr "Comparer"
 msgid "Complete"
 msgstr "Compléter"
 
-#: templates/admin/modal/remove_manager_confirm.html:10
-msgid "Confirm"
-msgstr "Confirmer"
+#: templates/admin/programmanager_confirm_delete_inner.html:10
+msgid "Confirm delete for : "
+msgstr ""
 
 #: forms/score_sheet_address.py:34
 msgid "Country"
@@ -224,18 +225,22 @@ msgstr "Tri descendant de la table de données"
 msgid "Deadline reached"
 msgstr "Date d'échéance atteinte"
 
-#: business/score_encoding_export.py:198
+#: business/score_encoding_export.py:201
 #: templates/online_double_encoding_form.html:104
 #: templates/online_encoding_form.html:103
 #: tests/functionals/test_score_encoding.py:375
 msgid "Decimal values in scores are NOT accepted."
 msgstr "Les valeurs décimales dans les notes ne sont PAS acceptées."
 
-#: business/score_encoding_export.py:196
+#: business/score_encoding_export.py:199
 #: templates/online_double_encoding_form.html:102
 #: templates/online_encoding_form.html:101
 msgid "Decimal values in scores are accepted."
 msgstr "Les valeurs décimales dans les notes sont acceptées."
+
+#: tests/business/test_score_encoding_export.py:185
+msgid "Decimals authorized for this learning unit"
+msgstr "Les notes décimales sont autorisées pour ce cours"
 
 #: templates/online_encoding.html:154 templates/online_encoding.html:295
 msgid "Definitive submission (Submit to faculty)"
@@ -267,10 +272,7 @@ msgstr "Double encodage"
 msgid "Download the Excel file"
 msgstr "Télécharger le fichier Excel"
 
-msgid "End date Prof"
-msgstr "Echéance Prof"
-
-#: models/score_sheet_address.py:55 templates/admin/modal/add_manager.html:51
+#: models/score_sheet_address.py:55
 msgid "Email"
 msgstr "Courriel"
 
@@ -288,7 +290,8 @@ msgstr "Encoder les notes"
 msgid "Encoding"
 msgstr "Encodage"
 
-#: business/score_encoding_export.py:179 templates/blocks/legend.html:30
+#: business/score_encoding_export.py:182 templates/blocks/legend.html:30
+#: tests/business/test_score_encoding_export.py:158
 msgid "Enrolled lately"
 msgstr "Inscrit tardivement"
 
@@ -296,7 +299,7 @@ msgstr "Inscrit tardivement"
 msgid "Enter a valid email address."
 msgstr "Entrer une adresse de messagerie valide."
 
-#: templates/admin/pgm_manager.html:45 templates/admin/pgm_manager.html:118
+#: templates/admin/pgm_manager.html:45 templates/admin/pgm_manager.html:122
 #: templates/scores_responsible.html:86
 msgid "Entity"
 msgstr "Entité"
@@ -319,7 +322,6 @@ msgstr "Fax"
 msgid "Final"
 msgstr "Final"
 
-#: templates/admin/modal/add_manager.html:49
 #: templates/online_double_encoding_form.html:122
 #: templates/online_double_encoding_validation.html:116
 #: templates/online_encoding.html:180 templates/online_encoding_form.html:124
@@ -354,7 +356,7 @@ msgstr "Injecter"
 msgid "Inject XLS file"
 msgstr "Injecter le fichier XLS"
 
-#: templates/admin/pgm_manager.html:30 templates/scores_responsible.html:30
+#: templates/admin/pgm_manager.html:28 templates/scores_responsible.html:30
 #: templates/scores_responsible_edit.html:29
 msgid "Institution"
 msgstr "Institution"
@@ -363,13 +365,14 @@ msgstr "Institution"
 msgid "Invalid justification value"
 msgstr "Valeur de justification invalide"
 
-#: business/score_encoding_export.py:172
+#: business/score_encoding_export.py:175
 #: templates/online_double_encoding_form.html:124
 #: templates/online_double_encoding_validation.html:118
 #: templates/online_double_encoding_validation.html:120
 #: templates/online_double_encoding_validation.html:122
 #: templates/online_encoding.html:182 templates/online_encoding_form.html:126
 #: templates/scores_encoding_by_specific_criteria.html:109
+#: tests/business/test_score_encoding_export.py:142
 msgid "Justification"
 msgstr "Justification"
 
@@ -391,7 +394,6 @@ msgstr "Absence justifiée"
 msgid "Last synchronization"
 msgstr "Dernière synchronisation"
 
-#: templates/admin/modal/add_manager.html:48
 #: templates/online_double_encoding_form.html:121
 #: templates/online_double_encoding_validation.html:115
 #: templates/online_encoding.html:179 templates/online_encoding_form.html:123
@@ -423,21 +425,21 @@ msgstr "Ligne"
 msgid "Location"
 msgstr "Location"
 
-#: business/score_encoding_export.py:204
+#: business/score_encoding_export.py:207
 msgid "M=Justified Absence"
 msgstr "M=Absence Justifiée"
 
-#: templates/admin/pgm_manager.html:143
+#: templates/admin/programmanager_list.html:8
+msgid "Main"
+msgstr ""
+
+#: templates/admin/programmanager_list.html:7
 msgid "Manager"
 msgstr "Gestionnaire"
 
-#: templates/admin/pgm_manager.html:73
+#: templates/admin/pgm_manager.html:75
 msgid "Managers"
 msgstr "Gestionnaires"
-
-#: templates/admin/modal/add_manager.html:50
-msgid "Middlename"
-msgstr "Deuxième prénom"
 
 #: templates/scores_encoding_by_specific_criteria.html:67
 msgid "Missing score"
@@ -463,7 +465,7 @@ msgstr "Aucune donnée pour cette année académique"
 msgid "No double score encoded ; nothing to compare."
 msgstr "Pas de note encodée en double ; rien à comparer."
 
-#: templates/admin/pgm_manager.html:170
+#: templates/admin/pgm_manager.html:146
 msgid "No entity associated to your profile"
 msgstr "Aucune entité associée à votre profile"
 
@@ -473,9 +475,7 @@ msgstr ""
 "Aucune nouvelles notes encodées. L'encodage double nécessite de nouvelle "
 "notes."
 
-#: templates/admin/modal/add_manager.html:42
-#: templates/admin/modal/add_manager.html:44
-#: templates/admin/pgm_manager.html:105 templates/scores_responsible.html:80
+#: templates/admin/pgm_manager.html:107 templates/scores_responsible.html:80
 #: views/score_encoding.py:163 views/score_encoding.py:594
 msgid "No result!"
 msgstr "Aucun résultat!"
@@ -508,7 +508,8 @@ msgstr "Non communiquée"
 msgid "Number of enrollments"
 msgstr "Nombre d'inscriptions"
 
-#: business/score_encoding_export.py:192
+#: business/score_encoding_export.py:195
+#: tests/business/test_score_encoding_export.py:177
 msgid "Numbered scores"
 msgstr "Notes chiffrées"
 
@@ -549,14 +550,15 @@ msgstr "Encodage en ligne des notes"
 msgid "Other tutors"
 msgstr "Autre tuteurs"
 
-#: business/score_encoding_export.py:183
+#: business/score_encoding_export.py:186
+#: tests/business/test_score_encoding_export.py:164
 #, python-format
 msgid ""
 "Other values reserved to administration: %(justification_other_values)s "
 msgstr ""
 "Autres valeurs réservées à l'administration : %(justification_other_values)s "
 
-#: templates/admin/modal/add_manager.html:10
+#: templates/admin/manager_add_inner.html:10
 msgid "Person search"
 msgstr "Recherche de personne"
 
@@ -567,10 +569,6 @@ msgstr "Téléphone"
 #: views/score_encoding.py:577
 msgid "Please choose at least one criteria!"
 msgstr "Veuillez choisir au moins un critère!"
-
-#: templates/admin/modal/add_manager.html:21
-msgid "Please enter a lastname, and optionnally a firstname"
-msgstr "Veuillez entrer un nom de famille, et optionnellement un prénom"
 
 #: templates/online_encoding.html:266
 msgid "Please select an XLS file for injection"
@@ -599,15 +597,15 @@ msgstr "Imprimer tous les cours"
 msgid "Print the scores"
 msgstr "Imprimer toutes les notes"
 
-#: templates/admin/pgm_manager.html:116 templates/online_encoding.html:177
+#: templates/admin/pgm_manager.html:120 templates/online_encoding.html:177
 msgid "Program"
 msgstr "Programme"
 
-#: templates/admin/pgm_manager.html:32 templates/admin/pgm_manager.html:37
+#: templates/admin/pgm_manager.html:31 templates/admin/pgm_manager.html:36
 msgid "Program managers"
 msgstr "Gestionnaires de programme"
 
-#: templates/admin/pgm_manager.html:60
+#: templates/admin/pgm_manager.html:62
 msgid "Program type"
 msgstr "Programme type"
 
@@ -644,7 +642,7 @@ msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 msgid "Registration number"
 msgstr "Noma"
 
-#: templates/admin/modal/remove_manager_confirm.html:30
+#: templates/admin/programmanager_confirm_delete_inner.html:31
 msgid "Remove"
 msgstr "Retirer"
 
@@ -676,10 +674,11 @@ msgstr ""
 msgid "Row"
 msgstr "Ligne"
 
-#: business/score_encoding_export.py:203
+#: business/score_encoding_export.py:206
 msgid "S=Unjustified Absence"
 msgstr "S=Absence Injustifiée"
 
+#: templates/admin/manager_add_inner.html:26
 #: templates/offer/score_sheet_address_tab.html:124
 #: templates/online_double_encoding_validation.html:251
 #: templates/online_encoding_form.html:113
@@ -703,7 +702,8 @@ msgstr "Note"
 msgid "Score already submitted"
 msgstr "Note déjà soumise"
 
-#: business/score_encoding_export.py:193
+#: business/score_encoding_export.py:196
+#: tests/business/test_score_encoding_export.py:181
 #, python-format
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr "Valeur acceptée: %(score_legend)s (0=Note de présence)"
@@ -782,11 +782,11 @@ msgstr "Sélectionnez un type d'encodage"
 msgid "Select an excel file to inject scores."
 msgstr "Sélectionnez un fichier excel pour injecter des notes."
 
-#: templates/admin/pgm_manager.html:115
+#: templates/admin/pgm_manager.html:118
 msgid "Select/deselect all"
 msgstr "Sélectionner/Dé-sélectionner tout"
 
-#: templates/admin/pgm_manager.html:112
+#: templates/admin/pgm_manager.html:111
 msgid "Selected"
 msgstr "Sélectionné"
 
@@ -812,7 +812,8 @@ msgstr "Status"
 msgid "Student not registered for exam"
 msgstr "L'étudiant n'est plus inscrit à l'examen"
 
-#: business/score_encoding_export.py:166
+#: business/score_encoding_export.py:169
+#: tests/business/test_score_encoding_export.py:138
 msgid "Students deliberated are not shown"
 msgstr "Les étudiants délibérés ne sont pas montrés"
 
@@ -836,7 +837,8 @@ msgstr "Date d'échéance de l'enseignant"
 msgid "Temporary save (not submitted to the faculty yet)"
 msgstr "Enregistrement temporaire (non soumis à la faculté pour le moment)"
 
-#: business/score_encoding_export.py:160
+#: business/score_encoding_export.py:163
+#: tests/business/test_score_encoding_export.py:132
 #, python-format
 msgid ""
 "The data presented on this document correspond to the state of the system "
@@ -856,7 +858,7 @@ msgstr "L'inscription à l'activité %(xls_learning_unit_acronym)s n'existe pas"
 msgid "The file must be a valid 'XLSX' excel file"
 msgstr "Le fichier dois être un fichier excel valide"
 
-#: templates/admin/modal/remove_manager_confirm.html:25
+#: templates/admin/programmanager_confirm_delete_inner.html:17
 msgid "The manager will keep the following programs : "
 msgstr "Le gestionnaire devra conserver les programmes suivant : "
 
@@ -906,9 +908,13 @@ msgstr "Tuteur"
 msgid "Tutors of the course"
 msgstr "Tuteurs du cours"
 
-#: templates/admin/pgm_manager.html:117
+#: templates/admin/pgm_manager.html:121
 msgid "Type"
 msgstr "Type"
+
+#: tests/business/test_score_encoding_export.py:187
+msgid "Unauthorized decimal for this learning unit"
+msgstr "Attention : décimales non autorisées pour ce cours"
 
 #: templates/online_double_encoding_form.html:174
 #: templates/online_double_encoding_validation.html:275
@@ -919,13 +925,10 @@ msgstr "Type"
 msgid "Unjustified absence"
 msgstr "Absence injustifiée"
 
-#: business/score_encoding_export.py:189 templates/blocks/legend.html:35
+#: business/score_encoding_export.py:192 templates/blocks/legend.html:35
+#: tests/business/test_score_encoding_export.py:173
 msgid "Unsubscribed lately"
 msgstr "Désinscrit tardivement"
-
-#: templates/admin/modal/add_manager.html:52
-msgid "Username"
-msgstr "Nom d'utilisateur"
 
 #: templates/scores_encoding.html:93
 #: templates/scores_encoding_by_learning_unit.html:137
@@ -994,21 +997,18 @@ msgstr ""
 "Votre fichier excel n'est pas bien structuré. Veuillez suivre la structure "
 "du ficheir excel à fournir (bouton '%(button_value)s')"
 
-#: business/score_encoding_export.py:155 business/score_encoding_export.py:208
-#: business/score_encoding_sheet.py:104 tests/views/test_score_encoding.py:353
-#: views/score_encoding.py:75
+#: business/score_encoding_export.py:158 business/score_encoding_export.py:211
+#: business/score_encoding_sheet.py:104
+#: tests/business/test_score_encoding_export.py:133
+#: tests/views/test_score_encoding.py:353 views/score_encoding.py:75
 msgid "date_format"
 msgstr "%d%m%Y"
-
-#: views/pgm_manager_administration.py:230
-msgid "is already program manager for"
-msgstr "est déjà gestionnaire de programme pour"
 
 #: templates/scores_encoding_by_learning_unit.html:121
 msgid "learning units in"
 msgstr "unités d'enseignement dans"
 
-#: templates/admin/pgm_manager.html:112
+#: templates/admin/pgm_manager.html:111
 msgid "of"
 msgstr "sur"
 
@@ -1019,6 +1019,3 @@ msgstr "programme(s)"
 #: views/score_encoding.py:324
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
-
-#~ msgid "Not enrolled"
-#~ msgstr "Pas inscrit"

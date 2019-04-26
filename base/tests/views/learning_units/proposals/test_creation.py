@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ class LearningUnitViewTestCase(TestCase):
         self.organization = organization_factory.OrganizationFactory(type=organization_type.MAIN)
         self.campus = campus_factory.CampusFactory(organization=self.organization, is_administration=True)
         self.entity = EntityFactory(organization=self.organization)
-        self.entity_version = EntityVersionFactory(entity=self.entity, entity_type=entity_type.SCHOOL,
+        self.entity_version = EntityVersionFactory(entity=self.entity, entity_type=entity_type.FACULTY,
                                                    start_date=today.replace(year=1900),
                                                    end_date=None)
 

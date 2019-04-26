@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
@@ -67,61 +66,32 @@ class TestBuildPDFTree(TestCase):
                                                             child_leaf=self.learning_unit_year_3,
                                                             is_mandatory=True)
         self.learning_component_year_1 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_1.learning_container_year,
+            learning_unit_year=self.learning_unit_year_1,
             type=LECTURING
         )
         self.learning_component_year_2 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_1.learning_container_year,
+            learning_unit_year=self.learning_unit_year_1,
             type=PRACTICAL_EXERCISES
         )
         self.learning_component_year_3 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_2.learning_container_year,
+            learning_unit_year=self.learning_unit_year_2,
             type=LECTURING
         )
         self.learning_component_year_4 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_2.learning_container_year,
+            learning_unit_year=self.learning_unit_year_2,
             type=PRACTICAL_EXERCISES
         )
         self.learning_component_year_5 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_3.learning_container_year,
+            learning_unit_year=self.learning_unit_year_3,
             type=LECTURING
         )
         self.learning_component_year_6 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_3.learning_container_year,
+            learning_unit_year=self.learning_unit_year_3,
             type=PRACTICAL_EXERCISES
         )
         self.learning_component_year_7 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_4.learning_container_year,
-            type=LECTURING
-        )
-
-        self.learning_unit_component_1 = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year_1,
-            learning_component_year=self.learning_component_year_1
-        )
-        self.learning_unit_component_2 = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year_1,
-            learning_component_year=self.learning_component_year_2
-        )
-        self.learning_unit_component_3 = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year_2,
-            learning_component_year=self.learning_component_year_3
-        )
-        self.learning_unit_component_4 = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year_2,
-            learning_component_year=self.learning_component_year_4
-        )
-        self.learning_unit_component_5 = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year_3,
-            learning_component_year=self.learning_component_year_5
-        )
-        self.learning_unit_component_6 = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year_3,
-            learning_component_year=self.learning_component_year_6
-        )
-        self.learning_unit_component_7 = LearningUnitComponentFactory(
             learning_unit_year=self.learning_unit_year_4,
-            learning_component_year=self.learning_component_year_7
+            type=LECTURING
         )
 
     def test_build_pdf_tree_with_mandatory(self):
