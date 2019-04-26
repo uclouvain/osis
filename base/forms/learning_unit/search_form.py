@@ -93,7 +93,7 @@ class LearningUnitSearchForm(BaseSearchForm):
         label=_('Alloc. Ent.')
     )
 
-    with_entity_subordinated = forms.BooleanField(label=_('With subord. ent.'))
+    with_entity_subordinated = forms.BooleanField(label=_('Include subordinate entities'))
 
     def get_queryset(self):
         """ Filter a LearningUnitYearQueryset """
