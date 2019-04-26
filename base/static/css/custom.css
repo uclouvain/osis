@@ -109,9 +109,9 @@ table.volumes tbody {
 
 table.volumes_simplified tbody tr th:nth-child(1),
 table.volumes tbody tr td:nth-child(1),
-table.volumes tbody tr td:nth-child(8),
+table.volumes tbody tr td:nth-child(10),
 table.volumes tbody tr th:nth-child(1),
-table.volumes tbody tr th:nth-child(8) {
+table.volumes tbody tr th:nth-child(10) {
     background-color: #f3f3f3;
 }
 
