@@ -60,7 +60,7 @@ class Attribution(SerializableModel):
     summary_responsible = models.BooleanField(default=False)
 
     def __str__(self):
-        return u"%s - %s" % (self.tutor.person, self.function)
+        return u"%s - %s" % (self.tutor.person, self.get_function_display())
 
     @property
     def duration(self):
