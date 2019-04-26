@@ -69,11 +69,8 @@ class TestGroupElementYearForm(TestCase):
             child_leaf=self.child_leaf
         )
 
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors["link_type"],
-            [_("You are not allowed to create a reference with a learning unit")]
-        )
+        self.assertTrue(form.is_valid())
+        self.assertTrue("link_type" not in form.fields)
 
     def test_clean_link_type_reference_between_eg_without_authorized_relationship(self):
         AuthorizedRelationshipFactory(
