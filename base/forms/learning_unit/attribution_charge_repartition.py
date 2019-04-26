@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ class AttributionChargeForm(forms.ModelForm):
         attribution_new_obj = kwargs.pop("attribution")
         learning_component_year = LearningComponentYear.objects.get(
             Q(type=self.component_type) | Q(type__isnull=True),
-            learningunitcomponent__learning_unit_year=self.learning_unit_year
+            learning_unit_year=self.learning_unit_year
         )
 
         attribution_charge_obj = super().save(commit=False)

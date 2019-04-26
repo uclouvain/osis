@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -215,9 +215,6 @@ class PgmManagerAdministrationTest(TestCase):
     def test_get_entity_root_with_none(self):
         self.assertIsNone(pgm_manager_administration.get_entity_root(None))
 
-    def test_get_not_entity_root(self):
-        self.assertIsNone(pgm_manager_administration.get_entity_root(1))
-
     @mock.patch('django.contrib.auth.decorators')
     def test_get_entity_root_selected_all(self, mock_decorators):
         post_request = set_post_request(mock_decorators, {'entity': 'all_ESPO'}, '/pgm_manager/search')
@@ -247,7 +244,6 @@ class PgmManagerAdministrationTest(TestCase):
         StructureFactory(acronym='C22', part_of=entity_child2)
 
         self.assertEqual(len(pgm_manager_administration.get_entity_list(entity_child1.id, None)), 1)
-        self.assertIsNone(pgm_manager_administration.get_entity_list(5, None))
 
     def test_get_entity_list_for_entity_hierarchy(self):
         entity_parent1 = StructureFactory(acronym='P1')
