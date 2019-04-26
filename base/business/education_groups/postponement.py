@@ -1,29 +1,26 @@
-##############################################################################
+# ############################################################################
+#  OSIS stands for Open Student Information System. It's an application
+#  designed to manage the core business of higher education institutions,
+#  such as universities, faculties, institutes and professional schools.
+#  The core business involves the administration of students, teachers,
+#  courses, programs and so on.
 #
-#    OSIS stands for Open Student Information System. It's an application
-#    designed to manage the core business of higher education institutions,
-#    such as universities, faculties, institutes and professional schools.
-#    The core business involves the administration of students, teachers,
-#    courses, programs and so on.
+#  Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
 #
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    A copy of this license - GNU General Public License - is available
-#    at the root of the source code of this program.  If not,
-#    see http://www.gnu.org/licenses/.
-#
-##############################################################################
-
+#  A copy of this license - GNU General Public License - is available
+#  at the root of the source code of this program.  If not,
+#  see http://www.gnu.org/licenses/.
+# ############################################################################
 from django import forms
 from django.db import Error
 from django.utils.translation import ugettext as _
@@ -35,8 +32,8 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.hops import Hops
 
 EDUCATION_GROUP_MAX_POSTPONE_YEARS = 6
-FIELD_TO_EXCLUDE = ['id', 'uuid', 'external_id', 'academic_year']
-HOPS_FIELDS = ('ares_study',  'ares_graca', 'ares_ability')
+FIELD_TO_EXCLUDE = ['id', 'uuid', 'external_id', 'academic_year', 'linked_with_epc', 'publication_contact_entity']
+HOPS_FIELDS = ('ares_study', 'ares_graca', 'ares_ability')
 
 
 class ConsistencyError(Error):
@@ -165,9 +162,15 @@ class PostponementEducationGroupYearMixin:
         for academic_year in AcademicYear.objects.filter(year__gt=self.postpone_start_year,
                                                          year__lte=self.postpone_end_year):
             try:
-                postponed_egy = duplicate_education_group_year(
-                    education_group_year, academic_year, self.dict_initial_egy, self.hops_form.data
-                )
+                # hops is not relevant for a mini-training
+                if education_group_year.is_mini_training():
+                    postponed_egy = duplicate_education_group_year(
+                        education_group_year, academic_year, self.dict_initial_egy
+                    )
+                else:
+                    postponed_egy = duplicate_education_group_year(
+                        education_group_year, academic_year, self.dict_initial_egy, self.hops_form.data
+                    )
                 self.education_group_year_postponed.append(postponed_egy)
 
             except ConsistencyError as e:

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -39,10 +39,28 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class TestGroupElementYearForm(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
+
     def setUp(self):
-        self.parent = TrainingFactory()
+        self.parent = TrainingFactory(academic_year=self.academic_year)
         self.child_leaf = LearningUnitYearFactory()
-        self.child_branch = MiniTrainingFactory()
+        self.child_branch = MiniTrainingFactory(academic_year=self.academic_year)
+
+    def test_fields_relevant(self):
+        form = GroupElementYearForm()
+
+        expected_fields = {
+            "relative_credits",
+            "is_mandatory",
+            "block",
+            "link_type",
+            "comment",
+            "comment_english",
+            "access_condition"
+        }
+        self.assertFalse(expected_fields.symmetric_difference(set(form.fields.keys())))
 
     def test_clean_link_type_reference_between_eg_lu(self):
         form = GroupElementYearForm(
@@ -62,8 +80,8 @@ class TestGroupElementYearForm(TestCase):
             parent_type=self.parent.education_group_type,
             child_type=self.child_branch.education_group_type,
         )
-        ref_group = GroupElementYearFactory(parent=self.child_branch)
-
+        ref_group = GroupElementYearFactory(parent=self.child_branch,
+                                            child_branch=EducationGroupYearFactory(academic_year=self.academic_year))
         form = GroupElementYearForm(
             data={'link_type': LinkTypes.REFERENCE.name},
             parent=self.parent,
@@ -87,7 +105,8 @@ class TestGroupElementYearForm(TestCase):
             parent_type=self.parent.education_group_type,
             child_type=self.child_branch.education_group_type,
         )
-        ref_group = GroupElementYearFactory(parent=self.child_branch)
+        ref_group = GroupElementYearFactory(parent=self.child_branch,
+                                            child_branch=EducationGroupYearFactory(academic_year=self.academic_year))
         AuthorizedRelationshipFactory(
             parent_type=self.parent.education_group_type,
             child_type=ref_group.child_branch.education_group_type,
@@ -103,13 +122,14 @@ class TestGroupElementYearForm(TestCase):
 
     def test_reorder_children_by_partial_acronym(self):
         group_element_1 = GroupElementYearFactory(
-            child_branch__partial_acronym="SECOND",
-            order=1
+            order=1,
+            parent=EducationGroupYearFactory(academic_year=self.academic_year),
+            child_branch=EducationGroupYearFactory(academic_year=self.academic_year, partial_acronym="SECOND")
         )
         group_element_2 = GroupElementYearFactory(
             parent=group_element_1.parent,
-            child_branch__partial_acronym="FIRST",
-            order=2
+            order=2,
+            child_branch=EducationGroupYearFactory(academic_year=self.academic_year, partial_acronym="FIRST")
         )
         GroupElementYearForm._reorder_children_by_partial_acronym(group_element_1.parent)
 
@@ -176,7 +196,7 @@ class TestGroupElementYearForm(TestCase):
         )
 
     def test_referenced_child_with_max_limit(self):
-        child = EducationGroupYearFactory()
+        child = EducationGroupYearFactory(academic_year=self.academic_year)
 
         GroupElementYearFactory(
             parent=self.parent,
@@ -189,7 +209,8 @@ class TestGroupElementYearForm(TestCase):
             max_count_authorized=1,
         )
 
-        ref_group = GroupElementYearFactory(parent=self.child_branch)
+        ref_group = GroupElementYearFactory(parent=self.child_branch,
+                                            child_branch__academic_year=self.academic_year)
         AuthorizedRelationshipFactory(
             parent_type=self.parent.education_group_type,
             child_type=ref_group.child_branch.education_group_type,

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,13 +24,12 @@
 #
 ##############################################################################
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
-from osis_common.document import xls_build
-from base.business.learning_unit import get_entity_acronym
 from base.business.xls import get_name_or_username
-from base.models.proposal_learning_unit import find_by_learning_unit_year
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
+from base.models.proposal_learning_unit import find_by_learning_unit_year
+from osis_common.document import xls_build
 
 WORKSHEET_TITLE = _('Proposals')
 XLS_FILENAME = _('Proposals')
@@ -40,6 +39,85 @@ PROPOSAL_TITLES = [str(_('Req. Entity')), str(_('Code')), str(_('Title')), str(_
                    str(_('Proposal type')), str(_('Proposal status')), str(_('Folder num.')),
                    str(_('Decision')), str(_('Periodicity')), str(_('Credits')),
                    str(_('Alloc. Ent.')), str(_('Proposals date'))]
+
+COMPARISON_WORKSHEET_TITLE = _("Proposals comparison")
+XLS_COMPARISON_FILENAME = _('Proposals_comparison')
+XLS_DESCRIPTION_COMPARISON = _("List of comparison between proposals and UE")
+BLANK_VALUE = '-'
+
+
+def basic_titles_part_1():
+    return [
+        str(_('Code')),
+        str(_('Ac yr.')),
+        str(_('Type')),
+        str(_('Active')),
+        str(_('Subtype')),
+        str(_('Internship subtype')),
+        str(_('Credits')),
+        str(_('Language')),
+        str(_('Periodicity')),
+        str(_('Quadrimester')),
+        str(_('Session derogation')),
+        str(_('Common title')),
+        str(_('English title proper')),
+        str(_('Common English title')),
+        str(_('English title proper')),
+        str(_('Req. Entities')),
+        str(_('Alloc. Ent.')),
+        str(_('Add. requ. ent. 1')),
+        str(_('Add. requ. ent. 2')),
+        str(_('Profes. integration')),
+        str(_('Institution')),
+        str(_('Learning location')),
+    ]
+
+
+def basic_titles_part_2():
+    return [
+        str(_("Faculty remark")),
+        str(_("Other remark")),
+        str(_("Team management")),
+        str(_("Vacant")),
+        str(_("Decision")),
+        str(_("Procedure")),
+    ]
+
+
+def components_titles():
+    return [
+        "PM {}".format(_('code')),
+        "PM {}".format(_('Vol. Q1')),
+        "PM {}".format(_('Vol. Q2')),
+        "PM {}".format(_('Vol. annual')),
+        "PM {}".format(_('Real classes')),
+        "PM {}".format(_('Planned classes')),
+        "PM {}".format(_('Vol. global')),
+        "PM {}".format(_('Req. Entities')),
+        "PM {}".format(_('Add. requ. ent. 1')),
+        "PM {}".format(_('Add. requ. ent. 2')),
+        "PP {}".format(_('code')),
+        "PP {}".format(_('Vol. Q1')),
+        "PP {}".format(_('Vol. Q2')),
+        "PP {}".format(_('Vol. annual')),
+        "PM {}".format(_('Real classes')),
+        "PM {}".format(_('Planned classes')),
+        "PP {}".format(_('Vol. global')),
+        "PP {}".format(_('Req. Entities')),
+        "PM {}".format(_('Add. requ. ent. 1')),
+        "PM {}".format(_('Add. requ. ent. 2'))
+    ]
+
+
+def basic_titles():
+    return basic_titles_part_1() + [str(_('Partims'))] + basic_titles_part_2()
+
+
+COMPARISON_PROPOSAL_TITLES = \
+    [''] + \
+    basic_titles_part_1() + \
+    basic_titles_part_2() + \
+    components_titles()
 
 
 def prepare_xls_content(proposals):

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,13 +26,14 @@
 from ckeditor.fields import RichTextField
 from django.conf import settings
 from django.db import models
+from reversion.admin import VersionAdmin
 
 from cms.enums.entity_name import ENTITY_NAME
 from osis_common.models import osis_model_admin
 from .text_label import TextLabel
 
 
-class TranslatedTextAdmin(osis_model_admin.OsisModelAdmin):
+class TranslatedTextAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
     actions = None  # Remove ability to delete in Admin Interface
     list_display = ('text_label', 'entity', 'reference', 'language', 'text')
     ordering = ('text_label',)

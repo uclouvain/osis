@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,11 +26,14 @@
 import re
 from collections import defaultdict
 
+from django.db.models import Case, When, Value, IntegerField
+
 from base.business.utils import model
 from base.forms.common import ValidationRuleMixin
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import GroupType
 from base.models.group_element_year import GroupElementYear
 from base.models.utils import utils
 from base.models.utils.utils import get_object_or_none
@@ -53,6 +56,14 @@ def create_initial_group_element_year_structure(parent_egys):
     auth_rels = AuthorizedRelationship.objects.filter(
         parent_type=first_parent.education_group_type,
         min_count_authorized=1
+    ).annotate(
+        rels_ordering=Case(
+            *[When(child_type__name=type_name, then=Value(i)) for i, type_name in enumerate(GroupType.ordered())],
+            default=Value(len(GroupType.ordered())),
+            output_field=IntegerField()
+        )
+    ).order_by(
+        "rels_ordering"
     ).only('child_type').select_related('child_type')
 
     for relationship in auth_rels:
@@ -84,31 +95,41 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
         return existing_grp_ele
 
     year = parent_egy.academic_year.year
-    child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
 
-    child_egy = EducationGroupYear.objects.create(
+    previous_grp_ele = utils.get_object_or_none(
+        GroupElementYear,
+        parent__education_group=parent_egy.education_group,
+        parent__academic_year__year__in=[year - 1, year],
+        child_branch__education_group_type=child_education_group_type
+    )
+    if not previous_grp_ele:
+        child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
+    else:
+        child_eg = previous_grp_ele.child_branch.education_group
+
+    child_egy, _ = EducationGroupYear.objects.update_or_create(
         academic_year=parent_egy.academic_year,
-        main_teaching_campus=parent_egy.main_teaching_campus,
-        management_entity=parent_egy.management_entity,
-        education_group_type=child_education_group_type,
-        title="{child_title} {parent_acronym}".format(
-            child_title=title_initial_value,
-            parent_acronym=parent_egy.acronym
-        ),
-        partial_acronym=_generate_child_partial_acronym(
-            parent_egy,
-            partial_acronym_initial_value,
-            child_education_group_type
-        ),
-        acronym="{child_title}{parent_acronym}".format(
-            child_title=title_initial_value.replace(" ", "").upper(),
-            parent_acronym=parent_egy.acronym
-        ),
-        education_group=child_eg
+        education_group=child_eg,
+        defaults={
+            'main_teaching_campus': parent_egy.main_teaching_campus,
+            'management_entity': parent_egy.management_entity,
+            'education_group_type': child_education_group_type,
+            'title': "{child_title} {parent_acronym}".format(
+                child_title=title_initial_value,
+                parent_acronym=parent_egy.acronym
+            ),
+            'partial_acronym': _generate_child_partial_acronym(
+                parent_egy, partial_acronym_initial_value,
+                child_education_group_type
+            ),
+            'acronym': "{child_title}{parent_acronym}".format(
+                child_title=title_initial_value.replace(" ", "").upper(),
+                parent_acronym=parent_egy.acronym
+            ),
+        }
     )
 
-    grp_ele = GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)
-    return grp_ele
+    return GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)
 
 
 def _duplicate_branch(child_education_group_type, parent_egy, last_child):
@@ -121,15 +142,16 @@ def _duplicate_branch(child_education_group_type, parent_egy, last_child):
         return existing_grp_ele
 
     year = parent_egy.academic_year.year
-    child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
+    # child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
+    last_child.education_group.end_year = year
+    last_child.education_group.save()
 
     child_egy = model.duplicate_object(last_child)
-    child_egy.education_group = child_eg
+    child_egy.education_group = last_child.education_group
     child_egy.academic_year = parent_egy.academic_year
     child_egy.save()
 
-    grp_ele = GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)
-    return grp_ele
+    return GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)
 
 
 def _get_validation_rule(field_name, education_group_type):
@@ -159,8 +181,7 @@ def _generate_child_partial_acronym(parent, child_initial_value, child_type):
     sigle_ele = match_result.group("sigle_ele")
 
     reg_child_initial_value = re.compile(REGEX_GROUP_PARTIAL_ACRONYM_INITIAL_VALUE)
-    match_result = reg_child_initial_value.search(child_initial_value)
-    cnum, subdivision = match_result.group("cnum", "subdivision")
+    cnum, subdivision = _get_cnum_subdivision(child_initial_value, reg_child_initial_value)
 
     partial_acronym = "{}{}{}".format(sigle_ele, cnum, subdivision)
     while EducationGroupYear.objects.filter(partial_acronym=partial_acronym).exists():
@@ -171,3 +192,13 @@ def _generate_child_partial_acronym(parent, child_initial_value, child_type):
         partial_acronym = "{}{}{}".format(sigle_ele, cnum, subdivision)
 
     return partial_acronym
+
+
+def _get_cnum_subdivision(child_initial_value, reg_child_initial_value):
+    match_result = reg_child_initial_value.search(child_initial_value)
+    if match_result:
+        cnum, subdivision = match_result.group("cnum", "subdivision")
+    else:
+        cnum = None
+        subdivision = None
+    return cnum, subdivision

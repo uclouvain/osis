@@ -8,7 +8,7 @@
     * The core business involves the administration of students, teachers,
     * courses, programs and so on.
     *
-    * Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
     *
     * This program is free software: you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -25,10 +25,12 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-
+<div class="panel panel-default">
+    <div class="panel-body" id="div_tab_diploma">
 {% bootstrap_field form_education_group_year.joint_diploma %}
 
 {% bootstrap_field form_education_group_year.diploma_printing_title %}
+
 
 {% bootstrap_field form_education_group_year.professional_title %}
 
@@ -48,7 +50,8 @@
 </div>
 
 {{ form_education_group_year.media }}
-
+    </div>
+</div>
 <style>
 
     .select2-container--default .select2-selection--multiple .select2-selection__rendered {

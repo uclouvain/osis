@@ -34,7 +34,7 @@ from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import CentralManagerFactory
@@ -44,11 +44,15 @@ from base.tests.factories.person import CentralManagerFactory
 class TestUp(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.education_group_year = EducationGroupYearFactory()
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         # Create contents of education group years [3 elements]
-        cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year)
-        cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year)
-        cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year)
+        cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year,
+                                                           child_branch__academic_year=cls.academic_year)
+        cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year,
+                                                           child_branch__academic_year=cls.academic_year)
+        cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year,
+                                                           child_branch__academic_year=cls.academic_year)
 
         cls.person = CentralManagerFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
@@ -111,9 +115,12 @@ class TestDown(TestCase):
         cls.current_academic_year = create_current_academic_year()
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.current_academic_year)
         # Create contents of education group years [3 elements]
-        cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year)
-        cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year)
-        cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year)
+        cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year,
+                                                           child_branch__academic_year=cls.current_academic_year)
+        cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year,
+                                                           child_branch__academic_year=cls.current_academic_year)
+        cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year,
+                                                           child_branch__academic_year=cls.current_academic_year)
 
         cls.person = CentralManagerFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))

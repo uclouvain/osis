@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ from itertools import chain
 
 from django import forms
 from django.db import transaction
+from django.db.models import Q
 
 from base.business.learning_unit_proposal import compute_proposal_type, \
     compute_proposal_state, copy_learning_unit_data
@@ -37,6 +38,7 @@ from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.models.academic_year import current_academic_year
 from base.models.entity_version import find_pedagogical_entities_version, get_last_version
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.entity_type import FACULTY
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import get_by_id
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -47,6 +49,8 @@ class ProposalLearningUnitForm(forms.ModelForm):
 
     def __init__(self, data, person, *args, initial=None, **kwargs):
         super().__init__(data, *args, initial=initial, **kwargs)
+        self.fields['entity'].queryset = person.find_main_entities_version.filter(Q(entity_type=FACULTY)
+                                                                                  | Q(acronym="ILV"))
 
         if initial:
             for key, value in initial.items():
@@ -73,6 +77,9 @@ class ProposalLearningUnitForm(forms.ModelForm):
     class Meta:
         model = ProposalLearningUnit
         fields = ['entity', 'folder_id', 'state', 'type']
+        widgets = {
+            'folder_id': forms.TextInput(),
+        }
 
     def save(self, commit=True):
         if hasattr(self.instance, 'learning_unit_year'):
@@ -101,7 +108,8 @@ class ProposalBaseForm:
             learning_unit = learning_unit_year.learning_unit if learning_unit_year else None
             start_year = default_ac_year.year if default_ac_year else None
             self.learning_unit_form_container = FullForm(person, ac_year, learning_unit_instance=learning_unit,
-                                                         data=data, start_year=start_year, proposal=True)
+                                                         data=data, start_year=start_year, proposal=True,
+                                                         proposal_type=proposal_type)
         else:
             self.learning_unit_form_container = PartimForm(person,
                                                            learning_unit_year.parent.learning_unit,
@@ -159,9 +167,9 @@ class CreationProposalBaseForm(ProposalBaseForm):
 
     def __init__(self, data, person, default_ac_year=None):
         if not default_ac_year:
-            default_ac_year = current_academic_year()
+            default_ac_year = current_academic_year().next()
 
-        super().__init__(data, person, default_ac_year=default_ac_year)
+        super().__init__(data, person, default_ac_year=default_ac_year, proposal_type=ProposalType.CREATION.name)
 
     @transaction.atomic
     def save(self):

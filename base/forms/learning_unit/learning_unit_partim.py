@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 ##############################################################################
 from django import forms
 from django.http import QueryDict
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.utils.model import merge_two_dicts
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
@@ -149,7 +149,7 @@ class PartimForm(LearningUnitBaseForm):
             SimplifiedVolumeManagementForm: {
                 'data': data,
                 'queryset': LearningComponentYear.objects.filter(
-                    learningunitcomponent__learning_unit_year=self.instance)
+                    learning_unit_year=self.instance)
                 if self.instance else LearningComponentYear.objects.none(),
                 'person': self.person,
             }
@@ -195,7 +195,7 @@ class PartimForm(LearningUnitBaseForm):
             'campus': self.learning_unit_year_full.campus,
             'periodicity': self.learning_unit_year_full.periodicity
         }
-        acronym_splited = split_acronym(acronym)
+        acronym_splited = split_acronym(acronym, instance=self.instance)
         initial_learning_unit_year.update({
             "acronym_{}".format(idx): acronym_part for idx, acronym_part in enumerate(acronym_splited)
         })

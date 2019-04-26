@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPO
     _get_significant_volume, _prepare_legend_ws_data, _get_wrapped_cells, \
     _get_colored_rows, _get_attribution_line, _get_col_letter, _get_trainings_by_educ_group_year, _add_training_data, \
     _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
-    _get_data_part2, prepare_xls_content, annotate_qs
+    _get_data_part2, annotate_qs, learning_unit_titles_part1
 from base.models.enums import education_group_categories
 from base.models.enums import entity_type, organization_type
 from base.models.enums import learning_component_year_type
@@ -51,7 +51,6 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
@@ -113,8 +112,8 @@ class TestLearningUnitXls(TestCase):
                 entity__organization__type=organization_type.MAIN
             ) for _ in range(4)
         ]
-        self.learning_unit_year_with_entities.entities = {'REQUIREMENT_ENTITY': entities[0],
-                                                          'ALLOCATION_ENTITY': entities[1]}
+        self.learning_unit_year_with_entities.entity_requirement = entities[0]
+        self.learning_unit_year_with_entities.entity_allocation = entities[1]
         self.proposal_creation_3 = ProposalLearningUnitFactory(
             learning_unit_year=self.learning_unit_year_with_entities,
             state=proposal_state.ProposalState.ACCEPTED.name,
@@ -247,7 +246,7 @@ class TestLearningUnitXls(TestCase):
                                       )
 
         component_lecturing = LearningComponentYearFactory(
-            learning_container_year=learning_container_luy,
+            learning_unit_year=luy,
             type=learning_component_year_type.LECTURING,
             hourly_volume_total_annual=15,
             hourly_volume_partial_q1=10,
@@ -255,15 +254,13 @@ class TestLearningUnitXls(TestCase):
             planned_classes=1
         )
         component_practical = LearningComponentYearFactory(
-            learning_container_year=learning_container_luy,
+            learning_unit_year=luy,
             type=learning_component_year_type.PRACTICAL_EXERCISES,
             hourly_volume_total_annual=15,
             hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=5,
             planned_classes=1
         )
-        LearningUnitComponentFactory(learning_unit_year=luy, learning_component_year=component_lecturing)
-        LearningUnitComponentFactory(learning_unit_year=luy, learning_component_year=component_practical)
         a_tutor = TutorFactory()
 
         an_attribution = AttributionNewFactory(
@@ -309,6 +306,24 @@ class TestLearningUnitXls(TestCase):
                 expected_common,
                 luy
             )
+        )
+
+    def test_learning_unit_titles_part1(self):
+        self.assertEqual(
+            learning_unit_titles_part1(),
+            [
+                str(_('Code')),
+                str(_('Ac yr.')),
+                str(_('Title')),
+                str(_('Type')),
+                str(_('Subtype')),
+                "{} ({})".format(_('Req. Entity'), _('fac. level')),
+                str(_('Proposal type')),
+                str(_('Proposal status')),
+                str(_('Credits')),
+                str(_('Alloc. Ent.')),
+                str(_('Title in English')),
+            ]
         )
 
 

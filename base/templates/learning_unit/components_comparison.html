@@ -6,7 +6,7 @@
     * The core business involves the administration of students, teachers,
     * courses, programs and so on.
     *
-    * Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
     *
     * This program is free software: you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -23,44 +23,35 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% if components_comparison %}
-    {% for component in components_comparison %}
+{% if current.components %}
+    {% for key, component in current.components.items %}
         <tr class="table_header" style="border-top: groove">
-            <td class="table_header">{% trans 'Component' %} : {{ component|get_item:'type' }}</td>
-            {% if previous_lu %}
-                <th>{{ previous_academic_yr }}</th>
+            <td class="table_header">{% trans 'Component' %} : {{ key }}</td>
+            {% if previous %}
+                <th>{{ previous.learning_unit_year.academic_year }}</th>
             {% endif %}
-            <th>{{ learning_unit_year.academic_year }}</th>
-            {% if next_lu %}
-                <th>{{ next_academic_yr }}</th>
+            <th>{{ current.learning_unit_year.academic_year }}</th>
+            {% if next %}
+                <th>{{ next.learning_unit_year.academic_year }}</th>
             {% endif %}
         </tr>
-        {% for key, values in component.items %}
-            {% if key != 'type' %}
+        {% for title, values in component.items %}
+            {% if title != 'type' %}
                 <tr>
                     <td class="table_header">
                         <table>
                             <tr>
                                 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                                <td>
-                                    {% trans key %}
-                                    {% if key != 'VOLUME_REQUIREMENT_ENTITY' and key != 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1' and key != 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2' %}
-                                        &nbsp;
-                                    {% else %}
-                                        : {% if key == 'VOLUME_REQUIREMENT_ENTITY' %}{{ REQUIREMENT_ENTITY }}{% endif %}{% if key == 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1' %}{{ ADDITIONAL_REQUIREMENT_ENTITY_1 }}{% endif %}{% if key == 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2' %}{{ ADDITIONAL_REQUIREMENT_ENTITY_2 }}{% endif %}
-                                    {% endif %}
-                                </td>
+                                <td>{{ title }}</td>
                             </tr>
                         </table>
-
-
                     </td>
-                    {% if previous_lu %}
-                        <td>{% changed_label values.0 other1=values.1 %}</td>
+                    {% if previous.components %}
+                        {% changed_label previous.components|get_item:key|get_item:title|default:'0' other=values|default:'0' %}
                     {% endif %}
-                    <td>{{ values.1 | default_if_none:'-' }}</td>
-                    {% if next_lu %}
-                        <td>{% changed_label values.2 other1=values.1 %}</td>
+                    {% changed_label values|default:'0' %}
+                    {% if next.components %}
+                        {% changed_label next.components|get_item:key|get_item:title|default:'0' other=values|default:'0' %}
                     {% endif %}
                 </tr>
             {% endif %}

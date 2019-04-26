@@ -7,7 +7,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -42,9 +42,12 @@
     </div>
     <div class="modal-footer">
         <button class="btn btn-primary" type="submit">
-            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}
+            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
         </button>
-        <button type="submit" class="btn" data-dismiss="modal">{% trans 'cancel' %} </button>
+        <button type="submit" class="btn" data-dismiss="modal">{% trans 'Cancel' %} </button>
     </div>
 </form>
 
+{% block script %}
+    <script type="text/javascript" src="{% static 'js/learning_unit/ckeditor.js' %}"></script>
+{% endblock script %}

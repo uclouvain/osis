@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ from unittest.mock import Mock
 from django.db import Error
 from django.test import TestCase
 
-from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponement
+from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponementToN6
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -49,7 +49,7 @@ class TestFetchLearningUnitToPostpone(TestCase):
         )
 
         self.assertEqual(LearningUnitYear.objects.count(), 1)
-        result, errors = LearningUnitAutomaticPostponement().postpone()
+        result, errors = LearningUnitAutomaticPostponementToN6().postpone()
         self.assertEqual(len(result), 1)
         self.assertFalse(errors)
 
@@ -63,7 +63,7 @@ class TestFetchLearningUnitToPostpone(TestCase):
             academic_year=self.academic_years[-2],
         )
         self.assertEqual(LearningUnitYear.objects.count(), 1)
-        result, errors = LearningUnitAutomaticPostponement().postpone()
+        result, errors = LearningUnitAutomaticPostponementToN6().postpone()
         self.assertEqual(len(result), 0)
         self.assertFalse(errors)
 
@@ -77,11 +77,11 @@ class TestFetchLearningUnitToPostpone(TestCase):
             academic_year=self.academic_years[-1],
         )
         self.assertEqual(LearningUnitYear.objects.count(), 2)
-        result, errors = LearningUnitAutomaticPostponement().postpone()
+        result, errors = LearningUnitAutomaticPostponementToN6().postpone()
         self.assertEqual(len(result), 0)
         self.assertFalse(errors)
 
-    @mock.patch('base.business.learning_units.automatic_postponement.LearningUnitAutomaticPostponement.extend_obj')
+    @mock.patch('base.business.learning_units.automatic_postponement.LearningUnitAutomaticPostponementToN6.extend_obj')
     def test_luy_to_duplicate_with_error(self, mock_method):
         mock_method.side_effect = Mock(side_effect=Error("test error"))
 
@@ -91,7 +91,7 @@ class TestFetchLearningUnitToPostpone(TestCase):
         )
         self.assertEqual(LearningUnitYear.objects.count(), 1)
 
-        result, errors = LearningUnitAutomaticPostponement().postpone()
+        result, errors = LearningUnitAutomaticPostponementToN6().postpone()
         self.assertEqual(errors, [luy_with_error.learning_unit])
         self.assertEqual(len(result), 0)
 
@@ -104,9 +104,9 @@ class TestSerializePostponement(TestCase):
         cls.luys = [LearningUnitYearFactory() for _ in range(10)]
 
     def test_empty_results_and_errors(self):
-        result_dict = LearningUnitAutomaticPostponement().serialize_postponement_results()
+        result_dict = LearningUnitAutomaticPostponementToN6().serialize_postponement_results()
         self.assertDictEqual(result_dict, {
-            "msg": LearningUnitAutomaticPostponement.msg_result % {
+            "msg": LearningUnitAutomaticPostponementToN6.msg_result % {
                 "number_extended": 0,
                 "number_error": 0
             },
@@ -114,7 +114,7 @@ class TestSerializePostponement(TestCase):
         })
 
     def test_empty_errors(self):
-        postponement = LearningUnitAutomaticPostponement()
+        postponement = LearningUnitAutomaticPostponementToN6()
 
         postponement.result = self.luys
 
@@ -128,7 +128,7 @@ class TestSerializePostponement(TestCase):
         })
 
     def test_with_errors_and_results(self):
-        postponement = LearningUnitAutomaticPostponement()
+        postponement = LearningUnitAutomaticPostponementToN6()
         postponement.result = self.luys[:5]
         postponement.errors = [str(luy) for luy in self.luys[5:]]
         result_dict = postponement.serialize_postponement_results()

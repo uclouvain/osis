@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,12 +27,11 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from attribution.models.attribution_new import AttributionNew
 from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import learning_unit_year
-from base.models.entity import Entity
-from base.models.enums import learning_unit_year_subtypes, learning_container_year_types
+from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import vacant_declaration_type
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 FIELDS_FOR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant']
@@ -53,7 +52,7 @@ class LearningContainerYear(SerializableModel):
         verbose_name=_('Type'),
         db_index=True,
         max_length=20,
-        choices=learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES,
+        choices=LearningContainerYearType.choices(),
     )
 
     common_title = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('Common title'))
@@ -88,3 +87,6 @@ class LearningContainerYear(SerializableModel):
     def get_partims_related(self):
         return learning_unit_year.search(learning_container_year_id=self,
                                          subtype=learning_unit_year_subtypes.PARTIM).order_by('acronym')
+
+    def is_type_for_faculty(self) -> bool:
+        return self.container_type in LearningContainerYearType.for_faculty()

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ValidationError
 
 
 class StartDateHigherThanEndDateException(Exception):
@@ -77,3 +78,7 @@ class AuthorizedRelationshipNotRespectedException(Exception):
     def __init__(self, message=None, errors=None):
         super(AuthorizedRelationshipNotRespectedException, self).__init__(message)
         self.errors = errors
+
+
+class ValidationWarning(ValidationError):
+    pass

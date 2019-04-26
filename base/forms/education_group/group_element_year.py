@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+from base.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
 from base.business.group_element_years.management import check_authorized_relationship
 from base.models.enums import education_group_categories
 from base.models.enums.link_type import LinkTypes
@@ -40,7 +41,6 @@ class GroupElementYearForm(forms.ModelForm):
             "relative_credits",
             "is_mandatory",
             "block",
-            "quadrimester_derogation",
             "link_type",
             "comment",
             "comment_english",
@@ -49,7 +49,8 @@ class GroupElementYearForm(forms.ModelForm):
         widgets = {
             "comment": forms.Textarea(attrs={'rows': 5}),
             "comment_english": forms.Textarea(attrs={'rows': 5}),
-
+            "block": forms.TextInput(),
+            "relative_credits": forms.TextInput()
         }
 
     def __init__(self, *args, parent=None, child_branch=None, child_leaf=None, **kwargs):
@@ -105,6 +106,12 @@ class GroupElementYearForm(forms.ModelForm):
         except AuthorizedRelationshipNotRespectedException as e:
             raise ValidationError(e.errors)
         return data_cleaned
+
+    def clean(self):
+        strategy = AttachEducationGroupYearStrategy if self.instance.child_branch else \
+            AttachLearningUnitYearStrategy
+        strategy(parent=self.instance.parent, child=self.instance.child).is_valid()
+        return super().clean()
 
     def _check_authorized_relationship(self, child_type):
         return self.instance.parent.education_group_type.authorized_parent_type.filter(child_type=child_type).exists()

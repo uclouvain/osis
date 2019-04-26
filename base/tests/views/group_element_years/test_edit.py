@@ -32,6 +32,7 @@ from django.urls import reverse
 from waffle.testutils import override_flag
 
 from base.models.enums import quadrimesters
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -42,8 +43,10 @@ from base.tests.factories.person import CentralManagerFactory
 class TestEdit(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.education_group_year = EducationGroupYearFactory()
-        cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year)
+        cls.academic_year = AcademicYearFactory()
+        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
+        cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
+                                                         child_branch__academic_year=cls.academic_year)
         AuthorizedRelationshipFactory(
             parent_type=cls.education_group_year.education_group_type,
             child_type=cls.group_element_year.child_branch.education_group_type,
@@ -99,8 +102,6 @@ class TestEdit(TestCase):
             "comment_english": """It's a dangerous business, Frodo, 
             going out your door. You step onto the road, and if you don't keep your feet,
              there's no knowing where you might be swept off to.""",
-
-            "quadrimester_derogation": quadrimesters.Q1,
         }
         response = self.client.post(self.url, data=data)
 
@@ -109,4 +110,3 @@ class TestEdit(TestCase):
         self.group_element_year.refresh_from_db()
         self.assertEqual(self.group_element_year.comment, data['comment'])
         self.assertEqual(self.group_element_year.comment_english, data['comment_english'])
-        self.assertEqual(self.group_element_year.quadrimester_derogation, data['quadrimester_derogation'])

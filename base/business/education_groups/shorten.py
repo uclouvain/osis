@@ -25,27 +25,25 @@
 ##############################################################################
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.utils.safestring import mark_safe
-from django.utils.translation import ngettext_lazy, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
-from base.models.education_group_year import EducationGroupYear
-from base.models.group_element_year import GroupElementYear
-from base.models.offer_enrollment import OfferEnrollment
+from base.business.education_groups import delete
 
 
 def start(education_group, until_year):
     """
     This function will delete all education group year
     """
-    education_group_years_to_delete = _get_education_group_years_to_delete(education_group, until_year)
+    education_group_years_to_delete = delete.get_education_group_years_to_delete(education_group, end_year=until_year)
     egy_deleted = []
     for education_group_year in education_group_years_to_delete:
         egy_deleted.append(education_group_year)
-        education_group_year.delete()
+        delete.start(education_group_year)
     return egy_deleted
 
 
 def check_education_group_end_date(education_group, end_year):
-    education_group_years_to_delete = _get_education_group_years_to_delete(education_group, end_year)
+    education_group_years_to_delete = delete.get_education_group_years_to_delete(education_group, end_year=end_year)
     protected_messages = _get_protected_messages(education_group_years_to_delete)
     if protected_messages:
         error_msg = _get_formated_error_msg(end_year, protected_messages)
@@ -68,42 +66,10 @@ def _get_formated_error_msg(end_year, protected_messages):
     return mark_safe(error_msg)
 
 
-def get_protected_messages_by_education_group_year(education_group_year):
-    protected_message = []
-
-    # Count the number of enrollment
-    count_enrollment = OfferEnrollment.objects.filter(education_group_year=education_group_year).count()
-    if count_enrollment:
-        protected_message.append(
-            ngettext_lazy(
-                "%(count_enrollment)d student is enrolled in the offer.",
-                "%(count_enrollment)d students are enrolled in the offer.",
-                count_enrollment
-            ) % {"count_enrollment": count_enrollment}
-        )
-
-    # Check if content is not empty
-    have_pgrm_content = GroupElementYear.objects.filter(parent=education_group_year).exists()
-    if have_pgrm_content:
-        protected_message.append(_("The content of the education group is not empty."))
-
-    if education_group_year.linked_with_epc:
-        protected_message.append(_("Linked with EPC"))
-
-    return protected_message
-
-
-def _get_education_group_years_to_delete(education_group, end_year):
-    return EducationGroupYear.objects.filter(
-        education_group=education_group,
-        academic_year__year__gt=end_year
-    ).order_by('academic_year__year')
-
-
 def _get_protected_messages(education_group_years):
     protected_messages = []
     for education_group_year in education_group_years:
-        protected_message = get_protected_messages_by_education_group_year(education_group_year)
+        protected_message = delete.get_protected_messages_by_education_group_year(education_group_year)
         if protected_message:
             protected_messages.append({
                 'education_group_year': education_group_year,

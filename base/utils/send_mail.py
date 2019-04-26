@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -231,7 +231,7 @@ def build_proposal_report_attachment(manager, proposals_with_results, operation,
         xls_build.WORKSHEETS_DATA: [
             {
                 xls_build.CONTENT_KEY: table_data,
-                xls_build.HEADER_TITLES_KEY: [_('Ac yr.'), _('code'), _('Title'), _('type'),
+                xls_build.HEADER_TITLES_KEY: [_('Ac yr.'), _('Code'), _('Title'), _('Type'),
                                               _("Proposal status"), _('Status'), _('Remarks')],
                 xls_build.WORKSHEET_TITLE_KEY: 'Report'
             }
@@ -249,8 +249,8 @@ def _build_table_proposal_data(proposals_with_results):
             proposal.learning_unit_year.academic_year.name,
             proposal.learning_unit_year.acronym,
             proposal.learning_unit_year.complete_title,
-            _(proposal.type),
-            _(proposal.state),
+            proposal.get_type_display(),
+            proposal.get_state_display(),
             _("Success") if ERROR not in results else _("Failure"),
             "\n".join(results.get(ERROR, []))
         ) for (proposal, results) in proposals_with_results

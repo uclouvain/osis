@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,14 +27,14 @@ from collections import defaultdict
 
 from django.db.models import Subquery, OuterRef
 from django.template.defaultfilters import yesno
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
 from openpyxl.utils import get_column_letter
 
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import Functions
 from base import models as mdl_base
-from base.business.learning_unit import LEARNING_UNIT_TITLES_PART2, XLS_DESCRIPTION, XLS_FILENAME, \
+from base.business.learning_unit import learning_unit_titles_part2, XLS_DESCRIPTION, XLS_FILENAME, \
     WORKSHEET_TITLE
 from base.business.xls import get_name_or_username
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -68,19 +68,21 @@ WRAP_TEXT_STYLE = Style(alignment=Alignment(wrapText=True, vertical="top"), )
 WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
 
-LEARNING_UNIT_TITLES_PART1 = [
-    str(_('Code')),
-    str(_('Ac yr.')),
-    str(_('Title')),
-    str(_('Type')),
-    str(_('Subtype')),
-    "{} ({})".format(_('Req. Entity'), _('fac. level')),
-    str(_('Proposal type')),
-    str(_('Proposal status')),
-    str(_('Credits')),
-    str(_('Alloc. Ent.')),
-    str(_('Title in English')),
-]
+
+def learning_unit_titles_part1():
+    return [
+        str(_('Code')),
+        str(_('Ac yr.')),
+        str(_('Title')),
+        str(_('Type')),
+        str(_('Subtype')),
+        "{} ({})".format(_('Req. Entity'), _('fac. level')),
+        str(_('Proposal type')),
+        str(_('Proposal status')),
+        str(_('Credits')),
+        str(_('Alloc. Ent.')),
+        str(_('Title in English')),
+    ]
 
 
 def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=False):
@@ -95,7 +97,7 @@ def annotate_qs(learning_unit_years):
     """ Fetch directly in the queryset all volumes data."""
 
     subquery_component = LearningComponentYear.objects.filter(
-        learningunityear__in=OuterRef('pk')
+        learning_unit_year__in=OuterRef('pk')
     )
     subquery_component_pm = subquery_component.filter(
         type=LECTURING
@@ -129,8 +131,8 @@ def extract_xls_data_from_learning_unit(learning_unit_yr, with_grp, with_attribu
 def create_xls_with_parameters(user, learning_units, filters, extra_configuration):
     with_grp = extra_configuration.get(WITH_GRP)
     with_attributions = extra_configuration.get(WITH_ATTRIBUTIONS)
-    titles_part1 = LEARNING_UNIT_TITLES_PART1.copy()
-    titles_part2 = LEARNING_UNIT_TITLES_PART2.copy()
+    titles_part1 = learning_unit_titles_part1()
+    titles_part2 = learning_unit_titles_part2()
 
     if with_grp:
         titles_part2.append(str(HEADER_PROGRAMS))
@@ -302,28 +304,13 @@ def _get_data_part2(learning_unit_yr, with_attributions):
 
 def _get_data_part1(learning_unit_yr):
     proposal = getattr(learning_unit_yr, "proposallearningunit", None)
-
-    requirement_acronym = getattr(learning_unit_yr, 'entity_requirement', None)
-    if not requirement_acronym:
-        requirement_acronym = _get_entity_faculty_acronym(
-            learning_unit_yr.entities.get('REQUIREMENT_ENTITY'),
-            learning_unit_yr.academic_year
-        )
-
-    allocation_acronym = getattr(learning_unit_yr, 'entity_allocation', None)
-    if not allocation_acronym:
-        allocation_acronym = _get_entity_faculty_acronym(
-            learning_unit_yr.entities.get('ALLOCATION_ENTITY'),
-            learning_unit_yr.academic_year
-        )
-
+    requirement_acronym = learning_unit_yr.entity_requirement
+    allocation_acronym = learning_unit_yr.entity_allocation
     lu_data_part1 = [
         learning_unit_yr.acronym,
         learning_unit_yr.academic_year.name,
         learning_unit_yr.complete_title,
-        learning_unit_yr.learning_container_year.get_container_type_display()
-        # FIXME Condition to remove when the LearningUnitYear.learning_container_year_id will be null=false
-        if learning_unit_yr.learning_container_year else "",
+        learning_unit_yr.get_container_type_display(),
         learning_unit_yr.get_subtype_display(),
         requirement_acronym,
         proposal.get_type_display() if proposal else '',
@@ -333,10 +320,3 @@ def _get_data_part1(learning_unit_yr):
         learning_unit_yr.complete_title_english,
     ]
     return lu_data_part1
-
-
-def _get_entity_faculty_acronym(an_entity, academic_yr):
-    if an_entity:
-        faculty_entity = an_entity.find_faculty_version(academic_yr)
-        return faculty_entity.acronym if faculty_entity else None
-    return None

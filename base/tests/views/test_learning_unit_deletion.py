@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 ##############################################################################
 import datetime
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
@@ -49,7 +50,6 @@ from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
@@ -76,11 +76,11 @@ class LearningUnitDelete(TestCase):
 
     def create_learning_unit_years_and_dependencies(self):
         acronym = "LDROI1004"
-        l1 = LearningUnitFactory(start_year=2015)
+        l1 = LearningUnitFactory(start_year=settings.YEAR_LIMIT_LUE_MODIFICATION)
 
         learning_unit_years = []
         for year in range(4):
-            ac_year = AcademicYearFactory(year=2000 + year)
+            ac_year = AcademicYearFactory(year=settings.YEAR_LIMIT_LUE_MODIFICATION + year)
             l_containeryear = LearningContainerYearFactory(academic_year=ac_year)
             EntityContainerYearFactory(learning_container_year=l_containeryear, entity=self.entity_version.entity,
                                        type=entity_container_year_link_type.REQUIREMENT_ENTITY)
@@ -93,8 +93,6 @@ class LearningUnitDelete(TestCase):
         lcomponent = LearningComponentYearFactory()
         LearningClassYearFactory(learning_component_year=lcomponent)
         LearningClassYearFactory(learning_component_year=lcomponent)
-        LearningUnitComponentFactory(learning_unit_year=learning_unit_years[1],
-                                     learning_component_year=lcomponent)
         return learning_unit_years
 
     def test_delete_all_learning_units_year_method_not_allowed(self):
@@ -193,7 +191,6 @@ class LearningUnitDelete(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('learning_unit', kwargs={'learning_unit_year_id': ly1.pk}))
 
-
     def test_delete_all_learning_units_year_case_error_have_attribution(self):
         learning_unit_years = self.learning_unit_year_list
         ly1 = learning_unit_years[1]
@@ -231,7 +228,6 @@ class LearningUnitDelete(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('learning_unit', kwargs={'learning_unit_year_id': ly1.pk}))
 
-
     def test_delete_all_learning_units_year_case_success_have_attribution_new_without_charge(self):
         learning_unit_years = self.learning_unit_year_list
         ly1 = learning_unit_years[1]
@@ -257,13 +253,11 @@ class LearningUnitDelete(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('learning_units'))
 
-
     def test_delete_all_learning_units_year_case_error_have_attributionnew_with_charge(self):
         learning_unit_years = self.learning_unit_year_list
         ly1 = learning_unit_years[1]
         attrib_new_1 = AttributionNewFactory(learning_container_year=ly1.learning_container_year)
-        learning_component_year_1 = LearningComponentYearFactory(learning_container_year=ly1.learning_container_year)
-        LearningUnitComponentFactory(learning_unit_year=ly1, learning_component_year=learning_component_year_1)
+        learning_component_year_1 = LearningComponentYearFactory(learning_unit_year=ly1)
         AttributionChargeNewFactory(attribution=attrib_new_1, learning_component_year=learning_component_year_1)
 
         request_factory = RequestFactory()

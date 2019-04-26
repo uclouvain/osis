@@ -28,8 +28,8 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.core.cache import cache
-from django.http import HttpResponseForbidden
-from django.test import TestCase
+from django.http import HttpResponseForbidden, HttpResponse
+from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -44,6 +44,7 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from base.utils.cache import RequestCache
+from education_group.api.serializers.education_group import EducationGroupSerializer
 
 FILTER_DATA = {"acronym": "LBIR", "title": "dummy filter"}
 
@@ -140,6 +141,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
 
         cls.user = PersonFactory().user
         cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.form_class = EducationGroupFilter()._meta.form
         cls.url = reverse("education_groups")
 
     def setUp(self):
@@ -159,7 +161,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertTemplateUsed(response, "education_group/search.html")
 
         context = response.context
-        self.assertIsInstance(context["form"], EducationGroupFilter)
+        self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["object_list_count"], 0)
         self.assertEqual(context["experimental_phase"], True)
 
@@ -169,7 +171,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertTemplateUsed(response, "education_group/search.html")
 
         context = response.context
-        self.assertIsInstance(context["form"], EducationGroupFilter)
+        self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["object_list_count"], 0)
         self.assertEqual(context["experimental_phase"], True)
 
@@ -177,8 +179,8 @@ class TestEducationGroupDataSearchFilter(TestCase):
         response = self.client.get(self.url)
 
         form = response.context["form"]
-        self.assertEqual(form.initial["academic_year"], self.academic_year)
-        self.assertEqual(form.initial["category"], education_group_categories.TRAINING)
+        self.assertEqual(form.fields["academic_year"].initial, self.academic_year)
+        self.assertEqual(form.fields["category"].initial, education_group_categories.TRAINING)
 
     def test_with_empty_search_result(self):
         response = self.client.get(self.url, data={"category": education_group_categories.MINI_TRAINING})
@@ -186,7 +188,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertTemplateUsed(response, "education_group/search.html")
 
         context = response.context
-        self.assertIsInstance(context["form"], EducationGroupFilter)
+        self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["experimental_phase"], True)
         self.assertEqual(len(context["object_list"]), 0)
         messages = [str(m) for m in context["messages"]]
@@ -198,7 +200,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertTemplateUsed(response, "education_group/search.html")
 
         context = response.context
-        self.assertIsInstance(context["form"], EducationGroupFilter)
+        self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(context["object_list"],
                               [self.education_group_arke2a, self.education_group_arke2a_previous_year])
@@ -209,7 +211,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertTemplateUsed(response, "education_group/search.html")
 
         context = response.context
-        self.assertIsInstance(context["form"], EducationGroupFilter)
+        self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(context["object_list"],
                               [self.education_group_arke2a, self.education_group_edph2, self.education_group_hist2a])
@@ -220,18 +222,17 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertTemplateUsed(response, "education_group/search.html")
 
         context = response.context
-        self.assertIsInstance(context["form"], EducationGroupFilter)
+        self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(context["object_list"], [self.education_group_edph2])
 
-    def test_search_with_requirement_entity(self):
-        response = self.client.get(self.url,
-                                   data={"requirement_entity_acronym": self.oph_entity_v.acronym})
+    def test_search_with_management_entity(self):
+        response = self.client.get(self.url, data={"management_entity": self.oph_entity_v.acronym})
 
         self.assertTemplateUsed(response, "education_group/search.html")
 
         context = response.context
-        self.assertIsInstance(context["form"], EducationGroupFilter)
+        self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(context["object_list"],
                               [self.education_group_arke2a, self.education_group_arke2a_previous_year,
@@ -241,7 +242,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         response = self.client.get(
             self.url,
             data={
-                "requirement_entity_acronym": self.envi_entity_v.acronym,
+                "management_entity": self.envi_entity_v.acronym,
                 "with_entity_subordinated": True
             }
         )
@@ -249,7 +250,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertTemplateUsed(response, "education_group/search.html")
 
         context = response.context
-        self.assertIsInstance(context["form"], EducationGroupFilter)
+        self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(
             context["object_list"],
@@ -268,7 +269,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertTemplateUsed(response, "education_group/search.html")
 
         context = response.context
-        self.assertIsInstance(context["form"], EducationGroupFilter)
+        self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(context["object_list"], [self.education_group_hist2a, self.education_group_edph2])
 
@@ -279,7 +280,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertTemplateUsed(response, "education_group/search.html")
 
         context = response.context
-        self.assertIsInstance(context["form"], EducationGroupFilter)
+        self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(context["object_list"],
                               [self.education_group_arke2a, self.education_group_arke2a_previous_year])
@@ -289,7 +290,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
             self.url, data={
                 "academic_year": self.academic_year.id,
                 "acronym": self.education_group_arke2a.acronym,
-                "requirement_entity_acronym": self.envi_entity_v.acronym,
+                "management_entity": self.envi_entity_v.acronym,
                 "with_entity_subordinated": True
             }
         )
@@ -297,6 +298,27 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertTemplateUsed(response, "education_group/search.html")
 
         context = response.context
-        self.assertIsInstance(context["form"], EducationGroupFilter)
+        self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(context["object_list"], [self.education_group_arke2a])
+
+    def test_search_case_get_ajax_request(self):
+        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+
+        response = self.client.get(self.url, data={
+                "academic_year": self.academic_year.id,
+                "acronym": self.education_group_arke2a.acronym,
+                "management_entity": self.envi_entity_v.acronym,
+                "with_entity_subordinated": True
+            }, **kwargs)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        data_serialized = EducationGroupSerializer(
+            [self.education_group_arke2a],
+            many=True,
+            context={'request': RequestFactory().get(self.url)}
+        )
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {'object_list': data_serialized.data}
+        )

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,15 +24,17 @@
 #
 ##############################################################################
 from django.conf.urls import url, include
-from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration, score_sheet
-from django.views.i18n import javascript_catalog, JavaScriptCatalog
+from django.views.i18n import javascript_catalog
 
+from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration, score_sheet
 from assessments.views import scores_responsible
+from assessments.views.pgm_manager_administration import ProgramManagerListView, ProgramManagerDeleteView, \
+    ProgramManagerCreateView, PersonAutocomplete, MainProgramManagerUpdateView, MainProgramManagerPersonUpdateView, \
+    ProgramManagerPersonDeleteView
 
 js_info_dict = {
-    'packages': ('assessments', )
+    'packages': ('assessments',)
 }
-
 
 urlpatterns = [
 
@@ -78,11 +80,15 @@ urlpatterns = [
     url(r'^pgm_manager/', include([
         url(r'^$', pgm_manager_administration.pgm_manager_administration, name='pgm_manager'),
         url(r'^search$', pgm_manager_administration.pgm_manager_search, name='pgm_manager_search'),
-        url(r'^delete', pgm_manager_administration.delete_manager, name='delete_manager'),
-        url(r'^person/list/search$', pgm_manager_administration.person_list_search),
-
-        url(r'^create$', pgm_manager_administration.create_manager, name='create_manager_person'),
-
+        url(r'^manager_list/$', ProgramManagerListView.as_view(), name='manager_list'),
+        url(r'^update_main/(?P<pk>[0-9]+)/$', MainProgramManagerUpdateView.as_view(), name='update_main'),
+        url(r'^update_main_person/(?P<pk>[0-9]+)/$', MainProgramManagerPersonUpdateView.as_view(),
+            name='update_main_person'),
+        url(r'^delete_manager/(?P<pk>[0-9]+)/$', ProgramManagerDeleteView.as_view(), name='delete_manager'),
+        url(r'^delete_manager_person/(?P<pk>[0-9]+)/$', ProgramManagerPersonDeleteView.as_view(),
+            name='delete_manager_person'),
+        url(r'^create$', ProgramManagerCreateView.as_view(), name='create_manager_person'),
+        url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),
     ])),
 
     url(r'^srm_manager/', include([
@@ -95,11 +101,6 @@ urlpatterns = [
         url(r'^scores_responsible_add/(?P<pk>[0-9]+)/$', scores_responsible.scores_responsible_add,
             name='scores_responsible_add'),
     ])),
-
-    url(r'^update_managers_list/$', pgm_manager_administration.update_managers_list),
-    url(r'^manager_pgm_list/$', pgm_manager_administration.manager_pgm_list),
-    url(r'^delete_manager_information/$', pgm_manager_administration.delete_manager_information),
-
 
     url(r'^$', score_encoding.assessments, name="assessments"),
 ]

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -30,14 +30,14 @@ from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext_lazy as _
 from waffle.models import Flag
 
+from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models import proposal_learning_unit, tutor
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, \
-    starting_academic_year
+    starting_academic_year, current_academic_year
 from base.models.entity import Entity
 from base.models.entity_version import find_last_entity_version_by_learning_unit_year_id
 from base.models.enums import learning_container_year_types, entity_container_year_link_type
-from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
@@ -63,6 +63,8 @@ MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY = _("You can only modify a learning unit whe
                                         "entity")
 MSG_LEARNING_UNIT_IS_OR_HAS_PREREQUISITE = _("You cannot delete a learning unit which is prerequisite or has "
                                              "prerequisite(s)")
+MSG_LEARNING_UNIT_EXIST_IN_PAST = _("You cannot delete a learning unit which is existing before %(limit_year)s") % {
+                "limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION}
 MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE = _("Person not in accordance with proposal state")
 MSG_NOT_PROPOSAL_STATE_FACULTY = _("You are faculty manager and the proposal state is not 'Faculty', so you can't edit")
 MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL = _("You are not eligible to cancel proposal")
@@ -81,6 +83,9 @@ MSG_NOT_ELIGIBLE_FOR_MODIFICATION_BECAUSE_OF_TYPE = _("This learning unit isn't 
                                                       "it's type")
 MSG_CANNOT_UPDATE_EXTERNAL_UNIT_NOT_COGRADUATION = _("You can only edit co-graduation external learning units")
 MSG_CANNOT_EDIT_BECAUSE_OF_PROPOSAL = _("You can't edit because the learning unit has proposal")
+MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR = _(
+    "You are not allowed to change the end year for this academic year")
+MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR = _("You are not allowed to put in proposal for this academic year")
 
 
 def _any_existing_proposal_in_epc(learning_unit_year, _, raise_exception=False):
@@ -222,6 +227,9 @@ def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_e
         msg = MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY
     elif learning_unit_year.is_prerequisite():
         msg = MSG_LEARNING_UNIT_IS_OR_HAS_PREREQUISITE
+    elif LearningUnitYear.objects.filter(learning_unit=learning_unit_year.learning_unit,
+                                         academic_year__year__lt=settings.YEAR_LIMIT_LUE_MODIFICATION):
+        msg = MSG_LEARNING_UNIT_EXIST_IN_PAST
 
     result = False if msg else True
     can_raise_exception(
@@ -277,7 +285,7 @@ def is_eligible_to_manage_charge_repartition(learning_unit_year, person):
 
 def is_eligible_to_manage_attributions(learning_unit_year, person):
     container_types = (learning_container_year_types.OTHER_COLLECTIVE, learning_container_year_types.OTHER_INDIVIDUAL,
-                       learning_container_year_types.MASTER_THESIS)
+                       learning_container_year_types.MASTER_THESIS, learning_container_year_types.INTERNSHIP)
     return person.user.has_perm("base.can_manage_attribution") and \
         learning_unit_year.learning_container_year.container_type in container_types and \
         person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
@@ -463,10 +471,8 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
 
 
 def _is_tutor_summary_responsible_of_learning_unit_year(*, user, learning_unit_year_id, **kwargs):
-    value = LearningUnitYear.objects.filter(pk=learning_unit_year_id, attribution__summary_responsible=True,
-                                            attribution__tutor__person__user=user).exists()
-    if not value:
-        raise PermissionDenied(_("You are not summary responsible for this learning unit."))
+    if not _is_tutor_attributed_to_the_learning_unit(user, learning_unit_year_id):
+        raise PermissionDenied(_("You are not attributed to this learning unit."))
 
 
 def _is_learning_unit_year_summary_editable(*, learning_unit_year_id, **kwargs):
@@ -476,19 +482,20 @@ def _is_learning_unit_year_summary_editable(*, learning_unit_year_id, **kwargs):
         value = LearningUnitYear.objects.filter(pk=learning_unit_year_id, summary_locked=False).exists()
 
     if not value:
-        raise PermissionDenied(_("The learning unit is not summary editable."))
+        raise PermissionDenied(_("The learning unit's description fiche is not editable."))
 
 
 def _is_calendar_opened_to_edit_educational_information(*, learning_unit_year_id, **kwargs):
     submission_dates = find_educational_information_submission_dates_of_learning_unit_year(learning_unit_year_id)
+    permission_denied_msg = _("Not in period to edit description fiche.")
     if not submission_dates:
-        raise PermissionDenied(_("Not in period to edit educational information."))
+        raise PermissionDenied(permission_denied_msg)
 
     now = datetime.datetime.now(tz=get_tzinfo())
     value = convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
         convert_date_to_datetime(submission_dates["end_date"])
     if not value:
-        raise PermissionDenied(_("Not in period to edit educational information."))
+        raise PermissionDenied(permission_denied_msg)
 
 
 def find_educational_information_submission_dates_of_learning_unit_year(learning_unit_year_id):
@@ -576,5 +583,89 @@ def _check_proposal_edition(learning_unit_year, person, raise_exception):
         raise_exception,
         result,
         MSG_CANNOT_EDIT_BECAUSE_OF_PROPOSAL,
+    )
+    return result
+
+
+def _is_container_type_course_dissertation_or_internship(learning_unit_year, _, raise_exception):
+    result = \
+        learning_unit_year.learning_container_year and \
+        learning_unit_year.learning_container_year.container_type in FACULTY_UPDATABLE_CONTAINER_TYPES
+
+    can_raise_exception(
+        raise_exception,
+        result,
+        MSG_NOT_ELIGIBLE_FOR_MODIFICATION_BECAUSE_OF_TYPE
+    )
+    return result
+
+
+def is_eligible_to_modify_end_year_by_proposal(learning_unit_year, person, raise_exception=False):
+    result = is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception)
+    if result:
+        return can_modify_end_year_by_proposal(learning_unit_year, person, raise_exception)
+    else:
+        can_raise_exception(
+            raise_exception,
+            result,
+            MSG_CANNOT_EDIT_BECAUSE_OF_PROPOSAL,
+        )
+        return result
+
+
+def can_modify_end_year_by_proposal(learning_unit_year, person, raise_exception=False):
+    result = True
+    max_limit = current_academic_year().year + 6
+    if person.is_faculty_manager and not person.is_central_manager:
+        n_year = current_academic_year().next().year
+
+    elif person.is_central_manager:
+        n_year = current_academic_year().year
+    else:
+        return False
+
+    if learning_unit_year.academic_year.year < n_year or learning_unit_year.academic_year.year >= max_limit:
+        result = False
+
+    can_raise_exception(
+        raise_exception, result,
+        MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR
+    )
+    return result
+
+
+def is_eligible_to_modify_by_proposal(learning_unit_year, person, raise_exception=False):
+    result = is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception)
+
+    if result:
+        return can_modify_by_proposal(learning_unit_year, person, raise_exception)
+    else:
+        can_raise_exception(
+            raise_exception,
+            result,
+            MSG_CANNOT_EDIT_BECAUSE_OF_PROPOSAL,
+        )
+        return result
+
+
+def can_modify_by_proposal(learning_unit_year, person, raise_exception=False):
+    result = True
+
+    if person.is_faculty_manager and not person.is_central_manager:
+        n_year = current_academic_year().next().year
+        max_limit = n_year
+
+    elif person.is_central_manager:
+        n_year = current_academic_year().year
+        max_limit = n_year+1
+    else:
+        return False
+
+    if learning_unit_year.academic_year.year < n_year or learning_unit_year.academic_year.year > max_limit:
+        result = False
+
+    can_raise_exception(
+        raise_exception, result,
+        MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
     )
     return result

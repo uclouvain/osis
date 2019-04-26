@@ -24,13 +24,13 @@
 from django.utils.translation import ugettext as _
 
 from base.business.learning_units.edition import duplicate_learning_unit_year
-from base.business.utils.postponement import AutomaticPostponement
+from base.business.utils.postponement import AutomaticPostponementToN6
 from base.models.learning_unit import LearningUnit
 from base.utils.send_mail import send_mail_before_annual_procedure_of_automatic_postponement_of_luy, \
     send_mail_after_annual_procedure_of_automatic_postponement_of_luy
 
 
-class LearningUnitAutomaticPostponement(AutomaticPostponement):
+class LearningUnitAutomaticPostponementToN6(AutomaticPostponementToN6):
     model = LearningUnit
     annualized_set = "learningunityear"
 

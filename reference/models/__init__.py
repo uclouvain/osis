@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,5 +28,6 @@ from reference.models import country
 from reference.models import currency
 from reference.models import decree
 from reference.models import domain
+from reference.models import domain_isced
 from reference.models import grade_type
 from reference.models import language

@@ -7,7 +7,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -56,7 +56,8 @@
         {% endblock %}
 
         {% block modal_footer %}
-            <button type="button" class="btn btn-primary" id="btn_modal_mail_summary_reminder" title="{% trans 'Sent email to remind to update educational information' %}">
+            <button type="button" class="btn btn-primary" id="btn_modal_mail_summary_reminder"
+                    title="{% trans 'Sent email to remind to update description fiche' %}">
                 {% trans 'yes' %}
             </button>
             <button type="button" class="btn btn-default" id="btn_modal_mail_summary_reminder_cancel" data-dismiss="modal"  title="{% trans 'cancel'%}">{% trans "cancel" %}</button>

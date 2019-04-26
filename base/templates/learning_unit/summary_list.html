@@ -10,7 +10,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -78,7 +78,6 @@
                         <th id="lu_title_sort">{% trans 'Title' %}</th>
                         <th>{% trans 'Type' %}</th>
                         <th>{% trans 'Subtype' %}</th>
-                        <th>{% trans 'Summary responsible(s)' %}</th>
                         <th>{% trans 'Status' %}</th>
                     </tr>
                     </thead>
@@ -95,14 +94,6 @@
                             </td>
                             <td>
                                 {{ learning_unit.get_subtype_display }}
-                            </td>
-                            <td>{% for responsible in learning_unit.summary_responsibles %}
-                                {% if forloop.counter0 > 0 %}
-                                    ,
-                                {% endif %}
-                                {{ responsible.tutor.person.last_name }}
-                                {{ responsible.tutor.person.first_name|default_if_none:'' }}
-                            {% endfor %}
                             </td>
                             <td>
                                 {% trans 'Modification made' as title_status_true %}

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -285,7 +285,8 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_FR, 'infos_pratiques', 'Informations Pratiques'),
     (settings.LANGUAGE_CODE_FR, 'mineures', 'Mineures'),
     (settings.LANGUAGE_CODE_FR, 'majeures', 'Majeures'),
-    (settings.LANGUAGE_CODE_FR, 'finalites', 'Finalités'),
+    (settings.LANGUAGE_CODE_FR, 'finalites', 'Introduction - liste des finalités'),
+    (settings.LANGUAGE_CODE_FR, 'options', 'Introduction - liste des options'),
     (settings.LANGUAGE_CODE_FR, 'finalites_didactiques-commun', 'Finalités Didactique'),
     (settings.LANGUAGE_CODE_FR, 'agregation', 'Agrégation'),
     (settings.LANGUAGE_CODE_FR, 'prerequis', 'Prérequis'),
@@ -309,7 +310,8 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_EN, 'infos_pratiques', 'Practical informations'),
     (settings.LANGUAGE_CODE_EN, 'mineures', 'Minors'),
     (settings.LANGUAGE_CODE_EN, 'majeures', 'Majors'),
-    (settings.LANGUAGE_CODE_EN, 'finalites', 'Focuses'),
+    (settings.LANGUAGE_CODE_EN, 'finalites', 'Introduction - focus list'),
+    (settings.LANGUAGE_CODE_EN, 'options', 'Introduction - option list'),
     (settings.LANGUAGE_CODE_EN, 'finalites_didactiques-commun', 'Teaching Focuses'),
     (settings.LANGUAGE_CODE_EN, 'agregation', 'Agregation'),
     (settings.LANGUAGE_CODE_EN, 'prerequis', 'Prerequis'),

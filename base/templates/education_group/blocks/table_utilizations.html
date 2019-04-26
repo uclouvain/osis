@@ -6,7 +6,7 @@
     * The core business involves the administration of students, teachers,
     * courses, programs and so on.
     *
-    * Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
     *
     * This program is free software: you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -28,14 +28,13 @@
     <tr>
         <th></th>
         <th>{% trans 'Code' %}</th>
-        <th>{% trans 'Acronym' %}</th>
+        <th>{% trans 'Acronym/Short title' context 'abbreviation'%}</th>
         <th>{% trans 'Title' %}</th>
         <th>{% trans 'Cred. rel./abs.' %}</th>
         <th>{% trans 'Min. credits' %}</th>
         <th>{% trans 'Max. credits' %}</th>
         <th>{% trans 'Mandatory' %}</th>
         <th>{% trans 'Block' %}</th>
-        <th>{% trans 'Quadrimester derogation' %}</th>
     </tr>
     </thead>
     <tbody>
@@ -58,7 +57,6 @@
                 <td>{{ group_element_year.max_credits | default_if_none:'-' }}</td>
                 <td>{{ group_element_year.is_mandatory | yesno:_("yes,no") | title }}</td>
                 <td>{{ group_element_year.block | default_if_none:'-' }}</td>
-                <td>{{ group_element_year.quadrimester_derogation | default_if_none:'-' }}</td>
             </tr>
             {% if ref_parent %}
                 <tr>
@@ -74,7 +72,6 @@
                     <td>{{ ref_parent.max_credits | default_if_none:'-' }}</td>
                     <td>{{ ref_parent.is_mandatory | yesno:_("yes,no") | title }}</td>
                     <td>{{ ref_parent.block | default_if_none:'-' }}</td>
-                    <td>{{ ref_parent.quadrimester_derogation | default_if_none:'-' }}</td>
                 </tr>
             {% endif %}
         {% endwith %}

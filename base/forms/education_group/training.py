@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -38,19 +38,15 @@ from base.forms.education_group.common import CommonBaseForm, EducationGroupMode
 from base.forms.utils.choice_field import add_blank
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
+from base.models.education_group_year import EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.entity_version import get_last_version
 from base.models.enums import education_group_categories, rate_code, decree_category
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
+from base.models.hops import Hops
 from reference.models.domain import Domain
 from reference.models.enums import domain_type
-from base.models.hops import Hops
-
-
-class MainDomainChoiceField(forms.ModelChoiceField):
-    def label_from_instance(self, domain):
-        return "{}:{} {}".format(domain.decree.name, domain.code, domain.name)
 
 
 def _get_section_choices():
@@ -66,6 +62,11 @@ class HopsEducationGroupYearModelForm(forms.ModelForm):
             'ares_graca',
             'ares_ability',
         ]
+        widgets = {
+            "ares_study": forms.TextInput(),
+            "ares_graca": forms.TextInput(),
+            "ares_ability": forms.TextInput(),
+        }
 
     def is_valid(self):
         return super(HopsEducationGroupYearModelForm, self).is_valid() and self._valid_hops()
@@ -153,6 +154,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             "administration_entity",
             "management_entity",
             "main_domain",
+            "isced_domain",
             "secondary_domains",
             "decree_category",
             "rate_code",
@@ -169,7 +171,8 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             **EducationGroupYearModelForm.Meta.field_classes,
             **{
                 "administration_entity": MainEntitiesVersionChoiceField,
-                "main_domain": MainDomainChoiceField
+                "main_domain": forms.ModelChoiceField,
+                "isced_domain": forms.ModelChoiceField,
             }
         }
         widgets = {
@@ -181,7 +184,12 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
                     'data-width': '100%',
                 },
                 forward=['section'],
-            )
+            ),
+            "co_graduation_coefficient": forms.TextInput(),
+            "credits": forms.TextInput(),
+            "duration": forms.TextInput(),
+            "min_constraint": forms.TextInput(),
+            "max_constraint": forms.TextInput(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -192,16 +200,19 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         if getattr(self.instance, 'administration_entity', None):
             self.initial['administration_entity'] = get_last_version(self.instance.administration_entity).pk
 
-        self.fields['decree_category'].choices = sorted(decree_category.DECREE_CATEGORY, key=lambda c: c[1])
+        self.fields['decree_category'].choices = sorted(add_blank(decree_category.DecreeCategories.choices()),
+                                                        key=lambda c: c[1])
         self.fields['rate_code'].choices = sorted(rate_code.RATE_CODE, key=lambda c: c[1])
         self.fields['main_domain'].queryset = Domain.objects.filter(type=domain_type.UNIVERSITY)\
-                                                    .select_related('decree')\
-                                                    .order_by('-decree__name', 'name')
+                                                    .select_related('decree')
         if not self.fields['certificate_aims'].disabled:
             self.fields['section'].disabled = False
 
         if not getattr(self.initial, 'academic_year', None):
             self.set_initial_diploma_values()
+
+        if 'instance' in kwargs and not kwargs['instance']:
+            self.fields['academic_year'].label = _('Start')
 
     def set_initial_diploma_values(self):
         if self.education_group_type and \
@@ -230,6 +241,33 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             )
 
     def save_certificate_aims(self):
+        self.instance.certificate_aims.clear()
+        for certificate_aim in self.cleaned_data["certificate_aims"]:
+            EducationGroupCertificateAim.objects.get_or_create(
+                education_group_year=self.instance,
+                certificate_aim=certificate_aim,
+            )
+
+
+class CertificateAimsForm(forms.ModelForm):
+    section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False)
+
+    class Meta:
+        model = EducationGroupYear
+        fields = ["certificate_aims"]
+        widgets = {
+            'certificate_aims': autocomplete.ModelSelect2Multiple(
+                url='certificate_aim_autocomplete',
+                attrs={
+                    'data-html': True,
+                    'data-placeholder': _('Search...'),
+                    'data-width': '100%',
+                },
+                forward=['section'],
+            )
+        }
+
+    def save(self, commit=True):
         self.instance.certificate_aims.clear()
         for certificate_aim in self.cleaned_data["certificate_aims"]:
             EducationGroupCertificateAim.objects.get_or_create(

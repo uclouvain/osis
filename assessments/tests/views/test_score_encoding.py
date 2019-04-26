@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,27 +34,26 @@ from django.http import Http404
 from django.test import TestCase, RequestFactory, TransactionTestCase
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+
 from assessments.business.score_encoding_list import ScoresEncodingList
 from assessments.tests.views.test_upload_xls_utils import generate_exam_enrollments
-from base.models.enums import exam_enrollment_justification_type
-from base.tests.mixin.academic_year import AcademicYearMockMixin
-from base.tests.mixin.session_exam_calendar import SessionExamCalendarMockMixin
-
-from base.tests.models import test_exam_enrollment, test_offer_enrollment, test_learning_unit_enrollment, \
-    test_session_exam
 from assessments.views import score_encoding
+from base.models.enums import exam_enrollment_justification_type
 from base.models.enums import number_session, academic_calendar_type
 from base.models.exam_enrollment import ExamEnrollment
-
-from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
-from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
+from base.tests.factories.person import PersonFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.student import StudentFactory
+from base.tests.mixin.academic_year import AcademicYearMockMixin
+from base.tests.mixin.session_exam_calendar import SessionExamCalendarMockMixin
+from base.tests.models import test_exam_enrollment, test_offer_enrollment, test_learning_unit_enrollment, \
+    test_session_exam
 
 
 class MixinSetupOnlineEncoding(AcademicYearMockMixin, SessionExamCalendarMockMixin):
@@ -492,9 +491,9 @@ class UploadXLSTest(TestCase):
 
     def test_header_not_changed(self):
         from assessments.business.score_encoding_export import HEADER
-        header_expected_list = ['academic_year', 'Session derogation', 'Learning unit', 'program',
-                                'registration_number', 'lastname', 'firstname', 'email', 'Numbered scores',
-                                'justification', 'End date']
+        header_expected_list = ['Academic year', 'Session', 'Learning unit', 'Program',
+                                'Registration number', 'Lastname', 'Firstname', 'Email', 'Numbered scores',
+                                'Justification (A,T)', 'End date Prof']
         self.assertListEqual(HEADER, header_expected_list)
 
 

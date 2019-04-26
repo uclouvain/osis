@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ from django.http import QueryDict
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
-from base.forms.learning_unit.search_form import filter_is_borrowed_learning_unit_year, LearningUnitSearchForm, LearningUnitYearForm
+from base.forms.learning_unit.search_form import filter_is_borrowed_learning_unit_year, LearningUnitSearchForm, \
+    LearningUnitYearForm
 from base.models.enums import entity_container_year_link_type, entity_type, learning_container_year_types
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -38,6 +39,7 @@ from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_year_entity import OfferYearEntityFactory
@@ -77,6 +79,46 @@ class TestSearchForm(TestCase):
                                       (_('Type'), _("Course"))]
         actual_research_criteria = get_research_criteria(form)
         self.assertListEqual(expected_research_criteria, actual_research_criteria)
+
+    def test_search_on_external_mobility(self):
+        data = QueryDict(mutable=True)
+        academic_year = self.academic_years[0]
+        data.update({
+            "academic_year_id": str(academic_year.id),
+            "container_type": LearningUnitSearchForm.MOBILITY
+        })
+        ExternalLearningUnitYearFactory(
+            learning_unit_year__academic_year=academic_year,
+            learning_unit_year__learning_container_year__container_type=learning_container_year_types.EXTERNAL,
+            mobility=True,
+            co_graduation=False,
+        )
+        form = LearningUnitYearForm(data)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.get_queryset().count(), 1)
+
+    def test_search_on_external_cograduation(self):
+        data = QueryDict(mutable=True)
+        academic_year = self.academic_years[0]
+        data.update({
+            "academic_year_id": str(academic_year.id),
+            "container_type": learning_container_year_types.EXTERNAL
+        })
+        ExternalLearningUnitYearFactory(
+            learning_unit_year__academic_year=academic_year,
+            learning_unit_year__learning_container_year__container_type=learning_container_year_types.EXTERNAL,
+            mobility=True,
+            co_graduation=False,
+        )
+        ExternalLearningUnitYearFactory(
+            learning_unit_year__academic_year=academic_year,
+            learning_unit_year__learning_container_year__container_type=learning_container_year_types.EXTERNAL,
+            mobility=False,
+            co_graduation=True,
+        )
+        form = LearningUnitYearForm(data)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.get_queryset().count(), 1)
 
 
 class TestFilterIsBorrowedLearningUnitYear(TestCase):
@@ -163,3 +205,11 @@ def generate_learning_unit_year_with_associated_education_group(academic_year, s
                             parent=offer_year_entity.education_group_year)
 
     return luy
+
+
+class TestFilterDescriptiveficheLearningUnitYear(TestCase):
+    def test_init_with_entity_subordinated_search_form(self):
+        form = LearningUnitYearForm(
+            None,
+        )
+        self.assertTrue(form.fields['with_entity_subordinated'].initial)

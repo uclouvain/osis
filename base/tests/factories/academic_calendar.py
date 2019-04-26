@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -52,8 +52,8 @@ class AcademicCalendarFactory(factory.DjangoModelFactory):
 
 
 class OpenAcademicCalendarFactory(AcademicCalendarFactory):
-    start_date = factory.LazyAttribute(lambda obj: datetime.date.today() - datetime.timedelta(days=3))
-    end_date = factory.LazyAttribute(lambda obj: datetime.date.today() + datetime.timedelta(days=3))
+    start_date = factory.Faker('past_date')
+    end_date = factory.Faker('future_date')
 
 
 class CloseAcademicCalendarFactory(AcademicCalendarFactory):

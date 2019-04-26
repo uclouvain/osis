@@ -16,6 +16,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import tag
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from openpyxl import load_workbook
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
@@ -231,8 +232,10 @@ class FunctionalTest(SeleniumTestCase, BusinessMixin):
 
         self.assertEqual(
             warning_messages.text,
-            "La période d'encodage des notes pour la session {} sera ouverte à partir du {}".
-                format(str(sec.number_session), academic_calendar.start_date.strftime('%d/%m/%Y'))
+            _("The period of scores' encoding %(session_number)s will be open %(str_date)s") % {
+                "session_number": sec.number_session,
+                "str_date": academic_calendar.start_date.strftime('%d/%m/%Y')
+            }
         )
 
     def test_04(self):
@@ -339,7 +342,6 @@ class FunctionalTest(SeleniumTestCase, BusinessMixin):
         exam_enrollment_15 = ExamEnrollmentFactory(learning_unit_enrollment=learning_unit_enrollment15, session_exam=session_exam_phys11ba)
         exam_enrollment_16 = ExamEnrollmentFactory(learning_unit_enrollment=learning_unit_enrollment16, session_exam=session_exam_phys11ba)
 
-
         ExamEnrollmentFactory(learning_unit_enrollment=learning_unit_enrollment4, session_exam=session_exam_econ2m1)
         ExamEnrollmentFactory(learning_unit_enrollment=learning_unit_enrollment5, session_exam=session_exam_econ2m1)
 
@@ -369,7 +371,10 @@ class FunctionalTest(SeleniumTestCase, BusinessMixin):
         self.assertFalse(learning_unit_year_1.decimal_scores)
         self.assertElementTextEqual(
             'message_decimal_accepted',
-            "Les notes de ce cours ne peuvent PAS recevoir de valeurs décimales."
+            "{}{}".format(
+                _("Decimal values in scores are NOT accepted."),
+                _("If you try to put decimal values, it will be ignored.")
+            )
         )
 
         self.assertElementTextEqualInt('number_of_enrollments', 10)
@@ -591,7 +596,7 @@ class FunctionalTest(SeleniumTestCase, BusinessMixin):
 
         for enrollment_id, (key, value) in updated_values.items():
             element_id = 'enrollment_{}_{}'.format(key, enrollment_id)
-            value = {'T': 'Tricherie', 'A': 'Absence injustifiée'}.get(value, value)
+            value = {'T': _("Cheating"), 'A': _("Unjustified absence")}.get(value, value)
 
             self.assertElementTextEqual(element_id, str(value))
 
@@ -605,7 +610,7 @@ class FunctionalTest(SeleniumTestCase, BusinessMixin):
         sheet = wb.active
 
         if sheet.max_row > 11:
-            start_row = 12
+            start_row = 13
 
             nomas = {
                 enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id: {
@@ -969,7 +974,10 @@ class FunctionalTest(SeleniumTestCase, BusinessMixin):
 
         self.click_on('lnk_notes_printing_{}'.format(learning_unit_year_1.id))
         time.sleep(1)
-        filename = 'Feuille de notes.pdf'
+        filename = "session_%s_%s_%s.pdf" % (
+            learning_unit_year_1.academic_year.year,
+            1,
+            learning_unit_year_1.acronym)
         full_path = os.path.join(self.full_path_temp_dir, filename)
 
         self.assertTrue(os.path.exists(full_path))

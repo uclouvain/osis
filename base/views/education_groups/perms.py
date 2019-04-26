@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ from django.shortcuts import get_object_or_404
 from base.business.education_groups import perms as business_perms
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_categories import Categories
 from base.models.person import Person
 
 
@@ -41,7 +42,7 @@ def can_create_education_group(view_func):
         parent = get_object_or_404(EducationGroupYear, pk=parent_id) if parent_id else None
         education_group_type_pk = kwargs.get("education_group_type_pk")
         education_group_type = get_object_or_404(EducationGroupType, pk=education_group_type_pk)
-        if not business_perms._is_eligible_to_add_education_group(pers, parent, category,
+        if not business_perms._is_eligible_to_add_education_group(pers, parent, Categories[category],
                                                                   education_group_type=education_group_type,
                                                                   raise_exception=True):
             raise PermissionDenied

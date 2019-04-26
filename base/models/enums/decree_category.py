@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,96 +27,38 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.models.utils.utils import ChoiceEnum
 
-FCONT = "FCONT"
-BAS1 = "1BAS"
-BAS2 = "2BAS"
-AESS = "AESS"
-DEC1 = "DEC1"
-DEC2 = "DEC2"
-DES = "DES"
-DEA = "DEA"
-DOC = "DOC"
-AES = "AES"
-AUTRE = "AUTRE"
-BAC = "BAC"
-AP2C = "AP2C"
-MA1 = "MA1"
-MA2X = "MA2X"
-MA2D = "MA2D"
-MA2S = "MA2S"
-MA2A = "MA2A"
-MA2M = "MA2M"
-AS2C = "AS2C"
-MACO = "MACO"
-AESSB = "AESSB"
-CAPS = "CAPS"
-AS3C = "AS3C"
-FODO = "FODO"
-DOCB = "DOCB"
-CEMC = "CEMC"
-MED = "MED"
-VETE = "VETE"
 
-DECREE_CATEGORY = (
-    (FCONT, _(FCONT)),
-    (BAS1, _(BAS1)),
-    (BAS2, _(BAS2)),
-    (AESS, _(AESS)),
-    (DEC1, _(DEC1)),
-    (DEC2, _(DEC2)),
-    (DES, _(DES)),
-    (DEA, _(DEA)),
-    (DOC, _(DOC)),
-    (AES, _(AES)),
-    (AUTRE, _(AUTRE)),
-    (BAC, _(BAC)),
-    (AP2C, _(AP2C)),
-    (MA1, _(MA1)),
-    (MA2X, _(MA2X)),
-    (MA2D, _(MA2D)),
-    (MA2S, _(MA2S)),
-    (MA2A, _(MA2A)),
-    (MA2M, _(MA2M)),
-    (AS2C, _(AS2C)),
-    (MACO, _(MACO)),
-    (AESSB, _(AESSB)),
-    (CAPS, _(CAPS)),
-    (AS3C, _(AS3C)),
-    (FODO, _(FODO)),
-    (DOCB, _(DOCB)),
-    (CEMC, _(CEMC)),
-    (MED, _(MED)),
-    (VETE, _(VETE))
-)
-
-
+# FIXME Get decree category title in english
 class DecreeCategories(ChoiceEnum):
-    FCONT = "FCONT"
-    BAS1 = "BAS1"
-    BAS2 = "BAS2"
-    AESS = "AESS"
-    DEC1 = "DEC1"
-    DEC2 = "DEC2"
-    DES = "DES"
-    DEA = "DEA"
-    DOC = "DOC"
-    AES = "AES"
-    AUTRE = "AUTRE"
-    BAC = "BAC"
-    AP2C = "AP2C"
-    MA1 = "MA1"
-    MA2X = "MA2X"
-    MA2D = "MA2D"
-    MA2S = "MA2S"
-    MA2A = "MA2A"
-    MA2M = "MA2M"
-    AS2C = "AS2C"
-    MACO = "MACO"
-    AESSB = "AESSB"
-    CAPS = "CAPS"
-    AS3C = "AS3C"
-    FODO = "FODO"
-    DOCB = "DOCB"
-    CEMC = "CEMC"
-    MED = "MED"
-    VETE = "VETE"
+    FCONT = "Formation continue (non académique)"
+    BAS1 = "Etudes de base de premier cycle"
+    BAS2 = "Etudes de base de deuxième cycle"
+    AESS = "A.E.S.S."
+    DEC1 = "Etudes complémentaires de premier cycle"
+    DEC2 = "Etudes complémentaires de deuxième cycle"
+    DES = "Etudes spécialisées de troisième cycle"
+    DEA = "Etudes approfondies de troisième cycle"
+    AES = "A.E.S."
+    AUTRE = "Autre (non académique)"
+    BAC = "Bachelier"
+    AP2C = "Année préparatoire à un 2ème cycle"
+    MA1 = "Master en 60 crédits"
+    MA2X = "Master en 120 crédits"
+    MA2D = "Master en 120 crédits à finalité didactique"
+    MA2S = "Master en 120 crédits à finalité spécialisée"
+    MA2A = "Master en 120 crédits à finalité approfondie"
+    MA2M = "Master en 180 ou 240 crédits"
+    AS2C = "Année supplémentaire à un 2ème cycle"
+    MACO = "Master complémentaire"
+    AESSB = "Agrégation de l'enseignement secondaire supérieur (AESS)"
+    CAPS = "Certificat d'aptitude pédagogique approprié à l'enseignement supérieur (CAPAES)"
+    AS3C = "Année supplémentaire à un 3ème cycle"
+    FODO = "Formations doctorales (Certificat de formation à la recherche)"
+    DOCB = "Docteur"
+    CEMC = "Certificats de médecine clinique / Certificats interuniversitaires de formation médicale spécialisée"
+    MED = "Médecin"
+    VETE = "Médecin vétérinaire"
+
+    @classmethod
+    def choices(cls):
+        return tuple((x.name, "{name} - {value}".format(name=x.name, value=x.value)) for x in cls)

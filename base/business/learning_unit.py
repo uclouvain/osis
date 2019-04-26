@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ from operator import itemgetter
 from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
 
-from attribution.models.attribution import find_all_tutors_by_learning_unit_year
 from base import models as mdl_base
 from base.business.entity import get_entity_calendar
 from base.business.learning_unit_year_with_context import volume_learning_component_year
@@ -42,6 +41,7 @@ from base.models.enums import academic_calendar_type
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
+from base.models.learning_component_year import LearningComponentYear
 from base.models.utils.utils import get_object_or_none
 from cms import models as mdl_cms
 from cms.enums import entity_name
@@ -53,35 +53,7 @@ from osis_common.utils.datetime import convert_date_to_datetime
 WORKSHEET_TITLE = _('Learning units list')
 XLS_FILENAME = _('LearningUnitsList')
 XLS_DESCRIPTION = _('Learning units list')
-LEARNING_UNIT_TITLES_PART1 = [
-    str(_('Code')),
-    str(_('Ac yr.')),
-    str(_('Title')),
-    str(_('Type')),
-    str(_('Subtype')),
-    str(_('Req. Entity')),
-    str(_('Proposal type')),
-    str(_('Proposal status')),
-    str(_('Credits')),
-    str(_('Alloc. Ent.')),
-    str(_('Title in English')),
-]
 
-LEARNING_UNIT_TITLES_PART2 = [
-    str(_('Periodicity')),
-    str(_('Active')),
-    "{} - {}".format(_('Lecturing vol.'), _('Annual')),
-    "{} - {}".format(_('Lecturing vol.'), _('1st quadri')),
-    "{} - {}".format(_('Lecturing vol.'), _('2nd quadri')),
-    "{}".format(_('Lecturing planned classes')),
-    "{} - {}".format(_('Practical vol.'), _('Annual')),
-    "{} - {}".format(_('Practical vol.'), _('1st quadri')),
-    "{} - {}".format(_('Practical vol.'), _('2nd quadri')),
-    "{}".format(_('Practical planned classes')),
-    str(_('Quadrimester')),
-    str(_('Session derogation')),
-    str(_('Language')),
-]
 CMS_LABEL_SPECIFICATIONS = ['themes_discussed', 'prerequisite']
 
 CMS_LABEL_PEDAGOGY_FR_AND_EN = ['resume', 'teaching_methods', 'evaluation_methods', 'other_informations',
@@ -94,25 +66,60 @@ CMS_LABEL_SUMMARY = ['resume']
 COLORED = 'COLORED_ROW'
 
 
+def learning_unit_titles_part2():
+    return [
+        str(_('Periodicity')),
+        str(_('Active')),
+        "{} - {}".format(_('Lecturing vol.'), _('Annual')),
+        "{} - {}".format(_('Lecturing vol.'), _('1st quadri')),
+        "{} - {}".format(_('Lecturing vol.'), _('2nd quadri')),
+        "{}".format(_('Lecturing planned classes')),
+        "{} - {}".format(_('Practical vol.'), _('Annual')),
+        "{} - {}".format(_('Practical vol.'), _('1st quadri')),
+        "{} - {}".format(_('Practical vol.'), _('2nd quadri')),
+        "{}".format(_('Practical planned classes')),
+        str(_('Quadrimester')),
+        str(_('Session derogation')),
+        str(_('Language')),
+    ]
+
+
+def learning_unit_titles_part1():
+    return [
+        str(_('Code')),
+        str(_('Ac yr.')),
+        str(_('Title')),
+        str(_('Type')),
+        str(_('Subtype')),
+        str(_('Req. Entity')),
+        str(_('Proposal type')),
+        str(_('Proposal status')),
+        str(_('Credits')),
+        str(_('Alloc. Ent.')),
+        str(_('Title in English')),
+    ]
+
+
 def get_same_container_year_components(learning_unit_year):
     learning_container_year = learning_unit_year.learning_container_year
     components = []
 
-    learning_components_year = learning_container_year.learningcomponentyear_set.prefetch_related(
+    learning_components_year = LearningComponentYear.objects.filter(
+        learning_unit_year__learning_container_year=learning_container_year
+    ).prefetch_related(
         Prefetch('learningclassyear_set', to_attr="classes"),
-        'learningunityear_set'
-    ).order_by('type', 'acronym')
+    ).select_related('learning_unit_year').order_by('type', 'acronym')
 
     additionnal_entities = {}
 
     for indx, learning_component_year in enumerate(learning_components_year):
         if learning_component_year.classes:
             for learning_class_year in learning_component_year.classes:
-                learning_class_year.used_by_learning_units_year = _learning_unit_usage_by_class(learning_class_year)
+                learning_class_year.used_by_learning_units_year = learning_unit_year.acronym
                 learning_class_year.is_used_by_full_learning_unit_year = _is_used_by_full_learning_unit_year(
                     learning_class_year)
 
-        used_by_learning_unit = mdl_base.learning_unit_component.search(learning_component_year, learning_unit_year)
+        used_by_learning_unit = learning_component_year.learning_unit_year == learning_unit_year
 
         entity_components_yr = learning_component_year.entitycomponentyear_set.all()
         if indx == 0:
@@ -122,7 +129,7 @@ def get_same_container_year_components(learning_unit_year):
             {
                 'learning_component_year': learning_component_year,
                 'volumes': volume_learning_component_year(learning_component_year, entity_components_yr),
-                'learning_unit_usage': _learning_unit_usage(learning_component_year),
+                'learning_unit_usage': _learning_unit_usage(learning_component_year.learning_unit_year),
                 'used_by_learning_unit': used_by_learning_unit
             }
         )
@@ -163,27 +170,19 @@ def get_cms_label_data(cms_label, user_language):
     return cms_label_data
 
 
-def _learning_unit_usage(a_learning_component_year):
-    components = mdl_base.learning_unit_component.find_by_learning_component_year(a_learning_component_year)
-    return ", ".join(["{} ({})".format(
-        c.learning_unit_year.acronym,
-        _(c.learning_unit_year.quadrimester) if c.learning_unit_year.quadrimester else '?'
-    ) for c in components])
-
-
-def _learning_unit_usage_by_class(a_learning_class_year):
-    queryset = a_learning_class_year.learningunitcomponentclass_set \
-        .order_by('learning_unit_component__learning_unit_year__acronym') \
-        .values_list('learning_unit_component__learning_unit_year__acronym', flat=True)
-    return ", ".join(list(queryset))
+def _learning_unit_usage(learning_unit_year):
+    return "{} ({})".format(
+        learning_unit_year.acronym,
+        _(learning_unit_year.quadrimester) if learning_unit_year.quadrimester else '?'
+    )
 
 
 def get_components_identification(learning_unit_yr):
     components = []
     additional_entities = {}
 
-    learning_component_year_list_from_luy = learning_unit_yr.learning_component_years.filter(
-        learning_container_year=learning_unit_yr.learning_container_year
+    learning_component_year_list_from_luy = LearningComponentYear.objects.filter(
+        learning_unit_year=learning_unit_yr
     ).order_by('type', 'acronym').prefetch_related('entitycomponentyear_set')
 
     for learning_component_year in learning_component_year_list_from_luy:
@@ -207,11 +206,7 @@ def get_components_identification(learning_unit_yr):
 
 
 def _is_used_by_full_learning_unit_year(a_learning_class_year):
-    for l in mdl_base.learning_unit_component_class.find_by_learning_class_year(a_learning_class_year):
-        if l.learning_unit_component.learning_unit_year.subdivision is None:
-            return True
-
-    return False
+    return a_learning_class_year.learning_component_year.learning_unit_year.is_full()
 
 
 def prepare_xls_content(found_learning_units):
@@ -236,7 +231,7 @@ def get_entity_acronym(an_entity):
 
 
 def create_xls(user, found_learning_units, filters):
-    titles = LEARNING_UNIT_TITLES_PART1 + LEARNING_UNIT_TITLES_PART2
+    titles = learning_unit_titles_part1() + learning_unit_titles_part2()
     working_sheets_data = prepare_xls_content(found_learning_units)
     parameters = {xls_build.DESCRIPTION: XLS_DESCRIPTION,
                   xls_build.USER: get_name_or_username(user),
@@ -305,11 +300,6 @@ def get_achievements_group_by_language(learning_unit_year):
         key = 'achievements_{}'.format(achievement.language.code)
         achievement_grouped.setdefault(key, []).append(achievement)
     return achievement_grouped
-
-
-def get_no_summary_responsible_teachers(learning_unit_yr, summary_responsibles):
-    tutors = find_all_tutors_by_learning_unit_year(learning_unit_yr, "-summary_responsible")
-    return [tutor[0] for tutor in tutors if tutor[0] not in summary_responsibles]
 
 
 def get_learning_unit_comparison_context(learning_unit_year):

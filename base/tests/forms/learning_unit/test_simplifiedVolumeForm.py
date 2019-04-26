@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -64,10 +64,8 @@ class TestSimplifiedVolumeManagementForm(TestCase):
         cm_component = learning_component_years[0]
         tp_component = learning_component_years[1]
 
-        self.assertEqual(cm_component.learningunitcomponent_set.get().learning_unit_year,
-                         self.learning_unit_year)
-        self.assertEqual(tp_component.learningunitcomponent_set.get().learning_unit_year,
-                         self.learning_unit_year)
+        self.assertEqual(cm_component.learning_unit_year, self.learning_unit_year)
+        self.assertEqual(tp_component.learning_unit_year, self.learning_unit_year)
 
         self.assertEqual(cm_component.type, LECTURING)
         self.assertEqual(tp_component.type, PRACTICAL_EXERCISES)
@@ -85,10 +83,8 @@ class TestSimplifiedVolumeManagementForm(TestCase):
         cm_component = learning_component_years[0]
         tp_component = learning_component_years[1]
 
-        self.assertEqual(cm_component.learningunitcomponent_set.get().learning_unit_year,
-                         self.learning_unit_year)
-        self.assertEqual(tp_component.learningunitcomponent_set.get().learning_unit_year,
-                         self.learning_unit_year)
+        self.assertEqual(cm_component.learning_unit_year, self.learning_unit_year)
+        self.assertEqual(tp_component.learning_unit_year, self.learning_unit_year)
 
         self.assertEqual(cm_component.type, LECTURING)
         self.assertEqual(tp_component.type, PRACTICAL_EXERCISES)
@@ -99,9 +95,7 @@ class TestSimplifiedVolumeManagementForm(TestCase):
     def test_save_update(self):
         formset = SimplifiedVolumeManagementForm(
             self.data, self.person,
-            queryset=LearningComponentYear.objects.filter(
-                learningunitcomponent__learning_unit_year=self.learning_unit_year
-            )
+            queryset=LearningComponentYear.objects.filter(learning_unit_year=self.learning_unit_year)
         )
 
         self.assertEqual(len(formset.forms), 2)
@@ -112,43 +106,14 @@ class TestSimplifiedVolumeManagementForm(TestCase):
         cm_component = learning_component_years[0]
         tp_component = learning_component_years[1]
 
-        self.assertEqual(cm_component.learningunitcomponent_set.get().learning_unit_year,
-                         self.learning_unit_year)
-        self.assertEqual(tp_component.learningunitcomponent_set.get().learning_unit_year,
-                         self.learning_unit_year)
+        self.assertEqual(cm_component.learning_unit_year, self.learning_unit_year)
+        self.assertEqual(tp_component.learning_unit_year, self.learning_unit_year)
 
         self.assertEqual(cm_component.type, LECTURING)
         self.assertEqual(tp_component.type, PRACTICAL_EXERCISES)
 
         self.assertEqual(cm_component.entitycomponentyear_set.count(), 3)
         self.assertEqual(tp_component.entitycomponentyear_set.count(), 3)
-
-    def test_save_correct_planned_classes(self):
-        strange_data = {
-            'component-TOTAL_FORMS': '2',
-            'component-INITIAL_FORMS': '0',
-            'component-MAX_NUM_FORMS': '2',
-            'component-0-hourly_volume_total_annual': 0,
-            'component-0-hourly_volume_partial_q1': 0,
-            'component-0-hourly_volume_partial_q2': 0,
-            'component-1-hourly_volume_total_annual': 20,
-            'component-1-hourly_volume_partial_q1': 10,
-            'component-1-hourly_volume_partial_q2': 10,
-        }
-
-        formset = SimplifiedVolumeManagementForm(
-            strange_data, self.person,
-            queryset=LearningComponentYear.objects.none())
-        self.assertEqual(len(formset.forms), 2)
-        self.assertTrue(formset.is_valid())
-
-        learning_component_years = formset.save_all_forms(self.learning_unit_year, self.entity_container_years)
-
-        component_with_volume_nul = learning_component_years[0]
-        component_with_volume_not_null = learning_component_years[1]
-
-        self.assertEqual(component_with_volume_nul.planned_classes, 0)
-        self.assertEqual(component_with_volume_not_null.planned_classes, 1)
 
 
 class TestSimplifiedVolumeForm(TestCase):

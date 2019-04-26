@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ from collections import OrderedDict
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 from base.templatetags.learning_unit import get_difference_css, has_proposal, get_previous_acronym, value_label, \
-    DIFFERENCE_CSS, _volume_format, get_component_volume_css, dl_component_tooltip
+    DIFFERENCE_CSS, volume_format, get_component_volume_css, dl_component_tooltip, changed_label
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -132,9 +132,9 @@ class LearningUnitTagTest(TestCase):
                               mark_safe("<label {}>{}</label>".format(DIFFERENCE_CSS, 'campus 2')))
 
     def test_numeric_format(self):
-        self.assertEqual(_volume_format(None), '')
-        self.assertEqual(_volume_format(20), 20)
-        self.assertEqual(_volume_format(20.50), '20.5')
+        self.assertEqual(volume_format(None), '')
+        self.assertEqual(volume_format(20), 20)
+        self.assertEqual(volume_format(20.50), '20.5')
 
     def test_get_component_volume_css(self):
         values = {'param1': 20, 'param2': 'test2'}
@@ -163,6 +163,19 @@ class LearningUnitTagTest(TestCase):
         self.assertEqual(
             dl_component_tooltip({'differences': {'components_initial_data': {}}}, "VOLUME_Q1", value=VOLUME),
             VOLUME
+        )
+
+    def test_changed_label_with_no_other(self):
+        self.assertEqual(changed_label("value", other=None), '<td><label>value</label></td>')
+
+    def test_changed_label_with_other(self):
+        self.assertEqual(
+            changed_label("value1", other="value1"), "<td><label>value1</label></td>"
+        )
+
+    def test_changed_label_with_other_different(self):
+        self.assertEqual(
+            changed_label("value1", other="value2"), "<td><label style='color:#5CB85C;'>value1</label></td>"
         )
 
     def test_dl_component_tooltip(self):

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -126,14 +126,6 @@ class OfferYear(SerializableModel):
         return None
 
 
-def find_by_academic_year(academic_yr):
-    return OfferYear.objects.filter(academic_year=academic_yr)
-
-
-def find_by_structure(struct):
-    return OfferYear.objects.filter(entity_management=struct).order_by('academic_year', 'acronym')
-
-
 def find_by_id(offer_year_id):
     try:
         return OfferYear.objects.get(pk=offer_year_id)
@@ -143,10 +135,6 @@ def find_by_id(offer_year_id):
 
 def find_by_ids(offer_year_ids):
     return OfferYear.objects.filter(pk__in=offer_year_ids)
-
-
-def find_by_acronym(acronym):
-    return OfferYear.objects.filter(acronym=acronym)
 
 
 def search(entity=None, academic_yr=None, acronym=None):
@@ -184,58 +172,8 @@ def find_by_user(user, academic_yr=None):
     return OfferYear.objects.filter(pk__in=offer_year_ids).order_by('acronym')
 
 
-def find_by_offer(offers):
-    return OfferYear.objects.filter(offer__in=offers)
-
-
-def find_by_offers_and_year(offers, ac_year):
-    return find_by_offer(offers).filter(academic_year=ac_year)
-
-
-def find_by_id_list(ids):
-    if ids:
-        return OfferYear.objects.filter(id__in=ids)
-    return None
-
-
-def search_offers(entity_list=None, academic_yr=None, an_offer_type=None):
-    out = None
-    queryset = OfferYear.objects
-
-    queryset = entity_list_parameter(entity_list, queryset)
-
-    queryset = academic_year_parameter(academic_yr, queryset)
-
-    queryset = offer_type_parameter(an_offer_type, queryset)
-
-    if entity_list or academic_yr or an_offer_type:
-        out = queryset.order_by('acronym')
-
-    return out.select_related("entity_management", "offer_type")
-
-
-def offer_type_parameter(an_offer_type, queryset):
-    if an_offer_type:
-        queryset = queryset.filter(offer_type=an_offer_type)
-    else:
-        queryset = queryset.filter(offer_type__isnull=False)
-    return queryset
-
-
-def academic_year_parameter(academic_yr, queryset):
-    if academic_yr:
-        queryset = queryset.filter(academic_year=academic_yr)
-    return queryset
-
-
-def entity_list_parameter(entity_list, queryset):
-    if entity_list:
-        queryset = queryset.filter(entity_management__in=entity_list)
-    return queryset
-
-
 def get_last_offer_year_by_offer(an_offer):
-    last_offer_year = OfferYear.objects.filter(offer=an_offer).order_by('-academic_year__start_date').first()
+    last_offer_year = an_offer.offeryear_set.order_by('-academic_year__start_date').first()
     if last_offer_year:
         return last_offer_year
     return None

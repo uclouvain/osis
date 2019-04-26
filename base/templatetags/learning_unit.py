@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,9 +27,11 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym, LearningUnitYear
-from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
+from base.business.utils.convert import volume_format
+from base.models.enums.learning_unit_year_subtypes import PARTIM
+from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.utils import get_verbose_field_value
 
 register = template.Library()
@@ -104,7 +106,7 @@ def dl_tooltip(context, instance, key, **kwargs):
     if url:
         value = "<a href='{url}'>{value}</a>".format(value=_(str(value)), url=url)
 
-    if inherited == "PARTIM":
+    if inherited == PARTIM:
         label_text = get_style_of_label_text(label_text, "color:grey",
                                              "The value of this attribute is inherited from the parent UE")
         value = get_style_of_value("color:grey", "The value of this attribute is inherited from the parent UE", value)
@@ -170,12 +172,12 @@ def _get_label(data, key_comp, val):
 
 
 @register.simple_tag
-def changed_label(value, other1=None):
-    if value != other1:
+def changed_label(value, other=None):
+    if value != other and other:
         return mark_safe(
-            "<label {}>{}</label>".format(DIFFERENCE_CSS, DEFAULT_VALUE_FOR_NONE if value is None else value))
+            "<td><label {}>{}</label></td>".format(DIFFERENCE_CSS, DEFAULT_VALUE_FOR_NONE if value is None else value))
     else:
-        return mark_safe("{}".format(DEFAULT_VALUE_FOR_NONE if value is None else value))
+        return mark_safe("<td><label>{}</label></td>".format(DEFAULT_VALUE_FOR_NONE if value is None else value))
 
 
 @register.simple_tag(takes_context=True)
@@ -194,21 +196,12 @@ def dl_component_tooltip(context, key, **kwargs):
                 break
 
         difference = get_component_volume_css(volumes, key, default_if_none, value) or 'title="{}"'.format(_(title))
-        value = get_style_of_value("", "", _volume_format(value))
+        value = get_style_of_value("", "", volume_format(value))
         html_id = "id='id_{}'".format(key.lower())
 
         return mark_safe("<dl><dd {difference} {id}>{value}</dd></dl>".format(
             difference=difference, id=html_id, value=str(value)))
-    return _volume_format(value) if value else default_if_none
-
-
-def _volume_format(value):
-    if value is None:
-        return ''
-    else:
-        if value - int(value) != 0:
-            return "{0:.1f}".format(value)
-        return int(value)
+    return volume_format(value) if value else default_if_none
 
 
 @register.filter
@@ -217,7 +210,7 @@ def get_component_volume_css(values, parameter, default_if_none="", value=None):
         return mark_safe(
             " data-toggle=tooltip title='{} : {}' class='{}' ".format(
                 LABEL_VALUE_BEFORE_PROPOSAL,
-                _volume_format(values[parameter]) or default_if_none,
+                volume_format(values[parameter]) or default_if_none,
                 CSS_PROPOSAL_VALUE
             )
         )

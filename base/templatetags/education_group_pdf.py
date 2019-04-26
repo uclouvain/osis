@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -158,9 +158,9 @@ def append_output(item, output, padding, sublist):
                               value=force_text(item.verbose),
                               comment=comment,
                               sublist=sublist,
-                              an_1=check_block(item, "1"),
-                              an_2=check_block(item, "2"),
-                              an_3=check_block(item, "3")
+                              an_1=check_block(item, 1),
+                              an_2=check_block(item, 2),
+                              an_3=check_block(item, 3)
                               )
         )
     else:
@@ -211,4 +211,4 @@ def get_case_picture(item):
 
 
 def check_block(item, value):
-    return "X" if item.block and value in item.block else ""
+    return "X" if item.block and value == item.block else ""

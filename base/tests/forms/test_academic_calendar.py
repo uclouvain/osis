@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,14 +26,14 @@
 import datetime
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
-
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
-from base.tests.factories.offer_year import OfferYearFactory
-from base.forms.academic_calendar import AcademicCalendarForm
 from django.test.utils import override_settings
+from django.utils.translation import ugettext_lazy as _
+
+from base.forms.academic_calendar import AcademicCalendarForm
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 
 
 class TestAcademicCalendarForm(TestCase):

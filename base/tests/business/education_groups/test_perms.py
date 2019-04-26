@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ from base.business.education_groups.perms import is_education_group_edit_period_
     check_authorized_type, is_eligible_to_edit_general_information, is_eligible_to_edit_admission_condition, \
     GeneralInformationPerms, CommonEducationGroupStrategyPerms, AdmissionConditionPerms
 from base.models.enums import academic_calendar_type
-from base.models.enums.education_group_categories import TRAINING
+from base.models.enums.education_group_categories import TRAINING, Categories
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
@@ -93,13 +93,13 @@ class TestPerms(TestCase):
 
     def test_check_unauthorized_type(self):
         education_group = EducationGroupYearFactory()
-        result = check_authorized_type(education_group, TRAINING)
+        result = check_authorized_type(education_group, Categories.TRAINING)
         self.assertFalse(result)
 
     def test_check_authorized_type(self):
         education_group = EducationGroupYearFactory()
         AuthorizedRelationshipFactory(parent_type=education_group.education_group_type)
-        result = check_authorized_type(education_group, TRAINING)
+        result = check_authorized_type(education_group, Categories.TRAINING)
         self.assertTrue(result)
 
     def test_check_authorized_type_without_parent(self):
@@ -168,8 +168,12 @@ class TestCommonEducationGroupStrategyPerms(TestCase):
         perm = CommonEducationGroupStrategyPerms(super_user, training)
         self.assertTrue(perm._is_eligible())
 
-    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_current_academic_year_in_range_of_editable_education_group_year", return_value=True)
-    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_linked_to_management_entity", return_value=True)
+    @mock.patch(
+        "base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_current_academic_year_in_range_of_editable_education_group_year",
+        return_value=True)
+    @mock.patch(
+        "base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_linked_to_management_entity",
+        return_value=True)
     def test_ensure_is_eligible_case_all_submethod_true(self, mock_linked_to_management, mock_is_current_in_range):
         perm = CommonEducationGroupStrategyPerms(self.person.user, TrainingFactory())
 
@@ -177,16 +181,24 @@ class TestCommonEducationGroupStrategyPerms(TestCase):
         self.assertTrue(mock_linked_to_management.called)
         self.assertTrue(mock_is_current_in_range.called)
 
-    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_current_academic_year_in_range_of_editable_education_group_year", return_value=False)
-    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_linked_to_management_entity", return_value=True)
+    @mock.patch(
+        "base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_current_academic_year_in_range_of_editable_education_group_year",
+        return_value=False)
+    @mock.patch(
+        "base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_linked_to_management_entity",
+        return_value=True)
     def test_ensure_is_eligible_case_permission_denied(self, mock_linked_to_management, mock_is_current_in_range):
         perm = CommonEducationGroupStrategyPerms(self.person.user, TrainingFactory())
 
         with self.assertRaises(PermissionDenied):
             perm._is_eligible()
 
-    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_current_academic_year_in_range_of_editable_education_group_year", return_value=True)
-    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_linked_to_management_entity", return_value=False)
+    @mock.patch(
+        "base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_current_academic_year_in_range_of_editable_education_group_year",
+        return_value=True)
+    @mock.patch(
+        "base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_linked_to_management_entity",
+        return_value=False)
     def test_ensure_is_eligible_case_permission_denied(self, mock_linked_to_management, mock_is_current_in_range):
         perm = CommonEducationGroupStrategyPerms(self.person.user, TrainingFactory())
 

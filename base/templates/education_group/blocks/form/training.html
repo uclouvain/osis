@@ -8,7 +8,7 @@
     * The core business involves the administration of students, teachers,
     * courses, programs and so on.
     *
-    * Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
     *
     * This program is free software: you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -26,13 +26,14 @@
 {% endcomment %}
 {% bootstrap_form_errors form_education_group_year %}
 {% bootstrap_form_errors form_education_group %}
-
-<form method="post" id="UpdateTrainingForm">
+<form method="post" id="UpdateTrainingForm"
+      class="education_group_form"
+      data-validate-url="{% if education_group_year %}{% url 'validate_education_group_field' form_education_group_year.category education_group_year.pk %} {% else %}{% url 'validate_education_group_field' form_education_group_year.category %}{% endif %}">
     {% csrf_token %}
     <div class="panel panel-default">
 
         <div class="panel-heading">
-            {% include "education_group/blocks/form/create_cancel_buttons.html" %}
+            {% include "education_group/blocks/form/create_cancel_buttons.html" with btn_submit_name="btn_submit_UpdateTrainingForm" %}
         </div>
 
         <div class="panel-body">
@@ -40,9 +41,40 @@
         </div>
 
         <div class="panel-footer text-right">
-            {% include "education_group/blocks/form/create_cancel_buttons.html" %}
+            {% include "education_group/blocks/form/create_cancel_buttons.html" with btn_submit_name="btn_submit_UpdateTrainingForm"  %}
         </div>
 
     </div>
+    <script type="text/javascript" src="{% static 'js/education_group/validation.js' %}"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('button[name="btn_submit_UpdateTrainingForm"]').click(function (e) {
+                $("#spn_identification_errors").empty();
+                $("#spn_diploma_errors").empty();
+            });
+
+            var form = document.getElementById("UpdateTrainingForm");
+
+            form.addEventListener('invalid', (e)=>{
+                var el = e.target;
+                while (el && el.parentNode) {
+                    el = el.parentNode;
+
+                    if(el.parentNode.id == "tab_identification"){
+                        $("#spn_identification_errors").append('<i class="fa fa-circle" aria-hidden="true"></i>');
+                        return false;
+                    }
+                    if(el.parentNode.id == "div_tab_diploma"){
+                        $("#spn_diploma_errors").append('<i class="fa fa-circle" aria-hidden="true"></i>');
+                        return false;
+                    }
+
+                }
+
+        },true)
+        });
+
+    </script>
     {% include "blocks/modal/confirmation_modal.html" %}
 </form>

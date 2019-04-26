@@ -1,3 +1,17 @@
+#: templates/offer/score_sheet_address_tab.html:52
+#, python-format
+msgid ""
+"\n"
+"                                    If you customize one of the field below, "
+"it only change the address displayed on the\n"
+"                                    score encodings sheets for the program "
+"%(program)s.\n"
+"                                    It will never change the address of any "
+"structure. The list below will help you to\n"
+"                                    pre-fill in the form.\n"
+"                                "
+msgstr ""
+
 #: templates/online_encoding.html:287
 #, python-format
 msgid ""
@@ -19,7 +33,7 @@ msgstr ""
 msgid "Absent"
 msgstr ""
 
-#: templates/admin/pgm_manager.html:31 templates/scores_responsible.html:31
+#: templates/admin/pgm_manager.html:30 templates/scores_responsible.html:31
 #: templates/scores_responsible_edit.html:30
 msgid "Academic actors"
 msgstr ""
@@ -40,7 +54,8 @@ msgstr ""
 msgid "Academic year"
 msgstr ""
 
-#: business/score_encoding_export.py:171
+#: business/score_encoding_export.py:176
+#: tests/business/test_score_encoding_export.py:148
 #, python-format
 msgid "Accepted value: %(justification_label_authorized)s "
 msgstr ""
@@ -58,11 +73,11 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-#: templates/admin/pgm_manager.html:153
+#: templates/admin/programmanager_list.html:66
 msgid "Add manager"
 msgstr ""
 
-#: templates/admin/pgm_manager.html:62 templates/admin/pgm_manager.html:75
+#: templates/admin/pgm_manager.html:64 templates/admin/pgm_manager.html:77
 #: templates/scores_encoding.html:66
 #: templates/scores_encoding_by_learning_unit.html:63
 #: templates/scores_encoding_by_learning_unit.html:73
@@ -71,7 +86,7 @@ msgstr ""
 msgid "All"
 msgstr ""
 
-#: templates/admin/pgm_manager.html:48
+#: templates/admin/pgm_manager.html:50
 msgid "All hierarchy of "
 msgstr ""
 
@@ -91,7 +106,7 @@ msgid ""
 "All the scores were submitted. It is not possible to encode scores anymore."
 msgstr ""
 
-#: templates/admin/modal/remove_manager_confirm.html:21
+#: templates/admin/programmanager_confirm_delete_inner.html:13
 msgid "Are you sure you want to remove the following manager ?"
 msgstr ""
 
@@ -105,8 +120,8 @@ msgstr ""
 msgid "By specific criteria"
 msgstr ""
 
-#: templates/admin/modal/add_manager.html:62
-#: templates/admin/modal/remove_manager_confirm.html:29
+#: templates/admin/manager_add_inner.html:24
+#: templates/admin/programmanager_confirm_delete_inner.html:29
 #: templates/online_double_encoding_form.html:114
 #: templates/online_double_encoding_form.html:191
 #: templates/online_double_encoding_validation.html:252
@@ -122,6 +137,7 @@ msgstr ""
 #: templates/online_encoding_form.html:223
 #: templates/scores_encoding_by_specific_criteria.html:66
 #: templates/scores_encoding_by_specific_criteria.html:158
+#: tests/functionals/test_score_encoding.py:599
 msgid "Cheating"
 msgstr ""
 
@@ -129,7 +145,7 @@ msgstr ""
 msgid "Choose file"
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:97
+#: forms/score_sheet_address.py:38
 msgid "City"
 msgstr ""
 
@@ -148,15 +164,15 @@ msgstr ""
 msgid "Complete"
 msgstr ""
 
-#: templates/admin/modal/remove_manager_confirm.html:10
-msgid "Confirm"
+#: templates/admin/programmanager_confirm_delete_inner.html:10
+msgid "Confirm delete for : "
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:102
+#: forms/score_sheet_address.py:34
 msgid "Country"
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:60
+#: templates/offer/score_sheet_address_tab.html:65
 msgid "Customized"
 msgstr ""
 
@@ -176,16 +192,21 @@ msgstr ""
 msgid "Deadline reached"
 msgstr ""
 
+#: business/score_encoding_export.py:201
 #: templates/online_double_encoding_form.html:104
 #: templates/online_encoding_form.html:103
-msgid ""
-"Decimal values in scores are NOT accepted. If you try to put decimal values, "
-"it will be ignored."
+#: tests/functionals/test_score_encoding.py:375
+msgid "Decimal values in scores are NOT accepted."
 msgstr ""
 
+#: business/score_encoding_export.py:199
 #: templates/online_double_encoding_form.html:102
 #: templates/online_encoding_form.html:101
 msgid "Decimal values in scores are accepted."
+msgstr ""
+
+#: tests/business/test_score_encoding_export.py:185
+msgid "Decimals authorized for this learning unit"
 msgstr ""
 
 #: templates/online_encoding.html:154 templates/online_encoding.html:295
@@ -218,8 +239,7 @@ msgstr ""
 msgid "Download the Excel file"
 msgstr ""
 
-#: templates/admin/modal/add_manager.html:51
-#: templates/offer/score_sheet_address_tab.html:117
+#: models/score_sheet_address.py:55
 msgid "Email"
 msgstr ""
 
@@ -237,15 +257,16 @@ msgstr ""
 msgid "Encoding"
 msgstr ""
 
-#: business/score_encoding_export.py:176 templates/blocks/legend.html:30
-msgid "Enrolled after session starts"
+#: business/score_encoding_export.py:182 templates/blocks/legend.html:30
+#: tests/business/test_score_encoding_export.py:158
+msgid "Enrolled lately"
 msgstr ""
 
-#: views/score_sheet.py:111
+#: views/score_sheet.py:118
 msgid "Enter a valid email address."
 msgstr ""
 
-#: templates/admin/pgm_manager.html:45 templates/admin/pgm_manager.html:118
+#: templates/admin/pgm_manager.html:45 templates/admin/pgm_manager.html:122
 #: templates/scores_responsible.html:86
 msgid "Entity"
 msgstr ""
@@ -260,7 +281,7 @@ msgstr ""
 msgid "Evaluations"
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:113
+#: models/score_sheet_address.py:54
 msgid "Fax"
 msgstr ""
 
@@ -268,7 +289,6 @@ msgstr ""
 msgid "Final"
 msgstr ""
 
-#: templates/admin/modal/add_manager.html:49
 #: templates/online_double_encoding_form.html:122
 #: templates/online_double_encoding_validation.html:116
 #: templates/online_encoding.html:180 templates/online_encoding_form.html:124
@@ -284,13 +304,10 @@ msgstr ""
 msgid "Get Excel file"
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:51
-#, python-format
-msgid ""
-"If you customize one of the field below, it only change the address "
-"displayed on the score encodings sheets for the program %%(program)s. It "
-"will never change the address of any structure. The list below will help you "
-"to pre-fill in the form."
+#: templates/online_double_encoding_form.html:104
+#: templates/online_encoding_form.html:103
+#: tests/functionals/test_score_encoding.py:376
+msgid "If you try to put decimal values, it will be ignored."
 msgstr ""
 
 #: templates/scores_encoding_by_learning_unit.html:97
@@ -305,7 +322,7 @@ msgstr ""
 msgid "Inject XLS file"
 msgstr ""
 
-#: templates/admin/pgm_manager.html:30 templates/scores_responsible.html:30
+#: templates/admin/pgm_manager.html:28 templates/scores_responsible.html:30
 #: templates/scores_responsible_edit.html:29
 msgid "Institution"
 msgstr ""
@@ -314,13 +331,14 @@ msgstr ""
 msgid "Invalid justification value"
 msgstr ""
 
-#: business/score_encoding_export.py:170
+#: business/score_encoding_export.py:175
 #: templates/online_double_encoding_form.html:124
 #: templates/online_double_encoding_validation.html:118
 #: templates/online_double_encoding_validation.html:120
 #: templates/online_double_encoding_validation.html:122
 #: templates/online_encoding.html:182 templates/online_encoding_form.html:126
 #: templates/scores_encoding_by_specific_criteria.html:109
+#: tests/business/test_score_encoding_export.py:142
 msgid "Justification"
 msgstr ""
 
@@ -341,7 +359,6 @@ msgstr ""
 msgid "Last synchronization"
 msgstr ""
 
-#: templates/admin/modal/add_manager.html:48
 #: templates/online_double_encoding_form.html:121
 #: templates/online_double_encoding_validation.html:115
 #: templates/online_encoding.html:179 templates/online_encoding_form.html:123
@@ -369,37 +386,37 @@ msgstr ""
 msgid "Line"
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:84
+#: forms/score_sheet_address.py:36
 msgid "Location"
 msgstr ""
 
-#: business/score_encoding_export.py:195
+#: business/score_encoding_export.py:207
 msgid "M=Justified Absence"
 msgstr ""
 
-#: templates/admin/pgm_manager.html:143
+#: templates/admin/programmanager_list.html:8
+msgid "Main"
+msgstr ""
+
+#: templates/admin/programmanager_list.html:7
 msgid "Manager"
 msgstr ""
 
-#: templates/admin/pgm_manager.html:73
+#: templates/admin/pgm_manager.html:75
 msgid "Managers"
-msgstr ""
-
-#: templates/admin/modal/add_manager.html:50
-msgid "Middlename"
 msgstr ""
 
 #: templates/scores_encoding_by_specific_criteria.html:67
 msgid "Missing score"
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:54
+#: templates/offer/score_sheet_address_tab.html:59
 msgid ""
 "NOTE : the 'Email' field is optional. You can fill in this field if you want "
 "it to appear on the score sheet."
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:70
+#: templates/offer/score_sheet_address_tab.html:77
 msgid "No address found for the selected entity."
 msgstr ""
 
@@ -411,18 +428,16 @@ msgstr ""
 msgid "No double score encoded ; nothing to compare."
 msgstr ""
 
-#: templates/admin/pgm_manager.html:170
+#: templates/admin/pgm_manager.html:146
 msgid "No entity associated to your profile"
 msgstr ""
 
-#: views/score_encoding.py:527
+#: views/score_encoding.py:522
 msgid "No new scores encoded. The double encoding needs new scores."
 msgstr ""
 
-#: templates/admin/modal/add_manager.html:42
-#: templates/admin/modal/add_manager.html:44
-#: templates/admin/pgm_manager.html:105 templates/scores_responsible.html:80
-#: views/score_encoding.py:163 views/score_encoding.py:599
+#: templates/admin/pgm_manager.html:107 templates/scores_responsible.html:80
+#: views/score_encoding.py:163 views/score_encoding.py:594
 msgid "No result!"
 msgstr ""
 
@@ -454,7 +469,8 @@ msgstr ""
 msgid "Number of enrollments"
 msgstr ""
 
-#: business/score_encoding_export.py:188
+#: business/score_encoding_export.py:195
+#: tests/business/test_score_encoding_export.py:177
 msgid "Numbered scores"
 msgstr ""
 
@@ -495,36 +511,34 @@ msgstr ""
 msgid "Other tutors"
 msgstr ""
 
-#: business/score_encoding_export.py:180
+#: business/score_encoding_export.py:186
+#: tests/business/test_score_encoding_export.py:164
 #, python-format
-msgid "Other values: %(justification_other_values)s "
+msgid ""
+"Other values reserved to administration: %(justification_other_values)s "
 msgstr ""
 
-#: templates/admin/modal/add_manager.html:10
+#: templates/admin/manager_add_inner.html:10
 msgid "Person search"
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:109
+#: models/score_sheet_address.py:53
 msgid "Phone"
 msgstr ""
 
-#: views/score_encoding.py:582
+#: views/score_encoding.py:577
 msgid "Please choose at least one criteria!"
-msgstr ""
-
-#: templates/admin/modal/add_manager.html:21
-msgid "Please enter a lastname, and optionnally a firstname"
 msgstr ""
 
 #: templates/online_encoding.html:266
 msgid "Please select an XLS file for injection"
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:58
+#: templates/offer/score_sheet_address_tab.html:63
 msgid "Please select an address"
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:92
+#: forms/score_sheet_address.py:37
 msgid "Postal code"
 msgstr ""
 
@@ -543,15 +557,15 @@ msgstr ""
 msgid "Print the scores"
 msgstr ""
 
-#: templates/admin/pgm_manager.html:116 templates/online_encoding.html:177
+#: templates/admin/pgm_manager.html:120 templates/online_encoding.html:177
 msgid "Program"
 msgstr ""
 
-#: templates/admin/pgm_manager.html:32 templates/admin/pgm_manager.html:37
+#: templates/admin/pgm_manager.html:31 templates/admin/pgm_manager.html:36
 msgid "Program managers"
 msgstr ""
 
-#: templates/admin/pgm_manager.html:60
+#: templates/admin/pgm_manager.html:62
 msgid "Program type"
 msgstr ""
 
@@ -563,7 +577,7 @@ msgstr ""
 msgid "Progress"
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:79
+#: forms/score_sheet_address.py:35
 msgid "Recipient"
 msgstr ""
 
@@ -588,7 +602,7 @@ msgstr ""
 msgid "Registration number"
 msgstr ""
 
-#: templates/admin/modal/remove_manager_confirm.html:30
+#: templates/admin/programmanager_confirm_delete_inner.html:31
 msgid "Remove"
 msgstr ""
 
@@ -602,7 +616,7 @@ msgid ""
 "tutor that aren't submitted yet ('draft' state)"
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:47
+#: templates/offer/score_sheet_address_tab.html:48
 msgid ""
 "Reuse the address of an entity linked to the program or inform the posting "
 "address for the papersheet."
@@ -615,11 +629,12 @@ msgstr ""
 msgid "Row"
 msgstr ""
 
-#: business/score_encoding_export.py:194
+#: business/score_encoding_export.py:206
 msgid "S=Unjustified Absence"
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:126
+#: templates/admin/manager_add_inner.html:26
+#: templates/offer/score_sheet_address_tab.html:124
 #: templates/online_double_encoding_validation.html:251
 #: templates/online_encoding_form.html:113
 #: templates/online_encoding_form.html:240
@@ -642,7 +657,8 @@ msgstr ""
 msgid "Score already submitted"
 msgstr ""
 
-#: business/score_encoding_export.py:189
+#: business/score_encoding_export.py:196
+#: tests/business/test_score_encoding_export.py:181
 #, python-format
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr ""
@@ -655,7 +671,7 @@ msgstr ""
 msgid "Score saved"
 msgstr ""
 
-#: views/score_sheet.py:85 views/score_sheet.py:95
+#: views/score_sheet.py:92 views/score_sheet.py:102
 msgid "Score sheet address was successfully saved."
 msgstr ""
 
@@ -721,11 +737,11 @@ msgstr ""
 msgid "Select an excel file to inject scores."
 msgstr ""
 
-#: templates/admin/pgm_manager.html:115
+#: templates/admin/pgm_manager.html:118
 msgid "Select/deselect all"
 msgstr ""
 
-#: templates/admin/pgm_manager.html:112
+#: templates/admin/pgm_manager.html:111
 msgid "Selected"
 msgstr ""
 
@@ -751,7 +767,8 @@ msgstr ""
 msgid "Student not registered for exam"
 msgstr ""
 
-#: business/score_encoding_export.py:164
+#: business/score_encoding_export.py:169
+#: tests/business/test_score_encoding_export.py:138
 msgid "Students deliberated are not shown"
 msgstr ""
 
@@ -775,7 +792,8 @@ msgstr ""
 msgid "Temporary save (not submitted to the faculty yet)"
 msgstr ""
 
-#: business/score_encoding_export.py:158
+#: business/score_encoding_export.py:163
+#: tests/business/test_score_encoding_export.py:132
 #, python-format
 msgid ""
 "The data presented on this document correspond to the state of the system "
@@ -793,24 +811,25 @@ msgstr ""
 msgid "The file must be a valid 'XLSX' excel file"
 msgstr ""
 
-#: templates/admin/modal/remove_manager_confirm.html:25
+#: templates/admin/programmanager_confirm_delete_inner.html:17
 msgid "The manager will keep the following programs : "
 msgstr ""
 
-#: tests/views/test_score_encoding.py:378 views/score_encoding.py:83
+#: tests/views/test_score_encoding.py:377 views/score_encoding.py:83
 #, python-format
 msgid ""
 "The period of scores' encoding %(session_number)s is closed since "
 "%(str_date)s"
 msgstr ""
 
-#: tests/views/test_score_encoding.py:383 views/score_encoding.py:90
+#: tests/functionals/test_score_encoding.py:235
+#: tests/views/test_score_encoding.py:382 views/score_encoding.py:90
 #, python-format
 msgid ""
 "The period of scores' encoding %(session_number)s will be open %(str_date)s"
 msgstr ""
 
-#: tests/views/test_score_encoding.py:351 views/score_encoding.py:94
+#: tests/views/test_score_encoding.py:350 views/score_encoding.py:94
 msgid "The period of scores' encoding is not opened"
 msgstr ""
 
@@ -818,7 +837,7 @@ msgstr ""
 msgid "The scores responsible must still submit the scores"
 msgstr ""
 
-#: templates/offer/score_sheet_address_tab.html:74
+#: templates/offer/score_sheet_address_tab.html:83
 msgid "The selected entity no longer exists today (end date passed)."
 msgstr ""
 
@@ -837,8 +856,12 @@ msgstr ""
 msgid "Tutors of the course"
 msgstr ""
 
-#: templates/admin/pgm_manager.html:117
+#: templates/admin/pgm_manager.html:121
 msgid "Type"
+msgstr ""
+
+#: tests/business/test_score_encoding_export.py:187
+msgid "Unauthorized decimal for this learning unit"
 msgstr ""
 
 #: templates/online_double_encoding_form.html:174
@@ -846,15 +869,13 @@ msgstr ""
 #: templates/online_encoding_form.html:200
 #: templates/scores_encoding_by_specific_criteria.html:64
 #: templates/scores_encoding_by_specific_criteria.html:156
+#: tests/functionals/test_score_encoding.py:599
 msgid "Unjustified absence"
 msgstr ""
 
-#: business/score_encoding_export.py:185 templates/blocks/legend.html:35
-msgid "Unsubscribed after the opening of the session"
-msgstr ""
-
-#: templates/admin/modal/add_manager.html:52
-msgid "Username"
+#: business/score_encoding_export.py:192 templates/blocks/legend.html:35
+#: tests/business/test_score_encoding_export.py:173
+msgid "Unsubscribed lately"
 msgstr ""
 
 #: templates/scores_encoding.html:93
@@ -914,21 +935,18 @@ msgid ""
 "excel file provided (button '%(button_value)s')"
 msgstr ""
 
-#: business/score_encoding_export.py:153 business/score_encoding_export.py:199
-#: business/score_encoding_sheet.py:104 tests/views/test_score_encoding.py:354
-#: views/score_encoding.py:75
+#: business/score_encoding_export.py:158 business/score_encoding_export.py:211
+#: business/score_encoding_sheet.py:104
+#: tests/business/test_score_encoding_export.py:133
+#: tests/views/test_score_encoding.py:353 views/score_encoding.py:75
 msgid "date_format"
-msgstr ""
-
-#: views/pgm_manager_administration.py:228
-msgid "is already program manager for"
 msgstr ""
 
 #: templates/scores_encoding_by_learning_unit.html:121
 msgid "learning units in"
 msgstr ""
 
-#: templates/admin/pgm_manager.html:112
+#: templates/admin/pgm_manager.html:111
 msgid "of"
 msgstr ""
 

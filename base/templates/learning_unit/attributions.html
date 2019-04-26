@@ -8,7 +8,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -31,10 +31,12 @@
         <table class="table">
             <thead>
             <tr>
-                <th>{% trans 'Tutor' %}</th>
+                <th>{% trans 'Tutors' %}</th>
                 <th>{% trans 'Function' %}</th>
-                <th>{% trans 'Start' %}</th>
-                <th>{% trans 'Duration' %}</th>
+                {% if not learning_unit_year.is_for_faculty_or_partim %}
+                    <th>{% trans 'Start' %}</th>
+                    <th>{% trans 'Duration' %}</th>
+                {% endif %}
                 <th>{% trans "Volume 1" %}</th>
                 <th>{% trans "Volume 2" %}</th>
                 <th>{% trans 'Substitute' %}</th>
@@ -46,8 +48,10 @@
                 <tr>
                     <td>{{ attribution.tutor.person }}</td>
                     <td>{{ attribution.get_function_display }}</td>
-                    <td>{{ attribution.start_year | default_if_none:'' }}</td>
-                    <td>{{ attribution.duration | default_if_none:'' }}</td>
+                    {% if not learning_unit_year.is_for_faculty_or_partim %}
+                        <td>{{ attribution.start_year | default_if_none:'' }}</td>
+                        <td>{{ attribution.duration | default_if_none:'' }}</td>
+                    {% endif %}
                     <td>{{ attribution.lecturing_charges.0.allocation_charge | floatformat:2 }}</td>
                     <td>{{ attribution.practical_charges.0.allocation_charge| floatformat:2 }}</td>
                     <td>{{ attribution.substitute | default_if_none:'' }}</td>
@@ -85,7 +89,11 @@
                role="button"
                data-url="{% url "add_attribution" learning_unit_year.id %}"
                data-modal_class="modal-lg">
-                {% trans "Add attribution" %}
+                {% if learning_unit_year.learning_container_year.is_type_for_faculty %}
+                    {% trans "Add current year attribution" %}
+                {% else %}
+                    {% trans "Add attribution" %}
+                {% endif %}
             </a>
         {% endif %}
         {% if learning_unit_year.is_partim %}

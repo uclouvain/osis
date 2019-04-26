@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ from django.db.models import Q
 from django.db.models import Value
 from django.db.models.functions import Concat, Lower
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models.entity import Entity
 from base.models.entity_version import find_pedagogical_entities_version
@@ -80,6 +80,7 @@ class Person(SerializableModel):
     source = models.CharField(max_length=25, blank=True, null=True, choices=person_source_type.CHOICES,
                               default=person_source_type.BASE)
     employee = models.BooleanField(default=False)
+    managed_entities = models.ManyToManyField("Entity", through="EntityManager")
 
     def save(self, **kwargs):
         # When person is created by another application this rule can be applied.
@@ -228,16 +229,6 @@ def search_employee(full_name):
                     Q(begin_by_last_name__iexact='{}'.format(full_name.lower())) |
                     Q(first_name__icontains=full_name) |
                     Q(last_name__icontains=full_name))
-    return None
-
-
-def search(full_name):
-    queryset = annotate_with_first_last_names()
-    if full_name:
-        return queryset.filter(Q(begin_by_first_name__iexact='{}'.format(full_name.lower())) |
-                               Q(begin_by_last_name__iexact='{}'.format(full_name.lower())) |
-                               Q(first_name__icontains=full_name) |
-                               Q(last_name__icontains=full_name))
     return None
 
 

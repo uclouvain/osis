@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ class TrainingListSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'url',
+            'uuid',
             'acronym',
             'code',
             'education_group_type',
@@ -98,6 +99,7 @@ class TrainingDetailSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'url',
+            'uuid',
             'acronym',
             'code',
             'education_group_type',
@@ -141,14 +143,15 @@ class TrainingDetailSerializerTestCase(TestCase):
             'duration',
             'duration_unit',
             'duration_unit_text',
+            'language_association_text',
             'enrollment_enabled',
             'credits',
             'remark',
             'remark_english',
             'min_constraint',
             'max_constraint',
-            'constraint_type_text',
             'constraint_type',
+            'constraint_type_text',
             'weighting',
             'default_learning_unit_enrollment',
             'decree_category',

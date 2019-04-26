@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -73,6 +73,7 @@ class RulesRequiredMixin(UserPassesTestMixin):
 
 class AjaxTemplateMixin:
     ajax_template_suffix = "_inner"
+    partial_reload = None
 
     def get_template_names(self):
         template_names = super().get_template_names()
@@ -110,6 +111,8 @@ class AjaxTemplateMixin:
             url = self.get_success_url()
             if url:
                 response['success_url'] = url
+            if self.partial_reload:
+                response['partial_reload'] = self.partial_reload
             return JsonResponse(response)
 
 

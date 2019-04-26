@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -75,10 +75,10 @@ class TestPersonAutoComplete(TestCase):
     def test_get_result_label(self):
         self.assertEqual(
             EmployeeAutocomplete().get_result_label(self.jean),
-            "Dupont Jean"
+            "DUPONT Jean"
         )
 
         self.assertEqual(
             EmployeeAutocomplete().get_result_label(self.henry),
-            "Arkin Henry"
+            "ARKIN Henry"
         )

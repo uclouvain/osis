@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,10 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django import forms
+
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, EducationGroupYearModelForm
 from base.models.enums import education_group_categories
-from django.utils.translation import ugettext_lazy as _
-
 from base.models.enums.education_group_categories import Categories
 
 
@@ -51,14 +51,16 @@ class GroupYearModelForm(EducationGroupYearModelForm):
             "constraint_type",
             "management_entity"
         )
+        widgets = {
+            "credits": forms.TextInput(),
+            "min_constraint": forms.TextInput(),
+            "max_constraint": forms.TextInput(),
+        }
 
 
 class GroupModelForm(EducationGroupModelForm):
     """ For groups, it is forbidden to update data about education_group """
     category = education_group_categories.GROUP
-
-    def __init__(self, _, *args, **kwargs):
-        super().__init__({}, *args, **kwargs)
 
 
 class GroupForm(CommonBaseForm):
