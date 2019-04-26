@@ -96,8 +96,17 @@
                                 {{ learning_unit.get_subtype_display }}
                             </td>
                             <td>
+                                {% if learning_unit.status %}
+                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:green;"
+                                          title="{% trans 'Active' %}"></span>
+                                    <div style="display:none;">1</div>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:gray;"
+                                          title="{% trans 'Inactive' %}"></span>
+                                    <div style="display:none;">0</div>
+                                {% endif %}
                                 {% trans 'Modification made' as title_status_true %}
-                                {% include "blocks/span/span_status.html" with status=learning_unit.summary_status title_status_false=learning_unit.error.as_ul title_status_true=title_status_true %}
+                                {% include "blocks/span/span_mod_status.html" with status=learning_unit.summary_status title_status_false=learning_unit.error.as_ul title_status_true=title_status_true %}
                             </td>
                         </tr>
                     {% endfor %}
