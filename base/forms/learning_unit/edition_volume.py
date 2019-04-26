@@ -105,7 +105,8 @@ class VolumeEditionForm(forms.Form):
 
         # Append dynamic fields
         entities_to_add = [entity for entity in REQUIREMENT_ENTITIES if entity in self.entities]
-        if len(entities_to_add) > 1:
+        size_entities_to_add = len(entities_to_add)
+        if size_entities_to_add > 1:
             self.fields["opening_brackets_entities_field"] = EmptyField(label='[')
         for i, key in enumerate(entities_to_add):
             entity = self.entities[key]
@@ -117,7 +118,7 @@ class VolumeEditionForm(forms.Form):
             )
             if i != len(entities_to_add) - 1:
                 self.fields["add" + key.lower()] = EmptyField(label='+')
-        if len(entities_to_add) > 1:
+        if size_entities_to_add > 1:
             self.fields["closing_brackets_entities_field"] = EmptyField(label=']')
 
         if self.is_faculty_manager \
