@@ -576,7 +576,6 @@ def _check_proposal_edition(learning_unit_year, raise_exception):
         learning_unit_year__learning_unit=learning_unit_year.learning_unit,
         learning_unit_year__academic_year__year__lte=learning_unit_year.academic_year.year
     ).exists()
-    print(learning_unit_year.academic_year)
 
     can_raise_exception(
         raise_exception,
