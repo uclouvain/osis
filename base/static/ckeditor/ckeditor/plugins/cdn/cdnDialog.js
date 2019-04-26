@@ -13,7 +13,7 @@ var cdn_document_name;
 		  {
 			id : "cdn_browse",
 			label : 'Sélection du fichier cible',
-			title : 'tab1: Browse',
+			title : 'Browse',
 			expand : true,
 			elements :[
 			  {
@@ -43,7 +43,7 @@ var cdn_document_name;
 		  }
 		  else {
 			// no selection, we have to create the html text of the link with the the name of the file
-			if ( cdn_document_name!=null && cdn_document_name.length != 0) link.setHtml(" "+cdn_document_name+" ");
+			if ( cdn_document_name!=null && cdn_document_name.length != 0) link.setHtml(" "+cdn_document_name);
 		  }
 
 		  link.setAttribute( 'href', cdn_document_url);
@@ -62,12 +62,13 @@ var cdn_document_name;
 // automatic dialog re size  feature
 //
 	CKEDITOR.dialog.on('resize', function (evt) {
+
 	  var dialog = CKEDITOR.dialog.getCurrent();
 	  if ( dialog ) {
 		dialog = dialog._.contents;
 		var BrowseIframeId = dialog.cdn_browse.iframe_cdn_browse._.frameId;
 		var instanceBrowse = document.getElementById(BrowseIframeId);
-		console.log(evt);
+		console.log(instanceBrowse)
 		instanceBrowse.style.height = evt.data.height + 'px';
 		instanceBrowse.style.width = evt.data.width + 'px';
 	  }
