@@ -95,6 +95,10 @@ class LearningUnitSearchForm(BaseSearchForm):
 
     with_entity_subordinated = forms.BooleanField(label=_('With subord. ent.'))
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["with_entity_subordinated"].initial = True
+
     def get_queryset(self):
         """ Filter a LearningUnitYearQueryset """
         has_proposal = ProposalLearningUnit.objects.filter(
