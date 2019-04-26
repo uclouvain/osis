@@ -92,8 +92,8 @@ class VolumeEditionForm(forms.Form):
         self.entities = kwargs.pop('entities', [])
         self.is_faculty_manager = kwargs.pop('is_faculty_manager', False)
 
-        self.title = self.component.acronym
-        self.title_help = _(self.component.type) + ' ' if self.component.type else ''
+        self.title = _(self.component.get_type_display()) + ' ' if self.component.type else self.component.acronym
+        self.title_help = _(self.component.get_type_display()) + ' ' if self.component.type else ''
         self.title_help += self.component.acronym
 
         super().__init__(*args, **kwargs)
