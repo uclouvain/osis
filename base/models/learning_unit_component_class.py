@@ -34,8 +34,8 @@ class LearningUnitComponentClassAdmin(osis_model_admin.OsisModelAdmin):
 
 
 class LearningUnitComponentClass(models.Model):
-    learning_unit_component = models.ForeignKey('LearningUnitComponent')
-    learning_class_year = models.ForeignKey('LearningClassYear')
+    learning_unit_component = models.ForeignKey('LearningUnitComponent', on_delete=models.CASCADE)
+    learning_class_year = models.ForeignKey('LearningClassYear', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         learning_component_year = self.learning_unit_component.learning_component_year

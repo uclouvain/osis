@@ -52,15 +52,15 @@ class AttributionNewAdmin(admin.ModelAdmin):
 class AttributionNew(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    learning_container_year = models.ForeignKey('base.LearningContainerYear')
-    tutor = models.ForeignKey('base.Tutor')
+    learning_container_year = models.ForeignKey('base.LearningContainerYear', on_delete=models.CASCADE)
+    tutor = models.ForeignKey('base.Tutor', on_delete=models.CASCADE)
     function = models.CharField(max_length=35, choices=Functions.choices(), db_index=True, verbose_name=_("Function"))
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     start_year = models.IntegerField(blank=True, null=True, verbose_name=_("Start"))
     end_year = models.IntegerField(blank=True, null=True)
     score_responsible = models.BooleanField(default=False)
-    substitute = models.ForeignKey('base.Person', blank=True, null=True)
+    substitute = models.ForeignKey('base.Person', blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return u"%s - %s" % (self.tutor.person, self.function)

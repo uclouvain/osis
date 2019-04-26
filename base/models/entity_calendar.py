@@ -40,7 +40,7 @@ class EntityCalendarAdmin(OsisModelAdmin):
 
 
 class EntityCalendar(AbstractCalendar):
-    entity = models.ForeignKey('Entity')
+    entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ('academic_calendar', 'entity')

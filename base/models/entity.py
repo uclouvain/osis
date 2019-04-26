@@ -41,14 +41,14 @@ class EntityAdmin(SerializableModelAdmin):
 
 
 class Entity(SerializableModel):
-    organization = models.ForeignKey('Organization', blank=True, null=True)
+    organization = models.ForeignKey('Organization', blank=True, null=True, on_delete=models.CASCADE)
     external_id = models.CharField(max_length=255, unique=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
     location = models.CharField(max_length=255, blank=True, null=True)
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
-    country = models.ForeignKey('reference.Country', blank=True, null=True)
+    country = models.ForeignKey('reference.Country', blank=True, null=True, on_delete=models.CASCADE)
     phone = models.CharField(max_length=30, blank=True, null=True)
     fax = models.CharField(max_length=255, blank=True, null=True)
     website = models.CharField(max_length=255, blank=True, null=True)
@@ -107,10 +107,10 @@ def find_versions_from_entites(entities, date):
         date = timezone.now()
     order_list = [entity_type.SECTOR, entity_type.FACULTY, entity_type.SCHOOL, entity_type.INSTITUTE, entity_type.POLE]
     preserved = Case(*[When(entity_type=pk, then=pos) for pos, pk in enumerate(order_list)])
-    return Entity.objects.filter(pk__in=entities).\
+    return Entity.objects.filter(pk__in=entities). \
         filter(Q(entityversion__end_date__gte=date) | Q(entityversion__end_date__isnull=True),
-               entityversion__start_date__lte=date).\
-        annotate(acronym=F('entityversion__acronym')).annotate(title=F('entityversion__title')).\
+               entityversion__start_date__lte=date). \
+        annotate(acronym=F('entityversion__acronym')).annotate(title=F('entityversion__title')). \
         annotate(entity_type=F('entityversion__entity_type')).order_by(preserved)
 
 

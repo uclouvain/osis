@@ -55,11 +55,11 @@ PREREQUISITE_SYNTAX_REGEX = r'^({no_element_regex}|' \
                             r'{unique_element_regex}|' \
                             r'{multiple_elements_regex_and}|' \
                             r'{multiple_elements_regex_or})$'.format(
-                                no_element_regex=NO_PREREQUISITE_REGEX,
-                                unique_element_regex=UNIQUE_PREREQUISITE_REGEX,
-                                multiple_elements_regex_and=MULTIPLE_PREREQUISITES_REGEX_AND,
-                                multiple_elements_regex_or=MULTIPLE_PREREQUISITES_REGEX_OR
-                            )
+    no_element_regex=NO_PREREQUISITE_REGEX,
+    unique_element_regex=UNIQUE_PREREQUISITE_REGEX,
+    multiple_elements_regex_and=MULTIPLE_PREREQUISITES_REGEX_AND,
+    multiple_elements_regex_or=MULTIPLE_PREREQUISITES_REGEX_OR
+)
 mark_safe_lazy = lazy(mark_safe, str)
 prerequisite_syntax_validator = validators.RegexValidator(regex=PREREQUISITE_SYNTAX_REGEX,
                                                           message=mark_safe_lazy(_("Prerequisites are invalid")))
@@ -87,10 +87,11 @@ class Prerequisite(models.Model):
     )
 
     learning_unit_year = models.ForeignKey(
-        "LearningUnitYear"
+        "LearningUnitYear", on_delete=models.CASCADE
+
     )
     education_group_year = models.ForeignKey(
-        "EducationGroupYear"
+        "EducationGroupYear", on_delete=models.CASCADE
     )
     main_operator = models.CharField(
         choices=prerequisite_operator.PREREQUISITES_OPERATORS,

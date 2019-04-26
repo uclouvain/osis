@@ -40,8 +40,8 @@ class LearningUnitComponentAdmin(VersionAdmin, SerializableModelAdmin):
 class LearningUnitComponent(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    learning_unit_year = models.ForeignKey('LearningUnitYear')
-    learning_component_year = models.ForeignKey('LearningComponentYear')
+    learning_unit_year = models.ForeignKey('LearningUnitYear', on_delete=models.CASCADE)
+    learning_component_year = models.ForeignKey('LearningComponentYear', on_delete=models.CASCADE)
     # FIXME :  Duplicate with learningComponentYear.type (check if used in OSIS-portal)
     type = models.CharField(max_length=25, blank=True, null=True, choices=component_type.COMPONENT_TYPES, db_index=True)
 

@@ -54,8 +54,8 @@ class Attribution(SerializableModel):
     start_year = models.IntegerField(blank=True, null=True)
     end_year = models.IntegerField(blank=True, null=True)
     function = models.CharField(max_length=35, blank=True, null=True, choices=Functions.choices(), db_index=True)
-    learning_unit_year = models.ForeignKey('base.LearningUnitYear')
-    tutor = models.ForeignKey('base.Tutor')
+    learning_unit_year = models.ForeignKey('base.LearningUnitYear', on_delete=models.CASCADE)
+    tutor = models.ForeignKey('base.Tutor', on_delete=models.CASCADE)
     score_responsible = models.BooleanField(default=False)
     summary_responsible = models.BooleanField(default=False)
 

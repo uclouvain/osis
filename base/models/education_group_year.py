@@ -181,7 +181,8 @@ class EducationGroupYear(SerializableModel):
 
     academic_year = models.ForeignKey(
         'AcademicYear',
-        verbose_name=_("validity")
+        verbose_name=_("validity"),
+        on_delete=models.CASCADE
     )
 
     education_group = models.ForeignKey(
@@ -191,7 +192,8 @@ class EducationGroupYear(SerializableModel):
 
     education_group_type = models.ForeignKey(
         'EducationGroupType',
-        verbose_name=_("Type of training")
+        verbose_name=_("Type of training"),
+        on_delete=models.CASCADE
     )
 
     active = models.CharField(
@@ -256,6 +258,7 @@ class EducationGroupYear(SerializableModel):
         blank=True,
         null=True,
         verbose_name=_("Enrollment campus"),
+        on_delete=models.CASCADE
     )
 
     main_teaching_campus = models.ForeignKey(
@@ -263,7 +266,8 @@ class EducationGroupYear(SerializableModel):
         blank=True,
         null=True,
         related_name='teaching',
-        verbose_name=_("Learning location")
+        verbose_name=_("Learning location"),
+        on_delete=models.CASCADE
     )
 
     dissertation = models.BooleanField(
@@ -347,6 +351,7 @@ class EducationGroupYear(SerializableModel):
         'reference.Language',
         null=True,
         verbose_name=_('Primary language'),
+        on_delete=models.CASCADE
     )
 
     language_association = models.CharField(
@@ -459,13 +464,15 @@ class EducationGroupYear(SerializableModel):
         Entity,
         verbose_name=_("Management entity"),
         null=True,
-        related_name="management_entity"
+        related_name="management_entity",
+        on_delete=models.CASCADE
     )
 
     administration_entity = models.ForeignKey(
         Entity, null=True,
         verbose_name=_("Administration entity"),
-        related_name='administration_entity'
+        related_name='administration_entity',
+        on_delete=models.CASCADE
     )
 
     weighting = models.BooleanField(
@@ -539,6 +546,7 @@ class EducationGroupYear(SerializableModel):
         verbose_name=_("Publication contact entity"),
         null=True,
         blank=True,
+        on_delete=models.CASCADE
     )
 
     linked_with_epc = models.BooleanField(
