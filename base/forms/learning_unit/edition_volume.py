@@ -54,6 +54,7 @@ class VolumeEditionForm(forms.Form):
     additional_requirement_entity_1_key = 'volume_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1.lower()
     additional_requirement_entity_2_key = 'volume_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2.lower()
 
+    opening_brackets_field = EmptyField(label='[')
     opening_parenthesis_field = EmptyField(label='(')
     volume_q1 = VolumeField(
         label=_('Q1'),
@@ -68,6 +69,7 @@ class VolumeEditionForm(forms.Form):
         widget=forms.TextInput(),
         required=False,
     )
+    closing_parenthesis_field = EmptyField(label=')')
     equal_field_1 = EmptyField(label='=')
     volume_total = VolumeField(
         label=_('Vol. annual'),
@@ -76,7 +78,7 @@ class VolumeEditionForm(forms.Form):
         required=False,
     )
     help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('Volume Q1'), _('Volume Q2'))
-    closing_parenthesis_field = EmptyField(label=')')
+    closing_brackets_field = EmptyField(label=']')
     mult_field = EmptyField(label='*')
     planned_classes = forms.IntegerField(label=_('Classes'), help_text=_('Planned classes'), min_value=0,
                                          widget=forms.TextInput(), required=False)
@@ -103,6 +105,9 @@ class VolumeEditionForm(forms.Form):
 
         # Append dynamic fields
         entities_to_add = [entity for entity in REQUIREMENT_ENTITIES if entity in self.entities]
+        size_entities_to_add = len(entities_to_add)
+        if size_entities_to_add > 1:
+            self.fields["opening_brackets_entities_field"] = EmptyField(label='[')
         for i, key in enumerate(entities_to_add):
             entity = self.entities[key]
             self.fields["volume_" + key.lower()] = VolumeField(
@@ -113,6 +118,8 @@ class VolumeEditionForm(forms.Form):
             )
             if i != len(entities_to_add) - 1:
                 self.fields["add" + key.lower()] = EmptyField(label='+')
+        if size_entities_to_add > 1:
+            self.fields["closing_brackets_entities_field"] = EmptyField(label=']')
 
         if self.is_faculty_manager \
                 and self.learning_unit_year.is_full() \
