@@ -1,12 +1,10 @@
 function redirect_after_success(modal, xhr) {
     $(modal).modal('toggle');
-    if(xhr.hasOwnProperty('partial_reload')) {
+    if (xhr.hasOwnProperty('partial_reload')) {
         $(xhr["partial_reload"]).load(xhr["success_url"]);
-    }
-    else if (xhr.hasOwnProperty('success_url')) {
+    } else if (xhr.hasOwnProperty('success_url')) {
         window.location.href = xhr["success_url"];
-    }
-    else {
+    } else {
         window.location.reload();
     }
 }
@@ -57,20 +55,22 @@ function CKupdate() {
 }
 
 function bind_trigger_modal() {
-  $(".trigger_modal").click(function () {
-    let url = $(this).data("url");
-    let modal_class = $(this).data("modal_class");
-    $('#modal_dialog_id').attr("class", "modal-dialog").addClass(modal_class);
-    $('#form-modal-ajax-content').empty();
-    $('#form-ajax-modal').modal('toggle');
+    $(".trigger_modal").click(function () {
+        let url = $(this).data("url");
+        let modal_class = $(this).data("modal_class");
+        let content = $('#form-modal-ajax-content');
 
-    $('#form-modal-ajax-content').load(url, function () {
-        bindTextArea();
-        // Make the template more flexible to find the first form
-        let form = $(this).find('form').first()
-        formAjaxSubmit(form, '#form-ajax-modal');
+        $('#modal_dialog_id').attr("class", "modal-dialog").addClass(modal_class);
+        content.empty();
+        $('#form-ajax-modal').modal('toggle');
+
+        content.load(url, function () {
+            bindTextArea();
+            // Make the template more flexible to find the first form
+            let form = $(this).find('form').first();
+            formAjaxSubmit(form, '#form-ajax-modal');
+        });
     });
-  });
 }
 
 bind_trigger_modal();
