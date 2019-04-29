@@ -87,10 +87,11 @@ class Prerequisite(models.Model):
     )
 
     learning_unit_year = models.ForeignKey(
-        "LearningUnitYear"
+        "LearningUnitYear", on_delete=models.CASCADE
+
     )
     education_group_year = models.ForeignKey(
-        "EducationGroupYear"
+        "EducationGroupYear", on_delete=models.CASCADE
     )
     main_operator = models.CharField(
         choices=prerequisite_operator.PREREQUISITES_OPERATORS,
