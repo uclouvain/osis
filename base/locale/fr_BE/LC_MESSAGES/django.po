@@ -3,8 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:157
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:158
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
@@ -685,6 +683,10 @@ msgstr "Êtes-vous sûr de vouloir changer l'état de"
 #, python-format
 msgid "Are you sure you want to delete %(education_group_year)s?"
 msgstr "Êtes-vous sûr·e que vous voulez supprimer %(education_group_year)s?"
+
+#: templates/learning_unit/specifications_all.html:261
+msgid "Are you sure you want to delete the achievement?"
+msgstr "Êtes-vous sûre de vouloir supprimer l'acquis d'apprentissage?"
 
 #: templates/education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html:8
 msgid "Are you sure you want to delete the contact ?"
