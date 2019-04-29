@@ -5931,6 +5931,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:163
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "With subord. ent."
-#~ msgstr "Avec ent. subord."
