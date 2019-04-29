@@ -97,7 +97,6 @@ class LearningUnitSearchForm(BaseSearchForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["with_entity_subordinated"].initial = True
 
     def get_queryset(self):
         """ Filter a LearningUnitYearQueryset """
