@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -246,14 +246,6 @@ class TestEditLearningUnit(TestCase):
 
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-    def test_template_used_for_get_request_learning_unit_on_modification_proposal(self):
-        ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year)
-
-        response = self.client.get(self.url)
-
-        self.assertTemplateUsed(response, "learning_unit/simple/update.html")
-        self.assertEqual(response.status_code, HttpResponse.status_code)
 
     def test_template_used_for_get_request(self):
         response = self.client.get(self.url)

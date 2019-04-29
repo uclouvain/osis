@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -41,15 +41,20 @@ class ScoreSheetAddressAdmin(OsisModelAdmin):
 class ScoreSheetAddress(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    offer_year = models.OneToOneField('base.OfferYear')
+    offer_year = models.OneToOneField('base.OfferYear', on_delete=models.CASCADE)
     # Info to find the address
-    entity_address_choice = models.CharField(max_length=50, blank=True, null=True, choices=score_sheet_address_choices.CHOICES)
+    entity_address_choice = models.CharField(max_length=50, blank=True, null=True,
+                                             choices=score_sheet_address_choices.CHOICES)
     # Address fields
     recipient = models.CharField(max_length=255, blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)  # Address for scores sheets
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
-    country = models.ForeignKey('reference.Country', blank=True, null=True)
+    country = models.ForeignKey(
+        'reference.Country',
+        blank=True, null=True,
+        on_delete=models.CASCADE
+    )
     phone = models.CharField(max_length=30, blank=True, null=True, verbose_name=gettext_lazy("Phone"))
     fax = models.CharField(max_length=30, blank=True, null=True, verbose_name=gettext_lazy("Fax"))
     email = models.EmailField(null=True, blank=True, verbose_name=gettext_lazy("Email"))
@@ -62,7 +67,8 @@ class ScoreSheetAddress(models.Model):
         if self.customized or self.entity_address_choice:
             super(ScoreSheetAddress, self).save(*args, **kwargs)
         else:
-            raise Exception("Please set either entity_address_choice nor location, postal_code, city... but not all of them.")
+            raise Exception(
+                "Please set either entity_address_choice nor location, postal_code, city... but not all of them.")
 
     def __str__(self):
         return "{0} - {1}".format(self.offer_year, self.entity_address_choice)

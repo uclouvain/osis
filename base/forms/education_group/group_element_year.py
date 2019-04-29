@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -49,7 +49,8 @@ class GroupElementYearForm(forms.ModelForm):
         widgets = {
             "comment": forms.Textarea(attrs={'rows': 5}),
             "comment_english": forms.Textarea(attrs={'rows': 5}),
-            "block": forms.TextInput()
+            "block": forms.TextInput(),
+            "relative_credits": forms.TextInput()
         }
 
     def __init__(self, *args, parent=None, child_branch=None, child_leaf=None, **kwargs):
@@ -81,7 +82,12 @@ class GroupElementYearForm(forms.ModelForm):
                 self._is_education_group_year_a_minor_major_option_list_choice(self.instance.child_branch):
             self._keep_only_fields(["block"])
 
+        elif self.instance.child_leaf:
+            self.fields.pop("link_type")
+            self.fields.pop("access_condition")
+
         else:
+            self.fields.pop("relative_credits")
             self.fields.pop("access_condition")
 
     def save(self, commit=True):

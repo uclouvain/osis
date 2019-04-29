@@ -93,6 +93,19 @@ class TrainingType(ChoiceEnum):
             cls.CAPAES.name,
         ]
 
+    @classmethod
+    def with_skills_achievements(cls):
+        return [
+            cls.BACHELOR.name,
+            cls.MASTER_MC.name,
+            cls.MASTER_M1.name,
+            cls.PGRM_MASTER_120.name,
+            cls.PGRM_MASTER_180_240.name,
+            cls.AGGREGATION.name,
+            cls.CERTIFICATE.name,
+            cls.RESEARCH_CERTIFICATE.name,
+        ]
+
 
 class MiniTrainingType(ChoiceEnum):
     DEEPENING = _("Deepening")
@@ -141,6 +154,14 @@ class GroupType(ChoiceEnum):
     def minor_major_option_list_choice(cls):
         return [
             cls.MINOR_LIST_CHOICE.name, cls.MAJOR_LIST_CHOICE.name, cls.OPTION_LIST_CHOICE.name
+        ]
+
+    @classmethod
+    def ordered(cls):
+        return [
+            cls.COMMON_CORE.name, cls.FINALITY_120_LIST_CHOICE.name, cls.FINALITY_180_LIST_CHOICE.name,
+            cls.OPTION_LIST_CHOICE.name, cls.MINOR_LIST_CHOICE.name, cls.MAJOR_LIST_CHOICE.name,
+            cls.MOBILITY_PARTNERSHIP_LIST_CHOICE.name, cls.COMPLEMENTARY_MODULE.name, cls.SUB_GROUP.name
         ]
 
 

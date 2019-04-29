@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -42,12 +42,6 @@ from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITI
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY, \
     CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_component import LearningUnitComponent
-
-
-class StepHalfIntegerWidget(forms.NumberInput):
-    def __init__(self):
-        super().__init__(attrs={'step': STEP_HALF_INTEGER, 'min': 0})
 
 
 class VolumeField(forms.DecimalField):
@@ -60,31 +54,34 @@ class VolumeEditionForm(forms.Form):
     additional_requirement_entity_1_key = 'volume_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1.lower()
     additional_requirement_entity_2_key = 'volume_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2.lower()
 
+    opening_brackets_field = EmptyField(label='[')
     opening_parenthesis_field = EmptyField(label='(')
     volume_q1 = VolumeField(
         label=_('Q1'),
         help_text=_('Volume Q1'),
-        widget=StepHalfIntegerWidget(),
+        widget=forms.TextInput(),
         required=False,
     )
     add_field = EmptyField(label='+')
     volume_q2 = VolumeField(
         label=_('Q2'),
         help_text=_('Volume Q2'),
-        widget=StepHalfIntegerWidget(),
+        widget=forms.TextInput(),
         required=False,
     )
+    closing_parenthesis_field = EmptyField(label=')')
     equal_field_1 = EmptyField(label='=')
     volume_total = VolumeField(
         label=_('Vol. annual'),
         help_text=_('The annual volume must be equal to the sum of the volumes Q1 and Q2'),
-        widget=StepHalfIntegerWidget(),
+        widget=forms.TextInput(),
         required=False,
     )
     help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('Volume Q1'), _('Volume Q2'))
-    closing_parenthesis_field = EmptyField(label=')')
+    closing_brackets_field = EmptyField(label=']')
     mult_field = EmptyField(label='*')
-    planned_classes = forms.IntegerField(label=_('P.C.'), help_text=_('Planned classes'), min_value=0)
+    planned_classes = forms.IntegerField(label=_('Classes'), help_text=_('Planned classes'), min_value=0,
+                                         widget=forms.TextInput(), required=False)
     equal_field_2 = EmptyField(label='=')
 
     _post_errors = []
@@ -97,8 +94,8 @@ class VolumeEditionForm(forms.Form):
         self.entities = kwargs.pop('entities', [])
         self.is_faculty_manager = kwargs.pop('is_faculty_manager', False)
 
-        self.title = self.component.acronym
-        self.title_help = _(self.component.type) + ' ' if self.component.type else ''
+        self.title = _(self.component.get_type_display()) + ' ' if self.component.type else self.component.acronym
+        self.title_help = _(self.component.get_type_display()) + ' ' if self.component.type else ''
         self.title_help += self.component.acronym
 
         super().__init__(*args, **kwargs)
@@ -108,15 +105,21 @@ class VolumeEditionForm(forms.Form):
 
         # Append dynamic fields
         entities_to_add = [entity for entity in REQUIREMENT_ENTITIES if entity in self.entities]
+        size_entities_to_add = len(entities_to_add)
+        if size_entities_to_add > 1:
+            self.fields["opening_brackets_entities_field"] = EmptyField(label='[')
         for i, key in enumerate(entities_to_add):
             entity = self.entities[key]
             self.fields["volume_" + key.lower()] = VolumeField(
                 label=entity.acronym,
                 help_text=entity.title,
-                widget=StepHalfIntegerWidget(),
+                widget=forms.TextInput(),
+                required=False
             )
             if i != len(entities_to_add) - 1:
                 self.fields["add" + key.lower()] = EmptyField(label='+')
+        if size_entities_to_add > 1:
+            self.fields["closing_brackets_entities_field"] = EmptyField(label=']')
 
         if self.is_faculty_manager \
                 and self.learning_unit_year.is_full() \
@@ -140,8 +143,7 @@ class VolumeEditionForm(forms.Form):
         volume_q2 = self.cleaned_data.get("volume_q2") or 0
         volume_total = self.cleaned_data.get("volume_total") or 0
 
-        if (self.cleaned_data.get("volume_q1") is not None or self.cleaned_data.get(
-                "volume_q2") is not None) and volume_total != volume_q1 + volume_q2:
+        if (volume_q1 or volume_q2) and volume_total != volume_q1 + volume_q2:
             self.add_error("volume_total", _('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
             self.add_error("volume_q1", "")
             self.add_error("volume_q2", "")
@@ -205,15 +207,15 @@ class VolumeEditionForm(forms.Form):
 
     def _find_learning_components_year(self, luy_to_update_list):
         prefetch = Prefetch(
-            'learning_component_year__entitycomponentyear_set',
+            'entitycomponentyear_set',
             queryset=EntityComponentYear.objects.all(),
             to_attr='entity_components_year'
         )
         return [
-            luc.learning_component_year
-            for luc in LearningUnitComponent.objects.filter(
+            lcy
+            for lcy in LearningComponentYear.objects.filter(
                 learning_unit_year__in=luy_to_update_list).prefetch_related(prefetch)
-            if luc.learning_component_year.type == self.component.type
+            if lcy.type == self.component.type
         ]
 
 
@@ -322,12 +324,14 @@ class SimplifiedVolumeForm(forms.ModelForm):
         fields = (
             'hourly_volume_total_annual',
             'hourly_volume_partial_q1',
-            'hourly_volume_partial_q2'
+            'hourly_volume_partial_q2',
+            'planned_classes'
         )
         widgets = {
-            'hourly_volume_total_annual': StepHalfIntegerWidget,
-            'hourly_volume_partial_q1': StepHalfIntegerWidget,
-            'hourly_volume_partial_q2': StepHalfIntegerWidget,
+            'hourly_volume_total_annual': forms.TextInput(),
+            'hourly_volume_partial_q1': forms.TextInput(),
+            'hourly_volume_partial_q2': forms.TextInput(),
+            'planned_classes': forms.TextInput()
         }
 
     def clean(self):
@@ -377,33 +381,24 @@ class SimplifiedVolumeForm(forms.ModelForm):
         return container_type not in CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
 
     def _create_structure_components(self, commit):
-        self.instance.learning_container_year = self._learning_unit_year.learning_container_year
+        self.instance.learning_unit_year = self._learning_unit_year
 
-        if self.instance.hourly_volume_total_annual is None or self.instance.hourly_volume_total_annual == 0:
-            self.instance.planned_classes = 0
-        else:
-            self.instance.planned_classes = 1
         instance = super().save(commit)
-
-        LearningUnitComponent.objects.update_or_create(
-            learning_unit_year=self._learning_unit_year,
-            learning_component_year=instance
-        )
 
         requirement_entity_containers = self._get_requirement_entity_container()
         for requirement_entity_container in requirement_entity_containers:
-            learning_unit_components = LearningUnitComponent.objects.filter(
+            learning_components = LearningComponentYear.objects.filter(
                 learning_unit_year__learning_container_year=self._learning_unit_year.learning_container_year
             )
-            self._create_entity_component_years(learning_unit_components, requirement_entity_container)
+            self._create_entity_component_years(learning_components, requirement_entity_container)
         return instance
 
     @staticmethod
-    def _create_entity_component_years(learning_unit_components, requirement_entity_container):
-        for learning_unit_component in learning_unit_components:
+    def _create_entity_component_years(learning_components, requirement_entity_container):
+        for component_year in learning_components:
             EntityComponentYear.objects.update_or_create(
                 entity_container_year=requirement_entity_container,
-                learning_component_year=learning_unit_component.learning_component_year
+                learning_component_year=component_year
             )
 
     def _get_requirement_entity_container(self):

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class Campus(SerializableModel):
     name = models.CharField(max_length=100)
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    organization = models.ForeignKey('Organization')
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE)
     is_administration = models.BooleanField(default=False)
 
     def __str__(self):

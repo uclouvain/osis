@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -76,8 +76,8 @@ class ExamEnrollment(models.Model):
                                                choices=justification_types.JUSTIFICATION_TYPES)
     justification_final = models.CharField(max_length=20, blank=True, null=True,
                                            choices=justification_types.JUSTIFICATION_TYPES)
-    session_exam = models.ForeignKey('SessionExam')
-    learning_unit_enrollment = models.ForeignKey('LearningUnitEnrollment')
+    session_exam = models.ForeignKey('SessionExam', on_delete=models.CASCADE)
+    learning_unit_enrollment = models.ForeignKey('LearningUnitEnrollment', on_delete=models.CASCADE)
     enrollment_state = models.CharField(max_length=20,
                                         default=enrollment_states.ENROLLED,
                                         choices=enrollment_states.STATES,
@@ -246,8 +246,8 @@ class ExamEnrollmentHistoryAdmin(OsisModelAdmin):
 
 
 class ExamEnrollmentHistory(models.Model):
-    exam_enrollment = models.ForeignKey(ExamEnrollment)
-    person = models.ForeignKey(person.Person)
+    exam_enrollment = models.ForeignKey(ExamEnrollment, on_delete=models.CASCADE)
+    person = models.ForeignKey(person.Person, on_delete=models.CASCADE)
     score_final = models.DecimalField(max_digits=4, decimal_places=2, null=True)
     justification_final = models.CharField(max_length=20, null=True, choices=justification_types.JUSTIFICATION_TYPES)
     modification_date = models.DateTimeField(auto_now=True)

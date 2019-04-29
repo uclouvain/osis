@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -47,8 +47,8 @@ class PersonEntityAdmin(OsisModelAdmin):
 
 
 class PersonEntity(models.Model):
-    person = models.ForeignKey('Person')
-    entity = models.ForeignKey('Entity')
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
     with_child = models.BooleanField(default=False)
 
     class Meta:

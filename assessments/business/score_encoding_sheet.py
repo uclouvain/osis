@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -192,7 +192,8 @@ def scores_sheet_data(exam_enrollments, tutor=None):
                     "last_name": student.person.last_name,
                     "first_name": student.person.first_name,
                     "score": score,
-                    "justification": _(exam_enrol.justification_final) if exam_enrol.justification_final else '',
+                    "justification": _(exam_enrol.get_justification_final_display())
+                    if exam_enrol.justification_final else '',
                     "deadline": deadline if deadline else '',
                     "enrollment_state_color": get_line_color(exam_enrol),
                 })

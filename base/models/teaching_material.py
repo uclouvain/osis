@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ class TeachingMaterialAdmin(VersionAdmin, OrderedModelAdmin):
 
 class TeachingMaterial(OrderedModel):
     title = models.CharField(max_length=255, verbose_name=_('Title'))
-    mandatory = models.BooleanField(verbose_name=_('Mandatory'))
+    mandatory = models.BooleanField(verbose_name=_('Is this teaching material mandatory?'))
     learning_unit_year = models.ForeignKey(LearningUnitYear, on_delete=models.CASCADE)
     order_with_respect_to = 'learning_unit_year'
 

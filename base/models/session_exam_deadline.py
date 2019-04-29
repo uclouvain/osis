@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ class SessionExamDeadline(models.Model):
     deliberation_date = models.DateField(blank=True, null=True)
     deadline_tutor = models.IntegerField(null=True, blank=True)  # Delta day(s)
     number_session = models.IntegerField(choices=number_session.NUMBERS_SESSION)
-    offer_enrollment = models.ForeignKey('OfferEnrollment')
+    offer_enrollment = models.ForeignKey('OfferEnrollment', on_delete=models.CASCADE)
 
     __original_deliberation_date = None
 

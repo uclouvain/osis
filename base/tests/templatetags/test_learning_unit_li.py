@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -102,28 +102,26 @@ class LearningUnitTagLiEditTest(TestCase):
         self.person_entity = PersonEntityFactory(person=self.central_manager_person)
 
         self.requirement_entity = self.person_entity.entity
-        self.proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year,
-                                                    initial_data={
-                                                        'learning_container_year': {
-                                                            'common_title': self.lcy.common_title},
-                                                        'entities': {'REQUIREMENT_ENTITY': self.requirement_entity.id}
-                                                    },
-                                                    )
+        self.proposal = ProposalLearningUnitFactory(
+            learning_unit_year=self.learning_unit_year,
+            initial_data={
+                'learning_container_year': {'common_title': self.lcy.common_title},
+                'entities': {'REQUIREMENT_ENTITY': self.requirement_entity.id}
+            },
+        )
 
         self.entity_container_yr = EntityContainerYearFactory(
             learning_container_year=self.learning_unit_year.learning_container_year,
             entity=self.person_entity.entity,
             type=entity_container_year_link_type.REQUIREMENT_ENTITY
         )
+        EntityContainerYearFactory(
+            learning_container_year=self.previous_learning_unit_year.learning_container_year,
+            entity=self.person_entity.entity,
+            type=entity_container_year_link_type.REQUIREMENT_ENTITY
+        )
         self.client.force_login(user=self.central_manager_person.user)
         self.url_edit = reverse('edit_learning_unit', args=[self.learning_unit_year.id])
-
-        self.url = self.client.get(reverse(
-            "learning_unit",
-            kwargs={
-                "learning_unit_year_id": self.learning_unit_year.id
-            }
-        ))
         self.request = RequestFactory().get("")
         self.context = {
             "learning_unit_year": self.learning_unit_year,
@@ -216,6 +214,7 @@ class LearningUnitTagLiEditTest(TestCase):
         )
 
     def test_li_edit_lu_everything_ok(self):
+        self.proposal.delete()
         result = li_edit_lu(self.context, self.url_edit, "")
         self.assertEqual(
             result, self._get_result_data_expected(ID_LINK_EDIT_LU, url=self.url_edit)

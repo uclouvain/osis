@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ class AttributionChargeNew(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     attribution = models.ForeignKey('AttributionNew', on_delete=models.CASCADE)
-    learning_component_year = models.ForeignKey('base.LearningComponentYear')
+    learning_component_year = models.ForeignKey('base.LearningComponentYear', on_delete=models.CASCADE)
     allocation_charge = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
 
     def __str__(self):

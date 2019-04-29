@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -44,36 +44,41 @@ GRADE_TYPES = (
 class OfferYear(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    offer = models.ForeignKey('Offer')
-    academic_year = models.ForeignKey('AcademicYear')
+    offer = models.ForeignKey('Offer', on_delete=models.CASCADE)
+    academic_year = models.ForeignKey('AcademicYear', on_delete=models.CASCADE)
     acronym = models.CharField(max_length=15, db_index=True)
     title = models.CharField(max_length=255)
     title_international = models.CharField(max_length=255, blank=True, null=True)
     title_short = models.CharField(max_length=255, blank=True, null=True)
     title_printable = models.CharField(max_length=255, blank=True, null=True)
-    parent = models.ForeignKey('self', blank=True, null=True, related_name='children', db_index=True)
+    parent = models.ForeignKey('self', blank=True, null=True, related_name='children', db_index=True,
+                               on_delete=models.CASCADE)
     grade = models.CharField(max_length=20, blank=True, null=True, choices=GRADE_TYPES)
-    entity_administration = models.ForeignKey('Structure', related_name='admministration', blank=True, null=True)
+    entity_administration = models.ForeignKey('Structure', related_name='admministration', blank=True, null=True,
+                                              on_delete=models.CASCADE)
     entity_administration_fac = models.ForeignKey(
         'Structure',
         related_name='admministration_fac',
         blank=True,
-        null=True
+        null=True,
+        on_delete=models.CASCADE
     )
-    entity_management = models.ForeignKey('Structure', related_name='management', blank=True, null=True)
-    entity_management_fac = models.ForeignKey('Structure', related_name='management_fac', blank=True, null=True)
+    entity_management = models.ForeignKey('Structure', related_name='management', blank=True, null=True,
+                                          on_delete=models.CASCADE)
+    entity_management_fac = models.ForeignKey('Structure', related_name='management_fac', blank=True, null=True,
+                                              on_delete=models.CASCADE)
     recipient = models.CharField(max_length=255, blank=True, null=True)  # Recipient of scores cheets (Structure)
     location = models.CharField(max_length=255, blank=True, null=True)  # Address for scores cheets
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
-    country = models.ForeignKey('reference.Country', blank=True, null=True)
+    country = models.ForeignKey('reference.Country', blank=True, null=True, on_delete=models.CASCADE)
     phone = models.CharField(max_length=30, blank=True, null=True)
     fax = models.CharField(max_length=30, blank=True, null=True)
     email = models.EmailField(null=True, blank=True)
-    campus = models.ForeignKey('Campus', blank=True, null=True)
-    grade_type = models.ForeignKey('reference.GradeType', blank=True, null=True)
+    campus = models.ForeignKey('Campus', blank=True, null=True, on_delete=models.CASCADE)
+    grade_type = models.ForeignKey('reference.GradeType', blank=True, null=True, on_delete=models.CASCADE)
     enrollment_enabled = models.BooleanField(default=False)
-    offer_type = models.ForeignKey('OfferType', blank=True, null=True)
+    offer_type = models.ForeignKey('OfferType', blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return u"%s - %s" % (self.academic_year, self.acronym)
@@ -155,7 +160,7 @@ def search(entity=None, academic_yr=None, acronym=None):
 
     if entity or academic_yr or acronym:
         out = queryset.order_by('acronym')
-               
+
     return out
 
 

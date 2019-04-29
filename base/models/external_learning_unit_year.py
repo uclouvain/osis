@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ class ExternalLearningUnitYear(models.Model):
 
     co_graduation = models.BooleanField(default=False, verbose_name=_('Co-graduation'))
     mobility = models.BooleanField(default=False, verbose_name=_('Mobility'))
-    author = models.ForeignKey('Person', null=True)
+    author = models.ForeignKey('Person', null=True, on_delete=models.CASCADE)
     creation_date = models.DateTimeField(null=True, auto_now_add=True)
 
     class Meta:

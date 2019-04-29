@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -39,8 +39,8 @@ class EducationGroupLanguage(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     type = models.CharField(max_length=255, choices=education_group_language.EducationGroupLanguages.choices())
     order = models.IntegerField()
-    education_group_year = models.ForeignKey('base.EducationGroupYear')
-    language = models.ForeignKey('reference.Language')
+    education_group_year = models.ForeignKey('base.EducationGroupYear', on_delete=models.CASCADE)
+    language = models.ForeignKey('reference.Language', on_delete=models.CASCADE)
 
     def __str__(self):
         return "{} - {}".format(self.education_group_year, self.language)

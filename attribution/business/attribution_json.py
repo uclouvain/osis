@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ def publish_to_portal(global_ids=None):
         try:
             queue_sender.send_message(queue_name, attribution_list)
         except (RuntimeError, pika.exceptions.ConnectionClosed, pika.exceptions.ChannelClosed,
-                 pika.exceptions.AMQPError):
+                pika.exceptions.AMQPError):
             logger.exception('Could not recompute attributions for portal...')
             return False
         return True
@@ -66,12 +66,8 @@ def _compute_list(global_ids=None):
 
 def _get_all_attributions_with_charges(global_ids):
     attributioncharge_prefetch = mdl_attribution.attribution_charge_new.search()\
-        .prefetch_related(
-            Prefetch('learning_component_year__learningunitcomponent_set',
-                     queryset=mdl_base.learning_unit_component.search()
-                        .filter(learning_unit_year__learning_container_year__in_charge=True),
-                     to_attr='learning_unit_components')
-    )
+        .filter(learning_component_year__learning_unit_year__learning_container_year__in_charge=True)\
+        .select_related('learning_component_year__learning_unit_year__academic_year')
 
     if global_ids is not None:
         qs = mdl_attribution.attribution_new.search(global_id=global_ids)
@@ -107,23 +103,34 @@ def _split_attribution_by_learning_unit_year(attribution):
     attribution_splitted = {}
 
     for attrib_charge in attribution.attribution_charges:
-        for learning_component in attrib_charge.learning_component_year.learning_unit_components:
-            lunit_year = learning_component.learning_unit_year
+        component = attrib_charge.learning_component_year
+        lunit_year = component.learning_unit_year
 
-            allocation_charge_key = attrib_charge.learning_component_year.type if attrib_charge.learning_component_year.type\
-                                    else 'OTHER_CHARGE'
+        allocation_charge_key = component.type if component.type else 'OTHER_CHARGE'
 
-            attribution_splitted.setdefault(lunit_year.id, {
-                    'acronym': lunit_year.acronym,
-                    'title': lunit_year.complete_title,
-                    'start_year': attribution.start_year,
-                    'end_year': attribution.end_year,
-                    'function': attribution.function,
-                    'year': lunit_year.academic_year.year,
-                    'weight': str(lunit_year.credits) if lunit_year.credits else '',
-                    'is_substitute': bool(attribution.substitute)
-            }).update({
-                allocation_charge_key: str(attrib_charge.allocation_charge)
-            })
+        attribution_splitted.setdefault(lunit_year.id, {
+                'acronym': lunit_year.acronym,
+                'title': lunit_year.complete_title,
+                'title_next_yr': _get_title_next_luyr(component.learning_unit_year),
+                'start_year': attribution.start_year,
+                'end_year': attribution.end_year,
+                'function': attribution.function,
+                'year': lunit_year.academic_year.year,
+                'weight': str(lunit_year.credits) if lunit_year.credits else '',
+                'is_substitute': bool(attribution.substitute)
+        }).update({
+            allocation_charge_key: str(attrib_charge.allocation_charge)
+        })
 
     return attribution_splitted.values()
+
+
+def _get_title_next_luyr(learning_unit_yr):
+    next_academic_year = mdl_base.academic_year.find_academic_year_by_year(
+        learning_unit_yr.academic_year.year + 1)
+    if next_academic_year:
+        next_lunit_year = mdl_base.learning_unit_year.search(
+            academic_year_id=next_academic_year.id,
+            learning_unit=learning_unit_yr.learning_unit).first()
+        return next_lunit_year.complete_title if next_lunit_year else None
+    return None

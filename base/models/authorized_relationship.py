@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@ class AuthorizedRelationshipAdmin(OsisModelAdmin):
 
 
 class AuthorizedRelationship(models.Model):
-    parent_type = models.ForeignKey(EducationGroupType, related_name='authorized_parent_type')
-    child_type = models.ForeignKey(EducationGroupType, related_name='authorized_child_type')
+    parent_type = models.ForeignKey(EducationGroupType, related_name='authorized_parent_type', on_delete=models.CASCADE)
+    child_type = models.ForeignKey(EducationGroupType, related_name='authorized_child_type', on_delete=models.CASCADE)
     changed = models.DateTimeField(auto_now=True)
 
     min_count_authorized = models.PositiveIntegerField(

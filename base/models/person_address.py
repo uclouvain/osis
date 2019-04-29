@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -37,11 +37,11 @@ class PersonAddressAdmin(OsisModelAdmin):
 
 class PersonAddress(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    person = models.ForeignKey('Person')
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
     location = models.CharField(max_length=255, blank=True, null=True)
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
-    country = models.ForeignKey('reference.Country', blank=True, null=True)
+    country = models.ForeignKey('reference.Country', blank=True, null=True, on_delete=models.CASCADE)
     label = models.CharField(max_length=20, choices=PersonAddressType.choices(),
                              default=PersonAddressType.PROFESSIONAL.value)
 

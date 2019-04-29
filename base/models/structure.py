@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -42,8 +42,8 @@ class Structure(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     acronym = models.CharField(max_length=15)
     title = models.CharField(max_length=255)
-    organization = models.ForeignKey('Organization', null=True)
-    part_of = models.ForeignKey('self', null=True, blank=True)
+    organization = models.ForeignKey('Organization', null=True, on_delete=models.CASCADE)
+    part_of = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
     type = models.CharField(max_length=30, blank=True, null=True, choices=structure_type.TYPES)
 
     @property

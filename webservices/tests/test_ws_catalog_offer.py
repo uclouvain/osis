@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from base.business.education_groups import general_information_sections
+from base.business.education_groups.general_information_sections import SECTIONS_PER_OFFER_TYPE
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.enums import organization_type
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -538,7 +539,7 @@ class WsCatalogCommonOfferPostTestCase(APITestCase):
         self.language = 'fr'
 
         # Create random text related to common text label in french
-        for label_name in general_information_sections.COMMON_GENERAL_INFO_SECTIONS:
+        for label_name in SECTIONS_PER_OFFER_TYPE['common']:
             TranslatedTextRandomFactory(
                 language='fr-be',
                 reference=str(self.common.pk),
@@ -569,7 +570,7 @@ class WsCatalogCommonOfferPostTestCase(APITestCase):
 
         response_json = response.json()
         self.assertTrue(all(label_name in response_json.keys()
-                            for label_name in general_information_sections.COMMON_GENERAL_INFO_SECTIONS))
+                            for label_name in SECTIONS_PER_OFFER_TYPE['common']))
         self.assertTrue(all(value for value in response_json.values()))
 
     def test_get_text_case_no_data_return_all_sections_with_none_as_value(self):
@@ -582,7 +583,7 @@ class WsCatalogCommonOfferPostTestCase(APITestCase):
 
         response_json = response.json()
         self.assertTrue(all(label_name in response_json.keys()
-                            for label_name in general_information_sections.COMMON_GENERAL_INFO_SECTIONS))
+                            for label_name in SECTIONS_PER_OFFER_TYPE['common']))
         self.assertTrue(all(value is None for value in response_json.values()))
 
     def test_get_text_case_empty_str_as_data_return_all_sections_with_none_as_value(self):
@@ -595,7 +596,7 @@ class WsCatalogCommonOfferPostTestCase(APITestCase):
 
         response_json = response.json()
         self.assertTrue(all(label_name in response_json.keys()
-                            for label_name in general_information_sections.COMMON_GENERAL_INFO_SECTIONS))
+                            for label_name in SECTIONS_PER_OFFER_TYPE['common']))
         self.assertTrue(all(value is None for value in response_json.values()))
 
 

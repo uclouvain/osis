@@ -1,6 +1,6 @@
 <!doctype html>
 {% load staticfiles i18n %}
-{% load analytical hijack_tags %}
+{% load statici18n analytical hijack_tags %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -9,7 +9,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -77,12 +77,13 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery.dataTables.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dataTables.bootstrap.min.js' %}"></script>
+    <script>window.CKEDITOR_BASEPATH = '/static/ckeditor/ckeditor/';</script>
     <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
     <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery-validation/jquery.validate.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/diacritics-sort.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jstree.min.js' %}"></script>
-    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+    <script src="{% statici18n LANGUAGE_CODE %}"></script>
 
     {% block header %}
         <noscript>

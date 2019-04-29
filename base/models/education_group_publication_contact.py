@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ class EducationGroupPublicationContact(OrderedModel):
         default=PublicationContactType.OTHER_CONTACT.name,
         verbose_name=_('type'),
     )
-    education_group_year = models.ForeignKey('EducationGroupYear')
+    education_group_year = models.ForeignKey('EducationGroupYear', on_delete=models.CASCADE)
     order_with_respect_to = ('education_group_year', 'type', )
 
     objects = EducationGroupPublicationQuerySet.as_manager()

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -44,8 +44,8 @@ class EntityContainerYearAdmin(VersionAdmin, SerializableModelAdmin):
 class EntityContainerYear(SerializableModel):
     external_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    entity = models.ForeignKey('Entity')
-    learning_container_year = models.ForeignKey('LearningContainerYear')
+    entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
+    learning_container_year = models.ForeignKey('LearningContainerYear', on_delete=models.CASCADE)
     type = models.CharField(max_length=35, choices=EntityContainerYearLinkTypes.choices())
     _warnings = None
 

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -119,7 +119,7 @@ class XlsTests(TestCase):
         _add_header_and_legend_to_file([exam_enrollment], self.worksheet)
         self.assertEqual(
             self.worksheet.cell(row=1, column=1).value,
-            str(ue) + " " + ue.specific_title if ue.specific_title else str(ue)
+            str(ue) + " " + ue.complete_title if ue.complete_title else str(ue)
         )
         self.assertEqual(
             self.worksheet.cell(row=2, column=1).value,
@@ -181,8 +181,8 @@ class XlsTests(TestCase):
             str(_('Score legend: %(score_legend)s (0=Score of presence)') % {"score_legend": "0 - 20"}),
         )
         self.assertEqual(
-            self.worksheet.cell(row=10, column=1).value,
-            str(_('Decimal values in scores are accepted.'))
+            self.worksheet.cell(row=10, column=2).value,
+            str(_('Decimals authorized for this learning unit'))
             if ue.decimal_scores else
-            str(_('Decimal values in scores are NOT accepted.'))
+            str(_('Unauthorized decimal for this learning unit'))
         )

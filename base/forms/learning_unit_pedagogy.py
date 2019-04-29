@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@
 #
 ##############################################################################
 from ckeditor.widgets import CKEditorWidget
+from django import forms
 from django.conf import settings
 from django.db.transaction import atomic
-from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
@@ -95,10 +95,10 @@ class LearningUnitPedagogyEditForm(forms.Form):
 class TeachingMaterialModelForm(forms.ModelForm):
     mandatory = forms.ChoiceField(widget=forms.RadioSelect,
                                   choices=[
-                                      (True, _('Mandatory')),
-                                      (False, _('No mandatory'))
+                                      (True, _('Yes')),
+                                      (False, _('No'))
                                   ],
-                                  label=_('Mandatory'),
+                                  label=_('Is this teaching material mandatory?'),
                                   required=True)
 
     class Meta:

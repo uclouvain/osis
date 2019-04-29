@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -88,7 +88,6 @@ def learning_units_summary_list(request):
         if search_form.is_valid():
             found_learning_units = search_form.get_learning_units_and_summary_status(
                 requirement_entities=a_user_person.find_main_entities_version,
-                luy_status=True
             )
             check_if_display_message(request, found_learning_units)
     except TooManyResultsException:

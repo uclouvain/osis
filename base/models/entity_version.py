@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -46,7 +46,6 @@ PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS = [
     "IUFC",
     "CCR"
 ]
-
 
 SQL_RECURSIVE_QUERY = """\
 WITH RECURSIVE under_entity AS (
@@ -159,7 +158,7 @@ class EntityVersionQuerySet(models.QuerySet):
 class EntityVersion(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    entity = models.ForeignKey('Entity')
+    entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
     title = models.CharField(db_index=True, max_length=255)
     acronym = models.CharField(db_index=True, max_length=20)
 
@@ -171,7 +170,8 @@ class EntityVersion(SerializableModel):
         verbose_name=_("Type")
     )
 
-    parent = models.ForeignKey('Entity', related_name='parent_of', blank=True, null=True)
+    parent = models.ForeignKey('Entity', related_name='parent_of',
+                               blank=True, null=True, on_delete=models.CASCADE)
     start_date = models.DateField(db_index=True)
     end_date = models.DateField(db_index=True, blank=True, null=True)
 
@@ -218,7 +218,7 @@ class EntityVersion(SerializableModel):
                 Q(start_date__range=(self.start_date, self.end_date)) |
                 Q(end_date__range=(self.start_date, self.end_date)) |
                 (
-                    Q(start_date__lte=self.start_date) & Q(end_date__gte=self.end_date)
+                        Q(start_date__lte=self.start_date) & Q(end_date__gte=self.end_date)
                 )
             )
         else:
@@ -506,7 +506,7 @@ def find_latest_version_by_entity(entity, date):
 def find_last_entity_version_by_learning_unit_year_id(learning_unit_year_id, entity_type):
     now = datetime.datetime.now(get_tzinfo())
     try:
-        return EntityVersion.objects.current(now).\
+        return EntityVersion.objects.current(now). \
             filter(entity__entitycontaineryear__learning_container_year__learningunityear__id=learning_unit_year_id,
                    entity__entitycontaineryear__type=entity_type). \
             latest('start_date')

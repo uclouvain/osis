@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -51,8 +51,8 @@ class TutorApplicationAdmin(admin.ModelAdmin):
 class TutorApplication(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    learning_container_year = models.ForeignKey('base.LearningContainerYear')
-    tutor = models.ForeignKey('base.Tutor')
+    learning_container_year = models.ForeignKey('base.LearningContainerYear', on_delete=models.CASCADE)
+    tutor = models.ForeignKey('base.Tutor', on_delete=models.CASCADE)
     function = models.CharField(max_length=35, blank=True, null=True, choices=Functions.choices(), db_index=True)
     volume_lecturing = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
     volume_pratical_exercice = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)

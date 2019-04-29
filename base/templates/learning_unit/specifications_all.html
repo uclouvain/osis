@@ -7,7 +7,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -216,7 +216,7 @@
                                     {% with achievement_en=achievements_EN|index:forloop.counter0 %}
                                         {% if achievement_en %}
                                             <a class="trigger_modal pull-right"
-                                               data-url="{% url 'achievement_edit' learning_unit_year_id=learning_unit_year.id learning_achievement_id=achievement_en.id %}"
+                                               data-url="{% url 'achievement_edit' learning_unit_year.id achievement_en.id %}"
                                                data-modal_class="modal-lg"
                                                title="{% trans 'Edit' %}">
                                                 <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
@@ -258,16 +258,15 @@
 
                 //Show confirm popup before delete application
                 $("button[id^='btn_operation_delete_']").click(function () {
-                    return confirm(gettext('confirm_achievement_delete'));
+                    return confirm("{% trans 'Are you sure you want to delete the achievement?' %}");
                 });
             });
         </script>
         <script>
             function changeOrientation(button) {
-                if (button.className == "glyphicon glyphicon-collapse-down") {
+                if (button.className === "glyphicon glyphicon-collapse-down") {
                     button.className = "glyphicon glyphicon-expand"
-                }
-                else if (button.className == "glyphicon glyphicon-expand") {
+                } else if (button.className === "glyphicon glyphicon-expand") {
                     button.className = "glyphicon glyphicon-collapse-down"
                 }
             }

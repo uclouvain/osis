@@ -1,33 +1,63 @@
 {% load i18n static %}
 
-<table class="table table-striped table-hover" id="tb_managers">
+<table class="table" id="tb_managers">
     <thead>
     <tr>
-        <th>{% trans 'Manager' %}</th>
         <th></th>
+        <th>{% trans 'Manager' %}</th>
+        <th>{% trans 'Main' %}</th>
         <th></th>
     </tr>
     </thead>
 
     <tbody>
-    {% for obj in object_list %}
+
+    {% for person, object_list  in by_person.items %}
         <tr>
-            <td>{{ obj }}</td>
             <td>
-                <label>
-                    <input type="checkbox" name="is_main" {% if obj.is_main %}checked{% endif %}
-                           data-url="{% url 'update_main' obj.pk %}?offer_year={{ offer_years|join:',' }}">
-                    {% trans "Main" %}
-                </label>
+                <span aria-hidden="true" data-toggle="collapse"
+                      class="collapse_span_updown glyphicon glyphicon-chevron-up"
+                      data-target=".{{ person|slugify }}"></span>
+            </td>
+            <td>
+                {% if offer_years|length == object_list|length %}
+                    <strong>{{ person }}</strong>
+                {% else %}
+                    {{ person }}
+                {% endif %}
+            </td>
+            <td>
+                <input type="checkbox" name="all_main"
+                       data-url="{% url 'update_main_person' person.pk %}?offer_year={{ offer_years|join:',' }}"
+                       data-target=".{{ person|slugify }}_checkbox">
             </td>
             <td>
                 <a class="btn btn-default pull-right trigger_modal"
-                   data-url="{% url 'delete_manager' obj.pk %}?offer_year={{ offer_years|join:',' }}">
+                   data-url="{% url 'delete_manager_person' person.pk %}?offer_year={{ offer_years|join:',' }}">
                     <span class="fa fa-minus"></span>
                 </a>
             </td>
         </tr>
+        {% for obj in object_list %}
+            <tr class="collapse {{ person|slugify }}" data-person="{{ person|slugify }}">
+                <td></td>
+                <td>&emsp;{{ obj.offer_year.acronym }}</td>
+                <td>
+                    <input type="checkbox" class="{{ person|slugify }}_checkbox"
+                           name="is_main" {% if obj.is_main %}checked{% endif %}
+                           data-url="{% url 'update_main' obj.pk %}?offer_year={{ offer_years|join:',' }}">
+                </td>
+                <td>
+                    <a class="btn btn-default btn-sm pull-right trigger_modal"
+                       data-url="{% url 'delete_manager' obj.pk %}?offer_year={{ offer_years|join:',' }}">
+                        <span class="fa fa-minus"></span>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+
     {% endfor %}
+
     </tbody>
 </table>
 <br>
@@ -38,16 +68,55 @@
         <span class="fa fa-plus"></span>
     </a>
 {% endif %}
+<style>
+    tr.collapse.in {
+        display: table-row;
+    }
+</style>
 <script>
     $(document).ready(function () {
         bind_trigger_modal();
+        $('.collapse').on('shown.bs.collapse', function () {
+            sessionStorage.setItem($(this).data("person"), 'true');
+        }).on('hidden.bs.collapse', function () {
+            sessionStorage.setItem($(this).data("person"), 'false');
+        }).each(function () {
+                if (sessionStorage.getItem($(this).data("person")) === 'true') {
+                    $(this).collapse('show');
+                    $('span[data-target=".' + $(this).data("person") + '"]')
+                        .addClass('glyphicon-chevron-down')
+                        .removeClass('glyphicon-chevron-up');
+                }
+            }
+        );
 
-        $("input[name='is_main']").click(function () {
-            $.post($(this).data('url'), {'is_main': $(this).is(':checked')}).done(
+
+        $("input[name='all_main']").each(function () {
+                let target_class = $(this).data("target");
+
+                if ($(target_class + ':not(:checked)').length === 0) {
+                    $(this).prop('checked', true);
+                }
+            }
+        );
+
+
+        $("input[name='is_main'], input[name='all_main']").change(function () {
+            post_is_main($(this))
+        });
+
+        function post_is_main(node) {
+            $.post(node.data('url'), {'is_main': node.is(':checked')}).done(
                 function (data) {
-                    redirect_after_success(null, data)
-                });
-            $(this).replaceWith("<img src=\"{% static 'img/loading.gif' %}\" alt=\"Loading...\" width='12px' />")
-        })
+                    redirect_after_success(null, data);
+                }
+            );
+            node.replaceWith("<img src=\"{% static 'img/loading.gif' %}\" alt=\"Loading...\" width='12px' />");
+        }
+
+        $('.collapse_span_updown').on('click', function () {
+            $(this).toggleClass('glyphicon-chevron-up').toggleClass('glyphicon-chevron-down');
+        });
     });
+
 </script>
