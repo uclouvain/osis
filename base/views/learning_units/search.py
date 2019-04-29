@@ -239,7 +239,7 @@ def _get_search_type_label(search_type):
 def learning_units_external_search(request):
     search_form = ExternalLearningUnitYearForm(
         request.GET or None,
-        initial={'academic_year_id': current_academic_year()}
+        initial={'academic_year_id': current_academic_year(), 'with_entity_subordinated': True}
     )
     user_person = get_object_or_404(Person, user=request.user)
     found_learning_units = LearningUnitYear.objects.none()
