@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-29 08:56+0200\n"
+"POT-Creation-Date: 2019-04-29 11:00+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2003,6 +2003,10 @@ msgstr "En proposition"
 #: templates/learning_unit/summary_list.html:105
 msgid "Inactive"
 msgstr "Inactif"
+
+#: forms/education_groups.py:81 forms/learning_unit/search_form.py:96
+msgid "Include subordinate entities"
+msgstr "Inclure les entitées subordonnées"
 
 #: forms/learning_unit/attribution_charge_repartition.py:75
 msgid "Indicate the name or the FGS"
@@ -4284,7 +4288,7 @@ msgstr "L'unité d'enseignement a été modifiée jusqu'en %(year)s."
 msgid "The learning unit has been updated."
 msgstr "L'unité d'enseignement a été modifiée."
 
-#: views/learning_units/proposal/update.py:130
+#: views/learning_units/detail.py:74
 msgid "The learning unit have partim"
 msgstr "L'unité d'enseignement dispose de partim"
 
@@ -5024,10 +5028,6 @@ msgstr "Accueil"
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
 msgstr "Quel type de %(category)s voulez-vous créer ?"
-
-#: forms/education_groups.py:81 forms/learning_unit/search_form.py:96
-msgid "With subord. ent."
-msgstr "Avec ent. subord."
 
 #: templates/learning_unit/by_proposal.html:55
 msgid "Xls"
@@ -5824,7 +5824,7 @@ msgid "the"
 msgstr "le"
 
 #: tests/views/test_learning_unit_pedagogy.py:239
-#: views/learning_units/educational_information.py:105
+#: views/learning_units/educational_information.py:106
 msgid "the list to generate is empty."
 msgstr "la liste à générer est vide."
 

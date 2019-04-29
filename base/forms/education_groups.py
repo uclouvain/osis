@@ -78,7 +78,7 @@ class EducationGroupFilter(FilterSet):
     )
     with_entity_subordinated = filters.BooleanFilter(
         method=lambda queryset, *args, **kwargs: queryset,
-        label=_('With subord. ent.'),
+        label=_('Include subordinate entities'),
         widget=forms.CheckboxInput
     )
     acronym = filters.CharFilter(
