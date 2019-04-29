@@ -219,6 +219,8 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             self.fields["academic_year_id"].required = True
             self.fields["academic_year_id"].empty_label = None
 
+        self.fields["with_entity_subordinated"].initial = True
+
     def clean_acronym(self):
         acronym = self.cleaned_data.get('acronym')
         acronym = treat_empty_or_str_none_as_none(acronym)
