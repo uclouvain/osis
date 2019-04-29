@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from importlib import import_module
+
 from django.conf import settings
 from django.conf.urls import url, include
 
@@ -42,11 +44,11 @@ webservice_apps = [
 for app_name in webservice_apps:
     if app_name in settings.INSTALLED_APPS:
         context = {'app_name': app_name}
-        imported_urls = __import__("{app_name}.api.url_v1".format(**context))
+        imported_urls = import_module("{app_name}.api.url_v1".format(**context))
         regex = r'^{app_name}/'.format(**context)
         namespace = '{app_name}_api_v1'.format(**context)
 
-        url_api_v1.append(url(regex, include(imported_urls, namespace=namespace)))
+        url_api_v1.append(url(regex, include(imported_urls.urlpatterns, namespace=namespace)))
 
 urlpatterns = [
     url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/common$',
