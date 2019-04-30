@@ -32,7 +32,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.forms.utils.choice_field import add_blank, add_all
 from base.models.entity_container_year import EntityContainerYear
-from base.models.entity_version import get_last_version, find_all_current_entities_version
+from base.models.entity_version import get_last_version, find_all_current_entities_version, \
+    find_pedagogical_entities_version
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2, ENTITY_TYPE_LIST, EntityContainerYearLinkTypes
 from reference.models.country import Country
@@ -108,9 +109,9 @@ class RequirementEntityContainerYearModelForm(EntityContainerYearModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        field = self.fields['entity']
-        field.queryset = self.person.find_main_entities_version
-        field.widget.attrs = {
+        entity_field = self.fields['entity']
+        entity_field.queryset = self.person.find_main_entities_version
+        entity_field.widget.attrs = {
             'onchange': (
                 'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_1", false);'
                 'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_1_country", false);'
@@ -124,8 +125,9 @@ class AllocationEntityContainerYearModelForm(EntityContainerYearModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        field = self.fields['entity']
-        field.widget.attrs = {'id': 'allocation_entity'}
+        entity_field = self.fields['entity']
+        entity_field.queryset = find_pedagogical_entities_version()
+        entity_field.widget.attrs = {'id': 'allocation_entity'}
 
 
 class Additional1EntityContainerYearModelForm(EntityContainerYearModelForm):
