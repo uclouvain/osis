@@ -158,7 +158,7 @@ class LearningUnitPostponementForm:
         if self.start_postponement.is_past():
             to_update = self._init_forms_in_past(existing_learn_unit_years, data)
         else:
-            if self._is_update_action():
+            if self._is_update_action() and existing_learn_unit_years:
                 to_delete = [
                     self._instantiate_base_form_as_update(luy, index_form=index)
                     for index, luy in enumerate(existing_learn_unit_years)

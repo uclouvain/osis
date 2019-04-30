@@ -622,31 +622,6 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         result = form.consistency_errors
         self.assertEqual(result, expected_result)
 
-    def test_when_differences_found_on_components(self):
-        next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 1)
-        self._change_cm_component_value(next_academic_year, 12)
-
-        expected_result = OrderedDict({
-            next_academic_year: [
-                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
-                    'col_name': _("Lecturing") + ' (' + _('hourly volume total annual') + ')',
-                    'current_value': '-',
-                    'new_value': '12.00'
-                }
-            ],
-        })
-        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
-
-        form = LearningUnitPostponementForm(
-            self.person,
-            self.learning_unit_year_full.academic_year,
-            learning_unit_instance=instance_luy_base_form.learning_unit_instance,
-            data=instance_luy_base_form.data
-        )
-
-        self.assertTrue(form.is_valid(), form.errors)
-        result = form.consistency_errors
-        self.assertDictEqual(result, expected_result)
 
     def test_when_differences_found_on_entity_component(self):
         next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 1)
