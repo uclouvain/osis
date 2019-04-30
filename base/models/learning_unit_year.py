@@ -398,8 +398,11 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def is_external(self):
         return hasattr(self, "externallearningunityear")
 
-    def is_co_external(self):
+    def is_external_with_co_graduation(self):
         return self.is_external() and self.externallearningunityear.co_graduation
+
+    def is_external_mobility(self):
+        return self.is_external() and self.externallearningunityear.mobility
 
     def is_prerequisite(self):
         return PrerequisiteItem.objects.filter(
