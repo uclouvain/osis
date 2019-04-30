@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import datetime
-from collections.__init__ import OrderedDict
+from collections import OrderedDict
 
 from dal import autocomplete
 from django import forms
