@@ -30,15 +30,18 @@
 
 <div role="tabpanel" class="tab-pane active" id="pedagogy">
     <div class="row well" style="margin-left: 10px;margin-right: 10px">
-        <div class="col-md-6">
+        <div class="col-md-4">
             {% if attributions %}
                 <label>{% trans 'Tutors' %} : </label>
                 <br>
-                <ul>
-                    {% for attribution in attributions %}
-                        <li>{{ attribution }}</li>
-                    {% endfor %}
-                </ul>
+                <table class="table" style="border-bottom: 1px solid #ddd">
+                    <tbody>
+                        {% for attribution in attributions %}
+                            <td>{{ attribution.tutor }}</td>
+                            <td>{{ attribution.get_function_display }}</td>
+                        {% endfor %}
+                    </tbody>
+                </table>
             {% endif %}
         </div>
         {% include "learning_unit/blocks/summary_locked.html" %}
