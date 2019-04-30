@@ -51,7 +51,11 @@ FIELDS_TO_NOT_POSTPONE = {
     'type_declaration_vacant': 'learning_container_year.type_declaration_vacant',
     'attribution_procedure': 'attribution_procedure'
 }
-FIELDS_TO_NOT_CHECK = ['academic_year', 'id'] + list(FIELDS_TO_NOT_POSTPONE.keys())
+FIELDS_TO_CHECK = ['faculty_remark', 'other_remark', 'acronym', 'specific_title', 'specific_title_english',
+                   'credits', 'session', 'quadrimestre', 'status', 'internship_subtype', 'professional_integration',
+                   'campus', 'language', 'periodicity', 'container_type', 'common_title', 'common_title_english',
+                   'team', 'requirement_entity', 'allocation_entity', 'additional_requirement_entity_1',
+                   'additional_requirement_entity_2']
 
 
 # @TODO: Use LearningUnitPostponementForm to manage END_DATE of learning unit year
@@ -378,7 +382,7 @@ class LearningUnitPostponementForm:
                 'current_value': self._get_translated_value(value)
             } for col_name, value in current_form.instances_data.items()
             if self._get_cmp_value(next_form.instances_data.get(col_name)) != self._get_cmp_value(value) and
-            col_name not in FIELDS_TO_NOT_CHECK
+            col_name in FIELDS_TO_CHECK
         ]
 
         if differences:
