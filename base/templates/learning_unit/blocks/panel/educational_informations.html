@@ -30,15 +30,17 @@
 
 <div role="tabpanel" class="tab-pane active" id="pedagogy">
     <div class="row well" style="margin-left: 10px;margin-right: 10px">
-        <div class="col-md-4">
+        <div class="col-md-3">
             {% if attributions %}
                 <label>{% trans 'Tutors' %} : </label>
                 <br>
                 <table class="table" style="border-bottom: 1px solid #ddd">
                     <tbody>
                         {% for attribution in attributions %}
+                            <tr>
                             <td>{{ attribution.tutor }}</td>
                             <td>{{ attribution.get_function_display }}</td>
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>
