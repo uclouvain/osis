@@ -41,7 +41,8 @@ from reference.models.country import Country
 
 def _get_section_choices():
     return add_blank(
-        add_all(Country.objects.filter(entity__isnull=False).values_list('id', 'name') .distinct().order_by('name'))
+        add_all(Country.objects.filter(entity__isnull=False).values_list('id', 'name') .distinct().order_by('name')),
+        blank_choice_display="UCLouvain"
     )
 
 
