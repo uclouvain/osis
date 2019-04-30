@@ -689,7 +689,7 @@ msgstr "Êtes-vous sûr·e que vous voulez supprimer %(education_group_year)s?"
 
 #: templates/learning_unit/specifications_all.html:261
 msgid "Are you sure you want to delete the achievement?"
-msgstr "Êtes-vous sûre de vouloir supprimer l'acquis d'apprentissage?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer l'acquis d'apprentissage?"
 
 #: templates/education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html:8
 msgid "Are you sure you want to delete the contact ?"
