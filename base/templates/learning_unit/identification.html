@@ -141,17 +141,18 @@
                             {% endblock panel_components %}
                         </div>
                     </div>
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <div>
-                                {% dl_tooltip learning_unit_year.learning_unit 'faculty_remark' not_annualized=True %}
-                            </div>
-                            <div>
-                                {% dl_tooltip learning_unit_year.learning_unit 'other_remark' not_annualized=True %}
+                    {% if not object.is_co_external %}
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div>
+                                    {% dl_tooltip learning_unit_year.learning_unit 'faculty_remark' not_annualized=True %}
+                                </div>
+                                <div>
+                                    {% dl_tooltip learning_unit_year.learning_unit 'other_remark' not_annualized=True %}
+                                </div>
                             </div>
                         </div>
-                    </div>
-
+                    {% endif %}
                     {% if learning_unit_year.subtype != "PARTIM" %}
                         <div class="panel panel-default">
                             <div class="panel-body">
@@ -179,24 +180,58 @@
                 {% endblock panel_remarks %}
 
                 {% block panel_external %}
+                    {% if object.is_co_external %}
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        {% dl_tooltip learning_unit_year.externallearningunityear 'external_acronym' %}
+                                    </div>
+                                    <div class="col-md-9">
+                                        {% dl_tooltip learning_unit_year.externallearningunityear "url" %}
+                                    </div>
+                                </div>
+                                {% dl_tooltip learning_unit_year.externallearningunityear 'external_credits' %}
+                                {% dl_tooltip learning_unit_year.learning_unit 'faculty_remark' %}
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endblock panel_external %}
             </div>
             <div class="col-md-4">
+                {% if object.is_external %}
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            {% with organization=learning_unit_year.campus.organization campus=learning_unit_year.campus  %}
+                                {% url 'organization_read' organization_id=organization.id as url_organization %}
+                                {% dl_tooltip organization 'country' label_text=_('Country') %}
+                                {% dl_tooltip campus 'campus' label_text=_('City of institution') value=campus.name %}
+                                {% dl_tooltip organization 'institution' label_text=_('Reference institution') value=organization.name url=url_organization %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                {% endif %}
                 <div class="panel panel-default">
                     <div class="panel-body">
                         {% block institution %}
-                            {% with organization=learning_unit_year.campus.organization campus=learning_unit_year.campus %}
-                                {% url 'organization_read' organization_id=organization.id as url_organization %}
-                                {% dl_tooltip organization 'institution' label_text=_('Institution') value=organization.name url=url_organization %}
-                                {% dl_tooltip campus 'campus' label_text=_('Learning location') value=campus.name %}
-                            {% endwith %}
+                            {% if not object.is_external %}
+                                {% with organization=learning_unit_year.campus.organization campus=learning_unit_year.campus %}
+                                    {% url 'organization_read' organization_id=organization.id as url_organization %}
+                                    {% dl_tooltip organization 'institution' label_text=_('Institution') value=organization.name url=url_organization %}
+                                    {% dl_tooltip campus 'campus' label_text=_('Learning location') value=campus.name %}
+                                {% endwith %}
+                            {% endif %}
 
                             {% url 'entity_read' entity_version_id=requirement_entity.id as url_entity_requirement %}
                             {% url 'entity_read' entity_version_id=allocation_entity.id as url_entity_allocation %}
                             {% url 'entity_read' entity_version_id=additional_requirement_entity_1.id as url_additional_requirement_entity_1 %}
                             {% url 'entity_read' entity_version_id=additional_requirement_entity_2.id as url_additional_requirement_entity_2 %}
 
-                            {% dl_tooltip requirement_entity 'REQUIREMENT_ENTITY' label_text=_('Requirement entity') inherited=learning_unit_year.subtype default_if_none="-" value=requirement_entity.acronym title=requirement_entity.title url=url_entity_requirement %}
+                            {% if object.is_external %}
+                                {% dl_tooltip learning_unit_year.externallearningunityear 'requesting_entity' label_text=_('Requirement entity') %}
+                            {% else %}
+                                {% dl_tooltip requirement_entity 'REQUIREMENT_ENTITY' label_text=_('Requirement entity') inherited=learning_unit_year.subtype default_if_none="-" value=requirement_entity.acronym title=requirement_entity.title url=url_entity_requirement %}
+                            {% endif %}
                             {% dl_tooltip allocation_entity 'ALLOCATION_ENTITY' label_text=_('Attribution entity') inherited=learning_unit_year.subtype default_if_none="-" value=allocation_entity.acronym title=allocation_entity.title url=url_entity_allocation %}
                             {% dl_tooltip additional_requirement_entity_1 'ADDITIONAL_REQUIREMENT_ENTITY_1' label_text=_('Additional requirement entity 1') inherited=learning_unit_year.subtype title=additional_requirement_entity_1.title value=additional_requirement_entity_1.acronym url=url_additional_requirement_entity_1 default_if_none="-" %}
                             {% dl_tooltip additional_requirement_entity_2 'ADDITIONAL_REQUIREMENT_ENTITY_2' label_text=_('Additional requirement entity 2') inherited=learning_unit_year.subtype title=additional_requirement_entity_2.title value=additional_requirement_entity_2.acronym url=url_additional_requirement_entity_2 default_if_none="-" %}
@@ -211,7 +246,16 @@
                 {% block panel_proposal %}
                     {% include 'learning_unit/blocks/panel/proposal.html' %}
                 {% endblock %}
-                {% block panel_external_author %}{% endblock %}
+                {% block panel_external_author %}
+                    {% if object.is_co_external %}
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <p>{% trans 'Introduced by' %} {{ learning_unit_year.externallearningunityear.author }}</p>
+                                <p>{% trans 'The' %} {{ learning_unit_year.externallearningunityear.date }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endblock %}
                 {% include 'blocks/panel/reversion.html' %}
             </div>
         </div>
