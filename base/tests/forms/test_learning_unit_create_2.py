@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import collections
-import datetime
 from unittest import mock
 
 import factory.fuzzy
@@ -35,15 +34,14 @@ from django.utils.translation import ugettext_lazy as _
 from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm
-from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.forms.learning_unit.learning_unit_create_2 import FullForm, FACULTY_OPEN_FIELDS, \
     FULL_READ_ONLY_FIELDS, PROPOSAL_READ_ONLY_FIELDS
-from base.models.academic_year import AcademicYear
 from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_unit_year_subtypes, learning_container_year_types, organization_type, \
     learning_unit_year_periodicity
+from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.models.enums.entity_container_year_link_type import ADDITIONAL_REQUIREMENT_ENTITY_1, \
     ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.models.enums.internship_subtypes import TEACHING_INTERNSHIP
@@ -56,12 +54,12 @@ from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.group import FacultyManagerGroupFactory, CentralManagerGroupFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -195,7 +193,7 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
             FullForm(self.person, self.learning_unit_year.academic_year, post_data=self.post_data)
 
     def test_disable_fields_full_with_faculty_manager(self):
-        self.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+        self.person.user.groups.add(FacultyManagerGroupFactory())
         form = FullForm(self.person, self.learning_unit_year.academic_year,
                         learning_unit_instance=self.learning_unit_year.learning_unit)
         disabled_fields = {key for key, value in form.fields.items() if value.disabled}
@@ -208,7 +206,7 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
         self.assertTrue(form.fields['container_type'].disabled)
 
     def test_disable_fields_full_proposal_with_faculty_manager(self):
-        self.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+        self.person.user.groups.add(FacultyManagerGroupFactory())
         form = FullForm(
             self.person,
             self.learning_unit_year.academic_year,
@@ -271,8 +269,7 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
                          learn_unit_year.learning_container_year)
 
     def test_academic_years_restriction_for_central_manager(self):
-        central_group = Group.objects.get(name='central_managers')
-        self.person.user.groups.add(central_group)
+        self.person.user.groups.add(CentralManagerGroupFactory())
         form = FullForm(self.person, self.learning_unit_year.academic_year,
                         start_year=self.learning_unit_year.academic_year.year,
                         postposal=True)
@@ -282,8 +279,7 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
         self.assertCountEqual(actual_choices, expected_choices)
 
     def test_academic_years_restriction_for_faculty_manager(self):
-        faculty_group = Group.objects.get(name='faculty_managers')
-        self.person.user.groups.add(faculty_group)
+        self.person.user.groups.add(FacultyManagerGroupFactory())
         form = FullForm(self.person, self.learning_unit_year.academic_year,
                         start_year=self.learning_unit_year.academic_year.year,
                         postposal=True)
@@ -292,18 +288,12 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
         self.assertCountEqual(actual_choices, expected_choices)
 
     def test_disable_fields_full_with_faculty_manager_and_central_manager(self):
-        self.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
-        self.person.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
+        self.person.user.groups.add(FacultyManagerGroupFactory())
+        self.person.user.groups.add(CentralManagerGroupFactory())
         form = FullForm(self.person, self.learning_unit_year.academic_year,
                         learning_unit_instance=self.learning_unit_year.learning_unit)
         disabled_fields = {key for key, value in form.fields.items() if value.disabled}
         self.assertEqual(disabled_fields, FULL_READ_ONLY_FIELDS.union({'internship_subtype'}))
-
-    def tearDown(self):
-        faculty_group = Group.objects.get(name=FACULTY_MANAGER_GROUP)
-        self.person.user.groups.remove(faculty_group)
-        central_group = Group.objects.get(name=CENTRAL_MANAGER_GROUP)
-        self.person.user.groups.remove(central_group)
 
 
 class TestFullFormIsValid(LearningUnitFullFormContextMixin):

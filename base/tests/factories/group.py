@@ -25,6 +25,8 @@
 ##############################################################################
 import factory
 
+from base.models.enums.groups import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP
+
 
 class GroupFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -32,6 +34,14 @@ class GroupFactory(factory.django.DjangoModelFactory):
         django_get_or_create = ('name',)
 
     name = ""
+
+
+class FacultyManagerGroupFactory(GroupFactory):
+    name = FACULTY_MANAGER_GROUP
+
+
+class CentralManagerGroupFactory(GroupFactory):
+    name = CENTRAL_MANAGER_GROUP
 
 
 class TutorGroupFactory(GroupFactory):
