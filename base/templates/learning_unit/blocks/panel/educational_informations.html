@@ -31,12 +31,12 @@
 <div role="tabpanel" class="tab-pane active" id="pedagogy">
     <div class="row well" style="margin-left: 10px;margin-right: 10px">
         <div class="col-md-6">
-            {% if tutors %}
+            {% if attributions %}
                 <label>{% trans 'Tutors' %} : </label>
                 <br>
                 <ul>
-                    {% for tutor in tutors %}
-                        <li>{{ tutor.person }}</li>
+                    {% for attribution in attributions %}
+                        <li>{{ attribution }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
