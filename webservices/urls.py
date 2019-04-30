@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from importlib import import_module
-
 from django.conf import settings
 from django.conf.urls import url, include
 
