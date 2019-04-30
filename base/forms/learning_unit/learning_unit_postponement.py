@@ -170,9 +170,13 @@ class LearningUnitPostponementForm:
                 for index, ac_year in enumerate(ac_year_postponement_range):
                     if ac_year not in existing_ac_years:
                         new_learning_unit_year = duplicate_learning_unit_year(
-                            existing_learn_unit_years[index-1], ac_year
+                            existing_learn_unit_years[len(existing_learn_unit_years) - 1], ac_year
                         )
-                        self._instantiate_base_form_as_update(new_learning_unit_year, index_form=index, data=data)
+                        to_insert.append(self._instantiate_base_form_as_update(
+                            new_learning_unit_year,
+                            index_form=index,
+                            data=data)
+                        )
             else:
                 to_insert = [
                     self._instantiate_base_form_as_insert(ac_year, data)
