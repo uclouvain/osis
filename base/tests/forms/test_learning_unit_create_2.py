@@ -27,7 +27,6 @@ import collections
 from unittest import mock
 
 import factory.fuzzy
-from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
@@ -48,6 +47,7 @@ from base.models.enums.internship_subtypes import TEACHING_INTERNSHIP
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import ANNUAL
+from base.models.enums.organization_type import ACADEMIC_PARTNER
 from base.models.enums.person_source_type import DISSERTATION
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container import LearningContainer
@@ -305,8 +305,8 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
 
     def test_creation_case_correct_post_data(self):
         form = _instanciate_form(self.current_academic_year, post_data=self.post_data,
-                                 start_year=self.current_academic_year.year)
-        form.is_valid()
+                                 start_year=self.current_academic_year.year, person=self.person)
+        self.assertTrue(form.is_valid(), form.errors)
         self._test_learning_unit_model_form_instance(form)
         self._test_learning_unit_year_model_form_instance(form)
         self._test_learning_container_model_form_instance(form)
@@ -388,6 +388,16 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
             learning_unit_instance=self.learning_unit_year.learning_unit
         )
 
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_filter_additional_requirement_entity(self):
+        partner = EntityVersionFactory(
+            entity__organization__is_current_partner=True,
+            entity__organization__type=ACADEMIC_PARTNER
+        )
+        self.post_data["additional_requirement_entity_1"] = partner.id
+        form = _instanciate_form(self.learning_unit_year.academic_year, post_data=self.post_data,
+                                 learning_unit_instance=self.learning_unit_year.learning_unit, person=self.person)
         self.assertTrue(form.is_valid(), form.errors)
 
     @mock.patch('base.forms.learning_unit.learning_unit_create.LearningUnitModelForm.is_valid',
