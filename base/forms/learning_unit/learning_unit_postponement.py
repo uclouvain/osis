@@ -31,6 +31,7 @@ from django.db.models import Max
 from django.http import QueryDict
 from django.utils.translation import ugettext as _
 
+from base.business.learning_units.edition import duplicate_learning_unit_year
 from base.forms.learning_unit.external_learning_unit import ExternalLearningUnitBaseForm
 from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
@@ -166,79 +167,10 @@ class LearningUnitPostponementForm:
                 ]
                 existing_ac_years = [luy.academic_year for luy in existing_learn_unit_years]
                 to_insert = []
-                # FIXME: We use data copy because data is immuniable and acronym, academic_year and container_type
-                # is not in data with edition form
                 for index, ac_year in enumerate(ac_year_postponement_range):
                     if ac_year not in existing_ac_years:
-                        data_to_insert = None
-                        if data and existing_learn_unit_years:
-                            data_to_insert = data.copy()
-                            existing_learning_container_year = existing_learn_unit_years[0].learning_container_year
-                            data_to_insert["acronym_0"] = data.get("acronym_0",
-                                                                   existing_learn_unit_years[0].acronym[0])
-                            data_to_insert["acronym_1"] = data.get("acronym_1",
-                                                                   existing_learn_unit_years[0].acronym[1:])
-                            data_to_insert["container_type"] = data.get("container_type",
-                                                                        existing_learning_container_year.container_type)
-                            data_to_insert["academic_year"] = data.get("academic_year", str(ac_year.id))
-                            # FIXME: component-initial_forms must be 0 for the insert in DB
-                            data_to_insert["component-INITIAL_FORMS"] = data.get("component-INITIAL_FORMS", 0)
-                            data_to_insert["credits"] = data.get("credits",
-                                                                 existing_learn_unit_years[0].credits)
-                            data_to_insert["periodicity"] = data.get("periodicity",
-                                                                     existing_learn_unit_years[0].periodicity)
-                            data_to_insert["language"] = data.get("language", existing_learn_unit_years[0].language.id)
-                            data_to_insert["common_title"] = data.get("common_title",
-                                                                      existing_learning_container_year.common_title)
-                            data_to_insert["specific_title"] = data.get("specific_title",
-                                                                        existing_learn_unit_years[0].specific_title)
-                            data_to_insert["type_declaration_vacant"] = data.get("type_declaration_vacant",
-                                                                                 existing_learning_container_year.
-                                                                                 type_declaration_vacant)
-                            data_to_insert["attribution_procedure"] = data.get("attribution_procedure",
-                                                                               existing_learn_unit_years[0].
-                                                                               attribution_procedure)
-                            data_to_insert["campus"] = data.get("campus", existing_learn_unit_years[0].campus.id)
-
-                            component_lecturing = learning_component_year.find_lecturing_by_learning_unit_year(
-                                existing_learn_unit_years[0])
-                            data_to_insert["component-0-hourly_volume_total_annual"] = data.get(
-                                "component-0-hourly_volume_total_annual",
-                                component_lecturing.hourly_volume_total_annual)
-                            data_to_insert["component-0-planned_classes"] = data.get(
-                                "component-0-planned_classes", component_lecturing.planned_classes)
-
-                            component_practical = learning_component_year.find_practical_by_learning_unit_year(
-                                existing_learn_unit_years[0])
-                            data_to_insert["component-1-hourly_volume_total_annual"] = data.get(
-                                "component-1-hourly_volume_total_annual",
-                                component_practical.hourly_volume_total_annual)
-                            data_to_insert["component-1-planned_classes"] = data.get(
-                                "component-1-planned_classes", component_practical.planned_classes)
-
-                            data_to_insert["requirement_entity-entity"] = data.get(
-                                "requirement_entity-entity",
-                                entity_container_year.find_requirement_entity(existing_learning_container_year).id
-                            )
-                            data_to_insert["allocation_entity-entity"] = data.get(
-                                "allocation_entity-entity",
-                                entity_container_year.find_allocation_entity(existing_learning_container_year).id
-                            )
-
-                            additional_requirement_entities = entity_container_year.\
-                                find_all_additional_requirement_entities(existing_learning_container_year)
-                            data_to_insert["additional_requirement_entity_1-entity"] = data.get(
-                                "additional_requirement_entity_1-entity",
-                                additional_requirement_entities[0].id if additional_requirement_entities else ""
-                            )
-                            data_to_insert["additional_requirement_entity_2-entity"] = data.get(
-                                "additional_requirement_entity_2-entity",
-                                additional_requirement_entities[1].id if additional_requirement_entities else ""
-                            )
-
-                            to_insert.append(self._instantiate_base_form_as_insert(ac_year, data_to_insert))
-                        else:
-                            to_insert.append(self._instantiate_base_form_as_insert(ac_year, data))
+                        new_learning_unit_year = duplicate_learning_unit_year(existing_learn_unit_years[index-1], ac_year)
+                        self._instantiate_base_form_as_update(new_learning_unit_year, index_form=index, data=data)
             else:
                 to_insert = [
                     self._instantiate_base_form_as_insert(ac_year, data)
