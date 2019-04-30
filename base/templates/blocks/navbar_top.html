@@ -171,6 +171,12 @@
                 </ul>
             {% endif %}
             <ul class="nav navbar-nav navbar-right" id="">
+                <li>
+                    <a class="trigger_modal pull-right" data-url="{% url 'quick_search' %}" data-modal_class="modal-lg"
+                       title="{% trans 'Search' %}">
+                        <i class="fa fa-search"></i>
+                    </a>
+                </li>
                 {% if request.user.is_authenticated %}
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
@@ -220,7 +226,8 @@
                         {% include "blocks/notifications.html" %}
                     </li>
                     <li>
-                        <a href="{{ user_manual.global }}" role="button" id="bt_help" title="{% trans 'Help' %}" class="hidden-md">
+                        <a href="{{ user_manual.global }}" role="button" id="bt_help" title="{% trans 'Help' %}"
+                           class="hidden-md">
                             <span class="glyphicon glyphicon-question-sign"></span>
                         </a>
                     </li>

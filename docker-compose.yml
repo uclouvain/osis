@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+
+  database:
+    env_file: .env
+
+    image: postgres:latest
+
+    ports:
+      - 5432:5432
+
+    restart: unless-stopped
+    volumes:
+      - ${DOCKER_VOLUME}:/var/lib/postgresql/data
+
+  cache:
+    image: redis
+    ports:
+      - 6379:6379
+
+    restart: unless-stopped

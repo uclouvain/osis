@@ -21,20 +21,44 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django_filters.views import FilterView
+from django import forms
+from django.db.models import Q
+from django.views.generic import ListView
 
+from base.models.academic_year import current_academic_year, AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
+from base.utils.cache import CacheFilterMixin
 from base.views.mixins import AjaxTemplateMixin
 
 
-class QuickSearchView(AjaxTemplateMixin, FilterView):
-    model = LearningUnitYear
-    filterset_fields = {
-        'acronym': ['icontains'],
-        'specific_title': ['icontains'],
-        'academic_year': ["exact"],
-    }
+class QuickSearchForm(forms.Form):
+    academic_year = forms.ModelChoiceField(AcademicYear.objects.all(), required=True)
+    search_text = forms.CharField(required=False)
 
-    paginate_by = "20"
+
+class QuickSearchView(CacheFilterMixin, AjaxTemplateMixin, ListView):
+    model = LearningUnitYear
+    paginate_by = "12"
     ordering = 'academic_year', 'acronym',
-    queryset = LearningUnitYear.objects.select_related('academic_year')
+    template_name = 'base/learningunityear_filter_inner.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.GET.get('academic_year'):
+            qs = qs.filter(academic_year=self.request.GET['academic_year'])
+
+        search_text = self.request.GET.get('search_text')
+        if search_text:
+            qs = qs.filter(Q(acronym__icontains=search_text) | Q(specific_title__icontains=search_text))
+
+        return qs.select_related('academic_year', 'learning_container_year')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = QuickSearchForm(
+            initial={
+                'academic_year': self.request.GET.get('academic_year', current_academic_year()),
+                'search_text': self.request.GET.get('search_text', ''),
+            }
+        )
+        return context

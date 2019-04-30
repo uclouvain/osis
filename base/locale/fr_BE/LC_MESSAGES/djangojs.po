@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-06 08:27+0100\n"
+"POT-Creation-Date: 2019-04-29 09:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -11,11 +11,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: static/js/education_group/education_group_tree.js:95
+#: static/js/education_group/education_group_tree.js:96
 msgid "Attach"
 msgstr "Attacher"
 
-#: static/js/education_group/education_group_tree.js:151
+#: static/js/education_group/education_group_tree.js:155
 msgid "Close all"
 msgstr "Fermer tout"
 
@@ -23,7 +23,7 @@ msgstr "Fermer tout"
 msgid "Collapse"
 msgstr "Fermer"
 
-#: static/js/education_group/education_group_tree.js:116
+#: static/js/education_group/education_group_tree.js:118
 msgid "Detach"
 msgstr "Détacher"
 
@@ -31,7 +31,7 @@ msgstr "Détacher"
 msgid "Open"
 msgstr "Ouvrir"
 
-#: static/js/education_group/education_group_tree.js:144
+#: static/js/education_group/education_group_tree.js:148
 msgid "Open all"
 msgstr "Ouvrir tout"
 
@@ -39,7 +39,7 @@ msgstr "Ouvrir tout"
 msgid "Please enter a valid URL."
 msgstr "Entrez une URL valide."
 
-#: static/js/education_group/education_group_tree.js:73
+#: static/js/education_group/education_group_tree.js:74
 msgid "Select"
 msgstr "Sélectionner"
 

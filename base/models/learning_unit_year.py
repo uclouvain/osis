@@ -29,6 +29,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
 from django.db.models import Q, Sum
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
@@ -139,7 +140,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     class Meta:
         unique_together = (('learning_unit', 'academic_year'), ('acronym', 'academic_year'))
-
+        ordering = 'acronym',
         permissions = (
             ("can_receive_emails_about_automatic_postponement", "Can receive emails about automatic postponement"),
         )
@@ -377,8 +378,8 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         components_queryset = LearningComponentYear.objects.filter(
             learning_unit_year__learning_container_year=self.learning_container_year
         )
-        all_components = components_queryset.order_by('acronym')\
-            .select_related('learning_unit_year')\
+        all_components = components_queryset.order_by('acronym') \
+            .select_related('learning_unit_year') \
             .annotate(vol_global=Sum('entitycomponentyear__repartition_volume'))
         for learning_component_year in all_components:
             _warnings.extend(learning_component_year.warnings)
@@ -409,6 +410,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
             Q(prerequisite__learning_unit_year=self, prerequisite__education_group_year__in=formations) |
             Q(prerequisite__education_group_year__in=formations, learning_unit=self.learning_unit)
         ).exists()
+
+    def get_absolute_url(self):
+        return reverse('learning_unit', args=[self.pk])
 
 
 def get_by_id(learning_unit_year_id):
