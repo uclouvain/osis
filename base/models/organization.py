@@ -25,6 +25,7 @@
 ##############################################################################
 from django.db import models
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import organization_type
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
@@ -53,6 +54,7 @@ class Organization(SerializableModel):
 
     prefix = models.CharField(max_length=30, blank=True)
     logo = models.ImageField(upload_to='organization_logos', null=True, blank=True)
+    is_current_partner = models.BooleanField(default=False, verbose_name=_("Is current partner"))
 
     def __str__(self):
         return "{}".format(self.name)
