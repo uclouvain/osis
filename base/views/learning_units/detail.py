@@ -60,9 +60,9 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
 
         # Change template and permissions for external learning units and co_graduation is false.
         if self.object.is_external_mobility():
-            self.permission_required = "base.can_access_externallearningunityear"
             self.template_name = "learning_unit/external/read.html"
-
+        if self.object.is_external():
+            self.permission_required = "base.can_access_externallearningunityear"
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):

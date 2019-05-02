@@ -29,7 +29,6 @@ from unittest import mock
 import factory.fuzzy
 import reversion
 from django.contrib.auth.models import Permission, Group
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden
 from django.http import HttpResponseNotAllowed
@@ -546,7 +545,7 @@ class LearningUnitViewTestCase(TestCase):
 
         response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
 
-        self.assertTemplateUsed(response, 'learning_unit/external/read.html')
+        self.assertTemplateUsed(response, 'learning_unit/identification.html')
         self.assertEqual(response.context['learning_unit_year'], learning_unit_year)
 
     def test_external_learning_unit_read_permission_denied(self):
