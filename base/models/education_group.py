@@ -94,8 +94,8 @@ class EducationGroup(SerializableModel):
 
     @property
     def most_recent_acronym(self):
-        most_recent_education_group = self.educationgroupyear_set.filter(education_group_id=self.id) \
-            .latest('academic_year__year')
+        most_recent_education_group = self.educationgroupyear_set.filter(education_group_id=self.id)\
+                                                                 .latest('academic_year__year')
         return most_recent_education_group.acronym
 
     def __str__(self):
@@ -110,7 +110,7 @@ class EducationGroup(SerializableModel):
         verbose_name = _("Education group")
 
     def clean(self):
-        # Check end_year should be greater of equals to     start_year
+        # Check end_year should be greater of equals to start_year
         if self.start_year and self.end_year:
             if self.start_year > self.end_year:
                 raise ValidationError({
@@ -157,9 +157,9 @@ class EducationGroup(SerializableModel):
         qs = EducationGroupYear.hierarchy.filter(pk=root_2m_egy.pk) \
             .get_children() \
             .filter(
-            Q(education_group__end_year__gt=self.end_year) | Q(education_group__end_year__isnull=True),
-            education_group_type__name__in=TrainingType.finality_types(),
-        )
+                Q(education_group__end_year__gt=self.end_year) | Q(education_group__end_year__isnull=True),
+                education_group_type__name__in=TrainingType.finality_types(),
+            )
 
         for invalid_finality in qs:
             raise ValidationError({
