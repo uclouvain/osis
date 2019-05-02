@@ -289,12 +289,14 @@ CKEDITOR_CONFIGS = {
     },
     'minimal': {
         'toolbar': 'Custom',
+        'extraPlugins': ','.join(['cdn']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList'],
-            ['Link', 'Unlink']
+            ['Link', 'Unlink'],
+            {'name': 'cdn_integration', 'items': ['CDN']},
         ],
         'autoParagraph': False
     },
