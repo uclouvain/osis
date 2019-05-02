@@ -62,7 +62,7 @@ class EntitiesVersionChoiceField(forms.ModelChoiceField):
 
 
 def find_additional_requirement_entities_choices():
-    date = datetime.datetime.now(timezone.now())
+    date = timezone.now()
     return EntityVersion.objects.current(date).filter(
         Q(entity__organization__type=MAIN) |
         (Q(entity__organization__type=ACADEMIC_PARTNER) & Q(entity__organization__is_current_partner=True))
