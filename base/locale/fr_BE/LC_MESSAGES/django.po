@@ -4026,7 +4026,7 @@ msgstr "Essai"
 
 #: forms/learning_achievement.py:36
 msgid "Text"
-msgstr "Text"
+msgstr "Texte"
 
 #: templates/learning_unit/blocks/form/form_external.html:66
 #: templates/learning_unit/blocks/panel/proposal.html:28
