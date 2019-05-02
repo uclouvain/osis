@@ -26,6 +26,7 @@ from django.db.models import Q
 from django.views.generic import ListView
 
 from base.models.academic_year import current_academic_year, AcademicYear
+from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.views.mixins import AjaxTemplateMixin
@@ -36,22 +37,18 @@ class QuickSearchForm(forms.Form):
     search_text = forms.CharField(required=False)
 
 
-class QuickSearchView(CacheFilterMixin, AjaxTemplateMixin, ListView):
-    model = LearningUnitYear
+class QuickSearchGenericView(CacheFilterMixin, AjaxTemplateMixin, ListView):
     paginate_by = "12"
     ordering = 'academic_year', 'acronym',
-    template_name = 'base/learningunityear_filter_inner.html'
+    template_name = 'base/quick_search_inner.html'
+    cache_exclude_params = 'page',
 
     def get_queryset(self):
         qs = super().get_queryset()
         if self.request.GET.get('academic_year'):
             qs = qs.filter(academic_year=self.request.GET['academic_year'])
 
-        search_text = self.request.GET.get('search_text')
-        if search_text:
-            qs = qs.filter(Q(acronym__icontains=search_text) | Q(specific_title__icontains=search_text))
-
-        return qs.select_related('academic_year', 'learning_container_year')
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -61,4 +58,31 @@ class QuickSearchView(CacheFilterMixin, AjaxTemplateMixin, ListView):
                 'search_text': self.request.GET.get('search_text', ''),
             }
         )
+
+        self.request.session['quick_search_model'] = self.model.__name__
         return context
+
+
+class QuickSearchLearningUnitYearView(QuickSearchGenericView):
+    model = LearningUnitYear
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        search_text = self.request.GET.get('search_text')
+        if search_text:
+            qs = qs.filter(Q(acronym__icontains=search_text) | Q(specific_title__icontains=search_text))
+        return qs.select_related('learning_container_year')
+
+
+class QuickSearchEducationGroupYearView(QuickSearchGenericView):
+    model = EducationGroupYear
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        search_text = self.request.GET.get('search_text')
+        if search_text:
+            qs = qs.filter(Q(acronym__icontains=search_text) | Q(title=search_text) | Q(title_english=search_text))
+
+        return qs

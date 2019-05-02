@@ -16,7 +16,7 @@
                 {% bootstrap_field form.search_text show_label=False %}
             </div>
             <div class="col-md-1 col-md-offset-2">
-                <button type="submit" onclick="$('#form-modal').submit();" class="btn btn-primary"
+                <button type="button" onclick="$('#form-modal').submit();" class="btn btn-primary"
                         name="search" title="search">
                     <i class="fa fa-search"></i>
                 </button>
@@ -24,6 +24,20 @@
         </div>
 
     </form>
+    <ul class="nav nav-tabs" role="tablist">
+        {% url 'quick_search_learning_unit' as quick_search_lu %}
+        <li {% if request.path == quick_search_lu %} class="active" {% endif %}>
+            <a href="#" onclick="submit_with_url('{{ quick_search_lu }}')" role="tab">
+                {% trans 'Learning unit' %}
+            </a>
+        </li>
+        {% url 'quick_search_education_group' as quick_search_eg %}
+        <li {% if request.path == quick_search_eg %} class="active" {% endif %}>
+            <a href="#" onclick="submit_with_url('{{ quick_search_eg }}')" role="tab">
+                {% trans 'Education group' %}
+            </a>
+        </li>
+    </ul>
     <div class="row">
         <div class="col-md-12">
             <table class="table table-striped table-responsive">
@@ -31,9 +45,16 @@
                 {% for object in object_list %}
                     <tr>
                         <td>
-                            <button onclick="select('{% url "learning_unit_select" object.pk %}')">
-                                <i class="fas fa-file-import"></i>
-                            </button>
+                            {% if request.path == quick_search_eg %}
+                                <button onclick="select('{% url "education_group_select" object.pk object.pk %}',{'element_id': {{ object.pk }}})">
+                                    <i class="fas fa-file-import"></i>
+                                </button>
+                            {% else %}
+                                <button onclick="select('{% url "learning_unit_select" object.pk %}')">
+                                    <i class="fas fa-file-import"></i>
+                                </button>
+                            {% endif %}
+
                         </td>
                         <td><a href="{{ object.get_absolute_url }}">{{ object.acronym }}</a></td>
                         <td>{{ object.complete_title }}</td>
@@ -47,7 +68,8 @@
 
                 <ul class="pagination">
                     {% if page_obj.has_previous %}
-                        <li><a href="#" onclick="submit_with_page('{{ page_obj.previous_page_number }}')">&laquo;</a></li>
+                        <li><a href="#" onclick="submit_with_page('{{ page_obj.previous_page_number }}')">&laquo;</a>
+                        </li>
                     {% else %}
                         <li class="disabled"><span>&laquo;</span></li>
                     {% endif %}
@@ -78,11 +100,18 @@
         $('#form-modal').submit();
     }
 
-    function select(url_select) {
+    function submit_with_url(url) {
+        let form = $('#form-modal');
+        form.attr('action', url);
+        form.submit();
+    }
+
+    function select(url_select, data) {
         $.ajax({
             url: url_select,
             dataType: 'json',
             type: 'POST',
+            data: data,
             success: function (jsonResponse) {
                 displayInfoMessage(jsonResponse, 'message_info_modal');
             }
