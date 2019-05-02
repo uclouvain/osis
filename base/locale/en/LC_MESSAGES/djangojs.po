@@ -71,20 +71,6 @@ msgstr "Please enter a value greater than or equal to 0."
 msgid "step_for_field"
 msgstr "Please enter a value that is a multiple of 0.5."
 
-#~ msgid "REFUSED"
-#~ msgstr "Refused"
-
-#~ msgid "ACCEPTED"
-#~ msgstr "Accepted"
-
-#~ msgid "CENTRAL"
-#~ msgstr "central"
-
-#~ msgid "FACULTY"
-#~ msgstr "Faculty"
-
-#~ msgid "remove"
-#~ msgstr "Remove"
-
-#~ msgid "confirm_achievement_delete"
-#~ msgstr "Are you sure you want to delete the achievement?"
+#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:33
+msgid "You should make a selection before clicking 'ok'"
+msgstr "Vous devez faire une séléction avant de cliquer sur 'ok'"

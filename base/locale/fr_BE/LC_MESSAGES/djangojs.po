@@ -71,63 +71,7 @@ msgstr "Veuillez entrer une valeur supérieure ou égale à 0."
 msgid "step_for_field"
 msgstr "Veuillez entrer une valeur qui est un multiple de 0,5."
 
-#~ msgid "REFUSED"
-#~ msgstr "Refusé"
+#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:33
+msgid "You should make a selection before clicking 'ok'"
+msgstr "Vous devez faire une séléction avant de cliquer sur 'ok'"
 
-#~ msgid "ACCEPTED"
-#~ msgstr "Accepté"
-
-#~ msgid "CENTRAL"
-#~ msgstr "Central"
-
-#~ msgid "FACULTY"
-#~ msgstr "Faculté"
-
-#~ msgid ""
-#~ "You will pass the proposal %(proposal)s from state %(old_state)s to "
-#~ "%(new_state)s"
-#~ msgstr ""
-#~ "Vous allez passer la proposition %(proposal)s de l'état %(old_state)s à "
-#~ "%(new_state)s"
-
-#~ msgid "Add another"
-#~ msgstr "Ajouter un autre"
-
-#~ msgid "remove"
-#~ msgstr "Supprimer"
-
-#~ msgid "confirm_achievement_delete"
-#~ msgstr "Etes-vous sûre de vouloir supprimer l'acquis d'apprentissage?"
-
-#~ msgid ""
-#~ "We can't remove this line of section because it does not exist on the "
-#~ "server"
-#~ msgstr ""
-#~ "Nous ne pouvons supprimer la ligne de cette section parce qu'elle "
-#~ "n'existe pas sur le serveur"
-
-#~ msgid "There is an error on the server, please contact the OSIS team."
-#~ msgstr "Il y a une erreur sur le serveur, veuillez contacter la team OSIS."
-
-#~ msgid ""
-#~ "We can't edit this line of section because it does not exist on the server"
-#~ msgstr ""
-#~ "Nous ne pouvons pas éditer la ligne de cette section car elle n'existe pas"
-
-#~ msgid "We can't read the text because it does not exist on the server"
-#~ msgstr ""
-#~ "Nous ne pouvons pas lire ce texte car il n'existe pas sur le serveur"
-
-#~ msgid "We can't modify the text because it does not exist on the server"
-#~ msgstr ""
-#~ "Nous ne pouvons pas modifer ce texte car il n'existe pas sur le serveur"
-
-#~ msgid ""
-#~ "We can't save this line because it (the offer or the line) does not exist "
-#~ "on the server"
-#~ msgstr ""
-#~ "Nous ne pouvons pas enregister cette ligne car l'offre ou la ligne "
-#~ "n'existe pas sur le serveur"
-
-#~ msgid "There is already a coorganization with this organization"
-#~ msgstr "Il y a déjà une coorganization existante avec cette institution"
