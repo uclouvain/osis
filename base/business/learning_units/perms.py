@@ -49,8 +49,7 @@ from osis_common.utils.perms import conjunction, disjunction, negation, BasePerm
 
 FACULTY_UPDATABLE_CONTAINER_TYPES = (learning_container_year_types.COURSE,
                                      learning_container_year_types.DISSERTATION,
-                                     learning_container_year_types.INTERNSHIP,
-                                     learning_container_year_types.EXTERNAL)
+                                     learning_container_year_types.INTERNSHIP)
 
 PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name,
                                           ProposalState.REFUSED.name)
