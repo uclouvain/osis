@@ -27,6 +27,14 @@ msgstr ""
 msgid "Detach"
 msgstr ""
 
+#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:8
+msgid "Insertion of a link to a CDN document"
+msgstr ""
+
+#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:23
+msgid "Link to CDN Doc"
+msgstr ""
+
 #: static/js/osis.js:186
 msgid "Open"
 msgstr ""
@@ -41,6 +49,14 @@ msgstr ""
 
 #: static/js/education_group/education_group_tree.js:73
 msgid "Select"
+msgstr ""
+
+#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:15
+msgid "Selection of target files"
+msgstr ""
+
+#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:33
+msgid "You should make a selection before clicking 'ok'"
 msgstr ""
 
 #: static/js/learning_unit_creation.js:3
@@ -71,6 +87,3 @@ msgstr "Please enter a value greater than or equal to 0."
 msgid "step_for_field"
 msgstr "Please enter a value that is a multiple of 0.5."
 
-#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:33
-msgid "You should make a selection before clicking 'ok'"
-msgstr "Vous devez faire une séléction avant de cliquer sur 'ok'"

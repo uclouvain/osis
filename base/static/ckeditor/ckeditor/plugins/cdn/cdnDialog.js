@@ -5,22 +5,22 @@ var cdn_document_name;
 
 	  return {
 
-		title : 'Insertion d\'un lien vers un document du CDN',
+		title : gettext("Insertion of a link to a CDN document"),
 		resizable : CKEDITOR.DIALOG_RESIZE_HEIGHT,
 		minWidth : 600,
 		minHeight : 480,
 		contents : [
 		  {
 			id : "cdn_browse",
-			label : 'Sélection du fichier cible',
-			title : 'Browse',
+			label : gettext("Selection of target files"),
+			title : "Browse",
 			expand : true,
 			elements :[
 			  {
 				id : "iframe_cdn_browse",
 				src : "https://uclouvain.be/PPE-filemanager/",
 				type : 'iframe',
-				label : 'Link to CDN Doc',
+				label : gettext("Link to CDN Doc"),
 				width : '100%',
 				height : 480
 			  }
