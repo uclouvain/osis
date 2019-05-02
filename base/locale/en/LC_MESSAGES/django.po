@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-29 11:00+0200\n"
+"POT-Creation-Date: 2019-04-30 15:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -463,7 +463,7 @@ msgstr ""
 
 #: templates/blocks/forms/create_cancel_buttons.html:31
 #: templates/blocks/forms/create_cancel_buttons_modal.html:29
-#: templates/learning_unit/blocks/panel/educational_informations.html:94
+#: templates/learning_unit/blocks/panel/educational_informations.html:97
 #: templates/learning_unit/select_attribution.html:67
 msgid "Add"
 msgstr ""
@@ -1505,7 +1505,7 @@ msgstr ""
 #: forms/education_group/achievement.py:85
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:40
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:36
-#: templates/learning_unit/blocks/panel/educational_informations.html:52
+#: templates/learning_unit/blocks/panel/educational_informations.html:55
 msgid "English"
 msgstr ""
 
@@ -1776,7 +1776,7 @@ msgstr ""
 #: forms/education_group/achievement.py:79
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:39
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:35
-#: templates/learning_unit/blocks/panel/educational_informations.html:51
+#: templates/learning_unit/blocks/panel/educational_informations.html:54
 msgid "French"
 msgstr ""
 
@@ -2133,7 +2133,7 @@ msgstr ""
 #: business/learning_unit.py:83 business/learning_units/edition.py:429
 #: business/proposal_xls.py:58 models/abstracts/abstract_achievement.py:48
 #: models/learning_unit_year.py:134
-#: templates/learning_unit/blocks/panel/educational_informations.html:50
+#: templates/learning_unit/blocks/panel/educational_informations.html:53
 #: templates/learning_unit/specifications_all.html:30
 #: templates/my_osis/profile.html:102
 #: tests/business/learning_units/test_edition.py:207
@@ -2569,7 +2569,7 @@ msgstr ""
 #: forms/learning_unit/search_form.py:67
 #: models/external_learning_unit_year.py:90 models/learning_unit_year.py:227
 #: models/learning_unit_year.py:242
-#: templates/learning_unit/blocks/panel/educational_informations.html:113
+#: templates/learning_unit/blocks/panel/educational_informations.html:116
 #: tests/models/test_learning_unit_year.py:777
 msgid "Mobility"
 msgstr ""
@@ -3526,7 +3526,7 @@ msgstr ""
 #: models/enums/field_status.py:35
 #: templates/education_group/group_element_year_comment_inner.html:40
 #: templates/education_group/group_element_year_comment_inner.html:42
-#: templates/learning_unit/blocks/panel/educational_informations.html:74
+#: templates/learning_unit/blocks/panel/educational_informations.html:77
 msgid "Required"
 msgstr ""
 
@@ -3899,7 +3899,7 @@ msgid "Teaching internship"
 msgstr ""
 
 #: business/learning_units/xls_generator.py:63
-#: templates/learning_unit/blocks/panel/educational_informations.html:65
+#: templates/learning_unit/blocks/panel/educational_informations.html:68
 #: templates/learning_unit/teaching_material/modal_edit.html:31
 msgid "Teaching material"
 msgstr ""
