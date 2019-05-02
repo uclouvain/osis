@@ -23,10 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView
 from reversion.models import Version
 
@@ -58,11 +58,11 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        # Change template and permissions for external learning units.
+        # Change template and permissions for external learning units and co_graduation is false.
+        if self.object.is_external_mobility():
+            self.template_name = "learning_unit/external/read.html"
         if self.object.is_external():
             self.permission_required = "base.can_access_externallearningunityear"
-            self.template_name = "learning_unit/external/read.html"
-
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
