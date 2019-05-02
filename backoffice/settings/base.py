@@ -26,8 +26,8 @@
 import os
 import sys
 
-from django.core.urlresolvers import reverse_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = os.path.dirname((os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -446,3 +446,5 @@ YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 
 YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 2019))
 
 CDN_URL = os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager/")
+
+STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')

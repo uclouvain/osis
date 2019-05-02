@@ -83,7 +83,7 @@ class EducationGroupPublicationContact(OrderedModel):
         default=PublicationContactType.OTHER_CONTACT.name,
         verbose_name=_('type'),
     )
-    education_group_year = models.ForeignKey('EducationGroupYear')
+    education_group_year = models.ForeignKey('EducationGroupYear', on_delete=models.CASCADE)
     order_with_respect_to = ('education_group_year', 'type', )
 
     objects = EducationGroupPublicationQuerySet.as_manager()

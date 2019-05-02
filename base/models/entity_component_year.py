@@ -39,8 +39,8 @@ class EntityComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
 class EntityComponentYear(SerializableModel):
     external_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    entity_container_year = models.ForeignKey('EntityContainerYear')
-    learning_component_year = models.ForeignKey('LearningComponentYear')
+    entity_container_year = models.ForeignKey('EntityContainerYear', on_delete=models.CASCADE)
+    learning_component_year = models.ForeignKey('LearningComponentYear', on_delete=models.CASCADE)
     repartition_volume = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
