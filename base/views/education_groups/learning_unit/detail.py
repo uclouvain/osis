@@ -101,12 +101,20 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-
+        luy = self.object
+        root = context["root"]
         context["prerequisite"] = get_object_or_none(Prerequisite,
-                                                     learning_unit_year=context["learning_unit_year"],
-                                                     education_group_year=context["root"])
-        context["can_modify_prerequisite"] = perms.is_eligible_to_change_education_group(context['person'],
-                                                                                         context["root"])
+                                                     learning_unit_year=luy,
+                                                     education_group_year=root)
+        context["can_modify_prerequisite"] = perms.is_eligible_to_change_education_group(
+            context['person'],
+            context["root"]
+        )
+
+        context['is_prerequisite_acronym_list'] = Prerequisite.objects.filter(
+            prerequisiteitem__learning_unit=luy.learning_unit,
+            education_group_year=root
+        ).values_list('learning_unit_year__acronym', flat=True)
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -117,7 +125,7 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
         root = context["root"]
         prerequisite = context["prerequisite"]
         learning_unit_year = context["learning_unit_year"]
-        learning_unit_inconsistent = get_prerequisite_acronyms_which_are_outside_of_education_group(root, prerequisite)\
+        learning_unit_inconsistent = get_prerequisite_acronyms_which_are_outside_of_education_group(root, prerequisite) \
             if prerequisite else []
         if learning_unit_inconsistent:
             display_warning_messages(
@@ -138,7 +146,7 @@ class LearningUnitPrerequisiteGroup(LearningUnitGenericDetailView):
         context = super().get_context_data()
 
         learning_unit_year = context["learning_unit_year"]
-        formations_id = group_element_year.find_learning_unit_formations([learning_unit_year]).\
+        formations_id = group_element_year.find_learning_unit_formations([learning_unit_year]). \
             get(learning_unit_year.id, [])
         qs = EducationGroupYear.objects.filter(id__in=formations_id)
         prefetch_prerequisites = Prefetch("prerequisite_set",
