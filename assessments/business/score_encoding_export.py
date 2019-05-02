@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,18 +24,18 @@
 #
 ##############################################################################
 from django.http import HttpResponse
-from openpyxl import Workbook
-from openpyxl.writer.excel import save_virtual_workbook
-from openpyxl.styles import Color, Style, PatternFill, Font, colors
-from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from openpyxl import Workbook
+from openpyxl.styles import Color, Style, PatternFill, Font, colors
+from openpyxl.writer.excel import save_virtual_workbook
 
+from assessments.business.enrollment_state import get_line_color, ENROLLED_LATE_COLOR, NOT_ENROLLED_COLOR
 from base import models as mdl
 from base.models.enums import exam_enrollment_justification_type
-from assessments.business.enrollment_state import get_line_color, ENROLLED_LATE_COLOR, NOT_ENROLLED_COLOR
 
-HEADER = ['academic_year', 'Session derogation', 'Learning unit', 'program', 'registration_number', 'lastname',
-          'firstname', 'email', 'Numbered scores', 'justification', 'End date']
+HEADER = ['Academic year', 'Session', 'Learning unit', 'Program', 'Registration number', 'Lastname',
+          'Firstname', 'Email', 'Numbered scores', 'Justification (A,T)', 'End date Prof']
 
 JUSTIFICATION_ALIASES = {
     exam_enrollment_justification_type.ABSENCE_JUSTIFIED: "M",
@@ -43,28 +43,16 @@ JUSTIFICATION_ALIASES = {
     exam_enrollment_justification_type.CHEATING: "T",
 }
 
-FIRST_COL_LEGEND_ENROLLMENT_STATUS = 6
+FIRST_COL_LEGEND_ENROLLMENT_STATUS = 7
 FIRST_ROW_LEGEND_ENROLLMENT_STATUS = 7
 
 
 def export_xls(exam_enrollments):
     workbook = Workbook()
     worksheet = workbook.active
+    _add_header_and_legend_to_file(exam_enrollments, worksheet)
 
-    worksheet.append([str(exam_enrollments[0].learning_unit_enrollment.learning_unit_year)])
-    worksheet.append([str('Session: %s' % exam_enrollments[0].session_exam.number_session)])
-    worksheet.append([str('')])
-    __display_creation_date_with_message_about_state(worksheet, row_number=4)
-    __display_warning_about_students_deliberated(worksheet, row_number=5)
-    worksheet.append([str('')])
-    __display_legends(worksheet)
-    _color_legend(worksheet)
-    worksheet.append([str('')])
-    __columns_resizing(worksheet)
-    header_translate_list = [str(_(elem)) for elem in HEADER]
-    worksheet.append(header_translate_list)
-
-    row_number = 11
+    row_number = 12
     for exam_enroll in exam_enrollments:
         student = exam_enroll.learning_unit_enrollment.student
         offer = exam_enroll.learning_unit_enrollment.offer
@@ -105,6 +93,23 @@ def export_xls(exam_enrollments):
     response = HttpResponse(save_virtual_workbook(workbook), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
+
+
+def _add_header_and_legend_to_file(exam_enrollments, worksheet):
+    ue = exam_enrollments[0].learning_unit_enrollment.learning_unit_year
+    worksheet.append([str(ue) + " " + ue.complete_title if ue.complete_title else str(ue)])
+    worksheet.append([str('Session: %s' % exam_enrollments[0].session_exam.number_session)])
+    worksheet.append([str('')])
+    __display_creation_date_with_message_about_state(worksheet, row_number=4)
+    __display_warning_about_students_deliberated(worksheet, row_number=5)
+    worksheet.append([str('')])
+    show_decimal = ue.decimal_scores
+    __display_legends(worksheet, show_decimal)
+    _color_legend(worksheet)
+    worksheet.append([str('')])
+    __columns_resizing(worksheet)
+    header_translate_list = [str(_(elem)) for elem in HEADER]
+    worksheet.append(header_translate_list)
 
 
 def __columns_resizing(ws):
@@ -165,7 +170,7 @@ def __display_warning_about_students_deliberated(ws, row_number):
     ws.cell(row=row_number, column=1).font = Font(color=colors.RED)
 
 
-def __display_legends(ws):
+def __display_legends(ws, decimal):
     ws.append([
         str(_('Justification')),
         str(_("Accepted value: %(justification_label_authorized)s ")
@@ -173,20 +178,28 @@ def __display_legends(ws):
         str(''),
         str(''),
         str(''),
-        str(_('Enrolled after session starts')),
+        str(''),
+        str(_('Enrolled lately')),
     ])
     ws.append([
         str(''),
-        str(_("Other values: %(justification_other_values)s ") % {
+        str(_("Other values reserved to administration: %(justification_other_values)s ") % {
             'justification_other_values': justification_other_values()}),
         str(''),
         str(''),
         str(''),
-        str(_('Unsubscribed after the opening of the session')),
+        str(''),
+        str(_('Unsubscribed lately')),
     ])
     ws.append([
         str(_('Numbered scores')),
         str(_('Score legend: %(score_legend)s (0=Score of presence)') % {"score_legend": "0 - 20"}),
+    ])
+    ws.append([
+            str(''),
+            str(_('Decimals authorized for this learning unit'))
+            if decimal else
+            str(_('Unauthorized decimal for this learning unit'))
     ])
 
 
@@ -225,10 +238,10 @@ def _coloring_enrollment_state(ws, row_number, exam_enroll):
 def _color_legend(ws):
     __apply_style_to_cells(ws, ENROLLED_LATE_COLOR, FIRST_ROW_LEGEND_ENROLLMENT_STATUS)
     __apply_style_to_cells(ws, NOT_ENROLLED_COLOR, FIRST_ROW_LEGEND_ENROLLMENT_STATUS + 1)
+    ws.cell(row=10, column=2).font = Font(color=colors.RED)
 
 
 def __apply_style_to_cells(ws, color_style, row):
     style_enrollment_state = Style(fill=PatternFill(patternType='solid',
                                                     fgColor=Color(color_style.lstrip("#"))))
     ws.cell(row=row, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).style = style_enrollment_state
-    ws.cell(row=row, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS+1).style = style_enrollment_state

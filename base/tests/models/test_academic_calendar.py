@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,59 +26,42 @@
 import datetime
 from unittest import mock
 
-from django.forms import model_to_dict
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from faker import Faker
 
 from base.models import academic_calendar
-from base.models.academic_calendar import find_dates_for_current_academic_year, is_academic_calendar_has_started
+from base.models.academic_calendar import is_academic_calendar_has_started
 from base.models.enums import academic_calendar_type
 from base.models.exceptions import StartDateHigherThanEndDateException
 from base.signals.publisher import compute_all_scores_encodings_deadlines
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.academic_year import AcademicYearFactory, AcademicYearFakerFactory, \
-    create_current_academic_year
+from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory, \
+    CloseAcademicCalendarFactory
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 
 
 class AcademicCalendarTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        pass
 
     def test_start_date_higher_than_end_date(self):
-        yr = timezone.now().year
-        an_academic_year = AcademicYearFactory(year=yr)
-        an_academic_calendar = AcademicCalendarFactory.build(academic_year=an_academic_year,
-                                                             title="An event",
-                                                             start_date=datetime.date(yr, 3, 4),
-                                                             end_date=datetime.date(yr, 3, 3))
-        self.assertRaises(StartDateHigherThanEndDateException, an_academic_calendar.save)
+        fake = Faker()
+        with self.assertRaises(StartDateHigherThanEndDateException):
+            AcademicCalendarFactory(start_date=fake.future_date(), end_date=fake.past_date())
 
     def test_find_highlight_academic_calendar(self):
-        an_academic_year = AcademicYearFakerFactory(start_date=timezone.now() - datetime.timedelta(days=10),
-                                                    end_date=timezone.now() + datetime.timedelta(days=10))
+        open_academic_calendar = OpenAcademicCalendarFactory()
+        close_academic_calendar = CloseAcademicCalendarFactory()
+        academic_calendar_without_description = OpenAcademicCalendarFactory(highlight_description=None)
+        academic_calendar_with_empty_title = OpenAcademicCalendarFactory(highlight_title="")
 
-        tmp_academic_calendar_1 = AcademicCalendarFactory(academic_year=an_academic_year, title="First calendar event")
-
-        tmp_academic_calendar_2 = AcademicCalendarFactory(academic_year=an_academic_year, title="Second calendar event")
-
-        null_academic_calendar = AcademicCalendarFactory(academic_year=an_academic_year,
-                                                         title="A third event which is null",
-                                                         highlight_description=None)
-
-        empty_academic_calendar = AcademicCalendarFactory(academic_year=an_academic_year,
-                                                          title="A third event which is null",
-                                                          highlight_title="")
-
-        db_academic_calendars = list(academic_calendar.find_highlight_academic_calendar())
-        self.assertIsNotNone(db_academic_calendars)
-        self.assertCountEqual(db_academic_calendars, [tmp_academic_calendar_1, tmp_academic_calendar_2])
-
-    def test_find_academic_calendar_by_academic_year(self):
-        tmp_academic_year = AcademicYearFactory()
-        tmp_academic_calendar = AcademicCalendarFactory(academic_year=tmp_academic_year)
-        db_academic_calendar = list(academic_calendar.find_academic_calendar_by_academic_year
-                                    ([tmp_academic_year][0]))[0]
-        self.assertIsNotNone(db_academic_calendar)
-        self.assertEqual(db_academic_calendar, tmp_academic_calendar)
+        self.assertQuerysetEqual(
+            academic_calendar.find_highlight_academic_calendar(),
+            [open_academic_calendar],
+            transform=lambda rec: rec
+        )
 
     def test_find_academic_calendar_by_academic_year_with_dates(self):
         tmp_academic_year = AcademicYearFactory(year=timezone.now().year)
@@ -92,23 +75,6 @@ class AcademicCalendarTest(TestCase):
         with mock.patch.object(compute_all_scores_encodings_deadlines, 'send') as mock_method:
             AcademicCalendarFactory()
             self.assertTrue(mock_method.called)
-
-
-class TestFindDatesForCurrentAcademicYear(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.current_academic_calendar = AcademicCalendarFactory(academic_year=create_current_academic_year(),
-                                                                reference=academic_calendar_type.EXAM_ENROLLMENTS)
-
-    def test_when_no_matching_reference(self):
-        dates = find_dates_for_current_academic_year(academic_calendar_type.TEACHING_CHARGE_APPLICATION)
-        self.assertFalse(dates)
-
-    def test_when_matched(self):
-        dates = find_dates_for_current_academic_year(academic_calendar_type.EXAM_ENROLLMENTS)
-        self.assertEqual(dates,
-                         model_to_dict(self.current_academic_calendar,
-                                       fields=("start_date", "end_date")))
 
 
 class TestIsAcademicCalendarHasStarted(TestCase):

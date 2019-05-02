@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -50,17 +50,17 @@ from base.tests.factories.person_entity import PersonEntityFactory
 class TestDeleteGroupEducationView(TestCase):
 
     def setUp(self):
-        current_ac = create_current_academic_year()
+        self.current_ac = create_current_academic_year()
 
         self.education_group1 = EducationGroupFactory()
         self.education_group2 = EducationGroupFactory()
         self.education_group_year1 = EducationGroupYearFactory(
             education_group=self.education_group1,
-            academic_year=current_ac,
+            academic_year=self.current_ac,
         )
         self.education_group_year2 = EducationGroupYearFactory(
             education_group=self.education_group2,
-            academic_year=current_ac,
+            academic_year=self.current_ac,
         )
         self.person = PersonWithPermissionsFactory("delete_educationgroup")
         PersonEntityFactory(person=self.person, entity=self.education_group_year1.management_entity)
@@ -76,7 +76,7 @@ class TestDeleteGroupEducationView(TestCase):
             reference=EDUCATION_GROUP_EDITION,
             start_date=timezone.now(),
             end_date=timezone.now() + timedelta(weeks=+1),
-            academic_year=current_ac,
+            academic_year=self.current_ac,
         )
 
     def test_delete_get_permission_denied(self):
@@ -92,21 +92,23 @@ class TestDeleteGroupEducationView(TestCase):
 
     def test_delete_post(self):
         response = self.client.post(self.url)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertFalse(EducationGroupYear.objects.filter(pk=self.education_group_year1.pk).exists())
         self.assertTrue(EducationGroupYear.objects.filter(pk=self.education_group_year2.pk).exists())
         self.assertFalse(EducationGroup.objects.filter(pk=self.education_group1.pk).exists())
         self.assertTrue(EducationGroup.objects.filter(pk=self.education_group2.pk).exists())
         response = self.client.post(self.url2)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertFalse(EducationGroupYear.objects.filter(pk=self.education_group_year2.pk).exists())
         self.assertFalse(EducationGroup.objects.filter(pk=self.education_group2.pk).exists())
 
     def test_delete_get_with_protected_objects(self):
         # Create protected data
         OfferEnrollmentFactory(education_group_year=self.education_group_year1)
-        GroupElementYearFactory(parent=self.education_group_year1)
-        GroupElementYearFactory(parent=self.education_group_year1)
+        GroupElementYearFactory(parent=self.education_group_year1,
+                                child_branch__academic_year=self.current_ac)
+        GroupElementYearFactory(parent=self.education_group_year1,
+                                child_branch__academic_year=self.current_ac)
 
         count_enrollment = 1
         msg_offer_enrollment = ngettext_lazy(

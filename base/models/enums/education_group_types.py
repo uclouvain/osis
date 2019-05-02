@@ -59,6 +59,17 @@ class TrainingType(ChoiceEnum):
     INTERNSHIP = pgettext_lazy("Internship for education group", "Internship")
 
     @classmethod
+    def finality_types(cls):
+        return [
+            cls.MASTER_MA_120.name, cls.MASTER_MD_120.name, cls.MASTER_MS_120.name,
+            cls.MASTER_MA_180_240.name, cls.MASTER_MD_180_240.name, cls.MASTER_MS_180_240.name
+        ]
+
+    @classmethod
+    def root_master_2m_types(cls):
+        return [cls.PGRM_MASTER_120.name, cls.PGRM_MASTER_180_240.name]
+
+    @classmethod
     def with_diploma_values_set_initially_as_true(cls):
         return [
             cls.AGGREGATION.name, cls.BACHELOR.name, cls.FORMATION_PHD.name, cls.PHD.name, cls.MASTER_MA_120.name,
@@ -80,6 +91,19 @@ class TrainingType(ChoiceEnum):
             cls.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
             cls.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name,
             cls.CAPAES.name,
+        ]
+
+    @classmethod
+    def with_skills_achievements(cls):
+        return [
+            cls.BACHELOR.name,
+            cls.MASTER_MC.name,
+            cls.MASTER_M1.name,
+            cls.PGRM_MASTER_120.name,
+            cls.PGRM_MASTER_180_240.name,
+            cls.AGGREGATION.name,
+            cls.CERTIFICATE.name,
+            cls.RESEARCH_CERTIFICATE.name,
         ]
 
 
@@ -130,6 +154,14 @@ class GroupType(ChoiceEnum):
     def minor_major_option_list_choice(cls):
         return [
             cls.MINOR_LIST_CHOICE.name, cls.MAJOR_LIST_CHOICE.name, cls.OPTION_LIST_CHOICE.name
+        ]
+
+    @classmethod
+    def ordered(cls):
+        return [
+            cls.COMMON_CORE.name, cls.FINALITY_120_LIST_CHOICE.name, cls.FINALITY_180_LIST_CHOICE.name,
+            cls.OPTION_LIST_CHOICE.name, cls.MINOR_LIST_CHOICE.name, cls.MAJOR_LIST_CHOICE.name,
+            cls.MOBILITY_PARTNERSHIP_LIST_CHOICE.name, cls.COMPLEMENTARY_MODULE.name, cls.SUB_GROUP.name
         ]
 
 

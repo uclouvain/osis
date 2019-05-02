@@ -27,9 +27,12 @@ from django.urls import reverse
 
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
+from base.models.enums.proposal_type import ProposalType
 from base.models.group_element_year import GroupElementYear, fetch_all_group_elements_in_tree
 from base.models.prerequisite_item import PrerequisiteItem
+from base.models.proposal_learning_unit import ProposalLearningUnit
 
 
 class EducationGroupHierarchy:
@@ -38,7 +41,8 @@ class EducationGroupHierarchy:
 
     _cache_hierarchy = None
 
-    def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear=None, cache_hierarchy: dict=None):
+    def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear = None,
+                 cache_hierarchy: dict = None):
 
         self.children = []
         self.root = root
@@ -86,9 +90,11 @@ class EducationGroupHierarchy:
             .annotate(has_prerequisite=Exists(has_prerequisite)) \
             .annotate(is_prerequisite=Exists(is_prerequisite)) \
             .select_related('child_branch__academic_year',
+                            'child_branch__education_group_type',
                             'child_leaf__academic_year',
                             'child_leaf__learning_container_year',
-                            'parent')
+                            'child_leaf__proposallearningunit',
+                            'parent').order_by("order", "parent__partial_acronym")
 
     def to_json(self):
         group_element_year_pk = self.group_element_year.pk if self.group_element_year else '#'
@@ -111,21 +117,23 @@ class EducationGroupHierarchy:
             'id': 'id_{}_{}'.format(self.education_group_year.pk, group_element_year_pk),
         }
 
-    def to_list(self):
-        """ Generate list of group_element_year without reference link """
+    def to_list(self, flat=False, pruning_function=None):
+        """ Generate list of group_element_year without reference link
+        @:param flat: return a flat list
+        @:param pruning_function: Allow to prune the tree
+        """
         result = []
+        _children = filter(pruning_function, self.children) if pruning_function else self.children
 
-        for child in self.children:
-            child_list = child.to_list()
+        for child in _children:
+            child_list = child.to_list(flat=flat, pruning_function=pruning_function)
 
             if child.reference:
                 result.extend(child_list)
-
             else:
                 result.append(child.group_element_year)
                 if child_list:
-                    result.append(child_list)
-
+                    result.extend(child_list) if flat else result.append(child_list)
         return result
 
     def _get_icon(self):
@@ -143,6 +151,17 @@ class EducationGroupHierarchy:
         url = reverse('education_group_read', args=[self.root.pk, self.education_group_year.pk])
         return url + self.url_group_to_parent()
 
+    def get_option_list(self):
+        def pruning_function(node):
+            return node.group_element_year.child_branch and \
+                   node.group_element_year.child_branch.education_group_type.name not in \
+                   [GroupType.FINALITY_120_LIST_CHOICE.name, GroupType.FINALITY_180_LIST_CHOICE.name]
+
+        return [
+            element.child_branch for element in self.to_list(flat=True, pruning_function=pruning_function)
+            if element.child_branch.education_group_type.name == MiniTrainingType.OPTION.name
+        ]
+
 
 class NodeLeafJsTree(EducationGroupHierarchy):
     element_type = LEARNING_UNIT_YEAR
@@ -159,7 +178,7 @@ class NodeLeafJsTree(EducationGroupHierarchy):
     def to_json(self):
         group_element_year_pk = self.group_element_year.pk if self.group_element_year else '#'
         return {
-            'text': self.learning_unit_year.acronym,
+            'text': self._get_acronym(),
             'icon': self.icon,
             'a_attr': {
                 'href': self.get_url(),
@@ -172,19 +191,43 @@ class NodeLeafJsTree(EducationGroupHierarchy):
                 'is_prerequisite': self.group_element_year.is_prerequisite,
                 'detach_url': reverse('group_element_year_delete', args=[
                     self.root.pk, self.group_element_year.parent.pk, self.group_element_year.pk
-                ]) if self.group_element_year else '#'
+                ]) if self.group_element_year else '#',
+                'class': self._get_class()
             },
             'id': 'id_{}_{}'.format(self.learning_unit_year.pk, group_element_year_pk),
         }
 
     def _get_icon(self):
         if self.group_element_year.has_prerequisite and self.group_element_year.is_prerequisite:
-            return "fa fa-exchange"
+            return "fa fa-exchange-alt"
         elif self.group_element_year.has_prerequisite:
             return "fa fa-arrow-right"
         elif self.group_element_year.is_prerequisite:
             return "fa fa-arrow-left"
-        return "jstree-file"
+        return "far fa-file"
+
+    def _get_acronym(self) -> str:
+        """
+            When the LU year is different than its education group, we have to display the year in the title.
+        """
+        if self.learning_unit_year.academic_year != self.root.academic_year:
+            return "|{}| {}".format(self.learning_unit_year.academic_year.year, self.learning_unit_year.acronym)
+        return self.learning_unit_year.acronym
+
+    def _get_class(self):
+        try:
+            proposal = self.learning_unit_year.proposallearningunit
+        except ProposalLearningUnit.DoesNotExist:
+            proposal = None
+
+        class_by_proposal_type = {
+            ProposalType.CREATION.name: "proposal proposal_creation",
+            ProposalType.MODIFICATION.name: "proposal proposal_modification",
+            ProposalType.TRANSFORMATION.name: "proposal proposal_transformation",
+            ProposalType.TRANSFORMATION_AND_MODIFICATION.name: "proposal proposal_transformation_modification",
+            ProposalType.SUPPRESSION.name: "proposal proposal_suppression"
+        }
+        return class_by_proposal_type[proposal.type] if proposal else ""
 
     def get_url(self):
         url = reverse('learning_unit_utilization', args=[self.root.pk, self.learning_unit_year.pk])

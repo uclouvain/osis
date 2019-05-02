@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -43,22 +43,6 @@ def create_offer_year(acronym, title, academic_year):
 
 class OfferYearTest(TestCase):
 
-    def test_find_by_id_list_none_ids_list(self):
-        self.assertIsNone(offer_year.find_by_id_list(None))
-
-    def test_find_by_id_list_empty_ids_list(self):
-        self.assertIsNone(offer_year.find_by_id_list([]))
-
-    def test_search_offers(self):
-        academic_year = AcademicYearFactory(year=timezone.now().year)
-        self.assertFalse(offer_year.search_offers(None, academic_year, None).exists())
-
-        offer_yr = OfferYearFactory(academic_year=academic_year)
-        self.assertEqual(offer_year.search_offers([offer_yr.entity_management], academic_year, None)[0], offer_yr)
-
-        previous_academic_year = AcademicYearFactory(year=timezone.now().year-1)
-        self.assertFalse(offer_year.search_offers([offer_yr.entity_management], previous_academic_year, None).exists())
-
     def test_get_last_offer_year_by_offer(self):
         an_offer = test_offer.create_offer("test_offer")
         academic_years = [
@@ -73,9 +57,3 @@ class OfferYearTest(TestCase):
             ]
         self.assertEqual(offer_year.get_last_offer_year_by_offer(an_offer), offer_years[2])
 
-    def test_find_by_offers_and_year(self):
-        ac_year = academic_year.create_current_academic_year()
-        offer1 = OfferFactory()
-        offer_year1 = OfferYearFactory(offer=offer1, academic_year=ac_year)
-        result = list(offer_year.find_by_offers_and_year([offer1],ac_year))
-        self.assertEqual(result[0],offer_year1)

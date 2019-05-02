@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -39,7 +39,8 @@ from base.models.validation_rule import ValidationRule
 from base.tests.factories.academic_calendar import AcademicCalendarEducationGroupEditionFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import GroupFactory
+from base.tests.factories.education_group_year import GroupFactory, EducationGroupYearFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin, _get_valid_post_data
@@ -147,7 +148,6 @@ class TestGroupForm(TestCase):
             user=self.user,
             education_group_type=self.egt
         )
-
         self.assertTrue(form.is_valid(), form.errors)
 
         education_group_year = form.save()
@@ -157,7 +157,10 @@ class TestGroupForm(TestCase):
             self.expected_educ_group_year.academic_year.year
         )
 
-        self.assertIsNone(education_group_year.education_group.end_year)
+        self.assertEqual(
+            education_group_year.education_group.end_year,
+            self.expected_educ_group_year.education_group.end_year
+        )
 
     @patch('base.forms.education_group.common.find_authorized_types', return_value=EducationGroupType.objects.all())
     def test_create_with_parent(self, mock_find_authorized_types):
@@ -181,6 +184,7 @@ class TestGroupPostponedList(EducationGroupYearModelFormMixin):
         super(TestGroupPostponedList, self).setUp(education_group_type=self.education_group_type)
 
     def test_group_doesnt_have_post_save_method(self):
+        self.parent_education_group_year.education_group_type = self.education_group_type
         instance = self.parent_education_group_year
         form = GroupForm(data={}, user=self.user, instance=instance)
         self.assertFalse(hasattr(form, '_post_save'))

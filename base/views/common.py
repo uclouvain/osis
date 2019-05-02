@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -233,7 +233,7 @@ def display_messages(request, messages_to_display, level, extra_tags=None):
         messages_to_display = [messages_to_display]
 
     for msg in messages_to_display:
-        messages.add_message(request, level, _(msg), extra_tags=extra_tags)
+        messages.add_message(request, level, str(msg), extra_tags=extra_tags)
 
 
 def check_if_display_message(request, results):

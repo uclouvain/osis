@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ from base.models.entity import find_by_id
 from reference.models.language import find_by_id as language_find_by_id
 from base.business.learning_unit_year_with_context import volume_from_initial_learning_component_year
 from base.models.enums import vacant_declaration_type, attribution_procedure
+from base.business import learning_unit_year_with_context
 
 BOOLEAN_FIELDS = ('professional_integration', 'is_vacant', 'team')
 FOREIGN_KEY_NAME = (
@@ -82,6 +83,7 @@ INITIAL_DATA_FIELDS = {
     ],
     'learning_component_year': [
         "id", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2", "planned_classes",
+        "type"
     ],
 }
 
@@ -139,11 +141,10 @@ def _reinitialize_entities_before_proposal(learning_container_year, initial_enti
                 current_entity_container_year.delete()
 
 
-def delete_learning_unit_proposal(learning_unit_proposal):
-    prop_type = learning_unit_proposal.type
+def delete_learning_unit_proposal(learning_unit_proposal, delete_learning_unit):
     lu = learning_unit_proposal.learning_unit_year.learning_unit
     learning_unit_proposal.delete()
-    if prop_type == ProposalType.CREATION.name:
+    if delete_learning_unit:
         lu.delete()
 
 
@@ -235,8 +236,8 @@ def force_state_of_proposals(proposals, author, new_state):
         proposals,
         author,
         change_state,
-        _("Proposal %(acronym)s (%(academic_year)s) successfully changed state."),
-        _("Proposal %(acronym)s (%(academic_year)s) cannot be changed state."),
+        _("successfully changed state"),
+        _("cannot be changed state"),
         None,
         None,
         perms.is_eligible_to_edit_proposal
@@ -254,8 +255,8 @@ def cancel_proposals_and_send_report(proposals, author, research_criteria):
         proposals,
         author,
         cancel_proposal,
-        "Proposal %(acronym)s (%(academic_year)s) successfully canceled.",
-        "Proposal %(acronym)s (%(academic_year)s) cannot be canceled.",
+        _("successfully canceled"),
+        _("cannot be canceled"),
         send_mail_util.send_mail_cancellation_learning_unit_proposals,
         research_criteria,
         perms.is_eligible_for_cancel_of_proposal
@@ -267,8 +268,8 @@ def consolidate_proposals_and_send_report(proposals, author, research_criteria):
         proposals,
         author,
         consolidate_proposal,
-        "Proposal %(acronym)s (%(academic_year)s) successfully consolidated.",
-        "Proposal %(acronym)s (%(academic_year)s) cannot be consolidated.",
+        _('successfully consolidated'),
+        _('cannot be consolidated'),
         send_mail_util.send_mail_consolidation_learning_unit_proposal,
         research_criteria,
         perms.is_eligible_to_consolidate_proposal
@@ -286,14 +287,18 @@ def _apply_action_on_proposals_and_send_report(proposals, author, action_method,
 
     for proposal, results in proposals_with_results:
         if ERROR in results:
-            messages_by_level[ERROR].append(_(error_msg_id) % {
+            messages_by_level[ERROR].append("%(proposal)s %(acronym)s (%(academic_year)s) %(msg_detail)s." % {
+                "proposal": _('Proposal'),
                 "acronym": proposal.learning_unit_year.acronym,
-                "academic_year": proposal.learning_unit_year.academic_year
+                "academic_year": proposal.learning_unit_year.academic_year,
+                "msg_detail": error_msg_id
             })
         else:
-            messages_by_level[SUCCESS].append(_(success_msg_id) % {
+            messages_by_level[SUCCESS].append("%(proposal)s %(acronym)s (%(academic_year)s) %(msg_detail)s." % {
+                "proposal": _('Proposal'),
                 "acronym": proposal.learning_unit_year.acronym,
-                "academic_year": proposal.learning_unit_year.academic_year
+                "academic_year": proposal.learning_unit_year.academic_year,
+                "msg_detail": success_msg_id
             })
     return messages_by_level
 
@@ -323,10 +328,10 @@ def cancel_proposal(proposal):
             results = {ERROR: errors}
         else:
             results = {SUCCESS: business_deletion.delete_from_given_learning_unit_year(learning_unit_year)}
-            delete_learning_unit_proposal(proposal)
+            delete_learning_unit_proposal(proposal, True)
     else:
         reinitialize_data_before_proposal(proposal)
-        delete_learning_unit_proposal(proposal)
+        delete_learning_unit_proposal(proposal, False)
 
     return results
 
@@ -338,7 +343,7 @@ def consolidate_proposal(proposal):
     elif proposal.state == proposal_state.ProposalState.ACCEPTED.name:
         results = _consolidate_accepted_proposal(proposal)
         if not results.get(ERROR):
-            delete_learning_unit_proposal(proposal)
+            delete_learning_unit_proposal(proposal, False)
     return results
 
 
@@ -414,7 +419,8 @@ def copy_learning_unit_data(learning_unit_year):
         "learning_unit": _get_attributes_values(learning_unit_year.learning_unit,
                                                 INITIAL_DATA_FIELDS['learning_unit']),
         "entities": get_entities(entities_by_type),
-        'learning_component_years': get_components_initial_data(learning_unit_year),
+        "learning_component_years": get_components_initial_data(learning_unit_year),
+        "volumes": _get_volumes_for_initial(learning_unit_year)
     }
 
 
@@ -521,7 +527,21 @@ def _get_name_attribute(obj):
 def _get_model_differences(actual_data, differences_param, initial_data_by_model, model):
     differences = differences_param
     for column_name, value in initial_data_by_model.items():
-        if not (value is None and actual_data[model][column_name] == '') and \
-                        value != actual_data[model][column_name]:
+        if not (value is None and actual_data[model][column_name] == '') and value != actual_data[model][column_name]:
             differences[column_name] = _get_the_old_value(column_name, actual_data[model], initial_data_by_model)
     return differences
+
+
+def _get_volumes_for_initial(learning_unit_year):
+    # Add volumes dict to initial_data by type
+    volumes = None
+    learning_unit_yrs = learning_unit_year_with_context.get_with_context(
+        learning_container_year_id=learning_unit_year.learning_container_year.id)
+
+    volumes = next(luy.components for luy in learning_unit_yrs if luy.id == learning_unit_year.id)
+
+    volumes_for_initial = {}
+    for component_key, volume_data in volumes.items():
+        volumes_for_initial[component_key.type] = volume_data
+
+    return volumes_for_initial

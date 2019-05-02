@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ class EducationGroupSkillsAchievements(EducationGroupGenericDetailView):
             text_labels = [CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION]
             self.cms_translated_texts = translated_text.search(
                 entity=entity_name.OFFER_YEAR,
-                reference=self.get_object().id,
+                reference=self.object.pk,
                 text_labels_name=text_labels
             ).select_related('text_label')
         return next(

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,13 +24,16 @@
 #
 ##############################################################################
 import itertools
+from collections import Counter
 
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, BaseValidator
 from django.db import models, connection
 from django.db.models import Q, F, Case, When
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
+from openpyxl.descriptors import Min
 from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
@@ -38,7 +41,8 @@ from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import education_group_type, education_group_year
 from base.models.education_group_type import GROUP_TYPE_OPTION
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories, link_type, quadrimesters
+from base.models.enums import education_group_categories, quadrimesters
+from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.models.learning_unit_year import LearningUnitYear
@@ -55,7 +59,7 @@ class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
         'parent__acronym',
         'parent__partial_acronym'
     ]
-    list_filter = ('is_mandatory', 'access_condition', 'quadrimester_derogation', 'parent__academic_year')
+    list_filter = ('is_mandatory', 'access_condition', 'parent__academic_year')
 
 
 SQL_RECURSIVE_QUERY_EDUCATION_GROUP = """\
@@ -80,6 +84,36 @@ WITH RECURSIVE group_element_year_parent AS (
 
 SELECT * FROM group_element_year_parent ;
 """
+
+
+def validate_block_value(value):
+    max_authorized_value = 6
+    _error_msg = _("Please register a maximum of %(max_authorized_value)s digits in ascending order, "
+                   "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46") %\
+        {'max_authorized_value': max_authorized_value}
+
+    MinValueValidator(1, message=_error_msg)(value)
+    if not all([
+        _check_integers_max_authorized_value(value, max_authorized_value),
+        _check_integers_duplications(value),
+        _check_integers_orders(value),
+    ]):
+        raise ValidationError(_error_msg)
+
+
+def _check_integers_max_authorized_value(value, max_authorized_value):
+    return all(int(char) <= max_authorized_value for char in str(value))
+
+
+def _check_integers_duplications(value):
+    if any(integer for integer, occurence in Counter(str(value)).items() if occurence > 1):
+        return False
+    return True
+
+
+def _check_integers_orders(value):
+    digit_values = [int(char) for char in str(value)]
+    return list(sorted(digit_values)) == digit_values
 
 
 class GroupElementYearManager(models.Manager):
@@ -136,11 +170,11 @@ class GroupElementYear(OrderedModel):
         verbose_name=_("Mandatory"),
     )
 
-    block = models.CharField(
-        max_length=7,
+    block = models.IntegerField(
         blank=True,
         null=True,
-        verbose_name=_("Block")
+        verbose_name=_("Block"),
+        validators=[validate_block_value]
     )
 
     access_condition = models.BooleanField(
@@ -189,7 +223,7 @@ class GroupElementYear(OrderedModel):
 
         else:
             components = LearningComponentYear.objects.filter(
-                learningunitcomponent__learning_unit_year=self.child_leaf).annotate(
+                learning_unit_year=self.child_leaf).annotate(
                 total=Case(When(hourly_volume_total_annual=None, then=0),
                            default=F('hourly_volume_total_annual'))).values('type', 'total')
 
@@ -230,6 +264,21 @@ class GroupElementYear(OrderedModel):
             raise ValidationError(
                 {'link_type': _("You are not allowed to create a reference with a learning unit")}
             )
+        self._check_same_academic_year_parent_child_branch()
+
+    def _check_same_academic_year_parent_child_branch(self):
+        if (self.parent and self.child_branch) and\
+                (self.parent.academic_year.year != self.child_branch.academic_year.year):
+            raise ValidationError(_("It is forbidden to attach an element to an element of another academic year."))
+
+        self._clean_link_type()
+
+    def _clean_link_type(self):
+        if getattr(self.parent, 'type', None) in [GroupType.MINOR_LIST_CHOICE.name,
+                                                  GroupType.MAJOR_LIST_CHOICE.name] and \
+           isinstance(self.child, EducationGroupYear) and self.child.type in MiniTrainingType.minors() + \
+                [MiniTrainingType.FSA_SPECIALITY.name, MiniTrainingType.DEEPENING.name]:
+            self.link_type = LinkTypes.REFERENCE.name
 
     @cached_property
     def child(self):
@@ -363,7 +412,7 @@ def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict
     if queryset.model != GroupElementYear:
         raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
 
-    elements = _fetch_row_sql([root.id])
+    elements = fetch_row_sql([root.id])
 
     distinct_group_elem_ids = {elem['id'] for elem in elements}
     queryset = queryset.filter(pk__in=distinct_group_elem_ids)
@@ -375,7 +424,7 @@ def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict
     return group_elems_by_parent_id
 
 
-def _fetch_row_sql(root_ids):
+def fetch_row_sql(root_ids):
     with connection.cursor() as cursor:
         cursor.execute(SQL_RECURSIVE_QUERY_EDUCATION_GROUP, root_ids)
         return [

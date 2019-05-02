@@ -9,7 +9,7 @@
     * The core business involves the administration of students, teachers,
     * courses, programs and so on.
     *
-    * Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
     *
     * This program is free software: you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -51,9 +51,7 @@
                         <dl>
                             <dt>{% trans 'Decree category' %}</dt>
                             <dd>
-                                {% if education_group_year.decree_category %}
-                                    {% trans education_group_year.decree_category %}
-                                {% endif %}
+                                    {{ education_group_year.get_decree_category_display|default:"" }}
                             </dd>
                         </dl>
                         <dl>
@@ -84,6 +82,10 @@
                             {% endif %}
                             <br>
                         </div>
+                        <dl>
+                            <dt>{% trans 'ISCED domain' %}</dt>
+                            <dd>{{ education_group_year.isced_domain | default_if_none:'' }}</dd>
+                        </dl>
                         {% dl_with_parent 'internal_comment' %}
                     </div>
                 </div>

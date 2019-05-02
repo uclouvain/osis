@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         if self.object.is_external():
             versions |= Version.objects.get_for_object(self.object.externallearningunityear)
 
-        for component in self.object.learning_component_years.all():
+        for component in self.object.learningcomponentyear_set.all():
             versions |= Version.objects.get_for_object(component)
             for entity_component in component.entitycomponentyear_set.all():
                 versions |= Version.objects.get_for_object(entity_component)

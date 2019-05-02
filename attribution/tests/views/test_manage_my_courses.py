@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@ from waffle.testutils import override_flag
 
 from attribution.tests.factories.attribution import AttributionFactory
 from attribution.views.manage_my_courses import list_my_attributions_summary_editable, view_educational_information
-from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm
 from base.models.enums import academic_calendar_type
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.entity_type import FACULTY
@@ -106,7 +105,6 @@ class ManageMyCoursesViewTestCase(TestCase):
 
         context = response.context
         self.assertIsInstance(context['entity_calendars'], dict)
-        self.assertIsInstance(context['score_responsibles'], dict)
         self.assertTrue("learning_unit_years_with_errors" in context)
         # Ensure that we only see UE of current year + 1
         for luy, error in context["learning_unit_years_with_errors"]:
@@ -154,9 +152,7 @@ class TestViewEducationalInformation(TestCase):
         context = response.context
         self.assertEqual(context["learning_unit_year"], self.attribution.learning_unit_year)
         self.assertTrue("teaching_materials" in context)
-        self.assertTrue(context["cms_labels_translated"])
-        self.assertIsInstance(context["form_french"], LearningUnitPedagogyForm)
-        self.assertIsInstance(context["form_english"], LearningUnitPedagogyForm)
+        self.assertFalse(context["cms_labels_translated"])
         self.assertFalse(context["can_edit_information"])
         self.assertFalse(context["can_edit_summary_locked_field"])
         self.assertFalse(context["submission_dates"])

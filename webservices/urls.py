@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -45,6 +45,13 @@ if 'continuing_education' in settings.INSTALLED_APPS:
     url_api_v1.append(
         url(r'^continuing_education/',
             include(continuing_education.api.url_v1.urlpatterns, namespace='continuing_education_api_v1'))
+    )
+
+if 'base' in settings.INSTALLED_APPS:
+    import base.api.url_v1
+    url_api_v1.append(
+        url(r'^base/',
+            include(base.api.url_v1.urlpatterns, namespace='base_api_v1'))
     )
 
 urlpatterns = [

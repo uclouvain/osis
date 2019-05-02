@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ def entity_read(request, entity_version_id):
 
     form = EntityCalendarEducationalInformationForm(entity_version, request.POST or None)
     if form.is_valid():
-        display_success_messages(request, _("Educational information submission dates updated"))
+        display_success_messages(request, _("Description fiche submission dates updated"))
         form.save_entity_calendar(entity_version.entity)
 
     # TODO Remove locals

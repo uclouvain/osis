@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -6,7 +5,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,10 +22,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+import re
 from django.test import TestCase
 
-from base.business.education_groups.create import create_initial_group_element_year_structure
+from base.business.education_groups.create import create_initial_group_element_year_structure, \
+    _get_cnum_subdivision
 from base.models.enums import education_group_types, education_group_categories
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
@@ -210,6 +210,11 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
             children_egys[self.egy.id][0].child_branch.partial_acronym
         )
 
+        self.assertEqual(
+            previous_child.education_group,
+            children_egys[self.egy.id][0].child_branch.education_group
+        )
+
     def test_should_not_recreate_existing_children(self):
         child = EducationGroupYearFactory(
             education_group_type=self.finality_type,
@@ -260,3 +265,21 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
             current_child.partial_acronym,
             children_egys[self.egy_next_year.id][0].child_branch.partial_acronym
         )
+
+    def test_get_cnum_subdivision(self):
+        cnum, subdivision = _get_cnum_subdivision("100T", re.compile('^(?P<cnum>\\d{3})(?P<subdivision>[A-Z])$'))
+        self.assertEqual(cnum, "100")
+        self.assertEqual(subdivision, "T")
+
+    def test_no_cnum_subdivision(self):
+        cnum, subdivision = _get_cnum_subdivision("", re.compile('^(?P<cnum>\\d{3})(?P<subdivision>[A-Z])$'))
+        self.assertIsNone(cnum)
+        self.assertIsNone(subdivision)
+
+        cnum, subdivision = _get_cnum_subdivision("100", re.compile('^(?P<cnum>\\d{3})(?P<subdivision>[A-Z])$'))
+        self.assertIsNone(cnum)
+        self.assertIsNone(subdivision)
+
+        cnum, subdivision = _get_cnum_subdivision("T", re.compile('^(?P<cnum>\\d{3})(?P<subdivision>[A-Z])$'))
+        self.assertIsNone(cnum)
+        self.assertIsNone(subdivision)

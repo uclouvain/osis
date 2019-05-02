@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 import re
 
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models import learning_unit
 from base.models import prerequisite_item
@@ -76,12 +76,16 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
         self.instance.main_operator = self.main_operator or AND
         self.instance.save()
 
-        _delete_related_items(prerequisite=self.instance)
-
+        self._delete_old_items()
         _create_prerequisite_items(
             grouped_items=grouped_items,
             prerequisite=self.instance
         )
+
+    def _delete_old_items(self):
+        items = self.instance.prerequisiteitem_set.all()
+        for item in items:
+            item.delete()
 
     def get_grouped_items_from_string(self, prerequisite_string, main_operator):
         main_operator_splitter = ' ET ' if main_operator == AND else ' OU '
@@ -115,10 +119,6 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
                     _("No match has been found for this learning unit :  %(acronym)s") % {'acronym': item}
                 )
         return group_of_learning_units
-
-
-def _delete_related_items(prerequisite):
-    prerequisite_item.delete_items_by_related_prerequisite(prerequisite)
 
 
 def _create_prerequisite_items(grouped_items, prerequisite):

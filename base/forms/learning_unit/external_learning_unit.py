@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ from base.models import entity_version
 from base.models.entity_version import get_last_version, EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import EXTERNAL
+from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from reference.models import language
 from reference.models.country import Country
@@ -85,7 +86,8 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
             'campus': autocomplete.ModelSelect2(
                 url='campus-autocomplete',
                 forward=["country"]
-            )
+            ),
+            'credits': forms.TextInput(),
         }
 
 
@@ -109,6 +111,9 @@ class ExternalLearningUnitModelForm(forms.ModelForm):
     class Meta:
         model = ExternalLearningUnitYear
         fields = ('external_acronym', 'external_credits', 'url', 'requesting_entity', 'co_graduation', 'mobility')
+        widgets = {
+            'external_credits': forms.TextInput(),
+        }
 
     def post_clean(self, start_date):
         entity = self.cleaned_data.get('requesting_entity')
@@ -148,6 +153,10 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
         super().__init__(instances_data, *args, **kwargs)
         self.learning_unit_year_form.fields['acronym'] = ExternalAcronymField()
+        if not self.instance or self.instance.acronym[0] == LearningUnitExternalSite.E.value:
+            self.learning_unit_year_form.fields['acronym'].initial = LearningUnitExternalSite.E.value
+            self.learning_unit_year_form.fields['acronym'].widget.widgets[0].attrs['disabled'] = True
+            self.learning_unit_year_form.fields['acronym'].required = False
         self.start_year = self.instance.learning_unit.start_year if self.instance else start_year
 
     @property
@@ -234,7 +243,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             commit=commit
         )
 
-        # Save learning unit year (learning_unit_component +  learning_component_year + entity_component_year)
+        # Save learning unit year (learning_component_year + entity_component_year)
         learning_unit_year = self.learning_unit_year_form.save(
             learning_container_year=container_year,
             learning_unit=learning_unit,

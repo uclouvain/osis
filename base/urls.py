@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -177,8 +177,6 @@ urlpatterns = [
             url(r'^specifications/$', learning_unit.learning_unit_specifications, name="learning_unit_specifications"),
             url(r'^specifications/edit/$', learning_unit.learning_unit_specifications_edit,
                 name="learning_unit_specifications_edit"),
-            url(r'^component/edit/$', learning_unit.learning_unit_component_edit, name="learning_unit_component_edit"),
-            url(r'^class/edit/$', learning_unit.learning_class_year_edit, name="learning_class_year_edit"),
             url(r'^volumes/(?P<form_type>[a-z]+)$', base.views.learning_units.update.learning_unit_volumes_management,
                 name="learning_unit_volumes_management"),
             url(r'^delete_full/$', base.views.learning_units.delete.delete_all_learning_units_year,
@@ -205,6 +203,8 @@ urlpatterns = [
                     name="teaching_material_delete")
             ])),
             url(r'^comparison/$', learning_unit.learning_unit_comparison, name="learning_unit_comparison"),
+            url(r'^proposal_comparison/$', learning_unit.learning_unit_proposal_comparison,
+                name="learning_unit_proposal_comparison"),
         ])),
         url(r'^check/(?P<subtype>[A-Z]+)$', base.views.learning_units.common.check_acronym, name="check_acronym"),
         url(r'^email_educational_information_update/$',
@@ -260,16 +260,11 @@ urlpatterns = [
     ])),
 
     url(r'^organization_address/', include([
-        url(r'^save/$', organization.organization_address_new, name='organization_address_save_new'),
         url(r'^(?P<organization_address_id>[0-9]+)/', include([
             url(r'^read/$', organization.organization_address_read,
                 name='organization_address_read'),
             url(r'^edit/$', organization.organization_address_edit,
                 name='organization_address_edit'),
-            url(r'^save/$', organization.organization_address_save,
-                name='organization_address_save'),
-            url(r'^create/$', organization.organization_address_create,
-                name='organization_address_create'),
             url(r'^delete/$', organization.organization_address_delete,
                 name='organization_address_delete')
         ]))
@@ -282,7 +277,6 @@ urlpatterns = [
     url(r'^studies/$', common.studies, name='studies'),
     url(r'^students/', include([
         url(r'^$', student.students, name='students'),
-        url(r'^search$', student.student_search, name='students_search'),
         url(r'^(?P<student_id>[0-9]+)/', include([
             url(r'^$', student.student_read, name='student_read'),
             url(r'^picture$', student.student_picture, name='student_picture'),

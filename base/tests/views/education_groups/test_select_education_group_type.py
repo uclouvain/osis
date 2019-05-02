@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.models.enums import education_group_categories
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -41,9 +42,12 @@ from base.tests.factories.person import PersonFactory
 
 @override_flag('education_group_create', active=True)
 class TestSelectEducationGroupTypeView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
 
     def setUp(self):
-        self.parent_education_group_year = EducationGroupYearFactory()
+        self.parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
 
         self.test_categories = [
             education_group_categories.GROUP,
@@ -105,7 +109,7 @@ class TestSelectEducationGroupTypeView(TestCase):
         response = self.client.post(
             reverse(
                 "select_education_group_type",
-                args=[self.test_categories[0], self.parent_education_group_year.pk]
+                args=[self.test_categories[0], self.parent_education_group_year.pk, self.parent_education_group_year.pk]
             ), data={"name": self.education_group_types[0].pk}
         )
 
@@ -113,13 +117,15 @@ class TestSelectEducationGroupTypeView(TestCase):
             response,
             reverse(
                 "new_education_group",
-                args=[self.test_categories[0], self.education_group_types[0].pk, self.parent_education_group_year.pk]
+                args=[self.test_categories[0], self.education_group_types[0].pk, self.parent_education_group_year.pk,
+                      self.parent_education_group_year.pk]
             )
         )
 
     def test_post_invalid_when_max_limit_reached(self):
         GroupElementYearFactory(
             parent=self.parent_education_group_year,
+            child_branch__academic_year=self.academic_year,
             child_branch__education_group_type=self.education_group_types[0]
         )
         expected_error_msg = _("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
@@ -130,7 +136,7 @@ class TestSelectEducationGroupTypeView(TestCase):
         response = self.client.post(
             reverse(
                 "select_education_group_type",
-                args=[self.test_categories[0], self.parent_education_group_year.pk]
+                args=[self.test_categories[0], self.parent_education_group_year.pk, self.parent_education_group_year.pk]
             ), data={"name": self.education_group_types[0].pk}
         )
         self.assertEqual(response.status_code, HttpResponse.status_code)

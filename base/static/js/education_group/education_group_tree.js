@@ -1,27 +1,13 @@
-function switchTreeVisibility() {
-    var newTreeVisibility = (sessionStorage.getItem('treeVisibility') === '0') ? '1' : '0';
-    sessionStorage.setItem('treeVisibility', newTreeVisibility);
-    showOrHideTree()
-}
-
-function showOrHideTree() {
-    if (sessionStorage.getItem('treeVisibility') === "0") {
-        modifyPanelAttribute("none", "col-md-0", "col-md-12");
-    } else {
-        modifyPanelAttribute("block", "col-md-3", "col-md-9");
-    }
-}
-
-
-function modifyPanelAttribute(collapse_style_display, panel_collapse_class, panel_data_class) {
-    document.getElementById('collapse').style.display = collapse_style_display;
-    document.getElementById('panel-collapse').className = panel_collapse_class;
-    document.getElementById('panel-data').className = panel_data_class;
-}
-
-
 $(document).ready(function () {
-    var $documentTree = $('#panel_file_tree');
+    // open or hide the sidebar.
+    let treeVisibility = sessionStorage.getItem("treeVisibility") || "0";
+    if (treeVisibility === "1") {
+        openNav();
+    } else {
+        closeNav();
+    }
+
+    let $documentTree = $('#panel_file_tree');
 
     $documentTree.bind("state_ready.jstree", function (event, data) {
 
@@ -31,14 +17,14 @@ $(document).ready(function () {
             document.location.href = data.node.a_attr.href;
         });
 
-        // if the tree has never been loaded, execute open_all by default.
+        // if the tree has never been loaded, execute close_all by default.
         if ($.vakata.storage.get(data.instance.settings.state.key) === null) {
-            $(this).jstree('open_all');
+            $(this).jstree('close_all');
         }
     });
 
     function get_data_from_tree(data) {
-        var inst = $.jstree.reference(data.reference),
+        let inst = $.jstree.reference(data.reference),
             obj = inst.get_node(data.reference);
 
         return {
@@ -114,7 +100,8 @@ $(document).ready(function () {
                             $('#form-modal-ajax-content').load(__ret.attach_url, function (response, status, xhr) {
                                 if (status === "success") {
                                     $('#form-ajax-modal').modal('toggle');
-                                    formAjaxSubmit('#form-modal-ajax-content form', '#form-ajax-modal');
+                                    let form = $(this).find('form').first();
+                                    formAjaxSubmit(form, '#form-ajax-modal');
                                 } else {
                                     window.location.href = __ret.attach_url
                                 }
@@ -137,7 +124,9 @@ $(document).ready(function () {
                             $('#form-modal-ajax-content').load(__ret.detach_url, function (response, status, xhr) {
                                 if (status === "success") {
                                     $('#form-ajax-modal').modal('toggle');
-                                    formAjaxSubmit('#form-modal-ajax-content form', '#form-ajax-modal');
+
+                                    let form = $(this).find('form').first();
+                                    formAjaxSubmit(form, '#form-ajax-modal');
                                 } else {
                                     window.location.href = __ret.detach_url
                                 }
@@ -151,12 +140,72 @@ $(document).ready(function () {
                                 __ret.has_prerequisite === true ||
                                 __ret.is_prerequisite === true;
                         }
+                    },
+
+                    "open_all": {
+                        "separator_before": true,
+                        "label": gettext("Open all"),
+                        "action": function (node) {
+                            let tree = $("#panel_file_tree").jstree(true);
+                            tree.open_all(node.reference)
+                        }
+                    },
+                    "close_all": {
+                        "label": gettext("Close all"),
+                        "action": function (node) {
+                            let tree = $("#panel_file_tree").jstree(true);
+                            tree.close_all(node.reference);
+                        }
                     }
                 }
             }
         }
     );
-
-    showOrHideTree();
-
 });
+
+
+function toggleNav() {
+    let treeVisibility = sessionStorage.getItem("treeVisibility") || "0";
+    if (treeVisibility === "0") {
+        openNav();
+    } else {
+        closeNav();
+    }
+}
+
+function openNav() {
+    let size = sessionStorage.getItem("sidenav_size") || "300px";
+    document.getElementById("mySidenav").style.width = size;
+    document.getElementById("main").style.marginLeft = size;
+    sessionStorage.setItem("treeVisibility", "1");
+
+}
+
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+    document.getElementById("main").style.marginLeft = "0";
+    sessionStorage.setItem("treeVisibility", "0");
+}
+
+const min = 300;
+const max = 1000;
+const mainmin = 600;
+
+$('#split-bar').mousedown(function (e) {
+    e.preventDefault();
+    $(document).mousemove(function (e) {
+        e.preventDefault();
+
+        let sidebar = $("#mySidenav");
+        let x = e.pageX - sidebar.offset().left;
+        if (x > min && x < max && e.pageX < ($(window).width() - mainmin)) {
+            sidebar.css("width", x);
+            $('#main').css("margin-left", x);
+        }
+        sessionStorage.setItem("sidenav_size", sidebar.width().toString() + "px")
+    })
+});
+$(document).mouseup(function () {
+    $(document).unbind('mousemove');
+});
+

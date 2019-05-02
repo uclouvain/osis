@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -99,14 +99,6 @@ def find_latest_end_date_by_academic_calendar(academic_calendar_id):
 
 def find_by_education_group_year(education_group_year):
     return OfferYearCalendar.objects.filter(education_group_year=education_group_year)
-
-
-def get_by_education_group_year_and_academic_calendar(an_academic_calendar, an_education_group_year):
-    try:
-        return OfferYearCalendar.objects.get(academic_calendar=an_academic_calendar,
-                                             education_group_year=an_education_group_year)
-    except ObjectDoesNotExist:
-        return None
 
 
 def search(**kwargs):

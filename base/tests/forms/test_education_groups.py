@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -38,13 +38,14 @@ class TestEducationGroupTypeOrderingForm(TestCase):
         self.educ_grp_type_A = EducationGroupTypeFactory(name='A label')
 
     def test_ordering(self):
-        self.form = EducationGroupFilter()
-        self.assertEqual(list(self.form.fields["education_group_type"].queryset),
+        filter = EducationGroupFilter()
+        self.assertEqual(list(filter.form.fields["education_group_type"].queryset),
                          [self.educ_grp_type_A, self.educ_grp_type_B, self.educ_grp_type_D])
 
         educ_grp_type_C = EducationGroupTypeFactory(name='C label')
-        self.form = EducationGroupFilter()
+
+        filter = EducationGroupFilter()
         self.assertEqual(
-            list(self.form.fields["education_group_type"].queryset),
+            list(filter.form.fields["education_group_type"].queryset),
             [self.educ_grp_type_A, self.educ_grp_type_B, educ_grp_type_C, self.educ_grp_type_D]
         )

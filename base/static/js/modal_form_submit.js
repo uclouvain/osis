@@ -1,6 +1,9 @@
 function redirect_after_success(modal, xhr) {
     $(modal).modal('toggle');
-    if (xhr.hasOwnProperty('success_url')) {
+    if(xhr.hasOwnProperty('partial_reload')) {
+        $(xhr["partial_reload"]).load(xhr["success_url"]);
+    }
+    else if (xhr.hasOwnProperty('success_url')) {
         window.location.href = xhr["success_url"];
     }
     else {
@@ -9,7 +12,7 @@ function redirect_after_success(modal, xhr) {
 }
 
 var formAjaxSubmit = function (form, modal) {
-    $(form).submit(function (e) {
+    form.submit(function (e) {
         // Added preventDefaut so as to not add anchor "href" to address bar
         e.preventDefault();
 
@@ -20,7 +23,7 @@ var formAjaxSubmit = function (form, modal) {
             context: this,
             success: function (xhr, ajaxOptions, thrownError) {
                 //Stay on the form if there are errors.
-                if ($(xhr).find('.has-error').length > 0) {
+                if ($(xhr).find('.has-error,.alert-danger').length > 0) {
                     $(modal).find('.modal-content').html(xhr);
                     // Add compatibility with ckeditor and related textareas
                     bindTextArea();
@@ -53,15 +56,22 @@ function CKupdate() {
         CKEDITOR.instances[instance].updateElement();
 }
 
-
-$(".trigger_modal").click(function () {
+function bind_trigger_modal() {
+  $(".trigger_modal").click(function () {
     let url = $(this).data("url");
     let modal_class = $(this).data("modal_class");
     $('#modal_dialog_id').attr("class", "modal-dialog").addClass(modal_class);
+    $('#form-modal-ajax-content').empty();
     $('#form-ajax-modal').modal('toggle');
 
     $('#form-modal-ajax-content').load(url, function () {
         bindTextArea();
-        formAjaxSubmit('#form-modal-body form', '#form-ajax-modal');
+        // Make the template more flexible to find the first form
+        let form = $(this).find('form').first()
+        formAjaxSubmit(form, '#form-ajax-modal');
     });
-});
+  });
+}
+
+bind_trigger_modal();
+

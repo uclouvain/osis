@@ -49,6 +49,8 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from django.contrib.auth.models import Group
+from base.models.enums.groups import FACULTY_MANAGER_GROUP
 
 FULL_ACRONYM = 'LAGRO1000'
 SUBDIVISION_ACRONYM = 'C'
@@ -176,6 +178,24 @@ class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMi
         self.assertEqual(form._forms_to_upsert[0].forms[LearningUnitYearModelForm].instance,
                          self.learning_unit_year_partim)
         self.assertEqual(len(form._forms_to_delete), 6)
+
+    def test_update_proposal(self):
+        self.faculty_manager = PersonFactory()
+        self.faculty_manager.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+
+        next_learning_unit_year = LearningUnitYear.objects.get(
+            learning_unit=self.learn_unit_structure.learning_unit_full,
+            academic_year__year=self.current_academic_year.year + 1
+        )
+
+        ProposalLearningUnitFactory(learning_unit_year=next_learning_unit_year)
+        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full,
+                                                                      self.faculty_manager)
+        form = _instanciate_postponement_form(self.faculty_manager, self.learning_unit_year_full.academic_year,
+                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
+                                              data=instance_luy_base_form.data)
+
+        self.assertEqual(len(form._forms_to_upsert), 1)
 
 
 class TestLearningUnitPostponementFormIsValid(LearningUnitPostponementFormContextMixin):
@@ -446,17 +466,16 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
     def _change_cm_component_value(self, academic_year, new_hourly_total_value):
         LearningComponentYear.objects.filter(
             type=LECTURING,
-            learning_container_year__academic_year=academic_year,
-            learning_container_year__learning_container=self.learning_unit_year_full.learning_container_year.learning_container
+            learning_unit_year__academic_year=academic_year,
+            learning_unit_year__learning_container_year__learning_container=self.learning_unit_year_full.learning_container_year.learning_container
         ).update(hourly_volume_total_annual=new_hourly_total_value)
 
     def _change_entity_component_value(self, academic_year, repartition_volume):
         qs = EntityComponentYear.objects.filter(
             learning_component_year__type=LECTURING,
             entity_container_year__type=REQUIREMENT_ENTITY,
-            learning_component_year__learning_container_year__academic_year=academic_year,
-            learning_component_year__learningunitcomponent__learning_unit_year__learning_unit=
-            self.learning_unit_year_full.learning_unit
+            learning_component_year__learning_unit_year__academic_year=academic_year,
+            learning_component_year__learning_unit_year__learning_unit=self.learning_unit_year_full.learning_unit
         )
         qs.update(repartition_volume=repartition_volume)
         return qs.get()
@@ -466,8 +485,8 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         learning_unit_full = self.learning_unit_year_full.learning_unit
         EntityComponentYear.objects.filter(
             entity_container_year__type=ADDITIONAL_REQUIREMENT_ENTITY_2,
-            learning_component_year__learning_container_year__academic_year=academic_year,
-            learning_component_year__learningunitcomponent__learning_unit_year__learning_unit=learning_unit_full
+            learning_component_year__learning_unit_year__academic_year=academic_year,
+            learning_component_year__learning_unit_year__learning_unit=learning_unit_full
         ).delete()
 
         # Remove additional requirement entity 2 container year

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -121,15 +121,6 @@ def find_by_session_and_academic_year(nb_session, an_academic_year):
         number_session=nb_session,
         academic_calendar__academic_year=an_academic_year
     )
-
-
-def get_by_session_reference_and_academic_year(nb_session, a_reference, an_academic_year):
-    try:
-        return SessionExamCalendar.objects.get(number_session=nb_session,
-                                               academic_calendar__reference=a_reference,
-                                               academic_calendar__academic_year=an_academic_year)
-    except SessionExamCalendar.DoesNotExist:
-        return None
 
 
 def get_number_session_by_academic_calendar(academic_calendar):

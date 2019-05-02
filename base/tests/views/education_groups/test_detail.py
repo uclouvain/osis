@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -47,7 +47,6 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory,
     MiniTrainingFactory, EducationGroupYearCommonFactory, EducationGroupYearCommonAgregationFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
@@ -467,24 +466,19 @@ class EducationGroupDiplomas(TestCase):
 class TestUtilizationTab(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
         cls.person = PersonFactory()
-        cls.education_group_year_1 = EducationGroupYearFactory(title_english="")
-        cls.education_group_year_2 = EducationGroupYearFactory(title_english="")
-        cls.education_group_year_3 = EducationGroupYearFactory(title_english="")
+        cls.education_group_year_1 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
+        cls.education_group_year_2 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
+        cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
         cls.learning_unit_year_1 = LearningUnitYearFactory(specific_title_english="")
         cls.learning_unit_year_2 = LearningUnitYearFactory(specific_title_english="")
         cls.learning_component_year_1 = LearningComponentYearFactory(
-            learning_container_year=cls.learning_unit_year_1.learning_container_year, hourly_volume_partial_q1=10,
+            learning_unit_year=cls.learning_unit_year_1, hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=10)
         cls.learning_component_year_2 = LearningComponentYearFactory(
-            learning_container_year=cls.learning_unit_year_1.learning_container_year, hourly_volume_partial_q1=10,
+            learning_unit_year=cls.learning_unit_year_1, hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=10)
-        cls.learning_unit_component_1 = LearningUnitComponentFactory(
-            learning_component_year=cls.learning_component_year_1,
-            learning_unit_year=cls.learning_unit_year_1)
-        cls.learning_unit_component_2 = LearningUnitComponentFactory(
-            learning_component_year=cls.learning_component_year_2,
-            learning_unit_year=cls.learning_unit_year_1)
         cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year_1,
                                                            child_branch=cls.education_group_year_2)
         cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year_2,
@@ -499,6 +493,7 @@ class TestUtilizationTab(TestCase):
         cls.person = PersonFactory(user=cls.user)
         cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
 
+        AcademicYearFactory(current=True)
         cls.url = reverse(
             "education_group_utilization",
             args=[
@@ -523,31 +518,21 @@ class TestContent(TestCase):
     def setUp(self):
         self.current_academic_year = create_current_academic_year()
         self.person = PersonFactory()
-        self.education_group_year_1 = EducationGroupYearFactory()
-        self.education_group_year_2 = EducationGroupYearFactory()
-        self.education_group_year_3 = EducationGroupYearFactory()
+        self.education_group_year_1 = EducationGroupYearFactory(academic_year=self.current_academic_year)
+        self.education_group_year_2 = EducationGroupYearFactory(academic_year=self.current_academic_year)
+        self.education_group_year_3 = EducationGroupYearFactory(academic_year=self.current_academic_year)
         self.learning_unit_year_1 = LearningUnitYearFactory()
 
         self.learning_component_year_1 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_1.learning_container_year,
+            learning_unit_year=self.learning_unit_year_1,
             hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=10
         )
 
         self.learning_component_year_2 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_1.learning_container_year,
+            learning_unit_year=self.learning_unit_year_1,
             hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=10
-        )
-
-        self.learning_unit_component_1 = LearningUnitComponentFactory(
-            learning_component_year=self.learning_component_year_1,
-            learning_unit_year=self.learning_unit_year_1
-        )
-
-        self.learning_unit_component_2 = LearningUnitComponentFactory(
-            learning_component_year=self.learning_component_year_2,
-            learning_unit_year=self.learning_unit_year_1
         )
 
         self.learning_unit_year_without_container = LearningUnitYearFactory(

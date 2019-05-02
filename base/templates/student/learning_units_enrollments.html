@@ -8,7 +8,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 
 <div id="tab_learning_units_enrollments" class="tab-pane fade">
     <ul class="nav nav-tabs" role="tablist">
-        {% regroup lu_enrollments by learning_unit_year.academic_year as grouped_by_year %}
+        {% regroup learning_unit_enrollments by learning_unit_year.academic_year as grouped_by_year %}
         {% for lue_year in grouped_by_year %}
         <li class="{% if forloop.counter == 1 %}active{%endif%}" >
             <a data-toggle="tab" href="#tab_learning_units_enrollments_year_{{lue_year.grouper}}" role="tab">
@@ -37,29 +37,26 @@
         {% endfor%}
     </ul>
     <div class="tab-content">
-        {% if lu_enrollments %}
-        {% regroup lu_enrollments by learning_unit_year.academic_year as grouped_by_year %}
         {% for lue_year in grouped_by_year %}
-        <div id="tab_learning_units_enrollments_year_{{lue_year.grouper}}"
-             class="tab-pane fade {% if forloop.counter == 1 %} in active{%endif%}">
-            <table class="table table-striped table-hover">
-                <thead>
-                <th>{% trans 'code' %}</th>
-                </thead>
-                <tbody>
-                {% for lue in lue_year.list %}
-                <tr>
-                    <td>{{lue.learning_unit_year.acronym}}</td>
-                </tr>
-                {% endfor%}
-                </tbody>
-            </table>
-        </div>
+            <div id="tab_learning_units_enrollments_year_{{lue_year.grouper}}"
+                 class="tab-pane fade {% if forloop.counter == 1 %} in active{%endif%}">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <th>{% trans 'Code' %}</th>
+                    </thead>
+                    <tbody>
+                    {% for lue in lue_year.list %}
+                    <tr>
+                        <td>{{lue.learning_unit_year.acronym}}</td>
+                    </tr>
+                    {% endfor%}
+                    </tbody>
+                </table>
+            </div>
+        {% empty %}
+            <div>
+                <label class="alert alert-warning" style="margin:5px">{% trans 'No data'%}</label>
+            </div>
         {% endfor%}
-        {% else%}
-        <div>
-            <label class="alert alert-warning" style="margin:5px">{% trans 'No data'%}</label>
-        </div>
-        {% endif%}
     </div>
 </div>

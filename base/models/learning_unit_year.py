@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -94,12 +94,6 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     learning_unit = models.ForeignKey('LearningUnit')
 
     learning_container_year = models.ForeignKey('LearningContainerYear', null=True)
-
-    learning_component_years = models.ManyToManyField(
-        LearningComponentYear,
-        through="base.LearningUnitComponent",
-        verbose_name=_("Components"),
-    )
 
     changed = models.DateTimeField(null=True, auto_now=True)
     acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('Code'),
@@ -225,14 +219,28 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     @property
     def container_type_verbose(self):
-        container_type = ''
-        if self.learning_container_year:
-            container_type = _(self.learning_container_year.get_container_type_display())
+        verbose_type = ''
+        if self.learning_container_year:  # FIXME :: remove this 'if' when classes will be remoed from LearningUnitYear
+            verbose_type = _(self.learning_container_year.get_container_type_display())
+
+            if self.is_external_of_mobility():
+                verbose_type = _('Mobility')
 
             if self.learning_container_year.container_type in (COURSE, INTERNSHIP):
-                container_type += " ({subtype})".format(subtype=self.get_subtype_display())
+                verbose_type += " ({subtype})".format(subtype=self.get_subtype_display())
 
-        return container_type
+        return verbose_type
+
+    def is_external_of_mobility(self):
+        return self.is_external() and self.externallearningunityear.mobility
+
+    def get_container_type_display(self):
+        # FIXME :: Condition to remove when the LearningUnitYear.learning_container_year_id will be null=false
+        if not self.learning_container_year:
+            return ''
+        if self.is_external_of_mobility():
+            return _('Mobility')
+        return self.learning_container_year.get_container_type_display()
 
     @property
     def status_verbose(self):
@@ -282,6 +290,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     def is_partim(self):
         return self.subtype == learning_unit_year_subtypes.PARTIM
+
+    def is_for_faculty_or_partim(self) -> bool:
+        return self.learning_container_year.is_type_for_faculty() or self.is_partim()
 
     def get_entity(self, entity_type):
         # @TODO: Remove this condition when classes will be removed from learning unit year
@@ -363,9 +374,12 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     def _check_learning_component_year_warnings(self):
         _warnings = []
-        components_queryset = self.learning_container_year.learningcomponentyear_set
-        all_components = components_queryset.order_by('learningunityear__acronym').prefetch_related(
-            'learningunityear_set').annotate(vol_global=Sum('entitycomponentyear__repartition_volume'))
+        components_queryset = LearningComponentYear.objects.filter(
+            learning_unit_year__learning_container_year=self.learning_container_year
+        )
+        all_components = components_queryset.order_by('acronym')\
+            .select_related('learning_unit_year')\
+            .annotate(vol_global=Sum('entitycomponentyear__repartition_volume'))
         for learning_component_year in all_components:
             _warnings.extend(learning_component_year.warnings)
 
@@ -484,7 +498,7 @@ def find_summary_responsible_by_name(queryset, name):
 
 
 def _build_tutor_filter(name_type):
-    return '__'.join(['learningunitcomponent', 'learning_component_year', 'attributionchargenew', 'attribution',
+    return '__'.join(['learningcomponentyear', 'attributionchargenew', 'attribution',
                       'tutor', 'person', name_type, 'iregex'])
 
 

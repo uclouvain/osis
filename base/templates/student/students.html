@@ -1,6 +1,5 @@
 {% extends "layout.html" %}
-{% load staticfiles %}
-{% load i18n %}
+{% load staticfiles i18n bootstrap3 %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -9,7 +8,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -36,40 +35,26 @@
     <h2>{% trans 'Students' %}</h2>
 </div>
 <div class="panel panel-default">
-    <form method="get" action="{% url 'students_search'%}" id="form_students" name="search">
+    <form method="get" action="{% url 'students'%}" id="form_students" name="search">
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-3">
-                    <label>{% trans 'Registration ID'%}</label>
-                    <input type="text" class="form-control" id="txt_registration_id" name="registration_id"
-                           value="{{registration_id | default_if_none:''}}">
-                </div>
-                <div class="col-md-3">
-                    <label>{% trans 'Name'%}</label>
-                    <input type="text" class="form-control" id="txt_name" name="name" value="{{name | default_if_none:''}}">
-                </div>
-                <div class="col-md-6">
-                    <button type="submit" id="bt_submit_student_search"
-                            class="btn btn-primary" style="margin-top:23px;" role="button"
-                            title="{% trans 'Student search' %}">
-                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                {% bootstrap_field form.registration_id form_group_class="col-md-3" %}
+                {% bootstrap_field form.name form_group_class="col-md-3" %}
+                <br>
+                <div class="col-md-1">
+                    <div class="btn-toolbar pull-right">
+                        {% bootstrap_button "" value=_('Student search') button_type="submit" button_class="btn-primary" icon="search" %}
+                    </div>
                 </div>
             </div>
         </div>
     </form>
-    <div>
-        {% if form.non_field_errors %}
-        <div id="pnl_error_messages" class="alert alert-warning" role="alert">
-            {% for error in form.non_field_errors %}
-                {% trans error|escape %}<br>
-            {% endfor %}
-        </div>
-        {% endif %}
 
+    <div>
         {% if students %}
         <table id="table_students" class="table table-striped table-hover">
             <thead>
-            <th>{% trans 'Registration ID'%}</th>
+            <th>{% trans 'Registration Id'%}</th>
             <th>{% trans 'Name'%}</th>
             <th>{% trans 'Gender'%}</th>
             </thead>
@@ -80,10 +65,12 @@
                     {{ student.registration_id }}</a></td>
                 <td>{{ student.person }}</td>
                 <td>{{ student.person.get_gender_display| default_if_none:''}}</td>
-
             </tr>
             {% endfor %}
         </table>
+        <div class="text-center">
+            {% bootstrap_pagination students extra=request.GET.urlencode %}
+        </div>
         {% endif %}
     </div>
 </div>

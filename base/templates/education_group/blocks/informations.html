@@ -7,7 +7,7 @@
     * The core business involves the administration of students, teachers,
     * courses, programs and so on.
     *
-    * Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
     *
     * This program is free software: you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            {% dl_with_parent 'acronym' class_dl="col-md-6" %}
+            {% dl_with_parent 'acronym' class_dl="col-md-6" dl_title='Acronym/Short title'%}
             {% dl_with_parent 'partial_acronym' class_dl="col-md-6" %}
             {% dl_with_parent 'category' education_group_year.education_group_type parent.education_group_type class_dl="col-md-6" %}
             {% dl_with_parent 'name' education_group_year.education_group_type parent.education_group_type class_dl="col-md-6" %}
@@ -45,17 +45,13 @@
 
         <div>
             <label>{% trans 'Title in French' %}</label>
-            {% if parent.title %}
-                <strong class="text-primary">{{ parent.title }}</strong><br>
-            {% endif %}
+            <br>
             {{ education_group_year.title | default_if_none:'-' }}
         </div>
         <br>
         <div>
             <label>{% trans 'Title in English' %}</label>
-            {% if parent.title_english %}
-                <strong class="text-primary">{{ parent.title_english }}</strong><br>
-            {% endif %}
+            <br>
             {{ education_group_year.title_english | default_if_none:'' }}
         </div>
         {% if education_group_year.education_group_type.category != 'GROUP' %}

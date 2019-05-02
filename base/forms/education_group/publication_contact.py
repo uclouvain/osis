@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,15 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models.education_group_publication_contact import EducationGroupPublicationContact, ROLE_REQUIRED_FOR_TYPES
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import find_all_current_entities_version, get_last_version
 from base.models.enums.organization_type import MAIN
+from base.models.enums.publication_contact_type import PublicationContactType
 
 
 class EducationGroupPublicationContactForm(forms.ModelForm):
@@ -46,6 +47,19 @@ class EducationGroupPublicationContactForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if not kwargs.get('instance'):
             self.instance.education_group_year = education_group_year
+        contacts = EducationGroupPublicationContact.objects.filter(
+            education_group_year=education_group_year,
+            type=PublicationContactType.ACADEMIC_RESPONSIBLE.name
+        ).exists()
+        if contacts:
+            self.fields['type'].choices = [
+                (PublicationContactType.OTHER_ACADEMIC_RESPONSIBLE.name,
+                 PublicationContactType.OTHER_ACADEMIC_RESPONSIBLE.value),
+                (PublicationContactType.JURY_MEMBER.name,
+                 PublicationContactType.JURY_MEMBER.value),
+                (PublicationContactType.OTHER_CONTACT.name,
+                 PublicationContactType.OTHER_CONTACT.value),
+            ]
         self._disable_fields()
 
     @property

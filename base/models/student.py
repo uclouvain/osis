@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -106,11 +106,3 @@ def find_by_id(student_id):
         return Student.objects.get(pk=student_id)
     except ObjectDoesNotExist:
         return None
-
-
-def search(full_name):
-    if full_name:
-        persons = person.search(full_name)
-        if persons.exists():
-            return Student.objects.filter(person__in=persons).order_by('person__last_name', 'person__first_name')
-    return None

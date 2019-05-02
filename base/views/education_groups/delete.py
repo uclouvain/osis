@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,11 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.http import JsonResponse
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
-from base.business.education_groups import shorten
+from base.business.education_groups import delete
 from base.models.education_group import EducationGroup
 from base.views.education_groups.perms import can_delete_all_education_group
+
+from base.views import common
 from base.views.mixins import DeleteViewWithDependencies
 
 
@@ -44,7 +48,7 @@ class DeleteGroupEducationView(DeleteViewWithDependencies):
     rules = [can_delete_all_education_group]
 
     # DeleteViewWithDependencies
-    success_message = "The education group has been deleted."
+    success_message = _("The education group has been deleted.")
     protected_template = "education_group/protect_delete.html"
 
     # FlagMixin
@@ -53,13 +57,19 @@ class DeleteGroupEducationView(DeleteViewWithDependencies):
 
     def get_protected_messages(self):
         """This function will return all protected message ordered by year"""
-        self.education_group_years = self.get_object().educationgroupyear_set.all().order_by('academic_year__year')
+        self.education_group_years = delete.get_education_group_years_to_delete(self.get_object())
         protected_messages = []
         for education_group_year in self.education_group_years:
-            protected_message = shorten.get_protected_messages_by_education_group_year(education_group_year)
+            protected_message = delete.get_protected_messages_by_education_group_year(education_group_year)
             if protected_message:
                 protected_messages.append({
                     'education_group_year': education_group_year,
                     'messages': protected_message
                 })
         return protected_messages
+
+    def delete(self, request, *args, **kwargs):
+        for education_group_year in delete.get_education_group_years_to_delete(self.get_object()):
+            delete.start(education_group_year)
+        common.display_success_messages(request, self.success_message)
+        return JsonResponse({'success': True, 'success_url': self.success_url})

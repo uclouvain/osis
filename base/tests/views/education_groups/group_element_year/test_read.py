@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -30,10 +30,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import SuperUserFactory
@@ -42,24 +42,19 @@ from base.tests.factories.user import SuperUserFactory
 class TestRead(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
         cls.person = PersonFactory()
-        cls.education_group_year_1 = EducationGroupYearFactory(title_english="")
-        cls.education_group_year_2 = EducationGroupYearFactory(title_english="")
-        cls.education_group_year_3 = EducationGroupYearFactory(title_english="")
+        cls.education_group_year_1 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
+        cls.education_group_year_2 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
+        cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
         cls.learning_unit_year_1 = LearningUnitYearFactory(specific_title_english="")
         cls.learning_unit_year_2 = LearningUnitYearFactory(specific_title_english="")
         cls.learning_component_year_1 = LearningComponentYearFactory(
-            learning_container_year=cls.learning_unit_year_1.learning_container_year, hourly_volume_partial_q1=10,
+            learning_unit_year=cls.learning_unit_year_1, hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=10)
         cls.learning_component_year_2 = LearningComponentYearFactory(
-            learning_container_year=cls.learning_unit_year_1.learning_container_year, hourly_volume_partial_q1=10,
+            learning_unit_year=cls.learning_unit_year_1, hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=10)
-        cls.learning_unit_component_1 = LearningUnitComponentFactory(
-            learning_component_year=cls.learning_component_year_1,
-            learning_unit_year=cls.learning_unit_year_1)
-        cls.learning_unit_component_2 = LearningUnitComponentFactory(
-            learning_component_year=cls.learning_component_year_2,
-            learning_unit_year=cls.learning_unit_year_1)
         cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year_1,
                                                            child_branch=cls.education_group_year_2,
                                                            comment="commentaire",
@@ -101,7 +96,7 @@ class TestRead(TestCase):
         self.assertEqual(self.group_element_year_1.verbose, verbose_branch)
 
         components = LearningComponentYear.objects.filter(
-            learningunitcomponent__learning_unit_year=self.group_element_year_2.child_leaf).annotate(
+            learning_unit_year=self.group_element_year_2.child_leaf).annotate(
             total=Case(When(hourly_volume_total_annual=None, then=0),
                        default=F('hourly_volume_total_annual'))).values('type', 'total')
 

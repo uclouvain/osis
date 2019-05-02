@@ -11,7 +11,7 @@
  * The core business involves the administration of students, teachers,
  * courses, programs and so on.
  *
- * Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+ * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -100,7 +100,7 @@
             {% if enrollments.0.learning_unit_enrollment.learning_unit_year.decimal_scores %}
                 {% trans 'Decimal values in scores are accepted.' %}
             {% else %}
-                {% trans "Decimal values in scores are NOT accepted. If you try to put decimal values, it will be ignored." %}
+                {% trans "Decimal values in scores are NOT accepted." %}{% trans "If you try to put decimal values, it will be ignored." %}
             {% endif %}
             </span>
         </div>

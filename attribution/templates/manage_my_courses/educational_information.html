@@ -9,7 +9,7 @@
  * The core business involves the administration of students, teachers,
  * courses, programs and so on.
  *
- * Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+ * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,9 +27,9 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-    <li class="active"><a href="{% url "list_my_attributions_summary_editable" %}">{% trans 'Manage educational information' %}</a></li>
+    <li class="active"><a href="{% url "list_my_attributions_summary_editable" %}">{% trans 'Manage description fiche' %}</a></li>
     <li class="active">{{ learning_unit_year.academic_year }} - {{ learning_unit_year.acronym }}</li>
-    <li class="active">{% trans 'Educational information' %}</li>
+    <li class="active">{% trans 'Description fiche' %}</li>
 {% endblock %}
 
 {% block content %}
@@ -41,17 +41,50 @@
 <div class="panel panel-default">
     <div class="panel-body" id="tabs">
         {% include "manage_my_courses/blocks/tabs.html" %}
-        <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="educational_information">
-                <br>
-                {% include "manage_my_courses/blocks/submission_dates.html" %}
-                <br>
-                {% url 'tutor_edit_educational_information' learning_unit_year_id=learning_unit_year.id as post_url%}
+        <br>
+        <div class="panel panel-default" style="background-color: #f5f5f5">
+            <div class="panel-heading show_collapse">
+                <label style="font-size: larger">{% trans 'Information approved and updatable by the Commission of Program' %}</label>
+                <a
+                        class=" pull-right collapsed a_show_collapse"
+                        data-toggle="collapse"
+                        href="#ue_specifications"
+                        role="button"
+                        aria-expanded="false"
+                        aria-controls="eu_specifications">
+                </a>
+            </div>
+            <div class="panel-body collapse" id="ue_specifications">
+                {% include "learning_unit/specifications_all.html" %}
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading"><label style="font-size: larger">{% trans 'Informations updatable by teachers' %}</label></div>
 
-                {% include "learning_unit/blocks/panel/educational_informations.html" %}
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="educational_information">
+                    <br>
+                    {% include "manage_my_courses/blocks/submission_dates.html" %}
+                    <br>
+                    {% url 'tutor_edit_educational_information' learning_unit_year_id=learning_unit_year.id as post_url%}
+
+                    {% include "learning_unit/blocks/panel/educational_informations.html" %}
+                </div>
             </div>
         </div>
     </div>
 </div>
 <div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
+{% endblock %}
+{% block script %}
+    <script>
+        function changeOrientation(button) {
+            if (button.className == "glyphicon glyphicon-collapse-down") {
+                button.className = "glyphicon glyphicon-expand"
+            }
+            else if (button.className == "glyphicon glyphicon-expand") {
+                button.className = "glyphicon glyphicon-collapse-down"
+            }
+        }
+    </script>
 {% endblock %}

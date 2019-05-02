@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -117,11 +117,12 @@ APPS_TO_TEST = (
 TEST_RUNNER = os.environ.get('TEST_RUNNER', 'osis_common.tests.runner.InstalledAppsTestRunner')
 SKIP_QUEUES_TESTS = os.environ.get('SKIP_QUEUES_TESTS', 'False').lower() == 'true'
 QUEUES_TESTING_TIMEOUT = float(os.environ.get('QUEUES_TESTING_TIMEOUT', 0.1))
+TESTS_TYPES = os.environ.get('TESTS_TYPES', 'UNIT')
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'debug': DEBUG,
@@ -132,7 +133,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'base.views.common.common_context_processor',
-                'base.context_processors.user_manual.user_manual_url'
+                'base.context_processors.user_manual.user_manual_url',
+                'django.template.context_processors.i18n',
             ],
         },
     },
@@ -170,6 +172,7 @@ TIME_ZONE = os.environ.get('TIME_ZONE', 'Europe/Brussels')
 # Static files (CSS, JavaScript, Images) and Media
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = os.environ.get('STATIC_URL', '/static/')
+STATICI18N_ROOT = os.path.join(BASE_DIR, os.environ.get('STATICI18N', 'base/static'))
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(BASE_DIR, "uploads"))
 MEDIA_URL = os.environ.get('MEDIA_URL',  '/media/')
 CONTENT_TYPES = ['application/csv', 'application/doc', 'application/pdf', 'application/xls', 'application/xml',
@@ -197,6 +200,10 @@ EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 25))
 SEND_BROKEN_LINK_EMAILS = os.environ.get('SEND_BROKEN_LINK_EMAILS', 'True').lower() == 'true'
 INTERNAL_EMAIL_SUFFIX = os.environ.get('INTERNAL_EMAIL_SUFFIX', 'osis.org')
+MAIL_SENDER_CLASSES = os.environ.get(
+    'MAIL_SENDER_CLASSES',
+    'osis_common.messaging.mail_sender_classes.MessageHistorySender'
+).split()
 
 # Authentication settings
 LOGIN_URL = os.environ.get('LOGIN_URL', reverse_lazy('login'))
@@ -213,7 +220,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = int(os.environ.get('DATA_UPLOAD_MAX_NUMBER_FIELD
 # Ex : LOGO_INSTITUTION_URL = 'https://www.google.be/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png'
 # A relative URL will work on local , but not out of the box on the servers.
 LOGO_INSTITUTION_URL = os.environ.get('LOGO_INSTITUTION_URL',
-                                      os.path.join(BASE_DIR, "base/static/img/logo_institution.jpg"))
+                                      os.path.join(BASE_DIR, "base/static/img/logo_uclouvain.png"))
 LOGO_OSIS_URL = os.environ.get('LOGO_OSIS_URL', '')
 
 # The Queues are optional
@@ -262,7 +269,7 @@ CKEDITOR_CONFIGS = {
     'reddot': {
         "removePlugins": "stylesheetparser",
         'extraAllowedContent': 'div(reddot_*,contacts_*)',
-        'extraPlugins': ','.join(['reddot', 'pastefromword']),
+        'extraPlugins': ','.join(['pastefromword']),
         'stylesSet': REDDOT_STYLES,
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
@@ -280,7 +287,7 @@ CKEDITOR_CONFIGS = {
         "removePlugins": "stylesheetparser",
         'allowedContent': True,
         'extraAllowedContent': 'div(reddot_*,contacts_*)',
-        'extraPlugins': ','.join(['reddot', 'pastefromword']),
+        'extraPlugins': ','.join(['pastefromword']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
@@ -452,6 +459,6 @@ REQUESTS_TIMEOUT = 20
 
 # PEDAGOGY INFORMATION
 URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/prog-{year}-{code}")
-GET_SECTION_PARAM = os.environ.get("GET_SECTION_PARAM", "")
 
 YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 2018))
+YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 2019))

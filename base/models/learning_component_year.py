@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 ##############################################################################
 from django.db import models
 from django.db.models import Sum
-from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
@@ -36,15 +35,15 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class LearningComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('learning_container_year', 'learning_unit_year', 'acronym', 'type', 'comment', 'changed')
-    search_fields = ['acronym', 'learning_container_year__acronym']
-    list_filter = ('learning_container_year__academic_year',)
+    list_display = ('learning_unit_year', 'acronym', 'type', 'comment', 'changed')
+    search_fields = ['acronym', 'learning_unit_year__acronym']
+    list_filter = ('learning_unit_year__academic_year',)
 
 
 class LearningComponentYear(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    learning_container_year = models.ForeignKey('LearningContainerYear')
+    learning_unit_year = models.ForeignKey('LearningUnitYear')
     acronym = models.CharField(max_length=4, blank=True, null=True)
     type = models.CharField(max_length=30, choices=learning_component_year_type.LEARNING_COMPONENT_YEAR_TYPES,
                             blank=True, null=True)
@@ -62,7 +61,7 @@ class LearningComponentYear(SerializableModel):
     _warnings = None
 
     def __str__(self):
-        return u"%s - %s" % (self.acronym, self.learning_container_year.acronym)
+        return u"%s - %s" % (self.acronym, self.learning_unit_year.acronym)
 
     class Meta:
         permissions = (
@@ -71,7 +70,7 @@ class LearningComponentYear(SerializableModel):
 
     @property
     def type_letter_acronym(self):
-        if self.learning_container_year.container_type == learning_container_year_types.COURSE:
+        if self.learning_unit_year.learning_container_year.container_type == learning_container_year_types.COURSE:
             if self.type in (learning_component_year_type.LECTURING, learning_component_year_type.PRACTICAL_EXERCISES):
                 return self.acronym
             return None
@@ -79,7 +78,7 @@ class LearningComponentYear(SerializableModel):
             return {
                 learning_container_year_types.INTERNSHIP: 'S',
                 learning_container_year_types.DISSERTATION: 'D',
-            }.get(self.learning_container_year.container_type)
+            }.get(self.learning_unit_year.learning_container_year.container_type)
 
     @property
     def complete_acronym(self):
@@ -88,10 +87,6 @@ class LearningComponentYear(SerializableModel):
             return '{}/PM'.format(self.learning_unit_year.acronym)
         else:
             return '{}/{}'.format(self.learning_unit_year.acronym, self.acronym)
-
-    @cached_property
-    def learning_unit_year(self):
-        return self.learningunityear_set.get()
 
     @property
     def real_classes(self):
@@ -114,7 +109,6 @@ class LearningComponentYear(SerializableModel):
         vol_q1 = self.hourly_volume_partial_q1 or 0
         vol_q2 = self.hourly_volume_partial_q2 or 0
         planned_classes = self.planned_classes or 0
-
         inconsistent_msg = _('Volumes of {} are inconsistent').format(self.complete_acronym)
         if vol_q1 + vol_q2 != vol_total_annual:
             _warnings.append("{} ({})".format(
@@ -148,8 +142,9 @@ def find_by_id(learning_component_year_id):
 
 
 def find_by_learning_container_year(learning_container_year, with_classes=False):
-    queryset = LearningComponentYear.objects.filter(learning_container_year=learning_container_year) \
-        .order_by('type', 'acronym')
+    queryset = LearningComponentYear.objects.filter(
+        learning_unit_year__learning_container_year=learning_container_year
+    ).order_by('type', 'acronym')
     if with_classes:
         queryset = queryset.prefetch_related(
             models.Prefetch('learningclassyear_set', to_attr="classes")

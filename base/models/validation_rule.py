@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,15 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+from ckeditor.fields import RichTextField
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, get_language
 
 from base.models.enums.field_status import FIELD_STATUS, NOT_REQUIRED
+from base.models.enums.language_code import LanguageCodes
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class ValidationRuleAdmin(OsisModelAdmin):
-    list_display = ('field_reference', 'status_field', 'initial_value', 'regex_rule')
+    list_display = ('field_reference', 'status_field', 'initial_value', 'regex_rule', 'placeholder')
     search_fields = ['field_reference']
 
 
@@ -66,5 +68,23 @@ class ValidationRule(models.Model):
         verbose_name=_("regex error message")
     )
 
+    help_text_en = RichTextField(
+        blank=True,
+        verbose_name=_("english help text")
+    )
+
+    help_text_fr = RichTextField(
+        blank=True,
+        verbose_name=_("french help text")
+    )
+
+    placeholder = models.CharField(max_length=15, verbose_name=_('Placeholder'), blank=True,)
+
     class Meta:
         verbose_name = _("validation rule")
+
+    @property
+    def help_text(self):
+        if get_language() == LanguageCodes.EN.value:
+            return self.help_text_en
+        return self.help_text_fr

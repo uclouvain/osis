@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 ##############################################################################
 from gettext import ngettext
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, IntegrityError
 from django.db.models import Max
 from django.utils.translation import ugettext_lazy as _
@@ -36,9 +37,9 @@ from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
 from osis_common.models.serializable_model import SerializableModel, \
     SerializableModelAdmin
 
-LEARNING_UNIT_ACRONYM_REGEX_MODEL = "^[BGLMTWX][A-Z]{2,4}\d{4}"
+LEARNING_UNIT_ACRONYM_REGEX_MODEL = "^[BEGLMTWX][A-Z]{2,4}\d{4}"
 LEARNING_UNIT_ACRONYM_REGEX_BASE = "^[BLMWX][A-Z]{2,4}\d{4}"
-LEARNING_UNIT_ACRONYM_REGEX_EXTERNAL = "^[GLMTW][A-Z]{2,4}\d{4}$"
+LEARNING_UNIT_ACRONYM_REGEX_EXTERNAL = "^[EGLMTW][A-Z]{2,4}\d{4}$"
 LETTER_OR_DIGIT = "[A-Z0-9]"
 STRING_END = "$"
 LEARNING_UNIT_ACRONYM_REGEX_ALL = LEARNING_UNIT_ACRONYM_REGEX_BASE + LETTER_OR_DIGIT + "{0,1}" + STRING_END
@@ -63,10 +64,10 @@ class LearningUnitAdmin(VersionAdmin, SerializableModelAdmin):
 
     def apply_learning_unit_year_postponement(self, request, queryset):
         # Potential circular imports
-        from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponement
+        from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponementToN6
         from base.views.common import display_success_messages, display_error_messages
 
-        result, errors = LearningUnitAutomaticPostponement(queryset).postpone()
+        result, errors = LearningUnitAutomaticPostponementToN6(queryset).postpone()
         count = len(result)
         display_success_messages(
             request, ngettext(
@@ -100,7 +101,7 @@ class LearningUnit(SerializableModel):
     )
 
     def __str__(self):
-        return "{}".format(self.id)
+        return self.acronym
 
     def save(self, *args, **kwargs):
         if self.end_year and self.end_year < self.start_year:
@@ -109,7 +110,10 @@ class LearningUnit(SerializableModel):
 
     @property
     def acronym(self):
-        return self.most_recent_learning_unit_year().acronym
+        try:
+            return self.most_recent_learning_unit_year().acronym
+        except ObjectDoesNotExist:
+            return str(self.id)
 
     @property
     def title(self):
@@ -124,7 +128,7 @@ class LearningUnit(SerializableModel):
         return self.end_year and current_academic_year().year > self.end_year
 
     def most_recent_learning_unit_year(self):
-        return self.learningunityear_set.filter(learning_unit_id=self.id).latest('academic_year__year')
+        return self.learningunityear_set.latest('academic_year__year')
 
     class Meta:
         permissions = (

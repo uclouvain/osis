@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -52,10 +52,13 @@ class PrerequisiteItem(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
 
     learning_unit = models.ForeignKey("LearningUnit")
-    prerequisite = models.ForeignKey("Prerequisite")
+    prerequisite = models.ForeignKey("Prerequisite", on_delete=models.CASCADE)
 
     group_number = models.PositiveIntegerField()
     position = models.PositiveIntegerField()
+
+    def __str__(self):
+        return "{} / {}".format(self.prerequisite, self.learning_unit.acronym)
 
     class Meta:
         unique_together = (
@@ -65,8 +68,4 @@ class PrerequisiteItem(models.Model):
     def save(self, *args, **kwargs):
         if self.learning_unit == self.prerequisite.learning_unit_year.learning_unit:
             raise IntegrityError("A learning unit cannot be prerequisite to itself")
-        super(PrerequisiteItem, self).save(*args, **kwargs)
-
-
-def delete_items_by_related_prerequisite(prerequisite):
-    PrerequisiteItem.objects.filter(prerequisite=prerequisite).delete()
+        super().save(*args, **kwargs)

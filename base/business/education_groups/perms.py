@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,13 +27,14 @@ from django.core.exceptions import PermissionDenied
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext
 
+from django.conf import settings
 from base.business.group_element_years import management
 from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year
 from base.models.education_group_type import find_authorized_types
 from base.models.enums import academic_calendar_type
-from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP, Categories
+from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
 
 ERRORS_MSG = {
     "base.add_educationgroup": "The user has not permission to create education groups.",
@@ -43,15 +44,18 @@ ERRORS_MSG = {
 
 
 def is_eligible_to_add_training(person, education_group, raise_exception=False):
-    return _is_eligible_to_add_education_group(person, education_group, TRAINING, raise_exception=raise_exception)
+    return _is_eligible_to_add_education_group(person, education_group, Categories.TRAINING,
+                                               raise_exception=raise_exception)
 
 
 def is_eligible_to_add_mini_training(person, education_group, raise_exception=False):
-    return _is_eligible_to_add_education_group(person, education_group, MINI_TRAINING, raise_exception=raise_exception)
+    return _is_eligible_to_add_education_group(person, education_group, Categories.MINI_TRAINING,
+                                               raise_exception=raise_exception)
 
 
 def is_eligible_to_add_group(person, education_group, raise_exception=False):
-    return _is_eligible_to_add_education_group(person, education_group, GROUP, raise_exception=raise_exception)
+    return _is_eligible_to_add_education_group(person, education_group, Categories.GROUP,
+                                               raise_exception=raise_exception)
 
 
 def _is_eligible_to_add_education_group(person, education_group, category, education_group_type=None,
@@ -66,7 +70,19 @@ def _is_eligible_to_add_education_group(person, education_group, category, educa
 
 def is_eligible_to_change_education_group(person, education_group, raise_exception=False):
     return check_permission(person, "base.change_educationgroup", raise_exception) and \
-           _is_eligible_education_group(person, education_group, raise_exception)
+           _is_eligible_education_group(person, education_group, raise_exception) and \
+           _is_year_editable(education_group, raise_exception)
+
+
+def _is_year_editable(education_group, raise_exception):
+    error_msg = None
+    if education_group.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION:
+        error_msg = _("You cannot change a education group before %(limit_year)s") % {
+                "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}
+
+    result = error_msg is None
+    can_raise_exception(raise_exception, result, error_msg)
+    return result
 
 
 def is_eligible_to_change_coorganization(person, education_group, raise_exception=False):
@@ -113,9 +129,9 @@ def is_education_group_edit_period_opened(education_group, raise_exception=False
 
     qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION).open_calendars()
     if not qs.exists():
-        error_msg = "The education group edition period is not open."
+        error_msg = _("The education group edition period is not open.")
     elif education_group and not qs.filter(academic_year=education_group.academic_year).exists():
-        error_msg = "This education group is not editable during this period."
+        error_msg = _("This education group is not editable during this period.")
 
     result = error_msg is None
     can_raise_exception(raise_exception, result, error_msg)
@@ -127,10 +143,20 @@ def _is_eligible_education_group(person, education_group, raise_exception):
             (person.is_central_manager or is_education_group_edit_period_opened(education_group, raise_exception)))
 
 
+def _is_eligible_certificate_aims(person, education_group, raise_exception):
+    return check_link_to_management_entity(education_group, person, raise_exception)
+
+
 def _is_eligible_to_add_education_group_with_category(person, category, raise_exception):
     # TRAINING/MINI_TRAINING can only be added by central managers | Faculty manager must make a proposition of creation
-    result = person.is_central_manager or (person.is_faculty_manager and category == GROUP)
-    msg = _("The user has not permission to create a %(category)s.") % {"category": _(category)}
+    # based on US OSIS-2592, Faculty manager can add a MINI-TRAINING
+    result = person.is_central_manager or (person.is_faculty_manager and category == Categories.MINI_TRAINING)
+
+    msg = pgettext(
+        "male" if category == Categories.GROUP else "female",
+        "The user has not permission to create a %(category)s."
+    ) % {"category": category.value}
+
     can_raise_exception(raise_exception, result, msg)
     return result
 
@@ -164,7 +190,7 @@ def check_authorized_type(education_group, category, raise_exception=False):
         return True
 
     result = find_authorized_types(
-        category=category,
+        category=category.name,
         parents=[education_group]
     ).exists()
 
@@ -175,7 +201,7 @@ def check_authorized_type(education_group, category, raise_exception=False):
             "female" if parent_category in [TRAINING, MINI_TRAINING] else "male",
             "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
         ) % {
-            "child_category": Categories[category].value,
+            "child_category": category.value,
             "category": education_group.education_group_type.get_category_display(),
             "type": education_group.education_group_type.get_name_display(),
         })

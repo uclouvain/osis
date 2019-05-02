@@ -27,17 +27,44 @@
     </div>
 {% endblock %}
 
+{% block sidebar %}
+
+    <div class="side-container" id="mySidenav">
+
+        <div class="sidenav">
+            <div class="row" id="panel_file_tree"></div>
+        </div>
+        <div id="split-bar"></div>
+
+    </div>
+{% endblock %}
+
+
 {% block content %}
-    <div class="panel panel-default">
+
+    <div class="panel panel-default" id="panel-data">
         <div class="panel-heading">
             <div class="row">
-                <a class="btn btn-default" style="margin-left: 15px;" onclick="switchTreeVisibility()">
+                <a class="btn btn-default" style="margin-left: 15px;" onclick="toggleNav()">
                     <span class="fa fa-bars" aria-hidden="true"></span>
                 </a>
+
+                {% if root == education_group_year %}
+                    <label>
+                        <select class="form-control"
+                                onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
+                            {% for edy in education_group_year.education_group.educationgroupyear_set.all %}
+                                <option value="{% url "education_group_read" edy.pk edy.pk %}"
+                                        {% if edy == education_group_year %} selected="selected" {% endif %}>
+                                    {{ edy.academic_year }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                {% endif %}
                 <div class="pull-right" style="margin-right: 15px;">
                     {% block top_action_bar %}
                     {% endblock %}
-
                 </div>
             </div>
         </div>
@@ -45,18 +72,10 @@
             <div class="tab-content" id="tab_content">
                 <div role="tabpanel" class="tab-pane active" id="identification">
                     <div class="row" style="display:flex;">
-
-                        <div id="panel-collapse" class="col-md-0">
-                            <div id="collapse" class="panel panel-default"
-                                 style="height: 100%;display:flex;overflow: auto;">
-                                <div class="panel-body">
-                                    <div class="row" id="panel_file_tree"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="panel-data" class="col-md-12" style="height: 100%;">
-                            {% include "education_group/tabs.html" %}
+                        <div class="col-md-12" style="height: 100%;">
+                            {% block tabs %}
+                                {% include "education_group/tabs.html" %}
+                            {% endblock %}
                             <br>
                             {% block details %}
                             {% endblock %}
@@ -70,6 +89,7 @@
             {% endblock %}
         </div>
     </div>
+
 
     <script>
         const root_id = "{{ root_id }}";

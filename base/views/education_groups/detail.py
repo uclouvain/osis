@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,14 +25,14 @@
 ##############################################################################
 import itertools
 import json
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import F, Case, When
+from django.db.models import F, Case, When, Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -46,10 +46,11 @@ from reversion.models import Version
 from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
 from base.business.education_groups import perms, general_information
-from base.business.education_groups.general_information import PublishException, RelevantSectionException
-from base.business.education_groups.general_information_sections import SECTION_LIST, SECTION_INTRO, SECTION_DIDACTIC, \
-    MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
+from base.business.education_groups.general_information import PublishException
+from base.business.education_groups.general_information_sections import SECTION_LIST, \
+    MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
+from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
@@ -59,16 +60,19 @@ from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year import EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
-from base.models.enums.education_group_categories import TRAINING, GROUP
-from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from base.models.enums.education_group_categories import TRAINING
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
+from base.models.mandatary import Mandatary
+from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.person import Person
+from base.models.program_manager import ProgramManager
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-from webservices.business import CONTACTS_KEY, CONTACT_INTRO_KEY
+from webservices.business import CONTACT_INTRO_KEY
 
 SECTIONS_WITH_TEXT = (
     'ucl_bachelors',
@@ -80,29 +84,6 @@ SECTIONS_WITH_TEXT = (
 )
 
 NUMBER_SESSIONS = 3
-
-COMMON_PARAGRAPH = (
-    'agregation',
-    'finalites_didactiques-commun',
-    'prerequis'
-)
-
-INTRO_OFFER = (
-    TrainingType.MASTER_MS_120.name,
-    TrainingType.MASTER_MS_180_240.name,
-    TrainingType.MASTER_MD_120.name,
-    TrainingType.MASTER_MD_180_240.name,
-    TrainingType.MASTER_MA_120.name,
-    TrainingType.MASTER_MA_180_240.name,
-    GroupType.COMMON_CORE.name,
-    GroupType.SUB_GROUP.name,
-    MiniTrainingType.OPTION.name
-)
-
-DIDACTIC_OFFERS = (
-    TrainingType.MASTER_MD_120.name,
-    TrainingType.MASTER_MD_180_240.name,
-)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -153,9 +134,6 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         )
         context['enums'] = mdl.enums.education_group_categories
 
-        self.is_intro_offer = self.object.education_group_type.name in INTRO_OFFER
-        self.is_didactic_offer = self.object.education_group_type.name in DIDACTIC_OFFERS
-
         context["show_identification"] = self.show_identification()
         context["show_diploma"] = self.show_diploma()
         context["show_general_information"] = self.show_general_information()
@@ -180,8 +158,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
     def show_general_information(self):
         return not self.object.acronym.startswith('common-') and \
                self.is_general_info_and_condition_admission_in_display_range() and \
-               (self.object.education_group_type.category != GROUP or
-                self.object.education_group_type.name == GroupType.COMMON_CORE.name)
+               self.object.education_group_type.name in SECTIONS_PER_OFFER_TYPE.keys()
 
     def show_administrative(self):
         return self.object.education_group_type.category == "TRAINING" and \
@@ -203,7 +180,10 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
                and self.is_general_info_and_condition_admission_in_display_range()
 
     def show_skills_and_achievements(self):
-        return self.show_admission_conditions() and not self.object.is_common
+        return not self.object.is_common and \
+               self.object.education_group_type.name in itertools.chain(TrainingType.with_skills_achievements(),
+                                                                        MiniTrainingType.with_admission_condition()) \
+               and self.is_general_info_and_condition_admission_in_display_range()
 
     def is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.object.academic_year.year < \
@@ -282,15 +262,26 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         is_common_education_group_year = self.object.acronym.startswith('common')
-        sections_to_display = self.get_appropriate_sections()
-        show_contacts = (not sections_to_display or CONTACTS_KEY in sections_to_display) and not self.is_intro_offer
+        common_education_group_year = None
+        if not is_common_education_group_year:
+            common_education_group_year = EducationGroupYear.objects.get_common(
+                academic_year=self.object.academic_year,
+            )
+        sections_to_display = SECTIONS_PER_OFFER_TYPE.get(
+            'common' if is_common_education_group_year
+            else self.object.education_group_type.name,
+            {'specific': [], 'common': []}
+        )
+        texts = self.get_translated_texts(sections_to_display, common_education_group_year, self.user_language_code)
+
+        show_contacts = CONTACT_INTRO_KEY in sections_to_display['specific']
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(
                 sections_to_display,
-                is_common_education_group_year,
+                texts
             ),
-            'contacts': self.get_contacts_section(),
+            'contacts': self.get_contacts_section(sections_to_display, texts),
             'show_contacts': show_contacts,
             'can_edit_information': perms.is_eligible_to_edit_general_information(context['person'], context['object'])
         })
@@ -300,115 +291,79 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def user_language_code(self):
         return mdl.person.get_user_interface_language(self.request.user)
 
-    def get_sections_with_translated_labels(self, sections_to_display, is_common_education_group_year=None):
-        # Load the info from the common education group year
-        common_education_group_year = None
-        if not is_common_education_group_year:
-            common_education_group_year = EducationGroupYear.objects.get_common(
-                academic_year=self.object.academic_year,
-            )
-
+    def get_sections_with_translated_labels(self, sections_to_display, texts):
         # Load the labels
         Section = namedtuple('Section', 'title labels')
         sections_with_translated_labels = []
-        if self.is_intro_offer:
-            sections_list = SECTION_INTRO
-            if self.is_didactic_offer:
-                sections_list = sections_list + SECTION_DIDACTIC
-            sections_to_display = []  # TODO: Remove eligibleFiles dependency (Planned)
-        else:
-            sections_list = SECTION_LIST
-        for section in sections_list:
-            translated_labels = self.get_translated_labels_and_content(section,
-                                                                       self.user_language_code,
-                                                                       common_education_group_year,
-                                                                       sections_to_display)
+        for section in SECTION_LIST:
+            translated_labels = []
+            for label in section.labels:
+                translated_labels += self.get_texts_for_label(label, sections_to_display, texts)
             if translated_labels:
                 sections_with_translated_labels.append(Section(section.title, translated_labels))
         return sections_with_translated_labels
 
-    def get_translated_labels_and_content(self, section, user_language, common_education_group_year, sections_list):
-        records = []
-        for label, selectors in section.labels:
-            if not sections_list or label in sections_list:
-                records.extend(
-                    self.get_selectors(common_education_group_year, label, selectors, user_language)
-                )
-        return records
+    def get_texts_for_label(self, label, sections_to_display, texts):
+        translated_labels = []
+        translated_label = next((text for text in texts['labels'] if text.text_label.label == label), None)
+        if label in sections_to_display['common']:
+            common_text = self.get_text_structure_for_display(label, texts['common'], translated_label)
+            common_text.update({'type': 'common'})
+            translated_labels.append(common_text)
+        if label in sections_to_display['specific']:
+            text = self.get_text_structure_for_display(label, texts['specific'], translated_label)
+            text.update({'type': 'specific'})
+            translated_labels.append(text)
+        return translated_labels
 
-    def get_selectors(self, common_education_group_year, label, selectors, user_language):
-        records = []
-
-        for selector in selectors.split(','):
-            translations = None
-            if selector == 'specific':
-                translations = self.get_content_translations_for_label(
-                    self.object, label, user_language, 'specific')
-
-            elif selector == 'common':
-                translations = self._get_common_selector(common_education_group_year, label, user_language)
-
-            if translations and translations not in records:
-                records.append(translations)
-
-        return records
-
-    def _get_common_selector(self, common_education_group_year, label, user_language):
-        translations = None
-        # common_education_group_year is None if education_group_year is common
-        # if not common, translation must be non-editable in non common offer
-        if common_education_group_year is not None:
-            translations = self.get_content_translations_for_label(
-                common_education_group_year, label, user_language, 'common')
-        # if is common and a label in COMMON_PARAGRAPH, must be editable in common offer
-        elif label in COMMON_PARAGRAPH:
-            translations = self.get_content_translations_for_label(
-                self.object, label, user_language, 'specific')
-        return translations
-
-    def get_content_translations_for_label(self, education_group_year, label, user_language, type):
-        # FIX ME: Change contacts ==> contact_intro in sections
-        if label == CONTACTS_KEY:
-            label = CONTACT_INTRO_KEY
-
-        # fetch the translation for the current user
-        translated_label = TranslatedTextLabel.objects.filter(text_label__entity=entity_name.OFFER_YEAR,
-                                                              text_label__label=label,
-                                                              language=user_language).first()
-        # fetch the translations for the both languages
+    def get_text_structure_for_display(self, label, texts, translated_label):
         french, english = 'fr-be', 'en'
-        fr_translated_text = TranslatedText.objects.filter(entity=entity_name.OFFER_YEAR,
-                                                           text_label__label=label,
-                                                           reference=str(education_group_year.id),
-                                                           language=french).first()
-        en_translated_text = TranslatedText.objects.filter(entity=entity_name.OFFER_YEAR,
-                                                           text_label__label=label,
-                                                           reference=str(education_group_year.id),
-                                                           language=english).first()
+        text_fr = next(
+            (
+                text.text for text in texts
+                if text.text_label.label == label and text.language == french
+            ),
+            None
+        )
+        text_en = next(
+            (
+                text.text for text in texts
+                if text.text_label.label == label and text.language == english
+            ),
+            None
+        )
+
         return {
             'label': label,
-            'type': type,
-            'translation': translated_label.label if translated_label else
+            'translation': translated_label if translated_label else
             (_('This label %s does not exist') % label),
-            french: fr_translated_text.text if fr_translated_text else None,
-            english: en_translated_text.text if en_translated_text else None,
+            french: text_fr,
+            english: text_en,
         }
 
-    def get_appropriate_sections(self):
-        sections = []
-        try:
-            sections = general_information.get_relevant_sections(self.object)
-        except RelevantSectionException as e:
-            display_error_messages(self.request, str(e))
-        return sections
+    def get_translated_texts(self, sections_to_display, common_edy, user_language):
+        specific_texts = TranslatedText.objects.filter(
+            text_label__label__in=sections_to_display['specific'],
+            entity=entity_name.OFFER_YEAR,
+            reference=str(self.object.pk)
+        ).select_related("text_label")
 
-    def get_contacts_section(self):
-        introduction = self.get_content_translations_for_label(
-            self.object,
-            CONTACT_INTRO_KEY,
-            self.user_language_code,
-            'specific'
-        )
+        common_texts = TranslatedText.objects.filter(
+            text_label__label__in=sections_to_display['common'],
+            entity=entity_name.OFFER_YEAR,
+            reference=str(common_edy.pk)
+        ).select_related("text_label") if common_edy else None
+
+        labels = TranslatedTextLabel.objects.filter(
+            text_label__label__in=sections_to_display['common']+sections_to_display['specific'],
+            text_label__entity=entity_name.OFFER_YEAR,
+            language=user_language
+        ).select_related("text_label")
+
+        return {'common': common_texts, 'specific': specific_texts, 'labels': labels}
+
+    def get_contacts_section(self, sections_to_display, texts):
+        introduction = self.get_texts_for_label(CONTACT_INTRO_KEY, sections_to_display, texts)
         return {
             'contact_intro': introduction,
             'contacts_grouped': self._get_publication_contacts_group_by_type()
@@ -444,45 +399,80 @@ class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        pgm_mgrs = ProgramManager.objects.filter(
+            education_group=self.object.education_group
+        ).order_by("person__last_name", "person__first_name")
+
+        mandataries = Mandatary.objects.filter(
+            mandate__education_group=self.object.education_group,
+            start_date__lte=self.object.academic_year.start_date,
+            end_date__gte=self.object.academic_year.end_date
+        ).order_by(
+            'mandate__function',
+            'person__last_name',
+            'person__first_name'
+        ).select_related("person", "mandate")
+
+        course_enrollment_dates = OfferYearCalendar.objects.filter(
+            education_group_year=self.object,
+            academic_calendar__reference=academic_calendar_type.COURSE_ENROLLMENT,
+            academic_calendar__academic_year=self.object.academic_year
+        ).first()
+
         context.update({
-            'course_enrollment': get_dates(academic_calendar_type.COURSE_ENROLLMENT, self.object),
-            'mandataries': mdl.mandatary.find_by_education_group_year(self.object),
-            'pgm_mgrs': mdl.program_manager.find_by_education_group(self.object.education_group),
-            'exam_enrollments': get_sessions_dates(academic_calendar_type.EXAM_ENROLLMENTS, self.object),
-            'scores_exam_submission': get_sessions_dates(academic_calendar_type.SCORES_EXAM_SUBMISSION, self.object),
-            'dissertation_submission': get_sessions_dates(academic_calendar_type.DISSERTATION_SUBMISSION, self.object),
-            'deliberation': get_sessions_dates(academic_calendar_type.DELIBERATION, self.object),
-            'scores_exam_diffusion': get_sessions_dates(academic_calendar_type.SCORES_EXAM_DIFFUSION, self.object),
+            'course_enrollment_dates': course_enrollment_dates,
+            'mandataries': mandataries,
+            'pgm_mgrs': pgm_mgrs,
             "can_edit_administrative_data": can_user_edit_administrative_data(self.request.user, self.object)
         })
+        context.update(get_sessions_dates(self.object))
 
         return context
 
 
-def get_sessions_dates(an_academic_calendar_type, an_education_group_year):
-    date_dict = {}
+def get_sessions_dates(education_group_year):
+    calendar_types = (academic_calendar_type.EXAM_ENROLLMENTS, academic_calendar_type.SCORES_EXAM_SUBMISSION,
+                      academic_calendar_type.DISSERTATION_SUBMISSION, academic_calendar_type.DELIBERATION,
+                      academic_calendar_type.SCORES_EXAM_DIFFUSION)
+    calendars = AcademicCalendar.objects.filter(
+        reference__in=calendar_types,
+        academic_year=education_group_year.academic_year
+    ).select_related(
+        "sessionexamcalendar"
+    ).prefetch_related(
+        Prefetch(
+            "offeryearcalendar_set",
+            queryset=OfferYearCalendar.objects.filter(
+                education_group_year=education_group_year
+            ),
+            to_attr="offer_calendars"
+        )
+    )
 
-    for session_number in range(NUMBER_SESSIONS):
-        session = mdl.session_exam_calendar.get_by_session_reference_and_academic_year(
-            session_number + 1,
-            an_academic_calendar_type,
-            an_education_group_year.academic_year)
-        if session:
-            dates = mdl.offer_year_calendar.get_by_education_group_year_and_academic_calendar(session.academic_calendar,
-                                                                                              an_education_group_year)
-            date_dict['session{}'.format(session_number + 1)] = dates
+    sessions_dates_by_calendar_type = defaultdict(dict)
 
-    return date_dict
+    for calendar in calendars:
+        session = calendar.sessionexamcalendar
+        offer_year_calendars = calendar.offer_calendars
+        if offer_year_calendars:
+            sessions_dates_by_calendar_type[calendar.reference.lower()]['session{}'.format(session.number_session)] = \
+                offer_year_calendars[0]
+
+    return sessions_dates_by_calendar_type
 
 
 def get_dates(an_academic_calendar_type, an_education_group_year):
-    ac = mdl.academic_calendar.get_by_reference_and_academic_year(an_academic_calendar_type,
-                                                                  an_education_group_year.academic_year)
-    if ac:
-        dates = mdl.offer_year_calendar.get_by_education_group_year_and_academic_calendar(ac, an_education_group_year)
-        return {'dates': dates}
-    else:
-        return {}
+    try:
+        dates = OfferYearCalendar.objects.get(
+            education_group_year=an_education_group_year,
+            academic_calendar__reference=an_academic_calendar_type,
+            academic_calendar__academic_year=an_education_group_year.academic_year
+        )
+    except OfferYearCalendar.DoesNotExist:
+        dates = None
+
+    return {"dates": dates} if dates else {}
 
 
 class EducationGroupContent(EducationGroupGenericDetailView):
@@ -499,10 +489,6 @@ class EducationGroupContent(EducationGroupGenericDetailView):
             code=Case(
                 When(child_branch__isnull=False, then=F("child_branch__partial_acronym")),
                 default=None
-            ),
-            title=Case(
-                When(child_leaf__isnull=False, then=F("child_leaf__specific_title")),
-                When(child_branch__isnull=False, then=F("child_branch__title")),
             ),
             child_id=Case(
                 When(child_leaf__isnull=False, then=F("child_leaf__id")),
@@ -577,17 +563,25 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
 
     def _show_free_text(self):
         return not self.object.is_common and self.object.education_group_type.name in itertools.chain(
-                    TrainingType.with_admission_condition(),
-                    MiniTrainingType.with_admission_condition()
-                )
+            TrainingType.with_admission_condition(),
+            MiniTrainingType.with_admission_condition()
+        )
 
 
 def get_appropriate_common_admission_condition(edy):
-    if not edy.is_common and \
-            any([edy.is_bachelor, edy.is_master60, edy.is_master120, edy.is_aggregation, edy.is_specialized_master]):
-        return EducationGroupYear.objects.look_for_common(
-            education_group_type__name=TrainingType.PGRM_MASTER_120.name if edy.is_master60
+    if not edy.is_common and any([
+        edy.is_bachelor,
+        edy.is_master60,
+        edy.is_master120,
+        edy.is_aggregation,
+        edy.is_specialized_master,
+        edy.is_master180
+    ]):
+        common_egy = EducationGroupYear.objects.look_for_common(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name if edy.is_master60 or edy.is_master180
             else edy.education_group_type.name,
             academic_year=edy.academic_year
-        ).select_related('admissioncondition').get().admissioncondition
+        ).get()
+        common_admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=common_egy)
+        return common_admission_condition
     return None
