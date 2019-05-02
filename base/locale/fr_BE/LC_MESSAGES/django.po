@@ -3585,7 +3585,7 @@ msgstr "Stage de recherche"
 
 #: models/enums/vacant_declaration_type.py:37
 msgid "Reserved for interns"
-msgstr "Réservé aux stagiaires"
+msgstr "Réservé aux internes"
 
 #: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:41
 msgid "Responsible"
