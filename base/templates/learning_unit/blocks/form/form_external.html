@@ -21,36 +21,69 @@
                             {% bootstrap_field learning_unit_year_form.acronym show_label=False %}
                         </div>
                         {% bootstrap_field learning_container_year_form.container_type form_group_class="form-group col-md-4" %}
-                        {% bootstrap_field learning_unit_external_form.co_graduation form_group_class="form-group col-md-2" %}
-                        {% bootstrap_field learning_unit_external_form.mobility form_group_class="form-group col-md-2" %}
+                        {% bootstrap_field learning_unit_year_form.internship_subtype form_group_class="col-md-4"%}
                     </div>
                     <div class="row">
                         {% bootstrap_field learning_unit_year_form.credits form_group_class="form-group col-md-3" field_class="ignore-js-validator" %}
-                        {% bootstrap_field learning_unit_external_form.external_credits form_group_class="form-group col-md-3" %}
+                        {% bootstrap_field learning_unit_year_form.periodicity form_group_class="col-md-3" %}
                         {% bootstrap_field learning_unit_year_form.status form_group_class="form-group col-md-2" %}
                         {% bootstrap_field learning_unit_year_form.language form_group_class="form-group col-md-4" %}
+                    </div>
+                    <div class="row">
+                        {% bootstrap_field learning_unit_year_form.professional_integration form_group_class="col-md-3" %}
                     </div>
                     {% include "learning_unit/blocks/titles.html" %}
                 </div>
             </div>
-
+            {% include "learning_unit/blocks/components.html" %}
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        {% bootstrap_field learning_container_year_form.is_vacant form_group_class="form-group col-md-3" %}
+                        {% bootstrap_field learning_container_year_form.team form_group_class="form-group col-md-3" %}
+                        {% bootstrap_field learning_container_year_form.type_declaration_vacant form_group_class="form-group col-md-3" %}
+                        {% bootstrap_field learning_unit_year_form.attribution_procedure form_group_class="form-group col-md-3" %}
+                    </div>
+                </div>
+            </div>
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="row">
                         {% bootstrap_field learning_unit_external_form.external_acronym form_group_class="form-group col-md-3" %}
-                        {% bootstrap_field learning_unit_external_form.url form_group_class="form-group col-md-9" %}
-                        {% bootstrap_field learning_unit_external_form.requesting_entity form_group_class="form-group col-md-6" %}
+                        {% bootstrap_field learning_unit_external_form.url form_group_class="form-group col-md-6" %}
+                        {% bootstrap_field learning_unit_external_form.external_credits form_group_class="form-group col-md-3" %}
                     </div>
                     {% bootstrap_field learning_unit_form.faculty_remark %}
                 </div>
             </div>
         </div>
+
         <div class="col-md-4">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    {% bootstrap_field learning_unit_year_form.country %}
-                    {% bootstrap_field learning_unit_year_form.campus %}
-                    {% bootstrap_field learning_unit_year_form.academic_year %}
+                    {% bootstrap_field learning_unit_year_form.country form_group_class="form-group col-md-12" %}
+                    {% bootstrap_field learning_unit_year_form.campus form_group_class="form-group col-md-12" %}
+                    {% bootstrap_field learning_unit_external_form.requesting_entity form_group_class="form-group col-md-12" %}
+                    {% for form in entity_container_form.forms %}
+                        {% if forloop.first %}
+                            <div>
+                                {% bootstrap_field form.entity %}
+                            </div>
+                        {% elif forloop.counter == 2 %}
+                            <div class="row">
+                                {% bootstrap_field form.entity form_group_class="col-md-9" %}
+                                {% bootstrap_field form.country form_group_class="col-md-3" %}
+                            </div>
+                        {% else %}
+                            <div class="row">
+                                {% bootstrap_field form.entity form_group_class="col-md-9" %}
+                                <br>
+                                {% bootstrap_field form.country show_label=False form_group_class="col-md-3" %}
+                            </div>
+                        {% endif %}
+                        <br>
+                    {% endfor %}
+                    {% bootstrap_field learning_unit_year_form.academic_year form_group_class="form-group col-md-12" %}
                 </div>
             </div>
             <div class="panel panel-default">

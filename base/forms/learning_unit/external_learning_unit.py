@@ -31,7 +31,7 @@ from django.db import transaction
 from django.forms import ModelChoiceField
 from django.utils.translation import ugettext_lazy as _
 
-from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
+from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField, EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningContainerModelForm, \
     LearningContainerYearModelForm, LearningUnitYearModelForm
 from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
@@ -76,11 +76,13 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
                 country = organization_address.country
                 initial["country"] = country.pk
         super().__init__(*args, instance=instance, initial=initial, external=True, **kwargs)
+        self.fields['campus'].label = _('Reference institution')
 
     class Meta(LearningUnitYearModelForm.Meta):
         fields = ('academic_year', 'acronym', 'specific_title',
                   'specific_title_english', 'credits',
-                  'status', 'campus', 'language')
+                  'status', 'campus', 'language', 'internship_subtype', 'periodicity', 'professional_integration',
+                  'quadrimester', 'session', 'attribution_procedure')
 
         widgets = {
             'campus': autocomplete.ModelSelect2(
@@ -142,6 +144,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
         LearningUnitYearForExternalModelForm,
         LearningContainerModelForm,
         LearningContainerYearExternalModelForm,
+        # EntityContainerBaseForm,
         ExternalLearningUnitModelForm
     ]
 
@@ -170,6 +173,10 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
     @property
     def learning_unit_year_form(self):
         return self.forms[LearningUnitYearForExternalModelForm]
+
+    # @property
+    # def entity_container_form(self):
+    #     return self.forms.get(EntityContainerBaseForm)
 
     def _build_instance_data(self, data):
         return {
@@ -223,6 +230,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             'learning_unit_form': self.learning_unit_form,
             'learning_unit_year_form': self.learning_unit_year_form,
             'learning_container_year_form': self.learning_container_year_form,
+            'entity_container_form': self.entity_container_form,
             'learning_unit_external_form': self.learning_unit_external_form
         }
 
