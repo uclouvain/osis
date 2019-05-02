@@ -79,10 +79,10 @@ def _update_or_create_proposal(request, learning_unit_year, proposal=None):
     if proposal_base_form.is_valid():
         proposal = proposal_base_form.save()
         display_success_messages(
-            request, _("You proposed a modification of type %(type)s for the learning unit %(acronym)s." % {
+            request, _("You proposed a modification of type %(type)s for the learning unit %(acronym)s.") % {
                 'type': proposal.get_type_display(),
                 'acronym': learning_unit_year.acronym
-            })
+            }
         )
         return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
 
@@ -112,9 +112,9 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
             form_end_date.save(update_learning_unit_year=False)
 
             display_success_messages(
-                request, _("You proposed a modification of type %(type)s for the learning unit %(acronym)s." % {
+                request, _("You proposed a modification of type %(type)s for the learning unit %(acronym)s.") % {
                     'type': ProposalType.SUPPRESSION.value, 'acronym': learning_unit_year.acronym
-                })
+                }
             )
 
         return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
@@ -125,9 +125,6 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
         'form_end_date': form_end_date,
         'form_proposal': form_proposal,
         'experimental_phase': True})
-
-    if learning_unit_year.get_partims_related().exists():
-        display_warning_messages(request, _("The learning unit have partim"))
 
     if proposal:
         return render(request, 'learning_unit/proposal/update_suppression.html', context)

@@ -235,10 +235,10 @@ class TestLearningUnitModificationProposal(TestCase):
 
         messages_list = [str(message) for message in get_messages(response.wsgi_request)]
         self.assertIn(
-            _("You proposed a modification of type %(type)s for the learning unit %(acronym)s." % {
+            _("You proposed a modification of type %(type)s for the learning unit %(acronym)s.") % {
                 'type': proposal_type.ProposalType.MODIFICATION.value,
                 'acronym': self.learning_unit_year.acronym
-            }),
+            },
             list(messages_list))
 
     def test_initial_data_fields(self):
@@ -362,10 +362,10 @@ class TestLearningUnitSuppressionProposal(TestCase):
 
         messages = [str(message) for message in get_messages(response.wsgi_request)]
         self.assertIn(
-            _("You proposed a modification of type %(type)s for the learning unit %(acronym)s." % {
+            _("You proposed a modification of type %(type)s for the learning unit %(acronym)s.") % {
                 'type': proposal_type.ProposalType.SUPPRESSION.value,
                 'acronym': self.learning_unit_year.acronym
-            }),
+            },
             list(messages)
         )
 

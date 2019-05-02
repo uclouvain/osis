@@ -3,6 +3,8 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:157
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:158
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
@@ -495,7 +497,7 @@ msgstr "Horaire adapté"
 
 #: templates/blocks/forms/create_cancel_buttons.html:31
 #: templates/blocks/forms/create_cancel_buttons_modal.html:29
-#: templates/learning_unit/blocks/panel/educational_informations.html:94
+#: templates/learning_unit/blocks/panel/educational_informations.html:97
 #: templates/learning_unit/select_attribution.html:67
 msgid "Add"
 msgstr "Ajouter"
@@ -687,7 +689,7 @@ msgstr "Êtes-vous sûr·e que vous voulez supprimer %(education_group_year)s?"
 
 #: templates/learning_unit/specifications_all.html:261
 msgid "Are you sure you want to delete the achievement?"
-msgstr "Êtes-vous sûre de vouloir supprimer l'acquis d'apprentissage?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer l'acquis d'apprentissage?"
 
 #: templates/education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html:8
 msgid "Are you sure you want to delete the contact ?"
@@ -1555,7 +1557,7 @@ msgstr "Fin inscription aux examens"
 #: forms/education_group/achievement.py:85
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:40
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:36
-#: templates/learning_unit/blocks/panel/educational_informations.html:52
+#: templates/learning_unit/blocks/panel/educational_informations.html:55
 msgid "English"
 msgstr "Anglais"
 
@@ -1831,7 +1833,7 @@ msgstr "Anciennement"
 #: forms/education_group/achievement.py:79
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:39
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:35
-#: templates/learning_unit/blocks/panel/educational_informations.html:51
+#: templates/learning_unit/blocks/panel/educational_informations.html:54
 msgid "French"
 msgstr "Français"
 
@@ -2005,6 +2007,10 @@ msgstr "En proposition"
 #: templates/learning_unit/summary_list.html:105
 msgid "Inactive"
 msgstr "Inactif"
+
+#: forms/education_groups.py:81 forms/learning_unit/search_form.py:96
+msgid "Include subordinate entities"
+msgstr "Inclure les entités subordonnées"
 
 #: forms/learning_unit/attribution_charge_repartition.py:75
 msgid "Indicate the name or the FGS"
@@ -2191,7 +2197,7 @@ msgstr "Label"
 #: business/learning_unit.py:83 business/learning_units/edition.py:429
 #: business/proposal_xls.py:58 models/abstracts/abstract_achievement.py:48
 #: models/learning_unit_year.py:135
-#: templates/learning_unit/blocks/panel/educational_informations.html:50
+#: templates/learning_unit/blocks/panel/educational_informations.html:53
 #: templates/learning_unit/specifications_all.html:30
 #: templates/my_osis/profile.html:102
 #: tests/business/learning_units/test_edition.py:207
@@ -2646,7 +2652,7 @@ msgstr "Téléphone mobile (GSM)"
 #: forms/learning_unit/search_form.py:67
 #: models/external_learning_unit_year.py:90 models/learning_unit_year.py:229
 #: models/learning_unit_year.py:244
-#: templates/learning_unit/blocks/panel/educational_informations.html:113
+#: templates/learning_unit/blocks/panel/educational_informations.html:116
 #: tests/models/test_learning_unit_year.py:777
 msgid "Mobility"
 msgstr "Mobilité"
@@ -3626,7 +3632,7 @@ msgstr "Entité demandeuse"
 #: models/enums/field_status.py:35
 #: templates/education_group/group_element_year_comment_inner.html:40
 #: templates/education_group/group_element_year_comment_inner.html:42
-#: templates/learning_unit/blocks/panel/educational_informations.html:74
+#: templates/learning_unit/blocks/panel/educational_informations.html:77
 msgid "Required"
 msgstr "Obligatoire"
 
@@ -4006,7 +4012,7 @@ msgid "Teaching internship"
 msgstr "Stage d’enseignement"
 
 #: business/learning_units/xls_generator.py:63
-#: templates/learning_unit/blocks/panel/educational_informations.html:65
+#: templates/learning_unit/blocks/panel/educational_informations.html:68
 #: templates/learning_unit/teaching_material/modal_edit.html:31
 msgid "Teaching material"
 msgstr "Supports de cours"
@@ -4297,7 +4303,7 @@ msgstr "L'unité d'enseignement a été modifiée jusqu'en %(year)s."
 msgid "The learning unit has been updated."
 msgstr "L'unité d'enseignement a été modifiée."
 
-#: views/learning_units/proposal/update.py:130
+#: views/learning_units/detail.py:74
 msgid "The learning unit have partim"
 msgstr "L'unité d'enseignement dispose de partim"
 
@@ -5038,10 +5044,6 @@ msgstr "Accueil"
 msgid "Which type of %(category)s do you want to create ?"
 msgstr "Quel type de %(category)s voulez-vous créer ?"
 
-#: forms/education_groups.py:81 forms/learning_unit/search_form.py:96
-msgid "With subord. ent."
-msgstr "Avec ent. subord."
-
 #: templates/learning_unit/by_proposal.html:55
 msgid "Xls"
 msgstr "Xls"
@@ -5278,16 +5280,13 @@ msgstr "L'intitulé propre ou l'intitulé commun est requis"
 #: tests/views/test_learning_unit_proposal.py:365
 #: views/learning_units/proposal/update.py:82
 #: views/learning_units/proposal/update.py:115
-#, fuzzy, python-format
-#| msgid ""
-#| "You proposed a modification of type %(type)s for the learning unit "
-#| "%(acronym)s."
+#, python-format
 msgid ""
 "You proposed a modification of type %(type)s for the learning unit "
 "%(acronym)s."
 msgstr ""
-"Une proposition de modification de type {} a été faite pour l'unité "
-"d'enseignement {}."
+"Une proposition de modification de type %(type)s a été faite pour l'unité "
+"d'enseignement %(acronym)s."
 
 #: models/education_group_year.py:784
 msgid "You should precise at least minimum or maximum constraint"

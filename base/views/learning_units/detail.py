@@ -23,23 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
 from django.views.generic import DetailView
 from reversion.models import Version
 
-from base.business.learning_unit import get_organization_from_learning_unit_year, get_all_attributions, \
-    get_components_identification
+from base.business.learning_unit import get_all_attributions, get_components_identification
 from base.business.learning_unit_proposal import get_difference_of_proposal
 from base.business.learning_units.perms import is_eligible_to_create_partim, learning_unit_year_permissions, \
     learning_unit_proposal_permissions, is_eligible_for_modification
+from base.models import proposal_learning_unit
 from base.models.academic_year import current_academic_year
 from base.models.entity_version import get_by_entity_and_date
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.utils import get_object_or_none
+from base.views.common import display_warning_messages
 
 
 class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
@@ -66,6 +68,10 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         # Get does not need to fetch self.object again
         context = self.get_context_data(object=self.object)
+
+        if proposal_learning_unit.is_learning_unit_year_in_proposal(self.object) and \
+                self.object.get_partims_related().exists():
+            display_warning_messages(request, _("The learning unit have partim"))
         return self.render_to_response(context)
 
     @cached_property
