@@ -34,22 +34,32 @@ var cdn_document_name;
 		  }
 
 		  var sel = editor.getSelection();
-		  var selectedText = sel.getSelectedText( ) ;
-		  var link = editor.document.createElement( 'a' );
+		  var selectedText = sel.getSelectedText();
 
-		  // user has selected/highlighted some text in the editor window
-		  if (selectedText!=null && selectedText.length != 0) {
-			 link.setHtml(selectedText);
+		  var re = /(?:\.([^.]+))?$/;
+		  var ext = re.exec(cdn_document_name)[0];
+		  var is_image = ext.match(/.(jpg|jpeg|png|gif)$/i);
+		  var has_selected_text = selectedText != null && selectedText.length != 0;
+
+		  var link;
+
+		  if (is_image && !has_selected_text){
+		  	link = editor.document.createElement('img');
+		  	link.setAttribute('src', cdn_document_url);
+		  	link.setAttribute('alt', cdn_document_name);
 		  }
 		  else {
-			// no selection, we have to create the html text of the link with the the name of the file
-			if ( cdn_document_name!=null && cdn_document_name.length != 0) link.setHtml(" "+cdn_document_name);
-		  }
+		  	  link = editor.document.createElement('a');
+			  if (has_selected_text) link.setHtml(selectedText);
+			  else {
+				  if (cdn_document_name != null && cdn_document_name.length != 0) link.setHtml(" " + cdn_document_name);
+			  }
 
-		  link.setAttribute( 'href', cdn_document_url);
-		  link.setAttribute('target', '_blank');
-		  if ( cdn_document_name!=null ) link.setAttribute( 'title', cdn_document_name);
-		  editor.insertElement( link );
+			  link.setAttribute('href', cdn_document_url);
+			  link.setAttribute('target', '_blank');
+			  if (cdn_document_name != null) link.setAttribute('title', cdn_document_name);
+		  }
+		  editor.insertElement(link);
 
 		}
 	  }
@@ -68,7 +78,6 @@ var cdn_document_name;
 		dialog = dialog._.contents;
 		var BrowseIframeId = dialog.cdn_browse.iframe_cdn_browse._.frameId;
 		var instanceBrowse = document.getElementById(BrowseIframeId);
-		console.log(instanceBrowse)
 		instanceBrowse.style.height = evt.data.height + 'px';
 		instanceBrowse.style.width = evt.data.width + 'px';
 	  }

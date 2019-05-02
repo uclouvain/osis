@@ -261,7 +261,8 @@ CKEDITOR_CONFIGS = {
             {'name': 'insert', 'items': ['Table']},
             {'name': 'cdn_integration', 'items': ['CDN']},
         ],
-        'autoParagraph': False
+        'autoParagraph': False,
+        'allowedContent': True,
     },
     'default': {
         "removePlugins": "stylesheetparser",
@@ -298,7 +299,8 @@ CKEDITOR_CONFIGS = {
             ['Link', 'Unlink'],
             {'name': 'cdn_integration', 'items': ['CDN']},
         ],
-        'autoParagraph': False
+        'autoParagraph': False,
+        'allowedContent': True,
     },
     'minimal_plus_headers': {
         'toolbar': 'Custom',
