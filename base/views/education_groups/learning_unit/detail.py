@@ -125,7 +125,7 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
         root = context["root"]
         prerequisite = context["prerequisite"]
         learning_unit_year = context["learning_unit_year"]
-        learning_unit_inconsistent = get_prerequisite_acronyms_which_are_outside_of_education_group(root, prerequisite) \
+        learning_unit_inconsistent = get_prerequisite_acronyms_which_are_outside_of_education_group(root, prerequisite)\
             if prerequisite else []
         if learning_unit_inconsistent:
             display_warning_messages(
