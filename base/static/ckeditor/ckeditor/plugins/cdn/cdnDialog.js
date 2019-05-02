@@ -28,8 +28,9 @@ var cdn_document_name;
 		  }
 		],
 		onOk: function() {
+
 		  if ( cdn_document_url == null ) {
-			alert("Vous devez faire une sélection avant de cliquer 'ok'");
+			alert(gettext("You should make a selection before clicking 'ok'"));
 			return false;
 		  }
 
