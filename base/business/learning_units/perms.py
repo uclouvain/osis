@@ -49,7 +49,8 @@ from osis_common.utils.perms import conjunction, disjunction, negation, BasePerm
 
 FACULTY_UPDATABLE_CONTAINER_TYPES = (learning_container_year_types.COURSE,
                                      learning_container_year_types.DISSERTATION,
-                                     learning_container_year_types.INTERNSHIP)
+                                     learning_container_year_types.INTERNSHIP,
+                                     learning_container_year_types.EXTERNAL)
 
 PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name,
                                           ProposalState.REFUSED.name)
@@ -411,7 +412,6 @@ def _is_container_type_course_dissertation_or_internship(learning_unit_year, _, 
     result = \
         learning_unit_year.learning_container_year and \
         learning_unit_year.learning_container_year.container_type in FACULTY_UPDATABLE_CONTAINER_TYPES
-
     can_raise_exception(
         raise_exception,
         result,
