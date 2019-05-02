@@ -29,17 +29,16 @@ from collections import OrderedDict
 from dal import autocomplete
 from django import forms
 from django.db.models import Q
+from django.utils import timezone
 from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
 
 from base.forms.utils.choice_field import add_blank, add_all
 from base.models.entity_container_year import EntityContainerYear
-from base.models.entity_version import get_last_version, find_all_current_entities_version, \
-    find_pedagogical_entities_version, EntityVersion
+from base.models.entity_version import get_last_version, find_pedagogical_entities_version, EntityVersion
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2, ENTITY_TYPE_LIST, EntityContainerYearLinkTypes
 from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
-from osis_common.utils.datetime import get_tzinfo
 from reference.models.country import Country
 
 
@@ -63,7 +62,7 @@ class EntitiesVersionChoiceField(forms.ModelChoiceField):
 
 
 def find_additional_requirement_entities_choices():
-    date = datetime.datetime.now(get_tzinfo())
+    date = datetime.datetime.now(timezone.now())
     return EntityVersion.objects.current(date).filter(
         Q(entity__organization__type=MAIN) |
         (Q(entity__organization__type=ACADEMIC_PARTNER) & Q(entity__organization__is_current_partner=True))
