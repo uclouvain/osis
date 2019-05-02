@@ -47,13 +47,10 @@ var cdn_document_name;
 		  	link = editor.document.createElement('img');
 		  	link.setAttribute('src', cdn_document_url);
 		  	link.setAttribute('alt', cdn_document_name);
-		  }
-		  else {
+		  } else {
 		  	  link = editor.document.createElement('a');
 			  if (has_selected_text) link.setHtml(selectedText);
-			  else {
-				  if (cdn_document_name != null && cdn_document_name.length != 0) link.setHtml(" " + cdn_document_name);
-			  }
+			  else if (cdn_document_name != null && cdn_document_name.length != 0) link.setHtml(" " + cdn_document_name);
 
 			  link.setAttribute('href', cdn_document_url);
 			  link.setAttribute('target', '_blank');
