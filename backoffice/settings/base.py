@@ -389,8 +389,7 @@ ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT = os.environ.get('ESB_REFRESH_COMMON_PEDAGO
 ESB_REFRESH_COMMON_ADMISSION_ENDPOINT = os.environ.get('ESB_REFRESH_COMMON_ADMISSION_ENDPOINT')
 
 RELEASE_TAG = os.environ.get('RELEASE_TAG')
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
+
 # Selenium Testing
 SELENIUM_SETTINGS = {
     'WEB_BROWSER': os.environ.get('SELENIUM_WEB_BROWSER', 'FIREFOX'),
@@ -447,7 +446,5 @@ URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/pr
 
 YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 2018))
 YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 2019))
-
-CDN_URL = os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager/")
 
 STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')
