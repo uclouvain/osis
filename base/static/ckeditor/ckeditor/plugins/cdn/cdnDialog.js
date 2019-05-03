@@ -18,7 +18,7 @@ var cdn_document_name;
 			elements :[
 			  {
 				id : "iframe_cdn_browse",
-				src : "https://uclouvain.be/PPE-filemanager/",
+				src : editor.config.customValues.cdn_url,
 				type : 'iframe',
 				label : gettext("Link to CDN Doc"),
 				width : '100%',
@@ -28,7 +28,6 @@ var cdn_document_name;
 		  }
 		],
 		onOk: function() {
-
 		  if ( cdn_document_url == null ) {
 			alert(gettext("You should make a selection before clicking 'ok'"));
 			return false;

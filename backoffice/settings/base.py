@@ -263,6 +263,7 @@ CKEDITOR_CONFIGS = {
         ],
         'autoParagraph': False,
         'allowedContent': True,
+        'customValues': {'cdn_url': os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager/")},
     },
     'default': {
         "removePlugins": "stylesheetparser",
@@ -301,6 +302,7 @@ CKEDITOR_CONFIGS = {
         ],
         'autoParagraph': False,
         'allowedContent': True,
+        'customValues': {'cdn_url': os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager/")},
     },
     'minimal_plus_headers': {
         'toolbar': 'Custom',
@@ -387,7 +389,8 @@ ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT = os.environ.get('ESB_REFRESH_COMMON_PEDAGO
 ESB_REFRESH_COMMON_ADMISSION_ENDPOINT = os.environ.get('ESB_REFRESH_COMMON_ADMISSION_ENDPOINT')
 
 RELEASE_TAG = os.environ.get('RELEASE_TAG')
-
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 # Selenium Testing
 SELENIUM_SETTINGS = {
     'WEB_BROWSER': os.environ.get('SELENIUM_WEB_BROWSER', 'FIREFOX'),
