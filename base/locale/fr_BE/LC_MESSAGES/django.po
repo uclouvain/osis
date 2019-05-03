@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-03 10:55+0200\n"
-"PO-Revision-Date: 2019-05-03 10:55+0200\n"
+"PO-Revision-Date: 2019-05-03 11:00+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_BE\n"
@@ -1165,7 +1165,7 @@ msgstr "Inscription aux cours"
 
 #: templates/education_group/pdf_content.html:125
 msgid "Courses not taught"
-msgstr "Activité non dispensée en "
+msgstr "Activité non dispensée en"
 
 #: templates/education_group/blocks/contacts_general_informations.html:54
 #: templates/education_group/blocks/coorganization.html:156
@@ -1740,10 +1740,10 @@ msgid_plural ""
 "program."
 msgstr[0] ""
 "La finalité \"%(acronym)s\" a une date de fin plus grande que le programme "
-"%(root_acronym)s"
+"%(root_acronym)s."
 msgstr[1] ""
 "Les finalités \"%(acronym)s\" ont une date de fin plus grande que le "
-"programme %(root_acronym)s"
+"programme %(root_acronym)s."
 
 #: models/enums/education_group_types.py:147
 msgid "Finality 120 list choice"
@@ -2993,10 +2993,10 @@ msgid_plural ""
 "%(finality_acronym)s program."
 msgstr[0] ""
 "L'option \"%(acronym)s\" ne peut pas être détachée car elle est présente "
-"dans le programme %(finality_acronym)s"
+"dans le programme %(finality_acronym)s."
 msgstr[1] ""
 "Les options \"%(acronym)s\" ne peuvent pas être détachées car elles sont "
-"présentes dans le programme %(finality_acronym)s"
+"présentes dans le programme %(finality_acronym)s."
 
 #: business/group_element_years/attach.py:134
 #, python-format
@@ -3146,11 +3146,11 @@ msgstr "En attente"
 
 #: templates/education_group/pdf_content.html:131
 msgid "Periodic courses not taught"
-msgstr "Activité cyclique non dispensée en "
+msgstr "Activité cyclique non dispensée en"
 
 #: templates/education_group/pdf_content.html:139
 msgid "Periodic courses taught during"
-msgstr "Activité cyclique dispensée en "
+msgstr "Activité cyclique dispensée en"
 
 #: business/learning_unit.py:71 business/proposal_xls.py:40
 #: business/proposal_xls.py:59 models/learning_unit_year.py:137
@@ -5603,7 +5603,7 @@ msgstr "valeur initiale"
 
 #: templates/education_group/learning_unit/tab_prerequisite_training.html:65
 msgid "is the prereqisite of"
-msgstr "Est prérequis de"
+msgstr "est prérequis de"
 
 #: templates/education_group/learning_unit/tab_utilization.html:34
 #: templates/education_group/tab_utilization.html:34
