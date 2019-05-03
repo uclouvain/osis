@@ -63,6 +63,7 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
 
     def clean_prerequisite_string(self):
         prerequisite_string = self.cleaned_data['prerequisite_string']
+        prerequisite_string = prerequisite_string.upper()
         self.main_operator = _detect_main_operator_in_string(prerequisite_string)
 
         return self.get_grouped_items_from_string(

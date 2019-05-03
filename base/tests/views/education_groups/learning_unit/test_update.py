@@ -165,6 +165,25 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
             '(LSINF1111 ET LDROI1200) OU LEDPH1200'
         )
 
+    def test_post_data_with_prerequisite_in_lower_case(self):
+        LearningUnitYearFactory(acronym='LSINF1111')
+        LearningUnitYearFactory(acronym='LDROI1200')
+
+        form_data = {
+            "prerequisite_string": "lsinf1111 et ldroi1200"
+        }
+        self.client.post(self.url, data=form_data)
+        prerequisite = Prerequisite.objects.get(
+            learning_unit_year=self.learning_unit_year_child.id,
+            education_group_year=self.education_group_year_parents[0].id,
+        )
+
+        self.assertTrue(prerequisite)
+        self.assertEqual(
+            prerequisite.prerequisite_string,
+            'LSINF1111 ET LDROI1200'
+        )
+
     def test_post_data_prerequisite_accept_duplicates(self):
         LearningUnitYearFactory(acronym='LDROI1200')
         LearningUnitYearFactory(acronym='LEDPH1200')
