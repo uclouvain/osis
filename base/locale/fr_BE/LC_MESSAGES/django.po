@@ -3,8 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:157
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:158
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
@@ -1448,7 +1446,7 @@ msgstr "Éditer"
 msgid "Edit the proposal"
 msgstr "Editer la proposition"
 
-#: models/education_group.py:110
+#: models/education_group.py:110 templates/base/quick_search_inner.html:37
 msgid "Education group"
 msgstr "Organisation de formations"
 
@@ -2249,7 +2247,8 @@ msgstr "Acquis d'apprentissage"
 msgid "Learning location"
 msgstr "Lieu d'enseignement"
 
-#: models/learning_unit.py:145 templates/learning_unit/breadcrumb.html:30
+#: models/learning_unit.py:145 templates/base/quick_search_inner.html:31
+#: templates/learning_unit/breadcrumb.html:30
 #: templates/learning_unit/comparison.html:31
 #: templates/learning_unit/proposal_comparison.html:31
 #: templates/learning_units.html:62 templates/my_osis/profile.html:131
@@ -3729,12 +3728,10 @@ msgstr "Les scores doivent être compris entre 0 et 20"
 msgid "Scores responsibles"
 msgstr "Responsables de notes"
 
-#: templates/base/learningunityear_filter_inner.html:5
-#: templates/blocks/navbar_top.html:176
-#, fuzzy
-#| msgid "search"
+#: templates/base/quick_search_inner.html:5
+#: templates/blocks/navbar_top.html:181
 msgid "Search"
-msgstr "recherche"
+msgstr "Recherche"
 
 #: templates/entities.html:47
 msgid "Search for an entity"
@@ -5839,7 +5836,7 @@ msgid "the"
 msgstr "le"
 
 #: tests/views/test_learning_unit_pedagogy.py:239
-#: views/learning_units/educational_information.py:105
+#: views/learning_units/educational_information.py:106
 msgid "the list to generate is empty."
 msgstr "la liste à générer est vide."
 
