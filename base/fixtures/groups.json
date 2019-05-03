@@ -3472,5 +3472,23 @@
                 ]
             ]
         }
+    },
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "continuing_education_student_workers",
+            "permissions": [
+                [
+                    "can_access_admission",
+                    "continuing_education",
+                    "admission"
+                ],
+                [
+                    "can_edit_received_file_field",
+                    "continuing_education",
+                    "admission"
+                ]
+            ]
+        }
     }
 ]
