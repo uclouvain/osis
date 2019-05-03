@@ -447,4 +447,20 @@ if CACHE_ENABLED:
 
 WAFFLE_FLAG_DEFAULT = os.environ.get("WAFFLE_FLAG_DEFAULT", "False").lower() == 'true'
 
+
+# HIJACK
+HIJACK_LOGIN_REDIRECT_URL = '/'  # Where admins are redirected to after hijacking a user
+# Where admins are redirected to after releasing a user
+HIJACK_LOGOUT_REDIRECT_URL = "/{admin_url}auth/user".format(admin_url=ADMIN_URL)
+HIJACK_ALLOW_GET_REQUESTS = True
+HIJACK_USE_BOOTSTRAP = True
+
+REQUESTS_TIMEOUT = 20
+
+# PEDAGOGY INFORMATION
+URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/prog-{year}-{code}")
+
+YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 2018))
+YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 2019))
+
 STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')
