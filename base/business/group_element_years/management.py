@@ -70,7 +70,7 @@ def is_max_child_reached(parent, child_education_group_type):
     return auth_rel.max_count_authorized is not None and education_group_type_count >= auth_rel.max_count_authorized
 
 
-def check_authorized_relationship(root, link, to_delete=False):
+def _check_authorized_relationship(root, link, to_delete=False):
     auth_rels = root.education_group_type.authorized_parent_type.all().select_related("child_type")
     auth_rels_dict = {auth_rel.child_type.name: auth_rel for auth_rel in auth_rels}
 
@@ -95,6 +95,22 @@ def check_authorized_relationship(root, link, to_delete=False):
     for key, auth_rel in auth_rels_dict.items():
         if key not in count_children_dict and auth_rel.min_count_authorized > 0:
             min_reached.append(key)
+
+    return min_reached, max_reached, not_authorized
+
+
+def check_min_reached(root, link, to_delete=False):
+    min_reached, max_reached, not_authorized = _check_authorized_relationship(root, link, to_delete=to_delete)
+    if link.child_branch.education_group_type.name in min_reached:
+        raise AuthorizedRelationshipNotRespectedException(
+            errors=_("The parent must have at least one child of type(s) \"%(types)s\".") % {
+                "types": ', '.join(str(AllTypes.get_value(name)) for name in min_reached)
+            }
+        )
+
+
+def check_authorized_relationship(root, link, to_delete=False):
+    min_reached, max_reached, not_authorized = _check_authorized_relationship(root, link, to_delete=to_delete)
 
     if min_reached:
         raise AuthorizedRelationshipNotRespectedException(
