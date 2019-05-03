@@ -32,7 +32,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import F, Case, When, Prefetch
+from django.db.models import F, Case, When, Prefetch, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -405,9 +405,11 @@ class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
         ).order_by("person__last_name", "person__first_name")
 
         mandataries = Mandatary.objects.filter(
-            mandate__education_group=self.object.education_group,
-            start_date__lte=self.object.academic_year.start_date,
-            end_date__gte=self.object.academic_year.end_date
+            mandate__education_group=self.object.education_group
+        ).filter(
+            Q(start_date__lte=self.object.academic_year.start_date, end_date__gte=self.object.academic_year.start_date)
+            |
+            Q(start_date__lte=self.object.academic_year.end_date, end_date__gte=self.object.academic_year.end_date)
         ).order_by(
             'mandate__function',
             'person__last_name',
