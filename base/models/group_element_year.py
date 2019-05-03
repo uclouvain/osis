@@ -27,13 +27,12 @@ import itertools
 from collections import Counter
 
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator, BaseValidator
+from django.core.validators import MinValueValidator
 from django.db import models, connection
 from django.db.models import Q, F, Case, When
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
-from openpyxl.descriptors import Min
 from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 

@@ -31,13 +31,17 @@ BLANK_CHOICE = [(None, BLANK_CHOICE_DISPLAY)]
 ALL_CHOICE = [("all", pgettext_lazy("plural", "All"))]
 
 
-def add_blank(choices):
+def add_blank(choices, blank_choice_display=None):
+    blank_choice = BLANK_CHOICE
+    if blank_choice_display:
+        blank_choice = [(None, blank_choice_display)]
+
     if isinstance(choices, QuerySet):
         choices = list(choices)
     if isinstance(choices, list):
-        return BLANK_CHOICE + choices
+        return blank_choice + choices
 
-    return tuple(BLANK_CHOICE) + choices
+    return tuple(blank_choice) + choices
 
 
 def add_all(choices):
