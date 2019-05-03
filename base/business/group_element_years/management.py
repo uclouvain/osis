@@ -132,29 +132,25 @@ def check_authorized_relationship(root, link, to_delete=False):
 
 
 def compute_number_children_by_education_group_type(root, link=None, to_delete=False):
-    child_branch_id = None if not link else link.child_branch_id
+    child_branch_id = None if not link else link.child_branch.id
 
-    qs_children = EducationGroupYear.objects.filter(
-        (
-                Q(child_branch__parent=root) & Q(child_branch__link_type=None) & ~Q(child_branch__id=child_branch_id)
-        ) | (
-                Q(child_branch__parent__child_branch__parent=root) &
-                Q(child_branch__parent__child_branch__link_type=LinkTypes.REFERENCE.name) &
-                ~Q(child_branch__parent__id=child_branch_id)
-        )
-    )
+    direct_children = (Q(child_branch__parent=root) &
+                       Q(child_branch__link_type=None) &
+                       ~Q(child_branch__id=child_branch_id))
+    referenced_children = (Q(child_branch__parent__child_branch__parent=root) &
+                           Q(child_branch__parent__child_branch__link_type=LinkTypes.REFERENCE.name) &
+                           ~Q(child_branch__parent__id=child_branch_id))
+    filter_children_clause = direct_children | referenced_children
+
     if link and not to_delete:
-        link_children_qs = EducationGroupYear.objects.filter(pk=link.child_branch.pk)
+        link_children = Q(id=link.child_branch.id)
         if link.link_type == LinkTypes.REFERENCE.name:
-            link_children_qs = EducationGroupYear.objects.filter(child_branch__parent=link.child_branch.pk)
+            link_children = Q(child_branch__parent__id=link.child_branch.id)
 
-        qs_children = qs_children.union(link_children_qs)
+        filter_children_clause = filter_children_clause | link_children
 
-    # FIXME Because when applying the annotate on the union and intersection,
-    #  it returns strange value for the count and education group type name
-    pks = qs_children.values_list("pk", flat=True)
-    qs_children = EducationGroupYear.objects.filter(
-        pk__in=list(pks)
+    return EducationGroupYear.objects.filter(
+        filter_children_clause
     ).values(
         "education_group_type__name"
     ).order_by(
@@ -162,48 +158,3 @@ def compute_number_children_by_education_group_type(root, link=None, to_delete=F
     ).annotate(
         count=Count("education_group_type__name")
     )
-    return qs_children
-
-
-class CheckAuthorizedRelationship:
-    def __init__(self, root, link, to_delete=False):
-        self.root = root
-        self.link = link
-        self.to_delete = to_delete
-
-    def compute_number_children_by_education_group_type(self, root, link=None, to_delete=False):
-        qs = EducationGroupYear.objects.filter(
-            (
-                    Q(child_branch__parent=root) & Q(child_branch__link_type=None)
-            ) | (
-                    Q(child_branch__parent__child_branch__parent=root) &
-                    Q(child_branch__parent__child_branch__link_type=LinkTypes.REFERENCE.name)
-            )
-        )
-        if link:
-            # Need to remove childrens in common between root and link to not false count
-            records_to_remove_qs = EducationGroupYear.objects.filter(
-                Q(pk=link.child_branch.pk) | Q(child_branch__parent=link.child_branch.pk)
-            )
-            qs = qs.difference(records_to_remove_qs)
-
-            link_children_qs = EducationGroupYear.objects.filter(pk=link.child_branch.pk)
-            if link.link_type == LinkTypes.REFERENCE.name:
-                link_children_qs = EducationGroupYear.objects.filter(child_branch__parent=link.child_branch.pk)
-
-            if not to_delete:
-                qs = qs.union(link_children_qs)
-
-        # FIXME Because when applying the annotate on the union and intersection,
-        #  it returns strange value for the count and education group type name
-        pks = qs.values_list("pk", flat=True)
-        qs = EducationGroupYear.objects.filter(
-            pk__in=list(pks)
-        ).values(
-            "education_group_type__name"
-        ).order_by(
-            "education_group_type__name"
-        ).annotate(
-            count=Count("education_group_type__name")
-        )
-        return qs
