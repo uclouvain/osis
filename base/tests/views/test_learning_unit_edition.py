@@ -43,6 +43,7 @@ from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import learning_unit_year_periodicity, learning_container_year_types, \
     learning_unit_year_subtypes, \
     entity_container_year_link_type, vacant_declaration_type, attribution_procedure, entity_type, organization_type
+from base.models.enums.organization_type import MAIN
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -593,7 +594,8 @@ class TestEntityAutocomplete(TestCase):
             entity_type=entity_type.SCHOOL,
             start_date=today.replace(year=1900),
             end_date=None,
-            acronym="DRT"
+            acronym="DRT",
+            entity__organization__type=MAIN
         )
 
     def test_when_param_is_digit_assert_searching_on_code(self):

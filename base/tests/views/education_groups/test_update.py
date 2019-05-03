@@ -455,9 +455,10 @@ class TestSelectAttach(TestCase):
             "learning_unit_select",
             args=[self.learning_unit_year.id]
         )
-        group_above_new_parent = GroupElementYearFactory(parent=EducationGroupYearFactory(
-                                                                    academic_year=self.academic_year),
-                                                         child_branch=self.new_parent_education_group_year)
+        group_above_new_parent = GroupElementYearFactory(
+            parent__academic_year=self.academic_year,
+            child_branch=self.new_parent_education_group_year
+        )
 
         self.url_management = reverse("education_groups_management")
         self.select_data = {
