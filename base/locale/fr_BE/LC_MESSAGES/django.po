@@ -2094,10 +2094,8 @@ msgid "Invalid code"
 msgstr "Code non valide"
 
 #: models/organization.py:57
-#, fuzzy
-#| msgid "Industrial partner"
 msgid "Is current partner"
-msgstr "Partenaire industriel"
+msgstr ""
 
 #: forms/learning_unit_pedagogy.py:101 models/teaching_material.py:45
 msgid "Is this teaching material mandatory?"
@@ -5602,10 +5600,8 @@ msgid "initial value"
 msgstr "valeur initiale"
 
 #: templates/education_group/learning_unit/tab_prerequisite_training.html:65
-#, fuzzy
-#| msgid "has the following prerequisites"
 msgid "is the prereqisite of"
-msgstr "dispose des prérequis suivants"
+msgstr "est le prérequis de"
 
 #: templates/education_group/learning_unit/tab_utilization.html:34
 #: templates/education_group/tab_utilization.html:34
