@@ -37,7 +37,7 @@ class OrganizationAddressAdmin(OsisModelAdmin):
 class OrganizationAddress(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    organization = models.ForeignKey('Organization')
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE)
     # TODO is_main and label are similar.
     # TODO rename label to type
     # FIXME Create a FK directly between Organization and Address for main address.
@@ -45,7 +45,7 @@ class OrganizationAddress(models.Model):
     location = models.CharField(max_length=255, verbose_name=_("Location"))
     postal_code = models.CharField(max_length=20, blank=True, null=True, verbose_name=_("Postal code"))
     city = models.CharField(max_length=255, verbose_name=_("City"))
-    country = models.ForeignKey('reference.Country', verbose_name=_("Country"))
+    country = models.ForeignKey('reference.Country', verbose_name=_("Country"), on_delete=models.CASCADE)
     is_main = models.BooleanField(default=False)
 
 

@@ -36,9 +36,11 @@
                 {% bootstrap_form_errors form %}
 
                 {% csrf_token %}
-                {% bootstrap_row field_0=form.link_type form_group_class_0="col-md-4" field_1=form.is_mandatory label_1=_('Required') form_group_class_1="col-md-4" field_2=form.relative_credits form_group_class_2="col-md-4" %}
-
-                {% bootstrap_row field_0=form.block form_group_class_0="col-md-6" %}
+                {% if form.link_type %}
+                    {% bootstrap_row field_0=form.is_mandatory label_0=_('Required') form_group_class_0="col-md-3" field_1=form.link_type form_group_class_1="col-md-5" field_2=form.block form_group_class_2="col-md-4"%}
+                {% else %}
+                    {% bootstrap_row field_0=form.is_mandatory label_0=_('Required') form_group_class_0="col-md-3" field_1=form.relative_credits form_group_class_1="col-md-5" field_2=form.block form_group_class_2="col-md-4"%}
+                {% endif %}
 
                 {% bootstrap_row field_0=form.comment form_group_class_0="col-md-12" %}
 

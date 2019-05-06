@@ -83,12 +83,12 @@ def learning_units_summary_list(request):
     if academic_calendar.is_academic_calendar_has_started(initial_academic_year, SUMMARY_COURSE_SUBMISSION):
         initial_academic_year = initial_academic_year.next()
 
-    search_form = LearningUnitYearForm(request.GET or None, initial={'academic_year_id': initial_academic_year})
+    search_form = LearningUnitYearForm(request.GET or None, initial={'academic_year_id': initial_academic_year,
+                                                                     'with_entity_subordinated': True})
     try:
         if search_form.is_valid():
             found_learning_units = search_form.get_learning_units_and_summary_status(
                 requirement_entities=a_user_person.find_main_entities_version,
-                luy_status=True
             )
             check_if_display_message(request, found_learning_units)
     except TooManyResultsException:
