@@ -97,42 +97,21 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
 
 
 class ExternalLearningUnitModelForm(forms.ModelForm):
-    requesting_entity = EntitiesVersionChoiceField(queryset=EntityVersion.objects.none(), label=_('Requesting entity'))
-    entity_version = None
-
     def __init__(self, data, person, *args, **kwargs):
         self.person = person
 
         super().__init__(data, *args, **kwargs)
         self.instance.author = person
-        self.fields['requesting_entity'].queryset = self.person.find_main_entities_version
         self.fields['co_graduation'].initial = True
         self.fields['co_graduation'].disabled = True
         self.fields['mobility'].disabled = True
 
-        if self.instance.id and hasattr(self.instance, 'requesting_entity'):
-            self.initial['requesting_entity'] = get_last_version(self.instance.requesting_entity)
-
     class Meta:
         model = ExternalLearningUnitYear
-        fields = ('external_acronym', 'external_credits', 'url', 'requesting_entity', 'co_graduation', 'mobility')
+        fields = ('external_acronym', 'external_credits', 'url', 'co_graduation', 'mobility')
         widgets = {
             'external_credits': forms.TextInput(),
         }
-
-    def post_clean(self, start_date):
-        entity = self.cleaned_data.get('requesting_entity')
-        if not entity:
-            return True
-
-        entity_v = entity_version.get_by_entity_and_date(entity, start_date)
-        if not entity_v:
-            self.add_error('requesting_entity', _("The linked entity does not exist at the start date of the "
-                                                  "academic year linked to this learning unit"))
-        else:
-            self.entity_version = entity_v
-
-        return not self.errors
 
 
 class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
@@ -275,10 +254,18 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             commit=commit
         )
 
+        entity_container_years = self.entity_container_form.save(
+            commit=commit,
+            learning_container_year=container_year
+        )
+
+        self.simplified_volume_management_form.save_all_forms(
+            self.instance,
+            entity_container_years,
+            commit=commit
+        )
+
         self.learning_unit_external_form.instance.learning_unit_year = learning_unit_year
         self.learning_unit_external_form.save(commit)
 
         return learning_unit_year
-
-    def is_valid(self):
-        return super().is_valid() and self.learning_unit_external_form.post_clean(self.academic_year.start_date)
