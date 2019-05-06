@@ -246,6 +246,10 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
                 "%(count)d education group has been postponed with success.",
                 "%(count)d education groups have been postponed with success.", count
             ) % {'count': count}
+            success = _("%(count_elements)s OF and %(count_links)s links have been postponed with success.") % {
+                'count_elements': postponer.number_elements_created,
+                'count_links': postponer.number_links_created
+            }
             display_success_messages(request, success)
             display_warning_messages(request, postponer.warnings)
 
