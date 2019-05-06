@@ -73,7 +73,7 @@ msgstr[0] "%(count)d unité d'enseignement a été reportée avec succès"
 msgstr[1] "%(count)d unités d'enseignement ont été reportées avec succès"
 
 #: views/education_groups/update.py:244
-#, fuzzy, python-format
+#, python-format
 #| msgid "%(count)d education group has been postponed with success."
 #| msgid_plural "%(count)d education groups have been postponed with success."
 msgid ""
