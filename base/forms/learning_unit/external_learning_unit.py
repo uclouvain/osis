@@ -59,7 +59,7 @@ class LearningContainerYearExternalModelForm(LearningContainerYearModelForm):
 
 
 class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
-    country = ModelChoiceField(
+    state = ModelChoiceField(
         queryset=Country.objects.all(),
         required=False,
         label=_("Country"),
@@ -72,9 +72,10 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
             organization_address = instance.campus.organization.organizationaddress_set.order_by('is_main').first()
 
             if organization_address:
-                country = organization_address.country
-                initial["country"] = country.pk
+                state = organization_address.country
+                initial["state"] = state.pk
         super().__init__(*args, instance=instance, initial=initial, external=True, **kwargs)
+        self.fields['internship_subtype'].disabled = True
 
     class Meta(LearningUnitYearModelForm.Meta):
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
@@ -84,7 +85,7 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
         widgets = {
             'campus': autocomplete.ModelSelect2(
                 url='campus-autocomplete',
-                forward=["country"]
+                forward=["state"]
             ),
             'credits': forms.TextInput(),
         }
@@ -258,7 +259,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
         )
 
         self.simplified_volume_management_form.save_all_forms(
-            self.instance,
+            learning_unit_year,
             entity_container_years,
             commit=commit
         )

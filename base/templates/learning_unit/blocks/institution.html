@@ -2,8 +2,8 @@
 
 <div class="panel panel-default">
     <div class="panel-body">
-        {% if learning_unit_year.is_external_with_co_graduation %}
-            {% bootstrap_field learning_unit_year_form.country %}
+        {% if learning_unit_external_form %}
+            {% bootstrap_field learning_unit_year_form.state %}
             {% bootstrap_field learning_unit_year_form.campus %}
         {% else %}
             <div class="form-group">
