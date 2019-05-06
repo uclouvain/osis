@@ -131,7 +131,6 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             EVALUATION,
             ACCESS_TO_PROFESSIONS,
-            PRACTICAL_INFO,
             PEDAGOGY,
             DETAILED_PROGRAM,
             STRUCTURE,
@@ -139,6 +138,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_JOB,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
+            CONTACT_INTRO,
         ]
     },
     TrainingType.CERTIFICATE_OF_PARTICIPATION.name: {
@@ -146,6 +146,10 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [WELCOME_INTRODUCTION, ]
     },
     TrainingType.CERTIFICATE_OF_SUCCESS.name: {
+        'common': [],
+        'specific': [WELCOME_INTRODUCTION, ]
+    },
+    TrainingType.CERTIFICATE_OF_HOLDING_CREDITS.name: {
         'common': [],
         'specific': [WELCOME_INTRODUCTION, ]
     },
@@ -166,6 +170,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
+            PREREQUISITE,
         ]
     },
     TrainingType.CERTIFICATE.name: {
@@ -181,18 +186,27 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
+            PREREQUISITE,
         ]
+    },
+    TrainingType.CAPAES.name: {
+        'common': [],
+        'specific': [WELCOME_INTRODUCTION, ]
     },
     TrainingType.RESEARCH_CERTIFICATE.name: {
         'common': [CAAP, EVALUATION, PREREQUISITE, ],
-        'specific': [EVALUATION, PEDAGOGY, DETAILED_PROGRAM, STRUCTURE, ]
+        'specific': [WELCOME_INTRODUCTION, EVALUATION, PEDAGOGY, DETAILED_PROGRAM, STRUCTURE, ]
+    },
+    TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name: {
+        'common': [],
+        'specific': [WELCOME_INTRODUCTION, ]
     },
     TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name: {
         'common': [],
         'specific': [WELCOME_INTRODUCTION, ]
     },
     TrainingType.PGRM_MASTER_120.name: {
-        'common': [CAAP, EVALUATION, COMMON_DIDACTIC_PURPOSES, COMPLEMENTARY_MODULE, PREREQUISITE, ],
+        'common': [CAAP, EVALUATION, COMPLEMENTARY_MODULE, PREREQUISITE, ],
         'specific': [
             EVALUATION,
             COMPLEMENTARY_MODULE,
@@ -205,7 +219,6 @@ SECTIONS_PER_OFFER_TYPE = {
             MOBILITY,
             OPTIONS,
             PEDAGOGY,
-            DETAILED_PROGRAM,
             STRUCTURE,
             WELCOME_INTRODUCTION,
             WELCOME_JOB,
@@ -227,7 +240,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [INTRODUCTION, ]
     },
     TrainingType.PGRM_MASTER_180_240.name: {
-        'common': [CAAP, EVALUATION, PREREQUISITE, ],
+        'common': [CAAP, EVALUATION, COMPLEMENTARY_MODULE, PREREQUISITE, ],
         'specific': [
             EVALUATION,
             ACCESS_TO_PROFESSIONS,
@@ -240,6 +253,12 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_JOB,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
+            WELCOME_PATH,
+            PURPOSES,
+            OPTIONS,
+            PREREQUISITE,
+            COMPLEMENTARY_MODULE,
+            CONTACT_INTRO
         ]
     },
     TrainingType.MASTER_MA_180_240.name: {
@@ -271,24 +290,25 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
+            COMPLEMENTARY_MODULE,
         ]
     },
     TrainingType.MASTER_MC.name: {
-        'common': [CAAP, EVALUATION, COMPLEMENTARY_MODULE, ],
+        'common': [CAAP, EVALUATION, ],
         'specific': [
             EVALUATION,
             ACCESS_TO_PROFESSIONS,
             CONTACT_INTRO,
             FURTHER_TRAININGS,
-            PRACTICAL_INFO,
             MOBILITY,
             PEDAGOGY,
-            DETAILED_PROGRAM,
             STRUCTURE,
             WELCOME_INTRODUCTION,
             WELCOME_JOB,
+            WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
+            PREREQUISITE
         ]
     },
 
