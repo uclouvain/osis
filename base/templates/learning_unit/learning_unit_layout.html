@@ -61,9 +61,11 @@
 
                                 {% include "learning_unit/blocks/components.html" %}
 
+                                {% if not learning_unit_year.is_external_with_co_graduation %}
                                 {% block remarks %}
                                     {% include "learning_unit/blocks/remarks.html" %}
                                 {% endblock remarks %}
+                                {% endif %}
 
                                 {% block components %}
                                     {% if components %}
