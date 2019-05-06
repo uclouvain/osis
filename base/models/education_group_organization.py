@@ -42,8 +42,8 @@ class EducationGroupOrganizationAdmin(VersionAdmin, OsisModelAdmin):
 class EducationGroupOrganization(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    education_group_year = models.ForeignKey('EducationGroupYear')
-    organization = models.ForeignKey('Organization')
+    education_group_year = models.ForeignKey('EducationGroupYear', on_delete=models.CASCADE)
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE)
     all_students = models.BooleanField(default=False, verbose_name=_('For all students'))
     enrollment_place = models.BooleanField(default=False, verbose_name=_('Reference institution'))
     diploma = models.CharField(max_length=40,
