@@ -981,7 +981,7 @@ msgstr ""
 #: business/proposal_xls.py:51 forms/education_groups.py:103
 #: forms/learning_unit/search_form.py:83 forms/utils/acronym_field.py:83
 #: forms/utils/acronym_field.py:129 models/learning_unit_year.py:99
-gg#: templates/education_group/blocks/content_default_table.html:31
+#: templates/education_group/blocks/content_default_table.html:31
 #: templates/education_group/blocks/content_minor_major_option_table.html:30
 #: templates/education_group/blocks/table_utilizations.html:30
 #: templates/education_group/search.html:149
