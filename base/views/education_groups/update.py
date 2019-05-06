@@ -25,13 +25,12 @@
 ##############################################################################
 from dal import autocomplete
 from django import forms
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _, ngettext
+from django.utils.translation import ugettext_lazy as _
 from waffle.decorators import waffle_flag
 
 from base import models as mdl_base
@@ -241,12 +240,7 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
         try:
             postponer = PostponeContent(self.get_root().previous_year())
             postponer.postpone()
-            count = len(postponer.result)
-            success = ngettext(
-                "%(count)d education group has been postponed with success.",
-                "%(count)d education groups have been postponed with success.", count
-            ) % {'count': count}
-            success = _("%(count_elements)s OF and %(count_links)s links have been postponed with success.") % {
+            success = _("%(count_elements)s OF(s) and %(count_links)s link(s) have been postponed with success.") % {
                 'count_elements': postponer.number_elements_created,
                 'count_links': postponer.number_links_created
             }
