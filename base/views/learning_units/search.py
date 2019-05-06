@@ -73,7 +73,7 @@ def learning_units_search(request, search_type):
         request.GET or None,
         service_course_search=service_course_search,
         borrowed_course_search=borrowed_course_search,
-        initial={'academic_year_id': starting_academic_year()}
+        initial={'academic_year_id': starting_academic_year(), 'with_entity_subordinated': True}
     )
     found_learning_units = LearningUnitYear.objects.none()
     try:
@@ -155,7 +155,7 @@ def learning_units_proposal_search(request):
     search_form = LearningUnitProposalForm(
         request.GET or None,
         person=user_person,
-        initial={'academic_year_id': current_academic_year()},
+        initial={'academic_year_id': current_academic_year(), 'with_entity_subordinated': True},
     )
     found_learning_units = LearningUnitYear.objects.none()
 
@@ -239,7 +239,7 @@ def _get_search_type_label(search_type):
 def learning_units_external_search(request):
     search_form = ExternalLearningUnitYearForm(
         request.GET or None,
-        initial={'academic_year_id': current_academic_year()}
+        initial={'academic_year_id': current_academic_year(), 'with_entity_subordinated': True}
     )
     user_person = get_object_or_404(Person, user=request.user)
     found_learning_units = LearningUnitYear.objects.none()

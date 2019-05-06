@@ -29,6 +29,7 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
+from django.core.cache import cache
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -454,9 +455,10 @@ class TestSelectAttach(TestCase):
             "learning_unit_select",
             args=[self.learning_unit_year.id]
         )
-        group_above_new_parent = GroupElementYearFactory(parent=EducationGroupYearFactory(
-                                                                    academic_year=self.academic_year),
-                                                         child_branch=self.new_parent_education_group_year)
+        group_above_new_parent = GroupElementYearFactory(
+            parent__academic_year=self.academic_year,
+            child_branch=self.new_parent_education_group_year
+        )
 
         self.url_management = reverse("education_groups_management")
         self.select_data = {
@@ -481,10 +483,9 @@ class TestSelectAttach(TestCase):
             return_value=True
         )
         self.mocked_perm = self.perm_patcher.start()
-
-    def tearDown(self):
-        self.client.logout()
-        self.perm_patcher.stop()
+        self.addCleanup(self.perm_patcher.stop)
+        # Clean cache state
+        self.addCleanup(cache.clear)
 
     def test_select_case_education_group(self):
         response = self.client.post(self.url_management, data=self.select_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -531,10 +532,7 @@ class TestSelectAttach(TestCase):
         self._assert_link_with_inital_parent_present()
 
         # Select :
-        self.client.post(
-            self.url_management,
-            data=self.select_data
-        )
+        self.client.post(self.url_management, data=self.select_data)
 
         # Attach :
         self.client.post(

@@ -82,7 +82,12 @@ class GroupElementYearForm(forms.ModelForm):
                 self._is_education_group_year_a_minor_major_option_list_choice(self.instance.child_branch):
             self._keep_only_fields(["block"])
 
+        elif self.instance.child_leaf:
+            self.fields.pop("link_type")
+            self.fields.pop("access_condition")
+
         else:
+            self.fields.pop("relative_credits")
             self.fields.pop("access_condition")
 
     def save(self, commit=True):

@@ -29,7 +29,7 @@ from django.core import validators
 from django.db import models
 from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models import learning_unit
 from base.models.enums import prerequisite_operator
@@ -87,10 +87,11 @@ class Prerequisite(models.Model):
     )
 
     learning_unit_year = models.ForeignKey(
-        "LearningUnitYear"
+        "LearningUnitYear", on_delete=models.CASCADE
+
     )
     education_group_year = models.ForeignKey(
-        "EducationGroupYear"
+        "EducationGroupYear", on_delete=models.CASCADE
     )
     main_operator = models.CharField(
         choices=prerequisite_operator.PREREQUISITES_OPERATORS,

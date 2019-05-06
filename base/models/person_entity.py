@@ -47,8 +47,8 @@ class PersonEntityAdmin(OsisModelAdmin):
 
 
 class PersonEntity(models.Model):
-    person = models.ForeignKey('Person')
-    entity = models.ForeignKey('Entity')
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
     with_child = models.BooleanField(default=False)
 
     class Meta:

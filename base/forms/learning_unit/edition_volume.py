@@ -54,6 +54,7 @@ class VolumeEditionForm(forms.Form):
     additional_requirement_entity_1_key = 'volume_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1.lower()
     additional_requirement_entity_2_key = 'volume_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2.lower()
 
+    opening_brackets_field = EmptyField(label='[')
     opening_parenthesis_field = EmptyField(label='(')
     volume_q1 = VolumeField(
         label=_('Q1'),
@@ -68,6 +69,7 @@ class VolumeEditionForm(forms.Form):
         widget=forms.TextInput(),
         required=False,
     )
+    closing_parenthesis_field = EmptyField(label=')')
     equal_field_1 = EmptyField(label='=')
     volume_total = VolumeField(
         label=_('Vol. annual'),
@@ -76,7 +78,7 @@ class VolumeEditionForm(forms.Form):
         required=False,
     )
     help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('Volume Q1'), _('Volume Q2'))
-    closing_parenthesis_field = EmptyField(label=')')
+    closing_brackets_field = EmptyField(label=']')
     mult_field = EmptyField(label='*')
     planned_classes = forms.IntegerField(label=_('Classes'), help_text=_('Planned classes'), min_value=0,
                                          widget=forms.TextInput(), required=False)
@@ -92,8 +94,8 @@ class VolumeEditionForm(forms.Form):
         self.entities = kwargs.pop('entities', [])
         self.is_faculty_manager = kwargs.pop('is_faculty_manager', False)
 
-        self.title = self.component.acronym
-        self.title_help = _(self.component.type) + ' ' if self.component.type else ''
+        self.title = _(self.component.get_type_display()) + ' ' if self.component.type else self.component.acronym
+        self.title_help = _(self.component.get_type_display()) + ' ' if self.component.type else ''
         self.title_help += self.component.acronym
 
         super().__init__(*args, **kwargs)
@@ -103,6 +105,9 @@ class VolumeEditionForm(forms.Form):
 
         # Append dynamic fields
         entities_to_add = [entity for entity in REQUIREMENT_ENTITIES if entity in self.entities]
+        size_entities_to_add = len(entities_to_add)
+        if size_entities_to_add > 1:
+            self.fields["opening_brackets_entities_field"] = EmptyField(label='[')
         for i, key in enumerate(entities_to_add):
             entity = self.entities[key]
             self.fields["volume_" + key.lower()] = VolumeField(
@@ -113,6 +118,8 @@ class VolumeEditionForm(forms.Form):
             )
             if i != len(entities_to_add) - 1:
                 self.fields["add" + key.lower()] = EmptyField(label='+')
+        if size_entities_to_add > 1:
+            self.fields["closing_brackets_entities_field"] = EmptyField(label=']')
 
         if self.is_faculty_manager \
                 and self.learning_unit_year.is_full() \
@@ -391,7 +398,8 @@ class SimplifiedVolumeForm(forms.ModelForm):
         for component_year in learning_components:
             EntityComponentYear.objects.update_or_create(
                 entity_container_year=requirement_entity_container,
-                learning_component_year=component_year
+                learning_component_year=component_year,
+                defaults={'repartition_volume': component_year.hourly_volume_total_annual}
             )
 
     def _get_requirement_entity_container(self):

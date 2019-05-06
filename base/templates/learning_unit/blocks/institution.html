@@ -15,9 +15,8 @@
                     {% bootstrap_field form.entity %}
                 </div>
             {% elif forloop.counter == 2 %}
-                <div class="row">
-                    {% bootstrap_field form.entity form_group_class="col-md-9" %}
-                    {% bootstrap_field form.country form_group_class="col-md-3" %}
+                <div >
+                    {% bootstrap_field form.entity %}
                 </div>
             {% else %}
                 <div class="row">

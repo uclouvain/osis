@@ -39,7 +39,7 @@ class Campus(SerializableModel):
     name = models.CharField(max_length=100)
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    organization = models.ForeignKey('Organization')
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE)
     is_administration = models.BooleanField(default=False)
 
     def __str__(self):
