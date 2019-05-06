@@ -2,13 +2,19 @@
 
 <div class="panel panel-default">
     <div class="panel-body">
-        <div class="form-group">
-            {% if learning_unit_year.campus %}
-                <label>{% trans 'Institution' %}</label><br>
-                {{ learning_unit_year.campus.organization.name }}
-            {% endif %}
-        </div>
-        {% bootstrap_field learning_unit_year_form.campus %}
+        {% if learning_unit_year.is_external_with_co_graduation %}
+            {% bootstrap_field learning_unit_year_form.country %}
+            {% bootstrap_field learning_unit_year_form.campus %}
+            {% bootstrap_field learning_unit_external_form.requesting_entity %}
+        {% else %}
+            <div class="form-group">
+                {% if learning_unit_year.campus %}
+                    <label>{% trans 'Institution' %}</label><br>
+                    {{ learning_unit_year.campus.organization.name }}
+                {% endif %}
+            </div>
+            {% bootstrap_field learning_unit_year_form.campus %}
+        {% endif %}
         {% for form in entity_container_form.forms %}
             {% if forloop.first %}
                 <div>

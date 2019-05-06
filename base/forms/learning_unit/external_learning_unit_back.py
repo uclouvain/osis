@@ -31,11 +31,11 @@ from django.db import transaction
 from django.forms import ModelChoiceField
 from django.utils.translation import ugettext_lazy as _
 
-from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
-from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField, EntityContainerBaseForm
+from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningContainerModelForm, \
     LearningContainerYearModelForm, LearningUnitYearModelForm
 from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
+from base.forms.learning_unit.learning_unit_partim import merge_data
 from base.forms.utils.acronym_field import ExternalAcronymField
 from base.models import entity_version
 from base.models.entity_version import get_last_version, EntityVersion
@@ -43,7 +43,6 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
-from base.models.learning_component_year import LearningComponentYear
 from reference.models import language
 from reference.models.country import Country
 
@@ -79,15 +78,14 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
         super().__init__(*args, instance=instance, initial=initial, external=True, **kwargs)
 
     class Meta(LearningUnitYearModelForm.Meta):
-        fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
-                  'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure',
-                  'professional_integration', 'campus', 'language', 'periodicity')
+        fields = ('academic_year', 'acronym', 'specific_title',
+                  'specific_title_english', 'credits',
+                  'status', 'campus', 'language')
 
         widgets = {
             'campus': autocomplete.ModelSelect2(
                 url='campus-autocomplete',
-                forward=["country"],
-                labels=_("Reference institution")
+                forward=["country"]
             ),
             'credits': forms.TextInput(),
         }
@@ -144,18 +142,14 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
         LearningUnitYearForExternalModelForm,
         LearningContainerModelForm,
         LearningContainerYearExternalModelForm,
-        EntityContainerBaseForm,
-        SimplifiedVolumeManagementForm,
         ExternalLearningUnitModelForm
     ]
 
-    def __init__(self, person, academic_year, learning_unit_instance=None, data=None, start_year=None, proposal=False,
-                 *args, **kwargs):
+    def __init__(self, person, academic_year, learning_unit_instance=None, data=None, start_year=None, *args, **kwargs):
         self.academic_year = academic_year
         self.person = person
         self.learning_unit_instance = learning_unit_instance
-        self.proposal = proposal
-        instances_data = self._build_instance_data(data, proposal)
+        instances_data = self._build_instance_data(data)
 
         super().__init__(instances_data, *args, **kwargs)
         self.learning_unit_year_form.fields['acronym'] = ExternalAcronymField()
@@ -177,10 +171,10 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
     def learning_unit_year_form(self):
         return self.forms[LearningUnitYearForExternalModelForm]
 
-    def _build_instance_data(self, data, proposal):
+    def _build_instance_data(self, data):
         return {
             LearningUnitModelForm: {
-                'data': data,
+                'data': merge_data(data, {'periodicity': 'ANNUAL'}),
                 'instance': self.instance.learning_unit if self.instance else None,
             },
             LearningContainerModelForm: {
@@ -188,20 +182,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
                 'instance': self.instance.learning_container_year.learning_container if self.instance else None,
             },
             LearningUnitYearForExternalModelForm: self._build_instance_data_learning_unit_year(data),
-            LearningContainerYearExternalModelForm: self._build_instance_data_learning_container_year(data, proposal),
-            EntityContainerBaseForm: {
-                'data': data,
-                'learning_container_year': self.instance.learning_container_year if self.instance else None,
-                'person': self.person
-            },
-            SimplifiedVolumeManagementForm: {
-                'data': data,
-                'proposal': proposal,
-                'queryset': LearningComponentYear.objects.filter(
-                    learning_unit_year=self.instance
-                ) if self.instance else LearningComponentYear.objects.none(),
-                'person': self.person
-            },
+            LearningContainerYearExternalModelForm: self._build_instance_data_learning_container_year(data),
             ExternalLearningUnitModelForm: self._build_instance_data_external_learning_unit(data)
         }
 
@@ -224,11 +205,10 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             'subtype': self.subtype
         }
 
-    def _build_instance_data_learning_container_year(self, data, proposal):
+    def _build_instance_data_learning_container_year(self, data):
         return {
             'data': data,
             'instance': self.instance and self.instance.learning_container_year,
-            'proposal': proposal,
             'initial': {
                 # Default language French
                 'language': language.find_by_code('FR'),
@@ -243,8 +223,6 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             'learning_unit_form': self.learning_unit_form,
             'learning_unit_year_form': self.learning_unit_year_form,
             'learning_container_year_form': self.learning_container_year_form,
-            'entity_container_form': self.entity_container_form,
-            'simplified_volume_management_form': self.simplified_volume_management_form,
             'learning_unit_external_form': self.learning_unit_external_form
         }
 

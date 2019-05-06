@@ -128,7 +128,7 @@ def update_learning_unit(request, learning_unit_year_id):
     context["learning_unit_year"] = learning_unit_year
     context["is_update"] = True
 
-    if learning_unit_year.is_external():
+    if learning_unit_year.is_external() and not learning_unit_year.is_external_with_co_graduation():
         template = "learning_unit/external/update.html"
     else:
         template = 'learning_unit/simple/update.html'
