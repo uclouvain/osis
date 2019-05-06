@@ -31,6 +31,7 @@ from django.db.models import Max
 from django.http import QueryDict
 from django.utils.translation import ugettext as _
 
+from base.business.learning_units.edition import duplicate_learning_unit_year
 from base.forms.learning_unit.external_learning_unit import ExternalLearningUnitBaseForm
 from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
@@ -50,7 +51,11 @@ FIELDS_TO_NOT_POSTPONE = {
     'type_declaration_vacant': 'learning_container_year.type_declaration_vacant',
     'attribution_procedure': 'attribution_procedure'
 }
-FIELDS_TO_NOT_CHECK = ['academic_year', 'id'] + list(FIELDS_TO_NOT_POSTPONE.keys())
+FIELDS_TO_CHECK = ['faculty_remark', 'other_remark', 'acronym', 'specific_title', 'specific_title_english',
+                   'credits', 'session', 'quadrimestre', 'status', 'internship_subtype', 'professional_integration',
+                   'campus', 'language', 'periodicity', 'container_type', 'common_title', 'common_title_english',
+                   'team', 'requirement_entity', 'allocation_entity', 'additional_requirement_entity_1',
+                   'additional_requirement_entity_2']
 
 
 # @TODO: Use LearningUnitPostponementForm to manage END_DATE of learning unit year
@@ -153,7 +158,7 @@ class LearningUnitPostponementForm:
         if self.start_postponement.is_past():
             to_update = self._init_forms_in_past(existing_learn_unit_years, data)
         else:
-            if self._is_update_action():
+            if self._is_update_action() and existing_learn_unit_years:
                 to_delete = [
                     self._instantiate_base_form_as_update(luy, index_form=index)
                     for index, luy in enumerate(existing_learn_unit_years)
@@ -166,23 +171,16 @@ class LearningUnitPostponementForm:
                 ]
                 existing_ac_years = [luy.academic_year for luy in existing_learn_unit_years]
                 to_insert = []
-                # FIXME: We use data copy because data is immuniable and acronym, academic_year and container_type
-                # is not in data with edition form
                 for index, ac_year in enumerate(ac_year_postponement_range):
                     if ac_year not in existing_ac_years:
-                        data_to_insert = None
-                        if data and existing_learn_unit_years:
-                            data_to_insert = data.copy()
-                            data_to_insert["acronym_0"] = existing_learn_unit_years[0].acronym[0]
-                            data_to_insert["acronym_1"] = existing_learn_unit_years[0].acronym[1:]
-                            data_to_insert["container_type"] = \
-                                existing_learn_unit_years[0].learning_container_year.container_type
-                            data_to_insert["academic_year"] = str(ac_year.id)
-                            # FIXME: component-initial_forms must be 0 for the insert in DB
-                            data_to_insert["component-INITIAL_FORMS"] = 0
-                            to_insert.append(self._instantiate_base_form_as_insert(ac_year, data_to_insert))
-                        else:
-                            to_insert.append(self._instantiate_base_form_as_insert(ac_year, data))
+                        new_learning_unit_year = duplicate_learning_unit_year(
+                            existing_learn_unit_years[len(existing_learn_unit_years) - 1], ac_year
+                        )
+                        to_insert.append(self._instantiate_base_form_as_update(
+                            new_learning_unit_year,
+                            index_form=index,
+                            data=data)
+                        )
             else:
                 to_insert = [
                     self._instantiate_base_form_as_insert(ac_year, data)
@@ -384,7 +382,7 @@ class LearningUnitPostponementForm:
                 'current_value': self._get_translated_value(value)
             } for col_name, value in current_form.instances_data.items()
             if self._get_cmp_value(next_form.instances_data.get(col_name)) != self._get_cmp_value(value) and
-            col_name not in FIELDS_TO_NOT_CHECK
+            col_name in FIELDS_TO_CHECK
         ]
 
         if differences:

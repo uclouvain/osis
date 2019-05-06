@@ -204,7 +204,9 @@ class EntityVersion(SerializableModel):
 
     @property
     def verbose_title(self):
-        complete_title = ' - '.join(filter(None, [self.acronym, self.title]))
+        complete_title = self.title
+        if self.entity.organization and self.entity.organization.type == MAIN:
+            complete_title = ' - '.join(filter(None, [self.acronym, self.title]))
         return complete_title
 
     def can_save_entity_version(self):

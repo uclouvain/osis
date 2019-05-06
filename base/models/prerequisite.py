@@ -29,7 +29,7 @@ from django.core import validators
 from django.db import models
 from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models import learning_unit
 from base.models.enums import prerequisite_operator
@@ -51,7 +51,7 @@ MULTIPLE_PREREQUISITES_REGEX_AND = MULTIPLE_PREREQUISITES_REGEX.format(
     main_operator=AND_OPERATOR,
     element_regex=ELEMENT_REGEX.format(acronym_regex=ACRONYM_REGEX, secondary_operator=OR_OPERATOR)
 )
-PREREQUISITE_SYNTAX_REGEX = r'^({no_element_regex}|' \
+PREREQUISITE_SYNTAX_REGEX = r'^(?i)({no_element_regex}|' \
                             r'{unique_element_regex}|' \
                             r'{multiple_elements_regex_and}|' \
                             r'{multiple_elements_regex_or})$'.format(
