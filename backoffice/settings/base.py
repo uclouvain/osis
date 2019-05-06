@@ -263,7 +263,7 @@ CKEDITOR_CONFIGS = {
         ],
         'autoParagraph': False,
         'allowedContent': True,
-        'customValues': {'cdn_url': os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager/")},
+        'customValues': {'cdn_url': os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager?ckeditor=true")},
     },
     'default': {
         "removePlugins": "stylesheetparser",
@@ -302,7 +302,7 @@ CKEDITOR_CONFIGS = {
         ],
         'autoParagraph': False,
         'allowedContent': True,
-        'customValues': {'cdn_url': os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager/")},
+        'customValues': {'cdn_url': os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager?ckeditor=true")},
     },
     'minimal_plus_headers': {
         'toolbar': 'Custom',
