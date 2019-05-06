@@ -51,7 +51,7 @@ MULTIPLE_PREREQUISITES_REGEX_AND = MULTIPLE_PREREQUISITES_REGEX.format(
     main_operator=AND_OPERATOR,
     element_regex=ELEMENT_REGEX.format(acronym_regex=ACRONYM_REGEX, secondary_operator=OR_OPERATOR)
 )
-PREREQUISITE_SYNTAX_REGEX = r'^({no_element_regex}|' \
+PREREQUISITE_SYNTAX_REGEX = r'^(?i)({no_element_regex}|' \
                             r'{unique_element_regex}|' \
                             r'{multiple_elements_regex_and}|' \
                             r'{multiple_elements_regex_or})$'.format(
