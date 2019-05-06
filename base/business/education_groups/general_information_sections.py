@@ -219,7 +219,6 @@ SECTIONS_PER_OFFER_TYPE = {
             MOBILITY,
             OPTIONS,
             PEDAGOGY,
-            DETAILED_PROGRAM,
             STRUCTURE,
             WELCOME_INTRODUCTION,
             WELCOME_JOB,
@@ -295,16 +294,14 @@ SECTIONS_PER_OFFER_TYPE = {
         ]
     },
     TrainingType.MASTER_MC.name: {
-        'common': [CAAP, EVALUATION, COMPLEMENTARY_MODULE, ],
+        'common': [CAAP, EVALUATION, ],
         'specific': [
             EVALUATION,
             ACCESS_TO_PROFESSIONS,
             CONTACT_INTRO,
             FURTHER_TRAININGS,
-            PRACTICAL_INFO,
             MOBILITY,
             PEDAGOGY,
-            DETAILED_PROGRAM,
             STRUCTURE,
             WELCOME_INTRODUCTION,
             WELCOME_JOB,
