@@ -134,15 +134,13 @@ class LearningUnitYearModelForm(forms.ModelForm):
             if "acronym" not in self.initial or self.initial["acronym"][0] == LearningUnitExternalSite.E.value:
                 self.data["acronym_0"] = LearningUnitExternalSite.E.value
                 if not self.instance.subtype == PARTIM:
-                    self.cleaned_data['acronym'] = (LearningUnitExternalSite.E.value + self.data["acronym_1"]).upper()
+                    self.cleaned_data['acronym'] = (self.data["acronym_0"] + self.data["acronym_1"]).upper()
                 else:
                     self.cleaned_data['acronym'] = (
-                                LearningUnitExternalSite.E.value + self.data["acronym_1"] + self.data[
-                            "acronym_2"]).upper()
+                            self.data["acronym_0"] + self.data["acronym_1"] + self.data["acronym_2"]).upper()
             if not re.match(REGEX_BY_SUBTYPE[EXTERNAL], self.cleaned_data["acronym"]) and self.instance.subtype == FULL:
                 raise ValidationError(_('Invalid code'))
-            if not re.match(REGEX_BY_SUBTYPE[PARTIM], self.cleaned_data["acronym"]) and \
-                    self.instance.subtype == PARTIM:
+            if not re.match(REGEX_BY_SUBTYPE[PARTIM], self.cleaned_data["acronym"]) and self.instance.subtype == PARTIM:
                 raise ValidationError(_('Invalid code'))
         elif not self.external and not re.match(REGEX_BY_SUBTYPE[self.instance.subtype], self.cleaned_data["acronym"]):
             raise ValidationError(_('Invalid code'))

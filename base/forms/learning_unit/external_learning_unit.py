@@ -289,7 +289,11 @@ class ExternalPartimForm(LearningUnitBaseForm):
         CograduationExternalLearningUnitModelForm,
     ]
 
-    form_cls_to_validate = [LearningUnitPartimModelForm, LearningUnitYearForExternalModelForm, SimplifiedVolumeManagementForm]
+    form_cls_to_validate = [
+        LearningUnitPartimModelForm,
+        LearningUnitYearForExternalModelForm,
+        SimplifiedVolumeManagementForm
+    ]
 
     def __init__(self, person, learning_unit_full_instance, academic_year, learning_unit_instance=None,
                  data=None, *args, **kwargs):
@@ -334,7 +338,10 @@ class ExternalPartimForm(LearningUnitBaseForm):
     def _build_instance_data(self, data, inherit_luy_values):
         return {
             LearningUnitPartimModelForm: self._build_instance_data_learning_unit(data),
-            LearningUnitYearForExternalModelForm: self._build_instance_data_learning_unit_year(data, inherit_luy_values),
+            LearningUnitYearForExternalModelForm: self._build_instance_data_learning_unit_year(
+                data,
+                inherit_luy_values
+            ),
             # Cannot be modify by user [No DATA args provided]
             LearningContainerModelForm: {
                 'instance': self.learning_unit_year_full.learning_container_year.learning_container,
