@@ -94,20 +94,21 @@ def get_valid_external_learning_unit_form_data(academic_year, person, learning_u
         'is_vacant': learning_unit_year.learning_container_year.is_vacant,
 
         # External learning unit model form
-        'requesting_entity': requesting_entity.id,
+        'requirement_entity-entity': requesting_entity.id,
+        'allocation_entity-entity': requesting_entity.id,
         'external_acronym': 'Gorzyne',
         'external_credits': '5',
 
         # Learning component year data model form
-        'form-TOTAL_FORMS': '2',
-        'form-INITIAL_FORMS': '0',
-        'form-MAX_NUM_FORMS': '2',
-        'form-0-hourly_volume_total_annual': 20,
-        'form-0-hourly_volume_partial_q1': 10,
-        'form-0-hourly_volume_partial_q2': 10,
-        'form-1-hourly_volume_total_annual': 20,
-        'form-1-hourly_volume_partial_q1': 10,
-        'form-1-hourly_volume_partial_q2': 10,
+        'component-TOTAL_FORMS': '2',
+        'component-INITIAL_FORMS': '0',
+        'component-MAX_NUM_FORMS': '2',
+        'component-0-hourly_volume_total_annual': 20,
+        'component-0-hourly_volume_partial_q1': 10,
+        'component-0-hourly_volume_partial_q2': 10,
+        'component-1-hourly_volume_total_annual': 20,
+        'component-1-hourly_volume_partial_q1': 10,
+        'component-1-hourly_volume_partial_q2': 10,
     }
 
 
@@ -161,7 +162,7 @@ class TestLearningUnitYearForExternalModelForm(TestCase):
         form = LearningUnitYearForExternalModelForm(
             person=self.person, data=None,
             subtype=FULL, instance=luy, initial={})
-        self.assertEqual(form.initial["country"], address.country.pk)
+        self.assertEqual(form.initial["state"], address.country.pk)
 
 
 class TestExternalLearningUnitSearchForm(TestCase):

@@ -151,7 +151,7 @@ class CountryAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
 
 class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Campus.objects.all()
+        qs = Campus.objects.filter(organization__is_current_partner=True)
 
         country = self.forwarded.get('state', None)
 
