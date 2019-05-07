@@ -303,7 +303,7 @@ class PostponeContent:
             if new_gr.link_type == LinkTypes.REFERENCE.name and is_empty:
                 self.warnings.append(ReferenceLinkEmptyWarning(new_egy))
             elif not is_empty:
-                if not (new_egy.is_training() or new_egy.is_mini_training()):
+                if not (new_egy.is_training() or new_egy.education_group_type.name in MiniTrainingType.to_postpone()):
                     self.warnings.append(EducationGroupYearNotEmptyWarning(new_egy, self.next_academic_year))
             else:
                 self._postpone(old_egy, new_egy)
@@ -383,7 +383,7 @@ class PostponeContent:
 
         for finality, options in missing_options.items():
             for option in options:
-                if option.id in self.postponed_options:
+                if option.id in self.postponed_options and self.postponed_options[option.id].id:
                     self.warnings.append(
                         FinalityOptionNotValidWarning(
                             option,

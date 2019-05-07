@@ -200,7 +200,7 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
         else:
             qs = find_pedagogical_entities_version()
         if self.q:
-            qs = qs.filter(acronym__icontains=self.q).order_by('acronym')
+            qs = qs.filter(Q(title__icontains=self.q) | Q(acronym__icontains=self.q)).order_by('acronym')
         return qs
 
     def get_result_label(self, result):
