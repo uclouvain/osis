@@ -48,8 +48,7 @@ class TestPrerequisiteSyntaxValidator(TestCase):
         test_values = (
             "1452 LINGI",
             "LILKNLJLJFD48464",
-            "LI12",
-            "lsinf1111a",
+            "LI12"
         )
         self.assert_raises_validation_error(test_values)
 
