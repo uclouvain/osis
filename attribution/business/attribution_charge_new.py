@@ -70,7 +70,7 @@ def find_attributions_with_charges(learning_unit_year_id):
                                           to_attr="practical_charges")
 
     attributions = AttributionNew.objects \
-        .filter(learning_container_year__learningunityear__pk=learning_unit_year_id) \
+        .filter(attributionchargenew__learning_component_year__learning_unit_year_id=learning_unit_year_id) \
         .distinct("id") \
         .prefetch_related(prefetch_lecturing_charges) \
         .prefetch_related(prefetch_practical_charges) \
