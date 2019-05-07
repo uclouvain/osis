@@ -633,6 +633,10 @@ class EducationGroupYear(SerializableModel):
         return self.title
 
     @property
+    def complete_title(self):
+        return self.verbose_title
+
+    @property
     def verbose_remark(self):
         if self.remark_english and translation.get_language() == LANGUAGE_CODE_EN:
             return self.remark_english
@@ -654,7 +658,7 @@ class EducationGroupYear(SerializableModel):
         return ""
 
     def get_absolute_url(self):
-        return reverse("education_group_read", args=[self.pk])
+        return reverse("education_group_read", args=[self.pk, self.pk])
 
     @property
     def str_domains(self):
