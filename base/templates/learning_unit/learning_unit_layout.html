@@ -61,9 +61,11 @@
 
                                 {% include "learning_unit/blocks/components.html" %}
 
+                                {% if not learning_unit_year.is_external_with_co_graduation %}
                                 {% block remarks %}
                                     {% include "learning_unit/blocks/remarks.html" %}
                                 {% endblock remarks %}
+                                {% endif %}
 
                                 {% block components %}
                                     {% if components %}
@@ -76,6 +78,19 @@
                                         {% include "learning_unit/blocks/partim_attributes.html" %}
                                     {% endif %}
                                 {% endblock partim_attributes %}
+
+                                {% if learning_unit_year.is_external_with_co_graduation %}
+                                    <div class="panel panel-default">
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                {% bootstrap_field learning_unit_external_form.external_acronym form_group_class="form-group col-md-3" %}
+                                                {% bootstrap_field learning_unit_external_form.url form_group_class="form-group col-md-6" %}
+                                                {% bootstrap_field learning_unit_external_form.external_credits form_group_class="form-group col-md-3" %}
+                                            </div>
+                                            {% bootstrap_field learning_unit_form.faculty_remark %}
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <div class="col-md-4">

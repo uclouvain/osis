@@ -25,10 +25,10 @@
 ##############################################################################
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.external_learning_unit import ExternalLearningUnitBaseForm, \
-    LearningContainerYearExternalModelForm, ExternalLearningUnitModelForm, LearningUnitYearForExternalModelForm
+    LearningContainerYearExternalModelForm, CograduationExternalLearningUnitModelForm, \
+    LearningUnitYearForExternalModelForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm
 from base.forms.learning_unit.search_form import ExternalLearningUnitYearForm
@@ -36,7 +36,6 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import organization_type
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_year_subtypes import FULL
-from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.entities import create_entities_hierarchy
@@ -48,7 +47,6 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory
 
 NAMEN = 'Namur'
@@ -94,20 +92,21 @@ def get_valid_external_learning_unit_form_data(academic_year, person, learning_u
         'is_vacant': learning_unit_year.learning_container_year.is_vacant,
 
         # External learning unit model form
-        'requesting_entity': requesting_entity.id,
+        'requirement_entity-entity': requesting_entity.id,
+        'allocation_entity-entity': requesting_entity.id,
         'external_acronym': 'Gorzyne',
         'external_credits': '5',
 
         # Learning component year data model form
-        'form-TOTAL_FORMS': '2',
-        'form-INITIAL_FORMS': '0',
-        'form-MAX_NUM_FORMS': '2',
-        'form-0-hourly_volume_total_annual': 20,
-        'form-0-hourly_volume_partial_q1': 10,
-        'form-0-hourly_volume_partial_q2': 10,
-        'form-1-hourly_volume_total_annual': 20,
-        'form-1-hourly_volume_partial_q1': 10,
-        'form-1-hourly_volume_partial_q2': 10,
+        'component-TOTAL_FORMS': '2',
+        'component-INITIAL_FORMS': '0',
+        'component-MAX_NUM_FORMS': '2',
+        'component-0-hourly_volume_total_annual': 20,
+        'component-0-hourly_volume_partial_q1': 10,
+        'component-0-hourly_volume_partial_q2': 10,
+        'component-1-hourly_volume_total_annual': 20,
+        'component-1-hourly_volume_partial_q1': 10,
+        'component-1-hourly_volume_partial_q2': 10,
     }
 
 
@@ -125,7 +124,7 @@ class TestExternalLearningUnitForm(TestCase):
         self.assertIsInstance(context['learning_unit_form'], LearningUnitModelForm)
         self.assertIsInstance(context['learning_unit_year_form'], LearningUnitYearModelForm)
         self.assertIsInstance(context['learning_container_year_form'], LearningContainerYearExternalModelForm)
-        self.assertIsInstance(context['learning_unit_external_form'], ExternalLearningUnitModelForm)
+        self.assertIsInstance(context['learning_unit_external_form'], CograduationExternalLearningUnitModelForm)
 
     def test_external_learning_unit_form_is_valid(self):
         data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
@@ -161,7 +160,7 @@ class TestLearningUnitYearForExternalModelForm(TestCase):
         form = LearningUnitYearForExternalModelForm(
             person=self.person, data=None,
             subtype=FULL, instance=luy, initial={})
-        self.assertEqual(form.initial["country"], address.country.pk)
+        self.assertEqual(form.initial["country_external_institution"], address.country.pk)
 
 
 class TestExternalLearningUnitSearchForm(TestCase):
