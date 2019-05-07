@@ -406,8 +406,8 @@ class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
 
         mandataries = Mandatary.objects.filter(
             mandate__education_group=self.object.education_group,
-            start_date__lte=self.object.academic_year.start_date,
-            end_date__gte=self.object.academic_year.end_date
+            start_date__lte=self.object.academic_year.end_date,
+            end_date__gte=self.object.academic_year.start_date
         ).order_by(
             'mandate__function',
             'person__last_name',
