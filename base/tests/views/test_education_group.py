@@ -27,6 +27,7 @@ import datetime
 import json
 import urllib
 from http import HTTPStatus
+from itertools import product
 from unittest import mock
 
 import bs4
@@ -47,11 +48,13 @@ from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.admission_condition import AdmissionConditionFactory
+from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory, \
     TrainingFactory, EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonBachelorFactory, \
     EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.mandatary import MandataryFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
@@ -530,6 +533,47 @@ class EducationGroupAdministrativedata(TestCase):
         self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
 
         self.assertTrue(response.context["can_edit_administrative_data"])
+
+    def test_get_good_mandataries(self):
+        ed = EducationGroupFactory()
+        ac = AcademicYearFactory(current=True)
+        edy = EducationGroupYearFactory(education_group=ed, academic_year=ac)
+
+        url = reverse('education_group_administrative', args=[
+            edy.id, edy.id
+        ])
+
+        combinations = list(product((0, 1, -1), repeat=2))
+        one_day = datetime.timedelta(days=1)
+        good_dates = [
+            (ac.start_date + combi[0]*one_day, ac.end_date + combi[1]*one_day)
+            for combi in combinations
+        ]
+        bad_dates = [
+            (ac.start_date - 2*one_day, ac.start_date - one_day),
+            (ac.end_date + one_day, ac.end_date + 2*one_day),
+        ]
+
+        good_mandataries = [
+            MandataryFactory(
+                mandate__education_group=ed,
+                start_date=date[0],
+                end_date=date[1]
+            )
+            for date in good_dates
+        ]
+        bad_mandataries = [
+            MandataryFactory(
+                mandate__education_group=ed,
+                start_date=date[0],
+                end_date=date[1]
+            )
+            for date in bad_dates
+        ]
+        response = self.client.get(url)
+        self.assertCountEqual(good_mandataries, response.context['mandataries'])
+        for bad in bad_mandataries:
+            self.assertFalse(bad in response.context['mandataries'])
 
 
 @override_flag('education_group_update', active=True)

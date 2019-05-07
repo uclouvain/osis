@@ -142,6 +142,7 @@ class LearningUnit(SerializableModel):
             ("can_create_learningunit", "Can create learning unit"),
             ("can_consolidate_learningunit_proposal", "Can consolidate learning unit proposal"),
         )
+        verbose_name = _("Learning unit")
 
     @property
     def parent(self):
