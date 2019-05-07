@@ -206,7 +206,7 @@ class TestCampusAutocomplete(TestCase):
         self.client.force_login(user=self.super_user)
         response = self.client.get(
             self.url,
-            data={'forward': '{"country": "%s"}' % self.organization_address.country.pk}
+            data={'forward': '{"state": "%s"}' % self.organization_address.country.pk}
         )
         expected_results = [{'text': "{} ({})".format(self.organization.name, self.campus.name),
                              'id': str(self.campus.pk)}]
@@ -220,7 +220,7 @@ class TestCampusAutocomplete(TestCase):
         self.client.force_login(user=self.super_user)
         response = self.client.get(
             self.url,
-            data={'forward': '{"country": "%s"}' % country.pk}
+            data={'forward': '{"state": "%s"}' % country.pk}
         )
 
         self.assertEqual(response.status_code, 200)
