@@ -383,7 +383,7 @@ class PostponeContent:
 
         for finality, options in missing_options.items():
             for option in options:
-                if option.id in self.postponed_options:
+                if option.id in self.postponed_options and self.postponed_options[option.id].id:
                     self.warnings.append(
                         FinalityOptionNotValidWarning(
                             option,
