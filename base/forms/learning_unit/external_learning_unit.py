@@ -59,7 +59,7 @@ class LearningContainerYearExternalModelForm(LearningContainerYearModelForm):
 
 
 class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
-    state = ModelChoiceField(
+    country_external_institution = ModelChoiceField(
         queryset=Country.objects.all(),
         required=False,
         label=_("Country"),
@@ -72,8 +72,8 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
             organization_address = instance.campus.organization.organizationaddress_set.order_by('is_main').first()
 
             if organization_address:
-                state = organization_address.country
-                initial["state"] = state.pk
+                country_external_institution = organization_address.country
+                initial["state"] = country_external_institution.pk
         super().__init__(*args, instance=instance, initial=initial, external=True, **kwargs)
         self.fields['internship_subtype'].disabled = True
 
@@ -85,7 +85,7 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
         widgets = {
             'campus': autocomplete.ModelSelect2(
                 url='campus-autocomplete',
-                forward=["state"]
+                forward=["country_external_institution"]
             ),
             'credits': forms.TextInput(),
         }
@@ -95,7 +95,7 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
         }
 
 
-class ExternalLearningUnitModelForm(forms.ModelForm):
+class CograduationExternalLearningUnitModelForm(forms.ModelForm):
     def __init__(self, data, person, *args, **kwargs):
         self.person = person
 
@@ -103,6 +103,7 @@ class ExternalLearningUnitModelForm(forms.ModelForm):
         self.instance.author = person
         self.fields['co_graduation'].initial = True
         self.fields['co_graduation'].disabled = True
+        self.fields['mobility'].initial = False
         self.fields['mobility'].disabled = True
 
     class Meta:
@@ -127,7 +128,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
         LearningContainerYearExternalModelForm,
         EntityContainerBaseForm,
         SimplifiedVolumeManagementForm,
-        ExternalLearningUnitModelForm
+        CograduationExternalLearningUnitModelForm
     ]
 
     def __init__(self, person, academic_year, learning_unit_instance=None, data=None, start_year=None, proposal=False,
@@ -148,7 +149,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
     @property
     def learning_unit_external_form(self):
-        return self.forms[ExternalLearningUnitModelForm]
+        return self.forms[CograduationExternalLearningUnitModelForm]
 
     @property
     def learning_container_year_form(self):
@@ -183,7 +184,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
                 ) if self.instance else LearningComponentYear.objects.none(),
                 'person': self.person
             },
-            ExternalLearningUnitModelForm: self._build_instance_data_external_learning_unit(data)
+            CograduationExternalLearningUnitModelForm: self._build_instance_data_external_learning_unit(data)
         }
 
     def _build_instance_data_external_learning_unit(self, data):
