@@ -73,7 +73,7 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
 
             if organization_address:
                 country_external_institution = organization_address.country
-                initial["state"] = country_external_institution.pk
+                initial["country_external_institution"] = country_external_institution.pk
         super().__init__(*args, instance=instance, initial=initial, external=True, **kwargs)
         self.fields['internship_subtype'].disabled = True
 
