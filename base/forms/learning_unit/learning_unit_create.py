@@ -129,19 +129,23 @@ class LearningUnitYearModelForm(forms.ModelForm):
             'credits': forms.TextInput(),
         }
 
+    def __clean_acronym_external(self):
+        acronym = None
+        if "acronym" not in self.initial or self.initial["acronym"][0] == LearningUnitExternalSite.E.value:
+            self.data["acronym_0"] = LearningUnitExternalSite.E.value
+            if not self.instance.subtype == PARTIM:
+                acronym = self.data["acronym_0"] + self.data["acronym_1"]
+            else:
+                acronym = self.data["acronym_0"] + self.data["acronym_1"] + self.data["acronym_2"]
+        if not re.match(REGEX_BY_SUBTYPE[EXTERNAL], self.cleaned_data["acronym"]) and self.instance.subtype == FULL:
+            raise ValidationError(_('Invalid code'))
+        if not re.match(REGEX_BY_SUBTYPE[PARTIM], self.cleaned_data["acronym"]) and self.instance.subtype == PARTIM:
+            raise ValidationError(_('Invalid code'))
+        return acronym.upper()
+
     def clean_acronym(self):
         if self.external:
-            if "acronym" not in self.initial or self.initial["acronym"][0] == LearningUnitExternalSite.E.value:
-                self.data["acronym_0"] = LearningUnitExternalSite.E.value
-                if not self.instance.subtype == PARTIM:
-                    self.cleaned_data['acronym'] = (self.data["acronym_0"] + self.data["acronym_1"]).upper()
-                else:
-                    self.cleaned_data['acronym'] = (
-                            self.data["acronym_0"] + self.data["acronym_1"] + self.data["acronym_2"]).upper()
-            if not re.match(REGEX_BY_SUBTYPE[EXTERNAL], self.cleaned_data["acronym"]) and self.instance.subtype == FULL:
-                raise ValidationError(_('Invalid code'))
-            if not re.match(REGEX_BY_SUBTYPE[PARTIM], self.cleaned_data["acronym"]) and self.instance.subtype == PARTIM:
-                raise ValidationError(_('Invalid code'))
+            self.cleaned_data["acronym"] = self.__clean_acronym_external()
         elif not self.external and not re.match(REGEX_BY_SUBTYPE[self.instance.subtype], self.cleaned_data["acronym"]):
             raise ValidationError(_('Invalid code'))
         return self.cleaned_data["acronym"]
