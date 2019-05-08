@@ -29,7 +29,7 @@ from collections import Counter
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models, connection
-from django.db.models import Q, F, Case, When
+from django.db.models import Q, F, Case, When, QuerySet
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -37,8 +37,8 @@ from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
-from base.models import education_group_type, education_group_year
-from base.models.education_group_type import GROUP_TYPE_OPTION
+from base.models.academic_year import AcademicYear
+from base.models.education_group_type import GROUP_TYPE_OPTION, EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, quadrimesters
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
@@ -88,8 +88,8 @@ SELECT * FROM group_element_year_parent ;
 def validate_block_value(value):
     max_authorized_value = 6
     _error_msg = _("Please register a maximum of %(max_authorized_value)s digits in ascending order, "
-                   "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46") %\
-        {'max_authorized_value': max_authorized_value}
+                   "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46") % \
+                 {'max_authorized_value': max_authorized_value}
 
     MinValueValidator(1, message=_error_msg)(value)
     if not all([
@@ -119,6 +119,13 @@ class GroupElementYearManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(
             Q(child_branch__isnull=False) | Q(child_leaf__learning_container_year__isnull=False)
+        )
+
+    def filter_academic_year(self, ac: AcademicYear):
+        return self.get_queryset().filter(
+            Q(parent__academic_year=ac) |
+            Q(child_branch__academic_year=ac) |
+            Q(child_leaf__academic_year=ac)
         )
 
 
@@ -266,7 +273,7 @@ class GroupElementYear(OrderedModel):
         self._check_same_academic_year_parent_child_branch()
 
     def _check_same_academic_year_parent_child_branch(self):
-        if (self.parent and self.child_branch) and\
+        if (self.parent and self.child_branch) and \
                 (self.parent.academic_year.year != self.child_branch.academic_year.year):
             raise ValidationError(_("It is forbidden to attach an element to an element of another academic year."))
 
@@ -275,7 +282,7 @@ class GroupElementYear(OrderedModel):
     def _clean_link_type(self):
         if getattr(self.parent, 'type', None) in [GroupType.MINOR_LIST_CHOICE.name,
                                                   GroupType.MAJOR_LIST_CHOICE.name] and \
-           isinstance(self.child, EducationGroupYear) and self.child.type in MiniTrainingType.minors() + \
+                isinstance(self.child, EducationGroupYear) and self.child.type in MiniTrainingType.minors() + \
                 [MiniTrainingType.FSA_SPECIALITY.name, MiniTrainingType.DEEPENING.name]:
             self.link_type = LinkTypes.REFERENCE.name
 
@@ -289,33 +296,17 @@ class GroupElementYear(OrderedModel):
         return True
 
 
-def search(**kwargs):
-    queryset = GroupElementYear.objects
-
-    if 'academic_year' in kwargs:
-        academic_year = kwargs['academic_year']
-        queryset = queryset.filter(Q(parent__academic_year=academic_year) |
-                                   Q(child_branch__academic_year=academic_year) |
-                                   Q(child_leaf__academic_year=academic_year))
-
-    if 'child_leaf' in kwargs:
-        queryset = queryset.filter(child_leaf=kwargs['child_leaf'])
-
-    return queryset
-
-
-def find_learning_unit_formations(objects, parents_as_instances=False):
+def find_learning_unit_formations(objects: QuerySet, parents_as_instances=False, filters=None):
     root_ids_by_object_id = {}
     if objects:
-        filters = _get_root_filters()
-        root_ids_by_object_id = _find_related_formations(objects, filters)
+        root_ids_by_object_id = _find_related_formations(objects, filters or get_root_filters())
         if parents_as_instances:
             root_ids_by_object_id = _convert_parent_ids_to_instances(root_ids_by_object_id)
     return root_ids_by_object_id
 
 
-def _get_root_filters():
-    root_type_names = education_group_type.search(category=education_group_categories.MINI_TRAINING) \
+def get_root_filters():
+    root_type_names = EducationGroupType.objects.filter(category=education_group_categories.MINI_TRAINING) \
         .exclude(name=GROUP_TYPE_OPTION).values_list('name', flat=True)
     root_categories = [education_group_categories.TRAINING]
     return {
@@ -326,7 +317,7 @@ def _get_root_filters():
 
 def _convert_parent_ids_to_instances(root_ids_by_object_id):
     flat_root_ids = list(set(itertools.chain.from_iterable(root_ids_by_object_id.values())))
-    map_instance_by_id = {obj.id: obj for obj in education_group_year.search(id=flat_root_ids)}
+    map_instance_by_id = EducationGroupYear.objects.in_bulk(flat_root_ids)
     return {
         obj_id: sorted([map_instance_by_id[parent_id] for parent_id in parents], key=lambda obj: obj.acronym)
         for obj_id, parents in root_ids_by_object_id.items()
@@ -334,12 +325,8 @@ def _convert_parent_ids_to_instances(root_ids_by_object_id):
 
 
 def _raise_if_incorrect_instance(objects):
-    first_obj = objects[0]
-    obj_class = first_obj.__class__
-    if obj_class not in [LearningUnitYear, EducationGroupYear]:
+    if objects.model not in [LearningUnitYear, EducationGroupYear]:
         raise AttributeError("Objects must be either LearningUnitYear or EducationGroupYear intances.")
-    if any(obj for obj in objects if obj.__class__ != obj_class):
-        raise AttributeError("All objects must be the same class instance ({})".format(obj_class))
 
 
 def _find_related_formations(objects, filters):
@@ -359,13 +346,11 @@ def _extract_common_academic_year(objects):
     return objects[0].academic_year
 
 
-def _build_parent_list_by_education_group_year_id(academic_year, filters=None):
+def _build_parent_list_by_education_group_year_id(academic_year: AcademicYear, filters=None):
     columns_needed_for_filters = filters.keys() if filters else []
-    group_elements = list(search(academic_year=academic_year)
-                          .filter(parent__isnull=False)
-                          .filter(Q(child_leaf__isnull=False) | Q(child_branch__isnull=False))
-                          .select_related('education_group_year__education_group_type')
-                          .values('parent', 'child_branch', 'child_leaf', *columns_needed_for_filters))
+    queryset = GroupElementYear.objects.filter_academic_year(academic_year).filter(parent__isnull=False)
+    group_elements = queryset.values('parent', 'child_branch', 'child_leaf', *columns_needed_for_filters)
+
     result = {}
     # TODO :: uses .annotate() on queryset to make the below expected result
     for group_element_year in group_elements:

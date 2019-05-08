@@ -39,6 +39,7 @@ from base.business.learning_unit import learning_unit_titles_part2, XLS_DESCRIPT
 from base.business.xls import get_name_or_username
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.proposal_type import ProposalType
+from base.models.group_element_year import GroupElementYear, get_root_filters
 from base.models.learning_component_year import LearningComponentYear
 from osis_common.document import xls_build
 
@@ -87,10 +88,23 @@ def learning_unit_titles_part1():
 
 def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=False):
     qs = annotate_qs(learning_unit_years)
+    result = []
 
-    return [
-        extract_xls_data_from_learning_unit(lu, with_grp, with_attributions) for lu in qs
-    ]
+    # That filters will be used during the fetch of the trainings.
+    filters = get_root_filters() if with_grp else None
+
+    for learning_unit_yr in qs.prefetch_related('child_leaf__parent'):
+        lu_data_part1 = _get_data_part1(learning_unit_yr)
+        lu_data_part2 = _get_data_part2(learning_unit_yr, with_attributions)
+
+        if with_grp:
+            # TODO this part is too slow
+            lu_data_part2.append(_add_training_data(learning_unit_yr, filters=filters))
+
+        lu_data_part1.extend(lu_data_part2)
+        result.append(lu_data_part1)
+
+    return result
 
 
 def annotate_qs(learning_unit_years):
@@ -116,16 +130,6 @@ def annotate_qs(learning_unit_years):
         pp_vol_tot=Subquery(subquery_component_pp.values('hourly_volume_total_annual')[:1]),
         pp_classes=Subquery(subquery_component_pp.values('planned_classes')[:1])
     )
-
-
-def extract_xls_data_from_learning_unit(learning_unit_yr, with_grp, with_attributions):
-    lu_data_part1 = _get_data_part1(learning_unit_yr)
-    lu_data_part2 = _get_data_part2(learning_unit_yr, with_attributions)
-
-    if with_grp:
-        lu_data_part2.append(_add_training_data(learning_unit_yr))
-    lu_data_part1.extend(lu_data_part2)
-    return lu_data_part1
 
 
 def create_xls_with_parameters(user, learning_units, filters, extra_configuration):
@@ -238,37 +242,35 @@ def _get_col_letter(titles, title_search):
     return None
 
 
-def _get_trainings_by_educ_group_year(learning_unit_yr):
-    groups = []
-    learning_unit_yr.group_elements_years = mdl_base.group_element_year.search(child_leaf=learning_unit_yr) \
-        .select_related("child_leaf", "parent__education_group_type") \
-        .order_by('parent__partial_acronym')
-    groups.extend(learning_unit_yr.group_elements_years)
-    education_groups_years = [group_element_year.parent for group_element_year in groups]
-    return mdl_base.group_element_year \
-        .find_learning_unit_formations(education_groups_years, parents_as_instances=True)
+def _add_training_data(learning_unit_yr, filters):
+    education_groups_years = learning_unit_yr.education_groups.all().order_by('partial_acronym')
+    # TODO find another way to fetch formations_by_educ_group_year
+    formations_by_educ_group_year = mdl_base.group_element_year.find_learning_unit_formations(
+        education_groups_years, parents_as_instances=True, filters=filters
+    )
+    return "\n".join([
+            _concatenate_training_data(formations_by_educ_group_year, group_element_year)
+            for group_element_year in learning_unit_yr.child_leaf.all()
+        ])
 
 
-def _add_training_data(learning_unit_yr):
-    formations_by_educ_group_year = _get_trainings_by_educ_group_year(learning_unit_yr)
-    return "\n".join(["{}".format(_concatenate_training_data(formations_by_educ_group_year, group_element_year)) for
-                      group_element_year in learning_unit_yr.group_elements_years])
-
-
-def _concatenate_training_data(formations_by_educ_group_year, group_element_year):
-    concatened_string = ''
+def _concatenate_training_data(formations_by_educ_group_year: dict, group_element_year: GroupElementYear) -> str:
+    concatenated_string = ''
     for training in formations_by_educ_group_year.get(group_element_year.parent_id):
-        training_string = "{} {} {}".format(
-            group_element_year.parent.partial_acronym if group_element_year.parent.partial_acronym else '',
-            "({}) {}".format(
-                '{0:.2f}'.format(
-                    group_element_year.child_leaf.credits) if group_element_year.child_leaf.credits else '-',
-                '-' if len(formations_by_educ_group_year.get(group_element_year.parent_id)) > 0 else ''),
+        partial_acronym = group_element_year.parent.partial_acronym or ''
+        leaf_credits = round(group_element_year.child_leaf.credits) if group_element_year.child_leaf.credits else '-'
+        nb_parents = '-' if len(formations_by_educ_group_year.get(group_element_year.parent_id)) > 0 else ''
 
-            "{} - {}".format(training.acronym, training.title)
+        training_string = "{} ({}) {} {} - {}\n".format(
+            partial_acronym,
+            leaf_credits,
+            nb_parents,
+            training.acronym,
+            training.title
         )
-        concatened_string = "{} {}\n".format(concatened_string, training_string)
-    return concatened_string
+        concatenated_string += training_string
+
+    return concatenated_string
 
 
 def _get_data_part2(learning_unit_yr, with_attributions):

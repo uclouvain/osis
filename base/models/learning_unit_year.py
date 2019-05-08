@@ -37,6 +37,7 @@ from reversion.admin import VersionAdmin
 from base.models import entity_container_year as mdl_entity_container_year, group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import active_status, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
@@ -137,6 +138,12 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
                                    verbose_name=_('Periodicity'))
     _warnings = None
+
+    education_groups = models.ManyToManyField(
+        EducationGroupYear,
+        through='GroupElementYear',
+        through_fields=['child_leaf', 'parent']
+    )
 
     class Meta:
         unique_together = (('learning_unit', 'academic_year'), ('acronym', 'academic_year'))

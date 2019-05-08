@@ -34,7 +34,7 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPOSAL_LINE_STYLES, \
     _get_significant_volume, _prepare_legend_ws_data, _get_wrapped_cells, \
-    _get_colored_rows, _get_attribution_line, _get_col_letter, _get_trainings_by_educ_group_year, _add_training_data, \
+    _get_colored_rows, _get_attribution_line, _get_col_letter, _add_training_data, \
     _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
     _get_data_part2, annotate_qs, learning_unit_titles_part1
 from base.models.enums import education_group_categories
@@ -197,11 +197,6 @@ class TestLearningUnitXls(TestCase):
         }
         self.assertEqual(_prepare_legend_ws_data(), expected)
 
-    def test_get_formations_by_educ_group_year(self):
-        formations = _get_trainings_by_educ_group_year(self.learning_unit_yr_1)
-        self.assertCountEqual(formations.get(self.an_education_group_parent.id),
-                              [self.an_education_group])
-
     def test_add_training_data(self):
         formations = _add_training_data(self.learning_unit_yr_1)
         expected = " {} ({}) - {} - {}\n".format(self.an_education_group_parent.partial_acronym,
@@ -281,7 +276,6 @@ class TestLearningUnitXls(TestCase):
 
         luy.attribution_charge_news = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
             luy)
-
 
         expected_common = [
             str(_(luy.periodicity.title())),
