@@ -130,7 +130,7 @@ class LearningUnitYearModelForm(forms.ModelForm):
         }
 
     def __clean_acronym_external(self):
-        acronym = None
+        acronym = ""
         if "acronym" not in self.initial or self.initial["acronym"][0] == LearningUnitExternalSite.E.value:
             self.data["acronym_0"] = LearningUnitExternalSite.E.value
             if not self.instance.subtype == PARTIM:

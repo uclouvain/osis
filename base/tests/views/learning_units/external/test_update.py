@@ -29,15 +29,13 @@ from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
-from base.models.entity_version import EntityVersion
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.learning_container_year_types import EXTERNAL
-from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
 from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
@@ -56,7 +54,7 @@ class TestUpdateExternalLearningUnitView(TestCase):
 
         self.academic_year = create_current_academic_year()
 
-        luy = LearningUnitYearFullFactory(academic_year=self.academic_year, internship_subtype=None)
+        luy = LearningUnitYearFullFactory(academic_year=self.academic_year, internship_subtype=None, acronym="EFAC0000")
         self.external = ExternalLearningUnitYearFactory(learning_unit_year=luy)
 
         luy.learning_container_year.container_type = EXTERNAL
