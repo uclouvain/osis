@@ -42,11 +42,14 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import find_pedagogical_entities_version, get_last_version
 from base.models.enums import academic_calendar_type, education_group_categories
 from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import MiniTrainingType
 from reference.models.language import Language
 from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT, \
     MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT, GROUP_PGRM_ENCODING_PERIOD, \
     GROUP_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
+
+DISABLED_MINI_TRAINING = [MiniTrainingType.FSA_SPECIALITY.name, MiniTrainingType.MOBILITY_PARTNERSHIP.name]
 
 
 class MainCampusChoiceField(forms.ModelChoiceField):
@@ -324,7 +327,7 @@ class EducationGroupTypeForm(forms.Form):
         self.fields["name"].queryset = find_authorized_types(
             category=category,
             parents=self.parent
-        )
+        ).exclude(name__in=DISABLED_MINI_TRAINING)
 
         self.fields["name"].label = _("Which type of %(category)s do you want to create ?") % {
             "category": Categories[category].value
