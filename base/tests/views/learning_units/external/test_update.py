@@ -54,7 +54,7 @@ class TestUpdateExternalLearningUnitView(TestCase):
 
         self.academic_year = create_current_academic_year()
 
-        luy = LearningUnitYearFullFactory(academic_year=self.academic_year)
+        luy = LearningUnitYearFullFactory(academic_year=self.academic_year, internship_subtype=None)
         self.external = ExternalLearningUnitYearFactory(learning_unit_year=luy)
 
         luy.learning_container_year.container_type = EXTERNAL

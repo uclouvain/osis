@@ -31,18 +31,17 @@ from django.db import transaction
 from django.forms import ModelChoiceField
 from django.utils.translation import ugettext_lazy as _
 
-from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
+from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
+from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningContainerModelForm, \
     LearningContainerYearModelForm, LearningUnitYearModelForm
 from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
-from base.forms.learning_unit.learning_unit_partim import merge_data
 from base.forms.utils.acronym_field import ExternalAcronymField
-from base.models import entity_version
-from base.models.entity_version import get_last_version, EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
+from base.models.learning_component_year import LearningComponentYear
 from reference.models import language
 from reference.models.country import Country
 
@@ -60,7 +59,7 @@ class LearningContainerYearExternalModelForm(LearningContainerYearModelForm):
 
 
 class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
-    country = ModelChoiceField(
+    country_external_institution = ModelChoiceField(
         queryset=Country.objects.all(),
         required=False,
         label=_("Country"),
@@ -73,61 +72,46 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
             organization_address = instance.campus.organization.organizationaddress_set.order_by('is_main').first()
 
             if organization_address:
-                country = organization_address.country
-                initial["country"] = country.pk
+                country_external_institution = organization_address.country
+                initial["country_external_institution"] = country_external_institution.pk
         super().__init__(*args, instance=instance, initial=initial, external=True, **kwargs)
+        self.fields['internship_subtype'].disabled = True
 
     class Meta(LearningUnitYearModelForm.Meta):
-        fields = ('academic_year', 'acronym', 'specific_title',
-                  'specific_title_english', 'credits',
-                  'status', 'campus', 'language')
+        fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
+                  'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure',
+                  'professional_integration', 'campus', 'language', 'periodicity')
 
         widgets = {
             'campus': autocomplete.ModelSelect2(
                 url='campus-autocomplete',
-                forward=["country"]
+                forward=["country_external_institution"]
             ),
             'credits': forms.TextInput(),
         }
 
+        labels = {
+            'campus': _("Reference institution")
+        }
 
-class ExternalLearningUnitModelForm(forms.ModelForm):
-    requesting_entity = EntitiesVersionChoiceField(queryset=EntityVersion.objects.none(), label=_('Requesting entity'))
-    entity_version = None
 
+class CograduationExternalLearningUnitModelForm(forms.ModelForm):
     def __init__(self, data, person, *args, **kwargs):
         self.person = person
 
         super().__init__(data, *args, **kwargs)
         self.instance.author = person
-        self.fields['requesting_entity'].queryset = self.person.find_main_entities_version
         self.fields['co_graduation'].initial = True
         self.fields['co_graduation'].disabled = True
+        self.fields['mobility'].initial = False
         self.fields['mobility'].disabled = True
-
-        if self.instance.id and hasattr(self.instance, 'requesting_entity'):
-            self.initial['requesting_entity'] = get_last_version(self.instance.requesting_entity)
 
     class Meta:
         model = ExternalLearningUnitYear
-        fields = ('external_acronym', 'external_credits', 'url', 'requesting_entity', 'co_graduation', 'mobility')
+        fields = ('external_acronym', 'external_credits', 'url', 'co_graduation', 'mobility')
         widgets = {
             'external_credits': forms.TextInput(),
         }
-
-    def post_clean(self, start_date):
-        entity = self.cleaned_data.get('requesting_entity')
-        if not entity:
-            return True
-
-        entity_v = entity_version.get_by_entity_and_date(entity, start_date)
-        if not entity_v:
-            self.add_error('requesting_entity', _("The linked entity does not exist at the start date of the "
-                                                  "academic year linked to this learning unit"))
-        else:
-            self.entity_version = entity_v
-
-        return not self.errors
 
 
 class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
@@ -142,14 +126,18 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
         LearningUnitYearForExternalModelForm,
         LearningContainerModelForm,
         LearningContainerYearExternalModelForm,
-        ExternalLearningUnitModelForm
+        EntityContainerBaseForm,
+        SimplifiedVolumeManagementForm,
+        CograduationExternalLearningUnitModelForm
     ]
 
-    def __init__(self, person, academic_year, learning_unit_instance=None, data=None, start_year=None, *args, **kwargs):
+    def __init__(self, person, academic_year, learning_unit_instance=None, data=None, start_year=None, proposal=False,
+                 *args, **kwargs):
         self.academic_year = academic_year
         self.person = person
         self.learning_unit_instance = learning_unit_instance
-        instances_data = self._build_instance_data(data)
+        self.proposal = proposal
+        instances_data = self._build_instance_data(data, proposal)
 
         super().__init__(instances_data, *args, **kwargs)
         self.learning_unit_year_form.fields['acronym'] = ExternalAcronymField()
@@ -161,7 +149,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
     @property
     def learning_unit_external_form(self):
-        return self.forms[ExternalLearningUnitModelForm]
+        return self.forms[CograduationExternalLearningUnitModelForm]
 
     @property
     def learning_container_year_form(self):
@@ -171,10 +159,10 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
     def learning_unit_year_form(self):
         return self.forms[LearningUnitYearForExternalModelForm]
 
-    def _build_instance_data(self, data):
+    def _build_instance_data(self, data, proposal):
         return {
             LearningUnitModelForm: {
-                'data': merge_data(data, {'periodicity': 'ANNUAL'}),
+                'data': data,
                 'instance': self.instance.learning_unit if self.instance else None,
             },
             LearningContainerModelForm: {
@@ -182,8 +170,21 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
                 'instance': self.instance.learning_container_year.learning_container if self.instance else None,
             },
             LearningUnitYearForExternalModelForm: self._build_instance_data_learning_unit_year(data),
-            LearningContainerYearExternalModelForm: self._build_instance_data_learning_container_year(data),
-            ExternalLearningUnitModelForm: self._build_instance_data_external_learning_unit(data)
+            LearningContainerYearExternalModelForm: self._build_instance_data_learning_container_year(data, proposal),
+            EntityContainerBaseForm: {
+                'data': data,
+                'learning_container_year': self.instance.learning_container_year if self.instance else None,
+                'person': self.person
+            },
+            SimplifiedVolumeManagementForm: {
+                'data': data,
+                'proposal': proposal,
+                'queryset': LearningComponentYear.objects.filter(
+                    learning_unit_year=self.instance
+                ) if self.instance else LearningComponentYear.objects.none(),
+                'person': self.person
+            },
+            CograduationExternalLearningUnitModelForm: self._build_instance_data_external_learning_unit(data)
         }
 
     def _build_instance_data_external_learning_unit(self, data):
@@ -205,10 +206,11 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             'subtype': self.subtype
         }
 
-    def _build_instance_data_learning_container_year(self, data):
+    def _build_instance_data_learning_container_year(self, data, proposal):
         return {
             'data': data,
             'instance': self.instance and self.instance.learning_container_year,
+            'proposal': proposal,
             'initial': {
                 # Default language French
                 'language': language.find_by_code('FR'),
@@ -223,6 +225,8 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             'learning_unit_form': self.learning_unit_form,
             'learning_unit_year_form': self.learning_unit_year_form,
             'learning_container_year_form': self.learning_container_year_form,
+            'entity_container_form': self.entity_container_form,
+            'simplified_volume_management_form': self.simplified_volume_management_form,
             'learning_unit_external_form': self.learning_unit_external_form
         }
 
@@ -250,10 +254,18 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             commit=commit
         )
 
+        entity_container_years = self.entity_container_form.save(
+            commit=commit,
+            learning_container_year=container_year
+        )
+
+        self.simplified_volume_management_form.save_all_forms(
+            learning_unit_year,
+            entity_container_years,
+            commit=commit
+        )
+
         self.learning_unit_external_form.instance.learning_unit_year = learning_unit_year
         self.learning_unit_external_form.save(commit)
 
         return learning_unit_year
-
-    def is_valid(self):
-        return super().is_valid() and self.learning_unit_external_form.post_clean(self.academic_year.start_date)

@@ -123,11 +123,7 @@ def update_learning_unit(request, learning_unit_year_id):
     context = postponement_form.get_context()
     context["learning_unit_year"] = learning_unit_year
     context["is_update"] = True
-
-    if learning_unit_year.is_external():
-        template = "learning_unit/external/update.html"
-    else:
-        template = 'learning_unit/simple/update.html'
+    template = 'learning_unit/simple/update.html'
 
     return render(request, template, context)
 
