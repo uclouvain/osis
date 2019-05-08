@@ -82,7 +82,7 @@ def my_messages_action(request):
 def delete_from_my_messages(request, message_id):
     message = message_history_mdl.find_by_id(message_id)
     person_user = mdl.person.find_by_user(request.user)
-    if message and (message.receiver_id == person_user.id):
+    if message and (message.receiver_person_id == person_user.id):
         message_history_mdl.delete_my_messages([message_id, ])
     return HttpResponseRedirect(reverse('my_messages'))
 
