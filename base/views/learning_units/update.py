@@ -189,12 +189,10 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
         country = self.forwarded.get('country', None)
         qs = find_additional_requirement_entities_choices()
-        if country == "all":
-            qs = qs
-        elif country:
-            qs = qs.filter(entity__country_id=country)
-            if self.is_country_from_main_organization(country):
-                qs = qs.exclude(entity__organization__type=MAIN)
+        if country:
+            qs = qs.exclude(entity__organization__type=MAIN)
+            if country != "all":
+                qs = qs.filter(entity__country_id=country)
         else:
             qs = find_pedagogical_entities_version()
         if self.q:
@@ -203,11 +201,3 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
 
     def get_result_label(self, result):
         return format_html(result.verbose_title)
-
-    @staticmethod
-    def is_country_from_main_organization(country_id):
-        return EntityVersion.objects.filter(
-            entity__organization__type=MAIN,
-            parent__isnull=True,
-            entity__organization__organizationaddress__country_id=country_id
-        ).exists()
