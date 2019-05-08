@@ -33,6 +33,7 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from waffle.decorators import waffle_flag
@@ -200,7 +201,9 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
         if country == "all":
             qs = qs
         elif country:
-            qs = qs.filter(entity__country__id=country)
+            qs = qs.filter(entity__country_id=country)
+            if self.is_country_from_main_organization(country):
+                qs = qs.exclude(entity__organization__type=MAIN)
         else:
             qs = find_pedagogical_entities_version()
         if self.q:
@@ -209,3 +212,11 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
 
     def get_result_label(self, result):
         return format_html(result.verbose_title)
+
+    @staticmethod
+    def is_country_from_main_organization(country_id):
+        return EntityVersion.objects.filter(
+            entity__organization__type=MAIN,
+            parent__isnull=True,
+            entity__organization__organizationaddress__country_id=country_id
+        ).exists()
