@@ -127,11 +127,7 @@ def update_learning_unit(request, learning_unit_year_id):
     context = postponement_form.get_context()
     context["learning_unit_year"] = learning_unit_year
     context["is_update"] = True
-
-    if learning_unit_year.is_external():
-        template = "learning_unit/external/update.html"
-    else:
-        template = 'learning_unit/simple/update.html'
+    template = 'learning_unit/simple/update.html'
 
     return render(request, template, context)
 
@@ -204,7 +200,7 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
         else:
             qs = find_pedagogical_entities_version()
         if self.q:
-            qs = qs.filter(acronym__icontains=self.q).order_by('acronym')
+            qs = qs.filter(Q(title__icontains=self.q) | Q(acronym__icontains=self.q)).order_by('acronym')
         return qs
 
     def get_result_label(self, result):

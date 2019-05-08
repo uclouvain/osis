@@ -1,3 +1,21 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-05-03 10:17+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
 #: templates/offer/score_sheet_address_tab.html:52
 #, python-format
 msgid ""
@@ -27,8 +45,8 @@ msgid "Absence justified cannot be remplaced by absence unjustified"
 msgstr ""
 
 #: templates/online_double_encoding_form.html:177
-#: templates/online_double_encoding_validation.html:273
-#: templates/online_double_encoding_validation.html:279
+#: templates/online_double_encoding_validation.html:269
+#: templates/online_double_encoding_validation.html:275
 #: templates/online_encoding_form.html:213
 msgid "Absent"
 msgstr ""
@@ -124,7 +142,7 @@ msgstr ""
 #: templates/admin/programmanager_confirm_delete_inner.html:29
 #: templates/online_double_encoding_form.html:114
 #: templates/online_double_encoding_form.html:191
-#: templates/online_double_encoding_validation.html:252
+#: templates/online_double_encoding_validation.html:248
 #: templates/online_encoding.html:269 templates/online_encoding.html:296
 #: templates/online_encoding_form.html:115
 #: templates/online_encoding_form.html:242
@@ -133,7 +151,7 @@ msgid "Cancel"
 msgstr ""
 
 #: templates/online_double_encoding_form.html:179
-#: templates/online_double_encoding_validation.html:284
+#: templates/online_double_encoding_validation.html:280
 #: templates/online_encoding_form.html:223
 #: templates/scores_encoding_by_specific_criteria.html:66
 #: templates/scores_encoding_by_specific_criteria.html:158
@@ -192,19 +210,18 @@ msgstr ""
 msgid "Deadline reached"
 msgstr ""
 
-#: business/score_encoding_export.py:201
 #: templates/online_double_encoding_form.html:104
 #: templates/online_encoding_form.html:103
 #: tests/functionals/test_score_encoding.py:375
 msgid "Decimal values in scores are NOT accepted."
 msgstr ""
 
-#: business/score_encoding_export.py:199
 #: templates/online_double_encoding_form.html:102
 #: templates/online_encoding_form.html:101
 msgid "Decimal values in scores are accepted."
 msgstr ""
 
+#: business/score_encoding_export.py:200
 #: tests/business/test_score_encoding_export.py:185
 msgid "Decimals authorized for this learning unit"
 msgstr ""
@@ -239,7 +256,7 @@ msgstr ""
 msgid "Download the Excel file"
 msgstr ""
 
-#: models/score_sheet_address.py:55
+#: models/score_sheet_address.py:60
 msgid "Email"
 msgstr ""
 
@@ -281,7 +298,7 @@ msgstr ""
 msgid "Evaluations"
 msgstr ""
 
-#: models/score_sheet_address.py:54
+#: models/score_sheet_address.py:59
 msgid "Fax"
 msgstr ""
 
@@ -348,7 +365,7 @@ msgid "Justification legend: %(justification_label_authorized)s"
 msgstr ""
 
 #: templates/online_double_encoding_form.html:175
-#: templates/online_double_encoding_validation.html:281
+#: templates/online_double_encoding_validation.html:277
 #: templates/online_encoding_form.html:206
 #: templates/scores_encoding_by_specific_criteria.html:65
 #: templates/scores_encoding_by_specific_criteria.html:157
@@ -390,7 +407,7 @@ msgstr ""
 msgid "Location"
 msgstr ""
 
-#: business/score_encoding_export.py:207
+#: business/score_encoding_export.py:208
 msgid "M=Justified Absence"
 msgstr ""
 
@@ -522,7 +539,7 @@ msgstr ""
 msgid "Person search"
 msgstr ""
 
-#: models/score_sheet_address.py:53
+#: models/score_sheet_address.py:58
 msgid "Phone"
 msgstr ""
 
@@ -629,13 +646,13 @@ msgstr ""
 msgid "Row"
 msgstr ""
 
-#: business/score_encoding_export.py:206
+#: business/score_encoding_export.py:207
 msgid "S=Unjustified Absence"
 msgstr ""
 
 #: templates/admin/manager_add_inner.html:26
 #: templates/offer/score_sheet_address_tab.html:124
-#: templates/online_double_encoding_validation.html:251
+#: templates/online_double_encoding_validation.html:247
 #: templates/online_encoding_form.html:113
 #: templates/online_encoding_form.html:240
 #: templates/scores_encoding_by_specific_criteria.html:96
@@ -860,12 +877,13 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
+#: business/score_encoding_export.py:202
 #: tests/business/test_score_encoding_export.py:187
 msgid "Unauthorized decimal for this learning unit"
 msgstr ""
 
 #: templates/online_double_encoding_form.html:174
-#: templates/online_double_encoding_validation.html:275
+#: templates/online_double_encoding_validation.html:271
 #: templates/online_encoding_form.html:200
 #: templates/scores_encoding_by_specific_criteria.html:64
 #: templates/scores_encoding_by_specific_criteria.html:156
@@ -935,7 +953,7 @@ msgid ""
 "excel file provided (button '%(button_value)s')"
 msgstr ""
 
-#: business/score_encoding_export.py:158 business/score_encoding_export.py:211
+#: business/score_encoding_export.py:158 business/score_encoding_export.py:212
 #: business/score_encoding_sheet.py:104
 #: tests/business/test_score_encoding_export.py:133
 #: tests/views/test_score_encoding.py:353 views/score_encoding.py:75

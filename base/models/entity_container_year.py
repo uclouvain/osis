@@ -31,7 +31,7 @@ from reversion.admin import VersionAdmin
 
 from base.models import entity_version
 from base.models.enums import entity_container_year_link_type
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES, EntityContainerYearLinkTypes
+from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
@@ -68,7 +68,7 @@ class EntityContainerYear(SerializableModel):
             if not entity_version.get_by_entity_and_date(self.entity,
                                                          self.learning_container_year.academic_year.start_date):
                 self._warnings.append(_("The linked %(entity)s does not exist at the start date of the academic year"
-                                        " linked to this learning unit") % {'entity': _(self.type.lower())})
+                                        " linked to this learning unit") % {'entity': self.get_type_display().lower()})
         return self._warnings
 
 
