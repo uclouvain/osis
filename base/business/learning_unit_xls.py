@@ -88,18 +88,17 @@ def learning_unit_titles_part1():
 
 def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=False):
     qs = annotate_qs(learning_unit_years)
+
     if with_grp:
         qs = qs.annotate(
             closest_trainings=RawSQL(
                 SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ()
             )
-        )
+        ).prefetch_related('child_leaf__parent')
+
     result = []
 
-    # That filters will be used during the fetch of the trainings.
-    # filters = get_root_filters() if with_grp else None
-
-    for learning_unit_yr in qs.prefetch_related('child_leaf__parent'):
+    for learning_unit_yr in qs:
         lu_data_part1 = _get_data_part1(learning_unit_yr)
         lu_data_part2 = _get_data_part2(learning_unit_yr, with_attributions)
 
