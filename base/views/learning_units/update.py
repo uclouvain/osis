@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-
 from dal import autocomplete
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -43,11 +41,10 @@ from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit.edition_volume import VolumeEditionFormsetContainer
 from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
-from base.models.entity_version import find_pedagogical_entities_version, \
-    find_all_current_entities_version, EntityVersion
+from base.models.entity_version import find_pedagogical_entities_version, EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
-from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
+from base.models.enums.organization_type import MAIN
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages
@@ -55,7 +52,6 @@ from base.views.learning_unit import learning_unit_components
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context, \
     get_common_context_learning_unit_year
-from osis_common.utils.datetime import get_tzinfo
 
 
 @login_required
@@ -193,10 +189,10 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
         country = self.forwarded.get('country', None)
         qs = find_additional_requirement_entities_choices()
-        if country == "all":
-            qs = qs
-        elif country:
-            qs = qs.filter(entity__country__id=country)
+        if country:
+            qs = qs.exclude(entity__organization__type=MAIN)
+            if country != "all":
+                qs = qs.filter(entity__country_id=country)
         else:
             qs = find_pedagogical_entities_version()
         if self.q:
