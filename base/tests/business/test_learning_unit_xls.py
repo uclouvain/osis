@@ -25,6 +25,7 @@
 ##############################################################################
 import datetime
 
+from django.db.models.expressions import RawSQL
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
@@ -42,6 +43,7 @@ from base.models.enums import entity_type, organization_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import proposal_type, proposal_state
+from base.models.group_element_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
@@ -198,9 +200,14 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(_prepare_legend_ws_data(), expected)
 
     def test_add_training_data(self):
-        formations = _add_training_data(self.learning_unit_yr_1)
+        luy_1 = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_1.pk).annotate(
+            closest_trainings=RawSQL(
+                SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ()
+            )
+        ).get()
+        formations = _add_training_data(luy_1)
         expected = " {} ({}) - {} - {}\n".format(self.an_education_group_parent.partial_acronym,
-                                                 "{0:.2f}".format(self.learning_unit_yr_1.credits),
+                                                 "{0:.2f}".format(luy_1.credits),
                                                  PARENT_ACRONYM,
                                                  PARENT_TITLE)
         self.assertEqual(formations, expected)
