@@ -133,7 +133,7 @@ class LearningUnitYearModelForm(forms.ModelForm):
         if self.external:
             if "acronym" not in self.initial or self.initial["acronym"][0] == LearningUnitExternalSite.E.value:
                 self.data["acronym_0"] = LearningUnitExternalSite.E.value
-                self.cleaned_data['acronym'] = LearningUnitExternalSite.E.value+self.data["acronym_1"]
+                self.cleaned_data['acronym'] = (LearningUnitExternalSite.E.value+self.data["acronym_1"]).upper()
             if not re.match(REGEX_BY_SUBTYPE[EXTERNAL], self.cleaned_data["acronym"]):
                 raise ValidationError(_('Invalid code'))
         elif not self.external and not re.match(REGEX_BY_SUBTYPE[self.instance.subtype], self.cleaned_data["acronym"]):

@@ -34,12 +34,12 @@ from base.forms.utils.acronym_field import PartimAcronymField, AcronymField
 from base.models.enums import learning_container_year_types, organization_type
 from base.models.enums.attribution_procedure import INTERNAL_TEAM
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
-    ADDITIONAL_REQUIREMENT_ENTITY_2, ADDITIONAL_REQUIREMENT_ENTITY_1
+    ADDITIONAL_REQUIREMENT_ENTITY_2, ADDITIONAL_REQUIREMENT_ENTITY_1, EntityContainerYearLinkTypes
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.enums.internship_subtypes import PROFESSIONAL_INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import ANNUAL
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
@@ -265,7 +265,8 @@ class TestLearningUnitYearModelFormSave(TestCase):
         self.assertEqual(len(form.instance.warnings), 1)
         self.assertEqual(form.instance.warnings,
                          [_("The linked %(entity)s does not exist at the start date of the academic year linked to this"
-                            " learning unit") % {'entity': _(REQUIREMENT_ENTITY.lower())}])
+                            " learning unit")
+                          % {'entity': EntityContainerYearLinkTypes.REQUIREMENT_ENTITY.value.lower()}])
 
     def test_multiple_warnings_entity_container_year(self):
         learning_unit_year_to_update = LearningUnitYearFactory(
@@ -286,7 +287,13 @@ class TestLearningUnitYearModelFormSave(TestCase):
                                          instance=learning_unit_year_to_update)
         self.assertTrue(form.is_valid(), form.errors)
         self.assertEqual(len(form.instance.warnings), 2)
-        self.assertTrue(_("The linked %(entity)s does not exist at the start date of the academic year linked to this"
-                          " learning unit") % {'entity': _(REQUIREMENT_ENTITY.lower())} in form.instance.warnings)
-        self.assertTrue(_("The linked %(entity)s does not exist at the start date of the academic year linked to this"
-                          " learning unit") % {'entity': _(ALLOCATION_ENTITY.lower())} in form.instance.warnings)
+        self.assertTrue(
+            _("The linked %(entity)s does not exist at the start date of the academic year linked to this"
+              " learning unit") % {'entity': EntityContainerYearLinkTypes.REQUIREMENT_ENTITY.value.lower()}
+            in form.instance.warnings
+        )
+        self.assertTrue(
+            _("The linked %(entity)s does not exist at the start date of the academic year linked to this"
+              " learning unit") % {'entity': EntityContainerYearLinkTypes.ALLOCATION_ENTITY.value.lower()}
+            in form.instance.warnings
+        )

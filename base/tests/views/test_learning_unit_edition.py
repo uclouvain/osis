@@ -43,7 +43,7 @@ from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import learning_unit_year_periodicity, learning_container_year_types, \
     learning_unit_year_subtypes, \
     entity_container_year_link_type, vacant_declaration_type, attribution_procedure, entity_type, organization_type
-from base.models.enums.organization_type import MAIN
+from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -590,26 +590,26 @@ class TestEntityAutocomplete(TestCase):
         self.super_user = SuperUserFactory()
         self.url = reverse("entity_autocomplete")
         today = datetime.date.today()
-        self.entity_version = EntityVersionFactory(
+        self.external_entity_version = EntityVersionFactory(
             entity_type=entity_type.SCHOOL,
             start_date=today.replace(year=1900),
             end_date=None,
             acronym="DRT",
-            entity__organization__type=MAIN
+            entity__organization__type=ACADEMIC_PARTNER
         )
 
     def test_when_param_is_digit_assert_searching_on_code(self):
         # When searching on "code"
         self.client.force_login(user=self.super_user)
         response = self.client.get(
-            self.url, data={'q': 'DRT', 'forward': '{"country": "%s"}' % self.entity_version.entity.country.id}
+            self.url, data={'q': 'DRT', 'forward': '{"country": "%s"}' % self.external_entity_version.entity.country.id}
         )
         self._assert_result_is_correct(response)
 
     def test_with_filter_by_section(self):
         self.client.force_login(user=self.super_user)
         response = self.client.get(
-            self.url, data={'forward': '{"country": "%s"}' % self.entity_version.entity.country.id}
+            self.url, data={'forward': '{"country": "%s"}' % self.external_entity_version.entity.country.id}
         )
         self._assert_result_is_correct(response)
 
@@ -618,4 +618,4 @@ class TestEntityAutocomplete(TestCase):
         json_response = str(response.content, encoding='utf8')
         results = json.loads(json_response)['results']
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['text'], str(self.entity_version.verbose_title))
+        self.assertEqual(results[0]['text'], str(self.external_entity_version.verbose_title))
