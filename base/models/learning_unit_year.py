@@ -29,6 +29,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
 from django.db.models import Q, Sum
+from django.db.models.expressions import RawSQL
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -37,7 +38,6 @@ from reversion.admin import VersionAdmin
 from base.models import entity_container_year as mdl_entity_container_year, group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums import active_status, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
@@ -52,6 +52,34 @@ AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
 MINIMUM_CREDITS = 0.0
 MAXIMUM_CREDITS = 500
+
+SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS = """\
+WITH RECURSIVE group_element_year_parent AS (
+    SELECT gs.id, gs.id AS gs_origin, child_branch_id, child_leaf_id, parent_id, educ.acronym, educ.title,
+    educ_type.category, educ_type.name, educ_type.id, 0 AS level
+    
+    FROM base_groupelementyear AS gs
+    INNER JOIN base_educationgroupyear AS educ ON gs.parent_id = educ.id
+    INNER JOIN base_educationgrouptype AS educ_type on educ.education_group_type_id = educ_type.id
+    WHERE gs.child_leaf_id = "base_learningunityear"."id" 
+    
+    UNION ALL
+    
+    SELECT parent.id, gs_origin, parent.child_branch_id, parent.child_leaf_id, parent.parent_id, 
+    educ.acronym, educ.title, educ_type.category, educ_type.name, educ_type.id, child.level + 1
+    
+    FROM base_groupelementyear AS parent
+    INNER JOIN base_educationgroupyear AS educ ON parent.parent_id = educ.id
+    INNER JOIN base_educationgrouptype AS educ_type ON educ.education_group_type_id = educ_type.id
+    INNER JOIN base_educationgroupyear AS educ_child ON parent.child_branch_id = educ_child.id
+    INNER JOIN base_educationgrouptype AS educ_type_child ON educ_child.education_group_type_id = educ_type_child.id
+    INNER JOIN group_element_year_parent AS child on parent.child_branch_id = child.parent_id
+    WHERE not(educ_type_child.name != 'OPTION' AND educ_type_child.category IN ('MINI_TRAINING', 'TRAINING'))
+)
+
+SELECT array_to_json(array_agg(row_to_json(group_element_year_parent))) FROM group_element_year_parent 
+WHERE name != 'OPTION' AND category IN ('MINI_TRAINING', 'TRAINING') 
+"""
 
 
 def academic_year_validator(value):
@@ -73,6 +101,13 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
     actions = [
         'resend_messages_to_queue',
     ]
+
+
+class CustomQuerySet(models.QuerySet):
+    def annotate_closest_trainings(self):
+        return self.annotate(
+            closest_trainings=RawSQL(SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ())
+        )
 
 
 class LearningUnitYearWithContainerManager(models.Manager):
@@ -138,12 +173,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
                                    verbose_name=_('Periodicity'))
     _warnings = None
-
-    education_groups = models.ManyToManyField(
-        EducationGroupYear,
-        through='GroupElementYear',
-        through_fields=['child_leaf', 'parent']
-    )
+    objects = models.Manager.from_queryset(CustomQuerySet)()
 
     class Meta:
         unique_together = (('learning_unit', 'academic_year'), ('acronym', 'academic_year'))

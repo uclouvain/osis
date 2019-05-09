@@ -43,8 +43,7 @@ from base.models.enums import entity_type, organization_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import proposal_type, proposal_state
-from base.models.group_element_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
-from base.models.learning_unit_year import LearningUnitYear
+from base.models.learning_unit_year import LearningUnitYear, SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -200,11 +199,7 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(_prepare_legend_ws_data(), expected)
 
     def test_add_training_data(self):
-        luy_1 = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_1.pk).annotate(
-            closest_trainings=RawSQL(
-                SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ()
-            )
-        ).get()
+        luy_1 = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_1.pk).annotate_closest_trainings().get()
         formations = _add_training_data(luy_1)
         expected = " {} ({}) - {} - {}\n".format(self.an_education_group_parent.partial_acronym,
                                                  "{0:.2f}".format(luy_1.credits),

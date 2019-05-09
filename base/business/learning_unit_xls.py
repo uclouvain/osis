@@ -26,7 +26,6 @@
 from collections import defaultdict
 
 from django.db.models import Subquery, OuterRef
-from django.db.models.expressions import RawSQL
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
@@ -39,7 +38,6 @@ from base.business.learning_unit import learning_unit_titles_part2, XLS_DESCRIPT
 from base.business.xls import get_name_or_username
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.proposal_type import ProposalType
-from base.models.group_element_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from base.models.learning_component_year import LearningComponentYear
 from osis_common.document import xls_build
 
@@ -90,11 +88,7 @@ def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=F
     qs = annotate_qs(learning_unit_years)
 
     if with_grp:
-        qs = qs.annotate(
-            closest_trainings=RawSQL(
-                SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ()
-            )
-        ).prefetch_related('child_leaf__parent')
+        qs = qs.annotate_closest_trainings().prefetch_related('child_leaf__parent')
 
     result = []
 
@@ -260,7 +254,8 @@ def _concatenate_training_data(learning_unit_year, group_element_year) -> str:
         return concatenated_string
 
     partial_acronym = group_element_year.parent.partial_acronym or ''
-    leaf_credits = round(group_element_year.child_leaf.credits) if group_element_year.child_leaf.credits else '-'
+    leaf_credits = "{0:.2f}".format(
+        group_element_year.child_leaf.credits) if group_element_year.child_leaf.credits else '-'
     nb_parents = '-' if len(learning_unit_year.closest_trainings) > 0 else ''
 
     for training in learning_unit_year.closest_trainings:
