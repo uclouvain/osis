@@ -25,7 +25,6 @@
 ##############################################################################
 import datetime
 
-from django.db.models.expressions import RawSQL
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
@@ -43,7 +42,7 @@ from base.models.enums import entity_type, organization_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import proposal_type, proposal_state
-from base.models.learning_unit_year import LearningUnitYear, SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
+from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
