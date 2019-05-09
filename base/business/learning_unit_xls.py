@@ -26,6 +26,7 @@
 from collections import defaultdict
 
 from django.db.models import Subquery, OuterRef
+from django.db.models.expressions import RawSQL
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
@@ -39,6 +40,7 @@ from base.business.xls import get_name_or_username
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
+from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from osis_common.document import xls_build
 
 TRANSFORMATION_AND_MODIFICATION_COLOR = Color('808000')
@@ -88,7 +90,9 @@ def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=F
     qs = annotate_qs(learning_unit_years)
 
     if with_grp:
-        qs = qs.annotate_closest_trainings().prefetch_related('child_leaf__parent')
+        qs = qs.annotate(
+            closest_trainings=RawSQL(SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ())
+        ).prefetch_related('child_leaf__parent')
 
     result = []
 

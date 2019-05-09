@@ -29,7 +29,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
 from django.db.models import Q, Sum
-from django.db.models.expressions import RawSQL
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -103,13 +102,6 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
     ]
 
 
-class CustomQuerySet(models.QuerySet):
-    def annotate_closest_trainings(self):
-        return self.annotate(
-            closest_trainings=RawSQL(SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ())
-        )
-
-
 class LearningUnitYearWithContainerManager(models.Manager):
     def get_queryset(self):
         # FIXME For the moment, the learning_unit_year without container must be hide !
@@ -173,7 +165,6 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
                                    verbose_name=_('Periodicity'))
     _warnings = None
-    objects = models.Manager.from_queryset(CustomQuerySet)()
 
     class Meta:
         unique_together = (('learning_unit', 'academic_year'), ('acronym', 'academic_year'))
