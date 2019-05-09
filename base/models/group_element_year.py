@@ -84,6 +84,53 @@ WITH RECURSIVE group_element_year_parent AS (
 SELECT * FROM group_element_year_parent ;
 """
 
+SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS = """\
+WITH RECURSIVE group_element_year_parent AS (
+    SELECT gs.id, 
+           gs.id AS gs_origin,
+           child_branch_id, 
+           child_leaf_id, 
+           parent_id, 
+           educ.acronym, 
+           educ.title, 
+           educ_type.category, 
+           educ_type.name,
+           educ_type.id,  
+           0 AS level
+    FROM base_groupelementyear AS gs
+        INNER JOIN base_educationgroupyear AS educ ON gs.parent_id = educ.id
+        INNER JOIN base_educationgrouptype AS educ_type on educ.education_group_type_id = educ_type.id
+
+    WHERE gs.child_leaf_id = "base_learningunityear"."id" 
+
+    UNION ALL
+
+    SELECT parent.id,
+           gs_origin,
+           parent.child_branch_id,
+           parent.child_leaf_id,
+           parent.parent_id,
+           educ.acronym,
+           educ.title,
+           educ_type.category,
+           educ_type.name,
+           educ_type.id,
+           child.level + 1
+
+    FROM base_groupelementyear AS parent
+             INNER JOIN base_educationgroupyear AS educ ON parent.parent_id = educ.id
+             INNER JOIN base_educationgrouptype AS educ_type on educ.education_group_type_id = educ_type.id
+             INNER JOIN base_educationgroupyear AS educ_child ON parent.child_branch_id = educ_child.id
+             INNER JOIN base_educationgrouptype AS educ_type_child on educ_child.education_group_type_id = educ_type_child.id
+             INNER JOIN group_element_year_parent AS child on parent.child_branch_id = child.parent_id
+             WHERE not(educ_type_child.name != 'OPTION' AND educ_type_child.category IN ('MINI_TRAINING', 'TRAINING'))
+
+)
+
+SELECT array_to_json(array_agg(row_to_json(group_element_year_parent))) FROM group_element_year_parent WHERE 
+    name != 'OPTION' AND category IN ('MINI_TRAINING', 'TRAINING') 
+"""
+
 
 def validate_block_value(value):
     max_authorized_value = 6

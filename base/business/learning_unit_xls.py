@@ -26,6 +26,7 @@
 from collections import defaultdict
 
 from django.db.models import Subquery, OuterRef
+from django.db.models.expressions import RawSQL
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
@@ -33,13 +34,12 @@ from openpyxl.utils import get_column_letter
 
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import Functions
-from base import models as mdl_base
 from base.business.learning_unit import learning_unit_titles_part2, XLS_DESCRIPTION, XLS_FILENAME, \
     WORKSHEET_TITLE
 from base.business.xls import get_name_or_username
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.proposal_type import ProposalType
-from base.models.group_element_year import GroupElementYear, get_root_filters
+from base.models.group_element_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from base.models.learning_component_year import LearningComponentYear
 from osis_common.document import xls_build
 
@@ -88,10 +88,16 @@ def learning_unit_titles_part1():
 
 def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=False):
     qs = annotate_qs(learning_unit_years)
+    if with_grp:
+        qs = qs.annotate(
+            closest_trainings=RawSQL(
+                SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ()
+            )
+        )
     result = []
 
     # That filters will be used during the fetch of the trainings.
-    filters = get_root_filters() if with_grp else None
+    # filters = get_root_filters() if with_grp else None
 
     for learning_unit_yr in qs.prefetch_related('child_leaf__parent'):
         lu_data_part1 = _get_data_part1(learning_unit_yr)
@@ -99,7 +105,7 @@ def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=F
 
         if with_grp:
             # TODO this part is too slow
-            lu_data_part2.append(_add_training_data(learning_unit_yr, filters=filters))
+            lu_data_part2.append(_add_training_data(learning_unit_yr))
 
         lu_data_part1.extend(lu_data_part2)
         result.append(lu_data_part1)
@@ -242,33 +248,32 @@ def _get_col_letter(titles, title_search):
     return None
 
 
-def _add_training_data(learning_unit_yr, filters):
-    education_groups_years = learning_unit_yr.education_groups.all().order_by('partial_acronym')
-    # TODO find another way to fetch formations_by_educ_group_year
-    formations_by_educ_group_year = mdl_base.group_element_year.find_learning_unit_formations(
-        education_groups_years, parents_as_instances=True, filters=filters
-    )
+def _add_training_data(learning_unit_yr):
     return "\n".join([
-            _concatenate_training_data(formations_by_educ_group_year, group_element_year)
-            for group_element_year in learning_unit_yr.child_leaf.all()
-        ])
+        _concatenate_training_data(learning_unit_yr, group_element_year)
+        for group_element_year in learning_unit_yr.child_leaf.all()
+    ])
 
 
-def _concatenate_training_data(formations_by_educ_group_year: dict, group_element_year: GroupElementYear) -> str:
+def _concatenate_training_data(learning_unit_year, group_element_year) -> str:
     concatenated_string = ''
-    for training in formations_by_educ_group_year.get(group_element_year.parent_id):
-        partial_acronym = group_element_year.parent.partial_acronym or ''
-        leaf_credits = round(group_element_year.child_leaf.credits) if group_element_year.child_leaf.credits else '-'
-        nb_parents = '-' if len(formations_by_educ_group_year.get(group_element_year.parent_id)) > 0 else ''
+    if not learning_unit_year.closest_trainings:
+        return concatenated_string
 
-        training_string = "{} ({}) {} {} - {}\n".format(
-            partial_acronym,
-            leaf_credits,
-            nb_parents,
-            training.acronym,
-            training.title
-        )
-        concatenated_string += training_string
+    partial_acronym = group_element_year.parent.partial_acronym or ''
+    leaf_credits = round(group_element_year.child_leaf.credits) if group_element_year.child_leaf.credits else '-'
+    nb_parents = '-' if len(learning_unit_year.closest_trainings) > 0 else ''
+
+    for training in learning_unit_year.closest_trainings:
+        if training['gs_origin'] == group_element_year.pk:
+            training_string = "{} ({}) {} {} - {}\n".format(
+                partial_acronym,
+                leaf_credits,
+                nb_parents,
+                training['acronym'],
+                training['title'],
+            )
+            concatenated_string += training_string
 
     return concatenated_string
 
