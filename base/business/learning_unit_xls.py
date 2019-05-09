@@ -101,7 +101,6 @@ def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=F
         lu_data_part2 = _get_data_part2(learning_unit_yr, with_attributions)
 
         if with_grp:
-            # TODO this part is too slow
             lu_data_part2.append(_add_training_data(learning_unit_yr))
 
         lu_data_part1.extend(lu_data_part2)

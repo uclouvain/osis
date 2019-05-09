@@ -52,6 +52,13 @@ REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
 MINIMUM_CREDITS = 0.0
 MAXIMUM_CREDITS = 500
 
+# This query can be used as annotation in a LearningUnitYearQuerySet with a RawSql.
+# It return a dictionary with the closest trainings and mini_training (except 'option')
+# through the recursive database structure
+# ! It is a raw SQL : Use it only in last resort !
+# The returned structure is :
+# { id, gs_origin, child_branch_id, child_leaf_id, parent_id, acronym,
+#   title, category, name, id (for education_group_type) and level }
 SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS = """\
 WITH RECURSIVE group_element_year_parent AS (
     SELECT gs.id, gs.id AS gs_origin, child_branch_id, child_leaf_id, parent_id, educ.acronym, educ.title,
