@@ -45,6 +45,9 @@ class LearningComponentYearFactory(factory.django.DjangoModelFactory):
     hourly_volume_total_annual = None
     hourly_volume_partial_q1 = None
     hourly_volume_partial_q2 = None
+    repartition_volume_requirement_entity = factory.fuzzy.FuzzyDecimal(20)
+    repartition_volume_additional_entity_1 = factory.fuzzy.FuzzyDecimal(10)
+    repartition_volume_additional_entity_2 = factory.fuzzy.FuzzyDecimal(5)
 
     @factory.post_generation
     def consistency_of_planned_classes(self, create, extracted, ** kwargs):
