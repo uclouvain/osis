@@ -66,7 +66,7 @@ class Person(SerializableModel):
 
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, blank=True, null=True)
     global_id = models.CharField(max_length=10, blank=True, null=True, db_index=True)
     gender = models.CharField(max_length=1, blank=True, null=True, choices=GENDER_CHOICES, default='U')
     first_name = models.CharField(max_length=50, blank=True, null=True, db_index=True)

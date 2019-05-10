@@ -45,7 +45,7 @@ class LearningContainerYearAdmin(VersionAdmin, SerializableModelAdmin):
 
 class LearningContainerYear(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    academic_year = models.ForeignKey('AcademicYear', on_delete=models.CASCADE)
+    academic_year = models.ForeignKey('AcademicYear', on_delete=models.PROTECT)
     learning_container = models.ForeignKey('LearningContainer', on_delete=models.CASCADE)
 
     container_type = models.CharField(

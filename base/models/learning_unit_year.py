@@ -91,7 +91,7 @@ class ExtraManagerLearningUnitYear(models.Model):
 class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
-                                      validators=[academic_year_validator], on_delete=models.CASCADE)
+                                      validators=[academic_year_validator], on_delete=models.PROTECT)
     learning_unit = models.ForeignKey('LearningUnit', on_delete=models.CASCADE)
 
     learning_container_year = models.ForeignKey('LearningContainerYear', null=True, on_delete=models.CASCADE)
@@ -130,9 +130,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     professional_integration = models.BooleanField(default=False, verbose_name=_('professional integration'))
 
-    campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"), on_delete=models.CASCADE)
+    campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"), on_delete=models.PROTECT)
 
-    language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'), on_delete=models.CASCADE)
+    language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'), on_delete=models.PROTECT)
 
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
                                    verbose_name=_('Periodicity'))
