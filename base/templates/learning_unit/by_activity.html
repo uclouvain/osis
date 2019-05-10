@@ -84,6 +84,7 @@
                         <th>{% trans 'Alloc. Ent.' %}</th>
                         <th>{% trans 'Credits' %}</th>
                         <th>{% trans 'Status' %}</th>
+                        <th><span data-toggle="tooltip" data-placement="right" title="{% trans 'Proposal' %}">{% trans 'P.' %}</span></th>
                     </tr>
                     </thead>
                     {% for learning_unit in page_obj %}
@@ -105,19 +106,19 @@
                             <td>{% if learning_unit.credits %}{{ learning_unit.credits|floatformat }}{% endif %}</td>
                             <td>
                                 {% if learning_unit.status %}
-                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:green;"
+                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color: lightgreen;"
                                           title="{% trans 'Active' %}"></span>
                                     <div style="display:none;">1</div>
                                 {% else %}
-                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:gray;"
+                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color: darkred;"
                                           title="{% trans 'Inactive' %}"></span>
                                     <div style="display:none;">0</div>
                                 {% endif %}
-                                {% if learning_unit.has_proposal %}
+                            </td>
+                            <td>{% if learning_unit.has_proposal %}
                                     <i class="fa fa-flag warning" data-toggle="tooltip" data-placement="right"
                                        title="{% trans 'In proposal' %}"></i>
-                                {% endif %}
-                            </td>
+                                {% endif %}</td>
                         </tr>
                     {% endfor %}
                 </table>
