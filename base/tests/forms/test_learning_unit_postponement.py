@@ -35,7 +35,6 @@ from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm, FIELDS_TO_NOT_POSTPONE
 from base.models import entity_container_year
 from base.models.academic_year import AcademicYear
-from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import attribution_procedure, entity_container_year_link_type, learning_unit_year_subtypes, \
     vacant_declaration_type
@@ -471,24 +470,16 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         ).update(hourly_volume_total_annual=new_hourly_total_value)
 
     def _change_entity_component_value(self, academic_year, repartition_volume):
-        qs = EntityComponentYear.objects.filter(
-            learning_component_year__type=LECTURING,
-            entity_container_year__type=REQUIREMENT_ENTITY,
-            learning_component_year__learning_unit_year__academic_year=academic_year,
-            learning_component_year__learning_unit_year__learning_unit=self.learning_unit_year_full.learning_unit
+        qs = LearningComponentYear.objects.filter(
+            type=LECTURING,
+            # entity_container_year__type=REQUIREMENT_ENTITY,
+            learning_unit_year__academic_year=academic_year,
+            learning_unit_year__learning_unit=self.learning_unit_year_full.learning_unit
         )
-        qs.update(repartition_volume=repartition_volume)
+        qs.update(repartition_volume_requirement_entity=repartition_volume)
         return qs.get()
 
     def _remove_additional_requirement_entity_2(self, academic_year):
-        # Remove additional requirements entities component year
-        learning_unit_full = self.learning_unit_year_full.learning_unit
-        EntityComponentYear.objects.filter(
-            entity_container_year__type=ADDITIONAL_REQUIREMENT_ENTITY_2,
-            learning_component_year__learning_unit_year__academic_year=academic_year,
-            learning_component_year__learning_unit_year__learning_unit=learning_unit_full
-        ).delete()
-
         # Remove additional requirement entity 2 container year
         initial_entity_container_year = EntityContainerYear.objects.get(
             type=ADDITIONAL_REQUIREMENT_ENTITY_2,
@@ -621,7 +612,6 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         self.assertTrue(form.is_valid(), form.errors)
         result = form.consistency_errors
         self.assertEqual(result, expected_result)
-
 
     def test_when_differences_found_on_entity_component(self):
         next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 1)
