@@ -106,11 +106,11 @@
                             <td>{% if learning_unit.credits %}{{ learning_unit.credits|floatformat }}{% endif %}</td>
                             <td>
                                 {% if learning_unit.status %}
-                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color: lightgreen;"
+                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color: limegreen;"
                                           title="{% trans 'Active' %}"></span>
                                     <div style="display:none;">1</div>
                                 {% else %}
-                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color: darkred;"
+                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color: red;"
                                           title="{% trans 'Inactive' %}"></span>
                                     <div style="display:none;">0</div>
                                 {% endif %}
