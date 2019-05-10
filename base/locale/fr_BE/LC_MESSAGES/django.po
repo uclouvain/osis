@@ -2704,7 +2704,6 @@ msgid "Modifications should be made in EPC for year %(year)d"
 msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
 
 #: templates/learning_unit/summary_list.html:82
-#, fuzzy
 #| msgid "Modified by"
 msgid "Modified"
 msgstr "Modifié par"
