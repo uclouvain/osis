@@ -28,7 +28,7 @@ from collections import OrderedDict
 from django.db import models
 
 from base.business import entity_version as business_entity_version
-from base.models import entity_container_year, entity_component_year, learning_unit_year
+from base.models import entity_container_year, learning_unit_year
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.learning_component_year import LearningComponentYear
@@ -82,8 +82,7 @@ def append_components(learning_unit_year):
     learning_unit_year.components = OrderedDict()
     if learning_unit_year.learning_components:
         for component in learning_unit_year.learning_components:
-            entity_components_year = component.entity_components_year
-            req_entities_volumes = _get_requirement_entities_volumes(entity_components_year)
+            req_entities_volumes = _get_requirement_entities_volumes(component)
             vol_req_entity = req_entities_volumes.get(entity_types.REQUIREMENT_ENTITY, 0) or 0
             vol_add_req_entity_1 = req_entities_volumes.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0) or 0
             vol_add_req_entity_2 = req_entities_volumes.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0) or 0
@@ -104,29 +103,25 @@ def append_components(learning_unit_year):
     return learning_unit_year
 
 
-def _get_requirement_entities_volumes(entity_components_year):
+# TODO :: in this conversion to float really useful? To test
+def _get_requirement_entities_volumes(learning_component):
     return {
-        entity_type: _get_floated_only_element_of_list(
-            [
-                ecy.repartition_volume for ecy in entity_components_year
-                if ecy.entity_container_year.type == entity_type
-            ], default=0
-        )
-        for entity_type in REQUIREMENT_ENTITIES
+        key: float(value) for key, value in learning_component.repartition_volumes.items()
     }
 
 
-def _get_floated_only_element_of_list(a_list, default=None):
-    len_of_list = len(a_list)
-    if not len_of_list:
-        return default
-    elif len_of_list == 1:
-        return float(a_list[0]) if a_list[0] else 0.0
-    raise ValueError("The provided list should contain 0 or 1 elements")
+# def (a_list, default=None):
+#     len_of_list = len(a_list)
+#     if not len_of_list:
+#         return default
+#     elif len_of_list == 1:
+#         return float(a_list[0]) if a_list[0] else 0.0
+#     raise ValueError("The provided list should contain 0 or 1 elements")
 
 
+# TODO :: remove entity_components_year parameter
 def volume_learning_component_year(learning_component_year, entity_components_year):
-    requirement_vols = _get_requirement_entities_volumes(entity_components_year)
+    requirement_vols = _get_requirement_entities_volumes(learning_component_year)
     return {
         'VOLUME_TOTAL': learning_component_year.hourly_volume_total_annual,
         'VOLUME_Q1': learning_component_year.hourly_volume_partial_q1,
@@ -158,19 +153,14 @@ def is_service_course(academic_year, requirement_entity_version, allocation_enti
 def get_learning_component_prefetch():
     return models.Prefetch(
         'learningcomponentyear_set',
-        queryset=LearningComponentYear.objects.all().order_by('type', 'acronym').prefetch_related(
-            models.Prefetch('entitycomponentyear_set',
-                            queryset=entity_component_year.EntityComponentYear.objects.all()
-                            .select_related('entity_container_year'),
-                            to_attr='entity_components_year'
-                            )
-        ),
+        queryset=LearningComponentYear.objects.all().order_by('type', 'acronym'),
         to_attr='learning_components'
     )
 
 
+# TODO :: remove entity_components_year param
 def volume_from_initial_learning_component_year(learning_component_year, entity_components_year):
-    requirement_vols = _get_requirement_entities_volumes(entity_components_year)
+    requirement_vols = _get_requirement_entities_volumes(learning_component_year)
     return {
         'VOLUME_TOTAL': learning_component_year['hourly_volume_total_annual'],
         'VOLUME_Q1': learning_component_year['hourly_volume_partial_q1'],
