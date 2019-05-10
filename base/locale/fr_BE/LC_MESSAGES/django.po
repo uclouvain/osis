@@ -5968,14 +5968,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:164
 msgid "yes,no"
 msgstr "oui,non"
-
-#~| msgid "Block"
-#~ msgid "Blocked"
-#~ msgstr "Bloqué"
-
-#~ msgid ""
-#~ "The linked entity does not exist at the start date of the academic year "
-#~ "linked to this learning unit"
-#~ msgstr ""
-#~ "L'entité liée n'existe pas à la date de début de l'année académique liée "
-#~ "à cette unité d'enseignement"
