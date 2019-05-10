@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.db.models import Count, Q
 from django.utils.translation import ugettext as _
 
@@ -38,15 +37,14 @@ from base.utils.cache import ElementCache
 
 LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
-SELECT_CACHE_KEY = 'select_element_{user}'
 
 
 def extract_child_from_cache(parent, user):
     selected_data = ElementCache(user).cached_data
-    kwargs = {'parent': parent}
     if not selected_data:
         return {}
 
+    kwargs = {'parent': parent}
     if selected_data['modelname'] == LEARNING_UNIT_YEAR:
         kwargs['child_leaf'] = LearningUnitYear.objects.get(pk=selected_data['id'])
 
@@ -70,7 +68,7 @@ def is_max_child_reached(parent, child_education_group_type):
     return auth_rel.max_count_authorized is not None and education_group_type_count >= auth_rel.max_count_authorized
 
 
-def check_authorized_relationship(root, link, to_delete=False):
+def _check_authorized_relationship(root, link, to_delete=False):
     auth_rels = root.education_group_type.authorized_parent_type.all().select_related("child_type")
     auth_rels_dict = {auth_rel.child_type.name: auth_rel for auth_rel in auth_rels}
 
@@ -79,22 +77,35 @@ def check_authorized_relationship(root, link, to_delete=False):
         record["education_group_type__name"]: record["count"] for record in count_children_by_education_group_type_qs
     }
 
-    max_reached = []
-    min_reached = []
-    not_authorized = []
+    max_reached, min_reached, not_authorized = [], [], []
     for key, count in count_children_dict.items():
         if key not in auth_rels_dict:
             not_authorized.append(key)
         elif count < auth_rels_dict[key].min_count_authorized:
             min_reached.append(key)
-        elif auth_rels_dict[key].max_count_authorized is not None \
-                and count > auth_rels_dict[key].max_count_authorized:
+        elif auth_rels_dict[key].max_count_authorized is not None and count > auth_rels_dict[key].max_count_authorized:
             max_reached.append(key)
 
     # Check for technical group that would not be linked to root
     for key, auth_rel in auth_rels_dict.items():
         if key not in count_children_dict and auth_rel.min_count_authorized > 0:
             min_reached.append(key)
+
+    return min_reached, max_reached, not_authorized
+
+
+def can_link_be_detached(root, link):
+    min_reached, max_reached, not_authorized = _check_authorized_relationship(root, link, to_delete=True)
+    if link.child_branch.education_group_type.name in min_reached:
+        raise AuthorizedRelationshipNotRespectedException(
+            errors=_("The parent must have at least one child of type(s) \"%(types)s\".") % {
+                "types": ', '.join(str(AllTypes.get_value(name)) for name in min_reached)
+            }
+        )
+
+
+def check_authorized_relationship(root, link, to_delete=False):
+    min_reached, max_reached, not_authorized = _check_authorized_relationship(root, link, to_delete=to_delete)
 
     if min_reached:
         raise AuthorizedRelationshipNotRespectedException(
@@ -121,29 +132,29 @@ def check_authorized_relationship(root, link, to_delete=False):
 
 
 def compute_number_children_by_education_group_type(root, link=None, to_delete=False):
-    qs = EducationGroupYear.objects.filter(
-        (Q(child_branch__parent=root) & Q(child_branch__link_type=None)) |
-        (Q(child_branch__parent__child_branch__parent=root) &
-         Q(child_branch__parent__child_branch__link_type=LinkTypes.REFERENCE.name))
-    )
-    if link:
-        # Need to remove childrens in common between root and link to not false count
-        records_to_remove_qs = EducationGroupYear.objects.filter(Q(pk=link.child_branch.pk) |
-                                                                 Q(child_branch__parent=link.child_branch.pk))
-        qs = qs.difference(records_to_remove_qs)
+    child_branch_id = None if not link else link.child_branch.id
 
-        link_children_qs = EducationGroupYear.objects.filter(pk=link.child_branch.pk)
+    direct_children = (Q(child_branch__parent=root) &
+                       Q(child_branch__link_type=None) &
+                       ~Q(child_branch__id=child_branch_id))
+    referenced_children = (Q(child_branch__parent__child_branch__parent=root) &
+                           Q(child_branch__parent__child_branch__link_type=LinkTypes.REFERENCE.name) &
+                           ~Q(child_branch__parent__id=child_branch_id))
+    filter_children_clause = direct_children | referenced_children
+
+    if link and not to_delete:
+        link_children = Q(id=link.child_branch.id)
         if link.link_type == LinkTypes.REFERENCE.name:
-            link_children_qs = EducationGroupYear.objects.filter(child_branch__parent=link.child_branch.pk)
+            link_children = Q(child_branch__parent__id=link.child_branch.id)
 
-        if not to_delete:
-            qs = qs.union(link_children_qs)
+        filter_children_clause = filter_children_clause | link_children
 
-    # FIXME Because when applying the annotate on the union and intersection,
-    #  it returns strange value for the count and education group type name
-    pks = qs.values_list("pk", flat=True)
-    qs = EducationGroupYear.objects.filter(pk__in=list(pks)). \
-        values("education_group_type__name"). \
-        order_by("education_group_type__name"). \
-        annotate(count=Count("education_group_type__name"))
-    return qs
+    return EducationGroupYear.objects.filter(
+        filter_children_clause
+    ).values(
+        "education_group_type__name"
+    ).order_by(
+        "education_group_type__name"
+    ).annotate(
+        count=Count("education_group_type__name")
+    )
