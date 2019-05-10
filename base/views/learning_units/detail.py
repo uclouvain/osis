@@ -139,8 +139,6 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
 
         for component in self.object.learningcomponentyear_set.all():
             versions |= Version.objects.get_for_object(component)
-            for entity_component in component.entitycomponentyear_set.all():
-                versions |= Version.objects.get_for_object(entity_component)
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created'
                                                                      ).select_related('revision__user__person')
