@@ -40,6 +40,14 @@ class LearningComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_filter = ('learning_unit_year__academic_year',)
 
 
+class RepartitionVolumeField(models.DecimalField):
+    def __init__(self, *args, **kwargs):
+        super(RepartitionVolumeField, self).__init__(*args, **kwargs)
+        self.blank = self.null = True
+        self.max_digits = 6
+        self.decimal_places = 2
+
+
 class LearningComponentYear(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
@@ -57,6 +65,9 @@ class LearningComponentYear(SerializableModel):
                                                    verbose_name=_("hourly volume partial q2"))
     volume_declared_vacant = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True,
                                                  verbose_name=_("volume declared vacant"))
+    repartition_volume_requirement_entity = RepartitionVolumeField()
+    repartition_volume_additional_entity_1 = RepartitionVolumeField()
+    repartition_volume_additional_entity_2 = RepartitionVolumeField()
 
     _warnings = None
 
