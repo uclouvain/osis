@@ -31,6 +31,8 @@ from reversion.admin import VersionAdmin
 from base.models import learning_class_year
 from base.models.enums import learning_component_year_type, learning_container_year_types
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ADDITIONAL_REQUIREMENT_ENTITY_2,\
+    ADDITIONAL_REQUIREMENT_ENTITY_1
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
@@ -112,10 +114,6 @@ class LearningComponentYear(SerializableModel):
     def _check_volumes_consistency(self):
         _warnings = []
 
-        if not hasattr(self, 'vol_global'):
-            self.vol_global = self.entitycomponentyear_set.aggregate(
-                Sum('repartition_volume')
-            )['repartition_volume__sum'] or 0
         vol_total_annual = self.hourly_volume_total_annual or 0
         vol_q1 = self.hourly_volume_partial_q1 or 0
         vol_q2 = self.hourly_volume_partial_q2 or 0
@@ -138,6 +136,39 @@ class LearningComponentYear(SerializableModel):
                 inconsistent_msg,
                 _('planned classes cannot be greather than 0 while volume is equal to 0')))
         return _warnings
+
+    def get_repartition_volume(self, entity_type):
+        return self.repartition_volumes[entity_type]
+
+    @property
+    def vol_global(self):
+        # TODO :: unit test this property
+        return float(sum(float(value) for value in self.repartition_volumes.values()))
+
+    @property
+    def repartition_volumes(self):
+        default_value = 0.0
+        return {
+            REQUIREMENT_ENTITY: self.repartition_volume_requirement_entity or default_value,
+            ADDITIONAL_REQUIREMENT_ENTITY_1: self.repartition_volume_additional_entity_1 or default_value,
+            ADDITIONAL_REQUIREMENT_ENTITY_2: self.repartition_volume_additional_entity_2 or default_value,
+        }
+
+    def set_repartition_volume(self, entity_container_type, repartition_volume):
+        setattr(self, self.repartition_volume_attrs_by_entity_container_type[entity_container_type], repartition_volume)
+
+    @property
+    def repartition_volume_attrs_by_entity_container_type(self):
+        return {
+            REQUIREMENT_ENTITY: 'repartition_volume_requirement_entity',
+            ADDITIONAL_REQUIREMENT_ENTITY_1: 'repartition_volume_additional_entity_1',
+            ADDITIONAL_REQUIREMENT_ENTITY_2: 'repartition_volume_additional_entity_2',
+        }
+
+    # TODO :: add unit test on this function
+    def set_repartition_volumes(self, repartition_volumes):
+        for entity_container_type, attr in self.repartition_volume_attrs_by_entity_container_type.items():
+            setattr(self, attr, repartition_volumes[entity_container_type])
 
 
 def volume_total_verbose(learning_component_years):
