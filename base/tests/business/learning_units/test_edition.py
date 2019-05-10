@@ -32,7 +32,6 @@ from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units import edition as business_edition
-from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_component_year_type
@@ -42,7 +41,6 @@ from base.models.learning_component_year import LearningComponentYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_component_year import EntityComponentYearFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
@@ -100,9 +98,6 @@ class LearningUnitEditionTestCase(TestCase):
         )
         self.assertEqual(EntityContainerYear.objects.filter(
             learning_container_year=a_learning_container_year).count(), 1)
-        self.assertEqual(EntityComponentYear.objects.filter(
-            entity_container_year__learning_container_year=a_learning_container_year
-        ).count(), 2)
 
     def test_update_or_create_entity_container_year_with_components_type_allocation(self):
         """In this test, we ensure that when we create an entity_container type allocation,
@@ -117,8 +112,6 @@ class LearningUnitEditionTestCase(TestCase):
                                                                                 link_type)
         self.assertEqual(EntityContainerYear.objects.filter(
             learning_container_year=a_learning_container_year).count(), 1)
-        self.assertEqual(EntityComponentYear.objects.filter(
-            entity_container_year__learning_container_year=a_learning_container_year).count(), 0)
 
     def test_check_postponement_conflict_learning_unit_year_no_differences(self):
         # Copy the same learning unit + change academic year
@@ -637,28 +630,38 @@ def _create_learning_unit_year_with_components(l_container, create_lecturing_com
     return a_learning_unit_year
 
 
-def _create_entity_container_with_entity_components(a_learning_unit_year, container_type, an_entity,
+def _create_entity_container_with_entity_components(a_learning_unit_year, entity_container_type, an_entity,
                                                     repartition_lecturing=None, repartition_practical_exercises=None):
     an_entity_container = EntityContainerYearFactory(
         learning_container_year=a_learning_unit_year.learning_container_year,
-        type=container_type,
+        type=entity_container_type,
         entity=an_entity
     )
 
     if repartition_lecturing is not None:
-        _create_entity_component_year(a_learning_unit_year, learning_component_year_type.LECTURING,
-                                      an_entity_container, repartition_lecturing)
+        _create_component_year(
+            a_learning_unit_year,
+            learning_component_year_type.LECTURING,
+            entity_container_type,
+            repartition_lecturing
+        )
+
     if repartition_practical_exercises is not None:
-        _create_entity_component_year(a_learning_unit_year, learning_component_year_type.PRACTICAL_EXERCISES,
-                                      an_entity_container, repartition_practical_exercises)
+        _create_component_year(
+            a_learning_unit_year,
+            learning_component_year_type.PRACTICAL_EXERCISES,
+            entity_container_type,
+            repartition_practical_exercises
+        )
     return an_entity_container
 
 
-def _create_entity_component_year(luy, component_type, entity_container_year, repartition_volume):
-    component = LearningComponentYear.objects.get(learning_unit_year=luy, type=component_type)
-    EntityComponentYearFactory(entity_container_year=entity_container_year,
-                               learning_component_year=component,
-                               repartition_volume=repartition_volume)
+def _create_component_year(luy, component_type, entity_container_type, repartition_volume):
+    component = LearningComponentYear.objects.get(
+        learning_unit_year=luy, type=component_type
+    )
+    component.set_repartition_volume(entity_container_type, repartition_volume)
+    component.save()
 
 
 def _delete_components(luy, component_type):
