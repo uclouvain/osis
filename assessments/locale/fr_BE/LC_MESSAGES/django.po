@@ -1019,3 +1019,8 @@ msgstr "programme(s)"
 #: views/score_encoding.py:324
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
+
+
+#: business/score_encoding_export.py:38
+msgid "End date Prof"
+msgstr "Date de remise"
