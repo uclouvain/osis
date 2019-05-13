@@ -32,7 +32,7 @@ from django.http import QueryDict
 from django.utils.translation import ugettext as _
 
 from base.business.learning_units.edition import duplicate_learning_unit_year
-from base.forms.learning_unit.external_learning_unit import ExternalLearningUnitBaseForm
+from base.forms.learning_unit.external_learning_unit import ExternalPartimForm, ExternalLearningUnitBaseForm
 from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.models import academic_year
@@ -245,7 +245,9 @@ class LearningUnitPostponementForm:
             'postposal': not data
         }
         if self.external:
-            return ExternalLearningUnitBaseForm(**form_kwargs)
+            return ExternalLearningUnitBaseForm(
+                **form_kwargs) if self.subtype == learning_unit_year_subtypes.FULL else ExternalPartimForm(
+                **form_kwargs)
         return FullForm(**form_kwargs) if self.subtype == learning_unit_year_subtypes.FULL else \
             PartimForm(**form_kwargs)
 

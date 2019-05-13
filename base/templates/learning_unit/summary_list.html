@@ -79,6 +79,7 @@
                         <th>{% trans 'Type' %}</th>
                         <th>{% trans 'Subtype' %}</th>
                         <th>{% trans 'Status' %}</th>
+                        <th><span data-toggle="tooltip" data-placement="right" title="{% trans 'Modified' %}">{% trans 'M.' %}</span></th>
                     </tr>
                     </thead>
                     {% for learning_unit in page_obj %}
@@ -97,16 +98,18 @@
                             </td>
                             <td>
                                 {% if learning_unit.status %}
-                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:green;"
+                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:limegreen;"
                                           title="{% trans 'Active' %}"></span>
                                     <div style="display:none;">1</div>
                                 {% else %}
-                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:gray;"
+                                    <span class="glyphicon glyphicon-remove-circle" aria-hidden="true" style="color:red;"
                                           title="{% trans 'Inactive' %}"></span>
                                     <div style="display:none;">0</div>
                                 {% endif %}
+                            </td>
+                            <td>
                                 {% trans 'Modification made' as title_status_true %}
-                                {% include "blocks/span/span_mod_status.html" with status=learning_unit.summary_status title_status_false=learning_unit.error.as_ul title_status_true=title_status_true %}
+                                {% include "blocks/span/span_mod_status.html" with status=learning_unit.summary_status blocked=learning_unit.summary_locked title_status_false=learning_unit.error.as_ul title_status_true=title_status_true %}
                             </td>
                         </tr>
                     {% endfor %}
