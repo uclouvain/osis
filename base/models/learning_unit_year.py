@@ -228,7 +228,8 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
             if self.is_external_of_mobility():
                 verbose_type = _('Mobility')
 
-            if self.learning_container_year.container_type in (COURSE, INTERNSHIP):
+            if self.learning_container_year.container_type in (COURSE, INTERNSHIP) or \
+                    self.is_external_with_co_graduation():
                 verbose_type += " ({subtype})".format(subtype=self.get_subtype_display())
 
         return verbose_type

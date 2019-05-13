@@ -58,6 +58,7 @@ from base.tests.forms.test_edition_form import get_valid_formset_data
 from base.views.learning_unit import learning_unit_components
 from base.views.learning_units.update import learning_unit_edition_end_date, learning_unit_volumes_management, \
     update_learning_unit, _get_learning_units_for_context
+from reference.tests.factories.country import CountryFactory
 
 
 @override_flag('learning_unit_update', active=True)
@@ -611,8 +612,52 @@ class TestEntityAutocomplete(TestCase):
         self._assert_result_is_correct(response)
 
     def _assert_result_is_correct(self, response):
-        self.assertEqual(response.status_code, 200)
-        json_response = str(response.content, encoding='utf8')
-        results = json.loads(json_response)['results']
+        results = self._get_list_of_entities_from_response(response)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['text'], str(self.external_entity_version.verbose_title))
+
+    def _get_list_of_entities_from_response(self, response):
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        return json.loads(json_response)['results']
+
+    def test_ordering_external_entities(self):
+        country = CountryFactory()
+
+        for letter in ['C', 'A', 'B']:
+            EntityVersionFactory(
+                entity_type=entity_type.SCHOOL,
+                start_date=datetime.date.today().replace(year=1900),
+                end_date=None,
+                title="{} title".format(letter),
+                entity__organization__type=ACADEMIC_PARTNER,
+                entity__country=country,
+            )
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(
+            self.url, data={'forward': '{"country": "%s"}' % country.id}
+        )
+        results = self._get_list_of_entities_from_response(response)
+        self.assertEqual(results[0]['text'], "A title")
+        self.assertEqual(results[1]['text'], "B title")
+        self.assertEqual(results[2]['text'], "C title")
+
+    def test_ordering_main_entities(self):
+        for letter in ['C', 'A', 'B']:
+            EntityVersionFactory(
+                entity_type=entity_type.FACULTY,
+                start_date=datetime.date.today().replace(year=1900),
+                end_date=None,
+                acronym="{letter}{letter}{letter}".format(letter=letter),
+                entity__organization__type=MAIN
+            )
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(
+            self.url, data={'forward': '{"country": ""}'}
+        )
+        results = self._get_list_of_entities_from_response(response)
+        # Assert order and assert that acronym is displayed
+        self.assertIn('AAA - ', results[0]['text'])
+        self.assertIn('BBB - ', results[1]['text'])
+        self.assertIn('CCC - ', results[2]['text'])
+

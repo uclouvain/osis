@@ -739,6 +739,7 @@ class ContainerTypeVerboseTest(TestCase):
     def test_normal_case(self):
         external_learning_unit = ExternalLearningUnitYearFactory(
             learning_unit_year__learning_container_year__container_type=LearningContainerYearType.OTHER_INDIVIDUAL.name,
+            co_graduation=False
         )
         result = external_learning_unit.learning_unit_year.container_type_verbose
         expected_result = external_learning_unit.learning_unit_year.learning_container_year.get_container_type_display()
@@ -748,6 +749,7 @@ class ContainerTypeVerboseTest(TestCase):
         external_learning_unit = ExternalLearningUnitYearFactory(
             learning_unit_year__learning_container_year__container_type=LearningContainerYearType.EXTERNAL.name,
             mobility=True,
+            co_graduation=False
         )
         result = external_learning_unit.learning_unit_year.container_type_verbose
         self.assertEqual(result, _("Mobility"))

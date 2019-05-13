@@ -38,6 +38,8 @@ register = template.Library()
 DIFFERENCE_CSS = "style='color:#5CB85C;'"
 CSS_PROPOSAL_VALUE = "proposal_value"
 LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
+EXTERNAL_CREDIT_TOOLTIP = _('If the partner university does not use ECTS credit units, '
+                            'enter below the number of credit units according to the local system.')
 
 
 @register.filter
@@ -101,7 +103,10 @@ def dl_tooltip(context, instance, key, **kwargs):
     if not value:
         value = get_verbose_field_value(instance, key)
 
-    difference = get_difference_css(differences, key, default_if_none) or 'title="{}"'.format(_(title))
+    difference = get_difference_css(differences, key, default_if_none) or 'title="{}"'.format(
+        EXTERNAL_CREDIT_TOOLTIP if key == 'external_credits'
+        else _(title)
+    )
 
     if url:
         value = "<a href='{url}'>{value}</a>".format(value=_(str(value)), url=url)
