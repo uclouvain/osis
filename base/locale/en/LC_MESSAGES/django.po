@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-10 11:15+0200\n"
+"POT-Creation-Date: 2019-05-13 14:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,7 +33,7 @@ msgstr ""
 msgid "%(col_name)s has been already modified."
 msgstr ""
 
-#: forms/learning_unit/learning_unit_postponement.py:379
+#: forms/learning_unit/learning_unit_postponement.py:381
 #: tests/forms/test_learning_unit_postponement.py:541
 #: tests/forms/test_learning_unit_postponement.py:555
 #: tests/forms/test_learning_unit_postponement.py:579
@@ -443,7 +443,7 @@ msgstr ""
 #: business/learning_units/xls_comparison.py:177 business/proposal_xls.py:54
 #: models/enums/active_status.py:34 models/learning_unit_year.py:116
 #: models/learning_unit_year.py:249
-#: templates/learning_unit/by_activity.html:109
+#: templates/learning_unit/by_activity.html:110
 #: templates/learning_unit/by_external.html:67
 #: templates/learning_unit/comparison.html:54
 #: templates/learning_unit/summary_list.html:102
@@ -986,7 +986,8 @@ msgstr ""
 #: business/learning_unit_xls.py:74 business/proposal_xls.py:38
 #: business/proposal_xls.py:51 forms/education_groups.py:103
 #: forms/learning_unit/search_form.py:83 forms/utils/acronym_field.py:83
-#: forms/utils/acronym_field.py:129 models/learning_unit_year.py:100
+#: forms/utils/acronym_field.py:129 forms/utils/acronym_field.py:175
+#: models/learning_unit_year.py:100
 #: templates/education_group/blocks/content_default_table.html:31
 #: templates/education_group/blocks/content_minor_major_option_table.html:30
 #: templates/education_group/blocks/table_utilizations.html:30
@@ -1073,7 +1074,7 @@ msgid "Confirm your action."
 msgstr ""
 
 #: business/education_groups/postponement.py:192
-#: forms/learning_unit/learning_unit_postponement.py:327
+#: forms/learning_unit/learning_unit_postponement.py:329
 #, python-format
 msgid "Consistency error in %(academic_year)s : %(error)s"
 msgstr ""
@@ -1109,7 +1110,7 @@ msgstr ""
 
 #: forms/education_group/coorganization.py:40
 #: forms/learning_unit/entity_form.py:82
-#: forms/learning_unit/external_learning_unit.py:65
+#: forms/learning_unit/external_learning_unit.py:70
 #: forms/learning_unit/search_form.py:411 models/organization_address.py:48
 #: templates/learning_unit/external/read.html:58
 #: templates/learning_unit/identification.html:207
@@ -1533,7 +1534,7 @@ msgid "English title proper"
 msgstr ""
 
 #: forms/learning_unit/learning_unit_create.py:96
-#: forms/learning_unit/learning_unit_create.py:172
+#: forms/learning_unit/learning_unit_create.py:182
 #: templates/learning_unit/identification.html:112
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:78
 msgid "English title proper to the partim"
@@ -1646,7 +1647,7 @@ msgstr ""
 msgid "Export"
 msgstr ""
 
-#: forms/learning_unit/external_learning_unit.py:52
+#: forms/learning_unit/external_learning_unit.py:57
 #: models/enums/attribution_procedure.py:35
 #: models/enums/learning_container_year_types.py:53
 #: tests/views/test_learning_unit.py:1412
@@ -1951,7 +1952,7 @@ msgstr ""
 msgid "In practice"
 msgstr ""
 
-#: templates/learning_unit/by_activity.html:118
+#: templates/learning_unit/by_activity.html:120
 msgid "In proposal"
 msgstr ""
 
@@ -1959,7 +1960,7 @@ msgstr ""
 #: business/learning_units/comparison.py:67
 #: business/learning_units/xls_comparison.py:179
 #: models/enums/active_status.py:35 models/learning_unit_year.py:249
-#: templates/learning_unit/by_activity.html:113
+#: templates/learning_unit/by_activity.html:114
 #: templates/learning_unit/by_external.html:71
 #: templates/learning_unit/summary_list.html:106
 msgid "Inactive"
@@ -2044,8 +2045,9 @@ msgstr ""
 msgid "Invalid action"
 msgstr ""
 
-#: forms/learning_unit/learning_unit_create.py:138
-#: forms/learning_unit/learning_unit_create.py:140
+#: forms/learning_unit/learning_unit_create.py:141
+#: forms/learning_unit/learning_unit_create.py:143
+#: forms/learning_unit/learning_unit_create.py:150
 msgid "Invalid code"
 msgstr ""
 
@@ -2075,7 +2077,7 @@ msgid "It is forbidden to attach an element to itself."
 msgstr ""
 
 #: models/group_element_year.py:260
-#: tests/views/education_groups/test_update.py:578
+#: tests/views/education_groups/test_update.py:619
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 
@@ -2231,7 +2233,7 @@ msgid ""
 msgstr ""
 
 #: templates/blocks/forms/search_form.html:44
-#: templates/learning_unit/blocks/form/search_form_external_learning_unit.html:45
+#: templates/learning_unit/blocks/form/search_form_external_learning_unit.html:46
 #: templates/learning_unit/blocks/form/search_form_learning_unit.html:70
 msgid "Learning unit search"
 msgstr ""
@@ -3033,6 +3035,10 @@ msgstr ""
 msgid "Own components"
 msgstr ""
 
+#: templates/learning_unit/by_activity.html:87
+msgid "P."
+msgstr ""
+
 #: templates/page_not_found.html:34
 msgid "Page not found."
 msgstr ""
@@ -3132,7 +3138,7 @@ msgstr ""
 msgid "Platform"
 msgstr ""
 
-#: tests/views/education_groups/test_update.py:662
+#: tests/views/education_groups/test_update.py:703
 #: views/education_groups/group_element_year/create.py:58
 msgid "Please Select or Move an item before Attach it"
 msgstr ""
@@ -3314,6 +3320,7 @@ msgstr ""
 #: business/learning_unit_proposal.py:296
 #: business/learning_units/xls_comparison.py:498
 #: templates/learning_unit/blocks/panel/proposal.html:6
+#: templates/learning_unit/by_activity.html:87
 #: tests/business/learning_units/test_xls_comparison.py:175
 msgid "Proposal"
 msgstr ""
@@ -3474,7 +3481,7 @@ msgstr ""
 msgid "Reference"
 msgstr ""
 
-#: forms/learning_unit/external_learning_unit.py:94
+#: forms/learning_unit/external_learning_unit.py:99
 #: models/education_group_organization.py:48
 #: templates/education_group/blocks/coorganization.html:38
 #: templates/learning_unit/identification.html:209
@@ -4054,7 +4061,7 @@ msgid ""
 "credits value of the parent learning unit."
 msgstr ""
 
-#: forms/learning_unit/learning_unit_create.py:164
+#: forms/learning_unit/learning_unit_create.py:174
 #: models/learning_unit_year.py:336
 #: tests/forms/learning_unit/test_learningUnitYearModelForm.py:89
 #: tests/models/test_learning_unit_year.py:600
@@ -4187,7 +4194,7 @@ msgid ""
 msgstr ""
 
 #: business/learning_units/edition.py:471
-#: forms/learning_unit/learning_unit_postponement.py:336
+#: forms/learning_unit/learning_unit_postponement.py:338
 #: tests/business/test_learning_unit_edition.py:952
 #: tests/forms/test_learning_unit_postponement.py:660
 #, python-format
@@ -4196,7 +4203,7 @@ msgid ""
 "year %(academic_year)s"
 msgstr ""
 
-#: forms/learning_unit/learning_unit_postponement.py:321
+#: forms/learning_unit/learning_unit_postponement.py:323
 #: views/learning_units/update.py:182
 #, python-format
 msgid "The learning unit has been updated until %(year)s."
@@ -4317,7 +4324,7 @@ msgstr ""
 msgid "The registration form is available at the Secretariat of"
 msgstr ""
 
-#: forms/learning_unit/learning_unit_postponement.py:369
+#: forms/learning_unit/learning_unit_postponement.py:371
 #: tests/forms/test_learning_unit_postponement.py:632
 #, python-format
 msgid ""
@@ -4455,7 +4462,7 @@ msgstr ""
 msgid "This feature is in testing phase"
 msgstr ""
 
-#: forms/learning_unit/learning_unit_create.py:147
+#: forms/learning_unit/learning_unit_create.py:157
 msgid "This field cannot be set"
 msgstr ""
 
@@ -4552,7 +4559,7 @@ msgid "Title in French"
 msgstr ""
 
 #: forms/learning_unit/learning_unit_create.py:95
-#: forms/learning_unit/learning_unit_create.py:171
+#: forms/learning_unit/learning_unit_create.py:181
 #: templates/learning_unit/identification.html:110
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:77
 msgid "Title proper to the partim"
@@ -5098,7 +5105,7 @@ msgstr ""
 msgid "You have the choice between"
 msgstr ""
 
-#: forms/learning_unit/learning_unit_create.py:209
+#: forms/learning_unit/learning_unit_create.py:219
 #: forms/learning_unit/learning_unit_create_2.py:183
 #: tests/views/learning_units/proposals/test_creation.py:196
 msgid "You must either set the common title or the specific title"
@@ -5462,7 +5469,7 @@ msgstr ""
 
 #: business/learning_units/comparison.py:63
 #: business/learning_units/edition.py:466 business/xls.py:37
-#: forms/learning_unit/learning_unit_postponement.py:401
+#: forms/learning_unit/learning_unit_postponement.py:403
 #: models/enums/activity_presence.py:35 models/enums/internship_presence.py:35
 #: templates/blocks/modal/confirmation_modal.html:18
 #: templates/learning_unit/blocks/modal/modal_modification_ask_to_report.html:35
@@ -5728,7 +5735,7 @@ msgstr ""
 
 #: business/learning_units/comparison.py:63
 #: business/learning_units/edition.py:466 business/xls.py:37
-#: forms/learning_unit/learning_unit_postponement.py:401
+#: forms/learning_unit/learning_unit_postponement.py:403
 #: models/enums/activity_presence.py:34 models/enums/internship_presence.py:34
 #: templates/blocks/modal/confirmation_modal.html:19
 #: templates/learning_unit/blocks/modal/modal_back_to_initial.html:39
