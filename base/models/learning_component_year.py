@@ -25,6 +25,7 @@
 ##############################################################################
 from django.db import models
 from django.db.models import Sum
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
@@ -123,10 +124,10 @@ class LearningComponentYear(SerializableModel):
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
                 _('The annual volume must be equal to the sum of the volumes Q1 and Q2')))
-        if vol_total_annual * planned_classes != self.vol_global:
+        if self.vol_global != float(sum(self.repartition_volumes.values())):
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
-                _('Vol_global is not equal to Vol_tot * planned_classes')))
+                _('the sum of repartition volumes must be equal to the global volume')))
         if planned_classes == 0 and vol_total_annual > 0:
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
@@ -140,10 +141,9 @@ class LearningComponentYear(SerializableModel):
     def get_repartition_volume(self, entity_type):
         return self.repartition_volumes[entity_type]
 
-    @property
+    @cached_property
     def vol_global(self):
-        # TODO :: unit test this property
-        return float(sum(value for value in self.repartition_volumes.values()))
+        return float(float(self.hourly_volume_total_annual or 0.0) * float(self.planned_classes or 0.0))
 
     @property
     def repartition_volumes(self):
@@ -165,7 +165,6 @@ class LearningComponentYear(SerializableModel):
             ADDITIONAL_REQUIREMENT_ENTITY_2: 'repartition_volume_additional_entity_2',
         }
 
-    # TODO :: add unit test on this function
     # TODO :: add unit test to be sure that repartition volume is set to 0 if removing any additional entity (prevent inconsistance)
     def set_repartition_volumes(self, repartition_volumes):
         for entity_container_type, attr in self.repartition_volume_attrs_by_entity_container_type.items():

@@ -32,36 +32,23 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 
 
 class LearningUnitYearWithContextTestCase(TestCase):
-    # def setUp(self):
-    #     today = datetime.date.today()
-    #     self.current_academic_year = AcademicYearFactory(start_date=today,
-    #                                                      end_date=today.replace(year=today.year + 1),
-    #                                                      year=today.year)
-    #     self.learning_container_yr = LearningContainerYearFactory(academic_year=self.current_academic_year)
-    #     self.organization = OrganizationFactory(type=organization_type.MAIN)
-    #     self.country = CountryFactory()
-    #     self.entity = EntityFactory(country=self.country, organization=self.organization)
-    #     self.entity_container_yr = EntityContainerYearFactory(learning_container_year=self.learning_container_yr,
-    #                                                           type=entity_container_year_link_type.REQUIREMENT_ENTITY,
-    #                                                           entity=self.entity)
-    #     self.learning_component_yr = LearningComponentYearFactory(
-    #         learning_unit_year__learning_container_year=self.learning_container_yr,
-    #         hourly_volume_partial_q1=-1,
-    #         planned_classes=1
-    #     )
-    #     self.entity_component_yr = EntityComponentYearFactory(learning_component_year=self.learning_component_yr,
-    #                                                           entity_container_year=self.entity_container_yr,
-    #                                                           repartition_volume=None)
-    #
-    #     self.entity_components_yr = [self.entity_component_yr, ]
+    def setUp(self):
+        self.component_with_repartition = LearningComponentYearFactory(
+            hourly_volume_total_annual=15.0,
+            planned_classes=3,
+            repartition_volume_requirement_entity=20.0,
+            repartition_volume_additional_entity_1=10.0,
+            repartition_volume_additional_entity_2=15.0,
+        )
+        self.component_without_repartition = LearningComponentYearFactory(
+            hourly_volume_total_annual=15.0,
+            planned_classes=3,
+            repartition_volume_requirement_entity=None,
+            repartition_volume_additional_entity_1=None,
+            repartition_volume_additional_entity_2=None,
+        )
 
     def test_get_requirement_entities_volumes(self):
-        learning_component_year = LearningComponentYearFactory(
-            # learning_unit_year__learning_container_year=learning_container_year,
-            repartition_volume_requirement_entity=5,
-            repartition_volume_additional_entity_1=6,
-            repartition_volume_additional_entity_2=7,
-        )
         entity_types_list = [
             entity_types.REQUIREMENT_ENTITY,
             entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
@@ -70,13 +57,51 @@ class LearningUnitYearWithContextTestCase(TestCase):
         entity_containers_year = [
             EntityContainerYearFactory(
                 type=entity_types_list[x],
-                learning_container_year=learning_component_year.learning_unit_year.learning_container_year
+                learning_container_year=self.component_with_repartition.learning_unit_year.learning_container_year
             ) for x in range(3)
         ]
         expected_result = {
-            "REQUIREMENT_ENTITY": 5,
-            "ADDITIONAL_REQUIREMENT_ENTITY_1": 6,
-            "ADDITIONAL_REQUIREMENT_ENTITY_2": 7,
+            "REQUIREMENT_ENTITY": 20.0,
+            "ADDITIONAL_REQUIREMENT_ENTITY_1": 10.0,
+            "ADDITIONAL_REQUIREMENT_ENTITY_2": 15.0,
         }
 
-        self.assertDictEqual(learning_component_year.repartition_volumes, expected_result)
+        self.assertDictEqual(self.component_with_repartition.repartition_volumes, expected_result)
+
+    def test_vol_global(self):
+        self.assertIsInstance(self.component_with_repartition.vol_global, float)
+        self.assertEqual(self.component_with_repartition.vol_global, 45.0)
+
+    def test_vol_global_when_repartition_volumes_are_none(self):
+        self.assertIsInstance(self.component_without_repartition.vol_global, float)
+        self.assertEqual(self.component_without_repartition.vol_global, 45.0)
+
+    def test_get_repartition_volume(self):
+        repartition_value = self.component_with_repartition.get_repartition_volume(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1)
+        self.assertEqual(repartition_value, 10.0)
+
+    def test_set_repartition_volume(self):
+        new_repartition_value = 1.0
+
+        self.component_without_repartition.set_repartition_volume(entity_types.REQUIREMENT_ENTITY, new_repartition_value)
+        self.assertEqual(self.component_without_repartition.repartition_volume_requirement_entity, new_repartition_value)
+
+        self.component_without_repartition.set_repartition_volume(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, new_repartition_value)
+        self.assertEqual(self.component_without_repartition.repartition_volume_requirement_entity, new_repartition_value)
+
+        self.component_without_repartition.set_repartition_volume(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, new_repartition_value)
+        self.assertEqual(self.component_without_repartition.repartition_volume_requirement_entity, new_repartition_value)
+
+        self.component_without_repartition.refresh_from_db()
+
+    def test_set_repartition_volumes(self):
+        new_repartition_volumes = {
+            entity_types.REQUIREMENT_ENTITY: 1.0,
+            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1: 2.0,
+            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2: 3.0,
+        }
+        self.component_without_repartition.set_repartition_volumes(new_repartition_volumes)
+        self.assertEqual(self.component_without_repartition.repartition_volume_requirement_entity, 1.0)
+        self.assertEqual(self.component_without_repartition.repartition_volume_additional_entity_1, 2.0)
+        self.assertEqual(self.component_without_repartition.repartition_volume_additional_entity_2, 3.0)
+        self.component_without_repartition.refresh_from_db()
