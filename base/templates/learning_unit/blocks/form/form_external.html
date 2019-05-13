@@ -44,34 +44,35 @@
 
                 {% if learning_unit_external_form %}
                     <div class="panel panel-default">
-                    <div class="panel-body">
-                        <div class="row">
-                            {% bootstrap_field learning_unit_external_form.external_acronym form_group_class="form-group col-md-3" %}
-                            {% bootstrap_field learning_unit_external_form.url form_group_class="form-group col-md-6" %}
-                            <div class="col-md-3 external_credits-group">
-                                {% bootstrap_label learning_unit_external_form.external_credits.label label_class="control-label" %}
-                                <abbr title="{% trans 'external credits rules' %}">
-                                            <span class="glyphicon glyphicon-question-sign "
-                                                  title="{% trans 'external credits rules' %}"
-                                                  style="font-size: 12pt;"></span></abbr>
-                                {% bootstrap_field learning_unit_external_form.external_credits show_label=False %}
+                        <div class="panel-body">
+                            <div class="row">
+                                {% bootstrap_field learning_unit_external_form.external_acronym form_group_class="form-group col-md-3" %}
+                                {% bootstrap_field learning_unit_external_form.url form_group_class="form-group col-md-6" %}
+                                <div class="col-md-3">
+                                    {% bootstrap_label learning_unit_external_form.external_credits.label label_class="control-label" %}
+                                    <abbr title="{% trans 'external credits rules' %}">
+                                                <span class="glyphicon glyphicon-question-sign "
+                                                      title="{% trans 'external credits rules' %}"
+                                                      style="font-size: 12pt;"></span></abbr>
+                                    {% bootstrap_field learning_unit_external_form.external_credits show_label=False %}
+                                </div>
                             </div>
                             {% bootstrap_field learning_unit_form.faculty_remark %}
                         </div>
                     </div>
                 {% endif %}
-                </div>
-                <div class="col-md-4">
-                    {% block institution %}
-                        {% include "learning_unit/blocks/institution.html" %}
-                    {% endblock %}
-
-                    {% block proposal_management %}
-                    {% endblock proposal_management %}
-                </div>
             </div>
-            {% block modal %}
-            {% endblock modal %}
+            <div class="col-md-4">
+                {% block institution %}
+                    {% include "learning_unit/blocks/institution.html" %}
+                {% endblock %}
+
+                {% block proposal_management %}
+                {% endblock proposal_management %}
+            </div>
         </div>
+        {% block modal %}
+        {% endblock modal %}
+    </div>
 </form>
 
