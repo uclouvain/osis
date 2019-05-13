@@ -166,6 +166,7 @@ class LearningComponentYear(SerializableModel):
         }
 
     # TODO :: add unit test on this function
+    # TODO :: add unit test to be sure that repartition volume is set to 0 if removing any additional entity (prevent inconsistance)
     def set_repartition_volumes(self, repartition_volumes):
         for entity_container_type, attr in self.repartition_volume_attrs_by_entity_container_type.items():
             setattr(self, attr, repartition_volumes[entity_container_type])
