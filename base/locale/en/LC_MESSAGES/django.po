@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-13 14:23+0200\n"
+"POT-Creation-Date: 2019-05-13 14:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1809,7 +1809,7 @@ msgstr ""
 #: templates/education_group/tab_administrative_data.html:57
 #: templates/education_group/tab_administrative_data.html:65
 #: templates/education_group/tab_administrative_data.html:73
-#: templatetags/learning_unit.py:49 templatetags/learning_unit.py:55
+#: templatetags/learning_unit.py:51 templatetags/learning_unit.py:57
 #: tests/models/test_learning_unit.py:83 tests/models/test_learning_unit.py:86
 msgid "From"
 msgstr ""
@@ -1938,6 +1938,12 @@ msgstr "ISCED/CITE domain"
 #: templates/my_osis/profile.html:43 templates/offer/tabs.html:37
 #: templates/organization/organization.html:44
 msgid "Identification"
+msgstr ""
+
+#: templatetags/learning_unit.py:41
+msgid ""
+"If the partner university does not use ECTS credit units, enter below the "
+"number of credit units according to the local system."
 msgstr ""
 
 #: models/enums/diploma_printing_orientation.py:35
@@ -5482,7 +5488,7 @@ msgstr ""
 msgid "no"
 msgstr ""
 
-#: templatetags/learning_unit.py:55 tests/models/test_learning_unit.py:86
+#: templatetags/learning_unit.py:57 tests/models/test_learning_unit.py:86
 msgid "no planned end"
 msgstr ""
 
@@ -5675,7 +5681,7 @@ msgstr ""
 #: templates/education_group/tab_administrative_data.html:67
 #: templates/education_group/tab_administrative_data.html:75
 #: templates/learning_unit/blocks/modal/modal_warning_state_modification.html:33
-#: templatetags/learning_unit.py:51 tests/models/test_learning_unit.py:83
+#: templatetags/learning_unit.py:53 tests/models/test_learning_unit.py:83
 msgid "to"
 msgstr ""
 

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-13 14:23+0200\n"
+"POT-Creation-Date: 2019-05-13 14:34+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1864,7 +1864,7 @@ msgstr "Intitulé propre en français"
 #: templates/education_group/tab_administrative_data.html:57
 #: templates/education_group/tab_administrative_data.html:65
 #: templates/education_group/tab_administrative_data.html:73
-#: templatetags/learning_unit.py:49 templatetags/learning_unit.py:55
+#: templatetags/learning_unit.py:51 templatetags/learning_unit.py:57
 #: tests/models/test_learning_unit.py:83 tests/models/test_learning_unit.py:86
 msgid "From"
 msgstr "De"
@@ -1994,6 +1994,14 @@ msgstr "Domaine ISCED/CITE"
 #: templates/organization/organization.html:44
 msgid "Identification"
 msgstr "Identification"
+
+#: templatetags/learning_unit.py:41
+msgid ""
+"If the partner university does not use ECTS credit units, enter below the "
+"number of credit units according to the local system."
+msgstr ""
+"Si l'université partenaire ne fait pas usage des unités de crédits ECTS, "
+"renseignez ci-dessous le nombre d'unité de crédit selon le système local."
 
 #: models/enums/diploma_printing_orientation.py:35
 msgid "In expected form"
@@ -3129,10 +3137,8 @@ msgid "Own components"
 msgstr "Composants propres"
 
 #: templates/learning_unit/by_activity.html:87
-#, fuzzy
-#| msgid "Ph.D"
 msgid "P."
-msgstr "Ph.D"
+msgstr "P."
 
 #: templates/page_not_found.html:34
 msgid "Page not found."
@@ -5687,7 +5693,7 @@ msgstr "contrainte minimum"
 msgid "no"
 msgstr "non"
 
-#: templatetags/learning_unit.py:55 tests/models/test_learning_unit.py:86
+#: templatetags/learning_unit.py:57 tests/models/test_learning_unit.py:86
 msgid "no planned end"
 msgstr "pas de fin prévue"
 
@@ -5884,7 +5890,7 @@ msgstr "le programme vise"
 #: templates/education_group/tab_administrative_data.html:67
 #: templates/education_group/tab_administrative_data.html:75
 #: templates/learning_unit/blocks/modal/modal_warning_state_modification.html:33
-#: templatetags/learning_unit.py:51 tests/models/test_learning_unit.py:83
+#: templatetags/learning_unit.py:53 tests/models/test_learning_unit.py:83
 msgid "to"
 msgstr "à"
 
@@ -5975,10 +5981,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:164
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid ""
-#~ "If the partner university does not use ECTS credit units, enter below the "
-#~ "number of credit units according to the local system."
-#~ msgstr ""
-#~ "Si l'université partenaire ne fait pas usage des unités de crédits ECTS, "
-#~ "renseignez ci-dessous le nombre d'unité de crédit selon le système local."

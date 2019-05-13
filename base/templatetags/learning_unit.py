@@ -38,6 +38,8 @@ register = template.Library()
 DIFFERENCE_CSS = "style='color:#5CB85C;'"
 CSS_PROPOSAL_VALUE = "proposal_value"
 LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
+EXTERNAL_CREDIT_TOOLTIP = _('If the partner university does not use ECTS credit units, '
+                            'enter below the number of credit units according to the local system.')
 
 
 @register.filter
@@ -95,6 +97,8 @@ def dl_tooltip(context, instance, key, **kwargs):
     not_annualized = kwargs.get('not_annualized', '')
     differences = context['differences']
 
+    if key == 'external_credits':
+        title = EXTERNAL_CREDIT_TOOLTIP
     if not label_text:
         label_text = instance._meta.get_field(key).verbose_name.capitalize()
 
