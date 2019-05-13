@@ -143,15 +143,15 @@ class LearningComponentYear(SerializableModel):
     @property
     def vol_global(self):
         # TODO :: unit test this property
-        return float(sum(float(value) for value in self.repartition_volumes.values()))
+        return float(sum(value for value in self.repartition_volumes.values()))
 
     @property
     def repartition_volumes(self):
         default_value = 0.0
         return {
-            REQUIREMENT_ENTITY: self.repartition_volume_requirement_entity or default_value,
-            ADDITIONAL_REQUIREMENT_ENTITY_1: self.repartition_volume_additional_entity_1 or default_value,
-            ADDITIONAL_REQUIREMENT_ENTITY_2: self.repartition_volume_additional_entity_2 or default_value,
+            REQUIREMENT_ENTITY: float(self.repartition_volume_requirement_entity or default_value),
+            ADDITIONAL_REQUIREMENT_ENTITY_1: float(self.repartition_volume_additional_entity_1 or default_value),
+            ADDITIONAL_REQUIREMENT_ENTITY_2: float(self.repartition_volume_additional_entity_2 or default_value),
         }
 
     def set_repartition_volume(self, entity_container_type, repartition_volume):

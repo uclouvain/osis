@@ -37,6 +37,7 @@ from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.models import academic_year
 from base.models.academic_year import AcademicYear
+from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.learning_component_year import LearningComponentYear
@@ -344,6 +345,10 @@ class LearningUnitPostponementForm:
         This volume is never edited in the form, so we have to load data separably
         """
         initial_learning_unit_year = self._forms_to_upsert[0].instance
+        entity_containers = EntityContainerYear.objects.filter(
+            learning_container_year=initial_learning_unit_year.learning_container_year,
+        ).select_related("entity")
+        entity_by_type = {ec.type: ec.entity for ec in entity_containers}
         # initial_values = EntityComponentYear.objects.filter(
         #     learning_component_year__learning_unit_year=initial_learning_unit_year
         # ).values_list('repartition_volume', 'learning_component_year__type', 'entity_container_year__type')
@@ -360,17 +365,17 @@ class LearningUnitPostponementForm:
             #     # Case: N year have additional requirement but N+1 doesn't have.
             #     # Not need to display message because, already done on _check_differences function
             #     component = None
-            for entity_container_type, repartition_volume in new_component.repartition_volumes.items():
+
+            for entity_container_type, new_repartition_volume in new_component.repartition_volumes.items():
                 current_repartition = current_component.repartition_volumes[entity_container_type]
-                if repartition_volume != current_repartition:
-                    name = new_component.learning_component_year.acronym + "-" + \
-                           new_component.entity_container_year.entity.most_recent_acronym
+                if new_repartition_volume != current_repartition:
+                    name = new_component.acronym + "-" + entity_by_type[entity_container_type].most_recent_acronym
 
                     self.consistency_errors.setdefault(luy.academic_year, []).append(
                         _("The repartition volume of %(col_name)s has been already modified. "
                           "({%(new_value)s} instead of {%(current_value)s})") % {
                             'col_name': name,
-                            'new_value': new_component.repartition_volume,
+                            'new_value': new_repartition_volume,
                             'current_value': current_repartition
                         }
                     )

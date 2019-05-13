@@ -617,13 +617,18 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 1)
         component = self._change_entity_component_value(next_academic_year, 24)
 
+        requirement_entity = EntityContainerYear.objects.filter(
+            learning_container_year=component.learning_unit_year.learning_container_year,
+            type=REQUIREMENT_ENTITY
+        ).select_related('entity').get().entity
+
         expected_result = OrderedDict({
             next_academic_year: [
                 _("The repartition volume of %(col_name)s has been already modified. "
                   "({%(new_value)s} instead of {%(current_value)s})") % {
-                    'col_name': component.learning_component_year.acronym + "-" + component.entity_container_year.entity.most_recent_acronym,
-                    'new_value': component.repartition_volume,
-                    'current_value': '0.00'
+                    'col_name': component.acronym + "-" + requirement_entity.most_recent_acronym,
+                    'new_value': float(component.repartition_volume_requirement_entity),
+                    'current_value': float('0.00')
                 }
             ],
         })
