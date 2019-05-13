@@ -78,7 +78,7 @@ class LearningUnitYearWithContextTestCase(TestCase):
         self.learning_component_yr.hourly_volume_total_annual = 15
         self.learning_component_yr.hourly_volume_partial_q1 = 10
         self.learning_component_yr.hourly_volume_partial_q2 = 5
-        data = learning_unit_year_with_context.volume_learning_component_year(self.learning_component_yr, None)
+        data = learning_unit_year_with_context.volume_learning_component_year(self.learning_component_yr)
         self.assertEqual(data.get('VOLUME_TOTAL'), 15)
         self.assertEqual(data.get('VOLUME_Q1'), 10)
         self.assertEqual(data.get('VOLUME_Q2'), 5)

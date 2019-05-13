@@ -124,7 +124,7 @@ def get_same_container_year_components(learning_unit_year):
         components.append(
             {
                 'learning_component_year': learning_component_year,
-                'volumes': volume_learning_component_year(learning_component_year, None),
+                'volumes': volume_learning_component_year(learning_component_year),
                 'learning_unit_usage': _learning_unit_usage(learning_component_year.learning_unit_year),
                 'used_by_learning_unit': used_by_learning_unit
             }
@@ -185,7 +185,7 @@ def get_components_identification(learning_unit_yr):
         components.append(
             {
                 'learning_component_year': learning_component_year,
-                'volumes': volume_learning_component_year(learning_component_year, None)
+                'volumes': volume_learning_component_year(learning_component_year)
             }
         )
 

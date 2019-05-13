@@ -119,8 +119,7 @@ def _get_requirement_entities_volumes(learning_component):
 #     raise ValueError("The provided list should contain 0 or 1 elements")
 
 
-# TODO :: remove entity_components_year parameter
-def volume_learning_component_year(learning_component_year, entity_components_year):
+def volume_learning_component_year(learning_component_year):
     requirement_vols = _get_requirement_entities_volumes(learning_component_year)
     return {
         'VOLUME_TOTAL': learning_component_year.hourly_volume_total_annual,
