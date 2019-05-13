@@ -354,7 +354,7 @@ class LearningUnitYearWarningsTest(TestCase):
         complete_acronym = self.component_full_lecturing.complete_acronym
         excepted_error = "{} ({})".format(
             _('Volumes of {} are inconsistent').format(complete_acronym),
-            _('Vol_global is not equal to Vol_tot * planned_classes'))
+            _('the sum of repartition volumes must be equal to the global volume'))
         self.assertIn(excepted_error, self.component_full_lecturing.warnings)
         self.assertIn(excepted_error, self.luy_full.warnings)
 
@@ -371,7 +371,7 @@ class LearningUnitYearWarningsTest(TestCase):
         complete_acronym = self.component_full_lecturing.complete_acronym
         excepted_error_1 = "{} ({})".format(
             _('Volumes of {} are inconsistent').format(complete_acronym),
-            _('Vol_global is not equal to Vol_tot * planned_classes'))
+            _('the sum of repartition volumes must be equal to the global volume'))
         self.assertIn(excepted_error_1, self.component_full_lecturing.warnings)
         self.assertIn(excepted_error_1, self.luy_full.warnings)
 
@@ -495,7 +495,6 @@ class LearningUnitYearWarningsTest(TestCase):
         self.component_full_lecturing.hourly_volume_partial_q2 = 15.0
         self.component_full_lecturing.hourly_volume_total_annual = 30.0
         self.component_full_lecturing.planned_classes = 1
-        self.component_full_lecturing.save()
         self.component_full_lecturing.repartition_volume_requirement_entity = 30.0
         self.component_full_lecturing.save()
 
@@ -511,7 +510,6 @@ class LearningUnitYearWarningsTest(TestCase):
         learning_component_year_full_practical.hourly_volume_partial_q2 = 15.0
         learning_component_year_full_practical.hourly_volume_total_annual = 25.0
         learning_component_year_full_practical.planned_classes = 1
-        learning_component_year_full_practical.save()
         learning_component_year_full_practical.repartition_volume_requirement_entity = 25.0
         learning_component_year_full_practical.save()
 
@@ -519,12 +517,13 @@ class LearningUnitYearWarningsTest(TestCase):
         learning_component_year_partim_practical.hourly_volume_partial_q2 = 10.0
         learning_component_year_partim_practical.hourly_volume_total_annual = 20.0
         learning_component_year_partim_practical.planned_classes = 1
-        learning_component_year_partim_practical.save()
-        learning_component_year_partim_practical.repartition_volume_requirement_entity = 25.0
+        learning_component_year_partim_practical.repartition_volume_requirement_entity = 25.0  # wrong repartition
         learning_component_year_partim_practical.save()
 
         self.assertFalse(self.luy_full.learning_container_year.warnings)
-        self.assertTrue(self.luy_full.warnings)
+        warnings = self.luy_full.warnings
+        self.assertEqual(len(warnings), 1)
+        self.assertIn(_('the sum of repartition volumes must be equal to the global volume'), warnings[0])
 
     def test_warning_when_partim_parent_periodicity_different_from_parent(self):
         # Set Parent UE to biannual odd
