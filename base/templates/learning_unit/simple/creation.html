@@ -111,11 +111,11 @@
                                     <div class="row">
                                         {% bootstrap_field learning_unit_external_form.external_acronym form_group_class="form-group col-md-3" %}
                                         {% bootstrap_field learning_unit_external_form.url form_group_class="form-group col-md-6" %}
-                                        <div class="col-md-3 external_credits-group">
+                                        <div class="col-md-3">
                                             {% bootstrap_label learning_unit_external_form.external_credits.label label_class="control-label" %}
-                                            <abbr title="{% trans 'external credits rules' %}">
+                                            <abbr title="{% trans 'If the partner university does not use ECTS credit units, enter below the number of credit units according to the local system.' %}">
                                             <span class="glyphicon glyphicon-question-sign "
-                                                  title="{% trans 'external credits rules' %}"
+                                                  title="{% trans 'If the partner university does not use ECTS credit units, enter below the number of credit units according to the local system.' %}"
                                                   style="font-size: 12pt;"></span></abbr>
                                             {% bootstrap_field learning_unit_external_form.external_credits show_label=False %}
                                         </div>

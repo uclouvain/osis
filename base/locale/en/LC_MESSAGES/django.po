@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-13 15:22+0200\n"
+"POT-Creation-Date: 2019-05-13 15:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -442,7 +442,7 @@ msgstr ""
 #: business/learning_units/comparison.py:67
 #: business/learning_units/xls_comparison.py:177 business/proposal_xls.py:54
 #: models/enums/active_status.py:34 models/learning_unit_year.py:116
-#: models/learning_unit_year.py:249
+#: models/learning_unit_year.py:250
 #: templates/learning_unit/by_activity.html:110
 #: templates/learning_unit/by_external.html:67
 #: templates/learning_unit/comparison.html:54
@@ -701,8 +701,8 @@ msgid "Assistants"
 msgstr ""
 
 #: business/learning_container_year.py:45
-#: tests/models/test_learning_unit_year.py:445
-#: tests/models/test_learning_unit_year.py:479
+#: tests/models/test_learning_unit_year.py:442
+#: tests/models/test_learning_unit_year.py:476
 msgid ""
 "At least a partim volume value is greater than corresponding volume of parent"
 msgstr ""
@@ -1633,7 +1633,7 @@ msgstr ""
 msgid "Execute selected action"
 msgstr ""
 
-#: models/learning_unit_year.py:316
+#: models/learning_unit_year.py:317
 msgid "Existing acronym"
 msgstr ""
 
@@ -1809,7 +1809,7 @@ msgstr ""
 #: templates/education_group/tab_administrative_data.html:57
 #: templates/education_group/tab_administrative_data.html:65
 #: templates/education_group/tab_administrative_data.html:73
-#: templatetags/learning_unit.py:49 templatetags/learning_unit.py:55
+#: templatetags/learning_unit.py:51 templatetags/learning_unit.py:57
 #: tests/models/test_learning_unit.py:83 tests/models/test_learning_unit.py:86
 msgid "From"
 msgstr ""
@@ -1940,6 +1940,18 @@ msgstr "ISCED/CITE domain"
 msgid "Identification"
 msgstr ""
 
+#: templates/learning_unit/blocks/form/form_external.html:53
+#: templates/learning_unit/blocks/form/form_external.html:55
+#: templates/learning_unit/learning_unit_layout.html:91
+#: templates/learning_unit/learning_unit_layout.html:93
+#: templates/learning_unit/simple/creation.html:116
+#: templates/learning_unit/simple/creation.html:118
+#: templatetags/learning_unit.py:41
+msgid ""
+"If the partner university does not use ECTS credit units, enter below the "
+"number of credit units according to the local system."
+msgstr ""
+
 #: models/enums/diploma_printing_orientation.py:35
 msgid "In expected form"
 msgstr ""
@@ -1959,7 +1971,7 @@ msgstr ""
 #: business/learning_unit_proposal.py:67
 #: business/learning_units/comparison.py:67
 #: business/learning_units/xls_comparison.py:179
-#: models/enums/active_status.py:35 models/learning_unit_year.py:249
+#: models/enums/active_status.py:35 models/learning_unit_year.py:250
 #: templates/learning_unit/by_activity.html:114
 #: templates/learning_unit/by_external.html:71
 #: templates/learning_unit/summary_list.html:106
@@ -2087,7 +2099,7 @@ msgid ""
 "leaf."
 msgstr ""
 
-#: models/learning_unit_year.py:350
+#: models/learning_unit_year.py:351
 msgid "It is necessary to indicate the internship subtype."
 msgstr ""
 
@@ -2591,9 +2603,9 @@ msgstr ""
 
 #: forms/learning_unit/search_form.py:67
 #: models/external_learning_unit_year.py:90 models/learning_unit_year.py:229
-#: models/learning_unit_year.py:244
+#: models/learning_unit_year.py:245
 #: templates/learning_unit/blocks/panel/educational_informations.html:118
-#: tests/models/test_learning_unit_year.py:777
+#: tests/models/test_learning_unit_year.py:776
 msgid "Mobility"
 msgstr ""
 
@@ -4004,8 +4016,8 @@ msgstr ""
 #: templates/learning_unit/components.html:51
 #: templates/learning_unit/components_identification.html:37
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:160
-#: tests/models/test_learning_unit_year.py:349
-#: tests/models/test_learning_unit_year.py:389
+#: tests/models/test_learning_unit_year.py:346
+#: tests/models/test_learning_unit_year.py:386
 msgid "The annual volume must be equal to the sum of the volumes Q1 and Q2"
 msgstr ""
 
@@ -4053,7 +4065,7 @@ msgstr ""
 msgid "The coorganization modifications has been saved"
 msgstr ""
 
-#: models/learning_unit_year.py:341
+#: models/learning_unit_year.py:342
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:232
 #, python-format
 msgid ""
@@ -4062,9 +4074,9 @@ msgid ""
 msgstr ""
 
 #: forms/learning_unit/learning_unit_create.py:174
-#: models/learning_unit_year.py:336
+#: models/learning_unit_year.py:337
 #: tests/forms/learning_unit/test_learningUnitYearModelForm.py:89
-#: tests/models/test_learning_unit_year.py:600
+#: tests/models/test_learning_unit_year.py:597
 msgid "The credits value should be an integer"
 msgstr ""
 
@@ -4275,14 +4287,14 @@ msgid ""
 "finality %(education_group_year_finality)s."
 msgstr ""
 
-#: models/learning_unit_year.py:373 tests/models/test_learning_unit_year.py:562
+#: models/learning_unit_year.py:374 tests/models/test_learning_unit_year.py:559
 #, python-format
 msgid ""
 "The parent is %(parent_periodicty)s and there is at least one partim which "
 "is not %(parent_periodicty)s"
 msgstr ""
 
-#: models/learning_unit_year.py:360
+#: models/learning_unit_year.py:361
 msgid "The parent is inactive and there is at least one partim active"
 msgstr ""
 
@@ -4501,13 +4513,13 @@ msgstr ""
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr ""
 
-#: models/learning_unit_year.py:367 tests/models/test_learning_unit_year.py:578
+#: models/learning_unit_year.py:368 tests/models/test_learning_unit_year.py:575
 #, python-format
 msgid ""
 "This partim is %(partim_periodicity)s and the parent is %(parent_periodicty)s"
 msgstr ""
 
-#: models/learning_unit_year.py:357
+#: models/learning_unit_year.py:358
 msgid "This partim is active and the parent is inactive"
 msgstr ""
 
@@ -4565,7 +4577,7 @@ msgstr ""
 msgid "Title proper to the partim"
 msgstr ""
 
-#: models/learning_unit_year.py:255
+#: models/learning_unit_year.py:256
 msgid "To complete"
 msgstr ""
 
@@ -4815,8 +4827,8 @@ msgid "Vol. global"
 msgstr ""
 
 #: models/learning_component_year.py:120
-#: tests/models/test_learning_unit_year.py:366
-#: tests/models/test_learning_unit_year.py:383
+#: tests/models/test_learning_unit_year.py:363
+#: tests/models/test_learning_unit_year.py:380
 msgid "Vol_global is not equal to Vol_tot * planned_classes"
 msgstr ""
 "The overall volume must be equal to the annual volume multiplied by the "
@@ -4858,8 +4870,8 @@ msgid "Volume total annual"
 msgstr ""
 
 #: business/learning_container_year.py:44
-#: tests/models/test_learning_unit_year.py:444
-#: tests/models/test_learning_unit_year.py:478
+#: tests/models/test_learning_unit_year.py:441
+#: tests/models/test_learning_unit_year.py:475
 msgid "Volumes are inconsistent"
 msgstr ""
 
@@ -4869,12 +4881,12 @@ msgid "Volumes management"
 msgstr ""
 
 #: models/learning_component_year.py:112
-#: tests/models/test_learning_unit_year.py:348
-#: tests/models/test_learning_unit_year.py:365
-#: tests/models/test_learning_unit_year.py:382
-#: tests/models/test_learning_unit_year.py:388
-#: tests/models/test_learning_unit_year.py:631
-#: tests/models/test_learning_unit_year.py:649
+#: tests/models/test_learning_unit_year.py:345
+#: tests/models/test_learning_unit_year.py:362
+#: tests/models/test_learning_unit_year.py:379
+#: tests/models/test_learning_unit_year.py:385
+#: tests/models/test_learning_unit_year.py:628
+#: tests/models/test_learning_unit_year.py:646
 msgid "Volumes of {} are inconsistent"
 msgstr ""
 
@@ -5385,22 +5397,12 @@ msgstr ""
 #: templates/learning_unit/blocks/learning_unit_identification.html:14
 #: templates/learning_unit/simple/creation.html:76
 #: templates/learning_unit/simple/creation.html:78
-#, fuzzy
-#| msgid "acronym rules"
 msgid "external acronym rules"
 msgstr ""
 "Site with one letter\n"
 "Acronym with min 2 et max 4 letters\n"
-"Number Code with 4 digit"
-
-#: templates/learning_unit/blocks/form/form_external.html:53
-#: templates/learning_unit/blocks/form/form_external.html:55
-#: templates/learning_unit/learning_unit_layout.html:91
-#: templates/learning_unit/learning_unit_layout.html:93
-#: templates/learning_unit/simple/creation.html:116
-#: templates/learning_unit/simple/creation.html:118
-msgid "external credits rules"
-msgstr ""
+"Number Code with 4 digit\n"
+"Subdivision with one character"
 
 #: business/learning_unit_xls.py:79
 #: tests/business/test_learning_unit_xls.py:320
@@ -5507,7 +5509,7 @@ msgstr ""
 msgid "no"
 msgstr ""
 
-#: templatetags/learning_unit.py:55 tests/models/test_learning_unit.py:86
+#: templatetags/learning_unit.py:57 tests/models/test_learning_unit.py:86
 msgid "no planned end"
 msgstr ""
 
@@ -5547,12 +5549,12 @@ msgid "person"
 msgstr ""
 
 #: models/learning_component_year.py:124
-#: tests/models/test_learning_unit_year.py:632
+#: tests/models/test_learning_unit_year.py:629
 msgid "planned classes cannot be 0 while volume is greater than 0"
 msgstr ""
 
 #: models/learning_component_year.py:128
-#: tests/models/test_learning_unit_year.py:650
+#: tests/models/test_learning_unit_year.py:647
 msgid "planned classes cannot be greather than 0 while volume is equal to 0"
 msgstr ""
 
@@ -5700,7 +5702,7 @@ msgstr ""
 #: templates/education_group/tab_administrative_data.html:67
 #: templates/education_group/tab_administrative_data.html:75
 #: templates/learning_unit/blocks/modal/modal_warning_state_modification.html:33
-#: templatetags/learning_unit.py:51 tests/models/test_learning_unit.py:83
+#: templatetags/learning_unit.py:53 tests/models/test_learning_unit.py:83
 msgid "to"
 msgstr ""
 

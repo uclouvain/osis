@@ -34,9 +34,7 @@ from attribution.models.enums.function import COORDINATOR, CO_HOLDER
 from attribution.tests.factories.attribution import AttributionFactory
 from base.models import learning_unit_year
 from base.models.entity_component_year import EntityComponentYear
-from base.models.entity_container_year import EntityContainerYear
-from base.models.enums import learning_unit_year_periodicity, entity_container_year_link_type, \
-    learning_container_year_types
+from base.models.enums import learning_unit_year_periodicity, entity_container_year_link_type
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -53,7 +51,6 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
-from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.tutor import TutorFactory
 
@@ -763,6 +760,7 @@ class ContainerTypeVerboseTest(TestCase):
     def test_normal_case(self):
         external_learning_unit = ExternalLearningUnitYearFactory(
             learning_unit_year__learning_container_year__container_type=LearningContainerYearType.OTHER_INDIVIDUAL.name,
+            co_graduation=False
         )
         result = external_learning_unit.learning_unit_year.container_type_verbose
         expected_result = external_learning_unit.learning_unit_year.learning_container_year.get_container_type_display()
@@ -772,6 +770,7 @@ class ContainerTypeVerboseTest(TestCase):
         external_learning_unit = ExternalLearningUnitYearFactory(
             learning_unit_year__learning_container_year__container_type=LearningContainerYearType.EXTERNAL.name,
             mobility=True,
+            co_graduation=False
         )
         result = external_learning_unit.learning_unit_year.container_type_verbose
         self.assertEqual(result, _("Mobility"))
