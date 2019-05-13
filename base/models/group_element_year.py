@@ -38,7 +38,7 @@ from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import education_group_type, education_group_year
-from base.models.education_group_type import GROUP_TYPE_OPTION
+from base.models.education_group_type import GROUP_TYPE_OPTION, EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, quadrimesters
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
@@ -315,7 +315,7 @@ def find_learning_unit_formations(objects, parents_as_instances=False):
 
 
 def _get_root_filters():
-    root_type_names = education_group_type.search(category=education_group_categories.MINI_TRAINING) \
+    root_type_names = EducationGroupType.objects.filter(category=education_group_categories.MINI_TRAINING) \
         .exclude(name=GROUP_TYPE_OPTION).values_list('name', flat=True)
     root_categories = [education_group_categories.TRAINING]
     return {

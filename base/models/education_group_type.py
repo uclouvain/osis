@@ -91,20 +91,10 @@ class EducationGroupType(SerializableModel):
         return (self.name,)
 
 
-def search(**kwargs):
-    queryset = EducationGroupType.objects
-
-    if 'category' in kwargs:
-        queryset = queryset.filter(category=kwargs['category'])
-
-    return queryset
-
-
 def find_authorized_types(category=None, parents=None):
+    queryset = EducationGroupType.objects.all()
     if category:
-        queryset = search(category=category)
-    else:
-        queryset = EducationGroupType.objects.all()
+        queryset = queryset.filter(category=category)
 
     if parents:
         if not isinstance(parents, collections.Iterable):
