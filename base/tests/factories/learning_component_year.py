@@ -52,15 +52,7 @@ class LearningComponentYearFactory(factory.django.DjangoModelFactory):
     def consistency_of_planned_classes_and_volumes(self, create, extracted, ** kwargs):
         if self.hourly_volume_total_annual is None or self.hourly_volume_total_annual == 0:
             self.planned_classes = 0
-        else:
-            self.planned_classes = 1
-            vol_global = self.hourly_volume_total_annual * self.planned_classes
-            if self.hourly_volume_total_annual > 2:
-                self.repartition_volume_requirement_entity = float(vol_global - 3)
-                self.repartition_volume_additional_entity_1 = 2.0
-                self.repartition_volume_additional_entity_2 = 1.0
-            else:
-                self.repartition_volume_requirement_entity = vol_global
+            self.repartition_volume_requirement_entity = self.vol_global
 
 
 class LecturingLearningComponentYearFactory(LearningComponentYearFactory):
