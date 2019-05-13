@@ -97,15 +97,16 @@ def dl_tooltip(context, instance, key, **kwargs):
     not_annualized = kwargs.get('not_annualized', '')
     differences = context['differences']
 
-    if key == 'external_credits':
-        title = EXTERNAL_CREDIT_TOOLTIP
     if not label_text:
         label_text = instance._meta.get_field(key).verbose_name.capitalize()
 
     if not value:
         value = get_verbose_field_value(instance, key)
 
-    difference = get_difference_css(differences, key, default_if_none) or 'title="{}"'.format(_(title))
+    difference = get_difference_css(differences, key, default_if_none) or 'title="{}"'.format(
+        EXTERNAL_CREDIT_TOOLTIP if key == 'external_credits'
+        else _(title)
+    )
 
     if url:
         value = "<a href='{url}'>{value}</a>".format(value=_(str(value)), url=url)
