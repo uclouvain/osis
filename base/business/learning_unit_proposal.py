@@ -480,7 +480,8 @@ def get_components_identification_initial_data(proposal):
                 {
                     'learning_component_year': learning_component_year,
                     'volumes': volume_from_initial_learning_component_year(
-                        learning_component_year
+                        learning_component_year,
+                        proposal.initial_data.get('volumes')[learning_component_year['type']]
                     )
                 }
             )
