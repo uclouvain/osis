@@ -431,10 +431,7 @@ def _setup_learning_component_year(learning_unit_year, component_type):
     return LearningComponentYearFactory(
         learning_unit_year=learning_unit_year,
         type=component_type,
-        planned_classes=1,
-        repartition_volume_requirement_entity=Decimal(20),
-        repartition_volume_additional_entity_1=Decimal(10),
-        repartition_volume_additional_entity_2=Decimal(5)
+        planned_classes=1
     )
 
 
