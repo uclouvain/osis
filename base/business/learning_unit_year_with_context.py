@@ -103,10 +103,9 @@ def append_components(learning_unit_year):
     return learning_unit_year
 
 
-# TODO :: in this conversion to float really useful? To test
 def _get_requirement_entities_volumes(learning_component):
     return {
-        key: float(value) for key, value in learning_component.repartition_volumes.items()
+        key: value for key, value in learning_component.repartition_volumes.items()
     }
 
 
