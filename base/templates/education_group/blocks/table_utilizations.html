@@ -27,7 +27,6 @@
     <thead>
     <tr>
         <th></th>
-        <th>{% trans 'Formation' %}</th>
         <th>{% trans 'Code' %}</th>
         <th>{% trans 'Acronym/Short title' context 'abbreviation'%}</th>
         <th>{% trans 'Title' %}</th>
@@ -36,22 +35,18 @@
         <th>{% trans 'Max. credits' %}</th>
         <th>{% trans 'Mandatory' %}</th>
         <th>{% trans 'Block' %}</th>
+        <th>{% trans 'Formations' %}</th>
     </tr>
     </thead>
     <tbody>
     {% for group_element_year in group_element_years %}
         {% with ref_parent=group_element_year.parent|get_parent_of_reference_link %}
-            {% for formation in formations|get_item:group_element_year.parent.id %}
-                {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=group_element_year formation=formation only %}
+            {% with formations|get_item:group_element_year.parent.id as parent_formations %}
+                {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=group_element_year formations=parent_formations only %}
                 {% if ref_parent %}
                     {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=ref_parent is_reference=True only %}
                 {% endif %}
-            {% empty %}
-                {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=group_element_year only %}
-                {% if ref_parent %}
-                    {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=ref_parent is_reference=True only %}
-                {% endif %}
-            {% endfor %}
+            {% endwith %}
         {% endwith %}
     {% endfor %}
     </tbody>

@@ -30,13 +30,6 @@
             <img src="{% static 'img/reference.jpg' %}" >
         {% endif %}
     </td>
-    <td>
-        {% if formation %}
-           <a href="{% url "education_group_read" root_id=formation.id education_group_year_id=formation.id%}">{{ formation.acronym }}</a>
-         {% else %}
-            -
-        {% endif %}
-    </td>
     <td>{{ group_element_year.parent.partial_acronym | default_if_none:'' }}</td>
     <td>{{ group_element_year.parent.acronym | default_if_none:'' }}</td>
     <td>{{ group_element_year.parent.title | default_if_none:'' }}</td>
@@ -48,4 +41,11 @@
     <td>{{ group_element_year.max_credits | default_if_none:'-' }}</td>
     <td>{{ group_element_year.is_mandatory | yesno:_("yes,no") | title }}</td>
     <td>{{ group_element_year.block | default_if_none:'-' }}</td>
+    <td>
+        {% for formation in formations%}
+           <a href="{% url "education_group_read" root_id=formation.id education_group_year_id=formation.id%}">{{ formation.acronym }}</a>
+         {% empty %}
+            -
+        {% endfor %}
+    </td>
 </tr>
