@@ -5343,7 +5343,7 @@ msgstr "événements académiques"
 # TODO
 #: templates/learning_unit/simple/creation.html:70
 #: templates/learning_unit/simple/creation.html:71
-msgid "acronym_rules"
+msgid "acronym rules"
 msgstr ""
 "Code composé de:\n"
 "site: 1 lettre\n"

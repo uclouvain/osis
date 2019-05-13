@@ -5144,7 +5144,7 @@ msgstr ""
 # TODO
 #: templates/learning_unit/simple/creation.html:70
 #: templates/learning_unit/simple/creation.html:71
-msgid "acronym_rules"
+msgid "acronym rules"
 msgstr ""
 "Site with one letter\n"
 "Acronym with min 2 et max 4 letters\n"
