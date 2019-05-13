@@ -247,8 +247,11 @@ class PersonTest(PersonTestCase):
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
         )
 
-        external_luy.requesting_entity = person_entity.entity
-        external_luy.save()
+        EntityContainerYearFactory(
+            learning_container_year=luy.learning_container_year,
+            entity=person_entity.entity,
+            type=REQUIREMENT_ENTITY
+        )
 
         self.assertTrue(
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)

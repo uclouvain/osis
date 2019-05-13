@@ -26,9 +26,9 @@
 import re
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
-from base.forms.common import STEP_HALF_INTEGER
 from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, split_acronym
 from base.forms.utils.choice_field import add_blank
 from base.models.campus import find_main_campuses
@@ -36,12 +36,12 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, EXTERNAL
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_WITHOUT_EXTERNAL, INTERNSHIP
 from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
+from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit, REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
 from reference.models.language import find_all_languages
-from django.core.exceptions import ValidationError
 
 CRUCIAL_YEAR_FOR_CREDITS_VALIDATION = 2018
 
@@ -129,13 +129,23 @@ class LearningUnitYearModelForm(forms.ModelForm):
             'credits': forms.TextInput(),
         }
 
+    def __clean_acronym_external(self):
+        acronym = ""
+        if "acronym" not in self.initial or self.initial["acronym"][0] == LearningUnitExternalSite.E.value:
+            self.data["acronym_0"] = LearningUnitExternalSite.E.value
+            if not self.instance.subtype == PARTIM:
+                acronym = self.data["acronym_0"] + self.data["acronym_1"]
+            else:
+                acronym = self.data["acronym_0"] + self.data["acronym_1"] + self.data["acronym_2"]
+        if not re.match(REGEX_BY_SUBTYPE[EXTERNAL], self.cleaned_data["acronym"]) and self.instance.subtype == FULL:
+            raise ValidationError(_('Invalid code'))
+        if not re.match(REGEX_BY_SUBTYPE[PARTIM], self.cleaned_data["acronym"]) and self.instance.subtype == PARTIM:
+            raise ValidationError(_('Invalid code'))
+        return acronym.upper()
+
     def clean_acronym(self):
         if self.external:
-            if "acronym" not in self.initial or self.initial["acronym"][0] == LearningUnitExternalSite.E.value:
-                self.data["acronym_0"] = LearningUnitExternalSite.E.value
-                self.cleaned_data['acronym'] = (LearningUnitExternalSite.E.value+self.data["acronym_1"]).upper()
-            if not re.match(REGEX_BY_SUBTYPE[EXTERNAL], self.cleaned_data["acronym"]):
-                raise ValidationError(_('Invalid code'))
+            self.cleaned_data["acronym"] = self.__clean_acronym_external()
         elif not self.external and not re.match(REGEX_BY_SUBTYPE[self.instance.subtype], self.cleaned_data["acronym"]):
             raise ValidationError(_('Invalid code'))
         return self.cleaned_data["acronym"]
