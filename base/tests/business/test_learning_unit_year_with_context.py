@@ -73,7 +73,7 @@ class LearningUnitYearWithContextTestCase(TestCase):
     #         learning_unit_year_with_context._get_floated_only_element_of_list(a_list)
 
     def test_volume_learning_component_year(self):
-        self.entity_component_yr.repatition_volume_requirement_entity = 15
+        self.learning_component_yr.repartition_volume_requirement_entity = 15
 
         self.learning_component_yr.hourly_volume_total_annual = 15
         self.learning_component_yr.hourly_volume_partial_q1 = 10
