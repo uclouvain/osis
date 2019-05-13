@@ -344,10 +344,7 @@ def _update_learning_unit_year_entities(luy, entities_by_type_to_update):
 
 
 def update_or_create_entity_container_year_with_components(an_entity, learning_container_year, type_entity):
-    an_entity_container_year = _update_entity_container_year(an_entity, learning_container_year, type_entity)
-    # if type_entity in REQUIREMENT_ENTITIES:
-        # Only entity with volume can have entity_component_year
-        # _create_entity_component_year_if_not_exists(an_entity_container_year)
+    return _update_entity_container_year(an_entity, learning_container_year, type_entity)
 
 
 def _update_entity_container_year(an_entity, learning_container_year, type_entity):

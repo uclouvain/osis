@@ -110,15 +110,6 @@ def _get_requirement_entities_volumes(learning_component):
     }
 
 
-# def (a_list, default=None):
-#     len_of_list = len(a_list)
-#     if not len_of_list:
-#         return default
-#     elif len_of_list == 1:
-#         return float(a_list[0]) if a_list[0] else 0.0
-#     raise ValueError("The provided list should contain 0 or 1 elements")
-
-
 def volume_learning_component_year(learning_component_year):
     requirement_vols = _get_requirement_entities_volumes(learning_component_year)
     return {

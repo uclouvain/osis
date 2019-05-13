@@ -351,22 +351,13 @@ class LearningUnitPostponementForm:
             learning_container_year=initial_learning_unit_year.learning_container_year,
         ).select_related("entity")
         entity_by_type = {ec.type: ec.entity for ec in entity_containers}
-        # initial_values = EntityComponentYear.objects.filter(
-        #     learning_component_year__learning_unit_year=initial_learning_unit_year
-        # ).values_list('repartition_volume', 'learning_component_year__type', 'entity_container_year__type')
 
-        # for reparation_volume, component_type, entity_type in initial_learning_unit_year.learningcompoentyear_set.all():
         for current_component in initial_learning_unit_year.learningcomponentyear_set.all():
             component_type = current_component.type
-            # try:
             new_component = LearningComponentYear.objects.filter(
                 type=component_type,
                 learning_unit_year=luy
             ).select_related("learning_unit_year__learning_container_year").get()
-            # except EntityComponentYear.DoesNotExist:
-            #     # Case: N year have additional requirement but N+1 doesn't have.
-            #     # Not need to display message because, already done on _check_differences function
-            #     component = None
 
             for entity_container_type, new_repartition_volume in new_component.repartition_volumes.items():
                 current_repartition = current_component.repartition_volumes[entity_container_type]

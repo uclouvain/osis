@@ -297,7 +297,6 @@ class GenerateContainerYear:
         self._setup_learning_unit_year_partim(learning_unit_partim)
         self._setup_learning_components_year()
         self._setup_entity_containers_year()
-        # self._setup_entity_components_year()
         self.nb_classes = 5
         self._setup_classes()
 
@@ -370,11 +369,6 @@ class GenerateContainerYear:
             self.additionnal_1_entity_container_year,
             self.addtionnal_2_entity_container_year
         ]
-    #
-    # def _setup_entity_components_year(self):
-    #     for component in self.list_components:
-    #         for entity_container_year in self.list_repartition_volume_entities:
-    #             _setup_entity_component_year(component, entity_container_year)
 
     def _setup_classes(self):
         for component in self.list_components:

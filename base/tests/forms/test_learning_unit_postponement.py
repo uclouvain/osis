@@ -472,7 +472,6 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
     def _change_entity_component_value(self, academic_year, repartition_volume):
         qs = LearningComponentYear.objects.filter(
             type=LECTURING,
-            # entity_container_year__type=REQUIREMENT_ENTITY,
             learning_unit_year__academic_year=academic_year,
             learning_unit_year__learning_unit=self.learning_unit_year_full.learning_unit
         )
