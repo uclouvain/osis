@@ -42,14 +42,14 @@
     {% for group_element_year in group_element_years %}
         {% with ref_parent=group_element_year.parent|get_parent_of_reference_link %}
             {% for formation in formations|get_item:group_element_year.parent.id %}
-                {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=group_element_year formation=formation %}
+                {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=group_element_year formation=formation only %}
                 {% if ref_parent %}
-                    {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=ref_parent is_reference=True %}
+                    {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=ref_parent is_reference=True only %}
                 {% endif %}
             {% empty %}
-                {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=group_element_year %}
+                {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=group_element_year only %}
                 {% if ref_parent %}
-                    {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=ref_parent is_reference=True %}
+                    {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=ref_parent is_reference=True only %}
                 {% endif %}
             {% endfor %}
         {% endwith %}
