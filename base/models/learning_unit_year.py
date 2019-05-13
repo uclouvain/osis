@@ -40,7 +40,7 @@ from base.models.academic_year import compute_max_academic_year_adjournment, Aca
 from base.models.enums import active_status, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
-from base.models.enums.learning_container_year_types import COURSE, INTERNSHIP
+from base.models.enums.learning_container_year_types import COURSE, INTERNSHIP, EXTERNAL
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, ANNUAL, BIENNIAL_EVEN, BIENNIAL_ODD
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
@@ -228,7 +228,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
             if self.is_external_of_mobility():
                 verbose_type = _('Mobility')
 
-            if self.learning_container_year.container_type in (COURSE, INTERNSHIP):
+            if self.learning_container_year.container_type in (COURSE, INTERNSHIP, EXTERNAL):
                 verbose_type += " ({subtype})".format(subtype=self.get_subtype_display())
 
         return verbose_type
