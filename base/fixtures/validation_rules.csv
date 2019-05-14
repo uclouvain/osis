@@ -106,7 +106,7 @@ Examples: <i>ALLELV, JAPOLV, FRANLV</i>","Sigle d’un Cours de langue est compo
 <li>2-4 lettres + <b>LV</b></li>
 </ul>
 Exemples: <i>ALLELV, JAPOLV, FRANLV</i>",Ex: FRANLV
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_IS,REQUIRED,IS,"^([A-Za-z]{2,4})([Ii])([Ss])$",,"Acronym of Isolated class is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_IS,REQUIRED,IS,"^([A-Za-z]{2,4})[ ]([Ii])([Ss])$",,"Acronym of Isolated class is composed of:
 <ul>
 <li>2-4 letters + <b>IS</b></li>
 </ul>
@@ -300,7 +300,7 @@ Examples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>","Code d’une Attestation d’
 <li>partie numérique: 3 chiffres</li>
 <li><b>Q</b> or <b>>W</b></li>
 </ul>
-Exemples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>",Ex: LFRTB100Q
+Exemples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>",Ex: LPCDI100W
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_1BA,REQUIRED,100B,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Bb])$",,"Code of Bachelor is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -435,7 +435,7 @@ Examples: <i>WCDEN900X, LARCB900X, LCHIM900X</i>","Code d’un Cour isolé est c
 <li>partie numérique: 3 chiffres</li>
 <li><b>X</b></li>
 </ul>
-Exemples: <i>WCDEN900X, LARCB900X, LCHIM900X</i>",Ex: WCDEN900X
+Exemples: <i>WCDEN900X, LARCB900X, LCHIM900X</i>",Ex: LACTU900X
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_3DP,REQUIRED,300D,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Dd])$",,"Code of PhD is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -533,14 +533,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>S</b></li>
 </ul>
-Examples: <i>MAPHM200S, LARKE200S, LROGE200S</i>","Code d’un Master en 120 crédits à finalité spécialisé est composé de:
+Examples: <i>LBBMC200S, LARKE200S, LROGE200S</i>","Code d’un Master en 120 crédits à finalité spécialisé est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>S</b></li>
 </ul>
-Exemples: <i>MAPHM200S, LARKE200S, LROGE200S</i>",Ex: MAPHM200S
+Exemples: <i>LBBMC200S, LARKE200S, LROGE200S</i>",Ex: LBBMC200S
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2M180,REQUIRED,200M,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Mm])$",,"Code of Program master 180-240 is composed of:
 <ul>
 <li>site: 1 letter</li>
