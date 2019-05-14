@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import collections
 import itertools
 from collections import Counter
 
@@ -360,18 +361,24 @@ def _extract_common_academic_year(objects):
 
 
 def _build_parent_list_by_education_group_year_id(academic_year):
-    group_elements = list(search(academic_year=academic_year)
-                          .filter(parent__isnull=False)
-                          .filter(Q(child_leaf__isnull=False) | Q(child_branch__isnull=False))
-                          .select_related('education_group_year__education_group_type')
-                          .values('parent', 'child_branch', 'child_leaf', 'parent__education_group_type__name',
-                                  'parent__education_group_type__category'))
-    result = {}
+    group_elements = search(
+        academic_year=academic_year
+    ).filter(
+        parent__isnull=False
+    ).filter(
+        Q(child_leaf__isnull=False) | Q(child_branch__isnull=False)
+    ).select_related(
+        'education_group_year__education_group_type'
+    ).values(
+        'parent', 'child_branch', 'child_leaf', 'parent__education_group_type__name',
+        'parent__education_group_type__category'
+    )
+    result = collections.defaultdict(list)
     # TODO :: uses .annotate() on queryset to make the below expected result
     for group_element_year in group_elements:
         key = _build_child_key(child_branch=group_element_year['child_branch'],
                                child_leaf=group_element_year['child_leaf'])
-        result.setdefault(key, []).append(group_element_year)
+        result[key].append(group_element_year)
     return result
 
 
