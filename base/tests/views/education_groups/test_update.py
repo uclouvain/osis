@@ -425,12 +425,21 @@ class TestSelectAttach(TestCase):
     def setUpTestData(self):
         self.person = PersonFactory()
         self.academic_year = create_current_academic_year()
-        self.child_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
+        self.child_education_group_year = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group__end_year=self.academic_year.year+1
+        )
         self.learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
         self.initial_parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
         self.new_parent_education_group_year = EducationGroupYearFactory(
             academic_year=self.academic_year,
-            education_group_type__learning_unit_child_allowed=True
+            education_group_type__learning_unit_child_allowed=True,
+            education_group__end_year=self.academic_year.year+2
+        )
+        self.bad_parent = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__learning_unit_child_allowed=True,
+            education_group__end_year=self.academic_year.year-1
         )
 
         self.initial_group_element_year = GroupElementYearFactory(
@@ -516,6 +525,38 @@ class TestSelectAttach(TestCase):
 
         redirected_url = reverse('learning_unit', args=[self.learning_unit_year.id])
         self.assertRedirects(response, redirected_url, fetch_redirect_response=False)
+
+    def test_attach_case_child_education_group_year_with_larger_end_year(self):
+        AuthorizedRelationshipFactory(
+            parent_type=self.bad_parent.education_group_type,
+            child_type=self.child_education_group_year.education_group_type,
+        )
+
+        expected_absent_group_element_year = GroupElementYear.objects.filter(
+            parent=self.bad_parent,
+            child_branch=self.child_education_group_year
+        ).exists()
+        self.assertFalse(expected_absent_group_element_year)
+
+        self._assert_link_with_inital_parent_present()
+
+        # Select :
+        self.client.post(self.url_management, data=self.select_data)
+
+        # Attach :
+        self.client.post(
+            reverse("education_group_attach",
+                    args=[self.attach_data["root_id"],
+                          self.attach_data["element_id"]]),
+        )
+
+        expected_group_element_year_existing = GroupElementYear.objects.filter(
+            parent=self.bad_parent,
+            child_branch=self.child_education_group_year
+        ).exists()
+        self.assertFalse(expected_group_element_year_existing)
+
+        self._assert_link_with_inital_parent_present()
 
     def test_attach_case_child_education_group_year(self):
         AuthorizedRelationshipFactory(
