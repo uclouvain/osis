@@ -73,7 +73,6 @@ class TestFindBuildParentListByEducationGroupYearId(TestCase):
                 'child_leaf': None,
                 'parent__education_group_type__category': self.root.education_group_type.category,
                 'parent__education_group_type__name': self.root.education_group_type.name,
-                'key': 'base_educationgroupyear_{}'.format(self.child_branch.id)
             }, ],
             'base_learningunityear_{}'.format(self.child_leaf.id): [{
                 'parent': self.child_branch.id,
@@ -81,7 +80,6 @@ class TestFindBuildParentListByEducationGroupYearId(TestCase):
                 'child_leaf': self.child_leaf.id,
                 'parent__education_group_type__category': self.child_branch.education_group_type.category,
                 'parent__education_group_type__name': self.child_branch.education_group_type.name,
-                'key': 'base_learningunityear_{}'.format(self.child_leaf.id)
             }, ]
         }
         self.assertEqual(len(result), len(expected_result))

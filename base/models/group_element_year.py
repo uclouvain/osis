@@ -291,21 +291,6 @@ class GroupElementYear(OrderedModel):
         return True
 
 
-def search(**kwargs):
-    queryset = GroupElementYear.objects
-
-    if 'academic_year' in kwargs:
-        academic_year = kwargs['academic_year']
-        queryset = queryset.filter(Q(parent__academic_year=academic_year) |
-                                   Q(child_branch__academic_year=academic_year) |
-                                   Q(child_leaf__academic_year=academic_year))
-
-    if 'child_leaf' in kwargs:
-        queryset = queryset.filter(child_leaf=kwargs['child_leaf'])
-
-    return queryset
-
-
 def find_learning_unit_formations(objects, parents_as_instances=False):
     root_ids_by_object_id = {}
     if objects:
@@ -362,39 +347,27 @@ def _extract_common_academic_year(objects):
 
 
 def _build_parent_list_by_education_group_year_id(academic_year):
-    MAX_LENGTH = 32
-    group_elements = search(
-        academic_year=academic_year
+    group_elements = GroupElementYear.objects.filter(
+        Q(parent__academic_year=academic_year) |
+        Q(child_branch__academic_year=academic_year) |
+        Q(child_leaf__academic_year=academic_year)
     ).filter(
         parent__isnull=False
     ).filter(
         Q(child_leaf__isnull=False) | Q(child_branch__isnull=False)
     ).select_related(
         'education_group_year__education_group_type'
-    ).annotate(
-        key=Case(
-            When(
-                child_leaf__isnull=False,
-                then=Concat(Value(LearningUnitYear._meta.db_table + "_"),
-                            Cast("child_leaf_id", CharField(max_length=MAX_LENGTH)),
-                            output_field=CharField(max_length=MAX_LENGTH))
-            ),
-            default=Concat(Value(EducationGroupYear._meta.db_table + "_"),
-                           Cast("child_branch_id", CharField(max_length=MAX_LENGTH)),
-                           output_field=CharField(max_length=MAX_LENGTH)),
-            output_field=CharField(max_length=MAX_LENGTH)
-        )
     ).values(
         'parent', 'child_branch', 'child_leaf', 'parent__education_group_type__name',
-        'parent__education_group_type__category', "key"
+        'parent__education_group_type__category'
     )
     result = collections.defaultdict(list)
     for group_element_year in group_elements:
-        # TODO Remove this check as it's not pertinent
-        args = [group_element_year['child_branch'], group_element_year['child_leaf']]
-        if not any(args) or all(args):
-            raise AttributeError('Only one of the 2 param must bet set (not both of them).')
-        result[group_element_year["key"]].append(group_element_year)
+        key = _build_child_key(
+            child_branch=group_element_year["child_branch"],
+            child_leaf=group_element_year["child_leaf"]
+        )
+        result[key].append(group_element_year)
     return result
 
 
@@ -408,7 +381,7 @@ def _build_child_key(child_branch=None, child_leaf=None):
     else:
         branch_part = EducationGroupYear._meta.db_table
         id_part = child_branch
-    return '{branch_part}_{id_part}'.format(**locals())
+    return '{branch_part}_{id_part}'.format(branch_part=branch_part, id_part=id_part)
 
 
 def _find_elements(group_elements_by_child_id, filters, child_leaf_id=None, child_branch_id=None):
