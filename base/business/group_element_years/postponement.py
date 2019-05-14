@@ -180,6 +180,9 @@ class PostponeContent:
         self.postponed_options = {}
         self.postponed_finalities = []
 
+        self.number_links_created = 0
+        self.number_elements_created = 0
+
     def check_instance(self):
         if self.instance.academic_year.year < self.current_year.year:
             raise NotPostponeError(_("You are not allowed to postpone this training in the past."))
@@ -239,6 +242,7 @@ class PostponeContent:
 
         if not new_gr:
             new_gr = update_related_object(gr, "parent", next_instance, commit_save=False)
+            self.number_links_created += 1
 
         if new_gr.child_leaf:
             new_gr = self._postpone_child_leaf(gr, new_gr)
@@ -299,13 +303,14 @@ class PostponeContent:
             if new_gr.link_type == LinkTypes.REFERENCE.name and is_empty:
                 self.warnings.append(ReferenceLinkEmptyWarning(new_egy))
             elif not is_empty:
-                if not (new_egy.is_training() or new_egy.is_mini_training()):
+                if not (new_egy.is_training() or new_egy.education_group_type.name in MiniTrainingType.to_postpone()):
                     self.warnings.append(EducationGroupYearNotEmptyWarning(new_egy, self.next_academic_year))
             else:
                 self._postpone(old_egy, new_egy)
         else:
             # If the education group does not exists for the next year, we have to postpone.
             new_egy = self._duplication_education_group_year(old_gr, old_egy)
+            self.number_elements_created += 1
 
         new_gr.child_branch = new_egy
         if new_egy and new_egy.education_group_type.name == MiniTrainingType.OPTION.name:
@@ -378,7 +383,7 @@ class PostponeContent:
 
         for finality, options in missing_options.items():
             for option in options:
-                if option.id in self.postponed_options:
+                if option.id in self.postponed_options and self.postponed_options[option.id].id:
                     self.warnings.append(
                         FinalityOptionNotValidWarning(
                             option,
@@ -435,6 +440,6 @@ class PostponeContent:
 
 
 def _display_education_group_year(egy: EducationGroupYear):
-    if egy.is_training() or egy.is_mini_training():
+    if egy.is_training() or egy.education_group_type.name in MiniTrainingType.to_postpone():
         return egy.verbose
     return egy.partial_acronym

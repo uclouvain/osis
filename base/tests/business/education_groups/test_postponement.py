@@ -698,8 +698,7 @@ class TestPostpone(TestCase):
             _("The option %(education_group_year_option)s is not anymore accessible in "
               "%(education_group_year_root)s "
               "in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
-                "education_group_year_option": "{} - {}".format(child_child_grp.child_branch.partial_acronym,
-                                                                child_child_grp.child_branch.acronym),
+                "education_group_year_option": "{}".format(child_child_grp.child_branch.partial_acronym),
                 "education_group_year_root": "{} - {}".format(root_egy_n1.partial_acronym, root_egy_n1.acronym),
                 "education_group_year_finality": "{} - {}".format(child_grp.child_branch.partial_acronym,
                                                                   child_grp.child_branch.acronym),

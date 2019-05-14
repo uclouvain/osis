@@ -42,7 +42,7 @@
                     <thead>
                         <th>{% trans 'Acronym'%}</th>
                         <th>{% trans 'Title'%}</th>
-                        <th>{% trans 'type'%}</th>
+                        <th>{% trans 'Type'%}</th>
                         <th>{% trans 'Start date'%}</th>
                         <th>{% trans 'End date'%}</th>
                     </thead>
@@ -55,7 +55,7 @@
                                     </a>
                                 </td>
                                 <td>{{ entity_version.title }}</td>
-                                <td>{% if entity_version.entity_type != 'UNKNOWN' and entity_version.entity_type %}{% trans entity_version.entity_type %}{% else %}-{% endif %}</td>
+                                <td>{% if entity_version.entity_type != 'UNKNOWN' and entity_version.entity_type %}{{ entity_version.get_entity_type_display }}{% else %}-{% endif %}</td>
                                 <td>{{ entity_version.start_date }}</td>
                                 <td>{{ entity_version.end_date | default_if_none:'-' }}</td>
                             </tr>

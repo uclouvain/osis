@@ -21,10 +21,16 @@ var formAjaxSubmit = function (form, modal) {
             context: this,
             success: function (xhr, ajaxOptions, thrownError) {
                 //Stay on the form if there are errors.
-                if ($(xhr).find('.has-error,.alert-danger').length > 0) {
+                if ($(xhr).find('.has-error,.alert-danger,.stay_in_modal').length > 0) {
                     $(modal).find('.modal-content').html(xhr);
+
                     // Add compatibility with ckeditor and related textareas
                     bindTextArea();
+
+                    // Refresh the form node because the modal content has changed.
+                    form = $("#"+form.attr('id'));
+
+                    // Binding the new content with submit method.
                     formAjaxSubmit(form, modal);
                     this.dispatchEvent(new CustomEvent("formAjaxSubmit:error", {}));
                 } else {
@@ -39,6 +45,8 @@ var formAjaxSubmit = function (form, modal) {
         });
     });
 };
+
+
 
 
 // CKEDITOR needs to dynamically bind the textareas during an XMLHttpRequest requests
