@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ from reversion.admin import VersionAdmin
 
 from base.models import entity_version
 from base.models.enums import entity_container_year_link_type
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES, EntityContainerYearLinkTypes
+from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
@@ -44,8 +44,8 @@ class EntityContainerYearAdmin(VersionAdmin, SerializableModelAdmin):
 class EntityContainerYear(SerializableModel):
     external_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    entity = models.ForeignKey('Entity')
-    learning_container_year = models.ForeignKey('LearningContainerYear')
+    entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
+    learning_container_year = models.ForeignKey('LearningContainerYear', on_delete=models.CASCADE)
     type = models.CharField(max_length=35, choices=EntityContainerYearLinkTypes.choices())
     _warnings = None
 
@@ -68,7 +68,7 @@ class EntityContainerYear(SerializableModel):
             if not entity_version.get_by_entity_and_date(self.entity,
                                                          self.learning_container_year.academic_year.start_date):
                 self._warnings.append(_("The linked %(entity)s does not exist at the start date of the academic year"
-                                        " linked to this learning unit") % {'entity': _(self.type.lower())})
+                                        " linked to this learning unit") % {'entity': self.get_type_display().lower()})
         return self._warnings
 
 

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ class TextLabelAdmin(osis_model_admin.OsisModelAdmin):
 class TextLabel(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    parent = models.ForeignKey('self', blank=True, null=True)
+    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
     entity = models.CharField(max_length=25, choices=ENTITY_NAME)
     label = models.CharField(max_length=255)
     order = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import datetime
 import json
 import urllib
 from http import HTTPStatus
+from itertools import product
 from unittest import mock
 
 import bs4
@@ -36,7 +37,7 @@ from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
-from django.test import TestCase, RequestFactory, override_settings
+from django.test import TestCase, RequestFactory
 from waffle.testutils import override_flag
 
 from base.business.education_groups.general_information import PublishException
@@ -47,11 +48,13 @@ from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.admission_condition import AdmissionConditionFactory
+from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory, \
     TrainingFactory, EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonBachelorFactory, \
     EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.mandatary import MandataryFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
@@ -61,7 +64,6 @@ from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
 
 
-@override_settings(URL_TO_PORTAL_UCL="http://portal-url.com", GET_SECTION_PARAM="sectionsParams")
 class EducationGroupGeneralInformations(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -76,7 +78,8 @@ class EducationGroupGeneralInformations(TestCase):
         )
         cls.education_group_child = TrainingFactory(
             acronym="Child_1",
-            academic_year=cls.current_academic_year
+            academic_year=cls.current_academic_year,
+            education_group_type__name=TrainingType.CERTIFICATE_OF_PARTICIPATION.name
         )
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
 
@@ -86,6 +89,7 @@ class EducationGroupGeneralInformations(TestCase):
         )
 
         cls.person = PersonWithPermissionsFactory("can_access_education_group")
+
         cls.url = reverse(
             "education_group_general_informations",
             args=[cls.education_group_parent.pk, cls.education_group_child.pk]
@@ -529,6 +533,47 @@ class EducationGroupAdministrativedata(TestCase):
         self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
 
         self.assertTrue(response.context["can_edit_administrative_data"])
+
+    def test_get_good_mandataries(self):
+        ed = EducationGroupFactory()
+        ac = AcademicYearFactory(current=True)
+        edy = EducationGroupYearFactory(education_group=ed, academic_year=ac)
+
+        url = reverse('education_group_administrative', args=[
+            edy.id, edy.id
+        ])
+
+        combinations = list(product((0, 1, -1), repeat=2))
+        one_day = datetime.timedelta(days=1)
+        good_dates = [
+            (ac.start_date + combi[0]*one_day, ac.end_date + combi[1]*one_day)
+            for combi in combinations
+        ]
+        bad_dates = [
+            (ac.start_date - 2*one_day, ac.start_date - one_day),
+            (ac.end_date + one_day, ac.end_date + 2*one_day),
+        ]
+
+        good_mandataries = [
+            MandataryFactory(
+                mandate__education_group=ed,
+                start_date=date[0],
+                end_date=date[1]
+            )
+            for date in good_dates
+        ]
+        bad_mandataries = [
+            MandataryFactory(
+                mandate__education_group=ed,
+                start_date=date[0],
+                end_date=date[1]
+            )
+            for date in bad_dates
+        ]
+        response = self.client.get(url)
+        self.assertCountEqual(good_mandataries, response.context['mandataries'])
+        for bad in bad_mandataries:
+            self.assertFalse(bad in response.context['mandataries'])
 
 
 @override_flag('education_group_update', active=True)
@@ -1111,6 +1156,13 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         edy = EducationGroupYearFactory(
             education_group_type__name=TrainingType.MASTER_M1.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.master_adm_cond)
+
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_180_240.name,
             academic_year=self.academic_year
         )
         result = get_appropriate_common_admission_condition(edy)

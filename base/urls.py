@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -54,6 +54,7 @@ from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 from base.views.organization import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete
 from base.views.person import EmployeeAutocomplete
+from base.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -177,8 +178,6 @@ urlpatterns = [
             url(r'^specifications/$', learning_unit.learning_unit_specifications, name="learning_unit_specifications"),
             url(r'^specifications/edit/$', learning_unit.learning_unit_specifications_edit,
                 name="learning_unit_specifications_edit"),
-            url(r'^component/edit/$', learning_unit.learning_unit_component_edit, name="learning_unit_component_edit"),
-            url(r'^class/edit/$', learning_unit.learning_class_year_edit, name="learning_class_year_edit"),
             url(r'^volumes/(?P<form_type>[a-z]+)$', base.views.learning_units.update.learning_unit_volumes_management,
                 name="learning_unit_volumes_management"),
             url(r'^delete_full/$', base.views.learning_units.delete.delete_all_learning_units_year,
@@ -290,7 +289,9 @@ urlpatterns = [
         url(r'^clear/$', base.views.notifications.clear_user_notifications, name="clear_notifications"),
         url(r'^mark_as_read/$', base.views.notifications.mark_notifications_as_read, name="mark_notifications_as_read"),
     ])),
-
+    url(r'^quick_search_learning_unit/$', QuickSearchLearningUnitYearView.as_view(), name="quick_search_learning_unit"),
+    url(r'^quick_search_education_group/$', QuickSearchEducationGroupYearView.as_view(),
+        name="quick_search_education_group"),
 ]
 
 if settings.DEBUG:

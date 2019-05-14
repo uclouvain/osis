@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,13 +29,13 @@ from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
-from base.models.entity_version import EntityVersion
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.learning_container_year_types import EXTERNAL
-from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
 from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
@@ -54,14 +54,21 @@ class TestUpdateExternalLearningUnitView(TestCase):
 
         self.academic_year = create_current_academic_year()
 
-        luy = LearningUnitYearFullFactory(academic_year=self.academic_year)
+        luy = LearningUnitYearFullFactory(academic_year=self.academic_year, internship_subtype=None, acronym="EFAC0000")
         self.external = ExternalLearningUnitYearFactory(learning_unit_year=luy)
 
         luy.learning_container_year.container_type = EXTERNAL
         luy.learning_container_year.save()
 
         EntityVersionFactory(entity=self.external.requesting_entity)
-        PersonEntityFactory(person=self.person, entity=self.external.requesting_entity)
+
+        person_entity = PersonEntityFactory(person=self.person, entity=self.external.requesting_entity)
+
+        EntityContainerYearFactory(
+            learning_container_year=luy.learning_container_year,
+            entity=person_entity.entity,
+            type=REQUIREMENT_ENTITY
+        )
 
         self.data = get_valid_external_learning_unit_form_data(self.academic_year, self.person,
                                                                self.external.learning_unit_year)

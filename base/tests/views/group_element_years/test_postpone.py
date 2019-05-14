@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.contrib.auth.models import Permission
+from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import ugettext as _, ngettext
@@ -62,9 +63,10 @@ class TestPostpone(TestCase):
 
         PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
 
-        self.group_element_year = GroupElementYearFactory(parent=self.education_group_year,
-                                                          child_branch__academic_year=
-                                                          self.education_group_year.academic_year)
+        self.group_element_year = GroupElementYearFactory(
+            parent=self.education_group_year,
+            child_branch__academic_year=self.education_group_year.academic_year
+        )
         self.url = reverse(
             "postpone_education_group",
             kwargs={
@@ -94,22 +96,18 @@ class TestPostpone(TestCase):
         self.group_element_year.delete()
         self.education_group_year.delete()
         response = self.client.post(self.url, follow=True)
-        self.assertRedirects(response, self.redirect_url)
-
-        message = list(response.context.get('messages'))[0]
+        message = list(get_messages(response.wsgi_request))[0]
         self.assertEqual(message.tags, "error")
 
     def test_post_with_success(self):
         response = self.client.post(self.url, follow=True)
-        self.assertRedirects(response, self.redirect_url)
 
-        message = list(response.context.get('messages'))[0]
+        message = list(get_messages(response.wsgi_request))[0]
 
-        count = 1
-        msg = ngettext(
-            "%(count)d education group has been postponed with success.",
-            "%(count)d education groups have been postponed with success.", count
-        ) % {'count': count}
+        msg = _("%(count_elements)s OF(s) and %(count_links)s link(s) have been postponed with success.") % {
+                'count_elements': 1,
+                'count_links': 1
+        }
 
         self.assertEqual(message.tags, "success")
         self.assertTrue(msg in message.message)

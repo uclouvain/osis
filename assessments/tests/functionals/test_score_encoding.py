@@ -974,7 +974,10 @@ class FunctionalTest(SeleniumTestCase, BusinessMixin):
 
         self.click_on('lnk_notes_printing_{}'.format(learning_unit_year_1.id))
         time.sleep(1)
-        filename = 'Feuille de notes.pdf'
+        filename = "session_%s_%s_%s.pdf" % (
+            learning_unit_year_1.academic_year.year,
+            session_exam_calendar.number_session,
+            learning_unit_year_1.acronym)
         full_path = os.path.join(self.full_path_temp_dir, filename)
 
         self.assertTrue(os.path.exists(full_path))
@@ -1112,9 +1115,11 @@ class Scenario7FunctionalTest(SeleniumTestCase, BusinessMixin):
 
 import pypom
 
+
 class Field:
     def __init__(self, *locator):
         self.locator = locator
+
 
 class InputField(Field):
     def __set__(self, obj, value):
@@ -1127,9 +1132,11 @@ class InputField(Field):
         element = obj.find_element(*self.locator)
         return element.get_attribute('value')
 
+
 class SubmitField(Field):
     def __get__(self, obj, owner):
         return obj.find_element(*self.locator)
+
 
 class ScoresEncodingPage(pypom.Page):
     acronym = InputField(By.ID, 'txt_acronym')

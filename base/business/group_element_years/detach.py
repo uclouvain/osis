@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         return options_to_detach
 
     def is_valid(self):
-        management.check_authorized_relationship(self.parent, self.link, to_delete=True)
+        management.can_link_be_detached(self.parent, self.link)
         if self._get_options_to_detach() and self.get_parents_program_master():
             self._check_detatch_options_rules()
         return True

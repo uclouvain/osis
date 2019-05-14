@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -107,6 +107,7 @@ class EducationGroup(SerializableModel):
             ("change_commonpedagogyinformation", "Can change common pedagogy information"),
             ("change_pedagogyinformation", "Can change pedagogy information"),
         )
+        verbose_name = _("Education group")
 
     def clean(self):
         # Check end_year should be greater of equals to start_year
@@ -137,7 +138,7 @@ class EducationGroup(SerializableModel):
                 self._check_end_year_root_2m_cover_all_finalities(education_group_year)
 
     def _check_end_year_finality_are_in_range_of_root_2m(self, finality_egy):
-        qs = EducationGroupYear.hierarchy.filter(pk=finality_egy.pk)\
+        qs = EducationGroupYear.hierarchy.filter(pk=finality_egy.pk) \
             .get_parents().filter(education_group_type__name__in=TrainingType.root_master_2m_types())
 
         if self.end_year is None:

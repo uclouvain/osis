@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -54,16 +54,20 @@ def cache_filter(exclude_params=None, **default_values):
             except Exception:
                 logger.exception('An error occurred with cache system')
             return func(request, *args, **kwargs)
+
         return inner
+
     return decorator
 
 
 class CacheFilterMixin:
+    cache_exclude_params = None
+
     # Mixin that keep the cache for cbv.
     def get(self, request, *args, **kwargs):
         request_cache = RequestCache(user=request.user, path=request.path)
         if request.GET:
-            request_cache.save_get_parameters(request)
+            request_cache.save_get_parameters(request, parameters_to_exclude=self.cache_exclude_params)
         request.GET = request_cache.restore_get_request(request)
         return super().get(request, *args, **kwargs)
 

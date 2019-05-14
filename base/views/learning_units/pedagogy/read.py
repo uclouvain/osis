@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ from django.db.models import Prefetch, Case, When, Value, IntegerField, Q
 from django.shortcuts import get_object_or_404, render
 from reversion.models import Version
 
+from attribution.models.attribution import Attribution
 from base import models as mdl
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
     CMS_LABEL_PEDAGOGY
@@ -39,7 +40,6 @@ from base.business.learning_units import perms
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
 from base.models.person import Person
 from base.models.teaching_material import TeachingMaterial
-from base.models.tutor import Tutor
 from base.views.learning_units.common import get_common_context_learning_unit_year
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
@@ -94,9 +94,9 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
         "label_ordering"
     )
     teaching_materials = TeachingMaterial.objects.filter(learning_unit_year=learning_unit_year).order_by('order')
-    tutors = Tutor.objects.filter(attribution__learning_unit_year=learning_unit_year).select_related(
-        "person"
-    ).order_by("person")
+    attributions = Attribution.objects.filter(learning_unit_year=learning_unit_year).select_related(
+        "tutor__person"
+    ).order_by("tutor__person")
 
     translated_text_ids = itertools.chain.from_iterable(
         (*translated_label.text_label.text_fr, *translated_label.text_label.text_en)
@@ -129,6 +129,6 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
     context['can_edit_information'] = perm_to_edit
     context['can_edit_summary_locked_field'] = perms.can_edit_summary_locked_field(learning_unit_year, person)
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
-    context['tutors'] = tutors
+    context['attributions'] = attributions
     context["version"] = reversion
     return render(request, template, context)

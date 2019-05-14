@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -116,7 +116,7 @@ def is_eligible_for_modification(learning_unit_year, person, raise_exception=Fal
         _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception) and \
         is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise_exception) and \
         is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception) and \
-        _check_proposal_edition(learning_unit_year, person, raise_exception)
+        _check_proposal_edition(learning_unit_year, raise_exception)
     return result
 
 
@@ -411,7 +411,6 @@ def _is_container_type_course_dissertation_or_internship(learning_unit_year, _, 
     result = \
         learning_unit_year.learning_container_year and \
         learning_unit_year.learning_container_year.container_type in FACULTY_UPDATABLE_CONTAINER_TYPES
-
     can_raise_exception(
         raise_exception,
         result,
@@ -571,13 +570,11 @@ def _is_container_type_course_dissertation_or_internship2(learning_unit_year, _,
         learning_unit_year.learning_container_year.container_type in FACULTY_UPDATABLE_CONTAINER_TYPES
 
 
-def _check_proposal_edition(learning_unit_year, person, raise_exception):
-    if person.is_faculty_manager:
-        result = not ProposalLearningUnit.objects.filter(
-            learning_unit_year__learning_unit=learning_unit_year.learning_unit,
-            learning_unit_year__academic_year__year__lte=learning_unit_year.academic_year.year).exists()
-    else:
-        result = True
+def _check_proposal_edition(learning_unit_year, raise_exception):
+    result = not ProposalLearningUnit.objects.filter(
+        learning_unit_year__learning_unit=learning_unit_year.learning_unit,
+        learning_unit_year__academic_year__year__lte=learning_unit_year.academic_year.year
+    ).exists()
 
     can_raise_exception(
         raise_exception,

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -40,10 +40,10 @@ class OfferYearEntityAdmin(OsisModelAdmin):
 class OfferYearEntity(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    offer_year = models.ForeignKey('OfferYear', blank=True, null=True)
-    entity = models.ForeignKey('Entity')
+    offer_year = models.ForeignKey('OfferYear', blank=True, null=True, on_delete=models.CASCADE)
+    entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
     type = models.CharField(max_length=30, blank=True, null=True, choices=offer_year_entity_type.TYPES)
-    education_group_year = models.ForeignKey('EducationGroupYear', blank=True, null=True)
+    education_group_year = models.ForeignKey('EducationGroupYear', blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ('offer_year', 'type')

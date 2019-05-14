@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,5 +34,6 @@ class OrganizationFactory(factory.DjangoModelFactory):
 
     external_id = factory.Faker('text', max_nb_chars=100)
     changed = factory.Faker('date_time_this_month', tzinfo=get_tzinfo())
+    is_current_partner = True
 
     type = factory.Iterator(organization_type.ORGANIZATION_TYPE, getter=lambda c: c[0])

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@
 import os
 import sys
 
-from django.core.urlresolvers import reverse_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = os.path.dirname((os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -122,7 +122,7 @@ TESTS_TYPES = os.environ.get('TESTS_TYPES', 'UNIT')
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'debug': DEBUG,
@@ -133,7 +133,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'base.views.common.common_context_processor',
-                'base.context_processors.user_manual.user_manual_url'
+                'base.context_processors.user_manual.user_manual_url',
+                'django.template.context_processors.i18n',
             ],
         },
     },
@@ -171,6 +172,7 @@ TIME_ZONE = os.environ.get('TIME_ZONE', 'Europe/Brussels')
 # Static files (CSS, JavaScript, Images) and Media
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = os.environ.get('STATIC_URL', '/static/')
+STATICI18N_ROOT = os.path.join(BASE_DIR, os.environ.get('STATICI18N', 'base/static'))
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(BASE_DIR, "uploads"))
 MEDIA_URL = os.environ.get('MEDIA_URL',  '/media/')
 CONTENT_TYPES = ['application/csv', 'application/doc', 'application/pdf', 'application/xls', 'application/xml',
@@ -242,33 +244,12 @@ CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'django-db')
 LOCALE_PATHS = ()
 
 
-def define_style_sheet(name, class_name):
-    return {'name': name, 'element': 'div', 'attributes': {'class': class_name}}
-
-
-REDDOT_STYLES = [
-    define_style_sheet('Intro', 'reddot_intro'),
-    define_style_sheet('Teaser', 'reddot_teaser'),
-    define_style_sheet('Collapse', 'reddot_collapse'),
-    define_style_sheet('Extra', 'reddot_extra'),
-    define_style_sheet('Body', 'reddot_body'),
-    define_style_sheet('Part1', 'reddot_part1'),
-    define_style_sheet('Part2', 'reddot_part2'),
-    define_style_sheet('Contact Responsible', 'contacts_responsible'),
-    define_style_sheet('Contact Other Responsibles', 'contacts_responsibles'),
-    define_style_sheet('Contact Jury', 'contacts_jury'),
-    define_style_sheet('Contact Contact', 'contacts_contact'),
-    define_style_sheet('Contact Introduction', 'contacts_introduction'),
-]
-
 # Apps Settings
 CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
     'reddot': {
         "removePlugins": "stylesheetparser",
-        'extraAllowedContent': 'div(reddot_*,contacts_*)',
-        'extraPlugins': ','.join(['reddot', 'pastefromword']),
-        'stylesSet': REDDOT_STYLES,
+        'extraPlugins': ','.join(['pastefromword', 'cdn']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
@@ -278,14 +259,16 @@ CKEDITOR_CONFIGS = {
             ['Link', 'Unlink'],
             ['CreateDiv'],
             {'name': 'insert', 'items': ['Table']},
+            {'name': 'cdn_integration', 'items': ['CDN']},
         ],
-        'autoParagraph': False
+        'autoParagraph': False,
+        'allowedContent': True,
+        'customValues': {'cdn_url': os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager/?ckeditor=yes")},
     },
     'default': {
         "removePlugins": "stylesheetparser",
         'allowedContent': True,
-        'extraAllowedContent': 'div(reddot_*,contacts_*)',
-        'extraPlugins': ','.join(['reddot', 'pastefromword']),
+        'extraPlugins': ','.join(['pastefromword']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
@@ -304,19 +287,22 @@ CKEDITOR_CONFIGS = {
                        'HiddenField']},
             {'name': 'about', 'items': ['About']},
         ],
-        'stylesSet': REDDOT_STYLES,
         'autoParagraph': False
     },
     'minimal': {
         'toolbar': 'Custom',
+        'extraPlugins': ','.join(['cdn']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList'],
-            ['Link', 'Unlink']
+            ['Link', 'Unlink'],
+            {'name': 'cdn_integration', 'items': ['CDN']},
         ],
-        'autoParagraph': False
+        'autoParagraph': False,
+        'allowedContent': True,
+        'customValues': {'cdn_url': os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager/?ckeditor=yes")},
     },
     'minimal_plus_headers': {
         'toolbar': 'Custom',
@@ -457,7 +443,8 @@ REQUESTS_TIMEOUT = 20
 
 # PEDAGOGY INFORMATION
 URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/prog-{year}-{code}")
-GET_SECTION_PARAM = os.environ.get("GET_SECTION_PARAM", "")
 
 YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 2018))
 YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 2019))
+
+STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')

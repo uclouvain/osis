@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -151,9 +151,9 @@ class CountryAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
 
 class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Campus.objects.all()
+        qs = Campus.objects.filter(organization__is_current_partner=True)
 
-        country = self.forwarded.get('country', None)
+        country = self.forwarded.get('country_external_institution', None)
 
         if country:
             qs = qs.filter(organization__organizationaddress__country=country)

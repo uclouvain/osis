@@ -107,10 +107,11 @@ table.volumes tbody {
     border-bottom: 2px solid #c0c0c0;
 }
 
+table.volumes_simplified tbody tr th:nth-child(1),
 table.volumes tbody tr td:nth-child(1),
-table.volumes tbody tr td:nth-child(8),
+table.volumes tbody tr td:nth-child(10),
 table.volumes tbody tr th:nth-child(1),
-table.volumes tbody tr th:nth-child(8) {
+table.volumes tbody tr th:nth-child(10) {
     background-color: #f3f3f3;
 }
 
@@ -261,7 +262,7 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
 }
 
 .sidenav {
-    padding-top: 70px;
+    padding-top: 60px;
     height: 100%;
     width: 100%;
     background-color: #ffffff;
@@ -269,10 +270,6 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
     overflow-y: auto;
     overflow-x: auto;
     padding-bottom: 50px;
-}
-
-.sidenav #panel_file_tree {
-    padding-left: 30px;
 }
 
 

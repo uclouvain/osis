@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -31,13 +31,17 @@ BLANK_CHOICE = [(None, BLANK_CHOICE_DISPLAY)]
 ALL_CHOICE = [("all", pgettext_lazy("plural", "All"))]
 
 
-def add_blank(choices):
+def add_blank(choices, blank_choice_display=None):
+    blank_choice = BLANK_CHOICE
+    if blank_choice_display:
+        blank_choice = [(None, blank_choice_display)]
+
     if isinstance(choices, QuerySet):
         choices = list(choices)
     if isinstance(choices, list):
-        return BLANK_CHOICE + choices
+        return blank_choice + choices
 
-    return tuple(BLANK_CHOICE) + choices
+    return tuple(blank_choice) + choices
 
 
 def add_all(choices):

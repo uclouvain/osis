@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -101,12 +101,20 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-
+        luy = self.object
+        root = context["root"]
         context["prerequisite"] = get_object_or_none(Prerequisite,
-                                                     learning_unit_year=context["learning_unit_year"],
-                                                     education_group_year=context["root"])
-        context["can_modify_prerequisite"] = perms.is_eligible_to_change_education_group(context['person'],
-                                                                                         context["root"])
+                                                     learning_unit_year=luy,
+                                                     education_group_year=root)
+        context["can_modify_prerequisite"] = perms.is_eligible_to_change_education_group(
+            context['person'],
+            context["root"]
+        )
+
+        context['is_prerequisite_acronym_list'] = Prerequisite.objects.filter(
+            prerequisiteitem__learning_unit=luy.learning_unit,
+            education_group_year=root
+        ).values_list('learning_unit_year__acronym', flat=True)
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -138,7 +146,7 @@ class LearningUnitPrerequisiteGroup(LearningUnitGenericDetailView):
         context = super().get_context_data()
 
         learning_unit_year = context["learning_unit_year"]
-        formations_id = group_element_year.find_learning_unit_formations([learning_unit_year]).\
+        formations_id = group_element_year.find_learning_unit_formations([learning_unit_year]). \
             get(learning_unit_year.id, [])
         qs = EducationGroupYear.objects.filter(id__in=formations_id)
         prefetch_prerequisites = Prefetch("prerequisite_set",

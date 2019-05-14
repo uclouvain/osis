@@ -58,6 +58,7 @@ $(document).ready(function () {
                 "contextmenu",
                 // Plugin to save the state of the node (collapsed or not)
                 "state",
+                "search",
             ],
             "state": {
                 // the key is important if you have multiple trees in the same domain
@@ -161,6 +162,17 @@ $(document).ready(function () {
             }
         }
     );
+
+    var to = false;
+    $('#search_jstree').keyup(function () {
+        if (to) {
+            clearTimeout(to);
+        }
+        to = setTimeout(function () {
+            var v = $('#search_jstree').val();
+            $documentTree.jstree(true).search(v);
+        }, 250);
+    });
 });
 
 

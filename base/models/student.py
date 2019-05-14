@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class Student(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     registration_id = models.CharField(max_length=10, unique=True, db_index=True)
-    person = models.ForeignKey('Person')
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
 
     def __str__(self):
         return u"%s (%s)" % (self.person, self.registration_id)

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -36,9 +36,9 @@ class EntityManagerAdmin(SerializableModelAdmin):
 
 
 class EntityManager(SerializableModel):
-    person = models.ForeignKey('Person')
-    structure = models.ForeignKey('Structure')
-    entity = models.ForeignKey('Entity', blank=True, null=True)
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    structure = models.ForeignKey('Structure', on_delete=models.CASCADE)
+    entity = models.ForeignKey('Entity', blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return u"%s" % self.person

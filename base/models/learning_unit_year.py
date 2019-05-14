@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
 from django.db.models import Q, Sum
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
@@ -90,16 +91,10 @@ class ExtraManagerLearningUnitYear(models.Model):
 class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
-                                      validators=[academic_year_validator])
-    learning_unit = models.ForeignKey('LearningUnit')
+                                      validators=[academic_year_validator], on_delete=models.CASCADE)
+    learning_unit = models.ForeignKey('LearningUnit', on_delete=models.CASCADE)
 
-    learning_container_year = models.ForeignKey('LearningContainerYear', null=True)
-
-    learning_component_years = models.ManyToManyField(
-        LearningComponentYear,
-        through="base.LearningUnitComponent",
-        verbose_name=_("Components"),
-    )
+    learning_container_year = models.ForeignKey('LearningContainerYear', null=True, on_delete=models.CASCADE)
 
     changed = models.DateTimeField(null=True, auto_now=True)
     acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('Code'),
@@ -114,7 +109,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
                                   validators=[MinValueValidator(MINIMUM_CREDITS), MaxValueValidator(MAXIMUM_CREDITS)],
                                   verbose_name=_('Credits'))
     decimal_scores = models.BooleanField(default=False)
-    structure = models.ForeignKey('Structure', blank=True, null=True)
+    structure = models.ForeignKey('Structure', blank=True, null=True, on_delete=models.CASCADE)
     internship_subtype = models.CharField(max_length=250, blank=True, null=True,
                                           verbose_name=_('Internship subtype'),
                                           choices=internship_subtypes.INTERNSHIP_SUBTYPES)
@@ -135,9 +130,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     professional_integration = models.BooleanField(default=False, verbose_name=_('professional integration'))
 
-    campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"))
+    campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"), on_delete=models.CASCADE)
 
-    language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'))
+    language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'), on_delete=models.CASCADE)
 
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
                                    verbose_name=_('Periodicity'))
@@ -145,7 +140,8 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     class Meta:
         unique_together = (('learning_unit', 'academic_year'), ('acronym', 'academic_year'))
-
+        ordering = 'acronym',
+        verbose_name = _("Learning unit year")
         permissions = (
             ("can_receive_emails_about_automatic_postponement", "Can receive emails about automatic postponement"),
         )
@@ -225,14 +221,29 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     @property
     def container_type_verbose(self):
-        container_type = ''
-        if self.learning_container_year:
-            container_type = _(self.learning_container_year.get_container_type_display())
+        verbose_type = ''
+        if self.learning_container_year:  # FIXME :: remove this 'if' when classes will be remoed from LearningUnitYear
+            verbose_type = _(self.learning_container_year.get_container_type_display())
 
-            if self.learning_container_year.container_type in (COURSE, INTERNSHIP):
-                container_type += " ({subtype})".format(subtype=self.get_subtype_display())
+            if self.is_external_of_mobility():
+                verbose_type = _('Mobility')
 
-        return container_type
+            if self.learning_container_year.container_type in (COURSE, INTERNSHIP) or \
+                    self.is_external_with_co_graduation():
+                verbose_type += " ({subtype})".format(subtype=self.get_subtype_display())
+
+        return verbose_type
+
+    def is_external_of_mobility(self):
+        return self.is_external() and self.externallearningunityear.mobility
+
+    def get_container_type_display(self):
+        # FIXME :: Condition to remove when the LearningUnitYear.learning_container_year_id will be null=false
+        if not self.learning_container_year:
+            return ''
+        if self.is_external_of_mobility():
+            return _('Mobility')
+        return self.learning_container_year.get_container_type_display()
 
     @property
     def status_verbose(self):
@@ -366,9 +377,12 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     def _check_learning_component_year_warnings(self):
         _warnings = []
-        components_queryset = self.learning_container_year.learningcomponentyear_set
-        all_components = components_queryset.order_by('learningunityear__acronym').prefetch_related(
-            'learningunityear_set').annotate(vol_global=Sum('entitycomponentyear__repartition_volume'))
+        components_queryset = LearningComponentYear.objects.filter(
+            learning_unit_year__learning_container_year=self.learning_container_year
+        )
+        all_components = components_queryset.order_by('acronym') \
+            .select_related('learning_unit_year') \
+            .annotate(vol_global=Sum('entitycomponentyear__repartition_volume'))
         for learning_component_year in all_components:
             _warnings.extend(learning_component_year.warnings)
 
@@ -387,6 +401,12 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def is_external(self):
         return hasattr(self, "externallearningunityear")
 
+    def is_external_with_co_graduation(self):
+        return self.is_external() and self.externallearningunityear.co_graduation
+
+    def is_external_mobility(self):
+        return self.is_external() and self.externallearningunityear.mobility
+
     def is_prerequisite(self):
         return PrerequisiteItem.objects.filter(
             Q(learning_unit=self.learning_unit) | Q(prerequisite__learning_unit_year=self)
@@ -398,6 +418,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
             Q(prerequisite__learning_unit_year=self, prerequisite__education_group_year__in=formations) |
             Q(prerequisite__education_group_year__in=formations, learning_unit=self.learning_unit)
         ).exists()
+
+    def get_absolute_url(self):
+        return reverse('learning_unit', args=[self.pk])
 
 
 def get_by_id(learning_unit_year_id):
@@ -487,7 +510,7 @@ def find_summary_responsible_by_name(queryset, name):
 
 
 def _build_tutor_filter(name_type):
-    return '__'.join(['learningunitcomponent', 'learning_component_year', 'attributionchargenew', 'attribution',
+    return '__'.join(['learningcomponentyear', 'attributionchargenew', 'attribution',
                       'tutor', 'person', name_type, 'iregex'])
 
 

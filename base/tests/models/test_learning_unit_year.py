@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,11 +34,11 @@ from attribution.models.enums.function import COORDINATOR, CO_HOLDER
 from attribution.tests.factories.attribution import AttributionFactory
 from base.models import learning_unit_year
 from base.models.entity_component_year import EntityComponentYear
-from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import learning_unit_year_periodicity, entity_container_year_link_type
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import find_max_credits_of_related_partims, check_if_acronym_regex_is_valid, \
     find_learning_unit_years_by_academic_year_tutor_attributions
@@ -51,7 +51,6 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
-from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.tutor import TutorFactory
 
@@ -325,7 +324,7 @@ class LearningUnitYearWarningsTest(TestCase):
         self.luy_full = self.generated_container.generated_container_years[0].learning_unit_year_full
         self.learning_component_year_full_lecturing = LearningComponentYear.objects.filter(
             type=LECTURING,
-            learningunitcomponent__learning_unit_year=self.luy_full
+            learning_unit_year=self.luy_full
         ).first()
         self.entity_component_year_full_lecturing_requirement = EntityComponentYear.objects.get(
             learning_component_year=self.learning_component_year_full_lecturing,
@@ -415,7 +414,7 @@ class LearningUnitYearWarningsTest(TestCase):
         luy_partim = self.generated_container.generated_container_years[0].learning_unit_year_partim
         learning_component_year_partim_lecturing = LearningComponentYear.objects.filter(
             type=LECTURING,
-            learningunitcomponent__learning_unit_year=luy_partim
+            learning_unit_year=luy_partim
         ).first()
         entity_component_year_partim_lecturing_requirement = EntityComponentYear.objects.get(
             learning_component_year=learning_component_year_partim_lecturing,
@@ -449,7 +448,7 @@ class LearningUnitYearWarningsTest(TestCase):
         luy_partim = self.generated_container.generated_container_years[0].learning_unit_year_partim
         learning_component_year_partim_lecturing = LearningComponentYear.objects.filter(
             type=LECTURING,
-            learningunitcomponent__learning_unit_year=luy_partim
+            learning_unit_year=luy_partim
         ).first()
         entity_component_year_partim_lecturing_requirement = EntityComponentYear.objects.get(
             learning_component_year=learning_component_year_partim_lecturing,
@@ -487,7 +486,7 @@ class LearningUnitYearWarningsTest(TestCase):
 
         learning_component_year_partim_lecturing = LearningComponentYear.objects.filter(
             type=LECTURING,
-            learningunitcomponent__learning_unit_year=luy_partim
+            learning_unit_year=luy_partim
         ).first()
         entity_component_year_partim_lecturing_requirement = EntityComponentYear.objects.get(
             learning_component_year=learning_component_year_partim_lecturing,
@@ -496,7 +495,7 @@ class LearningUnitYearWarningsTest(TestCase):
 
         learning_component_year_partim_practical = LearningComponentYear.objects.filter(
             type=PRACTICAL_EXERCISES,
-            learningunitcomponent__learning_unit_year=luy_partim
+            learning_unit_year=luy_partim
         ).first()
         entity_component_year_partim_lecturing_practical = EntityComponentYear.objects.get(
             learning_component_year=learning_component_year_partim_practical,
@@ -505,7 +504,7 @@ class LearningUnitYearWarningsTest(TestCase):
 
         learning_component_year_full_practical = LearningComponentYear.objects.filter(
             type=PRACTICAL_EXERCISES,
-            learningunitcomponent__learning_unit_year=self.luy_full
+            learning_unit_year=self.luy_full
         ).first()
         entity_component_year_full_practical = EntityComponentYear.objects.get(
             learning_component_year=learning_component_year_full_practical,
@@ -753,3 +752,50 @@ class TestHasOrIsPrerequisite(TestCase):
         self.assertTrue(
             self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
         )
+
+
+class ContainerTypeVerboseTest(TestCase):
+    """Unit tests on container_type_verbose()"""
+
+    def test_normal_case(self):
+        external_learning_unit = ExternalLearningUnitYearFactory(
+            learning_unit_year__learning_container_year__container_type=LearningContainerYearType.OTHER_INDIVIDUAL.name,
+            co_graduation=False
+        )
+        result = external_learning_unit.learning_unit_year.container_type_verbose
+        expected_result = external_learning_unit.learning_unit_year.learning_container_year.get_container_type_display()
+        self.assertEqual(result, expected_result)
+
+    def test_when_is_external_of_mobility(self):
+        external_learning_unit = ExternalLearningUnitYearFactory(
+            learning_unit_year__learning_container_year__container_type=LearningContainerYearType.EXTERNAL.name,
+            mobility=True,
+            co_graduation=False
+        )
+        result = external_learning_unit.learning_unit_year.container_type_verbose
+        self.assertEqual(result, _("Mobility"))
+
+    def test_when_is_course(self):
+        external_learning_unit = ExternalLearningUnitYearFactory(
+            learning_unit_year__learning_container_year__container_type=LearningContainerYearType.COURSE.name,
+        )
+        luy = external_learning_unit.learning_unit_year
+        result = luy.container_type_verbose
+        expected_result = '{} ({})'.format(
+            luy.learning_container_year.get_container_type_display(),
+            luy.get_subtype_display()
+        )
+        self.assertEqual(result, expected_result)
+
+    def test_when_is_internship(self):
+        external_learning_unit = ExternalLearningUnitYearFactory(
+            learning_unit_year__learning_container_year__container_type=LearningContainerYearType.INTERNSHIP.name,
+            learning_unit_year__subtype=learning_unit_year_subtypes.FULL,
+        )
+        luy = external_learning_unit.learning_unit_year
+        result = luy.container_type_verbose
+        expected_result = '{} ({})'.format(
+            luy.learning_container_year.get_container_type_display(),
+            luy.get_subtype_display()
+        )
+        self.assertEqual(result, expected_result)

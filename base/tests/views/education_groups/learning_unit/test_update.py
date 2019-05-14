@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.prerequisite import PrerequisiteFactory
 
 
 class TestUpdateLearningUnitPrerequisite(TestCase):
@@ -164,6 +165,25 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
             '(LSINF1111 ET LDROI1200) OU LEDPH1200'
         )
 
+    def test_post_data_with_prerequisite_in_lower_case(self):
+        LearningUnitYearFactory(acronym='LSINF1111')
+        LearningUnitYearFactory(acronym='LDROI1200')
+
+        form_data = {
+            "prerequisite_string": "lsinf1111 et ldroi1200"
+        }
+        self.client.post(self.url, data=form_data)
+        prerequisite = Prerequisite.objects.get(
+            learning_unit_year=self.learning_unit_year_child.id,
+            education_group_year=self.education_group_year_parents[0].id,
+        )
+
+        self.assertTrue(prerequisite)
+        self.assertEqual(
+            prerequisite.prerequisite_string,
+            'LSINF1111 ET LDROI1200'
+        )
+
     def test_post_data_prerequisite_accept_duplicates(self):
         LearningUnitYearFactory(acronym='LDROI1200')
         LearningUnitYearFactory(acronym='LEDPH1200')
@@ -223,4 +243,29 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertEqual(
             str(errors_prerequisite_string[0]),
             _("A learning unit cannot be prerequisite to itself : %(acronym)s") % {'acronym': 'LDROI1200'}
+        )
+
+    def test_post_data_modify_existing_prerequisite(self):
+        LearningUnitYearFactory(acronym='LSINF1111')
+        LearningUnitYearFactory(acronym='LSINF1112')
+
+        form_data = {
+            "prerequisite_string": "LSINF1111"
+        }
+        self.client.post(self.url, data=form_data)
+
+        form_data = {
+            "prerequisite_string": "LSINF1112"
+        }
+        self.client.post(self.url, data=form_data)
+
+        prerequisite = Prerequisite.objects.get(
+            learning_unit_year=self.learning_unit_year_child.id,
+            education_group_year=self.education_group_year_parents[0].id,
+        )
+
+        self.assertTrue(prerequisite)
+        self.assertEqual(
+            prerequisite.prerequisite_string,
+            'LSINF1112'
         )

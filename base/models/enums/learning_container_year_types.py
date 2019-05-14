@@ -39,7 +39,7 @@ EXTERNAL = "EXTERNAL"
 LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY = (
     (OTHER_COLLECTIVE, _("Other collective")),
     (OTHER_INDIVIDUAL, _("Other individual")),
-    (MASTER_THESIS, _("Master thesis")),
+    (MASTER_THESIS, _("Thesis")),
 )
 
 
@@ -49,7 +49,7 @@ class LearningContainerYearType(ChoiceEnum):
     DISSERTATION = _("Dissertation")
     OTHER_COLLECTIVE = _("Other collective")
     OTHER_INDIVIDUAL = _("Other individual")
-    MASTER_THESIS = _("Master thesis")
+    MASTER_THESIS = _("Thesis")
     EXTERNAL = _("External")
 
     @classmethod
@@ -61,4 +61,4 @@ LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY = [COURSE, INTERNSHIP, DISS
 
 LEARNING_CONTAINER_YEAR_TYPES_WITHOUT_EXTERNAL = LearningContainerYearType.choices()[:-1]
 
-CONTAINER_TYPE_WITH_DEFAULT_COMPONENT = [COURSE, MASTER_THESIS, OTHER_COLLECTIVE, INTERNSHIP]
+CONTAINER_TYPE_WITH_DEFAULT_COMPONENT = [COURSE, MASTER_THESIS, OTHER_COLLECTIVE, INTERNSHIP, EXTERNAL]

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
 from base.business.utils.convert import volume_format
+from base.models.enums.learning_unit_year_subtypes import PARTIM
 from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.utils import get_verbose_field_value
@@ -37,6 +38,8 @@ register = template.Library()
 DIFFERENCE_CSS = "style='color:#5CB85C;'"
 CSS_PROPOSAL_VALUE = "proposal_value"
 LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
+EXTERNAL_CREDIT_TOOLTIP = _('If the partner university does not use ECTS credit units, '
+                            'enter below the number of credit units according to the local system.')
 
 
 @register.filter
@@ -100,12 +103,15 @@ def dl_tooltip(context, instance, key, **kwargs):
     if not value:
         value = get_verbose_field_value(instance, key)
 
-    difference = get_difference_css(differences, key, default_if_none) or 'title="{}"'.format(_(title))
+    difference = get_difference_css(differences, key, default_if_none) or 'title="{}"'.format(
+        EXTERNAL_CREDIT_TOOLTIP if key == 'external_credits'
+        else _(title)
+    )
 
     if url:
         value = "<a href='{url}'>{value}</a>".format(value=_(str(value)), url=url)
 
-    if inherited == "PARTIM":
+    if inherited == PARTIM:
         label_text = get_style_of_label_text(label_text, "color:grey",
                                              "The value of this attribute is inherited from the parent UE")
         value = get_style_of_value("color:grey", "The value of this attribute is inherited from the parent UE", value)
@@ -121,7 +127,7 @@ def dl_tooltip(context, instance, key, **kwargs):
     html_id = "id='id_{}'".format(key.lower())
 
     return mark_safe("<dl><dt {difference}>{label_text}</dt><dd {difference} {id}>{value}</dd></dl>".format(
-        difference=difference, id=html_id, label_text=label_text, value=_(str(value))))
+        difference=difference, id=html_id, label_text=label_text, value=value or ''))
 
 
 def get_style_of_value(style, title, value):

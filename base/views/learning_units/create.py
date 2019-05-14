@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -71,7 +71,8 @@ def create_partim_form(request, learning_unit_year_id):
         learning_unit_full_instance=learning_unit_year_full.learning_unit,
         start_postponement=learning_unit_year_full.academic_year,
         end_postponement=end_postponement.academic_year,
-        data=request.POST or None
+        data=request.POST or None,
+        external=learning_unit_year_full.is_external()
     )
 
     if postponement_form.is_valid():

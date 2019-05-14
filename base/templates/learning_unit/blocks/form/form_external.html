@@ -2,89 +2,77 @@
 
 <form method="post" id="LearningUnitYearForm" data-validate-url="{% url 'check_acronym' subtype="EXTERNAL" %}">
     {% csrf_token %}
-
-    <div class="row">
-        <div class="col-md-8">
-            <div class="panel panel-default">
-                {% bootstrap_form_errors learning_unit_year_form %}
-                {% bootstrap_form_errors learning_unit_form %}
-                {% bootstrap_form_errors learning_container_year_form %}
-                {% bootstrap_form_errors learning_unit_external_form %}
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="form-group col-md-4 acronym-group required_field">
-                            {% bootstrap_label learning_unit_year_form.acronym.label label_class="control-label" %}
-                            <abbr title="{% trans 'acronym_rules' %}">
-                                            <span class="glyphicon glyphicon-question-sign"
-                                                  title="{% trans 'acronym_rules' %}" style="font-size: 11pt;"></span>
-                            </abbr>
-                            {% bootstrap_field learning_unit_year_form.acronym show_label=False %}
+    <div class="panel panel-default">
+        {% csrf_token %}
+        {% bootstrap_form_errors learning_unit_year_form %}
+        {% bootstrap_form_errors learning_unit_form %}
+        {% bootstrap_form_errors learning_container_year_form %}
+        {% if form_proposal %}{% bootstrap_form_errors form_proposal %}{% endif %}
+        <div class="row">
+            <div class="col-md-8">
+                {% block learning_unit_identification %}
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            {% include "learning_unit/blocks/learning_unit_identification.html" %}
+                            <br>
+                            {% block titles %}
+                                {% include "learning_unit/blocks/titles.html" %}
+                            {% endblock titles %}
                         </div>
-                        {% bootstrap_field learning_container_year_form.container_type form_group_class="form-group col-md-4" %}
-                        {% bootstrap_field learning_unit_external_form.co_graduation form_group_class="form-group col-md-2" %}
-                        {% bootstrap_field learning_unit_external_form.mobility form_group_class="form-group col-md-2" %}
                     </div>
-                    <div class="row">
-                        {% bootstrap_field learning_unit_year_form.credits form_group_class="form-group col-md-3" field_class="ignore-js-validator" %}
-                        {% bootstrap_field learning_unit_external_form.external_credits form_group_class="form-group col-md-3" %}
-                        {% bootstrap_field learning_unit_year_form.status form_group_class="form-group col-md-2" %}
-                        {% bootstrap_field learning_unit_year_form.language form_group_class="form-group col-md-4" %}
-                    </div>
-                    {% include "learning_unit/blocks/titles.html" %}
-                </div>
-            </div>
+                {% endblock learning_unit_identification %}
 
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div class="row">
-                        {% bootstrap_field learning_unit_external_form.external_acronym form_group_class="form-group col-md-3" %}
-                        {% bootstrap_field learning_unit_external_form.url form_group_class="form-group col-md-9" %}
-                        {% bootstrap_field learning_unit_external_form.requesting_entity form_group_class="form-group col-md-6" %}
+                {% include "learning_unit/blocks/components.html" %}
+
+                {% if not learning_unit_external_form %}
+                    {% block remarks %}
+                        {% include "learning_unit/blocks/remarks.html" %}
+                    {% endblock remarks %}
+                {% endif %}
+
+                {% block components %}
+                    {% if components %}
+                        {% include "learning_unit/components_identification.html" %}
+                    {% endif %}
+                {% endblock components %}
+
+                {% block partim_attributes %}
+                    {% if learning_unit_year.subtype != "PARTIM" %}
+                        {% include "learning_unit/blocks/partim_attributes.html" %}
+                    {% endif %}
+                {% endblock partim_attributes %}
+
+                {% if learning_unit_external_form %}
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="row">
+                                {% bootstrap_field learning_unit_external_form.external_acronym form_group_class="form-group col-md-3" %}
+                                {% bootstrap_field learning_unit_external_form.url form_group_class="form-group col-md-6" %}
+                                <div class="col-md-3">
+                                    {% bootstrap_label learning_unit_external_form.external_credits.label label_class="control-label" %}
+                                    <abbr title="{% trans 'If the partner university does not use ECTS credit units, enter below the number of credit units according to the local system.' %}">
+                                    <span class="glyphicon glyphicon-question-sign "
+                                          title="{% trans 'If the partner university does not use ECTS credit units, enter below the number of credit units according to the local system.' %}"
+                                          style="font-size: 12pt;"></span></abbr>
+                                    {% bootstrap_field learning_unit_external_form.external_credits show_label=False %}
+                                </div>
+                            </div>
+                            {% bootstrap_field learning_unit_form.faculty_remark %}
+                        </div>
                     </div>
-                    {% bootstrap_field learning_unit_form.faculty_remark %}
-                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                {% block institution %}
+                    {% include "learning_unit/blocks/institution.html" %}
+                {% endblock %}
+
+                {% block proposal_management %}
+                {% endblock proposal_management %}
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    {% bootstrap_field learning_unit_year_form.country %}
-                    {% bootstrap_field learning_unit_year_form.campus %}
-                    {% bootstrap_field learning_unit_year_form.academic_year %}
-                </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    {% trans 'Introduced by' %}
-                    {% if learning_unit_year %}
-                        {{ learning_unit_year.externallearningunityear.author }}
-                    {% else %}
-                        {{ learning_unit_external_form.person }}
-                    {% endif %}
-                    <br><br>
-
-                    {% trans 'The' %}
-                    {% if learning_unit_year %}
-                        {{ learning_unit_year.externallearningunityear.date| date:"SHORT_DATE_FORMAT" }}
-                    {% else %}
-                        {% now "SHORT_DATE_FORMAT" %}
-                    {% endif %}
-
-                </div>
-            </div>
-        </div>
+        {% block modal %}
+        {% endblock modal %}
     </div>
 </form>
-{{ learning_unit_year_form.media }}
 
-<script>
-    $(document).ready(function () {
-        // Bind on continent field change
-        $(':input[name$=country]').on('change', function () {
-            // Get the field prefix, ie. if this comes from a formset form
-            var prefix = $(this).getFormPrefix();
-            // Clear the autocomplete with the same prefix
-            $(':input[name=' + prefix + 'campus]').val(null).trigger('change');
-        });
-    });
-</script>

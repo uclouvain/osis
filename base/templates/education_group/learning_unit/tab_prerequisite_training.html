@@ -7,7 +7,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -28,27 +28,44 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <p>
-                <a href="{% url 'learning_unit' learning_unit_year_id=learning_unit_year.id %}"><ins>{{ learning_unit_year.acronym }}</ins></a>
+                <a href="{% url 'learning_unit' learning_unit_year.pk %}">
+                    <ins>{{ learning_unit_year.acronym }}</ins>
+                </a>
                 {% trans "has the following prerequisites" %}:
             </p>
 
             <div class="row">
                 <div class="col-md-7">
-                    <p>{{ prerequisite.prerequisite_string|default:"-"}}</p>
+                    <p>{{ prerequisite.prerequisite_string|default:"-" }}</p>
                 </div>
                 <div class="col-md-5">
                     {% if can_modify_prerequisite %}
                         <a class="btn btn-default"
-                           href="{% url 'learning_unit_prerequisite_update' root_id=root_id learning_unit_year_id=learning_unit_year.id%}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"
+                           href=
+                                   {% url 'learning_unit_prerequisite_update' root_id=root_id learning_unit_year_id=learning_unit_year.id %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"
                            role="button">
                             {% trans 'Modify prerequisites' %}
                         </a>
-                        {% else %}
+                    {% else %}
                         <button class="btn btn-default" disabled>{% trans 'Modify prerequisites' %}</button>
                     {% endif %}
                 </div>
             </div>
 
+
         </div>
     </div>
+    {% if is_prerequisite_acronym_list %}
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <p>
+                    <a href="{% url 'learning_unit' learning_unit_year.pk %}">
+                        <ins>{{ learning_unit_year.acronym }}</ins>
+                    </a>
+                    {% trans 'is the prereqisite of' %}:
+                </p>
+                {{ is_prerequisite_acronym_list|join:', ' }}
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

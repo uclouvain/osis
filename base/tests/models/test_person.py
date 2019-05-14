@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -247,8 +247,11 @@ class PersonTest(PersonTestCase):
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
         )
 
-        external_luy.requesting_entity = person_entity.entity
-        external_luy.save()
+        EntityContainerYearFactory(
+            learning_container_year=luy.learning_container_year,
+            entity=person_entity.entity,
+            type=REQUIREMENT_ENTITY
+        )
 
         self.assertTrue(
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)

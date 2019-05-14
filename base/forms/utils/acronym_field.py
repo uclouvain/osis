@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ class AcronymField(forms.MultiValueField):
             forms.CharField(*args, max_length=max_length, **kwargs)
         ]
         super().__init__(list_fields, *args, **kwargs)
-        self.label = _("Acronym")
+        self.label = _("Code")
 
     def compress(self, data_list):
         return ''.join(data_list).upper()
@@ -88,6 +88,52 @@ class AcronymField(forms.MultiValueField):
 
 class ExternalAcronymField(AcronymField):
     widget = ExternalAcronymInput
+
+
+class ExternalPartimAcronymInput(forms.MultiWidget):
+    template_name = 'learning_unit/blocks/widget/partim_widget.html'
+
+    def __init__(self, attrs=None):
+        widgets = [
+            forms.Select(choices=_create_external_first_letter_choices()),
+            forms.TextInput(attrs={'class': 'text-uppercase'}),
+            forms.TextInput(attrs={
+                'class': 'text-center text-uppercase',
+                'maxlength': "1",
+                'onchange': 'validate_acronym()'
+            })
+        ]
+        super().__init__(widgets)
+
+    def decompress(self, value):
+        if value:
+            return split_acronym(value)
+        return ['', '', '']
+
+
+class ExternalPartimAcronymField(forms.MultiValueField):
+    widget = ExternalPartimAcronymInput
+
+    def __init__(self, *args, **kwargs):
+        max_length = kwargs.pop('max_length', None)
+        disabled = kwargs.pop('disabled', [True, True, False])
+
+        list_fields = [
+            forms.ChoiceField(choices=_create_external_first_letter_choices()),
+            forms.CharField(max_length=max_length),
+            forms.CharField(max_length=1)
+        ]
+        kwargs['require_all_fields'] = kwargs.pop('required', True)
+        super().__init__(list_fields, *args, **kwargs)
+        self.apply_attrs_to_widgets('disabled', disabled)
+        self.label = _("Code")
+
+    def apply_attrs_to_widgets(self, property, values):
+        for index, subwidget in enumerate(self.widget.widgets):
+            subwidget.attrs[property] = values[index]
+
+    def compress(self, data_list):
+        return ''.join(data_list).upper()
 
 
 class PartimAcronymInput(forms.MultiWidget):
@@ -126,7 +172,7 @@ class PartimAcronymField(forms.MultiValueField):
         kwargs['require_all_fields'] = kwargs.pop('required', True)
         super().__init__(list_fields, *args, **kwargs)
         self.apply_attrs_to_widgets('disabled', disabled)
-        self.label = _("Acronym")
+        self.label = _("Code")
 
     def apply_attrs_to_widgets(self, property, values):
         for index, subwidget in enumerate(self.widget.widgets):
@@ -136,14 +182,18 @@ class PartimAcronymField(forms.MultiValueField):
         return ''.join(data_list).upper()
 
 
-def split_acronym(value, subtype=learning_unit_year_subtypes.PARTIM):
+def split_acronym(value, subtype=learning_unit_year_subtypes.PARTIM, instance=None):
     """This function split acronym into small piece list
     Index 0 :  Localisation (L/M/...)
     Index 1 :  Sigle/Cnum
     Index 2 :  Subdivision
     """
-    last_digit_position = re.match('.+([0-9])[^0-9]*$', value).start(1)
-    base_acronym = [value[0], value[1:last_digit_position + 1]]
     if subtype == learning_unit_year_subtypes.PARTIM:
-        base_acronym.append(value[last_digit_position + 1] if len(value) > last_digit_position + 1 else '')
+        if instance and instance.pk:
+            base_acronym = [value[0], value[1:-1], value[-1]]
+        else:
+            base_acronym = [value[0], value[1:]]
+    else:
+        last_digit_position = re.match('.+([0-9])[^0-9]*$', value).start(1)
+        base_acronym = [value[0], value[1:last_digit_position + 1]]
     return base_acronym

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,10 +26,11 @@
 from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _, ngettext
+from django.utils.translation import ugettext_lazy as _
 from waffle.decorators import waffle_flag
 
 from base import models as mdl_base
@@ -239,21 +240,21 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
         try:
             postponer = PostponeContent(self.get_root().previous_year())
             postponer.postpone()
-            count = len(postponer.result)
-            success = ngettext(
-                "%(count)d education group has been postponed with success.",
-                "%(count)d education groups have been postponed with success.", count
-            ) % {'count': count}
+            success = _("%(count_elements)s OF(s) and %(count_links)s link(s) have been postponed with success.") % {
+                'count_elements': postponer.number_elements_created,
+                'count_links': postponer.number_links_created
+            }
             display_success_messages(request, success)
             display_warning_messages(request, postponer.warnings)
 
         except NotPostponeError as e:
             display_error_messages(request, str(e))
 
-        return redirect(reverse(
-            "education_group_read",
-            args=[
-                kwargs["root_id"],
-                kwargs["education_group_year_id"]
-            ]
-        ))
+        return JsonResponse({
+            'success_url': reverse(
+                "education_group_read",
+                args=[
+                    kwargs["root_id"],
+                    kwargs["education_group_year_id"]
+                ]
+            )})

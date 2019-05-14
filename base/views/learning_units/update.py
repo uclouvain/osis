@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ from dal import autocomplete
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
+from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -38,11 +39,12 @@ from base.business import learning_unit_year_with_context
 from base.business.learning_units.edition import ConsistencyError
 from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit.edition_volume import VolumeEditionFormsetContainer
+from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
-from base.models.entity_version import find_pedagogical_entities_version, \
-    find_all_current_entities_version
+from base.models.entity_version import find_pedagogical_entities_version, EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
+from base.models.enums.organization_type import MAIN
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages
@@ -121,11 +123,7 @@ def update_learning_unit(request, learning_unit_year_id):
     context = postponement_form.get_context()
     context["learning_unit_year"] = learning_unit_year
     context["is_update"] = True
-
-    if learning_unit_year.is_external():
-        template = "learning_unit/external/update.html"
-    else:
-        template = 'learning_unit/simple/update.html'
+    template = 'learning_unit/simple/update.html'
 
     return render(request, template, context)
 
@@ -190,14 +188,15 @@ def _save_form_and_display_messages(request, form):
 class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
         country = self.forwarded.get('country', None)
-        if country and country == "all":
-            qs = find_all_current_entities_version().order_by('acronym')
-        elif country:
-            qs = find_all_current_entities_version().filter(entity__country__id=country).order_by('acronym')
+        qs = find_additional_requirement_entities_choices()
+        if country:
+            qs = qs.exclude(entity__organization__type=MAIN).order_by('title')
+            if country != "all":
+                qs = qs.filter(entity__country_id=country)
         else:
-            qs = find_pedagogical_entities_version()
+            qs = find_pedagogical_entities_version().order_by('acronym')
         if self.q:
-            qs = qs.filter(acronym__icontains=self.q).order_by('acronym')
+            qs = qs.filter(Q(title__icontains=self.q) | Q(acronym__icontains=self.q))
         return qs
 
     def get_result_label(self, result):

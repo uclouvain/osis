@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ def my_messages_action(request):
 def delete_from_my_messages(request, message_id):
     message = message_history_mdl.find_by_id(message_id)
     person_user = mdl.person.find_by_user(request.user)
-    if message and (message.receiver_id == person_user.id):
+    if message and (message.receiver_person_id == person_user.id):
         message_history_mdl.delete_my_messages([message_id, ])
     return HttpResponseRedirect(reverse('my_messages'))
 
