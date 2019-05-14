@@ -30,8 +30,7 @@ from collections import Counter
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models, connection
-from django.db.models import Q, F, Case, When, Value, CharField
-from django.db.models.functions import Concat, Cast
+from django.db.models import Q, F, Case, When
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -39,8 +38,7 @@ from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
-from base.models import education_group_type, education_group_year
-from base.models.education_group_type import GROUP_TYPE_OPTION, EducationGroupType
+from base.models import education_group_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, quadrimesters
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
@@ -294,21 +292,10 @@ class GroupElementYear(OrderedModel):
 def find_learning_unit_formations(objects, parents_as_instances=False):
     root_ids_by_object_id = {}
     if objects:
-        filters = _get_root_filters()
-        root_ids_by_object_id = _find_related_formations(objects, filters)
+        root_ids_by_object_id = _find_related_formations(objects)
         if parents_as_instances:
             root_ids_by_object_id = _convert_parent_ids_to_instances(root_ids_by_object_id)
     return root_ids_by_object_id
-
-
-def _get_root_filters():
-    root_type_names = EducationGroupType.objects.filter(category=education_group_categories.MINI_TRAINING) \
-        .exclude(name=GROUP_TYPE_OPTION).values_list('name', flat=True)
-    root_categories = [education_group_categories.TRAINING]
-    return {
-        'parent__education_group_type__name': root_type_names,
-        'parent__education_group_type__category': root_categories
-    }
 
 
 def _convert_parent_ids_to_instances(root_ids_by_object_id):
@@ -329,14 +316,14 @@ def _raise_if_incorrect_instance(objects):
         raise AttributeError("All objects must be the same class instance ({})".format(obj_class))
 
 
-def _find_related_formations(objects, filters):
+def _find_related_formations(objects):
     _raise_if_incorrect_instance(objects)
     academic_year = _extract_common_academic_year(objects)
     parents_by_id = _build_parent_list_by_education_group_year_id(academic_year)
     if isinstance(objects[0], LearningUnitYear):
-        return {obj.id: _find_elements(parents_by_id, filters, child_leaf_id=obj.id) for obj in objects}
+        return {obj.id: _find_elements(parents_by_id, child_leaf_id=obj.id) for obj in objects}
     else:
-        return {obj.id: _find_elements(parents_by_id, filters, child_branch_id=obj.id) for obj in objects}
+        return {obj.id: _find_elements(parents_by_id, child_branch_id=obj.id) for obj in objects}
 
 
 def _extract_common_academic_year(objects):
@@ -384,23 +371,28 @@ def _build_child_key(child_branch=None, child_leaf=None):
     return '{branch_part}_{id_part}'.format(branch_part=branch_part, id_part=id_part)
 
 
-def _find_elements(group_elements_by_child_id, filters, child_leaf_id=None, child_branch_id=None):
+def _find_elements(group_elements_by_child_id, child_leaf_id=None, child_branch_id=None):
     roots = []
     unique_child_key = _build_child_key(child_leaf=child_leaf_id, child_branch=child_branch_id)
     group_elem_year_parents = group_elements_by_child_id.get(unique_child_key, [])
     for group_elem_year in group_elem_year_parents:
         parent_id = group_elem_year['parent']
-        if filters and _match_any_filters(group_elem_year, filters):
+        if _is_root_group_element_year(group_elem_year):
             # If record matches any filter, we must stop mounting across the hierarchy.
             roots.append(parent_id)
         else:
             # Recursive call ; the parent_id becomes the child_branch.
-            roots.extend(_find_elements(group_elements_by_child_id, filters, child_branch_id=parent_id))
+            roots.extend(_find_elements(group_elements_by_child_id, child_branch_id=parent_id))
     return list(set(roots))
 
 
-def _match_any_filters(element_year, filters):
-    return any(element_year[col_name] in values_list for col_name, values_list in filters.items())
+def _is_root_group_element_year(element_year):
+    if element_year["parent__education_group_type__category"] not in (education_group_categories.TRAINING,
+                                                                      education_group_categories.MINI_TRAINING):
+        return False
+    if element_year["parent__education_group_type__name"] == MiniTrainingType.OPTION.name:
+        return False
+    return True
 
 
 def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict:
