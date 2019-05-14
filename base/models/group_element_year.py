@@ -362,7 +362,7 @@ def _extract_common_academic_year(objects):
 
 
 def _build_parent_list_by_education_group_year_id(academic_year):
-    MAX_LENGTH = 20
+    MAX_LENGTH = 32
     group_elements = search(
         academic_year=academic_year
     ).filter(
@@ -375,10 +375,12 @@ def _build_parent_list_by_education_group_year_id(academic_year):
         key=Case(
             When(
                 child_leaf__isnull=False,
-                then=Concat(Value("child_leaf_"), Cast("child_leaf_id", CharField(max_length=MAX_LENGTH)),
+                then=Concat(Value(LearningUnitYear._meta.db_table + "_"),
+                            Cast("child_leaf_id", CharField(max_length=MAX_LENGTH)),
                             output_field=CharField(max_length=MAX_LENGTH))
             ),
-            default=Concat(Value("child_branch_"), Cast("child_branch_id", CharField(max_length=MAX_LENGTH)),
+            default=Concat(Value(EducationGroupYear._meta.db_table + "_"),
+                           Cast("child_branch_id", CharField(max_length=MAX_LENGTH)),
                            output_field=CharField(max_length=MAX_LENGTH)),
             output_field=CharField(max_length=MAX_LENGTH)
         )
@@ -401,10 +403,10 @@ def _build_child_key(child_branch=None, child_leaf=None):
     if not any(args) or all(args):
         raise AttributeError('Only one of the 2 param must bet set (not both of them).')
     if child_leaf:
-        branch_part = 'child_leaf'
+        branch_part = LearningUnitYear._meta.db_table
         id_part = child_leaf
     else:
-        branch_part = 'child_branch'
+        branch_part = EducationGroupYear._meta.db_table
         id_part = child_branch
     return '{branch_part}_{id_part}'.format(**locals())
 
@@ -412,7 +414,7 @@ def _build_child_key(child_branch=None, child_leaf=None):
 def _find_elements(group_elements_by_child_id, filters, child_leaf_id=None, child_branch_id=None):
     roots = []
     unique_child_key = _build_child_key(child_leaf=child_leaf_id, child_branch=child_branch_id)
-    group_elem_year_parents = group_elements_by_child_id.get(unique_child_key) or []
+    group_elem_year_parents = group_elements_by_child_id.get(unique_child_key, [])
     for group_elem_year in group_elem_year_parents:
         parent_id = group_elem_year['parent']
         if filters and _match_any_filters(group_elem_year, filters):
