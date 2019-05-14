@@ -298,24 +298,6 @@ def find_learning_unit_formations(objects, parents_as_instances=False):
     return root_ids_by_object_id
 
 
-def _convert_parent_ids_to_instances(root_ids_by_object_id):
-    flat_root_ids = list(set(itertools.chain.from_iterable(root_ids_by_object_id.values())))
-    map_instance_by_id = {obj.id: obj for obj in education_group_year.search(id=flat_root_ids)}
-    return {
-        obj_id: sorted([map_instance_by_id[parent_id] for parent_id in parents], key=lambda obj: obj.acronym)
-        for obj_id, parents in root_ids_by_object_id.items()
-    }
-
-
-def _raise_if_incorrect_instance(objects):
-    first_obj = objects[0]
-    obj_class = first_obj.__class__
-    if obj_class not in [LearningUnitYear, EducationGroupYear]:
-        raise AttributeError("Objects must be either LearningUnitYear or EducationGroupYear intances.")
-    if any(obj for obj in objects if obj.__class__ != obj_class):
-        raise AttributeError("All objects must be the same class instance ({})".format(obj_class))
-
-
 def _find_related_formations(objects):
     _raise_if_incorrect_instance(objects)
     academic_year = _extract_common_academic_year(objects)
@@ -324,13 +306,6 @@ def _find_related_formations(objects):
         return {obj.id: _find_elements(parents_by_id, child_leaf_id=obj.id) for obj in objects}
     else:
         return {obj.id: _find_elements(parents_by_id, child_branch_id=obj.id) for obj in objects}
-
-
-def _extract_common_academic_year(objects):
-    if len(set(getattr(obj, 'academic_year_id') for obj in objects)) > 1:
-        raise AttributeError("The algorithm should load only graph/structure for 1 academic_year "
-                             "to avoid too large 'in-memory' data and performance issues.")
-    return objects[0].academic_year
 
 
 def _build_parent_list_by_education_group_year_id(academic_year):
@@ -358,19 +333,6 @@ def _build_parent_list_by_education_group_year_id(academic_year):
     return result
 
 
-def _build_child_key(child_branch=None, child_leaf=None):
-    args = [child_leaf, child_branch]
-    if not any(args) or all(args):
-        raise AttributeError('Only one of the 2 param must bet set (not both of them).')
-    if child_leaf:
-        branch_part = LearningUnitYear._meta.db_table
-        id_part = child_leaf
-    else:
-        branch_part = EducationGroupYear._meta.db_table
-        id_part = child_branch
-    return '{branch_part}_{id_part}'.format(branch_part=branch_part, id_part=id_part)
-
-
 def _find_elements(group_elements_by_child_id, child_leaf_id=None, child_branch_id=None):
     roots = []
     unique_child_key = _build_child_key(child_leaf=child_leaf_id, child_branch=child_branch_id)
@@ -386,11 +348,49 @@ def _find_elements(group_elements_by_child_id, child_leaf_id=None, child_branch_
     return list(set(roots))
 
 
-def _is_root_group_element_year(element_year):
-    if element_year["parent__education_group_type__category"] not in (education_group_categories.TRAINING,
-                                                                      education_group_categories.MINI_TRAINING):
+def _convert_parent_ids_to_instances(root_ids_by_object_id):
+    flat_root_ids = list(set(itertools.chain.from_iterable(root_ids_by_object_id.values())))
+    map_instance_by_id = {obj.id: obj for obj in education_group_year.search(id=flat_root_ids)}
+    return {
+        obj_id: sorted([map_instance_by_id[parent_id] for parent_id in parents], key=lambda obj: obj.acronym)
+        for obj_id, parents in root_ids_by_object_id.items()
+    }
+
+
+def _raise_if_incorrect_instance(objects):
+    first_obj = objects[0]
+    obj_class = first_obj.__class__
+    if obj_class not in (LearningUnitYear, EducationGroupYear):
+        raise AttributeError("Objects must be either LearningUnitYear or EducationGroupYear instances.")
+    if any(obj for obj in objects if obj.__class__ != obj_class):
+        raise AttributeError("All objects must be the same class instance ({})".format(obj_class))
+
+
+def _extract_common_academic_year(objects):
+    if len(set(getattr(obj, 'academic_year_id') for obj in objects)) > 1:
+        raise AttributeError("The algorithm should load only graph/structure for 1 academic_year "
+                             "to avoid too large 'in-memory' data and performance issues.")
+    return objects[0].academic_year
+
+
+def _build_child_key(child_branch=None, child_leaf=None):
+    args = [child_leaf, child_branch]
+    if not any(args) or all(args):
+        raise AttributeError('Only one of the 2 param must bet set (not both of them).')
+    if child_leaf:
+        branch_part = LearningUnitYear._meta.db_table
+        id_part = child_leaf
+    else:
+        branch_part = EducationGroupYear._meta.db_table
+        id_part = child_branch
+    return '{branch_part}_{id_part}'.format(branch_part=branch_part, id_part=id_part)
+
+
+def _is_root_group_element_year(group_element_year):
+    if group_element_year["parent__education_group_type__category"] not in (education_group_categories.TRAINING,
+                                                                            education_group_categories.MINI_TRAINING):
         return False
-    if element_year["parent__education_group_type__name"] == MiniTrainingType.OPTION.name:
+    if group_element_year["parent__education_group_type__name"] == MiniTrainingType.OPTION.name:
         return False
     return True
 
