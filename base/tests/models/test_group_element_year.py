@@ -61,40 +61,25 @@ class TestFindBuildParentListByEducationGroupYearId(TestCase):
 
     def test_with_filters(self):
         filters = {
+
             'parent__education_group_type__category': [education_group_categories.TRAINING]
         }
-        result = group_element_year._build_parent_list_by_education_group_year_id(self.child_leaf.academic_year,
-                                                                                  filters=filters)
-
-        expected_result = {
-            'child_branch_{}'.format(self.child_branch.id): [{
-                'parent': self.root.id,
-                'child_branch': self.child_branch.id,
-                'child_leaf': None,
-                'parent__education_group_type__category': self.root.education_group_type.category
-            }, ],
-            'child_leaf_{}'.format(self.child_leaf.id): [{
-                'parent': self.child_branch.id,
-                'child_branch': None,
-                'child_leaf': self.child_leaf.id,
-                'parent__education_group_type__category': self.child_branch.education_group_type.category
-            }, ]
-        }
-        self.assertEqual(len(result), len(expected_result))
-        self.assertDictEqual(result, expected_result)
-
-    def test_without_filters(self):
         result = group_element_year._build_parent_list_by_education_group_year_id(self.child_leaf.academic_year)
+
         expected_result = {
             'child_branch_{}'.format(self.child_branch.id): [{
                 'parent': self.root.id,
                 'child_branch': self.child_branch.id,
                 'child_leaf': None,
+                'parent__education_group_type__category': self.root.education_group_type.category,
+                'parent__education_group_type__name': self.root.education_group_type.name
             }, ],
             'child_leaf_{}'.format(self.child_leaf.id): [{
                 'parent': self.child_branch.id,
                 'child_branch': None,
                 'child_leaf': self.child_leaf.id,
+                'parent__education_group_type__category': self.child_branch.education_group_type.category,
+                'parent__education_group_type__name': self.child_branch.education_group_type.name
             }, ]
         }
         self.assertEqual(len(result), len(expected_result))

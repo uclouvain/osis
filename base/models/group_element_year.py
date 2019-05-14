@@ -345,7 +345,7 @@ def _raise_if_incorrect_instance(objects):
 def _find_related_formations(objects, filters):
     _raise_if_incorrect_instance(objects)
     academic_year = _extract_common_academic_year(objects)
-    parents_by_id = _build_parent_list_by_education_group_year_id(academic_year, filters=filters)
+    parents_by_id = _build_parent_list_by_education_group_year_id(academic_year)
     if isinstance(objects[0], LearningUnitYear):
         return {obj.id: _find_elements(parents_by_id, filters, child_leaf_id=obj.id) for obj in objects}
     else:
@@ -359,13 +359,13 @@ def _extract_common_academic_year(objects):
     return objects[0].academic_year
 
 
-def _build_parent_list_by_education_group_year_id(academic_year, filters=None):
-    columns_needed_for_filters = filters.keys() if filters else []
+def _build_parent_list_by_education_group_year_id(academic_year):
     group_elements = list(search(academic_year=academic_year)
                           .filter(parent__isnull=False)
                           .filter(Q(child_leaf__isnull=False) | Q(child_branch__isnull=False))
                           .select_related('education_group_year__education_group_type')
-                          .values('parent', 'child_branch', 'child_leaf', *columns_needed_for_filters))
+                          .values('parent', 'child_branch', 'child_leaf', 'parent__education_group_type__name',
+                                  'parent__education_group_type__category'))
     result = {}
     # TODO :: uses .annotate() on queryset to make the below expected result
     for group_element_year in group_elements:
