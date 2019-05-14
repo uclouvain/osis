@@ -30,7 +30,8 @@ from collections import Counter
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models, connection
-from django.db.models import Q, F, Case, When
+from django.db.models import Q, F, Case, When, Value, CharField
+from django.db.models.functions import Concat, Cast
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -361,6 +362,7 @@ def _extract_common_academic_year(objects):
 
 
 def _build_parent_list_by_education_group_year_id(academic_year):
+    MAX_LENGTH = 20
     group_elements = search(
         academic_year=academic_year
     ).filter(
@@ -369,16 +371,28 @@ def _build_parent_list_by_education_group_year_id(academic_year):
         Q(child_leaf__isnull=False) | Q(child_branch__isnull=False)
     ).select_related(
         'education_group_year__education_group_type'
+    ).annotate(
+        key=Case(
+            When(
+                child_leaf__isnull=False,
+                then=Concat(Value("child_leaf_"), Cast("child_leaf_id", CharField(max_length=MAX_LENGTH)),
+                            output_field=CharField(max_length=MAX_LENGTH))
+            ),
+            default=Concat(Value("child_branch_"), Cast("child_branch_id", CharField(max_length=MAX_LENGTH)),
+                           output_field=CharField(max_length=MAX_LENGTH)),
+            output_field=CharField(max_length=MAX_LENGTH)
+        )
     ).values(
         'parent', 'child_branch', 'child_leaf', 'parent__education_group_type__name',
-        'parent__education_group_type__category'
+        'parent__education_group_type__category', "key"
     )
     result = collections.defaultdict(list)
-    # TODO :: uses .annotate() on queryset to make the below expected result
     for group_element_year in group_elements:
-        key = _build_child_key(child_branch=group_element_year['child_branch'],
-                               child_leaf=group_element_year['child_leaf'])
-        result[key].append(group_element_year)
+        # TODO Remove this check as it's not pertinent
+        args = [group_element_year['child_branch'], group_element_year['child_leaf']]
+        if not any(args) or all(args):
+            raise AttributeError('Only one of the 2 param must bet set (not both of them).')
+        result[group_element_year["key"]].append(group_element_year)
     return result
 
 
