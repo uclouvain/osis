@@ -419,6 +419,7 @@ class SimplifiedVolumeFormset(forms.BaseModelFormSet):
         for form in self.forms:
             form._learning_unit_year = learning_unit_year
             form._entity_containers = entity_container_years
+            form.save()
         return super().save(commit)
 
 

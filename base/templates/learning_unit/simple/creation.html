@@ -26,112 +26,127 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue'%}</a></li>
-<li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units'%}</a> </li>
-{% if subtype == 'PARTIM' %}
-    <li id="lnk_learning_unit_UE">
-        <a href="{% url 'learning_unit' learning_unit_year.id %}">
-            {{ learning_unit_year_form.acronym.value.0 }}{{ learning_unit_year_form.acronym.value.1 }}
-        </a>
-    </li>
-    <li id="lnk_learning_unit">{% trans 'New partim' %}</li>
-{% else %}
-    {% if form_proposal %}
-        <li id="lnk_learning_unit">{% trans 'Proposal of creation' %}</li>
+    <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+    <li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></li>
+    {% if subtype == 'PARTIM' %}
+        <li id="lnk_learning_unit_UE">
+            <a href="{% url 'learning_unit' learning_unit_year.id %}">
+                {{ learning_unit_year_form.acronym.value.0 }}{{ learning_unit_year_form.acronym.value.1 }}
+            </a>
+        </li>
+        <li id="lnk_learning_unit">{% trans 'New partim' %}</li>
     {% else %}
-        <li id="lnk_learning_unit">{% trans 'New learning unit' %}</li>
-    {% endif %}
+        {% if form_proposal %}
+            <li id="lnk_learning_unit">{% trans 'Proposal of creation' %}</li>
+        {% else %}
+            <li id="lnk_learning_unit">{% trans 'New learning unit' %}</li>
+        {% endif %}
 
-{% endif %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h2>{% block h2_title %}{% trans 'New learning unit' %}{% endblock %}</h2>
-</div>
-<div class="panel panel-default">
-    <form method="post" id="LearningUnitYearForm" data-validate-url="{% url 'check_acronym' subtype %}">
-    <div class="panel-heading">
-        {% include "learning_unit/blocks/create_cancel_buttons.html" %}
+    <div class="page-header">
+        <h2>{% block h2_title %}{% trans 'New learning unit' %}{% endblock %}</h2>
     </div>
-    <div class="panel-body">
-
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-md-8">
-
-                    {% block learning_unit_identification %}
-                        <div class="panel panel-default">
-                            <div class="panel-body">
-
-                                <div class="row">
-                                    <div class="col-md-4 acronym-group required_field">
-                                        {% bootstrap_label learning_unit_year_form.acronym.label label_class="control-label" %}
-                                        <abbr title="{% trans 'acronym_rules' %}">
-                                            <span class="glyphicon glyphicon-question-sign " title="{% trans 'acronym_rules' %}" style="font-size: 14pt;"></span>
-                                        </abbr>
-                                        {% bootstrap_field learning_unit_year_form.acronym show_label=False %}
-                                    </div>
-                                    {% bootstrap_field learning_container_year_form.container_type form_group_class="col-md-3" %}
-                                    {% if learning_unit_year_form.internship_subtype in learning_unit_year_form.visible_fields %}
-                                        {% bootstrap_field  learning_unit_year_form.internship_subtype form_group_class="col-md-5"%}
-                                    {% endif %}
-                                </div>
-                                <div class="row">
-                                    {% bootstrap_field learning_unit_year_form.credits form_group_class="col-md-3" field_class="ignore-js-validator" %}
-                                    {% bootstrap_field learning_unit_year_form.periodicity form_group_class="col-md-3" %}
-                                    {% bootstrap_field learning_unit_year_form.status form_group_class="col-md-2" %}
-                                    {% bootstrap_field learning_unit_year_form.language form_group_class="col-md-4" %}
-                                </div>
-                                <br>
-                                <div class="row">
-                                    {% bootstrap_field learning_unit_year_form.professional_integration form_group_class="col-md-3" %}
-                                </div>
-                                <br>
-                                {% block titles %}
-                                    {% include "learning_unit/blocks/titles.html" %}
-                                {% endblock titles %}
-                            </div>
-                        </div>
-                    {% endblock learning_unit_identification %}
-
-                    {% include "learning_unit/blocks/components.html" %}
-
-                    {% if learning_unit_year.is_external_with_co_graduation %}
-                        <div class="panel panel-default">
-                            <div class="panel-body">
-                                <div class="row">
-                                    {% bootstrap_field learning_unit_external_form.external_acronym form_group_class="form-group col-md-3" %}
-                                    {% bootstrap_field learning_unit_external_form.url form_group_class="form-group col-md-6" %}
-                                    {% bootstrap_field learning_unit_external_form.external_credits form_group_class="form-group col-md-3" %}
-                                </div>
-                                {% bootstrap_field learning_unit_form.faculty_remark %}
-                            </div>
-                        </div>
-                    {% else %}
-                        {% block remarks %}
-                            {% include "learning_unit/blocks/remarks.html" %}
-                        {% endblock remarks %}
-                    {% endif %}
-                </div>
-
-                <div class="col-md-4">
-                    {% block institution %}
-                        {% include "learning_unit/blocks/institution.html" %}
-                    {% endblock %}
-                    {% block create_proposal %}{% endblock %}
-                </div>
+    <div class="panel panel-default">
+        <form method="post" id="LearningUnitYearForm" data-validate-url="{% url 'check_acronym' subtype %}">
+            <div class="panel-heading">
+                {% include "learning_unit/blocks/create_cancel_buttons.html" %}
             </div>
-            <br>
+            <div class="panel-body">
+
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-8">
+
+                        {% block learning_unit_identification %}
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+
+                                    <div class="row">
+                                        <div class="col-md-4 acronym-group required_field">
+                                            {% bootstrap_label learning_unit_year_form.acronym.label label_class="control-label" %}
+                                            {% if subtype == 'FULL' %}
+                                                <abbr title="{% trans 'acronym rules' %}">
+                                                <span class="glyphicon glyphicon-question-sign "
+                                                      title="{% trans 'acronym rules' %}"
+                                                      style="font-size: 14pt;"></span></abbr>
+                                            {% else %}
+                                                <abbr title="{% trans 'external acronym rules' %}">
+                                                <span class="glyphicon glyphicon-question-sign "
+                                                      title="{% trans 'external acronym rules' %}"
+                                                      style="font-size: 14pt;"></span></abbr>
+                                            {% endif %}
+                                            {% bootstrap_field learning_unit_year_form.acronym show_label=False %}
+                                        </div>
+                                        {% bootstrap_field learning_container_year_form.container_type form_group_class="col-md-3" %}
+                                        {% if learning_unit_year_form.internship_subtype in learning_unit_year_form.visible_fields %}
+                                            {% bootstrap_field learning_unit_year_form.internship_subtype form_group_class="col-md-5" %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="row">
+                                        {% bootstrap_field learning_unit_year_form.credits form_group_class="col-md-3" field_class="ignore-js-validator" %}
+                                        {% bootstrap_field learning_unit_year_form.periodicity form_group_class="col-md-3" %}
+                                        {% bootstrap_field learning_unit_year_form.status form_group_class="col-md-2" %}
+                                        {% bootstrap_field learning_unit_year_form.language form_group_class="col-md-4" %}
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        {% bootstrap_field learning_unit_year_form.professional_integration form_group_class="col-md-3" %}
+                                    </div>
+                                    <br>
+                                    {% block titles %}
+                                        {% include "learning_unit/blocks/titles.html" %}
+                                    {% endblock titles %}
+                                </div>
+                            </div>
+                        {% endblock learning_unit_identification %}
+
+                        {% include "learning_unit/blocks/components.html" %}
+
+                        {% if learning_unit_year.is_external_with_co_graduation %}
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        {% bootstrap_field learning_unit_external_form.external_acronym form_group_class="form-group col-md-3" %}
+                                        {% bootstrap_field learning_unit_external_form.url form_group_class="form-group col-md-6" %}
+                                        <div class="col-md-3">
+                                            {% bootstrap_label learning_unit_external_form.external_credits.label label_class="control-label" %}
+                                            <abbr title="{% trans 'If the partner university does not use ECTS credit units, enter below the number of credit units according to the local system.' %}">
+                                            <span class="glyphicon glyphicon-question-sign "
+                                                  title="{% trans 'If the partner university does not use ECTS credit units, enter below the number of credit units according to the local system.' %}"
+                                                  style="font-size: 12pt;"></span></abbr>
+                                            {% bootstrap_field learning_unit_external_form.external_credits show_label=False %}
+                                        </div>
+                                    </div>
+                                    {% bootstrap_field learning_unit_form.faculty_remark %}
+                                </div>
+                            </div>
+                        {% else %}
+                            {% block remarks %}
+                                {% include "learning_unit/blocks/remarks.html" %}
+                            {% endblock remarks %}
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% block institution %}
+                            {% include "learning_unit/blocks/institution.html" %}
+                        {% endblock %}
+                        {% block create_proposal %}{% endblock %}
+                    </div>
+                </div>
+                <br>
 
 
-        {% include 'learning_unit/blocks/modal/prolongOrCreateModal.html' %}
+                {% include 'learning_unit/blocks/modal/prolongOrCreateModal.html' %}
+            </div>
+            <div class="panel-footer">
+                {% include "learning_unit/blocks/create_cancel_buttons.html" %}
+            </div>
+        </form>
     </div>
-    <div class="panel-footer">
-        {% include "learning_unit/blocks/create_cancel_buttons.html" %}
-    </div>
-    </form>
-</div>
 {% endblock %}
 
 {% block script %}
