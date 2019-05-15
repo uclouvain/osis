@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-15 15:36+0200\n"
+"POT-Creation-Date: 2019-05-15 15:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4421,21 +4421,23 @@ msgid ""
 "%(value)s and year %(next_year)s - %(next_value)s"
 msgstr ""
 
-#: models/learning_component_year.py:145
+#: models/learning_component_year.py:149
 msgid "The volume Q1 cannot have a value"
 msgstr ""
 
-#: models/learning_component_year.py:139 models/learning_component_year.py:155
-#: models/learning_component_year.py:165
+#: models/learning_component_year.py:135
 msgid "The volume Q1 must have a value"
 msgstr ""
 
-#: models/learning_component_year.py:135
+#: models/learning_component_year.py:161
+msgid "The volume Q1 or Q2 must have a value but not both"
+msgstr ""
+
+#: models/learning_component_year.py:139
 msgid "The volume Q2 cannot have a value"
 msgstr ""
 
-#: models/learning_component_year.py:149 models/learning_component_year.py:159
-#: models/learning_component_year.py:169
+#: models/learning_component_year.py:145
 msgid "The volume Q2 must have a value"
 msgstr ""
 
@@ -4448,7 +4450,7 @@ msgstr ""
 msgid "The volume can not be set to 0."
 msgstr ""
 
-#: models/learning_component_year.py:173
+#: models/learning_component_year.py:155
 msgid "The volumes Q1 and Q2 must have a value"
 msgstr ""
 

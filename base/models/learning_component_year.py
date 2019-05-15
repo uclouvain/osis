@@ -129,48 +129,37 @@ class LearningComponentYear(SerializableModel):
                 _('planned classes cannot be greather than 0 while volume is equal to 0')))
 
         if quadrimester == quadrimesters.Q1:
+            if not vol_q1:
+                _warnings.append("{} ({})".format(
+                    inconsistent_msg,
+                    _('The volume Q1 must have a value')))
             if vol_q2:
                 _warnings.append("{} ({})".format(
                     inconsistent_msg,
                     _("The volume Q2 cannot have a value")))
-            if not vol_q1:
-                _warnings.append("{} ({})".format(
-                    inconsistent_msg,
-                    _('The volume Q1 must have a value')))
 
         if quadrimester == quadrimesters.Q2:
+            if not vol_q2:
+                _warnings.append("{} ({})".format(
+                    inconsistent_msg,
+                    _('The volume Q2 must have a value')))
             if vol_q1:
                 _warnings.append("{} ({})".format(
                     inconsistent_msg,
                     _("The volume Q1 cannot have a value")))
-            if not vol_q2:
-                _warnings.append("{} ({})".format(
-                    inconsistent_msg,
-                    _('The volume Q2 must have a value')))
 
-        if quadrimester == quadrimesters.Q1and2 and (not vol_q1 or not vol_q2):
-            if not vol_q1:
-                _warnings.append("{} ({})".format(
-                    inconsistent_msg,
-                    _('The volume Q1 must have a value')))
-            if not vol_q2:
-                _warnings.append("{} ({})".format(
-                    inconsistent_msg,
-                    _('The volume Q2 must have a value')))
-
-        if quadrimester == quadrimesters.Q1or2 and (not vol_q1 and not vol_q2):
-            if not vol_q1 and vol_q2:
-                _warnings.append("{} ({})".format(
-                    inconsistent_msg,
-                    _('The volume Q1 must have a value')))
-            elif not vol_q2 and vol_q1:
-                _warnings.append("{} ({})".format(
-                    inconsistent_msg,
-                    _('The volume Q2 must have a value')))
-            else:
+        if quadrimester == quadrimesters.Q1and2:
+            if not vol_q1 or not vol_q2:
                 _warnings.append("{} ({})".format(
                     inconsistent_msg,
                     _('The volumes Q1 and Q2 must have a value')))
+
+        if quadrimester == quadrimesters.Q1or2:
+            if (vol_q1 and vol_q2) or (not vol_q1 and not vol_q2):
+                _warnings.append("{} ({})".format(
+                    inconsistent_msg,
+                    _('The volume Q1 or Q2 must have a value but not both')))
+
         return _warnings
 
 
