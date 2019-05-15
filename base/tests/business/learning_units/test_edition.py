@@ -86,7 +86,7 @@ class LearningUnitEditionTestCase(TestCase):
 
     def test_update_or_create_entity_container_year_with_components_type_requirement(self):
         """In this test, we ensure that when we create an entity_container type requirement,
-           we have an entity_component created"""
+           we have an entity_container created"""
         an_entity = EntityFactory()
         a_learning_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
         LearningComponentYearFactory(acronym="PM", learning_unit_year__learning_container_year=a_learning_container_year)
@@ -101,7 +101,7 @@ class LearningUnitEditionTestCase(TestCase):
 
     def test_update_or_create_entity_container_year_with_components_type_allocation(self):
         """In this test, we ensure that when we create an entity_container type allocation,
-           we have NO entity_component created"""
+           we have NO entity_container created"""
         an_entity = EntityFactory()
         a_learning_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
         LearningComponentYearFactory(acronym="PM", learning_unit_year__learning_container_year=a_learning_container_year)
