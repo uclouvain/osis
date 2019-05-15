@@ -91,7 +91,25 @@ class SearchLearningUnitPage(pypom.Page):
     container_type = SelectField(By.ID, 'id_container_type')
     clear_button = ButtonField(By.ID, 'btn_clear_filter')
     search = SubmitField(By.CSS_SELECTOR, '#search_form > div > div:nth-child(2) > div.col-md-1 > div > button')
+    export = ButtonField(By.ID, "dLabel")
+    list_learning_units = ButtonField(By.ID, "btn_produce_xls_with_parameters")
+    with_program = ButtonField(By.ID, "chb_with_grp")
+    with_tutor = ButtonField(By.ID, "chb_with_attributions")
+    generate_xls = ButtonField(By.ID, "btn_xls_with_parameters")
 
     def count_result(self):
-        text = self.find_element(By.CSS_SELECTOR, "#main > div.panel.panel-default > div > strong")
+        text = self.find_element(By.CSS_SELECTOR, "#main > div.panel.panel-default > div > strong").text
         return text.split()[0]
+
+    def find_acronym_in_table(self, row:int=1, col:int=2):
+        selector = '// *[ @ id = "table_learning_units"] / tbody / tr[{}] / td[{}] / a'.format(row, col)
+        return self.find_element(By.XPATH, selector).text
+
+
+
+class LearningUnitPage(pypom.Page):
+    actions = ButtonField(By.ID, "dLabel")
+
+    def is_li_edit_link_disabled(self):
+        return "disabled" in self.find_element(By.ID, "link_edit_lu").get_attribute("class")
+

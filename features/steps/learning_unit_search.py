@@ -21,33 +21,17 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-
 from behave import *
 from behave.runner import Context
 
-from base.tests.functionals.test_education_group import LoginPage
 from features.steps.utils import SearchLearningUnitPage
 
 use_step_matcher("re")
 
 
-@given("La base de données est dans son état initial.")
+@step("Aller sur la page de recherche d'UE")
 def step_impl(context: Context):
-    # TODO: Should be done in the real env.
-    pass
-
-
-@step("L'utilisateur est loggé en tant que gestionnaire facultaire ou central")
-def step_impl(context: Context):
-    page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
-    page.login('deryck', 'test')
-
-    context.test.assertEqual(context.browser.current_url, context.get_url('/'))
-
-
-@step("Aller sur la page (?P<url>.+)")
-def step_impl(context: Context, url: str):
-    # TODO find a solution to select the correct object page depending the given URL.
+    url = '/learning_units/by_activity/'
     context.current_page = SearchLearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
     context.test.assertEqual(context.browser.current_url, context.get_url(url))
 
@@ -70,6 +54,7 @@ def step_impl(context: Context, search_value: str, search_field: str):
 @step("Cliquer sur le bouton Rechercher \(Loupe\)")
 def step_impl(context: Context):
     context.current_page.search.click()
+    context.current_page.wait_for_page_to_load()
 
 
 @then("Le nombre total de résultat est (?P<result_count>.+)")
@@ -77,12 +62,38 @@ def step_impl(context: Context, result_count: str):
     context.test.assertEqual(context.current_page.count_result(), result_count)
 
 
-@step("Cocher la case « Avec ent. subord. »")
-def step_impl(context: Context):
-    raise NotImplementedError(u'STEP: And Cocher la case « Avec ent. subord. »')
-
-
 @step("Dans la liste de résultat, le\(s\) premier\(s\) « Code » est\(sont\) bien (?P<acronym>.+)\.")
 def step_impl(context: Context, acronym: str):
-    raise NotImplementedError(
-        u'STEP: And Dans la liste de résultat, le(s) premier(s) « Code » est(sont) bien <acronym>.')
+    acronyms = acronym.split(',')
+    for row, acronym in enumerate(acronyms):
+        context.test.assertEqual(context.current_page.find_acronym_in_table(row + 1), acronym)
+
+
+@when("Ouvrir le menu « Exporter »")
+def step_impl(context: Context):
+    context.current_page.export.click()
+
+
+@step("Sélection « Liste personnalisée des unités d’enseignement »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page.list_learning_units.click()
+
+
+@step("Cocher les cases « Programmes/regroupements » et « Enseignant\(e\)s »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page.with_program.click()
+    context.current_page.with_tutor.click()
+
+
+@step("Cliquer sur « Produire Excel »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page.generate_xls.click()
