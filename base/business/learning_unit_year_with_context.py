@@ -82,7 +82,7 @@ def append_components(learning_unit_year):
     learning_unit_year.components = OrderedDict()
     if learning_unit_year.learning_components:
         for component in learning_unit_year.learning_components:
-            req_entities_volumes = _get_requirement_entities_volumes(component)
+            req_entities_volumes = component.repartition_volumes
             vol_req_entity = req_entities_volumes.get(entity_types.REQUIREMENT_ENTITY, 0) or 0
             vol_add_req_entity_1 = req_entities_volumes.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0) or 0
             vol_add_req_entity_2 = req_entities_volumes.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0) or 0
@@ -103,14 +103,8 @@ def append_components(learning_unit_year):
     return learning_unit_year
 
 
-def _get_requirement_entities_volumes(learning_component):
-    return {
-        key: value for key, value in learning_component.repartition_volumes.items()
-    }
-
-
 def volume_learning_component_year(learning_component_year):
-    requirement_vols = _get_requirement_entities_volumes(learning_component_year)
+    requirement_vols = learning_component_year.repartition_volumes
     return {
         'VOLUME_TOTAL': learning_component_year.hourly_volume_total_annual,
         'VOLUME_Q1': learning_component_year.hourly_volume_partial_q1,
