@@ -469,7 +469,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
             learning_unit_year__learning_container_year__learning_container=self.learning_unit_year_full.learning_container_year.learning_container
         ).update(hourly_volume_total_annual=new_hourly_total_value)
 
-    def _change_entity_component_value(self, academic_year, repartition_volume):
+    def _change_requirement_entity_repartition_vlume(self, academic_year, repartition_volume):
         qs = LearningComponentYear.objects.filter(
             type=LECTURING,
             learning_unit_year__academic_year=academic_year,
@@ -612,9 +612,9 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         result = form.consistency_errors
         self.assertEqual(result, expected_result)
 
-    def test_when_differences_found_on_entity_component(self):
+    def test_when_differences_found_on_repartition_volume(self):
         next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 1)
-        component = self._change_entity_component_value(next_academic_year, 24)
+        component = self._change_requirement_entity_repartition_vlume(next_academic_year, 24)
 
         requirement_entity = EntityContainerYear.objects.filter(
             learning_container_year=component.learning_unit_year.learning_container_year,
