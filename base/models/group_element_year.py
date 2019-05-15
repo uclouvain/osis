@@ -387,7 +387,7 @@ def _build_child_key(child_branch=None, child_leaf=None):
 
 
 def _is_root_group_element_year(group_element_year):
-    root_categories = (education_group_categories.TRAINING,education_group_categories.MINI_TRAINING)
+    root_categories = (education_group_categories.TRAINING, education_group_categories.MINI_TRAINING)
     return group_element_year["parent__education_group_type__category"] in root_categories and \
         group_element_year["parent__education_group_type__name"] != MiniTrainingType.OPTION.name
 
