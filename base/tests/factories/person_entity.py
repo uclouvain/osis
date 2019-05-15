@@ -33,6 +33,8 @@ from base.tests.factories.person import PersonFactory
 class PersonEntityFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.PersonEntity'
+        django_get_or_create = ('person', 'entity')
+
 
     person = factory.SubFactory(PersonFactory)
     entity = factory.SubFactory(EntityFactory)

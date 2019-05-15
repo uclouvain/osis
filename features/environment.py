@@ -21,9 +21,9 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-
 from selenium import webdriver
 
+TAKE_SCREEN_ON_FAILURE = True
 
 def before_all(context):
     context.browser = webdriver.Firefox()
@@ -35,3 +35,8 @@ def after_all(context):
 
 def before_feature(context, feature):
     pass
+
+
+def after_step(context, step):
+    if TAKE_SCREEN_ON_FAILURE and step.status == "failed":
+        context.browser.save_screenshot("features/logs/failure_{}{}.png".format(context.feature.name, step.name))

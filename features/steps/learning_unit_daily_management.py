@@ -24,9 +24,16 @@
 from behave import *
 from behave.runner import Context
 from django.urls import reverse
+from django.utils.text import slugify
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
+from base.models.entity import Entity
 from base.models.learning_unit_year import LearningUnitYear
-from features.steps.utils import LearningUnitPage, LoginPage
+from base.tests.factories.person import FacultyManagerFactory
+from base.tests.factories.person_entity import PersonEntityFactory
+from features.steps.utils import LearningUnitPage, LoginPage, LearningUnitEditPage
 
 use_step_matcher("re")
 
@@ -36,35 +43,35 @@ def step_impl(context):
     """
     :type context: behave.runner.Context
     """
-    #FIXME
+    # FIXME
+    pass
+
+
+@step("L’utilisateur est dans le groupe « faculty manager »")
+def step_impl(context: Context):
+    person = FacultyManagerFactory(
+        user__username="usual_suspect",
+        user__first_name="Keyser",
+        user__last_name="Söze",
+        user__password="Roger_Verbal_Kint"
+    )
+
+    context.user = person.user
+
     page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
-    page.login('deryck', 'test')
+    page.login("usual_suspect", 'Roger_Verbal_Kint')
 
     context.test.assertEqual(context.browser.current_url, context.get_url('/'))
 
-@step("L’utilisateur est dans le groupe « faculty manager »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    pass
-    # raise NotImplementedError(u'STEP: And L’utilisateur est dans le groupe « faculty manager »')
-
 
 @step("L’utilisateur est attaché à l’entité DRT")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    pass
-    # raise NotImplementedError(u'STEP: And L’utilisateur est attaché à l’entité DRT')
+def step_impl(context: Context):
+    drt_faculty = Entity.objects.filter(entityversion__acronym='DRT').first()
+    PersonEntityFactory(person=context.user.person, entity=drt_faculty, with_child=True)
 
 
 @when("Cliquer sur le menu « Actions »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
+def step_impl(context: Context):
     context.current_page.actions.click()
 
 
@@ -85,3 +92,101 @@ def step_impl(context: Context, acronym: str):
 @then("L’action « Modifier » est activée.")
 def step_impl(context: Context):
     context.test.assertFalse(context.current_page.is_li_edit_link_disabled())
+
+
+@step("Cliquer sur le menu « Modifier »")
+def step_impl(context):
+    context.current_page.edit_button.click()
+    context.current_page = LearningUnitEditPage(context.browser, context.browser.current_url)
+
+
+@step("Décocher la case « Actif »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page.actif = False
+
+
+@step("Encoder (?P<value>.+) comme (?P<field>.+)")
+def step_impl(context: Context, value: str, field: str):
+    slug_field = slugify(field).replace('-', '_')
+    setattr(context.current_page, slug_field, value)
+
+
+@step("Cliquer sur le bouton « Enregistrer »")
+def step_impl(context: Context):
+    context.current_page.save_button.click()
+
+
+@step("A la question, « voulez-vous reporter » répondez « non »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page.no_postponement.click()
+
+
+@then("Vérifier que le cours est bien (?P<status>.+)")
+def step_impl(context: Context, status: str):
+    # Slow page...
+    WebDriverWait(context.browser, 10).until(
+        EC.presence_of_element_located((By.ID, "id_acronym"))
+    )
+
+    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
+
+    context.test.assertEqual(context.current_page.find_element(By.ID, "id_status").text, status)
+
+
+@step("Vérifier que le Quadrimestre est bien (?P<value>.+)")
+def step_impl(context: Context, value: str):
+    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
+
+    context.test.assertEqual(context.current_page.find_element(By.ID, "id_quadrimester").text, value)
+
+
+@step("Vérifier que la Session dérogation est bien (?P<value>.+)")
+def step_impl(context: Context, value: str):
+    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
+
+    context.test.assertEqual(context.current_page.find_element(By.ID, "id_session").text, value)
+
+
+@step("Vérifier que le volume Q1 pour la partie magistrale est bien (?P<value>.+)")
+def step_impl(context: Context, value: str):
+    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
+
+    context.test.assertEqual(context.current_page.find_element(
+        By.XPATH,
+        '//*[@id="identification"]/div/div[1]/div[3]/div/table/tbody/tr[1]/td[3]'
+    ).text, value)
+
+
+@step("Vérifier que le volume Q2 pour la partie magistrale est bien (?P<value>.+)")
+def step_impl(context: Context, value: str):
+    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
+    context.test.assertEqual(context.current_page.find_element(
+        By.XPATH,
+        '//*[@id="identification"]/div/div[1]/div[3]/div/table/tbody/tr[1]/td[4]'
+    ).text, value)
+
+
+@step("Vérifier que le volume Q1 pour la partie pratique est bien (?P<value>.+)")
+def step_impl(context: Context, value: str):
+    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
+
+    context.test.assertEqual(context.current_page.find_element(
+        By.XPATH,
+        '//*[@id="identification"]/div/div[1]/div[3]/div/table/tbody/tr[2]/td[3]'
+    ).text, value)
+
+
+@step("Vérifier que la volume Q2 pour la partie pratique est bien (?P<value>.+)")
+def step_impl(context: Context, value: str):
+    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
+
+    context.test.assertEqual(context.current_page.find_element(
+        By.XPATH,
+        '//*[@id="identification"]/div/div[1]/div[3]/div/table/tbody/tr[2]/td[4]'
+    ).text, value)

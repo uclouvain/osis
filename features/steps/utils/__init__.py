@@ -68,6 +68,16 @@ class CharField(Field):
         return obj.find_element(*self.locator).text
 
 
+class Checkbox(Field):
+    def __set__(self, obj, value: bool):
+        element = obj.find_element(*self.locator)
+        old_val = element.get_attribute('checked')
+        if not old_val and value:
+            element.click()
+        elif old_val and not value:
+            element.click()
+
+
 class LoginPage(pypom.Page):
     URL_TEMPLATE = '/login/'
 
@@ -101,15 +111,29 @@ class SearchLearningUnitPage(pypom.Page):
         text = self.find_element(By.CSS_SELECTOR, "#main > div.panel.panel-default > div > strong").text
         return text.split()[0]
 
-    def find_acronym_in_table(self, row:int=1, col:int=2):
+    def find_acronym_in_table(self, row: int = 1, col: int = 2):
         selector = '// *[ @ id = "table_learning_units"] / tbody / tr[{}] / td[{}] / a'.format(row, col)
         return self.find_element(By.XPATH, selector).text
 
 
-
 class LearningUnitPage(pypom.Page):
     actions = ButtonField(By.ID, "dLabel")
+    edit_button = ButtonField(By.CSS_SELECTOR, "#link_edit_lu > a")
 
     def is_li_edit_link_disabled(self):
         return "disabled" in self.find_element(By.ID, "link_edit_lu").get_attribute("class")
 
+
+class LearningUnitEditPage(pypom.Page):
+    actif = Checkbox(By.ID, "id_status")
+    volume_q1_pour_la_partie_magistrale = InputField(By.ID, "id_component-0-hourly_volume_partial_q1")
+    volume_q1_pour_la_partie_pratique = InputField(By.ID, "id_component-1-hourly_volume_partial_q1")
+    volume_q2_pour_la_partie_magistrale = InputField(By.ID, "id_component-0-hourly_volume_partial_q2")
+    volume_q2_pour_la_partie_pratique = InputField(By.ID, "id_component-1-hourly_volume_partial_q2")
+    quadrimestre = SelectField(By.ID, "id_quadrimester")
+    session_derogation = SelectField(By.ID, "id_session")
+
+    save_button = ButtonField(By.CSS_SELECTOR,
+                              "#main > div.panel.panel-default > div.panel-heading > div > div > button")
+
+    no_postponement = ButtonField(By.ID, "btn_without_postponement")

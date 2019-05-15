@@ -24,6 +24,7 @@
 from behave import *
 from behave.runner import Context
 
+from base.tests.factories.user import SuperUserFactory
 from base.tests.functionals.test_education_group import LoginPage
 
 use_step_matcher("re")
@@ -37,7 +38,10 @@ def step_impl(context: Context):
 
 @step("L'utilisateur est loggé en tant que gestionnaire facultaire ou central")
 def step_impl(context: Context):
+    context.user = SuperUserFactory(username="usual_suspect", first_name="Keyser", last_name="Söze",
+                                    password="Roger_Verbal_Kint")
+
     page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
-    page.login('deryck', 'test')
+    page.login("usual_suspect", 'Roger_Verbal_Kint')
 
     context.test.assertEqual(context.browser.current_url, context.get_url('/'))
