@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-13 15:50+0200\n"
+"POT-Creation-Date: 2019-05-15 15:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4012,7 +4012,7 @@ msgstr ""
 #: forms/learning_unit/edition_volume.py:76
 #: forms/learning_unit/edition_volume.py:147
 #: forms/learning_unit/edition_volume.py:364
-#: models/learning_component_year.py:116
+#: models/learning_component_year.py:117
 #: templates/learning_unit/components.html:51
 #: templates/learning_unit/components_identification.html:37
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:160
@@ -4421,6 +4421,24 @@ msgid ""
 "%(value)s and year %(next_year)s - %(next_value)s"
 msgstr ""
 
+#: models/learning_component_year.py:145
+msgid "The volume Q1 cannot have a value"
+msgstr ""
+
+#: models/learning_component_year.py:139 models/learning_component_year.py:155
+#: models/learning_component_year.py:165
+msgid "The volume Q1 must have a value"
+msgstr ""
+
+#: models/learning_component_year.py:135
+msgid "The volume Q2 cannot have a value"
+msgstr ""
+
+#: models/learning_component_year.py:149 models/learning_component_year.py:159
+#: models/learning_component_year.py:169
+msgid "The volume Q2 must have a value"
+msgstr ""
+
 #: forms/learning_unit/edition_volume.py:160
 #: forms/learning_unit/edition_volume.py:162
 #: forms/learning_unit/edition_volume.py:353
@@ -4428,6 +4446,10 @@ msgstr ""
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:146
 #: tests/forms/test_edition_form.py:332 tests/forms/test_edition_form.py:342
 msgid "The volume can not be set to 0."
+msgstr ""
+
+#: models/learning_component_year.py:173
+msgid "The volumes Q1 and Q2 must have a value"
 msgstr ""
 
 #: templates/blocks/modal/confirmation_modal.html:7
@@ -4826,7 +4848,7 @@ msgstr ""
 msgid "Vol. global"
 msgstr ""
 
-#: models/learning_component_year.py:120
+#: models/learning_component_year.py:121
 #: tests/models/test_learning_unit_year.py:363
 #: tests/models/test_learning_unit_year.py:380
 msgid "Vol_global is not equal to Vol_tot * planned_classes"
@@ -4880,7 +4902,7 @@ msgstr ""
 msgid "Volumes management"
 msgstr ""
 
-#: models/learning_component_year.py:112
+#: models/learning_component_year.py:113
 #: tests/models/test_learning_unit_year.py:345
 #: tests/models/test_learning_unit_year.py:362
 #: tests/models/test_learning_unit_year.py:379
@@ -5548,12 +5570,12 @@ msgstr ""
 msgid "person"
 msgstr ""
 
-#: models/learning_component_year.py:124
+#: models/learning_component_year.py:125
 #: tests/models/test_learning_unit_year.py:629
 msgid "planned classes cannot be 0 while volume is greater than 0"
 msgstr ""
 
-#: models/learning_component_year.py:128
+#: models/learning_component_year.py:129
 #: tests/models/test_learning_unit_year.py:647
 msgid "planned classes cannot be greather than 0 while volume is equal to 0"
 msgstr ""
