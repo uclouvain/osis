@@ -29,7 +29,7 @@ from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models import learning_class_year
-from base.models.enums import learning_component_year_type, learning_container_year_types
+from base.models.enums import learning_component_year_type, learning_container_year_types, quadrimesters
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -99,6 +99,7 @@ class LearningComponentYear(SerializableModel):
         return self._warnings
 
     def _check_volumes_consistency(self):
+        quadrimester = self.learning_unit_year.quadrimester
         _warnings = []
 
         if not hasattr(self, 'vol_global'):
@@ -126,6 +127,40 @@ class LearningComponentYear(SerializableModel):
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
                 _('planned classes cannot be greather than 0 while volume is equal to 0')))
+
+        if quadrimester == quadrimesters.Q1 and vol_q2:
+            _warnings.append("{} ({})".format(
+                inconsistent_msg,
+                _("si quadrimestre = Q1 et seul vol Q2 PM et/ou vol Q2 PP encodé")))
+
+        if quadrimester == quadrimesters.Q2 and vol_q1:
+            _warnings.append("{} ({})".format(
+                inconsistent_msg,
+                _("si quadrimestre = Q2 et seul vol Q1 PM et/ou vol Q1 PP encodé")))
+
+        if quadrimester == quadrimesters.Q1and2 and (not vol_q1 or not vol_q2):
+            if not vol_q1:
+                _warnings.append("{} ({})".format(
+                    inconsistent_msg,
+                    _('The volume must have a value')))
+            if not vol_q2:
+                _warnings.append("{} ({})".format(
+                    inconsistent_msg,
+                    _('The volume must have a value')))
+
+        if quadrimester == quadrimesters.Q1or2 and (not vol_q1 and not vol_q2):
+            if not vol_q1 and vol_q1:
+                _warnings.append("{} ({})".format(
+                    inconsistent_msg,
+                    _('The volume must have a value')))
+            elif not vol_q2 and vol_q2:
+                _warnings.append("{} ({})".format(
+                    inconsistent_msg,
+                    _('The volume must have a value')))
+            else:
+                _warnings.append("{} ({})".format(
+                    inconsistent_msg,
+                    _('The volumes must have a value')))
         return _warnings
 
 
