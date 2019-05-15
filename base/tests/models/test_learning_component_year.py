@@ -48,7 +48,7 @@ class LearningUnitYearWithContextTestCase(TestCase):
             repartition_volume_additional_entity_2=None,
         )
 
-    def test_get_requirement_entities_volumes(self):
+    def test_repartition_volumes_property(self):
         entity_types_list = [
             entity_types.REQUIREMENT_ENTITY,
             entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
@@ -67,6 +67,13 @@ class LearningUnitYearWithContextTestCase(TestCase):
         }
 
         self.assertDictEqual(self.component_with_repartition.repartition_volumes, expected_result)
+
+        expected_result = {
+            "REQUIREMENT_ENTITY": 0.0,
+            "ADDITIONAL_REQUIREMENT_ENTITY_1": 0.0,
+            "ADDITIONAL_REQUIREMENT_ENTITY_2": 0.0,
+        }
+        self.assertDictEqual(self.component_without_repartition.repartition_volumes, expected_result)
 
     def test_vol_global(self):
         self.assertIsInstance(self.component_with_repartition.vol_global, float)
