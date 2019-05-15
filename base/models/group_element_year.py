@@ -387,12 +387,9 @@ def _build_child_key(child_branch=None, child_leaf=None):
 
 
 def _is_root_group_element_year(group_element_year):
-    if group_element_year["parent__education_group_type__category"] not in (education_group_categories.TRAINING,
-                                                                            education_group_categories.MINI_TRAINING):
-        return False
-    if group_element_year["parent__education_group_type__name"] == MiniTrainingType.OPTION.name:
-        return False
-    return True
+    root_categories = (education_group_categories.TRAINING,education_group_categories.MINI_TRAINING)
+    return group_element_year["parent__education_group_type__category"] in root_categories and \
+        group_element_year["parent__education_group_type__name"] != MiniTrainingType.OPTION.name
 
 
 def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict:
