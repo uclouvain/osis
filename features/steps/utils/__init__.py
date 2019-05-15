@@ -126,6 +126,8 @@ class LearningUnitPage(pypom.Page):
 
 class LearningUnitEditPage(pypom.Page):
     actif = Checkbox(By.ID, "id_status")
+    periodicite = SelectField(By.ID, "id_periodicity")
+    credits = InputField(By.ID, "id_credits")
     volume_q1_pour_la_partie_magistrale = InputField(By.ID, "id_component-0-hourly_volume_partial_q1")
     volume_q1_pour_la_partie_pratique = InputField(By.ID, "id_component-1-hourly_volume_partial_q1")
     volume_q2_pour_la_partie_magistrale = InputField(By.ID, "id_component-0-hourly_volume_partial_q2")
@@ -137,3 +139,4 @@ class LearningUnitEditPage(pypom.Page):
                               "#main > div.panel.panel-default > div.panel-heading > div > div > button")
 
     no_postponement = ButtonField(By.ID, "btn_without_postponement")
+    with_postponement = ButtonField(By.ID, "btn_with_postponement")

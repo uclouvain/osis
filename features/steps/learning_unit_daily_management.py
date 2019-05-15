@@ -31,7 +31,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from base.models.entity import Entity
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.person import FacultyManagerFactory
+from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from features.steps.utils import LearningUnitPage, LoginPage, LearningUnitEditPage
 
@@ -125,10 +125,6 @@ def step_impl(context):
     :type context: behave.runner.Context
     """
     context.current_page.no_postponement.click()
-
-
-@then("Vérifier que le cours est bien (?P<status>.+)")
-def step_impl(context: Context, status: str):
     # Slow page...
     WebDriverWait(context.browser, 10).until(
         EC.presence_of_element_located((By.ID, "id_acronym"))
@@ -136,27 +132,24 @@ def step_impl(context: Context, status: str):
 
     context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
 
+
+@then("Vérifier que le cours est bien (?P<status>.+)")
+def step_impl(context: Context, status: str):
     context.test.assertEqual(context.current_page.find_element(By.ID, "id_status").text, status)
 
 
 @step("Vérifier que le Quadrimestre est bien (?P<value>.+)")
 def step_impl(context: Context, value: str):
-    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
-
     context.test.assertEqual(context.current_page.find_element(By.ID, "id_quadrimester").text, value)
 
 
 @step("Vérifier que la Session dérogation est bien (?P<value>.+)")
 def step_impl(context: Context, value: str):
-    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
-
     context.test.assertEqual(context.current_page.find_element(By.ID, "id_session").text, value)
 
 
 @step("Vérifier que le volume Q1 pour la partie magistrale est bien (?P<value>.+)")
 def step_impl(context: Context, value: str):
-    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
-
     context.test.assertEqual(context.current_page.find_element(
         By.XPATH,
         '//*[@id="identification"]/div/div[1]/div[3]/div/table/tbody/tr[1]/td[3]'
@@ -165,7 +158,6 @@ def step_impl(context: Context, value: str):
 
 @step("Vérifier que le volume Q2 pour la partie magistrale est bien (?P<value>.+)")
 def step_impl(context: Context, value: str):
-    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
     context.test.assertEqual(context.current_page.find_element(
         By.XPATH,
         '//*[@id="identification"]/div/div[1]/div[3]/div/table/tbody/tr[1]/td[4]'
@@ -174,8 +166,6 @@ def step_impl(context: Context, value: str):
 
 @step("Vérifier que le volume Q1 pour la partie pratique est bien (?P<value>.+)")
 def step_impl(context: Context, value: str):
-    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
-
     context.test.assertEqual(context.current_page.find_element(
         By.XPATH,
         '//*[@id="identification"]/div/div[1]/div[3]/div/table/tbody/tr[2]/td[3]'
@@ -184,9 +174,66 @@ def step_impl(context: Context, value: str):
 
 @step("Vérifier que la volume Q2 pour la partie pratique est bien (?P<value>.+)")
 def step_impl(context: Context, value: str):
-    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
-
     context.test.assertEqual(context.current_page.find_element(
         By.XPATH,
         '//*[@id="identification"]/div/div[1]/div[3]/div/table/tbody/tr[2]/td[4]'
     ).text, value)
+
+
+@given("La période de modification des programmes n’est pas en cours")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    # TODO
+    pass
+
+
+@step("L’utilisateur est dans le groupe « central manager »")
+def step_impl(context):
+    person = CentralManagerFactory(
+        user__username="usual_suspect",
+        user__first_name="Keyser",
+        user__last_name="Söze",
+        user__password="Roger_Verbal_Kint"
+    )
+
+    context.user = person.user
+
+    page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
+    page.login("usual_suspect", 'Roger_Verbal_Kint')
+
+    context.test.assertEqual(context.browser.current_url, context.get_url('/'))
+
+
+@step("A la question, « voulez-vous reporter » répondez « oui »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page.with_postponement.click()
+    # Slow page...
+    WebDriverWait(context.browser, 10).until(
+        EC.presence_of_element_located((By.ID, "id_acronym"))
+    )
+
+    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
+
+
+@then("Vérifier que le Crédits est bien (?P<value>.+)")
+def step_impl(context, value):
+    context.test.assertEqual(context.current_page.find_element(By.ID, "id_credits").text, value)
+
+
+@step("Vérifier que la Périodicité est bien (?P<value>.+)")
+def step_impl(context, value):
+    context.test.assertEqual(context.current_page.find_element(By.ID, "id_periodicity").text, value)
+
+
+@step("Rechercher (?P<acronym>.+) en 2020-21")
+def step_impl(context, acronym):
+    luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=2020)
+    url = reverse('learning_unit', args=[luy.pk])
+
+    context.current_page = LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
+    context.test.assertEqual(context.browser.current_url, context.get_url(url))
