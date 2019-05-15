@@ -64,19 +64,19 @@ class LearningUnitEditionTestCase(TestCase):
 
         an_entity = EntityFactory()
         self.entity_version = EntityVersionFactory(entity=an_entity, parent=None, end_date=None, acronym="DRT")
-        self.allocation_entity = _create_entity_container_with_entity_components(
+        self.allocation_entity = _create_entity_container_with_components(
             self.learning_unit_year,
             entity_container_year_link_type.ALLOCATION_ENTITY,
             an_entity
         )
-        self.requirement_entity = _create_entity_container_with_entity_components(
+        self.requirement_entity = _create_entity_container_with_components(
             self.learning_unit_year,
             entity_container_year_link_type.REQUIREMENT_ENTITY,
             an_entity,
             repartition_lecturing=30,
             repartition_practical_exercises=10
         )
-        self.add_requirement_entity_1 = _create_entity_container_with_entity_components(
+        self.add_requirement_entity_1 = _create_entity_container_with_components(
             self.learning_unit_year,
             entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
             an_entity,
@@ -380,19 +380,19 @@ class LearningUnitEditionTestCase(TestCase):
         another_learning_unit_year.learning_unit = self.learning_unit_year.learning_unit
         another_learning_unit_year.save()
 
-        _create_entity_container_with_entity_components(another_learning_unit_year,
-                                                        entity_container_year_link_type.ALLOCATION_ENTITY,
-                                                        self.allocation_entity.entity)
-        _create_entity_container_with_entity_components(another_learning_unit_year,
-                                                        entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                                        self.requirement_entity.entity,
-                                                        repartition_lecturing=30,
-                                                        repartition_practical_exercises=10)
-        _create_entity_container_with_entity_components(another_learning_unit_year,
-                                                        entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                                                        self.add_requirement_entity_1.entity,
-                                                        repartition_lecturing=10,
-                                                        repartition_practical_exercises=5)
+        _create_entity_container_with_components(another_learning_unit_year,
+                                                 entity_container_year_link_type.ALLOCATION_ENTITY,
+                                                 self.allocation_entity.entity)
+        _create_entity_container_with_components(another_learning_unit_year,
+                                                 entity_container_year_link_type.REQUIREMENT_ENTITY,
+                                                 self.requirement_entity.entity,
+                                                 repartition_lecturing=30,
+                                                 repartition_practical_exercises=10)
+        _create_entity_container_with_components(another_learning_unit_year,
+                                                 entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
+                                                 self.add_requirement_entity_1.entity,
+                                                 repartition_lecturing=10,
+                                                 repartition_practical_exercises=5)
 
         error_list = business_edition._check_postponement_conflict_on_volumes(self.learning_container_year,
                                                                               another_learning_container_year)
@@ -426,19 +426,19 @@ class LearningUnitEditionTestCase(TestCase):
         )
         another_learning_unit_year.save()
 
-        _create_entity_container_with_entity_components(another_learning_unit_year,
-                                                        entity_container_year_link_type.ALLOCATION_ENTITY,
-                                                        self.allocation_entity.entity)
-        _create_entity_container_with_entity_components(another_learning_unit_year,
-                                                        entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                                        self.requirement_entity.entity,
-                                                        repartition_lecturing=30,
-                                                        repartition_practical_exercises=10)
-        _create_entity_container_with_entity_components(another_learning_unit_year,
-                                                        entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                                                        self.add_requirement_entity_1.entity,
-                                                        repartition_lecturing=20,
-                                                        repartition_practical_exercises=10)
+        _create_entity_container_with_components(another_learning_unit_year,
+                                                 entity_container_year_link_type.ALLOCATION_ENTITY,
+                                                 self.allocation_entity.entity)
+        _create_entity_container_with_components(another_learning_unit_year,
+                                                 entity_container_year_link_type.REQUIREMENT_ENTITY,
+                                                 self.requirement_entity.entity,
+                                                 repartition_lecturing=30,
+                                                 repartition_practical_exercises=10)
+        _create_entity_container_with_components(another_learning_unit_year,
+                                                 entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
+                                                 self.add_requirement_entity_1.entity,
+                                                 repartition_lecturing=20,
+                                                 repartition_practical_exercises=10)
 
         error_list = business_edition._check_postponement_conflict_on_volumes(self.learning_container_year,
                                                                               another_learning_container_year)
@@ -483,17 +483,17 @@ class LearningUnitEditionTestCase(TestCase):
         another_learning_unit_year.learning_unit = self.learning_unit_year.learning_unit
         another_learning_unit_year.save()
 
-        _create_entity_container_with_entity_components(another_learning_unit_year,
-                                                        entity_container_year_link_type.ALLOCATION_ENTITY,
-                                                        self.allocation_entity.entity)
-        _create_entity_container_with_entity_components(another_learning_unit_year,
-                                                        entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                                        self.requirement_entity.entity,
-                                                        repartition_practical_exercises=10)
-        _create_entity_container_with_entity_components(another_learning_unit_year,
-                                                        entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                                                        self.add_requirement_entity_1.entity,
-                                                        repartition_practical_exercises=5)
+        _create_entity_container_with_components(another_learning_unit_year,
+                                                 entity_container_year_link_type.ALLOCATION_ENTITY,
+                                                 self.allocation_entity.entity)
+        _create_entity_container_with_components(another_learning_unit_year,
+                                                 entity_container_year_link_type.REQUIREMENT_ENTITY,
+                                                 self.requirement_entity.entity,
+                                                 repartition_practical_exercises=10)
+        _create_entity_container_with_components(another_learning_unit_year,
+                                                 entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
+                                                 self.add_requirement_entity_1.entity,
+                                                 repartition_practical_exercises=5)
 
         error_list = business_edition._check_postponement_conflict_on_volumes(self.learning_container_year,
                                                                               another_learning_container_year)
@@ -524,19 +524,19 @@ class LearningUnitEditionTestCase(TestCase):
         another_learning_unit_year.learning_unit = self.learning_unit_year.learning_unit
         another_learning_unit_year.save()
 
-        _create_entity_container_with_entity_components(another_learning_unit_year,
-                                                        entity_container_year_link_type.ALLOCATION_ENTITY,
-                                                        self.allocation_entity.entity)
-        _create_entity_container_with_entity_components(another_learning_unit_year,
-                                                        entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                                        self.requirement_entity.entity,
-                                                        repartition_lecturing=30,
-                                                        repartition_practical_exercises=10)
-        _create_entity_container_with_entity_components(another_learning_unit_year,
-                                                        entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                                                        self.add_requirement_entity_1.entity,
-                                                        repartition_lecturing=10,
-                                                        repartition_practical_exercises=5)
+        _create_entity_container_with_components(another_learning_unit_year,
+                                                 entity_container_year_link_type.ALLOCATION_ENTITY,
+                                                 self.allocation_entity.entity)
+        _create_entity_container_with_components(another_learning_unit_year,
+                                                 entity_container_year_link_type.REQUIREMENT_ENTITY,
+                                                 self.requirement_entity.entity,
+                                                 repartition_lecturing=30,
+                                                 repartition_practical_exercises=10)
+        _create_entity_container_with_components(another_learning_unit_year,
+                                                 entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
+                                                 self.add_requirement_entity_1.entity,
+                                                 repartition_lecturing=10,
+                                                 repartition_practical_exercises=5)
 
         # REMOVE PRATICAL_EXERCICE component for current learning unit year
         _delete_components(self.learning_unit_year, learning_component_year_type.PRACTICAL_EXERCISES)
@@ -630,8 +630,8 @@ def _create_learning_unit_year_with_components(l_container, create_lecturing_com
     return a_learning_unit_year
 
 
-def _create_entity_container_with_entity_components(a_learning_unit_year, entity_container_type, an_entity,
-                                                    repartition_lecturing=None, repartition_practical_exercises=None):
+def _create_entity_container_with_components(a_learning_unit_year, entity_container_type, an_entity,
+                                             repartition_lecturing=None, repartition_practical_exercises=None):
     an_entity_container = EntityContainerYearFactory(
         learning_container_year=a_learning_unit_year.learning_container_year,
         type=entity_container_type,
