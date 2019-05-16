@@ -28,7 +28,7 @@
     {# We do not display the form if those are warnings or errors #}
     {% if not messages %}
         <div class="modal-header">
-            <h4 class="text-center">{{ form.instance.child.acronym }}</h4>
+            <h4 class="text-center">{{ form.instance.child.partial_acronym }} - {{ form.instance.child.acronym }}</h4>
         </div>
 
         <div id="form-modal-body" class="modal-body">
