@@ -201,9 +201,9 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         if self.group_element_year.has_prerequisite and self.group_element_year.is_prerequisite:
             return "fa fa-exchange-alt"
         elif self.group_element_year.has_prerequisite:
-            return "fa fa-arrow-right"
-        elif self.group_element_year.is_prerequisite:
             return "fa fa-arrow-left"
+        elif self.group_element_year.is_prerequisite:
+            return "fa fa-arrow-right"
         return "far fa-file"
 
     def _get_acronym(self) -> str:
