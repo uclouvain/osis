@@ -79,33 +79,8 @@ def _filter_required_teaching_material(learning_units):
             continue
 
         # Fetch data in CMS and convert
-        bibliography = _html_list_to_string(
-            html.unescape(
-                getattr(
-                    TranslatedText.objects.filter(
-                        text_label__label='bibliography',
-                        entity=LEARNING_UNIT_YEAR,
-                        reference=learning_unit.pk
-                    ).first(),
-                    "text",
-                    " "
-                )
-            )
-        )
-
-        online_resources = _hyperlinks_to_string(
-            html.unescape(
-                getattr(
-                    TranslatedText.objects.filter(
-                        text_label__label='online_resources',
-                        entity=LEARNING_UNIT_YEAR,
-                        reference=learning_unit.pk
-                    ).first(),
-                    "text",
-                    " "
-                )
-            )
-        )
+        bibliography = _get_attr_cms(learning_unit, 'bibliography')
+        online_resources = _get_attr_cms(learning_unit, 'online_resources')
 
         result.append((
             learning_unit.acronym,
@@ -160,3 +135,18 @@ def _strip_tags(text):
 
 def _get_text_wrapped_cells(count):
     return ['{}{}'.format(col, row) for col in WRAP_TEXT_COLUMNS for row in range(2, count+2)]
+
+
+def _get_attr_cms(learning_unit, text_label):
+    attribute = getattr(
+        TranslatedText.objects.filter(text_label__label=text_label, entity=LEARNING_UNIT_YEAR,
+                                      reference=learning_unit.pk).first(), "text", " ")
+    if attribute:
+        return _html_list_to_string(
+            html.unescape(
+                attribute
+            )
+        )
+
+    return ""
+
