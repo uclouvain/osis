@@ -91,6 +91,25 @@ class TestBuildTree(TestCase):
                 args=[self.parent.pk, self.group_element_year_2_1.child_leaf.pk]
             ) + "?group_to_parent={}".format(self.group_element_year_2_1.pk))
 
+    def test_tree_to_json_a_attr(self):
+        """In this test, we ensure that a attr contains some url for tree contextual menu"""
+        node = EducationGroupHierarchy(self.parent)
+        json = node.to_json()
+        child = self.group_element_year_1.child_branch
+
+        expected_modify_url = reverse('group_element_year_update', args=[
+            self.parent.pk, child.pk, self.group_element_year_1.pk
+        ])
+        self.assertEqual(json['children'][0]['a_attr']['modify_url'], expected_modify_url)
+
+        expected_attach_url = reverse('education_group_attach', args=[self.parent.pk, child.pk])
+        self.assertEqual(json['children'][0]['a_attr']['attach_url'], expected_attach_url)
+
+        expected_detach_url = reverse('group_element_year_delete', args=[
+            self.parent.pk, child.pk, self.group_element_year_1.pk
+        ])
+        self.assertEqual(json['children'][0]['a_attr']['detach_url'], expected_detach_url)
+
     def test_tree_to_json_ids(self):
         node = EducationGroupHierarchy(self.parent)
         json = node.to_json()
