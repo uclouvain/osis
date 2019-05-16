@@ -61,7 +61,7 @@ class LearningComponentYear(SerializableModel):
     _warnings = None
 
     def __str__(self):
-        return u"%s - %s" % (self.acronym, self.learning_unit_year.acronym)
+        return "{} - {}".format(self.acronym, self.learning_unit_year.acronym)
 
     class Meta:
         permissions = (
