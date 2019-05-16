@@ -327,7 +327,7 @@ class EducationGroupTypeForm(forms.Form):
         self.fields["name"].queryset = find_authorized_types(
             category=category,
             parents=self.parent
-        ).exclude(name__in=DISABLED_MINI_TRAINING)
+        ).exclude(name__in=DISABLED_MINI_TRAINING)  # Temporary exclude Major and Mobility partnership (OSIS-2911)
 
         self.fields["name"].label = _("Which type of %(category)s do you want to create ?") % {
             "category": Categories[category].value
