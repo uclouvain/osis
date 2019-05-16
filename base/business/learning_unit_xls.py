@@ -26,6 +26,7 @@
 from collections import defaultdict
 
 from django.db.models import Subquery, OuterRef
+from django.db.models.expressions import RawSQL
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
@@ -33,13 +34,13 @@ from openpyxl.utils import get_column_letter
 
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import Functions
-from base import models as mdl_base
 from base.business.learning_unit import learning_unit_titles_part2, XLS_DESCRIPTION, XLS_FILENAME, \
     WORKSHEET_TITLE
 from base.business.xls import get_name_or_username
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
+from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from osis_common.document import xls_build
 
 TRANSFORMATION_AND_MODIFICATION_COLOR = Color('808000')
@@ -88,9 +89,24 @@ def learning_unit_titles_part1():
 def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=False):
     qs = annotate_qs(learning_unit_years)
 
-    return [
-        extract_xls_data_from_learning_unit(lu, with_grp, with_attributions) for lu in qs
-    ]
+    if with_grp:
+        qs = qs.annotate(
+            closest_trainings=RawSQL(SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ())
+        ).prefetch_related('child_leaf__parent')
+
+    result = []
+
+    for learning_unit_yr in qs:
+        lu_data_part1 = _get_data_part1(learning_unit_yr)
+        lu_data_part2 = _get_data_part2(learning_unit_yr, with_attributions)
+
+        if with_grp:
+            lu_data_part2.append(_add_training_data(learning_unit_yr))
+
+        lu_data_part1.extend(lu_data_part2)
+        result.append(lu_data_part1)
+
+    return result
 
 
 def annotate_qs(learning_unit_years):
@@ -116,16 +132,6 @@ def annotate_qs(learning_unit_years):
         pp_vol_tot=Subquery(subquery_component_pp.values('hourly_volume_total_annual')[:1]),
         pp_classes=Subquery(subquery_component_pp.values('planned_classes')[:1])
     )
-
-
-def extract_xls_data_from_learning_unit(learning_unit_yr, with_grp, with_attributions):
-    lu_data_part1 = _get_data_part1(learning_unit_yr)
-    lu_data_part2 = _get_data_part2(learning_unit_yr, with_attributions)
-
-    if with_grp:
-        lu_data_part2.append(_add_training_data(learning_unit_yr))
-    lu_data_part1.extend(lu_data_part2)
-    return lu_data_part1
 
 
 def create_xls_with_parameters(user, learning_units, filters, extra_configuration):
@@ -238,41 +244,35 @@ def _get_col_letter(titles, title_search):
     return None
 
 
-def _get_trainings_by_educ_group_year(learning_unit_yr):
-    groups = []
-    learning_unit_yr.group_elements_years = mdl_base.group_element_year.GroupElementYear.objects.filter(
-        child_leaf=learning_unit_yr
-    ).select_related(
-        "child_leaf", "parent__education_group_type"
-    ).order_by(
-        'parent__partial_acronym'
-    )
-    groups.extend(learning_unit_yr.group_elements_years)
-    education_groups_years = [group_element_year.parent for group_element_year in groups]
-    return mdl_base.group_element_year \
-        .find_learning_unit_formations(education_groups_years, parents_as_instances=True)
-
-
 def _add_training_data(learning_unit_yr):
-    formations_by_educ_group_year = _get_trainings_by_educ_group_year(learning_unit_yr)
-    return "\n".join(["{}".format(_concatenate_training_data(formations_by_educ_group_year, group_element_year)) for
-                      group_element_year in learning_unit_yr.group_elements_years])
+    return "\n".join([
+        _concatenate_training_data(learning_unit_yr, group_element_year)
+        for group_element_year in learning_unit_yr.child_leaf.all()
+    ])
 
 
-def _concatenate_training_data(formations_by_educ_group_year, group_element_year):
-    concatened_string = ''
-    for training in formations_by_educ_group_year.get(group_element_year.parent_id):
-        training_string = "{} {} {}".format(
-            group_element_year.parent.partial_acronym if group_element_year.parent.partial_acronym else '',
-            "({}) {}".format(
-                '{0:.2f}'.format(
-                    group_element_year.child_leaf.credits) if group_element_year.child_leaf.credits else '-',
-                '-' if len(formations_by_educ_group_year.get(group_element_year.parent_id)) > 0 else ''),
+def _concatenate_training_data(learning_unit_year, group_element_year) -> str:
+    concatenated_string = ''
+    if not learning_unit_year.closest_trainings:
+        return concatenated_string
 
-            "{} - {}".format(training.acronym, training.title)
-        )
-        concatened_string = "{} {}\n".format(concatened_string, training_string)
-    return concatened_string
+    partial_acronym = group_element_year.parent.partial_acronym or ''
+    leaf_credits = "{0:.2f}".format(
+        group_element_year.child_leaf.credits) if group_element_year.child_leaf.credits else '-'
+    nb_parents = '-' if len(learning_unit_year.closest_trainings) > 0 else ''
+
+    for training in learning_unit_year.closest_trainings:
+        if training['gs_origin'] == group_element_year.pk:
+            training_string = "{} ({}) {} {} - {}\n".format(
+                partial_acronym,
+                leaf_credits,
+                nb_parents,
+                training['acronym'],
+                training['title'],
+            )
+            concatenated_string += training_string
+
+    return concatenated_string
 
 
 def _get_data_part2(learning_unit_yr, with_attributions):
