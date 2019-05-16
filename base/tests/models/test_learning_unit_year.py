@@ -332,9 +332,7 @@ class LearningUnitYearWarningsTest(TestCase):
         )
         self.luy_full.quadrimester = None
         self.luy_full.save()
-        for p in self.luy_full.get_partims_related():
-            p.quadrimester = None
-            p.save()
+        self.luy_full.get_partims_related().update(quadrimester=None)
 
     def test_warning_volumes_vol_tot(self):
         self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = 15.0
