@@ -240,9 +240,13 @@ def _get_col_letter(titles, title_search):
 
 def _get_trainings_by_educ_group_year(learning_unit_yr):
     groups = []
-    learning_unit_yr.group_elements_years = mdl_base.group_element_year.search(child_leaf=learning_unit_yr) \
-        .select_related("child_leaf", "parent__education_group_type") \
-        .order_by('parent__partial_acronym')
+    learning_unit_yr.group_elements_years = mdl_base.group_element_year.GroupElementYear.objects.filter(
+        child_leaf=learning_unit_yr
+    ).select_related(
+        "child_leaf", "parent__education_group_type"
+    ).order_by(
+        'parent__partial_acronym'
+    )
     groups.extend(learning_unit_yr.group_elements_years)
     education_groups_years = [group_element_year.parent for group_element_year in groups]
     return mdl_base.group_element_year \
