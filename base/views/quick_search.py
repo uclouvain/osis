@@ -103,5 +103,9 @@ class QuickSearchEducationGroupYearView(QuickSearchGenericView):
     permission_required = 'base.can_access_education_group'
 
     def search_text_filter(self, qs, search_text):
-        return qs.filter(Q(acronym__icontains=search_text) | Q(title__icontains=search_text) | Q(
-            title_english__icontains=search_text))
+        return qs.filter(
+            Q(acronym__icontains=search_text) |
+            Q(title__icontains=search_text) |
+            Q(title_english__icontains=search_text) |
+            Q(partial_acronym__icontains=search_text)
+        )

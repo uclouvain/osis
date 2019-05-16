@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-13 15:50+0200\n"
+"POT-Creation-Date: 2019-05-16 11:10+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -929,7 +929,7 @@ msgstr ""
 msgid "Cannot set end year to %(end_year)s :"
 msgstr "Impossible de mettre la fin à %(end_year)s :"
 
-#: forms/education_groups.py:64 models/education_group_type.py:75
+#: forms/education_groups.py:64 models/education_group_type.py:73
 #: templates/education_group/blocks/form/group.html:58
 #: templates/education_group/blocks/form/minitraining.html:59
 #: templates/education_group/blocks/form/training_tab_identification.html:67
@@ -1837,6 +1837,12 @@ msgstr "Formation doctorale"
 #: templates/offer_year_calendar.html:30 templates/offers.html:30
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
+
+#: templates/education_group/blocks/table_utilizations.html:38
+#, fuzzy
+#| msgid "Formation PhD"
+msgid "Formations"
+msgstr "Formation doctorale"
 
 #: templates/learning_unit/identification.html:77
 msgid "Formerly"
@@ -4093,8 +4099,8 @@ msgstr "Texte"
 msgid "The"
 msgstr "Le"
 
-#: views/education_groups/group_element_year/update.py:102
-#: views/education_groups/group_element_year/update.py:109
+#: views/education_groups/group_element_year/update.py:101
+#: views/education_groups/group_element_year/update.py:108
 #, python-format
 msgid "The %(acronym)s has been moved"
 msgstr "%(acronym)s a été déplacé"
@@ -4366,7 +4372,7 @@ msgstr "Les unités d'enseignement"
 msgid "The link of %(acronym)s has been created"
 msgstr "Le lien de %(acronym)s ont été mis à jour"
 
-#: views/education_groups/group_element_year/update.py:147
+#: views/education_groups/group_element_year/update.py:146
 #, python-format
 msgid "The link of %(acronym)s has been updated"
 msgstr "Le lien de %(acronym)s ont été mis à jour"
@@ -4450,7 +4456,7 @@ msgstr "Le parent doit au moins avoir un enfant de type(s) \"%(types)s\"."
 msgid "The partim"
 msgstr "Le partim"
 
-#: views/education_groups/learning_unit/detail.py:133
+#: views/education_groups/learning_unit/detail.py:138
 #, python-format
 msgid ""
 "The prerequisites %(prerequisites)s for the learning unit %(learning_unit)s "
@@ -4459,7 +4465,7 @@ msgstr ""
 "Les prérequis %(prerequisites)s pour l'unité d'enseignement "
 "%(learning_unit)s ne sont pas dans la formation sélectionnée %(root)s"
 
-#: views/education_groups/detail.py:386
+#: views/education_groups/detail.py:387
 #, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr "Le programme %(acronym)s sera publié sous peu"
@@ -4657,7 +4663,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 
-#: views/education_groups/detail.py:339
+#: views/education_groups/detail.py:340
 #, python-format
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
@@ -4834,7 +4840,7 @@ msgstr "Type de contrainte"
 msgid "Type of event"
 msgstr "Type d'événement"
 
-#: forms/education_group/common.py:317 models/education_group_type.py:81
+#: forms/education_group/common.py:317 models/education_group_type.py:79
 #: models/education_group_year.py:194
 msgid "Type of training"
 msgstr "Type de formation"
@@ -5989,8 +5995,7 @@ msgid "yes"
 msgstr "oui"
 
 #: templates/education_group/blocks/content_minor_major_option_table.html:43
-#: templates/education_group/blocks/table_utilizations.html:58
-#: templates/education_group/blocks/table_utilizations.html:73
+#: templates/education_group/blocks/row_table_utilizations.html:42
 #: templates/learning_unit/comparison.html:58
 #: templates/learning_unit/comparison.html:60
 #: templates/learning_unit/comparison.html:62
@@ -6002,4 +6007,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:164
 msgid "yes,no"
 msgstr "oui,non"
-
