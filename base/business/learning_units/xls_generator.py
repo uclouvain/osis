@@ -79,8 +79,8 @@ def _filter_required_teaching_material(learning_units):
             continue
 
         # Fetch data in CMS and convert
-        bibliography = _get_attr_cms(learning_unit, 'bibliography')
-        online_resources = _get_attr_cms(learning_unit, 'online_resources')
+        bibliography = _get_bibliography(learning_unit)
+        online_resources = _get_online_resources(learning_unit)
 
         result.append((
             learning_unit.acronym,
@@ -137,16 +137,17 @@ def _get_text_wrapped_cells(count):
     return ['{}{}'.format(col, row) for col in WRAP_TEXT_COLUMNS for row in range(2, count+2)]
 
 
-def _get_attr_cms(learning_unit, text_label):
-    attribute = getattr(
-        TranslatedText.objects.filter(text_label__label=text_label, entity=LEARNING_UNIT_YEAR,
-                                      reference=learning_unit.pk).first(), "text", " ")
-    if attribute:
-        return _html_list_to_string(
-            html.unescape(
-                attribute
-            )
-        )
+def _get_attribute_cms(learning_unit, text_label):
+    attr = getattr(TranslatedText.objects.filter(text_label__label=text_label, entity=LEARNING_UNIT_YEAR,
+                                                 reference=learning_unit.pk).first(), "text", " ")
+    return attr
 
-    return ""
 
+def _get_online_resources(learning_unit):
+    attr = _get_attribute_cms(learning_unit, 'online_resources')
+    return _hyperlinks_to_string(html.unescape(attr)) if attr else ""
+
+
+def _get_bibliography(learning_unit):
+    attr = _get_attribute_cms(learning_unit, 'bibliography')
+    return _html_list_to_string(html.unescape(attr)) if attr else ""
