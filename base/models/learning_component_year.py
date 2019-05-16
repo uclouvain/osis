@@ -99,7 +99,6 @@ class LearningComponentYear(SerializableModel):
         return self._warnings
 
     def _check_volumes_consistency(self):
-        quadrimester = self.learning_unit_year.quadrimester
         _warnings = []
 
         if not hasattr(self, 'vol_global'):

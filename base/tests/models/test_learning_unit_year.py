@@ -330,6 +330,8 @@ class LearningUnitYearWarningsTest(TestCase):
             learning_component_year=self.learning_component_year_full_lecturing,
             entity_container_year__type=REQUIREMENT_ENTITY
         )
+        self.luy_full.quadrimester = None
+        self.luy_full.save()
 
     def test_warning_volumes_vol_tot(self):
         self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = 15.0
