@@ -500,6 +500,42 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
             current_count = self._count_records(model_class)
             self.assertEqual(current_count, initial_count, model_class.objects.all())
 
+    def test_when_delete_additionnal_entity(self):
+        post_data = get_valid_form_data(self.current_academic_year, self.person, self.learning_unit_year)
+        # Assert additionnal entityContainerYear exists
+        EntityContainerYear.objects.get_or_create(
+            type=ADDITIONAL_REQUIREMENT_ENTITY_1,
+            learning_container_year=self.learning_unit_year.learning_container_year
+        )
+        # Assert repartition volumes are set for additional entity
+        component_queryset = LearningComponentYear.objects.filter(
+            learning_unit_year__learning_container_year=self.learning_unit_year.learning_container_year
+        )
+        component_queryset.update(repartition_volume_additional_entity_1=15.0)
+
+        # Removing additionnal entity
+        post_data["additional_requirement_entity_1-entity"] = ""
+
+        self.assertEqual(component_queryset.count(), 4)  # Assert we are testing for Full AND Partim (2 components each)
+
+        form = FullForm(
+            self.person,
+            self.learning_unit_year.academic_year,
+            learning_unit_instance=self.learning_unit_year.learning_unit,
+            data=post_data
+        )
+
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+
+        self.assertFalse(EntityContainerYear.objects.filter(
+                type=ADDITIONAL_REQUIREMENT_ENTITY_1,
+                learning_container_year=self.learning_unit_year.learning_container_year
+        ).exists())
+
+        for component in component_queryset:
+            self.assertIsNone(component.repartition_volume_additional_entity_1)
+
     def test_default_acronym_component(self):
         default_acronym_component = {
             LECTURING: "PM",

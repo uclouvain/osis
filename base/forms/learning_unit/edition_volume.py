@@ -367,7 +367,15 @@ class SimplifiedVolumeForm(forms.ModelForm):
                 return None
 
         self.instance.learning_unit_year = self._learning_unit_year
+        self._assert_repartition_volumes_consistency()
         return super().save(commit)
+
+    def _assert_repartition_volumes_consistency(self):
+        """In case EntityContainerYear does not exist (or was removed), need to reset repartition volumes to None."""
+        existing_entity_container_types = {ec.type for ec in self._entity_containers if ec}
+        for entity_container_type in LearningComponentYear.repartition_volume_attrs_by_entity_container_type().keys():
+            if entity_container_type not in existing_entity_container_types:
+                self.instance.set_repartition_volume(entity_container_type, None)
 
     def need_to_create_untyped_component(self):
         container_type = self._learning_unit_year.learning_container_year.container_type
