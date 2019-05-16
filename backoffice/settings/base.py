@@ -396,7 +396,8 @@ SELENIUM_SETTINGS = {
     'GECKO_DRIVER': os.environ.get('SELENIUM_GECKO_DRIVER', os.path.join(BASE_DIR, "selenium/geckodriver")),
     'VIRTUAL_DISPLAY': os.environ.get('SELENIUM_VIRTUAL_DISPLAY', 'True').lower() == 'true',
     'SCREEN_WIDTH': int(os.environ.get('SELENIUM_SCREEN_WIDTH', 1920)),
-    'SCREEN_HIGH': int(os.environ.get('SELENIUM_SCREEN_HIGH', 1080))
+    'SCREEN_HIGH': int(os.environ.get('SELENIUM_SCREEN_HIGH', 1080)),
+    'TAKE_SCREEN_ON_FAILURE': os.environ.get('SELENIUM_TAKE_SCREENSHOTS', 'True').lower() == 'true'
 }
 
 # BOOTSTRAP3 Configuration
