@@ -28,7 +28,7 @@ import abc
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.utils.functional import cached_property
-from django.utils.translation import ngettext
+from django.utils.translation import ngettext, gettext
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.education_group_year import EducationGroupYear
@@ -146,7 +146,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
 
     def _check_new_attach_is_not_duplication(self):
         if GroupElementYear.objects.filter(parent=self.parent, child_branch=self.child).exists():
-            raise ValidationError("EEEEEEEEEEEE")
+            raise ValidationError(gettext("You can not attach the same child several times."))
 
 
 class AttachLearningUnitYearStrategy(AttachStrategy):
@@ -160,4 +160,4 @@ class AttachLearningUnitYearStrategy(AttachStrategy):
 
     def _check_new_attach_is_not_duplication(self):
         if GroupElementYear.objects.filter(parent=self.parent, child_leaf=self.child).exists():
-            raise ValidationError("EEEEEEEEEEEE")
+            raise ValidationError(gettext("You can not attach the same child several times."))

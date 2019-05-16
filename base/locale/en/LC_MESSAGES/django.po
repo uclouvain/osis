@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-13 15:50+0200\n"
+"POT-Creation-Date: 2019-05-16 10:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -886,7 +886,7 @@ msgstr ""
 msgid "Cannot set end year to %(end_year)s :"
 msgstr ""
 
-#: forms/education_groups.py:64 models/education_group_type.py:75
+#: forms/education_groups.py:64 models/education_group_type.py:73
 #: templates/education_group/blocks/form/group.html:58
 #: templates/education_group/blocks/form/minitraining.html:59
 #: templates/education_group/blocks/form/training_tab_identification.html:67
@@ -1692,7 +1692,7 @@ msgstr ""
 msgid "Female"
 msgstr ""
 
-#: business/group_element_years/attach.py:89
+#: business/group_element_years/attach.py:91
 #, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
@@ -1781,6 +1781,10 @@ msgstr ""
 #: templates/learning_units.html:31 templates/offer/breadcrumb.html:27
 #: templates/offer_year_calendar.html:30 templates/offers.html:30
 msgid "Formation catalogue"
+msgstr ""
+
+#: templates/education_group/blocks/table_utilizations.html:38
+msgid "Formations"
 msgstr ""
 
 #: templates/learning_unit/identification.html:77
@@ -2079,21 +2083,21 @@ msgstr ""
 msgid "Isolated classes"
 msgstr ""
 
-#: models/group_element_year.py:271
+#: models/group_element_year.py:272
 msgid ""
 "It is forbidden to attach an element to an element of another academic year."
 msgstr ""
 
-#: models/group_element_year.py:257
+#: models/group_element_year.py:258
 msgid "It is forbidden to attach an element to itself."
 msgstr ""
 
-#: models/group_element_year.py:260
+#: models/group_element_year.py:261
 #: tests/views/education_groups/test_update.py:619
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 
-#: models/group_element_year.py:254
+#: models/group_element_year.py:255
 msgid ""
 "It is forbidden to save a GroupElementYear with a child branch and a child "
 "leaf."
@@ -2949,7 +2953,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: business/group_element_years/attach.py:134
+#: business/group_element_years/attach.py:136
 #, python-format
 msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
 msgid_plural ""
@@ -4316,14 +4320,14 @@ msgstr ""
 msgid "The partim"
 msgstr ""
 
-#: views/education_groups/learning_unit/detail.py:133
+#: views/education_groups/learning_unit/detail.py:138
 #, python-format
 msgid ""
 "The prerequisites %(prerequisites)s for the learning unit %(learning_unit)s "
 "are not inside the selected training %(root)s"
 msgstr ""
 
-#: views/education_groups/detail.py:386
+#: views/education_groups/detail.py:387
 #, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr ""
@@ -4500,7 +4504,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
-#: views/education_groups/detail.py:339
+#: views/education_groups/detail.py:340
 #, python-format
 msgid "This label %s does not exist"
 msgstr ""
@@ -4673,7 +4677,7 @@ msgstr ""
 msgid "Type of event"
 msgstr ""
 
-#: forms/education_group/common.py:317 models/education_group_type.py:81
+#: forms/education_group/common.py:317 models/education_group_type.py:79
 #: models/education_group_year.py:194
 msgid "Type of training"
 msgstr ""
@@ -4989,7 +4993,7 @@ msgid ""
 "You are not allowed to copy the content of this kind of education group."
 msgstr ""
 
-#: models/group_element_year.py:264
+#: models/group_element_year.py:265
 msgid "You are not allowed to create a reference with a learning unit"
 msgstr ""
 
@@ -5040,6 +5044,11 @@ msgstr ""
 
 #: templates/logged_out.html:36
 msgid "You are succesfully logout."
+msgstr ""
+
+#: business/group_element_years/attach.py:149
+#: business/group_element_years/attach.py:163
+msgid "You can not attach the same child several times."
 msgstr ""
 
 #: templates/education_group/protect_delete_inner.html:9
@@ -5780,8 +5789,7 @@ msgid "yes"
 msgstr ""
 
 #: templates/education_group/blocks/content_minor_major_option_table.html:43
-#: templates/education_group/blocks/table_utilizations.html:58
-#: templates/education_group/blocks/table_utilizations.html:73
+#: templates/education_group/blocks/row_table_utilizations.html:42
 #: templates/learning_unit/comparison.html:58
 #: templates/learning_unit/comparison.html:60
 #: templates/learning_unit/comparison.html:62
