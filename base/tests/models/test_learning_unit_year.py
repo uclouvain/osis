@@ -332,6 +332,9 @@ class LearningUnitYearWarningsTest(TestCase):
         )
         self.luy_full.quadrimester = None
         self.luy_full.save()
+        for p in self.luy_full.get_partims_related():
+            p.quadrimester = None
+            p.save()
 
     def test_warning_volumes_vol_tot(self):
         self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = 15.0
@@ -650,7 +653,7 @@ class LearningUnitYearWarningsTest(TestCase):
         self.assertCountEqual(
             self.luy_full._check_learning_component_year_warnings(),
             [excepted_error])
-        self.assertIn(excepted_error, self.luy_full._check_learning_component_year_warnings())
+        # self.assertIn(excepted_error, self.luy_full._check_learning_component_year_warnings())
 
 
 class TestHasOrIsPrerequisite(TestCase):
