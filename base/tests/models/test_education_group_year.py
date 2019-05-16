@@ -66,6 +66,8 @@ class EducationGroupYearTest(TestCase):
                                                                 education_group_type=self.education_group_type_group)
         self.education_group_year_5 = EducationGroupYearFactory(academic_year=self.academic_year,
                                                                 education_group_type=self.education_group_type_group)
+        self.education_group_year_6 = EducationGroupYearFactory(academic_year=self.academic_year,
+                                                                education_group_type=self.education_group_type_training)
 
         self.educ_group_year_domain = EducationGroupYearDomainFactory(education_group_year=self.education_group_year_2)
 
@@ -85,7 +87,7 @@ class EducationGroupYearTest(TestCase):
 
         self.group_element_year_4 = GroupElementYearFactory(parent=self.education_group_year_3,
                                                             child_branch=self.education_group_year_1)
-        self.group_element_year_5 = GroupElementYearFactory(parent=self.education_group_year_3,
+        self.group_element_year_5 = GroupElementYearFactory(parent=self.education_group_year_6,
                                                             child_branch=self.education_group_year_1)
 
     def test_verbose_credit(self):
@@ -104,7 +106,7 @@ class EducationGroupYearTest(TestCase):
 
         result = search(education_group_type=[self.education_group_type_training,
                                               self.education_group_type_minitraining])
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
 
     def test_domains_property(self):
         domains = self.education_group_year_1.str_domains
@@ -159,6 +161,7 @@ class EducationGroupYearTest(TestCase):
                 self.education_group_year_2,
                 self.education_group_year_3,
                 self.education_group_year_4,
+                self.education_group_year_6
             ]
         )
 
@@ -187,6 +190,7 @@ class EducationGroupYearTest(TestCase):
                 self.education_group_year_3,
                 self.education_group_year_4,
                 self.education_group_year_5,
+                self.education_group_year_6,
             ]
         )
 
@@ -196,6 +200,7 @@ class EducationGroupYearTest(TestCase):
         self.assertFalse(self.education_group_year_3.is_mini_training())
         self.assertFalse(self.education_group_year_4.is_mini_training())
         self.assertFalse(self.education_group_year_5.is_mini_training())
+        self.assertFalse(self.education_group_year_6.is_mini_training())
 
 
 class EducationGroupYearCleanTest(TestCase):
