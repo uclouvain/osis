@@ -94,7 +94,7 @@ $(document).ready(function () {
                     },
 
                     "modify" : {
-                        "label": gettext("Edit"),
+                        "label": gettext("Modify"),
                         "action": function(data) {
                             let __ret = get_data_from_tree(data);
 
