@@ -40,6 +40,7 @@ from base.business.education_groups.learning_units.prerequisite import \
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
+from base.models.group_element_year import find_learning_unit_formations
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.prerequisite import Prerequisite
@@ -82,6 +83,10 @@ class LearningUnitUtilization(LearningUnitGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["group_element_years"] = self.object.child_leaf.select_related("parent")
+        context["formations"] = find_learning_unit_formations(
+            list(grp.parent for grp in self.object.child_leaf.select_related("parent")),
+            parents_as_instances=True
+        )
         return context
 
 
