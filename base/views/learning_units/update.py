@@ -190,13 +190,13 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
         country = self.forwarded.get('country', None)
         qs = find_additional_requirement_entities_choices()
         if country:
-            qs = qs.exclude(entity__organization__type=MAIN)
+            qs = qs.exclude(entity__organization__type=MAIN).order_by('title')
             if country != "all":
                 qs = qs.filter(entity__country_id=country)
         else:
-            qs = find_pedagogical_entities_version()
+            qs = find_pedagogical_entities_version().order_by('acronym')
         if self.q:
-            qs = qs.filter(Q(title__icontains=self.q) | Q(acronym__icontains=self.q)).order_by('acronym')
+            qs = qs.filter(Q(title__icontains=self.q) | Q(acronym__icontains=self.q))
         return qs
 
     def get_result_label(self, result):

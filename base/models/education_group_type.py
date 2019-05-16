@@ -29,11 +29,9 @@ from django.db import models
 from django.db.models import Case, When
 from django.utils.translation import ugettext_lazy as _
 
-from base.models.enums import education_group_categories, education_group_types
+from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
-
-GROUP_TYPE_OPTION = 'Option'
 
 
 class EducationGroupTypeAdmin(SerializableModelAdmin):
@@ -91,20 +89,10 @@ class EducationGroupType(SerializableModel):
         return (self.name,)
 
 
-def search(**kwargs):
-    queryset = EducationGroupType.objects
-
-    if 'category' in kwargs:
-        queryset = queryset.filter(category=kwargs['category'])
-
-    return queryset
-
-
 def find_authorized_types(category=None, parents=None):
+    queryset = EducationGroupType.objects.all()
     if category:
-        queryset = search(category=category)
-    else:
-        queryset = EducationGroupType.objects.all()
+        queryset = queryset.filter(category=category)
 
     if parents:
         if not isinstance(parents, collections.Iterable):

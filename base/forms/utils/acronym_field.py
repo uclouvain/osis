@@ -90,6 +90,52 @@ class ExternalAcronymField(AcronymField):
     widget = ExternalAcronymInput
 
 
+class ExternalPartimAcronymInput(forms.MultiWidget):
+    template_name = 'learning_unit/blocks/widget/partim_widget.html'
+
+    def __init__(self, attrs=None):
+        widgets = [
+            forms.Select(choices=_create_external_first_letter_choices()),
+            forms.TextInput(attrs={'class': 'text-uppercase'}),
+            forms.TextInput(attrs={
+                'class': 'text-center text-uppercase',
+                'maxlength': "1",
+                'onchange': 'validate_acronym()'
+            })
+        ]
+        super().__init__(widgets)
+
+    def decompress(self, value):
+        if value:
+            return split_acronym(value)
+        return ['', '', '']
+
+
+class ExternalPartimAcronymField(forms.MultiValueField):
+    widget = ExternalPartimAcronymInput
+
+    def __init__(self, *args, **kwargs):
+        max_length = kwargs.pop('max_length', None)
+        disabled = kwargs.pop('disabled', [True, True, False])
+
+        list_fields = [
+            forms.ChoiceField(choices=_create_external_first_letter_choices()),
+            forms.CharField(max_length=max_length),
+            forms.CharField(max_length=1)
+        ]
+        kwargs['require_all_fields'] = kwargs.pop('required', True)
+        super().__init__(list_fields, *args, **kwargs)
+        self.apply_attrs_to_widgets('disabled', disabled)
+        self.label = _("Code")
+
+    def apply_attrs_to_widgets(self, property, values):
+        for index, subwidget in enumerate(self.widget.widgets):
+            subwidget.attrs[property] = values[index]
+
+    def compress(self, data_list):
+        return ''.join(data_list).upper()
+
+
 class PartimAcronymInput(forms.MultiWidget):
     template_name = 'learning_unit/blocks/widget/partim_widget.html'
 
