@@ -4,6 +4,7 @@ function set_config(config, input, input_type) {
     config.format = input.data('format');
     config.showToday = false;
     config.useCurrent = false;
+    config.autoApply = true;
 
     if (input_type === "daterangepicker"){
         input.daterangepicker(config);
