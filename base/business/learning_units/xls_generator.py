@@ -138,9 +138,13 @@ def _get_text_wrapped_cells(count):
 
 
 def _get_attribute_cms(learning_unit, text_label):
-    attr = getattr(TranslatedText.objects.filter(text_label__label=text_label, entity=LEARNING_UNIT_YEAR,
-                                                 reference=learning_unit.pk).first(), "text", " ")
-    return attr
+    obj, created = TranslatedText.objects.get_or_create(text_label__label=text_label,
+                                                        entity=LEARNING_UNIT_YEAR,
+                                                        reference=learning_unit.pk)
+    if created:
+        return None
+    else:
+        return obj.text
 
 
 def _get_online_resources(learning_unit):
