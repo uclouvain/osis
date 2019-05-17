@@ -30,7 +30,7 @@ from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.search_form import filter_is_borrowed_learning_unit_year, LearningUnitSearchForm, \
-    LearningUnitYearForm
+    LearningUnitYearForm, ExternalLearningUnitYearForm
 from base.models.enums import entity_container_year_link_type, entity_type, learning_container_year_types
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -45,6 +45,10 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_year_entity import OfferYearEntityFactory
 from base.forms.search.search_form import get_research_criteria
 from base.forms.common import TooManyResultsException
+from base.tests.factories.campus import CampusFactory
+from base.tests.factories.organization import OrganizationFactory
+from base.tests.factories.organization_address import OrganizationAddressFactory
+from reference.tests.factories.country import CountryFactory
 
 
 class TestSearchForm(TestCase):
@@ -123,8 +127,8 @@ class TestSearchForm(TestCase):
 
     def test_search_too_many_results(self):
         cpt = 0
-        MAX = 2000
-        while cpt < MAX + 1:
+        max_limit_of_results = 2000
+        while cpt < max_limit_of_results + 1:
             LearningUnitYearFactory(
                 acronym="L{}".format(cpt),
             )
@@ -133,6 +137,30 @@ class TestSearchForm(TestCase):
             form = LearningUnitYearForm({'acronym': 'L', 'service_course_search': False})
             self.assertTrue(form.is_valid())
             form.get_learning_units()
+
+    def test_dropdown_init(self):
+
+        country = CountryFactory()
+
+        organization_1 = OrganizationFactory(name="organization 1")
+        organization_2 = OrganizationFactory(name="organization 2")
+        organization_3 = OrganizationFactory(name="organization 3")
+        OrganizationAddressFactory(organization=organization_1, country=country, city="Namur")
+        OrganizationAddressFactory(organization=organization_2, country=country, city="Namur")
+        OrganizationAddressFactory(organization=organization_3, country=country, city="Ciney")
+
+        CampusFactory(organization=organization_1)
+        campus_2 = CampusFactory(organization=organization_1)
+        campus_3 = CampusFactory(organization=organization_2)
+
+        form = ExternalLearningUnitYearForm({'city': "Namur", 'country': country})
+        form._get_campus_list()
+
+        self.assertEqual(form.fields['campus'].choices,
+                         [(None, '---------'), (campus_2.id, 'organization 1'), (campus_3.id, 'organization 2')])
+        form._get_cities()
+        self.assertEqual(form.fields['city'].choices,
+                         [(None, '---------'), ("Ciney", 'Ciney'), ("Namur", "Namur")])
 
 
 class TestFilterIsBorrowedLearningUnitYear(TestCase):
