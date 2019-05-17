@@ -24,6 +24,7 @@
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.db.models import OuterRef, Exists
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 from base.models.education_group_year import EducationGroupYear
@@ -186,7 +187,7 @@ class NodeLeafJsTree(EducationGroupHierarchy):
                 'group_element_year': self.group_element_year and self.group_element_year.pk,
                 'element_id': self.learning_unit_year.pk,
                 'element_type': self.element_type,
-                'title': self.learning_unit_year.complete_title,
+                'title': self._get_tooltip_text(),
                 'has_prerequisite': self.group_element_year.has_prerequisite,
                 'is_prerequisite': self.group_element_year.is_prerequisite,
                 'detach_url': reverse('group_element_year_delete', args=[
@@ -196,6 +197,16 @@ class NodeLeafJsTree(EducationGroupHierarchy):
             },
             'id': 'id_{}_{}'.format(self.learning_unit_year.pk, group_element_year_pk),
         }
+
+    def _get_tooltip_text(self):
+        title = self.learning_unit_year.complete_title
+        if self.group_element_year.has_prerequisite and self.group_element_year.is_prerequisite:
+            title = "{}\n{}".format(title, _("The learning unit has prerequisites and is prerequisite"))
+        elif self.group_element_year.has_prerequisite:
+            title = "{}\n{}".format(title, _("The learning unit has prerequisites"))
+        elif self.group_element_year.is_prerequisite:
+            title = "{}\n{}".format(title, _("The learning unit is prerequisite"))
+        return title
 
     def _get_icon(self):
         if self.group_element_year.has_prerequisite and self.group_element_year.is_prerequisite:
