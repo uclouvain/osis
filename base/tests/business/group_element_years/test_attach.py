@@ -26,11 +26,12 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
+from base.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class TestAttachOptionEducationGroupYearStrategy(TestCase):
@@ -202,3 +203,31 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
         )
         with self.assertRaises(ValidationError):
             self.assertTrue(strategy.is_valid())
+
+    def test_is_invalid_case_attach_finality_which_child_branch_duplicate(self):
+        master_120_didactic = TrainingFactory(
+            education_group_type__name=TrainingType.MASTER_MD_120.name,
+            academic_year=self.academic_year,
+            education_group__end_year=self.master_120.education_group.end_year - 1
+        )
+
+        GroupElementYearFactory(parent=self.finality_group, child_branch=master_120_didactic)
+
+        duplicate = AttachEducationGroupYearStrategy(
+            parent=self.finality_group,
+            child=master_120_didactic
+        )
+        with self.assertRaises(ValidationError):
+            self.assertTrue(duplicate.is_valid())
+
+    def test_is_invalid_case_attach_finality_which_child_leaf_duplicate(self):
+        child_leaf = LearningUnitYearFactory(academic_year=self.finality_group.academic_year)
+
+        GroupElementYearFactory(parent=self.finality_group, child_leaf=child_leaf, child_branch=None)
+
+        duplicate = AttachLearningUnitYearStrategy(
+            parent=self.finality_group,
+            child=child_leaf
+        )
+        with self.assertRaises(ValidationError):
+            self.assertTrue(duplicate.is_valid())
