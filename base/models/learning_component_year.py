@@ -23,11 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Sum
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.business.learning_units.quadrimester_strategy import LearningComponentYearQ1Strategy, \
+    LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy
 from base.models import learning_class_year
 from base.models.enums import learning_component_year_type, learning_container_year_types, quadrimesters
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
@@ -127,35 +130,21 @@ class LearningComponentYear(SerializableModel):
                 inconsistent_msg,
                 _('planned classes cannot be greather than 0 while volume is equal to 0')))
 
-        for msg in self.__check_quadri_consistency(vol_q1, vol_q2):
-            _warnings.append("{} ({})".format(inconsistent_msg, msg))
+        strategies = {
+            quadrimesters.Q1: LearningComponentYearQ1Strategy,
+            quadrimesters.Q2: LearningComponentYearQ2Strategy,
+            quadrimesters.Q1and2: LearningComponentYearQ1and2Strategy,
+            quadrimesters.Q1or2: LearningComponentYearQ1or2Strategy,
+        }
+
+        try:
+            quadri = self.learning_unit_year.quadrimester
+            if quadri:
+                strategies[quadri](lcy=self).is_valid()
+        except ValidationError as e:
+            _warnings.append("{} ({})".format(inconsistent_msg, e.message))
 
         return _warnings
-
-    def __check_quadri_consistency(self, q1, q2):
-        quadrimester = self.learning_unit_year.quadrimester
-        list_messages = []
-        if quadrimester:
-            if quadrimester == quadrimesters.Q1:
-                if not q1:
-                    list_messages.append(_('The volume Q1 must have a value'))
-                if q2:
-                    list_messages.append(_("The volume Q2 cannot have a value"))
-
-            elif quadrimester == quadrimesters.Q2:
-                if not q2:
-                    list_messages.append(_('The volume Q2 must have a value'))
-                if q1:
-                    list_messages.append(_("The volume Q1 cannot have a value"))
-
-            elif quadrimester == quadrimesters.Q1and2:
-                if not q1 or not q2:
-                    list_messages.append(_('The volumes Q1 and Q2 must have a value'))
-
-            elif quadrimester == quadrimesters.Q1or2:
-                if (q1 and q2) or (not q1 and not q2):
-                    list_messages.append(_('The volume Q1 or Q2 must have a value but not both'))
-        return list_messages
 
 
 def volume_total_verbose(learning_component_years):

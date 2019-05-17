@@ -676,6 +676,7 @@ class TestQuadriConsistency(TestCase):
 
         test_cases = [
             {'vol_q1': None, 'vol_q2': 20, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
+            {'vol_q1': None, 'vol_q2': None, 'vol_tot_annual': None, 'planned_classes': None, 'vol_tot_global': None}
         ]
 
         for case in test_cases:
@@ -688,24 +689,19 @@ class TestQuadriConsistency(TestCase):
                 self.entity_component_year_full_lecturing_requirement.repartition_volume = case.get('vol_tot_global')
                 self.entity_component_year_full_lecturing_requirement.save()
 
-        excepted_error = [
-            "{} ({})".format(
+        excepted_error = "{} ({})".format(
                 _('Volumes of {} are inconsistent').format(self.learning_component_year_full_lecturing.complete_acronym),
-                _('The volume Q1 must have a value')),
-            "{} ({})".format(
-                _('Volumes of {} are inconsistent').format(
-                    self.learning_component_year_full_lecturing.complete_acronym),
-                _('The volume Q2 cannot have a value'))
-        ]
+                _('Only the volume Q1 must have a value'))
 
-        self.assertEqual(excepted_error, self.luy_full.warnings)
+        self.assertIn(excepted_error, self.luy_full.warnings)
 
-    def test_warning_volumes_for_Q1_without_value(self):
+    def test_warning_volumes_for_Q2(self):
         self.luy_full.credits = self.luy_full.credits + 1
-        self.luy_full.quadrimester = quadrimesters.Q1
+        self.luy_full.quadrimester = quadrimesters.Q2
         self.luy_full.save()
 
         test_cases = [
+            {'vol_q1': 20, 'vol_q2': None, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
             {'vol_q1': None, 'vol_q2': None, 'vol_tot_annual': None, 'planned_classes': None, 'vol_tot_global': None}
         ]
 
@@ -723,68 +719,7 @@ class TestQuadriConsistency(TestCase):
         excepted_error = "{} ({})".format(
                 _('Volumes of {} are inconsistent').format(
                     self.learning_component_year_full_lecturing.complete_acronym),
-                _('The volume Q1 must have a value'))
-
-        self.assertIn(excepted_error, self.luy_full.warnings)
-
-    def test_warning_volumes_for_Q2(self):
-        self.luy_full.credits = self.luy_full.credits + 1
-        self.luy_full.quadrimester = quadrimesters.Q2
-        self.luy_full.save()
-
-        test_cases = [
-            {'vol_q1': 20, 'vol_q2': None, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
-        ]
-
-        for case in test_cases:
-            with self.subTest(case=case):
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
-                self.learning_component_year_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
-                self.learning_component_year_full_lecturing.planned_classes = case.get('planned_classes')
-                self.learning_component_year_full_lecturing.save()
-                self.entity_component_year_full_lecturing_requirement.repartition_volume = case.get(
-                    'vol_tot_global')
-                self.entity_component_year_full_lecturing_requirement.save()
-
-        excepted_error = [
-            "{} ({})".format(
-                _('Volumes of {} are inconsistent').format(
-                    self.learning_component_year_full_lecturing.complete_acronym),
-                _('The volume Q2 must have a value')),
-            "{} ({})".format(
-                _('Volumes of {} are inconsistent').format(
-                    self.learning_component_year_full_lecturing.complete_acronym),
-                _('The volume Q1 cannot have a value'))
-        ]
-
-        self.assertListEqual(excepted_error, self.luy_full.warnings)
-
-    def test_warning_volumes_for_Q2_without_value(self):
-        self.luy_full.credits = self.luy_full.credits + 1
-        self.luy_full.quadrimester = quadrimesters.Q2
-        self.luy_full.save()
-
-        test_cases = [
-            {'vol_q1': None, 'vol_q2': None, 'vol_tot_annual': None, 'planned_classes': None,
-             'vol_tot_global': None}
-        ]
-
-        for case in test_cases:
-            with self.subTest(case=case):
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
-                self.learning_component_year_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
-                self.learning_component_year_full_lecturing.planned_classes = case.get('planned_classes')
-                self.learning_component_year_full_lecturing.save()
-                self.entity_component_year_full_lecturing_requirement.repartition_volume = case.get(
-                    'vol_tot_global')
-                self.entity_component_year_full_lecturing_requirement.save()
-
-        excepted_error = "{} ({})".format(
-                _('Volumes of {} are inconsistent').format(
-                    self.learning_component_year_full_lecturing.complete_acronym),
-                _('The volume Q2 must have a value'))
+                _('Only the volume Q2 must have a value'))
 
         self.assertIn(excepted_error, self.luy_full.warnings)
 
