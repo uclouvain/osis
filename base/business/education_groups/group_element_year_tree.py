@@ -112,7 +112,10 @@ class EducationGroupHierarchy:
                 'attach_url': reverse('education_group_attach', args=[self.root.pk, self.education_group_year.pk]),
                 'detach_url': reverse('group_element_year_delete', args=[
                     self.root.pk, self.education_group_year.pk, self.group_element_year.pk
-                ]) if self.group_element_year else '#'
+                ]) if self.group_element_year else '#',
+                'modify_url': reverse('group_element_year_update', args=[
+                    self.root.pk, self.education_group_year.pk, self.group_element_year.pk
+                ]) if self.group_element_year else '#',
             },
             'id': 'id_{}_{}'.format(self.education_group_year.pk, group_element_year_pk),
         }

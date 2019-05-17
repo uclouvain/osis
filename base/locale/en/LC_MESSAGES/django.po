@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-16 10:42+0200\n"
+"POT-Creation-Date: 2019-05-16 11:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3995,8 +3995,8 @@ msgstr ""
 msgid "The"
 msgstr ""
 
-#: views/education_groups/group_element_year/update.py:102
-#: views/education_groups/group_element_year/update.py:109
+#: views/education_groups/group_element_year/update.py:101
+#: views/education_groups/group_element_year/update.py:108
 #, python-format
 msgid "The %(acronym)s has been moved"
 msgstr ""
@@ -4247,7 +4247,7 @@ msgstr ""
 msgid "The link of %(acronym)s has been created"
 msgstr ""
 
-#: views/education_groups/group_element_year/update.py:147
+#: views/education_groups/group_element_year/update.py:146
 #, python-format
 msgid "The link of %(acronym)s has been updated"
 msgstr ""
