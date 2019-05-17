@@ -343,7 +343,7 @@ class LearningUnitYearForm(LearningUnitSearchForm):
         for luy in learning_unit_year_qs:
             if _is_borrowed_learning_unit(luy, entities_faculty,
                                           {'map_luy_entity': map_luy_entity,
-                                           'map_luy_education_group_entities':map_luy_education_group_entities
+                                           'map_luy_education_group_entities': map_luy_education_group_entities
                                            },
                                           entities_borrowing_allowed):
                 ids.append(luy.id)
