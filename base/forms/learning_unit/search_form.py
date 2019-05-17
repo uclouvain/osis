@@ -254,16 +254,16 @@ class LearningUnitYearForm(LearningUnitSearchForm):
         if not service_course_search and self.cleaned_data and learning_units.count() > self.MAX_RECORDS:
             raise TooManyResultsException
 
+        if self.borrowed_course_search:
+            # TODO must return a queryset
+            learning_units = self._filter_borrowed_learning_units(learning_units)
+
         learning_units = learning_units.prefetch_related(
             build_entity_container_prefetch([
                 entity_container_year_link_type.ALLOCATION_ENTITY,
                 entity_container_year_link_type.REQUIREMENT_ENTITY
             ])
         )
-
-        if self.borrowed_course_search:
-            # TODO must return a queryset
-            learning_units = list(self._filter_borrowed_learning_units(learning_units))
 
         for learning_unit in learning_units:
             append_latest_entities(learning_unit, service_course_search)
@@ -320,29 +320,32 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             except EntityVersion.DoesNotExist:
                 return []
 
-        return filter_is_borrowed_learning_unit_year(
+        return self._filter_is_borrowed_learning_unit_year(
             qs_learning_units,
             academic_year.start_date,
             faculty_borrowing=faculty_borrowing_id
         )
 
+    def _filter_is_borrowed_learning_unit_year(self, learning_unit_year_qs, date, faculty_borrowing=None):
+        entities = build_current_entity_version_structure_in_memory(date)
+        entities_borrowing_allowed = []
+        if faculty_borrowing in entities:
+            entities_borrowing_allowed.extend(entities[faculty_borrowing]["all_children"])
+            entities_borrowing_allowed.append(entities[faculty_borrowing]["entity_version"])
+            entities_borrowing_allowed = [entity_version.entity.id for entity_version in entities_borrowing_allowed]
 
-def filter_is_borrowed_learning_unit_year(learning_unit_year_qs, date, faculty_borrowing=None):
-    entities = build_current_entity_version_structure_in_memory(date)
-    entities_borrowing_allowed = []
-    if faculty_borrowing in entities:
-        entities_borrowing_allowed.extend(entities[faculty_borrowing]["all_children"])
-        entities_borrowing_allowed.append(entities[faculty_borrowing]["entity_version"])
-        entities_borrowing_allowed = [entity_version.entity.id for entity_version in entities_borrowing_allowed]
+        entities_faculty = compute_faculty_for_entities(entities)
+        map_luy_entity = map_learning_unit_year_with_requirement_entity(learning_unit_year_qs)
+        map_luy_education_group_entities = \
+            map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_qs)
 
-    entities_faculty = compute_faculty_for_entities(entities)
-    map_luy_entity = map_learning_unit_year_with_requirement_entity(learning_unit_year_qs)
-    map_luy_education_group_entities = \
-        map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_qs)
+        ids = []
+        for luy in learning_unit_year_qs:
+            if _is_borrowed_learning_unit(luy, entities_faculty, map_luy_entity,
+                                        map_luy_education_group_entities, entities_borrowing_allowed):
+                ids.append(luy.id)
 
-    return filter(lambda luy: __is_borrowed_learning_unit(luy, entities_faculty, map_luy_entity,
-                                                          map_luy_education_group_entities, entities_borrowing_allowed),
-                  learning_unit_year_qs)
+        return self.get_queryset().filter(id__in=ids)
 
 
 def compute_faculty_for_entities(entities):
@@ -386,7 +389,7 @@ def map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_
     return dict_education_group_year_entities_for_learning_unit_year
 
 
-def __is_borrowed_learning_unit(luy, map_entity_faculty, map_luy_entity, map_luy_education_group_entities,
+def _is_borrowed_learning_unit(luy, map_entity_faculty, map_luy_entity, map_luy_education_group_entities,
                                 entities_borrowing_allowed):
     luy_entity = map_luy_entity.get(luy.id)
     luy_faculty = map_entity_faculty.get(luy_entity)
