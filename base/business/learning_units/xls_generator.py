@@ -141,10 +141,7 @@ def _get_attribute_cms(learning_unit, text_label):
     obj, created = TranslatedText.objects.get_or_create(text_label__label=text_label,
                                                         entity=LEARNING_UNIT_YEAR,
                                                         reference=learning_unit.pk)
-    if created:
-        return None
-    else:
-        return obj.text
+    return obj.text
 
 
 def _get_online_resources(learning_unit):
