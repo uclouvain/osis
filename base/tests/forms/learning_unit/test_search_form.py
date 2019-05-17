@@ -44,6 +44,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_year_entity import OfferYearEntityFactory
 from base.forms.search.search_form import get_research_criteria
+from base.forms.common import TooManyResultsException
 
 
 class TestSearchForm(TestCase):
@@ -119,6 +120,19 @@ class TestSearchForm(TestCase):
         form = LearningUnitYearForm(data)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.get_queryset().count(), 1)
+
+    def test_search_too_many_results(self):
+        cpt = 0
+        MAX = 2000
+        while cpt < MAX + 1:
+            LearningUnitYearFactory(
+                acronym="L{}".format(cpt),
+            )
+            cpt += 1
+        with self.assertRaises(TooManyResultsException):
+            form = LearningUnitYearForm({'acronym': 'L', 'service_course_search': False})
+            self.assertTrue(form.is_valid())
+            form.get_learning_units()
 
 
 class TestFilterIsBorrowedLearningUnitYear(TestCase):
