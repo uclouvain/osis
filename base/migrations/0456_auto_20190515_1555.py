@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0454_populate_repartition_volumes'),
+        ('base', '0455_populate_repartition_volumes'),
     ]
 
     operations = [
