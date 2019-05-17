@@ -269,7 +269,8 @@ class TestReadEducationGroup(TestCase):
 
     def test_main_common_show_only_identification_and_general_information(self):
         main_common = EducationGroupYearCommonFactory(
-            academic_year=self.academic_year
+            academic_year=self.academic_year,
+            education_group_type=EducationGroupTypeFactory(name=TrainingType.BACHELOR.name)
         )
         url = reverse("education_group_read", args=[main_common.pk, main_common.pk])
 
