@@ -153,12 +153,13 @@ class TestSearchForm(TestCase):
         campus_2 = CampusFactory(organization=organization_1)
         campus_3 = CampusFactory(organization=organization_2)
 
-        form = ExternalLearningUnitYearForm({'city': "Namur", 'country': country})
-        form._get_campus_list()
+        form = ExternalLearningUnitYearForm({'city': "Namur", 'country': country, "campus": campus_2})
+        form._init_dropdown_list()
+        # form._get_campus_list()
 
         self.assertEqual(form.fields['campus'].choices,
                          [(None, '---------'), (campus_2.id, 'organization 1'), (campus_3.id, 'organization 2')])
-        form._get_cities()
+        # form._get_cities()
         self.assertEqual(form.fields['city'].choices,
                          [(None, '---------'), ("Ciney", 'Ciney'), ("Namur", "Namur")])
 
