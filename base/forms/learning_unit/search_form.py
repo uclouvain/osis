@@ -255,8 +255,7 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             raise TooManyResultsException
 
         if self.borrowed_course_search:
-            # TODO must return a queryset
-            learning_units = filter_borrowed_learning_units(learning_units)
+            learning_units = self._filter_borrowed_learning_units(learning_units)
 
         learning_units = learning_units.prefetch_related(
             build_entity_container_prefetch([
