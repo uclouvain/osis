@@ -133,10 +133,14 @@ class TestSearchForm(TestCase):
                 acronym="L{}".format(cpt),
             )
             cpt += 1
+        form = LearningUnitYearForm({'acronym': 'L', 'service_course_search': False})
+        self.assertTrue(form.is_valid())
+
         with self.assertRaises(TooManyResultsException):
-            form = LearningUnitYearForm({'acronym': 'L', 'service_course_search': False})
-            self.assertTrue(form.is_valid())
             form.get_learning_units()
+
+        with self.assertRaises(TooManyResultsException):
+            form.get_learning_units_and_summary_status()
 
     def test_dropdown_init(self):
 
