@@ -256,7 +256,7 @@ class LearningUnitYearForm(LearningUnitSearchForm):
 
         if self.borrowed_course_search:
             # TODO must return a queryset
-            learning_units = self._filter_borrowed_learning_units(learning_units)
+            learning_units = filter_borrowed_learning_units(learning_units)
 
         learning_units = learning_units.prefetch_related(
             build_entity_container_prefetch([
@@ -320,35 +320,38 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             except EntityVersion.DoesNotExist:
                 return []
 
-        return self._filter_is_borrowed_learning_unit_year(
+        ids = filter_is_borrowed_learning_unit_year(
             qs_learning_units,
             academic_year.start_date,
             faculty_borrowing=faculty_borrowing_id
         )
-
-    def _filter_is_borrowed_learning_unit_year(self, learning_unit_year_qs, date, faculty_borrowing=None):
-        entities = build_current_entity_version_structure_in_memory(date)
-        entities_borrowing_allowed = []
-        if faculty_borrowing in entities:
-            entities_borrowing_allowed.extend(entities[faculty_borrowing]["all_children"])
-            entities_borrowing_allowed.append(entities[faculty_borrowing]["entity_version"])
-            entities_borrowing_allowed = [entity_version.entity.id for entity_version in entities_borrowing_allowed]
-
-        entities_faculty = compute_faculty_for_entities(entities)
-        map_luy_entity = map_learning_unit_year_with_requirement_entity(learning_unit_year_qs)
-        map_luy_education_group_entities = \
-            map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_qs)
-
-        ids = []
-        for luy in learning_unit_year_qs:
-            if _is_borrowed_learning_unit(luy, entities_faculty,
-                                          {'map_luy_entity': map_luy_entity,
-                                           'map_luy_education_group_entities': map_luy_education_group_entities
-                                           },
-                                          entities_borrowing_allowed):
-                ids.append(luy.id)
-
         return self.get_queryset().filter(id__in=ids)
+
+
+def filter_is_borrowed_learning_unit_year(learning_unit_year_qs, date, faculty_borrowing=None):
+    entities = build_current_entity_version_structure_in_memory(date)
+    entities_borrowing_allowed = []
+    if faculty_borrowing in entities:
+        entities_borrowing_allowed.extend(entities[faculty_borrowing]["all_children"])
+        entities_borrowing_allowed.append(entities[faculty_borrowing]["entity_version"])
+        entities_borrowing_allowed = [entity_version.entity.id for entity_version in entities_borrowing_allowed]
+
+    entities_faculty = compute_faculty_for_entities(entities)
+    map_luy_entity = map_learning_unit_year_with_requirement_entity(learning_unit_year_qs)
+    map_luy_education_group_entities = \
+        map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_qs)
+
+    ids = []
+    for luy in learning_unit_year_qs:
+        if _is_borrowed_learning_unit(luy,
+                                      {'entities_faculty': entities_faculty,
+                                       'map_luy_entity': map_luy_entity,
+                                       'map_luy_education_group_entities': map_luy_education_group_entities
+                                       },
+                                      entities_borrowing_allowed):
+            ids.append(luy.id)
+
+    return ids
 
 
 def compute_faculty_for_entities(entities):
@@ -393,8 +396,9 @@ def map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_
 
 
 def _is_borrowed_learning_unit(luy, maps, entities_borrowing_allowed):
-    map_entity_faculty = maps.get('map_entity_faculty')
+    map_entity_faculty = maps.get('entities_faculty')
     map_luy_entity = maps.get('map_luy_entity')
+    map_luy_education_group_entities = maps.get('map_luy_education_group_entities')
 
     luy_entity = map_luy_entity.get(luy.id)
     luy_faculty = map_entity_faculty.get(luy_entity)
