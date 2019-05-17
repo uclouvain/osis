@@ -135,26 +135,24 @@ class LearningComponentYear(SerializableModel):
     def __check_quadri_consistency(self, q1, q2):
         quadrimester = self.learning_unit_year.quadrimester
         list_messages = []
-        if not quadrimester:
-            return list_messages
-        else:
+        if quadrimester:
             if quadrimester == quadrimesters.Q1:
                 if not q1:
                     list_messages.append(_('The volume Q1 must have a value'))
                 if q2:
                     list_messages.append(_("The volume Q2 cannot have a value"))
 
-            if quadrimester == quadrimesters.Q2:
+            elif quadrimester == quadrimesters.Q2:
                 if not q2:
                     list_messages.append(_('The volume Q2 must have a value'))
                 if q1:
                     list_messages.append(_("The volume Q1 cannot have a value"))
 
-            if quadrimester == quadrimesters.Q1and2:
+            elif quadrimester == quadrimesters.Q1and2:
                 if not q1 or not q2:
                     list_messages.append(_('The volumes Q1 and Q2 must have a value'))
 
-            if quadrimester == quadrimesters.Q1or2:
+            elif quadrimester == quadrimesters.Q1or2:
                 if (q1 and q2) or (not q1 and not q2):
                     list_messages.append(_('The volume Q1 or Q2 must have a value but not both'))
         return list_messages
