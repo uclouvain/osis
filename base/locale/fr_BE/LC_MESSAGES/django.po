@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-17 09:15+0200\n"
+"POT-Creation-Date: 2019-05-17 16:13+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -739,8 +739,8 @@ msgid "Assistants"
 msgstr "Assistants"
 
 #: business/learning_container_year.py:45
-#: tests/models/test_learning_unit_year.py:442
-#: tests/models/test_learning_unit_year.py:476
+#: tests/models/test_learning_unit_year.py:447
+#: tests/models/test_learning_unit_year.py:481
 msgid ""
 "At least a partim volume value is greater than corresponding volume of parent"
 msgstr ""
@@ -2690,7 +2690,7 @@ msgstr "Téléphone mobile (GSM)"
 #: models/external_learning_unit_year.py:90 models/learning_unit_year.py:264
 #: models/learning_unit_year.py:280
 #: templates/learning_unit/blocks/panel/educational_informations.html:118
-#: tests/models/test_learning_unit_year.py:776
+#: tests/models/test_learning_unit_year.py:905
 msgid "Mobility"
 msgstr "Mobilité"
 
@@ -3010,6 +3010,16 @@ msgstr ""
 "Seuls les gestionnaires de programme d'organisation de formation OU les "
 "gestionnaires facultaires liées à l'entité peuvent éditer."
 
+#: business/learning_units/quadrimester_strategy.py:19
+#: tests/models/test_learning_unit_year.py:694
+msgid "Only the volume Q1 must have a value"
+msgstr "Seulement le volume Q1 doit avoir une valeur"
+
+#: business/learning_units/quadrimester_strategy.py:29
+#: tests/models/test_learning_unit_year.py:722
+msgid "Only the volume Q2 must have a value"
+msgstr "Seulement le volume Q2 doit avoir une valeur"
+
 #: models/enums/vacant_declaration_type.py:38
 msgid "Open for externs"
 msgstr "Ouvert aux externes"
@@ -3242,7 +3252,7 @@ msgstr ""
 #: forms/learning_unit/edition_volume.py:104
 #: tests/business/test_proposal_xls.py:153
 #: tests/business/test_proposal_xls.py:163
-#: tests/views/test_learning_unit.py:1436 views/learning_unit.py:223
+#: tests/views/test_learning_unit.py:1439 views/learning_unit.py:223
 #: views/learning_unit.py:322 views/learning_unit.py:338
 msgid "Planned classes"
 msgstr "Classes prévues"
@@ -3284,7 +3294,8 @@ msgstr "Code postal"
 
 #: models/enums/component_type.py:33
 #: models/enums/learning_component_year_type.py:33
-#: tests/views/test_learning_unit.py:1434
+#: tests/views/test_learning_unit.py:1435
+#: tests/views/test_learning_unit.py:1437
 msgid "Practical exercises"
 msgstr "Partie pratique"
 
@@ -4120,12 +4131,12 @@ msgstr "Les données administratives ont été sauvées avec succès"
 #: forms/learning_unit/edition_volume.py:76
 #: forms/learning_unit/edition_volume.py:147
 #: forms/learning_unit/edition_volume.py:364
-#: models/learning_component_year.py:117
+#: models/learning_component_year.py:119
 #: templates/learning_unit/components.html:51
 #: templates/learning_unit/components_identification.html:37
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:160
-#: tests/models/test_learning_unit_year.py:346
-#: tests/models/test_learning_unit_year.py:386
+#: tests/models/test_learning_unit_year.py:351
+#: tests/models/test_learning_unit_year.py:391
 msgid "The annual volume must be equal to the sum of the volumes Q1 and Q2"
 msgstr "Le volume annuel doit être égal à la somme des volumes Q1 et Q2"
 
@@ -4188,7 +4199,7 @@ msgstr ""
 #: forms/learning_unit/learning_unit_create.py:174
 #: models/learning_unit_year.py:372
 #: tests/forms/learning_unit/test_learningUnitYearModelForm.py:89
-#: tests/models/test_learning_unit_year.py:597
+#: tests/models/test_learning_unit_year.py:602
 msgid "The credits value should be an integer"
 msgstr "La valeur du champ crédits doit être un entier"
 
@@ -4362,7 +4373,7 @@ msgstr "L'UE a des prérequis"
 msgid "The learning unit has prerequisites and is prerequisite"
 msgstr "L'UE a des prérequis et est prérequise"
 
-#: views/learning_units/detail.py:74
+#: views/learning_units/detail.py:76
 msgid "The learning unit have partim"
 msgstr "L'unité d'enseignement dispose de partim"
 
@@ -4440,7 +4451,7 @@ msgstr ""
 "%(education_group_year_root)s en %(academic_year)s => elle est retiré de la "
 "finalité %(education_group_year_finality)s."
 
-#: models/learning_unit_year.py:409 tests/models/test_learning_unit_year.py:559
+#: models/learning_unit_year.py:409 tests/models/test_learning_unit_year.py:564
 #, python-format
 msgid ""
 "The parent is %(parent_periodicty)s and there is at least one partim which "
@@ -4591,25 +4602,10 @@ msgstr ""
 "La valeur du champ '%(field)s' différe entre l'année %(year)s - %(value)s et "
 "l'année %(next_year)s - %(next_value)s"
 
-#: models/learning_component_year.py:149
-msgid "The volume Q1 cannot have a value"
-msgstr "Le volume Q1 ne peut pas avoir de valeur"
-
-#: models/learning_component_year.py:135
-msgid "The volume Q1 must have a value"
-msgstr "Le volume Q1 doit avoir une valeur"
-
-#: models/learning_component_year.py:161
+#: business/learning_units/quadrimester_strategy.py:50
+#: tests/models/test_learning_unit_year.py:779
 msgid "The volume Q1 or Q2 must have a value but not both"
 msgstr "Le volume Q1 ou Q2 doit avoir une valeur"
-
-#: models/learning_component_year.py:139
-msgid "The volume Q2 cannot have a value"
-msgstr "Le volume Q2 ne peut pas avoir de valeur"
-
-#: models/learning_component_year.py:145
-msgid "The volume Q2 must have a value"
-msgstr "Le volume Q2 doit avoir une valeur"
 
 #: forms/learning_unit/edition_volume.py:160
 #: forms/learning_unit/edition_volume.py:162
@@ -4620,7 +4616,8 @@ msgstr "Le volume Q2 doit avoir une valeur"
 msgid "The volume can not be set to 0."
 msgstr "Le volume ne peut pas être mis à 0."
 
-#: models/learning_component_year.py:155
+#: business/learning_units/quadrimester_strategy.py:39
+#: tests/models/test_learning_unit_year.py:751
 msgid "The volumes Q1 and Q2 must have a value"
 msgstr "Les volumes Q1 et Q2 doivent avoir une valeur"
 
@@ -4717,7 +4714,7 @@ msgstr ""
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr "Cette unité d'enseignement n'est pas éligible en raison de son type"
 
-#: models/learning_unit_year.py:403 tests/models/test_learning_unit_year.py:575
+#: models/learning_unit_year.py:403 tests/models/test_learning_unit_year.py:580
 #, python-format
 msgid ""
 "This partim is %(partim_periodicity)s and the parent is %(parent_periodicty)s"
@@ -5032,9 +5029,9 @@ msgstr "Vol. annuel"
 msgid "Vol. global"
 msgstr "Vol. global"
 
-#: models/learning_component_year.py:121
-#: tests/models/test_learning_unit_year.py:363
-#: tests/models/test_learning_unit_year.py:380
+#: models/learning_component_year.py:123
+#: tests/models/test_learning_unit_year.py:368
+#: tests/models/test_learning_unit_year.py:385
 msgid "Vol_global is not equal to Vol_tot * planned_classes"
 msgstr ""
 "Le volume global doit être égal au volume annuel multiplié par le nombre de "
@@ -5052,14 +5049,14 @@ msgstr "Volume 2"
 
 #: forms/learning_unit/edition_volume.py:61
 #: forms/learning_unit/edition_volume.py:80
-#: tests/views/test_learning_unit.py:1437 views/learning_unit.py:226
+#: tests/views/test_learning_unit.py:1440 views/learning_unit.py:226
 #: views/learning_unit.py:323 views/learning_unit.py:339
 msgid "Volume Q1"
 msgstr "Volume Q1"
 
 #: forms/learning_unit/edition_volume.py:68
 #: forms/learning_unit/edition_volume.py:80
-#: tests/views/test_learning_unit.py:1438 views/learning_unit.py:228
+#: tests/views/test_learning_unit.py:1441 views/learning_unit.py:228
 #: views/learning_unit.py:324 views/learning_unit.py:340
 msgid "Volume Q2"
 msgstr "Volume Q2"
@@ -5070,14 +5067,14 @@ msgstr "Volume total annuel"
 
 #: forms/learning_unit/edition_volume.py:80
 #: forms/learning_unit/edition_volume.py:103
-#: tests/views/test_learning_unit.py:1435 views/learning_unit.py:221
+#: tests/views/test_learning_unit.py:1438 views/learning_unit.py:221
 #: views/learning_unit.py:321 views/learning_unit.py:337
 msgid "Volume total annual"
 msgstr "Volume total annuel"
 
 #: business/learning_container_year.py:44
-#: tests/models/test_learning_unit_year.py:441
-#: tests/models/test_learning_unit_year.py:475
+#: tests/models/test_learning_unit_year.py:446
+#: tests/models/test_learning_unit_year.py:480
 msgid "Volumes are inconsistent"
 msgstr "Les volumes sont incohérents"
 
@@ -5086,13 +5083,17 @@ msgstr "Les volumes sont incohérents"
 msgid "Volumes management"
 msgstr "Gestion des volumes"
 
-#: models/learning_component_year.py:113
-#: tests/models/test_learning_unit_year.py:345
-#: tests/models/test_learning_unit_year.py:362
-#: tests/models/test_learning_unit_year.py:379
-#: tests/models/test_learning_unit_year.py:385
-#: tests/models/test_learning_unit_year.py:628
-#: tests/models/test_learning_unit_year.py:646
+#: models/learning_component_year.py:115
+#: tests/models/test_learning_unit_year.py:350
+#: tests/models/test_learning_unit_year.py:367
+#: tests/models/test_learning_unit_year.py:384
+#: tests/models/test_learning_unit_year.py:390
+#: tests/models/test_learning_unit_year.py:633
+#: tests/models/test_learning_unit_year.py:651
+#: tests/models/test_learning_unit_year.py:693
+#: tests/models/test_learning_unit_year.py:720
+#: tests/models/test_learning_unit_year.py:749
+#: tests/models/test_learning_unit_year.py:777
 msgid "Volumes of {} are inconsistent"
 msgstr "Les volumes de {} sont incohérents"
 
@@ -5687,15 +5688,15 @@ msgstr "texte d'aide en français"
 msgid "has the following prerequisites"
 msgstr "dispose des prérequis suivants"
 
-#: models/learning_component_year.py:55
+#: models/learning_component_year.py:58
 msgid "hourly volume partial q1"
 msgstr "volume horaire partiel q1"
 
-#: models/learning_component_year.py:57
+#: models/learning_component_year.py:60
 msgid "hourly volume partial q2"
 msgstr "volume horaire partiel q2"
 
-#: models/learning_component_year.py:53
+#: models/learning_component_year.py:56
 msgid "hourly volume total annual"
 msgstr "volume horaire total annuel"
 
@@ -5798,14 +5799,14 @@ msgstr ""
 msgid "person"
 msgstr "personne"
 
-#: models/learning_component_year.py:125
-#: tests/models/test_learning_unit_year.py:629
+#: models/learning_component_year.py:127
+#: tests/models/test_learning_unit_year.py:634
 msgid "planned classes cannot be 0 while volume is greater than 0"
 msgstr ""
 "le nombre de classes prévues ne peut être 0 si le volume est supérieur à 0"
 
-#: models/learning_component_year.py:129
-#: tests/models/test_learning_unit_year.py:647
+#: models/learning_component_year.py:131
+#: tests/models/test_learning_unit_year.py:652
 msgid "planned classes cannot be greather than 0 while volume is equal to 0"
 msgstr ""
 "le nombre de classes prévues ne peut être supérieur à 0 si le volume est "
@@ -6006,7 +6007,7 @@ msgstr "règle de validation"
 msgid "validity"
 msgstr "validité"
 
-#: models/learning_component_year.py:59
+#: models/learning_component_year.py:62
 msgid "volume declared vacant"
 msgstr "volume déclaré vacant"
 
@@ -6046,3 +6047,9 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:164
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "The volume Q1 cannot have a value"
+#~ msgstr "Le volume Q1 ne peut pas avoir de valeur"
+
+#~ msgid "The volume Q2 cannot have a value"
+#~ msgstr "Le volume Q2 ne peut pas avoir de valeur"
