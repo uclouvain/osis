@@ -50,6 +50,9 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
 from reference.tests.factories.country import CountryFactory
 
+CINEY = "Ciney"
+NAMUR = "Namur"
+
 
 class TestSearchForm(TestCase):
     @classmethod
@@ -149,23 +152,25 @@ class TestSearchForm(TestCase):
         organization_1 = OrganizationFactory(name="organization 1")
         organization_2 = OrganizationFactory(name="organization 2")
         organization_3 = OrganizationFactory(name="organization 3")
-        OrganizationAddressFactory(organization=organization_1, country=country, city="Namur")
-        OrganizationAddressFactory(organization=organization_2, country=country, city="Namur")
-        OrganizationAddressFactory(organization=organization_3, country=country, city="Ciney")
+
+        OrganizationAddressFactory(organization=organization_1, country=country, city=NAMUR)
+        OrganizationAddressFactory(organization=organization_2, country=country, city=NAMUR)
+
+        OrganizationAddressFactory(organization=organization_3, country=country, city=CINEY)
 
         CampusFactory(organization=organization_1)
         campus_2 = CampusFactory(organization=organization_1)
         campus_3 = CampusFactory(organization=organization_2)
 
-        form = ExternalLearningUnitYearForm({'city': "Namur", 'country': country, "campus": campus_2})
+        form = ExternalLearningUnitYearForm({'city': NAMUR, 'country': country, "campus": campus_2})
         form._init_dropdown_list()
-        # form._get_campus_list()
 
-        self.assertEqual(form.fields['campus'].choices,
-                         [(None, '---------'), (campus_2.id, 'organization 1'), (campus_3.id, 'organization 2')])
-        # form._get_cities()
+        self.assertEqual(form.fields['campus'].choices[0], (None, '---------'))
+        self.assertEqual(form.fields['campus'].choices[1][1], 'organization 1')
+        self.assertEqual(form.fields['campus'].choices[2], (campus_3.id, 'organization 2'))
+
         self.assertEqual(form.fields['city'].choices,
-                         [(None, '---------'), ("Ciney", 'Ciney'), ("Namur", "Namur")])
+                         [(None, '---------'), (CINEY, CINEY), (NAMUR, NAMUR)])
 
 
 class TestFilterIsBorrowedLearningUnitYear(TestCase):
