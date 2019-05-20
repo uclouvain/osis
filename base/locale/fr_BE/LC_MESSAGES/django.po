@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-17 09:15+0200\n"
+"POT-Creation-Date: 2019-05-20 10:30+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1427,6 +1427,10 @@ msgstr "Documentation"
 msgid "Down"
 msgstr "Descendre"
 
+#: tests/views/education_groups/test_update.py:719
+msgid "Dummy message"
+msgstr ""
+
 #: forms/learning_unit/attribution_charge_repartition.py:41
 #: models/education_group_year.py:374
 #: templates/education_group/identification_training_details.html:42
@@ -1482,8 +1486,8 @@ msgstr "Edition d'organisation de formations"
 msgid "Education group year"
 msgstr "Organisation de formations annualisée"
 
-#: tests/views/education_groups/test_update.py:372
-#: tests/views/education_groups/test_update.py:378
+#: tests/views/education_groups/test_update.py:374
+#: tests/views/education_groups/test_update.py:380
 #: views/education_groups/update.py:133
 #, python-format
 msgid ""
@@ -2154,7 +2158,7 @@ msgid "It is forbidden to attach an element to itself."
 msgstr "Il est interdit d’attacher un élément à lui-même."
 
 #: models/group_element_year.py:260
-#: tests/views/education_groups/test_update.py:619
+#: tests/views/education_groups/test_update.py:621
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 "Il est interdit d'attacher un élement à un autre élement y étant inclus."
@@ -3251,8 +3255,8 @@ msgstr "Classes prévues"
 msgid "Platform"
 msgstr "Plateforme"
 
-#: tests/views/education_groups/test_update.py:703
-#: views/education_groups/group_element_year/create.py:58
+#: tests/views/education_groups/test_update.py:705
+#: views/education_groups/group_element_year/create.py:64
 msgid "Please Select or Move an item before Attach it"
 msgstr "Veuillez Sélectionner ou Déplacer un élément avant d'Attacher"
 
@@ -4382,7 +4386,7 @@ msgstr ""
 msgid "The learning units"
 msgstr "Les unités d'enseignement"
 
-#: views/education_groups/group_element_year/create.py:77
+#: views/education_groups/group_element_year/create.py:84
 #, python-format
 msgid "The link of %(acronym)s has been created"
 msgstr "Le lien de %(acronym)s ont été mis à jour"
@@ -4762,6 +4766,10 @@ msgstr "Intitulé propre au partim"
 #: models/learning_unit_year.py:291
 msgid "To complete"
 msgstr "A compléter"
+
+#: views/learning_units/search.py:85
+msgid "Too many results"
+msgstr "Trop de résultats"
 
 #: business/education_group.py:60 models/enums/education_group_categories.py:36
 #: templates/learning_unit/formations.html:103
