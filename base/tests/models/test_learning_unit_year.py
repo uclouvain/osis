@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.db.models import QuerySet
 from django.test import TestCase
@@ -33,7 +34,8 @@ from attribution.models import attribution
 from attribution.models.enums.function import COORDINATOR, CO_HOLDER
 from attribution.tests.factories.attribution import AttributionFactory
 from base.business.learning_units.quadrimester_strategy import LearningComponentYearQ1Strategy, \
-    LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy
+    LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy, \
+    LearningComponentYearQuadriStrategy
 from base.models import learning_unit_year
 from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import learning_unit_year_periodicity, entity_container_year_link_type, quadrimesters
@@ -670,6 +672,12 @@ class TestQuadriConsistency(TestCase):
         self.entity_component_year_full_lecturing_requirement = EntityComponentYearFactory(
             learning_component_year=self.learning_component_year_full_lecturing,
             entity_container_year__type=REQUIREMENT_ENTITY)
+
+    @patch.multiple(LearningComponentYearQuadriStrategy, __abstractmethods__=set())
+    def test_is_valid_present(self):
+        instance = LearningComponentYearQuadriStrategy()
+        with self.assertRaises(NotImplementedError):
+            self.assertRaises(NotImplementedError, instance.is_valid())
 
     def test_ok_volumes_for_Q1(self):
         self.luy_full.credits = self.luy_full.credits + 1
