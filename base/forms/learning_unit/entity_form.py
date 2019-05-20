@@ -118,6 +118,14 @@ class EntityContainerYearModelForm(forms.ModelForm):
 
 class RequirementEntityContainerYearModelForm(EntityContainerYearModelForm):
     entity_type = REQUIREMENT_ENTITY
+    entity = EntitiesVersionChoiceField(
+        widget=autocomplete.ModelSelect2(
+            url='entity_requirement_autocomplete',
+            attrs={'data-html': True},
+            forward=['country']
+        ),
+        queryset=find_additional_requirement_entities_choices()
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

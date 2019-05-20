@@ -201,3 +201,21 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
 
     def get_result_label(self, result):
         return format_html(result.verbose_title)
+
+
+class EntityRequirementAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        country = self.forwarded.get('country', None)
+        qs = find_additional_requirement_entities_choices().filter(entity__in=self.request.user.person.linked_entities)
+        if country:
+            qs = qs.exclude(entity__organization__type=MAIN).order_by('title')
+            if country != "all":
+                qs = qs.filter(entity__country_id=country)
+        else:
+            qs = find_pedagogical_entities_version().filter(entity__in=self.request.user.person.linked_entities).order_by('acronym')
+        if self.q:
+            qs = qs.filter(Q(title__icontains=self.q) | Q(acronym__icontains=self.q))
+        return qs
+
+    def get_result_label(self, result):
+        return format_html(result.verbose_title)
