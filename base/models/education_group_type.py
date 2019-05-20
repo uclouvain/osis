@@ -103,7 +103,6 @@ def find_authorized_types(category=None, parents=None):
             queryset = queryset.filter(
                 authorized_child_type__parent_type__educationgroupyear=parent
             )
-
     return queryset.order_by_translated_name()
 
 
