@@ -100,9 +100,10 @@ urlpatterns = [
         url(r'^select/$', education_group_select, name='education_group_select'),
         url(r'^content/', include([
             url(u'^$', detail.EducationGroupContent.as_view(), name='education_group_content'),
+            url(u'^attach/', group_element_year.create.AttachTypeDialogView.as_view(),
+                name='education_group_attach'),
             url(u'^create/$', group_element_year.create.CreateGroupElementYearView.as_view(),
-                name='education_group_attach'
-                ),
+                name='group_element_year_create'),
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
                 url(r'^delete/$', group_element_year.delete.DetachGroupElementYearView.as_view(),
                     name='group_element_year_delete'),

@@ -125,6 +125,8 @@ class ElementCache(OsisCache):
     def key(self):
         return self.PREFIX_KEY.format(user=self.user.pk)
 
-    def save_element_selected(self, obj):
+    def save_element_selected(self, obj, source_link_id=None):
         data_to_cache = {'id': obj.pk, 'modelname': obj._meta.db_table}
+        if source_link_id:
+            data_to_cache['source_link_id'] = source_link_id
         self.set_cached_data(data_to_cache)
