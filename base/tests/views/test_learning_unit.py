@@ -373,11 +373,32 @@ class LearningUnitViewTestCase(TestCase):
         json_response = str(response.content, encoding='utf8')
         results = json.loads(json_response)['results']
         self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
-        self.assertEqual(results[1]['text'], self.entity_version_3.verbose_title)
+        self.assertEqual(results[1]['text'], self.entity_version_2.verbose_title)
 
     def test_entity_requirement_autocomplete_with_q(self):
         self.client.force_login(self.person.user)
         url = reverse("entity_requirement_autocomplete", args=[])
+        response = self.client.get(url, data={"q": "1"})
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
+
+    def test_entity_autocomplete(self):
+        self.client.force_login(self.person.user)
+        url = reverse("entity_autocomplete", args=[])
+        response = self.client.get(
+            url, data={}
+        )
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
+        self.assertEqual(results[1]['text'], self.entity_version_3.verbose_title)
+
+    def test_entity_autocomplete_with_q(self):
+        self.client.force_login(self.person.user)
+        url = reverse("entity_autocomplete", args=[])
         response = self.client.get(url, data={"q": "1"})
         self.assertEqual(response.status_code, 200)
         json_response = str(response.content, encoding='utf8')
