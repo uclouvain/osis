@@ -81,26 +81,29 @@ def _filter_required_teaching_material(learning_units):
         if not learning_unit.teachingmaterial_set.filter(mandatory=True):
             continue
 
-        # Fetch data in CMS and convert
-        bibliography = _get_bibliography(learning_unit)
-        online_resources_fr = _get_online_resources(learning_unit, settings.LANGUAGE_CODE_FR)
-        online_resources_en = _get_online_resources(learning_unit, settings.LANGUAGE_CODE_EN)
-
-        result.append((
-            learning_unit.acronym,
-            learning_unit.complete_title,
-            learning_unit.requirement_entity,
-            # Let a white space, the empty string is converted in None.
-            bibliography if bibliography != "" else " ",
-            ", ".join(learning_unit.teachingmaterial_set.filter(mandatory=True).values_list('title', flat=True)),
-            online_resources_fr if online_resources_fr != "" else " ",
-            online_resources_en if online_resources_en != "" else " ",
-        ))
+        result.append(_build_line(learning_unit))
 
     if not result:
         raise ObjectDoesNotExist
 
     return result
+
+
+def _build_line(learning_unit):
+    # Fetch data in CMS and convert
+    bibliography = _get_bibliography(learning_unit)
+    online_resources_fr = _get_online_resources(learning_unit, settings.LANGUAGE_CODE_FR)
+    online_resources_en = _get_online_resources(learning_unit, settings.LANGUAGE_CODE_EN)
+    return(
+        learning_unit.acronym,
+        learning_unit.complete_title,
+        learning_unit.requirement_entity,
+        # Let a white space, the empty string is converted in None.
+        bibliography if bibliography != "" else " ",
+        ", ".join(learning_unit.teachingmaterial_set.filter(mandatory=True).values_list('title', flat=True)),
+        online_resources_fr if online_resources_fr != "" else " ",
+        online_resources_en if online_resources_en != "" else " ",
+    )
 
 
 def _hyperlinks_to_string(text):
