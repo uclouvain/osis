@@ -27,6 +27,7 @@
 import html
 
 from bs4 import BeautifulSoup
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 from openpyxl.styles import Style, Alignment
@@ -50,7 +51,8 @@ def generate_xls_teaching_material(user, learning_units):
         str(_('Req. Entity')).title(),
         str(_('bibliography')).title(),
         str(_('teaching materials')).title(),
-        str(_('online resources')).title(),
+        str("{} {}".format(_('online resources'), settings.LANGUAGE_CODE_FR)).title(),
+        str("{} {}".format(_('online resources'), settings.LANGUAGE_CODE_EN)).title(),
     ]
 
     rows = [lu for lu in learning_units if lu.teachingmaterial_set.filter(mandatory=True)]
@@ -73,6 +75,7 @@ def generate_xls_teaching_material(user, learning_units):
 def _filter_required_teaching_material(learning_units):
     """ Apply a filter to return a list with only the learning units with at least one teaching material """
     result = []
+
     for learning_unit in learning_units:
         # Only learning_units with a required teaching material will be display
         if not learning_unit.teachingmaterial_set.filter(mandatory=True):
@@ -80,7 +83,8 @@ def _filter_required_teaching_material(learning_units):
 
         # Fetch data in CMS and convert
         bibliography = _get_bibliography(learning_unit)
-        online_resources = _get_online_resources(learning_unit)
+        online_resources_fr = _get_online_resources(learning_unit, settings.LANGUAGE_CODE_FR)
+        online_resources_en = _get_online_resources(learning_unit, settings.LANGUAGE_CODE_EN)
 
         result.append((
             learning_unit.acronym,
@@ -89,7 +93,8 @@ def _filter_required_teaching_material(learning_units):
             # Let a white space, the empty string is converted in None.
             bibliography if bibliography != "" else " ",
             ", ".join(learning_unit.teachingmaterial_set.filter(mandatory=True).values_list('title', flat=True)),
-            online_resources if online_resources != "" else " ",
+            online_resources_fr if online_resources_fr != "" else " ",
+            online_resources_en if online_resources_en != "" else " ",
         ))
 
     if not result:
@@ -137,18 +142,19 @@ def _get_text_wrapped_cells(count):
     return ['{}{}'.format(col, row) for col in WRAP_TEXT_COLUMNS for row in range(2, count+2)]
 
 
-def _get_attribute_cms(learning_unit, text_label):
+def _get_attribute_cms(learning_unit, text_label, language_code):
     obj, created = TranslatedText.objects.get_or_create(text_label__label=text_label,
                                                         entity=LEARNING_UNIT_YEAR,
-                                                        reference=learning_unit.pk)
+                                                        reference=learning_unit.pk,
+                                                        language=language_code)
     return obj.text
 
 
-def _get_online_resources(learning_unit):
-    attr = _get_attribute_cms(learning_unit, 'online_resources')
+def _get_online_resources(learning_unit, language_code):
+    attr = _get_attribute_cms(learning_unit, 'online_resources', language_code)
     return _hyperlinks_to_string(html.unescape(attr)) if attr else ""
 
 
 def _get_bibliography(learning_unit):
-    attr = _get_attribute_cms(learning_unit, 'bibliography')
+    attr = _get_attribute_cms(learning_unit, 'bibliography', settings.LANGUAGE_CODE_FR)
     return _html_list_to_string(html.unescape(attr)) if attr else ""
