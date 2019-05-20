@@ -688,15 +688,15 @@ class TestQuadriConsistency(TestCase):
             {'vol_q1': 20, 'vol_q2': None, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
         ]
 
-        for case in test_cases:
-            with self.subTest(case=case):
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
-                self.learning_component_year_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
-                self.learning_component_year_full_lecturing.planned_classes = case.get('planned_classes')
-                self.learning_component_year_full_lecturing.save()
-                self.entity_component_year_full_lecturing_requirement.repartition_volume = case.get('vol_tot_global')
-                self.entity_component_year_full_lecturing_requirement.save()
+        with self.subTest(case=test_cases[0]):
+            self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = test_cases[0].get('vol_q1')
+            self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = test_cases[0].get('vol_q2')
+            self.learning_component_year_full_lecturing.hourly_volume_total_annual = test_cases[0].get('vol_tot_annual')
+            self.learning_component_year_full_lecturing.planned_classes = test_cases[0].get('planned_classes')
+            self.learning_component_year_full_lecturing.save()
+            self.entity_component_year_full_lecturing_requirement.repartition_volume = test_cases[0].\
+                get('vol_tot_global')
+            self.entity_component_year_full_lecturing_requirement.save()
 
         self.assertTrue(LearningComponentYearQ1Strategy(lcy=self.learning_component_year_full_lecturing).is_valid())
 
@@ -735,15 +735,14 @@ class TestQuadriConsistency(TestCase):
             {'vol_q1': None, 'vol_q2': 20, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
         ]
 
-        for case in test_cases:
-            with self.subTest(case=case):
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
-                self.learning_component_year_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
-                self.learning_component_year_full_lecturing.planned_classes = case.get('planned_classes')
-                self.learning_component_year_full_lecturing.save()
-                self.entity_component_year_full_lecturing_requirement.repartition_volume = case.get('vol_tot_global')
-                self.entity_component_year_full_lecturing_requirement.save()
+        with self.subTest(case=test_cases[0]):
+            self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = test_cases[0].get('vol_q1')
+            self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = test_cases[0].get('vol_q2')
+            self.learning_component_year_full_lecturing.hourly_volume_total_annual = test_cases[0].get('vol_tot_annual')
+            self.learning_component_year_full_lecturing.planned_classes = test_cases[0].get('planned_classes')
+            self.learning_component_year_full_lecturing.save()
+            self.entity_component_year_full_lecturing_requirement.repartition_volume = test_cases[0].get('vol_tot_global')
+            self.entity_component_year_full_lecturing_requirement.save()
 
         self.assertTrue(LearningComponentYearQ2Strategy(lcy=self.learning_component_year_full_lecturing).is_valid())
 
@@ -784,15 +783,14 @@ class TestQuadriConsistency(TestCase):
             {'vol_q1': 10, 'vol_q2': 10, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
         ]
 
-        for case in test_cases:
-            with self.subTest(case=case):
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
-                self.learning_component_year_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
-                self.learning_component_year_full_lecturing.planned_classes = case.get('planned_classes')
-                self.learning_component_year_full_lecturing.save()
-                self.entity_component_year_full_lecturing_requirement.repartition_volume = case.get('vol_tot_global')
-                self.entity_component_year_full_lecturing_requirement.save()
+        with self.subTest(case=test_cases[0]):
+            self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = test_cases[0].get('vol_q1')
+            self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = test_cases[0].get('vol_q2')
+            self.learning_component_year_full_lecturing.hourly_volume_total_annual = test_cases[0].get('vol_tot_annual')
+            self.learning_component_year_full_lecturing.planned_classes = test_cases[0].get('planned_classes')
+            self.learning_component_year_full_lecturing.save()
+            self.entity_component_year_full_lecturing_requirement.repartition_volume = test_cases[0].get('vol_tot_global')
+            self.entity_component_year_full_lecturing_requirement.save()
 
         self.assertTrue(LearningComponentYearQ1and2Strategy(lcy=self.learning_component_year_full_lecturing).is_valid())
 
