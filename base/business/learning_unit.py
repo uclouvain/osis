@@ -181,7 +181,7 @@ def get_components_identification(learning_unit_yr):
     components = []
     additional_entities = {}
 
-    for learning_component_year in learning_unit_yr.learningcomponentyear_set.all():
+    for learning_component_year in learning_unit_yr.learningcomponentyear_set.all().order_by('type'):
         entity_components_yr = learning_component_year.entitycomponentyear_set.all()
 
         if not additional_entities:

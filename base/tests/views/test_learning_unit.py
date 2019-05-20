@@ -1431,14 +1431,11 @@ class TestLearningUnitProposalComparison(TestCase):
             type=entity_container_year_link_type.ALLOCATION_ENTITY
         )
         response = self.client.get(reverse(learning_unit_proposal_comparison, args=[self.learning_unit_year.pk]))
-        index = 0
-        if response.context['components'][0][0] != _("Practical exercises"):
-            index = 1
-        self.assertEqual(response.context['components'][index][0], _("Practical exercises"))
-        self.assertEqual(response.context['components'][index][1][_('Volume total annual')], [20, 0])
-        self.assertEqual(response.context['components'][index][1][_('Planned classes')], [0, 1])
-        self.assertEqual(response.context['components'][index][1][_('Volume Q1')], [10, 0])
-        self.assertEqual(response.context['components'][index][1][_('Volume Q2')], [10, 0])
+        self.assertEqual(response.context['components'][1][0], _("Practical exercises"))
+        self.assertEqual(response.context['components'][1][1][_('Volume total annual')], [20, 0])
+        self.assertEqual(response.context['components'][1][1][_('Planned classes')], [0, 1])
+        self.assertEqual(response.context['components'][1][1][_('Volume Q1')], [10, 0])
+        self.assertEqual(response.context['components'][1][1][_('Volume Q2')], [10, 0])
 
     def test_learning_unit_comparison_whitout_previous_and_next(self):
         self.previous_learning_unit_year.delete()
