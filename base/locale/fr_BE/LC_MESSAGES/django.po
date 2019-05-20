@@ -1429,7 +1429,7 @@ msgstr "Descendre"
 
 #: tests/views/education_groups/test_update.py:719
 msgid "Dummy message"
-msgstr "Stupide message"
+msgstr ""
 
 #: forms/learning_unit/attribution_charge_repartition.py:41
 #: models/education_group_year.py:374
