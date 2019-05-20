@@ -222,6 +222,18 @@ class TestFilterIsBorrowedLearningUnitYear(TestCase):
         result = list(filter_is_borrowed_learning_unit_year(qs, self.academic_year.start_date,
                                                             faculty_borrowing=entity.id))
         self.assertCountEqual(result, get_ids(self.luys_in_different_faculty_than_education_group[:1]))
+        
+        data = {
+            "academic_year_id": self.academic_year.id,
+            "faculty_borrowing_acronym": entity.most_recent_acronym
+        }
+
+        form = LearningUnitYearForm(data,   borrowed_course_search=True)
+
+        form.is_valid()
+        results = list(form.get_activity_learning_units())
+
+        self.assertEqual(results[0].id, self.luys_in_different_faculty_than_education_group[:1][0].id)
 
     def assert_filter_borrowed_luys_returns_empty_qs(self, learning_unit_years):
         qs = LearningUnitYear.objects.filter(pk__in=[luy.pk for luy in learning_unit_years])
