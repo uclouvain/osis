@@ -51,8 +51,8 @@ def generate_xls_teaching_material(user, learning_units):
         str(_('Req. Entity')).title(),
         str(_('bibliography')).title(),
         str(_('teaching materials')).title(),
-        str("{} {}".format(_('online resources'), settings.LANGUAGE_CODE_FR)).title(),
-        str("{} {}".format(_('online resources'), settings.LANGUAGE_CODE_EN)).title(),
+        str("{} - {}".format(_('online resources'), settings.LANGUAGE_CODE_FR)).title(),
+        str("{} - {}".format(_('online resources'), settings.LANGUAGE_CODE_EN)).title(),
     ]
 
     rows = [lu for lu in learning_units if lu.teachingmaterial_set.filter(mandatory=True)]
