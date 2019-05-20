@@ -8,7 +8,7 @@ class LearningComponentYearQuadriStrategy(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def is_valid(self):
-        pass
+        raise NotImplementedError
 
 
 class LearningComponentYearQ1Strategy(LearningComponentYearQuadriStrategy):
