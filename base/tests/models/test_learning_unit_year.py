@@ -659,6 +659,7 @@ class LearningUnitYearWarningsTest(TestCase):
             [excepted_error])
         self.assertIn(excepted_error, self.luy_full._check_learning_component_year_warnings())
 
+
 class TestQuadriConsistency(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -675,7 +676,7 @@ class TestQuadriConsistency(TestCase):
 
     @patch.multiple(LearningComponentYearQuadriStrategy, __abstractmethods__=set())
     def test_is_valid_present(self):
-        instance = LearningComponentYearQuadriStrategy()
+        instance = LearningComponentYearQuadriStrategy(lcy=self.learning_component_year_full_lecturing)
         with self.assertRaises(NotImplementedError):
             self.assertRaises(NotImplementedError, instance.is_valid())
 
@@ -701,7 +702,8 @@ class TestQuadriConsistency(TestCase):
                     'vol_tot_global')
                 self.entity_component_year_full_lecturing_requirement.save()
 
-        self.assertTrue(LearningComponentYearQuadriNoStrategy(lcy=self.learning_component_year_full_lecturing).is_valid())
+        self.assertTrue(
+            LearningComponentYearQuadriNoStrategy(lcy=self.learning_component_year_full_lecturing).is_valid())
 
     def test_ok_volumes_for_Q1(self):
         self.luy_full.credits = self.luy_full.credits + 1
@@ -745,7 +747,8 @@ class TestQuadriConsistency(TestCase):
                 self.entity_component_year_full_lecturing_requirement.save()
 
         excepted_error = "{} ({})".format(
-                _('Volumes of {} are inconsistent').format(self.learning_component_year_full_lecturing.complete_acronym),
+                _('Volumes of {} are inconsistent').format(
+                    self.learning_component_year_full_lecturing.complete_acronym),
                 _('Only the volume Q1 must have a value'))
 
         self.assertIn(excepted_error, self.luy_full.warnings)
@@ -765,7 +768,8 @@ class TestQuadriConsistency(TestCase):
             self.learning_component_year_full_lecturing.hourly_volume_total_annual = test_cases[0].get('vol_tot_annual')
             self.learning_component_year_full_lecturing.planned_classes = test_cases[0].get('planned_classes')
             self.learning_component_year_full_lecturing.save()
-            self.entity_component_year_full_lecturing_requirement.repartition_volume = test_cases[0].get('vol_tot_global')
+            self.entity_component_year_full_lecturing_requirement.repartition_volume = \
+                test_cases[0].get('vol_tot_global')
             self.entity_component_year_full_lecturing_requirement.save()
 
         self.assertTrue(LearningComponentYearQ2Strategy(lcy=self.learning_component_year_full_lecturing).is_valid())
@@ -813,7 +817,8 @@ class TestQuadriConsistency(TestCase):
             self.learning_component_year_full_lecturing.hourly_volume_total_annual = test_cases[0].get('vol_tot_annual')
             self.learning_component_year_full_lecturing.planned_classes = test_cases[0].get('planned_classes')
             self.learning_component_year_full_lecturing.save()
-            self.entity_component_year_full_lecturing_requirement.repartition_volume = test_cases[0].get('vol_tot_global')
+            self.entity_component_year_full_lecturing_requirement.repartition_volume = \
+                test_cases[0].get('vol_tot_global')
             self.entity_component_year_full_lecturing_requirement.save()
 
         self.assertTrue(LearningComponentYearQ1and2Strategy(lcy=self.learning_component_year_full_lecturing).is_valid())
