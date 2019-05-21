@@ -29,6 +29,7 @@ import html
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Subquery, OuterRef
 from django.utils.translation import ugettext_lazy as _
 from openpyxl.styles import Style, Alignment
 
@@ -51,8 +52,8 @@ def generate_xls_teaching_material(user, learning_units):
         str(_('Req. Entity')).title(),
         str(_('bibliography')).title(),
         str(_('teaching materials')).title(),
-        str("{} - {}".format(_('online resources'), settings.LANGUAGE_CODE_FR)).title(),
-        str("{} - {}".format(_('online resources'), settings.LANGUAGE_CODE_EN)).title(),
+        "{} - {}".format(_('online resources'), settings.LANGUAGE_CODE_FR).title(),
+        "{} - {}".format(_('online resources'), settings.LANGUAGE_CODE_EN).title(),
     ]
 
     rows = [lu for lu in learning_units if lu.teachingmaterial_set.filter(mandatory=True)]
@@ -68,6 +69,7 @@ def generate_xls_teaching_material(user, learning_units):
         }
     }
 
+    learning_units = _annotate_with_pedagogy_info(learning_units)
     working_sheets_data = _filter_required_teaching_material(learning_units)
     return xls_build.generate_xls(prepare_xls_parameters_list(working_sheets_data, file_parameters))
 
@@ -91,18 +93,20 @@ def _filter_required_teaching_material(learning_units):
 
 def _build_line(learning_unit):
     # Fetch data in CMS and convert
-    bibliography = _get_bibliography(learning_unit)
-    online_resources_fr = _get_online_resources(learning_unit, settings.LANGUAGE_CODE_FR)
-    online_resources_en = _get_online_resources(learning_unit, settings.LANGUAGE_CODE_EN)
+    bibliography = _html_list_to_string(html.unescape(learning_unit.bibliography)) if learning_unit.bibliography else ""
+    online_resources_fr = _hyperlinks_to_string(html.unescape(learning_unit.online_resources_fr)) \
+        if learning_unit.online_resources_fr else ""
+    online_resources_en = _hyperlinks_to_string(html.unescape(learning_unit.online_resources_en)) \
+        if learning_unit.online_resources_en else ""
     return(
         learning_unit.acronym,
         learning_unit.complete_title,
         learning_unit.requirement_entity,
         # Let a white space, the empty string is converted in None.
-        bibliography if bibliography != "" else " ",
+        bibliography or " ",
         ", ".join(learning_unit.teachingmaterial_set.filter(mandatory=True).values_list('title', flat=True)),
-        online_resources_fr if online_resources_fr != "" else " ",
-        online_resources_en if online_resources_en != "" else " ",
+        online_resources_fr or " ",
+        online_resources_en or " ",
     )
 
 
@@ -145,19 +149,24 @@ def _get_text_wrapped_cells(count):
     return ['{}{}'.format(col, row) for col in WRAP_TEXT_COLUMNS for row in range(2, count+2)]
 
 
-def _get_attribute_cms(learning_unit, text_label, language_code):
-    obj, created = TranslatedText.objects.get_or_create(text_label__label=text_label,
-                                                        entity=LEARNING_UNIT_YEAR,
-                                                        reference=learning_unit.pk,
-                                                        language=language_code)
-    return obj.text
-
-
-def _get_online_resources(learning_unit, language_code):
-    attr = _get_attribute_cms(learning_unit, 'online_resources', language_code)
-    return _hyperlinks_to_string(html.unescape(attr)) if attr else ""
-
-
-def _get_bibliography(learning_unit):
-    attr = _get_attribute_cms(learning_unit, 'bibliography', settings.LANGUAGE_CODE_FR)
-    return _html_list_to_string(html.unescape(attr)) if attr else ""
+def _annotate_with_pedagogy_info(learning_units):
+    learning_units = learning_units.annotate(bibliography=Subquery(
+        TranslatedText.objects.filter(
+            reference=OuterRef('pk'),
+            entity=LEARNING_UNIT_YEAR,
+            text_label__label='bibliography',
+            language=settings.LANGUAGE_CODE_FR).values('text')[:1]
+    )).annotate(online_resources_fr=Subquery(
+        TranslatedText.objects.filter(
+            reference=OuterRef('pk'),
+            entity=LEARNING_UNIT_YEAR,
+            text_label__label='online_resources',
+            language=settings.LANGUAGE_CODE_FR).values('text')[:1]
+    )).annotate(online_resources_en=Subquery(
+        TranslatedText.objects.filter(
+            reference=OuterRef('pk'),
+            entity=LEARNING_UNIT_YEAR,
+            text_label__label='online_resources',
+            language=settings.LANGUAGE_CODE_EN).values('text')[:1]
+    ))
+    return learning_units
