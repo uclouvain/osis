@@ -195,7 +195,8 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
     def _build_instance_data_external_learning_unit(self, data):
         return {
             'data': data,
-            'instance': self.instance and self.instance.externallearningunityear,
+            'instance': self.instance.externallearningunityear
+            if self.instance and self.instance.is_external() else None,
             'person': self.person
         }
 
@@ -367,7 +368,8 @@ class ExternalPartimForm(LearningUnitBaseForm):
     def _build_instance_data_external_learning_unit(self, data):
         return {
             'data': data,
-            'instance': self.instance and self.instance.externallearningunityear,
+            'instance': self.instance.externallearningunityear
+            if self.instance and self.instance.is_external() else None,
             'person': self.person
         }
 
