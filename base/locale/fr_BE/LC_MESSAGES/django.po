@@ -1747,7 +1747,7 @@ msgstr "Echec"
 msgid "Female"
 msgstr "Féminin"
 
-#: business/group_element_years/attach.py:89
+#: business/group_element_years/attach.py:91
 #, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
@@ -1843,10 +1843,8 @@ msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
 #: templates/education_group/blocks/table_utilizations.html:38
-#, fuzzy
-#| msgid "Formation PhD"
 msgid "Formations"
-msgstr "Formation doctorale"
+msgstr ""
 
 #: templates/learning_unit/identification.html:77
 msgid "Formerly"
@@ -2146,24 +2144,24 @@ msgstr "Ce n'est pas une proposition"
 msgid "Isolated classes"
 msgstr "Cours isolés"
 
-#: models/group_element_year.py:271
+#: models/group_element_year.py:272
 msgid ""
 "It is forbidden to attach an element to an element of another academic year."
 msgstr ""
 "Il est interdit d'attacher un élément à un élément d'une autre année "
 "académique."
 
-#: models/group_element_year.py:257
+#: models/group_element_year.py:258
 msgid "It is forbidden to attach an element to itself."
 msgstr "Il est interdit d’attacher un élément à lui-même."
 
-#: models/group_element_year.py:260
-#: tests/views/education_groups/test_update.py:621
+#: models/group_element_year.py:261
+#: tests/views/education_groups/test_update.py:619
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 "Il est interdit d'attacher un élement à un autre élement y étant inclus."
 
-#: models/group_element_year.py:254
+#: models/group_element_year.py:255
 msgid ""
 "It is forbidden to save a GroupElementYear with a child branch and a child "
 "leaf."
@@ -3060,7 +3058,7 @@ msgstr[1] ""
 "Les options \"%(acronym)s\" ne peuvent pas être détachées car elles sont "
 "présentes dans le programme %(finality_acronym)s."
 
-#: business/group_element_years/attach.py:134
+#: business/group_element_years/attach.py:136
 #, python-format
 msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
 msgid_plural ""
@@ -5209,7 +5207,7 @@ msgstr ""
 "Vous n'êtes pas autorisé de copier le contenu de ce type d'organisation de "
 "formation."
 
-#: models/group_element_year.py:264
+#: models/group_element_year.py:265
 msgid "You are not allowed to create a reference with a learning unit"
 msgstr ""
 "Vous n'êtes pas autorisé de créer une référence avec une unité d’enseignement"
@@ -5269,6 +5267,11 @@ msgstr ""
 #: templates/logged_out.html:36
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
+
+#: business/group_element_years/attach.py:149
+#: business/group_element_years/attach.py:163
+msgid "You can not attach the same child several times."
+msgstr "Vous ne pouvez pas attaché plusieurs fois le même enfant."
 
 #: templates/education_group/protect_delete_inner.html:9
 msgid "You can not delete this object because some dependencies are protected"

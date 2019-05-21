@@ -243,6 +243,7 @@ class GroupElementYear(OrderedModel):
         return self.comment
 
     class Meta:
+        unique_together = (('parent', 'child_branch'), ('parent', 'child_leaf'))
         ordering = ('order',)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
