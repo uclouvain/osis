@@ -18,6 +18,7 @@ class LearningComponentYearQuadriNoStrategy(LearningComponentYearQuadriStrategy)
     def is_valid(self):
         return True
 
+
 class LearningComponentYearQ1Strategy(LearningComponentYearQuadriStrategy):
     def __init__(self, lcy):
         self.lcy = lcy
