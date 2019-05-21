@@ -35,7 +35,7 @@ from attribution.models.enums.function import COORDINATOR, CO_HOLDER
 from attribution.tests.factories.attribution import AttributionFactory
 from base.business.learning_units.quadrimester_strategy import LearningComponentYearQ1Strategy, \
     LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy, \
-    LearningComponentYearQuadriStrategy
+    LearningComponentYearQuadriStrategy, LearningComponentYearQuadriNoStrategy
 from base.models import learning_unit_year
 from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import learning_unit_year_periodicity, entity_container_year_link_type, quadrimesters
@@ -678,6 +678,30 @@ class TestQuadriConsistency(TestCase):
         instance = LearningComponentYearQuadriStrategy()
         with self.assertRaises(NotImplementedError):
             self.assertRaises(NotImplementedError, instance.is_valid())
+
+    def test_no_strategy(self):
+        self.luy_full.credits = self.luy_full.credits + 1
+        self.luy_full.save()
+
+        test_cases = [
+            {'vol_q1': 20, 'vol_q2': None, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
+            {'vol_q1': None, 'vol_q2': 20, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
+            {'vol_q1': 10, 'vol_q2': 10, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
+            {'vol_q1': None, 'vol_q2': None, 'vol_tot_annual': None, 'planned_classes': None, 'vol_tot_global': None},
+        ]
+
+        for case in test_cases:
+            with self.subTest(case=case):
+                self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
+                self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
+                self.learning_component_year_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
+                self.learning_component_year_full_lecturing.planned_classes = case.get('planned_classes')
+                self.learning_component_year_full_lecturing.save()
+                self.entity_component_year_full_lecturing_requirement.repartition_volume = case.get(
+                    'vol_tot_global')
+                self.entity_component_year_full_lecturing_requirement.save()
+
+        self.assertTrue(LearningComponentYearQuadriNoStrategy(lcy=self.learning_component_year_full_lecturing).is_valid())
 
     def test_ok_volumes_for_Q1(self):
         self.luy_full.credits = self.luy_full.credits + 1

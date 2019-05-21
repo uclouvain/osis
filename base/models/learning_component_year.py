@@ -30,7 +30,8 @@ from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.business.learning_units.quadrimester_strategy import LearningComponentYearQ1Strategy, \
-    LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy
+    LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy, \
+    LearningComponentYearQuadriNoStrategy
 from base.models import learning_class_year
 from base.models.enums import learning_component_year_type, learning_container_year_types, quadrimesters
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
@@ -131,16 +132,16 @@ class LearningComponentYear(SerializableModel):
                 _('planned classes cannot be greather than 0 while volume is equal to 0')))
 
         strategies = {
+            None: LearningComponentYearQuadriNoStrategy,
             quadrimesters.Q1: LearningComponentYearQ1Strategy,
             quadrimesters.Q2: LearningComponentYearQ2Strategy,
             quadrimesters.Q1and2: LearningComponentYearQ1and2Strategy,
             quadrimesters.Q1or2: LearningComponentYearQ1or2Strategy,
+            quadrimesters.Q3: LearningComponentYearQuadriNoStrategy,
         }
 
         try:
-            quadri = self.learning_unit_year.quadrimester
-            if quadri:
-                strategies[quadri](lcy=self).is_valid()
+            strategies[self.learning_unit_year.quadrimester](lcy=self).is_valid()
         except ValidationError as e:
             _warnings.append("{} ({})".format(inconsistent_msg, e.message))
 

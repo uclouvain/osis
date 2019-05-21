@@ -11,6 +11,13 @@ class LearningComponentYearQuadriStrategy(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
 
+class LearningComponentYearQuadriNoStrategy(LearningComponentYearQuadriStrategy):
+    def __init__(self, lcy):
+        self.lcy = lcy
+
+    def is_valid(self):
+        return True
+
 class LearningComponentYearQ1Strategy(LearningComponentYearQuadriStrategy):
     def __init__(self, lcy):
         self.lcy = lcy
