@@ -24,6 +24,7 @@
 #
 ############################################################################
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -37,6 +38,7 @@ from base.business.learning_units.perms import is_eligible_to_create_partim, lea
 from base.models import proposal_learning_unit
 from base.models.academic_year import current_academic_year
 from base.models.entity_version import get_by_entity_and_date
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -78,17 +80,24 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
     def person(self):
         return get_object_or_404(Person.objects.select_related('user'), user=self.request.user)
 
+    @cached_property
+    def current_academic_year(self):
+        return current_academic_year()
+
     def get_queryset(self):
+        qs_learningcomponentyear = LearningComponentYear.objects.order_by('type', 'acronym').\
+            prefetch_related('entitycomponentyear_set')
+        prefetch = Prefetch('learningcomponentyear_set', queryset=qs_learningcomponentyear)
         return super().get_queryset().select_related(
             'learning_container_year__academic_year',
             'academic_year', 'learning_unit',
             'campus__organization', 'externallearningunityear'
-        )
+        ).prefetch_related(prefetch)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['current_academic_year'] = current_academic_year()
+        context['current_academic_year'] = self.current_academic_year
         context['is_person_linked_to_entity'] = self.person.is_linked_to_entity_in_charge_of_learning_unit_year(
             self.object)
 
