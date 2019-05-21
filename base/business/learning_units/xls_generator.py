@@ -79,33 +79,8 @@ def _filter_required_teaching_material(learning_units):
             continue
 
         # Fetch data in CMS and convert
-        bibliography = _html_list_to_string(
-            html.unescape(
-                getattr(
-                    TranslatedText.objects.filter(
-                        text_label__label='bibliography',
-                        entity=LEARNING_UNIT_YEAR,
-                        reference=learning_unit.pk
-                    ).first(),
-                    "text",
-                    " "
-                )
-            )
-        )
-
-        online_resources = _hyperlinks_to_string(
-            html.unescape(
-                getattr(
-                    TranslatedText.objects.filter(
-                        text_label__label='online_resources',
-                        entity=LEARNING_UNIT_YEAR,
-                        reference=learning_unit.pk
-                    ).first(),
-                    "text",
-                    " "
-                )
-            )
-        )
+        bibliography = _get_bibliography(learning_unit)
+        online_resources = _get_online_resources(learning_unit)
 
         result.append((
             learning_unit.acronym,
@@ -160,3 +135,20 @@ def _strip_tags(text):
 
 def _get_text_wrapped_cells(count):
     return ['{}{}'.format(col, row) for col in WRAP_TEXT_COLUMNS for row in range(2, count+2)]
+
+
+def _get_attribute_cms(learning_unit, text_label):
+    obj, created = TranslatedText.objects.get_or_create(text_label__label=text_label,
+                                                        entity=LEARNING_UNIT_YEAR,
+                                                        reference=learning_unit.pk)
+    return obj.text
+
+
+def _get_online_resources(learning_unit):
+    attr = _get_attribute_cms(learning_unit, 'online_resources')
+    return _hyperlinks_to_string(html.unescape(attr)) if attr else ""
+
+
+def _get_bibliography(learning_unit):
+    attr = _get_attribute_cms(learning_unit, 'bibliography')
+    return _html_list_to_string(html.unescape(attr)) if attr else ""

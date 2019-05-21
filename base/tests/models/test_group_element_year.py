@@ -269,19 +269,6 @@ class TestFindLearningUnitFormationRoots(TestCase):
         result = group_element_year.find_learning_unit_formations([self.child_leaf], parents_as_instances=True)
         self.assertEqual(result[self.child_leaf.id], [group_element.parent])
 
-    def test_when_child_appear_twice_for_same_parent(self):
-        group_element = GroupElementYearFactory(
-            child_branch=None,
-            child_leaf=self.child_leaf
-        )
-        GroupElementYearFactory(
-            parent=group_element.parent,
-            child_branch=None,
-            child_leaf=self.child_leaf
-        )
-        result = group_element_year.find_learning_unit_formations([self.child_leaf])
-        self.assertEqual(len(result), 1)
-
 
 class TestConvertParentIdsToInstances(TestCase):
     """Unit tests for _convert_parent_ids_to_instances()"""

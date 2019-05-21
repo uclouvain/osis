@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+import json
 from unittest import mock
 
 import factory.fuzzy
@@ -341,13 +342,13 @@ class LearningUnitViewTestCase(TestCase):
             type=entity_container_year_link_type.REQUIREMENT_ENTITY,
             entity=cls.entities[0]
         )
-        cls.entity_version = EntityVersionFactory(entity=cls.entities[0], entity_type=entity_type.SCHOOL,
+        cls.entity_version = EntityVersionFactory(acronym="1 acronym",entity=cls.entities[0], entity_type=entity_type.SCHOOL,
                                                   start_date=today - datetime.timedelta(days=1),
                                                   end_date=today.replace(year=today.year + 1))
-        cls.entity_version_2 = EntityVersionFactory(entity=cls.entities[1], entity_type=entity_type.INSTITUTE,
+        cls.entity_version_2 = EntityVersionFactory(acronym="2 acronym", entity=cls.entities[1], entity_type=entity_type.INSTITUTE,
                                                     start_date=today - datetime.timedelta(days=20),
                                                     end_date=today.replace(year=today.year + 1))
-        cls.entity_version_3 = EntityVersionFactory(entity=cls.entities[2], entity_type=entity_type.FACULTY,
+        cls.entity_version_3 = EntityVersionFactory(acronym="3 acronym", entity=cls.entities[2], entity_type=entity_type.FACULTY,
                                                     start_date=today - datetime.timedelta(days=50),
                                                     end_date=today.replace(year=today.year + 1))
 
@@ -361,6 +362,48 @@ class LearningUnitViewTestCase(TestCase):
 
     def setUp(self):
         self.client.force_login(self.a_superuser)
+
+    def test_entity_requirement_autocomplete(self):
+        self.client.force_login(self.person.user)
+        url = reverse("entity_requirement_autocomplete", args=[])
+        response = self.client.get(
+            url, data={}
+        )
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
+        self.assertEqual(results[1]['text'], self.entity_version_2.verbose_title)
+
+    def test_entity_requirement_autocomplete_with_q(self):
+        self.client.force_login(self.person.user)
+        url = reverse("entity_requirement_autocomplete", args=[])
+        response = self.client.get(url, data={"q": "1"})
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
+
+    def test_entity_autocomplete(self):
+        self.client.force_login(self.person.user)
+        url = reverse("entity_autocomplete", args=[])
+        response = self.client.get(
+            url, data={}
+        )
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
+        self.assertEqual(results[1]['text'], self.entity_version_3.verbose_title)
+
+    def test_entity_autocomplete_with_q(self):
+        self.client.force_login(self.person.user)
+        url = reverse("entity_autocomplete", args=[])
+        response = self.client.get(url, data={"q": "1"})
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
 
     def test_learning_units_search(self):
         response = self.client.get(reverse('learning_units'))

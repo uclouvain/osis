@@ -23,13 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Sum
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.business.learning_units.quadrimester_strategy import LearningComponentYearQ1Strategy, \
+    LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy
 from base.models import learning_class_year
-from base.models.enums import learning_component_year_type, learning_container_year_types
+from base.models.enums import learning_component_year_type, learning_container_year_types, quadrimesters
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -61,7 +64,7 @@ class LearningComponentYear(SerializableModel):
     _warnings = None
 
     def __str__(self):
-        return u"%s - %s" % (self.acronym, self.learning_unit_year.acronym)
+        return "{} - {}".format(self.acronym, self.learning_unit_year.acronym)
 
     class Meta:
         permissions = (
@@ -126,6 +129,21 @@ class LearningComponentYear(SerializableModel):
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
                 _('planned classes cannot be greather than 0 while volume is equal to 0')))
+
+        strategies = {
+            quadrimesters.Q1: LearningComponentYearQ1Strategy,
+            quadrimesters.Q2: LearningComponentYearQ2Strategy,
+            quadrimesters.Q1and2: LearningComponentYearQ1and2Strategy,
+            quadrimesters.Q1or2: LearningComponentYearQ1or2Strategy,
+        }
+
+        try:
+            quadri = self.learning_unit_year.quadrimester
+            if quadri:
+                strategies[quadri](lcy=self).is_valid()
+        except ValidationError as e:
+            _warnings.append("{} ({})".format(inconsistent_msg, e.message))
+
         return _warnings
 
 
