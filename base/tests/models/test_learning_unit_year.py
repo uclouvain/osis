@@ -529,7 +529,7 @@ class LearningUnitYearWarningsTest(TestCase):
         self.assertFalse(self.luy_full.learning_container_year.warnings)
         warnings = self.luy_full.warnings
         self.assertEqual(len(warnings), 1)
-        self.assertIn(_('the sum of repartition volumes must be equal to the global volume'), warnings[0])
+        self.assertIn(str(_('the sum of repartition volumes must be equal to the global volume')), warnings[0])
 
     def test_warning_when_partim_parent_periodicity_different_from_parent(self):
         # Set Parent UE to biannual odd
