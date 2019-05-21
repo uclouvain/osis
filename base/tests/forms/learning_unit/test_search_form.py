@@ -216,7 +216,7 @@ class TestFilterIsBorrowedLearningUnitYear(TestCase):
             pk__in=[luy.pk for luy in self.luys_in_different_faculty_than_education_group]
         )
         result = list(filter_is_borrowed_learning_unit_year(qs, self.academic_year.start_date))
-        self.assertCountEqual(result, get_ids(self.luys_in_different_faculty_than_education_group))
+        self.assertCountEqual(result,   [obj.id for obj in self.luys_in_different_faculty_than_education_group])
 
     def test_with_faculty_borrowing_set(self):
         qs = LearningUnitYear.objects.filter(
@@ -226,7 +226,7 @@ class TestFilterIsBorrowedLearningUnitYear(TestCase):
         entity = OfferYearEntity.objects.get(education_group_year=group.parent).entity
         result = list(filter_is_borrowed_learning_unit_year(qs, self.academic_year.start_date,
                                                             faculty_borrowing=entity.id))
-        self.assertCountEqual(result, get_ids(self.luys_in_different_faculty_than_education_group[:1]))
+        self.assertCountEqual(result, [obj.id for obj in self.luys_in_different_faculty_than_education_group[:1]])
         
         data = {
             "academic_year_id": self.academic_year.id,
@@ -269,13 +269,6 @@ def generate_learning_unit_year_with_associated_education_group(academic_year, s
                             parent=offer_year_entity.education_group_year)
 
     return luy
-
-
-def get_ids(objects):
-    ids = []
-    for object in objects:
-        ids.append(object.id)
-    return ids
 
 
 class TestFilterDescriptiveficheLearningUnitYear(TestCase):

@@ -343,10 +343,9 @@ def filter_is_borrowed_learning_unit_year(learning_unit_year_qs, date, faculty_b
     ids = []
     for luy in learning_unit_year_qs:
         if _is_borrowed_learning_unit(luy,
-                                      {'entities_faculty': entities_faculty,
-                                       'map_luy_entity': map_luy_entity,
-                                       'map_luy_education_group_entities': map_luy_education_group_entities
-                                       },
+                                      entities_faculty,
+                                      map_luy_entity,
+                                      map_luy_education_group_entities,
                                       entities_borrowing_allowed):
             ids.append(luy.id)
 
@@ -394,11 +393,8 @@ def map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_
     return dict_education_group_year_entities_for_learning_unit_year
 
 
-def _is_borrowed_learning_unit(luy, maps, entities_borrowing_allowed):
-    map_entity_faculty = maps.get('entities_faculty')
-    map_luy_entity = maps.get('map_luy_entity')
-    map_luy_education_group_entities = maps.get('map_luy_education_group_entities')
-
+def _is_borrowed_learning_unit(luy, map_entity_faculty, map_luy_entity,map_luy_education_group_entities,
+                               entities_borrowing_allowed):
     luy_entity = map_luy_entity.get(luy.id)
     luy_faculty = map_entity_faculty.get(luy_entity)
 
