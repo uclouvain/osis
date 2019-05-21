@@ -41,7 +41,7 @@ from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit.edition_volume import VolumeEditionFormsetContainer
 from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
-from base.models.entity_version import find_pedagogical_entities_version, EntityVersion
+from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.enums.organization_type import MAIN
@@ -195,6 +195,17 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
                 qs = qs.filter(entity__country_id=country)
         else:
             qs = find_pedagogical_entities_version().order_by('acronym')
+        if self.q:
+            qs = qs.filter(Q(title__icontains=self.q) | Q(acronym__icontains=self.q))
+        return qs
+
+    def get_result_label(self, result):
+        return format_html(result.verbose_title)
+
+
+class EntityRequirementAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = find_additional_requirement_entities_choices().filter(entity__in=self.request.user.person.linked_entities)
         if self.q:
             qs = qs.filter(Q(title__icontains=self.q) | Q(acronym__icontains=self.q))
         return qs
