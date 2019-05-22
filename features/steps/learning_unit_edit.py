@@ -22,6 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import time
+from datetime import datetime, timedelta
 
 from behave import *
 from behave.runner import Context
@@ -31,9 +32,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+from base.models.academic_calendar import AcademicCalendar
+from base.models.academic_year import current_academic_year
+from base.models.entity import Entity
+from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from features.steps.utils import LearningUnitPage, LoginPage, LearningUnitEditPage, NewPartimPage
@@ -42,12 +45,10 @@ use_step_matcher("re")
 
 
 @step("La période de modification des programmes est en cours")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    # FIXME
-    pass
+def step_impl(context: Context):
+    calendar = AcademicCalendar.objects.get(academic_year=current_academic_year(), reference=EDUCATION_GROUP_EDITION)
+    calendar.end_date = (datetime.now() + timedelta(days=1)).date()
+    calendar.save()
 
 
 @step("L’utilisateur est dans le groupe « faculty manager »")
@@ -69,7 +70,7 @@ def step_impl(context: Context):
 
 @step("L’utilisateur est attaché à l’entité (?P<value>.+)")
 def step_impl(context: Context, value: str):
-    entity = EntityVersionFactory(acronym=value).entity
+    entity = Entity.objects.filter(entityversion__acronym=value).first()
     PersonEntityFactory(person=context.user.person, entity=entity, with_child=True)
 
 
@@ -85,7 +86,7 @@ def step_impl(context: Context):
 
 @given("Aller sur la page de detail de l'ue: (?P<acronym>.+)")
 def step_impl(context: Context, acronym: str):
-    luy = LearningUnitYearFactory(acronym=acronym, academic_year__year=2019)
+    luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=2019)
     url = reverse('learning_unit', args=[luy.pk])
 
     context.current_page = LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
@@ -253,26 +254,28 @@ def step_impl(context):
     context.current_page = NewPartimPage(context.browser, context.browser.current_url)
 
 
-@then("Vérifier que le partim (?P<acronym>.+) a bien été créé de 2019-20 à 2024-25\.")
+@then("Vérifier que le partim (?P<acronym>.+) a bien été créé de 2019-20 à 2024-25.")
 def step_impl(context, acronym: str):
     context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
     context.current_page.wait_for_page_to_load()
-    for i in range(2019, 2024):
+    for i in range(2019, 2025):
         string_to_check = "{} ({}-".format(acronym, i)
         context.test.assertIn(string_to_check, context.current_page.success_messages())
 
 
-@when("Cliquer sur le lien WPEDI2910")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    raise NotImplementedError(u'STEP: When Cliquer sur le lien WPEDI2910')
+@when("Cliquer sur le lien (?P<acronym>.+)")
+def step_impl(context: Context, acronym: str):
+    context.current_page.go_to_full.click()
+
+    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
+    context.current_page.wait_for_page_to_load()
 
 
-@then("Vérifier que le cours parent WPEDI2910 contient bien 3 partims\.")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    raise NotImplementedError(u'STEP: Then Vérifier que le cours parent WPEDI2910 contient bien 3 partims.')
+@then("Vérifier que le cours parent (?P<acronym>.+) contient bien (?P<number>.+) partims\.")
+def step_impl(context, acronym, number):
+    # Slow page...
+    time.sleep(5)
+
+    list_partims = context.current_page.find_element(By.ID, "list_partims").text
+    expected_string = ' , '.join([str(i + 1) for i in range(3)])
+    context.test.assertEqual(list_partims, expected_string)

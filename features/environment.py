@@ -26,9 +26,6 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 
 
-TAKE_SCREEN_ON_FAILURE = True
-
-
 def before_all(context):
     options = Options()
     if settings.SELENIUM_SETTINGS["VIRTUAL_DISPLAY"]:
@@ -47,7 +44,6 @@ def after_scenario(context, scenario):
 
 def after_all(context):
     context.browser.quit()
-
 
 def after_step(context, step):
     if settings.SELENIUM_SETTINGS["TAKE_SCREEN_ON_FAILURE"] and step.status == "failed":

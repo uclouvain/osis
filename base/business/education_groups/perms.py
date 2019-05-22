@@ -77,7 +77,7 @@ def is_eligible_to_change_education_group(person, education_group, raise_excepti
 def _is_year_editable(education_group, raise_exception):
     error_msg = None
     if education_group.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION:
-        error_msg = _("You cannot change a education group before %(limit_year)s") % {
+        errpartimor_msg = _("You cannot change a education group before %(limit_year)s") % {
                 "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}
 
     result = error_msg is None

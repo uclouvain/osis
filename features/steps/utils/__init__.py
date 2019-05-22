@@ -119,7 +119,8 @@ class SearchLearningUnitPage(pypom.Page):
 class LearningUnitPage(pypom.Page):
     actions = ButtonField(By.ID, "dLabel")
     edit_button = ButtonField(By.CSS_SELECTOR, "#link_edit_lu > a")
-    new_partim = ButtonField(By.XPATH, "//*[@id='main']/div[4]/div[1]/div/div/div/ul/li[1]/a")
+    new_partim = ButtonField(By.ID, "new_partim")
+    go_to_full = ButtonField(By.ID, "full_acronym")
 
     def success_messages(self):
         success_panel = self.find_element(By.ID, "pnl_succes_messages")
