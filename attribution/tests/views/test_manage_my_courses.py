@@ -38,13 +38,11 @@ from waffle.testutils import override_flag
 from attribution.tests.factories.attribution import AttributionFactory
 from attribution.views.manage_my_courses import list_my_attributions_summary_editable, view_educational_information
 from base.models.enums import academic_calendar_type
-from base.models.enums import entity_container_year_link_type
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -211,17 +209,13 @@ class ManageMyCoursesMixin(TestCase):
                                                         start_date=datetime.date(timezone.now().year - 1, 9, 30),
                                                         end_date=datetime.date(timezone.now().year + 1, 9, 30))
         cls.academic_year_in_future = AcademicYearFactory(year=cls.current_academic_year.year + 1)
+        a_valid_entity_version = EntityVersionFactory(entity_type=FACULTY)
         cls.learning_unit_year = LearningUnitYearFactory(
             subtype=FULL,
             academic_year=cls.academic_year_in_future,
             learning_container_year__academic_year=cls.academic_year_in_future,
+            learning_container_year__requirement_entity=a_valid_entity_version.entity,
             summary_locked=False
-        )
-        a_valid_entity_version = EntityVersionFactory(entity_type=FACULTY)
-        EntityContainerYearFactory(
-            learning_container_year=cls.learning_unit_year.learning_container_year,
-            entity=a_valid_entity_version.entity,
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY
         )
         cls.tutor = _get_tutor()
         # Add attribution to course [set summary responsible]

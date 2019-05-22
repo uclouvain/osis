@@ -51,6 +51,7 @@ LEARNING_UNIT_TITLES = [
 ]
 
 
+# TODO :: function inutilisée ?????? à supprimer
 def prepare_xls_content(found_learning_units):
     res = []
     for learning_unit_yr in found_learning_units:

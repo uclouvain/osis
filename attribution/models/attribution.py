@@ -24,9 +24,12 @@
 #
 ##############################################################################
 from django.db import models
+from django.db.models import Prefetch
+
 from attribution.models.enums.function import Functions
 from base.models import person
 from base.models.academic_year import current_academic_year
+from base.models.entity import Entity
 from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
@@ -131,6 +134,8 @@ def search_scores_responsible(learning_unit_title, course_code, entities, tutor,
     if entities:
         queryset = filter_by_entities(queryset, entities)
 
+    queryset = _prefetch_entity_version(queryset)
+
     return queryset.select_related('learning_unit_year')\
                    .distinct("learning_unit_year")
 
@@ -144,6 +149,8 @@ def filter_attributions(attributions_queryset, entities, tutor, responsible):
             .filter(summary_responsible=True, tutor__person__in=person.find_by_firstname_or_lastname(responsible))
     if entities:
         queryset = filter_by_entities(queryset, entities)
+
+    queryset = _prefetch_entity_version(queryset)
 
     return queryset.select_related('learning_unit_year').distinct("learning_unit_year")
 
@@ -222,3 +229,12 @@ def find_by_learning_unit_year(learning_unit_year=None):
 
 def _filter_by_tutor(queryset, tutor):
     return queryset.filter(tutor__person__in=person.find_by_firstname_or_lastname(tutor))
+
+
+def _prefetch_entity_version(queryset):
+    return queryset.prefetch_related(
+        Prefetch(
+            'learning_unit_year__learning_container_year__allocation_entity',
+            queryset=Entity.objects.all().prefetch_related(Prefetch('entityversion_set', to_attr='entity_versions'))
+        )
+    )

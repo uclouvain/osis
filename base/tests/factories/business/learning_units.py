@@ -53,15 +53,15 @@ from reference.tests.factories.language import LanguageFactory
 
 
 def create_learning_unit_with_context(academic_year, structure, entity, acronym):
-    learning_container_year = LearningContainerYearFactory(academic_year=academic_year, acronym=acronym)
+    learning_container_year = LearningContainerYearFactory(
+        academic_year=academic_year,
+        acronym=acronym,
+        allocation_entity=entity,
+    )
     learning_unit_year = LearningUnitYearFactory(structure=structure,
                                                  acronym=acronym,
                                                  learning_container_year=learning_container_year,
                                                  academic_year=academic_year)
-
-    EntityContainerYearFactory(type=entity_container_year_link_type.ALLOCATION_ENTITY,
-                               learning_container_year=learning_container_year,
-                               entity=entity)
 
     return learning_unit_year
 
