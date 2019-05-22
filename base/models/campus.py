@@ -43,7 +43,7 @@ class Campus(SerializableModel):
     is_administration = models.BooleanField(default=False)
 
     def __str__(self):
-        return u"%s" % self.name
+        return "{} - {}".format(self.name, self.organization)
 
     class Meta:
         verbose_name_plural = 'campuses'

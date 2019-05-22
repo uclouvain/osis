@@ -72,15 +72,13 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
     )
 
     def __init__(self, *args, instance=None, initial=None, **kwargs):
-        if instance and isinstance(initial, dict):
-            # TODO Impossible to determine which is the main address
-            organization_address = instance.campus.organization.organizationaddress_set.order_by('is_main').first()
-
-            if organization_address:
-                country_external_institution = organization_address.country
-                initial["country_external_institution"] = country_external_institution.pk
         super().__init__(*args, instance=instance, initial=initial, external=True, **kwargs)
         self.fields['internship_subtype'].disabled = True
+        if instance:
+            self.fields["country_external_institution"].initial = instance.campus.organization.country.pk
+        else:
+            self.fields["country_external_institution"].initial = initial.get("campus") and initial[
+                "campus"].organization.country.pk
 
     class Meta(LearningUnitYearModelForm.Meta):
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
