@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-21 10:57+0200\n"
+"POT-Creation-Date: 2019-05-22 14:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -304,7 +304,7 @@ msgstr ""
 
 #: templates/academic_calendar/academic_calendar_form.html:37
 #: templates/academic_calendar/academic_calendars.html:44
-#: templates/academic_year.html:43 templates/home.html:115
+#: templates/academic_year.html:43 templates/home.html:108
 #: templates/offer/tabs.html:42 templates/offer_year_calendar.html:42
 msgid "Academic calendar"
 msgstr ""
@@ -2012,7 +2012,7 @@ msgstr ""
 #: templates/blocks/navbar_top.html:101
 #: templates/education_group/blocks/coorganization.html:35
 #: templates/entities.html:30 templates/entity/breadcrumb.html:28
-#: templates/home.html:98 templates/institution.html:29
+#: templates/home.html:91 templates/institution.html:29
 #: templates/institution.html:33
 #: templates/learning_unit/blocks/institution.html:11
 #: templates/learning_unit/by_external.html:48
@@ -2488,7 +2488,7 @@ msgstr ""
 msgid "Management of the dissertation managers"
 msgstr ""
 
-#: templates/home.html:100
+#: templates/home.html:93
 msgid "Management of the institution."
 msgstr ""
 
@@ -2685,7 +2685,7 @@ msgstr ""
 msgid "My Messages"
 msgstr ""
 
-#: templates/blocks/navbar_top.html:210 templates/home.html:105
+#: templates/blocks/navbar_top.html:210 templates/home.html:98
 #: templates/my_osis/home.html:30 templates/my_osis/home.html:34
 #: templates/my_osis/my_message.html:30 templates/my_osis/my_messages.html:30
 #: templates/my_osis/profile.html:30
@@ -5194,7 +5194,7 @@ msgstr ""
 msgid "Your browser is out of date. This can lead to unknown behaviour."
 msgstr ""
 
-#: templates/home.html:106
+#: templates/home.html:99
 msgid ""
 "Your personal details, configurations and other information related to you."
 msgstr ""
