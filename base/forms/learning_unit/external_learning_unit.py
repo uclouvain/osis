@@ -138,8 +138,6 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
     def __init__(self, person, academic_year, learning_unit_instance=None, data=None, start_year=None, proposal=False,
                  *args, **kwargs):
-        if not learning_unit_instance and not start_year:
-            raise AttributeError("Should set at least learning_unit_instance or start_year instance.")
         self.data = data
         self.academic_year = academic_year
         self.person = person
