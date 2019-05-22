@@ -1351,12 +1351,12 @@ Exemples: <i>LTEMP712R, LSPOL914R, LARKE803R</i>",Ex: LACTU900R
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_commoncore,REQUIRED,,,,,,Ex: TCBIOL2M
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_complementarymodule,REQUIRED,,,,,,Ex: BIOL1PM
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_minorlistchoice,REQUIRED,,,,,,Ex: MINEURESBIOL1BA
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_majorlistchoice,REQUIRED,,,,,,Ex: MAJEURESBIOL1BA
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_majorlistchoice,REQUIRED,,,,,,Ex: MAJEURES
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_optionlistchoice,REQUIRED,,,,,,Ex: OPTIONSBIOL2M
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_finality120listchoice,REQUIRED,,,,,,Ex: FINALITESBIOL2M
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_finality180listchoice,REQUIRED,,,,,,Ex: FINALITESBIOL2M
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_subgroup,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,,,,,,Ex: PARTENARIATS
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_subgroup,REQUIRED,,,,,,Ex: TPCHOIX
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_commoncore,REQUIRED,Partie de base,,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_complementarymodule,REQUIRED,Enseignements supplémentaires préparatoires,,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_minorlistchoice,REQUIRED,Liste au choix Mineures,,,,,
