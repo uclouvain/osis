@@ -44,16 +44,16 @@ Examples: <i>BIOL1BA, DROI1BA, ECGE1BA</i>","Sigle d’un Bachelier est composé
 <li>2-4 lettres + <b>1BA</b></li>
 </ul>
 Exemples: <i>BIOL1BA, DROI1BA, ECGE1BA</i>",Ex: BIOL1BA
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2CE,REQUIRED,CE,"^([A-Za-z]{2,4})([2|9])([Cc])([Ee])$",,"Acronym of Certificate is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_CE,REQUIRED,CE,"^([A-Za-z]{2,4})([2|9])([Cc])([Ee])$",,"Acronym of Certificate is composed of:
 <ul>
 <li>2-4 letters + 1 number among 2 and 9 + <b>CE</b></li>
 </ul>
-Examples: <i>ETES9CE</i>","Sigle d’une Certificat est composé de:
+Examples: <i>ETES9CE</i>","Sigle d’un Certificat est composé de:
 <ul>
 <li>2-4 lettres + 1 chiffre parmis 2 et 9 + <b>CE</b></li>
 </ul>
 Exemples: <i>ETES9CE</i>",Ex: ETES9CE
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_CE,REQUIRED,2CE,"^([A-Za-z]{2,4})(2)([Cc])([Ee])$",,"Acronym of CAPAES is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2CE,REQUIRED,2CE,"^([A-Za-z]{2,4})(2)([Cc])([Ee])$",,"Acronym of CAPAES is composed of:
 <ul>
 <li>2-4 letters + <b>2CE</b></li>
 </ul>
@@ -67,6 +67,7 @@ base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3C
 <li>2-4 letters + <b>3CE</b></li>
 </ul>
 Examples: <i>DROI3CE, FIAL3CE, ESPO3CE</i>","Sigle d’un Certificat de recherche est composé de:
+<ul>
 <li>2-4 lettres + <b>3CE</b></li>
 </ul>
 Exemples: <i>DROI3CE, FIAL3CE, ESPO3CE</i>",Ex: DROI3CE
@@ -308,7 +309,7 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>B</b></li>
 </ul>
-Examples: <i>LBIOL100B</i>","Code d’un bachelier est composé de:
+Examples: <i>LBIOL100B</i>","Code d’un Bachelier est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -316,22 +317,7 @@ Examples: <i>LBIOL100B</i>","Code d’un bachelier est composé de:
 <li><b>B</b></li>
 </ul>
 Exemples: <i>LBIOL100B</i>",Ex: LBIOL100B
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2CE,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of Certificate is composed of:
-<ul>
-<li>site: 1 letter</li>
-<li>alphabetical part: 2-4 letters</li>
-<li>numerical part: 3 numbers</li>
-<li><b>Q</b></li>
-</ul>
-Examples: <i>LETES300Q</i>","Code of Certificate is composed of:
-<ul>
-<li>site: 1 lettre</li>
-<li>partie alphabétique: 2-4 lettres</li>
-<li>partie numérique: 3 chiffres</li>
-<li><b>Q</b></li>
-</ul>
-Exemples: <i>LETES300Q</i>",Ex: LETES300Q
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_CE,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of CAPAES is composed of:
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2CE,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of CAPAES is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -346,6 +332,21 @@ Examples: <i>LCAPA300Q</i>","Code d’un CAPAES est composé de:
 <li><b>Q</b></li>
 </ul>
 Exemples: <i>LCAPA300Q</i>",Ex: LCAPA300Q
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_CE,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of Certificate is composed of:
+<ul>
+<li>site: 1 letter</li>
+<li>alphabetical part: 2-4 letters</li>
+<li>numerical part: 3 numbers</li>
+<li><b>Q</b></li>
+</ul>
+Examples: <i>LETES300Q</i>","Code d’un Certificate est composé de:
+<ul>
+<li>site: 1 lettre</li>
+<li>partie alphabétique: 2-4 lettres</li>
+<li>partie numérique: 3 chiffres</li>
+<li><b>Q</b></li>
+</ul>
+Exemples: <i>LETES300Q</i>",Ex: LETES300Q
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_3CE,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of Research certificate is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -368,7 +369,7 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>Q</b></li>
 </ul>
-Examples: <i>LDICI100Q, LMARH100Q, LPAFA100Q</i>","Code of University first cycle certificate is composed of:
+Examples: <i>LDICI100Q, LMARH100Q, LPAFA100Q</i>","Code d’un Certificat d’université 1er cycle est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -383,7 +384,7 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>Q</b></li>
 </ul>
-Examples: <i>LACSS100Q, WANIM100Q, LADAP100Q</i>","Code d’un Certificat d’université 1er cycle est composé de:
+Examples: <i>LACSS100Q, WANIM100Q, LADAP100Q</i>","Code d’un Certificat d’université 2ème cycle est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -398,7 +399,7 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>Z</b></li>
 </ul>
-Examples: <i>LMED100Z</i>","Code d’un Certificat d’université 2ème cycle est composé de:
+Examples: <i>LMED100Z</i>","Code d’un Concours d’accès est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -428,7 +429,7 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>X</b></li>
 </ul>
-Examples: <i>WCDEN900X, LARCB900X, LCHIM900X</i>","Code d’un Cour isolé est composé de:
+Examples: <i>WCDEN900X, LARCB900X, LCHIM900X</i>","Code d’un Cours isolé est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
