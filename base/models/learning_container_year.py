@@ -29,6 +29,7 @@ from reversion.admin import VersionAdmin
 
 from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import learning_unit_year
+from base.models.entity import Entity
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import vacant_declaration_type
 from base.models.enums.learning_container_year_types import LearningContainerYearType
@@ -41,6 +42,16 @@ class LearningContainerYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('learning_container', 'academic_year', 'container_type', 'acronym', 'common_title')
     search_fields = ['acronym']
     list_filter = ('academic_year', 'in_charge', 'is_vacant',)
+
+
+class ForeignKeyEntityField(models.ForeignKey):
+    def __init__(self, *args, **kwargs):
+        kwargs.update({
+            'to': 'base.Entity',
+            'null': True,
+            'on_delete': models.PROTECT,
+        })
+        super(ForeignKeyEntityField, self).__init__(*args, **kwargs)
 
 
 class LearningContainerYear(SerializableModel):
@@ -66,6 +77,11 @@ class LearningContainerYear(SerializableModel):
                                                verbose_name=_('Decision'),
                                                choices=vacant_declaration_type.DECLARATION_TYPE)
     in_charge = models.BooleanField(default=False)
+
+    requirement_entity = ForeignKeyEntityField(blank=False, related_name='requirement_entities')
+    allocation_entity = ForeignKeyEntityField(blank=True, related_name='allocation_entities')
+    additionnal_entity_1 = ForeignKeyEntityField(blank=True, related_name='additionnal_entities_1')
+    additionnal_entity_2 = ForeignKeyEntityField(blank=True, related_name='additionnal_entities_2')
 
     _warnings = None
 
