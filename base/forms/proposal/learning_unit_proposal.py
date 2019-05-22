@@ -46,9 +46,12 @@ class LearningUnitProposalForm(LearningUnitSearchForm):
         required=False
     )
 
-    folder_id = forms.IntegerField(min_value=0,
-                                   required=False,
-                                   label=_('Folder num.'),)
+    folder_id = forms.IntegerField(
+        min_value=0,
+        required=False,
+        label=_('Folder num.'),
+        widget=forms.TextInput()
+    )
 
     proposal_type = forms.ChoiceField(
         label=_('Proposal type'),
