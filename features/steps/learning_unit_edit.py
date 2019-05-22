@@ -21,6 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import time
+
 from behave import *
 from behave.runner import Context
 from django.urls import reverse
@@ -29,11 +31,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from base.models.entity import Entity
 from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from features.steps.utils import LearningUnitPage, LoginPage, LearningUnitEditPage
+from features.steps.utils import LearningUnitPage, LoginPage, LearningUnitEditPage, NewPartimPage
 
 use_step_matcher("re")
 
@@ -64,10 +67,10 @@ def step_impl(context: Context):
     context.test.assertEqual(context.browser.current_url, context.get_url('/'))
 
 
-@step("L’utilisateur est attaché à l’entité DRT")
-def step_impl(context: Context):
-    drt_faculty = Entity.objects.filter(entityversion__acronym='DRT').first()
-    PersonEntityFactory(person=context.user.person, entity=drt_faculty, with_child=True)
+@step("L’utilisateur est attaché à l’entité (?P<value>.+)")
+def step_impl(context: Context, value: str):
+    entity = EntityVersionFactory(acronym=value).entity
+    PersonEntityFactory(person=context.user.person, entity=entity, with_child=True)
 
 
 @when("Cliquer sur le menu « Actions »")
@@ -82,7 +85,7 @@ def step_impl(context: Context):
 
 @given("Aller sur la page de detail de l'ue: (?P<acronym>.+)")
 def step_impl(context: Context, acronym: str):
-    luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=2019)
+    luy = LearningUnitYearFactory(acronym=acronym, academic_year__year=2019)
     url = reverse('learning_unit', args=[luy.pk])
 
     context.current_page = LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
@@ -117,6 +120,7 @@ def step_impl(context: Context, value: str, field: str):
 @step("Cliquer sur le bouton « Enregistrer »")
 def step_impl(context: Context):
     context.current_page.save_button.click()
+    time.sleep(3)
 
 
 @step("A la question, « voulez-vous reporter » répondez « non »")
@@ -237,3 +241,38 @@ def step_impl(context, acronym):
 
     context.current_page = LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
     context.test.assertEqual(context.browser.current_url, context.get_url(url))
+
+
+@step("Cliquer sur le menu « Nouveau partim »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page.new_partim.click()
+    context.current_page = LearningUnitPage(driver=context.browser, base_url=context.get_url())
+    context.current_page = NewPartimPage(context.browser, context.browser.current_url)
+
+
+@then("Vérifier que le partim (?P<acronym>.+) a bien été créé de 2019-20 à 2024-25\.")
+def step_impl(context, acronym: str):
+    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
+    context.current_page.wait_for_page_to_load()
+    for i in range(2019, 2024):
+        string_to_check = "{} ({}-".format(acronym, i)
+        context.test.assertIn(string_to_check, context.current_page.success_messages())
+
+
+@when("Cliquer sur le lien WPEDI2910")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    raise NotImplementedError(u'STEP: When Cliquer sur le lien WPEDI2910')
+
+
+@then("Vérifier que le cours parent WPEDI2910 contient bien 3 partims\.")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    raise NotImplementedError(u'STEP: Then Vérifier que le cours parent WPEDI2910 contient bien 3 partims.')

@@ -24,6 +24,7 @@
 from behave import *
 from behave.runner import Context
 
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.user import SuperUserFactory
 from base.tests.functionals.test_education_group import LoginPage
 
@@ -45,3 +46,10 @@ def step_impl(context: Context):
     page.login("usual_suspect", 'Roger_Verbal_Kint')
 
     context.test.assertEqual(context.browser.current_url, context.get_url('/'))
+
+
+@step("L'UE (?P<acronym>.+) existe")
+def step_impl(context, acronym):
+
+    LearningUnitYearFactory()
+    raise NotImplementedError(u'STEP: And L\'UE WPEDI2190 existe')

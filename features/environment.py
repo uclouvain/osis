@@ -25,16 +25,21 @@ from selenium import webdriver
 
 TAKE_SCREEN_ON_FAILURE = True
 
+
 def before_all(context):
     context.browser = webdriver.Firefox()
 
 
+def before_scenario(context, scenario):
+    pass
+
+
+def after_scenario(context, scenario):
+    pass
+
+
 def after_all(context):
     context.browser.quit()
-
-
-def before_feature(context, feature):
-    pass
 
 
 def after_step(context, step):

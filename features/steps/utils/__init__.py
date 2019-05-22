@@ -119,6 +119,11 @@ class SearchLearningUnitPage(pypom.Page):
 class LearningUnitPage(pypom.Page):
     actions = ButtonField(By.ID, "dLabel")
     edit_button = ButtonField(By.CSS_SELECTOR, "#link_edit_lu > a")
+    new_partim = ButtonField(By.XPATH, "//*[@id='main']/div[4]/div[1]/div/div/div/ul/li[1]/a")
+
+    def success_messages(self):
+        success_panel = self.find_element(By.ID, "pnl_succes_messages")
+        return success_panel.text
 
     def is_li_edit_link_disabled(self):
         return "disabled" in self.find_element(By.ID, "link_edit_lu").get_attribute("class")
@@ -140,3 +145,9 @@ class LearningUnitEditPage(pypom.Page):
 
     no_postponement = ButtonField(By.ID, "btn_without_postponement")
     with_postponement = ButtonField(By.ID, "btn_with_postponement")
+
+
+class NewPartimPage(pypom.Page):
+    code_dedie_au_partim = InputField(By.ID, "id_acronym_2")
+    save_button = ButtonField(By.XPATH,
+                              '//*[@id="LearningUnitYearForm"]/div[1]/div/div/button')
