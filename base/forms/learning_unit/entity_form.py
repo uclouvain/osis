@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 from collections import OrderedDict
 
 from dal import autocomplete
@@ -39,12 +38,13 @@ from base.models.entity_version import get_last_version, find_pedagogical_entiti
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2, ENTITY_TYPE_LIST, EntityContainerYearLinkTypes
 from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
+from base.models.learning_component_year import LearningComponentYear
 from reference.models.country import Country
 
 
 def _get_section_choices():
     return add_blank(
-        add_all(Country.objects.filter(entity__isnull=False).values_list('id', 'name') .distinct().order_by('name')),
+        add_all(Country.objects.filter(entity__isnull=False).values_list('id', 'name').distinct().order_by('name')),
         blank_choice_display="UCLouvain"
     )
 
@@ -105,6 +105,15 @@ class EntityContainerYearModelForm(forms.ModelForm):
         elif self.instance.pk:
             # if the instance has no entity, it must be deleted
             self.instance.delete()
+            self._assert_repartition_volumes_consistency()
+
+    def _assert_repartition_volumes_consistency(self):
+        """In case EntityContainerYear was removed, need to reset repartition volumes to None."""
+        repartition_attr_by_type = LearningComponentYear.repartition_volume_attrs_by_entity_container_type()
+        attr_name = repartition_attr_by_type[self.entity_type]
+        qs = LearningComponentYear.objects.filter(
+            learning_unit_year__learning_container_year=self.instance.learning_container_year)
+        qs.update(**{attr_name: None})
 
     @property
     def entity_version(self):
@@ -118,6 +127,14 @@ class EntityContainerYearModelForm(forms.ModelForm):
 
 class RequirementEntityContainerYearModelForm(EntityContainerYearModelForm):
     entity_type = REQUIREMENT_ENTITY
+    entity = EntitiesVersionChoiceField(
+        widget=autocomplete.ModelSelect2(
+            url='entity_requirement_autocomplete',
+            attrs={'data-html': True},
+            forward=['country']
+        ),
+        queryset=find_additional_requirement_entities_choices()
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

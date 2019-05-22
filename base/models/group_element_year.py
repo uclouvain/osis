@@ -243,6 +243,7 @@ class GroupElementYear(OrderedModel):
         return self.comment
 
     class Meta:
+        unique_together = (('parent', 'child_branch'), ('parent', 'child_leaf'))
         ordering = ('order',)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
@@ -266,7 +267,7 @@ class GroupElementYear(OrderedModel):
         self._check_same_academic_year_parent_child_branch()
 
     def _check_same_academic_year_parent_child_branch(self):
-        if (self.parent and self.child_branch) and\
+        if (self.parent and self.child_branch) and \
                 (self.parent.academic_year.year != self.child_branch.academic_year.year):
             raise ValidationError(_("It is forbidden to attach an element to an element of another academic year."))
 
