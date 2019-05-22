@@ -78,8 +78,8 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
             self.fields["country_external_institution"].initial = instance.campus.organization.country and \
                                                                   instance.campus.organization.country.pk
         else:
-            self.fields["country_external_institution"].initial = initial.get("campus") and initial[
-                "campus"].organization.country.pk
+            self.fields["country_external_institution"].initial = initial.get("campus").organization.country and\
+                                                                  initial[ "campus"].organization.country.pk
 
     class Meta(LearningUnitYearModelForm.Meta):
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
