@@ -147,7 +147,6 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
         self.proposal = proposal
         instances_data = self._build_instance_data(data, proposal)
 
-
         super().__init__(instances_data, *args, **kwargs)
         self.learning_unit_year_form.fields['acronym'] = ExternalAcronymField()
         if not self.instance or self.instance.acronym[0] == LearningUnitExternalSite.E.value:
