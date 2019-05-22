@@ -39,7 +39,7 @@ from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from features.steps.utils import LearningUnitPage, LoginPage, LearningUnitEditPage, NewPartimPage
+from features.steps.utils import LearningUnitPage, LoginPage, LearningUnitEditPage, NewPartimPage, NewLearningUnitPage
 
 use_step_matcher("re")
 
@@ -84,9 +84,9 @@ def step_impl(context: Context):
     context.test.assertTrue(context.current_page.is_li_edit_link_disabled())
 
 
-@given("Aller sur la page de detail de l'ue: (?P<acronym>.+)")
-def step_impl(context: Context, acronym: str):
-    luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=2019)
+@given("Aller sur la page de detail de l'ue: (?P<acronym>.+) en (?P<annee>.+)")
+def step_impl(context: Context, acronym: str, annee: str):
+    luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=int(annee[:4]))
     url = reverse('learning_unit', args=[luy.pk])
 
     context.current_page = LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
@@ -115,6 +115,7 @@ def step_impl(context):
 @step("Encoder (?P<value>.+) comme (?P<field>.+)")
 def step_impl(context: Context, value: str, field: str):
     slug_field = slugify(field).replace('-', '_')
+    print(slug_field, "---->", value)
     setattr(context.current_page, slug_field, value)
 
 
@@ -279,3 +280,14 @@ def step_impl(context, acronym, number):
     list_partims = context.current_page.find_element(By.ID, "list_partims").text
     expected_string = ' , '.join([str(i + 1) for i in range(3)])
     context.test.assertEqual(list_partims, expected_string)
+
+
+@step("Cliquer sur le menu « Nouvelle UE »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page.new_luy.click()
+
+    context.current_page = NewLearningUnitPage(context.browser, context.browser.current_url)
+    context.current_page.wait_for_page_to_load()

@@ -7,7 +7,7 @@ Feature: Modification des unités d'enseignement.
     Given La période de modification des programmes est en cours
     And L’utilisateur est dans le groupe « faculty manager »
     And L’utilisateur est attaché à l’entité DRT
-    Given Aller sur la page de detail de l'ue: LLSMS2000
+    Given Aller sur la page de detail de l'ue: LLSMS2000 en 2019-20
     When Cliquer sur le menu « Actions »
     Then L’action « Modifier » est désactivée.
 
@@ -15,7 +15,7 @@ Feature: Modification des unités d'enseignement.
     Given La période de modification des programmes est en cours
     And L’utilisateur est dans le groupe « faculty manager »
     And L’utilisateur est attaché à l’entité DRT
-    Given Aller sur la page de detail de l'ue: LDROI1004
+    Given Aller sur la page de detail de l'ue: LDROI1004 en 2019-20
     When Cliquer sur le menu « Actions »
     Then L’action « Modifier » est activée.
 
@@ -23,7 +23,7 @@ Feature: Modification des unités d'enseignement.
     Given La période de modification des programmes est en cours
     And L’utilisateur est dans le groupe « faculty manager »
     And L’utilisateur est attaché à l’entité DRT
-    Given Aller sur la page de detail de l'ue: LDROI1004
+    Given Aller sur la page de detail de l'ue: LDROI1004 en 2019-20
     When Cliquer sur le menu « Actions »
     And Cliquer sur le menu « Modifier »
     And Décocher la case « Actif »
@@ -50,7 +50,7 @@ Feature: Modification des unités d'enseignement.
   être mises à jour par la gestionnaire central en dehors de la période de modification des programmes.
     Given La période de modification des programmes n’est pas en cours
     And L’utilisateur est dans le groupe « central manager »
-    And Aller sur la page de detail de l'ue: LDROI1004
+    And Aller sur la page de detail de l'ue: LDROI1004 en 2019-20
 
     When Cliquer sur le menu « Actions »
     And Cliquer sur le menu « Modifier »
@@ -65,3 +65,18 @@ Feature: Modification des unités d'enseignement.
     And Rechercher LDROI1004 en 2020-21
     And Vérifier que le Crédits est bien 12
     And Vérifier que la Périodicité est bien bisannuelle paire
+
+  Scenario: En tant que gestionnaire facultaire, je dois pouvoir modifier un autre collectif.
+    Given La période de modification des programmes est en cours
+    And L’utilisateur est dans le groupe « faculty manager »
+    And L’utilisateur est attaché à l’entité GLOR
+
+    Given Aller sur la page de detail de l'ue: LGLOR2839 en 2019-20
+
+    When Cliquer sur le menu « Actions »
+    And Cliquer sur le menu « Modifier »
+    And Encoder Annuel comme Périodicité
+    And Cliquer sur le bouton « Enregistrer »
+    And A la question, « voulez-vous reporter » répondez « oui »
+    Then Vérifier que la Périodicité est bien Annuel
+

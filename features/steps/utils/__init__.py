@@ -21,8 +21,11 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import time
+
 import pypom
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 
 
@@ -51,6 +54,22 @@ class SelectField(Field):
     def __get__(self, obj, owner):
         element = Select(obj.find_element(*self.locator))
         return element.first_selected_option
+
+
+class Select2Field(Field):
+    sub_input_locator = "select2-search__field"
+
+    def __set__(self, obj, value):
+        element = obj.find_element(*self.locator)
+        element.click()
+
+        sub_element = obj.find_element(By.CLASS_NAME, self.sub_input_locator)
+        sub_element.clear()
+
+        if value is not None:
+            sub_element.send_keys(value)
+        time.sleep(1)
+        sub_element.send_keys(Keys.RETURN)
 
 
 class SubmitField(Field):
@@ -107,6 +126,9 @@ class SearchLearningUnitPage(pypom.Page):
     with_tutor = ButtonField(By.ID, "chb_with_attributions")
     generate_xls = ButtonField(By.ID, "btn_xls_with_parameters")
 
+    actions = ButtonField(By.XPATH, '//*[@id="main"]/div[3]/div/div[2]/div/button')
+    new_luy = ButtonField(By.ID, 'lnk_learning_unit_create')
+
     def count_result(self):
         text = self.find_element(By.CSS_SELECTOR, "#main > div.panel.panel-default > div > strong").text
         return text.split()[0]
@@ -121,6 +143,7 @@ class LearningUnitPage(pypom.Page):
     edit_button = ButtonField(By.CSS_SELECTOR, "#link_edit_lu > a")
     new_partim = ButtonField(By.ID, "new_partim")
     go_to_full = ButtonField(By.ID, "full_acronym")
+    tab_training = ButtonField(By.ID, "training_link")
 
     def success_messages(self):
         success_panel = self.find_element(By.ID, "pnl_succes_messages")
@@ -128,6 +151,25 @@ class LearningUnitPage(pypom.Page):
 
     def is_li_edit_link_disabled(self):
         return "disabled" in self.find_element(By.ID, "link_edit_lu").get_attribute("class")
+
+
+class LearningUnitTrainingPage(pypom.Page):
+    def including_groups(self) -> list:
+        row_count = len(self.find_elements(By.XPATH, "//*[@id='trainings']/table/tbody/tr"))
+        groups = []
+        for i in range(1, row_count + 1):
+            groups.append(self.find_element(By.XPATH, '//*[@id="trainings"]/table/tbody/tr[{}]/td[1]/a'.format(i)).text)
+
+        return groups
+
+    def enrollments_row(self, row) -> list:
+        result = []
+        for i in range(1, 4):
+            result.append(self.find_element(
+                By.XPATH, "//*[@id='learning_unit_enrollments']/table/tbody/tr[{}]/td[{}]".format(
+                    row, i)
+            ).text)
+        return result
 
 
 class LearningUnitEditPage(pypom.Page):
@@ -148,7 +190,31 @@ class LearningUnitEditPage(pypom.Page):
     with_postponement = ButtonField(By.ID, "btn_with_postponement")
 
 
-class NewPartimPage(pypom.Page):
+class NewLearningUnitPage(pypom.Page):
+    _code_0 = SelectField(By.ID, "id_acronym_0")
+    _code_1 = InputField(By.ID, "id_acronym_1")
+
+    @property
+    def code(self):
+        return self._code_0 + self._code_1
+
+    @code.setter
+    def code(self, value):
+        self._code_0 = value[0]
+        self._code_1 = value[1:]
+
+    type = SelectField(By.ID, "id_container_type")
+    credit = InputField(By.ID, "id_credits")
+    lieu_denseignement = SelectField(By.ID, "id_campus")
+    intitule_commun = InputField(By.ID, "id_common_title")
+    entite_resp_cahier_des_charges = Select2Field(
+        By.XPATH, "//*[@id='LearningUnitYearForm']/div[2]/div[1]/div[2]/div/div/div[3]/div/span")
+    entite_dattribution = Select2Field(
+        By.XPATH, "//*[@id='LearningUnitYearForm']/div[2]/div[1]/div[2]/div/div/div[4]/div/span")
+    save_button = ButtonField(By.NAME, 'learning_unit_year_add')
+
+
+class NewPartimPage(NewLearningUnitPage):
     code_dedie_au_partim = InputField(By.ID, "id_acronym_2")
     save_button = ButtonField(By.XPATH,
                               '//*[@id="LearningUnitYearForm"]/div[1]/div/div/button')

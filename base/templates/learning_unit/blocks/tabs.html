@@ -70,7 +70,7 @@
             </li>
         {% endif %}
         <li role="presentation" {% if request.path == url_formations %} class="active" {% endif %}>
-            <a href="{{ url_formations }}" role="tab">
+            <a id="training_link" href="{{ url_formations }}" role="tab">
                 {% trans 'Trainings' %}
             </a>
         </li>
