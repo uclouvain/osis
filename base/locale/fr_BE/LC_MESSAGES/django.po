@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-21 10:57+0200\n"
+"POT-Creation-Date: 2019-05-22 14:01+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -340,7 +340,7 @@ msgstr "Gestion des acteurs académiques"
 
 #: templates/academic_calendar/academic_calendar_form.html:37
 #: templates/academic_calendar/academic_calendars.html:44
-#: templates/academic_year.html:43 templates/home.html:115
+#: templates/academic_year.html:43 templates/home.html:108
 #: templates/offer/tabs.html:42 templates/offer_year_calendar.html:42
 msgid "Academic calendar"
 msgstr "Calendrier académique"
@@ -2069,7 +2069,7 @@ msgstr "Institut"
 #: templates/blocks/navbar_top.html:101
 #: templates/education_group/blocks/coorganization.html:35
 #: templates/entities.html:30 templates/entity/breadcrumb.html:28
-#: templates/home.html:98 templates/institution.html:29
+#: templates/home.html:91 templates/institution.html:29
 #: templates/institution.html:33
 #: templates/learning_unit/blocks/institution.html:11
 #: templates/learning_unit/by_external.html:48
@@ -2563,7 +2563,7 @@ msgid "Management of the dissertation managers"
 msgstr ""
 "Permet d'administrer la liste des gestionnaires qui ont accès à Dissertation"
 
-#: templates/home.html:100
+#: templates/home.html:93
 msgid "Management of the institution."
 msgstr "Gestion de l'institution."
 
@@ -2764,7 +2764,7 @@ msgstr "Mois"
 msgid "My Messages"
 msgstr "Mes messages"
 
-#: templates/blocks/navbar_top.html:210 templates/home.html:105
+#: templates/blocks/navbar_top.html:210 templates/home.html:98
 #: templates/my_osis/home.html:30 templates/my_osis/home.html:34
 #: templates/my_osis/my_message.html:30 templates/my_osis/my_messages.html:30
 #: templates/my_osis/profile.html:30
@@ -3015,12 +3015,12 @@ msgstr ""
 #: business/learning_units/quadrimester_strategy.py:24
 #: tests/models/test_learning_unit_year.py:722
 msgid "Only the volume Q1 must have a value"
-msgstr "Seulement le volume Q1 doit avoir une valeur"
+msgstr "Seul le volume Q1 doit avoir une valeur"
 
 #: business/learning_units/quadrimester_strategy.py:31
 #: tests/models/test_learning_unit_year.py:769
 msgid "Only the volume Q2 must have a value"
-msgstr "Seulement le volume Q2 doit avoir une valeur"
+msgstr "Seul le volume Q2 doit avoir une valeur"
 
 #: models/enums/vacant_declaration_type.py:38
 msgid "Open for externs"
@@ -5392,7 +5392,7 @@ msgstr ""
 "Votre navigateur n'est pas à jour. Certaines fonctionnalités peuvent ne pas "
 "fonctionner correctement."
 
-#: templates/home.html:106
+#: templates/home.html:99
 msgid ""
 "Your personal details, configurations and other information related to you."
 msgstr ""
@@ -5961,7 +5961,9 @@ msgstr "le programme vise"
 #: tests/models/test_learning_unit_year.py:383
 #: tests/models/test_learning_unit_year.py:532
 msgid "the sum of repartition volumes must be equal to the global volume"
-msgstr "Le volume annuel doit être égal à la somme des volumes répartis sur les entités"
+msgstr ""
+"Le volume annuel doit être égal à la somme des volumes répartis sur les "
+"entités"
 
 #: templates/education_group/tab_administrative_data.html:39
 #: templates/education_group/tab_administrative_data.html:59
