@@ -960,11 +960,11 @@ class TestLearningUnitProposalDisplay(TestCase):
 
     def test_get_old_value_of_foreign_key_for_campus(self):
         differences = proposal_business._get_old_value_of_foreign_key('campus', self.campus.id)
-        self.assertEqual(differences, str(self.campus))
+        self.assertEqual(differences+" - ", str(self.campus))
 
     def test_get_old_value_of_foreign_key_for_language(self):
         differences = proposal_business._get_old_value_of_foreign_key('language', self.language_it.pk)
-        self.assertEqual(differences, str(self.language_it))
+        self.assertEqual(differences+" - ", str(self.language_it))
 
     def test_get_status_initial_value(self):
         self.assertEqual(proposal_business._get_status_initial_value(True),
