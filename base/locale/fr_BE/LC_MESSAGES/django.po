@@ -3408,7 +3408,7 @@ msgstr "Profil"
 #: templates/academic_actors.html:44 templates/academic_actors.html:57
 #: templates/offer/tabs.html:47
 msgid "Program Managers"
-msgstr "Gestionnaires de programme"
+msgstr "Gestionnaires de parcours étudiant"
 
 #: models/enums/structure_type.py:45
 msgid "Program commission"
@@ -3416,7 +3416,7 @@ msgstr "Commission du programme"
 
 #: templates/education_group/tab_administrative_data.html:186
 msgid "Program managers"
-msgstr "Gestionnaires de programme"
+msgstr "Gestionnaires de parcours étudiant"
 
 #: models/enums/education_group_types.py:49
 msgid "Program master 120"
