@@ -29,6 +29,7 @@ dev.py
 ghostdriver.log
 .DS_Store
 /geckodriver.log
+/features/logs/
 **/*.orig
 git_submodule_ref_update.py
 

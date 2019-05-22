@@ -21,13 +21,20 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.conf import settings
 from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+
 
 TAKE_SCREEN_ON_FAILURE = True
 
 
 def before_all(context):
-    context.browser = webdriver.Firefox()
+    options = Options()
+    if settings.SELENIUM_SETTINGS["VIRTUAL_DISPLAY"]:
+        options.add_argument('-headless')
+    executable_path = settings.SELENIUM_SETTINGS["GECKO_DRIVER"]
+    context.browser = webdriver.Firefox(options=options, executable_path=executable_path)
 
 
 def before_scenario(context, scenario):
@@ -43,5 +50,5 @@ def after_all(context):
 
 
 def after_step(context, step):
-    if TAKE_SCREEN_ON_FAILURE and step.status == "failed":
+    if settings.SELENIUM_SETTINGS["TAKE_SCREEN_ON_FAILURE"] and step.status == "failed":
         context.browser.save_screenshot("features/logs/failure_{}{}.png".format(context.feature.name, step.name))
