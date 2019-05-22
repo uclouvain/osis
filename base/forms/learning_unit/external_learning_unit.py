@@ -140,11 +140,13 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
                  *args, **kwargs):
         if not learning_unit_instance and not start_year:
             raise AttributeError("Should set at least learning_unit_instance or start_year instance.")
+        self.data = data
         self.academic_year = academic_year
         self.person = person
         self.learning_unit_instance = learning_unit_instance
         self.proposal = proposal
         instances_data = self._build_instance_data(data, proposal)
+
 
         super().__init__(instances_data, *args, **kwargs)
         self.learning_unit_year_form.fields['acronym'] = ExternalAcronymField()

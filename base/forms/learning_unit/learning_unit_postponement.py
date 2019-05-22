@@ -84,7 +84,6 @@ class LearningUnitPostponementForm:
         self.person = person
         self.check_consistency = check_consistency
         self.external = external
-        self.data = data
 
         # end_year can be given by the request (eg: for partims)
         end_year = data and data.get('end_year')
