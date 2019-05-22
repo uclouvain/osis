@@ -24,13 +24,9 @@
 #
 ##############################################################################
 from django.db import models
-from django.db.models import Prefetch
-
 from attribution.models.enums.function import Functions
-from base.models import entity_container_year
 from base.models import person
 from base.models.academic_year import current_academic_year
-from base.models.enums import entity_container_year_link_type
 from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
@@ -135,8 +131,6 @@ def search_scores_responsible(learning_unit_title, course_code, entities, tutor,
     if entities:
         queryset = filter_by_entities(queryset, entities)
 
-    queryset = _prefetch_entity_version(queryset)
-
     return queryset.select_related('learning_unit_year')\
                    .distinct("learning_unit_year")
 
@@ -150,8 +144,6 @@ def filter_attributions(attributions_queryset, entities, tutor, responsible):
             .filter(summary_responsible=True, tutor__person__in=person.find_by_firstname_or_lastname(responsible))
     if entities:
         queryset = filter_by_entities(queryset, entities)
-
-    queryset = _prefetch_entity_version(queryset)
 
     return queryset.select_related('learning_unit_year').distinct("learning_unit_year")
 
@@ -169,10 +161,7 @@ def search_by_learning_unit_this_year(code, specific_title, academic_year=None):
 
 def filter_by_entities(queryset, entities):
     entities_ids = [entity.id for entity in entities]
-    l_container_year_ids = entity_container_year.search(link_type=entity_container_year_link_type.ALLOCATION_ENTITY,
-                                                        entity_id=entities_ids) \
-        .values_list('learning_container_year_id', flat=True)
-    queryset = queryset.filter(learning_unit_year__learning_container_year__id__in=l_container_year_ids)
+    queryset = queryset.filter(learning_unit_year__learning_container_year__allocation_entity_id__in=entities_ids)
     return queryset
 
 
@@ -233,13 +222,3 @@ def find_by_learning_unit_year(learning_unit_year=None):
 
 def _filter_by_tutor(queryset, tutor):
     return queryset.filter(tutor__person__in=person.find_by_firstname_or_lastname(tutor))
-
-
-def _prefetch_entity_version(queryset):
-    return queryset.prefetch_related(
-        Prefetch('learning_unit_year__learning_container_year__entitycontaineryear_set',
-                 queryset=entity_container_year.search(link_type=entity_container_year_link_type.ALLOCATION_ENTITY)
-                 .prefetch_related(
-                     Prefetch('entity__entityversion_set', to_attr='entity_versions')
-                 ), to_attr='entities_containers_year')
-    )
