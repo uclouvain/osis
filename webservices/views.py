@@ -128,12 +128,12 @@ def ws_catalog_offer(request, year, language, acronym):
 def ws_catalog_common_offer(request, year, language):
     # Validation
     common_education_group, iso_language, year = parameters_validation('common', language, year)
-    response = dict.fromkeys(SECTIONS_PER_OFFER_TYPE['common'], None)
+    response = dict.fromkeys(SECTIONS_PER_OFFER_TYPE['common']['specific'], None)
 
     qs = TranslatedText.objects.filter(
         reference=str(common_education_group.pk),
         language=iso_language,
-        text_label__label__in=SECTIONS_PER_OFFER_TYPE['common']
+        text_label__label__in=SECTIONS_PER_OFFER_TYPE['common']['specific']
     ).exclude(Q(text__isnull=True) | Q(text__exact='')).select_related('text_label')
 
     for translated_text in qs:
