@@ -138,6 +138,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
     def __init__(self, person, academic_year, learning_unit_instance=None, data=None, start_year=None, proposal=False,
                  *args, **kwargs):
+        self.data = data
         self.academic_year = academic_year
         self.person = person
         self.learning_unit_instance = learning_unit_instance
