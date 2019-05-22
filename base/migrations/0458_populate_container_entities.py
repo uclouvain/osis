@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                 update base_learningcontaineryear
                 
                 set 
-                    requirement_entity_id = ecy_allocation.entity_id
+                    allocation_entity_id = ecy_allocation.entity_id
                 from 
                     base_entitycontaineryear as ecy_allocation
                 where (
@@ -49,22 +49,7 @@ class Migration(migrations.Migration):
                 update base_learningcontaineryear
                 
                 set 
-                    requirement_entity_id = ecy_allocation.entity_id
-                from 
-                    base_entitycontaineryear as ecy_allocation
-                where (
-                    ecy_allocation.learning_container_year_id = base_learningcontaineryear.id 
-                    and ecy_allocation.type = 'ALLOCATION_ENTITY'
-                )
-            """
-        ),
-
-        migrations.RunSQL(
-            """               
-                update base_learningcontaineryear
-                
-                set 
-                    requirement_entity_id = ecy_additionnal_1.entity_id
+                    additionnal_entity_1_id = ecy_additionnal_1.entity_id
                 from 
                     base_entitycontaineryear as ecy_additionnal_1
                 where (
@@ -79,7 +64,7 @@ class Migration(migrations.Migration):
                 update base_learningcontaineryear
                 
                 set 
-                    requirement_entity_id = ecy_additionnal_2.entity_id
+                    additionnal_entity_2_id = ecy_additionnal_2.entity_id
                 from 
                     base_entitycontaineryear as ecy_additionnal_2
                 where (
