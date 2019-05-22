@@ -1349,15 +1349,15 @@ Examples: <i>LTEMP712R, LSPOL914R, LARKE803R</i>","Code d’un Sous-groupe est c
 <li><b>R</b></li>
 </ul>
 Exemples: <i>LTEMP712R, LSPOL914R, LARKE803R</i>",Ex: LACTU900R
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_commoncore,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_complementarymodule,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_minorlistchoice,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_majorlistchoice,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_optionlistchoice,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_finality120listchoice,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_finality180listchoice,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_subgroup,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_commoncore,REQUIRED,,,,,,Ex: TCBIOL2M
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_complementarymodule,REQUIRED,,,,,,Ex: BIOL1PM
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_minorlistchoice,REQUIRED,,,,,,Ex: MINEURESBIOL1BA
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_majorlistchoice,REQUIRED,,,,,,Ex: MAJEURES
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_optionlistchoice,REQUIRED,,,,,,Ex: OPTIONSBIOL2M
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_finality120listchoice,REQUIRED,,,,,,Ex: FINALITESBIOL2M
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_finality180listchoice,REQUIRED,,,,,,Ex: FINALITESBIOL2M
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,,,,,,Ex: PARTENARIATS
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_subgroup,REQUIRED,,,,,,Ex: TPCHOIX
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_commoncore,REQUIRED,Partie de base,,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_complementarymodule,REQUIRED,Enseignements supplémentaires préparatoires,,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_minorlistchoice,REQUIRED,Liste au choix Mineures,,,,,
@@ -1496,14 +1496,14 @@ Examples: <i>LAGRO114V, LDRT100V, LFIAL100V</i>","Code d’un Parternariat de mo
 <li><b>V</b></li>
 </ul>
 Exemples: <i>LAGRO114V, LDRT100V, LFIAL100V</i>",Ex: LAGRO100V
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_deepening,REQUIRED,,,,,,Ex : APPBIOL
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_sociatyminor,REQUIRED,,,,,,Ex : MINDD
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_accessminor,REQUIRED,,,,,,Ex : MINECON
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_openminor,REQUIRED,,,,,,Ex : MINCULTS
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_disciplinarycomplementminor,REQUIRED,,,,,,Ex : MINANGL
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_fsaspeciality,REQUIRED,,,,,,Ex : MAJPSY
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_option,REQUIRED,,,,,,Ex : OPTLAFR2M1/LA
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,Ex : PSP - CH GENEVE01
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_deepening,REQUIRED,,,,,,Ex: APPBIOL
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_sociatyminor,REQUIRED,,,,,,Ex: MINDD
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_accessminor,REQUIRED,,,,,,Ex: MINECON
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_openminor,REQUIRED,,,,,,Ex: MINCULTS
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_disciplinarycomplementminor,REQUIRED,,,,,,Ex: MINANGL
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_fsaspeciality,REQUIRED,,,,,,Ex: MAJPSY
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_option,REQUIRED,,,,,,Ex: OPTLAFR2M1/LA
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,Ex: PSP - CH GENEVE01
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_deepening,REQUIRED,Approfondissement en,^(Approfondissement en)(.*)$,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_sociatyminor,REQUIRED,Mineure en,^(Mineure en)(.*)$,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_accessminor,REQUIRED,Mineure en,^(Mineure en)(.*)$,,,,
