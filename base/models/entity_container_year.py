@@ -25,11 +25,13 @@
 ##############################################################################
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.db.models import Prefetch
+from django.db.models import Prefetch, OuterRef, Subquery
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models import entity_version
+from base.models.entity import Entity
+from base.models.entity_version import EntityVersion
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
@@ -109,18 +111,6 @@ def search(*args, **kwargs):
             queryset = queryset.filter(entity=entity_id)
 
     return queryset.select_related('learning_container_year__academic_year', 'entity')
-
-
-def find_requirement_entity(learning_container_year):
-    results = find_last_entity_version_grouped_by_linktypes(learning_container_year,
-                                                            entity_container_year_link_type.REQUIREMENT_ENTITY)
-    return next(iter(results.values()), None)
-
-
-def find_allocation_entity(learning_container_year):
-    results = find_last_entity_version_grouped_by_linktypes(learning_container_year,
-                                                            entity_container_year_link_type.ALLOCATION_ENTITY)
-    return next(iter(results.values()), None)
 
 
 def find_all_additional_requirement_entities(learning_container_year):

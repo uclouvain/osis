@@ -100,81 +100,9 @@ class EntityContainerYearTest(TestCase):
         self.assertFalse(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1 in entities)
         self.assertFalse(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2 in entities)
 
-        # Find requirement entity
-        self.assertEqual(self.entity_versions[work_on_year],
-                         entity_container_year.find_requirement_entity(learning_container_year=l_container_year))
-
-        # Find allocation entity
-        self.assertEqual(self.entity_versions[work_on_year],
-                         entity_container_year.find_allocation_entity(learning_container_year=l_container_year))
-
         # No additional allocation entity
         self.assertFalse(entity_container_year.find_all_additional_requirement_entities(
             learning_container_year=l_container_year))
-
-    def test_find_latest_allocation_entity(self):
-        work_on_year = 2016
-
-        # Change version in order to have multiple version during the year
-        self.entity_versions[work_on_year].end_date = datetime.datetime(work_on_year, 3, 30)
-        self.entity_versions[work_on_year].save()
-        lastest_entity_version = EntityVersionFactory(entity=self.entity,
-                                                      parent=None,
-                                                      acronym="Entity V_{}_3".format(work_on_year),
-                                                      start_date=datetime.datetime(work_on_year, 8, 1),
-                                                      end_date=datetime.datetime(work_on_year, 12, 30))
-        EntityVersionFactory(entity=self.entity,
-                             parent=None,
-                             acronym="Entity V_{}_2".format(work_on_year),
-                             start_date=datetime.datetime(work_on_year, 4, 1),
-                             end_date=datetime.datetime(work_on_year, 7, 30))
-
-        l_container_year = LearningContainerYearFactory(
-            academic_year=self.academic_years[work_on_year]
-        )
-        # Create a link between entity and container
-        # Requirement entity
-        EntityContainerYearFactory(
-            entity=self.entity,
-            learning_container_year=l_container_year,
-            type=entity_container_year_link_type.ALLOCATION_ENTITY
-        )
-        # Find allocation entity
-        allocation_entity_found = entity_container_year.find_allocation_entity(learning_container_year=l_container_year)
-        self.assertEqual(lastest_entity_version, allocation_entity_found)
-
-    def test_find_latest_requirment_entity(self):
-        work_on_year = 2016
-
-        # Change version in order to have multiple version during the year
-        self.entity_versions[work_on_year].end_date = datetime.datetime(work_on_year, 3, 30)
-        self.entity_versions[work_on_year].save()
-        lastest_entity_version = EntityVersionFactory(entity=self.entity,
-                                                      parent=None,
-                                                      acronym="Entity V_{}_3".format(work_on_year),
-                                                      start_date=datetime.datetime(work_on_year, 8, 1),
-                                                      end_date=None)
-        EntityVersionFactory(entity=self.entity,
-                             parent=None,
-                             acronym="Entity V_{}_2".format(work_on_year),
-                             start_date=datetime.datetime(work_on_year, 4, 1),
-                             end_date=datetime.datetime(work_on_year, 7, 30))
-
-        l_container_year = LearningContainerYearFactory(
-            academic_year=self.academic_years[work_on_year]
-        )
-        # Create a link between entity and container
-        # Requirement entity
-        EntityContainerYearFactory(
-            entity=self.entity,
-            learning_container_year=l_container_year,
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY
-        )
-
-        # Find requirement entity
-        requirement_entity_found = entity_container_year.find_requirement_entity(
-            learning_container_year=l_container_year)
-        self.assertEqual(lastest_entity_version, requirement_entity_found)
 
     def test_find_entities_grouped_by_linktype(self):
         a_learning_container_year = LearningContainerYearFactory()
