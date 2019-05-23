@@ -32,6 +32,8 @@ from base.models import learning_unit_year
 from base.models.entity import Entity
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import vacant_declaration_type
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
+    ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -106,3 +108,16 @@ class LearningContainerYear(SerializableModel):
 
     def is_type_for_faculty(self) -> bool:
         return self.container_type in LearningContainerYearType.for_faculty()
+
+    @staticmethod
+    def get_attrs_by_entity_container_type():
+        return {
+            REQUIREMENT_ENTITY: 'requirement_entity',
+            ALLOCATION_ENTITY: 'allocation_entity',
+            ADDITIONAL_REQUIREMENT_ENTITY_1: 'additionnal_entity_1',
+            ADDITIONAL_REQUIREMENT_ENTITY_2: 'additionnal_entity_2',
+        }
+
+    def get_entity(self, entity_container_type):
+        attr = LearningContainerYear.get_attrs_by_entity_container_type()[entity_container_type]
+        return getattr(self, attr, None)

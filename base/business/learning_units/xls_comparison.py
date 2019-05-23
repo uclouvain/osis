@@ -115,12 +115,10 @@ def _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison, learning
     ).prefetch_related(
         get_learning_component_prefetch()
     ).prefetch_related(
-        build_entity_container_prefetch([
-            entity_types.ALLOCATION_ENTITY,
-            entity_types.REQUIREMENT_ENTITY,
-            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
-            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
-        ])
+        build_entity_container_prefetch(entity_types.ALLOCATION_ENTITY),
+        build_entity_container_prefetch(entity_types.REQUIREMENT_ENTITY),
+        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1),
+        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2),
     ).order_by('learning_unit', 'academic_year__year')
     [append_latest_entities(learning_unit) for learning_unit in learning_unit_years]
     [append_components(learning_unit) for learning_unit in learning_unit_years]
@@ -330,12 +328,10 @@ def _get_learning_unit_yr_with_component(learning_unit_years):
     ).prefetch_related(
         get_learning_component_prefetch()
     ).prefetch_related(
-        build_entity_container_prefetch([
-            entity_types.ALLOCATION_ENTITY,
-            entity_types.REQUIREMENT_ENTITY,
-            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
-            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
-        ])
+        build_entity_container_prefetch(entity_types.ALLOCATION_ENTITY),
+        build_entity_container_prefetch(entity_types.REQUIREMENT_ENTITY),
+        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1),
+        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2),
     ).order_by('learning_unit', 'academic_year__year')
     [append_latest_entities(learning_unit) for learning_unit in learning_unit_years]
     [append_components(learning_unit) for learning_unit in learning_unit_years]

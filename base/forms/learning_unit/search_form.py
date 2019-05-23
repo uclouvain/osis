@@ -258,10 +258,8 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             learning_units = self._filter_borrowed_learning_units(learning_units)
 
         learning_units = learning_units.prefetch_related(
-            build_entity_container_prefetch([
-                entity_container_year_link_type.ALLOCATION_ENTITY,
-                entity_container_year_link_type.REQUIREMENT_ENTITY
-            ])
+            build_entity_container_prefetch(entity_container_year_link_type.ALLOCATION_ENTITY),
+            build_entity_container_prefetch(entity_container_year_link_type.REQUIREMENT_ENTITY),
         )
 
         for learning_unit in learning_units:
@@ -280,10 +278,8 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             raise TooManyResultsException
 
         queryset = queryset.prefetch_related(
-            build_entity_container_prefetch([
-                entity_container_year_link_type.ALLOCATION_ENTITY,
-                entity_container_year_link_type.REQUIREMENT_ENTITY
-            ]),
+            build_entity_container_prefetch(entity_container_year_link_type.ALLOCATION_ENTITY),
+            build_entity_container_prefetch(entity_container_year_link_type.REQUIREMENT_ENTITY),
             Prefetch(
                 'attribution_set',
                 queryset=Attribution.objects.filter(summary_responsible=True),
