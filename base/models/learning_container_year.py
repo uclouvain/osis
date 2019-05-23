@@ -30,7 +30,7 @@ from reversion.admin import VersionAdmin
 from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import learning_unit_year
 from base.models.entity import Entity
-from base.models.enums import learning_unit_year_subtypes
+from base.models.enums import learning_unit_year_subtypes, entity_container_year_link_type
 from base.models.enums import vacant_declaration_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
@@ -127,3 +127,15 @@ class LearningContainerYear(SerializableModel):
             link_type: self.get_entity(link_type)
             for link_type in LearningContainerYear.get_attrs_by_entity_container_type()
         }
+
+
+def find_last_entity_version_grouped_by_linktypes(learning_container_year, link_type=None):
+    if link_type is None:
+        link_types = entity_container_year_link_type.ENTITY_TYPE_LIST
+    else:
+        link_types = [link_type]
+    return {
+        link_type: entity.get_latest_entity_version()
+        for link_type, entity in learning_container_year.get_entity_by_type().items()
+        if entity and link_type in link_types
+    }

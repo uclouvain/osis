@@ -25,14 +25,10 @@
 ##############################################################################
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.db.models import Prefetch, OuterRef, Subquery
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models import entity_version
-from base.models.entity import Entity
-from base.models.entity_version import EntityVersion
-from base.models.enums import entity_container_year_link_type
 from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -72,18 +68,6 @@ class EntityContainerYear(SerializableModel):
                 self._warnings.append(_("The linked %(entity)s does not exist at the start date of the academic year"
                                         " linked to this learning unit") % {'entity': self.get_type_display().lower()})
         return self._warnings
-
-
-def find_last_entity_version_grouped_by_linktypes(learning_container_year, link_type=None):
-    if link_type is None:
-        link_types = entity_container_year_link_type.ENTITY_TYPE_LIST
-    else:
-        link_types = [link_type]
-    return {
-        link_type: entity.get_latest_entity_version()
-        for link_type, entity in learning_container_year.get_entity_by_type().items()
-        if entity and link_type in link_types
-    }
 
 
 def search(*args, **kwargs):

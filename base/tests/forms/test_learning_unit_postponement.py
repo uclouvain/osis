@@ -33,7 +33,6 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelF
 from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm, FIELDS_TO_NOT_POSTPONE
-from base.models import entity_container_year
 from base.models.academic_year import AcademicYear
 from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import attribution_procedure, entity_container_year_link_type, learning_unit_year_subtypes, \
@@ -41,6 +40,7 @@ from base.models.enums import attribution_procedure, entity_container_year_link_
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.learning_component_year import LearningComponentYear
+from base.models.learning_container_year import find_last_entity_version_grouped_by_linktypes
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -450,7 +450,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         return initial_status_value, new_status_value
 
     def _change_requirement_entity_value(self, academic_year):
-        entity_version_by_type = entity_container_year.find_last_entity_version_grouped_by_linktypes(
+        entity_version_by_type = find_last_entity_version_grouped_by_linktypes(
             self.learning_unit_year_full.learning_container_year
         )
         initial_status_value = entity_version_by_type.get(entity_container_year_link_type.REQUIREMENT_ENTITY).entity
@@ -697,7 +697,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
 
 
 def _instantiate_base_learning_unit_form(learning_unit_year_instance, person):
-    entity_version_by_type = entity_container_year.find_last_entity_version_grouped_by_linktypes(
+    entity_version_by_type = find_last_entity_version_grouped_by_linktypes(
         learning_unit_year_instance.learning_container_year
     )
     learning_unit_instance = learning_unit_year_instance.learning_unit

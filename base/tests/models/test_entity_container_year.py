@@ -26,6 +26,7 @@
 from django.test import TestCase
 import datetime
 
+import base.models.learning_container_year
 from base.models import entity_container_year
 from base.models.enums import entity_container_year_link_type
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -54,7 +55,7 @@ class EntityContainerYearTest(TestCase):
             requirement_entity=None
         )
         # No link between an entity/learning_container_year, so no result
-        no_entity = entity_container_year.find_last_entity_version_grouped_by_linktypes(
+        no_entity = base.models.learning_container_year.find_last_entity_version_grouped_by_linktypes(
             learning_container_year=l_container_year)
         self.assertFalse(no_entity)
 
@@ -64,7 +65,7 @@ class EntityContainerYearTest(TestCase):
             requirement_entity=self.entity,
         )
         # No link between an entity/learning_container_year, so no result
-        no_entity = entity_container_year.find_last_entity_version_grouped_by_linktypes(
+        no_entity = base.models.learning_container_year.find_last_entity_version_grouped_by_linktypes(
             learning_container_year=l_container_year, link_type=[])
         self.assertFalse(no_entity)
 
@@ -77,7 +78,7 @@ class EntityContainerYearTest(TestCase):
             allocation_entity=self.entity,
         )
         # Find all entities
-        entities = entity_container_year.find_last_entity_version_grouped_by_linktypes(
+        entities = base.models.learning_container_year.find_last_entity_version_grouped_by_linktypes(
             learning_container_year=l_container_year)
         self.assertIsInstance(entities, dict)
         self.assertTrue(entity_container_year_link_type.REQUIREMENT_ENTITY in entities)
