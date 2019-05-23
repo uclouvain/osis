@@ -23,25 +23,66 @@
 # ############################################################################
 from behave import *
 
-from features.steps.utils.pages import LearningUnitTrainingPage
-
-use_step_matcher("re")
+use_step_matcher("parse")
 
 
 @when("Cliquer sur l'onglet Formations")
 def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page.tab_training.click()
-    context.current_page = LearningUnitTrainingPage(context.browser, context.browser.current_url)
+    context.current_page = context.current_page.tab_training
 
 
-@then("Vérifier que l'unité d'enseignement est incluse dans (?P<list_acronym>.+)")
+@then("Vérifier que l'unité d'enseignement est incluse dans {list_acronym}")
 def step_impl(context, list_acronym):
     context.test.assertEqual(context.current_page.including_groups(), list_acronym.split(', '))
 
 
-@then("Vérifier que (?P<acronym>.+) à la ligne (?P<nb_row>.+) a (?P<nb_training>.+) inscrits dont (?P<nb_luy>.+) à l'ue")
+@then("Vérifier que {acronym} à la ligne {nb_row} a {nb_training} inscrits dont {nb_luy} à l'ue")
 def step_impl(context, acronym, nb_row, nb_training, nb_luy):
     context.test.assertEqual(context.current_page.enrollments_row(nb_row), [acronym, nb_training, nb_luy])
+
+
+@when("Cliquer sur l'onglet Enseignant·e·s")
+def step_impl(context):
+    context.current_page = context.current_page.tab_attribution
+
+
+@then("Vérifier que à la ligne {nb_row}, l'enseignant est bien {teacher} avec comme fonction {function} "
+      "débutant en {start_year} pour une durée de {duration} ans avec un volume en Q1 de {vol_q1} et en Q2 de {vol_q2}")
+def step_impl(context, nb_row, teacher, function, start_year, duration, vol_q1, vol_q2):
+    context.test.assertEqual(context.current_page.attribution_row(nb_row),
+                             [teacher, function, duration, vol_q1, vol_q2])
+
+
+@then("Vérifier que à la ligne {nb_row}, l'enseignant est bien {teacher} avec comme fonction {function} "
+      "débutant en {start_year} pour une durée de {duration} ans")
+def step_impl(context, nb_row, teacher, function, start_year, duration):
+    context.test.assertEqual(context.current_page.attribution_row(nb_row), [teacher, function, duration])
+
+
+@step("Cliquer sur le bouton « Gérer la répartition »")
+def step_impl(context):
+    context.current_page = context.current_page.manage_repartition
+
+
+@step("Cliquer sur « Ajouter sur l’année en cours » sur la ligne {row}")
+def step_impl(context, row):
+    context.current_page.find_corresponding_button(row).click()
+
+
+@then("Vérifier que à la ligne {row}, l'enseignant a comme fonction {function} "
+      "avec un volume en Q1 de {vol_q1} et en Q2 de {vol_q2}")
+def step_impl(context, row, function, vol_q1, vol_q2):
+    context.test.assertEqual(context.current_page.attribution_row(row)[1:], [function, vol_q1, vol_q2])
+
+
+@when("Cliquer sur le bouton « Modifier » sur la ligne {row}")
+def step_impl(context, row):
+    context.current_page.find_edit_button(row).click()
+
+
+@when("Cliquer sur l'onglet Fiche descriptive")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    raise NotImplementedError(u'STEP: When Cliquer sur l\'onglet Fiche descriptive')

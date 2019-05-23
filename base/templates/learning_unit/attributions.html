@@ -97,7 +97,7 @@
             </a>
         {% endif %}
         {% if learning_unit_year.is_partim %}
-            <a href="{% url "select_attribution" learning_unit_year.id %}"
+            <a href="{% url "select_attribution" learning_unit_year.id %}" id="manage_repartition"
                class="btn btn-default {% if not can_manage_charge_repartition %}disabled{% endif %}"
                role="button">
                 {% trans "Manage repartition" %}

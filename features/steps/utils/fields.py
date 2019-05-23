@@ -33,6 +33,27 @@ class Field:
         self.locator = locator
 
 
+class Link:
+    def __init__(self, page, by, selector, waiting_time=0):
+        self.locator = by, selector
+        self.page = page
+        self.waiting_time = waiting_time
+
+    def __get__(self, obj, owner):
+        obj.find_element(*self.locator).click()
+        if isinstance(self.page, str):
+            mod = __import__('features.steps.utils.pages', fromlist=[self.page])
+            self.page = getattr(mod, self.page)
+
+        new_page = self.page(obj.driver, obj.driver.current_url)
+        new_page.wait_for_page_to_load()
+
+        # Sometimes the wait_for_page_to_load does not work because the redirection is on the same page.
+        # In that case, we have to impose a waiting time to be sure that the page is reloaded.
+        time.sleep(self.waiting_time)
+        return new_page
+
+
 class InputField(Field):
     def __set__(self, obj, value):
         element = obj.find_element(*self.locator)

@@ -6,7 +6,6 @@ Feature: Mise à jour en gestion journalière
 
   Scenario: 7. En tant que gestionnaire facultaire, je ne peux pas modifier uniquement les UE d'une autre fac.
     Given La période de modification des programmes est en cours
-    And L’utilisateur est dans le groupe « faculty manager »
     And L’utilisateur est attaché à l’entité DRT
     Given Aller sur la page de detail de l'ue: LLSMS2000 en 2019-20
     When Cliquer sur le menu « Actions »
@@ -14,7 +13,6 @@ Feature: Mise à jour en gestion journalière
 
   Scenario: 7. En tant que gestionnaire facultaire, je peux modifier uniquement les UE de ma FAC.
     Given La période de modification des programmes est en cours
-    And L’utilisateur est dans le groupe « faculty manager »
     And L’utilisateur est attaché à l’entité DRT
     Given Aller sur la page de detail de l'ue: LDROI1004 en 2019-20
     When Cliquer sur le menu « Actions »
@@ -22,7 +20,6 @@ Feature: Mise à jour en gestion journalière
 
   Scenario: 8. En tant que gestionnaire facultaire, je dois pouvoir mettre à jour une UE.
     Given La période de modification des programmes est en cours
-    And L’utilisateur est dans le groupe « faculty manager »
     And L’utilisateur est attaché à l’entité DRT
     Given Aller sur la page de detail de l'ue: LDROI1004 en 2019-20
     When Cliquer sur le menu « Actions »
@@ -69,7 +66,6 @@ Feature: Mise à jour en gestion journalière
 
   Scenario: 10. En tant que gestionnaire facultaire, je dois pouvoir créer un nouveau partim.
     Given La période de modification des programmes est en cours
-    And L’utilisateur est dans le groupe « faculty manager »
     And L’utilisateur est attaché à l’entité MED
     Given Aller sur la page de detail de l'ue: WPEDI2190 en 2019-20
     When Cliquer sur le menu « Actions »
@@ -83,7 +79,6 @@ Feature: Mise à jour en gestion journalière
 
   Scenario: 11. Un tant que gestionnaire facultaire, je dois pouvoir créer un autre collectif
     Given La période de modification des programmes est en cours
-    And L’utilisateur est dans le groupe « faculty manager »
     And L’utilisateur est attaché à l’entité MED
 
     Given Aller sur la page de recherche d'UE
@@ -103,9 +98,7 @@ Feature: Mise à jour en gestion journalière
 
   Scenario: 12. En tant que gestionnaire facultaire, je dois pouvoir modifier un autre collectif.
     Given La période de modification des programmes est en cours
-    And L’utilisateur est dans le groupe « faculty manager »
     And L’utilisateur est attaché à l’entité GLOR
-
     Given Aller sur la page de detail de l'ue: LGLOR2839 en 2019-20
 
     When Cliquer sur le menu « Actions »
@@ -115,7 +108,7 @@ Feature: Mise à jour en gestion journalière
     And A la question, « voulez-vous reporter » répondez « oui »
     Then Vérifier que la Périodicité est bien Annuel
 
-  Scenario: 13. En tant que gestionnaire facultaire, je ne peux pas modifier uniquement les UE d'une autre fac.
+  Scenario: 13. En tant que gestionnaire facultaire, je dois pouvoir consulter l’onglet « Formations ».
     Given Aller sur la page de detail de l'ue: LCHM1211 en 2018-19
     When Cliquer sur l'onglet Formations
     Then Vérifier que l'unité d'enseignement est incluse dans LBBMC365R, LBBMC951R, LCHIM501F, LCHIM971R
@@ -126,12 +119,34 @@ Feature: Mise à jour en gestion journalière
   Scenario: 14. En tant que gestionnaire facultaire, je dois pouvoir consulter l’onglet « Enseignants ».
     Given Aller sur la page de detail de l'ue: LCHM1211 en 2018-19
     When Cliquer sur l'onglet Enseignant·e·s
+    Then Vérifier que à la ligne 1, l'enseignant est bien DEVILLERS, Michel avec comme fonction Co-titulaire débutant en 2017 pour une durée de 3 ans avec un volume en Q1 de 15,00 et en Q2 de 27,00
+    Then Vérifier que à la ligne 2, l'enseignant est bien DEVILLERS, Michel avec comme fonction Coordinateur(trice) débutant en 2015 pour une durée de 3 ans
+    Then Vérifier que à la ligne 3, l'enseignant est bien HAUTIER, Geoffroy avec comme fonction Co-titulaire débutant en 2017 pour une durée de 3 ans avec un volume en Q1 de 15,00 et en Q2 de 27,00
 
-  Scenario: 15 : En tant que gestionnaire facultaire, je dois pouvoir modifier l’onglet « Enseignant ».
+  Scenario: 15. En tant que gestionnaire facultaire, je dois pouvoir modifier l’onglet « Enseignant ».
+    Given La période de modification des programmes est en cours
+    And L’utilisateur est attaché à l’entité MED
+    And Aller sur la page de detail de l'ue: WPEDI21901 en 2018-19
+    When Cliquer sur l'onglet Enseignant·e·s
+    And Cliquer sur le bouton « Gérer la répartition »
+    And Cliquer sur « Ajouter sur l’année en cours » sur la ligne 1
+    And Encoder 2.0 comme Volume 2
+    And Cliquer sur le bouton « Enregistrer »
+    Then Vérifier que à la ligne 2, l'enseignant a comme fonction Co-titulaire avec un volume en Q1 de 2,00 et en Q2 de 2,00
 
-  Scenario: 16 : En tant que gestionnaire facultaire, je dois pouvoir mettre à jour les fiches descriptives.
+    When  Cliquer sur le bouton « Modifier » sur la ligne 1
+    And Encoder 2.0 comme Volume 1
+    And Cliquer sur le bouton « Enregistrer »
+    Then Vérifier que à la ligne 1, l'enseignant a comme fonction Coordinateur(trice) avec un volume en Q1 de 2,00 et en Q2 de 0,00
 
-  Scenario: 17 : En tant que professeur, je dois pouvoir mettre à jour les fiches descriptives.
 
-  Scenario: 18 : En tant que gestionnaire facultaire, je dois pouvoir modifier le cahier des charges.
+  Scenario: 16. En tant que gestionnaire facultaire, je dois pouvoir mettre à jour les fiches descriptives.
+    Given L’utilisateur est attaché à l’entité FARM
+    And Aller sur la page de detail de l'ue: WFARM1003 en 2019-20
+    When Cliquer sur l'onglet Fiche descriptive
+
+
+  Scenario: 17. En tant que professeur, je dois pouvoir mettre à jour les fiches descriptives.
+
+  Scenario: 18. En tant que gestionnaire facultaire, je dois pouvoir modifier le cahier des charges.
 
