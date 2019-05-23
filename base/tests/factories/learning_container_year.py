@@ -30,6 +30,7 @@ import factory.fuzzy
 
 from base.models.enums import learning_container_year_types
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 
 
@@ -53,3 +54,8 @@ class LearningContainerYearFactory(factory.django.DjangoModelFactory):
 
     in_charge = False
     type_declaration_vacant = None
+
+    requirement_entity = factory.SubFactory(EntityFactory)
+    allocation_entity = None
+    additionnal_entity_1 = None
+    additionnal_entity_2 = None
