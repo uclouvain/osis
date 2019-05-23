@@ -121,3 +121,9 @@ class LearningContainerYear(SerializableModel):
     def get_entity(self, entity_container_type):
         attr = LearningContainerYear.get_attrs_by_entity_container_type()[entity_container_type]
         return getattr(self, attr, None)
+
+    def get_entity_by_type(self) -> dict:
+        return {
+            link_type: self.get_entity(link_type)
+            for link_type in LearningContainerYear.get_attrs_by_entity_container_type()
+        }

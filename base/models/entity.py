@@ -71,6 +71,7 @@ class Entity(SerializableModel):
     def has_address(self):
         return self.location and self.postal_code and self.city
 
+    # TODO :: remove this function and use annotation (most_recent_entity_version)
     def get_latest_entity_version(self):
         # Sometimes, entity-versions is prefetch to optimized queries
         if getattr(self, "entity_versions", None):

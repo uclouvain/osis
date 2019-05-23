@@ -50,7 +50,8 @@ class EntityContainerYearTest(TestCase):
 
     def test_find_entities_no_values(self):
         l_container_year = LearningContainerYearFactory(
-            academic_year=self.academic_years[2015]
+            academic_year=self.academic_years[2015],
+            requirement_entity=None
         )
         # No link between an entity/learning_container_year, so no result
         no_entity = entity_container_year.find_last_entity_version_grouped_by_linktypes(
@@ -59,13 +60,8 @@ class EntityContainerYearTest(TestCase):
 
     def test_find_entities_with_empty_link_type(self):
         l_container_year = LearningContainerYearFactory(
-            academic_year=self.academic_years[2015]
-        )
-        # Requirement entity
-        EntityContainerYearFactory(
-            entity=self.entity,
-            learning_container_year=l_container_year,
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY
+            academic_year=self.academic_years[2015],
+            requirement_entity=self.entity,
         )
         # No link between an entity/learning_container_year, so no result
         no_entity = entity_container_year.find_last_entity_version_grouped_by_linktypes(
@@ -76,20 +72,9 @@ class EntityContainerYearTest(TestCase):
         work_on_year = 2015
 
         l_container_year = LearningContainerYearFactory(
-            academic_year=self.academic_years[work_on_year]
-        )
-        # Create a link between entity and container
-        # Requirement entity
-        EntityContainerYearFactory(
-            entity=self.entity,
-            learning_container_year=l_container_year,
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY
-        )
-        # Allocation entity
-        EntityContainerYearFactory(
-            entity=self.entity,
-            learning_container_year=l_container_year,
-            type=entity_container_year_link_type.ALLOCATION_ENTITY
+            academic_year=self.academic_years[work_on_year],
+            requirement_entity=self.entity,
+            allocation_entity=self.entity,
         )
         # Find all entities
         entities = entity_container_year.find_last_entity_version_grouped_by_linktypes(

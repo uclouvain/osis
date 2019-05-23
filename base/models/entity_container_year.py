@@ -75,14 +75,15 @@ class EntityContainerYear(SerializableModel):
 
 
 def find_last_entity_version_grouped_by_linktypes(learning_container_year, link_type=None):
-    lcy_start_date = learning_container_year.academic_year.start_date
-    entity_container_years = search(learning_container_year=learning_container_year, link_type=link_type) \
-        .prefetch_related(
-        Prefetch('entity__entityversion_set',
-                 queryset=entity_version.find_latest_version(lcy_start_date),
-                 to_attr="entity_versions")
-    )
-    return {ecy.type: ecy.get_latest_entity_version() for ecy in entity_container_years}
+    if link_type is None:
+        link_types = entity_container_year_link_type.ENTITY_TYPE_LIST
+    else:
+        link_types = [link_type]
+    return {
+        link_type: entity.get_latest_entity_version()
+        for link_type, entity in learning_container_year.get_entity_by_type().items()
+        if entity and link_type in link_types
+    }
 
 
 def search(*args, **kwargs):
