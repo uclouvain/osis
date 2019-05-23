@@ -38,7 +38,6 @@ from django.utils.translation import gettext_lazy as _
 from base.models.entity import Entity
 from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums import person_source_type
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
 
@@ -151,12 +150,7 @@ class Person(SerializableModel):
         )
 
     def is_linked_to_entity_in_charge_of_learning_unit_year(self, learning_unit_year):
-        entities = Entity.objects.filter(
-            entitycontaineryear__learning_container_year=learning_unit_year.learning_container_year,
-            entitycontaineryear__type=REQUIREMENT_ENTITY
-        )
-
-        return self.is_attached_entities(entities)
+        return self.is_attached_entities([learning_unit_year.learning_container_year.requirement_entity])
 
     def is_attached_entities(self, entities):
         return any(self.is_attached_entity(entity) for entity in entities)
