@@ -66,6 +66,30 @@ class InputField(Field):
         return element.get_attribute('value')
 
 
+class CkeditorField(Field):
+    """ For Ckeditor, the field is included in an iframe,
+    We need to go into the frame before send the value.
+    """
+    def __set__(self, obj, value):
+        element = obj.find_element(*self.locator)
+        obj.driver.switch_to.frame(element)
+        body = obj.find_element(By.TAG_NAME, "body")
+        body.clear()
+        if value is not None:
+            body.send_keys(value)
+
+        obj.driver.switch_to.default_content()
+
+    def __get__(self, obj, owner):
+        element = obj.find_element(*self.locator)
+        obj.driver.switch_to.frame(element)
+        body = obj.find_element(By.TAG_NAME, "body")
+
+        obj.driver.switch_to.default_content()
+
+        return body.get_attribute('value')
+
+
 class SelectField(Field):
     def __set__(self, obj, text):
         element = Select(obj.find_element(*self.locator))
@@ -115,3 +139,13 @@ class Checkbox(Field):
             element.click()
         elif old_val and not value:
             element.click()
+
+class RadioField(Field):
+    def __set__(self, obj, value):
+        element = obj.find_element(*self.locator)
+
+        choices = element.find_elements(By.XPATH, '//*[@id="id_mandatory"]/div/label')
+        for choice in choices:
+            if choice.text == value:
+                choice.click()
+

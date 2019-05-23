@@ -116,6 +116,8 @@ def step_impl(context):
 def step_impl(context: Context, value: str, field: str):
     slug_field = slugify(field).replace('-', '_')
     print(slug_field, "---->", value)
+    # if not hasattr(context.current_page, slug_field):
+    #     raise
     setattr(context.current_page, slug_field, value)
 
 

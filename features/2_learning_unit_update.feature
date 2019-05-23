@@ -144,7 +144,16 @@ Feature: Mise à jour en gestion journalière
     Given L’utilisateur est attaché à l’entité FARM
     And Aller sur la page de detail de l'ue: WFARM1003 en 2019-20
     When Cliquer sur l'onglet Fiche descriptive
+    And Cliquer sur le bouton « Modifier » sur la ligne Méthodes d’enseignement
+    And Encoder Test comme méthode d'enseignement
+    And Cliquer sur le bouton « Enregistrer »
+    And Cliquer sur le bouton « Ajouter »
+    And Encoder Test comme Intitulé
+    And Encoder Oui comme Support Obligatoire
+    And Cliquer sur le bouton « Enregistrer »
 
+    Then Vérifier que la  Méthode d'enseignement est à Test
+    And Vérifier que le support de cours possède bien Test
 
   Scenario: 17. En tant que professeur, je dois pouvoir mettre à jour les fiches descriptives.
 

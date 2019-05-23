@@ -21,7 +21,10 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import time
+
 from behave import *
+from selenium.webdriver.common.by import By
 
 use_step_matcher("parse")
 
@@ -78,6 +81,8 @@ def step_impl(context, row, function, vol_q1, vol_q2):
 @when("Cliquer sur le bouton « Modifier » sur la ligne {row}")
 def step_impl(context, row):
     context.current_page.find_edit_button(row).click()
+    # Wait modal
+    time.sleep(1)
 
 
 @when("Cliquer sur l'onglet Fiche descriptive")
@@ -85,4 +90,32 @@ def step_impl(context):
     """
     :type context: behave.runner.Context
     """
-    raise NotImplementedError(u'STEP: When Cliquer sur l\'onglet Fiche descriptive')
+    context.current_page = context.current_page.tab_description
+
+
+@step("Cliquer sur le bouton « Ajouter »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page.add_button.click()
+    # Wait modal
+    time.sleep(1)
+
+
+@then("Vérifier que la  Méthode d'enseignement est à {value}")
+def step_impl(context, value):
+    """
+    :type context: behave.runner.Context
+    """
+    context.test.assertEqual(context.current_page.find_element(By.ID, 'cms_text_fr_9').text, value)
+
+
+@step("Vérifier que le support de cours possède bien {value}")
+def step_impl(context, value):
+    """
+    :type context: behave.runner.Context
+    """
+    context.test.assertEqual(
+        context.current_page.find_element(By.XPATH, '//*[@id="pedagogy"]/div[2]/div[2]/ul/li').text,
+        value)

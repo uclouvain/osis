@@ -24,7 +24,8 @@
 import pypom
 from selenium.webdriver.common.by import By
 
-from features.steps.utils.fields import InputField, SubmitField, SelectField, ButtonField, Checkbox, Select2Field, Link
+from features.steps.utils.fields import InputField, SubmitField, SelectField, ButtonField, Checkbox, Select2Field, Link, \
+    CkeditorField, RadioField
 
 
 class LoginPage(pypom.Page):
@@ -120,6 +121,20 @@ class NewPartimPage(NewLearningUnitPage):
                               '//*[@id="LearningUnitYearForm"]/div[1]/div/div/button')
 
 
+class DescriptionPage(pypom.Page):
+    methode_denseignement = CkeditorField(By.CLASS_NAME, 'cke_wysiwyg_frame')
+
+    add_button = ButtonField(By.XPATH, '//*[@id="pedagogy"]/div[2]/div[2]/div/a')
+    save_button = Link('DescriptionPage', By.XPATH, '//*[@id="form-modal-ajax-content"]/form/div[3]/button[1]', 2)
+
+    intitule = InputField(By.ID, 'id_title')
+    support_obligatoire = RadioField(By.ID, 'id_mandatory')
+
+    def find_edit_button(self, _):
+        return self.find_element(By.XPATH, '//*[@id="pedagogy"]/table[1]/tbody/tr[2]/td[2]/a')
+
+
+
 class LearningUnitPage(pypom.Page):
     actions = ButtonField(By.ID, "dLabel")
     edit_button = ButtonField(By.CSS_SELECTOR, "#link_edit_lu > a")
@@ -128,6 +143,7 @@ class LearningUnitPage(pypom.Page):
 
     tab_training = Link(LearningUnitTrainingPage, By.ID, "training_link")
     tab_attribution = Link(LearningUnitAttributionPage, By.ID, "attributions_link")
+    tab_description = Link(DescriptionPage, By.ID, "description_link")
 
     def success_messages(self):
         success_panel = self.find_element(By.ID, "pnl_succes_messages")
