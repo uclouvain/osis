@@ -1,9 +1,10 @@
-Feature: Modification des unités d'enseignement.
+Feature: Mise à jour en gestion journalière
 
   Background:
     Given La base de données est dans son état initial.
+    And L’utilisateur est dans le groupe « faculty manager »
 
-  Scenario: En tant que gestionnaire facultaire, je ne peux pas modifier uniquement les UE d'une autre fac.
+  Scenario: 7. En tant que gestionnaire facultaire, je ne peux pas modifier uniquement les UE d'une autre fac.
     Given La période de modification des programmes est en cours
     And L’utilisateur est dans le groupe « faculty manager »
     And L’utilisateur est attaché à l’entité DRT
@@ -11,7 +12,7 @@ Feature: Modification des unités d'enseignement.
     When Cliquer sur le menu « Actions »
     Then L’action « Modifier » est désactivée.
 
-  Scenario: En tant que gestionnaire facultaire, je peux modifier uniquement les UE de ma FAC.
+  Scenario: 7. En tant que gestionnaire facultaire, je peux modifier uniquement les UE de ma FAC.
     Given La période de modification des programmes est en cours
     And L’utilisateur est dans le groupe « faculty manager »
     And L’utilisateur est attaché à l’entité DRT
@@ -19,7 +20,7 @@ Feature: Modification des unités d'enseignement.
     When Cliquer sur le menu « Actions »
     Then L’action « Modifier » est activée.
 
-  Scenario: En tant que gestionnaire facultaire, je dois pouvoir mettre à jour une UE.
+  Scenario: 8. En tant que gestionnaire facultaire, je dois pouvoir mettre à jour une UE.
     Given La période de modification des programmes est en cours
     And L’utilisateur est dans le groupe « faculty manager »
     And L’utilisateur est attaché à l’entité DRT
@@ -45,7 +46,7 @@ Feature: Modification des unités d'enseignement.
     And Vérifier que la volume Q2 pour la partie pratique est bien 6
 
 
-  Scenario: En tant que gestionnaire central, je dois pouvoir mettre à jour une UE.
+  Scenario: 9. En tant que gestionnaire central, je dois pouvoir mettre à jour une UE.
   Description : en particulier les crédits et la périodicité + vérifier que les UE peuvent
   être mises à jour par la gestionnaire central en dehors de la période de modification des programmes.
     Given La période de modification des programmes n’est pas en cours
@@ -66,7 +67,41 @@ Feature: Modification des unités d'enseignement.
     And Vérifier que le Crédits est bien 12
     And Vérifier que la Périodicité est bien bisannuelle paire
 
-  Scenario: En tant que gestionnaire facultaire, je dois pouvoir modifier un autre collectif.
+  Scenario: 10. En tant que gestionnaire facultaire, je dois pouvoir créer un nouveau partim.
+    Given La période de modification des programmes est en cours
+    And L’utilisateur est dans le groupe « faculty manager »
+    And L’utilisateur est attaché à l’entité MED
+    Given Aller sur la page de detail de l'ue: WPEDI2190 en 2019-20
+    When Cliquer sur le menu « Actions »
+    And Cliquer sur le menu « Nouveau partim »
+    And Encoder 3 comme Code dédié au partim
+    And Cliquer sur le bouton « Enregistrer »
+
+    Then Vérifier que le partim WPEDI21903 a bien été créé de 2019-20 à 2024-25.
+    When Cliquer sur le lien WPEDI2190
+    Then Vérifier que le cours parent WPEDI2190 contient bien 3 partims.
+
+  Scenario: 11. Un tant que gestionnaire facultaire, je dois pouvoir créer un autre collectif
+    Given La période de modification des programmes est en cours
+    And L’utilisateur est dans le groupe « faculty manager »
+    And L’utilisateur est attaché à l’entité MED
+
+    Given Aller sur la page de recherche d'UE
+    When Cliquer sur le menu « Actions »
+    And Cliquer sur le menu « Nouvelle UE »
+
+    And Encoder WMEDI1234 comme Code
+    And Encoder Autre collectif comme Type
+    And Encoder 5 comme Crédit
+    And Encoder Louvain-la-Neuve comme Lieu d’enseignement
+    And Encoder MED comme Entité resp. cahier des charges
+    And Encoder MED comme Entité d’attribution
+    And Encoder Test comme Intitulé commun
+    And Cliquer sur le bouton « Enregistrer »
+
+    Then Vérifier que le partim WMEDI1234 a bien été créé de 2019-20 à 2024-25.
+
+  Scenario: 12. En tant que gestionnaire facultaire, je dois pouvoir modifier un autre collectif.
     Given La période de modification des programmes est en cours
     And L’utilisateur est dans le groupe « faculty manager »
     And L’utilisateur est attaché à l’entité GLOR
@@ -79,4 +114,24 @@ Feature: Modification des unités d'enseignement.
     And Cliquer sur le bouton « Enregistrer »
     And A la question, « voulez-vous reporter » répondez « oui »
     Then Vérifier que la Périodicité est bien Annuel
+
+  Scenario: 13. En tant que gestionnaire facultaire, je ne peux pas modifier uniquement les UE d'une autre fac.
+    Given Aller sur la page de detail de l'ue: LCHM1211 en 2018-19
+    When Cliquer sur l'onglet Formations
+    Then Vérifier que l'unité d'enseignement est incluse dans LBBMC365R, LBBMC951R, LCHIM501F, LCHIM971R
+    Then Vérifier que BIOL1BA à la ligne 1 a 88 inscrits dont 4 à l'ue
+    Then Vérifier que CHIM11BA à la ligne 2 a 63 inscrits dont 1 à l'ue
+    Then Vérifier que CHIM1BA à la ligne 3 a 53 inscrits dont 34 à l'ue
+
+  Scenario: 14. En tant que gestionnaire facultaire, je dois pouvoir consulter l’onglet « Enseignants ».
+    Given Aller sur la page de detail de l'ue: LCHM1211 en 2018-19
+    When Cliquer sur l'onglet Enseignant·e·s
+
+  Scenario: 15 : En tant que gestionnaire facultaire, je dois pouvoir modifier l’onglet « Enseignant ».
+
+  Scenario: 16 : En tant que gestionnaire facultaire, je dois pouvoir mettre à jour les fiches descriptives.
+
+  Scenario: 17 : En tant que professeur, je dois pouvoir mettre à jour les fiches descriptives.
+
+  Scenario: 18 : En tant que gestionnaire facultaire, je dois pouvoir modifier le cahier des charges.
 

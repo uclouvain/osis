@@ -6,13 +6,13 @@ Feature: Recherche des unités d'enseignements.
     And Aller sur la page de recherche d'UE
     And Réinitialiser les critères de recherche
 
-  Scenario Outline: En tant que gestionnaire facultaire ou central, je recherche une UE par <search_field>.
+  Scenario Outline: 1.2.3.4. En tant que gestionnaire facultaire ou central, je recherche une UE par <search_field>.
 
     When Sélectionner <anac> dans la zone de saisie « Anac. »
     And Encoder la valeur <search_value> dans la zone de saisie <search_field>
     And Cliquer sur le bouton Rechercher (Loupe)
 
-#    Then Le nombre total de résultat est <result_count>
+    # Then Le nombre total de résultat est <result_count>
     Then Dans la liste de résultat, le(s) premier(s) « Code » est(sont) bien <results>.
 
     Examples:
@@ -22,7 +22,7 @@ Feature: Recherche des unités d'enseignements.
       | 2019-20 | LACTU2950                           | container_type     | Stage        | 556          |
       | 2019-20 | LCHM1111,LCHM1211,LCHM1331,LCHM2130 | tutor              | Devillers    | 4            |
 
-  Scenario: En tant que gestionnaire facultaire ou central, je recherche des UE pour produire un Excel
+  Scenario: 5. En tant que gestionnaire facultaire ou central, je recherche des UE pour produire un Excel
     When Sélectionner 2019-20 dans la zone de saisie « Anac. »
     And Encoder la valeur Stage dans la zone de saisie container_type
     And Encoder la valeur LSM dans la zone de saisie requirement_entity
@@ -34,6 +34,6 @@ Feature: Recherche des unités d'enseignements.
     And Cocher les cases « Programmes/regroupements » et « Enseignant(e)s »
     And Cliquer sur « Produire Excel »
 
-    Scenario: UE externes (champs supplémentaires)
-      Une centaine de gestionnaires pour les 3 premières ; pas de calendrier.
+  Scenario: 6. UE externes (champs supplémentaires)
+  Une centaine de gestionnaires pour les 3 premières ; pas de calendrier.
 

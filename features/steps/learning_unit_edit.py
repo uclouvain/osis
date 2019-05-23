@@ -39,7 +39,8 @@ from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from features.steps.utils import LearningUnitPage, LoginPage, LearningUnitEditPage, NewPartimPage, NewLearningUnitPage
+from features.steps.utils.pages import LoginPage, LearningUnitPage, LearningUnitEditPage, NewLearningUnitPage, \
+    NewPartimPage
 
 use_step_matcher("re")
 

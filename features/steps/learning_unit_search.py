@@ -24,7 +24,7 @@
 from behave import *
 from behave.runner import Context
 
-from features.steps.utils import SearchLearningUnitPage
+from features.steps.utils.pages import SearchLearningUnitPage
 
 use_step_matcher("re")
 

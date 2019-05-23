@@ -23,7 +23,7 @@
 # ############################################################################
 from behave import *
 
-from features.steps.utils import LearningUnitTrainingPage
+from features.steps.utils.pages import LearningUnitTrainingPage
 
 use_step_matcher("re")
 

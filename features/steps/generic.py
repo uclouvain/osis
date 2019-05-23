@@ -46,10 +46,3 @@ def step_impl(context: Context):
     page.login("usual_suspect", 'Roger_Verbal_Kint')
 
     context.test.assertEqual(context.browser.current_url, context.get_url('/'))
-
-
-@step("L'UE (?P<acronym>.+) existe")
-def step_impl(context, acronym):
-
-    LearningUnitYearFactory()
-    raise NotImplementedError(u'STEP: And L\'UE WPEDI2190 existe')
