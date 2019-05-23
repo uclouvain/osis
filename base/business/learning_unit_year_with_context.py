@@ -26,29 +26,37 @@
 from collections import OrderedDict
 
 from django.db import models
+from django.db.models import Prefetch
 
 from base.business import entity_version as business_entity_version
-from base.models import entity_container_year, learning_unit_year
+from base.models import learning_unit_year
+from base.models.entity import Entity
 from base.models.enums import entity_container_year_link_type as entity_types
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
+
 from base.models.learning_component_year import LearningComponentYear
 from osis_common.utils.numbers import to_float_or_zero
 
 
 def get_with_context(**learning_unit_year_data):
-    entity_container_prefetch = models.Prefetch(
-        'learning_container_year__entitycontaineryear_set',
-        queryset=entity_container_year.search(
-            link_type=REQUIREMENT_ENTITIES
-        ).prefetch_related(
-            models.Prefetch('entity__entityversion_set', to_attr='entity_versions')
-        ),
-        to_attr='entity_containers_year'
+    entity_version_prefetch = Entity.objects.all().prefetch_related(Prefetch('entityversion_set', to_attr='entity_versions'))
+    requirement_entity_prefetch = models.Prefetch(
+        'learning_container_year__requirement_entity',
+        queryset=entity_version_prefetch
+    )
+    additionnal_entity_1_prefetch = models.Prefetch(
+        'learning_container_year__additionnal_entity_1',
+        queryset=entity_version_prefetch
+    )
+    additionnal_entity_2_prefetch = models.Prefetch(
+        'learning_container_year__additionnal_entity_2',
+        queryset=entity_version_prefetch
     )
 
     learning_unit_years = learning_unit_year.search(**learning_unit_year_data) \
         .select_related('academic_year', 'learning_container_year') \
-        .prefetch_related(entity_container_prefetch) \
+        .prefetch_related(requirement_entity_prefetch) \
+        .prefetch_related(additionnal_entity_1_prefetch) \
+        .prefetch_related(additionnal_entity_2_prefetch) \
         .prefetch_related(get_learning_component_prefetch()) \
         .order_by('academic_year__year', 'acronym')
 
