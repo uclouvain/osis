@@ -113,13 +113,6 @@ def search(*args, **kwargs):
     return queryset.select_related('learning_container_year__academic_year', 'entity')
 
 
-def find_all_additional_requirement_entities(learning_container_year):
-    results = find_last_entity_version_grouped_by_linktypes(learning_container_year, [
-        entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-        entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2])
-    return next(iter(results.values()), None)
-
-
 def find_by_learning_container_year(a_learning_container_year):
     return EntityContainerYear.objects.filter(learning_container_year=a_learning_container_year)
 

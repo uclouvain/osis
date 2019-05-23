@@ -100,10 +100,6 @@ class EntityContainerYearTest(TestCase):
         self.assertFalse(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1 in entities)
         self.assertFalse(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2 in entities)
 
-        # No additional allocation entity
-        self.assertFalse(entity_container_year.find_all_additional_requirement_entities(
-            learning_container_year=l_container_year))
-
     def test_find_entities_grouped_by_linktype(self):
         a_learning_container_year = LearningContainerYearFactory()
 
