@@ -84,34 +84,34 @@ class LearningUnitEditionTestCase(TestCase):
             repartition_practical_exercises=5
         )
 
-    def test_update_or_create_entity_container_year_with_components_type_requirement(self):
-        """In this test, we ensure that when we create an entity_container type requirement,
-           we have an entity_container created"""
-        an_entity = EntityFactory()
-        a_learning_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
-        LearningComponentYearFactory(acronym="PM", learning_unit_year__learning_container_year=a_learning_container_year)
-        LearningComponentYearFactory(acronym="PP", learning_unit_year__learning_container_year=a_learning_container_year)
-        link_type = random.choice(REQUIREMENT_ENTITIES)
-
-        business_edition.update_or_create_entity_container_year_with_components(
-            an_entity, a_learning_container_year, link_type
-        )
-        self.assertEqual(EntityContainerYear.objects.filter(
-            learning_container_year=a_learning_container_year).count(), 1)
-
-    def test_update_or_create_entity_container_year_with_components_type_allocation(self):
-        """In this test, we ensure that when we create an entity_container type allocation,
-           we have NO entity_container created"""
-        an_entity = EntityFactory()
-        a_learning_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
-        LearningComponentYearFactory(acronym="PM", learning_unit_year__learning_container_year=a_learning_container_year)
-        LearningComponentYearFactory(acronym="PP", learning_unit_year__learning_container_year=a_learning_container_year)
-        link_type = entity_container_year_link_type.ALLOCATION_ENTITY
-
-        business_edition.update_or_create_entity_container_year_with_components(an_entity, a_learning_container_year,
-                                                                                link_type)
-        self.assertEqual(EntityContainerYear.objects.filter(
-            learning_container_year=a_learning_container_year).count(), 1)
+    # def test_update_or_create_entity_container_year_with_components_type_requirement(self):
+    #     """In this test, we ensure that when we create an entity_container type requirement,
+    #        we have an entity_container created"""
+    #     an_entity = EntityFactory()
+    #     a_learning_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
+    #     LearningComponentYearFactory(acronym="PM", learning_unit_year__learning_container_year=a_learning_container_year)
+    #     LearningComponentYearFactory(acronym="PP", learning_unit_year__learning_container_year=a_learning_container_year)
+    #     link_type = random.choice(REQUIREMENT_ENTITIES)
+    #
+    #     business_edition.update_or_create_entity_container_year_with_components(
+    #         an_entity, a_learning_container_year, link_type
+    #     )
+    #     self.assertEqual(EntityContainerYear.objects.filter(
+    #         learning_container_year=a_learning_container_year).count(), 1)
+    #
+    # def test_update_or_create_entity_container_year_with_components_type_allocation(self):
+    #     """In this test, we ensure that when we create an entity_container type allocation,
+    #        we have NO entity_container created"""
+    #     an_entity = EntityFactory()
+    #     a_learning_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
+    #     LearningComponentYearFactory(acronym="PM", learning_unit_year__learning_container_year=a_learning_container_year)
+    #     LearningComponentYearFactory(acronym="PP", learning_unit_year__learning_container_year=a_learning_container_year)
+    #     link_type = entity_container_year_link_type.ALLOCATION_ENTITY
+    #
+    #     business_edition.update_or_create_entity_container_year_with_components(an_entity, a_learning_container_year,
+    #                                                                             link_type)
+    #     self.assertEqual(EntityContainerYear.objects.filter(
+    #         learning_container_year=a_learning_container_year).count(), 1)
 
     def test_check_postponement_conflict_learning_unit_year_no_differences(self):
         # Copy the same learning unit + change academic year
