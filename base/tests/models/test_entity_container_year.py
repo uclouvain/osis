@@ -109,7 +109,7 @@ class EntityContainerYearTest(TestCase):
                                    entity=additional_requirement_entity_2,
                                    type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2)
 
-        entities_by_linktype = entity_container_year.find_entities_grouped_by_linktype(a_learning_container_year)
+        entities_by_linktype = a_learning_container_year.get_entity_by_type()
 
         expected_result = {
             entity_container_year_link_type.REQUIREMENT_ENTITY: requirement_entity,

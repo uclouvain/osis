@@ -102,11 +102,6 @@ def find_by_learning_container_year(a_learning_container_year):
     return EntityContainerYear.objects.filter(learning_container_year=a_learning_container_year)
 
 
-def find_entities_grouped_by_linktype(a_learning_container_year):
-    entity_containers_year = search(learning_container_year=a_learning_container_year)
-    return {ecy.type: ecy.entity for ecy in entity_containers_year}
-
-
 def find_by_learning_container_year_and_linktype(a_learning_container_year, linktype):
     try:
         return EntityContainerYear.objects.get(learning_container_year=a_learning_container_year, type=linktype)

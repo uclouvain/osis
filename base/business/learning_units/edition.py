@@ -433,8 +433,8 @@ def _check_postponement_learning_unit_year_proposal_state(nex_luy):
 
 
 def _check_postponement_conflict_on_entity_container_year(lcy, next_lcy):
-    current_entities = entity_container_year.find_entities_grouped_by_linktype(lcy)
-    next_year_entities = entity_container_year.find_entities_grouped_by_linktype(next_lcy)
+    current_entities = lcy.get_entity_by_type()
+    next_year_entities = next_lcy.get_entity_by_type()
     error_list = _check_if_all_entities_exist(next_lcy, list(next_year_entities.values()))
     entity_type_diff = filter(lambda type: _is_different_value(current_entities, next_year_entities, type),
                               ENTITY_TYPE_LIST)

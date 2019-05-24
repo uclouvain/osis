@@ -38,10 +38,9 @@ from base.business.learning_unit_year_with_context import volume_from_initial_le
 from base.business.learning_units import perms
 from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report
 from base.business.learning_units.simple import deletion as business_deletion
-from base.models import entity_container_year, campus, entity
+from base.models import campus
 from base.models.academic_year import find_academic_year_by_year
 from base.models.entity import find_by_id
-from base.models.entity_container_year import find_entities_grouped_by_linktype
 from base.models.enums import proposal_state, proposal_type
 from base.models.enums import vacant_declaration_type, attribution_procedure
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
@@ -389,7 +388,7 @@ def _consolidate_modification_proposal_accepted(proposal):
         for field_name, field_value in fields_to_update.items():
             fields_to_update_clean[field_name] = _clean_attribute_initial_value(field_name, field_value)
 
-        entities_to_update = find_entities_grouped_by_linktype(proposal.learning_unit_year.learning_container_year)
+        entities_to_update = proposal.learning_unit_year.learning_container_year.get_entity_by_type()
 
         update_learning_unit_year_with_report(next_luy, fields_to_update_clean, entities_to_update,
                                               override_postponement_consistency=True)
@@ -403,7 +402,7 @@ def compute_proposal_state(a_person):
 
 def copy_learning_unit_data(learning_unit_year):
     learning_container_year = learning_unit_year.learning_container_year
-    entities_by_type = entity_container_year.find_entities_grouped_by_linktype(learning_container_year)
+    entities_by_type = learning_container_year.get_entity_by_type()
 
     learning_unit_year_values = _get_attributes_values(learning_unit_year,
                                                        INITIAL_DATA_FIELDS['learning_unit_year'])
