@@ -466,7 +466,7 @@ msgstr "Pas de note encodée en double ; rien à comparer."
 
 #: templates/admin/pgm_manager.html:146
 msgid "No entity associated to your profile"
-msgstr "Aucune entité associée à votre profile"
+msgstr "Aucune entité associée à votre profil"
 
 #: views/score_encoding.py:522
 msgid "No new scores encoded. The double encoding needs new scores."
@@ -602,7 +602,7 @@ msgstr "Programme"
 
 #: templates/admin/pgm_manager.html:31 templates/admin/pgm_manager.html:36
 msgid "Program managers"
-msgstr "Gestionnaires de programme"
+msgstr "Gestionnaires de parcours étudiant"
 
 #: templates/admin/pgm_manager.html:62
 msgid "Program type"

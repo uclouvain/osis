@@ -28,11 +28,12 @@ import abc
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.utils.functional import cached_property
-from django.utils.translation import ngettext
+from django.utils.translation import ngettext, gettext
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
+from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 
 
@@ -50,13 +51,14 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
     @cached_property
     def parents(self):
         return EducationGroupYear.hierarchy.filter(pk=self.parent.pk).get_parents() \
-                                           .select_related('education_group_type')
+            .select_related('education_group_type')
 
     def is_valid(self):
         if self.parent.education_group_type.name in TrainingType.root_master_2m_types() or \
                 self.parents.filter(education_group_type__name__in=TrainingType.root_master_2m_types()).exists():
             self._check_end_year_constraints_on_2m()
             self._check_attach_options_rules()
+            self._check_new_attach_is_not_duplication()
         return True
 
     def _check_end_year_constraints_on_2m(self):
@@ -64,8 +66,8 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         In context of 2M, when we add a finality [or group which contains finality], we must ensure that
         the end date of all 2M is greater or equals of all finalities
         """
-        finalities_to_add_qs = EducationGroupYear.objects.filter(pk=self.child.pk) | \
-            EducationGroupYear.hierarchy.filter(pk=self.child.pk).get_children()
+        finalities_to_add_qs = EducationGroupYear.objects.filter(
+            pk=self.child.pk) | EducationGroupYear.hierarchy.filter(pk=self.child.pk).get_children()
         finalities_to_add_qs = finalities_to_add_qs.filter(education_group_type__name__in=TrainingType.finality_types())
 
         root_2m_qs = self.parents | EducationGroupYear.objects.filter(pk=self.parent.pk)
@@ -142,6 +144,10 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         if errors:
             raise ValidationError(errors)
 
+    def _check_new_attach_is_not_duplication(self):
+        if GroupElementYear.objects.filter(parent=self.parent, child_branch=self.child).exists():
+            raise ValidationError(gettext("You can not attach the same child several times."))
+
 
 class AttachLearningUnitYearStrategy(AttachStrategy):
     def __init__(self, parent: EducationGroupYear, child: LearningUnitYear):
@@ -149,4 +155,9 @@ class AttachLearningUnitYearStrategy(AttachStrategy):
         self.child = child
 
     def is_valid(self):
+        self._check_new_attach_is_not_duplication()
         return True
+
+    def _check_new_attach_is_not_duplication(self):
+        if GroupElementYear.objects.filter(parent=self.parent, child_leaf=self.child).exists():
+            raise ValidationError(gettext("You can not attach the same child several times."))

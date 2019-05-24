@@ -197,7 +197,7 @@ def add_message_template_txt():
                  "par le serveur OSIS &ndash; Merci de ne pas y r&eacute;pondre.</em></p>\r\n\r\n<p>Nous vous informons"
                  " que l&#39;ensemble des notes<strong> </strong>de<strong> {{ learning_unit_acronym }}</strong> pour"
                  " l&#39;offre <strong>{{ offer_acronym }}</strong> ont &eacute;t&eacute; valid&eacute;es par le "
-                 "gestionnaire de programme.</p>\r\n\r\n<p>{{ enrollments }}</p>\r\n\r\n<p>Osis UCLouvain."
+                 "gestionnaire de parcours étudiant.</p>\r\n\r\n<p>{{ enrollments }}</p>\r\n\r\n<p>Osis UCLouvain."
                  "</p>\r\n\r\n<p>&nbsp;</p>",
         format="PLAIN",
         language="fr-be"
@@ -213,8 +213,8 @@ def add_message_template_html():
                  "automatique g&eacute;n&eacute;r&eacute; par le serveur OSIS &ndash; Merci de ne pas y r&eacute;pondre"
                  ".</em></p>\r\n\r\n<p>Nous vous informons que l&#39;ensemble des notes<strong> </strong>de<strong> "
                  "{{ learning_unit_acronym }}</strong> pour l&#39;offre <strong>{{ offer_acronym }}</strong> ont "
-                 "&eacute;t&eacute; valid&eacute;es par le gestionnaire de programme.</p>\r\n\r\n<p>{{ enrollments }}"
-                 "</p>\r\n\r\n<p>{{ signature }}</p>\r\n\r\n<p>{% endautoescape %}</p>",
+                 "&eacute;t&eacute; valid&eacute;es par le gestionnaire de parcours étudiant.</p>\r\n\r\n"
+                 "<p>{{ enrollments }}</p>\r\n\r\n<p>{{ signature }}</p>\r\n\r\n<p>{% endautoescape %}</p>",
         format="HTML",
         language="fr-be"
     )

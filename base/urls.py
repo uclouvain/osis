@@ -60,6 +60,8 @@ urlpatterns = [
     url(r'^$', common.home, name='home'),
     url(r'^entity_autocomplete/$', base.views.learning_units.update.EntityAutocomplete.as_view(),
         name='entity_autocomplete'),
+    url(r'^entity_requirement_autocomplete/$', base.views.learning_units.update.EntityRequirementAutocomplete.as_view(),
+        name='entity_requirement_autocomplete'),
     url(r'^organization-autocomplete/$', OrganizationAutocomplete.as_view(),
         name='organization_autocomplete'),
     url(r'^country-autocomplete/$', CountryAutocomplete.as_view(),
