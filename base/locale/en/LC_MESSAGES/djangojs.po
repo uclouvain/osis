@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-29 09:04+0200\n"
+"POT-Creation-Date: 2019-05-16 11:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -11,11 +11,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: static/js/education_group/education_group_tree.js:96
+#: static/js/moment.min.js:1
+msgid ": "
+msgstr ""
+
+#: static/js/education_group/education_group_tree.js:119
 msgid "Attach"
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:155
+#: static/js/education_group/education_group_tree.js:178
 msgid "Close all"
 msgstr ""
 
@@ -23,7 +27,7 @@ msgstr ""
 msgid "Collapse"
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:118
+#: static/js/education_group/education_group_tree.js:141
 msgid "Detach"
 msgstr ""
 
@@ -35,11 +39,15 @@ msgstr ""
 msgid "Link to CDN Doc"
 msgstr ""
 
+#: static/js/education_group/education_group_tree.js:97
+msgid "Modify"
+msgstr ""
+
 #: static/js/osis.js:186
 msgid "Open"
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:148
+#: static/js/education_group/education_group_tree.js:171
 msgid "Open all"
 msgstr ""
 
@@ -47,7 +55,7 @@ msgstr ""
 msgid "Please enter a valid URL."
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:74
+#: static/js/education_group/education_group_tree.js:75
 msgid "Select"
 msgstr ""
 
@@ -55,7 +63,7 @@ msgstr ""
 msgid "Selection of target files"
 msgstr ""
 
-#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:33
+#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:32
 msgid "You should make a selection before clicking 'ok'"
 msgstr ""
 
@@ -86,4 +94,3 @@ msgstr "Please enter a value greater than or equal to 0."
 #: static/js/learning_unit_creation.js:9
 msgid "step_for_field"
 msgstr "Please enter a value that is a multiple of 0.5."
-

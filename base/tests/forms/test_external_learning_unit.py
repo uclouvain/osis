@@ -215,7 +215,7 @@ class TestLearningUnitYearForExternalModelForm(TestCase):
         form = LearningUnitYearForExternalModelForm(
             person=self.person, data=None,
             subtype=FULL, instance=luy, initial={})
-        self.assertEqual(form.initial["country_external_institution"], address.country.pk)
+        self.assertEqual(form.fields["country_external_institution"].initial, address.country.pk)
 
 
 class TestExternalLearningUnitSearchForm(TestCase):

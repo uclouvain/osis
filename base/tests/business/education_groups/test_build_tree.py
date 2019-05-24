@@ -27,15 +27,17 @@
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory, GroupEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.prerequisite import PrerequisiteFactory
+from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 
 class TestBuildTree(TestCase):
@@ -54,10 +56,11 @@ class TestBuildTree(TestCase):
             parent=self.parent,
             child_branch=EducationGroupYearFactory(academic_year=self.academic_year)
         )
+        self.learning_unit_year_1 = LearningUnitYearFactory()
         self.group_element_year_2_1 = GroupElementYearFactory(
             parent=self.group_element_year_2.child_branch,
             child_branch=None,
-            child_leaf=LearningUnitYearFactory()
+            child_leaf=self.learning_unit_year_1
         )
 
     def test_init_tree(self):
@@ -89,7 +92,96 @@ class TestBuildTree(TestCase):
             reverse(
                 'learning_unit_utilization',
                 args=[self.parent.pk, self.group_element_year_2_1.child_leaf.pk]
-            ) + "?group_to_parent={}".format(self.group_element_year_2_1.pk))
+            ) + "?group_to_parent={}".format(self.group_element_year_2_1.pk)
+        )
+
+    def test_tree_luy_has_prerequisite(self):
+        # self.learning_unit_year_1 has prerequisite
+        PrerequisiteItemFactory(
+            prerequisite=PrerequisiteFactory(
+                learning_unit_year=self.learning_unit_year_1,
+                education_group_year=self.parent
+            )
+        )
+
+        node = EducationGroupHierarchy(self.parent)
+        json = node.to_json()
+
+        self.assertEqual(
+            json['children'][1]['children'][0]['a_attr']['title'],
+            "{}\n{}".format(self.learning_unit_year_1.complete_title, _("The learning unit has prerequisites"))
+        )
+        self.assertEqual(
+            json['children'][1]['children'][0]['icon'],
+            'fa fa-arrow-left'
+        )
+
+    def test_tree_luy_is_prerequisite(self):
+        # self.learning_unit_year_1 is prerequisite
+        PrerequisiteItemFactory(
+            learning_unit=self.learning_unit_year_1.learning_unit,
+            prerequisite=PrerequisiteFactory(education_group_year=self.parent)
+        )
+
+        node = EducationGroupHierarchy(self.parent)
+        json = node.to_json()
+
+        self.assertEqual(
+            json['children'][1]['children'][0]['a_attr']['title'],
+            "{}\n{}".format(self.learning_unit_year_1.complete_title, _("The learning unit is prerequisite"))
+        )
+        self.assertEqual(
+            json['children'][1]['children'][0]['icon'],
+            'fa fa-arrow-right'
+        )
+
+    def test_tree_luy_has_and_is_prerequisite(self):
+        # self.learning_unit_year_1 is prerequisite
+        PrerequisiteItemFactory(
+            learning_unit=self.learning_unit_year_1.learning_unit,
+            prerequisite=PrerequisiteFactory(education_group_year=self.parent)
+        )
+        # self.learning_unit_year_1 has prerequisite
+        PrerequisiteItemFactory(
+            prerequisite=PrerequisiteFactory(
+                learning_unit_year=self.learning_unit_year_1,
+                education_group_year=self.parent
+            )
+        )
+
+        node = EducationGroupHierarchy(self.parent)
+        json = node.to_json()
+
+        self.assertEqual(
+            json['children'][1]['children'][0]['a_attr']['title'],
+            "{}\n{}".format(
+                self.learning_unit_year_1.complete_title,
+                _("The learning unit has prerequisites and is prerequisite")
+            )
+        )
+        self.assertEqual(
+            json['children'][1]['children'][0]['icon'],
+            'fa fa-exchange-alt'
+        )
+
+    def test_tree_to_json_a_attr(self):
+        """In this test, we ensure that a attr contains some url for tree contextual menu"""
+        node = EducationGroupHierarchy(self.parent)
+        json = node.to_json()
+        child = self.group_element_year_1.child_branch
+
+        expected_modify_url = reverse('group_element_year_update', args=[
+            self.parent.pk, child.pk, self.group_element_year_1.pk
+        ])
+        self.assertEqual(json['children'][0]['a_attr']['modify_url'], expected_modify_url)
+
+        expected_attach_url = reverse('education_group_attach', args=[self.parent.pk, child.pk])
+        self.assertEqual(json['children'][0]['a_attr']['attach_url'], expected_attach_url)
+
+        expected_detach_url = reverse('group_element_year_delete', args=[
+            self.parent.pk, child.pk, self.group_element_year_1.pk
+        ])
+        self.assertEqual(json['children'][0]['a_attr']['detach_url'], expected_detach_url)
 
     def test_tree_to_json_ids(self):
         node = EducationGroupHierarchy(self.parent)

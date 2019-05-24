@@ -34,7 +34,8 @@ $(document).ready(function () {
             has_prerequisite: obj.a_attr.has_prerequisite,
             is_prerequisite: obj.a_attr.is_prerequisite,
             attach_url: obj.a_attr.attach_url,
-            detach_url: obj.a_attr.detach_url
+            detach_url: obj.a_attr.detach_url,
+            modify_url: obj.a_attr.modify_url
         };
     }
 
@@ -89,6 +90,28 @@ $(document).ready(function () {
                                     displayInfoMessage(jsonResponse, 'message_info_container')
                                 }
                             });
+                        }
+                    },
+
+                    "modify" : {
+                        "label": gettext("Modify"),
+                        "action": function(data) {
+                            let __ret = get_data_from_tree(data);
+
+                            $('#form-modal-ajax-content').load(__ret.modify_url, function (response, status, xhr) {
+                                if (status === "success") {
+                                    $('#form-ajax-modal').modal('toggle');
+                                    let form = $(this).find('form').first();
+                                    formAjaxSubmit(form, '#form-ajax-modal');
+                                } else {
+                                    window.location.href = __ret.modify_url
+                                }
+                            });
+                        },
+                        "_disabled": function (data) {
+                            let __ret = get_data_from_tree(data);
+                            // tree's root cannot be edit (no link with parent...)
+                            return __ret.group_element_year_id === null
                         }
                     },
 

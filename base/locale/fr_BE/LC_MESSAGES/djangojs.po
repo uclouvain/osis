@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-29 09:04+0200\n"
+"POT-Creation-Date: 2019-05-16 11:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -11,11 +11,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: static/js/education_group/education_group_tree.js:96
+#: static/js/moment.min.js:1
+msgid ": "
+msgstr ""
+
+#: static/js/education_group/education_group_tree.js:119
 msgid "Attach"
 msgstr "Attacher"
 
-#: static/js/education_group/education_group_tree.js:155
+#: static/js/education_group/education_group_tree.js:178
 msgid "Close all"
 msgstr "Fermer tout"
 
@@ -23,7 +27,7 @@ msgstr "Fermer tout"
 msgid "Collapse"
 msgstr "Fermer"
 
-#: static/js/education_group/education_group_tree.js:118
+#: static/js/education_group/education_group_tree.js:141
 msgid "Detach"
 msgstr "Détacher"
 
@@ -35,11 +39,15 @@ msgstr "Insertion d'un lien vers un document du CDN"
 msgid "Link to CDN Doc"
 msgstr "Lien vers document du CDN"
 
+#: static/js/education_group/education_group_tree.js:97
+msgid "Modify"
+msgstr "Modifier"
+
 #: static/js/osis.js:186
 msgid "Open"
 msgstr "Ouvrir"
 
-#: static/js/education_group/education_group_tree.js:148
+#: static/js/education_group/education_group_tree.js:171
 msgid "Open all"
 msgstr "Ouvrir tout"
 
@@ -47,7 +55,7 @@ msgstr "Ouvrir tout"
 msgid "Please enter a valid URL."
 msgstr "Entrez une URL valide."
 
-#: static/js/education_group/education_group_tree.js:74
+#: static/js/education_group/education_group_tree.js:75
 msgid "Select"
 msgstr "Sélectionner"
 
@@ -55,7 +63,7 @@ msgstr "Sélectionner"
 msgid "Selection of target files"
 msgstr "Sélection du fichier cible"
 
-#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:33
+#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:32
 msgid "You should make a selection before clicking 'ok'"
 msgstr "Vous devez faire une séléction avant de cliquer sur 'ok'"
 
@@ -86,5 +94,3 @@ msgstr "Veuillez entrer une valeur supérieure ou égale à 0."
 #: static/js/learning_unit_creation.js:9
 msgid "step_for_field"
 msgstr "Veuillez entrer une valeur qui est un multiple de 0,5."
-
-

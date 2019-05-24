@@ -48,9 +48,9 @@
                 {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_generales" text=_("General Conditions") field=common_conditions.text_ca_bacs_cond_generales field_en=common_conditions.text_ca_bacs_cond_generales_en can_edit=False%}
             {% endif %}
             {% if info.is_common %}
-                {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_particulieres" text=_("Specific Conditions") field=admission_condition.text_ca_bacs_cond_particulieres field_en=admission_condition.text_ca_bacs_cond_particulieres can_edit=True%}
+                {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_particulieres" text=_("Specific Conditions") field=admission_condition.text_ca_bacs_cond_particulieres field_en=admission_condition.text_ca_bacs_cond_particulieres_en can_edit=True%}
             {% elif common_conditions %}
-                {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_particulieres" text=_("Specific Conditions") field=common_conditions.text_ca_bacs_cond_particulieres field_en=common_conditions.text_ca_bacs_cond_particulieres can_edit=False%}
+                {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_particulieres" text=_("Specific Conditions") field=common_conditions.text_ca_bacs_cond_particulieres field_en=common_conditions.text_ca_bacs_cond_particulieres_en can_edit=False%}
             {% endif %}
             {% if info.is_common %}
                 {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_examen_langue" text=_("Language Exam") field=admission_condition.text_ca_bacs_examen_langue field_en=admission_condition.text_ca_bacs_examen_langue_en can_edit=True%}

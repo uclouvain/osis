@@ -52,6 +52,41 @@ REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
 MINIMUM_CREDITS = 0.0
 MAXIMUM_CREDITS = 500
 
+# This query can be used as annotation in a LearningUnitYearQuerySet with a RawSql.
+# It return a dictionary with the closest trainings and mini_training (except 'option')
+# through the recursive database structure
+# ! It is a raw SQL : Use it only in last resort !
+# The returned structure is :
+# { id, gs_origin, child_branch_id, child_leaf_id, parent_id, acronym,
+#   title, category, name, id (for education_group_type) and level }
+SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS = """\
+WITH RECURSIVE group_element_year_parent AS (
+    SELECT gs.id, gs.id AS gs_origin, child_branch_id, child_leaf_id, parent_id, educ.acronym, educ.title,
+    educ_type.category, educ_type.name, educ_type.id, 0 AS level
+    
+    FROM base_groupelementyear AS gs
+    INNER JOIN base_educationgroupyear AS educ ON gs.parent_id = educ.id
+    INNER JOIN base_educationgrouptype AS educ_type on educ.education_group_type_id = educ_type.id
+    WHERE gs.child_leaf_id = "base_learningunityear"."id" 
+    
+    UNION ALL
+    
+    SELECT parent.id, gs_origin, parent.child_branch_id, parent.child_leaf_id, parent.parent_id, 
+    educ.acronym, educ.title, educ_type.category, educ_type.name, educ_type.id, child.level + 1
+    
+    FROM base_groupelementyear AS parent
+    INNER JOIN base_educationgroupyear AS educ ON parent.parent_id = educ.id
+    INNER JOIN base_educationgrouptype AS educ_type ON educ.education_group_type_id = educ_type.id
+    INNER JOIN base_educationgroupyear AS educ_child ON parent.child_branch_id = educ_child.id
+    INNER JOIN base_educationgrouptype AS educ_type_child ON educ_child.education_group_type_id = educ_type_child.id
+    INNER JOIN group_element_year_parent AS child on parent.child_branch_id = child.parent_id
+    WHERE not(educ_type_child.name != 'OPTION' AND educ_type_child.category IN ('MINI_TRAINING', 'TRAINING'))
+)
+
+SELECT array_to_json(array_agg(row_to_json(group_element_year_parent))) FROM group_element_year_parent 
+WHERE name != 'OPTION' AND category IN ('MINI_TRAINING', 'TRAINING') 
+"""
+
 
 def academic_year_validator(value):
     academic = AcademicYear.objects.get(pk=value)
@@ -381,8 +416,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
             learning_unit_year__learning_container_year=self.learning_container_year
         )
         all_components = components_queryset.order_by('acronym') \
-            .select_related('learning_unit_year') \
-            .annotate(vol_global=Sum('entitycomponentyear__repartition_volume'))
+            .select_related('learning_unit_year')
         for learning_component_year in all_components:
             _warnings.extend(learning_component_year.warnings)
 

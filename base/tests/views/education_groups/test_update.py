@@ -30,6 +30,7 @@ from unittest import mock
 from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -37,6 +38,7 @@ from django.utils.translation import ugettext as _
 from waffle.testutils import override_flag
 
 from base.business.group_element_years import management
+from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from base.forms.education_group.group import GroupYearModelForm
 from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
@@ -701,6 +703,20 @@ class TestSelectAttach(TestCase):
 
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), _("Please Select or Move an item before Attach it"))
+
+    @mock.patch.object(AttachEducationGroupYearStrategy, 'is_valid', side_effect=ValidationError('Dummy message'))
+    def test_attach_a_not_valid_case(self, mock_attach_strategy):
+        ElementCache(self.person.user).save_element_selected(self.child_education_group_year)
+        response = self.client.get(
+            reverse("education_group_attach",
+                    args=[self.root.pk,
+                          self.new_parent_education_group_year.pk]),
+        )
+        self.assertEqual(response.status_code, 200)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), _("Dummy message"))
 
     def _assert_link_with_inital_parent_present(self):
         expected_initial_group_element_year = GroupElementYear.objects.get(

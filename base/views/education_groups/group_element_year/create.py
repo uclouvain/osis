@@ -23,15 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView
 
+from base.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
 from base.business.group_element_years.management import extract_child_from_cache
 from base.forms.education_group.group_element_year import GroupElementYearForm
+from base.models.education_group_year import EducationGroupYear
 from base.utils.cache import ElementCache
-from base.views.common import display_warning_messages
+from base.views.common import display_warning_messages, display_error_messages
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
 
 
@@ -54,10 +56,15 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
                 'child_leaf': cached_data.get('child_leaf')
             })
 
+            child = kwargs['child_branch'] if kwargs['child_branch'] else kwargs['child_leaf']
+            strategy = AttachEducationGroupYearStrategy if isinstance(child, EducationGroupYear) else \
+                AttachLearningUnitYearStrategy
+            strategy(parent=self.education_group_year, child=child).is_valid()
         except ObjectDoesNotExist:
             warning_msg = _("Please Select or Move an item before Attach it")
             display_warning_messages(self.request, warning_msg)
-
+        except ValidationError as e:
+            display_error_messages(self.request, e.messages)
         except IntegrityError as e:
             warning_msg = str(e)
             display_warning_messages(self.request, warning_msg)
