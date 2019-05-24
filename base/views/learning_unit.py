@@ -217,6 +217,9 @@ def get_volumes_comparison_context(component, initial_data):
     volume_q1 = component['volumes']['VOLUME_Q1'] or 0
     volume_q2 = component['volumes']['VOLUME_Q2'] or 0
     planned_classes = component['volumes']['PLANNED_CLASSES'] or 0
+    repartition_volume_requirement_entity = component['volumes']['VOLUME_REQUIREMENT_ENTITY'] or 0
+    repartition_volume_additional_entity_1 = component['volumes']['VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1'] or 0
+    repartition_volume_additional_entity_2 = component['volumes']['VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2'] or 0
     if volume_total != initial_data['volumes'][component_type]['VOLUME_TOTAL']:
         volumes[_('Volume total annual')] = [initial_data['volumes'][component_type]['VOLUME_TOTAL'], volume_total]
     if planned_classes != initial_data['volumes'][component_type]['PLANNED_CLASSES']:
@@ -226,6 +229,19 @@ def get_volumes_comparison_context(component, initial_data):
         volumes[_('Volume Q1')] = [initial_data['volumes'][component_type]['VOLUME_Q1'], volume_q1]
     if volume_q2 != initial_data['volumes'][component_type]['VOLUME_Q2']:
         volumes[_('Volume Q2')] = [initial_data['volumes'][component_type]['VOLUME_Q2'], volume_q2]
+    if repartition_volume_requirement_entity != initial_data['volumes'][component_type]['VOLUME_REQUIREMENT_ENTITY']:
+        volumes[_('Requirement entity')] = [initial_data['volumes'][component_type]['VOLUME_REQUIREMENT_ENTITY'],
+                                            repartition_volume_requirement_entity]
+    if repartition_volume_additional_entity_1 != initial_data['volumes'][component_type][
+        'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1']:
+        volumes[_('Additional requirement entity 1')] = [
+            initial_data['volumes'][component_type]['VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1'],
+            repartition_volume_additional_entity_1]
+    if repartition_volume_additional_entity_2 != initial_data['volumes'][component_type][
+        'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2']:
+        volumes[_('Additional requirement entity 2')] = [
+            initial_data['volumes'][component_type]['VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2'],
+            repartition_volume_additional_entity_2]
     return volumes
 
 
@@ -321,7 +337,13 @@ def get_full_context(learning_unit_year):
             volumes = {_('Volume total annual'): component['volumes']['VOLUME_TOTAL'] or 0,
                        _('Planned classes'): component['volumes']['PLANNED_CLASSES'] or 0,
                        _('Volume Q1'): component['volumes']['VOLUME_Q1'] or 0,
-                       _('Volume Q2'): component['volumes']['VOLUME_Q2'] or 0}
+                       _('Volume Q2'): component['volumes']['VOLUME_Q2'] or 0,
+                       _('Requirement entity'): component['volumes']['VOLUME_REQUIREMENT_ENTITY'] or 0,
+                       _('Additional requirement entity 1'): component['volumes'][
+                                                                 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1'] or 0,
+                       _('Additional requirement entity 2'): component['volumes'][
+                                                                 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2'] or 0
+                       }
             components_list[_get_value_from_enum(LEARNING_COMPONENT_YEAR_TYPES,
                                                  component['learning_component_year'].type)] = volumes
         context['components'] = components_list
@@ -337,7 +359,11 @@ def reinitialize_learning_unit_year(components_list, context, initial_data, lear
         volumes = {_('Volume total annual'): component['hourly_volume_total_annual'] or 0,
                    _('Planned classes'): component['planned_classes'] or 0,
                    _('Volume Q1'): component['hourly_volume_partial_q1'] or 0,
-                   _('Volume Q2'): component['hourly_volume_partial_q2'] or 0}
+                   _('Volume Q2'): component['hourly_volume_partial_q2'] or 0,
+                   _('Requirement entity'): component['repartition_volume_requirement_entity'] or 0,
+                   _('Additional requirement entity 1'): component['repartition_volume_additional_entity_1'] or 0,
+                   _('Additional requirement entity 2'): component['repartition_volume_additional_entity_2'] or 0
+                   }
         components_list[_get_value_from_enum(LEARNING_COMPONENT_YEAR_TYPES, component['type'])] = volumes
     context['components'] = components_list
     return initial_data

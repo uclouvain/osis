@@ -466,6 +466,9 @@ def get_components_initial_data(learning_unit_year):
         data.update(convert_volume_to_float(data, 'hourly_volume_total_annual'))
         data.update(convert_volume_to_float(data, 'hourly_volume_partial_q1'))
         data.update(convert_volume_to_float(data, 'hourly_volume_partial_q2'))
+        data.update(convert_volume_to_float(data, 'repartition_volume_requirement_entity'))
+        data.update(convert_volume_to_float(data, 'repartition_volume_additional_entity_1'))
+        data.update(convert_volume_to_float(data, 'repartition_volume_additional_entity_2'))
         component_values_list.append(data)
     return component_values_list
 
