@@ -31,7 +31,7 @@ from django.db.models import Prefetch
 from base.business import entity_version as business_entity_version
 from base.models import learning_unit_year
 from base.models.entity import Entity
-from base.models.enums import entity_container_year_link_type as entity_types, entity_container_year_link_type
+from base.models.enums import entity_container_year_link_type as entity_types
 
 from base.models.learning_component_year import LearningComponentYear
 from osis_common.utils.numbers import to_float_or_zero
@@ -69,7 +69,7 @@ def get_with_context(**learning_unit_year_data):
 def append_latest_entities(learning_unit_yr, service_course_search=False):
     learning_unit_yr.entities = {}
 
-    for link_type in entity_container_year_link_type.ENTITY_TYPE_LIST:
+    for link_type in entity_types.ENTITY_TYPE_LIST:
         container = learning_unit_yr.learning_container_year
         entity = container.get_entity(link_type)
         learning_unit_yr.entities[link_type] = entity.get_latest_entity_version() if entity else None

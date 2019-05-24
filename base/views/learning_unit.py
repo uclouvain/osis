@@ -44,8 +44,8 @@ from base.business.learning_unit import get_cms_label_data, \
     get_components_identification
 from base.business.learning_unit_proposal import _get_value_from_enum
 from base.business.learning_units import perms as business_perms
-from base.business.learning_units.comparison import get_entity_by_type, \
-    FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON
+from base.business.learning_units.comparison import FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, \
+    FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON
 from base.business.learning_units.perms import can_update_learning_achievement
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models import education_group_year, campus, proposal_learning_unit, entity
@@ -233,13 +233,12 @@ def get_all_entities_comparison_context(initial_data, learning_unit_year):
     entities_fields = []
     for link_type in ENTITY_TYPE_LIST:
         link = EntityContainerYearLinkTypes[link_type].value
-        new_entity = get_entity_by_type(learning_unit_year, link_type).most_recent_acronym if get_entity_by_type(
-            learning_unit_year, link_type) else None
-        initial_entity = entity.find_by_id(
+        new_entity_acronym = learning_unit_year.learning_container_year.get_most_recent_entity_acronym(link_type)
+        initial_entity_acronym = entity.find_by_id(
             initial_data['entities'][link_type]).most_recent_acronym if entity.find_by_id(
             initial_data['entities'][link_type]) else None
-        if initial_entity != new_entity:
-            entities_fields.append([link, initial_entity, new_entity])
+        if initial_entity_acronym != new_entity_acronym:
+            entities_fields.append([link, initial_entity_acronym, new_entity_acronym])
     return entities_fields
 
 
@@ -348,13 +347,12 @@ def get_entities_context(initial_data, learning_unit_year):
     for link_type in ENTITY_TYPE_LIST:
         link = EntityContainerYearLinkTypes[link_type].value
         if initial_data:
-            entity_data = entity.find_by_id(
+            entity_acronym = entity.find_by_id(
                 initial_data['entities'][link_type]).most_recent_acronym if entity.find_by_id(
                 initial_data['entities'][link_type]) else None
         else:
-            entity_data = get_entity_by_type(learning_unit_year, link_type).most_recent_acronym if get_entity_by_type(
-                learning_unit_year, link_type) else None
-        entities_fields[link] = entity_data
+            entity_acronym = learning_unit_year.learning_container_year.get_most_recent_entity_acronym(link_type)
+        entities_fields[link] = entity_acronym
     return entities_fields
 
 

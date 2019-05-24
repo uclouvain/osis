@@ -118,15 +118,21 @@ class LearningContainerYear(SerializableModel):
             ADDITIONAL_REQUIREMENT_ENTITY_2: 'additionnal_entity_2',
         }
 
+    # TODO :: rename function
     def get_entity(self, entity_container_type):
         attr = LearningContainerYear.get_attrs_by_entity_container_type()[entity_container_type]
         return getattr(self, attr, None)
 
+    # TODO :: rename function
     def get_entity_by_type(self) -> dict:
         return {
             link_type: self.get_entity(link_type)
             for link_type in LearningContainerYear.get_attrs_by_entity_container_type()
         }
+
+    def get_most_recent_entity_acronym(self, entity_container_type):
+        entity = self.get_entity(entity_container_type)
+        return entity.most_recent_acronym if entity else None
 
 
 def find_last_entity_version_grouped_by_linktypes(learning_container_year, link_type=None):
