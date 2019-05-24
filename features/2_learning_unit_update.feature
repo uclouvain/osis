@@ -2,6 +2,7 @@ Feature: Mise à jour en gestion journalière
 
   Background:
     Given La base de données est dans son état initial.
+    And les flags d'éditions des UEs sont désactivés.
     And L’utilisateur est dans le groupe « faculty manager »
 
   Scenario: 7. En tant que gestionnaire facultaire, je ne peux pas modifier uniquement les UE d'une autre fac.
@@ -156,6 +157,30 @@ Feature: Mise à jour en gestion journalière
     And Vérifier que le support de cours possède bien Test
 
   Scenario: 17. En tant que professeur, je dois pouvoir mettre à jour les fiches descriptives.
+  Description : Mise à jour par les professeurs depuis le bureau virtuel
+  Tester l’interface telle que vue par les professeurs
 
   Scenario: 18. En tant que gestionnaire facultaire, je dois pouvoir modifier le cahier des charges.
+    Given La période de modification des programmes est en cours
+    And L’utilisateur est attaché à l’entité MED
+    And Aller sur la page de detail de l'ue: WBIOL1950 en 2019-20
+    When Sélectionner l’onglet « Cahier des charges »
+    And Cliquer sur le bouton « Modifier » sur la ligne Thèmes abordés
+    And Encoder Test1 comme thèmes abordés
+    And Cliquer sur le bouton « Enregistrer »
+    Then Vérifier que Test1 est bien un thème abordé
+
+    When Cliquer sur le bouton « Ajouter un autre »
+    And Encoder AA1 comme Code
+    And Encoder Test AA1 comme Texte
+    And Cliquer sur le bouton « Enregistrer »
+
+    When  Cliquer sur le bouton « Ajouter un autre »
+    And Encoder AA2 comme Code
+    And Encoder Test AA2 comme Texte
+    And Cliquer sur le bouton « Enregistrer »
+    And Cliquer sur la « flèche vers le haut »
+
+    Then Vérifier que Test AA2 est bien présent à la ligne 1 des acquis d'apprentissage.
+    And Vérifier que Test AA1 est bien présent à la ligne 2 des acquis d'apprentissage.
 

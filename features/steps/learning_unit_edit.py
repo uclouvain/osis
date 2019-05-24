@@ -30,6 +30,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 from pypom import Page
 from selenium.webdriver.common.by import By
+from waffle.models import Flag
 
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year
@@ -277,3 +278,13 @@ def step_impl(context, acronym, number):
 @step("Cliquer sur le menu « Nouvelle UE »")
 def step_impl(context: Context):
     context.current_page = context.current_page.new_luy
+
+
+@step("les flags d'éditions des UEs sont désactivés\.")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    flag = Flag.objects.get(name='learning_achievement_update')
+    flag.authenticated = True
+    flag.save()

@@ -119,3 +119,47 @@ def step_impl(context, value):
     context.test.assertEqual(
         context.current_page.find_element(By.XPATH, '//*[@id="pedagogy"]/div[2]/div[2]/ul/li').text,
         value)
+
+
+@when("Sélectionner l’onglet « Cahier des charges »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page = context.current_page.tab_specification
+
+
+@then("Vérifier que {value} est bien un thème abordé")
+def step_impl(context, value):
+    """
+    :type context: behave.runner.Context
+    """
+    context.test.assertEqual(context.current_page.find_element(By.ID, 'cms_text_fr_0').text, value)
+
+
+@when("Cliquer sur le bouton « Ajouter un autre »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page.add_button.click()
+    time.sleep(1)
+
+
+@step("Cliquer sur la « flèche vers le haut »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page.up.click()
+    time.sleep(1)
+
+
+@then("Vérifier que {value} est bien présent à la ligne {row} des acquis d'apprentissage.")
+def step_impl(context, value, row):
+    """
+    :type context: behave.runner.Context
+    """
+    context.test.assertEqual(
+        context.current_page.find_element(By.ID, 'cms_text_fr_achievement_{}'.format(int(row) - 1)).text, value
+    )

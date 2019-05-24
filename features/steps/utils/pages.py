@@ -134,6 +134,20 @@ class DescriptionPage(pypom.Page):
         return self.find_element(By.XPATH, '//*[@id="pedagogy"]/table[1]/tbody/tr[2]/td[2]/a')
 
 
+class SpecificationPage(pypom.Page):
+    themes_abordes = CkeditorField(By.CLASS_NAME, 'cke_wysiwyg_frame')
+    save_button = ButtonField(By.CSS_SELECTOR, 'div.modal-footer > .btn-primary')
+    add_button = ButtonField(By.CSS_SELECTOR, '.btn.btn-info.btn-sm.trigger_modal')
+
+    code = InputField(By.ID, 'id_code_name')
+    texte = CkeditorField(By.CLASS_NAME, 'cke_wysiwyg_frame')
+
+    up = ButtonField(By.XPATH, '//*[@id="form_achievements"]/div[3]/div[1]/div/button[1]')
+
+    def find_edit_button(self, _):
+        # TODO hardcoded value for "Thèmes abordés"
+        return self.find_element(By.XPATH, '//*[@id="cms_text_fr_0"]/a')
+
 
 class LearningUnitPage(pypom.Page):
     actions = ButtonField(By.ID, "dLabel")
@@ -144,6 +158,7 @@ class LearningUnitPage(pypom.Page):
     tab_training = Link(LearningUnitTrainingPage, By.ID, "training_link")
     tab_attribution = Link(LearningUnitAttributionPage, By.ID, "attributions_link")
     tab_description = Link(DescriptionPage, By.ID, "description_link")
+    tab_specification = Link(SpecificationPage, By.ID, "specification_link")
 
     def success_messages(self):
         success_panel = self.find_element(By.ID, "pnl_succes_messages")
