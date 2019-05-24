@@ -67,7 +67,7 @@ def export_xls(exam_enrollments):
                 score = "{0:.0f}".format(exam_enroll.score_final)
 
         justification = JUSTIFICATION_ALIASES.get(exam_enroll.justification_final, "")
-        print(exam_enroll.enrollment_state)
+
         worksheet.append([str(exam_enroll.learning_unit_enrollment.learning_unit_year.academic_year),
                           str(exam_enroll.session_exam.number_session),
                           exam_enroll.session_exam.learning_unit_year.acronym,
