@@ -67,7 +67,7 @@ def export_xls(exam_enrollments):
                 score = "{0:.0f}".format(exam_enroll.score_final)
 
         justification = JUSTIFICATION_ALIASES.get(exam_enroll.justification_final, "")
-
+        print(exam_enroll.enrollment_state)
         worksheet.append([str(exam_enroll.learning_unit_enrollment.learning_unit_year.academic_year),
                           str(exam_enroll.session_exam.number_session),
                           exam_enroll.session_exam.learning_unit_year.acronym,
@@ -78,7 +78,7 @@ def export_xls(exam_enrollments):
                           person.email,
                           score,
                           str(justification),
-                          end_date])
+                          end_date if exam_enroll.enrollment_state == 'ENROLLED' else ''])
 
         row_number += 1
         __coloring_non_editable(worksheet, row_number, score, exam_enroll.justification_final)
