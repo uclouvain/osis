@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-22 14:01+0200\n"
+"POT-Creation-Date: 2019-05-24 10:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -887,8 +887,8 @@ msgid "Cannot set end year to %(end_year)s :"
 msgstr ""
 
 #: forms/education_groups.py:64 models/education_group_type.py:73
-#: templates/education_group/blocks/form/group.html:64
-#: templates/education_group/blocks/form/minitraining.html:65
+#: templates/education_group/blocks/form/group.html:60
+#: templates/education_group/blocks/form/minitraining.html:61
 #: templates/education_group/blocks/form/training_tab_identification.html:67
 msgid "Category"
 msgstr ""
@@ -1742,7 +1742,7 @@ msgstr ""
 msgid "Folder entity"
 msgstr ""
 
-#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:51
+#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:52
 msgid "Folder num."
 msgstr ""
 
@@ -2910,8 +2910,8 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:154
 #: forms/learning_unit/edition_volume.py:155
-#: forms/learning_unit/edition_volume.py:339
-#: forms/learning_unit/edition_volume.py:340
+#: forms/learning_unit/edition_volume.py:341
+#: forms/learning_unit/edition_volume.py:342
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:125
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:127
 #: tests/forms/test_edition_form.py:321 tests/forms/test_edition_form.py:322
@@ -3157,6 +3157,7 @@ msgstr ""
 #: business/proposal_xls.py:94 business/proposal_xls.py:104
 #: forms/learning_unit/edition_volume.py:82
 #: forms/learning_unit/edition_volume.py:103
+#: forms/learning_unit/edition_volume.py:327
 #: tests/business/test_proposal_xls.py:153
 #: tests/business/test_proposal_xls.py:163
 #: tests/views/test_learning_unit.py:1479 views/learning_unit.py:223
@@ -3404,14 +3405,14 @@ msgid "Proposal of creation"
 msgstr ""
 
 #: business/learning_unit.py:96 business/learning_unit_xls.py:82
-#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:60
+#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:63
 #: templates/learning_unit/by_proposal.html:88
 #: tests/business/test_learning_unit_xls.py:323 utils/send_mail.py:235
 msgid "Proposal status"
 msgstr ""
 
 #: business/learning_unit.py:95 business/learning_unit_xls.py:81
-#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:54
+#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:57
 #: templates/learning_unit/by_proposal.html:87
 #: tests/business/test_learning_unit_xls.py:322
 msgid "Proposal type"
@@ -3511,7 +3512,7 @@ msgstr ""
 msgid "Reference"
 msgstr ""
 
-#: forms/learning_unit/external_learning_unit.py:99
+#: forms/learning_unit/external_learning_unit.py:98
 #: models/education_group_organization.py:48
 #: templates/education_group/blocks/coorganization.html:38
 #: templates/learning_unit/identification.html:209
@@ -4029,7 +4030,8 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:75
 #: forms/learning_unit/edition_volume.py:146
-#: forms/learning_unit/edition_volume.py:355
+#: forms/learning_unit/edition_volume.py:323
+#: forms/learning_unit/edition_volume.py:357
 #: models/learning_component_year.py:130
 #: templates/learning_unit/components.html:51
 #: templates/learning_unit/components_identification.html:37
@@ -4157,8 +4159,8 @@ msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
 #: forms/common.py:138 forms/education_group/common.py:194
-#: templates/education_group/blocks/form/group.html:67
-#: templates/education_group/blocks/form/minitraining.html:68
+#: templates/education_group/blocks/form/group.html:63
+#: templates/education_group/blocks/form/minitraining.html:64
 #: templates/education_group/blocks/form/training_tab_identification.html:70
 msgid "The field can contain only one value."
 msgstr ""
@@ -4461,8 +4463,8 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:159
 #: forms/learning_unit/edition_volume.py:161
-#: forms/learning_unit/edition_volume.py:344
 #: forms/learning_unit/edition_volume.py:346
+#: forms/learning_unit/edition_volume.py:348
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:137
 #: tests/forms/test_edition_form.py:332 tests/forms/test_edition_form.py:342
 msgid "The volume can not be set to 0."
@@ -4885,6 +4887,7 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:60
 #: forms/learning_unit/edition_volume.py:79
+#: forms/learning_unit/edition_volume.py:325
 #: tests/views/test_learning_unit.py:1480 views/learning_unit.py:226
 #: views/learning_unit.py:323 views/learning_unit.py:339
 msgid "Volume Q1"
@@ -4892,6 +4895,7 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:67
 #: forms/learning_unit/edition_volume.py:79
+#: forms/learning_unit/edition_volume.py:326
 #: tests/views/test_learning_unit.py:1481 views/learning_unit.py:228
 #: views/learning_unit.py:324 views/learning_unit.py:340
 msgid "Volume Q2"

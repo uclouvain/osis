@@ -319,10 +319,12 @@ class SimplifiedVolumeForm(forms.ModelForm):
             'planned_classes'
         )
         widgets = {
-            'hourly_volume_total_annual': forms.TextInput(attrs={'title': _("Volume annuel")}),
-            'hourly_volume_partial_q1': forms.TextInput(attrs={'title': _("Vol. Q1")}),
-            'hourly_volume_partial_q2': forms.TextInput(attrs={'title': _("Vol. Q2")}),
-            'planned_classes': forms.TextInput(attrs={'title': _("Classes")})
+            'hourly_volume_total_annual': forms.TextInput(
+                attrs={'title': _("The annual volume must be equal to the sum of the volumes Q1 and Q2")}
+            ),
+            'hourly_volume_partial_q1': forms.TextInput(attrs={'title': _("Volume Q1")}),
+            'hourly_volume_partial_q2': forms.TextInput(attrs={'title': _("Volume Q2")}),
+            'planned_classes': forms.TextInput(attrs={'title': _("Planned classes")})
         }
 
     def clean(self):
