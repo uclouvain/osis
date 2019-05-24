@@ -200,7 +200,10 @@ class EntityVersion(SerializableModel):
 
     def exists_now(self):
         now = datetime.datetime.now().date()
-        return (not self.end_date) or (self.end_date and self.start_date < now < self.end_date)
+        return self.exists_at_specific_date(now)
+
+    def exists_at_specific_date(self, date):
+        return (not self.end_date) or (self.end_date and self.start_date < date < self.end_date)
 
     @property
     def verbose_title(self):

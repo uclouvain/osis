@@ -259,14 +259,8 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             commit=commit
         )
 
-        entity_container_years = self.entity_container_form.save(
-            commit=commit,
-            learning_container_year=container_year
-        )
-
         self.simplified_volume_management_form.save_all_forms(
             learning_unit_year,
-            entity_container_years,
             commit=commit
         )
 
@@ -438,7 +432,6 @@ class ExternalPartimForm(LearningUnitBaseForm):
 
         self.simplified_volume_management_form.save_all_forms(
             learning_unit_yr,
-            EntityContainerYear.objects.filter(learning_container_year=lcy),
             commit=commit
         )
 

@@ -222,7 +222,6 @@ class PartimForm(LearningUnitBaseForm):
 
         self.simplified_volume_management_form.save_all_forms(
             learning_unit_yr,
-            EntityContainerYear.objects.filter(learning_container_year=lcy),
             commit=commit
         )
 
