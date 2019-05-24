@@ -38,11 +38,13 @@ from base.models import academic_year
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, AcademicYear
 from base.models.campus import Campus
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY
+from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, \
+    CONTAINER_TYPES_CREATION_PROPOSAL
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from reference.models import language
 from base.models.enums.proposal_type import ProposalType
+from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
 
 FULL_READ_ONLY_FIELDS = {"acronym", "academic_year", "container_type"}
 FULL_PROPOSAL_READ_ONLY_FIELDS = {"academic_year", "container_type"}
@@ -235,6 +237,7 @@ class FullForm(LearningUnitBaseForm):
             self._disable_fields()
         else:
             self._restrict_academic_years_choice(postposal, proposal_type)
+            self._restrict_type_choice_for_proposal_creation(proposal_type)
 
     def _restrict_academic_years_choice(self, postposal, proposal_type):
         if postposal:
@@ -383,3 +386,7 @@ class FullForm(LearningUnitBaseForm):
                 start_year=starting_academic_year.year,
                 end_year=starting_academic_year.year + end_year_range
             )
+
+    def _restrict_type_choice_for_proposal_creation(self, proposal_type):
+        if proposal_type == ProposalType.CREATION.name:
+            self.fields["container_type"].choices = ((None, BLANK_CHOICE_DISPLAY),) + CONTAINER_TYPES_CREATION_PROPOSAL
