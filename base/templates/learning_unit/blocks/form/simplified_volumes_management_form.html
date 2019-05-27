@@ -42,23 +42,11 @@
         <th class="text-center">{% trans 'Classes' %}</th>
         <th>=</th>
         <th>(</th>
-        {% if entity_container_form.forms.0.instance.entity %}
-            <th class="text-center">{{ entity_container_form.forms.0.instance.entity }}</th>
-        {% else %}
-            <th class="text-center">{% trans 'Entity' %}</th>
-        {% endif %}
+        <th class="text-center">{% trans 'Entity' %} 1</th>
         <th>+</th>
-        {% if entity_container_form.forms.2.instance.entity %}
-            <th class="text-center">{{ entity_container_form.forms.2.instance.entity }}</th>
-        {% else %}
-            <th class="text-center">{% trans 'Entity' %}</th>
-        {% endif %}
+        <th class="text-center">{% trans 'Entity' %} 2</th>
         <th>+</th>
-        {% if entity_container_form.forms.3.instance.entity %}
-            <th class="text-center">{{ entity_container_form.forms.3.instance.entity }}</th>
-        {% else %}
-            <th class="text-center">{% trans 'Entity' %}</th>
-        {% endif %}
+        <th class="text-center">{% trans 'Entity' %} 3</th>
         <th>)</th>
     </tr>
     </thead>
