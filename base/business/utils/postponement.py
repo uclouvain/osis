@@ -144,7 +144,7 @@ class AutomaticPostponementToN6(AutomaticPostponement):
 
     def get_queryset(self, queryset=None):
         """ Override if you need to add additional filters"""
-        queryset = super().get_queryset(queryset).select_related('education_group_type')
+        queryset = super().get_queryset(queryset)
 
         # Annotate the latest year with an annualized data.
         return queryset.annotate(
