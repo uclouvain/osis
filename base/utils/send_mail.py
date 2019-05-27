@@ -191,7 +191,6 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
                           }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
-    print(message_content)
     return message_service.send_messages(message_content)
 
 
