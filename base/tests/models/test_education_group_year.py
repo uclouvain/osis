@@ -91,8 +91,8 @@ class EducationGroupYearTest(TestCase):
                                                             child_branch=self.education_group_year_1)
 
     def test_verbose_type(self):
-        print(self.education_group_year_1.verbose_type)
-        self.assertEqual(_("Aggregation"), self.education_group_year_1.verbose_type)
+        type_of_egt = self.education_group_year_1.education_group_type.__str__()
+        self.assertEqual(type_of_egt, self.education_group_year_1.verbose_type)
 
     def test_verbose_credit(self):
         verbose__waiting = "{} ({} {})".format(
