@@ -61,8 +61,10 @@ def step_impl(context: Context):
 def step_impl(context, acronym, year, entity):
     ac = AcademicYear.objects.get(year=year[:4])
     luy = LearningUnitYearFactory(acronym=acronym, academic_year=ac)
+    entity = Entity.objects.filter(entityversion__acronym=entity).last()
     ProposalLearningUnitFactory(learning_unit_year=luy,
-                                entity=Entity.objects.filter(entityversion__acronym=entity).last())
+                                entity=entity,
+                                folder_id=12)
 
 
 @step("La période de modification des programmes est en cours")

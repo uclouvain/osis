@@ -88,12 +88,14 @@ Feature: Propositions d’UE
     When Cliquer sur le menu « Actions »
     And Cliquer sur le menu « Mettre en proposition de modification »
     And Encoder 4 comme Crédits
-    And Encoder Bisannuelle paire comme Périodicité
+    And Encoder bisannuelle paire comme Périodicité
     And Encoder DRT4321 comme Dossier
     Then Vérifier que la zone Etat est bien grisée
     And Vérifier que la zone Type est bien grisée
     And Cliquer sur le bouton « Enregistrer »
-    Then  Vérifier les valeurs ci-dessous.
+    Then Vérifier que une proposition de modification a été faite pour l'unité d'enseignement LDROI1006
+    And Vérifier que le Crédits est bien 4
+    And Vérifier que la Périodicité est bien bisannuelle paire
 
 
   Scenario: 25 : En tant que gestionnaire facultaire, je dois pouvoir faire une proposition de fin d’enseignement.

@@ -46,6 +46,10 @@ class Field:
     def is_enabled(self):
         return self.element.is_enabled()
 
+    @property
+    def text(self):
+        return self.element.text
+
 
 class Link(Field):
     def __init__(self, page, by, selector, waiting_time=0):
@@ -92,12 +96,13 @@ class CkeditorField(Field):
 
         obj.driver.switch_to.default_content()
 
-    def __get__(self, obj, owner):
-        element = obj.find_element(*self.locator)
-        obj.driver.switch_to.frame(element)
-        body = obj.find_element(By.TAG_NAME, "body")
+    @property
+    def text(self):
+        self.element = self.current_page.find_element(*self.locator)
+        self.current_page.driver.switch_to.frame(self.element)
+        body = self.current_page.find_element(By.TAG_NAME, "body")
 
-        obj.driver.switch_to.default_content()
+        self.current_page.driver.switch_to.default_content()
 
         return body.get_attribute('value')
 
@@ -131,15 +136,15 @@ class Select2Field(Field):
         sub_element.send_keys(Keys.RETURN)
 
 
-class SubmitField(Field):
-    def __get__(self, obj, owner):
-        return obj.find_element(*self.locator)
+
 
 
 class ButtonField(Field):
-    def __get__(self, obj, owner):
-        return obj.find_element(*self.locator)
+    def click(self):
+        self.element.click()
 
+class SubmitField(ButtonField):
+    pass
 
 class CharField(Field):
     @property

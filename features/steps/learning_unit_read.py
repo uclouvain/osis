@@ -177,3 +177,11 @@ def step_impl(context):
 def step_impl(context, acronym, year):
     string_to_check = "{} ({})".format(acronym, year)
     context.test.assertIn(string_to_check, context.current_page.success_messages())
+
+
+@then("Vérifier que une proposition de modification a été faite pour l'unité d'enseignement {acronym}")
+def step_impl(context, acronym):
+    """
+    :type context: behave.runner.Context
+    """
+    context.test.assertIn(acronym, context.current_page.success_messages())

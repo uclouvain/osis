@@ -36,7 +36,7 @@ from base.models.academic_year import current_academic_year
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.person import CentralManagerFactory
-from features.steps.utils.pages import LoginPage, LearningUnitPage, LearningUnitEditPage
+from features.steps.utils.pages import LoginPage, LearningUnitPage
 
 use_step_matcher("parse")
 
@@ -67,8 +67,7 @@ def step_impl(context: Context):
 
 @step("Cliquer sur le menu « Modifier »")
 def step_impl(context):
-    context.current_page.edit_button.click()
-    context.current_page = LearningUnitEditPage(context.browser, context.browser.current_url)
+    context.current_page = context.current_page.edit_button.click()
 
 
 @step("Décocher la case « Actif »")
@@ -76,20 +75,23 @@ def step_impl(context):
     """
     :type context: behave.runner.Context
     """
-    context.current_page.actif = False
+    context.current_page.acntif = False
 
 
 @step("Encoder {value} comme {field}")
 def step_impl(context: Context, value: str, field: str):
     slug_field = slugify(field).replace('-', '_')
-    print(slug_field, "---->", value)
-
-    setattr(context.current_page, slug_field, value)
+    if hasattr(context.current_page, slug_field):
+        setattr(context.current_page, slug_field, value)
+    else:
+        raise AttributeError(context.current_page.__class__.__name__ + " has no " + slug_field)
 
 
 @step("Cliquer sur le bouton « Enregistrer »")
 def step_impl(context: Context):
-    context.current_page = context.current_page.save_button.click()
+    result = context.current_page.save_button.click()
+    if result:
+        context.current_page = result
 
 
 @step("A la question, « voulez-vous reporter » répondez « non »")

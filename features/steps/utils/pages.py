@@ -98,7 +98,7 @@ class NewLearningUnitPage(pypom.Page):
 
     @property
     def code(self):
-        return self._code_0 + self._code_1
+        return self._code_0.text + self._code_1.text
 
     @code.setter
     def code(self, value):
@@ -119,7 +119,7 @@ class NewLearningUnitPage(pypom.Page):
 
 class NewLearningUnitProposalPage(NewLearningUnitPage):
     etat = SelectField(By.ID, 'id_state')
-
+    periodicite = SelectField(By.ID, "id_periodicity")
     annee_academique = SelectField(By.ID, 'id_academic_year')
 
     _dossier_0 = SelectField(By.ID, 'id_entity')
@@ -127,7 +127,7 @@ class NewLearningUnitProposalPage(NewLearningUnitPage):
 
     @property
     def dossier(self):
-        return self._dossier_0 + self._dossier_1
+        return self._dossier_0.text + self._dossier_1.text
 
     @dossier.setter
     def dossier(self, value):
@@ -144,6 +144,7 @@ class EditLearningUnitProposalPage(NewLearningUnitProposalPage):
 
 
 class LearningUnitProposalEndYearPage(NewLearningUnitProposalPage):
+    anac_de_fin = SelectField(By.ID, "id_academic_year")
     type = SelectField(By.ID, 'id_type')
     save_button = Link('LearningUnitPage', By.CSS_SELECTOR,
                        '#identification > div > div.col-md-4 > div.form-group > button')
@@ -185,7 +186,7 @@ class SpecificationPage(pypom.Page):
 
 class LearningUnitPage(pypom.Page):
     actions = ButtonField(By.ID, "dLabel")
-    edit_button = ButtonField(By.CSS_SELECTOR, "#link_edit_lu > a")
+    edit_button = Link('LearningUnitEditPage', By.CSS_SELECTOR, "#link_edit_lu > a")
     proposal_edit = Link(EditLearningUnitProposalPage, By.CSS_SELECTOR, "#link_proposal_modification > a")
     proposal_suppression = Link(LearningUnitProposalEndYearPage, By.CSS_SELECTOR, "#link_proposal_suppression > a")
     new_partim = Link(NewPartimPage, By.ID, "new_partim")
@@ -235,6 +236,8 @@ class SearchLearningUnitPage(pypom.Page):
     acronym = InputField(By.ID, 'id_acronym')
     code = InputField(By.ID, 'id_acronym')
     tutor = InputField(By.ID, 'id_tutor')
+    sigle_dossier = SelectField(By.ID, "id_entity_folder_id")
+
     requirement_entity = InputField(By.ID, 'id_requirement_entity_acronym')
     ent_charge = InputField(By.ID, 'id_requirement_entity_acronym')
     container_type = SelectField(By.ID, 'id_container_type')
@@ -247,7 +250,7 @@ class SearchLearningUnitPage(pypom.Page):
     with_tutor = ButtonField(By.ID, "chb_with_attributions")
     generate_xls = ButtonField(By.ID, "btn_xls_with_parameters")
 
-    actions = ButtonField(By.XPATH, '//*[@id="main"]/div[3]/div/div[2]/div/button')
+    actions = ButtonField(By.ID, 'btn-action')
     new_luy = Link(NewLearningUnitPage, By.ID, 'lnk_learning_unit_create')
     create_proposal_url = Link(NewLearningUnitProposalPage, By.ID, 'lnk_create_proposal_url')
 
