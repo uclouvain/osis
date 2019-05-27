@@ -333,21 +333,24 @@ def get_full_context(learning_unit_year):
     context['entities_fields'] = get_entities_context(initial_data, learning_unit_year)
     if 'components' not in context:
         components = get_components_identification(learning_unit_year)
-        for component in components['components']:
-            volumes = {_('Volume total annual'): component['volumes']['VOLUME_TOTAL'] or 0,
-                       _('Planned classes'): component['volumes']['PLANNED_CLASSES'] or 0,
-                       _('Volume Q1'): component['volumes']['VOLUME_Q1'] or 0,
-                       _('Volume Q2'): component['volumes']['VOLUME_Q2'] or 0,
-                       _('Requirement entity'): component['volumes']['VOLUME_REQUIREMENT_ENTITY'] or 0,
-                       _('Additional requirement entity 1'): component['volumes'][
-                                                                 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1'] or 0,
-                       _('Additional requirement entity 2'): component['volumes'][
-                                                                 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2'] or 0
-                       }
-            components_list[_get_value_from_enum(LEARNING_COMPONENT_YEAR_TYPES,
-                                                 component['learning_component_year'].type)] = volumes
+        get_component_values(components, components_list)
         context['components'] = components_list
     return context
+
+
+def get_component_values(components, components_list):
+    for component in components['components']:
+        volumes = {
+            _('Volume total annual'): component['volumes']['VOLUME_TOTAL'] or 0,
+            _('Planned classes'): component['volumes']['PLANNED_CLASSES'] or 0,
+            _('Volume Q1'): component['volumes']['VOLUME_Q1'] or 0,
+            _('Volume Q2'): component['volumes']['VOLUME_Q2'] or 0,
+            _('Requirement entity'): component['volumes']['VOLUME_REQUIREMENT_ENTITY'] or 0,
+            _('Additional requirement entity 1'): component['volumes']['VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1'] or 0,
+            _('Additional requirement entity 2'): component['volumes']['VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2'] or 0
+        }
+        components_list[_get_value_from_enum(LEARNING_COMPONENT_YEAR_TYPES,
+                                             component['learning_component_year'].type)] = volumes
 
 
 def reinitialize_learning_unit_year(components_list, context, initial_data, learning_unit_year):
