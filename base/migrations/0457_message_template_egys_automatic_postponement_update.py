@@ -119,24 +119,11 @@ class Migration(migrations.Migration):
                     <p><strong>Les organisations de formation suivantes n&#39;ont pas &eacute;t&eacute; recopi&eacute;es :</strong></p>
                 
                     <div class="w3-responsive">
-                    <table class="w3-table w3-striped w3-hoverable">
-                        <thead>
-                            <tr>
-                                <th>Sigle</th>
-                                <th>Intitul&eacute;</th>
-                            </tr>
-                        </thead>
-                
+                    <table class="w3-table w3-striped w3-hoverable">                
                         <tbody>
                         {% for egy in egys_with_errors %}
-                            {% ifchanged  egy.verbose_type%}
                             <tr>
-                                <th colspan="2">{{ egy.verbose_type }}</th>
-                            </tr>
-                            {% endifchanged %}
-                            <tr>
-                                <td>{{ egy.verbose }}</td>
-                                <td>{{ egy.complete_title }}</td>
+                                <td>{{ egy }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -200,12 +187,8 @@ class Migration(migrations.Migration):
                 
                     <p><strong>Les organisations de formation suivantes n&#39;ont pas &eacute;t&eacute; recopi&eacute;es :</strong></p>
                 
-                    <strong>Sigle - Intitul&eacute;</strong><br/>
                     {% for egy in egys_with_errors %}
-                        {% ifchanged  egy.verbose_type%}
-                            <strong>{{ egy.verbose_type }}</strong><br/>
-                        {% endifchanged %}
-                        {{ egy.verbose }} - {{ egy.complete_title }}<br/>
+                        {{ egy }}<br/>
                     {% endfor %}
                 {% endif %}
                 <p>Cordialement, Osis UCLouvain</p>
