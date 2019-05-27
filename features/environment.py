@@ -22,6 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from django.conf import settings
+from django.utils.text import slugify
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 
@@ -45,6 +46,8 @@ def after_scenario(context, scenario):
 def after_all(context):
     context.browser.quit()
 
+
 def after_step(context, step):
     if settings.SELENIUM_SETTINGS["TAKE_SCREEN_ON_FAILURE"] and step.status == "failed":
-        context.browser.save_screenshot("features/logs/failure_{}{}.png".format(context.feature.name, step.name))
+        name = slugify(context.scenario.name + ' ' + step.name)
+        context.browser.save_screenshot("features/logs/{}.png".format(name))

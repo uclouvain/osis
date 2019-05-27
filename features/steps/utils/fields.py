@@ -29,23 +29,37 @@ from selenium.webdriver.support.select import Select
 
 
 class Field:
+    """ Field respects the descriptor pattern for the setter but not for the getter.
+     The purpose of this method, it is to allow the user to fetch the selenium node and to manipulate it.
+     """
+
     def __init__(self, *locator):
         self.locator = locator
+        self.element = None
+        self.current_page = None
+
+    def __get__(self, obj, owner):
+        self.element = obj.find_element(*self.locator)
+        self.current_page = obj
+        return self
+
+    def is_enabled(self):
+        return self.element.is_enabled()
 
 
-class Link:
+class Link(Field):
     def __init__(self, page, by, selector, waiting_time=0):
-        self.locator = by, selector
+        super().__init__(by, selector)
         self.page = page
         self.waiting_time = waiting_time
 
-    def __get__(self, obj, owner):
-        obj.find_element(*self.locator).click()
+    def click(self):
+        self.element.click()
         if isinstance(self.page, str):
             mod = __import__('features.steps.utils.pages', fromlist=[self.page])
             self.page = getattr(mod, self.page)
 
-        new_page = self.page(obj.driver, obj.driver.current_url)
+        new_page = self.page(self.current_page.driver, self.current_page.driver.current_url)
         new_page.wait_for_page_to_load()
 
         # Sometimes the wait_for_page_to_load does not work because the redirection is on the same page.
@@ -55,21 +69,19 @@ class Link:
 
 
 class InputField(Field):
+
     def __set__(self, obj, value):
         element = obj.find_element(*self.locator)
         element.clear()
         if value is not None:
             element.send_keys(value)
 
-    def __get__(self, obj, owner):
-        element = obj.find_element(*self.locator)
-        return element.get_attribute('value')
-
 
 class CkeditorField(Field):
     """ For Ckeditor, the field is included in an iframe,
     We need to go into the frame before send the value.
     """
+
     def __set__(self, obj, value):
         element = obj.find_element(*self.locator)
         obj.driver.switch_to.frame(element)
@@ -91,13 +103,16 @@ class CkeditorField(Field):
 
 
 class SelectField(Field):
-    def __set__(self, obj, text):
+    def __set__(self, obj, value):
         element = Select(obj.find_element(*self.locator))
-        element.select_by_visible_text(text)
+        if isinstance(value, str):
+            element.select_by_visible_text(value)
+        else:
+            element.select_by_value(str(value))
 
-    def __get__(self, obj, owner):
-        element = Select(obj.find_element(*self.locator))
-        return element.first_selected_option
+    @property
+    def text(self):
+        return Select(self.element).first_selected_option.text
 
 
 class Select2Field(Field):
@@ -127,8 +142,9 @@ class ButtonField(Field):
 
 
 class CharField(Field):
-    def __get__(self, obj, owner):
-        return obj.find_element(*self.locator).text
+    @property
+    def text(self):
+        return self.element.text
 
 
 class Checkbox(Field):
@@ -140,6 +156,7 @@ class Checkbox(Field):
         elif old_val and not value:
             element.click()
 
+
 class RadioField(Field):
     def __set__(self, obj, value):
         element = obj.find_element(*self.locator)
@@ -148,4 +165,3 @@ class RadioField(Field):
         for choice in choices:
             if choice.text == value:
                 choice.click()
-

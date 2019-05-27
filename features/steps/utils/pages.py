@@ -24,6 +24,7 @@
 import pypom
 from selenium.webdriver.common.by import By
 
+from base.models.entity_version import EntityVersion
 from features.steps.utils.fields import InputField, SubmitField, SelectField, ButtonField, Checkbox, Select2Field, Link, \
     CkeditorField, RadioField
 
@@ -106,6 +107,7 @@ class NewLearningUnitPage(pypom.Page):
 
     type = SelectField(By.ID, "id_container_type")
     credit = InputField(By.ID, "id_credits")
+    credits = InputField(By.ID, "id_credits")
     lieu_denseignement = SelectField(By.ID, "id_campus")
     intitule_commun = InputField(By.ID, "id_common_title")
     entite_resp_cahier_des_charges = Select2Field(
@@ -113,6 +115,38 @@ class NewLearningUnitPage(pypom.Page):
     entite_dattribution = Select2Field(
         By.XPATH, "//*[@id='LearningUnitYearForm']/div[2]/div[1]/div[2]/div/div/div[4]/div/span")
     save_button = ButtonField(By.NAME, 'learning_unit_year_add')
+
+
+class NewLearningUnitProposalPage(NewLearningUnitPage):
+    etat = SelectField(By.ID, 'id_state')
+
+    annee_academique = SelectField(By.ID, 'id_academic_year')
+
+    _dossier_0 = SelectField(By.ID, 'id_entity')
+    _dossier_1 = InputField(By.ID, 'id_folder_id')
+
+    @property
+    def dossier(self):
+        return self._dossier_0 + self._dossier_1
+
+    @dossier.setter
+    def dossier(self, value):
+        value_0 = EntityVersion.objects.get(acronym=value[:3]).pk
+        self._dossier_0 = value_0
+        self._dossier_1 = value[3:]
+
+    save_button = Link('LearningUnitPage', By.NAME, 'learning_unit_year_add')
+
+
+class EditLearningUnitProposalPage(NewLearningUnitProposalPage):
+    save_button = Link('LearningUnitPage', By.CSS_SELECTOR,
+                       '#main > div.panel.panel-default > div.panel-footer > div > div > button.btn-primary')
+
+
+class LearningUnitProposalEndYearPage(NewLearningUnitProposalPage):
+    type = SelectField(By.ID, 'id_type')
+    save_button = Link('LearningUnitPage', By.CSS_SELECTOR,
+                       '#identification > div > div.col-md-4 > div.form-group > button')
 
 
 class NewPartimPage(NewLearningUnitPage):
@@ -152,6 +186,8 @@ class SpecificationPage(pypom.Page):
 class LearningUnitPage(pypom.Page):
     actions = ButtonField(By.ID, "dLabel")
     edit_button = ButtonField(By.CSS_SELECTOR, "#link_edit_lu > a")
+    proposal_edit = Link(EditLearningUnitProposalPage, By.CSS_SELECTOR, "#link_proposal_modification > a")
+    proposal_suppression = Link(LearningUnitProposalEndYearPage, By.CSS_SELECTOR, "#link_proposal_suppression > a")
     new_partim = Link(NewPartimPage, By.ID, "new_partim")
     go_to_full = ButtonField(By.ID, "full_acronym")
 
@@ -193,13 +229,18 @@ class LearningUnitEditPage(pypom.Page):
 class SearchLearningUnitPage(pypom.Page):
     URL_TEMPLATE = '/learning_units/by_activity/'
 
+    proposal_search = Link('SearchLearningUnitPage', By.ID, 'lnk_proposal_search', 1)
+
     anac = SelectField(By.ID, 'id_academic_year_id')
     acronym = InputField(By.ID, 'id_acronym')
+    code = InputField(By.ID, 'id_acronym')
     tutor = InputField(By.ID, 'id_tutor')
     requirement_entity = InputField(By.ID, 'id_requirement_entity_acronym')
+    ent_charge = InputField(By.ID, 'id_requirement_entity_acronym')
     container_type = SelectField(By.ID, 'id_container_type')
     clear_button = ButtonField(By.ID, 'btn_clear_filter')
-    search = SubmitField(By.CSS_SELECTOR, '#search_form > div > div:nth-child(2) > div.col-md-1 > div > button')
+
+    search = SubmitField(By.CSS_SELECTOR, 'button.btn-primary')
     export = ButtonField(By.ID, "dLabel")
     list_learning_units = ButtonField(By.ID, "btn_produce_xls_with_parameters")
     with_program = ButtonField(By.ID, "chb_with_grp")
@@ -208,11 +249,12 @@ class SearchLearningUnitPage(pypom.Page):
 
     actions = ButtonField(By.XPATH, '//*[@id="main"]/div[3]/div/div[2]/div/button')
     new_luy = Link(NewLearningUnitPage, By.ID, 'lnk_learning_unit_create')
+    create_proposal_url = Link(NewLearningUnitProposalPage, By.ID, 'lnk_create_proposal_url')
 
     def count_result(self):
         text = self.find_element(By.CSS_SELECTOR, "#main > div.panel.panel-default > div > strong").text
         return text.split()[0]
 
-    def find_acronym_in_table(self, row: int = 1, col: int = 2):
-        selector = '// *[ @ id = "table_learning_units"] / tbody / tr[{}] / td[{}] / a'.format(row, col)
-        return self.find_element(By.XPATH, selector).text
+    def find_acronym_in_table(self, row: int = 1):
+        selector = '#table_learning_units > tbody > tr:nth-child({}) > td.col-acronym > a'.format(row)
+        return self.find_element(By.CSS_SELECTOR, selector).text

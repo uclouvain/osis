@@ -21,14 +21,23 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from datetime import timedelta, datetime
+
 from behave import *
 from behave.runner import Context
 
+from base.models.academic_calendar import AcademicCalendar
+from base.models.academic_year import AcademicYear, current_academic_year
+from base.models.entity import Entity
+from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
+from base.models.person_entity import PersonEntity
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.person import FacultyManagerFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory
 from base.tests.functionals.test_education_group import LoginPage
 
-use_step_matcher("re")
+use_step_matcher("parse")
 
 
 @given("La base de données est dans son état initial.")
@@ -46,3 +55,43 @@ def step_impl(context: Context):
     page.login("usual_suspect", 'Roger_Verbal_Kint')
 
     context.test.assertEqual(context.browser.current_url, context.get_url('/'))
+
+
+@step("{acronym} est en proposition en {year} lié à {entity}")
+def step_impl(context, acronym, year, entity):
+    ac = AcademicYear.objects.get(year=year[:4])
+    luy = LearningUnitYearFactory(acronym=acronym, academic_year=ac)
+    ProposalLearningUnitFactory(learning_unit_year=luy,
+                                entity=Entity.objects.filter(entityversion__acronym=entity).last())
+
+
+@step("La période de modification des programmes est en cours")
+def step_impl(context: Context):
+    calendar = AcademicCalendar.objects.get(academic_year=current_academic_year(), reference=EDUCATION_GROUP_EDITION)
+    calendar.end_date = (datetime.now() + timedelta(days=1)).date()
+    calendar.save()
+
+
+@step("L’utilisateur est dans le groupe « faculty manager »")
+def step_impl(context: Context):
+    person = FacultyManagerFactory(
+        user__username="usual_suspect",
+        user__first_name="Keyser",
+        user__last_name="Söze",
+        user__password="Roger_Verbal_Kint",
+    )
+
+    person.user.superuser = True
+    person.user.save()
+    context.user = person.user
+
+    page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
+    page.login("usual_suspect", 'Roger_Verbal_Kint')
+
+    context.test.assertEqual(context.browser.current_url, context.get_url('/'))
+
+
+@step("L’utilisateur est attaché à l’entité {value}")
+def step_impl(context: Context, value: str):
+    entity = Entity.objects.filter(entityversion__acronym=value).first()
+    PersonEntity.objects.get_or_create(person=context.user.person, entity=entity, defaults={'with_child': True})

@@ -28,51 +28,17 @@ from behave import *
 from behave.runner import Context
 from django.urls import reverse
 from django.utils.text import slugify
-from pypom import Page
 from selenium.webdriver.common.by import By
 from waffle.models import Flag
 
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year
-from base.models.entity import Entity
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
-from base.tests.factories.person_entity import PersonEntityFactory
-from features.steps.utils.fields import Link
+from base.tests.factories.person import CentralManagerFactory
 from features.steps.utils.pages import LoginPage, LearningUnitPage, LearningUnitEditPage
 
-use_step_matcher("re")
-
-
-@step("La période de modification des programmes est en cours")
-def step_impl(context: Context):
-    calendar = AcademicCalendar.objects.get(academic_year=current_academic_year(), reference=EDUCATION_GROUP_EDITION)
-    calendar.end_date = (datetime.now() + timedelta(days=1)).date()
-    calendar.save()
-
-
-@step("L’utilisateur est dans le groupe « faculty manager »")
-def step_impl(context: Context):
-    person = FacultyManagerFactory(
-        user__username="usual_suspect",
-        user__first_name="Keyser",
-        user__last_name="Söze",
-        user__password="Roger_Verbal_Kint"
-    )
-
-    context.user = person.user
-
-    page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
-    page.login("usual_suspect", 'Roger_Verbal_Kint')
-
-    context.test.assertEqual(context.browser.current_url, context.get_url('/'))
-
-
-@step("L’utilisateur est attaché à l’entité (?P<value>.+)")
-def step_impl(context: Context, value: str):
-    entity = Entity.objects.filter(entityversion__acronym=value).first()
-    PersonEntityFactory(person=context.user.person, entity=entity, with_child=True)
+use_step_matcher("parse")
 
 
 @when("Cliquer sur le menu « Actions »")
@@ -85,9 +51,9 @@ def step_impl(context: Context):
     context.test.assertTrue(context.current_page.is_li_edit_link_disabled())
 
 
-@given("Aller sur la page de detail de l'ue: (?P<acronym>.+) en (?P<annee>.+)")
-def step_impl(context: Context, acronym: str, annee: str):
-    luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=int(annee[:4]))
+@given("Aller sur la page de detail de l'ue: {acronym} en {year}")
+def step_impl(context: Context, acronym: str, year: str):
+    luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=int(year[:4]))
     url = reverse('learning_unit', args=[luy.pk])
 
     context.current_page = LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
@@ -113,25 +79,17 @@ def step_impl(context):
     context.current_page.actif = False
 
 
-@step("Encoder (?P<value>.+) comme (?P<field>.+)")
+@step("Encoder {value} comme {field}")
 def step_impl(context: Context, value: str, field: str):
     slug_field = slugify(field).replace('-', '_')
     print(slug_field, "---->", value)
-    # if not hasattr(context.current_page, slug_field):
-    #     raise
+
     setattr(context.current_page, slug_field, value)
 
 
 @step("Cliquer sur le bouton « Enregistrer »")
 def step_impl(context: Context):
-    result = context.current_page.save_button
-    # For Link, the getter is override. so if you get save_button, it will return directly a new page.
-    if isinstance(result, Page):
-        context.current_page = result
-    # But save_button can be a ButtonField too.
-    else:
-        result.click()
-        time.sleep(2)
+    context.current_page = context.current_page.save_button.click()
 
 
 @step("A la question, « voulez-vous reporter » répondez « non »")
@@ -139,25 +97,25 @@ def step_impl(context):
     """
     :type context: behave.runner.Context
     """
-    context.current_page = context.current_page.no_postponement
+    context.current_page = context.current_page.no_postponement.click()
 
 
-@then("Vérifier que le cours est bien (?P<status>.+)")
+@then("Vérifier que le cours est bien {status}")
 def step_impl(context: Context, status: str):
     context.test.assertEqual(context.current_page.find_element(By.ID, "id_status").text, status)
 
 
-@step("Vérifier que le Quadrimestre est bien (?P<value>.+)")
+@step("Vérifier que le Quadrimestre est bien {value}")
 def step_impl(context: Context, value: str):
     context.test.assertEqual(context.current_page.find_element(By.ID, "id_quadrimester").text, value)
 
 
-@step("Vérifier que la Session dérogation est bien (?P<value>.+)")
+@step("Vérifier que la Session dérogation est bien {value}")
 def step_impl(context: Context, value: str):
     context.test.assertEqual(context.current_page.find_element(By.ID, "id_session").text, value)
 
 
-@step("Vérifier que le volume Q1 pour la partie magistrale est bien (?P<value>.+)")
+@step("Vérifier que le volume Q1 pour la partie magistrale est bien {value}")
 def step_impl(context: Context, value: str):
     context.test.assertEqual(context.current_page.find_element(
         By.XPATH,
@@ -165,7 +123,7 @@ def step_impl(context: Context, value: str):
     ).text, value)
 
 
-@step("Vérifier que le volume Q2 pour la partie magistrale est bien (?P<value>.+)")
+@step("Vérifier que le volume Q2 pour la partie magistrale est bien {value}")
 def step_impl(context: Context, value: str):
     context.test.assertEqual(context.current_page.find_element(
         By.XPATH,
@@ -173,7 +131,7 @@ def step_impl(context: Context, value: str):
     ).text, value)
 
 
-@step("Vérifier que le volume Q1 pour la partie pratique est bien (?P<value>.+)")
+@step("Vérifier que le volume Q1 pour la partie pratique est bien {value}")
 def step_impl(context: Context, value: str):
     context.test.assertEqual(context.current_page.find_element(
         By.XPATH,
@@ -181,7 +139,7 @@ def step_impl(context: Context, value: str):
     ).text, value)
 
 
-@step("Vérifier que la volume Q2 pour la partie pratique est bien (?P<value>.+)")
+@step("Vérifier que la volume Q2 pour la partie pratique est bien {value}")
 def step_impl(context: Context, value: str):
     context.test.assertEqual(context.current_page.find_element(
         By.XPATH,
@@ -218,20 +176,20 @@ def step_impl(context):
     """
     :type context: behave.runner.Context
     """
-    context.current_page = context.current_page.with_postponement
+    context.current_page = context.current_page.with_postponement.click()
 
 
-@then("Vérifier que le Crédits est bien (?P<value>.+)")
+@then("Vérifier que le Crédits est bien {value}")
 def step_impl(context, value):
     context.test.assertEqual(context.current_page.find_element(By.ID, "id_credits").text, value)
 
 
-@step("Vérifier que la Périodicité est bien (?P<value>.+)")
+@step("Vérifier que la Périodicité est bien {value}")
 def step_impl(context, value):
     context.test.assertEqual(context.current_page.find_element(By.ID, "id_periodicity").text, value)
 
 
-@step("Rechercher (?P<acronym>.+) en 2020-21")
+@step("Rechercher {acronym} en 2020-21")
 def step_impl(context, acronym):
     luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=2020)
     url = reverse('learning_unit', args=[luy.pk])
@@ -245,10 +203,10 @@ def step_impl(context):
     """
     :type context: behave.runner.Context
     """
-    context.current_page = context.current_page.new_partim
+    context.current_page = context.current_page.new_partim.click()
 
 
-@then("Vérifier que le partim (?P<acronym>.+) a bien été créé de 2019-20 à 2024-25.")
+@then("Vérifier que le partim {acronym} a bien été créé de 2019-20 à 2024-25.")
 def step_impl(context, acronym: str):
     context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
     context.current_page.wait_for_page_to_load()
@@ -257,7 +215,7 @@ def step_impl(context, acronym: str):
         context.test.assertIn(string_to_check, context.current_page.success_messages())
 
 
-@when("Cliquer sur le lien (?P<acronym>.+)")
+@when("Cliquer sur le lien {acronym}")
 def step_impl(context: Context, acronym: str):
     context.current_page.go_to_full.click()
 
@@ -265,7 +223,7 @@ def step_impl(context: Context, acronym: str):
     context.current_page.wait_for_page_to_load()
 
 
-@then("Vérifier que le cours parent (?P<acronym>.+) contient bien (?P<number>.+) partims\.")
+@then("Vérifier que le cours parent {acronym} contient bien {number} partims.")
 def step_impl(context, acronym, number):
     # Slow page...
     time.sleep(5)
@@ -277,10 +235,10 @@ def step_impl(context, acronym, number):
 
 @step("Cliquer sur le menu « Nouvelle UE »")
 def step_impl(context: Context):
-    context.current_page = context.current_page.new_luy
+    context.current_page = context.current_page.new_luy.click()
 
 
-@step("les flags d'éditions des UEs sont désactivés\.")
+@step("les flags d'éditions des UEs sont désactivés.")
 def step_impl(context):
     """
     :type context: behave.runner.Context
@@ -288,3 +246,56 @@ def step_impl(context):
     flag = Flag.objects.get(name='learning_achievement_update')
     flag.authenticated = True
     flag.save()
+
+
+@step("Cliquer sur le menu Proposition de création")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page = context.current_page.create_proposal_url.click()
+
+
+@then("la valeur de {field} est bien {value}")
+def step_impl(context, field, value):
+    """
+    :type context: behave.runner.Context
+    """
+    slug_field = slugify(field).replace('-', '_')
+    msg = getattr(context.current_page, slug_field).text.strip()
+    context.test.assertEqual(msg, value.strip())
+
+
+@then("Vérifier les valeurs ci-dessous.")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    # TODO
+    raise
+
+
+@step("Cliquer sur le menu « Mettre en proposition de modification »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page = context.current_page.proposal_edit.click()
+
+
+@then("Vérifier que la zone {field} est bien grisée")
+def step_impl(context, field):
+    """
+    :type context: behave.runner.Context
+    """
+    slug_field = slugify(field).replace('-', '_')
+
+    context.test.assertFalse(getattr(context.current_page, slug_field).is_enabled())
+
+
+@step("Cliquer sur le menu « Mettre en proposition de fin d’enseignement »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page = context.current_page.proposal_suppression.click()

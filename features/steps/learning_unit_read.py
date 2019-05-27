@@ -31,7 +31,7 @@ use_step_matcher("parse")
 
 @when("Cliquer sur l'onglet Formations")
 def step_impl(context):
-    context.current_page = context.current_page.tab_training
+    context.current_page = context.current_page.tab_training.click()
 
 
 @then("Vérifier que l'unité d'enseignement est incluse dans {list_acronym}")
@@ -46,7 +46,7 @@ def step_impl(context, acronym, nb_row, nb_training, nb_luy):
 
 @when("Cliquer sur l'onglet Enseignant·e·s")
 def step_impl(context):
-    context.current_page = context.current_page.tab_attribution
+    context.current_page = context.current_page.tab_attribution.click()
 
 
 @then("Vérifier que à la ligne {nb_row}, l'enseignant est bien {teacher} avec comme fonction {function} "
@@ -64,7 +64,7 @@ def step_impl(context, nb_row, teacher, function, start_year, duration):
 
 @step("Cliquer sur le bouton « Gérer la répartition »")
 def step_impl(context):
-    context.current_page = context.current_page.manage_repartition
+    context.current_page = context.current_page.manage_repartition.click()
 
 
 @step("Cliquer sur « Ajouter sur l’année en cours » sur la ligne {row}")
@@ -90,7 +90,7 @@ def step_impl(context):
     """
     :type context: behave.runner.Context
     """
-    context.current_page = context.current_page.tab_description
+    context.current_page = context.current_page.tab_description.click()
 
 
 @step("Cliquer sur le bouton « Ajouter »")
@@ -126,7 +126,7 @@ def step_impl(context):
     """
     :type context: behave.runner.Context
     """
-    context.current_page = context.current_page.tab_specification
+    context.current_page = context.current_page.tab_specification.click()
 
 
 @then("Vérifier que {value} est bien un thème abordé")
@@ -163,3 +163,17 @@ def step_impl(context, value, row):
     context.test.assertEqual(
         context.current_page.find_element(By.ID, 'cms_text_fr_achievement_{}'.format(int(row) - 1)).text, value
     )
+
+
+@when("Cliquer sur le bouton « Oui, je confirme »")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page = context.current_page.save_button.click()
+
+
+@then("Vérifier que la unité d'enseignement {acronym} a bien été mise en proposition pour l'année {year}")
+def step_impl(context, acronym, year):
+    string_to_check = "{} ({})".format(acronym, year)
+    context.test.assertIn(string_to_check, context.current_page.success_messages())
