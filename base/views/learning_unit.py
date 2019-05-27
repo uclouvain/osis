@@ -232,16 +232,14 @@ def get_volumes_comparison_context(component, initial_data):
     if repartition_volume_requirement_entity != initial_data['volumes'][component_type]['VOLUME_REQUIREMENT_ENTITY']:
         volumes[_('Requirement entity')] = [initial_data['volumes'][component_type]['VOLUME_REQUIREMENT_ENTITY'],
                                             repartition_volume_requirement_entity]
-    if repartition_volume_additional_entity_1 != initial_data['volumes'][component_type][
-        'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1']:
-        volumes[_('Additional requirement entity 1')] = [
-            initial_data['volumes'][component_type]['VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1'],
-            repartition_volume_additional_entity_1]
-    if repartition_volume_additional_entity_2 != initial_data['volumes'][component_type][
-        'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2']:
-        volumes[_('Additional requirement entity 2')] = [
-            initial_data['volumes'][component_type]['VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2'],
-            repartition_volume_additional_entity_2]
+    vol_additional_entity_1 = initial_data['volumes'][component_type]['VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1']
+    if repartition_volume_additional_entity_1 != vol_additional_entity_1:
+        volumes[_('Additional requirement entity 1')] = [vol_additional_entity_1,
+                                                         repartition_volume_additional_entity_1]
+    vol_additional_entity_2 = initial_data['volumes'][component_type]['VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2']
+    if repartition_volume_additional_entity_2 != vol_additional_entity_2:
+        volumes[_('Additional requirement entity 2')] = [vol_additional_entity_2,
+                                                         repartition_volume_additional_entity_2]
     return volumes
 
 
