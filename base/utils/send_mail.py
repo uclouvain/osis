@@ -181,10 +181,13 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
                           'egys_postponed': len(egys_postponed),
                           'egys_postponed_qs': sorted(egys_postponed, key=__sort_education_group_type),
                           'egys_already_existing': len(egys_already_existing),
-                          'egys_already_existing_qs': egys_already_existing.order_by('educationgroupyear__education_group_type__name'),
+                          'egys_already_existing_qs': egys_already_existing.order_by(
+                              'educationgroupyear__education_group_type__name'),
                           'egys_ending_this_year': len(egys_ending_this_year),
-                          'egys_ending_this_year_qs': egys_ending_this_year.order_by('educationgroupyear__education_group_type__name'),
-                          'egys_with_errors': egys_with_errors and sorted(egys_with_errors, key=__sort_education_group_type)
+                          'egys_ending_this_year_qs': egys_ending_this_year.order_by(
+                              'educationgroupyear__education_group_type__name'),
+                          'egys_with_errors': egys_with_errors and sorted(egys_with_errors,
+                                                                          key=__sort_education_group_type)
                           }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
