@@ -1353,12 +1353,18 @@ class TestLearningUnitProposalComparison(TestCase):
         self.learning_component_year_lecturing = LearningComponentYearFactory(
             type=learning_component_year_type.LECTURING,
             acronym="TP",
-            learning_unit_year=self.learning_unit_year
+            learning_unit_year=self.learning_unit_year,
+            repartition_volume_requirement_entity=10,
+            repartition_volume_additional_entity_1=10,
+            repartition_volume_additional_entity_2=10
         )
         self.learning_component_year_practical = LearningComponentYearFactory(
             type=learning_component_year_type.PRACTICAL_EXERCISES,
             acronym="PP",
-            learning_unit_year=self.learning_unit_year
+            learning_unit_year=self.learning_unit_year,
+            repartition_volume_requirement_entity=10,
+            repartition_volume_additional_entity_1=10,
+            repartition_volume_additional_entity_2=10
         )
         self.entity_container_year = EntityContainerYearFactory(
             learning_container_year=self.learning_unit_year.learning_container_year,
@@ -1395,8 +1401,8 @@ class TestLearningUnitProposalComparison(TestCase):
             "entities": {
                 entity_container_year_link_type.REQUIREMENT_ENTITY: self.entity_container_year.id,
                 entity_container_year_link_type.ALLOCATION_ENTITY: None,
-                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
-                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
+                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: self.entity_container_year.id,
+                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: self.entity_container_year.id
             },
             "learning_component_years": [
                 {"id": self.learning_component_year_lecturing.id,
