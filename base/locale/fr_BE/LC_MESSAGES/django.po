@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-21 10:57+0200\n"
+"POT-Creation-Date: 2019-05-24 10:29+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -340,7 +340,7 @@ msgstr "Gestion des acteurs académiques"
 
 #: templates/academic_calendar/academic_calendar_form.html:37
 #: templates/academic_calendar/academic_calendars.html:44
-#: templates/academic_year.html:43 templates/home.html:115
+#: templates/academic_year.html:43 templates/home.html:108
 #: templates/offer/tabs.html:42 templates/offer_year_calendar.html:42
 msgid "Academic calendar"
 msgstr "Calendrier académique"
@@ -930,8 +930,8 @@ msgid "Cannot set end year to %(end_year)s :"
 msgstr "Impossible de mettre la fin à %(end_year)s :"
 
 #: forms/education_groups.py:64 models/education_group_type.py:73
-#: templates/education_group/blocks/form/group.html:64
-#: templates/education_group/blocks/form/minitraining.html:65
+#: templates/education_group/blocks/form/group.html:60
+#: templates/education_group/blocks/form/minitraining.html:61
 #: templates/education_group/blocks/form/training_tab_identification.html:67
 msgid "Category"
 msgstr "Catégorie"
@@ -1797,7 +1797,7 @@ msgstr "Dossier"
 msgid "Folder entity"
 msgstr "Sigle dossier"
 
-#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:51
+#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:52
 msgid "Folder num."
 msgstr "N° dossier"
 
@@ -2069,7 +2069,7 @@ msgstr "Institut"
 #: templates/blocks/navbar_top.html:101
 #: templates/education_group/blocks/coorganization.html:35
 #: templates/entities.html:30 templates/entity/breadcrumb.html:28
-#: templates/home.html:98 templates/institution.html:29
+#: templates/home.html:91 templates/institution.html:29
 #: templates/institution.html:33
 #: templates/learning_unit/blocks/institution.html:11
 #: templates/learning_unit/by_external.html:48
@@ -2563,7 +2563,7 @@ msgid "Management of the dissertation managers"
 msgstr ""
 "Permet d'administrer la liste des gestionnaires qui ont accès à Dissertation"
 
-#: templates/home.html:100
+#: templates/home.html:93
 msgid "Management of the institution."
 msgstr "Gestion de l'institution."
 
@@ -2764,7 +2764,7 @@ msgstr "Mois"
 msgid "My Messages"
 msgstr "Mes messages"
 
-#: templates/blocks/navbar_top.html:210 templates/home.html:105
+#: templates/blocks/navbar_top.html:210 templates/home.html:98
 #: templates/my_osis/home.html:30 templates/my_osis/home.html:34
 #: templates/my_osis/my_message.html:30 templates/my_osis/my_messages.html:30
 #: templates/my_osis/profile.html:30
@@ -2995,8 +2995,8 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:154
 #: forms/learning_unit/edition_volume.py:155
-#: forms/learning_unit/edition_volume.py:339
-#: forms/learning_unit/edition_volume.py:340
+#: forms/learning_unit/edition_volume.py:341
+#: forms/learning_unit/edition_volume.py:342
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:125
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:127
 #: tests/forms/test_edition_form.py:321 tests/forms/test_edition_form.py:322
@@ -3015,12 +3015,12 @@ msgstr ""
 #: business/learning_units/quadrimester_strategy.py:24
 #: tests/models/test_learning_unit_year.py:722
 msgid "Only the volume Q1 must have a value"
-msgstr "Seulement le volume Q1 doit avoir une valeur"
+msgstr "Seul le volume Q1 doit avoir une valeur"
 
 #: business/learning_units/quadrimester_strategy.py:31
 #: tests/models/test_learning_unit_year.py:769
 msgid "Only the volume Q2 must have a value"
-msgstr "Seulement le volume Q2 doit avoir une valeur"
+msgstr "Seul le volume Q2 doit avoir une valeur"
 
 #: models/enums/vacant_declaration_type.py:38
 msgid "Open for externs"
@@ -3252,6 +3252,7 @@ msgstr ""
 #: business/proposal_xls.py:94 business/proposal_xls.py:104
 #: forms/learning_unit/edition_volume.py:82
 #: forms/learning_unit/edition_volume.py:103
+#: forms/learning_unit/edition_volume.py:327
 #: tests/business/test_proposal_xls.py:153
 #: tests/business/test_proposal_xls.py:163
 #: tests/views/test_learning_unit.py:1479 views/learning_unit.py:223
@@ -3506,14 +3507,14 @@ msgid "Proposal of creation"
 msgstr "Proposition de création"
 
 #: business/learning_unit.py:96 business/learning_unit_xls.py:82
-#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:60
+#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:63
 #: templates/learning_unit/by_proposal.html:88
 #: tests/business/test_learning_unit_xls.py:323 utils/send_mail.py:235
 msgid "Proposal status"
 msgstr "Etat proposition"
 
 #: business/learning_unit.py:95 business/learning_unit_xls.py:81
-#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:54
+#: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:57
 #: templates/learning_unit/by_proposal.html:87
 #: tests/business/test_learning_unit_xls.py:322
 msgid "Proposal type"
@@ -3613,7 +3614,7 @@ msgstr "Inscriptions en allègement"
 msgid "Reference"
 msgstr "Référence"
 
-#: forms/learning_unit/external_learning_unit.py:99
+#: forms/learning_unit/external_learning_unit.py:98
 #: models/education_group_organization.py:48
 #: templates/education_group/blocks/coorganization.html:38
 #: templates/learning_unit/identification.html:209
@@ -4131,7 +4132,8 @@ msgstr "Les données administratives ont été sauvées avec succès"
 
 #: forms/learning_unit/edition_volume.py:75
 #: forms/learning_unit/edition_volume.py:146
-#: forms/learning_unit/edition_volume.py:355
+#: forms/learning_unit/edition_volume.py:323
+#: forms/learning_unit/edition_volume.py:357
 #: models/learning_component_year.py:130
 #: templates/learning_unit/components.html:51
 #: templates/learning_unit/components_identification.html:37
@@ -4267,8 +4269,8 @@ msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
 #: forms/common.py:138 forms/education_group/common.py:194
-#: templates/education_group/blocks/form/group.html:67
-#: templates/education_group/blocks/form/minitraining.html:68
+#: templates/education_group/blocks/form/group.html:63
+#: templates/education_group/blocks/form/minitraining.html:64
 #: templates/education_group/blocks/form/training_tab_identification.html:70
 msgid "The field can contain only one value."
 msgstr "Ce champ ne peut contenir d'autre valeur."
@@ -4610,8 +4612,8 @@ msgstr "Le volume Q1 ou Q2 doit avoir une valeur"
 
 #: forms/learning_unit/edition_volume.py:159
 #: forms/learning_unit/edition_volume.py:161
-#: forms/learning_unit/edition_volume.py:344
 #: forms/learning_unit/edition_volume.py:346
+#: forms/learning_unit/edition_volume.py:348
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:137
 #: tests/forms/test_edition_form.py:332 tests/forms/test_edition_form.py:342
 msgid "The volume can not be set to 0."
@@ -5046,6 +5048,7 @@ msgstr "Volume 2"
 
 #: forms/learning_unit/edition_volume.py:60
 #: forms/learning_unit/edition_volume.py:79
+#: forms/learning_unit/edition_volume.py:325
 #: tests/views/test_learning_unit.py:1480 views/learning_unit.py:226
 #: views/learning_unit.py:323 views/learning_unit.py:339
 msgid "Volume Q1"
@@ -5053,6 +5056,7 @@ msgstr "Volume Q1"
 
 #: forms/learning_unit/edition_volume.py:67
 #: forms/learning_unit/edition_volume.py:79
+#: forms/learning_unit/edition_volume.py:326
 #: tests/views/test_learning_unit.py:1481 views/learning_unit.py:228
 #: views/learning_unit.py:324 views/learning_unit.py:340
 msgid "Volume Q2"
@@ -5288,7 +5292,7 @@ msgstr ""
 msgid "You can't edit because the learning unit has proposal"
 msgstr ""
 "Vous ne pouvez pas modifier l'unité d'enseignement car elle est en "
-"proposition pour cette année ou un année antérieure"
+"proposition pour cette année ou une année antérieure"
 
 #: business/learning_units/perms.py:61
 msgid "You can't modify learning unit of a previous year"
@@ -5392,7 +5396,7 @@ msgstr ""
 "Votre navigateur n'est pas à jour. Certaines fonctionnalités peuvent ne pas "
 "fonctionner correctement."
 
-#: templates/home.html:106
+#: templates/home.html:99
 msgid ""
 "Your personal details, configurations and other information related to you."
 msgstr ""
@@ -5961,7 +5965,9 @@ msgstr "le programme vise"
 #: tests/models/test_learning_unit_year.py:383
 #: tests/models/test_learning_unit_year.py:532
 msgid "the sum of repartition volumes must be equal to the global volume"
-msgstr "Le volume annuel doit être égal à la somme des volumes répartis sur les entités"
+msgstr ""
+"Le volume annuel doit être égal à la somme des volumes répartis sur les "
+"entités"
 
 #: templates/education_group/tab_administrative_data.html:39
 #: templates/education_group/tab_administrative_data.html:59
