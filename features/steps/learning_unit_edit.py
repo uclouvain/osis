@@ -329,6 +329,7 @@ def step_impl(context):
         By.CSS_SELECTOR,
         '#table_learning_units > tbody > tr:nth-child(1) > td.sorting_1 > input'
     ).click()
+    time.sleep(1)
 
 
 @step("Cliquer sur « Retour à l’état initial »")
@@ -339,7 +340,7 @@ def step_impl(context):
     context.current_page.find_element(By.ID, 'btn_modal_get_back_to_initial').click()
 
 
-@step("Cliquer sur « Oui »")
+@step("Cliquer sur « Oui » pour retourner à l'état initial")
 def step_impl(context):
     """
     :type context: behave.runner.Context
@@ -347,77 +348,28 @@ def step_impl(context):
     context.current_page.back_to_initial_yes.click()
 
 
-@then("Vérifier que la proposition {acronym} a été annulée avec succès.")
-def step_impl(context, acronym):
+@step("Cliquer sur « Oui » pour consolider")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page.consolidate_yes.click()
+
+
+@then("Vérifier que la proposition {acronym} a été {msg}.")
+def step_impl(context, acronym, msg):
     """
     :type context: behave.runner.Context
     """
     context.test.assertIn(acronym, context.current_page.success_messages())
-    context.test.assertIn("annulée avec succès.", context.current_page.success_messages())
+    context.test.assertIn(msg, context.current_page.success_messages())
 
 
-@given("L'ue {acronym} en {year} et liée à {entity} est en proposition de création")
-def step_impl(context, acronym, year, entity):
+
+@step("Cliquer sur « Consolider »")
+def step_impl(context):
     """
     :type context: behave.runner.Context
     """
-
-    campus = Campus.objects.filter(organization__type='MAIN').first()
-
-    luy = LearningUnitYearFullFactory(
-        acronym=acronym,
-        campus=campus,
-        academic_year=AcademicYear.objects.get(year=year[:4])
-    )
-    e = Entity.objects.filter(entityversion__acronym=entity).first()
-
-    ProposalLearningUnitFactory(
-        learning_unit_year=luy,
-        type=ProposalType.CREATION.name,
-        state=ProposalState.FACULTY.name,
-        entity=e,
-    )
-
-    EntityContainerYearFactory(
-        learning_container_year=luy.learning_container_year,
-        entity=e,
-        type=EntityContainerYearLinkTypes.REQUIREMENT_ENTITY.name,
-    )
-
-    EntityContainerYearFactory(
-        learning_container_year=luy.learning_container_year,
-        entity=e,
-        type=EntityContainerYearLinkTypes.ALLOCATION_ENTITY.name,
-    )
-
-
-@given("L'ue {acronym} en {year} et liée à {entity} est en proposition de modification")
-def step_impl(context, acronym, year, entity):
-    """
-    :type context: behave.runner.Context
-    """
-    luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=year[:4])
-    e = Entity.objects.filter(entityversion__acronym=entity).first()
-
-    ProposalLearningUnitFactory(
-        learning_unit_year=luy,
-        type=ProposalType.MODIFICATION.name,
-        state=ProposalState.FACULTY.name,
-        entity=e,
-    )
-
-
-@given("L'ue {acronym} en {year} et liée à {entity} est en proposition de suppression")
-def step_impl(context, acronym, year, entity):
-    """
-    :type context: behave.runner.Context
-    """
-    luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=year[:4])
-    e = Entity.objects.filter(entityversion__acronym=entity).first()
-
-    ProposalLearningUnitFactory(
-        learning_unit_year=luy,
-        type=ProposalType.SUPPRESSION.name,
-        state=ProposalState.FACULTY.name,
-        entity=e,
-    )
+    context.current_page.find_element(By.ID, 'btn_modal_consolidate').click()
+    time.sleep(1)

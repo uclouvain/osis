@@ -28,10 +28,17 @@ from behave.runner import Context
 
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear, current_academic_year
+from base.models.campus import Campus
 from base.models.entity import Entity
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
+from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
+from base.models.enums.proposal_state import ProposalState
+from base.models.enums.proposal_type import ProposalType
+from base.models.learning_unit import LearningUnit
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.person_entity import PersonEntity
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
 from base.tests.factories.person import FacultyManagerFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory
@@ -97,3 +104,81 @@ def step_impl(context: Context):
 def step_impl(context: Context, value: str):
     entity = Entity.objects.filter(entityversion__acronym=value).first()
     PersonEntity.objects.get_or_create(person=context.user.person, entity=entity, defaults={'with_child': True})
+
+
+@given("S’assurer que la date de fin de {acronym} est {year}.")
+def step_impl(context, acronym, year):
+    """
+    :type context: behave.runner.Context
+    """
+    lu = LearningUnit.objects.filter(learningunityear__acronym=acronym).first()
+    lu.end_year = int(year[:4])
+    lu.save()
+
+
+@given("L'ue {acronym} en {year} et liée à {entity} est en proposition de création")
+def step_impl(context, acronym, year, entity):
+    """
+    :type context: behave.runner.Context
+    """
+
+    campus = Campus.objects.filter(organization__type='MAIN').first()
+
+    luy = LearningUnitYearFullFactory(
+        acronym=acronym,
+        campus=campus,
+        academic_year=AcademicYear.objects.get(year=year[:4]),
+        internship_subtype=None,
+    )
+    e = Entity.objects.filter(entityversion__acronym=entity).first()
+
+    ProposalLearningUnitFactory(
+        learning_unit_year=luy,
+        type=ProposalType.CREATION.name,
+        state=ProposalState.FACULTY.name,
+        entity=e,
+    )
+
+    EntityContainerYearFactory(
+        learning_container_year=luy.learning_container_year,
+        entity=e,
+        type=EntityContainerYearLinkTypes.REQUIREMENT_ENTITY.name,
+    )
+
+    EntityContainerYearFactory(
+        learning_container_year=luy.learning_container_year,
+        entity=e,
+        type=EntityContainerYearLinkTypes.ALLOCATION_ENTITY.name,
+    )
+
+
+@given("L'ue {acronym} en {year} et liée à {entity} est en proposition de modification")
+def step_impl(context, acronym, year, entity):
+    """
+    :type context: behave.runner.Context
+    """
+    luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=year[:4])
+    e = Entity.objects.filter(entityversion__acronym=entity).first()
+
+    ProposalLearningUnitFactory(
+        learning_unit_year=luy,
+        type=ProposalType.MODIFICATION.name,
+        state=ProposalState.FACULTY.name,
+        entity=e,
+    )
+
+
+@given("L'ue {acronym} en {year} et liée à {entity} est en proposition de suppression")
+def step_impl(context, acronym, year, entity):
+    """
+    :type context: behave.runner.Context
+    """
+    luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=year[:4])
+    e = Entity.objects.filter(entityversion__acronym=entity).first()
+
+    ProposalLearningUnitFactory(
+        learning_unit_year=luy,
+        type=ProposalType.SUPPRESSION.name,
+        state=ProposalState.FACULTY.name,
+        entity=e,
+    )

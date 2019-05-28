@@ -258,6 +258,11 @@ class SearchLearningUnitPage(pypom.Page):
         '#modalBackToInitial > div > div > div.modal-footer > button.btn.btn-primary', 4
     )
 
+    consolidate_yes = Link(
+        'SearchLearningUnitPage', By.CSS_SELECTOR,
+        '#modalConsolidate > div > div > div.modal-footer > button.btn.btn-primary', 4
+    )
+
     def success_messages(self):
         success_panel = self.find_element(By.ID, "pnl_succes_messages")
         return success_panel.text

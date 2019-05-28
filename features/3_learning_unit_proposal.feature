@@ -163,7 +163,7 @@ Feature: Propositions d’UE
 
     When Sélectionner le premier résultat
     And Cliquer sur « Retour à l’état initial »
-    And Cliquer sur « Oui »
+    And Cliquer sur « Oui » pour retourner à l'état initial
     Then Vérifier que la proposition <acronym> a été annulée avec succès.
 
     Examples:
@@ -173,25 +173,44 @@ Feature: Propositions d’UE
       | LDROI1007 | 2019-20 |
 
 
-  Scenario: 28 : En tant que gestionnaire central, je dois pouvoir consolider une proposition.
+  Scenario Outline: 28 : En tant que gestionnaire central, je dois pouvoir consolider une proposition.
     Given L'ue LDROI1234 en 2019-20 et liée à DRT est en proposition de création
     Given L'ue LDROI1006 en 2019-20 et liée à DRT est en proposition de modification
     Given L'ue LDROI1007 en 2019-20 et liée à DRT est en proposition de suppression
+    Given S’assurer que la date de fin de LDROI1007 est 2020-21.
 
-    Given L’utilisateur est dans le groupe « faculty manager »
+    Given L’utilisateur est dans le groupe « central manager »
     And L’utilisateur est attaché à l’entité DRT
-#S’assurer que la date de fin de « LDROI1007 » est 2020-21.
-    And Aller sur la page de detail de l'ue: LDROI1234 en 2019-20
+    And Aller sur la page de detail de l'ue: <acronym> en <year>
     When Cliquer sur le menu « Actions »
     And Cliquer sur « Editer la proposition »
     And Encoder Accepté comme Etat
     And Cliquer sur le bouton « Enregistrer »
+
     And Aller sur la page de recherche d'UE
     And Sélectionner l’onglet « Propositions »
     And Réinitialiser les critères de recherche
 
-    When Encoder 2019-20 comme Anac.
-    And Encoder LDROI1234 comme Code
+    When Encoder <year> comme Anac.
+    And Encoder <acronym> comme Code
     And Cliquer sur le bouton Rechercher (Loupe)
 
-    Then Vérifier que le dossier LDROI1234 est bien Accepté
+    Then Vérifier que le dossier <acronym> est bien Accepté
+    When Sélectionner le premier résultat
+    And Cliquer sur « Consolider »
+    And Cliquer sur « Oui » pour consolider
+    Then Vérifier que la proposition <acronym> a été consolidée avec succès.
+
+    And Aller sur la page de recherche d'UE
+    And Réinitialiser les critères de recherche
+
+    When Encoder <year> comme Anac.
+    And Encoder <acronym> comme Code
+    And Cliquer sur le bouton Rechercher (Loupe)
+    Then Vérifier que <acronym> n'est pas en proposition.
+
+    Examples:
+      | acronym   | year    | proposal_type |
+      | LDROI1234 | 2019-20 | Création      |
+      | LDROI1006 | 2019-20 | Modification  |
+      | LDROI1007 | 2019-20 | Suppression   |

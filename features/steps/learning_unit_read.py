@@ -196,9 +196,22 @@ def step_impl(context, year):
     context.test.assertIn(year, context.current_page.find_element(By.ID, "id_end_year").text)
 
 
-@then("Vérifier que le dossier LDROI1234 est bien Accepté")
-def step_impl(context):
+@then("Vérifier que le dossier {acronym} est bien {state}")
+def step_impl(context, acronym, state):
     """
     :type context: behave.runner.Context
     """
-    raise NotImplementedError(u'STEP: Then Vérifier que le dossier LDROI1234 est bien Accepté')
+    current_state = context.current_page.find_element(
+        By.CSS_SELECTOR,
+        "#table_learning_units > tbody > tr:nth-child(1) > td.col-proposal_state"
+    ).text
+    context.test.assertEqual(current_state.strip(), state.strip())
+
+
+@then("Vérifier que {acronym} n'est pas en proposition.")
+def step_impl(context, acronym):
+    is_proposal = context.current_page.find_element(
+        By.CSS_SELECTOR,
+        '#table_learning_units > tbody > tr.odd > td:nth-child(10)'
+    ).text
+    context.test.assertEqual(is_proposal, "")
