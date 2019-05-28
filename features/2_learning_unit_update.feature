@@ -59,10 +59,10 @@ Feature: Mise à jour en gestion journalière
     And Cliquer sur le bouton « Enregistrer »
     And A la question, « voulez-vous reporter » répondez « oui »
 
-    Then Vérifier que le Crédits est bien 12
+    Then Vérifier que le champ Crédits est bien 12
     And Vérifier que la Périodicité est bien bisannuelle paire
     And Rechercher LDROI1004 en 2020-21
-    And Vérifier que le Crédits est bien 12
+    And Vérifier que le champ Crédits est bien 12
     And Vérifier que la Périodicité est bien bisannuelle paire
 
   Scenario: 10. En tant que gestionnaire facultaire, je dois pouvoir créer un nouveau partim.

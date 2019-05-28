@@ -179,9 +179,26 @@ def step_impl(context, acronym, year):
     context.test.assertIn(string_to_check, context.current_page.success_messages())
 
 
-@then("Vérifier que une proposition de modification a été faite pour l'unité d'enseignement {acronym}")
-def step_impl(context, acronym):
+@then("Vérifier que une proposition de {proposal_type} a été faite pour l'unité d'enseignement {acronym}")
+def step_impl(context, proposal_type, acronym):
     """
     :type context: behave.runner.Context
     """
     context.test.assertIn(acronym, context.current_page.success_messages())
+    context.test.assertIn(proposal_type, context.current_page.success_messages())
+
+
+@step("Vérifier que l'année academique termine en {year}")
+def step_impl(context, year):
+    """
+    :type context: behave.runner.Context
+    """
+    context.test.assertIn(year, context.current_page.find_element(By.ID, "id_end_year").text)
+
+
+@then("Vérifier que le dossier LDROI1234 est bien Accepté")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    raise NotImplementedError(u'STEP: Then Vérifier que le dossier LDROI1234 est bien Accepté')

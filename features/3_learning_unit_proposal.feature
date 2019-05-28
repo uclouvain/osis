@@ -93,8 +93,8 @@ Feature: Propositions d’UE
     Then Vérifier que la zone Etat est bien grisée
     And Vérifier que la zone Type est bien grisée
     And Cliquer sur le bouton « Enregistrer »
-    Then Vérifier que une proposition de modification a été faite pour l'unité d'enseignement LDROI1006
-    And Vérifier que le Crédits est bien 4
+    Then Vérifier que une proposition de Modification a été faite pour l'unité d'enseignement LDROI1006
+    And Vérifier que le champ Crédits est bien 4
     And Vérifier que la Périodicité est bien bisannuelle paire
 
 
@@ -106,17 +106,92 @@ Feature: Propositions d’UE
     When Cliquer sur le menu « Actions »
     And Cliquer sur le menu « Mettre en proposition de fin d’enseignement »
 
-    When Encoder 2019-20 comme Anac de fin
+    When Encoder 2020-21 comme Anac de fin
     When Encoder DRT5678 comme Dossier
 
     Then Vérifier que la zone Etat est bien grisée
     And Vérifier que la zone Type est bien grisée
 
     When Cliquer sur le bouton « Oui, je confirme »
-    And Vérifier les valeurs ci-dessous.
 
-  Scenario: 26 : En tant que gestionnaire facultaire, je dois pouvoir modifier une proposition.
+    Then Vérifier que une proposition de Suppression a été faite pour l'unité d'enseignement LDROI1007
+    And Vérifier que l'année academique termine en 2020-21
 
-  Scenario: 27 : En tant que gestionnaire facultaire, je dois pouvoir annuler une proposition.
+  Scenario Outline: 26 : En tant que gestionnaire facultaire, je dois pouvoir modifier une proposition.
+
+    Given L'ue LDROI1234 en 2019-20 et liée à DRT est en proposition de création
+    Given L'ue LDROI1006 en 2019-20 et liée à DRT est en proposition de modification
+    Given L'ue LDROI1007 en 2019-20 et liée à DRT est en proposition de suppression
+
+    Given L’utilisateur est dans le groupe « faculty manager »
+    And L’utilisateur est attaché à l’entité DRT
+
+    And Aller sur la page de detail de l'ue: <acronym> en <year>
+    When Cliquer sur le menu « Actions »
+    And Cliquer sur « Editer la proposition »
+    And Encoder <value> comme <field>
+    And Cliquer sur le bouton « Enregistrer »
+    Then Vérifier que une proposition de <proposal_type> a été faite pour l'unité d'enseignement <acronym>
+    And Vérifier que le champ <field> est bien <value>
+    Examples:
+      | acronym   | year    | proposal_type | field            | value   |
+      | LDROI1234 | 2019-20 | Création      | Crédits          | 6       |
+      | LDROI1006 | 2019-20 | Modification  | Crédits          | 6       |
+      | LDROI1007 | 2019-20 | Suppression   | Année academique | 2021-22 |
+
+
+  Scenario Outline: 27 : En tant que gestionnaire facultaire, je dois pouvoir annuler une proposition.
+  Description :
+  Annuler la proposition de création du scénario #23
+  Annuler la proposition de modification du scénario #24
+  Annuler la proposition de modification de fin d’enseignement du scénario #25
+
+    Given L'ue LDROI1234 en 2019-20 et liée à DRT est en proposition de création
+    Given L'ue LDROI1006 en 2019-20 et liée à DRT est en proposition de modification
+    Given L'ue LDROI1007 en 2019-20 et liée à DRT est en proposition de suppression
+
+    Given L’utilisateur est dans le groupe « faculty manager »
+    And L’utilisateur est attaché à l’entité DRT
+    And Aller sur la page de recherche d'UE
+    And Sélectionner l’onglet « Propositions »
+    And Réinitialiser les critères de recherche
+
+    When Encoder <year> comme Anac.
+    And Encoder <acronym> comme Code
+    And Cliquer sur le bouton Rechercher (Loupe)
+    Then Dans la liste de résultat, le(s) premier(s) « Code » est(sont) bien <acronym>.
+
+    When Sélectionner le premier résultat
+    And Cliquer sur « Retour à l’état initial »
+    And Cliquer sur « Oui »
+    Then Vérifier que la proposition <acronym> a été annulée avec succès.
+
+    Examples:
+      | acronym   | year    |
+      | LDROI1234 | 2019-20 |
+      | LDROI1006 | 2019-20 |
+      | LDROI1007 | 2019-20 |
+
 
   Scenario: 28 : En tant que gestionnaire central, je dois pouvoir consolider une proposition.
+    Given L'ue LDROI1234 en 2019-20 et liée à DRT est en proposition de création
+    Given L'ue LDROI1006 en 2019-20 et liée à DRT est en proposition de modification
+    Given L'ue LDROI1007 en 2019-20 et liée à DRT est en proposition de suppression
+
+    Given L’utilisateur est dans le groupe « faculty manager »
+    And L’utilisateur est attaché à l’entité DRT
+#S’assurer que la date de fin de « LDROI1007 » est 2020-21.
+    And Aller sur la page de detail de l'ue: LDROI1234 en 2019-20
+    When Cliquer sur le menu « Actions »
+    And Cliquer sur « Editer la proposition »
+    And Encoder Accepté comme Etat
+    And Cliquer sur le bouton « Enregistrer »
+    And Aller sur la page de recherche d'UE
+    And Sélectionner l’onglet « Propositions »
+    And Réinitialiser les critères de recherche
+
+    When Encoder 2019-20 comme Anac.
+    And Encoder LDROI1234 comme Code
+    And Cliquer sur le bouton Rechercher (Loupe)
+
+    Then Vérifier que le dossier LDROI1234 est bien Accepté

@@ -69,6 +69,7 @@ class Link(Field):
         # Sometimes the wait_for_page_to_load does not work because the redirection is on the same page.
         # In that case, we have to impose a waiting time to be sure that the page is reloaded.
         time.sleep(self.waiting_time)
+        print("wainting {}...".format(self.waiting_time))
         return new_page
 
 
@@ -136,15 +137,14 @@ class Select2Field(Field):
         sub_element.send_keys(Keys.RETURN)
 
 
-
-
-
 class ButtonField(Field):
     def click(self):
         self.element.click()
 
+
 class SubmitField(ButtonField):
     pass
+
 
 class CharField(Field):
     @property

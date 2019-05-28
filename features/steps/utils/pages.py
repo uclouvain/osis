@@ -26,7 +26,7 @@ from selenium.webdriver.common.by import By
 
 from base.models.entity_version import EntityVersion
 from features.steps.utils.fields import InputField, SubmitField, SelectField, ButtonField, Checkbox, Select2Field, Link, \
-    CkeditorField, RadioField
+    CkeditorField, RadioField, Field
 
 
 class LoginPage(pypom.Page):
@@ -114,7 +114,7 @@ class NewLearningUnitPage(pypom.Page):
         By.XPATH, "//*[@id='LearningUnitYearForm']/div[2]/div[1]/div[2]/div/div/div[3]/div/span")
     entite_dattribution = Select2Field(
         By.XPATH, "//*[@id='LearningUnitYearForm']/div[2]/div[1]/div[2]/div/div/div[4]/div/span")
-    save_button = ButtonField(By.NAME, 'learning_unit_year_add')
+    save_button = Link("LearningUnitPage", By.ID, 'btn-confirm', 2)
 
 
 class NewLearningUnitProposalPage(NewLearningUnitPage):
@@ -135,19 +135,14 @@ class NewLearningUnitProposalPage(NewLearningUnitPage):
         self._dossier_0 = value_0
         self._dossier_1 = value[3:]
 
-    save_button = Link('LearningUnitPage', By.NAME, 'learning_unit_year_add')
-
 
 class EditLearningUnitProposalPage(NewLearningUnitProposalPage):
-    save_button = Link('LearningUnitPage', By.CSS_SELECTOR,
-                       '#main > div.panel.panel-default > div.panel-footer > div > div > button.btn-primary')
+    pass
 
 
 class LearningUnitProposalEndYearPage(NewLearningUnitProposalPage):
     anac_de_fin = SelectField(By.ID, "id_academic_year")
     type = SelectField(By.ID, 'id_type')
-    save_button = Link('LearningUnitPage', By.CSS_SELECTOR,
-                       '#identification > div > div.col-md-4 > div.form-group > button')
 
 
 class NewPartimPage(NewLearningUnitPage):
@@ -188,10 +183,13 @@ class LearningUnitPage(pypom.Page):
     actions = ButtonField(By.ID, "dLabel")
     edit_button = Link('LearningUnitEditPage', By.CSS_SELECTOR, "#link_edit_lu > a")
     proposal_edit = Link(EditLearningUnitProposalPage, By.CSS_SELECTOR, "#link_proposal_modification > a")
+    edit_proposal_button = Link(EditLearningUnitProposalPage, By.CSS_SELECTOR, "#link_proposal_edit > a")
     proposal_suppression = Link(LearningUnitProposalEndYearPage, By.CSS_SELECTOR, "#link_proposal_suppression > a")
     new_partim = Link(NewPartimPage, By.ID, "new_partim")
     go_to_full = ButtonField(By.ID, "full_acronym")
 
+    credits = Field(By.ID, "id_credits")
+    annee_academique = Field(By.ID, "id_end_year")
     tab_training = Link(LearningUnitTrainingPage, By.ID, "training_link")
     tab_attribution = Link(LearningUnitAttributionPage, By.ID, "attributions_link")
     tab_description = Link(DescriptionPage, By.ID, "description_link")
@@ -253,6 +251,16 @@ class SearchLearningUnitPage(pypom.Page):
     actions = ButtonField(By.ID, 'btn-action')
     new_luy = Link(NewLearningUnitPage, By.ID, 'lnk_learning_unit_create')
     create_proposal_url = Link(NewLearningUnitProposalPage, By.ID, 'lnk_create_proposal_url')
+
+    # TODO this action is really slow.
+    back_to_initial_yes = Link(
+        'SearchLearningUnitPage', By.CSS_SELECTOR,
+        '#modalBackToInitial > div > div > div.modal-footer > button.btn.btn-primary', 4
+    )
+
+    def success_messages(self):
+        success_panel = self.find_element(By.ID, "pnl_succes_messages")
+        return success_panel.text
 
     def count_result(self):
         text = self.find_element(By.CSS_SELECTOR, "#main > div.panel.panel-default > div > strong").text
