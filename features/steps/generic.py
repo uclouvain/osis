@@ -25,6 +25,7 @@ from datetime import timedelta, datetime
 
 from behave import *
 from behave.runner import Context
+from django.contrib.auth.models import Group
 
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear, current_academic_year
@@ -32,6 +33,7 @@ from base.models.campus import Campus
 from base.models.entity import Entity
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
+from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit import LearningUnit
@@ -39,9 +41,8 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person_entity import PersonEntity
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
-from base.tests.factories.person import FacultyManagerFactory
+from base.tests.factories.person import FacultyManagerFactory, PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from base.tests.factories.user import SuperUserFactory
 from base.tests.functionals.test_education_group import LoginPage
 
 use_step_matcher("parse")
@@ -55,8 +56,11 @@ def step_impl(context: Context):
 
 @step("L'utilisateur est loggé en tant que gestionnaire facultaire ou central")
 def step_impl(context: Context):
-    context.user = SuperUserFactory(username="usual_suspect", first_name="Keyser", last_name="Söze",
-                                    password="Roger_Verbal_Kint")
+    context.user = FacultyManagerFactory(
+        user__username="usual_suspect",
+        user__first_name="Keyser",
+        user__last_name="Söze",
+        user__password="Roger_Verbal_Kint").user
 
     page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
     page.login("usual_suspect", 'Roger_Verbal_Kint')
@@ -83,15 +87,19 @@ def step_impl(context: Context):
 
 @step("L’utilisateur est dans le groupe « faculty manager »")
 def step_impl(context: Context):
-    person = FacultyManagerFactory(
+    person = PersonFactory(
         user__username="usual_suspect",
         user__first_name="Keyser",
         user__last_name="Söze",
         user__password="Roger_Verbal_Kint",
     )
 
-    person.user.superuser = True
+    person.user.groups.clear()
+
+    group = Group.objects.get(name=FACULTY_MANAGER_GROUP)
+    person.user.groups.add(group)
     person.user.save()
+
     context.user = person.user
 
     page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()

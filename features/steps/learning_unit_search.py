@@ -21,6 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import time
+
 from behave import *
 from behave.runner import Context
 
@@ -97,6 +99,7 @@ def step_impl(context):
     :type context: behave.runner.Context
     """
     context.current_page.generate_xls.click()
+    time.sleep(10)
 
 
 @step("Sélectionner l’onglet « Propositions »")

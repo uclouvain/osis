@@ -21,6 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import os
+
 from django.conf import settings
 from django.utils.text import slugify
 from selenium import webdriver
@@ -29,6 +31,14 @@ from selenium.webdriver.firefox.options import Options
 
 def before_all(context):
     options = Options()
+    options.set_preference('browser.download.folderList', 2)  # customlocation
+    options.set_preference("browser.download.dir", os.path.abspath("features/logs"))
+    options.set_preference("browser.download.manager.showWhenStarting", False)
+    options.set_preference(
+        "browser.helperApps.neverAsk.saveToDisk",
+        "application/xls;text/csv;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
     if settings.SELENIUM_SETTINGS["VIRTUAL_DISPLAY"]:
         options.add_argument('-headless')
     executable_path = settings.SELENIUM_SETTINGS["GECKO_DRIVER"]

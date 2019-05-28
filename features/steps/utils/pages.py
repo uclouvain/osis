@@ -70,7 +70,7 @@ class LearningUnitAttributionPage(pypom.Page):
 
     @property
     def loaded(self):
-        return self.find_element(By.XPATH, '//*[@id="attributions"]/table/thead/tr/th[1]').text == "Enseignant·e·s"
+        return "Enseignant·e·s" in self.find_element(By.CSS_SELECTOR, 'li.active[role=presentation]').text
 
 
 class LearningUnitTrainingPage(pypom.Page):
@@ -204,7 +204,7 @@ class LearningUnitPage(pypom.Page):
 
     @property
     def loaded(self) -> bool:
-        return bool("active" in self.find_element(By.XPATH, '//*[@id="main"]/ol/li[4]').get_attribute('class'))
+        return "Identification" in self.find_element(By.CSS_SELECTOR, 'li.active[role=presentation]').text
 
 
 class LearningUnitEditPage(pypom.Page):
