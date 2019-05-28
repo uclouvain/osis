@@ -33,7 +33,7 @@ from base.models.campus import Campus
 from base.models.entity import Entity
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
-from base.models.enums.groups import FACULTY_MANAGER_GROUP
+from base.models.enums.groups import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit import LearningUnit
@@ -65,6 +65,30 @@ def step_impl(context: Context):
     page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
     page.login("usual_suspect", 'Roger_Verbal_Kint')
 
+    context.test.assertEqual(context.browser.current_url, context.get_url('/'))\
+
+@step("L'utilisateur est loggé en tant que {group}.")
+def step_impl(context: Context, group):
+    user = PersonFactory(
+        user__username="usual_suspect",
+        user__first_name="Keyser",
+        user__last_name="Söze",
+        user__password="Roger_Verbal_Kint").user
+
+    user.groups.clear()
+
+    if group.lower() == 'gestionnaire factulaire':
+        user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+    elif group.lower() in ('gestionnaire central', 'central manager'):
+        user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
+
+    user.save()
+
+    context.user = user
+
+    page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
+    page.login("usual_suspect", 'Roger_Verbal_Kint')
+
     context.test.assertEqual(context.browser.current_url, context.get_url('/'))
 
 
@@ -85,8 +109,8 @@ def step_impl(context: Context):
     calendar.save()
 
 
-@step("L’utilisateur est dans le groupe « faculty manager »")
-def step_impl(context: Context):
+@step("L’utilisateur est dans le groupe {group}")
+def step_impl(context: Context, group):
     person = PersonFactory(
         user__username="usual_suspect",
         user__first_name="Keyser",
@@ -96,8 +120,11 @@ def step_impl(context: Context):
 
     person.user.groups.clear()
 
-    group = Group.objects.get(name=FACULTY_MANAGER_GROUP)
-    person.user.groups.add(group)
+    if group.lower() in ('gestionnaire factulaire', 'faculty manager'):
+        person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+    elif group.lower() in ('gestionnaire central', 'central manager'):
+        person.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
+
     person.user.save()
 
     context.user = person.user

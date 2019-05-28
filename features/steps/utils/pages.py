@@ -26,7 +26,7 @@ from selenium.webdriver.common.by import By
 
 from base.models.entity_version import EntityVersion
 from features.steps.utils.fields import InputField, SubmitField, SelectField, ButtonField, Checkbox, Select2Field, Link, \
-    CkeditorField, RadioField, Field
+    CkeditorField, RadioField, Field, SelectEntityVersionField
 
 
 class LoginPage(pypom.Page):
@@ -274,3 +274,54 @@ class SearchLearningUnitPage(pypom.Page):
     def find_acronym_in_table(self, row: int = 1):
         selector = '#table_learning_units > tbody > tr:nth-child({}) > td.col-acronym > a'.format(row)
         return self.find_element(By.CSS_SELECTOR, selector).text
+
+
+class EducationGroupPage(pypom.Page):
+    sigleintitule_abrege = Field(
+        By.CSS_SELECTOR,
+        '#identification > div > div > div.row > div.col-md-7 > div:nth-child(1) > div > div.row > dl:nth-child(1) > dd'
+    )
+    code = Field(
+        By.CSS_SELECTOR,
+        '#identification > div > div > div.row > div.col-md-7 > div:nth-child(1) > div > div.row > dl:nth-child(2) > dd'
+    )
+    entite_de_gestion = Field(
+        By.CSS_SELECTOR,
+        '#identification > div > div > div.row > div.col-md-5 > div:nth-child(1) > div > dl:nth-child(1) > dd'
+    )
+    entite_dadministration = Field(
+        By.CSS_SELECTOR,
+        '#identification > div > div > div.row > div.col-md-5 > div:nth-child(1) > div > dl:nth-child(2) > dd'
+    )
+
+    def success_messages(self):
+        success_panel = self.find_element(By.ID, "pnl_succes_messages")
+        return success_panel.text
+
+
+class NewTrainingPage(pypom.Page):
+    sigleintitule_abrege = InputField(By.ID, 'id_acronym')
+    code = InputField(By.ID, 'id_partial_acronym')
+    intitule_en_francais = InputField(By.ID, 'id_title')
+    entite_de_gestion = SelectEntityVersionField(By.ID, 'id_management_entity')
+    entite_dadministration = SelectEntityVersionField(By.ID, 'id_administration_entity')
+    intitule_du_diplome = InputField(By.ID, 'id_diploma_printing_title')
+
+    tab_diploma = ButtonField(By.ID, 'lnk_diplomas_certificats')
+    save_button = Link(
+        EducationGroupPage, By.ID, 'btn-confirm', waiting_time=3
+    )
+
+
+class SearchEducationGroupPage(pypom.Page):
+    URL_TEMPLATE = '/educationgroups/'
+
+    actions = ButtonField(By.ID, 'btn-action')
+    new_training = ButtonField(By.CSS_SELECTOR, '#link_create_training > a', 1)
+    new_mini_training = ButtonField(By.CSS_SELECTOR, '#link_create_mini_training > a', 1)
+    type_de_formation = SelectField(By.ID, "id_name")
+    confirm_modal = Link(NewTrainingPage, By.CSS_SELECTOR, '.modal-footer>input.btn-primary')
+
+    def success_messages(self):
+        success_panel = self.find_element(By.ID, "pnl_succes_messages")
+        return success_panel.text

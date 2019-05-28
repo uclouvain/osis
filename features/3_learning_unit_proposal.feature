@@ -3,10 +3,10 @@ Feature: Propositions d’UE
   Background:
     Given La base de données est dans son état initial.
     And LCHIM1141 est en proposition en 2019-20 lié à CHIM
+    Given L’utilisateur est dans le groupe faculty manager
 
   Scenario: 20 : En tant que gestionnaire facultaire, je dois pouvoir rechercher des propositions par sigle ou numéro de dossier.
-    Given L’utilisateur est dans le groupe « faculty manager »
-    And L’utilisateur est attaché à l’entité MED
+    Given L’utilisateur est attaché à l’entité MED
     And Aller sur la page de recherche d'UE
     And Sélectionner l’onglet « Propositions »
     And Réinitialiser les critères de recherche
@@ -23,8 +23,7 @@ Feature: Propositions d’UE
     Then Dans la liste de résultat, le(s) premier(s) « Code » est(sont) bien LCHIM1141.
 
   Scenario: 21 : En tant que gestionnaire facultaire, je dois pouvoir rechercher des propositions par entité de charge.
-    Given L’utilisateur est dans le groupe « faculty manager »
-    And L’utilisateur est attaché à l’entité DRT
+    Given L’utilisateur est attaché à l’entité DRT
     And Aller sur la page de recherche d'UE
     And Sélectionner l’onglet « Propositions »
     And Réinitialiser les critères de recherche
@@ -39,8 +38,7 @@ Feature: Propositions d’UE
   Description : Recherche des propositions + produire l’Excel
 
   Scenario: 23 : En tant que gestionnaire facultaire, je dois pouvoir faire une proposition de création.
-    Given L’utilisateur est dans le groupe « faculty manager »
-    And L’utilisateur est attaché à l’entité DRT
+    Given L’utilisateur est attaché à l’entité DRT
     And Aller sur la page de recherche d'UE
 
     When  Cliquer sur le menu « Actions »
@@ -81,8 +79,7 @@ Feature: Propositions d’UE
     Then Dans la liste de résultat, le(s) premier(s) « Code » est(sont) bien LDROI1234.
 
   Scenario: 24 : En tant que gestionnaire facultaire, je dois pouvoir faire une proposition de modification.
-    Given L’utilisateur est dans le groupe « faculty manager »
-    And L’utilisateur est attaché à l’entité DRT
+    Given L’utilisateur est attaché à l’entité DRT
     And Aller sur la page de detail de l'ue: LDROI1006 en 2019-20
 
     When Cliquer sur le menu « Actions »
@@ -99,8 +96,7 @@ Feature: Propositions d’UE
 
 
   Scenario: 25 : En tant que gestionnaire facultaire, je dois pouvoir faire une proposition de fin d’enseignement.
-    Given L’utilisateur est dans le groupe « faculty manager »
-    And L’utilisateur est attaché à l’entité DRT
+    Given L’utilisateur est attaché à l’entité DRT
     And Aller sur la page de detail de l'ue: LDROI1007 en 2019-20
 
     When Cliquer sur le menu « Actions »
@@ -123,8 +119,7 @@ Feature: Propositions d’UE
     Given L'ue LDROI1006 en 2019-20 et liée à DRT est en proposition de modification
     Given L'ue LDROI1007 en 2019-20 et liée à DRT est en proposition de suppression
 
-    Given L’utilisateur est dans le groupe « faculty manager »
-    And L’utilisateur est attaché à l’entité DRT
+    Given L’utilisateur est attaché à l’entité DRT
 
     And Aller sur la page de detail de l'ue: <acronym> en <year>
     When Cliquer sur le menu « Actions »
@@ -150,7 +145,6 @@ Feature: Propositions d’UE
     Given L'ue LDROI1006 en 2019-20 et liée à DRT est en proposition de modification
     Given L'ue LDROI1007 en 2019-20 et liée à DRT est en proposition de suppression
 
-    Given L’utilisateur est dans le groupe « faculty manager »
     And L’utilisateur est attaché à l’entité DRT
     And Aller sur la page de recherche d'UE
     And Sélectionner l’onglet « Propositions »
@@ -179,7 +173,7 @@ Feature: Propositions d’UE
     Given L'ue LDROI1007 en 2019-20 et liée à DRT est en proposition de suppression
     Given S’assurer que la date de fin de LDROI1007 est 2020-21.
 
-    Given L’utilisateur est dans le groupe « central manager »
+    Given L’utilisateur est dans le groupe central manager
     And L’utilisateur est attaché à l’entité DRT
     And Aller sur la page de detail de l'ue: <acronym> en <year>
     When Cliquer sur le menu « Actions »

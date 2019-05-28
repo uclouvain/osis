@@ -3,7 +3,7 @@ Feature: Mise à jour en gestion journalière
   Background:
     Given La base de données est dans son état initial.
     And les flags d'éditions des UEs sont désactivés.
-    And L’utilisateur est dans le groupe « faculty manager »
+    And L’utilisateur est dans le groupe faculty manager
 
   Scenario: 7. En tant que gestionnaire facultaire, je ne peux pas modifier uniquement les UE d'une autre fac.
     Given La période de modification des programmes est en cours
@@ -48,7 +48,7 @@ Feature: Mise à jour en gestion journalière
   Description : en particulier les crédits et la périodicité + vérifier que les UE peuvent
   être mises à jour par la gestionnaire central en dehors de la période de modification des programmes.
     Given La période de modification des programmes n’est pas en cours
-    And L’utilisateur est dans le groupe « central manager »
+    And L’utilisateur est dans le groupe central manager
     And Aller sur la page de detail de l'ue: LDROI1004 en 2019-20
 
     When Cliquer sur le menu « Actions »

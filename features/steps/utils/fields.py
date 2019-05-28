@@ -27,6 +27,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 
+from base.models.entity_version import EntityVersion
+
 
 class Field:
     """ Field respects the descriptor pattern for the setter but not for the getter.
@@ -69,7 +71,6 @@ class Link(Field):
         # Sometimes the wait_for_page_to_load does not work because the redirection is on the same page.
         # In that case, we have to impose a waiting time to be sure that the page is reloaded.
         time.sleep(self.waiting_time)
-        print("wainting {}...".format(self.waiting_time))
         return new_page
 
 
@@ -138,8 +139,14 @@ class Select2Field(Field):
 
 
 class ButtonField(Field):
+
+    def __init__(self, by, selector, waiting_time=0):
+        super().__init__(by, selector)
+        self.waiting_time = waiting_time
+
     def click(self):
         self.element.click()
+        time.sleep(self.waiting_time)
 
 
 class SubmitField(ButtonField):
@@ -170,3 +177,9 @@ class RadioField(Field):
         for choice in choices:
             if choice.text == value:
                 choice.click()
+
+
+class SelectEntityVersionField(SelectField):
+    def __set__(self, obj, value):
+        value = EntityVersion.objects.filter(acronym=value).order_by('start_date').last().pk
+        return super().__set__(obj, value)

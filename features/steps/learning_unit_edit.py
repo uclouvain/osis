@@ -164,23 +164,6 @@ def step_impl(context: Context):
     calendar.save()
 
 
-@step("L’utilisateur est dans le groupe « central manager »")
-def step_impl(context):
-    person = CentralManagerFactory(
-        user__username="usual_suspect",
-        user__first_name="Keyser",
-        user__last_name="Söze",
-        user__password="Roger_Verbal_Kint"
-    )
-
-    context.user = person.user
-
-    page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
-    page.login("usual_suspect", 'Roger_Verbal_Kint')
-
-    context.test.assertEqual(context.browser.current_url, context.get_url('/'))
-
-
 @step("A la question, « voulez-vous reporter » répondez « oui »")
 def step_impl(context):
     """
