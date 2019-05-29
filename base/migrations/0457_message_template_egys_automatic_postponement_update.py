@@ -328,7 +328,7 @@ class Migration(migrations.Migration):
                     </table>
                     </div>
                 {% endif %}
-                <p>Regards, Osis UCLouvain<</p>
+                <p>Regards, Osis UCLouvain</p>
                 {% endautoescape %}''',
                'egy_after_auto_postponement_html',
                'HTML',
