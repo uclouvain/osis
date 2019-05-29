@@ -25,6 +25,7 @@ from behave import *
 from selenium.webdriver.common.by import By
 
 from base.business.education_groups.create import create_initial_group_element_year_structure
+from base.models.campus import Campus
 from base.models.education_group_type import EducationGroupType
 from base.models.entity import Entity
 from base.models.enums.education_group_types import TrainingType
@@ -33,20 +34,25 @@ from base.tests.factories.education_group_year import TrainingFactory
 use_step_matcher("parse")
 
 
-@step("La formation {acronym} doit exister")
-def step_impl(context, acronym):
+@step("La formation {acronym} doit exister en {year}")
+def step_impl(context, acronym, year):
     """
     :type context: behave.runner.Context
     """
     entity = Entity.objects.filter(entityversion__acronym='DRT').first()
+    campus = Campus.objects.filter(organization__type='MAIN').first()
 
     training = TrainingFactory(
         acronym=acronym,
         partial_acronym='LDROI200S',
         education_group_type=EducationGroupType.objects.get(name=TrainingType.MASTER_MS_120.name),
-        academic_year__year=2018,
+        academic_year__year=int(year),
         management_entity=entity,
-        administration_entity=entity
+        administration_entity=entity,
+        enrollment_campus=campus,
+        main_teaching_campus=campus,
+        title='Master [120] en , à finalité spécialisée'
+
     )
     create_initial_group_element_year_structure([training])
 

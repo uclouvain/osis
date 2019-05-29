@@ -2,7 +2,9 @@ Feature: Modification d'offre
 
   Background:
     Given La base de données est dans son état initial.
-    And La formation DROI2MS/TT doit exister
+    And La formation DROI2MS/TT doit exister en 2019
+    And La période de modification des programmes est en cours
+
 
   Scenario: 32 : En tant que gestionnaire central, je dois pouvoir mettre une fin d’enseignement
   Rechercher OPES2M
@@ -15,14 +17,20 @@ Feature: Modification d'offre
     And L'utilisateur est loggé en tant que gestionnaire central.
     And L’utilisateur est attaché à l’entité UCL
     Given Aller sur la page de detail de la formation: DROI2MS/TT en 2019-2020
-    When Cliquer sur « Actions / Modifier »
+    When Cliquer sur le menu « Actions »
+    When Cliquer sur « Modifier »
     And Encoder 2021 comme  Fin
     And Cliquer sur le bouton « Enregistrer »
-    Then Vérifier que la formation DROI2MS/TT à bien été mise à jour de 2019 à 2021
-    Then Vérifier que la formation DROI2MS/TT à bien été supprimée de 2022 à 2024
+    And Si une modal d'avertissement s'affiche, cliquer sur « oui »
+
+    Then Vérifier que la formation DROI2MS/TT a bien été mise à jour de 2019 à 2021
 
     Given Aller sur la page Catalogue de formations / Formation
-    And Vérifier qu'il n'y a que 4 résultats.
+    And Réinitialiser les critères de recherche
+    And Encoder Tous comme Anac
+    And Encoder DROI2MS/TT comme Sigle/Intitulé abrégé
+    And Cliquer sur le bouton Rechercher (Loupe)
+    And Vérifier qu'il n'y a que 3 résultats.
 
   Scenario: 33 : En tant que gestionnaire facultaire, je dois pouvoir ajouter une finalité dans une offre.
 
@@ -35,35 +43,49 @@ Feature: Modification d'offre
     And L’utilisateur est attaché à l’entité DRT
 
     Given Aller sur la page de detail de la formation: DROI2M en 2018-2019
-    When Ouvrir « LDROI2M » dans l’arbre
-    And Ouvrir « LDROI220T » dans l’arbre
-    And Ouvrir « LDRMM900R » dans l’arbre
+    When Ouvrir l'arbre
+
+    And Ouvrir LDROI2M dans l’arbre
+    And Ouvrir LDROI220T dans l’arbre
+    And Ouvrir LDRMM900R dans l’arbre
+
     And Cliquer sur la recherche rapide
-    And Encoder la valeur « LCOMU2900 »
-    And Cliquer sur « Rechercher »
+    And Selectionner l'onglet d'unité d'enseignement
+    And Encoder LCOMU2900 comme Code
+    And Cliquer sur le bouton Rechercher (Loupe)
     And Cliquer sur « Sélectionner »
-    And Cliquer sur « Attacher »
-    And Cliquer sur « Enregistrer »
+    And Fermer la modal
+
+    And Dans l'arbre, cliquer sur Attacher sur LDRMM900R
+    And Cliquer sur « Enregistrer » dans la modal
 
     Then Vérifier que LCOMU2900 a été mis à jour
     And LCOMU2900 se trouve bien dans l'arbre sous LDRMM900R
 
 
   Scenario: 35 : En tant que gestionnaire facultaire, je dois pouvoir attacher un groupe au tronc commun d’une offre.
+  Pour pouvoir réaliser ce scénario, l'utilisateur doit être lié à AGRO pour selectionner le groupe.
+
     Given L’utilisateur est dans le groupe faculty manager
     And L’utilisateur est attaché à l’entité DRT
+    And L’utilisateur est attaché à l’entité AGRO
 
-    Given Aller sur la page de detail de la formation: CCCADRÉCOMPL.OPTION7E en 2018-2019
-    And Cliquer sur « Actions / Sélectionner »
+    Given Aller sur la page de detail de la formation: CCCADRÉCOMPL.OPTION7E en 2018-2019
+    When Cliquer sur le menu « Actions »
+    And Cliquer sur « Sélectionner »
 
     Given Aller sur la page de detail de la formation: DROI2M en 2018-2019
-    When Sélectionner « LDROI220T » dans l'arbre
-    And Cliquer sur « Attacher »
-    And Encoder Référence comme Type de lien
-    And Cliquer sur le bouton « Enregistrer »
 
-    Then Vérifier que LBIRE14R a été mis à jour
-    And LBIRE14R se trouve bien dans l'arbre sous LDROI220T
+    When Ouvrir l'arbre
+    And Ouvrir LDROI2M dans l’arbre
+    And Ouvrir LDROI220T dans l’arbre
+    And Dans l'arbre, cliquer sur Attacher sur LDROI220T
+
+    And Encoder Référence comme Type de lien
+    And Cliquer sur « Enregistrer » dans la modal
+
+    Then Vérifier que LBIRE914R a été mis à jour
+    And LBIRE914R se trouve bien dans l'arbre sous LDROI220T
 
   Scenario: 36 : En tant que gestionnaire facultaire, je dois pouvoir déplacer une UE d’un groupe vers un autre groupe.
     Given L’utilisateur est dans le groupe faculty manager

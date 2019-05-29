@@ -107,7 +107,9 @@ def step_impl(context, code, children):
     :type code: str
     :type children: str
     """
+    context.current_page.open_first_node_tree.click()
+
     expected_children = children.split(',')
     children_in_tree = context.current_page.get_name_first_children()
-    for i, child in enumerate(children_in_tree):
-        context.test.assertIn(expected_children[i], child)
+    for i, child in enumerate(expected_children):
+        context.test.assertIn(child, children_in_tree[i])

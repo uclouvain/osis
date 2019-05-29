@@ -13,7 +13,6 @@ Feature: Création d'offre
   « Certificat université 2ième cycle » CUIS2FC LCUIS100Q AGRO AGRO
   + vérifier la structure Partie de base
 
-
     Given Aller sur la page Catalogue de formations / Formation
     When Cliquer sur le menu « Actions »
     And Cliquer sur « Nouvelle Formation »
@@ -36,10 +35,9 @@ Feature: Création d'offre
     When Ouvrir l'arbre
     Then Vérifier que le(s) enfant(s) de <code> sont bien <children>
 
-
     Examples:
       | acronym    | code      | type_de_formation                            | entite_de_gestion | entite_dadministration | intitule_du_diplome | children            |
-      | DROI2MS/TT | LDROI200S | Master en 120 crédits à finalité spécialisée | DRT               | DRT                    | Diplome en droit    | LDROI101T,LDROI300G |
+      | DROI2MS/TT | LDROI200S | Master en 120 crédits à finalité spécialisée | DRT               | DRT                    | Diplome en droit    | LDROI100T,LDROI300G |
       | CUIS2FC    | LCUIS100Q | Certificat d’université 2ème cycle           | AGRO              | AGRO                   | Diplome en cuisine  | LCUIS100T           |
 
   Scenario: 30 : En tant que gestionnaire central, je dois pouvoir créer une offre de type « mini- formation ».

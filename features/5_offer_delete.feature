@@ -4,7 +4,7 @@ Feature: Suppression d'offre.
     Given La base de données est dans son état initial.
     And L'utilisateur est loggé en tant que gestionnaire central.
     And L’utilisateur est attaché à l’entité UCL
-    And La formation DROI2MS/TT doit exister
+    And La formation DROI2MS/TT doit exister en 2018
 
   Scenario: 31 : En tant que gestionnaire central, je dois pouvoir supprimer une offre.
     Given Aller sur la page Catalogue de formations / Formation
