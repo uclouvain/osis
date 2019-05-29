@@ -88,7 +88,6 @@ def learning_units_summary_list(request):
         if search_form.is_valid():
             found_learning_units = search_form.get_learning_units_and_summary_status(
                 requirement_entities=a_user_person.find_main_entities_version,
-                luy_status=True
             )
             check_if_display_message(request, found_learning_units)
     except TooManyResultsException:
