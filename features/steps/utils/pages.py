@@ -28,7 +28,8 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 
 from base.models.entity_version import EntityVersion
-from features.steps.utils.fields import InputField, SubmitField, SelectField, ButtonField, Checkbox, Select2Field, Link, \
+from features.steps.utils.fields import InputField, SubmitField, SelectField, ButtonField, \
+    Checkbox, Select2Field, Link, \
     CkeditorField, RadioField, Field, SelectEntityVersionField
 
 

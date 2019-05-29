@@ -65,7 +65,8 @@ def step_impl(context: Context):
     page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
     page.login("usual_suspect", 'Roger_Verbal_Kint')
 
-    context.test.assertEqual(context.browser.current_url, context.get_url('/'))\
+    context.test.assertEqual(context.browser.current_url, context.get_url('/'))
+
 
 @step("L'utilisateur est loggé en tant que {group}.")
 def step_impl(context: Context, group):
@@ -143,9 +144,6 @@ def step_impl(context: Context, value: str):
 
 @given("S’assurer que la date de fin de {acronym} est {year}.")
 def step_impl(context, acronym, year):
-    """
-    :type context: behave.runner.Context
-    """
     lu = LearningUnit.objects.filter(learningunityear__acronym=acronym).first()
     lu.end_year = int(year[:4])
     lu.save()
@@ -153,10 +151,6 @@ def step_impl(context, acronym, year):
 
 @given("L'ue {acronym} en {year} et liée à {entity} est en proposition de création")
 def step_impl(context, acronym, year, entity):
-    """
-    :type context: behave.runner.Context
-    """
-
     campus = Campus.objects.filter(organization__type='MAIN').first()
 
     luy = LearningUnitYearFullFactory(
@@ -189,9 +183,6 @@ def step_impl(context, acronym, year, entity):
 
 @given("L'ue {acronym} en {year} et liée à {entity} est en proposition de modification")
 def step_impl(context, acronym, year, entity):
-    """
-    :type context: behave.runner.Context
-    """
     luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=year[:4])
     e = Entity.objects.filter(entityversion__acronym=entity).first()
 
@@ -205,9 +196,6 @@ def step_impl(context, acronym, year, entity):
 
 @given("L'ue {acronym} en {year} et liée à {entity} est en proposition de suppression")
 def step_impl(context, acronym, year, entity):
-    """
-    :type context: behave.runner.Context
-    """
     luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=year[:4])
     e = Entity.objects.filter(entityversion__acronym=entity).first()
 

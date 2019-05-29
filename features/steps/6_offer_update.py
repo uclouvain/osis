@@ -100,7 +100,8 @@ def step_impl(context, action, acronym):
     elif action.lower() == 'sélectionner':
         context.current_page.select_node_tree(acronym)
     else:
-        raise Exception("Unknown action")\
+        raise Exception("Unknown action")
+
 
 @step("Dans l'arbre et dans {parent}, cliquer sur {action} sur {acronym}.")
 def step_impl(context, parent, action, acronym):
@@ -132,8 +133,5 @@ def step_impl(context, child, parent):
 
 @step("{child} ne se trouve plus bien dans l'arbre sous {parent}")
 def step_impl(context, child, parent):
-    """
-    :type context: behave.runner.Context
-    """
     with context.test.assertRaises(Exception):
         context.current_page.find_node_tree_by_acronym(child, parent)
