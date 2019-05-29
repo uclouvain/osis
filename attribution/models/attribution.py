@@ -94,9 +94,8 @@ def find_all_responsibles_by_learning_unit_year(a_learning_unit_year):
 
 
 def find_all_tutors_by_learning_unit_year(a_learning_unit_year, responsibles_order=""):
-    attribution_list = Attribution.objects.filter(learning_unit_year=a_learning_unit_year) \
-        .distinct("tutor").values_list('id', flat=True)
-    result = Attribution.objects.filter(id__in=attribution_list).order_by(responsibles_order, "tutor__person")
+    result = find_all_responsible_by_learning_unit_year(a_learning_unit_year, responsibles_order=responsibles_order)\
+        .order_by(responsibles_order, "tutor__person")
     return [
         [attribution.tutor, attribution.score_responsible, attribution.summary_responsible]
         for attribution in result
@@ -176,11 +175,18 @@ def filter_by_entities(queryset, entities):
     return queryset
 
 
-def find_all_responsible_by_learning_unit_year(learning_unit_year):
-    all_tutors = Attribution.objects.filter(learning_unit_year=learning_unit_year) \
-        .distinct("tutor").values_list('id', flat=True)
-    return Attribution.objects.filter(id__in=all_tutors).prefetch_related('tutor')\
-                              .order_by("tutor__person")
+def find_all_responsible_by_learning_unit_year(learning_unit_year, responsibles_order=None):
+    if not responsibles_order:
+        # FIXME :: this code fixes wrong database model. The flags summary_responsible and score_responsible should be
+        # FIXME :: in another model than Attribution (to avoid ducplicates tutor name)
+        raise AttributeError("Please set the responsibles_order param. It's used to order by attributions from"
+                             "scores responsibles or summary responsibles.")
+    all_tutors_qs = Attribution.objects.filter(learning_unit_year=learning_unit_year).order_by('tutor')
+    if responsibles_order:
+        all_tutors_qs = all_tutors_qs.order_by('tutor', responsibles_order)
+    all_tutors_qs = all_tutors_qs.distinct('tutor').values_list('id', flat=True)
+    return Attribution.objects.filter(id__in=all_tutors_qs).prefetch_related('tutor') \
+        .order_by("tutor__person")
 
 
 def find_all_summary_responsibles_by_learning_unit_years(learning_unit_years):
