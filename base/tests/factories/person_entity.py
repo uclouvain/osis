@@ -35,7 +35,6 @@ class PersonEntityFactory(factory.DjangoModelFactory):
         model = 'base.PersonEntity'
         django_get_or_create = ('person', 'entity')
 
-
     person = factory.SubFactory(PersonFactory)
     entity = factory.SubFactory(EntityFactory)
     with_child = False
