@@ -2585,6 +2585,10 @@ msgstr ""
 msgid "Modification made"
 msgstr ""
 
+#: templates/blocks/span/span_mod_status.html:35
+msgid "Modification blocked"
+msgstr ""
+
 #: business/learning_units/perms.py:531
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
