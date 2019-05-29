@@ -177,8 +177,7 @@ def filter_by_entities(queryset, entities):
 
 
 def find_all_responsible_by_learning_unit_year(learning_unit_year):
-    all_tutors = Attribution.objects.filter(learning_unit_year=learning_unit_year) \
-        .distinct("tutor").values_list('id', flat=True)
+    all_tutors = Attribution.objects.filter(learning_unit_year=learning_unit_year).values_list('id', flat=True)
     return Attribution.objects.filter(id__in=all_tutors).prefetch_related('tutor')\
                               .order_by("tutor__person")
 
