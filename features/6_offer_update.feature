@@ -44,7 +44,6 @@ Feature: Modification d'offre
 
     Given Aller sur la page de detail de la formation: DROI2M en 2018-2019
     When Ouvrir l'arbre
-
     And Ouvrir LDROI2M dans l’arbre
     And Ouvrir LDROI220T dans l’arbre
     And Ouvrir LDRMM900R dans l’arbre
@@ -56,7 +55,7 @@ Feature: Modification d'offre
     And Cliquer sur « Sélectionner »
     And Fermer la modal
 
-    And Dans l'arbre, cliquer sur Attacher sur LDRMM900R
+    And Dans l'arbre, cliquer sur Attacher sur LDRMM900R.
     And Cliquer sur « Enregistrer » dans la modal
 
     Then Vérifier que LCOMU2900 a été mis à jour
@@ -79,7 +78,7 @@ Feature: Modification d'offre
     When Ouvrir l'arbre
     And Ouvrir LDROI2M dans l’arbre
     And Ouvrir LDROI220T dans l’arbre
-    And Dans l'arbre, cliquer sur Attacher sur LDROI220T
+    And Dans l'arbre, cliquer sur Attacher sur LDROI220T.
 
     And Encoder Référence comme Type de lien
     And Cliquer sur « Enregistrer » dans la modal
@@ -90,7 +89,42 @@ Feature: Modification d'offre
   Scenario: 36 : En tant que gestionnaire facultaire, je dois pouvoir déplacer une UE d’un groupe vers un autre groupe.
     Given L’utilisateur est dans le groupe faculty manager
     And L’utilisateur est attaché à l’entité DRT
+    Given Aller sur la page de detail de la formation: DROI2M en 2018-2019
+    When Ouvrir l'arbre
+    And Ouvrir LDROI2M dans l’arbre
+    And Ouvrir LDROI220T dans l’arbre
+    And Ouvrir LDRCC900R dans l’arbre
+    And Dans l'arbre, cliquer sur Sélectionner sur LDROI2108.
+
+    And Ouvrir LDRMM900R dans l’arbre
+    And Dans l'arbre, cliquer sur Attacher sur LDRMM900R.
+    And Cliquer sur « Enregistrer » dans la modal
+
+    And Dans l'arbre et dans LDRCC900R, cliquer sur Détacher sur LDROI2108.
+    And Cliquer sur « Enregistrer » dans la modal
+    And LDROI2108 se trouve bien dans l'arbre sous LDRMM900R
+    And LDROI2108 ne se trouve plus bien dans l'arbre sous LDRCC900R
+
 
   Scenario: 37 : En tant que gestionnaire facultaire, je ne dois pas pouvoir supprimer une option de la liste des options si cette option est toujours présente dans la liste des finalités.
+  Description :
+  Essayer de détacher une option de la liste d’option alors qu’elle est présente dans la liste des finalités (ex. LDROP2410O / OPTDROI2M/CP)
 
   Scenario: 38 : En tant que gestionnaire facultaire, je dois pouvoir déplacer une option d’un groupe vers un autre groupe.
+  Déplacer une option dans GEST2M
+  Détacher LGEST557O dans LGEST202G/LGEST202A/LGEST562G Le retrouver dans LGEST203G (ouvrir tout)
+  Sélectionner LGEST557O
+  Le rattacher dans LGEST202G/LGEST202A/LGEST562G
+  Améliorations :
+  a) Recherche rapide pour UE + OFFRE
+  b) Actuellement Copier / Coller, il faudrait Couper / Coller
+
+  Informations textuelles (alias générales)
+  Gestion des attendus sur les diplômes
+  Onglet et accès différents ; on peut modifier dans le passé ; principal accès en gestionnaire facultaire
+  Programme type
+  Recopier le programme de l’année précédente Modifier un programme existant
+  Créer un nouveau programme type
+  Candidature en ligne
+  Pour le moment hors scope ; vue prof uniquement
+

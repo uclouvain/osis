@@ -327,8 +327,7 @@ class EducationGroupPage(pypom.Page):
     open_first_node_tree = ButtonField(By.CSS_SELECTOR, '#panel_file_tree > ul > li > i')
 
     quick_search = Link(QuickSearchPage, By.ID, 'quick-search')
-    save_modal = Link('EducationGroupPage', By.CSS_SELECTOR,
-                      '#form-modal-content > div.modal-footer > button.btn.btn-primary.pull-right', 6)
+    save_modal = Link('EducationGroupPage', By.CSS_SELECTOR, '.modal-footer > [type=submit]', 6)
 
     type_de_lien = SelectField(By.ID, 'id_link_type')
 
@@ -343,6 +342,8 @@ class EducationGroupPage(pypom.Page):
     def find_node_tree_by_acronym(self, acronym, parent=None):
         if not parent:
             parent = self
+        else:
+            parent = self.find_node_tree_by_acronym(parent)
 
         for node in parent.find_elements(By.CSS_SELECTOR, 'li.jstree-node'):
             if acronym == node.text.split('-')[0].strip():
@@ -353,17 +354,27 @@ class EducationGroupPage(pypom.Page):
         node = self.find_node_tree_by_acronym(acronym)
         node.find_element(By.CSS_SELECTOR, 'i').click()
 
-    def rigth_click_node_tree(self, acronym):
-        node = self.find_node_tree_by_acronym(acronym)
+    def rigth_click_node_tree(self, acronym, parent=None):
+        node = self.find_node_tree_by_acronym(acronym, parent)
 
         actionChains = ActionChains(self.driver)
         child = node.find_element(By.CSS_SELECTOR, 'a')
         actionChains.context_click(child).perform()
         return child
 
-    def attach_node_tree(self, acronym):
-        self.rigth_click_node_tree(acronym)
+    def attach_node_tree(self, acronym, parent=None):
+        self.rigth_click_node_tree(acronym, parent)
         self.find_element(By.CSS_SELECTOR, 'body > ul > li:nth-child(4) > a').click()
+        time.sleep(1)
+
+    def detach_node_tree(self, acronym, parent=None):
+        self.rigth_click_node_tree(acronym, parent)
+        self.find_element(By.CSS_SELECTOR, 'body > ul > li:nth-child(5) > a').click()
+        time.sleep(1)
+
+    def select_node_tree(self, acronym, parent=None):
+        self.rigth_click_node_tree(acronym, parent)
+        self.find_element(By.CSS_SELECTOR, 'body > ul > li:nth-child(1) > a').click()
         time.sleep(1)
 
     @property

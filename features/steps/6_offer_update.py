@@ -93,9 +93,25 @@ def step_impl(context):
     context.current_page.lu_tab.click()
 
 
-@step("Dans l'arbre, cliquer sur {action} sur {acronym}")
+@step("Dans l'arbre, cliquer sur {action} sur {acronym}.")
 def step_impl(context, action, acronym):
-    context.current_page.attach_node_tree(acronym)
+    if action.lower() == 'attacher':
+        context.current_page.attach_node_tree(acronym)
+    elif action.lower() == 'sélectionner':
+        context.current_page.select_node_tree(acronym)
+    else:
+        raise Exception("Unknown action")\
+
+@step("Dans l'arbre et dans {parent}, cliquer sur {action} sur {acronym}.")
+def step_impl(context, parent, action, acronym):
+    if action.lower() == 'attacher':
+        context.current_page.attach_node_tree(acronym, parent)
+    elif action.lower() == 'sélectionner':
+        context.current_page.select_node_tree(acronym, parent)
+    elif action.lower() == 'détacher':
+        context.current_page.detach_node_tree(acronym, parent)
+    else:
+        raise Exception("Unknown action")
 
 
 @step("Cliquer sur « Enregistrer » dans la modal")
@@ -111,5 +127,13 @@ def step_impl(context, acronym):
 
 @step("{child} se trouve bien dans l'arbre sous {parent}")
 def step_impl(context, child, parent):
-    parent_node = context.current_page.find_node_tree_by_acronym(parent)
-    context.current_page.find_node_tree_by_acronym(child, parent_node)
+    context.current_page.find_node_tree_by_acronym(child, parent)
+
+
+@step("{child} ne se trouve plus bien dans l'arbre sous {parent}")
+def step_impl(context, child, parent):
+    """
+    :type context: behave.runner.Context
+    """
+    with context.test.assertRaises(Exception):
+        context.current_page.find_node_tree_by_acronym(child, parent)
