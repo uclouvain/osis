@@ -114,6 +114,7 @@ class TestFindAllResponsibleByLearningUnitYear(TestCase):
         )  # Second attribution with different function
         result = attribution.find_all_responsible_by_learning_unit_year(luy, '-score_responsible')
         self.assertEqual(result.count(), 1)
+        self.assertNotEqual(result.count(), 2)  # Prevent from duplication of Tutor name
         self.assertTrue(result.get().score_responsible)
 
     def test_summary_responsible_when_multiple_attribution_for_same_tutor(self):
@@ -131,6 +132,7 @@ class TestFindAllResponsibleByLearningUnitYear(TestCase):
         )  # Second attribution with different function
         result = attribution.find_all_responsible_by_learning_unit_year(luy, '-summary_responsible')
         self.assertEqual(result.count(), 1)
+        self.assertNotEqual(result.count(), 2)  # Prevent from duplication of Tutor name
         self.assertTrue(result.get().summary_responsible)
 
     def test_when_orderby_is_none(self):
