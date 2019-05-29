@@ -99,17 +99,41 @@ class AttributionTest(TestCase):
 class TestFindAllResponsibleByLearningUnitYear(TestCase):
     """Unit tests on find_all_responsible_by_learning_unit_year()"""
 
-    def test_when_multiple_attribution_for_same_tutor(self):
+    def test_score_responsible_when_multiple_attribution_for_same_tutor(self):
         luy = LearningUnitYearFactory()
         attr1 = AttributionFactory(
             function=COORDINATOR,
             learning_unit_year=luy,
+            score_responsible=False,
         )
         AttributionFactory(
             function=CO_HOLDER,
             tutor=attr1.tutor,
             learning_unit_year=luy,
+            score_responsible=True,
         )  # Second attribution with different function
-        result = attribution.find_all_responsible_by_learning_unit_year(luy)
-        self.assertEqual(result.count(), 2)
-        self.assertNotEqual(result.count(), 1)
+        result = attribution.find_all_responsible_by_learning_unit_year(luy, '-score_responsible')
+        self.assertEqual(result.count(), 1)
+        self.assertTrue(result.get().score_responsible)
+
+    def test_summary_responsible_when_multiple_attribution_for_same_tutor(self):
+        luy = LearningUnitYearFactory()
+        attr1 = AttributionFactory(
+            function=COORDINATOR,
+            learning_unit_year=luy,
+            summary_responsible=False,
+        )
+        AttributionFactory(
+            function=CO_HOLDER,
+            tutor=attr1.tutor,
+            learning_unit_year=luy,
+            summary_responsible=True,
+        )  # Second attribution with different function
+        result = attribution.find_all_responsible_by_learning_unit_year(luy, '-summary_responsible')
+        self.assertEqual(result.count(), 1)
+        self.assertTrue(result.get().summary_responsible)
+
+    def test_when_orderby_is_none(self):
+        order_by = None
+        with self.assertRaises(AttributeError):
+            attribution.find_all_responsible_by_learning_unit_year(LearningUnitYearFactory(), order_by)
