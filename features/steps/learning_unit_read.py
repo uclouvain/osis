@@ -53,7 +53,7 @@ def step_impl(context):
       "débutant en {start_year} pour une durée de {duration} ans avec un volume en Q1 de {vol_q1} et en Q2 de {vol_q2}")
 def step_impl(context, nb_row, teacher, function, start_year, duration, vol_q1, vol_q2):
     context.test.assertEqual(context.current_page.attribution_row(nb_row),
-                             [teacher, function, duration, vol_q1, vol_q2])
+                             [teacher, function, start_year, duration, vol_q1, vol_q2])
 
 
 @then("Vérifier que à la ligne {nb_row}, l'enseignant est bien {teacher} avec comme fonction {function} "

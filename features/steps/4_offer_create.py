@@ -90,3 +90,24 @@ def step_impl(context):
     :type context: behave.runner.Context
     """
     context.current_page.new_mini_training.click()
+
+
+@when("Ouvrir l'arbre")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page.toggle_tree.click()
+
+
+@then("Vérifier que le(s) enfant(s) de {code} sont bien {children}")
+def step_impl(context, code, children):
+    """
+    :type context: behave.runner.Context
+    :type code: str
+    :type children: str
+    """
+    expected_children = children.split(',')
+    children_in_tree = context.current_page.get_name_first_children()
+    for i, child in enumerate(children_in_tree):
+        context.test.assertIn(expected_children[i], child)

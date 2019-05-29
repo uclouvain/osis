@@ -70,7 +70,8 @@ class LearningUnitAttributionPage(pypom.Page):
 
     @property
     def loaded(self):
-        return "Enseignant·e·s" in self.find_element(By.CSS_SELECTOR, 'li.active[role=presentation]').text
+        return "Enseignant·e·s" in self.find_element(By.CSS_SELECTOR, 'li.active[role=presentation]').text and \
+               self.find_element(By.ID, "manage_repartition")
 
 
 class LearningUnitTrainingPage(pypom.Page):
@@ -166,7 +167,7 @@ class DescriptionPage(pypom.Page):
 
 class SpecificationPage(pypom.Page):
     themes_abordes = CkeditorField(By.CLASS_NAME, 'cke_wysiwyg_frame')
-    save_button = ButtonField(By.CSS_SELECTOR, 'div.modal-footer > .btn-primary')
+    save_button = Link('SpecificationPage', By.CSS_SELECTOR, 'div.modal-footer > .btn-primary', 1)
     add_button = ButtonField(By.CSS_SELECTOR, '.btn.btn-info.btn-sm.trigger_modal')
 
     code = InputField(By.ID, 'id_code_name')
@@ -293,6 +294,17 @@ class EducationGroupPage(pypom.Page):
         By.CSS_SELECTOR,
         '#identification > div > div > div.row > div.col-md-5 > div:nth-child(1) > div > dl:nth-child(2) > dd'
     )
+    actions = ButtonField(By.ID, 'dLabel')
+
+    delete = ButtonField(By.CSS_SELECTOR, '#link_delete > a', 1)
+    confirm_modal = Link('SearchEducationGroupPage', By.CSS_SELECTOR, '.modal-footer>input[type=submit]')
+
+    toggle_tree = ButtonField(By.CSS_SELECTOR, '#panel-data > div.panel-heading > div > a')
+    open_first_node_tree = ButtonField(By.CSS_SELECTOR, '#panel_file_tree > ul > li > i')
+
+    def get_name_first_children(self) -> list:
+        children = self.find_elements(By.CSS_SELECTOR, '#panel_file_tree > ul > li > ul > li')
+        return [child.text for child in children]
 
     def success_messages(self):
         success_panel = self.find_element(By.ID, "pnl_succes_messages")
@@ -316,11 +328,20 @@ class NewTrainingPage(pypom.Page):
 class SearchEducationGroupPage(pypom.Page):
     URL_TEMPLATE = '/educationgroups/'
 
+    sigleintitule_abrege = InputField(By.ID, 'id_acronym')
+    code = InputField(By.ID, 'id_partial_acronym')
+
     actions = ButtonField(By.ID, 'btn-action')
     new_training = ButtonField(By.CSS_SELECTOR, '#link_create_training > a', 1)
     new_mini_training = ButtonField(By.CSS_SELECTOR, '#link_create_mini_training > a', 1)
+
+    first_row = Link('EducationGroupPage', By.CSS_SELECTOR,
+                     '#table_education_groups > tbody > tr:nth-child(1) > td:nth-child(2) > a')
+
     type_de_formation = SelectField(By.ID, "id_name")
     confirm_modal = Link(NewTrainingPage, By.CSS_SELECTOR, '.modal-footer>input.btn-primary')
+    clear_button = ButtonField(By.ID, 'btn_clear_filter')
+    search = Link('SearchEducationGroupPage', By.CSS_SELECTOR, 'button.btn-primary', 1)
 
     def success_messages(self):
         success_panel = self.find_element(By.ID, "pnl_succes_messages")

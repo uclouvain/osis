@@ -83,7 +83,7 @@ def step_impl(context):
     """
     :type context: behave.runner.Context
     """
-    context.current_page.acntif = False
+    context.current_page.actif = False
 
 
 @step("Encoder {value} comme {field}")

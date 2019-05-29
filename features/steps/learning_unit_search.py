@@ -99,7 +99,6 @@ def step_impl(context):
     :type context: behave.runner.Context
     """
     context.current_page.generate_xls.click()
-    time.sleep(10)
 
 
 @step("Sélectionner l’onglet « Propositions »")
