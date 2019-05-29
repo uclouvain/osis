@@ -63,11 +63,11 @@
                             <td>{{ obj.externallearningunityear.external_credits | default_if_none:'' }}</td>
                             <td>
                                 {% if obj.status %}
-                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:green;"
+                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:limegreen;"
                                           title="{% trans 'Active' %}"></span>
                                     <div style="display:none;">1</div>
                                 {% else %}
-                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:gray;"
+                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:red;"
                                           title="{% trans 'Inactive' %}"></span>
                                     <div style="display:none;">0</div>
                                 {% endif %}
