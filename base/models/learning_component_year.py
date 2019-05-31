@@ -162,7 +162,7 @@ class LearningComponentYear(SerializableModel):
 
     @cached_property
     def vol_global(self):
-        return float(float(self.hourly_volume_total_annual or 0.0) * float(self.planned_classes or 0.0))
+        return float(float(self.hourly_volume_total_annual or 0.0) * float(self.planned_classes or 1))
 
     @property
     def repartition_volumes(self):

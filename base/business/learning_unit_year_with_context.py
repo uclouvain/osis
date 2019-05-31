@@ -104,10 +104,8 @@ def append_components(learning_unit_year):
 
 
 def volume_learning_component_year(learning_component_year):
-    print('volume_learning_component_year')
     requirement_vols = learning_component_year.repartition_volumes
     planned_classes = learning_component_year.planned_classes or 1
-    print("Glob: {}".format(learning_component_year.vol_global))
     return {
         'VOLUME_TOTAL': learning_component_year.hourly_volume_total_annual,
         'VOLUME_Q1': learning_component_year.hourly_volume_partial_q1,
