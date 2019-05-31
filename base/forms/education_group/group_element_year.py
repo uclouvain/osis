@@ -115,7 +115,7 @@ class GroupElementYearForm(forms.ModelForm):
     def clean(self):
         strategy = AttachEducationGroupYearStrategy if self.instance.child_branch else \
             AttachLearningUnitYearStrategy
-        strategy(parent=self.instance.parent, child=self.instance.child).is_valid()
+        strategy(parent=self.instance.parent, child=self.instance.child, instance=self.instance).is_valid()
         return super().clean()
 
     def _check_authorized_relationship(self, child_type):
