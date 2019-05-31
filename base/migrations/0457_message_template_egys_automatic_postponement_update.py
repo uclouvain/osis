@@ -124,7 +124,9 @@ class Migration(migrations.Migration):
                         {% for eg in egys_with_errors %}
                         {% with egy=eg.educationgroupyear_set.last %}
                             <tr>
-                                <td>{{ egy }}</td>
+                                <td>{{ egy.verbose }}</td>
+                                <td>{{ egy.complete_title }}</td>
+                                <td>{{ egy.academic_year }}</td>
                             </tr>
                         {% endwith %}
                         {% endfor %}
@@ -191,9 +193,6 @@ class Migration(migrations.Migration):
                 
                     {% for eg in egys_with_errors %}
                         {% with egy=eg.educationgroupyear_set.last %}
-                        {% ifchanged  egy.verbose_type%}
-                            <strong>{{ egy.verbose_type }}</strong><br/>
-                        {% endifchanged %}
                         {{ egy.verbose }} - {{ egy.complete_title }}<br/>
                     {% endwith %}
                     {% endfor %}
@@ -322,11 +321,6 @@ class Migration(migrations.Migration):
                         <tbody>
                         {% for eg in egys_with_errors %}
                         {% with egy=eg.educationgroupyear_set.last %}
-                            {% ifchanged  egy.verbose_type%}
-                            <tr>
-                                <th colspan="2">{{ egy.verbose_type }}</th>
-                            </tr>
-                            {% endifchanged %}
                             <tr>
                                 <td>{{ egy.verbose }}</td>
                                 <td>{{ egy.complete_title }} - {{ egy.verbose_type }}</td>
@@ -397,9 +391,6 @@ class Migration(migrations.Migration):
                     <strong>Acronym - Title</strong><br/>
                     {% for eg in egys_with_errors %}
                         {% with egy=eg.educationgroupyear_set.last %}
-                        {% ifchanged  egy.verbose_type%}
-                            <strong>{{ egy.verbose_type }}</strong><br/>
-                        {% endifchanged %}
                         {{ egy.verbose }} - {{ egy.complete_title }}<br/>
                     {% endwith %}
                     {% endfor %}
