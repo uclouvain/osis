@@ -121,10 +121,14 @@ class Migration(migrations.Migration):
                     <div class="w3-responsive">
                     <table class="w3-table w3-striped w3-hoverable">                
                         <tbody>
-                        {% for egy in egys_with_errors %}
+                        {% for eg in egys_with_errors %}
+                        {% with egy=eg.educationgroupyear_set.last %}
                             <tr>
-                                <td>{{ egy }}</td>
+                                <td>{{ egy.verbose }}</td>
+                                <td>{{ egy.complete_title }}</td>
+                                <td>{{ egy.academic_year }}</td>
                             </tr>
+                        {% endwith %}
                         {% endfor %}
                         </tbody>
                     </table>
@@ -187,8 +191,10 @@ class Migration(migrations.Migration):
                 
                     <p><strong>Les organisations de formation suivantes n&#39;ont pas &eacute;t&eacute; recopi&eacute;es :</strong></p>
                 
-                    {% for egy in egys_with_errors %}
-                        {{ egy }}<br/>
+                    {% for eg in egys_with_errors %}
+                        {% with egy=eg.educationgroupyear_set.last %}
+                        {{ egy.verbose }} - {{ egy.complete_title }}<br/>
+                    {% endwith %}
                     {% endfor %}
                 {% endif %}
                 <p>Cordialement, Osis UCLouvain</p>
@@ -313,16 +319,13 @@ class Migration(migrations.Migration):
                         </thead>
                 
                         <tbody>
-                        {% for egy in egys_with_errors %}
-                            {% ifchanged  egy.verbose_type%}
-                            <tr>
-                                <th colspan="2">{{ egy.verbose_type }}</th>
-                            </tr>
-                            {% endifchanged %}
+                        {% for eg in egys_with_errors %}
+                        {% with egy=eg.educationgroupyear_set.last %}
                             <tr>
                                 <td>{{ egy.verbose }}</td>
                                 <td>{{ egy.complete_title }} - {{ egy.verbose_type }}</td>
                             </tr>
+                        {% endwith %}
                         {% endfor %}
                         </tbody>
                     </table>
@@ -386,11 +389,10 @@ class Migration(migrations.Migration):
                     <p><strong>Errors occured with the following education groups :</strong></p>
                 
                     <strong>Acronym - Title</strong><br/>
-                    {% for egy in egys_with_errors %}
-                        {% ifchanged  egy.verbose_type%}
-                            <strong>{{ egy.verbose_type }}</strong><br/>
-                        {% endifchanged %}
+                    {% for eg in egys_with_errors %}
+                        {% with egy=eg.educationgroupyear_set.last %}
                         {{ egy.verbose }} - {{ egy.complete_title }}<br/>
+                    {% endwith %}
                     {% endfor %}
                 {% endif %}
                 

@@ -186,7 +186,7 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
                           'egys_ending_this_year': len(egys_ending_this_year),
                           'egys_ending_this_year_qs': egys_ending_this_year.order_by(
                               'educationgroupyear__education_group_type__name'),
-                          'egys_with_errors': egys_with_errors
+                          'egys_with_errors': sorted(egys_with_errors)
                           }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
