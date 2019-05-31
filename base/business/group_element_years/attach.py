@@ -151,7 +151,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
 
 
 class AttachLearningUnitYearStrategy(AttachStrategy):
-    def __init__(self, parent: EducationGroupYear, child: LearningUnitYear, instance):
+    def __init__(self, parent: EducationGroupYear, child: LearningUnitYear, instance=None):
         self.parent = parent
         self.child = child
         self.instance = instance
