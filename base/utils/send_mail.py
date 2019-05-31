@@ -37,6 +37,7 @@ from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
 from assessments.business import score_encoding_sheet
+from base.models.education_group import EducationGroup
 from base.models.person import Person
 from osis_common.document import paper_sheet, xls_build
 from osis_common.document.xls_build import _adjust_column_width
@@ -186,7 +187,8 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
                           'egys_ending_this_year': len(egys_ending_this_year),
                           'egys_ending_this_year_qs': egys_ending_this_year.order_by(
                               'educationgroupyear__education_group_type__name'),
-                          'egys_with_errors': egys_with_errors
+                          'egys_with_errors': EducationGroup.objects.filter(pk__in=egys_with_errors).order_by(
+                              'educationgroupyear__education_group_type__name')
                           }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
