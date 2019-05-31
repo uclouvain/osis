@@ -296,17 +296,6 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
         disabled_fields = {key for key, value in form.fields.items() if value.disabled}
         self.assertEqual(disabled_fields, FULL_READ_ONLY_FIELDS.union({'internship_subtype'}))
 
-    def test_restrict_type_choice_for_proposal_creation(self):
-        full_form = _instanciate_form(self.current_academic_year, post_data=self.post_data,
-                                      start_year=self.current_academic_year.year, proposal_type=ProposalType.CREATION.name)
-
-        self.assertEqual(full_form.fields['container_type'].choices,
-                         [(None, '---------'),
-                          ('COURSE', 'Cours'),
-                          ('DISSERTATION', 'Mémoire'),
-                          ('INTERNSHIP', 'Stage')]
-        )
-
 
 class TestFullFormIsValid(LearningUnitFullFormContextMixin):
     """Unit tests for is_valid() """
