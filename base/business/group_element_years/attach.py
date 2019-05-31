@@ -44,7 +44,7 @@ class AttachStrategy(metaclass=abc.ABCMeta):
 
 
 class AttachEducationGroupYearStrategy(AttachStrategy):
-    def __init__(self, parent: EducationGroupYear, child: EducationGroupYear, instance):
+    def __init__(self, parent: EducationGroupYear, child: EducationGroupYear, instance=None):
         self.parent = parent
         self.child = child
         self.instance = instance
