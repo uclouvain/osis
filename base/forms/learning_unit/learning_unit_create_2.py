@@ -259,7 +259,7 @@ class FullForm(LearningUnitBaseForm):
         if self.proposal:
             self.disable_fields(PROPOSAL_READ_ONLY_FIELDS)
         elif self.instance.learning_container_year and \
-                        self.instance.learning_container_year.container_type not in faculty_type_not_restricted:
+                self.instance.learning_container_year.container_type not in faculty_type_not_restricted:
             self.disable_fields(self.fields.keys() - set(FACULTY_OPEN_FIELDS))
         else:
             self.disable_fields(FULL_READ_ONLY_FIELDS)
