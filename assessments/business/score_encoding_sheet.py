@@ -34,6 +34,7 @@ from assessments.models.enums.score_sheet_address_choices import *
 from base.business import entity_version as entity_version_business
 from base.models.enums.person_address_type import PersonAddressType
 from assessments.business.enrollment_state import get_line_color
+from base.models.enums import exam_enrollment_state as enrollment_states
 
 
 def get_score_sheet_address(off_year):
@@ -182,11 +183,6 @@ def scores_sheet_data(exam_enrollments, tutor=None):
                     else:
                         score = str(int(exam_enrol.score_final))
 
-                # Compute deadline score encoding
-                deadline = get_deadline(exam_enrol)
-                if deadline:
-                    deadline = deadline.strftime(date_format)
-
                 enrollments.append({
                     "registration_id": student.registration_id,
                     "last_name": student.person.last_name,
@@ -194,7 +190,7 @@ def scores_sheet_data(exam_enrollments, tutor=None):
                     "score": score,
                     "justification": _(exam_enrol.get_justification_final_display())
                     if exam_enrol.justification_final else '',
-                    "deadline": deadline if deadline else '',
+                    "deadline": _get_formatted_deadline(date_format, exam_enrol),
                     "enrollment_state_color": get_line_color(exam_enrol),
                 })
             program['enrollments'] = enrollments
@@ -227,3 +223,12 @@ def _group_by_learning_unit_year_id(exam_enrollments):
         else:
             enrollments_by_learn_unit[key].append(exam_enroll)
     return enrollments_by_learn_unit
+
+
+def _get_formatted_deadline(date_format, exam_enrol):
+    # Compute deadline score encoding
+    if exam_enrol.enrollment_state == enrollment_states.ENROLLED:
+        deadline = get_deadline(exam_enrol)
+        if deadline:
+            return deadline.strftime(date_format)
+    return ''
