@@ -5932,6 +5932,14 @@ msgstr "oui"
 msgid "yes,no"
 msgstr "oui,non"
 
+#: templates/blocks/span/span_mod_status.html:48
+msgid "No change made"
+msgstr "Pas de modification apportée"
+
+#: templates/learning_unit/summary_list.html:82
+msgid "Modified"
+msgstr "Modifié"
+
 #~ msgid "Unable to retrieve appropriate sections for this programs"
 #~ msgstr ""
 #~ "Impossible de récupérer les sections pertinentes pour le programme "

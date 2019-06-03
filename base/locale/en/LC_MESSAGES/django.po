@@ -5720,3 +5720,11 @@ msgstr ""
 #: templates/learning_unit/identification.html:163
 msgid "yes,no"
 msgstr ""
+
+#: templates/blocks/span/span_mod_status.html:48
+msgid "No change made"
+msgstr ""
+
+#: templates/learning_unit/summary_list.html:82
+msgid "Modified"
+msgstr ""
