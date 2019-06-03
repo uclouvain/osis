@@ -180,6 +180,10 @@ class ScoreSheetDataTest(TestCase):
         self.assertEqual(score_responsible['first_name'], "Thomas")
         self.assertEqual(score_responsible['last_name'], "Durant")
         self.assertEqual(score_responsible['address']['city'], "Louvain-la-neuve")
+
+    def test_scores_sheet_deadline(self):
+        exam_enrollments = ExamEnrollment.objects.all()
+        data_computed = score_encoding_sheet.scores_sheet_data(exam_enrollments)
         # Check the deadline for enrolled/not enrolled students
         for enrollment in data_computed['learning_unit_years'][0]['programs'][0]['enrollments']:
             if enrollment['registration_id'] in (self.student_1.registration_id, self.student_2.registration_id, self.student_3.registration_id):
