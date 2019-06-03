@@ -27,7 +27,6 @@ from ajax_select import register, LookupChannel
 from ajax_select.fields import AutoCompleteSelectMultipleField
 from dal import autocomplete
 from django import forms
-from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
@@ -226,6 +225,16 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             self.fields['joint_diploma'].initial = False
             self.fields['diploma_printing_title'].required = False
 
+    def clean_certificate_aims(self):
+        certificate_aims = self.cleaned_data["certificate_aims"]
+        nb_type_2 = 0
+        for certificate_aim in certificate_aims:
+            if certificate_aim.section == 2:
+                nb_type_2 += 1
+        if nb_type_2 >= 2:
+            raise forms.ValidationError(_("There can only be one expectation of type 2"))
+        return certificate_aims
+
     def save(self, commit=True):
         education_group_year = super().save(commit=False)
         education_group_year.save()
@@ -269,17 +278,6 @@ class CertificateAimsForm(forms.ModelForm):
                 forward=['section'],
             )
         }
-
-    def clean_certificate_aims(self):
-        print("in clean")
-        certificate_aims = self.cleaned_data["certificate_aims"]
-        nb_type_2 = 0
-        for certificate_aim in certificate_aims:
-            if certificate_aim.section == 2:
-                nb_type_2 += 1
-        if nb_type_2 >= 2:
-            raise ValidationError(_("There can only be one expectation of type 2"))
-        return certificate_aims
 
     def save(self, commit=True):
         print("in save")
