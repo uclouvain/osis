@@ -995,7 +995,7 @@ msgid ""
 "excel file provided (button '%(button_value)s')"
 msgstr ""
 "Votre fichier excel n'est pas bien structuré. Veuillez suivre la structure "
-"du ficheir excel à fournir (bouton '%(button_value)s')"
+"du fichier excel à fournir (bouton '%(button_value)s')"
 
 #: business/score_encoding_export.py:158 business/score_encoding_export.py:211
 #: business/score_encoding_sheet.py:104
