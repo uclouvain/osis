@@ -27,6 +27,7 @@ import datetime
 
 from django.test import TestCase
 from django.utils import timezone
+from django.utils.translation import ugettext as _
 from assessments.business import score_encoding_sheet
 from assessments.models.enums import score_sheet_address_choices
 from assessments.tests.factories.score_sheet_address import ScoreSheetAddressFactory
@@ -46,9 +47,11 @@ from base.tests.factories.offer_year_entity import OfferYearEntityFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_address import PersonAddressFactory
 from base.tests.factories.session_examen import SessionExamFactory
+from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
 from base.tests.factories.student import StudentFactory
 from base.tests.factories.tutor import TutorFactory
 from reference.tests.factories.country import CountryFactory
+from base.models.enums import exam_enrollment_state as enrollment_states
 
 
 class ScoreSheetAddressTest(TestCase):
@@ -140,14 +143,27 @@ class ScoreSheetDataTest(TestCase):
         self.student_1 = StudentFactory(person=PersonFactory(last_name='Dupont', first_name='Jacques'))
         self.student_2 = StudentFactory(person=PersonFactory(last_name='Dupont', first_name='Axel'))
         self.student_3 = StudentFactory(person=PersonFactory(last_name='Armand', first_name='Zoe'))
+        self.deadline = datetime.datetime(2017, 3, 1)
+        self._build_enrollment([self.student_1, self.student_2, self.student_3], enrollment_states.ENROLLED)
 
-        for student in (self.student_1, self.student_2, self.student_3):
+        self.student_not_enrolled = StudentFactory(person=PersonFactory(last_name='Armand', first_name='Zoe'))
+        self._build_enrollment([self.student_not_enrolled], enrollment_states.NOT_ENROLLED)
+
+    def _build_enrollment(self, students, enrollment_state):
+        for student in students:
             offer_enrollment = OfferEnrollmentFactory(offer_year=self.offer_year, student=student)
-            lu_enrolmment = LearningUnitEnrollmentFactory(
+
+            SessionExamDeadlineFactory(offer_enrollment=offer_enrollment,
+                                       number_session=self.session_exam.number_session,
+                                       deadline=self.deadline,
+                                       deadline_tutor=0)
+            lu_enrollment = LearningUnitEnrollmentFactory(
                 offer_enrollment=offer_enrollment,
                 learning_unit_year=self.learning_unit_year
             )
-            ExamEnrollmentFactory(learning_unit_enrollment=lu_enrolmment, session_exam=self.session_exam)
+            ExamEnrollmentFactory(learning_unit_enrollment=lu_enrollment,
+                                  session_exam=self.session_exam,
+                                  enrollment_state=enrollment_state)
 
     def test_scores_sheet_data_no_decimal_scores(self):
         # Get all exam enrollments
@@ -164,6 +180,12 @@ class ScoreSheetDataTest(TestCase):
         self.assertEqual(score_responsible['first_name'], "Thomas")
         self.assertEqual(score_responsible['last_name'], "Durant")
         self.assertEqual(score_responsible['address']['city'], "Louvain-la-neuve")
+        # Check the deadline for enrolled/not enrolled students
+        for enrollment in data_computed['learning_unit_years'][0]['programs'][0]['enrollments']:
+            if enrollment['registration_id'] in (self.student_1.registration_id, self.student_2.registration_id, self.student_3.registration_id):
+                self.assertEqual(enrollment['deadline'], self.deadline.strftime(str(_('date_format'))))
+            else:
+                self.assertEqual(enrollment['deadline'], '')
 
 
 def _create_attribution(learning_unit_year, person, is_score_responsible=False):
