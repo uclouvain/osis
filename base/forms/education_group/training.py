@@ -27,6 +27,7 @@ from ajax_select import register, LookupChannel
 from ajax_select.fields import AutoCompleteSelectMultipleField
 from dal import autocomplete
 from django import forms
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
@@ -269,7 +270,19 @@ class CertificateAimsForm(forms.ModelForm):
             )
         }
 
+    def clean_certificate_aims(self):
+        print("in clean")
+        certificate_aims = self.cleaned_data["certificate_aims"]
+        nb_type_2 = 0
+        for certificate_aim in certificate_aims:
+            if certificate_aim.section == 2:
+                nb_type_2 += 1
+        if nb_type_2 >= 2:
+            raise ValidationError(_("There can only be one expectation of type 2"))
+        return certificate_aims
+
     def save(self, commit=True):
+        print("in save")
         self.instance.certificate_aims.clear()
         for certificate_aim in self.cleaned_data["certificate_aims"]:
             EducationGroupCertificateAim.objects.get_or_create(
