@@ -27,7 +27,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView
-from django.views.generic.base import View, TemplateView
+from django.views.generic.base import TemplateView
 
 from base.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
 from base.business.group_element_years.management import extract_child_from_cache
@@ -50,6 +50,8 @@ class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):
 
             context['object_to_attach'] = child
             context['source_link'] = cached_data.get('source_link')
+            context['education_group_year_parent'] = self.education_group_year
+
         except ObjectDoesNotExist:
             warning_msg = _("Please select an item before attach it")
             display_warning_messages(self.request, warning_msg)

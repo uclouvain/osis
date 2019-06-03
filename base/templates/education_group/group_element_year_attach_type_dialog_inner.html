@@ -55,7 +55,10 @@
             {% if source_link %}
                 <a class="btn btn-primary" href="">{% trans "Move" %}</a>
             {% endif %}
-            <a class="btn btn-primary" href="">{% trans "Copy" %}</a>
+            <a class="trigger_modal btn btn-primary"
+               data-url="{% url "group_element_year_create" root education_group_year_parent.id  %}">
+                {% trans "Copy" %}
+            </a>
         </div>
     {% else %}
         <div class="panel-body">
@@ -66,3 +69,7 @@
         </div>
     {% endif %}
 </div>
+
+<script>
+    bind_trigger_modal();
+</script>
