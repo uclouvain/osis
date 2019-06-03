@@ -107,6 +107,8 @@ urlpatterns = [
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
                 url(r'^delete/$', group_element_year.delete.DetachGroupElementYearView.as_view(),
                     name='group_element_year_delete'),
+                url(r'^move/$', group_element_year.create.MoveGroupElementYearView.as_view(),
+                    name='group_element_year_move'),
                 url(r'^update/$', group_element_year.update.UpdateGroupElementYearView.as_view(),
                     name="group_element_year_update")
             ]))

@@ -30,9 +30,11 @@ from django.views.generic import CreateView
 from django.views.generic.base import TemplateView
 
 from base.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
+from base.business.group_element_years.detach import DetachEducationGroupYearStrategy, DetachLearningUnitYearStrategy
 from base.business.group_element_years.management import extract_child_from_cache
 from base.forms.education_group.group_element_year import GroupElementYearForm
 from base.models.education_group_year import EducationGroupYear
+from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
@@ -96,6 +98,64 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
         """
         # Clear cache.
         ElementCache(self.request.user).clear()
+        return super().form_valid(form)
+
+    # SuccessMessageMixin
+    def get_success_message(self, cleaned_data):
+        return _("The link of %(acronym)s has been created") % {'acronym': self.object.child}
+
+    def get_success_url(self):
+        """ We'll reload the page """
+        return
+
+
+class MoveGroupElementYearView(GenericGroupElementYearMixin, CreateView):
+    form_class = GroupElementYearForm
+    template_name = "education_group/group_element_year_comment_inner.html"
+
+    def get_form_kwargs(self):
+        """ For the creation, the group_element_year needs a parent and a child """
+        kwargs = super().get_form_kwargs()
+
+        try:
+            cached_data = extract_child_from_cache(self.education_group_year, self.request.user)
+            kwargs.update({
+                'parent': self.education_group_year,
+                'child_branch': cached_data.get('child_branch'),
+                'child_leaf': cached_data.get('child_leaf')
+            })
+
+            child = kwargs['child_branch'] if kwargs['child_branch'] else kwargs['child_leaf']
+
+            obj = self.get_object()
+            delete_strategy = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
+            delete_strategy(obj).is_valid()
+
+            attach_strategy = AttachEducationGroupYearStrategy if isinstance(child, EducationGroupYear) else \
+                AttachLearningUnitYearStrategy
+            attach_strategy(parent=self.education_group_year, child=child).is_valid()
+
+        except ObjectDoesNotExist:
+            warning_msg = _("Please select an item before attach it")
+            display_warning_messages(self.request, warning_msg)
+        except AuthorizedRelationshipNotRespectedException as e:
+            display_error_messages(self.request, e.messages)
+        except ValidationError as e:
+            display_error_messages(self.request, e.messages)
+        except IntegrityError as e:
+            warning_msg = str(e)
+            display_warning_messages(self.request, warning_msg)
+
+        return kwargs
+
+    def form_valid(self, form):
+        """
+        If the form is valid, save the associated model.
+        """
+        # Clear cache.
+        ElementCache(self.request.user).clear()
+        obj = self.get_object()
+        obj.delete()
         return super().form_valid(form)
 
     # SuccessMessageMixin
