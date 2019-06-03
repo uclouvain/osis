@@ -36,10 +36,12 @@
                 <br>
                 <table class="table" style="border-bottom: 1px solid #ddd">
                     <tbody>
-                        {% for attribution in attributions %}
+                    {% for attribution in attributions %}
+                        <tr>
                             <td>{{ attribution.tutor }}</td>
                             <td>{{ attribution.get_function_display }}</td>
-                        {% endfor %}
+                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             {% endif %}
@@ -126,7 +128,7 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-12">
-                    {% for translated_label in  cms_labels_translated%}
+                    {% for translated_label in  cms_labels_translated %}
                         {% if translated_label.text_label.label == "mobility" %}
                             {{ translated_label.text_label.text_fr.0.text|default_if_none:"" }}
                         {% endif %}
