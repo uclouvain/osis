@@ -144,16 +144,8 @@ class RequirementEntityContainerYearModelForm(EntityContainerYearModelForm):
             'onchange': (
                 'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_1", false);'
                 'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_1_country", false);'
-                'updateAdditionalEntityEditability(this.value, "id_component-0-repartition_volume_additional_entity_1",'
-                ' false);'
-                'updateAdditionalEntityEditability(this.value, "id_component-1-repartition_volume_additional_entity_1",'
-                ' false);'
                 'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", true);'
                 'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2_country", true);'
-                'updateAdditionalEntityEditability(this.value, "id_component-0-repartition_volume_additional_entity_2",'
-                ' true);'
-                'updateAdditionalEntityEditability(this.value, "id_component-1-repartition_volume_additional_entity_2",'
-                ' true);'
             ), 'id': 'id_requirement_entity'}
 
 
@@ -178,9 +170,9 @@ class Additional1EntityContainerYearModelForm(EntityContainerYearModelForm):
             'onchange': (
                 'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", false);'
                 'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2_country", false);'
-                'updateAdditionalEntityEditability(this.value, "id_component-0-repartition_volume_additional_entity_2",'
+                'updateAdditionalEntityEditability(this.value, "id_component-0-repartition_volume_additional_entity_1",'
                 ' false);'
-                'updateAdditionalEntityEditability(this.value, "id_component-1-repartition_volume_additional_entity_2",'
+                'updateAdditionalEntityEditability(this.value, "id_component-1-repartition_volume_additional_entity_1",'
                 ' false);'
             ),
             'id': 'id_additional_requirement_entity_1'
@@ -196,7 +188,14 @@ class Additional2EntityContainerYearModelForm(EntityContainerYearModelForm):
         super().__init__(*args, **kwargs)
         field = self.fields['entity']
         field.required = False
-        field.widget.attrs = {'id': 'id_additional_requirement_entity_2'}
+        field.widget.attrs = {
+            'onchange': (
+                'updateAdditionalEntityEditability(this.value, "id_component-0-repartition_volume_additional_entity_2",'
+                ' false);'
+                'updateAdditionalEntityEditability(this.value, "id_component-1-repartition_volume_additional_entity_2",'
+                ' false);'
+            ),
+            'id': 'id_additional_requirement_entity_2'}
         country = self.fields['country']
         country.widget.attrs = {'id': 'id_additional_requirement_entity_2_country'}
 
