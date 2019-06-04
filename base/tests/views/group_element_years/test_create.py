@@ -28,7 +28,7 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import cache, ElementCache
@@ -36,14 +36,19 @@ from base.utils.cache import cache, ElementCache
 
 class TestAttachTypeDialogView(TestCase):
     def setUp(self):
-        self.group_element_year = GroupElementYearFactory()
-        self.education_group_year = EducationGroupYearFactory(
-            academic_year=self.group_element_year.parent.academic_year
+        self.root_egy = TrainingFactory()
+        self.egy = MiniTrainingFactory(academic_year=self.root_egy.academic_year)
+        self.group_element_year=  GroupElementYearFactory(
+            parent__academic_year=self.root_egy.academic_year,
+            child_branch=self.egy
+        )
+        self.selected_egy = EducationGroupYearFactory(
+            academic_year=self.root_egy.academic_year
         )
 
         self.url = reverse(
             "education_group_attach",
-            args=[self.group_element_year.parent.id, self.group_element_year.child_branch.id]
+            args=[self.root_egy.id, self.egy.id]
         )
 
         self.person = PersonFactory()
@@ -57,11 +62,11 @@ class TestAttachTypeDialogView(TestCase):
         self.addCleanup(cache.clear)
 
     def test_context_data(self):
-        ElementCache(self.person.user).save_element_selected(self.education_group_year,
+        ElementCache(self.person.user).save_element_selected(self.selected_egy,
                                                              source_link_id=self.group_element_year.id)
         response = self.client.get(self.url)
         context = response.context
 
-        self.assertEqual(context["object_to_attach"], self.education_group_year)
+        self.assertEqual(context["object_to_attach"], self.selected_egy)
         self.assertEqual(context["source_link"], self.group_element_year)
-        self.assertEqual(context["education_group_year_parent"], self.group_element_year.child_branch)
+        self.assertEqual(context["education_group_year_parent"], self.egy)
