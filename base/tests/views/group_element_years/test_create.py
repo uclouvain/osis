@@ -35,19 +35,17 @@ from base.utils.cache import cache, ElementCache
 
 
 class TestAttachTypeDialogView(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.group_element_year = GroupElementYearFactory()
-        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.group_element_year.parent.academic_year)
+    def setUp(self):
+        self.group_element_year = GroupElementYearFactory()
+        self.education_group_year = EducationGroupYearFactory(academic_year=self.group_element_year.parent.academic_year)
 
-        cls.url = reverse(
+        self.url = reverse(
             "education_group_attach",
-            args=[cls.group_element_year.parent.id, cls.group_element_year.child_branch.id]
+            args=[self.group_element_year.parent.id, self.group_element_year.child_branch.id]
         )
 
-        cls.person = PersonFactory()
+        self.person = PersonFactory()
 
-    def setUp(self):
         self.client.force_login(self.person.user)
         ElementCache(self.person.user).save_element_selected(self.education_group_year,
                                                              source_link_id=self.group_element_year.id)
