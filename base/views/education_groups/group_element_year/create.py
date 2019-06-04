@@ -45,11 +45,9 @@ class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         try:
             cached_data = extract_child_from_cache(self.education_group_year, self.request.user)
             child = cached_data['child_branch'] if cached_data.get('child_branch') else cached_data.get('child_leaf')
-
             context['object_to_attach'] = child
             context['source_link'] = cached_data.get('source_link')
             context['education_group_year_parent'] = self.education_group_year
