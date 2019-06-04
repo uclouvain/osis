@@ -169,6 +169,18 @@ $(document).ready(function() {
         document.getElementById('id_additional_requirement_entity_2_country').disabled = !isLearningUnitSubtypeFull()
             || isValueEmpty('id_additional_requirement_entity_1')
             || isDisabledField('id_additional_requirement_entity_1');
+        document.getElementById('id_component-0-repartition_volume_additional_entity_1').disabled = !isLearningUnitSubtypeFull()
+            || isValueEmpty('id_additional_requirement_entity_1')
+            || isDisabledField('id_additional_requirement_entity_1');
+        document.getElementById('id_component-1-repartition_volume_additional_entity_1').disabled = !isLearningUnitSubtypeFull()
+            || isValueEmpty('id_additional_requirement_entity_1')
+            || isDisabledField('id_additional_requirement_entity_1');
+        document.getElementById('id_component-0-repartition_volume_additional_entity_2').disabled = !isLearningUnitSubtypeFull()
+            || isValueEmpty('id_additional_requirement_entity_2')
+            || isDisabledField('id_additional_requirement_entity_2');
+        document.getElementById('id_component-1-repartition_volume_additional_entity_2').disabled = !isLearningUnitSubtypeFull()
+            || isValueEmpty('id_additional_requirement_entity_2')
+            || isDisabledField('id_additional_requirement_entity_2');
     }
 
     $('#id_acronym_0').change(validate_acronym);
