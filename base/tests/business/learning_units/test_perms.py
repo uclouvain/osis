@@ -28,7 +28,8 @@ from unittest import mock
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
-from base.business.learning_units.perms import MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR
+from base.business.learning_units.perms import MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR, \
+    is_eligible_for_modification
 from base.business.learning_units.perms import is_eligible_to_modify_end_year_by_proposal, \
     is_eligible_to_modify_by_proposal, MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
 from base.models.enums import learning_container_year_types
@@ -37,7 +38,7 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import FacultyManagerFactory
+from base.tests.factories.person import FacultyManagerFactory, AdministrativeManagerFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 
 
@@ -120,3 +121,8 @@ class TestPerms(TestCase):
             person_faculty_manager,
             True
         ))
+
+    def test_is_not_eligible_to_modify_cause_user_is_administrative_manager(self):
+        administrative_manager = AdministrativeManagerFactory()
+        luy = LearningUnitYearFactory(learning_unit=self.learning_unit, learning_container_year=self.lcy)
+        self.assertFalse(is_eligible_for_modification(luy, administrative_manager))
