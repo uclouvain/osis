@@ -105,7 +105,7 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
             volume_requirement_entity = form.cleaned_data.get("repartition_volume_requirement_entity") or 0
             volume_additional_entity_1 = form.cleaned_data.get("repartition_volume_additional_entity_1") or 0
             volume_additional_entity_2 = form.cleaned_data.get("repartition_volume_additional_entity_2") or 0
-            planned_classes = form.cleaned_data.get("planned_classes")
+            planned_classes = form.cleaned_data.get("planned_classes") or 1
             hourly_volume_total_annual = form.cleaned_data.get("hourly_volume_total_annual")
             vol_entities = volume_requirement_entity + volume_additional_entity_1 + volume_additional_entity_2
             if hourly_volume_total_annual and volume_requirement_entity and \
