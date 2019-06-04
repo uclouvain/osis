@@ -102,28 +102,19 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
         additional_entity_2 = self.entity_container_form.forms[3].initial.get('entity')
 
         for form in self.simplified_volume_management_form:
-            repartition_volume_requirement_entity = form.cleaned_data["repartition_volume_requirement_entity"]
-            volume_additional_entity_1 = form.cleaned_data.get("repartition_volume_additional_entity_1")
-            volume_additional_entity_2 = form.cleaned_data.get("repartition_volume_additional_entity_2")
+            volume_requirement_entity = form.cleaned_data.get("repartition_volume_requirement_entity") or 0
+            volume_additional_entity_1 = form.cleaned_data.get("repartition_volume_additional_entity_1") or 0
+            volume_additional_entity_2 = form.cleaned_data.get("repartition_volume_additional_entity_2") or 0
             planned_classes = form.cleaned_data.get("planned_classes")
             hourly_volume_total_annual = form.cleaned_data.get("hourly_volume_total_annual")
-            if not additional_entity_1 and volume_additional_entity_1:
-                form.add_error("repartition_volume_additional_entity_1", _('Entity not selected'))
-                self.entity_container_form.forms[2].add_error("entity", "")
-            if not additional_entity_2 and volume_additional_entity_2:
-                form.add_error("repartition_volume_additional_entity_2", _('Entity not selected'))
-                self.entity_container_form.forms[3].add_error("entity", "")
-            else:
-                vol_entities = repartition_volume_requirement_entity or 0
-                vol_entities += volume_additional_entity_1 or 0
-                vol_entities += volume_additional_entity_2 or 0
-                if planned_classes and planned_classes * hourly_volume_total_annual != vol_entities:
-                    form.add_error("repartition_volume_requirement_entity",
-                                   _('the sum of repartition volumes must be equal to the global volume'))
-                    if additional_entity_1:
-                        form.add_error("repartition_volume_additional_entity_1", "")
-                    if additional_entity_2:
-                        form.add_error("repartition_volume_additional_entity_2", "")
+            vol_entities = volume_requirement_entity + volume_additional_entity_1 + volume_additional_entity_2
+            if planned_classes * hourly_volume_total_annual != vol_entities:
+                form.add_error("repartition_volume_requirement_entity",
+                               ('the sum of repartition volumes must be equal to the global volume'))
+                if additional_entity_1:
+                    form.add_error("repartition_volume_additional_entity_1", "")
+                if additional_entity_2:
+                    form.add_error("repartition_volume_additional_entity_2", "")
 
         return not self.errors
 
