@@ -47,6 +47,9 @@ function updateAdditionalEntityEditability(elem, id, disable_only){
     var empty_element = elem === "";
     if (empty_element){
         $('#'.concat(id))[0].selectedIndex = 0;
+        if (id === 'id_additional_requirement_entity_2') {
+            $('#select2-id_additional_requirement_entity_2-container').empty();
+        }
         document.getElementById(id).disabled = true;
     }
     else if (!disable_only){

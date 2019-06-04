@@ -135,11 +135,12 @@ class LearningUnitYearModelForm(forms.ModelForm):
             acronym = acronym + self.data["acronym_1"]
         else:
             acronym = acronym + self.data["acronym_1"] + self.data["acronym_2"]
+        acronym = acronym.upper()
         if not re.match(REGEX_BY_SUBTYPE[EXTERNAL], acronym) and self.instance.subtype == FULL:
             raise ValidationError(_('Invalid code'))
         if not re.match(REGEX_BY_SUBTYPE[PARTIM], acronym) and self.instance.subtype == PARTIM:
             raise ValidationError(_('Invalid code'))
-        return acronym.upper()
+        return acronym
 
     def clean_acronym(self):
         if self.external:
