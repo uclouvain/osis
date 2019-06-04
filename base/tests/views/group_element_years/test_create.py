@@ -37,7 +37,9 @@ from base.utils.cache import cache, ElementCache
 class TestAttachTypeDialogView(TestCase):
     def setUp(self):
         self.group_element_year = GroupElementYearFactory()
-        self.education_group_year = EducationGroupYearFactory(academic_year=self.group_element_year.parent.academic_year)
+        self.education_group_year = EducationGroupYearFactory(
+            academic_year=self.group_element_year.parent.academic_year
+        )
 
         self.url = reverse(
             "education_group_attach",
@@ -47,9 +49,6 @@ class TestAttachTypeDialogView(TestCase):
         self.person = PersonFactory()
 
         self.client.force_login(self.person.user)
-        ElementCache(self.person.user).save_element_selected(self.education_group_year,
-                                                             source_link_id=self.group_element_year.id)
-
         self.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
                                        return_value=True)
         self.mocked_perm = self.perm_patcher.start()
@@ -58,6 +57,8 @@ class TestAttachTypeDialogView(TestCase):
         self.addCleanup(cache.clear)
 
     def test_context_data(self):
+        ElementCache(self.person.user).save_element_selected(self.education_group_year,
+                                                             source_link_id=self.group_element_year.id)
         response = self.client.get(self.url)
         context = response.context
 
