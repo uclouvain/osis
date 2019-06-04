@@ -108,9 +108,15 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
             planned_classes = form.cleaned_data.get("planned_classes")
             hourly_volume_total_annual = form.cleaned_data.get("hourly_volume_total_annual")
             vol_entities = volume_requirement_entity + volume_additional_entity_1 + volume_additional_entity_2
-            if planned_classes * hourly_volume_total_annual != vol_entities:
+            if hourly_volume_total_annual and volume_requirement_entity and (
+                    (additional_entity_1 and form.cleaned_data.get("repartition_volume_additional_entity_1")) or (
+                    not additional_entity_1 and not form.cleaned_data.get(
+                    "repartition_volume_additional_entity_1"))) and (
+                    (additional_entity_2 and form.cleaned_data.get("repartition_volume_additional_entity_2")) or (
+                    not additional_entity_2 and not form.cleaned_data.get(
+                    "repartition_volume_additional_entity_2"))) and planned_classes * hourly_volume_total_annual != vol_entities:
                 form.add_error("repartition_volume_requirement_entity",
-                               ('the sum of repartition volumes must be equal to the global volume'))
+                               _('the sum of repartition volumes must be equal to the global volume'))
                 if additional_entity_1:
                     form.add_error("repartition_volume_additional_entity_1", "")
                 if additional_entity_2:

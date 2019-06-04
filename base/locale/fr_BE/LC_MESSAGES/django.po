@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-04 15:49+0200\n"
+"POT-Creation-Date: 2019-06-04 20:22+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -904,6 +904,7 @@ msgstr ""
 #: templates/learning_unit/blocks/modal/modal_pedagogy_edit.html:47
 #: templates/learning_unit/blocks/modal/modal_xls_with_parameters.html:42
 #: templates/learning_unit/blocks/save_cancel_buttons.html:7
+#: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:8
 #: templates/learning_unit/confirm_delete.html:58
 #: templates/learning_unit/proposal/create_suppression.html:20
 #: templates/learning_unit/proposal/update_suppression.html:20
@@ -1595,7 +1596,7 @@ msgid "English title proper"
 msgstr "Intitulé propre en anglais"
 
 #: forms/learning_unit/learning_unit_create.py:96
-#: forms/learning_unit/learning_unit_create.py:180
+#: forms/learning_unit/learning_unit_create.py:181
 #: templates/learning_unit/identification.html:112
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:78
 msgid "English title proper to the partim"
@@ -1659,11 +1660,6 @@ msgstr "Entité"
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:48
 msgid "Entity charges"
 msgstr "Entités de charges"
-
-#: forms/learning_unit/learning_unit_create_2.py:111
-#: forms/learning_unit/learning_unit_create_2.py:114
-msgid "Entity not selected"
-msgstr "Il n'y a pas d'entité sélectionnée"
 
 #: templates/blocks/navbar_top.html:78 templates/studies.html:43
 msgid "Evaluations"
@@ -1759,7 +1755,7 @@ msgstr "Remarque de faculté"
 msgid "Failure"
 msgstr "Echec"
 
-#: models/person.py:60
+#: models/person.py:61
 msgid "Female"
 msgstr "Féminin"
 
@@ -2139,9 +2135,9 @@ msgstr "Introduit par"
 msgid "Invalid action"
 msgstr "Action invalide"
 
-#: forms/learning_unit/learning_unit_create.py:139
-#: forms/learning_unit/learning_unit_create.py:141
-#: forms/learning_unit/learning_unit_create.py:148
+#: forms/learning_unit/learning_unit_create.py:140
+#: forms/learning_unit/learning_unit_create.py:142
+#: forms/learning_unit/learning_unit_create.py:149
 msgid "Invalid code"
 msgstr "Code non valide"
 
@@ -2516,7 +2512,7 @@ msgstr "La maintenance de données avec la langage SQL"
 msgid "Major list choice"
 msgstr "Liste au choix Majeures"
 
-#: models/person.py:61
+#: models/person.py:62
 msgid "Male"
 msgstr "Masculin"
 
@@ -4225,7 +4221,7 @@ msgstr ""
 "Le nombre de crédits du partim %(acronym)s est supérieur ou égal à celui de "
 "l'unité d'enseignement parent."
 
-#: forms/learning_unit/learning_unit_create.py:172
+#: forms/learning_unit/learning_unit_create.py:173
 #: models/learning_unit_year.py:372
 #: tests/forms/learning_unit/test_learningUnitYearModelForm.py:89
 #: tests/models/test_learning_unit_year.py:582
@@ -4700,7 +4696,7 @@ msgstr ""
 msgid "This feature is in testing phase"
 msgstr "Cette fonctionnalité est en phase expérimentale"
 
-#: forms/learning_unit/learning_unit_create.py:155
+#: forms/learning_unit/learning_unit_create.py:156
 msgid "This field cannot be set"
 msgstr "Ce champ ne peut pas être défini"
 
@@ -4803,7 +4799,7 @@ msgid "Title in French"
 msgstr "Intitulé en français"
 
 #: forms/learning_unit/learning_unit_create.py:95
-#: forms/learning_unit/learning_unit_create.py:179
+#: forms/learning_unit/learning_unit_create.py:180
 #: templates/learning_unit/identification.html:110
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:77
 msgid "Title proper to the partim"
@@ -5392,8 +5388,8 @@ msgstr "Vous n'avez pas le droit de consolider"
 msgid "You have the choice between"
 msgstr "Vous avez le choix entre"
 
-#: forms/learning_unit/learning_unit_create.py:217
-#: forms/learning_unit/learning_unit_create_2.py:210
+#: forms/learning_unit/learning_unit_create.py:218
+#: forms/learning_unit/learning_unit_create_2.py:201
 #: tests/views/learning_units/proposals/test_creation.py:196
 msgid "You must either set the common title or the specific title"
 msgstr "L'intitulé propre ou l'intitulé commun est requis"
@@ -5548,7 +5544,6 @@ msgstr "mise-à-jour bloquée pour l'enseignant"
 #: templates/learning_unit/blocks/modal/modal_modification_ask_to_report.html:38
 #: templates/learning_unit/blocks/modal/modal_warning_state_modification.html:38
 #: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:30
-#: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:8
 #: templates/learning_unit/class_edit.html:54
 #: templates/learning_unit/component_edit.html:54
 #: templates/learning_unit/deletion_msg.html:54
@@ -5989,7 +5984,6 @@ msgstr "la liste à générer est vide."
 msgid "the program aims"
 msgstr "le programme vise"
 
-#: forms/learning_unit/learning_unit_create_2.py:126
 #: models/learning_component_year.py:134
 #: tests/models/test_learning_unit_year.py:366
 #: tests/models/test_learning_unit_year.py:383
@@ -6027,7 +6021,7 @@ msgstr "type"
 msgid "type of constraint"
 msgstr "type de contrainte"
 
-#: models/person.py:62
+#: models/person.py:63
 msgid "unknown"
 msgstr "indéfini"
 
