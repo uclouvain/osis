@@ -39,10 +39,10 @@ from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YE
 from base.models.campus import Campus
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY
+from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from reference.models import language
-from base.models.enums.proposal_type import ProposalType
 
 FULL_READ_ONLY_FIELDS = {"acronym", "academic_year", "container_type"}
 FULL_PROPOSAL_READ_ONLY_FIELDS = {"academic_year", "container_type"}
@@ -98,6 +98,33 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
 
         self.learning_unit_year_form.post_clean(self.learning_container_year_form.instance.container_type)
         self.learning_container_year_form.post_clean(self.learning_unit_year_form.cleaned_data["specific_title"])
+        additional_entity_1 = self.entity_container_form.forms[2].cleaned_data.get('entity')
+        additional_entity_2 = self.entity_container_form.forms[3].cleaned_data.get('entity')
+
+        for form in self.simplified_volume_management_form:
+            repartition_volume_requirement_entity = form.cleaned_data["repartition_volume_requirement_entity"]
+            volume_additional_entity_1 = form.cleaned_data.get("repartition_volume_additional_entity_1")
+            volume_additional_entity_2 = form.cleaned_data.get("repartition_volume_additional_entity_2")
+            planned_classes = form.cleaned_data.get("planned_classes")
+            hourly_volume_total_annual = form.cleaned_data.get("hourly_volume_total_annual")
+            if not additional_entity_1 and volume_additional_entity_1:
+                form.add_error("repartition_volume_additional_entity_1", _('Entity not selected'))
+                self.entity_container_form.forms[2].add_error("entity", "")
+            if not additional_entity_2 and volume_additional_entity_2:
+                form.add_error("repartition_volume_additional_entity_2", _('Entity not selected'))
+                self.entity_container_form.forms[3].add_error("entity", "")
+            else:
+                vol_entities = repartition_volume_requirement_entity or 0
+                if additional_entity_1:
+                    vol_entities += volume_additional_entity_1 or 0
+                    form.add_error("repartition_volume_additional_entity_1", "")
+                if additional_entity_2:
+                    vol_entities += volume_additional_entity_2 or 0
+                    form.add_error("repartition_volume_additional_entity_2", "")
+                if planned_classes * hourly_volume_total_annual != vol_entities:
+                    form.add_error("repartition_volume_requirement_entity",
+                                   _('the sum of repartition volumes must be equal to the global volume'))
+
         return not self.errors
 
     @transaction.atomic
@@ -147,8 +174,8 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
         data = {}
         for form_instance in self.forms.values():
             data.update({
-                            key: field.label for key, field in form_instance.fields.items()
-                            })
+                key: field.label for key, field in form_instance.fields.items()
+            })
         return data
 
     @property
