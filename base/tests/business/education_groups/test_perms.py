@@ -250,7 +250,7 @@ class TestGeneralInformationPerms(TestCase):
         perm = GeneralInformationPerms(faculty_manager.user, self.common_bachelor)
         with self.assertRaises(PermissionDenied):
             perm._is_eligible()
-            self.assertTrue(mock_super_is_eligible.called)
+        self.assertTrue(mock_super_is_eligible.called)
 
     @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
     @mock.patch("base.business.education_groups.perms.GeneralInformationPerms._is_user_have_perm", return_value=True)
@@ -365,7 +365,7 @@ class TestAdmissionConditionPerms(TestCase):
         perm = AdmissionConditionPerms(faculty_manager.user, self.common_bachelor)
         with self.assertRaises(PermissionDenied):
             perm._is_eligible()
-            self.assertTrue(mock_super_is_eligible.called)
+        self.assertTrue(mock_super_is_eligible.called)
 
     @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
     @mock.patch("base.business.education_groups.perms.AdmissionConditionPerms._is_user_have_perm", return_value=True)
