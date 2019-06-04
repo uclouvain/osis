@@ -34,7 +34,7 @@
             <div class="col-md-5" style="margin-top: 10px">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {% dl_with_parent "acronym" education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") %}
+                        {% dl_with_parent_without_context "acronym" education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") %}
                         {% dl_with_parent "main_teaching_campus" %}
                     </div>
                 </div>

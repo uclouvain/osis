@@ -686,6 +686,10 @@ msgstr "Êtes-vous sûr de vouloir changer l'état de"
 msgid "Are you sure you want to delete %(education_group_year)s?"
 msgstr "Êtes-vous sûr·e que vous voulez supprimer %(education_group_year)s?"
 
+#: templates/learning_unit/specifications_all.html:261
+msgid "Are you sure you want to delete the achievement?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer l'acquis d'apprentissage?"
+
 #: templates/education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html:8
 msgid "Are you sure you want to delete the contact ?"
 msgstr "Êtes-vous certain de vouloir supprimer le contact ?"
@@ -2659,6 +2663,10 @@ msgstr "Modification"
 #: templates/learning_unit/summary_list.html:99
 msgid "Modification made"
 msgstr "Modification apportée"
+
+#: templates/blocks/span/span_mod_status.html:35
+msgid "Modification blocked"
+msgstr "Modification bloquée"
 
 #: business/learning_units/perms.py:531
 #, python-format
@@ -5923,6 +5931,14 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:163
 msgid "yes,no"
 msgstr "oui,non"
+
+#: templates/blocks/span/span_mod_status.html:48
+msgid "No change made"
+msgstr "Pas de modification apportée"
+
+#: templates/learning_unit/summary_list.html:82
+msgid "Modified"
+msgstr "Modifié"
 
 #~ msgid "Unable to retrieve appropriate sections for this programs"
 #~ msgstr ""
