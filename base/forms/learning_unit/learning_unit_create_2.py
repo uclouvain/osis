@@ -98,8 +98,8 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
 
         self.learning_unit_year_form.post_clean(self.learning_container_year_form.instance.container_type)
         self.learning_container_year_form.post_clean(self.learning_unit_year_form.cleaned_data["specific_title"])
-        additional_entity_1 = self.entity_container_form.forms[2].cleaned_data.get('entity')
-        additional_entity_2 = self.entity_container_form.forms[3].cleaned_data.get('entity')
+        additional_entity_1 = self.entity_container_form.forms[2].initial.get('entity')
+        additional_entity_2 = self.entity_container_form.forms[3].initial.get('entity')
 
         for form in self.simplified_volume_management_form:
             repartition_volume_requirement_entity = form.cleaned_data["repartition_volume_requirement_entity"]
@@ -117,9 +117,7 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
                 vol_entities = repartition_volume_requirement_entity or 0
                 vol_entities += volume_additional_entity_1 or 0
                 vol_entities += volume_additional_entity_2 or 0
-                if planned_classes * hourly_volume_total_annual != vol_entities and (
-                        volume_additional_entity_1 or not additional_entity_1) and (
-                        volume_additional_entity_2 or not additional_entity_2):
+                if planned_classes and planned_classes * hourly_volume_total_annual != vol_entities:
                     form.add_error("repartition_volume_requirement_entity",
                                    _('the sum of repartition volumes must be equal to the global volume'))
                     if additional_entity_1:

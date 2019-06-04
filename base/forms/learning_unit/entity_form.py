@@ -174,6 +174,10 @@ class Additional1EntityContainerYearModelForm(EntityContainerYearModelForm):
                 ' false);'
                 'updateAdditionalEntityEditability(this.value, "id_component-1-repartition_volume_additional_entity_1",'
                 ' false);'
+                'updateAdditionalEntityEditability(this.value, "id_component-0-repartition_volume_additional_entity_2",'
+                ' true);'
+                'updateAdditionalEntityEditability(this.value, "id_component-1-repartition_volume_additional_entity_2",'
+                ' true);'
             ),
             'id': 'id_additional_requirement_entity_1'
         }
