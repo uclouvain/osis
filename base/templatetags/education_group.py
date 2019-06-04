@@ -262,18 +262,18 @@ def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None):
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=False)
 def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", default_value=None):
-    if not obj:
-        return {}
+    value = None
+    parent_value = None
+    if obj:
+        value = get_verbose_field_value(obj, key)
 
-    value = get_verbose_field_value(obj, key)
+        if not dl_title:
+            dl_title = obj._meta.get_field(key).verbose_name
 
-    if not dl_title:
-        dl_title = obj._meta.get_field(key).verbose_name
-
-    if value is None or value == "":
-        parent_value = get_verbose_field_value(parent, key)
-    else:
-        parent, parent_value = None, None
+        if value is None or value == "":
+            parent_value = get_verbose_field_value(parent, key)
+        else:
+            parent, parent_value = None, None
 
     return {
         'label': _(dl_title),
