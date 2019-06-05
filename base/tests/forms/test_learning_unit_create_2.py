@@ -157,12 +157,10 @@ def get_valid_form_data(academic_year, person, learning_unit_year=None):
         'component-0-hourly_volume_partial_q1': 10,
         'component-0-hourly_volume_partial_q2': 10,
         'component-0-planned_classes': 1,
-        'component-0-repartition_volume_requirement_entity': 10,
         'component-1-hourly_volume_total_annual': 20,
         'component-1-hourly_volume_partial_q1': 10,
         'component-1-hourly_volume_partial_q2': 10,
         'component-1-planned_classes': 1,
-        'component-1-repartition_volume_requirement_entity': 10,
     }
 
 
@@ -699,6 +697,8 @@ class TestFullFormValidateSameEntitiesContainer(LearningUnitFullFormContextMixin
 
     def test_when_volumes_entities_incorrect(self):
         self.post_data['additional_requirement_entity_1-entity'] = self.post_data['requirement_entity-entity']
+        self.post_data['component-1-repartition_volume_requirement_entity'] = 10
+        self.post_data['component-2-repartition_volume_requirement_entity'] = 10
         form = _instanciate_form(self.current_academic_year, post_data=self.post_data, person=self.person,
                                  start_year=self.current_academic_year.year)
         self.assertFalse(form.is_valid())
