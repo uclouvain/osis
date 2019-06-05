@@ -47,7 +47,7 @@ Feature: Propositions d’UE
     And  Encoder Cours comme Type
     And  Encoder 5 comme Crédits
     And  Encoder Cours de droit comme Intitulé commun
-    And  Encoder Louvain-la-Neuve comme Lieu d’enseignement
+    And  Encoder Louvain-la-Neuve - UCLouvain comme Lieu d’enseignement
     And  Encoder DRT comme Entité resp. cahier des charges
     And  Encoder DRT comme Entité d’attribution
     And  Encoder 2019-20 comme Année académique

@@ -89,7 +89,7 @@ Feature: Mise à jour en gestion journalière
     And Encoder WMEDI1234 comme Code
     And Encoder Autre collectif comme Type
     And Encoder 5 comme Crédit
-    And Encoder Louvain-la-Neuve comme Lieu d’enseignement
+    And Encoder Louvain-la-Neuve - UCLouvain comme Lieu d’enseignement
     And Encoder MED comme Entité resp. cahier des charges
     And Encoder MED comme Entité d’attribution
     And Encoder Test comme Intitulé commun
@@ -121,8 +121,7 @@ Feature: Mise à jour en gestion journalière
     Given Aller sur la page de detail de l'ue: LCHM1211 en 2018-19
     When Cliquer sur l'onglet Enseignant·e·s
     Then Vérifier que à la ligne 1, l'enseignant est bien DEVILLERS, Michel avec comme fonction Co-titulaire débutant en 2017 pour une durée de 3 ans avec un volume en Q1 de 15,00 et en Q2 de 27,00
-    Then Vérifier que à la ligne 2, l'enseignant est bien DEVILLERS, Michel avec comme fonction Coordinateur(trice) débutant en 2015 pour une durée de 3 ans
-    Then Vérifier que à la ligne 3, l'enseignant est bien HAUTIER, Geoffroy avec comme fonction Co-titulaire débutant en 2017 pour une durée de 3 ans avec un volume en Q1 de 15,00 et en Q2 de 27,00
+    Then Vérifier que à la ligne 2, l'enseignant est bien HAUTIER, Geoffroy avec comme fonction Co-titulaire débutant en 2017 pour une durée de 3 ans avec un volume en Q1 de 15,00 et en Q2 de 27,00
 
   Scenario: 15. En tant que gestionnaire facultaire, je dois pouvoir modifier l’onglet « Enseignant ».
     Given La période de modification des programmes est en cours
