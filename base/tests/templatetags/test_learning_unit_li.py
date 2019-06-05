@@ -24,39 +24,38 @@
 #
 ##############################################################################
 
-from django.test import TestCase, RequestFactory
-from django.urls import reverse
-from django.test.utils import override_settings
+from django.conf import settings
 from django.contrib.auth.models import Permission
+from django.core.exceptions import PermissionDenied
+from django.test import TestCase, RequestFactory
+from django.test.utils import override_settings
+from django.urls import reverse
 
 from base.business.learning_units.perms import MSG_EXISTING_PROPOSAL_IN_EPC, MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE, \
     MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY, \
     MSG_NOT_PROPOSAL_STATE_FACULTY, MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL, \
     MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE, MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY, MSG_NOT_GOOD_RANGE_OF_YEARS, \
     MSG_NO_RIGHTS_TO_CONSOLIDATE, \
-    MSG_NOT_ELIGIBLE_TO_CONSOLIDATE_PROPOSAL, MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES, \
-    MSG_NOT_ELIGIBLE_TO_DELETE_LU, MSG_CAN_DELETE_ACCORDING_TO_TYPE, MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR, \
-    can_modify_end_year_by_proposal, is_eligible_to_modify_by_proposal, can_modify_by_proposal, \
+    MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES, \
+    MSG_CAN_DELETE_ACCORDING_TO_TYPE, can_modify_end_year_by_proposal, can_modify_by_proposal, \
     MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR, MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
+from base.models.enums import entity_container_year_link_type
+from base.models.enums import learning_container_year_types
+from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.proposal_state import ProposalState
 from base.templatetags.learning_unit_li import li_edit_lu, li_edit_date_lu, li_modification_proposal, is_valid_proposal, \
     MSG_IS_NOT_A_PROPOSAL, MSG_PROPOSAL_NOT_ON_CURRENT_LU, DISABLED, li_suppression_proposal, li_cancel_proposal, \
     li_edit_proposal, li_consolidate_proposal, li_delete_all_lu
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.person import CentralManagerFactory, FacultyManagerFactory
-from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
-from base.models.enums import learning_unit_year_subtypes
-from base.tests.factories.user import UserFactory
+from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.person import CentralManagerFactory, FacultyManagerFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
-from base.models.enums import entity_container_year_link_type
-from base.models.enums import learning_container_year_types
-from base.models.enums.proposal_state import ProposalState
-from django.conf import settings
-from django.core.exceptions import PermissionDenied
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from base.tests.factories.user import UserFactory
 
 ID_LINK_EDIT_LU = "link_edit_lu"
 ID_LINK_EDIT_DATE_LU = "link_edit_date_lu"
@@ -99,6 +98,9 @@ class LearningUnitTagLiEditTest(TestCase):
         self.previous_proposal = ProposalLearningUnitFactory(learning_unit_year=self.previous_luy_2)
         self.user = UserFactory()
         self.central_manager_person = CentralManagerFactory()
+        self.central_manager_person.user.user_permissions.add(
+            Permission.objects.get(codename='can_edit_learningunit')
+        )
         self.person_entity = PersonEntityFactory(person=self.central_manager_person)
 
         self.requirement_entity = self.person_entity.entity
@@ -133,7 +135,9 @@ class LearningUnitTagLiEditTest(TestCase):
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_li_edit_lu_year_non_editable_for_faculty_manager(self):
         faculty_manager = FacultyManagerFactory()
-
+        faculty_manager.user.user_permissions.add(
+            Permission.objects.get(codename='can_edit_learningunit')
+        )
         self.context["learning_unit_year"] = self.previous_learning_unit_year
         self.context["user"] = faculty_manager.user
 
@@ -190,6 +194,9 @@ class LearningUnitTagLiEditTest(TestCase):
 
     def test_li_edit_lu_year_is_learning_unit_year_not_in_range_to_be_modified(self):
         person_faculty = FacultyManagerFactory()
+        person_faculty.user.user_permissions.add(
+            Permission.objects.get(codename='can_edit_learningunit')
+        )
         later_luy = LearningUnitYearFactory(academic_year=self.later_academic_year,
                                             learning_unit=LearningUnitFactory(existing_proposal_in_epc=False))
         self.context["learning_unit_year"] = later_luy
@@ -205,6 +212,9 @@ class LearningUnitTagLiEditTest(TestCase):
 
     def test_li_edit_lu_year_person_is_not_linked_to_entity_in_charge_of_lu(self):
         a_person = CentralManagerFactory()
+        a_person.user.user_permissions.add(
+            Permission.objects.get(codename='can_edit_learningunit')
+        )
         self.context['user'] = a_person.user
         result = li_edit_lu(self.context, self.url_edit, "")
         self.assertEqual(
@@ -235,7 +245,9 @@ class LearningUnitTagLiEditTest(TestCase):
             learning_container_year=self.lcy
         )
         person_faculty_manager = FacultyManagerFactory()
-
+        person_faculty_manager.user.user_permissions.add(
+            Permission.objects.get(codename='can_edit_learningunit')
+        )
         PersonEntityFactory(person=person_faculty_manager,
                             entity=self.entity_container_yr.entity)
 

@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
@@ -53,15 +54,23 @@ class TestCanUpdateGroupElementYear(TestCase):
             can_update_group_element_year(person.user, self.group_element_year)
 
     def test_return_true_if_is_central_manager(self):
+        central_manager = CentralManagerFactory()
+        central_manager.user.user_permissions.add(
+            Permission.objects.get(codename='change_educationgroup')
+        )
         person_entity = PersonEntityFactory(entity=self.group_element_year.parent.management_entity,
-                                            person=CentralManagerFactory())
+                                            person=central_manager)
 
         self.assertTrue(can_update_group_element_year(person_entity.person.user, self.group_element_year))
 
     def test_return_true_if_child_is_learning_unit_and_user_is_central_manager(self):
+        central_manager = CentralManagerFactory()
+        central_manager.user.user_permissions.add(
+            Permission.objects.get(codename='change_educationgroup')
+        )
         GroupElementYearChildLeafFactory(parent=self.group_element_year.parent)
         person_entity = PersonEntityFactory(entity=self.group_element_year.parent.management_entity,
-                                            person=CentralManagerFactory())
+                                            person=central_manager)
 
         self.assertTrue(can_update_group_element_year(person_entity.person.user, self.group_element_year))
 
