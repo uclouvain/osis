@@ -34,12 +34,7 @@
 
         <div id="form-modal-body" class="modal-body">
            <div id="attach_info">
-                Do you want to copy {{ object_to_attach.acronym }}
-
-                {% if source_link %}
-                    or to move {{ object_to_attach.acronym }} from {{ source_link.parent.acronym }}
-                {% endif %}
-                ?
+                {% blocktrans with object_acronym=object_to_attach.acronym parent_acronym=source_link.parent.acronym%}Do you want to copy {{ object_acronym }} or to move {{ object_acronym }} from {{ parent_acronym }} ?{% endblocktrans %}
 
                 {% if not request.is_ajax %}
                     {% if source_link %}
