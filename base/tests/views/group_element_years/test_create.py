@@ -29,6 +29,9 @@ from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums.link_type import LinkTypes
+from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -69,3 +72,40 @@ class TestAttachTypeDialogView(TestCase):
         self.assertEqual(context["object_to_attach"], self.selected_egy)
         self.assertEqual(context["source_link"], self.group_element_year)
         self.assertEqual(context["education_group_year_parent"], self.group_element_year.child_branch)
+
+
+@override_flag('education_group_update', active=True)
+class TestMoveGroupElementYearView(TestCase):
+    def setUp(self):
+        self.next_academic_year = AcademicYearFactory(current=True)
+        self.root_egy = EducationGroupYearFactory(academic_year=self.next_academic_year)
+        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.next_academic_year)
+        self.selected_egy = EducationGroupYearFactory(
+            academic_year=self.next_academic_year
+        )
+
+        self.url = reverse(
+            "group_element_year_move",
+            args=[self.root_egy.id, self.group_element_year.child_branch.id, self.group_element_year.id]
+        )
+
+        self.person = PersonFactory()
+
+        self.client.force_login(self.person.user)
+        self.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
+                                       return_value=True)
+        self.mocked_perm = self.perm_patcher.start()
+
+        self.addCleanup(self.mocked_perm.stop)
+        self.addCleanup(cache.clear)
+
+    def test_move(self):
+        ElementCache(self.person.user).save_element_selected(
+            self.selected_egy,
+            source_link_id=self.group_element_year.id
+        )
+        self.client.post(self.url, data={
+            "link_type": LinkTypes.REFERENCE.name
+        })
+
+        self.assertFalse(GroupElementYear.objects.filter(id=self.group_element_year.id))
