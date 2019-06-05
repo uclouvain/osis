@@ -42,10 +42,10 @@ from base.views.education_groups.group_element_year.perms import can_update_grou
 class TestCanUpdateGroupElementYear(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.current_acy, cls.previous_acy = AcademicYearFactory.produce_in_past(quantity=2)
+        cls.current_acy, cls.previous_acy = AcademicYearFactory.produce_in_past(from_year=2019, quantity=2)
         cls.group_element_year = GroupElementYearFactory(
             parent=TrainingFactory(academic_year=cls.current_acy),
-            child_branch=MiniTrainingFactory(academic_year=cls.current_acy)
+            child_branch=MiniTrainingFactory(academic_year=cls.current_acy),
         )
 
     def test_raise_permission_denied_when_user_not_linked_to_entity(self):
