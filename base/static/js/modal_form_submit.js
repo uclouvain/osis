@@ -70,7 +70,7 @@ function bind_trigger_modal() {
 
         $('#modal_dialog_id').attr("class", "modal-dialog").addClass(modal_class);
         content.empty();
-        $('#form-ajax-modal').modal('toggle');
+        $('#form-ajax-modal').modal('show');
 
         content.load(url, function () {
             bindTextArea();

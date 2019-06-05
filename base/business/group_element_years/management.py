@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q
 from django.utils.translation import ugettext as _
 
@@ -31,6 +32,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import AllTypes
 from base.models.enums.link_type import LinkTypes
 from base.models.exceptions import AuthorizedRelationshipNotRespectedException
+from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
 
@@ -42,7 +44,7 @@ EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
 def extract_child_from_cache(parent, user):
     selected_data = ElementCache(user).cached_data
     if not selected_data:
-        return {}
+        raise ObjectDoesNotExist
 
     kwargs = {'parent': parent}
     if selected_data['modelname'] == LEARNING_UNIT_YEAR:
@@ -50,6 +52,10 @@ def extract_child_from_cache(parent, user):
 
     elif selected_data['modelname'] == EDUCATION_GROUP_YEAR:
         kwargs['child_branch'] = EducationGroupYear.objects.get(pk=selected_data['id'])
+
+    if selected_data.get('source_link_id'):
+        kwargs['source_link'] = GroupElementYear.objects.select_related('parent')\
+                                                        .get(pk=selected_data['source_link_id'])
 
     return kwargs
 
