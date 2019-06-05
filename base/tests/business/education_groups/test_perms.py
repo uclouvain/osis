@@ -40,7 +40,7 @@ from base.tests.factories.authorized_relationship import AuthorizedRelationshipF
 from base.tests.factories.education_group_year import EducationGroupYearFactory, \
     EducationGroupYearCommonBachelorFactory, TrainingFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, SICFactory, \
-    FacultyManagerFactory, UEFacultyManagerFactory
+    FacultyManagerFactory, UEFacultyManagerFactory, AdministrativeManagerFactory
 from base.tests.factories.user import UserFactory
 
 
@@ -263,6 +263,12 @@ class TestGeneralInformationPerms(TestCase):
         self.assertTrue(mock_super_is_eligible.called)
         self.assertTrue(mock_is_sic_eligible.called)
 
+    def test_is_not_eligible_case_user_is_administrative_manager(self, ):
+        administrative_manager = AdministrativeManagerFactory()
+
+        perm = GeneralInformationPerms(administrative_manager.user, self.common_bachelor)
+        self.assertFalse(perm.is_eligible())
+
     def test_is_user_have_perm_for_common_case_user_without_perm(self):
         person = PersonWithPermissionsFactory()
 
@@ -377,6 +383,12 @@ class TestAdmissionConditionPerms(TestCase):
 
         self.assertTrue(mock_super_is_eligible.called)
         self.assertTrue(mock_is_sic_eligible.called)
+
+    def test_is_not_eligible_case_user_is_administrative_manager(self, ):
+        administrative_manager = AdministrativeManagerFactory()
+
+        perm = AdmissionConditionPerms(administrative_manager.user, self.common_bachelor)
+        self.assertFalse(perm.is_eligible())
 
     def test_is_user_have_perm_for_common_case_user_without_perm(self):
         person = PersonWithPermissionsFactory()
