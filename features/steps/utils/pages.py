@@ -74,7 +74,7 @@ class RepartitionPage(pypom.Page):
 
 class LearningUnitAttributionPage(pypom.Page):
     manage_repartition = Link(RepartitionPage, By.ID, "manage_repartition")
-    save_button = Link('LearningUnitAttributionPage', By.ID, 'save_btn', 2)
+    save_button = Link('LearningUnitAttributionPage', By.ID, 'save_btn', 3)
     volume_1 = InputField(By.ID, "id_lecturing_form-allocation_charge")
 
     def find_edit_button(self, row):

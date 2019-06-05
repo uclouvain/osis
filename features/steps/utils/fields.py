@@ -60,6 +60,8 @@ class Link(Field):
         self.waiting_time = waiting_time
 
     def click(self):
+        # Scroll to the top. The button can be under the navbar.
+        self.current_page.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         self.element.click()
         if isinstance(self.page, str):
             mod = __import__('features.steps.utils.pages', fromlist=[self.page])
