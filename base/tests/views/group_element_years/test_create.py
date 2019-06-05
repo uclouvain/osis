@@ -28,7 +28,6 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 
-from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -39,11 +38,7 @@ from base.utils.cache import cache, ElementCache
 class TestAttachTypeDialogView(TestCase):
     def setUp(self):
         self.next_academic_year = AcademicYearFactory(current=True)
-        self.group_element_year = GroupElementYearFactory(
-            parent__academic_year=self.next_academic_year,
-            parent__education_group_type__name=TrainingType.AGGREGATION.value,
-            child_branch__education_group_type__name=TrainingType.CERTIFICATE_OF_PARTICIPATION.value
-        )
+        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.next_academic_year)
         self.selected_egy = EducationGroupYearFactory(
             academic_year=self.next_academic_year
         )
