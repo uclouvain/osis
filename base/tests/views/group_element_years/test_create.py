@@ -28,6 +28,7 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
@@ -36,19 +37,15 @@ from base.utils.cache import cache, ElementCache
 
 class TestAttachTypeDialogView(TestCase):
     def setUp(self):
-        self.root_egy = TrainingFactory()
-        self.egy = MiniTrainingFactory(academic_year=self.root_egy.academic_year)
-        self.group_element_year=  GroupElementYearFactory(
-            parent__academic_year=self.root_egy.academic_year,
-            child_branch=self.egy
-        )
+        self.next_academic_year = AcademicYearFactory.produce_in_future(quantity=1)[0]
+        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.next_academic_year)
         self.selected_egy = EducationGroupYearFactory(
-            academic_year=self.root_egy.academic_year
+            academic_year=self.next_academic_year
         )
 
         self.url = reverse(
             "education_group_attach",
-            args=[self.root_egy.id, self.egy.id]
+            args=[self.group_element_year.parent.id, self.group_element_year.child_branch.id]
         )
 
         self.person = PersonFactory()
@@ -69,4 +66,4 @@ class TestAttachTypeDialogView(TestCase):
 
         self.assertEqual(context["object_to_attach"], self.selected_egy)
         self.assertEqual(context["source_link"], self.group_element_year)
-        self.assertEqual(context["education_group_year_parent"], self.egy)
+        self.assertEqual(context["education_group_year_parent"], self.group_element_year.child_branch)
