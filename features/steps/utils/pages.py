@@ -264,7 +264,7 @@ class SearchLearningUnitPage(pypom.Page):
     container_type = SelectField(By.ID, 'id_container_type')
     clear_button = ButtonField(By.ID, 'btn_clear_filter')
 
-    search = SubmitField(By.CSS_SELECTOR, 'button.btn-primary')
+    search = Link('SearchLearningUnitPage', By.CSS_SELECTOR, 'button.btn-primary', 2)
     export = ButtonField(By.ID, "dLabel")
     list_learning_units = ButtonField(By.ID, "btn_produce_xls_with_parameters")
     with_program = ButtonField(By.ID, "chb_with_grp")
