@@ -7,6 +7,7 @@ Feature: Propositions d’UE
 
   Scenario: 20 : En tant que gestionnaire facultaire, je dois pouvoir rechercher des propositions par sigle ou numéro de dossier.
     Given L’utilisateur est attaché à l’entité MED
+    Given L’utilisateur est attaché à l’entité CHIM
     And Aller sur la page de recherche d'UE
     And Sélectionner l’onglet « Propositions »
     And Réinitialiser les critères de recherche
