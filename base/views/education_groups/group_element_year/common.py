@@ -49,6 +49,7 @@ class GenericGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessage
 
     def _call_rule(self, rule):
         """ The permission is computed from the education_group_year """
+        print("rule is it")
         return rule(self.request.user, self.education_group_year)
 
     def get_context_data(self, **kwargs):
