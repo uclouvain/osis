@@ -40,7 +40,8 @@ from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
 from base.models.enums.schedule_type import DAILY
 from base.tests.factories.academic_calendar import AcademicCalendarEducationGroupEditionFactory
-from base.tests.factories.academic_year import create_current_academic_year, get_current_year
+from base.tests.factories.academic_year import create_current_academic_year, get_current_year, AcademicYearFactory
+from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.certificate_aim import CertificateAimFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -58,6 +59,10 @@ from rules_management.tests.fatories import PermissionFactory, FieldReferenceFac
 
 
 class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2018)
+
     def setUp(self):
         self.education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
         self.form_class = TrainingEducationGroupYearForm
@@ -68,6 +73,24 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
                                 ares_graca=200,
                                 ares_ability=300
                                 )
+
+    def test_clean_certificate_aims(self):
+        parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year,
+                                                                education_group_type=self.education_group_type)
+        AuthorizedRelationshipFactory(
+            parent_type=parent_education_group_year.education_group_type,
+            child_type=self.education_group_type,
+        )
+        self.form_class(
+            data={
+                'certificatate_aims': None
+            },
+            parent=parent_education_group_year,
+            education_group_type=parent_education_group_year.education_group_type,
+            user=self.user,
+        )
+        print(self.form_class.is_valid())
+        # self.assertTrue(self.form_class.is_valid())
 
     @patch('base.forms.education_group.common.find_authorized_types')
     def test_get_context_for_field_references_case_not_in_editing_pgrm_period(self, mock_authorized_types):
