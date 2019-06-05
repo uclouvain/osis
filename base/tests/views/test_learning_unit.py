@@ -652,6 +652,7 @@ class LearningUnitViewTestCase(TestCase):
 
         person_entity = PersonEntityFactory(entity=entity_container.entity)
         person_entity.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+        person_entity.person.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit'))
         url = reverse("learning_unit", args=[learning_unit_year.id])
         self.client.force_login(person_entity.person.user)
 
@@ -676,6 +677,7 @@ class LearningUnitViewTestCase(TestCase):
         person_entity = PersonEntityFactory(entity=entity_container.entity)
         group, created = Group.objects.get_or_create(name=FACULTY_MANAGER_GROUP)
         person_entity.person.user.groups.add(group)
+        person_entity.person.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit'))
         url = reverse("learning_unit", args=[learning_unit_year.id])
         self.client.force_login(person_entity.person.user)
 
