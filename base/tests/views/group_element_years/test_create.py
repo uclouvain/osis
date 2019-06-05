@@ -27,14 +27,16 @@ from unittest import mock
 
 from django.test import TestCase
 from django.urls import reverse
+from waffle.testutils import override_flag
 
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, MiniTrainingFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import cache, ElementCache
 
 
+@override_flag('education_group_update', active=True)
 class TestAttachTypeDialogView(TestCase):
     def setUp(self):
         self.next_academic_year = AcademicYearFactory(current=True)
