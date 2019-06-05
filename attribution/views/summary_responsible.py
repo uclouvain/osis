@@ -79,7 +79,7 @@ def edit(request):
         'summary_responsible': request.GET.get('summary_responsible')
     }
     learning_unit_year_id = request.GET.get('learning_unit_year').strip('learning_unit_year_')
-    attributions_data = get_attributions_data(request.user, learning_unit_year_id)
+    attributions_data = get_attributions_data(request.user, learning_unit_year_id, '-summary_responsible')
     context.update(attributions_data)
     return render(request, 'summary_responsible_edit.html', context)
 
