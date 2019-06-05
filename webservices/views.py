@@ -135,7 +135,6 @@ def ws_catalog_common_offer(request, year, language):
         language=iso_language,
         text_label__label__in=SECTIONS_PER_OFFER_TYPE['common']['specific']
     ).exclude(Q(text__isnull=True) | Q(text__exact='')).select_related('text_label')
-
     for translated_text in qs:
         response[translated_text.text_label.label] = translated_text.text
 

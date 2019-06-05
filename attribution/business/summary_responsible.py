@@ -63,10 +63,11 @@ def search_attributions(academic_year, entities_manager=None, course_code=None, 
     return list(attributions)
 
 
-def get_attributions_data(user, learning_unit_year_id):
+def get_attributions_data(user, learning_unit_year_id, responsibles_order):
     a_learning_unit_year = get_learning_unit_year_managed_by_user_from_id(user, learning_unit_year_id)
     return {
         'learning_unit_year': a_learning_unit_year,
-        'attributions': mdl_attr.attribution.find_all_responsible_by_learning_unit_year(a_learning_unit_year),
+        'attributions': mdl_attr.attribution.find_all_responsible_by_learning_unit_year(
+            a_learning_unit_year, responsibles_order=responsibles_order),
         'academic_year': a_learning_unit_year.academic_year
     }
