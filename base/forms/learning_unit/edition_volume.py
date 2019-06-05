@@ -27,13 +27,11 @@ from collections import OrderedDict
 
 from django import forms
 from django.db import transaction
-from django.db.models import Prefetch
 from django.forms import formset_factory, modelformset_factory
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units import edition
 from base.business.learning_units.edition import check_postponement_conflict_report_errors
-from base.forms.common import STEP_HALF_INTEGER
 from base.forms.utils.emptyfield import EmptyField
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT, COMPONENT_TYPES
