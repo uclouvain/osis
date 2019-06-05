@@ -24,7 +24,9 @@ Feature: Propositions d’UE
     Then Dans la liste de résultat, le(s) premier(s) « Code » est(sont) bien LCHIM1141.
 
   Scenario: 21 : En tant que gestionnaire facultaire, je dois pouvoir rechercher des propositions par entité de charge.
+    And Les propositions LDROI1003, doivent être attachées à DRT en 2019-20
     Given L’utilisateur est attaché à l’entité DRT
+
     And Aller sur la page de recherche d'UE
     And Sélectionner l’onglet « Propositions »
     And Réinitialiser les critères de recherche
@@ -33,7 +35,7 @@ Feature: Propositions d’UE
     And Encoder DRT comme Ent. charge
     And Cliquer sur le bouton Rechercher (Loupe)
 
-    Then Dans la liste de résultat, le(s) premier(s) « Code » est(sont) bien LDRH03401,LDRH03404,LDRH03406,LDROI1003.
+    Then Dans la liste de résultat, le(s) premier(s) « Code » est(sont) bien LDROI1003.
 
   Scenario: 22 : En tant que gestionnaire facultaire, je dois pouvoir rechercher des propositions et produire un Excel.
   Description : Recherche des propositions + produire l’Excel
