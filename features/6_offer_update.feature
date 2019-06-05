@@ -2,6 +2,7 @@ Feature: Modification d'offre
 
   Background:
     Given La base de données est dans son état initial.
+    And La formation DROI2MS/TT doit exister en 2018
     And La formation DROI2MS/TT doit exister en 2019
     And La période de modification des programmes est en cours
 
@@ -30,7 +31,7 @@ Feature: Modification d'offre
     And Encoder Tous comme Anac
     And Encoder DROI2MS/TT comme Sigle/Intitulé abrégé
     And Cliquer sur le bouton Rechercher (Loupe)
-    And Vérifier qu'il n'y a que 3 résultats.
+    And Vérifier qu'il n'y a que 4 résultats.
 
   Scenario: 33 : En tant que gestionnaire facultaire, je dois pouvoir ajouter une finalité dans une offre.
 
