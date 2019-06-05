@@ -257,7 +257,8 @@ class TestLearningUnitModificationProposal(TestCase):
             ],
             'learning_component_year': [
                 "id", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
-                "planned_classes", "type"
+                "planned_classes", "type", "repartition_volume_requirement_entity",
+                "repartition_volume_additional_entity_1", "repartition_volume_additional_entity_2"
             ],
         }
 
@@ -944,7 +945,7 @@ class TestLearningUnitProposalDisplay(TestCase):
 
     def test_get_str_representing_old_data_from_foreign_key(self):
         differences = proposal_business._get_str_representing_old_data_from_foreign_key('campus', self.campus.id)
-        self.assertEqual(differences, str(self.campus))
+        self.assertEqual(differences, str(self.campus.name))
 
     def test_get_str_representing_old_data_from_foreign_key_equals_no_value(self):
         differences = proposal_business._get_str_representing_old_data_from_foreign_key(
@@ -960,7 +961,7 @@ class TestLearningUnitProposalDisplay(TestCase):
 
     def test_get_old_value_of_foreign_key_for_campus(self):
         differences = proposal_business._get_old_value_of_foreign_key('campus', self.campus.id)
-        self.assertEqual(differences, str(self.campus))
+        self.assertEqual(differences, str(self.campus.name))
 
     def test_get_old_value_of_foreign_key_for_language(self):
         differences = proposal_business._get_old_value_of_foreign_key('language', self.language_it.pk)
