@@ -125,7 +125,9 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
 
     @staticmethod
     def _additional_entity_is_valid(additional_entity, repartition_volume_additional_entity):
-        return additional_entity and repartition_volume_additional_entity or not additional_entity and not repartition_volume_additional_entity
+        return additional_entity and\
+               repartition_volume_additional_entity or not additional_entity and\
+               not repartition_volume_additional_entity
 
     @transaction.atomic
     def save(self, commit=True):
