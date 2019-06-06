@@ -81,7 +81,7 @@ def step_impl(context, acronym, start_year, end_year):
     """
     for i in range(int(start_year), int(end_year) + 1):
         string_to_check = "{} ({}-".format(acronym, i)
-        context.test.assertIn(string_to_check, context.current_page.success_messages())
+        context.test.assertIn(string_to_check, context.current_page.success_messages.text)
 
 
 @step("Cliquer sur « Nouvelle Mini-Formation »")

@@ -39,6 +39,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person_entity import PersonEntity
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
 from base.tests.factories.person import FacultyManagerFactory, PersonFactory
@@ -105,7 +106,7 @@ def step_impl(context, acronym, year, entity):
 
 @step("La période de modification des programmes est en cours")
 def step_impl(context: Context):
-    calendar = AcademicCalendar.objects.get(academic_year=current_academic_year(), reference=EDUCATION_GROUP_EDITION)
+    calendar = AcademicCalendarFactory(academic_year=current_academic_year(), reference=EDUCATION_GROUP_EDITION)
     calendar.end_date = (datetime.now() + timedelta(days=1)).date()
     calendar.save()
 

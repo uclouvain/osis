@@ -57,13 +57,15 @@ Feature: Modification d'offre
     And Fermer la modal
 
     And Dans l'arbre, cliquer sur Attacher sur LDRMM900R.
+    And Cliquer sur Copier dans la modal
     And Cliquer sur « Enregistrer » dans la modal
 
     Then Vérifier que LCOMU2900 a été mis à jour
     And LCOMU2900 se trouve bien dans l'arbre sous LDRMM900R
 
 
-  Scenario: 35 : En tant que gestionnaire facultaire, je dois pouvoir attacher un groupe au tronc commun d’une offre.
+  Scenario: 35 : En tant que gestionnaire facultaire, je dois pouvoir attacher un groupe au tronc commun d’une offre.036
+
   Pour pouvoir réaliser ce scénario, l'utilisateur doit être lié à AGRO pour selectionner le groupe.
 
     Given L’utilisateur est dans le groupe faculty manager
@@ -80,7 +82,7 @@ Feature: Modification d'offre
     And Ouvrir LDROI2M dans l’arbre
     And Ouvrir LDROI220T dans l’arbre
     And Dans l'arbre, cliquer sur Attacher sur LDROI220T.
-
+    And Cliquer sur Copier dans la modal
     And Encoder Référence comme Type de lien
     And Cliquer sur « Enregistrer » dans la modal
 
@@ -99,6 +101,7 @@ Feature: Modification d'offre
 
     And Ouvrir LDRMM900R dans l’arbre
     And Dans l'arbre, cliquer sur Attacher sur LDRMM900R.
+    And Cliquer sur Copier dans la modal
     And Cliquer sur « Enregistrer » dans la modal
 
     And Dans l'arbre et dans LDRCC900R, cliquer sur Détacher sur LDROI2108.

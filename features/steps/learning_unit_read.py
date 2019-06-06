@@ -177,7 +177,7 @@ def step_impl(context):
 @then("Vérifier que la unité d'enseignement {acronym} a bien été mise en proposition pour l'année {year}")
 def step_impl(context, acronym, year):
     string_to_check = "{} ({})".format(acronym, year)
-    context.test.assertIn(string_to_check, context.current_page.success_messages())
+    context.test.assertIn(string_to_check, context.current_page.success_messages.text)
 
 
 @then("Vérifier que une proposition de {proposal_type} a été faite pour l'unité d'enseignement {acronym}")
@@ -185,8 +185,8 @@ def step_impl(context, proposal_type, acronym):
     """
     :type context: behave.runner.Context
     """
-    context.test.assertIn(acronym, context.current_page.success_messages())
-    context.test.assertIn(proposal_type, context.current_page.success_messages())
+    context.test.assertIn(acronym, context.current_page.success_messages.text)
+    context.test.assertIn(proposal_type, context.current_page.success_messages.text)
 
 
 @step("Vérifier que l'année academique termine en {year}")

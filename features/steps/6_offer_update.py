@@ -49,18 +49,18 @@ def step_impl(context):
 def step_impl(context, acronym, start_year, end_year):
     for i in range(int(start_year), int(end_year) + 1):
         string_to_check = "{} ({}-".format(acronym, i)
-        context.test.assertIn(string_to_check, context.current_page.success_messages())
+        context.test.assertIn(string_to_check, context.current_page.success_messages.text)
 
-    context.test.assertIn('mis à jour', context.current_page.success_messages())
+    context.test.assertIn('mis à jour', context.current_page.success_messages.text)
 
 
 @then("Vérifier que la formation {acronym} a bien été supprimée de {start_year} à {end_year}")
 def step_impl(context, acronym, start_year, end_year):
     for i in range(int(start_year), int(end_year) + 1):
         string_to_check = "{} ({}-".format(acronym, i)
-        context.test.assertIn(string_to_check, context.current_page.success_messages())
+        context.test.assertIn(string_to_check, context.current_page.success_messages.text)
 
-    context.test.assertIn('supprimé', context.current_page.success_messages())
+    context.test.assertIn('supprimé', context.current_page.success_messages.text)
 
 
 @step("Vérifier qu'il n'y a que {count} résultats.")
@@ -96,7 +96,7 @@ def step_impl(context):
 @step("Dans l'arbre, cliquer sur {action} sur {acronym}.")
 def step_impl(context, action, acronym):
     if action.lower() == 'attacher':
-        context.current_page.attach_node_tree(acronym)
+        context.current_page = context.current_page.attach_node_tree(acronym)
     elif action.lower() == 'sélectionner':
         context.current_page.select_node_tree(acronym)
     else:
@@ -106,7 +106,7 @@ def step_impl(context, action, acronym):
 @step("Dans l'arbre et dans {parent}, cliquer sur {action} sur {acronym}.")
 def step_impl(context, parent, action, acronym):
     if action.lower() == 'attacher':
-        context.current_page.attach_node_tree(acronym, parent)
+        context.current_page = context.current_page.attach_node_tree(acronym, parent)
     elif action.lower() == 'sélectionner':
         context.current_page.select_node_tree(acronym, parent)
     elif action.lower() == 'détacher':
@@ -117,13 +117,15 @@ def step_impl(context, parent, action, acronym):
 
 @step("Cliquer sur « Enregistrer » dans la modal")
 def step_impl(context):
-    context.current_page.save_modal.click()
+    result = context.current_page.save_modal.click()
+    if result:
+        context.current_page = result
 
 
 @then("Vérifier que {acronym} a été mis à jour")
 def step_impl(context, acronym):
-    context.test.assertIn(acronym, context.current_page.success_messages())
-    context.test.assertIn('mis à jour', context.current_page.success_messages())
+    context.test.assertIn(acronym, context.current_page.success_messages.text)
+    context.test.assertIn('mis à jour', context.current_page.success_messages.text)
 
 
 @step("{child} se trouve bien dans l'arbre sous {parent}")
@@ -135,3 +137,11 @@ def step_impl(context, child, parent):
 def step_impl(context, child, parent):
     with context.test.assertRaises(Exception):
         context.current_page.find_node_tree_by_acronym(child, parent)
+
+
+@step("Cliquer sur Copier dans la modal")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.current_page = context.current_page.copy_btn.click()

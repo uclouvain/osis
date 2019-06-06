@@ -12,15 +12,14 @@ Feature: Recherche des unités d'enseignements.
     And Encoder la valeur <search_value> dans la zone de saisie <search_field>
     And Cliquer sur le bouton Rechercher (Loupe)
 
-    # Then Le nombre total de résultat est <result_count>
     Then Dans la liste de résultat, le(s) premier(s) « Code » est(sont) bien <results>.
 
     Examples:
-      | anac    | results                             | search_field       | search_value    | result_count |
-      | 2019-20 | WSBIM1203                           | acronym            | WSBIM1203       | 1            |
-      | 2019-20 | LCRIM2101,LCRIM2103                 | requirement_entity | DRT             | 441          |
-      | 2019-20 | LACTU2950                           | container_type     | Stage           | 556          |
-      | 2019-20 | LCHM1111,LCHM1211,LCHM1331,LCHM2130 | tutor              | kaSenzangakhona | 4            |
+      | anac    | results                             | search_field       | search_value    |
+      | 2019-20 | WSBIM1203                           | acronym            | WSBIM1203       |
+      | 2019-20 | LCRIM2101,LCRIM2103                 | requirement_entity | DRT             |
+      | 2019-20 | LACTU2950                           | container_type     | Stage           |
+      | 2019-20 | LCHM1111,LCHM1211,LCHM1331,LCHM2130 | tutor              | kaSenzangakhona |
 
   Scenario: 5. En tant que gestionnaire facultaire ou central, je recherche des UE pour produire un Excel
     When Sélectionner 2019-20 dans la zone de saisie « Anac. »

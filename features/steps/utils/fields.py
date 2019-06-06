@@ -68,11 +68,13 @@ class Link(Field):
             self.page = getattr(mod, self.page)
 
         new_page = self.page(self.current_page.driver, self.current_page.driver.current_url)
-        new_page.wait_for_page_to_load()
 
         # Sometimes the wait_for_page_to_load does not work because the redirection is on the same page.
         # In that case, we have to impose a waiting time to be sure that the page is reloaded.
         time.sleep(self.waiting_time)
+
+        new_page.wait_for_page_to_load()
+
         return new_page
 
 

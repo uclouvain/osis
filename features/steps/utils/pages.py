@@ -22,6 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import time
+from abc import ABC
 
 import pypom
 from selenium.webdriver import ActionChains
@@ -33,7 +34,30 @@ from features.steps.utils.fields import InputField, SubmitField, SelectField, Bu
     CkeditorField, RadioField, Field, SelectEntityVersionField
 
 
-class QuickSearchPage(pypom.Page):
+class AjaxModal(pypom.Page, ABC):
+    def loaded(self):
+        return self.find_element(By.ID, "form-modal-ajax-content")
+
+
+class SuccessMessageRegion(pypom.Region):
+    _root_locator = (By.ID, 'pnl_succes_messages')
+
+    def loaded(self):
+        return self.root.is_displayed()
+
+    @property
+    def text(self):
+        return self.root.text
+
+
+class CommonPageMixin:
+    @property
+    def success_messages(self):
+        region = SuccessMessageRegion(self)
+        region.wait_for_region_to_load()
+        return region
+
+class QuickSearchPage(AjaxModal):
     code = InputField(By.ID, 'id_search_text')
     search = ButtonField(By.CSS_SELECTOR, '#form-modal > div > div.col-md-1.col-md-offset-2 > button', 1)
     select_first = ButtonField(
@@ -46,9 +70,6 @@ class QuickSearchPage(pypom.Page):
     eg_tab = ButtonField(By.CSS_SELECTOR, '#form-modal-ajax-content > div.modal-body > ul > li:nth-child(2) > a')
 
     close = Link('EducationGroupPage', By.CSS_SELECTOR, '#form-modal-ajax-content > div.modal-header > button')
-
-    def wait_for_page_to_load(self):
-        return self.find_element(By.ID, "form-modal-ajax-content").text
 
 
 class LoginPage(pypom.Page):
@@ -202,7 +223,7 @@ class SpecificationPage(pypom.Page):
         return self.find_element(By.XPATH, '//*[@id="cms_text_fr_0"]/a')
 
 
-class LearningUnitPage(pypom.Page):
+class LearningUnitPage(CommonPageMixin, pypom.Page):
     actions = ButtonField(By.ID, "dLabel")
     edit_button = Link('LearningUnitEditPage', By.CSS_SELECTOR, "#link_edit_lu > a")
     proposal_edit = Link(EditLearningUnitProposalPage, By.CSS_SELECTOR, "#link_proposal_modification > a")
@@ -217,10 +238,6 @@ class LearningUnitPage(pypom.Page):
     tab_attribution = Link(LearningUnitAttributionPage, By.ID, "attributions_link")
     tab_description = Link(DescriptionPage, By.ID, "description_link")
     tab_specification = Link(SpecificationPage, By.ID, "specification_link")
-
-    def success_messages(self):
-        success_panel = self.find_element(By.ID, "pnl_succes_messages")
-        return success_panel.text
 
     def is_li_edit_link_disabled(self):
         return "disabled" in self.find_element(By.ID, "link_edit_lu").get_attribute("class")
@@ -248,7 +265,7 @@ class LearningUnitEditPage(pypom.Page):
     with_postponement = Link(LearningUnitPage, By.ID, "btn_with_postponement")
 
 
-class SearchLearningUnitPage(pypom.Page):
+class SearchLearningUnitPage(CommonPageMixin, pypom.Page):
     URL_TEMPLATE = '/learning_units/by_activity/'
 
     proposal_search = Link('SearchLearningUnitPage', By.ID, 'lnk_proposal_search', 1)
@@ -286,10 +303,6 @@ class SearchLearningUnitPage(pypom.Page):
         '#modalConsolidate > div > div > div.modal-footer > button.btn.btn-primary', 4
     )
 
-    def success_messages(self):
-        success_panel = self.find_element(By.ID, "pnl_succes_messages")
-        return success_panel.text
-
     def count_result(self):
         text = self.find_element(By.CSS_SELECTOR, "#main > div.panel.panel-default > div > strong").text
         return text.split()[0]
@@ -299,7 +312,16 @@ class SearchLearningUnitPage(pypom.Page):
         return self.find_element(By.CSS_SELECTOR, selector).text
 
 
-class EducationGroupPage(pypom.Page):
+class CopyModalPage(AjaxModal):
+    copy_btn = Link('AttachModalPage', By.CSS_SELECTOR, '.modal-footer > .btn-primary', 1)
+
+
+class AttachModalPage(AjaxModal):
+    type_de_lien = SelectField(By.ID, 'id_link_type')
+    save_modal = Link('EducationGroupPage', By.CSS_SELECTOR, '.modal-footer > .btn-primary', 6)
+
+
+class EducationGroupPage(CommonPageMixin, pypom.Page):
     sigleintitule_abrege = Field(
         By.CSS_SELECTOR,
         '#identification > div > div > div.row > div.col-md-7 > div:nth-child(1) > div > div.row > dl:nth-child(1) > dd'
@@ -327,18 +349,14 @@ class EducationGroupPage(pypom.Page):
     toggle_tree = ButtonField(By.CSS_SELECTOR, '#panel-data > div.panel-heading > div > a')
     open_first_node_tree = ButtonField(By.CSS_SELECTOR, '#panel_file_tree > ul > li > i')
 
-    quick_search = Link(QuickSearchPage, By.ID, 'quick-search')
-    save_modal = Link('EducationGroupPage', By.CSS_SELECTOR, '.modal-footer > [type=submit]', 6)
+    quick_search = Link(QuickSearchPage, By.ID, 'quick-search', 1)
+    save_modal = Link('EducationGroupPage', By.CSS_SELECTOR, '.modal-footer > .btn-primary', 4)
 
-    type_de_lien = SelectField(By.ID, 'id_link_type')
+    attach = Link(CopyModalPage, By.CSS_SELECTOR, 'body > ul > li:nth-child(4) > a', 2)
 
     def get_name_first_children(self) -> list:
         children = self.find_elements(By.CSS_SELECTOR, '#panel_file_tree > ul > li > ul > li')
         return [child.text for child in children]
-
-    def success_messages(self):
-        success_panel = self.find_element(By.ID, "pnl_succes_messages")
-        return success_panel.text
 
     def find_node_tree_by_acronym(self, acronym, parent=None):
         if not parent:
@@ -365,8 +383,7 @@ class EducationGroupPage(pypom.Page):
 
     def attach_node_tree(self, acronym, parent=None):
         self.rigth_click_node_tree(acronym, parent)
-        self.find_element(By.CSS_SELECTOR, 'body > ul > li:nth-child(4) > a').click()
-        time.sleep(1)
+        return self.attach.click()
 
     def detach_node_tree(self, acronym, parent=None):
         self.rigth_click_node_tree(acronym, parent)
@@ -401,7 +418,7 @@ class UpdateTrainingPage(NewTrainingPage):
     fin = InputField(By.ID, 'id_end_year')
 
 
-class SearchEducationGroupPage(pypom.Page):
+class SearchEducationGroupPage(CommonPageMixin, pypom.Page):
     URL_TEMPLATE = '/educationgroups/'
 
     sigleintitule_abrege = InputField(By.ID, 'id_acronym')
@@ -420,11 +437,7 @@ class SearchEducationGroupPage(pypom.Page):
     clear_button = ButtonField(By.ID, 'btn_clear_filter')
     search = Link('SearchEducationGroupPage', By.CSS_SELECTOR, 'button.btn-primary', 1)
 
-    quick_search = Link(QuickSearchPage, By.ID, 'quick-search')
-
-    def success_messages(self):
-        success_panel = self.find_element(By.ID, "pnl_succes_messages")
-        return success_panel.text
+    quick_search = Link(QuickSearchPage, By.ID, 'quick-search', 1)
 
     def count_result(self):
         text = self.find_element(

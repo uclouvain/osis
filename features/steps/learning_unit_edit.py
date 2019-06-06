@@ -32,19 +32,10 @@ from selenium.webdriver.common.by import By
 from waffle.models import Flag
 
 from base.models.academic_calendar import AcademicCalendar
-from base.models.academic_year import current_academic_year, AcademicYear
-from base.models.campus import Campus
-from base.models.entity import Entity
+from base.models.academic_year import current_academic_year
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
-from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
-from base.models.enums.proposal_state import ProposalState
-from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
-from base.tests.factories.person import CentralManagerFactory
-from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from features.steps.utils.pages import LoginPage, LearningUnitPage
+from features.steps.utils.pages import LearningUnitPage
 
 use_step_matcher("parse")
 
@@ -159,9 +150,11 @@ def step_impl(context: Context, value: str):
 
 @given("La période de modification des programmes n’est pas en cours")
 def step_impl(context: Context):
-    calendar = AcademicCalendar.objects.get(academic_year=current_academic_year(), reference=EDUCATION_GROUP_EDITION)
-    calendar.end_date = (datetime.now() - timedelta(days=1)).date()
-    calendar.save()
+    calendar = AcademicCalendar.objects.filter(academic_year=current_academic_year(),
+                                               reference=EDUCATION_GROUP_EDITION).first()
+    if calendar:
+        calendar.end_date = (datetime.now() - timedelta(days=1)).date()
+        calendar.save()
 
 
 @step("A la question, « voulez-vous reporter » répondez « oui »")
@@ -206,7 +199,7 @@ def step_impl(context, acronym: str):
     context.current_page.wait_for_page_to_load()
     for i in range(2019, 2025):
         string_to_check = "{} ({}-".format(acronym, i)
-        context.test.assertIn(string_to_check, context.current_page.success_messages())
+        context.test.assertIn(string_to_check, context.current_page.success_messages.text)
 
 
 @when("Cliquer sur le lien {acronym}")
@@ -344,9 +337,8 @@ def step_impl(context, acronym, msg):
     """
     :type context: behave.runner.Context
     """
-    context.test.assertIn(acronym, context.current_page.success_messages())
-    context.test.assertIn(msg, context.current_page.success_messages())
-
+    context.test.assertIn(acronym, context.current_page.success_messages.text)
+    context.test.assertIn(msg, context.current_page.success_messages.text)
 
 
 @step("Cliquer sur « Consolider »")
