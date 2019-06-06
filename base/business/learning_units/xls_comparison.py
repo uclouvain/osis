@@ -51,6 +51,9 @@ from base.models.learning_unit_year import LearningUnitYear, get_by_id
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_common.document import xls_build
 from reference.models.language import find_by_id as find_language_by_id
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
+    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
+    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES
 
 EMPTY_VALUE = ''
 DATE_FORMAT = '%d-%m-%Y'
@@ -248,15 +251,15 @@ def _get_volumes(component, components):
     volumes = components[component]
     return [
         component.acronym if component.acronym else EMPTY_VALUE,
-        volumes.get('VOLUME_Q1', EMPTY_VALUE),
-        volumes.get('VOLUME_Q2', EMPTY_VALUE),
-        volumes.get('VOLUME_TOTAL', EMPTY_VALUE),
+        volumes.get(VOLUME_Q1, EMPTY_VALUE),
+        volumes.get(VOLUME_Q2, EMPTY_VALUE),
+        volumes.get(VOLUME_TOTAL, EMPTY_VALUE),
         component.real_classes if component.real_classes else EMPTY_VALUE,
         component.planned_classes if component.planned_classes else EMPTY_VALUE,
-        volumes.get('VOLUME_GLOBAL', '0'),
-        volumes.get('VOLUME_REQUIREMENT_ENTITY', EMPTY_VALUE),
-        volumes.get('VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1', EMPTY_VALUE),
-        volumes.get('VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2', EMPTY_VALUE)
+        volumes.get(VOLUME_GLOBAL, '0'),
+        volumes.get(VOLUME_REQUIREMENT_ENTITY, EMPTY_VALUE),
+        volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, EMPTY_VALUE),
+        volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, EMPTY_VALUE)
     ]
 
 
@@ -306,15 +309,15 @@ def _get_component_data_by_type(component, type):
     if component:
         return [
             DEFAULT_ACRONYM_COMPONENT.get(type),
-            component.get('VOLUME_Q1'),
-            component.get('VOLUME_Q2'),
-            component.get('VOLUME_TOTAL'),
-            component.get('REAL_CLASSES'),
-            component.get('PLANNED_CLASSES'),
-            component.get('VOLUME_TOTAL_REQUIREMENT_ENTITIES'),
-            component.get('VOLUME_REQUIREMENT_ENTITY'),
-            component.get('VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1'),
-            component.get('VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2'),
+            component.get(VOLUME_Q1),
+            component.get(VOLUME_Q2),
+            component.get(VOLUME_TOTAL),
+            component.get(REAL_CLASSES),
+            component.get(PLANNED_CLASSES),
+            component.get(VOLUME_TOTAL_REQUIREMENT_ENTITIES),
+            component.get(VOLUME_REQUIREMENT_ENTITY),
+            component.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1),
+            component.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2),
         ]
     else:
         return []

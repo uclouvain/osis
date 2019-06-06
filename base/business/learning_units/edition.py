@@ -42,18 +42,9 @@ from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
 from cms.models import translated_text
+from base.enums.component_detail import COMPONENT_DETAILS
 
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
-FIELD_NAMES = {'VOLUME_TOTAL': _('c'),
-               'VOLUME_Q1': _('Vol. Q1'),
-               'VOLUME_Q2': _('Vol. Q2'),
-               'PLANNED_CLASSES':  _('Planned classes'),
-               'VOLUME_REQUIREMENT_ENTITY': _('volume requirement entity'),
-               'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': _('volume additional requirement entity 1'),
-               'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': _('volume additional requirement entity 2'),
-               'VOLUME_TOTAL_REQUIREMENT_ENTITIES': _('volume total requirement entities'),
-               'REAL_CLASSES': _('Real classes')
-               }
 
 
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
@@ -571,7 +562,7 @@ def _get_error_volume_field_diff(field_diff, current_component, next_year_compon
     return _("The value of field '%(field)s' for the learning unit %(acronym)s (%(component_type)s) "
              "is different between year %(year)s - %(value)s and year %(next_year)s - %(next_value)s") % \
            {
-               'field': FIELD_NAMES[field_diff].lower(),
+               'field': COMPONENT_DETAILS[field_diff].lower(),
                'acronym': current_component.learning_unit_year.acronym,
                'component_type': _(current_component.type) if current_component.type else 'NT',
                'year': current_component.learning_unit_year.academic_year,
