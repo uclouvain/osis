@@ -697,13 +697,13 @@ class TestFullFormValidateSameEntitiesContainer(LearningUnitFullFormContextMixin
 
     def test_when_volumes_entities_incorrect(self):
         self.post_data['additional_requirement_entity_1-entity'] = self.post_data['requirement_entity-entity']
-        self.post_data['component-1-repartition_volume_requirement_entity'] = 10
-        self.post_data['component-2-repartition_volume_requirement_entity'] = 10
+        self.post_data['component-0-repartition_volume_requirement_entity'] = 5
+        self.post_data['component-0-repartition_volume_additional_entity_1'] = 10
         form = _instanciate_form(self.current_academic_year, post_data=self.post_data, person=self.person,
                                  start_year=self.current_academic_year.year)
         self.assertFalse(form.is_valid())
-        self.post_data['component-0-repartition_volume_requirement_entity'] = 20
-        self.post_data['component-1-repartition_volume_requirement_entity'] = 20
+        self.post_data['component-0-repartition_volume_requirement_entity'] = 10
+        self.post_data['component-0-repartition_volume_additional_entity_1'] = 10
         form = _instanciate_form(self.current_academic_year, post_data=self.post_data, person=self.person,
                                  start_year=self.current_academic_year.year)
         self.assertTrue(form.is_valid(), form.errors)

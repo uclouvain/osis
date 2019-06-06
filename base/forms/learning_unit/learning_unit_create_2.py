@@ -98,8 +98,8 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
 
         self.learning_unit_year_form.post_clean(self.learning_container_year_form.instance.container_type)
         self.learning_container_year_form.post_clean(self.learning_unit_year_form.cleaned_data["specific_title"])
-        additional_entity_1 = self.entity_container_form.forms[2].initial.get('entity')
-        additional_entity_2 = self.entity_container_form.forms[3].initial.get('entity')
+        additional_entity_1 = self.entity_container_form.forms[2].entity_version
+        additional_entity_2 = self.entity_container_form.forms[3].entity_version
 
         for form in self.simplified_volume_management_form:
             volume_requirement_entity = form.cleaned_data.get("repartition_volume_requirement_entity") or 0
@@ -110,9 +110,9 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
             vol_entities = volume_requirement_entity + volume_additional_entity_1 + volume_additional_entity_2
             if hourly_volume_total_annual and volume_requirement_entity and self._additional_entity_is_valid(
                     additional_entity_1, form.cleaned_data.get(
-                            "repartition_volume_additional_entity_1")) and self._additional_entity_is_valid(
-                    additional_entity_2, form.cleaned_data.get(
-                            "repartition_volume_additional_entity_2")) and \
+                        "repartition_volume_additional_entity_1")) and self._additional_entity_is_valid(
+                additional_entity_2, form.cleaned_data.get(
+                    "repartition_volume_additional_entity_2")) and \
                     planned_classes * hourly_volume_total_annual != vol_entities:
                 form.add_error("repartition_volume_requirement_entity",
                                _('the sum of repartition volumes must be equal to the global volume'))
@@ -125,8 +125,8 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
 
     @staticmethod
     def _additional_entity_is_valid(additional_entity, repartition_volume_additional_entity):
-        return additional_entity and\
-               repartition_volume_additional_entity or not additional_entity and\
+        return additional_entity and \
+               repartition_volume_additional_entity or not additional_entity and \
                not repartition_volume_additional_entity
 
     @transaction.atomic

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-04 20:22+0200\n"
+"POT-Creation-Date: 2019-06-05 17:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -718,6 +718,7 @@ msgid "At the end of this learning unit, the student is able to:"
 msgstr ""
 
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:68
+#: templates/education_group/group_element_year_attach_type_dialog_inner.html:32
 msgid "Attach"
 msgstr ""
 
@@ -822,6 +823,10 @@ msgstr ""
 msgid "Block"
 msgstr ""
 
+#: templates/blocks/span/span_mod_status.html:35
+msgid "Blocked"
+msgstr ""
+
 #: templates/learning_units.html:72 views/learning_units/search.py:232
 msgid "Borrowed courses"
 msgstr ""
@@ -853,6 +858,8 @@ msgstr ""
 #: templates/education_group/delete_inner.html:45
 #: templates/education_group/group_element_year/confirm_detach_inner.html:36
 #: templates/education_group/group_element_year/confirm_detach_inner.html:46
+#: templates/education_group/group_element_year_attach_type_dialog_inner.html:49
+#: templates/education_group/group_element_year_attach_type_dialog_inner.html:66
 #: templates/education_group/group_element_year_comment_inner.html:54
 #: templates/education_group/group_element_year_comment_inner.html:64
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:45
@@ -1103,6 +1110,11 @@ msgstr ""
 
 #: templates/education_group/organization_edit_inner.html:30
 msgid "Coorganization"
+msgstr ""
+
+#: templates/education_group/group_element_year_attach_type_dialog_inner.html:43
+#: templates/education_group/group_element_year_attach_type_dialog_inner.html:58
+msgid "Copy"
 msgstr ""
 
 #: models/education_group_year.py:86
@@ -1359,6 +1371,13 @@ msgstr ""
 msgid "Do you want to continue ?"
 msgstr ""
 
+#: templates/education_group/group_element_year_attach_type_dialog_inner.html:37
+#, python-format
+msgid ""
+"Do you want to copy %(object_acronym)s or to move %(object_acronym)s from "
+"%(parent_acronym)s ?"
+msgstr ""
+
 #: templates/learning_unit/blocks/modal/modal_xls_with_parameters.html:37
 msgid "Do you want to export the following informations"
 msgstr ""
@@ -1391,7 +1410,7 @@ msgstr ""
 msgid "Down"
 msgstr ""
 
-#: tests/views/education_groups/test_update.py:719
+#: tests/views/education_groups/test_update.py:726
 msgid "Dummy message"
 msgstr ""
 
@@ -1583,8 +1602,8 @@ msgstr ""
 
 #: forms/learning_unit/learning_unit_create.py:120
 #: forms/learning_unit/learning_unit_create.py:123
-#: tests/forms/test_learning_unit_create_2.py:452
-#: tests/forms/test_learning_unit_create_2.py:466
+#: tests/forms/test_learning_unit_create_2.py:454
+#: tests/forms/test_learning_unit_create_2.py:468
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
@@ -2110,7 +2129,7 @@ msgid "It is forbidden to attach an element to itself."
 msgstr ""
 
 #: models/group_element_year.py:261
-#: tests/views/education_groups/test_update.py:621
+#: tests/views/education_groups/test_update.py:628
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 
@@ -2648,10 +2667,6 @@ msgstr ""
 msgid "Modification"
 msgstr ""
 
-#: templates/blocks/span/span_mod_status.html:35
-msgid "Modification blocked"
-msgstr ""
-
 #: templates/learning_unit/summary_list.html:111
 msgid "Modification made"
 msgstr ""
@@ -2692,6 +2707,11 @@ msgstr ""
 
 #: models/enums/duration_unit.py:39
 msgid "Month"
+msgstr ""
+
+#: templates/education_group/group_element_year_attach_type_dialog_inner.html:41
+#: templates/education_group/group_element_year_attach_type_dialog_inner.html:53
+msgid "Move"
 msgstr ""
 
 #: templates/my_osis/my_messages.html:35
@@ -3188,11 +3208,6 @@ msgstr ""
 msgid "Platform"
 msgstr ""
 
-#: tests/views/education_groups/test_update.py:705
-#: views/education_groups/group_element_year/create.py:64
-msgid "Please Select or Move an item before Attach it"
-msgstr ""
-
 #: models/group_element_year.py:90
 #, python-format
 msgid ""
@@ -3204,6 +3219,12 @@ msgstr ""
 #: models/learning_unit_year.py:96
 #, python-format
 msgid "Please select an academic year lower than %(academic_year_max)d."
+msgstr ""
+
+#: tests/views/education_groups/test_update.py:712
+#: views/education_groups/group_element_year/create.py:56
+#: views/education_groups/group_element_year/create.py:83
+msgid "Please select an item before attach it"
 msgstr ""
 
 #: models/enums/entity_type.py:43 models/enums/structure_type.py:43
@@ -4295,7 +4316,7 @@ msgstr ""
 msgid "The learning units"
 msgstr ""
 
-#: views/education_groups/group_element_year/create.py:84
+#: views/education_groups/group_element_year/create.py:103
 #, python-format
 msgid "The link of %(acronym)s has been created"
 msgstr ""
@@ -4327,7 +4348,7 @@ msgid ""
 "already reached the limit."
 msgstr ""
 
-#: business/group_element_years/management.py:118
+#: business/group_element_years/management.py:124
 #: tests/forms/education_group/test_groupElementYearForm.py:228
 #, python-format
 msgid ""
@@ -4355,8 +4376,8 @@ msgstr ""
 msgid "The parent is inactive and there is at least one partim active"
 msgstr ""
 
-#: business/group_element_years/management.py:101
-#: business/group_element_years/management.py:112
+#: business/group_element_years/management.py:107
+#: business/group_element_years/management.py:118
 #, python-format
 msgid "The parent must have at least one child of type(s) \"%(types)s\"."
 msgstr ""
@@ -5155,7 +5176,7 @@ msgid ""
 "You can't modify proposition which are related to a learning unit year under"
 msgstr ""
 
-#: business/group_element_years/management.py:126
+#: business/group_element_years/management.py:132
 #: tests/forms/education_group/test_groupElementYearForm.py:92
 #: tests/forms/education_group/test_groupElementYearForm.py:188
 #, python-format
@@ -5195,7 +5216,7 @@ msgid "You have the choice between"
 msgstr ""
 
 #: forms/learning_unit/learning_unit_create.py:218
-#: forms/learning_unit/learning_unit_create_2.py:201
+#: forms/learning_unit/learning_unit_create_2.py:212
 #: tests/views/learning_units/proposals/test_creation.py:196
 msgid "You must either set the common title or the specific title"
 msgstr ""
@@ -5775,6 +5796,7 @@ msgstr ""
 msgid "the program aims"
 msgstr ""
 
+#: forms/learning_unit/learning_unit_create_2.py:118
 #: models/learning_component_year.py:134
 #: tests/models/test_learning_unit_year.py:366
 #: tests/models/test_learning_unit_year.py:383
