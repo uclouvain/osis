@@ -35,6 +35,7 @@ from base.models.academic_year import current_academic_year
 from base.models.education_group_type import find_authorized_types
 from base.models.enums import academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
+from base.views.education_groups.perms import can_delete_all_education_group
 
 ERRORS_MSG = {
     "base.add_educationgroup": "The user has not permission to create education groups.",
@@ -122,6 +123,10 @@ def is_eligible_to_delete_achievement(person, education_group, raise_exception=F
 def is_eligible_to_delete_education_group(person, education_group, raise_exception=False):
     return check_permission(person, "base.delete_educationgroup", raise_exception) and \
            _is_eligible_education_group(person, education_group, raise_exception)
+
+
+def is_eligible_to_delete_education_group_year(person, education_group_yr, raise_exception=False):
+    return can_delete_all_education_group(person.user, education_group_yr.education_group)
 
 
 def is_education_group_edit_period_opened(education_group, raise_exception=False):
