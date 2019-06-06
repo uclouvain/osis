@@ -42,10 +42,12 @@ from base.business.learning_units.perms import MSG_EXISTING_PROPOSAL_IN_EPC, MSG
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.templatetags.learning_unit_li import li_edit_lu, li_edit_date_lu, li_modification_proposal, is_valid_proposal, \
     MSG_IS_NOT_A_PROPOSAL, MSG_PROPOSAL_NOT_ON_CURRENT_LU, DISABLED, li_suppression_proposal, li_cancel_proposal, \
     li_edit_proposal, li_consolidate_proposal, li_delete_all_lu
+from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -97,9 +99,9 @@ class LearningUnitTagLiEditTest(TestCase):
 
         self.previous_proposal = ProposalLearningUnitFactory(learning_unit_year=self.previous_luy_2)
         self.user = UserFactory()
-        self.central_manager_person = CentralManagerFactory()
-        self.central_manager_person.user.user_permissions.add(
-            Permission.objects.get(codename='can_edit_learningunit')
+        self.central_manager_person = create_person_with_permission_and_group(
+            CENTRAL_MANAGER_GROUP,
+            'can_edit_learningunit'
         )
         self.person_entity = PersonEntityFactory(person=self.central_manager_person)
 
@@ -134,10 +136,7 @@ class LearningUnitTagLiEditTest(TestCase):
 
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_li_edit_lu_year_non_editable_for_faculty_manager(self):
-        faculty_manager = FacultyManagerFactory()
-        faculty_manager.user.user_permissions.add(
-            Permission.objects.get(codename='can_edit_learningunit')
-        )
+        faculty_manager = create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit')
         self.context["learning_unit_year"] = self.previous_learning_unit_year
         self.context["user"] = faculty_manager.user
 
@@ -193,10 +192,8 @@ class LearningUnitTagLiEditTest(TestCase):
         )
 
     def test_li_edit_lu_year_is_learning_unit_year_not_in_range_to_be_modified(self):
-        person_faculty = FacultyManagerFactory()
-        person_faculty.user.user_permissions.add(
-            Permission.objects.get(codename='can_edit_learningunit')
-        )
+        person_faculty = create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit')
+
         later_luy = LearningUnitYearFactory(academic_year=self.later_academic_year,
                                             learning_unit=LearningUnitFactory(existing_proposal_in_epc=False))
         self.context["learning_unit_year"] = later_luy
@@ -211,10 +208,7 @@ class LearningUnitTagLiEditTest(TestCase):
         )
 
     def test_li_edit_lu_year_person_is_not_linked_to_entity_in_charge_of_lu(self):
-        a_person = CentralManagerFactory()
-        a_person.user.user_permissions.add(
-            Permission.objects.get(codename='can_edit_learningunit')
-        )
+        a_person = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP, 'can_edit_learningunit')
         self.context['user'] = a_person.user
         result = li_edit_lu(self.context, self.url_edit, "")
         self.assertEqual(
@@ -244,10 +238,8 @@ class LearningUnitTagLiEditTest(TestCase):
             learning_unit=lu,
             learning_container_year=self.lcy
         )
-        person_faculty_manager = FacultyManagerFactory()
-        person_faculty_manager.user.user_permissions.add(
-            Permission.objects.get(codename='can_edit_learningunit')
-        )
+        person_faculty_manager = create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit')
+
         PersonEntityFactory(person=person_faculty_manager,
                             entity=self.entity_container_yr.entity)
 

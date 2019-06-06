@@ -23,18 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_types import GroupType
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP
+from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_calendar import CloseAcademicCalendarFactory, \
     OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
-from base.tests.factories.person import PersonFactory, CentralManagerFactory, FacultyManagerFactory
+from base.tests.factories.person import PersonFactory, FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.views.education_groups.group_element_year.perms import can_update_group_element_year
 
@@ -54,20 +55,14 @@ class TestCanUpdateGroupElementYear(TestCase):
             can_update_group_element_year(person.user, self.group_element_year)
 
     def test_return_true_if_is_central_manager(self):
-        central_manager = CentralManagerFactory()
-        central_manager.user.user_permissions.add(
-            Permission.objects.get(codename='change_educationgroup')
-        )
+        central_manager = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP, 'change_educationgroup')
         person_entity = PersonEntityFactory(entity=self.group_element_year.parent.management_entity,
                                             person=central_manager)
 
         self.assertTrue(can_update_group_element_year(person_entity.person.user, self.group_element_year))
 
     def test_return_true_if_child_is_learning_unit_and_user_is_central_manager(self):
-        central_manager = CentralManagerFactory()
-        central_manager.user.user_permissions.add(
-            Permission.objects.get(codename='change_educationgroup')
-        )
+        central_manager = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP, 'change_educationgroup')
         GroupElementYearChildLeafFactory(parent=self.group_element_year.parent)
         person_entity = PersonEntityFactory(entity=self.group_element_year.parent.management_entity,
                                             person=central_manager)
