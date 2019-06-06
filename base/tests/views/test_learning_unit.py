@@ -99,6 +99,9 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
+    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
+    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
 
 
 @override_flag('learning_unit_create', active=True)
@@ -1156,8 +1159,8 @@ class TestLearningUnitComponents(TestCase):
                           self.generated_container.generated_container_years[0].list_components)
 
             volumes = component['volumes']
-            self.assertEqual(volumes['VOLUME_Q1'], None)
-            self.assertEqual(volumes['VOLUME_Q2'], None)
+            self.assertEqual(volumes[VOLUME_Q1], None)
+            self.assertEqual(volumes[VOLUME_Q2], None)
 
 
 class TestLearningAchievements(TestCase):
@@ -1431,22 +1434,22 @@ class TestLearningUnitProposalComparison(TestCase):
             ],
             "volumes": {
                 'LECTURING': {
-                    'VOLUME_Q1': self.learning_component_year_lecturing.hourly_volume_partial_q1,
-                    'VOLUME_Q2': self.learning_component_year_lecturing.hourly_volume_partial_q2,
-                    'REAL_CLASSES': 1,
-                    'VOLUME_TOTAL': self.learning_component_year_practical.hourly_volume_total_annual,
-                    'PLANNED_CLASSES': self.learning_component_year_lecturing.planned_classes,
-                    'VOLUME_REQUIREMENT_ENTITY': 120.0,
-                    'VOLUME_TOTAL_REQUIREMENT_ENTITIES': 120.0,
-                    'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0,
-                    'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0
+                    VOLUME_Q1: self.learning_component_year_lecturing.hourly_volume_partial_q1,
+                    VOLUME_Q2: self.learning_component_year_lecturing.hourly_volume_partial_q2,
+                    REAL_CLASSES: 1,
+                    VOLUME_TOTAL: self.learning_component_year_practical.hourly_volume_total_annual,
+                    PLANNED_CLASSES: self.learning_component_year_lecturing.planned_classes,
+                    VOLUME_REQUIREMENT_ENTITY: 120.0,
+                    VOLUME_TOTAL_REQUIREMENT_ENTITIES: 120.0,
+                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: 0,
+                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: 0
                 },
                 'PRACTICAL_EXERCISES': {
-                    'VOLUME_Q1': 10, 'VOLUME_Q2': 10, 'REAL_CLASSES': 0, 'VOLUME_TOTAL': 20,
-                    'PLANNED_CLASSES': 0, 'VOLUME_REQUIREMENT_ENTITY': 0,
-                    'VOLUME_TOTAL_REQUIREMENT_ENTITIES': 0,
-                    'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0,
-                    'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0
+                    VOLUME_Q1: 10, VOLUME_Q2: 10, REAL_CLASSES: 0, VOLUME_TOTAL: 20,
+                    PLANNED_CLASSES: 0, VOLUME_REQUIREMENT_ENTITY: 0,
+                    VOLUME_TOTAL_REQUIREMENT_ENTITIES: 0,
+                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: 0,
+                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: 0
                 }
             }
         }
