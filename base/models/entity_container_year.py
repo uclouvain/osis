@@ -59,15 +59,15 @@ class EntityContainerYear(SerializableModel):
             return self.entity.entity_versions[-1]
         return self.entity.entityversion_set.order_by('start_date').last()
 
-    @property
-    def warnings(self):
-        if self._warnings is None:
-            self._warnings = []
-            if not entity_version.get_by_entity_and_date(self.entity,
-                                                         self.learning_container_year.academic_year.start_date):
-                self._warnings.append(_("The linked %(entity)s does not exist at the start date of the academic year"
-                                        " linked to this learning unit") % {'entity': self.get_type_display().lower()})
-        return self._warnings
+    # @property
+    # def warnings(self):
+    #     if self._warnings is None:
+    #         self._warnings = []
+    #         if not entity_version.get_by_entity_and_date(self.entity,
+    #                                                      self.learning_container_year.academic_year.start_date):
+    #             self._warnings.append(_("The linked %(entity)s does not exist at the start date of the academic year"
+    #                                     " linked to this learning unit") % {'entity': self.get_type_display().lower()})
+    #     return self._warnings
 
 
 def search(*args, **kwargs):

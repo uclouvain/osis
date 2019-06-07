@@ -34,7 +34,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from base.models import entity_container_year as mdl_entity_container_year, group_element_year
+from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
 from base.models.enums import active_status, learning_container_year_types
@@ -425,13 +425,6 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def _check_learning_container_year_warnings(self):
         return self.learning_container_year.warnings
 
-    def _check_entity_container_year_warnings(self):
-        _warnings = []
-        entity_container_years = mdl_entity_container_year.find_by_learning_container_year(self.learning_container_year)
-        for entity_container_year in entity_container_years:
-            _warnings.extend(entity_container_year.warnings)
-        return _warnings
-
     def is_external(self):
         return hasattr(self, "externallearningunityear")
 
@@ -491,8 +484,8 @@ def search(academic_year_id=None, acronym=None, learning_container_year_id=None,
 
     if requirement_entities:
         queryset = queryset.filter(
-            learning_container_year__entitycontaineryear__entity__entityversion__in=requirement_entities,
-            learning_container_year__entitycontaineryear__type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+            learning_container_year__requirement_entity__entityversion__in=requirement_entities,
+        )
 
     if learning_unit:
         queryset = queryset.filter(learning_unit=learning_unit)
