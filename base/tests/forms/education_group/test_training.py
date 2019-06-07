@@ -61,7 +61,7 @@ from rules_management.tests.fatories import PermissionFactory, FieldReferenceFac
 class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.academic_year = AcademicYearFactory(year=get_current_year())
 
     def setUp(self):
         self.education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
@@ -75,22 +75,52 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
                                 )
 
     def test_clean_certificate_aims(self):
-        parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year,
-                                                                education_group_type=self.education_group_type)
+        administration_entity_version = MainEntityVersionFactory(end_date=None)
+        management_entity_version = MainEntityVersionFactory(end_date=None)
+        person = PersonFactory()
+        PersonEntityFactory(
+            person=person,
+            entity=management_entity_version.entity
+        )
+        user = person.user
+
+        parent_education_group_year = TrainingFactory(academic_year=self.academic_year,
+                                                      education_group_type=self.education_group_type,
+                                                      management_entity=management_entity_version.entity,
+                                                      administration_entity=administration_entity_version.entity,
+                                                      )
         AuthorizedRelationshipFactory(
             parent_type=parent_education_group_year.education_group_type,
             child_type=self.education_group_type,
         )
-        self.form_class(
-            data={
-                'certificatate_aims': None
-            },
-            parent=parent_education_group_year,
-            education_group_type=parent_education_group_year.education_group_type,
-            user=self.user,
-        )
-        print(self.form_class.is_valid())
-        # self.assertTrue(self.form_class.is_valid())
+
+        cert = [CertificateAimFactory(code=code, section=2) for code in range(100, 102)]
+        for i in range(0, len(cert)):
+            with self.subTest(i=i):
+                cert_for_form = [str(cert[j].pk) for j in range(0, i+1)]
+
+                form = self.form_class(
+                    data={
+                        'acronym': "EEDY2020",
+                        'partial_acronym': 'EEDY2020F',
+                        'title': "Test",
+                        'internship': 'OPTIONAL',
+                        'primary_language': LanguageFactory().pk,
+                        'active': 'ACTIVE',
+                        'schedule_type': 'DAILY',
+                        'administration_entity': administration_entity_version.pk,
+                        'management_entity': management_entity_version.pk,
+                        'diploma_printing_title': 'Diplome en test',
+                        'certificate_aims': cert_for_form,
+                    },
+                    parent=parent_education_group_year,
+                    education_group_type=parent_education_group_year.education_group_type,
+                    user=user,
+                )
+                if i == 0:
+                    self.assertTrue(form.is_valid())
+                else:
+                    self.assertFalse(form.is_valid())
 
     @patch('base.forms.education_group.common.find_authorized_types')
     def test_get_context_for_field_references_case_not_in_editing_pgrm_period(self, mock_authorized_types):
