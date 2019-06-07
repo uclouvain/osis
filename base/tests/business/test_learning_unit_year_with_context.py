@@ -36,6 +36,9 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from reference.tests.factories.country import CountryFactory
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
+    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
+    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
 
 
 class LearningUnitYearWithContextTestCase(TestCase):
@@ -64,7 +67,8 @@ class LearningUnitYearWithContextTestCase(TestCase):
         self.learning_component_yr.hourly_volume_partial_q1 = 10
         self.learning_component_yr.hourly_volume_partial_q2 = 5
         data = learning_unit_year_with_context.volume_learning_component_year(self.learning_component_yr)
-        self.assertEqual(data.get('VOLUME_TOTAL'), 15)
-        self.assertEqual(data.get('VOLUME_Q1'), 10)
-        self.assertEqual(data.get('VOLUME_Q2'), 5)
-        self.assertEqual(data.get('VOLUME_REQUIREMENT_ENTITY'), 15)
+        self.assertEqual(data.get(VOLUME_TOTAL), 15)
+
+        self.assertEqual(data.get(VOLUME_Q1), 10)
+        self.assertEqual(data.get(VOLUME_Q2), 5)
+        self.assertEqual(data.get(VOLUME_REQUIREMENT_ENTITY), 15)

@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,31 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
+from django.utils.translation import ugettext_lazy as _
 
-import factory.fuzzy
+VOLUME_TOTAL = 'VOLUME_TOTAL'
+VOLUME_Q1 = 'VOLUME_Q1'
+VOLUME_Q2 = 'VOLUME_Q2'
+PLANNED_CLASSES = 'PLANNED_CLASSES'
+VOLUME_REQUIREMENT_ENTITY = 'VOLUME_REQUIREMENT_ENTITY'
+VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1 = 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1'
+VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2 = 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2'
+VOLUME_TOTAL_REQUIREMENT_ENTITIES = 'VOLUME_TOTAL_REQUIREMENT_ENTITIES'
+REAL_CLASSES = 'REAL_CLASSES'
+VOLUME_GLOBAL = 'VOLUME_GLOBAL'
 
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-
-
-class GroupElementYearFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "base.GroupElementYear"
-
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    parent = factory.SubFactory(EducationGroupYearFactory)
-    child_branch = factory.SubFactory(EducationGroupYearFactory,
-                                      academic_year=factory.SelfAttribute("..parent.academic_year"))
-    child_leaf = None
-    is_mandatory = False
-    link_type = None
-    order = None
-
-
-class GroupElementYearChildLeafFactory(GroupElementYearFactory):
-    child_branch = None
-    child_leaf = factory.SubFactory(LearningUnitYearFactory,
-                                    academic_year=factory.SelfAttribute("..parent.academic_year"))
+COMPONENT_DETAILS = {
+    VOLUME_TOTAL: _('Vol. annual'),
+    VOLUME_Q1: _('Vol. Q1'),
+    VOLUME_Q2: _('Vol. Q2'),
+    PLANNED_CLASSES: _('Planned classes'),
+    VOLUME_REQUIREMENT_ENTITY: _('volume requirement entity'),
+    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: _('volume additional requirement entity 1'),
+    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: _('volume additional requirement entity 2'),
+    VOLUME_TOTAL_REQUIREMENT_ENTITIES: _('volume total requirement entities'),
+    REAL_CLASSES: _('Real classes'),
+    VOLUME_GLOBAL: _('Vol. global'),
+}
