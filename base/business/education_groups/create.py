@@ -180,7 +180,7 @@ def _generate_child_partial_acronym(parent, child_initial_value, child_type):
     if not parent.partial_acronym:
         return ""
     match_result = reg_parent_partial_acronym.search(parent.partial_acronym) or \
-                   reg_common_partial_acronym.search(parent.partial_acronym)
+        reg_common_partial_acronym.search(parent.partial_acronym)
     sigle_ele = match_result.group("sigle_ele")
 
     reg_child_initial_value = re.compile(REGEX_GROUP_PARTIAL_ACRONYM_INITIAL_VALUE)
