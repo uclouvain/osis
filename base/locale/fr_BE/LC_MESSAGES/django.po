@@ -4636,7 +4636,7 @@ msgid ""
 "(%(component_type)s) is different between year %(year)s - %(value)s and year "
 "%(next_year)s - %(next_value)s"
 msgstr ""
-"La valeur du champ '%(field)s'de l'unité d'enseignement %(acronym)s "
+"La valeur du champ '%(field)s' de l'unité d'enseignement %(acronym)s "
 "(%(component_type)s) différe entre l'année %(year)s - %(value)s et l'année "
 "%(next_year)s - %(next_value)s"
 
