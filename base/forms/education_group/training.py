@@ -232,7 +232,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             if certificate_aim.section == 2:
                 nb_type_2 += 1
         if nb_type_2 >= 2:
-            raise forms.ValidationError(_("There can only be one expectation of type 2"))
+            raise forms.ValidationError(_("There can only be one type 2 expectation"))
         return certificate_aims
 
     def save(self, commit=True):
