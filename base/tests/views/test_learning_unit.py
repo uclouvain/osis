@@ -641,7 +641,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/identification.html')
         self.assertEqual(len(response.context['warnings']), 3)
 
-    def test_learning_unit__with_faculty_manager_when_can_edit_end_date(self):
+    def test_learning_unit_with_faculty_manager_when_can_edit_end_date(self):
         learning_container_year = LearningContainerYearFactory(
             academic_year=self.current_academic_year, container_type=learning_container_year_types.OTHER_COLLECTIVE)
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
