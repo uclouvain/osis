@@ -72,15 +72,14 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
     )
 
     def __init__(self, *args, instance=None, initial=None, **kwargs):
-        if instance and isinstance(initial, dict):
-            # TODO Impossible to determine which is the main address
-            organization_address = instance.campus.organization.organizationaddress_set.order_by('is_main').first()
-
-            if organization_address:
-                country_external_institution = organization_address.country
-                initial["country_external_institution"] = country_external_institution.pk
         super().__init__(*args, instance=instance, initial=initial, external=True, **kwargs)
         self.fields['internship_subtype'].disabled = True
+        if instance:
+            self.fields["country_external_institution"].initial = instance.campus.organization.country and \
+                                                                  instance.campus.organization.country.pk
+        elif initial.get("campus"):
+            self.fields["country_external_institution"].initial = initial["campus"].organization.country and\
+                                                                  initial["campus"].organization.country.pk
 
     class Meta(LearningUnitYearModelForm.Meta):
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
@@ -138,6 +137,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
     def __init__(self, person, academic_year, learning_unit_instance=None, data=None, start_year=None, proposal=False,
                  *args, **kwargs):
+        self.data = data
         self.academic_year = academic_year
         self.person = person
         self.learning_unit_instance = learning_unit_instance
@@ -195,7 +195,8 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
     def _build_instance_data_external_learning_unit(self, data):
         return {
             'data': data,
-            'instance': self.instance and self.instance.externallearningunityear,
+            'instance': self.instance.externallearningunityear
+            if self.instance and self.instance.is_external() else None,
             'person': self.person
         }
 
@@ -361,7 +362,8 @@ class ExternalPartimForm(LearningUnitBaseForm):
     def _build_instance_data_external_learning_unit(self, data):
         return {
             'data': data,
-            'instance': self.instance and self.instance.externallearningunityear,
+            'instance': self.instance.externallearningunityear
+            if self.instance and self.instance.is_external() else None,
             'person': self.person
         }
 

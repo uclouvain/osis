@@ -47,6 +47,10 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from reference.tests.factories.language import LanguageFactory
+from base.enums.component_detail import COMPONENT_DETAILS
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
+    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
+    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
 
 
 class LearningUnitEditionTestCase(TestCase):
@@ -89,8 +93,10 @@ class LearningUnitEditionTestCase(TestCase):
     #        we have an entity_container created"""
     #     an_entity = EntityFactory()
     #     a_learning_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
-    #     LearningComponentYearFactory(acronym="PM", learning_unit_year__learning_container_year=a_learning_container_year)
-    #     LearningComponentYearFactory(acronym="PP", learning_unit_year__learning_container_year=a_learning_container_year)
+    #     LearningComponentYearFactory(acronym="PM",
+    #                                  learning_unit_year__learning_container_year=a_learning_container_year)
+    #     LearningComponentYearFactory(acronym="PP",
+    #                                  learning_unit_year__learning_container_year=a_learning_container_year)
     #     link_type = random.choice(REQUIREMENT_ENTITIES)
     #
     #     business_edition.update_or_create_entity_container_year_with_components(
@@ -104,8 +110,10 @@ class LearningUnitEditionTestCase(TestCase):
     #        we have NO entity_container created"""
     #     an_entity = EntityFactory()
     #     a_learning_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
-    #     LearningComponentYearFactory(acronym="PM", learning_unit_year__learning_container_year=a_learning_container_year)
-    #     LearningComponentYearFactory(acronym="PP", learning_unit_year__learning_container_year=a_learning_container_year)
+    #     LearningComponentYearFactory(acronym="PM",
+    #                                  learning_unit_year__learning_container_year=a_learning_container_year)
+    #     LearningComponentYearFactory(acronym="PP",
+    #                                  learning_unit_year__learning_container_year=a_learning_container_year)
     #     link_type = entity_container_year_link_type.ALLOCATION_ENTITY
     #
     #     business_edition.update_or_create_entity_container_year_with_components(an_entity, a_learning_container_year,
@@ -446,10 +454,10 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertEqual(len(error_list), 10)
 
         tests_cases = [
-            {'field': 'volume_additional_requirement_entity_1', 'value': 10.0, 'next_value': 20.0},
-            {'field': 'volume_total', 'value': 60.0, 'next_value': 50.0},
-            {'field': 'volume_q1', 'value': 40.0, 'next_value': 35.0},
-            {'field': 'volume_q2', 'value': 20.0, 'next_value': 15.0}
+            {'field': VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, 'value': 10.0, 'next_value': 20.0},
+            {'field': VOLUME_TOTAL, 'value': 60.0, 'next_value': 50.0},
+            {'field': VOLUME_Q1, 'value': 40.0, 'next_value': 35.0},
+            {'field': VOLUME_Q2, 'value': 20.0, 'next_value': 15.0}
         ]
         for test in tests_cases:
             with self.subTest(test=test):
@@ -457,7 +465,7 @@ class LearningUnitEditionTestCase(TestCase):
                                     "(%(component_type)s) is different between year %(year)s - %(value)s and year "
                                     "%(next_year)s - %(next_value)s") %
                                   {
-                                      'field': _(test.get('field')),
+                                      'field': COMPONENT_DETAILS[test.get('field')].lower(),
                                       'acronym': another_learning_container_year.acronym,
                                       'component_type': _(learning_component_year_type.LECTURING),
                                       'year': self.learning_container_year.academic_year,

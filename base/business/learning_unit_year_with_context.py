@@ -35,6 +35,9 @@ from base.models.enums import entity_container_year_link_type as entity_types
 
 from base.models.learning_component_year import LearningComponentYear
 from osis_common.utils.numbers import to_float_or_zero
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
+    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
+    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
 
 
 def get_with_context(**learning_unit_year_data):
@@ -99,32 +102,31 @@ def append_components(learning_unit_year):
             planned_classes = component.planned_classes or 0
 
             learning_unit_year.components[component] = {
-                'VOLUME_TOTAL': to_float_or_zero(component.hourly_volume_total_annual),
-                'VOLUME_Q1': to_float_or_zero(component.hourly_volume_partial_q1),
-                'VOLUME_Q2': to_float_or_zero(component.hourly_volume_partial_q2),
-                'PLANNED_CLASSES': planned_classes,
-                'VOLUME_' + entity_types.REQUIREMENT_ENTITY: vol_req_entity,
-                'VOLUME_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1: vol_add_req_entity_1,
-                'VOLUME_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2: vol_add_req_entity_2,
-                'VOLUME_TOTAL_REQUIREMENT_ENTITIES': volume_global,
-                'REAL_CLASSES': component.real_classes  # Necessary for xls comparison with proposition
+                VOLUME_TOTAL: to_float_or_zero(component.hourly_volume_total_annual),
+                VOLUME_Q1: to_float_or_zero(component.hourly_volume_partial_q1),
+                VOLUME_Q2: to_float_or_zero(component.hourly_volume_partial_q2),
+                PLANNED_CLASSES: planned_classes,
+                VOLUME_REQUIREMENT_ENTITY: vol_req_entity,
+                VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: vol_add_req_entity_1,
+                VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: vol_add_req_entity_2,
+                VOLUME_TOTAL_REQUIREMENT_ENTITIES: volume_global,
+                REAL_CLASSES: component.real_classes  # Necessary for xls comparison with proposition
             }
     return learning_unit_year
 
 
 def volume_learning_component_year(learning_component_year):
     requirement_vols = learning_component_year.repartition_volumes
+    planned_classes = learning_component_year.planned_classes or 1
     return {
-        'VOLUME_TOTAL': learning_component_year.hourly_volume_total_annual,
-        'VOLUME_Q1': learning_component_year.hourly_volume_partial_q1,
-        'VOLUME_Q2': learning_component_year.hourly_volume_partial_q2,
-        'PLANNED_CLASSES': learning_component_year.planned_classes or 1,
-        'VOLUME_REQUIREMENT_ENTITY': requirement_vols.get(entity_types.REQUIREMENT_ENTITY, 0),
-        'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
-        'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0),
-        'VOLUME_GLOBAL': sum([requirement_vols.get(entity_types.REQUIREMENT_ENTITY, 0),
-                              requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
-                              requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0)])
+        VOLUME_TOTAL: learning_component_year.hourly_volume_total_annual,
+        VOLUME_Q1: learning_component_year.hourly_volume_partial_q1,
+        VOLUME_Q2: learning_component_year.hourly_volume_partial_q2,
+        PLANNED_CLASSES: planned_classes,
+        VOLUME_REQUIREMENT_ENTITY: requirement_vols.get(entity_types.REQUIREMENT_ENTITY, 0),
+        VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
+        VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0),
+        VOLUME_GLOBAL: learning_component_year.vol_global
     }
 
 
@@ -152,14 +154,14 @@ def get_learning_component_prefetch():
 
 def volume_from_initial_learning_component_year(learning_component_year, repartition_volumes):
     return {
-        'VOLUME_TOTAL': learning_component_year['hourly_volume_total_annual'],
-        'VOLUME_Q1': learning_component_year['hourly_volume_partial_q1'],
-        'VOLUME_Q2': learning_component_year['hourly_volume_partial_q2'],
-        'PLANNED_CLASSES': learning_component_year.get('planned_classes'),
-        'VOLUME_REQUIREMENT_ENTITY': repartition_volumes.get('VOLUME_REQUIREMENT_ENTITY', 0),
-        'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': repartition_volumes.get('VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1', 0),
-        'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': repartition_volumes.get('VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2', 0),
-        'VOLUME_GLOBAL': sum([repartition_volumes.get('VOLUME_REQUIREMENT_ENTITY', 0),
-                              repartition_volumes.get('VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1', 0),
-                              repartition_volumes.get('VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2', 0)])
+        VOLUME_TOTAL: learning_component_year['hourly_volume_total_annual'],
+        VOLUME_Q1: learning_component_year['hourly_volume_partial_q1'],
+        VOLUME_Q2: learning_component_year['hourly_volume_partial_q2'],
+        PLANNED_CLASSES: learning_component_year.get('planned_classes'),
+        VOLUME_REQUIREMENT_ENTITY: repartition_volumes.get(VOLUME_REQUIREMENT_ENTITY, 0),
+        VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
+        VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, 0),
+        VOLUME_GLOBAL: sum([repartition_volumes.get(VOLUME_REQUIREMENT_ENTITY, 0),
+                            repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
+                            repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, 0)])
     }

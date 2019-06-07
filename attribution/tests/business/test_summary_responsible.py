@@ -90,8 +90,9 @@ class TestGetAttributionsData(TestCase):
             'academic_year': learning_unit_year.academic_year
         }
         result = summary_responsible.get_attributions_data(
-            user=UserFactory(),
-            learning_unit_year_id=learning_unit_year.id
+            UserFactory(),
+            learning_unit_year.id,
+            '-summary_responsible'
         )
         self.assertIsInstance(result, dict)
         self.assertDictEqual(result, expected_result)

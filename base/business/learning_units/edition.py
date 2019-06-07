@@ -43,6 +43,7 @@ from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
 from cms.models import translated_text
+from base.enums.component_detail import COMPONENT_DETAILS
 
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
 
@@ -573,7 +574,7 @@ def _get_error_volume_field_diff(field_diff, current_component, next_year_compon
     return _("The value of field '%(field)s' for the learning unit %(acronym)s (%(component_type)s) "
              "is different between year %(year)s - %(value)s and year %(next_year)s - %(next_value)s") % \
            {
-               'field': _(field_diff.lower()),
+               'field': COMPONENT_DETAILS[field_diff].lower(),
                'acronym': current_component.learning_unit_year.acronym,
                'component_type': _(current_component.type) if current_component.type else 'NT',
                'year': current_component.learning_unit_year.academic_year,

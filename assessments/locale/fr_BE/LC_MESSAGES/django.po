@@ -466,7 +466,7 @@ msgstr "Pas de note encodée en double ; rien à comparer."
 
 #: templates/admin/pgm_manager.html:146
 msgid "No entity associated to your profile"
-msgstr "Aucune entité associée à votre profile"
+msgstr "Aucune entité associée à votre profil"
 
 #: views/score_encoding.py:522
 msgid "No new scores encoded. The double encoding needs new scores."
@@ -602,7 +602,7 @@ msgstr "Programme"
 
 #: templates/admin/pgm_manager.html:31 templates/admin/pgm_manager.html:36
 msgid "Program managers"
-msgstr "Gestionnaires de programme"
+msgstr "Gestionnaires de parcours étudiant"
 
 #: templates/admin/pgm_manager.html:62
 msgid "Program type"
@@ -995,7 +995,7 @@ msgid ""
 "excel file provided (button '%(button_value)s')"
 msgstr ""
 "Votre fichier excel n'est pas bien structuré. Veuillez suivre la structure "
-"du ficheir excel à fournir (bouton '%(button_value)s')"
+"du fichier excel à fournir (bouton '%(button_value)s')"
 
 #: business/score_encoding_export.py:158 business/score_encoding_export.py:212
 #: business/score_encoding_sheet.py:104
@@ -1019,3 +1019,8 @@ msgstr "programme(s)"
 #: views/score_encoding.py:324
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
+
+
+#: business/score_encoding_export.py:38
+msgid "End date Prof"
+msgstr "Date de remise"
