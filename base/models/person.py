@@ -160,12 +160,7 @@ class Person(SerializableModel):
         )
 
     def is_linked_to_entity_in_charge_of_learning_unit_year(self, learning_unit_year):
-        entities = Entity.objects.filter(
-            entitycontaineryear__learning_container_year=learning_unit_year.learning_container_year,
-            entitycontaineryear__type=REQUIREMENT_ENTITY
-        )
-
-        return self.is_attached_entities(entities)
+        return self.is_attached_entities(learning_unit_year.learning_container_year.requirement_entity)
 
     def is_attached_entities(self, entities):
         return any(self.is_attached_entity(entity) for entity in entities)
