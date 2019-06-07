@@ -29,7 +29,6 @@ from django.core.exceptions import ValidationError
 from base.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
 from base.business.group_element_years.management import check_authorized_relationship
 from base.models.enums import education_group_categories
-from base.models.enums.link_type import LinkTypes
 from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.models.group_element_year import GroupElementYear
 
