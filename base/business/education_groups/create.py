@@ -40,6 +40,7 @@ from base.models.utils.utils import get_object_or_none
 from base.models.validation_rule import ValidationRule
 
 REGEX_TRAINING_PARTIAL_ACRONYM = r"^(?P<sigle_ele>[A-Z]{3,5})\d{3}[A-Z]$"
+REGEX_COMMON_PARTIAL_ACRONYM = r"^(?P<sigle_ele>common(-\d[a-z]{1,2})?)$"
 REGEX_GROUP_PARTIAL_ACRONYM_INITIAL_VALUE = r"^(?P<cnum>\d{3})(?P<subdivision>[A-Z])$"
 MAX_CNUM = 999
 WIDTH_CNUM = 3
@@ -156,7 +157,7 @@ def _duplicate_branch(child_education_group_type, parent_egy, last_child):
 
 def _get_validation_rule(field_name, education_group_type):
     egy_title_reference = ValidationRuleMixin._field_reference(
-        EducationGroupYear,
+        EducationGroupYear,match_result
         field_name,
         education_group_type.external_id
     )
@@ -174,10 +175,13 @@ def _generate_child_partial_acronym(parent, child_initial_value, child_type):
         return previous_grp_ele.child_branch.partial_acronym
 
     reg_parent_partial_acronym = re.compile(REGEX_TRAINING_PARTIAL_ACRONYM)
+    reg_common_partial_acronym = re.compile(REGEX_COMMON_PARTIAL_ACRONYM)
     # FIXME : Sometimes parent does not have a partial acronym, it is a dirty situation. We have to clean the DB.
     if not parent.partial_acronym:
         return ""
-    match_result = reg_parent_partial_acronym.search(parent.partial_acronym)
+    match_result = reg_parent_partial_acronym.search(parent.partial_acronym) or\
+                   reg_common_partial_acronym.search(parent.partial_acronym)
+    print(parent)
     sigle_ele = match_result.group("sigle_ele")
 
     reg_child_initial_value = re.compile(REGEX_GROUP_PARTIAL_ACRONYM_INITIAL_VALUE)
