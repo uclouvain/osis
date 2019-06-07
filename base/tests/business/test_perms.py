@@ -397,6 +397,9 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
             year=cls.current_academic_year.year - 1
         )
         cls.person = PersonFactory()
+        cls.person.user.user_permissions.add(
+            Permission.objects.get(codename='can_propose_learningunit'),
+        )
 
     def setUp(self):
         self.luy = LearningUnitYearFakerFactory(learning_container_year__academic_year=self.current_academic_year,
