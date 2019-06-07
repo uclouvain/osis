@@ -30,7 +30,7 @@ import factory.fuzzy
 from django.test import TestCase
 
 from base.models import entity_version
-from base.models.entity_version import find_last_entity_version_by_learning_unit_year_id
+from base.business.learning_units.perms import find_last_requirement_entity_version
 from base.models.enums import organization_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -497,9 +497,8 @@ class TestFindLastEntityVersionByLearningUnitYearId(TestCase):
     def test_when_entity_version(self):
         learning_unit_year = LearningUnitYearFactory()
 
-        actual_entity_version = find_last_entity_version_by_learning_unit_year_id(
+        actual_entity_version = find_last_requirement_entity_version(
             learning_unit_year_id=learning_unit_year.id,
-            entity_type=REQUIREMENT_ENTITY
         )
 
         self.assertIsNone(actual_entity_version)
@@ -511,8 +510,7 @@ class TestFindLastEntityVersionByLearningUnitYearId(TestCase):
                                    learning_container_year=learning_unit_year.learning_container_year,
                                    type=REQUIREMENT_ENTITY)
 
-        actual_entity_version = find_last_entity_version_by_learning_unit_year_id(
+        actual_entity_version = find_last_requirement_entity_version(
             learning_unit_year_id=learning_unit_year.id,
-            entity_type=REQUIREMENT_ENTITY
         )
         self.assertEqual(an_entity_version, actual_entity_version)
