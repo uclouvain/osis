@@ -29,18 +29,10 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                {% if perms.base.can_access_offer %}
-                                    <li>
-                                        <a href="{% url 'offers' %}" id="lnk_dropdown_offers">
-                                            <span class="fa fa-map-marker-alt"></span>
-                                            {% trans 'Addresses' %}
-                                        </a>
-                                    </li>
-                                {% endif %}
                                 {% if perms.base.can_access_education_group %}
                                     <li>
                                         <a href="{% url 'education_groups' %}" id="lnk_dropdown_educationgroups">
-                                            <span class="fa fa-map"></span>
+                                            <span class="fa fa-folder-open"></span>
                                             {% trans 'Trainings' %}
                                         </a>
                                     </li>
@@ -48,7 +40,7 @@
                                 {% if perms.base.can_access_learningunit %}
                                     <li>
                                         <a href="{% url 'learning_units' %}" id="lnk_dropdown_learning_units">
-                                            <span class="fa fa-book"></span>
+                                            <span class="fa fa-file"></span>
                                             {% trans 'Learning units' %}
                                         </a>
                                     </li>
@@ -65,9 +57,21 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
+                                {% if perms.base.can_access_offer %}
+                                    <li>
+                                        <a href="{% url 'offers' %}" id="lnk_dropdown_offers">
+                                            <span class="fa fa-map-marker-alt"></span>
+                                            {% trans 'Addresses' %}
+                                        </a>
+                                    </li>
+                                {% endif %}
                                 {% if 'assessments' in installed_apps and perms.base.can_access_evaluation %}
-                                    <li><a href="{% url 'assessments' %}"
-                                           id="lnk_dropdown_evaluations">{% trans 'Evaluations' %}</a></li>
+                                    <li>
+                                        <a href="{% url 'assessments' %}" id="lnk_dropdown_evaluations">
+                                            <span class="fa fa-tachometer-alt"></span>
+                                            {% trans 'Evaluations' %}
+                                        </a>
+                                    </li>
                                 {% endif %}
                                 {% if perms.base.can_access_student %}
                                     <li><a href="{% url 'students' %}"
