@@ -10,7 +10,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0456_auto_20190515_1555'),
+        ('base', '0457_message_template_egys_automatic_postponement_update'),
     ]
 
     operations = [
