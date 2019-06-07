@@ -352,4 +352,3 @@ class LearningContainerYearModelForm(forms.ModelForm):
     @cached_property
     def additionnal_entity_version_2(self):
         return self.fields["additionnal_entity_2"].entity_version
-
