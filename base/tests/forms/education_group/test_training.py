@@ -312,7 +312,7 @@ class TestPostponementEducationGroupYear(TestCase):
         domains = [DomainFactory(name="Alchemy"), DomainFactory(name="Muggle Studies")]
         self.data["secondary_domains"] = '|'.join([str(domain.pk) for domain in domains])
 
-        certificate_aims = [CertificateAimFactory(code=code) for code in range(100, 103)]
+        certificate_aims = [CertificateAimFactory(code=100, section=1), CertificateAimFactory(code=101, section=2)]
         self.data["certificate_aims"] = [str(aim.pk) for aim in certificate_aims]
 
         form = TrainingForm(
@@ -334,7 +334,7 @@ class TestPostponementEducationGroupYear(TestCase):
         self.education_group_year.refresh_from_db()
         self.assertEqual(self.education_group_year.secondary_domains.count(), 2)
         self.assertEqual(last.secondary_domains.count(), 2)
-        self.assertEqual(last.certificate_aims.count(), 3)
+        self.assertEqual(last.certificate_aims.count(), len(certificate_aims))
         self.assertEqual(len(form.warnings), 0)
 
         # update with a conflict
