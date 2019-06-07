@@ -70,10 +70,6 @@ class GroupElementYearForm(forms.ModelForm):
                 self.instance.child_branch.education_group_type):
             self.fields.pop("access_condition")
 
-            # Change the initial but (for strange reasons) let the possibility to the user to try with the main link.
-            # Like that he will see the form error.
-            self.fields["link_type"].initial = LinkTypes.REFERENCE.name
-
         elif self._is_education_group_year_a_minor_major_option_list_choice(self.instance.parent) and \
                 not self._is_education_group_year_a_minor_major_option_list_choice(self.instance.child_branch):
             self._keep_only_fields(["access_condition"])
