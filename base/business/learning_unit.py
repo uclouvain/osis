@@ -243,9 +243,9 @@ def compose_components_dict(components, additional_entities):
 
 def get_entities(container_year):
     return {
-        ecy.type: ecy.entity.most_recent_acronym
-        for ecy in container_year.entitycontaineryear_set.all().select_related('entity')
-        if ecy.type in REQUIREMENT_ENTITIES
+        link_type: entity.most_recent_acronym
+        for link_type, entity in container_year.get_entity_by_type().items()
+        if link_type in REQUIREMENT_ENTITIES
     }
 
 
