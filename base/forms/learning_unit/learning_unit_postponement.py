@@ -37,7 +37,6 @@ from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.models import academic_year
 from base.models.academic_year import AcademicYear
-from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.learning_component_year import LearningComponentYear
@@ -347,10 +346,8 @@ class LearningUnitPostponementForm:
         This volume is never edited in the form, so we have to load data separably
         """
         initial_learning_unit_year = self._forms_to_upsert[0].instance
-        entity_containers = EntityContainerYear.objects.filter(
-            learning_container_year=initial_learning_unit_year.learning_container_year,
-        ).select_related("entity")
-        entity_by_type = {ec.type: ec.entity for ec in entity_containers}
+        # TODO :: select_related entities
+        entity_by_type = initial_learning_unit_year.learning_container_year.get_entity_by_type()
 
         for current_component in initial_learning_unit_year.learningcomponentyear_set.all():
             component_type = current_component.type

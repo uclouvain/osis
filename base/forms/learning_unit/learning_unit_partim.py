@@ -219,6 +219,3 @@ class PartimForm(LearningUnitBaseForm):
         )
 
         return learning_unit_yr
-
-    def _get_entity_container_year(self):
-        return self.learning_unit_year_full.learning_container_year.entitycontaineryear_set.all()
