@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-07 13:56+0200\n"
+"POT-Creation-Date: 2019-06-07 15:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4296,6 +4296,9 @@ msgid "The learning unit have partim"
 msgstr ""
 
 #: business/education_groups/group_element_year_tree.py:214
+msgid "The learning unit is a prerequisite"
+msgstr ""
+
 #: tests/business/education_groups/test_build_tree.py:131
 msgid "The learning unit is prerequisite"
 msgstr ""
@@ -5549,7 +5552,7 @@ msgid "initial value"
 msgstr ""
 
 #: templates/education_group/learning_unit/tab_prerequisite_training.html:65
-msgid "is the prereqisite of"
+msgid "is a prereqisite of"
 msgstr ""
 
 #: templates/education_group/learning_unit/tab_utilization.html:34
