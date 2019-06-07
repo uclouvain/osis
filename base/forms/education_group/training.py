@@ -51,6 +51,7 @@ from reference.models.language import find_all_languages
 
 MAX_NUMBER_CERTIFICATE_TYPE_2 = 2
 
+
 def _get_section_choices():
     return add_blank(CertificateAim.objects.values_list('section', 'section').distinct().order_by('section'))
 
