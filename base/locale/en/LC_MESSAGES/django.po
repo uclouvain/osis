@@ -3757,7 +3757,7 @@ msgstr ""
 msgid "Search type"
 msgstr ""
 
-#: forms/education_group/training.py:184 forms/education_group/training.py:265
+#: forms/education_group/training.py:184 forms/education_group/training.py:275
 msgid "Search..."
 msgstr ""
 
@@ -4211,7 +4211,7 @@ msgid "The field can contain only one value."
 msgstr ""
 
 #: forms/education_group/training.py:98
-#: tests/forms/education_group/test_training.py:118
+#: tests/forms/education_group/test_training.py:171
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
 
@@ -4522,6 +4522,10 @@ msgstr ""
 
 #: templates/blocks/modal/confirmation_modal.html:7
 msgid "There are warnings in the form."
+msgstr ""
+
+#: forms/education_group/training.py:235
+msgid "There can only be one type 2 expectation"
 msgstr ""
 
 #: business/learning_units/simple/deletion.py:230
