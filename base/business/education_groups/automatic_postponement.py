@@ -54,7 +54,7 @@ class EducationGroupAutomaticPostponementToN6(AutomaticPostponementToN6):
         return super().get_queryset(queryset).filter(
             Q(educationgroupyear__education_group_type__category=TRAINING) |
             Q(educationgroupyear__education_group_type__name__in=MiniTrainingType.to_postpone())
-        ).distinct()
+        ).exclude(educationgroupyear__acronym__startswith='common').distinct()
 
     def post_extend(self, original_object, list_postponed_objects):
         """ After the main postponement, we need to create the structure of the education_group_years """
