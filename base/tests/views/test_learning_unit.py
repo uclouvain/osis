@@ -46,6 +46,9 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit as learning_unit_business
 from base.business.learning_unit import learning_unit_titles_part1, learning_unit_titles_part2
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
+    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
+    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit.search_form import LearningUnitYearForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
@@ -100,9 +103,6 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory
-from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
-    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
-    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
 
 
 @override_flag('learning_unit_create', active=True)
@@ -661,6 +661,7 @@ class LearningUnitViewTestCase(TestCase):
         ]
 
         for manager in managers:
+            manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
             PersonEntityFactory(
                 entity=entity_container.entity,
                 person=manager
@@ -692,6 +693,7 @@ class LearningUnitViewTestCase(TestCase):
             ue_manager
         ]
         for manager in managers:
+            manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
             PersonEntityFactory(entity=entity_container.entity, person=manager)
             url = reverse("learning_unit", args=[learning_unit_year.id])
             self.client.force_login(manager.user)

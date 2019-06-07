@@ -41,11 +41,12 @@ from base.models.enums import entity_container_year_link_type
 from base.models.enums import entity_type
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.learning_class_year import LearningClassYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
+from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -56,7 +57,6 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.enums import entity_name
@@ -332,8 +332,7 @@ class LearningUnitYearDeletion(TestCase):
 
     def test_can_delete_learning_unit_year_with_faculty_manager_role(self):
         # Faculty manager can only delete other type than COURSE/INTERNSHIP/DISSERTATION
-        person = PersonFactory()
-        add_to_group(person.user, FACULTY_MANAGER_GROUP)
+        person = create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_delete_learningunit')
         entity_version = EntityVersionFactory(entity_type=entity_type.FACULTY, acronym="SST",
                                               start_date=datetime.date(year=1990, month=1, day=1),
                                               end_date=None)

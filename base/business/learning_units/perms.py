@@ -86,6 +86,14 @@ MSG_CANNOT_EDIT_BECAUSE_OF_PROPOSAL = _("You can't edit because the learning uni
 MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR = _(
     "You are not allowed to change the end year for this academic year")
 MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR = _("You are not allowed to put in proposal for this academic year")
+MSG_NOT_ELIGIBLE = _("You are not eligible to manage learning units")
+
+
+def check_lu_permission(person, permission, raise_exception=False):
+    result = person.user.has_perm(permission)
+    if raise_exception and not result:
+        raise PermissionDenied(_(MSG_NOT_ELIGIBLE).capitalize())
+    return result
 
 
 def _any_existing_proposal_in_epc(learning_unit_year, _, raise_exception=False):
@@ -110,9 +118,8 @@ def is_external_learning_unit_cograduation(learning_unit_year, person, raise_exc
 
 
 def is_eligible_for_modification(learning_unit_year, person, raise_exception=False):
-    if not person.user.has_perm('base.can_edit_learningunit'):
-        return False
     return \
+        check_lu_permission(person, 'base.can_edit_learningunit', raise_exception) and \
         is_year_editable(learning_unit_year, person, raise_exception) and \
         _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
         _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception) and \
@@ -123,6 +130,7 @@ def is_eligible_for_modification(learning_unit_year, person, raise_exception=Fal
 
 def is_eligible_for_modification_end_date(learning_unit_year, person, raise_exception=False):
     return \
+        check_lu_permission(person, 'base.can_edit_learningunit_date', raise_exception) and \
         is_year_editable(learning_unit_year, person, raise_exception) and \
         not (is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
         is_eligible_for_modification(learning_unit_year, person, raise_exception) and \
@@ -142,6 +150,7 @@ def is_eligible_to_create_partim(learning_unit_year, person, raise_exception=Fal
 
 def is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception=False):
     result = \
+        check_lu_permission(person, 'base.can_propose_learningunit', raise_exception) and \
         _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
         not(is_learning_unit_year_in_past(learning_unit_year, person, raise_exception))and \
         not(is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception))and \
@@ -220,6 +229,7 @@ def can_update_learning_achievement(learning_unit_year, person):
 def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_exception=False):
     msg = None
     checked_ok = \
+        check_lu_permission(person, 'base.can_delete_learningunit', raise_exception) and \
         _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
         _can_delete_learning_unit_year_according_type(learning_unit_year, person, raise_exception)
     if not checked_ok:
@@ -313,7 +323,7 @@ def _has_person_the_right_to_make_proposal(_, person, raise_exception=False):
     result = person.user.has_perm('base.can_propose_learningunit')
     can_raise_exception(
         raise_exception, result,
-        "_has_person_the_right_to_make_proposal")
+        MSG_NOT_ELIGIBLE_TO_CREATE_MODIFY_PROPOSAL)
     return result
 
 
