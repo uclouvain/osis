@@ -37,6 +37,7 @@ from reversion.admin import VersionAdmin
 from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
+from base.models.entity import Entity
 from base.models.enums import active_status, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
@@ -335,9 +336,10 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def get_entity(self, entity_type):
         # @TODO: Remove this condition when classes will be removed from learning unit year
         if self.learning_container_year:
-            entity_container_yr = self.learning_container_year.entitycontaineryear_set.filter(
-                type=entity_type).prefetch_related('entity__entityversion_set').first()
-            return entity_container_yr.entity if entity_container_yr else None
+            entity = self.learning_container_year.get_entity(entity_type)
+            if entity:
+                # TODO :: prefetch entityversion_set before call to this function
+                return Entity.objects.get(pk=entity.pk).prefetch_related('entityversion_set')
 
     def clean(self):
         learning_unit_years = find_gte_year_acronym(self.academic_year, self.acronym)
