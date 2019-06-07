@@ -25,13 +25,18 @@
 ##############################################################################
 import re
 
+from dal import autocomplete
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils.functional import lazy, cached_property
 from django.utils.translation import ugettext_lazy as _
 
+from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices, \
+    EntitiesVersionChoiceField
 from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, split_acronym
-from base.forms.utils.choice_field import add_blank
+from base.forms.utils.choice_field import add_blank, add_all
 from base.models.campus import find_main_campuses
+from base.models.entity_version import find_pedagogical_entities_version, get_last_version
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, EXTERNAL
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_WITHOUT_EXTERNAL, INTERNSHIP
@@ -41,6 +46,7 @@ from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit, REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
+from reference.models.country import Country
 from reference.models.language import find_all_languages
 
 CRUCIAL_YEAR_FOR_CREDITS_VALIDATION = 2018
@@ -185,13 +191,123 @@ class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
         }
 
 
+class CountryEntityField(forms.ChoiceField):
+    def __init__(self, *args, widget_attrs=None, **kwargs):
+        kwargs.update(
+            choices=lazy(CountryEntityField._get_section_choices, list),
+            required=False,
+            label=_("Country"),
+        )
+        super(CountryEntityField, self).__init__(*args, **kwargs)
+        if widget_attrs:
+            self.widget.attrs.update(**widget_attrs)
+
+    @staticmethod
+    def _get_section_choices():
+        return add_blank(
+            add_all(Country.objects.filter(entity__isnull=False).values_list('id', 'name').distinct().order_by('name')),
+            blank_choice_display="UCLouvain"
+        )
+
+
 class LearningContainerYearModelForm(forms.ModelForm):
+
+    # TODO :: Refactor code redundant code below for entity fields (requirement - allocation - additionnals)
+    requirement_entity = EntitiesVersionChoiceField(
+        widget=autocomplete.ModelSelect2(
+            url='entity_requirement_autocomplete',
+            attrs={
+                'id': 'id_requirement_entity',
+                'data-html': True,
+                'onchange': (
+                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_1", false);'
+                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_1_country", false);'
+                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", true);'
+                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2_country", true);'
+                ),
+            },
+            forward=['country_requirement_entity']
+        ),
+        queryset=find_additional_requirement_entities_choices()
+    )
+
+    country_requirement_entity = CountryEntityField()
+
+    allocation_entity = EntitiesVersionChoiceField(
+        widget=autocomplete.ModelSelect2(
+            url='allocation_entity_autocomplete',
+            attrs={
+                'id': 'allocation_entity',
+                'data-html': True,
+            },
+            forward=['country_allocation_entity']
+        ),
+        queryset=find_pedagogical_entities_version()
+    )
+
+    country_allocation_entity = CountryEntityField()
+
+    additionnal_entity_1 = EntitiesVersionChoiceField(
+        required=False,
+        widget=autocomplete.ModelSelect2(
+            url='additionnal_entity_1_autocomplete',
+            attrs={
+                'id': 'id_additional_requirement_entity_1',
+                'data-html': True,
+                'onchange': (
+                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", false);'
+                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2_country", false);'
+                ),
+            },
+            forward=['country_additionnal_entity_1']
+        ),
+        queryset=find_additional_requirement_entities_choices()
+    )
+
+    country_additionnal_entity_1 = CountryEntityField(
+        widget_attrs={'id': 'id_additional_requirement_entity_1_country'}
+    )
+
+    additionnal_entity_2 = EntitiesVersionChoiceField(
+        required=False,
+        widget=autocomplete.ModelSelect2(
+            url='additionnal_entity_2_autocomplete',
+            attrs={
+                'id': 'id_additional_requirement_entity_2',
+                'data-html': True,
+                'onchange': (
+                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", false);'
+                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2_country", false);'
+                ),
+            },
+            forward=['country_additionnal_entity_2']
+        ),
+        queryset=find_additional_requirement_entities_choices()
+    )
+
+    country_additionnal_entity_2 = CountryEntityField(
+        widget_attrs={'id': 'id_additional_requirement_entity_2_country'}
+    )
+
     def __init__(self, *args, **kwargs):
         self.person = kwargs.pop('person')
         self.proposal = kwargs.pop('proposal', False)
         self.is_create_form = kwargs['instance'] is None
         super().__init__(*args, **kwargs)
+        self.fields['requirement_entity'].queryset = self.person.find_main_entities_version
         self.prepare_fields()
+
+        if self.instance.requirement_entity:
+            self.initial['requirement_entity'] = get_last_version(self.instance.requirement_entity).pk
+
+        if self.instance.allocation_entity:
+            self.initial['allocation_entity'] = get_last_version(self.instance.allocation_entity).pk
+
+        if self.instance.additionnal_entity_1:
+            self.initial['additionnal_entity_1'] = get_last_version(self.instance.additionnal_entity_1).pk
+
+        if self.instance.additionnal_entity_2:
+            self.initial['additionnal_entity_2'] = get_last_version(self.instance.additionnal_entity_2).pk
 
     def prepare_fields(self):
         self.fields['container_type'].widget.attrs = {'onchange': 'showInternshipSubtype()'}
@@ -210,11 +326,30 @@ class LearningContainerYearModelForm(forms.ModelForm):
 
     class Meta:
         model = LearningContainerYear
-        fields = ('container_type', 'common_title', 'common_title_english',
-                  'type_declaration_vacant', 'team', 'is_vacant')
+        fields = (
+            'container_type',
+            'common_title',
+            'common_title_english',
+            'type_declaration_vacant',
+            'team',
+            'is_vacant',
+            'requirement_entity',
+            'allocation_entity',
+            'additionnal_entity_1',
+            'additionnal_entity_2',
+        )
 
     def post_clean(self, specific_title):
         if not self.instance.common_title and not specific_title:
             self.add_error("common_title", _("You must either set the common title or the specific title"))
 
         return not self.errors
+
+    @cached_property
+    def additionnal_entity_version_1(self):
+        return self.fields["additionnal_entity_1"].entity_version
+
+    @cached_property
+    def additionnal_entity_version_2(self):
+        return self.fields["additionnal_entity_2"].entity_version
+

@@ -29,7 +29,6 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business.utils.model import merge_two_dicts
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
-from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningContainerYearModelForm, LearningContainerModelForm, \
     LearningUnitModelForm
@@ -37,7 +36,6 @@ from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
 from base.forms.utils.acronym_field import split_acronym
 from base.forms.utils.choice_field import add_blank
 from base.models.academic_year import current_academic_year, LEARNING_UNIT_CREATION_SPAN_YEARS
-from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.learning_component_year import LearningComponentYear
@@ -97,7 +95,6 @@ class PartimForm(LearningUnitBaseForm):
         LearningUnitYearModelForm,
         LearningContainerModelForm,
         LearningContainerYearModelForm,
-        EntityContainerBaseForm,
         SimplifiedVolumeManagementForm
     ]
 
@@ -140,10 +137,6 @@ class PartimForm(LearningUnitBaseForm):
             },
             LearningContainerYearModelForm: {
                 'instance': self.learning_unit_year_full.learning_container_year,
-                'person': self.person
-            },
-            EntityContainerBaseForm: {
-                'learning_container_year': self.learning_unit_year_full.learning_container_year,
                 'person': self.person
             },
             SimplifiedVolumeManagementForm: {

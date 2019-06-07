@@ -203,6 +203,24 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
         return format_html(result.verbose_title)
 
 
+class AllocationEntityAutocomplete(EntityAutocomplete):
+    def get_queryset(self):
+        self.forwarded['country'] = self.forwarded.get('country_allocation_entity')
+        return super(AllocationEntityAutocomplete, self).get_queryset()
+
+
+class AdditionnalEntity1Autocomplete(EntityAutocomplete):
+    def get_queryset(self):
+        self.forwarded['country'] = self.forwarded.get('country_additionnal_entity_1')
+        return super(AdditionnalEntity1Autocomplete, self).get_queryset()
+
+
+class AdditionnalEntity2Autocomplete(EntityAutocomplete):
+    def get_queryset(self):
+        self.forwarded['country'] = self.forwarded.get('country_additionnal_entity_2')
+        return super(AdditionnalEntity2Autocomplete, self).get_queryset()
+
+
 class EntityRequirementAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = find_additional_requirement_entities_choices().filter(entity__in=self.request.user.person.linked_entities)
