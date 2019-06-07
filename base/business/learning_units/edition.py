@@ -33,10 +33,9 @@ from base.business import learning_unit_year_with_context
 from base.business.learning_units.simple.deletion import delete_from_given_learning_unit_year, \
     check_learning_unit_year_deletion
 from base.business.utils.model import update_instance_model_from_data, update_related_object
-from base.models import entity_container_year, learning_class_year
+from base.models import learning_class_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from base.models.entity import Entity
-from base.models.entity_version import EntityVersion
 from base.models.enums import learning_unit_year_periodicity, learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.learning_container_year import LearningContainerYear
