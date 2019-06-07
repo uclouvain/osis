@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-07 09:38+0200\n"
+"POT-Creation-Date: 2019-06-07 10:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -858,8 +858,8 @@ msgstr ""
 #: templates/education_group/delete_inner.html:45
 #: templates/education_group/group_element_year/confirm_detach_inner.html:36
 #: templates/education_group/group_element_year/confirm_detach_inner.html:46
-#: templates/education_group/group_element_year_attach_type_dialog_inner.html:49
-#: templates/education_group/group_element_year_attach_type_dialog_inner.html:66
+#: templates/education_group/group_element_year_attach_type_dialog_inner.html:46
+#: templates/education_group/group_element_year_attach_type_dialog_inner.html:63
 #: templates/education_group/group_element_year_comment_inner.html:54
 #: templates/education_group/group_element_year_comment_inner.html:64
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:45
@@ -1111,8 +1111,7 @@ msgstr ""
 msgid "Coorganization"
 msgstr ""
 
-#: templates/education_group/group_element_year_attach_type_dialog_inner.html:43
-#: templates/education_group/group_element_year_attach_type_dialog_inner.html:58
+#: templates/education_group/group_element_year_attach_type_dialog_inner.html:55
 msgid "Copy"
 msgstr ""
 
@@ -1370,11 +1369,15 @@ msgstr ""
 msgid "Do you want to continue ?"
 msgstr ""
 
-#: templates/education_group/group_element_year_attach_type_dialog_inner.html:37
+#: templates/education_group/group_element_year_attach_type_dialog_inner.html:40
+#, python-format
+msgid "Do you want to copy %(object_acronym)s ?"
+msgstr ""
+
+#: templates/education_group/group_element_year_attach_type_dialog_inner.html:38
 #, python-format
 msgid ""
-"Do you want to copy %(object_acronym)s or to move %(object_acronym)s from "
-"%(parent_acronym)s ?"
+"Do you want to copy or to move %(object_acronym)s from %(parent_acronym)s ?"
 msgstr ""
 
 #: templates/learning_unit/blocks/modal/modal_xls_with_parameters.html:37
@@ -2708,8 +2711,7 @@ msgstr ""
 msgid "Month"
 msgstr ""
 
-#: templates/education_group/group_element_year_attach_type_dialog_inner.html:41
-#: templates/education_group/group_element_year_attach_type_dialog_inner.html:53
+#: templates/education_group/group_element_year_attach_type_dialog_inner.html:50
 msgid "Move"
 msgstr ""
 
