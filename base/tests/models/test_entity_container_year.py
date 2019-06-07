@@ -119,14 +119,3 @@ class EntityContainerYearTest(TestCase):
         }
 
         self.assertDictEqual(entities_by_linktype, expected_result)
-
-    def test_find_by_learning_container_year_and_linktype(self):
-        a_learning_container_year = LearningContainerYearFactory()
-        expected_container = EntityContainerYearFactory(learning_container_year=a_learning_container_year,
-                                                        type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-
-        returned_container = entity_container_year.find_by_learning_container_year_and_linktype(
-            a_learning_container_year, entity_container_year_link_type.REQUIREMENT_ENTITY
-        )
-
-        self.assertEqual(expected_container, returned_container)

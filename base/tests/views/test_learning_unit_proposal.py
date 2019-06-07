@@ -483,11 +483,10 @@ class TestLearningUnitProposalCancellation(TestCase):
         self.learning_unit_proposal = _create_proposal_learning_unit("LOSIS1211")
         self.learning_unit_year = self.learning_unit_proposal.learning_unit_year
 
-        requirement_entity_container = entity_container_year. \
-            find_by_learning_container_year_and_linktype(self.learning_unit_year.learning_container_year,
-                                                         entity_container_year_link_type.REQUIREMENT_ENTITY)
-        self.person_entity = PersonEntityFactory(person=self.person,
-                                                 entity=requirement_entity_container.entity)
+        self.person_entity = PersonEntityFactory(
+            person=self.person,
+            entity=self.learning_unit_year.learning_container_year.requirement_entity
+        )
 
         self.client.force_login(self.person.user)
         self.url = reverse('learning_unit_cancel_proposal', args=[self.learning_unit_year.id])
@@ -587,8 +586,7 @@ def _test_entities_equal(learning_container_year, entities_values_dict):
                         entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
                         entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2]:
 
-        linked_entity_container = entity_container_year.find_by_learning_container_year_and_linktype(
-            learning_container_year, type_entity)
+        linked_entity_container = learning_container_year.get_entity(type_entity)
         if entities_values_dict[type_entity] is None and linked_entity_container is not None:
             return False
         if entities_values_dict[type_entity] is not None \
@@ -679,9 +677,8 @@ def _modify_learning_unit_year_data(a_learning_unit_year):
 
 
 def _modify_entities_linked_to_learning_container_year(a_learning_container_year):
-    a_new_entity = EntityFactory()
-    entity_container_year.search(learning_container_year=a_learning_container_year). \
-        update(entity=a_new_entity)
+    a_learning_container_year.requirement_entity = EntityFactory()
+    a_learning_container_year.save()
 
 
 @override_flag('learning_unit_proposal_update', active=True)

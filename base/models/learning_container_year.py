@@ -119,11 +119,13 @@ class LearningContainerYear(SerializableModel):
         }
 
     # TODO :: rename function
+    # TODO :: unit tests
     def get_entity(self, entity_container_type):
         attr = LearningContainerYear.get_attrs_by_entity_container_type()[entity_container_type]
         return getattr(self, attr, None)
 
     # TODO :: rename function
+    # TODO :: unit tests
     def get_entity_by_type(self) -> dict:
         return {
             link_type: self.get_entity(link_type)
