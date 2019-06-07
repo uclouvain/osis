@@ -44,9 +44,10 @@ class AttachStrategy(metaclass=abc.ABCMeta):
 
 
 class AttachEducationGroupYearStrategy(AttachStrategy):
-    def __init__(self, parent: EducationGroupYear, child: EducationGroupYear):
+    def __init__(self, parent: EducationGroupYear, child: EducationGroupYear, instance=None):
         self.parent = parent
         self.child = child
+        self.instance = instance
 
     @cached_property
     def parents(self):
@@ -150,12 +151,14 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
 
 
 class AttachLearningUnitYearStrategy(AttachStrategy):
-    def __init__(self, parent: EducationGroupYear, child: LearningUnitYear):
+    def __init__(self, parent: EducationGroupYear, child: LearningUnitYear, instance=None):
         self.parent = parent
         self.child = child
+        self.instance = instance
 
     def is_valid(self):
-        self._check_new_attach_is_not_duplication()
+        if not self.instance:
+            self._check_new_attach_is_not_duplication()
         return True
 
     def _check_new_attach_is_not_duplication(self):

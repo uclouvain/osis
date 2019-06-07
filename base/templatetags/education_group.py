@@ -63,8 +63,9 @@ def li_with_deletion_perm(context, url, message, url_id="link_delete"):
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_update_perm(context, url, message, url_id="link_update"):
-    if context['education_group_year'].academic_year.year < current_academic_year().year and \
-            context['person'].is_faculty_manager:
+    is_general_faculty_manager = context['person'].is_faculty_manager and \
+                                 not context['person'].is_faculty_manager_for_ue
+    if context['education_group_year'].academic_year.year < current_academic_year().year and is_general_faculty_manager:
         return li_with_permission(context, _is_eligible_certificate_aims, url, message, url_id, True)
     return li_with_permission(context, is_eligible_to_change_education_group, url, message, url_id)
 
@@ -246,27 +247,34 @@ def link_pdf_content_education_group(url):
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=True)
-def dl_with_parent(context, key, obj=None, parent=None, dl_title="", class_dl="", default_value=None):
+def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None):
     """
     Tag to render <dl> for details of education_group.
     If the fetched value does not exist for the current education_group_year,
     the method will try to fetch the parent's value and display it in another style
     (strong, blue).
     """
-    if not obj:
-        obj = context["education_group_year"]
-    if not parent:
-        parent = context["parent"]
+    obj = context["education_group_year"]
+    parent = context["parent"]
 
-    value = get_verbose_field_value(obj, key)
+    return dl_with_parent_without_context(key, obj, parent, dl_title=dl_title, class_dl=class_dl,
+                                          default_value=default_value)
 
-    if not dl_title:
-        dl_title = obj._meta.get_field(key).verbose_name
 
-    if value is None or value == "":
-        parent_value = get_verbose_field_value(parent, key)
-    else:
-        parent, parent_value = None, None
+@register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=False)
+def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", default_value=None):
+    value = None
+    parent_value = None
+    if obj:
+        value = get_verbose_field_value(obj, key)
+
+        if not dl_title:
+            dl_title = obj._meta.get_field(key).verbose_name
+
+        if value is None or value == "":
+            parent_value = get_verbose_field_value(parent, key)
+        else:
+            parent, parent_value = None, None
 
     return {
         'label': _(dl_title),

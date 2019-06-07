@@ -28,7 +28,10 @@ import datetime
 from django.test import TestCase
 
 from attribution.models import attribution
+from attribution.models.enums.function import CO_HOLDER, COORDINATOR
+from attribution.tests.factories.attribution import AttributionFactory
 from base.tests.factories import tutor, user, structure, entity_manager, academic_year, learning_unit_year
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.models.test_person import create_person_with_user
 
 
@@ -91,3 +94,48 @@ class AttributionTest(TestCase):
 
     def test_is_score_responsible_without_attribution(self):
         self.assertFalse(attribution.is_score_responsible(self.user, self.learning_unit_year_without_attribution))
+
+
+class TestFindAllResponsibleByLearningUnitYear(TestCase):
+    """Unit tests on find_all_responsible_by_learning_unit_year()"""
+
+    def test_score_responsible_when_multiple_attribution_for_same_tutor(self):
+        luy = LearningUnitYearFactory()
+        attr1 = AttributionFactory(
+            function=COORDINATOR,
+            learning_unit_year=luy,
+            score_responsible=False,
+        )
+        AttributionFactory(
+            function=CO_HOLDER,
+            tutor=attr1.tutor,
+            learning_unit_year=luy,
+            score_responsible=True,
+        )  # Second attribution with different function
+        result = attribution.find_all_responsible_by_learning_unit_year(luy, '-score_responsible')
+        self.assertEqual(result.count(), 1)
+        self.assertNotEqual(result.count(), 2)  # Prevent from duplication of Tutor name
+        self.assertTrue(result.get().score_responsible)
+
+    def test_summary_responsible_when_multiple_attribution_for_same_tutor(self):
+        luy = LearningUnitYearFactory()
+        attr1 = AttributionFactory(
+            function=COORDINATOR,
+            learning_unit_year=luy,
+            summary_responsible=False,
+        )
+        AttributionFactory(
+            function=CO_HOLDER,
+            tutor=attr1.tutor,
+            learning_unit_year=luy,
+            summary_responsible=True,
+        )  # Second attribution with different function
+        result = attribution.find_all_responsible_by_learning_unit_year(luy, '-summary_responsible')
+        self.assertEqual(result.count(), 1)
+        self.assertNotEqual(result.count(), 2)  # Prevent from duplication of Tutor name
+        self.assertTrue(result.get().summary_responsible)
+
+    def test_when_orderby_is_none(self):
+        order_by = None
+        with self.assertRaises(AttributeError):
+            attribution.find_all_responsible_by_learning_unit_year(LearningUnitYearFactory(), order_by)

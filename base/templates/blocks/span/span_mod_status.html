@@ -32,21 +32,21 @@
     </span>
 {% elif blocked %}
     <span class="glyphicon glyphicon-minus-sign" aria-hidden="true"
-          style="color: red;" data-toggle="tooltip" data-html="true" title="{% trans "Modification blocked" %}">
+          style="color: red;" data-toggle="tooltip" data-html="true" title="{% trans "Blocked" %}">
          <!-- This span is used for table sort JS -->
          <span style="display:None;">1</span>
     </span>
 {% elif title_status_false %}
     <span class="glyphicon glyphicon-unchecked" aria-hidden="true"
           style="color:red;"
-          data-toggle="tooltip" data-html="true" title="{{ title_status_false }}">
+          data-toggle="tooltip" data-html="true" title="{% trans "No change made" %}">
         <!-- This span is used for table sort JS -->
          <span style="display:None;">0</span>
     </span>
 {% else %}
     <span class="glyphicon glyphicon-unchecked" aria-hidden="true"
           style="color:red;"
-          data-toggle="tooltip" data-html="true" title="{{ title_status_false }}">
+          data-toggle="tooltip" data-html="true" title="{% trans "No change made" %}">
         <!-- This span is used for table sort JS -->
          <span style="display:None;">0</span>
     </span>

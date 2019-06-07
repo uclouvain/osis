@@ -196,6 +196,9 @@ class NodeLeafJsTree(EducationGroupHierarchy):
                 'detach_url': reverse('group_element_year_delete', args=[
                     self.root.pk, self.group_element_year.parent.pk, self.group_element_year.pk
                 ]) if self.group_element_year else '#',
+                'modify_url': reverse('group_element_year_update', args=[
+                    self.root.pk, self.learning_unit_year.pk, self.group_element_year.pk
+                ]) if self.group_element_year else '#',
                 'class': self._get_class()
             },
             'id': 'id_{}_{}'.format(self.learning_unit_year.pk, group_element_year_pk),
