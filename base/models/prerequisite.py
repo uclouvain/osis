@@ -139,4 +139,3 @@ def _get_acronym_as_href(prerequisite_item, academic_yr):
     if luy:
         return "<a href='/learning_units/{}/'>{}</a>".format(luy.id, prerequisite_item.learning_unit.acronym)
     return ''
-
