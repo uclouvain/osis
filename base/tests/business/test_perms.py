@@ -180,6 +180,7 @@ class PermsTestCase(TestCase):
 
     def test_can_central_manager_modify_end_date_full(self):
         a_person = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP, 'can_edit_learningunit')
+        a_person.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
         generated_container = GenerateContainer(start_year=self.academic_yr.year,
                                                 end_year=self.academic_yr.year)
         generated_container_first_year = generated_container.generated_container_years[0]
@@ -396,6 +397,9 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
             year=cls.current_academic_year.year - 1
         )
         cls.person = PersonFactory()
+        cls.person.user.user_permissions.add(
+            Permission.objects.get(codename='can_propose_learningunit'),
+        )
 
     def setUp(self):
         self.luy = LearningUnitYearFakerFactory(learning_container_year__academic_year=self.current_academic_year,

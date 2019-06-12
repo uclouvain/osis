@@ -128,7 +128,7 @@ class TestBuildTree(TestCase):
 
         self.assertEqual(
             json['children'][1]['children'][0]['a_attr']['title'],
-            "{}\n{}".format(self.learning_unit_year_1.complete_title, _("The learning unit is prerequisite"))
+            "{}\n{}".format(self.learning_unit_year_1.complete_title, _("The learning unit is a prerequisite"))
         )
         self.assertEqual(
             json['children'][1]['children'][0]['icon'],
