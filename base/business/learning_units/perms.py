@@ -466,20 +466,18 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
     :param person: Person
     :return: bool
     """
-    if not is_year_editable(learning_unit_year, raise_exception=False):
-        return False
-
     if not person.user.has_perm('base.can_edit_learningunit_pedagogy'):
         return False
 
-    # Case faculty/central: We need to check if user is linked to entity
-    if person.is_faculty_manager or person.is_central_manager:
-        return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+    if is_year_editable(learning_unit_year, raise_exception=False):
+        # Case faculty/central: We need to check if user is linked to entity
+        if person.is_faculty_manager or person.is_central_manager:
+            return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
-    # Case Tutor: We need to check if today is between submission date
-    if tutor.is_tutor(person.user):
-        return can_user_edit_educational_information(user=person.user, learning_unit_year_id=learning_unit_year.id). \
-            is_valid()
+        # Case Tutor: We need to check if today is between submission date
+        if tutor.is_tutor(person.user):
+            return can_user_edit_educational_information(user=person.user, learning_unit_year_id=learning_unit_year.id). \
+                is_valid()
 
     return False
 
