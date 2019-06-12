@@ -36,9 +36,9 @@ Feature: Création d'offre
     Then Vérifier que le(s) enfant(s) de <code> sont bien <children>
 
     Examples:
-      | acronym    | code      | type_de_formation                            | entite_de_gestion | entite_dadministration | intitule_du_diplome | children            |
+      | acronym    | code      | type_de_formation                            | entite_de_gestion | entite_dadministration | intitule_du_diplome | children                         |
       | DROI2MS/TT | LDROI200S | Master en 120 crédits à finalité spécialisée | DRT               | DRT                    | Diplome en droit    | PARTIEDEBASEDROI2MS/TT,LDROI300G |
-      | CUIS2FC    | LCUIS100Q | Certificat d’université 2ème cycle           | AGRO              | AGRO                   | Diplome en cuisine  | LCUIS100T           |
+      | CUIS2FC    | LCUIS100Q | Certificat d’université 2ème cycle           | AGRO              | AGRO                   | Diplome en cuisine  | LCUIS100T                        |
 
   Scenario: 30 : En tant que gestionnaire central, je dois pouvoir créer une offre de type « mini- formation ».
   OPTIONENTF LSIPS100O CAMG CAMG

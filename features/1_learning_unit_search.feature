@@ -17,7 +17,7 @@ Feature: Recherche des unités d'enseignements.
     Examples:
       | anac    | results                             | search_field       | search_value    |
       | 2019-20 | WSBIM1203                           | acronym            | WSBIM1203       |
-      | 2019-20 | LCRIM2101,LCRIM2103                 | requirement_entity | DRT             |
+      | 2019-20 | LALLE1100,LALLE1100E                | requirement_entity | ILV             |
       | 2019-20 | LACTU2950                           | container_type     | Stage           |
       | 2019-20 | LCHM1111,LCHM1211,LCHM1331,LCHM2130 | tutor              | kaSenzangakhona |
 
