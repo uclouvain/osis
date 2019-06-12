@@ -29,7 +29,7 @@ from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
 from base.business.learning_units.perms import MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR, \
-    is_eligible_for_modification, can_update_learning_achievement
+    is_eligible_for_modification, can_update_learning_achievement, is_eligible_to_update_learning_unit_pedagogy
 from base.business.learning_units.perms import is_eligible_to_modify_end_year_by_proposal, \
     is_eligible_to_modify_by_proposal, MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
 from base.models.entity import Entity
@@ -53,6 +53,16 @@ class TestPerms(TestCase):
         self.next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year+1)
         self.lcy = LearningContainerYearFactory(academic_year=self.current_academic_year,
                                                 container_type=learning_container_year_types.COURSE)
+        self.central_manager = CentralManagerFactory()
+        self.luy = LearningUnitYearFactory(
+            learning_unit=self.learning_unit,
+            learning_container_year=self.lcy,
+        )
+        self.ecy = EntityContainerYearFactory(
+            learning_container_year=self.luy.learning_container_year,
+            type=REQUIREMENT_ENTITY
+        )
+        self.central_manager.linked_entities = [Entity.objects.get(entitycontaineryear=self.ecy).id]
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_create_modification_proposal", return_value=True)
     def test_not_is_eligible_to_modify_end_year_by_proposal(self, mock_perm):
@@ -132,30 +142,18 @@ class TestPerms(TestCase):
 
     @mock.patch('waffle.models.Flag.is_active_for_user', return_value=True)
     def test_is_not_eligible_to_update_learning_achievement_cause_before_2018(self, mock_flag):
-        central_manager = CentralManagerFactory()
-        luy = LearningUnitYearFactory(
-            learning_unit=self.learning_unit,
-            learning_container_year=self.lcy,
-            academic_year__year=2015
-        )
-        ecy = EntityContainerYearFactory(
-            learning_container_year=luy.learning_container_year,
-            type=REQUIREMENT_ENTITY
-        )
-        central_manager.linked_entities = [Entity.objects.get(entitycontaineryear=ecy).id]
-        self.assertFalse(can_update_learning_achievement(luy, central_manager))
+        self.luy.academic_year = AcademicYearFactory(year=2015)
+        self.assertFalse(can_update_learning_achievement(self.luy, self.central_manager))
 
     @mock.patch('waffle.models.Flag.is_active_for_user', return_value=True)
     def test_is_eligible_to_update_learning_achievement_after_2017(self, mock_flag):
-        central_manager = CentralManagerFactory()
-        luy = LearningUnitYearFactory(
-            learning_unit=self.learning_unit,
-            learning_container_year=self.lcy,
-            academic_year__year=2019
-        )
-        ecy = EntityContainerYearFactory(
-            learning_container_year=luy.learning_container_year,
-            type=REQUIREMENT_ENTITY
-        )
-        central_manager.linked_entities = [Entity.objects.get(entitycontaineryear=ecy).id]
-        self.assertTrue(can_update_learning_achievement(luy, central_manager))
+        self.luy.academic_year = AcademicYearFactory(year=2019)
+        self.assertTrue(can_update_learning_achievement(self.luy, self.central_manager))
+
+    def test_is_not_eligible_to_update_learning_pedagogy_cause_before_2018(self):
+        self.luy.academic_year = AcademicYearFactory(year=2015)
+        self.assertFalse(is_eligible_to_update_learning_unit_pedagogy(self.luy, self.central_manager))
+
+    def test_is_eligible_to_update_learning_pedagogy_after_2017(self):
+        self.luy.academic_year = AcademicYearFactory(year=2019)
+        self.assertTrue(is_eligible_to_update_learning_unit_pedagogy(self.luy, self.central_manager))
