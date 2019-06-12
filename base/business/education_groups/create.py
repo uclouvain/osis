@@ -46,7 +46,7 @@ MAX_CNUM = 999
 WIDTH_CNUM = 3
 
 
-def create_initial_group_element_year_structure(parent_egys):
+def create_initial_group_element_year_structure(parent_egys: list):
     children_created = defaultdict(list)
     if not parent_egys:
         return children_created
@@ -103,6 +103,7 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
         parent__academic_year__year__in=[year - 1, year],
         child_branch__education_group_type=child_education_group_type
     )
+
     if not previous_grp_ele:
         child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
     else:
@@ -129,8 +130,8 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
             ),
         }
     )
-
-    return GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)
+    gey, _ = GroupElementYear.objects.get_or_create(parent=parent_egy, child_branch=child_egy)
+    return gey
 
 
 def _duplicate_branch(child_education_group_type, parent_egy, last_child):
