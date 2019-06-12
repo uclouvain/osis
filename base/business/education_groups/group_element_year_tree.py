@@ -211,7 +211,7 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         elif self.group_element_year.has_prerequisite:
             title = "{}\n{}".format(title, _("The learning unit has prerequisites"))
         elif self.group_element_year.is_prerequisite:
-            title = "{}\n{}".format(title, _("The learning unit is prerequisite"))
+            title = "{}\n{}".format(title, _("The learning unit is a prerequisite"))
         return title
 
     def _get_icon(self):
