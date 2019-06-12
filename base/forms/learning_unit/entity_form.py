@@ -164,9 +164,9 @@ class Additional1EntityContainerYearModelForm(EntityContainerYearModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        field = self.fields['entity']
-        field.required = False
-        field.widget.attrs = {
+        entity = self.fields['entity']
+        entity.required = False
+        entity.widget.attrs = {
             'onchange': (
                 'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", false);'
                 'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2_country", false);'
@@ -182,7 +182,12 @@ class Additional1EntityContainerYearModelForm(EntityContainerYearModelForm):
             'id': 'id_additional_requirement_entity_1'
         }
         country = self.fields['country']
-        country.widget.attrs = {'id': 'id_additional_requirement_entity_1_country'}
+        country.widget.attrs = {
+            'id': 'id_additional_requirement_entity_1_country',
+            'onchange': 'clearAdditionalEntity("id_additional_requirement_entity_1", false);'
+        }
+        if hasattr(self.instance, 'entity') and self.instance.entity.organization.type != MAIN:
+            country.initial = self.instance.entity.country.pk
 
 
 class Additional2EntityContainerYearModelForm(EntityContainerYearModelForm):
@@ -190,9 +195,9 @@ class Additional2EntityContainerYearModelForm(EntityContainerYearModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        field = self.fields['entity']
-        field.required = False
-        field.widget.attrs = {
+        entity = self.fields['entity']
+        entity.required = False
+        entity.widget.attrs = {
             'onchange': (
                 'updateAdditionalEntityEditability(this.value, "id_component-0-repartition_volume_additional_entity_2",'
                 ' false);'
@@ -201,7 +206,12 @@ class Additional2EntityContainerYearModelForm(EntityContainerYearModelForm):
             ),
             'id': 'id_additional_requirement_entity_2'}
         country = self.fields['country']
-        country.widget.attrs = {'id': 'id_additional_requirement_entity_2_country'}
+        country.widget.attrs = {
+            'id': 'id_additional_requirement_entity_2_country',
+            'onchange': 'clearAdditionalEntity("id_additional_requirement_entity_2", false);'
+        }
+        if hasattr(self.instance, 'entity') and self.instance.entity.organization.type != MAIN:
+            country.initial = self.instance.entity.country.pk
 
 
 class EntityContainerBaseForm:
