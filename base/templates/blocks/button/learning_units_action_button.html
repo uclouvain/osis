@@ -48,13 +48,11 @@
             <li role="separator" class="divider"></li>
         {% endflag %}
         {% flag "learning_unit_proposal_create" %}
-            {% if perms.base.can_edit_learning_unit_proposal %}
-                <li>
-                    <a href="{{ create_proposal_url }}" id="lnk_create_proposal_url">
-                        {% trans 'Proposal of creation' %}
-                    </a>
-                </li>
-            {% endif %}
+            <li {% if not perms.base.can_edit_learning_unit_proposal %}class="disabled"{% endif %}>
+                <a {% if perms.base.can_edit_learning_unit_proposal %}href="{{ create_proposal_url }}"{% endif %} id="lnk_create_proposal_url">
+                    {% trans 'Proposal of creation' %}
+                </a>
+            </li>
         {% endflag %}
     </ul>
 {% endif %}

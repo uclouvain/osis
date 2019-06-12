@@ -57,8 +57,8 @@
 
                         {# This feature is used for managing tree in education group context #}
                         {% flag "education_group_select" %}
-                            <li>
-                                <a href="#" onclick="javascript:select()">
+                            <li {% if not "base.can_edit_learningunit" in perms %}class="disabled"{% endif %}>
+                                <a {% if "base.can_edit_learningunit" in perms %} href="#" onclick="javascript:select()" {% endif %}>
                                     {% trans 'Select' %}
                                 </a>
                             </li>
@@ -66,17 +66,14 @@
                         {% endflag %}
 
                         {% flag "learning_unit_update" %}
-                            {% if "base.can_edit_learningunit" in perms %}
-                                {% url "edit_learning_unit" learning_unit_year_id=learning_unit_year.id as edit_learning_unit_url %}
+                            {%  url "edit_learning_unit" learning_unit_year_id=learning_unit_year.id as edit_learning_unit_url %}
                                 {% li_edit_lu edit_learning_unit_url _('Modify') %}
-                            {% endif %}
 
-                            {% if "base.can_edit_learningunit_date" in perms %}
-                                {% url "learning_unit_edition" learning_unit_year_id=learning_unit_year.id as learning_unit_edition_url %}
+
+                            {%  url "learning_unit_edition" learning_unit_year_id=learning_unit_year.id as learning_unit_edition_url %}
                                 {% li_edit_date_lu learning_unit_edition_url _('Modify end date') 'link_edit_date_learning_unit' %}
                                 <li class="divider"></li>
-                            {% endif %}
-                        {% endflag %}
+                            {%  endflag %}
                         {% url "learning_unit_comparison" learning_unit_year_id=learning_unit_year.id as url_lus_comparison %}
                         <li id="link_lus_comparison">
                             <a href="{{ url_lus_comparison }}"
@@ -92,7 +89,7 @@
                         </a>
                         <li class="divider"></li>
                         </a>
-                        {% if "base.can_propose_learningunit" in perms %}
+
                             {% flag "learning_unit_proposal_create" %}
 
                                 {% url "learning_unit_modification_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_modification_proposal_url %}
@@ -117,12 +114,11 @@
                                 {% li_consolidate_proposal '#' _('Consolidate the proposal') 'link_consolidate_proposal' 'document.getElementById(\'form_consolidate\').submit();' %}
                                 <li class="divider"></li>
                             {% endflag %}
-                        {% endif %}
+
 
                         {% flag "learning_unit_delete" %}
-                            {% if "base.can_delete_learningunit" in perms %}
-                                {% li_delete_all_lu "#" _('Delete learning unit year definitively') '#modalDeleteLuy' 'link_delete_lus' %}
-                            {% endif %}
+                            {%  li_delete_all_lu "#" _('Delete learning unit year definitively') '#modalDeleteLuy' 'link_delete_lus' %}
+
                         {% endflag %}
                     </ul>
                 </div>
