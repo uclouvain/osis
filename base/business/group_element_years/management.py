@@ -85,6 +85,9 @@ def _check_authorized_relationship(root, link, to_delete=False):
 
     max_reached, min_reached, not_authorized = [], [], []
     for key, count in count_children_dict.items():
+        if to_delete:
+            count -= 1
+
         if key not in auth_rels_dict:
             not_authorized.append(key)
         elif count < auth_rels_dict[key].min_count_authorized:
