@@ -476,8 +476,10 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
 
         # Case Tutor: We need to check if today is between submission date
         if tutor.is_tutor(person.user):
-            return can_user_edit_educational_information(user=person.user, learning_unit_year_id=learning_unit_year.id). \
-                is_valid()
+            return can_user_edit_educational_information(
+                user=person.user,
+                learning_unit_year_id=learning_unit_year.id
+            ).is_valid()
 
     return False
 
