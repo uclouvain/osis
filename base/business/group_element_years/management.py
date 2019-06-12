@@ -36,7 +36,6 @@ from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
 
-
 LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
 
@@ -54,8 +53,8 @@ def extract_child_from_cache(parent, user):
         kwargs['child_branch'] = EducationGroupYear.objects.get(pk=selected_data['id'])
 
     if selected_data.get('source_link_id'):
-        kwargs['source_link'] = GroupElementYear.objects.select_related('parent')\
-                                                        .get(pk=selected_data['source_link_id'])
+        kwargs['source_link'] = GroupElementYear.objects.select_related('parent') \
+            .get(pk=selected_data['source_link_id'])
 
     return kwargs
 
@@ -67,7 +66,7 @@ def is_max_child_reached(parent, child_education_group_type):
         return True
 
     try:
-        education_group_type_count = compute_number_children_by_education_group_type(parent, None).\
+        education_group_type_count = compute_number_children_by_education_group_type(parent, None). \
             get(education_group_type__name=child_education_group_type)["count"]
     except EducationGroupYear.DoesNotExist:
         education_group_type_count = 0
@@ -95,12 +94,15 @@ def _check_authorized_relationship(root, link, to_delete=False):
         elif auth_rels_dict[key].max_count_authorized is not None and count > auth_rels_dict[key].max_count_authorized:
             max_reached.append(key)
 
-    # Check for technical group that would not be linked to root
+    _min_reach_technical_group(auth_rels_dict, count_children_dict, min_reached)
+    return min_reached, max_reached, not_authorized
+
+
+def _min_reach_technical_group(auth_rels_dict, count_children_dict, min_reached):
+    """ Check for technical group that would not be linked to root """
     for key, auth_rel in auth_rels_dict.items():
         if key not in count_children_dict and auth_rel.min_count_authorized > 0:
             min_reached.append(key)
-
-    return min_reached, max_reached, not_authorized
 
 
 def can_link_be_detached(root, link):
@@ -132,12 +134,12 @@ def check_authorized_relationship(root, link, to_delete=False):
         )
     elif not_authorized:
         raise AuthorizedRelationshipNotRespectedException(
-                errors=_("You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
-                    'child_types': ', '.join(str(AllTypes.get_value(name)) for name in not_authorized),
-                    'parent': root,
-                    'parent_type': AllTypes.get_value(root.education_group_type.name),
-                }
-            )
+            errors=_("You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                'child_types': ', '.join(str(AllTypes.get_value(name)) for name in not_authorized),
+                'parent': root,
+                'parent_type': AllTypes.get_value(root.education_group_type.name),
+            }
+        )
 
 
 def compute_number_children_by_education_group_type(root, link=None, to_delete=False):
