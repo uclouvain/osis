@@ -128,8 +128,8 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
             ),
         }
     )
-
-    return GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)
+    gey, created = GroupElementYear.objects.get_or_create(parent=parent_egy, child_branch=child_egy)
+    return gey
 
 
 def _duplicate_branch(child_education_group_type, parent_egy, last_child):
