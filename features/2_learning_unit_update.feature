@@ -50,7 +50,7 @@ Feature: Mise à jour en gestion journalière
     Given La période de modification des programmes n’est pas en cours
     And L’utilisateur est attaché à l’entité DRT
     And L’utilisateur est dans le groupe central manager
-    And Aller sur la page de detail de l'ue: LDROI1004 en 2019-20
+    And Aller sur la page de detail de l'ue: LDROI1003 en 2019-20
 
     When Cliquer sur le menu « Actions »
     And Cliquer sur le menu « Modifier »
@@ -62,7 +62,7 @@ Feature: Mise à jour en gestion journalière
 
     Then Vérifier que le champ Crédits est bien 12
     And Vérifier que la Périodicité est bien bisannuelle paire
-    And Rechercher LDROI1004 en 2020-21
+    And Rechercher LDROI1003 en 2020-21
     And Vérifier que le champ Crédits est bien 12
     And Vérifier que la Périodicité est bien bisannuelle paire
 
