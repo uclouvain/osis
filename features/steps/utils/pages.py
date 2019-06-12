@@ -57,6 +57,7 @@ class CommonPageMixin:
         region.wait_for_region_to_load()
         return region
 
+
 class QuickSearchPage(AjaxModal):
     code = InputField(By.ID, 'id_search_text')
     search = ButtonField(By.CSS_SELECTOR, '#form-modal > div > div.col-md-1.col-md-offset-2 > button', 1)
@@ -316,6 +317,10 @@ class CopyModalPage(AjaxModal):
     copy_btn = Link('AttachModalPage', By.CSS_SELECTOR, '.modal-footer > .btn-primary', 1)
 
 
+class DetachModalPage(AjaxModal):
+    save_modal = Link('EducationGroupPage', By.CSS_SELECTOR, '.modal-footer > .btn-danger', 6)
+
+
 class AttachModalPage(AjaxModal):
     type_de_lien = SelectField(By.ID, 'id_link_type')
     save_modal = Link('EducationGroupPage', By.CSS_SELECTOR, '.modal-footer > .btn-primary', 6)
@@ -353,6 +358,7 @@ class EducationGroupPage(CommonPageMixin, pypom.Page):
     save_modal = Link('EducationGroupPage', By.CSS_SELECTOR, '.modal-footer > .btn-primary', 4)
 
     attach = Link(CopyModalPage, By.CSS_SELECTOR, 'body > ul > li:nth-child(4) > a', 2)
+    detach = Link(DetachModalPage, By.CSS_SELECTOR, 'body > ul > li:nth-child(5) > a', 2)
 
     def get_name_first_children(self) -> list:
         children = self.find_elements(By.CSS_SELECTOR, '#panel_file_tree > ul > li > ul > li')
@@ -387,8 +393,7 @@ class EducationGroupPage(CommonPageMixin, pypom.Page):
 
     def detach_node_tree(self, acronym, parent=None):
         self.rigth_click_node_tree(acronym, parent)
-        self.find_element(By.CSS_SELECTOR, 'body > ul > li:nth-child(5) > a').click()
-        time.sleep(1)
+        return self.detach.click()
 
     def select_node_tree(self, acronym, parent=None):
         self.rigth_click_node_tree(acronym, parent)
