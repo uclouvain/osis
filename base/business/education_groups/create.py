@@ -46,7 +46,7 @@ MAX_CNUM = 999
 WIDTH_CNUM = 3
 
 
-def create_initial_group_element_year_structure(parent_egys):
+def create_initial_group_element_year_structure(parent_egys: list):
     children_created = defaultdict(list)
     if not parent_egys:
         return children_created
