@@ -30,7 +30,7 @@
 {% features_or "learning_unit_create" "learning_unit_external_create" "learning_unit_proposal_create" as show_button %}
 
 {% if show_button %}
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button id="btn-action" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {% trans 'Actions' %}
         <span class="caret"></span>
     </button>

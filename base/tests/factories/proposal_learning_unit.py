@@ -38,6 +38,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 class ProposalLearningUnitFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.ProposalLearningUnit"
+        django_get_or_create = ('learning_unit_year',)
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
