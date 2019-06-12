@@ -55,7 +55,7 @@ class LearningContainerYearFactory(factory.django.DjangoModelFactory):
     in_charge = False
     type_declaration_vacant = None
 
-    requirement_entity = factory.SubFactory(EntityFactory)
+    requirement_entity = None
     allocation_entity = None
     additionnal_entity_1 = None
     additionnal_entity_2 = None

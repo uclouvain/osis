@@ -195,7 +195,7 @@ def _get_or_create_container_year(new_learn_unit_year, new_academic_year):
 
 def _raise_if_entity_version_does_not_exist(new_lcy, new_academic_year):
     prefetched_entities_previous_year = Entity.objects.filter(
-        pk__in=[ent.id for ent in new_lcy.copied_from.get_entity_by_type().values()]
+        pk__in=[ent.id for ent in new_lcy.copied_from.get_entity_by_type().values() if ent]
     ).prefetch_related(
         "entityversion_set"
     )
@@ -293,7 +293,7 @@ def update_learning_unit_year_with_report(luy_to_update, fields_to_update, entit
 
     # Update luy which doesn't have conflict
     for luy in luy_to_update_list:
-        _update_learning_unit_year(luy, fields_to_update, with_report=(luy != luy_to_update))
+        _update_learning_unit_year(luy, fields_to_update, (luy != luy_to_update), entities_by_type_to_update)
         # TODO :: remove this and add unit test to check if entities are correctly set to None or to specified value from entities_by_type_to_update
         # _update_learning_unit_year_entities(luy, entities_by_type_to_update)
 
@@ -329,17 +329,22 @@ def check_postponement_conflict_report_errors(conflict_report):
 
 
 # FIXME should used include and not exclude
-def _update_learning_unit_year(luy_to_update, fields_to_update, with_report):
+def _update_learning_unit_year(luy_to_update, fields_to_update, with_report, entities_to_update_by_type):
     fields_to_exclude = ()
     if with_report:
         fields_to_exclude = FIELDS_TO_EXCLUDE_WITH_REPORT
 
     update_instance_model_from_data(luy_to_update.learning_unit, fields_to_update, exclude=('acronym',))
 
+    luy_to_update.learning_container_year.set_entities(entities_to_update_by_type)
+
     # Only the subtype FULL can edit the container
     if luy_to_update.subtype == learning_unit_year_subtypes.FULL:
-        update_instance_model_from_data(luy_to_update.learning_container_year, fields_to_update,
-                                        exclude=fields_to_exclude)
+        update_instance_model_from_data(
+            luy_to_update.learning_container_year,
+            fields_to_update,
+            exclude=fields_to_exclude
+        )
 
     update_instance_model_from_data(luy_to_update, fields_to_update,
                                     exclude=fields_to_exclude + ("in_charge",))
@@ -447,7 +452,10 @@ def _check_postponement_learning_unit_year_proposal_state(nex_luy):
 def _check_postponement_conflict_on_entity_container_year(lcy, next_lcy):
     current_entities = lcy.get_entity_by_type()
     next_year_entities = next_lcy.get_entity_by_type()
-    error_list = _check_if_all_entities_exist(next_lcy, list(next_year_entities.values()))
+    error_list = _check_if_all_entities_exist(
+        next_lcy,
+        list(filter(lambda entity: entity, next_year_entities.values()))
+    )
     entity_type_diff = filter(lambda type: _is_different_value(current_entities, next_year_entities, type),
                               ENTITY_TYPE_LIST)
     for entity_type in entity_type_diff:

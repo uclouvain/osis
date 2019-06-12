@@ -132,6 +132,16 @@ class LearningContainerYear(SerializableModel):
             for link_type in LearningContainerYear.get_attrs_by_entity_container_type()
         }
 
+    # TODO :: unit test + check where to use this function (how are sets entities? via DAL?)
+    def set_entity(self, entity_container_type, new_entity):
+        attr = LearningContainerYear.get_attrs_by_entity_container_type()[entity_container_type]
+        setattr(self, attr, new_entity)
+
+    # TODO:: unit tests
+    def set_entities(self, entities_by_type_to_set):
+        for link_type, new_entity in entities_by_type_to_set.items():
+            self.set_entity(link_type, new_entity)
+
     def get_most_recent_entity_acronym(self, entity_container_type):
         entity = self.get_entity(entity_container_type)
         return entity.most_recent_acronym if entity else None
