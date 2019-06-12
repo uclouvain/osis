@@ -375,10 +375,12 @@ def prepare_xls_content_for_comparison(luy_with_proposals):
 
 def _get_data_from_initial_data(initial_data):
     learning_unit_yr = get_by_id(initial_data.get('learning_unit_year')['id'])
-    requirement_entity = find_by_id(initial_data.get('entities')['REQUIREMENT_ENTITY'])
-    allocation_entity = find_by_id(initial_data.get('entities')['ALLOCATION_ENTITY'])
-    add1_requirement_entity = find_by_id(initial_data.get('entities')['ADDITIONAL_REQUIREMENT_ENTITY_1'])
-    add2_requirement_entity = find_by_id(initial_data.get('entities')['ADDITIONAL_REQUIREMENT_ENTITY_2'])
+    learning_container_year = initial_data.get('learning_container_year') or {}
+
+    requirement_entity = find_by_id(learning_container_year['requirement_entity'])
+    allocation_entity = find_by_id(learning_container_year['allocation_entity'])
+    add1_requirement_entity = find_by_id(learning_container_year['additionnal_entity_1'])
+    add2_requirement_entity = find_by_id(learning_container_year['additionnal_entity_2'])
     campus = find_campus_by_id(initial_data.get('learning_unit_year')['campus'])
 
     organization = get_organization_from_learning_unit_year(learning_unit_yr)
