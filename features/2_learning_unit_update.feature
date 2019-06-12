@@ -48,6 +48,7 @@ Feature: Mise à jour en gestion journalière
   Description : en particulier les crédits et la périodicité + vérifier que les UE peuvent
   être mises à jour par la gestionnaire central en dehors de la période de modification des programmes.
     Given La période de modification des programmes n’est pas en cours
+    And L’utilisateur est attaché à l’entité DRT
     And L’utilisateur est dans le groupe central manager
     And Aller sur la page de detail de l'ue: LDROI1004 en 2019-20
 
