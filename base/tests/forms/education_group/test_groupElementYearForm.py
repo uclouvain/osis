@@ -31,7 +31,6 @@ from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory, \
     GroupFactory, EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory

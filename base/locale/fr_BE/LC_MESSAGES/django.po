@@ -676,7 +676,7 @@ msgstr "Appliquer le report sur les organisations de formations annualisées"
 msgid "Apply postponement on learning unit year"
 msgstr "Appliquer le report sur les unités d'enseignement annualisées"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:136
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:130
 msgid "Are you certain that you want to cancel the learning unit proposal ?"
 msgstr "Êtes-vous certain de vouloir annuler la proposition ?"
 
@@ -920,7 +920,7 @@ msgstr ""
 msgid "Cancel"
 msgstr "Annuler"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:111
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:107
 msgid "Cancel the proposal"
 msgstr "Annuler la proposition"
 
@@ -1015,7 +1015,7 @@ msgstr "Cliquez pour vous reconnectez"
 msgid "Clinical internship"
 msgstr "Stage clinique"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:139
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:133
 #: templates/learning_unit/class_edit.html:34
 #: templates/learning_unit/component_edit.html:33
 #: templates/my_osis/my_message.html:60
@@ -1136,7 +1136,7 @@ msgstr "Erreur de consistance en %(academic_year)s : %(error)s"
 msgid "Consolidate"
 msgstr "Consolider"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:113
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:109
 msgid "Consolidate the proposal"
 msgstr "Consolider la proposition"
 
@@ -1282,7 +1282,7 @@ msgstr "Inscription par défaut aux cours"
 msgid "Delete"
 msgstr "Supprimer"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:120
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:115
 msgid "Delete learning unit year definitively"
 msgstr "Supprimer l'UE définitivement"
 
@@ -1489,7 +1489,7 @@ msgstr "Durée"
 msgid "Edit"
 msgstr "Éditer"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:105
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:101
 msgid "Edit the proposal"
 msgstr "Editer la proposition"
 
@@ -2380,7 +2380,7 @@ msgstr "Unité d'enseignement annualisée"
 msgid "Learning units"
 msgstr "Unités d'enseignement"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:80
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:76
 #: templates/learning_unit/blocks/modal/modal_comparison.html:30
 #: templates/learning_unit/comparison.html:32
 msgid "Learning units comparison"
@@ -2394,7 +2394,7 @@ msgstr "Inscription aux unités d'enseignement"
 msgid "Learning units list"
 msgstr "Liste des UEs"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:85
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:81
 #: templates/learning_unit/proposal_comparison.html:32
 msgid "Learning units proposal comparison"
 msgstr "Fiche comparative de la proposition"
@@ -2767,7 +2767,7 @@ msgstr "Modifié par"
 msgid "Modify"
 msgstr "Modifier"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:74
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:71
 msgid "Modify end date"
 msgstr "Modifier la date de fin"
 
@@ -3582,11 +3582,11 @@ msgstr "Partenaire public"
 msgid "Publication contact entity"
 msgstr "Entité de contact de publication"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:98
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:94
 msgid "Put in proposal for ending date"
 msgstr "Mettre en proposition de fin d'enseignement"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:95
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:91
 msgid "Put in proposal in modification"
 msgstr "Mettre en proposition de modification"
 
@@ -5297,6 +5297,10 @@ msgstr "Vous ne pouvez pas créer/modifier les propositions"
 msgid "You are not eligible to edit proposal"
 msgstr "Vous ne pouvez pas modifier les propositions"
 
+#: business/learning_units/perms.py:89
+msgid "You are not eligible to manage learning units"
+msgstr "Vous ne pouvez pas agir sur les unités d'enseignements"
+
 #: business/learning_units/perms.py:58
 msgid ""
 "You are not eligible to modify the end date of this learning unit. You "
@@ -5617,7 +5621,7 @@ msgstr "commentaire"
 msgid "comment (internal)"
 msgstr "commentaire (interne)"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:140
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:134
 #: templates/learning_unit/blocks/modal/modal_confirm_delete.html:37
 #: templates/learning_unit/teaching_material/modal_delete.html:34
 msgid "confirm"
