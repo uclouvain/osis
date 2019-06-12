@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-07 16:23+0200\n"
+"POT-Creation-Date: 2019-06-07 15:07+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4407,13 +4407,16 @@ msgstr "L'UE a des prérequis"
 #: business/education_groups/group_element_year_tree.py:210
 #: tests/business/education_groups/test_build_tree.py:159
 msgid "The learning unit has prerequisites and is prerequisite"
-msgstr "L'UE a des prérequis et est prérequise"
+msgstr "L'UE a des prérequis et un prérequis"
 
 #: views/learning_units/detail.py:76
 msgid "The learning unit have partim"
 msgstr "L'unité d'enseignement dispose de partim"
 
 #: business/education_groups/group_element_year_tree.py:214
+msgid "The learning unit is a prerequisite"
+msgstr "L'UE est un prérequis"
+
 #: tests/business/education_groups/test_build_tree.py:131
 msgid "The learning unit is prerequisite"
 msgstr "L'UE est prérequise"
@@ -5736,7 +5739,7 @@ msgstr "texte d'aide en français"
 #: templates/education_group/learning_unit/tab_prerequisite_training.html:34
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:33
 msgid "has the following prerequisites"
-msgstr "dispose des prérequis suivants"
+msgstr "a des prérequis"
 
 #: models/learning_component_year.py:70
 msgid "hourly volume partial q1"
@@ -5755,8 +5758,8 @@ msgid "initial value"
 msgstr "valeur initiale"
 
 #: templates/education_group/learning_unit/tab_prerequisite_training.html:65
-msgid "is the prereqisite of"
-msgstr "est le prérequis de"
+msgid "is a prereqisite of"
+msgstr "est un prérequis de"
 
 #: templates/education_group/learning_unit/tab_utilization.html:34
 #: templates/education_group/tab_utilization.html:34
