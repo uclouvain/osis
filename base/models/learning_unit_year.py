@@ -339,7 +339,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
             entity = self.learning_container_year.get_entity(entity_type)
             if entity:
                 # TODO :: prefetch entityversion_set before call to this function
-                return Entity.objects.get(pk=entity.pk).prefetch_related('entityversion_set')
+                return Entity.objects.filter(pk=entity.pk).prefetch_related('entityversion_set').get()
 
     def clean(self):
         learning_unit_years = find_gte_year_acronym(self.academic_year, self.acronym)
