@@ -102,6 +102,7 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
         parent__academic_year__year__in=[year - 1, year],
         child_branch__education_group_type=child_education_group_type
     )
+
     if not previous_grp_ele:
         child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
     else:
@@ -128,7 +129,7 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
             ),
         }
     )
-    gey, created = GroupElementYear.objects.get_or_create(parent=parent_egy, child_branch=child_egy)
+    gey, _ = GroupElementYear.objects.get_or_create(parent=parent_egy, child_branch=child_egy)
     return gey
 
 
