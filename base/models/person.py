@@ -141,6 +141,10 @@ class Person(SerializableModel):
 
         return entities_id
 
+    @cached_property
+    def managed_programs(self):
+        return set(pgm_manager.offer_year for pgm_manager in self.programmanager_set.all())
+
     class Meta:
         permissions = (
             ("is_administrator", "Is administrator"),
