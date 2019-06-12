@@ -35,7 +35,11 @@
                         <td>-</td>
                     {% endif %}
                     {% trans 'Editable' as title_status_true %}
-                    <td>{% include "blocks/span/span_status.html" with status=error.is_valid title_status_false=error.as_ul %}</td>
+                    {% if error.errors|length > 1 %}
+                        <td>{% include "blocks/span/span_status.html" with status=error.is_valid title_status_false=error.as_ul %}</td>
+                    {% else %}
+                        <td>{% include "blocks/span/span_status.html" with status=error.is_valid title_status_false=error.errors.0 %}</td>
+                    {% endif %}
                 </tr>
                 {% endwith %}
             {% endfor %}
