@@ -40,12 +40,13 @@ from base.models.utils.utils import get_object_or_none
 from base.models.validation_rule import ValidationRule
 
 REGEX_TRAINING_PARTIAL_ACRONYM = r"^(?P<sigle_ele>[A-Z]{3,5})\d{3}[A-Z]$"
+REGEX_COMMON_PARTIAL_ACRONYM = r"^(?P<sigle_ele>common(-\d[a-z]{1,2})?)$"
 REGEX_GROUP_PARTIAL_ACRONYM_INITIAL_VALUE = r"^(?P<cnum>\d{3})(?P<subdivision>[A-Z])$"
 MAX_CNUM = 999
 WIDTH_CNUM = 3
 
 
-def create_initial_group_element_year_structure(parent_egys):
+def create_initial_group_element_year_structure(parent_egys: list):
     children_created = defaultdict(list)
     if not parent_egys:
         return children_created
@@ -102,6 +103,7 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
         parent__academic_year__year__in=[year - 1, year],
         child_branch__education_group_type=child_education_group_type
     )
+
     if not previous_grp_ele:
         child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
     else:
@@ -128,8 +130,8 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
             ),
         }
     )
-
-    return GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)
+    gey, _ = GroupElementYear.objects.get_or_create(parent=parent_egy, child_branch=child_egy)
+    return gey
 
 
 def _duplicate_branch(child_education_group_type, parent_egy, last_child):
@@ -174,10 +176,12 @@ def _generate_child_partial_acronym(parent, child_initial_value, child_type):
         return previous_grp_ele.child_branch.partial_acronym
 
     reg_parent_partial_acronym = re.compile(REGEX_TRAINING_PARTIAL_ACRONYM)
+    reg_common_partial_acronym = re.compile(REGEX_COMMON_PARTIAL_ACRONYM)
     # FIXME : Sometimes parent does not have a partial acronym, it is a dirty situation. We have to clean the DB.
     if not parent.partial_acronym:
         return ""
-    match_result = reg_parent_partial_acronym.search(parent.partial_acronym)
+    match_result = reg_parent_partial_acronym.search(parent.partial_acronym) or \
+        reg_common_partial_acronym.search(parent.partial_acronym)
     sigle_ele = match_result.group("sigle_ele")
 
     reg_child_initial_value = re.compile(REGEX_GROUP_PARTIAL_ACRONYM_INITIAL_VALUE)

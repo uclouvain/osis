@@ -120,7 +120,7 @@ base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3D
 <ul>
 <li>2-4 letters + <b>3DP</b></li>
 </ul>
-Examples: <i>AGRO3DP, ART3DP, ESP3DP</i>","Sigle d’un PhD est composé de:
+Examples: <i>AGRO3DP, ART3DP, ESP3DP</i>","Sigle d’un Doctorat est composé de:
 <ul>
 <li>2-4 lettres + <b>3DP</b></li>
 </ul>
@@ -444,7 +444,7 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>D</b></li>
 </ul>
-Examples: <i>LBAUR300D, MCOMM300D, LAGRO300D</i>","Code d’un PhD est composé de:
+Examples: <i>LBAUR300D, MCOMM300D, LAGRO300D</i>","Code d’un Doctorat est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
