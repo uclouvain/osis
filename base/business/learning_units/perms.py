@@ -120,7 +120,7 @@ def is_external_learning_unit_cograduation(learning_unit_year, person, raise_exc
 def is_eligible_for_modification(learning_unit_year, person, raise_exception=False):
     return \
         check_lu_permission(person, 'base.can_edit_learningunit', raise_exception) and \
-        is_year_editable(learning_unit_year, person, raise_exception) and \
+        is_year_editable(learning_unit_year, raise_exception) and \
         _any_existing_proposal_in_epc(learning_unit_year, person, raise_exception) and \
         _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception) and \
         is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise_exception) and \
