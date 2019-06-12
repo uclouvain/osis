@@ -48,7 +48,6 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
@@ -67,6 +66,7 @@ class TestLearningUnitProposalCancel(TestCase):
         learning_container_year = LearningContainerYearFactory(
             academic_year=current_academic_year,
             container_type=learning_container_year_types.COURSE,
+            requirement_entity=EntityFactory()
         )
         self.learning_unit_year = LearningUnitYearFakerFactory(
             credits=5,
@@ -74,11 +74,6 @@ class TestLearningUnitProposalCancel(TestCase):
             academic_year=current_academic_year,
             learning_container_year=learning_container_year,
             campus=CampusFactory(organization=an_organization, is_administration=True)
-        )
-
-        self.entity_container_year = EntityContainerYearFactory(
-            learning_container_year=self.learning_unit_year.learning_container_year,
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY
         )
 
         today = datetime.date.today()
@@ -120,9 +115,10 @@ class TestLearningUnitProposalCancel(TestCase):
     def test_cancel_proposals_of_type_suppression(self, mock_send_mail, mock_perm):
         proposal = self._create_proposal(prop_type=proposal_type.ProposalType.SUPPRESSION.name,
                                          prop_state=proposal_state.ProposalState.FACULTY.name)
-        proposal.entity = self.entity_container_year.entity
+        entity = self.learning_unit_year.learning_container_year.requirement_entity
+        proposal.entity = entity
         proposal.save()
-        person_entity = PersonEntityFactory(entity=self.entity_container_year.entity)
+        person_entity = PersonEntityFactory(entity=entity)
         lu_proposal_business.cancel_proposals_and_send_report([proposal], person_entity.person, [])
         self.assertCountEqual(list(mdl_base.proposal_learning_unit.ProposalLearningUnit.objects
                                    .filter(learning_unit_year=self.learning_unit_year)), [])
@@ -156,7 +152,7 @@ class TestLearningUnitProposalCancel(TestCase):
                 "id": self.learning_unit_year.learning_unit.id
             },
             "entities": {
-                entity_container_year_link_type.REQUIREMENT_ENTITY: self.entity_container_year.entity.id,
+                entity_container_year_link_type.REQUIREMENT_ENTITY: self.learning_unit_year.learning_container_year.requirement_entity.id,
                 entity_container_year_link_type.ALLOCATION_ENTITY: None,
                 entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
                 entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
@@ -240,9 +236,9 @@ class TestConsolidateProposals(TestCase):
         self.proposals = [ProposalLearningUnitFactory() for _ in range(2)]
         person_entity = PersonEntityFactory(person=self.author)
         for proposal in self.proposals:
-            EntityContainerYearFactory(learning_container_year=proposal.learning_unit_year.learning_container_year,
-                                       entity=person_entity.entity,
-                                       type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+            container_year = proposal.learning_unit_year.learning_container_year
+            container_year.requirement_entity = person_entity.entity
+            container_year.save()
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_consolidate_proposal",
                 side_effect=lambda proposal, person: True)
