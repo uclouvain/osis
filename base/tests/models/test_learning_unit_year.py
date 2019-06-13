@@ -48,7 +48,7 @@ from base.models.learning_unit_year import find_max_credits_of_related_partims, 
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
@@ -257,15 +257,14 @@ class LearningUnitYearTest(TestCase):
 
 class LearningUnitYearGetEntityTest(TestCase):
     def setUp(self):
-        self.learning_unit_year = LearningUnitYearFactory()
-        self.requirement_entity = EntityContainerYearFactory(
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY,
-            learning_container_year=self.learning_unit_year.learning_container_year
+        self.learning_unit_year = LearningUnitYearFactory(
+            learning_container_year__requirement_entity=EntityFactory()
         )
+        self.requirement_entity = self.learning_unit_year.learning_container_year.requirement_entity
 
     def test_get_entity_case_found_entity_type(self):
         result = self.learning_unit_year.get_entity(entity_type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-        self.assertEqual(result, self.requirement_entity.entity)
+        self.assertEqual(result, self.requirement_entity)
 
     def test_get_entity_case_no_learning_container_year(self):
         self.learning_unit_year.learning_container_year = None
