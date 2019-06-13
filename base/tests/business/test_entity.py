@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import timedelta
 
 from django.test import TestCase
 
@@ -101,12 +102,12 @@ class EntityTestCase(TestCase):
             child_entity_version = EntityVersionFactory(
                 parent=entity_parent,
                 acronym='TEST{}'.format(i),
-                start_date=self.current_academic_year.start_date,
-                end_date=self.current_academic_year.end_date
+                start_date=self.current_academic_year.start_date+timedelta(days=i),
+                end_date=self.current_academic_year.start_date+timedelta(days=i)
             )
             entity_parent = child_entity_version.entity
             entities.append(entity_parent.id)
         entities_ids = get_entities_ids('NOTHING', True)
         self.assertListEqual([], entities_ids)
-        entities_ids = get_entities_ids('TEST0', True)
-        self.assertListEqual(sorted(entities), sorted(entities_ids))
+        entities_ids = get_entities_ids('TEST', True)
+        self.assertListEqual(entities, sorted(entities_ids))
