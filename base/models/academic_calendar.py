@@ -116,6 +116,7 @@ class AcademicCalendar(SerializableModel):
         permissions = (
             ("can_access_academic_calendar", "Can access academic calendar"),
         )
+        unique_together = ("academic_year", "title")
 
 
 def find_highlight_academic_calendar():
