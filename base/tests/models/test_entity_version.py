@@ -32,10 +32,8 @@ from django.test import TestCase
 from base.models import entity_version
 from base.business.learning_units.perms import find_last_requirement_entity_version
 from base.models.enums import organization_type
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
