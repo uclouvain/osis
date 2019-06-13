@@ -87,28 +87,17 @@ class EntityContainerYearTest(TestCase):
         self.assertFalse(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2 in entities)
 
     def test_find_entities_grouped_by_linktype(self):
-        a_learning_container_year = LearningContainerYearFactory()
-
         requirement_entity = EntityFactory()
-        EntityContainerYearFactory(learning_container_year=a_learning_container_year,
-                                   entity=requirement_entity,
-                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-
         allocation_entity = EntityFactory()
-        EntityContainerYearFactory(learning_container_year=a_learning_container_year,
-                                   entity=allocation_entity,
-                                   type=entity_container_year_link_type.ALLOCATION_ENTITY)
-
         additional_requirement_entity_1 = EntityFactory()
-        EntityContainerYearFactory(learning_container_year=a_learning_container_year,
-                                   entity=additional_requirement_entity_1,
-                                   type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1)
-
         additional_requirement_entity_2 = EntityFactory()
-        EntityContainerYearFactory(learning_container_year=a_learning_container_year,
-                                   entity=additional_requirement_entity_2,
-                                   type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2)
 
+        a_learning_container_year = LearningContainerYearFactory(
+            requirement_entity=requirement_entity,
+            allocation_entity=allocation_entity,
+            additionnal_entity_1=additional_requirement_entity_1,
+            additionnal_entity_2=additional_requirement_entity_2,
+        )
         entities_by_linktype = a_learning_container_year.get_entity_by_type()
 
         expected_result = {
