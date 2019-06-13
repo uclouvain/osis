@@ -55,7 +55,7 @@
 
         </div>
     </div>
-    {% if is_prerequisite_acronym_list %}
+    {% if is_prerequisites_list %}
         <div class="panel panel-default">
             <div class="panel-body">
                 <p>
@@ -64,7 +64,15 @@
                     </a>
                     {% trans 'is a prereqisite of' %}:
                 </p>
-                {{ is_prerequisite_acronym_list|join:', ' }}
+
+                {% for p in is_prerequisites_list %}
+                    <a href="{% url 'learning_unit' p.learning_unit_year.pk %}">{{ p.learning_unit_year.acronym }}</a>
+                    {% if is_prerequisites_list|length > 1 %}
+                        {% if not forloop.last %}
+                            ,
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
     {% endif %}

@@ -23,17 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from distutils.command.config import config
 from django import template
-from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import PermissionDenied
+from django.utils.translation import ugettext_lazy as _
 
-from base.models.person import find_by_user
-from base.business.learning_units.perms import is_year_editable
 from base.business.learning_units.perms import is_eligible_for_modification, is_eligible_for_modification_end_date, \
-    is_eligible_to_create_modification_proposal, is_eligible_to_edit_proposal, is_eligible_for_cancel_of_proposal, \
+    is_eligible_to_edit_proposal, is_eligible_for_cancel_of_proposal, \
     is_eligible_to_consolidate_proposal, is_eligible_to_delete_learning_unit_year, \
     is_eligible_to_modify_end_year_by_proposal, is_eligible_to_modify_by_proposal
+from base.business.learning_units.perms import is_year_editable
+from base.models.person import find_by_user
 
 register = template.Library()
 
@@ -182,12 +181,11 @@ def li_with_permission_for_proposal(data):
     obj = data['obj']
 
     proposal = context['proposal']
-    person = find_by_user(context.get('user'))
 
     permission_denied_message, disabled = is_valid_proposal(context)
 
     if not disabled:
-        if not is_year_editable(proposal.learning_unit_year, person, raise_exception=False):
+        if not is_year_editable(proposal.learning_unit_year, raise_exception=False):
             disabled = "disabled"
             permission_denied_message = "{}" \
                 .format(_("You can't modify proposition which are related to a learning unit year under"))

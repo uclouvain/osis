@@ -32,6 +32,7 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
+from base.tests.factories.academic_year import create_current_academic_year
 
 
 class TestPrerequisiteItem(TestCase):
@@ -62,7 +63,17 @@ class TestPrerequisiteItem(TestCase):
 
 class TestPrerequisiteString(TestCase):
     def setUp(self):
-        self.prerequisite = PrerequisiteFactory()
+        academic_year = create_current_academic_year()
+        luy_prerequisite = LearningUnitYearFactory(acronym='LDROI1223', academic_year=academic_year)
+        self.prerequisite = PrerequisiteFactory(learning_unit_year=luy_prerequisite)
+
+        self.luy_prerequisite_item_1_1 = LearningUnitYearFactory(acronym='LDROI1001', academic_year=academic_year)
+        self.luy_prerequisite_item_1_2 = LearningUnitYearFactory(acronym='LDROI1002', academic_year=academic_year)
+        self.luy_prerequisite_item_1_3 = LearningUnitYearFactory(acronym='LDROI1003', academic_year=academic_year)
+
+        self.luy_prerequisite_item_2_1 = LearningUnitYearFactory(acronym='LDROI2001', academic_year=academic_year)
+        self.luy_prerequisite_item_2_2 = LearningUnitYearFactory(acronym='LDROI2002', academic_year=academic_year)
+        self.luy_prerequisite_item_2_3 = LearningUnitYearFactory(acronym='LDROI2003', academic_year=academic_year)
 
     def test_get_prerequisite_string_representation_no_item(self):
         self.assertEqual(
@@ -71,50 +82,97 @@ class TestPrerequisiteString(TestCase):
         )
 
     def test_get_prerequisite_string_representation_2_groupq_2_items(self):
-        self.prerequisite_items_group_1 = _build_group_of_prerequisite_items(
+
+        PrerequisiteItemFactory(
             prerequisite=self.prerequisite,
-            group=1,
-            positions=1
+            learning_unit=self.luy_prerequisite_item_1_1.learning_unit,
+            group_number=1,
+            position=1
         )
-        self.prerequisite_items_group_2 = _build_group_of_prerequisite_items(
+
+        PrerequisiteItemFactory(
             prerequisite=self.prerequisite,
-            group=2,
-            positions=1
+            learning_unit=self.luy_prerequisite_item_2_1.learning_unit,
+            group_number=2,
+            position=1
+        )
+        expected = "{} {} {}".format(
+            "<a href='/learning_units/{}/'>{}</a>".format(self.luy_prerequisite_item_1_1.id,
+                                                          self.luy_prerequisite_item_1_1.acronym),
+            _('AND'),
+            "<a href='/learning_units/{}/'>{}</a>".format(self.luy_prerequisite_item_2_1.id,
+                                                          self.luy_prerequisite_item_2_1.acronym)
+
         )
 
         self.assertEqual(
             self.prerequisite.prerequisite_string,
-            "LDROI1111 {AND} LDROI1121".format(AND=_('AND'))
+            expected
         )
 
     def test_get_prerequisite_string_representation_two_groups(self):
-        self.prerequisite_items_group_1 = _build_group_of_prerequisite_items(
+        PrerequisiteItemFactory(
             prerequisite=self.prerequisite,
-            group=1,
-            positions=3
+            learning_unit=self.luy_prerequisite_item_1_1.learning_unit,
+            group_number=1,
+            position=1
         )
-        self.prerequisite_items_group_2 = _build_group_of_prerequisite_items(
+        PrerequisiteItemFactory(
             prerequisite=self.prerequisite,
-            group=2,
-            positions=3
+            learning_unit=self.luy_prerequisite_item_1_2.learning_unit,
+            group_number=1,
+            position=2
         )
+        PrerequisiteItemFactory(
+            prerequisite=self.prerequisite,
+            learning_unit=self.luy_prerequisite_item_1_3.learning_unit,
+            group_number=1,
+            position=3
+        )
+
+        PrerequisiteItemFactory(
+            prerequisite=self.prerequisite,
+            learning_unit=self.luy_prerequisite_item_2_1.learning_unit,
+            group_number=2,
+            position=1
+        )
+        PrerequisiteItemFactory(
+            prerequisite=self.prerequisite,
+            learning_unit=self.luy_prerequisite_item_2_2.learning_unit,
+            group_number=2,
+            position=2
+        )
+        PrerequisiteItemFactory(
+            prerequisite=self.prerequisite,
+            learning_unit=self.luy_prerequisite_item_2_3.learning_unit,
+            group_number=2,
+            position=3
+        )
+
+        expected = \
+            "(<a href='/learning_units/{}/'>{}</a> {} <a href='/learning_units/{}/'>{}</a> {} " \
+            "<a href='/learning_units/{}/'>{}</a>) {} (<a href='/learning_units/{}/'>{}</a> {} " \
+            "<a href='/learning_units/{}/'>{}</a> {} <a href='/learning_units/{}/'>{}</a>)".format(
+                self.luy_prerequisite_item_1_1.id,
+                self.luy_prerequisite_item_1_1.acronym,
+                _('OR'),
+                self.luy_prerequisite_item_1_2.id,
+                self.luy_prerequisite_item_1_2.acronym,
+                _('OR'),
+                self.luy_prerequisite_item_1_3.id,
+                self.luy_prerequisite_item_1_3.acronym,
+                _('AND'),
+                self.luy_prerequisite_item_2_1.id,
+                self.luy_prerequisite_item_2_1.acronym,
+                _('OR'),
+                self.luy_prerequisite_item_2_2.id,
+                self.luy_prerequisite_item_2_2.acronym,
+                _('OR'),
+                self.luy_prerequisite_item_2_3.id,
+                self.luy_prerequisite_item_2_3.acronym
+            )
 
         self.assertEqual(
             self.prerequisite.prerequisite_string,
-            "(LDROI1111 {OR} LDROI1112 {OR} LDROI1113) {AND} (LDROI1121 {OR} LDROI1122 {OR} LDROI1123)".format(
-                OR=_('OR'),
-                AND=_('AND')
-            )
+            expected
         )
-
-
-def _build_group_of_prerequisite_items(prerequisite, group, positions):
-    return [
-        PrerequisiteItemFactory(
-            prerequisite=prerequisite,
-            learning_unit=LearningUnitYearFactory(acronym='LDROI11{}{}'.format(group, i)).learning_unit,
-            group_number=group,
-            position=i
-        )
-        for i in range(1, 1 + positions)
-    ]

@@ -72,8 +72,8 @@
             </li>
         {% endif %}
         <li role="presentation" {% if request.path == url_formations %} class="active" {% endif %}>
-            <a id="training_link" href="{{ url_formations }}" role="tab">
-                {% trans 'Trainings' %}
+            <a id="training_link"  href="{{ url_formations }}" role="tab">
+                {% trans 'Utilizations' %}
             </a>
         </li>
         <li role="presentation" {% if request.path == url_attributions or request.path == url_select_attributions %}

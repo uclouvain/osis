@@ -38,7 +38,9 @@ def get_entities_ids(entity_acronym, with_entity_subordinated):
         entity_versions = EntityVersion.objects.filter(acronym__iregex=entity_acronym)
         entities_ids = set(entity_versions.values_list('entity', flat=True))
 
-        if with_entity_subordinated:
+        if with_entity_subordinated and entity_versions:
+            # it is not possible to have the list of descendants
+            # when the entity_version is empty
             list_descendants = EntityVersion.objects.get_tree(
                 Entity.objects.filter(entityversion__acronym__iregex=entity_acronym)
             )
