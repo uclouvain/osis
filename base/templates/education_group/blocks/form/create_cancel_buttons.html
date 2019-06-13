@@ -22,9 +22,12 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-
-{% if parent and education_group_year %}
+{% if education_group_year.root %}
+    {% url 'education_group_read' education_group_year.root education_group_year.id as cancel_url %}
+{% elif parent and education_group_year %}
     {% url 'education_group_read' parent.id education_group_year.id as cancel_url %}
+{% elif root_pk and parent %}
+    {% url 'education_group_read' root_pk parent.pk as cancel_url %}
 {% elif parent %}
     {% url 'education_group_read' parent.id parent.id as cancel_url %}
 {% elif education_group_year %}
