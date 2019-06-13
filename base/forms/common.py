@@ -124,7 +124,8 @@ class ValidationRuleMixin(WarningFormMixin):
                 if rule.placeholder:
                     field.widget.attrs["placeholder"] = rule.placeholder
                 else:
-                    field.initial = rule.initial_value
+                    field.initial = rule.initial_value if rule.initial_value not in ['False', 'True'] else eval(
+                        rule.initial_value)
 
                 field.validators.append(
                     RegexValidator(rule.regex_rule, rule.regex_error_message or None)
