@@ -230,7 +230,8 @@ class LearningContainerYearModelForm(forms.ModelForm):
             },
             forward=['country_requirement_entity']
         ),
-        queryset=find_additional_requirement_entities_choices()
+        queryset=find_additional_requirement_entities_choices(),
+        label=_('Requirement entity')
     )
 
     country_requirement_entity = CountryEntityField()
@@ -244,7 +245,8 @@ class LearningContainerYearModelForm(forms.ModelForm):
             },
             forward=['country_allocation_entity']
         ),
-        queryset=find_pedagogical_entities_version()
+        queryset=find_pedagogical_entities_version(),
+        label=_('Allocation entity')
     )
 
     country_allocation_entity = CountryEntityField()
@@ -263,7 +265,8 @@ class LearningContainerYearModelForm(forms.ModelForm):
             },
             forward=['country_additionnal_entity_1']
         ),
-        queryset=find_additional_requirement_entities_choices()
+        queryset=find_additional_requirement_entities_choices(),
+        label=_('Additional requirement entity 1')
     )
 
     country_additionnal_entity_1 = CountryEntityField(
@@ -284,7 +287,8 @@ class LearningContainerYearModelForm(forms.ModelForm):
             },
             forward=['country_additionnal_entity_2']
         ),
-        queryset=find_additional_requirement_entities_choices()
+        queryset=find_additional_requirement_entities_choices(),
+        label=_('Additional requirement entity 2')
     )
 
     country_additionnal_entity_2 = CountryEntityField(
