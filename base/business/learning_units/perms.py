@@ -468,7 +468,6 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
     """
     if not person.user.has_perm('base.can_edit_learningunit_pedagogy'):
         return False
-
     if is_year_editable(learning_unit_year, raise_exception=False):
         # Case faculty/central: We need to check if user is linked to entity
         if person.is_faculty_manager or person.is_central_manager:
