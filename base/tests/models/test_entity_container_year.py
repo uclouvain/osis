@@ -27,13 +27,11 @@ from django.test import TestCase
 import datetime
 
 import base.models.learning_container_year
-from base.models import entity_container_year
 from base.models.enums import entity_container_year_link_type
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 
 
 class EntityContainerYearTest(TestCase):

@@ -511,18 +511,16 @@ def find_educational_information_submission_dates_of_learning_unit_year(learning
 
 def find_last_requirement_entity_version(learning_unit_year_id):
     now = datetime.datetime.now(get_tzinfo())
+    # TODO :: merge code below to get only 1 hit on database
+    requirement_entity_id = LearningUnitYear.objects.filter(
+        pk=learning_unit_year_id
+    ).select_related(
+        'learning_container_year'
+    ).only(
+        'learning_container_year'
+    ).get().learning_container_year.requirement_entity_id
     try:
-        return LearningUnitYear.objects.filter(pk=learning_unit_year_id).annotate(
-            last_requirement_entity_version=Subquery(
-                EntityVersion.objects.current(now).filter(
-                    entity=OuterRef('learning_container_year__requirement_entity')
-                ).latest('start_date')
-            ),
-        )
-        # return EntityVersion.objects.current(now). \
-        #     filter(entity__learningcontaineryear__learningunityear__id=learning_unit_year_id,
-        #            entity__entitycontaineryear__type=entity_type). \
-        #     latest('start_date')
+        return EntityVersion.objects.current(now).filter(entity=requirement_entity_id).get()
     except EntityVersion.DoesNotExist:
         return None
 

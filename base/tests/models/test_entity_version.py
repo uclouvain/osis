@@ -505,10 +505,9 @@ class TestFindLastEntityVersionByLearningUnitYearId(TestCase):
 
     def test_find_last_entity_version_by_learning_unit_year_id(self):
         an_entity_version = EntityVersionFactory()
-        learning_unit_year = LearningUnitYearFactory()
-        EntityContainerYearFactory(entity=an_entity_version.entity,
-                                   learning_container_year=learning_unit_year.learning_container_year,
-                                   type=REQUIREMENT_ENTITY)
+        learning_unit_year = LearningUnitYearFactory(
+            learning_container_year__requirement_entity=an_entity_version.entity
+        )
 
         actual_entity_version = find_last_requirement_entity_version(
             learning_unit_year_id=learning_unit_year.id,
