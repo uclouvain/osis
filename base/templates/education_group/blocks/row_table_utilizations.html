@@ -30,7 +30,10 @@
             <img src="{% static 'img/reference.jpg' %}" >
         {% endif %}
     </td>
-    <td>{{ group_element_year.parent.partial_acronym | default_if_none:'' }}</td>
+    <td>
+        {% url 'education_group_read' group_element_year.parent.id group_element_year.parent.id as url_education_group_yr %}
+        <a href="{{ url_education_group_yr }}">{{ group_element_year.parent.partial_acronym | default_if_none:'' }}</a>
+    </td>
     <td>{{ group_element_year.parent.acronym | default_if_none:'' }}</td>
     <td>{{ group_element_year.parent.title | default_if_none:'' }}</td>
     <td>

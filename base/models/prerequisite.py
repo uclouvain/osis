@@ -31,7 +31,7 @@ from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from base.models import learning_unit
+from base.models import learning_unit, learning_unit_year
 from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -119,7 +119,7 @@ class Prerequisite(models.Model):
             predicate = predicate_format.format(
                 join_secondary_operator.join(
                     map(
-                        lambda rec: rec.learning_unit.acronym,
+                        lambda rec: _get_acronym_as_href(rec, self.learning_unit_year.academic_year),
                         list_records
                     )
                 )
@@ -128,3 +128,14 @@ class Prerequisite(models.Model):
 
         join_main_operator = " {} ".format(_(main_operator))
         return join_main_operator.join(prerequisites_fragments)
+
+
+def _get_acronym_as_href(prerequisite_item, academic_yr):
+    luy = learning_unit_year.search(
+        academic_year_id=academic_yr.id,
+        learning_unit=prerequisite_item.learning_unit,
+    ).first()
+
+    if luy:
+        return "<a href='/learning_units/{}/'>{}</a>".format(luy.id, prerequisite_item.learning_unit.acronym)
+    return ''

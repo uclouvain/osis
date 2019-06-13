@@ -40,7 +40,7 @@
                             <table class="table">
                                 <thead>
                                 <tr>
-                                <th>{% trans 'code' %}</th>
+                                <th>{% trans 'Code' %}</th>
                                 <th>{% trans 'Title' %}</th>
                                 <th>{% trans "Training type" %}</th>
                                 <th>{% trans 'Block' %}</th>
@@ -63,7 +63,8 @@
                                         <td>
                                             <ul>
                                                 {% for training in  formations_by_educ_group_year|get_item:group_element_year.parent_id %}
-                                                    <li>{{ training.acronym }} - {{ training.title }}</li>
+                                                    {% url 'education_group_read' training.id training.id as url_education_group_yr %}
+                                                    <li><a href="{{ url_education_group_yr }}">{{ training.acronym }} - {{ training.title }}</a></li>
                                                 {% endfor %}
                                             </ul>
                                         </td>

@@ -90,7 +90,7 @@
                     {% for learning_unit in page_obj %}
                         <tr data-id="{{ learning_unit.id }}" data-value="{{ learning_unit.acronym }}">
                             <td>{{ learning_unit.academic_year.name }}</td>
-                            <td>
+                            <td  class="col-acronym">
                                 <a href="{% url 'learning_unit' learning_unit.id %}"
                                    id="lnk_learning_unit_{{ learning_unit.id }}">{{ learning_unit.acronym }}</a>
                             </td>

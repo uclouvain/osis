@@ -46,7 +46,9 @@
                                     {# FIXME Use dl_tooltip for all label/span #}
                                     <label {{ differences|get_difference_css:'acronym' }}>{% trans 'Code' %}</label><br>
                                     {% if learning_unit_year.parent %}
-                                        <a href="{% url 'learning_unit' learning_unit_year.parent.id %}" {{ differences|get_difference_css:'acronym' }}>{{ learning_unit_year.learning_container_year.acronym }}</a>
+                                        <a id="full_acronym"
+                                           href="{% url 'learning_unit' learning_unit_year.parent.id %}" {{ differences|get_difference_css:'acronym' }}>
+                                            {{ learning_unit_year.learning_container_year.acronym }}</a>
                                         {{ learning_unit_year.subdivision }}
                                     {% else %}
                                         <span {{ differences|get_difference_css:'acronym' }}
@@ -55,7 +57,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label>{% trans 'Partims' %}</label><br>
-                                    <div>
+                                    <div id="list_partims">
                                         {% for partim in learning_container_year_partims %}
                                             {% if forloop.counter > 1 %}
                                                 ,
@@ -202,7 +204,7 @@
                 {% if object.is_external %}
                     <div class="panel panel-default">
                         <div class="panel-body">
-                            {% with organization=learning_unit_year.campus.organization campus=learning_unit_year.campus  %}
+                            {% with organization=learning_unit_year.campus.organization campus=learning_unit_year.campus %}
                                 {% url 'organization_read' organization_id=organization.id as url_organization %}
                                 {% dl_tooltip organization 'country' label_text=_('Country') %}
                                 {% dl_tooltip campus 'campus' label_text=_('City of institution') value=campus.name %}

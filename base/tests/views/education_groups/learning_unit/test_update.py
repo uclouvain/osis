@@ -99,7 +99,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         )
 
     def test_post_data_simple_prerequisite(self):
-        LearningUnitYearFactory(acronym='LSINF1111')
+        luy_1 = LearningUnitYearFactory(acronym='LSINF1111', academic_year=self.academic_year)
 
         form_data = {
             "prerequisite_string": "LSINF1111"
@@ -120,13 +120,13 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertTrue(prerequisite)
         self.assertEqual(
             prerequisite.prerequisite_string,
-            'LSINF1111'
+            "<a href='/learning_units/{}/'>LSINF1111</a>".format(luy_1.id)
         )
 
     def test_post_data_complex_prerequisite_AND(self):
-        LearningUnitYearFactory(acronym='LSINF1111')
-        LearningUnitYearFactory(acronym='LDROI1200')
-        LearningUnitYearFactory(acronym='LEDPH1200')
+        luy_1 = LearningUnitYearFactory(acronym='LSINF1111', academic_year=self.academic_year)
+        luy_2 = LearningUnitYearFactory(acronym='LDROI1200', academic_year=self.academic_year)
+        luy_3 = LearningUnitYearFactory(acronym='LEDPH1200', academic_year=self.academic_year)
 
         form_data = {
             "prerequisite_string": "LSINF1111 ET (LDROI1200 OU LEDPH1200)"
@@ -141,13 +141,17 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertTrue(prerequisite)
         self.assertEqual(
             prerequisite.prerequisite_string,
-            'LSINF1111 ET (LDROI1200 OU LEDPH1200)'
+            "{} ET ({} OU {})".format(
+                "<a href='/learning_units/{}/'>LSINF1111</a>".format(luy_1.id),
+                "<a href='/learning_units/{}/'>LDROI1200</a>".format(luy_2.id),
+                "<a href='/learning_units/{}/'>LEDPH1200</a>".format(luy_3.id)
+            )
         )
 
     def test_post_data_complex_prerequisite_OR(self):
-        LearningUnitYearFactory(acronym='LSINF1111')
-        LearningUnitYearFactory(acronym='LDROI1200')
-        LearningUnitYearFactory(acronym='LEDPH1200')
+        luy_1 = LearningUnitYearFactory(acronym='LSINF1111', academic_year=self.academic_year)
+        luy_2 = LearningUnitYearFactory(acronym='LDROI1200', academic_year=self.academic_year)
+        luy_3 = LearningUnitYearFactory(acronym='LEDPH1200', academic_year=self.academic_year)
 
         form_data = {
             "prerequisite_string": "(LSINF1111 ET LDROI1200) OU LEDPH1200"
@@ -162,12 +166,16 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertTrue(prerequisite)
         self.assertEqual(
             prerequisite.prerequisite_string,
-            '(LSINF1111 ET LDROI1200) OU LEDPH1200'
+            "({} ET {}) OU {}".format(
+                "<a href='/learning_units/{}/'>LSINF1111</a>".format(luy_1.id),
+                "<a href='/learning_units/{}/'>LDROI1200</a>".format(luy_2.id),
+                "<a href='/learning_units/{}/'>LEDPH1200</a>".format(luy_3.id),
+            )
         )
 
     def test_post_data_with_prerequisite_in_lower_case(self):
-        LearningUnitYearFactory(acronym='LSINF1111')
-        LearningUnitYearFactory(acronym='LDROI1200')
+        luy_1 = LearningUnitYearFactory(acronym='LSINF1111', academic_year=self.academic_year)
+        luy_2 = LearningUnitYearFactory(acronym='LDROI1200', academic_year=self.academic_year)
 
         form_data = {
             "prerequisite_string": "lsinf1111 et ldroi1200"
@@ -181,12 +189,15 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertTrue(prerequisite)
         self.assertEqual(
             prerequisite.prerequisite_string,
-            'LSINF1111 ET LDROI1200'
+            "<a href='/learning_units/{}/'>LSINF1111</a> ET <a href='/learning_units/{}/'>LDROI1200</a>".format(
+                luy_1.id,
+                luy_2.id,
+            )
         )
 
     def test_post_data_prerequisite_accept_duplicates(self):
-        LearningUnitYearFactory(acronym='LDROI1200')
-        LearningUnitYearFactory(acronym='LEDPH1200')
+        luy_1 = LearningUnitYearFactory(acronym='LDROI1200', academic_year=self.academic_year)
+        luy_2 = LearningUnitYearFactory(acronym='LEDPH1200', academic_year=self.academic_year)
 
         form_data = {
             "prerequisite_string": "(LDROI1200 ET LEDPH1200) OU LDROI1200"
@@ -201,7 +212,11 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertTrue(prerequisite)
         self.assertEqual(
             prerequisite.prerequisite_string,
-            '(LDROI1200 ET LEDPH1200) OU LDROI1200'
+            "({} ET {}) OU {}".format(
+                "<a href='/learning_units/{}/'>LDROI1200</a>".format(luy_1.id),
+                "<a href='/learning_units/{}/'>LEDPH1200</a>".format(luy_2.id),
+                "<a href='/learning_units/{}/'>LDROI1200</a>".format(luy_1.id),
+            )
         )
 
     def test_post_data_prerequisite_learning_units_not_found(self):
@@ -246,8 +261,8 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         )
 
     def test_post_data_modify_existing_prerequisite(self):
-        LearningUnitYearFactory(acronym='LSINF1111')
-        LearningUnitYearFactory(acronym='LSINF1112')
+        LearningUnitYearFactory(acronym='LSINF1111', academic_year=self.academic_year)
+        luy_2 = LearningUnitYearFactory(acronym='LSINF1112', academic_year=self.academic_year)
 
         form_data = {
             "prerequisite_string": "LSINF1111"
@@ -267,5 +282,5 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertTrue(prerequisite)
         self.assertEqual(
             prerequisite.prerequisite_string,
-            'LSINF1112'
+            "<a href='/learning_units/{}/'>LSINF1112</a>".format(luy_2.id)
         )
