@@ -5,6 +5,7 @@ omit =
     */migrations/*
     venv/*
     */tests/*
+    features/*
 
 [report]
 fail_under = 100

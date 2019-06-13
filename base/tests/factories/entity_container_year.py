@@ -36,10 +36,11 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 class EntityContainerYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.EntityContainerYear"
+        django_get_or_create = ('learning_container_year', 'entity', 'type')
 
     external_id = factory.Sequence(lambda n: '10000000%02d' % n)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
+                                               datetime.datetime(2017, 3, 1))
     entity = factory.SubFactory(EntityFactory)
     learning_container_year = factory.SubFactory(LearningContainerYearFactory)
     type = factory.Iterator(EntityContainerYearLinkTypes.choices(), getter=operator.itemgetter(0))
