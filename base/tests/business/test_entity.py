@@ -108,6 +108,6 @@ class EntityTestCase(TestCase):
             entity_parent = child_entity_version.entity
             entities.append(entity_parent.id)
         entities_ids = get_entities_ids('NOTHING', True)
-        self.assertListEqual([], entities_ids)
+        self.assertEqual([], entities_ids)
         entities_ids = get_entities_ids('TEST', True)
-        self.assertListEqual(entities, sorted(entities_ids))
+        self.assertEqual(entities, sorted(entities_ids))
