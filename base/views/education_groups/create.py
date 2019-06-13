@@ -76,6 +76,7 @@ class SelectEducationGroupTypeView(FlagMixin, AjaxTemplateMixin, FormView):
         kwargs["parent"] = get_object_or_404(
             EducationGroupYear, pk=self.kwargs["parent_id"]
         ) if self.kwargs.get("parent_id") else None
+
         return kwargs
 
     def form_valid(self, form):
@@ -117,6 +118,7 @@ def create_education_group(request, category, education_group_type_pk, root_id=N
         "form_education_group_year": form_education_group_year.forms[forms.ModelForm],
         "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
         "parent": parent,
+        'root_pk': root_id,
     }
 
     if category == education_group_categories.TRAINING:
