@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext
 
@@ -33,8 +34,10 @@ from base.business.group_element_years.postponement import PostponeContent, NotP
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year
 from base.models.education_group_type import find_authorized_types
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
+from base.models.person import Person
 
 ERRORS_MSG = {
     "base.add_educationgroup": "The user has not permission to create education groups.",
@@ -77,7 +80,7 @@ def is_eligible_to_change_education_group(person, education_group, raise_excepti
 def _is_year_editable(education_group, raise_exception):
     error_msg = None
     if education_group.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION:
-        error_msg = _("You cannot change a education group before %(limit_year)s") % {
+        errpartimor_msg = _("You cannot change a education group before %(limit_year)s") % {
                 "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}
 
     result = error_msg is None
@@ -122,6 +125,10 @@ def is_eligible_to_delete_achievement(person, education_group, raise_exception=F
 def is_eligible_to_delete_education_group(person, education_group, raise_exception=False):
     return check_permission(person, "base.delete_educationgroup", raise_exception) and \
            _is_eligible_education_group(person, education_group, raise_exception)
+
+
+def is_eligible_to_delete_education_group_year(person, education_group_yr, raise_exception=False):
+    return can_delete_all_education_group(person.user, education_group_yr.education_group)
 
 
 def is_education_group_edit_period_opened(education_group, raise_exception=False):
@@ -329,3 +336,12 @@ class AdmissionConditionPerms(CommonEducationGroupStrategyPerms):
 
     def _is_sic_eligible(self):
         return True
+
+
+def can_delete_all_education_group(user, education_group):
+    pers = get_object_or_404(Person, user=user)
+    education_group_years = EducationGroupYear.objects.filter(education_group=education_group)
+    for education_group_yr in education_group_years:
+        if not is_eligible_to_delete_education_group(pers, education_group_yr, raise_exception=True):
+            raise PermissionDenied
+    return True

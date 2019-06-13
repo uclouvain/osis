@@ -57,6 +57,15 @@ function updateAdditionalEntityEditability(elem, id, disable_only){
     }
 }
 
+function clearAdditionalEntity(id){
+    if (id === 'id_additional_requirement_entity_1') {
+            $('#select2-id_additional_requirement_entity_1-container').empty();
+    }
+    if (id === 'id_additional_requirement_entity_2') {
+            $('#select2-id_additional_requirement_entity_2-container').empty();
+    }
+}
+
 function validate_acronym() {
     cleanErrorMessage();
     let newAcronym = getCompleteAcronym();

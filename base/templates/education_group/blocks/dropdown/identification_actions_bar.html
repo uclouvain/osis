@@ -50,7 +50,7 @@
                 {% endflag %}
 
                 {% flag "education_group_select" %}
-                    <li {% if not can_change_education_group %} class="disabled" {% endif %}>
+                    <li id='select_li' {% if not can_change_education_group %} class="disabled" {% endif %}>
                         <a {% if can_change_education_group %} href="#" onclick="select_education_group()" {% endif %}>
                             {% trans 'Select' %}
                         </a>

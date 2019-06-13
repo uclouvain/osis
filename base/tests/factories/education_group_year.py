@@ -38,6 +38,7 @@ from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.entity import EntityFactory
+from reference.tests.factories.language import LanguageFactory
 
 
 def generate_title(education_group_year):
@@ -72,7 +73,9 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     duration = factory.fuzzy.FuzzyInteger(1, 5)
     constraint_type = CREDITS
     linked_with_epc = False
-
+    primary_language = factory.SubFactory(LanguageFactory)
+    enrollment_campus = factory.SubFactory(CampusFactory)
+    diploma_printing_title = "Yolo"
 
 class MiniTrainingFactory(EducationGroupYearFactory):
     education_group_type__minitraining = True
