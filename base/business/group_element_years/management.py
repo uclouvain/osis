@@ -36,7 +36,6 @@ from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
 
-
 LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
 
@@ -113,13 +112,13 @@ def can_link_be_detached(root, link):
 def check_authorized_relationship(root, link, to_delete=False):
     min_reached, max_reached, not_authorized = _check_authorized_relationship(root, link, to_delete=to_delete)
 
-    if min_reached:
+    if link.child_branch.education_group_type.name in min_reached:
         raise AuthorizedRelationshipNotRespectedException(
             errors=_("The parent must have at least one child of type(s) \"%(types)s\".") % {
                 "types": ', '.join(str(AllTypes.get_value(name)) for name in min_reached)
             }
         )
-    elif max_reached:
+    elif link.child_branch.education_group_type.name in max_reached:
         raise AuthorizedRelationshipNotRespectedException(
             errors=_("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
                      "has already reached the limit.") % {
@@ -127,7 +126,7 @@ def check_authorized_relationship(root, link, to_delete=False):
                        'parent': root
                    }
         )
-    elif not_authorized:
+    elif link.child_branch.education_group_type.name in not_authorized:
         raise AuthorizedRelationshipNotRespectedException(
                 errors=_("You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
                     'child_types': ', '.join(str(AllTypes.get_value(name)) for name in not_authorized),
