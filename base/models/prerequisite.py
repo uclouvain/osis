@@ -125,7 +125,9 @@ class Prerequisite(models.Model):
             predicate = predicate_format.format(
                 join_secondary_operator.join(
                     map(
-                        lambda rec: _get_acronym_as_href(rec, self.learning_unit_year.academic_year) if as_href else rec.learning_unit.acronym,
+                        lambda rec: _get_acronym_as_href(rec,
+                                                         self.learning_unit_year.academic_year)
+                        if as_href else rec.learning_unit.acronym,
                         list_records
                     )
                 )
