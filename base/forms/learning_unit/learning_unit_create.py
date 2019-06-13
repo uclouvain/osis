@@ -38,10 +38,12 @@ from base.forms.utils.choice_field import add_blank, add_all
 from base.models.campus import find_main_campuses
 from base.models.entity_version import find_pedagogical_entities_version, get_last_version
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, EXTERNAL
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_WITHOUT_EXTERNAL, INTERNSHIP
 from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit, REGEX_BY_SUBTYPE
@@ -322,7 +324,20 @@ class LearningContainerYearModelForm(forms.ModelForm):
         self.instance.learning_container = kwargs.pop('learning_container')
         self.instance.acronym = kwargs.pop('acronym')
         self.instance.academic_year = kwargs.pop('academic_year')
+        self._reset_repartition_volumes_if_entity_removed()
         return super().save(**kwargs)
+
+    def _reset_repartition_volumes_if_entity_removed(self):
+        """In case an Entity was removed from container, need to reset repartition volume of this entity to None."""
+        for entity_link_type in REQUIREMENT_ENTITIES:
+            entity_container_attr = self.instance.get_attrs_by_entity_container_type()[entity_link_type]
+            entity = getattr(self.instance, entity_container_attr, None)
+            if entity_container_attr in self.changed_data and not entity:
+                repartition_attr_by_type = LearningComponentYear.repartition_volume_attrs_by_entity_container_type()
+                attr_name = repartition_attr_by_type[entity_link_type]
+                qs = LearningComponentYear.objects.filter(
+                    learning_unit_year__learning_container_year=self.instance)
+                qs.update(**{attr_name: None})
 
     class Meta:
         model = LearningContainerYear
