@@ -42,6 +42,7 @@ from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.campus import CampusFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container import LearningContainerFactory
@@ -113,9 +114,15 @@ class TestLearningUnitYearModelFormSave(TestCase):
 
         self.learning_container = LearningContainerFactory()
         self.learning_unit = LearningUnitFactory(learning_container=self.learning_container)
-        self.learning_container_year = LearningContainerYearFactory(learning_container=self.learning_container,
-                                                                    academic_year=self.current_academic_year,
-                                                                    container_type=learning_container_year_types.COURSE)
+        self.learning_container_year = LearningContainerYearFactory(
+            learning_container=self.learning_container,
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            requirement_entity=EntityFactory(),
+            allocation_entity=EntityFactory(),
+            additionnal_entity_1=EntityFactory(),
+            additionnal_entity_2=EntityFactory(),
+        )
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=FULL)
         campus = CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN))
         self.language = LanguageFactory(code='FR')
@@ -148,31 +155,25 @@ class TestLearningUnitYearModelFormSave(TestCase):
             'form-1-hourly_volume_partial_q2': 10,
         }
 
-        self.requirement_entity = EntityContainerYearFactory(type=REQUIREMENT_ENTITY,
-                                                             learning_container_year=self.learning_container_year)
-        self.allocation_entity = EntityContainerYearFactory(type=ALLOCATION_ENTITY,
-                                                            learning_container_year=self.learning_container_year)
-        self.additional_requirement_entity_1 = EntityContainerYearFactory(
-            type=ADDITIONAL_REQUIREMENT_ENTITY_1,
-            learning_container_year=self.learning_container_year)
-        self.additional_requirement_entity_2 = EntityContainerYearFactory(
-            type=ADDITIONAL_REQUIREMENT_ENTITY_2,
-            learning_container_year=self.learning_container_year)
+        self.requirement_entity = self.learning_container_year.requirement_entity
+        self.allocation_entity = self.learning_container_year.allocation_entity
+        self.additional_requirement_entity_1 = self.learning_container_year.additionnal_entity_1
+        self.additional_requirement_entity_2 = self.learning_container_year.additionnal_entity_2
 
-        EntityVersionFactory(entity=self.additional_requirement_entity_1.entity,
+        EntityVersionFactory(entity=self.additional_requirement_entity_1,
                              start_date=self.learning_container_year.academic_year.start_date,
                              end_date=self.learning_container_year.academic_year.end_date)
 
-        EntityVersionFactory(entity=self.additional_requirement_entity_2.entity,
+        EntityVersionFactory(entity=self.additional_requirement_entity_2,
                              start_date=self.learning_container_year.academic_year.start_date,
                              end_date=self.learning_container_year.academic_year.end_date)
 
         self.allocation_entity_version = EntityVersionFactory(
-            entity=self.allocation_entity.entity, start_date=self.learning_container_year.academic_year.start_date,
+            entity=self.allocation_entity, start_date=self.learning_container_year.academic_year.start_date,
             end_date=self.learning_container_year.academic_year.end_date)
 
         self.requirement_entity_version = EntityVersionFactory(
-            entity=self.requirement_entity.entity, start_date=self.learning_container_year.academic_year.start_date,
+            entity=self.requirement_entity, start_date=self.learning_container_year.academic_year.start_date,
             end_date=self.learning_container_year.academic_year.end_date)
 
         self.entity_container_years = [self.requirement_entity, self.allocation_entity,
@@ -266,7 +267,7 @@ class TestLearningUnitYearModelFormSave(TestCase):
         self.assertEqual(form.instance.warnings,
                          [_("The linked %(entity)s does not exist at the start date of the academic year linked to this"
                             " learning unit")
-                          % {'entity': EntityContainerYearLinkTypes.REQUIREMENT_ENTITY.value.lower()}])
+                          % {'entity': EntityContainerYearLinkTypes.get_value(REQUIREMENT_ENTITY)}])
 
     def test_multiple_warnings_entity_container_year(self):
         learning_unit_year_to_update = LearningUnitYearFactory(
@@ -289,11 +290,11 @@ class TestLearningUnitYearModelFormSave(TestCase):
         self.assertEqual(len(form.instance.warnings), 2)
         self.assertTrue(
             _("The linked %(entity)s does not exist at the start date of the academic year linked to this"
-              " learning unit") % {'entity': EntityContainerYearLinkTypes.REQUIREMENT_ENTITY.value.lower()}
+              " learning unit") % {'entity': EntityContainerYearLinkTypes.get_value(REQUIREMENT_ENTITY)}
             in form.instance.warnings
         )
         self.assertTrue(
             _("The linked %(entity)s does not exist at the start date of the academic year linked to this"
-              " learning unit") % {'entity': EntityContainerYearLinkTypes.ALLOCATION_ENTITY.value.lower()}
+              " learning unit") % {'entity': EntityContainerYearLinkTypes.get_value(ALLOCATION_ENTITY)}
             in form.instance.warnings
         )

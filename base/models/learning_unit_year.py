@@ -364,7 +364,6 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
             self._warnings.extend(self._check_partim_parent_periodicity())
             self._warnings.extend(self._check_learning_component_year_warnings())
             self._warnings.extend(self._check_learning_container_year_warnings())
-            self._warnings.extend(self._check_entity_container_year_warnings())
         return self._warnings
 
     # TODO: Currently, we should warning user that the credits is not an integer
