@@ -72,31 +72,6 @@ class TestGroupElementYearForm(TestCase):
         self.assertTrue(form.is_valid())
         self.assertTrue("link_type" not in form.fields)
 
-    def test_clean_link_type_reference_between_eg_without_authorized_relationship(self):
-        AuthorizedRelationshipFactory(
-            parent_type=self.parent.education_group_type,
-            child_type=self.child_branch.education_group_type,
-        )
-        ref_group = GroupElementYearFactory(parent=self.child_branch,
-                                            child_branch=EducationGroupYearFactory(academic_year=self.academic_year))
-        form = GroupElementYearForm(
-            data={'link_type': LinkTypes.REFERENCE.name},
-            parent=self.parent,
-            child_branch=self.child_branch
-        )
-
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors["link_type"],
-            [_(
-                "You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")"
-            ) % {
-                 "parent_type": self.parent.education_group_type,
-                 "parent": self.parent,
-                 "child_types": ref_group.child_branch.education_group_type,
-             }]
-        )
-
     def test_clean_link_type_reference_with_authorized_relationship(self):
         AuthorizedRelationshipFactory(
             parent_type=self.parent.education_group_type,
@@ -190,43 +165,3 @@ class TestGroupElementYearForm(TestCase):
                  'parent_type': self.parent.education_group_type,
              }]
         )
-
-    def test_referenced_child_with_max_limit(self):
-        child = EducationGroupYearFactory(academic_year=self.academic_year)
-
-        GroupElementYearFactory(
-            parent=self.parent,
-            child_branch=child
-        )
-
-        AuthorizedRelationshipFactory(
-            parent_type=self.parent.education_group_type,
-            child_type=child.education_group_type,
-            max_count_authorized=1,
-        )
-
-        ref_group = GroupElementYearFactory(parent=self.child_branch,
-                                            child_branch__academic_year=self.academic_year)
-        AuthorizedRelationshipFactory(
-            parent_type=self.parent.education_group_type,
-            child_type=ref_group.child_branch.education_group_type,
-        )
-
-        ref_group.child_branch.education_group_type = child.education_group_type
-        ref_group.child_branch.save()
-
-        form = GroupElementYearForm(
-            data={'link_type': LinkTypes.REFERENCE.name},
-            parent=self.parent,
-            child_branch=self.child_branch
-        )
-
-        self.assertFalse(form.is_valid())
-
-        self.assertEqual(form.errors['link_type'], [
-            _("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
-              "has already reached the limit.") % {
-                'child_types': child.education_group_type,
-                'parent': self.parent
-            }
-        ])
