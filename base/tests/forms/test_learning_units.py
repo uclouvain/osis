@@ -30,9 +30,8 @@ from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.business.learning_unit_year_with_context import is_service_course
 from base.forms.learning_unit import search_form
-from base.models.enums import entity_container_year_link_type, entity_type
+from base.models.enums import entity_type
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
