@@ -4406,8 +4406,8 @@ msgstr "L'UE a des prérequis"
 
 #: business/education_groups/group_element_year_tree.py:210
 #: tests/business/education_groups/test_build_tree.py:159
-msgid "The learning unit has prerequisites and is prerequisite"
-msgstr "L'UE a des prérequis et un prérequis"
+msgid "The learning unit has prerequisites and is a prerequisite"
+msgstr "L'UE a des prérequis et est un prérequis"
 
 #: views/learning_units/detail.py:76
 msgid "The learning unit have partim"
