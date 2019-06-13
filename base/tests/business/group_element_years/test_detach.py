@@ -30,7 +30,9 @@ from django.test import TestCase
 
 from base.business.group_element_years.detach import DetachEducationGroupYearStrategy
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 
@@ -175,4 +177,16 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
         # We try to detach OPT1 from GROUP1 but it is not allowed because another 2M structure won't be valid anymore
         strategy = DetachEducationGroupYearStrategy(link=group1_link_opt1)
         with self.assertRaises(ValidationError):
+            strategy.is_valid()
+
+    def test_not_valid_detach_technical_group(self):
+        gey = GroupElementYearFactory(parent=self.master_120)
+        AuthorizedRelationshipFactory(
+            parent_type=self.master_120.education_group_type,
+            child_type=gey.child_branch.education_group_type,
+            min_count_authorized=1
+        )
+
+        strategy = DetachEducationGroupYearStrategy(link=gey)
+        with self.assertRaises(AuthorizedRelationshipNotRespectedException):
             strategy.is_valid()
