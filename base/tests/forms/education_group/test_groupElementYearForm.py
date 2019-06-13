@@ -76,8 +76,13 @@ class TestGroupElementYearForm(TestCase):
             parent_type=self.parent.education_group_type,
             child_type=self.child_branch.education_group_type,
         )
-        ref_group = GroupElementYearFactory(parent=self.child_branch,
-                                            child_branch=EducationGroupYearFactory(academic_year=self.academic_year))
+        ref_group = GroupElementYearFactory(
+            parent=self.child_branch,
+            child_branch=EducationGroupYearFactory(
+                academic_year=self.academic_year,
+                education_group_type=self.child_branch.education_group_type
+            )
+        )
         AuthorizedRelationshipFactory(
             parent_type=self.parent.education_group_type,
             child_type=ref_group.child_branch.education_group_type,
