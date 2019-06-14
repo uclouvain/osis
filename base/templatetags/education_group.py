@@ -149,7 +149,7 @@ def button_edit_administrative_data(context):
 
     return {
         'class_li': is_disabled,
-        'message': permission_denied_message,
+        'title': permission_denied_message,
         'text': _('Modify'),
         'url': reverse('education_group_edit_administrative', args=[root.pk, education_group_year.pk])
     }

@@ -424,7 +424,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         )
 
         self.assertEqual(
-            result["message"],
+            result["title"],
             _('Only program managers of the education group OR central manager linked to entity can edit.')
         )
 
