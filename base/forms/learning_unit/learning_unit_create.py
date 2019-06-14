@@ -128,7 +128,6 @@ class LearningUnitYearModelForm(forms.ModelForm):
         }
         widgets = {
             'credits': FloatFormatInput(render_value=True),
-            # 'credits': forms.TextInput(),
         }
 
     def __clean_acronym_external(self):
