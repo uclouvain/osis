@@ -243,7 +243,7 @@ def compose_components_dict(components, additional_entities):
 
 def get_entities(container_year):
     return {
-        link_type: entity.most_recent_acronym
+        link_type: entity.most_recent_acronym if entity else None
         for link_type, entity in container_year.get_entity_by_type().items()
         if link_type in REQUIREMENT_ENTITIES
     }
