@@ -31,7 +31,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, pgettext
 
-from django.conf import settings
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
 from base.templatetags.education_group import li_with_deletion_perm, button_with_permission, \
@@ -39,7 +38,7 @@ from base.templatetags.education_group import li_with_deletion_perm, button_with
     li_with_create_perm_mini_training, li_with_create_perm_group, link_detach_education_group, \
     link_pdf_content_education_group, button_edit_administrative_data, dl_with_parent
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
@@ -425,11 +424,11 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         )
 
         self.assertEqual(
-            result["message"],
+            result["title"],
             _('Only program managers of the education group OR central manager linked to entity can edit.')
         )
 
-        self.assertEqual(result["is_disabled"], "disabled")
+        self.assertEqual(result["class_li"], "disabled")
         self.assertEqual(result["text"], _("Modify"))
 
 
