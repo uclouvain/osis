@@ -600,12 +600,6 @@ def _create_proposal_learning_unit(acronym):
         "learning_unit": {
             "id": a_learning_unit_year.learning_unit.id,
         },
-        # "entities": {
-        #     entity_container_year_link_type.REQUIREMENT_ENTITY: container_year.requirement_entity.id,
-        #     entity_container_year_link_type.ALLOCATION_ENTITY: None,
-        #     entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
-        #     entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
-        # },
         "learning_component_years": [
             {"id": learning_component_lecturing.id, "planned_classes": learning_component_lecturing.planned_classes,
              "hourly_volume_partial_q1": learning_component_lecturing.hourly_volume_partial_q1,

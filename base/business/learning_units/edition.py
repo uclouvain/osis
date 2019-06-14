@@ -294,8 +294,6 @@ def update_learning_unit_year_with_report(luy_to_update, fields_to_update, entit
     # Update luy which doesn't have conflict
     for luy in luy_to_update_list:
         _update_learning_unit_year(luy, fields_to_update, (luy != luy_to_update), entities_by_type_to_update)
-        # TODO :: remove this and add unit test to check if entities are correctly set to None or to specified value from entities_by_type_to_update
-        # _update_learning_unit_year_entities(luy, entities_by_type_to_update)
 
     # Show conflict error if exists
     check_postponement_conflict_report_errors(conflict_report)
@@ -348,29 +346,6 @@ def _update_learning_unit_year(luy_to_update, fields_to_update, with_report, ent
 
     update_instance_model_from_data(luy_to_update, fields_to_update,
                                     exclude=fields_to_exclude + ("in_charge",))
-
-
-# def _update_learning_unit_year_entities(luy, entities_by_type_to_update):
-#     for entity_link_type, entity, in entities_by_type_to_update.items():
-#         if entity:
-#             entity_container_yr = _update_entity_container_year(entity, luy.learning_container_year, entity_link_type)
-#         else:
-#             _delete_entity_container_year(luy.learning_container_year, entity_link_type)
-
-
-# def update_or_create_entity_container_year_with_components(an_entity, learning_container_year, type_entity):
-#     return _update_entity_container_year(an_entity, learning_container_year, type_entity)
-
-
-# def _update_entity_container_year(an_entity, learning_container_year, type_entity):
-#     entity_container_yr, created = entity_container_year.EntityContainerYear.objects.update_or_create(
-#         type=type_entity, learning_container_year=learning_container_year, defaults={"entity": an_entity})
-#     return entity_container_yr
-
-
-# def _delete_entity_container_year(learning_container_year, type_entity):
-#     entity_container_year.EntityContainerYear.objects.filter(
-#         type=type_entity, learning_container_year=learning_container_year).delete()
 
 
 def _check_postponement_conflict(luy, next_luy):

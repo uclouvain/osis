@@ -223,7 +223,6 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             'learning_unit_form': self.learning_unit_form,
             'learning_unit_year_form': self.learning_unit_year_form,
             'learning_container_year_form': self.learning_container_year_form,
-            # 'entity_container_form': self.entity_container_form,
             'simplified_volume_management_form': self.simplified_volume_management_form,
             'learning_unit_external_form': self.learning_unit_external_form
         }
@@ -436,7 +435,6 @@ class ExternalPartimForm(LearningUnitBaseForm):
             'learning_unit_form': self.learning_unit_form,
             'learning_unit_year_form': self.learning_unit_year_form,
             'learning_container_year_form': self.learning_container_year_form,
-            # 'entity_container_form': self.entity_container_form,
             'simplified_volume_management_form': self.simplified_volume_management_form,
             'learning_unit_external_form': self.learning_unit_external_form
         }

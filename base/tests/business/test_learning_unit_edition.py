@@ -775,15 +775,6 @@ def _create_classes(learning_component_year, number_classes):
         LearningClassYearFactory(learning_component_year=learning_component_year)
 
 
-# def _create_entity_container_years(learning_unit_years, entity=None):
-#     if not entity:
-#         entity = EntityFactory()
-#
-#     for lu in learning_unit_years:
-#         entity_container_year = EntityContainerYearFactory(learning_container_year=lu.learning_container_year,
-#                                                            entity=entity)
-
-
 def _create_learning_component_years(learning_unit_years, number_classes=None):
     for luy in learning_unit_years:
         component = LearningComponentYearFactory(learning_unit_year=luy)
@@ -1073,12 +1064,6 @@ class TestUpdateLearningUnitEntities(TestCase, LearningUnitsMixin):
 
         self.learning_container_year.refresh_from_db()
         self.assertIsNone(self.learning_container_year.additionnal_entity_2)
-        # self.assertFalse(
-        #     LearningContainerYear.objects.filter(
-        #         pk=self.learning_container_year.id,
-        #         additionnal_entity_2_id=id_obj_deleted,
-        #     ).exists()
-        # )
 
     def test_with_entity_none_and_full_in(self):
         self.learning_container_year.additionnal_entity_2 = None

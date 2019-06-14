@@ -199,7 +199,6 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
             'learning_unit_form': self.learning_unit_form,
             'learning_unit_year_form': self.learning_unit_year_form,
             'learning_container_year_form': self.learning_container_year_form,
-            # 'entity_container_form': self.entity_container_form,
             'simplified_volume_management_form': self.simplified_volume_management_form
         }
 
@@ -226,10 +225,6 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
     @property
     def learning_container_year_form(self):
         return self.forms[LearningContainerYearModelForm]
-
-    # @property
-    # def entity_container_form(self):
-    #     return self.forms.get(EntityContainerBaseForm)
 
     @property
     def simplified_volume_management_form(self):
@@ -309,11 +304,6 @@ class FullForm(LearningUnitBaseForm):
             },
             LearningUnitYearModelForm: self._build_instance_data_learning_unit_year(data, default_ac_year),
             LearningContainerYearModelForm: self._build_instance_data_learning_container_year(data, proposal),
-            # EntityContainerBaseForm: {
-            #     'data': data,
-            #     'learning_container_year': self.instance.learning_container_year if self.instance else None,
-            #     'person': self.person
-            # },
             SimplifiedVolumeManagementForm: {
                 'data': data,
                 'proposal': proposal,
@@ -350,15 +340,6 @@ class FullForm(LearningUnitBaseForm):
             'person': self.person,
             'subtype': self.subtype
         }
-
-    # def is_valid(self):
-    #     result = super().is_valid()
-    #     if result:
-    #         result = self.entity_container_form.post_clean(
-    #             self.learning_container_year_form.cleaned_data['container_type'],
-    #             self.learning_unit_year_form.instance.academic_year)
-    #
-    #     return result
 
     def save(self, commit=True):
         academic_year = self.academic_year
