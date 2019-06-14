@@ -41,6 +41,7 @@ from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit, REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
+from osis_common.forms.widgets import FloatFormatInput
 from reference.models.language import find_all_languages
 
 CRUCIAL_YEAR_FOR_CREDITS_VALIDATION = 2018
@@ -126,7 +127,7 @@ class LearningUnitYearModelForm(forms.ModelForm):
             }
         }
         widgets = {
-            'credits': forms.TextInput(),
+            'credits': FloatFormatInput(render_value=True),
         }
 
     def __clean_acronym_external(self):
