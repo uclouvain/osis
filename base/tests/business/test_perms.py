@@ -271,8 +271,8 @@ class PermsTestCase(TestCase):
             type=proposal_type.ProposalType.SUPPRESSION.name,
             state=proposal_state.ProposalState.CENTRAL.name,
             initial_data={
-                "entities": {
-                    entity_container_year_link_type.REQUIREMENT_ENTITY: an_entity.id,
+                "learning_container_year": {
+                    "requirement_entity": an_entity.id,
                 }
             })
         self.assertFalse(perms.is_eligible_for_cancel_of_proposal(a_proposal, a_person))
@@ -322,8 +322,8 @@ class PermsTestCase(TestCase):
             type=proposal_type.ProposalType.MODIFICATION.name,
             state=proposal_state.ProposalState.FACULTY.name,
             initial_data={
-                "entities": {
-                    entity_container_year_link_type.REQUIREMENT_ENTITY: an_requirement_entity.id,
+                "learning_container_year": {
+                    "requirement_entity": an_requirement_entity.id,
                 }
             })
 
@@ -349,8 +349,8 @@ class PermsTestCase(TestCase):
             type=proposal_type.ProposalType.MODIFICATION.name,
             state=proposal_state.ProposalState.CENTRAL.name,
             initial_data={
-                "entities": {
-                    entity_container_year_link_type.REQUIREMENT_ENTITY: an_requirement_entity.id,
+                "learning_container_year": {
+                    "requirement_entity": an_requirement_entity.id,
                 }
             })
 
@@ -373,8 +373,8 @@ class PermsTestCase(TestCase):
             type=proposal_type.ProposalType.MODIFICATION.name,
             state=proposal_state.ProposalState.CENTRAL.name,
             initial_data={
-                "entities": {
-                    entity_container_year_link_type.REQUIREMENT_ENTITY: an_requirement_entity.id,
+                "learning_container_year": {
+                    "requirement_entity": an_requirement_entity.id,
                 }
             })
         PersonEntityFactory(person=a_person, entity=an_requirement_entity)

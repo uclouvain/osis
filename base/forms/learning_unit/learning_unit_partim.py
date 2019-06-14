@@ -45,7 +45,7 @@ PARTIM_FORM_READ_ONLY_FIELD = {
     'acronym_0', 'acronym_1', 'common_title', 'common_title_english',
     'requirement_entity', 'allocation_entity',
     'academic_year', 'container_type', 'internship_subtype',
-    'additional_requirement_entity_1', 'additional_requirement_entity_2'
+    'additionnal_entity_1', 'additionnal_entity_2'
 }
 
 

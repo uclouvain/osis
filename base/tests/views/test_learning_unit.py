@@ -1409,7 +1409,11 @@ class TestLearningUnitProposalComparison(TestCase):
                 "common_title_english": self.learning_unit_year.learning_container_year.common_title_english,
                 "container_type": self.learning_unit_year.learning_container_year.container_type,
                 "in_charge": self.learning_unit_year.learning_container_year.in_charge,
-                "type_declaration_vacant": self.learning_unit_year.learning_container_year.type_declaration_vacant
+                "type_declaration_vacant": self.learning_unit_year.learning_container_year.type_declaration_vacant,
+                "requirement_entity": requirement_entity.id,
+                "allocation_entity": None,
+                "additionnal_entity_1": requirement_entity.id,
+                "additionnal_entity_2": requirement_entity.id,
             },
             "learning_unit_year": {
                 "id": self.learning_unit_year.id,
@@ -1427,12 +1431,6 @@ class TestLearningUnitProposalComparison(TestCase):
             },
             "learning_unit": {
                 "id": self.learning_unit_year.learning_unit.id
-            },
-            "entities": {
-                entity_container_year_link_type.REQUIREMENT_ENTITY: requirement_entity.id,
-                entity_container_year_link_type.ALLOCATION_ENTITY: None,
-                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: requirement_entity.id,
-                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: requirement_entity.id
             },
             "learning_component_years": [
                 {"id": self.learning_component_year_lecturing.id,

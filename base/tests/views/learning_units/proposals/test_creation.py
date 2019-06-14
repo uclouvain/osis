@@ -92,9 +92,9 @@ class LearningUnitViewTestCase(TestCase):
             "periodicity": learning_unit_year_periodicity.ANNUAL,
             "entity": self.entity_version.id,
             "folder_id": 1,
-            'requirement_entity-entity': self.entity_version.id,
-            'allocation_entity-entity': self.entity_version.id,
-            'additional_requirement_entity_1-entity': '',
+            'requirement_entity': self.entity_version.id,
+            'allocation_entity': self.entity_version.id,
+            'additionnal_entity_1': '',
 
             # Learning component year data model form
             'component-TOTAL_FORMS': '2',
