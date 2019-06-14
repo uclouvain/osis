@@ -42,7 +42,7 @@ from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language, \
     get_components_identification
-from base.business.learning_unit_proposal import _get_value_from_enum
+from base.business.learning_unit_proposal import _get_value_from_enum, clean_attribute_initial_value
 from base.business.learning_units import perms as business_perms
 from base.business.learning_units.comparison import FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, \
     FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON
@@ -424,17 +424,8 @@ def build_context_comparison(current_context, learning_unit_year, next_context, 
 def _reinitialize_model(obj_model, attribute_initial_values):
     for attribute_name, attribute_value in attribute_initial_values.items():
         if attribute_name != "id":
-            cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+            cleaned_initial_value = clean_attribute_initial_value(attribute_name, attribute_value)
             setattr(obj_model, attribute_name, cleaned_initial_value)
-
-
-def _clean_attribute_initial_value(attribute_name, attribute_value):
-    clean_attribute_value = attribute_value
-    if attribute_name == "campus":
-        clean_attribute_value = campus.find_by_id(attribute_value)
-    elif attribute_name == "language":
-        clean_attribute_value = language.find_by_id(attribute_value)
-    return clean_attribute_value
 
 
 def _reinitialize_components(initial_components):
@@ -444,7 +435,7 @@ def _reinitialize_components(initial_components):
         )
         for attribute_name, attribute_value in initial_data_by_model.items():
             if attribute_name != "id":
-                cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+                cleaned_initial_value = clean_attribute_initial_value(attribute_name, attribute_value)
                 setattr(learning_component_year, attribute_name, cleaned_initial_value)
 
 

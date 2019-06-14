@@ -112,12 +112,12 @@ def reinitialize_data_before_proposal(learning_unit_proposal):
 def _reinitialize_model_before_proposal(obj_model, attribute_initial_values):
     for attribute_name, attribute_value in attribute_initial_values.items():
         if attribute_name != "id":
-            cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+            cleaned_initial_value = clean_attribute_initial_value(attribute_name, attribute_value)
             setattr(obj_model, attribute_name, cleaned_initial_value)
     obj_model.save()
 
 
-def _clean_attribute_initial_value(attribute_name, attribute_value):
+def clean_attribute_initial_value(attribute_name, attribute_value):
     # TODO : clean this function ; it could make up to 6 hits DB
     clean_attribute_value = attribute_value
     if attribute_name == "campus":
@@ -390,7 +390,7 @@ def _consolidate_modification_proposal_accepted(proposal):
                                               exclude=("id",)))
         fields_to_update_clean = {}
         for field_name, field_value in fields_to_update.items():
-            fields_to_update_clean[field_name] = _clean_attribute_initial_value(field_name, field_value)
+            fields_to_update_clean[field_name] = clean_attribute_initial_value(field_name, field_value)
 
         entities_to_update = proposal.learning_unit_year.learning_container_year.get_entity_by_type()
 
@@ -446,7 +446,7 @@ def convert_volume_to_float(data, key):
 def update_or_create_learning_unit_component(obj_model, attribute_initial_values):
     for attribute_name, attribute_value in attribute_initial_values.items():
         if attribute_name != "id":
-            cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+            cleaned_initial_value = clean_attribute_initial_value(attribute_name, attribute_value)
             setattr(obj_model, attribute_name, cleaned_initial_value)
     obj_model.save()
 
