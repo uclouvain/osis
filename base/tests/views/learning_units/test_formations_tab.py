@@ -52,7 +52,7 @@ class TestLearningUnitFormationsTab(TestCase):
         self.education_group_year = EducationGroupYearFactory(
             academic_year=self.academic_year
         )
-        GroupElementYearFactory(
+        self.group_element_year = GroupElementYearFactory(
             parent=self.education_group_year,
             child_branch=None,
             child_leaf=self.learning_unit_year
@@ -102,4 +102,8 @@ class TestLearningUnitFormationsTab(TestCase):
                     self.education_group_year_formation_great_parent_2
                 ]
             }
+        )
+        self.assertEqual(
+            list(response.context['group_elements_years']),
+            [self.group_element_year]
         )
