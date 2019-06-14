@@ -40,7 +40,7 @@ from base.business.learning_units.edition import edit_learning_unit_end_date, up
 from base.business.learning_units.simple import deletion as business_deletion
 from base.models import campus
 from base.models.academic_year import find_academic_year_by_year
-from base.models.entity import find_by_id
+from base.models.entity import find_by_id, Entity, get_by_internal_id
 from base.models.enums import proposal_state, proposal_type
 from base.models.enums import vacant_declaration_type, attribution_procedure
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
@@ -118,11 +118,14 @@ def _reinitialize_model_before_proposal(obj_model, attribute_initial_values):
 
 
 def _clean_attribute_initial_value(attribute_name, attribute_value):
+    # TODO : clean this function ; it could make up to 6 hits DB
     clean_attribute_value = attribute_value
     if attribute_name == "campus":
         clean_attribute_value = campus.find_by_id(attribute_value)
     elif attribute_name == "language":
         clean_attribute_value = language.find_by_id(attribute_value)
+    elif attribute_name in ['requirement_entity', 'allocation_entity', 'additionnal_entity_1', 'additionnal_entity_2']:
+        clean_attribute_value = get_by_internal_id(attribute_value)
     return clean_attribute_value
 
 

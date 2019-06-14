@@ -402,11 +402,13 @@ def _is_attached_to_initial_or_current_requirement_entity(proposal, person, rais
 
 
 def _is_attached_to_initial_entity(learning_unit_proposal, a_person):
-    if not learning_unit_proposal.initial_data.get("entities") or \
-            not learning_unit_proposal.initial_data["entities"].get(REQUIREMENT_ENTITY):
+    initial_container_year = learning_unit_proposal.initial_data.get("learning_container_year")
+    if not initial_container_year:
         return False
-    initial_entity_requirement_id = learning_unit_proposal.initial_data["entities"][REQUIREMENT_ENTITY]
-    return a_person.is_attached_entities(Entity.objects.filter(pk=initial_entity_requirement_id))
+    requirement_entity = initial_container_year.get('requirement_entity')
+    if not requirement_entity:
+        return False
+    return a_person.is_attached_entities(Entity.objects.filter(pk=requirement_entity))
 
 
 def _is_container_type_course_dissertation_or_internship(learning_unit_year, _, raise_exception):
