@@ -219,7 +219,7 @@ def new_context(education_group_year, iso_language, language, original_acronym):
     assert isinstance(original_acronym, str)
 
     title = get_title_of_education_group_year(education_group_year, iso_language)
-    partial_acronym = education_group_year.partial_acronym.upper()
+    partial_acronym = education_group_year.partial_acronym.upper() if education_group_year.partial_acronym else ''
     acronym = education_group_year.acronym.upper()
 
     is_partial = original_acronym.upper() == partial_acronym

@@ -120,7 +120,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertTrue(prerequisite)
         self.assertEqual(
             prerequisite.prerequisite_string,
-            "<a href='/learning_units/{}/'>LSINF1111</a>".format(luy_1.id)
+            "LSINF1111"
         )
 
     def test_post_data_complex_prerequisite_AND(self):
@@ -141,11 +141,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertTrue(prerequisite)
         self.assertEqual(
             prerequisite.prerequisite_string,
-            "{} ET ({} OU {})".format(
-                "<a href='/learning_units/{}/'>LSINF1111</a>".format(luy_1.id),
-                "<a href='/learning_units/{}/'>LDROI1200</a>".format(luy_2.id),
-                "<a href='/learning_units/{}/'>LEDPH1200</a>".format(luy_3.id)
-            )
+            "LSINF1111 ET (LDROI1200 OU LEDPH1200)"
         )
 
     def test_post_data_complex_prerequisite_OR(self):
@@ -166,11 +162,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertTrue(prerequisite)
         self.assertEqual(
             prerequisite.prerequisite_string,
-            "({} ET {}) OU {}".format(
-                "<a href='/learning_units/{}/'>LSINF1111</a>".format(luy_1.id),
-                "<a href='/learning_units/{}/'>LDROI1200</a>".format(luy_2.id),
-                "<a href='/learning_units/{}/'>LEDPH1200</a>".format(luy_3.id),
-            )
+            "(LSINF1111 ET LDROI1200) OU LEDPH1200"
         )
 
     def test_post_data_with_prerequisite_in_lower_case(self):
@@ -189,10 +181,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertTrue(prerequisite)
         self.assertEqual(
             prerequisite.prerequisite_string,
-            "<a href='/learning_units/{}/'>LSINF1111</a> ET <a href='/learning_units/{}/'>LDROI1200</a>".format(
-                luy_1.id,
-                luy_2.id,
-            )
+            "LSINF1111 ET LDROI1200"
         )
 
     def test_post_data_prerequisite_accept_duplicates(self):
@@ -212,11 +201,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertTrue(prerequisite)
         self.assertEqual(
             prerequisite.prerequisite_string,
-            "({} ET {}) OU {}".format(
-                "<a href='/learning_units/{}/'>LDROI1200</a>".format(luy_1.id),
-                "<a href='/learning_units/{}/'>LEDPH1200</a>".format(luy_2.id),
-                "<a href='/learning_units/{}/'>LDROI1200</a>".format(luy_1.id),
-            )
+            "(LDROI1200 ET LEDPH1200) OU LDROI1200"
         )
 
     def test_post_data_prerequisite_learning_units_not_found(self):
@@ -282,5 +267,5 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertTrue(prerequisite)
         self.assertEqual(
             prerequisite.prerequisite_string,
-            "<a href='/learning_units/{}/'>LSINF1112</a>".format(luy_2.id)
+            "LSINF1112"
         )
