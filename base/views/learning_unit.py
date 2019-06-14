@@ -84,9 +84,8 @@ def learning_unit_formations(request, learning_unit_year_id):
         education_groups_years,
         parents_as_instances=True
     )
-    formations_flat = _flatten_dict_of_lists(formations_by_educ_group_year)
     parent_formations_by_formation = mdl.group_element_year.find_learning_unit_formations(
-        formations_flat,
+        _flatten_dict_of_lists(formations_by_educ_group_year),
         parents_as_instances=True
     )
     context['formations_by_educ_group_year'] = formations_by_educ_group_year
