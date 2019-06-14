@@ -1335,7 +1335,7 @@ class TestLearningUnitProposalComparison(TestCase):
             container_type=learning_container_year_types.COURSE,
             common_title="common_title",
             type_declaration_vacant=DO_NOT_ASSIGN,
-            requirement_entity=EntityFactory()
+            requirement_entity=EntityVersionFactory().entity
         )
         self.learning_unit_year = LearningUnitYearFakerFactory(
             credits=5,
@@ -1515,7 +1515,7 @@ class TestLearningUnitProposalComparison(TestCase):
         )
 
     def test_learning_unit_proposal_comparison_with_volumes_data_modified(self):
-        self.learning_unit_year.learning_container_year.allocation_entity = EntityFactory()
+        self.learning_unit_year.learning_container_year.allocation_entity = EntityVersionFactory().entity
         self.learning_unit_year.learning_container_year.save()
         response = self.client.get(reverse(learning_unit_proposal_comparison, args=[self.learning_unit_year.pk]))
         self.assertEqual(response.context['components'][1][0], _("Practical exercises"))

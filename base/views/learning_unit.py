@@ -32,6 +32,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
@@ -50,6 +51,7 @@ from base.business.learning_units.perms import can_update_learning_achievement
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models import education_group_year, campus, proposal_learning_unit, entity
 from base.models import learning_component_year as mdl_learning_component_year
+from base.models.entity_version import EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import ATTRIBUTION_PROCEDURES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, EntityContainerYearLinkTypes
@@ -248,15 +250,24 @@ def get_volumes_comparison_context(component, initial_data):
 
 def get_all_entities_comparison_context(initial_data, learning_unit_year):
     entities_fields = []
-    for link_type in ENTITY_TYPE_LIST:
-        link = EntityContainerYearLinkTypes[link_type].value
-        new_entity_acronym = learning_unit_year.learning_container_year.get_most_recent_entity_acronym(link_type)
-        initial_entity_acronym = entity.find_by_id(
-            initial_data['entities'][link_type]).most_recent_acronym if entity.find_by_id(
-            initial_data['entities'][link_type]) else None
+    new_container_year = learning_unit_year.learning_container_year
+    for entity_link, attr in new_container_year.get_attrs_by_entity_container_type().items():
+        new_entity = getattr(new_container_year, attr, None)
+        new_entity_acronym = new_entity.most_recent_acronym if new_entity else None
+        initial_entity_acronym = _get_initial_entity_acronym(initial_data, attr)
         if initial_entity_acronym != new_entity_acronym:
-            entities_fields.append([link, initial_entity_acronym, new_entity_acronym])
+            translated_value = EntityContainerYearLinkTypes[entity_link].value
+            entities_fields.append([translated_value, initial_entity_acronym, new_entity_acronym])
     return entities_fields
+
+
+def _get_initial_entity_acronym(initial_data, entity_key_field_name):
+    initial_entity_acronym = None
+    initial_entity_id = initial_data['learning_container_year'][entity_key_field_name]
+    if initial_entity_id:
+        now = timezone.now().date()
+        initial_entity_acronym = EntityVersion.objects.current(now).get(entity_id=initial_entity_id).acronym
+    return initial_entity_acronym
 
 
 def get_learning_container_year_comparison_context(initial_data, learning_unit_year):
@@ -374,15 +385,14 @@ def reinitialize_learning_unit_year(components_list, context, initial_data, lear
 
 def get_entities_context(initial_data, learning_unit_year):
     entities_fields = {}
-    for link_type in ENTITY_TYPE_LIST:
-        link = EntityContainerYearLinkTypes[link_type].value
+    container_year = learning_unit_year.learning_container_year
+    for entity_link, attr in container_year.get_attrs_by_entity_container_type().items():
         if initial_data:
-            entity_acronym = entity.find_by_id(
-                initial_data['entities'][link_type]).most_recent_acronym if entity.find_by_id(
-                initial_data['entities'][link_type]) else None
+            entity_acronym = _get_initial_entity_acronym(initial_data, attr)
         else:
-            entity_acronym = learning_unit_year.learning_container_year.get_most_recent_entity_acronym(link_type)
-        entities_fields[link] = entity_acronym
+            entity_acronym = container_year.get_most_recent_entity_acronym(entity_link)
+        translated_value = EntityContainerYearLinkTypes[entity_link].value
+        entities_fields[translated_value] = entity_acronym
     return entities_fields
 
 
