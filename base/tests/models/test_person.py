@@ -34,12 +34,11 @@ from django.test import override_settings
 
 from base.models import person
 from base.models.enums import person_source_type
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.person import get_user_interface_language, \
     change_language
 from base.tests.factories import user
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory, SICFactory, \
@@ -241,11 +240,8 @@ class PersonTest(PersonTestCase):
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
         )
 
-        EntityContainerYearFactory(
-            learning_container_year=luy.learning_container_year,
-            entity=person_entity.entity,
-            type=REQUIREMENT_ENTITY
-        )
+        luy.learning_container_year.requirement_entity = person_entity.entity
+        luy.learning_container_year.save()
 
         self.assertTrue(
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
@@ -260,11 +256,8 @@ class PersonTest(PersonTestCase):
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
         )
 
-        EntityContainerYearFactory(
-            learning_container_year=luy.learning_container_year,
-            entity=person_entity.entity,
-            type=REQUIREMENT_ENTITY
-        )
+        luy.learning_container_year.requirement_entity = person_entity.entity
+        luy.learning_container_year.save()
 
         self.assertTrue(
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
