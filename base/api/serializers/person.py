@@ -83,5 +83,5 @@ class PersonRolesSerializer(serializers.ModelSerializer):
         return entities_acronym
 
     def roles_for_program_managers(self, obj):
-        return set({'acronym': offer_year.acronym, 'year': offer_year.academic_year.year}
-                   for offer_year in obj.managed_programs)
+        return [{'acronym': offer_year.acronym, 'year': offer_year.academic_year.year}
+                for offer_year in obj.get_managed_programs()]

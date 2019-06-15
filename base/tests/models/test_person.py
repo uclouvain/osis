@@ -261,7 +261,7 @@ class PersonTest(PersonTestCase):
         offer_year_2 = OfferYearFactory()
         ProgramManagerFactory(person=self.person_with_user, offer_year=offer_year_1)
         ProgramManagerFactory(person=self.person_with_user, offer_year=offer_year_2)
-        managed_programs = self.person_with_user.managed_programs
+        managed_programs = self.person_with_user.get_managed_programs()
         self.assertTrue(len(managed_programs) == 2)
         self.assertTrue(offer_year_1 in managed_programs)
         self.assertTrue(offer_year_2 in managed_programs)
