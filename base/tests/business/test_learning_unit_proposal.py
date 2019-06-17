@@ -136,8 +136,8 @@ class TestLearningUnitProposalCancel(TestCase):
                 "in_charge": self.learning_unit_year.learning_container_year.in_charge,
                 "requirement_entity": self.learning_unit_year.learning_container_year.requirement_entity.id,
                 "allocation_entity": None,
-                "additionnal_entity_1": None,
-                "additionnal_entity_2": None,
+                "additional_entity_1": None,
+                "additional_entity_2": None,
             },
             "learning_unit_year": {
                 "id": self.learning_unit_year.id,

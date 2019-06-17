@@ -82,8 +82,8 @@ class LearningContainerYear(SerializableModel):
 
     requirement_entity = ForeignKeyEntityField(blank=False, related_name='requirement_entities')
     allocation_entity = ForeignKeyEntityField(blank=True, related_name='allocation_entities')
-    additionnal_entity_1 = ForeignKeyEntityField(blank=True, related_name='additionnal_entities_1')
-    additionnal_entity_2 = ForeignKeyEntityField(blank=True, related_name='additionnal_entities_2')
+    additional_entity_1 = ForeignKeyEntityField(blank=True, related_name='additional_entities_1')
+    additional_entity_2 = ForeignKeyEntityField(blank=True, related_name='additional_entities_2')
 
     _warnings = None
 
@@ -114,8 +114,8 @@ class LearningContainerYear(SerializableModel):
         return {
             REQUIREMENT_ENTITY: 'requirement_entity',
             ALLOCATION_ENTITY: 'allocation_entity',
-            ADDITIONAL_REQUIREMENT_ENTITY_1: 'additionnal_entity_1',
-            ADDITIONAL_REQUIREMENT_ENTITY_2: 'additionnal_entity_2',
+            ADDITIONAL_REQUIREMENT_ENTITY_1: 'additional_entity_1',
+            ADDITIONAL_REQUIREMENT_ENTITY_2: 'additional_entity_2',
         }
 
     # TODO :: rename function

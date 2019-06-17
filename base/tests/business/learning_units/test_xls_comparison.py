@@ -91,8 +91,8 @@ class TestComparisonXls(TestCase):
         self.assertEqual(data[0][14], learning_unit_yr.specific_title_english)
         self.assertEqual(data[0][15], learning_unit_yr.requirement_entity.most_recent_acronym)
         self.assertEqual(data[0][16], learning_unit_yr.allocation_entity.most_recent_acronym)
-        self.assertEqual(data[0][17], learning_unit_yr.learning_container_year.additionnal_entity_1.most_recent_acronym)
-        self.assertEqual(data[0][18], learning_unit_yr.learning_container_year.additionnal_entity_2.most_recent_acronym)
+        self.assertEqual(data[0][17], learning_unit_yr.learning_container_year.additional_entity_1.most_recent_acronym)
+        self.assertEqual(data[0][18], learning_unit_yr.learning_container_year.additional_entity_2.most_recent_acronym)
         self.assertEqual(data[0][19], _('Yes') if learning_unit_yr.professional_integration else _('No'))
         if learning_unit_yr.campus:
             self.assertEqual(data[0][20], learning_unit_yr.campus.organization.name)

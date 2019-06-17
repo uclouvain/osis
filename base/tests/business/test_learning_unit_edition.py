@@ -1005,8 +1005,8 @@ class TestUpdateLearningUnitEntities(TestCase, LearningUnitsMixin):
             type_declaration_vacant=vacant_declaration_type.DO_NOT_ASSIGN,
             requirement_entity=EntityFactory(),
             allocation_entity=EntityFactory(),
-            additionnal_entity_1=EntityFactory(),
-            additionnal_entity_2=EntityFactory(),
+            additional_entity_1=EntityFactory(),
+            additional_entity_2=EntityFactory(),
         )
         self.learning_unit_year = LearningUnitYearFactory(
             learning_container_year=self.learning_container_year,
@@ -1063,10 +1063,10 @@ class TestUpdateLearningUnitEntities(TestCase, LearningUnitsMixin):
         self.assert_entity_has_not_changed(self.learning_container_year, entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1)
 
         self.learning_container_year.refresh_from_db()
-        self.assertIsNone(self.learning_container_year.additionnal_entity_2)
+        self.assertIsNone(self.learning_container_year.additional_entity_2)
 
     def test_with_entity_none_and_full_in(self):
-        self.learning_container_year.additionnal_entity_2 = None
+        self.learning_container_year.additional_entity_2 = None
         self.learning_container_year.save()
 
         a_new_additional_requirement_entity = EntityFactory()
@@ -1078,7 +1078,7 @@ class TestUpdateLearningUnitEntities(TestCase, LearningUnitsMixin):
         self.assertTrue(
             LearningContainerYear.objects.filter(
                 pk=self.learning_container_year.id,
-                additionnal_entity_2=a_new_additional_requirement_entity,
+                additional_entity_2=a_new_additional_requirement_entity,
             ).exists()
         )
 

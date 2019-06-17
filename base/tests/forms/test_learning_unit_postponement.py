@@ -477,8 +477,8 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
     def _remove_additional_requirement_entity_2(self, academic_year):
         # Remove additional requirement entity 2 container year
         learn_container_year = LearningContainerYear.objects.filter(academic_year=academic_year).get()
-        initial_entity = learn_container_year.additionnal_entity_2
-        learn_container_year.additionnal_entity_2 = None
+        initial_entity = learn_container_year.additional_entity_2
+        learn_container_year.additional_entity_2 = None
         learn_container_year.save()
         return initial_entity
 
@@ -743,8 +743,8 @@ def _instantiate_base_learning_unit_form(learning_unit_year_instance, person):
 
             'requirement_entity': container_year.requirement_entity.get_latest_entity_version().id,
             'allocation_entity': container_year.allocation_entity.get_latest_entity_version().id,
-            'additionnal_entity_1': container_year.additionnal_entity_1.get_latest_entity_version().id,
-            'additionnal_entity_2': container_year.additionnal_entity_2.get_latest_entity_version().id,
+            'additional_entity_1': container_year.additional_entity_1.get_latest_entity_version().id,
+            'additional_entity_2': container_year.additional_entity_2.get_latest_entity_version().id,
         },
         'person': person
     }

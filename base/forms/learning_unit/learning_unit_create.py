@@ -252,10 +252,10 @@ class LearningContainerYearModelForm(forms.ModelForm):
 
     country_allocation_entity = CountryEntityField()
 
-    additionnal_entity_1 = EntitiesVersionChoiceField(
+    additional_entity_1 = EntitiesVersionChoiceField(
         required=False,
         widget=autocomplete.ModelSelect2(
-            url='additionnal_entity_1_autocomplete',
+            url='additional_entity_1_autocomplete',
             attrs={
                 'id': 'id_additional_requirement_entity_1',
                 'data-html': True,
@@ -264,20 +264,20 @@ class LearningContainerYearModelForm(forms.ModelForm):
                     'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2_country", false);'
                 ),
             },
-            forward=['country_additionnal_entity_1']
+            forward=['country_additional_entity_1']
         ),
         queryset=find_additional_requirement_entities_choices(),
         label=_('Additional requirement entity 1')
     )
 
-    country_additionnal_entity_1 = CountryEntityField(
+    country_additional_entity_1 = CountryEntityField(
         widget_attrs={'id': 'id_additional_requirement_entity_1_country'}
     )
 
-    additionnal_entity_2 = EntitiesVersionChoiceField(
+    additional_entity_2 = EntitiesVersionChoiceField(
         required=False,
         widget=autocomplete.ModelSelect2(
-            url='additionnal_entity_2_autocomplete',
+            url='additional_entity_2_autocomplete',
             attrs={
                 'id': 'id_additional_requirement_entity_2',
                 'data-html': True,
@@ -286,13 +286,13 @@ class LearningContainerYearModelForm(forms.ModelForm):
                     'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2_country", false);'
                 ),
             },
-            forward=['country_additionnal_entity_2']
+            forward=['country_additional_entity_2']
         ),
         queryset=find_additional_requirement_entities_choices(),
         label=_('Additional requirement entity 2')
     )
 
-    country_additionnal_entity_2 = CountryEntityField(
+    country_additional_entity_2 = CountryEntityField(
         widget_attrs={'id': 'id_additional_requirement_entity_2_country'}
     )
 
@@ -310,11 +310,11 @@ class LearningContainerYearModelForm(forms.ModelForm):
         if self.instance.allocation_entity:
             self.initial['allocation_entity'] = get_last_version(self.instance.allocation_entity).pk
 
-        if self.instance.additionnal_entity_1:
-            self.initial['additionnal_entity_1'] = get_last_version(self.instance.additionnal_entity_1).pk
+        if self.instance.additional_entity_1:
+            self.initial['additional_entity_1'] = get_last_version(self.instance.additional_entity_1).pk
 
-        if self.instance.additionnal_entity_2:
-            self.initial['additionnal_entity_2'] = get_last_version(self.instance.additionnal_entity_2).pk
+        if self.instance.additional_entity_2:
+            self.initial['additional_entity_2'] = get_last_version(self.instance.additional_entity_2).pk
 
     def prepare_fields(self):
         self.fields['container_type'].widget.attrs = {'onchange': 'showInternshipSubtype()'}
@@ -355,8 +355,8 @@ class LearningContainerYearModelForm(forms.ModelForm):
             'is_vacant',
             'requirement_entity',
             'allocation_entity',
-            'additionnal_entity_1',
-            'additionnal_entity_2',
+            'additional_entity_1',
+            'additional_entity_2',
         )
 
     def post_clean(self, specific_title):
@@ -367,8 +367,8 @@ class LearningContainerYearModelForm(forms.ModelForm):
 
     @cached_property
     def additionnal_entity_version_1(self):
-        return self.fields["additionnal_entity_1"].entity_version
+        return self.fields["additional_entity_1"].entity_version
 
     @cached_property
     def additionnal_entity_version_2(self):
-        return self.fields["additionnal_entity_2"].entity_version
+        return self.fields["additional_entity_2"].entity_version

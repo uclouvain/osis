@@ -81,8 +81,8 @@ def build_entity_container_prefetch(entity_container_year_link_type):
     prefetch_relation = {
         REQUIREMENT_ENTITY: 'learning_container_year__requirement_entity',
         ALLOCATION_ENTITY: 'learning_container_year__allocation_entity',
-        ADDITIONAL_REQUIREMENT_ENTITY_1: 'learning_container_year__additionnal_entity_1',
-        ADDITIONAL_REQUIREMENT_ENTITY_2: 'learning_container_year__additionnal_entity_2',
+        ADDITIONAL_REQUIREMENT_ENTITY_1: 'learning_container_year__additional_entity_1',
+        ADDITIONAL_REQUIREMENT_ENTITY_2: 'learning_container_year__additional_entity_2',
     }[entity_container_year_link_type]
     entity_container_prefetch = Prefetch(
         prefetch_relation,

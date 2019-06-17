@@ -53,8 +53,8 @@ FIELDS_TO_NOT_POSTPONE = {
 FIELDS_TO_CHECK = ['faculty_remark', 'other_remark', 'acronym', 'specific_title', 'specific_title_english',
                    'credits', 'session', 'quadrimestre', 'status', 'internship_subtype', 'professional_integration',
                    'campus', 'language', 'periodicity', 'container_type', 'common_title', 'common_title_english',
-                   'team', 'requirement_entity', 'allocation_entity', 'additionnal_entity_1',
-                   'additionnal_entity_2']
+                   'team', 'requirement_entity', 'allocation_entity', 'additional_entity_1',
+                   'additional_entity_2']
 
 
 # @TODO: Use LearningUnitPostponementForm to manage END_DATE of learning unit year

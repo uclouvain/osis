@@ -93,8 +93,8 @@ class EntityContainerYearTest(TestCase):
         a_learning_container_year = LearningContainerYearFactory(
             requirement_entity=requirement_entity,
             allocation_entity=allocation_entity,
-            additionnal_entity_1=additional_requirement_entity_1,
-            additionnal_entity_2=additional_requirement_entity_2,
+            additional_entity_1=additional_requirement_entity_1,
+            additional_entity_2=additional_requirement_entity_2,
         )
         entities_by_linktype = a_learning_container_year.get_entity_by_type()
 

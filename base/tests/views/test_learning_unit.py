@@ -624,8 +624,8 @@ class LearningUnitViewTestCase(TestCase):
             container_type=learning_container_year_types.INTERNSHIP,
             requirement_entity=EntityVersionFactory().entity,
             allocation_entity=EntityVersionFactory().entity,
-            additionnal_entity_1=EntityVersionFactory().entity,
-            additionnal_entity_2=EntityVersionFactory().entity,
+            additional_entity_1=EntityVersionFactory().entity,
+            additional_entity_2=EntityVersionFactory().entity,
         )
         LearningUnitYearFactory(academic_year=self.current_academic_year,
                                 learning_container_year=learning_container_year,
@@ -1414,8 +1414,8 @@ class TestLearningUnitProposalComparison(TestCase):
                 "type_declaration_vacant": self.learning_unit_year.learning_container_year.type_declaration_vacant,
                 "requirement_entity": requirement_entity.id,
                 "allocation_entity": None,
-                "additionnal_entity_1": requirement_entity.id,
-                "additionnal_entity_2": requirement_entity.id,
+                "additional_entity_1": requirement_entity.id,
+                "additional_entity_2": requirement_entity.id,
             },
             "learning_unit_year": {
                 "id": self.learning_unit_year.id,

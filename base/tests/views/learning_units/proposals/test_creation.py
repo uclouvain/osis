@@ -94,7 +94,7 @@ class LearningUnitViewTestCase(TestCase):
             "folder_id": 1,
             'requirement_entity': self.entity_version.id,
             'allocation_entity': self.entity_version.id,
-            'additionnal_entity_1': '',
+            'additional_entity_1': '',
 
             # Learning component year data model form
             'component-TOTAL_FORMS': '2',

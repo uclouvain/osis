@@ -141,7 +141,7 @@ def get_valid_form_data(academic_year, person, learning_unit_year=None):
 
         'requirement_entity': requirement_entity_version.id,
         'allocation_entity': requirement_entity_version.id,
-        'additionnal_entity_1': '',
+        'additional_entity_1': '',
 
         # Learning component year data model form
         'component-0-id': cm_lcy and cm_lcy.pk,
@@ -460,8 +460,8 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
     def test_when_update_instance(self):
         self.post_data = get_valid_form_data(self.current_academic_year, self.person, self.learning_unit_year)
 
-        self.learning_unit_year.learning_container_year.additionnal_entity_1 = None
-        self.learning_unit_year.learning_container_year.additionnal_entity_2 = None
+        self.learning_unit_year.learning_container_year.additional_entity_1 = None
+        self.learning_unit_year.learning_container_year.additional_entity_2 = None
         self.learning_unit_year.learning_container_year.save()
 
         initial_counts = self._get_initial_counts()
@@ -481,8 +481,8 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
     def test_when_delete_additionnal_entity(self):
         post_data = get_valid_form_data(self.current_academic_year, self.person, self.learning_unit_year)
         # Assert additionnal entity exists exists
-        if not self.learning_unit_year.learning_container_year.additionnal_entity_1:
-            self.learning_unit_year.learning_container_year.additionnal_entity_1 = EntityFactory()
+        if not self.learning_unit_year.learning_container_year.additional_entity_1:
+            self.learning_unit_year.learning_container_year.additional_entity_1 = EntityFactory()
             self.learning_unit_year.learning_container_year.save()
         # Assert repartition volumes are set for additional entity
         component_queryset = LearningComponentYear.objects.filter(
@@ -491,7 +491,7 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
         component_queryset.update(repartition_volume_additional_entity_1=15.0)
 
         # Removing additionnal entity
-        post_data["additionnal_entity_1"] = ""
+        post_data["additional_entity_1"] = ""
 
         self.assertEqual(component_queryset.count(), 4)  # Assert we are testing for Full AND Partim (2 components each)
 
@@ -506,7 +506,7 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
         form.save()
 
         self.learning_unit_year.learning_container_year.refresh_from_db()
-        self.assertIsNone(self.learning_unit_year.learning_container_year.additionnal_entity_1)
+        self.assertIsNone(self.learning_unit_year.learning_container_year.additional_entity_1)
         self.learning_unit_year.learning_container_year.refresh_from_db()
         self.assertIsNotNone(self.learning_unit_year.learning_container_year.requirement_entity)
         self.assertIsNotNone(self.learning_unit_year.learning_container_year.allocation_entity)
@@ -555,8 +555,8 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
                 learning_unit_year=saved_luy, type=PRACTICAL_EXERCISES).acronym, "PP")
 
     def test_when_type_is_internship(self):
-        self.learning_unit_year.learning_container_year.additionnal_entity_1 = None
-        self.learning_unit_year.learning_container_year.additionnal_entity_2 = None
+        self.learning_unit_year.learning_container_year.additional_entity_1 = None
+        self.learning_unit_year.learning_container_year.additional_entity_2 = None
         self.learning_unit_year.learning_container_year.save()
 
         self.post_data['credits'] = 99
@@ -586,8 +586,8 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
                 learning_unit_year=saved_luy, type=PRACTICAL_EXERCISES).acronym, "PP")
 
     def test_when_type_is_dissertation(self):
-        self.learning_unit_year.learning_container_year.additionnal_entity_1 = None
-        self.learning_unit_year.learning_container_year.additionnal_entity_2 = None
+        self.learning_unit_year.learning_container_year.additional_entity_1 = None
+        self.learning_unit_year.learning_container_year.additional_entity_2 = None
         self.learning_unit_year.learning_container_year.save()
 
         self.post_data['credits'] = 99
@@ -667,7 +667,7 @@ class TestFullFormValidateSameEntitiesContainer(LearningUnitFullFormContextMixin
         return post_data
 
     def test_when_volumes_entities_incorrect(self):
-        self.post_data['additionnal_entity_1'] = self.post_data['requirement_entity']
+        self.post_data['additional_entity_1'] = self.post_data['requirement_entity']
         self.post_data['component-0-repartition_volume_requirement_entity'] = 5
         self.post_data['component-0-repartition_volume_additional_entity_1'] = 10
         form = _instanciate_form(self.current_academic_year, post_data=self.post_data, person=self.person,

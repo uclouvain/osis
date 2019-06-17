@@ -282,7 +282,7 @@ class LearningUnitEditionTestCase(TestCase):
         requirement_entity_version.refresh_from_db()
         another_learning_container_year.requirement_entity = requirement_entity_version.entity
 
-        another_learning_container_year.additionnal_entity_1 = None
+        another_learning_container_year.additional_entity_1 = None
 
         another_learning_container_year.save()
 

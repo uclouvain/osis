@@ -57,5 +57,5 @@ class LearningContainerYearFactory(factory.django.DjangoModelFactory):
 
     requirement_entity = None
     allocation_entity = None
-    additionnal_entity_1 = None
-    additionnal_entity_2 = None
+    additional_entity_1 = None
+    additional_entity_2 = None

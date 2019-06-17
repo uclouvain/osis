@@ -211,13 +211,13 @@ class AllocationEntityAutocomplete(EntityAutocomplete):
 
 class AdditionnalEntity1Autocomplete(EntityAutocomplete):
     def get_queryset(self):
-        self.forwarded['country'] = self.forwarded.get('country_additionnal_entity_1')
+        self.forwarded['country'] = self.forwarded.get('country_additional_entity_1')
         return super(AdditionnalEntity1Autocomplete, self).get_queryset()
 
 
 class AdditionnalEntity2Autocomplete(EntityAutocomplete):
     def get_queryset(self):
-        self.forwarded['country'] = self.forwarded.get('country_additionnal_entity_2')
+        self.forwarded['country'] = self.forwarded.get('country_additional_entity_2')
         return super(AdditionnalEntity2Autocomplete, self).get_queryset()
 
 

@@ -46,20 +46,20 @@ def get_with_context(**learning_unit_year_data):
         'learning_container_year__requirement_entity',
         queryset=entity_version_prefetch
     )
-    additionnal_entity_1_prefetch = models.Prefetch(
-        'learning_container_year__additionnal_entity_1',
+    additional_entity_1_prefetch = models.Prefetch(
+        'learning_container_year__additional_entity_1',
         queryset=entity_version_prefetch
     )
-    additionnal_entity_2_prefetch = models.Prefetch(
-        'learning_container_year__additionnal_entity_2',
+    additional_entity_2_prefetch = models.Prefetch(
+        'learning_container_year__additional_entity_2',
         queryset=entity_version_prefetch
     )
 
     learning_unit_years = learning_unit_year.search(**learning_unit_year_data) \
         .select_related('academic_year', 'learning_container_year') \
         .prefetch_related(requirement_entity_prefetch) \
-        .prefetch_related(additionnal_entity_1_prefetch) \
-        .prefetch_related(additionnal_entity_2_prefetch) \
+        .prefetch_related(additional_entity_1_prefetch) \
+        .prefetch_related(additional_entity_2_prefetch) \
         .prefetch_related(get_learning_component_prefetch()) \
         .order_by('academic_year__year', 'acronym')
 

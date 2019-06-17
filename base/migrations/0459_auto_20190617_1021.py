@@ -16,13 +16,13 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='learningcontaineryear',
-            name='additionnal_entity_1',
-            field=base.models.learning_container_year.ForeignKeyEntityField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='additionnal_entities_1', to='base.Entity'),
+            name='additional_entity_1',
+            field=base.models.learning_container_year.ForeignKeyEntityField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='additional_entities_1', to='base.Entity'),
         ),
         migrations.AddField(
             model_name='learningcontaineryear',
-            name='additionnal_entity_2',
-            field=base.models.learning_container_year.ForeignKeyEntityField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='additionnal_entities_2', to='base.Entity'),
+            name='additional_entity_2',
+            field=base.models.learning_container_year.ForeignKeyEntityField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='additional_entities_2', to='base.Entity'),
         ),
         migrations.AddField(
             model_name='learningcontaineryear',

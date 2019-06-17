@@ -99,8 +99,8 @@ class TestLearningUnitModificationProposal(TestCase):
             container_type=learning_container_year_types.COURSE,
             requirement_entity=cls.entity_version.entity,
             allocation_entity=cls.entity_version.entity,
-            additionnal_entity_1=cls.entity_version.entity,
-            additionnal_entity_2=cls.entity_version.entity,
+            additional_entity_1=cls.entity_version.entity,
+            additional_entity_2=cls.entity_version.entity,
         )
         cls.learning_unit_year = LearningUnitYearFakerFactory(
             acronym=learning_container_year.acronym,
@@ -139,7 +139,7 @@ class TestLearningUnitModificationProposal(TestCase):
             "state": proposal_state.ProposalState.FACULTY.name,
             'requirement_entity': cls.entity_version.id,
             'allocation_entity': cls.entity_version.id,
-            'additionnal_entity_1': cls.entity_version.id,
+            'additional_entity_1': cls.entity_version.id,
             'additionanl_entity_2': cls.entity_version.id,
 
             # Learning component year data model form
@@ -545,7 +545,7 @@ def _test_attributes_equal(obj, attribute_values_dict):
         attr_value = getattr(obj, key)
         foreign_key_fields = [
             "campus", "language", 'requirement_entity', 'allocation_entity',
-            'additionnal_entity_1', 'additionnal_entity_2'
+            'additional_entity_1', 'additional_entity_2'
         ]
         if key == "credits":
             if float(attr_value) != float(value):
@@ -583,8 +583,8 @@ def _create_proposal_learning_unit(acronym):
             "in_charge": container_year.in_charge,
             "requirement_entity": container_year.requirement_entity.id,
             "allocation_entity": None,
-            "additionnal_entity_1": None,
-            "additionnal_entity_2": None,
+            "additional_entity_1": None,
+            "additional_entity_2": None,
         },
         "learning_unit_year": {
             "id": a_learning_unit_year.id,
@@ -714,7 +714,7 @@ class TestEditProposal(TestCase):
             "folder_id": 1,
             'requirement_entity': self.entity_version.id,
             'allocation_entity': self.entity_version.id,
-            'additionnal_entity_1': '',
+            'additional_entity_1': '',
 
             # Learning component year data model form
             'component-TOTAL_FORMS': '2',

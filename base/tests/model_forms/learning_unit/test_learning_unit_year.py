@@ -119,8 +119,8 @@ class TestLearningUnitYearModelFormSave(TestCase):
             container_type=learning_container_year_types.COURSE,
             requirement_entity=EntityFactory(),
             allocation_entity=EntityFactory(),
-            additionnal_entity_1=EntityFactory(),
-            additionnal_entity_2=EntityFactory(),
+            additional_entity_1=EntityFactory(),
+            additional_entity_2=EntityFactory(),
         )
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=FULL)
         campus = CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN))
@@ -156,8 +156,8 @@ class TestLearningUnitYearModelFormSave(TestCase):
 
         self.requirement_entity = self.learning_container_year.requirement_entity
         self.allocation_entity = self.learning_container_year.allocation_entity
-        self.additional_requirement_entity_1 = self.learning_container_year.additionnal_entity_1
-        self.additional_requirement_entity_2 = self.learning_container_year.additionnal_entity_2
+        self.additional_requirement_entity_1 = self.learning_container_year.additional_entity_1
+        self.additional_requirement_entity_2 = self.learning_container_year.additional_entity_2
 
         EntityVersionFactory(entity=self.additional_requirement_entity_1,
                              start_date=self.learning_container_year.academic_year.start_date,

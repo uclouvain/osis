@@ -321,8 +321,8 @@ class GenerateContainerYear:
             common_title_english="Droit international english",
             requirement_entity=self.requirement_entity_container_year,
             allocation_entity=self.allocation_entity_container_year,
-            additionnal_entity_1=self.additionnal_1_entity_container_year,
-            additionnal_entity_2=self.addtionnal_2_entity_container_year,
+            additional_entity_1=self.additionnal_1_entity_container_year,
+            additional_entity_2=self.addtionnal_2_entity_container_year,
         )
         self.learning_container = self.learning_container_year.learning_container
 

@@ -396,11 +396,11 @@ class LearningUnitYearWarningsTest(TestCase):
         test_cases = [
             {
                 'vol_q1': 15, 'vol_q2': 15, 'vol_tot_annual': 30, 'planned_classes': 1, 'vol_tot_global': 30,
-                'requirement_entity': 20, 'additional_entity_1': 5, 'additionnal_entity_2': 5
+                'requirement_entity': 20, 'additional_entity_1': 5, 'additional_entity_2': 5
             },
             {
                 'vol_q1': 10, 'vol_q2': 20, 'vol_tot_annual': 30, 'planned_classes': 2, 'vol_tot_global': 60,
-                'requirement_entity': 30, 'additional_entity_1': 20, 'additionnal_entity_2': 10
+                'requirement_entity': 30, 'additional_entity_1': 20, 'additional_entity_2': 10
             }
         ]
 
@@ -412,7 +412,7 @@ class LearningUnitYearWarningsTest(TestCase):
                 self.component_full_lecturing.planned_classes = case.get('planned_classes')
                 self.component_full_lecturing.repartition_volume_requirement_entity = case.get('requirement_entity')
                 self.component_full_lecturing.repartition_volume_additional_entity_1 = case.get('additional_entity_1')
-                self.component_full_lecturing.repartition_volume_additional_entity_2 = case.get('additionnal_entity_2')
+                self.component_full_lecturing.repartition_volume_additional_entity_2 = case.get('additional_entity_2')
                 self.component_full_lecturing.save()
 
                 self.assertFalse(self.component_full_lecturing.warnings)

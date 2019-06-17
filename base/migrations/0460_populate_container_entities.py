@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                 update base_learningcontaineryear
                 
                 set 
-                    additionnal_entity_1_id = ecy_additionnal_1.entity_id
+                    additional_entity_1_id = ecy_additionnal_1.entity_id
                 from 
                     base_entitycontaineryear as ecy_additionnal_1
                 where (
@@ -64,7 +64,7 @@ class Migration(migrations.Migration):
                 update base_learningcontaineryear
                 
                 set 
-                    additionnal_entity_2_id = ecy_additionnal_2.entity_id
+                    additional_entity_2_id = ecy_additionnal_2.entity_id
                 from 
                     base_entitycontaineryear as ecy_additionnal_2
                 where (

@@ -110,8 +110,8 @@ class TestSave(TestCase):
             "state": proposal_state.ProposalState.CENTRAL.name,
             'requirement_entity': self.entity_version.id,
             'allocation_entity': self.entity_version.id,
-            'additionnal_entity_1': self.entity_version.id,
-            'additionnal_entity_2': self.entity_version.id,
+            'additional_entity_1': self.entity_version.id,
+            'additional_entity_2': self.entity_version.id,
 
             # Learning component year data model form
             'component-TOTAL_FORMS': '2',
@@ -204,8 +204,8 @@ class TestSave(TestCase):
                                                            end_date=today.replace(year=today.year + 1),
                                                            entity=entity_2)
         self.form_data["allocation_entity"] = self.entity_version.id
-        self.form_data["additionnal_entity_1"] = additional_entity_version_1.id
-        self.form_data["additionnal_entity_2"] = additional_entity_version_2.id
+        self.form_data["additional_entity_1"] = additional_entity_version_1.id
+        self.form_data["additional_entity_2"] = additional_entity_version_2.id
 
         form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
         self.assertTrue(form.is_valid(), form.errors)
@@ -262,18 +262,18 @@ class TestSave(TestCase):
         }
         del initial_data_expected["learning_container_year"]['requirement_entity']
         del initial_data_expected["learning_container_year"]['allocation_entity']
-        del initial_data_expected["learning_container_year"]['additionnal_entity_1']
-        del initial_data_expected["learning_container_year"]['additionnal_entity_2']
+        del initial_data_expected["learning_container_year"]['additional_entity_1']
+        del initial_data_expected["learning_container_year"]['additional_entity_2']
         return initial_data_expected
 
     def test_when_setting_additional_entity_to_none(self):
-        self.form_data['additionnal_entity_1'] = None
+        self.form_data['additional_entity_1'] = None
         form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
         self.learning_unit_year.learning_container_year.refresh_from_db()
-        self.assertIsNone(self.learning_unit_year.learning_container_year.additionnal_entity_1)
+        self.assertIsNone(self.learning_unit_year.learning_container_year.additional_entity_1)
 
     def test_creation_proposal_learning_unit_with_school_entity(self):
         self.entity_version.entity_type = SCHOOL
@@ -302,8 +302,8 @@ def build_initial_data(learning_unit_year, entity):
             "type_declaration_vacant": learning_unit_year.learning_container_year.type_declaration_vacant,
             "requirement_entity": entity.id,
             "allocation_entity": None,
-            "additionnal_entity_1": None,
-            "additionnal_entity_2": None,
+            "additional_entity_1": None,
+            "additional_entity_2": None,
         },
         "learning_unit_year": {
             "id": learning_unit_year.id,

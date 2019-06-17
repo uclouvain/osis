@@ -157,8 +157,8 @@ class TestEditLearningUnit(TestCase):
             type_declaration_vacant=vacant_declaration_type.DO_NOT_ASSIGN,
             requirement_entity=cls.requirement_entity.entity,
             allocation_entity=cls.allocation_entity.entity,
-            additionnal_entity_1=cls.additional_entity_1.entity,
-            additionnal_entity_2=cls.additional_entity_2.entity,
+            additional_entity_1=cls.additional_entity_1.entity,
+            additional_entity_2=cls.additional_entity_2.entity,
         )
 
         cls.learning_unit_year = LearningUnitYearFactory(
@@ -270,8 +270,8 @@ class TestEditLearningUnit(TestCase):
                 "type_declaration_vacant": container_year.type_declaration_vacant,
                 "requirement_entity": self.requirement_entity.id,
                 "allocation_entity": self.allocation_entity.id,
-                "additionnal_entity_1": self.additional_entity_1.id,
-                "additionnal_entity_2": self.additional_entity_2.id,
+                "additional_entity_1": self.additional_entity_1.id,
+                "additional_entity_2": self.additional_entity_2.id,
             },
             'learning_unit_year_form': {
                 "acronym": [acronym[0], acronym[1:]],
@@ -324,7 +324,7 @@ class TestEditLearningUnit(TestCase):
 
             'requirement_entity': self.requirement_entity.id,
             'allocation_entity': self.allocation_entity.id,
-            'additionnal_entity_1': '',
+            'additional_entity_1': '',
             # Learning component year data model form
             'component-TOTAL_FORMS': '2',
             'component-INITIAL_FORMS': '0',
