@@ -60,7 +60,7 @@
                 var el = e.target;
                 while (el && el.parentNode) {
                     el = el.parentNode;
-
+                    document.getElementById(e.target.id).style.borderColor='#e52213';
                     if(el.parentNode.id == "tab_identification"){
                         $("#spn_identification_errors").append('<i class="fa fa-circle" aria-hidden="true"></i>');
                         return false;
