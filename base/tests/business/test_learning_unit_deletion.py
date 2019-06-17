@@ -343,10 +343,11 @@ class LearningUnitYearDeletion(TestCase):
 
             # Creation UE
             learning_unit = LearningUnitFactory()
-            l_containeryear = LearningContainerYearFactory(academic_year=self.academic_year,
-                                                           container_type=learning_container_year_types.COURSE)
-            EntityContainerYearFactory(learning_container_year=l_containeryear, entity=entity_version.entity,
-                                       type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+            l_containeryear = LearningContainerYearFactory(
+                academic_year=self.academic_year,
+                container_type=learning_container_year_types.COURSE,
+                requirement_entity=entity_version.entity
+            )
             learning_unit_year = LearningUnitYearFactory(learning_unit=learning_unit,
                                                          academic_year=self.academic_year,
                                                          learning_container_year=l_containeryear,
