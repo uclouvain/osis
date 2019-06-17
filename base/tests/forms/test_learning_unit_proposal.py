@@ -241,6 +241,7 @@ class TestSave(TestCase):
         self.assertEqual(self.learning_unit_year.internship_subtype, internship_subtypes.TEACHING_INTERNSHIP)
 
     def test_creation_proposal_learning_unit(self):
+        self.maxDiff = None
         form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
@@ -260,10 +261,6 @@ class TestSave(TestCase):
             entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
             entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
         }
-        del initial_data_expected["learning_container_year"]['requirement_entity']
-        del initial_data_expected["learning_container_year"]['allocation_entity']
-        del initial_data_expected["learning_container_year"]['additional_entity_1']
-        del initial_data_expected["learning_container_year"]['additional_entity_2']
         return initial_data_expected
 
     def test_when_setting_additional_entity_to_none(self):

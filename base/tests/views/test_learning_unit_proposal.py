@@ -228,6 +228,7 @@ class TestLearningUnitModificationProposal(TestCase):
             'learning_container_year': [
                 "id", "acronym", "common_title", "container_type", "in_charge", "common_title_english", "team",
                 "is_vacant", "type_declaration_vacant",
+                'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
             ],
             'learning_unit': [
                 "id", "end_year", "faculty_remark", "other_remark",

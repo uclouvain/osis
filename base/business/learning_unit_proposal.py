@@ -43,8 +43,7 @@ from base.models.academic_year import find_academic_year_by_year
 from base.models.entity import find_by_id, Entity, get_by_internal_id
 from base.models.enums import proposal_state, proposal_type
 from base.models.enums import vacant_declaration_type, attribution_procedure
-from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
-    ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
+from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.proposal_type import ProposalType
 from base.utils import send_mail as send_mail_util
@@ -52,8 +51,7 @@ from reference.models import language
 
 BOOLEAN_FIELDS = ('professional_integration', 'is_vacant', 'team')
 FOREIGN_KEY_NAME = (
-    'language', 'campus', REQUIREMENT_ENTITY, ALLOCATION_ENTITY, ADDITIONAL_REQUIREMENT_ENTITY_1,
-    ADDITIONAL_REQUIREMENT_ENTITY_2,
+    'language', 'campus', 'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
 )
 
 APP_BASE_LABEL = 'base'
@@ -67,6 +65,7 @@ INITIAL_DATA_FIELDS = {
     'learning_container_year': [
         "id", "acronym", "common_title", "container_type", "in_charge", "common_title_english", "team", "is_vacant",
         "type_declaration_vacant",
+        'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
     ],
     'learning_unit': [
         "id", "end_year", "faculty_remark", "other_remark"
@@ -404,6 +403,7 @@ def copy_learning_unit_data(learning_unit_year):
         "learning_unit_year": learning_unit_year_values,
         "learning_unit": _get_attributes_values(learning_unit_year.learning_unit,
                                                 INITIAL_DATA_FIELDS['learning_unit']),
+        # TODO :: remove "entities" key, duplicated with entities in LearningContainerYear
         "entities": get_entities(entities_by_type),
         "learning_component_years": get_components_initial_data(learning_unit_year),
         "volumes": _get_volumes_for_initial(learning_unit_year)
