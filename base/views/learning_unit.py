@@ -94,10 +94,6 @@ def learning_unit_formations(request, learning_unit_year_id):
     return render(request, "learning_unit/formations.html", context)
 
 
-def _flatten_dict_of_lists(dic):
-    return list(set([item for sublist in dic.values() for item in sublist]))
-
-
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def learning_unit_components(request, learning_unit_year_id):
