@@ -36,7 +36,7 @@ Feature: Propositions d’UE
     And Encoder LDROI1 comme Code
     And Cliquer sur le bouton Rechercher (Loupe)
 
-    Then Dans la liste de résultat, le(s) premier(s) « Code » est(sont) bien LDROI1001.
+    Then Dans la liste de résultat, le(s) premier(s) « Code » est(sont) bien LDROI1003.
 
   Scenario: 22 : En tant que gestionnaire facultaire, je dois pouvoir rechercher des propositions et produire un Excel.
   Description : Recherche des propositions + produire l’Excel
