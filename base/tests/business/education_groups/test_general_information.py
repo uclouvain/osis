@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
 from unittest import mock
 
 from django.conf import settings
@@ -34,9 +35,10 @@ from requests import Timeout
 from base.business.education_groups import general_information
 from base.business.education_groups.general_information import PublishException, _bulk_publish, \
     _get_url_to_publish
+from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory, \
-    EducationGroupYearCommonBachelorFactory
+    EducationGroupYearCommonBachelorFactory, MiniTrainingFactory
 
 
 @override_settings(ESB_API_URL="api.esb.com",
@@ -112,8 +114,12 @@ class TestGetUrlToPublish(TestCase):
 
         self.assertEqual(expected_url, _get_url_to_publish(bachelor_common))
 
-    def test_get_publish_url_case_not_common(self):
-        training = TrainingFactory()
+    def test_get_publish_url_case_not_common_and_general_case(self):
+        types_to_use = [
+            training_type for training_type in [t.name for t in TrainingType]
+            if training_type not in TrainingType.finality_types()
+        ]
+        training = TrainingFactory(education_group_type__name=random.choice(types_to_use))
         expected_url = "{api_url}/{endpoint}".format(
             api_url=settings.ESB_API_URL,
             endpoint=settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(
@@ -122,3 +128,34 @@ class TestGetUrlToPublish(TestCase):
             ),
         )
         self.assertEqual(expected_url, _get_url_to_publish(training))
+
+    def test_get_publish_url_case_not_common_and_finality_case(self):
+        training = TrainingFactory(education_group_type__name=random.choice(TrainingType.finality_types()))
+        expected_url = "{api_url}/{endpoint}".format(
+            api_url=settings.ESB_API_URL,
+            endpoint=settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(
+                year=training.academic_year.year,
+                code=training.partial_acronym
+            ),
+        )
+        self.assertEqual(expected_url, _get_url_to_publish(training))
+
+    def test_get_publish_url_case_not_common_and_mini_training_case(self):
+        mini_training = MiniTrainingFactory(education_group_type__name=random.choice(
+            [t.name for t in MiniTrainingType])
+        )
+        print(mini_training.education_group_type)
+        expected_url = "{api_url}/{endpoint}".format(
+            api_url=settings.ESB_API_URL,
+            endpoint=settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(
+                year=mini_training.academic_year.year,
+                code=self._get_correct_mini_training_code(mini_training)
+            ),
+        )
+        self.assertEqual(expected_url, _get_url_to_publish(mini_training))
+
+    def _get_correct_mini_training_code(self, mini_training):
+        return "app-{}".format(mini_training.partial_acronym) if mini_training.is_deepening else \
+            "min-{}".format(mini_training.partial_acronym) if mini_training.is_minor else \
+            mini_training.partial_acronym if mini_training.is_option else \
+            mini_training.acronym
