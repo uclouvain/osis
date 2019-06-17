@@ -1,6 +1,6 @@
 $(document).ready(function () {
     // open or hide the sidebar.
-    let treeVisibility = sessionStorage.getItem("treeVisibility") || "0";
+    let treeVisibility = localStorage.getItem("treeVisibility") || "0";
     if (treeVisibility === "1") {
         openNav();
     } else {
@@ -209,7 +209,7 @@ $(document).ready(function () {
 });
 
 function toggleNav() {
-    let treeVisibility = sessionStorage.getItem("treeVisibility") || "0";
+    let treeVisibility = localStorage.getItem("treeVisibility") || "0";
     if (treeVisibility === "0") {
         openNav();
     } else {
@@ -218,17 +218,17 @@ function toggleNav() {
 }
 
 function openNav() {
-    let size = sessionStorage.getItem("sidenav_size") || "300px";
+    let size = localStorage.getItem("sidenav_size") || "300px";
     document.getElementById("mySidenav").style.width = size;
     document.getElementById("main").style.marginLeft = size;
-    sessionStorage.setItem("treeVisibility", "1");
+    localStorage.setItem("treeVisibility", "1");
 
 }
 
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
     document.getElementById("main").style.marginLeft = "0";
-    sessionStorage.setItem("treeVisibility", "0");
+    localStorage.setItem("treeVisibility", "0");
 }
 
 const min = 300;
@@ -246,7 +246,7 @@ $('#split-bar').mousedown(function (e) {
             sidebar.css("width", x);
             $('#main').css("margin-left", x);
         }
-        sessionStorage.setItem("sidenav_size", sidebar.width().toString() + "px")
+        localStorage.setItem("sidenav_size", sidebar.width().toString() + "px")
     })
 });
 $(document).mouseup(function () {

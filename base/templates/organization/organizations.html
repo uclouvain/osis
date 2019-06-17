@@ -67,7 +67,7 @@
                     {% for organization in object_list %}
                         <tr>
                             <td>{{ organization.logo_tag }}</td>
-                            <td>
+                            <td id="td_organization_{{  forloop.counter  }}">
                                 <a href="{% url 'organization_read' organization_id=organization.id %}"
                                    id="lnk_organization_read_{{organization.id}}">{{ organization.acronym | default:'-' }}</a></td>
                             <td>{{ organization.name }}</td>

@@ -47,6 +47,8 @@ from base.business.learning_units import perms as business_perms
 from base.business.learning_units.comparison import get_entity_by_type, \
     FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON
 from base.business.learning_units.perms import can_update_learning_achievement
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
+    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models import education_group_year, campus, proposal_learning_unit, entity
 from base.models import learning_component_year as mdl_learning_component_year
@@ -63,9 +65,6 @@ from base.views.learning_units.common import get_common_context_learning_unit_ye
 from cms.models import text_label
 from reference.models import language
 from reference.models.language import find_language_in_settings
-from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
-    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
-    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
                      'ADDITIONAL_REQUIREMENT_ENTITY_1', 'ADDITIONAL_REQUIREMENT_ENTITY_2',
@@ -81,8 +80,11 @@ def learning_unit_formations(request, learning_unit_year_id):
         "parent", "child_leaf", "parent__education_group_type"
     ).order_by('parent__partial_acronym')
     education_groups_years = [group_element_year.parent for group_element_year in group_elements_years]
-    formations_by_educ_group_year = mdl.group_element_year.find_learning_unit_formations(education_groups_years,
-                                                                                         parents_as_instances=True)
+    formations_by_educ_group_year = mdl.group_element_year.find_learning_unit_formations(
+        education_groups_years,
+        parents_as_instances=True,
+        with_parents_of_parents=True
+    )
     context['formations_by_educ_group_year'] = formations_by_educ_group_year
     context['group_elements_years'] = group_elements_years
 

@@ -96,16 +96,25 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
         return existing_grp_ele
 
     year = parent_egy.academic_year.year
-
     previous_grp_ele = utils.get_object_or_none(
         GroupElementYear,
         parent__education_group=parent_egy.education_group,
         parent__academic_year__year__in=[year - 1, year],
         child_branch__education_group_type=child_education_group_type
     )
+    edy_acronym = "{child_title}{parent_acronym}".format(
+        child_title=title_initial_value.replace(" ", "").upper(),
+        parent_acronym=parent_egy.acronym
+    )
 
     if not previous_grp_ele:
-        child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
+        ed = EducationGroup.objects.filter(
+            educationgroupyear__acronym=edy_acronym,
+        )
+        if ed.exists():
+            child_eg = ed.first()
+        else:
+            child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
     else:
         child_eg = previous_grp_ele.child_branch.education_group
 
@@ -121,13 +130,11 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
                 parent_acronym=parent_egy.acronym
             ),
             'partial_acronym': _generate_child_partial_acronym(
-                parent_egy, partial_acronym_initial_value,
+                parent_egy,
+                partial_acronym_initial_value,
                 child_education_group_type
             ),
-            'acronym': "{child_title}{parent_acronym}".format(
-                child_title=title_initial_value.replace(" ", "").upper(),
-                parent_acronym=parent_egy.acronym
-            ),
+            'acronym': edy_acronym,
         }
     )
     gey, _ = GroupElementYear.objects.get_or_create(parent=parent_egy, child_branch=child_egy)

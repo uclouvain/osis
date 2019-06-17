@@ -1,6 +1,9 @@
 {% extends "education_group/layout.html" %}
 {% load education_group format i18n staticfiles %}
 
+{% block title %}
+    <title>OSIS - {{ education_group_year.acronym }}</title>
+{% endblock %}
 {% block breadcrumb %}
     {{ block.super }}
     <li class="active">

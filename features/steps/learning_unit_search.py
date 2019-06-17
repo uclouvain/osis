@@ -48,11 +48,6 @@ def step_impl(context: Context, anac: str):
     context.current_page.anac = anac
 
 
-@step("Encoder la valeur (?P<search_value>.+) dans la zone de saisie (?P<search_field>.+)")
-def step_impl(context: Context, search_value: str, search_field: str):
-    setattr(context.current_page, search_field, search_value)
-
-
 @step("Cliquer sur le bouton Rechercher \(Loupe\)")
 def step_impl(context: Context):
     context.current_page.search.click()
