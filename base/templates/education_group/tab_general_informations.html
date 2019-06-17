@@ -32,20 +32,22 @@
 {% endblock %}
 {% block details %}
     {% url 'education_group_pedagogy_edit' parent.pk education_group_year.id as post_url %}
-    {% for section_name, labels in sections_with_translated_labels %}
-        <div class="section row">
-            <div class="col-md-12 text-center">
-                <h3>{{ section_name }}</h3>
+    <div class="content container-fluid">
+        {% for section_name, labels in sections_with_translated_labels %}
+            <div class="section row">
+                <div class="col-md-12 text-center">
+                    <h3>{{ section_name }}</h3>
+                </div>
             </div>
-        </div>
-        {% for label in labels %}
-            {% include  "education_group/blocks/row_label_general_informations.html" %}
-            {% if not forloop.last %}
-                <hr/>
-            {% endif %}
+            {% for label in labels %}
+                {% include  "education_group/blocks/row_label_general_informations.html" %}
+                {% if not forloop.last %}
+                    <hr/>
+                {% endif %}
+            {% endfor %}
+            <hr/>
         {% endfor %}
-        <hr/>
-    {% endfor %}
+    </div>
 
     {% if show_contacts %}
         <div class="row">
