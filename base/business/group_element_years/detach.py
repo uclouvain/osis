@@ -27,6 +27,7 @@ import abc
 from collections import Counter
 
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _, ngettext
 
@@ -36,6 +37,7 @@ from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.group_element_year import GroupElementYear
+from base.models.prerequisite_item import PrerequisiteItem
 
 
 class DetachStrategy(metaclass=abc.ABCMeta):
@@ -77,7 +79,18 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         return True
 
     def _check_detach_prerequisite_rules(self):
-        return
+        learning_unit_year_child = EducationGroupHierarchy(root=self.parent).get_learning_unit_year_list()
+        formations = group_element_year.find_learning_unit_formations([self.parent])[self.parent.id]
+        has_or_is_prerequisite = PrerequisiteItem.objects.filter(
+            Q(prerequisite__learning_unit_year__in=learning_unit_year_child,
+              prerequisite__education_group_year__in=formations) |
+            Q(prerequisite__education_group_year__in=formations,
+              learning_unit__in=[luy.learning_unit for luy in learning_unit_year_child])
+        ).exists()
+        if has_or_is_prerequisite:
+            raise ValidationError(
+                "Msg to define"
+            )
 
     def _check_detatch_options_rules(self):
         """

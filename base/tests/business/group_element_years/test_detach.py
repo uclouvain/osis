@@ -37,6 +37,8 @@ from base.tests.factories.authorized_relationship import AuthorizedRelationshipF
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
+from base.tests.factories.prerequisite import PrerequisiteFactory
+from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 
 class TestOptionDetachEducationGroupYearStrategy(TestCase):
@@ -203,7 +205,7 @@ class TestDetachPrerequisiteCheck(TestCase):
         )
 
         cls.children_level_1 = GroupElementYearFactory.create_batch(
-            2,
+            3,
             parent=cls.root,
             child_branch__education_group_type__minitraining=True,
             child_branch__academic_year=cls.root.academic_year
@@ -215,7 +217,7 @@ class TestDetachPrerequisiteCheck(TestCase):
             child_branch__academic_year=cls.root.academic_year
         )
         cls.lu_children_level_2 = GroupElementYearChildLeafFactory.create_batch(
-            3,
+            2,
             parent=cls.children_level_1[1].child_branch,
             child_leaf__academic_year=cls.root.academic_year
         )
@@ -224,6 +226,15 @@ class TestDetachPrerequisiteCheck(TestCase):
             2,
             parent=cls.children_level_2[0].child_branch,
             child_leaf__academic_year=cls.root.academic_year
+        )
+
+        cls.prerequisite = PrerequisiteFactory(
+            learning_unit_year=cls.lu_children_level_3[0].child_leaf,
+            education_group_year=cls.root,
+        )
+        cls.prerequisite_item = PrerequisiteItemFactory(
+            prerequisite=cls.prerequisite,
+            learning_unit=cls.lu_children_level_2[0].child_leaf.learning_unit
         )
 
     def setUp(self):
@@ -235,5 +246,21 @@ class TestDetachPrerequisiteCheck(TestCase):
         self.addCleanup(self.authorized_relationship_patcher.stop)
 
     def test_when_no_prerequisite(self):
-        strategy = DetachEducationGroupYearStrategy(self.children_level_1[0])
+        strategy = DetachEducationGroupYearStrategy(self.children_level_1[2])
         self.assertIsNone(strategy._check_detach_prerequisite_rules())
+
+    def test_raise_error_when_has_prerequisite_in_formation(self):
+        strategy = DetachEducationGroupYearStrategy(self.lu_children_level_2[0])
+        with self.assertRaises(ValidationError):
+            strategy._check_detach_prerequisite_rules()
+
+    def test_raise_error_when_is_prerequisite_in_formation(self):
+        strategy = DetachEducationGroupYearStrategy(self.lu_children_level_2[1])
+        with self.assertRaises(ValidationError):
+            strategy._check_detach_prerequisite_rules()
+
+    # def test_warnings_when_removing_prerequisites(self):
+    #     strategy = DetachEducationGroupYearStrategy(self.children_level_1[0])
+    #     strategy._check_detach_prerequisite_rules()
+    #     self.assertIsNotNone(strategy.warnings)
+
