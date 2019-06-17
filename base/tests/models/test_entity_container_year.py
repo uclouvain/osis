@@ -96,7 +96,7 @@ class EntityContainerYearTest(TestCase):
             additional_entity_1=additional_requirement_entity_1,
             additional_entity_2=additional_requirement_entity_2,
         )
-        entities_by_linktype = a_learning_container_year.get_entity_by_type()
+        entities_by_linktype = a_learning_container_year.get_map_entity_by_type()
 
         expected_result = {
             entity_container_year_link_type.REQUIREMENT_ENTITY: requirement_entity,

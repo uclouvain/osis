@@ -179,7 +179,7 @@ class LearningUnitYearComparaisonTest(TestCase):
             academic_year=self.academic_year,
             additional_entity_1=EntityFactory()
         )
-        result = learning_cont_yr.get_entity(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1)
+        result = learning_cont_yr.get_entity_from_type(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1)
         self.assertEqual(result, learning_cont_yr.additional_entity_1)
-        result = learning_cont_yr.get_entity(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2)
+        result = learning_cont_yr.get_entity_from_type(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2)
         self.assertIsNone(result)
