@@ -34,7 +34,7 @@
 
 
 {% block details %}
-    <div class="content container-fluid">
+    <div class="container-fluid">
         <div class="row">
             {% if info.is_common %}
                 {% include 'education_group/blocks/admission_condition_text.html' with section_name="alert_message" text=_("Alert Message") field=admission_condition.text_alert_message field_en=admission_condition.text_alert_message_en can_edit=True%}
