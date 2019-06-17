@@ -43,7 +43,7 @@
                 <br>
                 <div class="col-md-1">
                     <div class="btn-toolbar pull-right">
-                        {% bootstrap_button "" value=_('Student search') button_type="submit" button_class="btn-primary" icon="search" %}
+                        {% bootstrap_button "" value=_('Student search') button_type="submit" button_class="btn-primary" icon="search" id="bt_submit_student_search" %}
                     </div>
                 </div>
             </div>
@@ -60,10 +60,10 @@
             </thead>
             {% for student in students %}
             <tr>
-                <td><a href="{% url 'student_read' student.id %}"
+                <td id="td_student_{{ forloop.counter }}"><a href="{% url 'student_read' student.id %}"
                        id="lnk_student_{{student.id}}">
                     {{ student.registration_id }}</a></td>
-                <td>{{ student.person }}</td>
+                <td><span id="spn_student_name_{{ forloop.counter }}">{{ student.person }}</span></td>
                 <td>{{ student.person.get_gender_display| default_if_none:''}}</td>
             </tr>
             {% endfor %}
