@@ -318,6 +318,8 @@ def _flatten_list_of_lists(list_of_lists):
 
 
 def _find_related_formations(objects, parents_by_id):
+    if not objects:
+        return {}
     if isinstance(objects[0], LearningUnitYear):
         return {obj.id: _find_elements(parents_by_id, child_leaf_id=obj.id) for obj in objects}
     else:
