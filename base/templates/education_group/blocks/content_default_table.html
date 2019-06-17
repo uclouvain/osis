@@ -42,7 +42,7 @@
         <tr>
             <td width="10%"><a href="{% url 'learning_unit' group.child_id %}"
                                id="lnk_learning_unit_{{ group.id }}">{{ group.acronym }}</a></td>
-            <td>{{ group.child_branch.partial_acronym }}{{ group.child_branch.id }}</td>
+            <td>{{ group.child_branch.partial_acronym }}</td>
             <td width="20%">
                 {% if group.child_branch %}
                     {{ group.child_branch.title }}
