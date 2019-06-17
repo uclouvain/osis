@@ -32,6 +32,7 @@ from base.business.group_element_years.detach import DetachEducationGroupYearStr
 from base.models.enums import education_group_types
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.exceptions import AuthorizedRelationshipNotRespectedException
+from base.models.prerequisite import Prerequisite
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -234,15 +235,6 @@ class TestDetachPrerequisiteCheck(TestCase):
             child_leaf__academic_year=cls.root.academic_year
         )
 
-        cls.prerequisite = PrerequisiteFactory(
-            learning_unit_year=cls.lu_children_level_3[0].child_leaf,
-            education_group_year=cls.root,
-        )
-        cls.prerequisite_item = PrerequisiteItemFactory(
-            prerequisite=cls.prerequisite,
-            learning_unit=cls.lu_children_level_2[0].child_leaf.learning_unit
-        )
-
     def setUp(self):
         self.authorized_relationship_patcher = mock.patch(
             "base.business.group_element_years.management.check_authorized_relationship",
@@ -250,6 +242,15 @@ class TestDetachPrerequisiteCheck(TestCase):
         )
         self.mocked_perm = self.authorized_relationship_patcher.start()
         self.addCleanup(self.authorized_relationship_patcher.stop)
+
+        self.prerequisite = PrerequisiteFactory(
+            learning_unit_year=self.lu_children_level_3[0].child_leaf,
+            education_group_year=self.root,
+        )
+        self.prerequisite_item = PrerequisiteItemFactory(
+            prerequisite=self.prerequisite,
+            learning_unit=self.lu_children_level_2[0].child_leaf.learning_unit
+        )
 
     def test_when_no_prerequisite(self):
         strategy = DetachEducationGroupYearStrategy(self.children_level_1[2])
@@ -269,3 +270,5 @@ class TestDetachPrerequisiteCheck(TestCase):
         strategy = DetachEducationGroupYearStrategy(self.children_level_0[0])
         strategy._check_detach_prerequisite_rules()
         self.assertTrue(strategy.warnings)
+
+        self.assertFalse(Prerequisite.objects.filter(id=self.prerequisite.id))

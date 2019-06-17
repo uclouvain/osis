@@ -37,6 +37,7 @@ from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.group_element_year import GroupElementYear
+from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
 
 
@@ -104,7 +105,19 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                 }
             )
         elif has_or_is_prerequisite_in_group:
-            self.warnings.append("Msg to define")
+            Prerequisite.objects.filter(
+                id__in=PrerequisiteItem.objects.filter(
+                    Q(prerequisite__learning_unit_year__in=learning_unit_year_child,
+                      prerequisite__education_group_year__in=formations) |
+                    Q(prerequisite__education_group_year__in=formations,
+                      learning_unit__in=[luy.learning_unit for luy in learning_unit_year_child])
+                ).values("prerequisite")
+            ).delete()
+            self.warnings.append(
+                _("The prerequisites contained in education group year %(acronym)s has been deleted.") % {
+                    "acronym": self.education_group_year.acronym
+                }
+            )
 
     def _check_detatch_options_rules(self):
         """
