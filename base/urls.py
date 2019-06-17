@@ -76,8 +76,8 @@ urlpatterns = [
     url(
         r'^additional_entity_2_autocomplete/$',
         base.views.learning_units.update.AdditionnalEntity2Autocomplete.as_view(),
-        name='additional_entity_2_autocomplete')
-    ,
+        name='additional_entity_2_autocomplete'
+    ),
     url(
         r'^entity_requirement_autocomplete/$',
         base.views.learning_units.update.EntityRequirementAutocomplete.as_view(),
