@@ -33,7 +33,9 @@
 <head>
     {% analytical_head_top %}
     <meta charset="utf-8">
-    <title>OSIS</title>
+    {% block title %}
+        <title>OSIS</title>
+    {% endblock %}
 
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
