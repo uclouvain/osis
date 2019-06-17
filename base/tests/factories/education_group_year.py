@@ -77,6 +77,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     enrollment_campus = factory.SubFactory(CampusFactory)
     diploma_printing_title = "Yolo"
 
+
 class MiniTrainingFactory(EducationGroupYearFactory):
     education_group_type__minitraining = True
 

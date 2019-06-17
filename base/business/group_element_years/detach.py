@@ -70,10 +70,14 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         return options_to_detach
 
     def is_valid(self):
+        # TODO Add check on prerequisite
         management.can_link_be_detached(self.parent, self.link)
         if self._get_options_to_detach() and self.get_parents_program_master():
             self._check_detatch_options_rules()
         return True
+
+    def _check_detach_prerequisite_rules(self):
+        return
 
     def _check_detatch_options_rules(self):
         """

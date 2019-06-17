@@ -29,12 +29,14 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from base.business.group_element_years.detach import DetachEducationGroupYearStrategy
+from base.models.enums import education_group_types
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 
 
 class TestOptionDetachEducationGroupYearStrategy(TestCase):
@@ -190,3 +192,48 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
         strategy = DetachEducationGroupYearStrategy(link=gey)
         with self.assertRaises(AuthorizedRelationshipNotRespectedException):
             strategy.is_valid()
+
+
+class TestDetachPrerequisiteCheck(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.root = TrainingFactory(
+            academic_year__current=True,
+            education_group_type=EducationGroupTypeFactory(name=education_group_types.TrainingType.MASTER_MA_120.name)
+        )
+
+        cls.children_level_1 = GroupElementYearFactory.create_batch(
+            2,
+            parent=cls.root,
+            child_branch__education_group_type__minitraining=True,
+            child_branch__academic_year=cls.root.academic_year
+        )
+        cls.children_level_2 = GroupElementYearFactory.create_batch(
+            1,
+            parent=cls.children_level_1[0].child_branch,
+            child_branch__education_group_type__minitraining=True,
+            child_branch__academic_year=cls.root.academic_year
+        )
+        cls.lu_children_level_2 = GroupElementYearChildLeafFactory.create_batch(
+            3,
+            parent=cls.children_level_1[1].child_branch,
+            child_leaf__academic_year=cls.root.academic_year
+        )
+
+        cls.lu_children_level_3 = GroupElementYearChildLeafFactory.create_batch(
+            2,
+            parent=cls.children_level_2[0].child_branch,
+            child_leaf__academic_year=cls.root.academic_year
+        )
+
+    def setUp(self):
+        self.authorized_relationship_patcher = mock.patch(
+            "base.business.group_element_years.management.check_authorized_relationship",
+            return_value=True
+        )
+        self.mocked_perm = self.authorized_relationship_patcher.start()
+        self.addCleanup(self.authorized_relationship_patcher.stop)
+
+    def test_when_no_prerequisite(self):
+        strategy = DetachEducationGroupYearStrategy(self.children_level_1[0])
+        self.assertIsNone(strategy._check_detach_prerequisite_rules())
