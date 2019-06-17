@@ -207,11 +207,11 @@ class NodeLeafJsTree(EducationGroupHierarchy):
     def _get_tooltip_text(self):
         title = self.learning_unit_year.complete_title
         if self.group_element_year.has_prerequisite and self.group_element_year.is_prerequisite:
-            title = "{}\n{}".format(title, _("The learning unit has prerequisites and is prerequisite"))
+            title = "%s\n%s" % (title, _("The learning unit has prerequisites and is a prerequisite"))
         elif self.group_element_year.has_prerequisite:
-            title = "{}\n{}".format(title, _("The learning unit has prerequisites"))
+            title = "%s\n%s" % (title, _("The learning unit has prerequisites"))
         elif self.group_element_year.is_prerequisite:
-            title = "{}\n{}".format(title, _("The learning unit is prerequisite"))
+            title = "%s\n%s" % (title, _("The learning unit is a prerequisite"))
         return title
 
     def _get_icon(self):

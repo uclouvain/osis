@@ -36,7 +36,7 @@
 
             <div class="row">
                 <div class="col-md-7">
-                    <p>{{ prerequisite.prerequisite_string|default:"-" }}</p>
+                    <p>{{ prerequisite.prerequisite_string_as_href|safe|default:"-" }}</p>
                 </div>
                 <div class="col-md-5">
                     {% if can_modify_prerequisite %}
@@ -55,16 +55,24 @@
 
         </div>
     </div>
-    {% if is_prerequisite_acronym_list %}
+    {% if is_prerequisites_list %}
         <div class="panel panel-default">
             <div class="panel-body">
                 <p>
                     <a href="{% url 'learning_unit' learning_unit_year.pk %}">
                         <ins>{{ learning_unit_year.acronym }}</ins>
                     </a>
-                    {% trans 'is the prereqisite of' %}:
+                    {% trans 'is a prereqisite of' %}:
                 </p>
-                {{ is_prerequisite_acronym_list|join:', ' }}
+
+                {% for p in is_prerequisites_list %}
+                    <a href="{% url 'learning_unit' p.learning_unit_year.pk %}">{{ p.learning_unit_year.acronym }}</a>
+                    {% if is_prerequisites_list|length > 1 %}
+                        {% if not forloop.last %}
+                            ,
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
     {% endif %}

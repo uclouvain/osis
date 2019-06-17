@@ -116,10 +116,10 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
             context["root"]
         )
 
-        context['is_prerequisite_acronym_list'] = Prerequisite.objects.filter(
+        context['is_prerequisites_list'] = Prerequisite.objects.filter(
             prerequisiteitem__learning_unit=luy.learning_unit,
             education_group_year=root
-        ).values_list('learning_unit_year__acronym', flat=True)
+        )
         return context
 
     def render_to_response(self, context, **response_kwargs):

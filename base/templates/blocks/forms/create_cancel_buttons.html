@@ -28,7 +28,8 @@
            style="margin-left: 10px;" role="button">
             {% trans 'Cancel' %}
         </a>
-        <button type="submit" {% if btn_submit_name %} name="{{ btn_submit_name }}" {% endif %} class="btn btn-primary pull-right" title="{% trans 'Add' %}">
+        <button type="submit" id="btn-confirm" {% if btn_submit_name %} name="{{ btn_submit_name }}" {% endif %}
+                class="btn btn-primary pull-right" title="{% trans 'Add' %}">
             <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
         </button>
     </div>

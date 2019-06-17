@@ -70,6 +70,11 @@ class LearningUnitTagLiEditTest(TestCase):
             CENTRAL_MANAGER_GROUP,
             'can_edit_learningunit'
         )
+        self.central_manager_person.user.user_permissions.add(
+            Permission.objects.get(codename='can_propose_learningunit'),
+            Permission.objects.get(codename='can_edit_learningunit_date'),
+            Permission.objects.get(codename='can_delete_learningunit')
+        )
         self.person_entity = PersonEntityFactory(person=self.central_manager_person)
 
         self.learning_unit = LearningUnitFactory()
@@ -244,6 +249,7 @@ class LearningUnitTagLiEditTest(TestCase):
         ]
 
         for manager in person_faculty_managers:
+            manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
             learning_unit_year_without_proposal.subtype = learning_unit_year_subtypes.FULL
             learning_unit_year_without_proposal.learning_container_year = self.lcy
             learning_unit_year_without_proposal.learning_container_year.container_type = learning_container_year_types.COURSE
@@ -409,7 +415,8 @@ class LearningUnitTagLiEditTest(TestCase):
                          self._get_result_data_expected_for_proposal('link_consolidate_proposal', "", ""))
 
     def test_li_delete_all_lu_cannot_delete_learning_unit_year_according_type(self):
-        self.context['user'] = FacultyManagerFactory().user
+        a_person = create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_delete_learningunit')
+        self.context['user'] = a_person.user
 
         lcy_master = LearningContainerYearFactory(academic_year=self.current_academic_year,
                                                   container_type=learning_container_year_types.COURSE)

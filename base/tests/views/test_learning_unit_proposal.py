@@ -44,9 +44,9 @@ from base.business.learning_unit_proposal import INITIAL_DATA_FIELDS
 from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit_proposal import ProposalLearningUnitForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm
-from base.models import entity_container_year, entity_version
+from base.models import entity_version
 from base.models import proposal_learning_unit
-from base.models.enums import entity_container_year_link_type, learning_unit_year_periodicity
+from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_component_year_type
 from base.models.enums import organization_type, entity_type, \
     learning_unit_year_subtypes, proposal_type, learning_container_year_types, proposal_state

@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from distutils.util import strtobool
+
 from django import forms
 from django.core.validators import RegexValidator
 from django.utils.safestring import mark_safe
@@ -124,7 +126,9 @@ class ValidationRuleMixin(WarningFormMixin):
                 if rule.placeholder:
                     field.widget.attrs["placeholder"] = rule.placeholder
                 else:
-                    field.initial = rule.initial_value
+                    field.initial = rule.initial_value if rule.initial_value not in ['False', 'True'] else bool(
+                        strtobool(
+                            rule.initial_value))
 
                 field.validators.append(
                     RegexValidator(rule.regex_rule, rule.regex_error_message or None)

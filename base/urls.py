@@ -88,8 +88,6 @@ urlpatterns = [
             name='academic_calendar_delete'),
     ])),
 
-    url(r'^academic_year/$', common.academic_year, name='academic_year'),
-
     url(r'^admin/', include([
         url(r'^data/$', common.data, name='data'),
         url(r'^data/maintenance$', common.data_maintenance, name='data_maintenance'),

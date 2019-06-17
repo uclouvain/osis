@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import timedelta
 
 from django.test import TestCase
 
-from base.business.entity import get_entity_calendar
+from base.business.entity import get_entity_calendar, get_entities_ids
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
@@ -93,3 +94,20 @@ class EntityTestCase(TestCase):
                                                           end_date=an_academic_calendar.end_date)
         self.assertEqual(get_entity_calendar(an_child_entity_version, self.current_academic_year),
                          an_parent_entity_calendar)
+
+    def test_get_entities_ids(self):
+        entity_parent = EntityFactory()
+        entities = []
+        for i in range(20):
+            child_entity_version = EntityVersionFactory(
+                parent=entity_parent,
+                acronym='TEST{}'.format(i),
+                start_date=self.current_academic_year.start_date+timedelta(days=i),
+                end_date=self.current_academic_year.start_date+timedelta(days=i)
+            )
+            entity_parent = child_entity_version.entity
+            entities.append(entity_parent.id)
+        entities_ids = get_entities_ids('NOTHING', True)
+        self.assertEqual([], entities_ids)
+        entities_ids = get_entities_ids('TEST', True)
+        self.assertEqual(entities, sorted(entities_ids))

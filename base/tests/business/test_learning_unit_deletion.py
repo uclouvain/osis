@@ -40,11 +40,12 @@ from base.business.learning_units.simple import deletion
 from base.models.enums import entity_type
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.learning_class_year import LearningClassYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
+from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -54,7 +55,7 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import AdministrativeManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.enums import entity_name
@@ -330,12 +331,66 @@ class LearningUnitYearDeletion(TestCase):
 
     def test_can_delete_learning_unit_year_with_faculty_manager_role(self):
         # Faculty manager can only delete other type than COURSE/INTERNSHIP/DISSERTATION
-        person = PersonFactory()
-        add_to_group(person.user, FACULTY_MANAGER_GROUP)
+        managers = [
+            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_delete_learningunit'),
+            create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_delete_learningunit')
+        ]
         entity_version = EntityVersionFactory(entity_type=entity_type.FACULTY, acronym="SST",
                                               start_date=datetime.date(year=1990, month=1, day=1),
                                               end_date=None)
-        PersonEntityFactory(person=person, entity=entity_version.entity, with_child=True)
+        for manager in managers:
+            PersonEntityFactory(person=manager, entity=entity_version.entity, with_child=True)
+
+            # Creation UE
+            learning_unit = LearningUnitFactory()
+            l_containeryear = LearningContainerYearFactory(academic_year=self.academic_year,
+                                                           container_type=learning_container_year_types.COURSE)
+            EntityContainerYearFactory(learning_container_year=l_containeryear, entity=entity_version.entity,
+                                       type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+            learning_unit_year = LearningUnitYearFactory(learning_unit=learning_unit,
+                                                         academic_year=self.academic_year,
+                                                         learning_container_year=l_containeryear,
+                                                         subtype=learning_unit_year_subtypes.FULL)
+
+            # Cannot remove FULL COURSE
+            self.assertFalse(
+                base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(
+                    learning_unit_year,
+                    manager
+                )
+            )
+
+            # Can remove PARTIM COURSE
+            learning_unit_year.subtype = learning_unit_year_subtypes.PARTIM
+            learning_unit_year.save()
+            self.assertTrue(
+                base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(
+                    learning_unit_year,
+                    manager
+                )
+            )
+
+            # Invalidate cache_property
+            del manager.is_central_manager
+            del manager.is_faculty_manager
+
+            # With both role, greatest is taken
+            add_to_group(manager.user, CENTRAL_MANAGER_GROUP)
+            learning_unit_year.subtype = learning_unit_year_subtypes.FULL
+            learning_unit_year.save()
+            self.assertTrue(
+                base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(
+                    learning_unit_year,
+                    manager
+                )
+            )
+
+    def test_cannot_delete_learning_unit_year_with_administrative_manager_role(self):
+        manager = AdministrativeManagerFactory()
+        entity_version = EntityVersionFactory(entity_type=entity_type.FACULTY, acronym="SST",
+                                              start_date=datetime.date(year=1990, month=1, day=1),
+                                              end_date=None)
+        PersonEntityFactory(person=manager, entity=entity_version.entity, with_child=True)
 
         # Creation UE
         learning_unit = LearningUnitFactory()
@@ -349,24 +404,21 @@ class LearningUnitYearDeletion(TestCase):
 
         # Cannot remove FULL COURSE
         self.assertFalse(
-            base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(learning_unit_year, person))
+            base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(
+                learning_unit_year,
+                manager
+            )
+        )
 
         # Can remove PARTIM COURSE
         learning_unit_year.subtype = learning_unit_year_subtypes.PARTIM
         learning_unit_year.save()
-        self.assertTrue(
-            base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(learning_unit_year, person))
-
-        # Invalidate cache_property
-        del person.is_central_manager
-        del person.is_faculty_manager
-
-        # With both role, greatest is taken
-        add_to_group(person.user, CENTRAL_MANAGER_GROUP)
-        learning_unit_year.subtype = learning_unit_year_subtypes.FULL
-        learning_unit_year.save()
-        self.assertTrue(
-            base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(learning_unit_year, person))
+        self.assertFalse(
+            base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(
+                learning_unit_year,
+                manager
+            )
+        )
 
 
 def add_to_group(user, group_name):

@@ -165,7 +165,11 @@ class TestManageEducationalInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.tutor = TutorFactory()
-        cls.attribution = AttributionFactory(tutor=cls.tutor, summary_responsible=True)
+        cls.attribution = AttributionFactory(
+            tutor=cls.tutor,
+            summary_responsible=True,
+            learning_unit_year__academic_year=AcademicYearFactory(year=2019)
+        )
         cls.url = reverse("tutor_edit_educational_information", args=[cls.attribution.learning_unit_year.id])
         cls.tutor.person.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_pedagogy'))
 
@@ -196,6 +200,18 @@ class TestManageEducationalInformation(TestCase):
     def test_use_edit_learning_unit_pedagogy_method(self, mock_edit_learning_unit_pedagogy):
         self.client.get(self.url)
         self.assertTrue(mock_edit_learning_unit_pedagogy.called)
+
+    @mock.patch("attribution.views.manage_my_courses.edit_learning_unit_pedagogy", return_value=HttpResponse())
+    def test_use_edit_learning_unit_pedagogy_method(self, mock_edit_learning_unit_pedagogy):
+        self.client.get(self.url)
+        self.assertTrue(mock_edit_learning_unit_pedagogy.called)
+
+    @mock.patch("attribution.views.manage_my_courses.edit_learning_unit_pedagogy", return_value=HttpResponse())
+    def test_should_not_call_edit_learning_unit_pedagogy_method_before_2018_(self, mock_edit_learning_unit_pedagogy):
+        self.attribution.learning_unit_year.academic_year = AcademicYearFactory(year=2015)
+        self.attribution.learning_unit_year.save()
+        self.client.get(self.url)
+        self.assertFalse(mock_edit_learning_unit_pedagogy.called)
 
 
 class ManageMyCoursesMixin(TestCase):
