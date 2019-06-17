@@ -37,7 +37,9 @@
     <tbody>
         {% for group in group_element_years %}
             <tr>
-                <td width="10%">{{ group.code }}</td>
+                <td width="10%">
+                    <a href="{% url 'education_group_read' group.child_id group.child_id %}">{{ group.code }}</a>
+                </td>
                 <td width="10%">{{ group.acronym }}</td>
                 <td width="45%" style="white-space: pre;">{{ group.title }}</td>
                 <td width="20%">{{ group.access_condition| yesno:_("yes,no") |title }}</td>
