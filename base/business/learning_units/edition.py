@@ -196,7 +196,7 @@ def _get_or_create_container_year(new_learn_unit_year, new_academic_year):
 
 def _raise_if_entity_version_does_not_exist(new_lcy, new_academic_year):
     prefetched_entities_previous_year = Entity.objects.filter(
-        pk__in=[ent.id for ent in new_lcy.copied_from.get_entity_by_type().values() if ent]
+        pk__in=[ent.id for ent in new_lcy.copied_from.get_map_entity_by_type().values() if ent]
     ).prefetch_related(
         "entityversion_set"
     )
@@ -426,8 +426,8 @@ def _check_postponement_learning_unit_year_proposal_state(nex_luy):
 # TODO :: should remove this function and add requirement_entity, allocation_entity, additional_entities
 # TODO ::  in _check_postponement_conflict_on_learning_container_year
 def _check_postponement_conflict_on_entity_container_year(lcy, next_lcy):
-    current_entities = lcy.get_entity_by_type()
-    next_year_entities = next_lcy.get_entity_by_type()
+    current_entities = lcy.get_map_entity_by_type()
+    next_year_entities = next_lcy.get_map_entity_by_type()
     error_list = _check_if_all_entities_exist(
         next_lcy,
         list(filter(lambda entity: entity, next_year_entities.values()))

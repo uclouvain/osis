@@ -33,7 +33,7 @@ from base.models.enums.entity_container_year_link_type import EntityContainerYea
 
 def _check_entity_version_exists(learning_container_year):
     warnings = []
-    for link_type, entity in learning_container_year.get_entity_by_type().items():
+    for link_type, entity in learning_container_year.get_map_entity_by_type().items():
         link_type_translated = EntityContainerYearLinkTypes.get_value(link_type)
         if not entity_version.get_by_entity_and_date(entity, learning_container_year.academic_year.start_date):
             warnings.append(

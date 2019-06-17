@@ -118,32 +118,26 @@ class LearningContainerYear(SerializableModel):
             ADDITIONAL_REQUIREMENT_ENTITY_2: 'additional_entity_2',
         }
 
-    # TODO :: rename function
-    # TODO :: unit tests
-    def get_entity(self, entity_container_type):
+    def get_entity_from_type(self, entity_container_type):
         attr = LearningContainerYear.get_attrs_by_entity_container_type()[entity_container_type]
         return getattr(self, attr, None)
 
-    # TODO :: rename function
-    # TODO :: unit tests
-    def get_entity_by_type(self) -> dict:
+    def get_map_entity_by_type(self) -> dict:
         return {
-            link_type: self.get_entity(link_type)
+            link_type: self.get_entity_from_type(link_type)
             for link_type in LearningContainerYear.get_attrs_by_entity_container_type()
         }
 
-    # TODO :: unit test + check where to use this function (how are sets entities? via DAL?)
     def set_entity(self, entity_container_type, new_entity):
         attr = LearningContainerYear.get_attrs_by_entity_container_type()[entity_container_type]
         setattr(self, attr, new_entity)
 
-    # TODO:: unit tests
     def set_entities(self, entities_by_type_to_set):
         for link_type, new_entity in entities_by_type_to_set.items():
             self.set_entity(link_type, new_entity)
 
     def get_most_recent_entity_acronym(self, entity_container_type):
-        entity = self.get_entity(entity_container_type)
+        entity = self.get_entity_from_type(entity_container_type)
         return entity.most_recent_acronym if entity else None
 
 
@@ -154,6 +148,6 @@ def find_last_entity_version_grouped_by_linktypes(learning_container_year, link_
         link_types = [link_type]
     return {
         link_type: entity.get_latest_entity_version()
-        for link_type, entity in learning_container_year.get_entity_by_type().items()
+        for link_type, entity in learning_container_year.get_map_entity_by_type().items()
         if entity and link_type in link_types
     }

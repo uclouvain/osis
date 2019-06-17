@@ -347,7 +347,7 @@ class LearningUnitPostponementForm:
         """
         initial_learning_unit_year = self._forms_to_upsert[0].instance
         # TODO :: select_related entities
-        entity_by_type = initial_learning_unit_year.learning_container_year.get_entity_by_type()
+        entity_by_type = initial_learning_unit_year.learning_container_year.get_map_entity_by_type()
 
         for current_component in initial_learning_unit_year.learningcomponentyear_set.all():
             component_type = current_component.type

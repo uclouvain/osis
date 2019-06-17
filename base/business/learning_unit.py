@@ -244,7 +244,7 @@ def compose_components_dict(components, additional_entities):
 def get_entities(container_year):
     return {
         link_type: entity.most_recent_acronym if entity else None
-        for link_type, entity in container_year.get_entity_by_type().items()
+        for link_type, entity in container_year.get_map_entity_by_type().items()
         if link_type in REQUIREMENT_ENTITIES
     }
 
@@ -296,5 +296,5 @@ def get_learning_unit_comparison_context(learning_unit_year):
     components = get_components_identification(learning_unit_year)
     context['components'] = components.get('components')
     context['learning_container_year_partims'] = learning_unit_year.get_partims_related()
-    context.update(learning_unit_year.learning_container_year.get_entity_by_type())
+    context.update(learning_unit_year.learning_container_year.get_map_entity_by_type())
     return context

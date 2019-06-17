@@ -212,7 +212,7 @@ class TestSave(TestCase):
         form.save()
 
         self.learning_unit_year.learning_container_year.refresh_from_db()
-        entities_by_type = self.learning_unit_year.learning_container_year.get_entity_by_type()
+        entities_by_type = self.learning_unit_year.learning_container_year.get_map_entity_by_type()
 
         expected_entities = {
             entity_container_year_link_type.REQUIREMENT_ENTITY: self.entity_version.entity,

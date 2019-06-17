@@ -583,7 +583,7 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
                          expected_nb_classes)
 
     def _assert_entity_container_year_correctly_duplicated(self, expected_entities, duplicated_container):
-        diff = set(expected_entities) - set(duplicated_container.get_entity_by_type().values())
+        diff = set(expected_entities) - set(duplicated_container.get_map_entity_by_type().values())
         self.assertEqual(diff, set())
 
     def test_shorten_and_extend_learning_unit(self):
@@ -1136,13 +1136,13 @@ class TestUpdateLearningUnitEntities(TestCase, LearningUnitsMixin):
             )
 
     def assert_entity_has_not_changed(self, learning_container_year, entity_link_type):
-        past_entity = learning_container_year.get_entity(entity_link_type)
+        past_entity = learning_container_year.get_entity_from_type(entity_link_type)
         learning_container_year.refresh_from_db()
-        current_entity = learning_container_year.get_entity(entity_link_type)
+        current_entity = learning_container_year.get_entity_from_type(entity_link_type)
 
         self.assertEqual(past_entity, current_entity)
 
     def assert_entity_has_been_modified(self, learning_container_year, expected_entity, entity_link_type):
         learning_container_year.refresh_from_db()
 
-        self.assertEqual(learning_container_year.get_entity(entity_link_type), expected_entity)
+        self.assertEqual(learning_container_year.get_entity_from_type(entity_link_type), expected_entity)

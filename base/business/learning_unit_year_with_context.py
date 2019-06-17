@@ -74,7 +74,7 @@ def append_latest_entities(learning_unit_yr, service_course_search=False):
 
     for link_type in entity_types.ENTITY_TYPE_LIST:
         container = learning_unit_yr.learning_container_year
-        entity = container.get_entity(link_type)
+        entity = container.get_entity_from_type(link_type)
         learning_unit_yr.entities[link_type] = entity.get_latest_entity_version() if entity else None
 
     requirement_entity_version = learning_unit_yr.entities.get(entity_types.REQUIREMENT_ENTITY)

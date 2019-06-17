@@ -336,7 +336,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def get_entity(self, entity_type):
         # @TODO: Remove this condition when classes will be removed from learning unit year
         if self.learning_container_year:
-            entity = self.learning_container_year.get_entity(entity_type)
+            entity = self.learning_container_year.get_entity_from_type(entity_type)
             if entity:
                 # TODO :: prefetch entityversion_set before call to this function
                 return Entity.objects.filter(pk=entity.pk).prefetch_related('entityversion_set').get()
