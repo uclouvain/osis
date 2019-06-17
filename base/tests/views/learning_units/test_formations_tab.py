@@ -91,12 +91,7 @@ class TestLearningUnitFormationsTab(TestCase):
             {
                 self.education_group_year.pk: [
                     self.education_group_year_formation_parent
-                ]
-            }
-        )
-        self.assertEqual(
-            response.context['parent_formations_by_formation'],
-            {
+                ],
                 self.education_group_year_formation_parent.pk: [
                     self.education_group_year_formation_great_parent_1,
                     self.education_group_year_formation_great_parent_2

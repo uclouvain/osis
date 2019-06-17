@@ -66,13 +66,15 @@
                                                     {% url 'education_group_read' training.id training.id as url_education_group_yr %}
                                                     <li>
                                                         <a href="{{ url_education_group_yr }}">{{ training.acronym }} - {{ training.title }}</a>
-                                                        {% if parent_formations_by_formation|get_item:training.id %}
-                                                            <br> {% trans 'Included in' %} :
-                                                            {% for parent_training in parent_formations_by_formation|get_item:training.id %}
-                                                                {% url 'education_group_read' parent_training.id parent_training.id as url_parent_training %}
-                                                                <a href="{{ url_parent_training }}">{{ parent_training.acronym }}</a>
-                                                                {% if not forloop.last %} / {% endif %}
-                                                            {% endfor %}
+                                                        {% if formations_by_educ_group_year|get_item:training.id %}
+                                                            <ul><li>
+                                                                {% trans 'Included in' %} :
+                                                                {% for parent_training in formations_by_educ_group_year|get_item:training.id %}
+                                                                    {% url 'education_group_read' parent_training.id parent_training.id as url_parent_training %}
+                                                                    <a href="{{ url_parent_training }}">{{ parent_training.acronym }}</a>
+                                                                    {% if not forloop.last %} - {% endif %}
+                                                                {% endfor %}
+                                                            </li></ul>
                                                         {% endif %}
                                                     </li>
                                                 {% endfor %}

@@ -290,19 +290,34 @@ class GroupElementYear(OrderedModel):
         return True
 
 
-def find_learning_unit_formations(objects, parents_as_instances=False):
-    root_ids_by_object_id = {}
+def find_learning_unit_formations(objects, parents_as_instances=False, with_parents_of_parents=False):
+    if with_parents_of_parents and not parents_as_instances:
+        raise ValueError("If parameter with_parents_of_parents is True, parameter parents_as_instances must be True")
+
+    roots_by_object_id = {}
     if objects:
-        root_ids_by_object_id = _find_related_formations(objects)
+        _raise_if_incorrect_instance(objects)
+        academic_year = _extract_common_academic_year(objects)
+        parents_by_id = _build_parent_list_by_education_group_year_id(academic_year)
+
+        roots_by_object_id = _find_related_formations(objects, parents_by_id)
+
         if parents_as_instances:
-            root_ids_by_object_id = _convert_parent_ids_to_instances(root_ids_by_object_id)
-    return root_ids_by_object_id
+            roots_by_object_id = _convert_parent_ids_to_instances(roots_by_object_id)
+            if with_parents_of_parents:
+                flat_list_of_parents = _flatten_list_of_lists(roots_by_object_id.values())
+                roots_by_parent_id = _find_related_formations(flat_list_of_parents, parents_by_id)
+                roots_by_parent_id = _convert_parent_ids_to_instances(roots_by_parent_id)
+                roots_by_object_id = {**roots_by_object_id, **roots_by_parent_id}
+
+    return roots_by_object_id
 
 
-def _find_related_formations(objects):
-    _raise_if_incorrect_instance(objects)
-    academic_year = _extract_common_academic_year(objects)
-    parents_by_id = _build_parent_list_by_education_group_year_id(academic_year)
+def _flatten_list_of_lists(list_of_lists):
+    return list(set(itertools.chain.from_iterable(list_of_lists)))
+
+
+def _find_related_formations(objects, parents_by_id):
     if isinstance(objects[0], LearningUnitYear):
         return {obj.id: _find_elements(parents_by_id, child_leaf_id=obj.id) for obj in objects}
     else:
@@ -350,7 +365,7 @@ def _find_elements(group_elements_by_child_id, child_leaf_id=None, child_branch_
 
 
 def _convert_parent_ids_to_instances(root_ids_by_object_id):
-    flat_root_ids = list(set(itertools.chain.from_iterable(root_ids_by_object_id.values())))
+    flat_root_ids = _flatten_list_of_lists(root_ids_by_object_id.values())
     map_instance_by_id = {obj.id: obj for obj in education_group_year.search(id=flat_root_ids)}
     return {
         obj_id: sorted([map_instance_by_id[parent_id] for parent_id in parents], key=lambda obj: obj.acronym)
