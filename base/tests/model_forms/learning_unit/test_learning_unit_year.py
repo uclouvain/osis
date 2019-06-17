@@ -34,7 +34,7 @@ from base.forms.utils.acronym_field import PartimAcronymField, AcronymField
 from base.models.enums import learning_container_year_types, organization_type
 from base.models.enums.attribution_procedure import INTERNAL_TEAM
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
-    ADDITIONAL_REQUIREMENT_ENTITY_2, ADDITIONAL_REQUIREMENT_ENTITY_1, EntityContainerYearLinkTypes
+    EntityContainerYearLinkTypes
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.enums.internship_subtypes import PROFESSIONAL_INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import ANNUAL
