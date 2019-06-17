@@ -379,9 +379,10 @@ class SimplifiedVolumeForm(forms.ModelForm):
 
     def _assert_repartition_volumes_consistency(self):
         """In case EntityContainer link is not set, need to reset repartition volumes to None."""
+        container_year = self._learning_unit_year.learning_container_year
         existing_entity_container_types = {
             link_type
-            for link_type, entity_id in self._learning_unit_year.learning_container_year.get_map_entity_by_type().items()
+            for link_type, entity_id in container_year.get_map_entity_by_type().items()
             if entity_id
         }
         for entity_container_type in LearningComponentYear.repartition_volume_attrs_by_entity_container_type().keys():

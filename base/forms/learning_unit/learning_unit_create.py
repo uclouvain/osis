@@ -224,9 +224,9 @@ class LearningContainerYearModelForm(forms.ModelForm):
                 'data-html': True,
                 'onchange': (
                     'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_1", false);'
-                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_1_country", false);'
+                    'updateAdditionalEntityEditability(this.value, "id_additional_entity_1_country", false);'
                     'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", true);'
-                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2_country", true);'
+                    'updateAdditionalEntityEditability(this.value, "id_additional_entity_2_country", true);'
                 ),
             },
             forward=['country_requirement_entity']
@@ -261,7 +261,7 @@ class LearningContainerYearModelForm(forms.ModelForm):
                 'data-html': True,
                 'onchange': (
                     'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", false);'
-                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2_country", false);'
+                    'updateAdditionalEntityEditability(this.value, "id_additional_entity_2_country", false);'
                 ),
             },
             forward=['country_additional_entity_1']
@@ -271,7 +271,7 @@ class LearningContainerYearModelForm(forms.ModelForm):
     )
 
     country_additional_entity_1 = CountryEntityField(
-        widget_attrs={'id': 'id_additional_requirement_entity_1_country'}
+        widget_attrs={'id': 'id_additional_entity_1_country'}
     )
 
     additional_entity_2 = EntitiesVersionChoiceField(
@@ -283,7 +283,7 @@ class LearningContainerYearModelForm(forms.ModelForm):
                 'data-html': True,
                 'onchange': (
                     'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", false);'
-                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2_country", false);'
+                    'updateAdditionalEntityEditability(this.value, "id_additional_entity_2_country", false);'
                 ),
             },
             forward=['country_additional_entity_2']
@@ -293,7 +293,7 @@ class LearningContainerYearModelForm(forms.ModelForm):
     )
 
     country_additional_entity_2 = CountryEntityField(
-        widget_attrs={'id': 'id_additional_requirement_entity_2_country'}
+        widget_attrs={'id': 'id_additional_entity_2_country'}
     )
 
     def __init__(self, *args, **kwargs):
