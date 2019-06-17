@@ -203,17 +203,23 @@ class TestDetachPrerequisiteCheck(TestCase):
             academic_year__current=True,
             education_group_type=EducationGroupTypeFactory(name=education_group_types.TrainingType.MASTER_MA_120.name)
         )
+        cls.children_level_0 = GroupElementYearFactory.create_batch(
+            1,
+            parent=cls.root,
+            child_branch__education_group_type__group=True,
+            child_branch__academic_year=cls.root.academic_year
+        )
 
         cls.children_level_1 = GroupElementYearFactory.create_batch(
             3,
-            parent=cls.root,
-            child_branch__education_group_type__minitraining=True,
+            parent=cls.children_level_0[0].child_branch,
+            child_branch__education_group_type__group=True,
             child_branch__academic_year=cls.root.academic_year
         )
         cls.children_level_2 = GroupElementYearFactory.create_batch(
             1,
             parent=cls.children_level_1[0].child_branch,
-            child_branch__education_group_type__minitraining=True,
+            child_branch__education_group_type__group=True,
             child_branch__academic_year=cls.root.academic_year
         )
         cls.lu_children_level_2 = GroupElementYearChildLeafFactory.create_batch(
@@ -250,17 +256,16 @@ class TestDetachPrerequisiteCheck(TestCase):
         self.assertIsNone(strategy._check_detach_prerequisite_rules())
 
     def test_raise_error_when_has_prerequisite_in_formation(self):
-        strategy = DetachEducationGroupYearStrategy(self.lu_children_level_2[0])
+        strategy = DetachEducationGroupYearStrategy(self.children_level_2[0])
         with self.assertRaises(ValidationError):
             strategy._check_detach_prerequisite_rules()
 
     def test_raise_error_when_is_prerequisite_in_formation(self):
-        strategy = DetachEducationGroupYearStrategy(self.lu_children_level_2[1])
+        strategy = DetachEducationGroupYearStrategy(self.children_level_1[1])
         with self.assertRaises(ValidationError):
             strategy._check_detach_prerequisite_rules()
 
-    # def test_warnings_when_removing_prerequisites(self):
-    #     strategy = DetachEducationGroupYearStrategy(self.children_level_1[0])
-    #     strategy._check_detach_prerequisite_rules()
-    #     self.assertIsNotNone(strategy.warnings)
-
+    def test_warnings_when_prerequisites_in_group_that_is_detached(self):
+        strategy = DetachEducationGroupYearStrategy(self.children_level_0[0])
+        strategy._check_detach_prerequisite_rules()
+        self.assertTrue(strategy.warnings)

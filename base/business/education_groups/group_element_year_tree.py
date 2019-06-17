@@ -167,10 +167,7 @@ class EducationGroupHierarchy:
         ]
 
     def get_learning_unit_year_list(self):
-        def pruning_function(node):
-            return node.group_element_year.child_leaf
-
-        return [element.child_leaf for element in self.to_list(flat=True, pruning_function=pruning_function)]
+        return [element.child_leaf for element in self.to_list(flat=True) if element.child_leaf]
 
 
 class NodeLeafJsTree(EducationGroupHierarchy):

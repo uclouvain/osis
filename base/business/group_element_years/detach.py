@@ -51,6 +51,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         self.link = link
         self.parent = self.link.parent
         self.education_group_year = self.link.child
+        self.warnings = []
 
     @cached_property
     def _parents(self):
@@ -72,25 +73,38 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         return options_to_detach
 
     def is_valid(self):
-        # TODO Add check on prerequisite
         management.can_link_be_detached(self.parent, self.link)
+        self._check_detach_prerequisite_rules()
         if self._get_options_to_detach() and self.get_parents_program_master():
             self._check_detatch_options_rules()
         return True
 
     def _check_detach_prerequisite_rules(self):
-        learning_unit_year_child = EducationGroupHierarchy(root=self.parent).get_learning_unit_year_list()
-        formations = group_element_year.find_learning_unit_formations([self.parent])[self.parent.id]
-        has_or_is_prerequisite = PrerequisiteItem.objects.filter(
+        learning_unit_year_child = EducationGroupHierarchy(root=self.education_group_year).get_learning_unit_year_list()
+        formations = self._parents
+        has_or_is_prerequisite_in_group = PrerequisiteItem.objects.filter(
             Q(prerequisite__learning_unit_year__in=learning_unit_year_child,
               prerequisite__education_group_year__in=formations) |
             Q(prerequisite__education_group_year__in=formations,
               learning_unit__in=[luy.learning_unit for luy in learning_unit_year_child])
         ).exists()
-        if has_or_is_prerequisite:
+        has_or_is_prerequisite_in_other_group = PrerequisiteItem.objects.filter(
+            (Q(prerequisite__learning_unit_year__in=learning_unit_year_child,
+               prerequisite__education_group_year__in=formations) &
+             ~Q(learning_unit__in=[luy.learning_unit for luy in learning_unit_year_child])) |
+            (Q(prerequisite__education_group_year__in=formations,
+               learning_unit__in=[luy.learning_unit for luy in learning_unit_year_child]) &
+             ~Q(prerequisite__learning_unit_year__in=learning_unit_year_child))
+        ).exists()
+        if has_or_is_prerequisite_in_other_group:
             raise ValidationError(
-                "Msg to define"
+                _("Cannot detach education group year %(acronym)s as some of "
+                  "its learning units has prerequisites or are prerequisite.") % {
+                    "acronym": self.education_group_year.acronym
+                }
             )
+        elif has_or_is_prerequisite_in_group:
+            self.warnings.append("Msg to define")
 
     def _check_detatch_options_rules(self):
         """
