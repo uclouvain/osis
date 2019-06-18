@@ -61,7 +61,12 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     def setUp(self):
         academic_year = AcademicYearFactory(year=2020)
         self.education_group_year = TrainingFactory(academic_year=academic_year)
-        self.person = CentralManagerFactory("delete_educationgroup", "change_educationgroup", "add_educationgroup")
+        self.person = CentralManagerFactory(
+            "delete_educationgroup",
+            "change_educationgroup",
+            "add_educationgroup",
+            "can_edit_education_group_administrative_data"
+        )
         PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
 
         self.url = reverse('delete_education_group', args=[self.education_group_year.id, self.education_group_year.id])
@@ -70,7 +75,8 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         self.context = {
             "person": self.person,
             "education_group_year": self.education_group_year,
-            "request": self.request
+            "request": self.request,
+            "root": self.education_group_year,
         }
 
     def test_li_with_deletion_perm(self):
@@ -275,7 +281,8 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
                 'url': {
                     'person': self.person,
                     'education_group_year': self.education_group_year,
-                    'request': self.request
+                    'request': self.request,
+                    'root': self.education_group_year
                 },
                 'text': 'Générer le pdf',
                 'class_li': '',
@@ -284,6 +291,23 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
                 'load_modal': True
             }
         )
+
+    def test_button_edit_administrative_data_enabled(self):
+        result = button_edit_administrative_data(self.context)
+
+        self.assertEqual(
+            result["url"],
+            reverse('education_group_edit_administrative', args=[
+                self.education_group_year.pk,
+                self.education_group_year.pk
+            ])
+        )
+
+        self.assertEqual(result["title"], "")
+
+        self.assertEqual(result["class_li"], "")
+
+        self.assertEqual(result["text"], _("Modify"))
 
 
 class TestEducationGroupAsFacultyManagerTag(TestCase):
@@ -412,16 +436,10 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             }
         )
 
-    def test_button_edit_administrative_data(self):
+    def test_button_edit_administrative_data_disabled(self):
         result = button_edit_administrative_data(self.context)
 
-        self.assertEqual(
-            result["url"],
-            reverse('education_group_edit_administrative', args=[
-                self.education_group_year.pk,
-                self.education_group_year.pk
-            ])
-        )
+        self.assertEqual(result["url"], "#")
 
         self.assertEqual(
             result["title"],
