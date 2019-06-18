@@ -18,11 +18,10 @@ $(document).ready(function () {
         $("a.jstree-anchor").click(function( event ) {
             let pageLocator = '_self';
             if (event.ctrlKey) pageLocator = '_blank';
+            data.instance.deselect_all();
             window.open($(this).attr('href'), pageLocator);
         });
     });
-
-
 
     function get_data_from_tree(data) {
         let inst = $.jstree.reference(data.reference),
