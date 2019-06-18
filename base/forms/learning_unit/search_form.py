@@ -46,11 +46,11 @@ from base.models.academic_year import AcademicYear
 from base.models.campus import Campus
 from base.models.entity_container_year import EntityContainerYear
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
-from base.models.enums import entity_container_year_link_type, learning_unit_year_subtypes, active_status, entity_type,\
+from base.models.enums import entity_container_year_link_type, learning_unit_year_subtypes, active_status, entity_type, \
     learning_container_year_types
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY
 from base.models.enums.learning_container_year_types import LearningContainerYearType
-from base.models.learning_unit_year import convert_status_bool
+from base.models.learning_unit_year import convert_status_bool, LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
 from base.models.organization_address import find_distinct_by_country
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -251,6 +251,7 @@ class LearningUnitYearForm(LearningUnitSearchForm):
         service_course_search = service_course_search or self.service_course_search
 
         learning_units = self.get_queryset()
+
         if not service_course_search and self.cleaned_data and learning_units.count() > self.MAX_RECORDS:
             raise TooManyResultsException
 
@@ -263,7 +264,6 @@ class LearningUnitYearForm(LearningUnitSearchForm):
                 entity_container_year_link_type.REQUIREMENT_ENTITY
             ])
         )
-
         for learning_unit in learning_units:
             append_latest_entities(learning_unit, service_course_search)
 
@@ -317,7 +317,7 @@ class LearningUnitYearForm(LearningUnitSearchForm):
                 faculty_borrowing_id = EntityVersion.objects.current(academic_year.start_date). \
                     get(acronym=faculty_borrowing_acronym).entity.id
             except EntityVersion.DoesNotExist:
-                return []
+                return LearningUnitYear.objects.none()
 
         ids = filter_is_borrowed_learning_unit_year(
             qs_learning_units,
