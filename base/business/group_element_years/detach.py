@@ -37,7 +37,6 @@ from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.group_element_year import GroupElementYear
-from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
 
 
@@ -61,6 +60,20 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
             parents_as_instances=True
         )[self.parent.pk] + [self.parent]
 
+    @cached_property
+    def _learning_unit_year_children(self):
+        return EducationGroupHierarchy(root=self.education_group_year).get_learning_unit_year_list()
+
+    @cached_property
+    def _prerequisites_of_children(self):
+        formations = self._parents
+        return PrerequisiteItem.objects.filter(
+            Q(prerequisite__learning_unit_year__in=self._learning_unit_year_children,
+              prerequisite__education_group_year__in=formations) |
+            Q(prerequisite__education_group_year__in=formations,
+              learning_unit__in=[luy.learning_unit for luy in self._learning_unit_year_children])
+        ).select_related("prerequisite")
+
     def get_parents_program_master(self):
         return filter(lambda elem: elem.education_group_type.name in [
             TrainingType.PGRM_MASTER_120.name,
@@ -81,22 +94,11 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         return True
 
     def _check_detach_prerequisite_rules(self):
-        learning_unit_year_child = EducationGroupHierarchy(root=self.education_group_year).get_learning_unit_year_list()
-        formations = self._parents
-        has_or_is_prerequisite_in_group = PrerequisiteItem.objects.filter(
-            Q(prerequisite__learning_unit_year__in=learning_unit_year_child,
-              prerequisite__education_group_year__in=formations) |
-            Q(prerequisite__education_group_year__in=formations,
-              learning_unit__in=[luy.learning_unit for luy in learning_unit_year_child])
+        has_or_is_prerequisite_in_other_group = self._prerequisites_of_children.exclude(
+            learning_unit__in=[luy.learning_unit for luy in self._learning_unit_year_children],
+            prerequisite__learning_unit_year__in=self._learning_unit_year_children
         ).exists()
-        has_or_is_prerequisite_in_other_group = PrerequisiteItem.objects.filter(
-            (Q(prerequisite__learning_unit_year__in=learning_unit_year_child,
-               prerequisite__education_group_year__in=formations) &
-             ~Q(learning_unit__in=[luy.learning_unit for luy in learning_unit_year_child])) |
-            (Q(prerequisite__education_group_year__in=formations,
-               learning_unit__in=[luy.learning_unit for luy in learning_unit_year_child]) &
-             ~Q(prerequisite__learning_unit_year__in=learning_unit_year_child))
-        ).exists()
+        has_or_is_prerequisite_in_group = self._prerequisites_of_children.exists()
         if has_or_is_prerequisite_in_other_group:
             raise ValidationError(
                 _("Cannot detach education group year %(acronym)s as some of "
@@ -105,19 +107,15 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                 }
             )
         elif has_or_is_prerequisite_in_group:
-            Prerequisite.objects.filter(
-                id__in=PrerequisiteItem.objects.filter(
-                    Q(prerequisite__learning_unit_year__in=learning_unit_year_child,
-                      prerequisite__education_group_year__in=formations) |
-                    Q(prerequisite__education_group_year__in=formations,
-                      learning_unit__in=[luy.learning_unit for luy in learning_unit_year_child])
-                ).values("prerequisite")
-            ).delete()
             self.warnings.append(
-                _("The prerequisites contained in education group year %(acronym)s has been deleted.") % {
+                _("The prerequisites contained in education group year %(acronym)s will be deleted.") % {
                     "acronym": self.education_group_year.acronym
                 }
             )
+
+    def delete_prerequisites(self):
+        for prerequisite_item in self._prerequisites_of_children:
+            prerequisite_item.prerequisite.delete()
 
     def _check_detatch_options_rules(self):
         """
@@ -166,6 +164,7 @@ class DetachLearningUnitYearStrategy(DetachStrategy):
     def __init__(self, link: GroupElementYear):
         self.parent = link.parent
         self.learning_unit_year = link.child
+        self.warnings = []
 
     def is_valid(self):
         if self.learning_unit_year.has_or_is_prerequisite(self.parent):

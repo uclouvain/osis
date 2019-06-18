@@ -271,4 +271,5 @@ class TestDetachPrerequisiteCheck(TestCase):
         strategy._check_detach_prerequisite_rules()
         self.assertTrue(strategy.warnings)
 
+        strategy.delete_prerequisites()
         self.assertFalse(Prerequisite.objects.filter(id=self.prerequisite.id))
