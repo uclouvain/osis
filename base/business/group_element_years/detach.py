@@ -94,19 +94,19 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         return True
 
     def _check_detach_prerequisite_rules(self):
-        has_or_is_prerequisite_in_other_group = self._prerequisites_of_children.exclude(
+        has_or_is_prerequisite_in_descendants = self._prerequisites_of_children.exclude(
             learning_unit__in=[luy.learning_unit for luy in self._learning_unit_year_children],
             prerequisite__learning_unit_year__in=self._learning_unit_year_children
         ).exists()
-        has_or_is_prerequisite_in_group = self._prerequisites_of_children.exists()
-        if has_or_is_prerequisite_in_other_group:
+        has_or_is_prerequisite_outside_descendants = self._prerequisites_of_children.exists()
+        if has_or_is_prerequisite_in_descendants:
             raise ValidationError(
                 _("Cannot detach education group year %(acronym)s as some of "
                   "its learning units has prerequisites or are prerequisite.") % {
                     "acronym": self.education_group_year.acronym
                 }
             )
-        elif has_or_is_prerequisite_in_group:
+        elif has_or_is_prerequisite_outside_descendants:
             self.warnings.append(
                 _("The prerequisites contained in education group year %(acronym)s will be deleted.") % {
                     "acronym": self.education_group_year.acronym
