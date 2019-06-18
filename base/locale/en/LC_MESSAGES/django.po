@@ -642,6 +642,7 @@ msgstr ""
 msgid "Apply postponement on learning unit year"
 msgstr ""
 
+
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:140
 msgid "Are you certain that you want to cancel the learning unit proposal ?"
 msgstr ""

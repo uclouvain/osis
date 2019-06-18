@@ -564,6 +564,7 @@ msgstr "Infos complémentaires"
 
 #: models/enums/entity_container_year_link_type.py:46
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:50
+
 #: templates/learning_unit/identification.html:235 views/learning_unit.py:242
 #: views/learning_unit.py:352 views/learning_unit.py:370
 msgid "Additional requirement entity 1"
@@ -6137,23 +6138,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:166
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid ""
-#~ "%(col_name)s has been already modified. ({%(new_value)s} instead of "
-#~ "{%(current_value)s})"
-#~ msgstr ""
-#~ "%(col_name)s a déjà été modifié. ({%(new_value)s} à la place de "
-#~ "{%(current_value)s})"
-
-#~ msgid ""
-#~ "The repartition volume of %(col_name)s has been already modified. "
-#~ "({%(new_value)s} instead of {%(current_value)s})"
-#~ msgstr ""
-#~ "La répartition de volume de %(col_name)s a déjà été modifiée. "
-#~ "(%(new_value)s à la place de %(current_value)s)"
-
-#~ msgid "Offers"
-#~ msgstr "Programmes"
-
-#~ msgid "The learning unit is prerequisite"
-#~ msgstr "L'UE est prérequise"
