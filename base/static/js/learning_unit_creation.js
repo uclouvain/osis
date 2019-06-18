@@ -1,12 +1,12 @@
 const internship = "INTERNSHIP";
 const LEARNING_UNIT_FULL_SUBTYPE = "FULL";
-const trans_existed_acronym = gettext('Existed acronym');
-const trans_existing_acronym = gettext('Existing acronym');
-const trans_invalid_acronym = gettext('Invalid acronym');
-const trans_field_required = gettext('Field is required');
-const trans_field_min = gettext('Min for field');
-const trans_field_max = gettext('Max for field');
-const trans_field_step = gettext('Step for field');
+const trans_existed_acronym = gettext('Existed code for ');
+const trans_existing_acronym = gettext('Existing code in ');
+const trans_invalid_acronym = gettext('Invalid code');
+const trans_field_required = gettext('This field is required');
+const trans_field_min = gettext('Please enter a value greater than or equal to 0.');
+const trans_field_max = gettext('Please enter a value less than or equal to 500.');
+const trans_field_step = gettext('Please enter a value that is a multiple of 0.5.');
 
 
 var form = $('#LearningUnitYearForm').closest("form");

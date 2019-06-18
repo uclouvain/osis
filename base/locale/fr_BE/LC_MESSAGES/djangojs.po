@@ -32,15 +32,15 @@ msgid "Detach"
 msgstr "Détacher"
 
 #: static/js/learning_unit_creation.js:3
-msgid "Existed acronym"
+msgid "Existed code for "
 msgstr "Code a déjà existé pour "
 
 #: static/js/learning_unit_creation.js:4
-msgid "Existing acronym"
+msgid "Existing code in "
 msgstr "Code déjà existant en "
 
 #: static/js/learning_unit_creation.js:6
-msgid "Field is required"
+msgid "This field is required"
 msgstr "Ce champ est obligatoire."
 
 #: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:8
@@ -48,7 +48,7 @@ msgid "Insertion of a link to a CDN document"
 msgstr "Insertion d'un lien vers un document du CDN"
 
 #: static/js/learning_unit_creation.js:5
-msgid "Invalid acronym"
+msgid "Invalid code"
 msgstr "Code non valide"
 
 #: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:23
@@ -56,11 +56,11 @@ msgid "Link to CDN Doc"
 msgstr "Lien vers document du CDN"
 
 #: static/js/learning_unit_creation.js:8
-msgid "Max for field"
+msgid "Please enter a value less than or equal to 500."
 msgstr "Veuillez entrer une valeur inférieur ou égale à 500."
 
 #: static/js/learning_unit_creation.js:7
-msgid "Min for field"
+msgid "Please enter a value greater than or equal to 0."
 msgstr "Veuillez entrer une valeur supérieure ou égale à 0."
 
 #: static/js/education_group/education_group_tree.js:97
@@ -88,7 +88,7 @@ msgid "Selection of target files"
 msgstr "Sélection du fichier cible"
 
 #: static/js/learning_unit_creation.js:9
-msgid "Step for field"
+msgid "Please enter a value that is a multiple of 0.5."
 msgstr "Veuillez entrer une valeur qui est un multiple de 0,5."
 
 #: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:32
