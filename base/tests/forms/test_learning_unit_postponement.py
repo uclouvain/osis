@@ -528,7 +528,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         result = form.consistency_errors
         expected_result = OrderedDict({
             next_academic_year: [
-                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+                _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                     'col_name': _('French title proper'),
                     'new_value': '-',
                     'current_value': instance_luy_base_form.data['specific_title']
@@ -542,7 +542,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         initial_status_value, new_status_value = self._change_status_value(next_academic_year)
         expected_result = OrderedDict({
             next_academic_year: [
-                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+                _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                     'col_name': _('Active'),
                     'new_value': _('yes') if new_status_value else _('no'),
                     'current_value': _('yes') if initial_status_value else _('no')
@@ -566,14 +566,14 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         initial_credits_value_2, new_credits_value_2 = self._change_credits_value(next_academic_year)
         expected_result = OrderedDict({
             next_academic_year: [
-                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+                _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                     'col_name': "Crédits",
                     'current_value': initial_credits_value,
                     'new_value': new_credits_value
                 }
             ],
             next_academic_year_2: [
-                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+                _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                     'col_name': "Crédits",
                     'current_value': initial_credits_value_2,
                     'new_value': new_credits_value_2
@@ -596,7 +596,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         initial_requirement_entity, new_requirement_entity = self._change_requirement_entity_value(next_academic_year)
         expected_result = OrderedDict({
             next_academic_year: [
-                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+                _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                     'col_name': _('Requirement entity'),
                     'current_value': initial_requirement_entity,
                     'new_value': new_requirement_entity
@@ -624,7 +624,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         expected_result = OrderedDict({
             next_academic_year: [
                 _("The repartition volume of %(col_name)s has been already modified. "
-                  "({%(new_value)s} instead of {%(current_value)s})") % {
+                  "(%(new_value)s instead of %(current_value)s)") % {
                     'col_name': component.acronym + "-" + requirement_entity.most_recent_acronym,
                     'new_value': float(component.repartition_volume_requirement_entity),
                     'current_value': float('0.00')
@@ -680,7 +680,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
 
         expected_result = OrderedDict({
             next_academic_year: [
-                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+                _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                     'col_name': _('Additional requirement entity 2'),
                     'new_value': '-',
                     'current_value': initial_entity

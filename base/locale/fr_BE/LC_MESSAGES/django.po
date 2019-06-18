@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-18 10:00+0200\n"
+"POT-Creation-Date: 2019-06-18 10:07+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -44,11 +44,11 @@ msgstr "%(col_name)s a déjà été modifié."
 #: tests/forms/test_learning_unit_postponement.py:683
 #, python-format
 msgid ""
-"%(col_name)s has been already modified. ({%(new_value)s} instead of "
-"{%(current_value)s})"
+"%(col_name)s has been already modified. (%(new_value)s instead of "
+"%(current_value)s)"
 msgstr ""
-"%(col_name)s a déjà été modifié. ({%(new_value)s} à la place de "
-"{%(current_value)s})"
+"%(col_name)s a déjà été modifié. (%(new_value)s à la place de "
+"%(current_value)s)"
 
 #: models/education_group.py:56 tests/models/test_education_group.py:137
 #, python-format
@@ -447,9 +447,9 @@ msgid "Acronym existed in %(academic_year)s"
 msgstr "Code a déjà existé en %(academic_year)s"
 
 #: forms/education_groups.py:89 models/education_group_year.py:166
-#: tests/templatetags/test_education_group.py:447
-#: tests/templatetags/test_education_group.py:454
-#: tests/templatetags/test_education_group.py:463
+#: tests/templatetags/test_education_group.py:465
+#: tests/templatetags/test_education_group.py:472
+#: tests/templatetags/test_education_group.py:481
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
 
@@ -1329,12 +1329,12 @@ msgid "Description fiche submission dates updated"
 msgstr "Date de soumission des fiches descriptives mis à jour"
 
 #: templates/education_group/blocks/content_actions.html:43
-#: tests/templatetags/test_education_group.py:220
-#: tests/templatetags/test_education_group.py:221
-#: tests/templatetags/test_education_group.py:232
-#: tests/templatetags/test_education_group.py:243
-#: tests/templatetags/test_education_group.py:244
-#: tests/templatetags/test_education_group.py:258
+#: tests/templatetags/test_education_group.py:226
+#: tests/templatetags/test_education_group.py:227
+#: tests/templatetags/test_education_group.py:238
+#: tests/templatetags/test_education_group.py:249
+#: tests/templatetags/test_education_group.py:250
+#: tests/templatetags/test_education_group.py:264
 msgid "Detach"
 msgstr "Détacher"
 
@@ -1964,9 +1964,9 @@ msgstr "Informations générales et Conditions d'admission"
 msgid "General informations"
 msgstr "Infos générales"
 
-#: templatetags/education_group.py:236
-#: tests/templatetags/test_education_group.py:268
-#: tests/templatetags/test_education_group.py:270
+#: templatetags/education_group.py:237
+#: tests/templatetags/test_education_group.py:274
+#: tests/templatetags/test_education_group.py:276
 msgid "Generate pdf"
 msgstr "Générer le pdf"
 
@@ -2033,8 +2033,8 @@ msgstr "Domaine ISCED/CITE"
 msgid "Identification"
 msgstr "Identification"
 
-#: templates/learning_unit/blocks/form/form_external.html:53
-#: templates/learning_unit/blocks/form/form_external.html:55
+#: templates/learning_unit/blocks/form/form_external.html:54
+#: templates/learning_unit/blocks/form/form_external.html:56
 #: templates/learning_unit/learning_unit_layout.html:91
 #: templates/learning_unit/learning_unit_layout.html:93
 #: templates/learning_unit/simple/creation.html:116
@@ -2211,13 +2211,13 @@ msgstr ""
 msgid "It is necessary to indicate the internship subtype."
 msgstr "Il est nécessaire d'indiquer le sous-type de stage."
 
-#: templatetags/education_group.py:213
-#: tests/templatetags/test_education_group.py:243
+#: templatetags/education_group.py:214
+#: tests/templatetags/test_education_group.py:249
 #, python-format
 msgid "It is not possible to %(action)s the root element."
 msgstr "Il n'est pas possible de %(action)s l'élément racine."
 
-#: tests/templatetags/test_education_group.py:256
+#: tests/templatetags/test_education_group.py:262
 msgid "It is not possible to detach the root element."
 msgstr "Il n'est pas possible de détacher l'élément racine."
 
@@ -2770,7 +2770,8 @@ msgstr "Modifié par"
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:70
 #: templatetags/education_group.py:153
-#: tests/templatetags/test_education_group.py:432
+#: tests/templatetags/test_education_group.py:310
+#: tests/templatetags/test_education_group.py:450
 msgid "Modify"
 msgstr "Modifier"
 
@@ -3045,7 +3046,7 @@ msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
 
 #: templatetags/education_group.py:147
-#: tests/templatetags/test_education_group.py:428 views/education_group.py:70
+#: tests/templatetags/test_education_group.py:446 views/education_group.py:70
 msgid ""
 "Only program managers of the education group OR central manager linked to "
 "entity can edit."
@@ -4256,7 +4257,7 @@ msgstr "La valeur du champ crédits doit être un entier"
 
 #: business/education_groups/perms.py:139
 #: tests/templatetags/test_education_group.py:48
-#: tests/templatetags/test_education_group.py:326
+#: tests/templatetags/test_education_group.py:350
 msgid "The education group edition period is not open."
 msgstr ""
 "La période de modification d'organisation de formation n'est pas ouverte."
@@ -4559,10 +4560,10 @@ msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
 #, python-format
 msgid ""
 "The repartition volume of %(col_name)s has been already modified. "
-"({%(new_value)s} instead of {%(current_value)s})"
+"(%(new_value)s instead of %(current_value)s)"
 msgstr ""
-"La répartition de volume de %(col_name)s a déjà été modifiée. "
-"({%(new_value)s} a la place de {%(current_value)s})"
+"La répartition de volume de %(col_name)s a déjà été modifiée. (%(new_value)s "
+"à la place de %(current_value)s)"
 
 #: business/group_element_years/postponement.py:205
 #: tests/business/education_groups/test_postponement.py:190
@@ -4607,13 +4608,13 @@ msgid "The user doesn't have right to update general information"
 msgstr ""
 "L’utilisateur n’a pas le droit de mettre à jour les informations générales"
 
-#: templatetags/education_group.py:211
-#: tests/templatetags/test_education_group.py:231
-#: tests/templatetags/test_education_group.py:255
+#: templatetags/education_group.py:212
+#: tests/templatetags/test_education_group.py:237
+#: tests/templatetags/test_education_group.py:261
 msgid "The user has not permission to change education groups."
 msgstr "L'utilisateur n'a pas la permission de modifier les formations."
 
-#: tests/templatetags/test_education_group.py:400
+#: tests/templatetags/test_education_group.py:424
 #, python-format
 msgctxt "female"
 msgid "The user has not permission to create a %(category)s."
@@ -6136,6 +6137,20 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:166
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid ""
+#~ "%(col_name)s has been already modified. ({%(new_value)s} instead of "
+#~ "{%(current_value)s})"
+#~ msgstr ""
+#~ "%(col_name)s a déjà été modifié. ({%(new_value)s} à la place de "
+#~ "{%(current_value)s})"
+
+#~ msgid ""
+#~ "The repartition volume of %(col_name)s has been already modified. "
+#~ "({%(new_value)s} instead of {%(current_value)s})"
+#~ msgstr ""
+#~ "La répartition de volume de %(col_name)s a déjà été modifiée. "
+#~ "(%(new_value)s à la place de %(current_value)s)"
 
 #~ msgid "Offers"
 #~ msgstr "Programmes"
