@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-18 09:03+0200\n"
+"POT-Creation-Date: 2019-06-18 10:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -411,9 +411,9 @@ msgid "Acronym existed in %(academic_year)s"
 msgstr ""
 
 #: forms/education_groups.py:89 models/education_group_year.py:166
-#: tests/templatetags/test_education_group.py:447
-#: tests/templatetags/test_education_group.py:454
-#: tests/templatetags/test_education_group.py:463
+#: tests/templatetags/test_education_group.py:465
+#: tests/templatetags/test_education_group.py:472
+#: tests/templatetags/test_education_group.py:481
 msgid "Acronym/Short title"
 msgstr ""
 
@@ -642,7 +642,7 @@ msgstr ""
 msgid "Apply postponement on learning unit year"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:137
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:140
 msgid "Are you certain that you want to cancel the learning unit proposal ?"
 msgstr ""
 
@@ -881,7 +881,7 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:112
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:115
 msgid "Cancel the proposal"
 msgstr ""
 
@@ -974,7 +974,7 @@ msgstr ""
 msgid "Clinical internship"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:141
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:144
 #: templates/learning_unit/class_edit.html:34
 #: templates/learning_unit/component_edit.html:33
 #: templates/my_osis/my_message.html:60
@@ -1096,7 +1096,7 @@ msgstr ""
 msgid "Consolidate"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:114
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:117
 msgid "Consolidate the proposal"
 msgstr ""
 
@@ -1242,7 +1242,7 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:120
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:123
 msgid "Delete learning unit year definitively"
 msgstr ""
 
@@ -1286,12 +1286,12 @@ msgid "Description fiche submission dates updated"
 msgstr ""
 
 #: templates/education_group/blocks/content_actions.html:43
-#: tests/templatetags/test_education_group.py:220
-#: tests/templatetags/test_education_group.py:221
-#: tests/templatetags/test_education_group.py:232
-#: tests/templatetags/test_education_group.py:243
-#: tests/templatetags/test_education_group.py:244
-#: tests/templatetags/test_education_group.py:258
+#: tests/templatetags/test_education_group.py:226
+#: tests/templatetags/test_education_group.py:227
+#: tests/templatetags/test_education_group.py:238
+#: tests/templatetags/test_education_group.py:249
+#: tests/templatetags/test_education_group.py:250
+#: tests/templatetags/test_education_group.py:264
 msgid "Detach"
 msgstr ""
 
@@ -1447,7 +1447,7 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:106
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:109
 msgid "Edit the proposal"
 msgstr ""
 
@@ -1908,9 +1908,9 @@ msgstr ""
 msgid "General informations"
 msgstr ""
 
-#: templatetags/education_group.py:236
-#: tests/templatetags/test_education_group.py:268
-#: tests/templatetags/test_education_group.py:270
+#: templatetags/education_group.py:237
+#: tests/templatetags/test_education_group.py:274
+#: tests/templatetags/test_education_group.py:276
 msgid "Generate pdf"
 msgstr ""
 
@@ -1977,8 +1977,8 @@ msgstr "ISCED/CITE domain"
 msgid "Identification"
 msgstr ""
 
-#: templates/learning_unit/blocks/form/form_external.html:53
-#: templates/learning_unit/blocks/form/form_external.html:55
+#: templates/learning_unit/blocks/form/form_external.html:54
+#: templates/learning_unit/blocks/form/form_external.html:56
 #: templates/learning_unit/learning_unit_layout.html:91
 #: templates/learning_unit/learning_unit_layout.html:93
 #: templates/learning_unit/simple/creation.html:116
@@ -2148,13 +2148,13 @@ msgstr ""
 msgid "It is necessary to indicate the internship subtype."
 msgstr ""
 
-#: templatetags/education_group.py:213
-#: tests/templatetags/test_education_group.py:243
+#: templatetags/education_group.py:214
+#: tests/templatetags/test_education_group.py:249
 #, python-format
 msgid "It is not possible to %(action)s the root element."
 msgstr ""
 
-#: tests/templatetags/test_education_group.py:256
+#: tests/templatetags/test_education_group.py:262
 msgid "It is not possible to detach the root element."
 msgstr ""
 
@@ -2315,7 +2315,7 @@ msgstr ""
 msgid "Learning units"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:80
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:82
 #: templates/learning_unit/blocks/modal/modal_comparison.html:30
 #: templates/learning_unit/comparison.html:32
 msgid "Learning units comparison"
@@ -2329,7 +2329,7 @@ msgstr ""
 msgid "Learning units list"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:86
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:89
 #: templates/learning_unit/proposal_comparison.html:32
 msgid "Learning units proposal comparison"
 msgstr ""
@@ -2692,7 +2692,8 @@ msgstr ""
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:70
 #: templatetags/education_group.py:153
-#: tests/templatetags/test_education_group.py:432
+#: tests/templatetags/test_education_group.py:310
+#: tests/templatetags/test_education_group.py:450
 msgid "Modify"
 msgstr ""
 
@@ -2961,7 +2962,7 @@ msgid "One of the partial volumes must have a value to 0."
 msgstr ""
 
 #: templatetags/education_group.py:147
-#: tests/templatetags/test_education_group.py:428 views/education_group.py:70
+#: tests/templatetags/test_education_group.py:446 views/education_group.py:70
 msgid ""
 "Only program managers of the education group OR central manager linked to "
 "entity can edit."
@@ -3444,6 +3445,10 @@ msgstr ""
 msgid "Proposal of creation"
 msgstr ""
 
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:81
+msgid "Proposal of creation, so nothing to compare to"
+msgstr ""
+
 #: business/learning_unit.py:96 business/learning_unit_xls.py:82
 #: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:63
 #: templates/learning_unit/by_proposal.html:88
@@ -3487,11 +3492,11 @@ msgstr ""
 msgid "Publication contact entity"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:99
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:102
 msgid "Put in proposal for ending date"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:96
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:99
 msgid "Put in proposal in modification"
 msgstr ""
 
@@ -4147,7 +4152,7 @@ msgstr ""
 
 #: business/education_groups/perms.py:139
 #: tests/templatetags/test_education_group.py:48
-#: tests/templatetags/test_education_group.py:326
+#: tests/templatetags/test_education_group.py:350
 msgid "The education group edition period is not open."
 msgstr ""
 
@@ -4460,13 +4465,13 @@ msgstr ""
 msgid "The user doesn't have right to update general information"
 msgstr ""
 
-#: templatetags/education_group.py:211
-#: tests/templatetags/test_education_group.py:231
-#: tests/templatetags/test_education_group.py:255
+#: templatetags/education_group.py:212
+#: tests/templatetags/test_education_group.py:237
+#: tests/templatetags/test_education_group.py:261
 msgid "The user has not permission to change education groups."
 msgstr ""
 
-#: tests/templatetags/test_education_group.py:400
+#: tests/templatetags/test_education_group.py:424
 #, python-format
 msgctxt "female"
 msgid "The user has not permission to create a %(category)s."
@@ -5422,7 +5427,7 @@ msgstr ""
 msgid "comment (internal)"
 msgstr ""
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:143
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:146
 #: templates/learning_unit/blocks/modal/modal_confirm_delete.html:37
 #: templates/learning_unit/teaching_material/modal_delete.html:34
 msgid "confirm"
