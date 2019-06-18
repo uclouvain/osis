@@ -573,6 +573,14 @@ class EducationGroupYear(SerializableModel):
         return self.education_group_type.name
 
     @property
+    def is_option(self):
+        return self.type == MiniTrainingType.OPTION.name
+
+    @property
+    def is_finality(self):
+        return self.type in TrainingType.finality_types()
+
+    @property
     def is_minor(self):
         return self.type in MiniTrainingType.minors()
 

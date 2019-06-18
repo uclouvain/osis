@@ -95,6 +95,8 @@ def _get_code_according_type(education_group_year):
         return "min-{}".format(education_group_year.partial_acronym)
     elif education_group_year.is_deepening:
         return "app-{}".format(education_group_year.partial_acronym)
+    elif education_group_year.is_option or education_group_year.is_finality:
+        return education_group_year.partial_acronym
     return education_group_year.acronym
 
 

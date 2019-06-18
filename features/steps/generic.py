@@ -33,7 +33,7 @@ from base.models.campus import Campus
 from base.models.entity import Entity
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
-from base.models.enums.groups import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP
+from base.models.enums.groups import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit import LearningUnit
@@ -45,6 +45,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory, Lea
 from base.tests.factories.person import FacultyManagerFactory, PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.functionals.test_education_group import LoginPage
+from base.tests.factories.person import PersonWithPermissionsFactory
 
 use_step_matcher("parse")
 
@@ -83,6 +84,8 @@ def step_impl(context: Context, group):
         user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
     elif group.lower() in ('gestionnaire central', 'central manager'):
         user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
+    elif group.lower() == "gestionnaire d'institution":
+        user.groups.add(Group.objects.get(name="institution_administration"))
 
     user.save()
 
@@ -206,3 +209,31 @@ def step_impl(context, acronym, year, entity):
         state=ProposalState.FACULTY.name,
         entity=e,
     )
+
+
+@step("Encoder la valeur {search_value} dans la zone de saisie {search_field}")
+def step_impl(context: Context, search_value: str, search_field: str):
+    setattr(context.current_page, search_field, search_value)
+
+
+@step("L'utilisateur a la permission {permission}.")
+def step_impl(context: Context, permission: str):
+    """
+    :type context behave.runner.Context
+    """
+    user = PersonWithPermissionsFactory(
+        permission,
+        user__username="usual_suspect",
+        user__first_name="Keyser",
+        user__last_name="Söze",
+        user__password="Roger_Verbal_Kint",
+    ).user
+    user.groups.clear()
+
+    user.save()
+    context.user = user
+
+    page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
+    page.login("usual_suspect", 'Roger_Verbal_Kint')
+
+    context.test.assertEqual(context.browser.current_url, context.get_url('/'))

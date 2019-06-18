@@ -35,12 +35,13 @@
                         {% include "learning_unit/components_identification.html" %}
                     {% endif %}
                 {% endblock components %}
-
-                {% block partim_attributes %}
-                    {% if learning_unit_year.subtype != "PARTIM" %}
-                        {% include "learning_unit/blocks/partim_attributes.html" %}
-                    {% endif %}
-                {% endblock partim_attributes %}
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            {% bootstrap_field learning_container_year_form.team form_group_class="col-md-12" %}
+                        </div>
+                    </div>
+                </div>
 
                 {% if learning_unit_external_form %}
                     <div class="panel panel-default">

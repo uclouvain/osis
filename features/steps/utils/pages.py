@@ -32,6 +32,7 @@ from base.models.entity_version import EntityVersion
 from features.steps.utils.fields import InputField, SubmitField, SelectField, ButtonField, \
     Checkbox, Select2Field, Link, \
     CkeditorField, RadioField, Field, SelectEntityVersionField
+from selenium.common.exceptions import NoSuchElementException
 
 
 class AjaxModal(pypom.Page, ABC):
@@ -308,7 +309,7 @@ class SearchLearningUnitPage(CommonPageMixin, pypom.Page):
         text = self.find_element(By.CSS_SELECTOR, "#main > div.panel.panel-default > div > strong").text
         return text.split()[0]
 
-    def find_acronym_in_table(self, row: int = 1):
+    def find_acronym_in_table(self, row: int=1):
         selector = '#table_learning_units > tbody > tr:nth-child({}) > td.col-acronym > a'.format(row)
         return self.find_element(By.CSS_SELECTOR, selector).text
 
@@ -449,3 +450,58 @@ class SearchEducationGroupPage(CommonPageMixin, pypom.Page):
             By.CSS_SELECTOR,
             '#main > div.panel.panel-default > div > div > div.row > div:nth-child(1)').text
         return text.split()[0]
+
+
+class SearchEntityPage(CommonPageMixin, pypom.Page):
+    URL_TEMPLATE = '/entities/'
+
+    acronym = InputField(By.ID, 'id_acronym')
+    title = InputField(By.ID, 'id_title')
+    entity_type = SelectField(By.ID, "id_entity_type")
+
+    search = ButtonField(By.ID, "bt_submit_entity_search")
+
+    def find_acronym_in_table(self, row: int=1):
+        return self.find_element(By.ID, 'td_entity_%d' % row).text
+
+
+class SearchOrganizationPage(CommonPageMixin, pypom.Page):
+
+    URL_TEMPLATE = '/organizations/'
+
+    acronym = InputField(By.ID, 'id_acronym')
+    name = InputField(By.ID, 'id_name')
+    type = SelectField(By.ID, "id_type")
+
+    search = ButtonField(By.ID, "bt_submit_organization_search")
+
+    def find_acronym_in_table(self, row: int=1):
+        return self.find_element(By.ID, 'td_organization_%d' % row).text
+
+
+class SearchStudentPage(CommonPageMixin, pypom.Page):
+
+    URL_TEMPLATE = '/students/'
+
+    registration_id = InputField(By.ID, 'id_registration_id')
+    name = InputField(By.ID, 'id_name')
+
+    search = ButtonField(By.ID, "bt_submit_student_search")
+
+    def find_registration_id_in_table(self, row: int=1):
+        return self.find_element(By.ID, 'td_student_%d' % row).text
+
+    def find_name_in_table(self):
+        names = []
+        row = 1
+        last = False
+        while not last:
+            try:
+                elt = self.find_element(By.ID, 'spn_student_name_%d' % row)
+                names.append(elt.text)
+
+                row += 1
+            except NoSuchElementException as e:
+                return names
+
+        return names
