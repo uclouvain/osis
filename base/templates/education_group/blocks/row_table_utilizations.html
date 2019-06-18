@@ -45,9 +45,10 @@
     <td>{{ group_element_year.is_mandatory | yesno:_("yes,no") | title }}</td>
     <td>{{ group_element_year.block | default_if_none:'-' }}</td>
     <td>
-        {% for formation in formations%}
-           <a href="{% url "education_group_read" root_id=formation.id education_group_year_id=formation.id%}">{{ formation.acronym }}</a>
-         {% empty %}
+        {% for formation in formations %}
+            <a href="{% url "education_group_read" root_id=formation.id education_group_year_id=formation.id%}">{{ formation.acronym }}</a>
+            {% if not forloop.last %} - {% endif %}
+        {% empty %}
             -
         {% endfor %}
     </td>
