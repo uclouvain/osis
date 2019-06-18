@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-16 11:08+0200\n"
+"POT-Creation-Date: 2019-06-18 10:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,13 +31,37 @@ msgstr "Fermer"
 msgid "Detach"
 msgstr "Détacher"
 
+#: static/js/learning_unit_creation.js:3
+msgid "Existed acronym"
+msgstr "Code a déjà existé pour "
+
+#: static/js/learning_unit_creation.js:4
+msgid "Existing acronym"
+msgstr "Code déjà existant en "
+
+#: static/js/learning_unit_creation.js:6
+msgid "Field is required"
+msgstr "Ce champ est obligatoire."
+
 #: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:8
 msgid "Insertion of a link to a CDN document"
 msgstr "Insertion d'un lien vers un document du CDN"
 
+#: static/js/learning_unit_creation.js:5
+msgid "Invalid acronym"
+msgstr "Code non valide"
+
 #: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:23
 msgid "Link to CDN Doc"
 msgstr "Lien vers document du CDN"
+
+#: static/js/learning_unit_creation.js:8
+msgid "Max for field"
+msgstr "Veuillez entrer une valeur inférieur ou égale à 500."
+
+#: static/js/learning_unit_creation.js:7
+msgid "Min for field"
+msgstr "Veuillez entrer une valeur supérieure ou égale à 0."
 
 #: static/js/education_group/education_group_tree.js:97
 msgid "Modify"
@@ -51,7 +75,7 @@ msgstr "Ouvrir"
 msgid "Open all"
 msgstr "Ouvrir tout"
 
-#: static/js/learning_unit_creation.js:152
+#: static/js/learning_unit_creation.js:164
 msgid "Please enter a valid URL."
 msgstr "Entrez une URL valide."
 
@@ -63,34 +87,10 @@ msgstr "Sélectionner"
 msgid "Selection of target files"
 msgstr "Sélection du fichier cible"
 
+#: static/js/learning_unit_creation.js:9
+msgid "Step for field"
+msgstr "Veuillez entrer une valeur qui est un multiple de 0,5."
+
 #: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:32
 msgid "You should make a selection before clicking 'ok'"
 msgstr "Vous devez faire une séléction avant de cliquer sur 'ok'"
-
-#: static/js/learning_unit_creation.js:3
-msgid "existed_acronym"
-msgstr "Code a déjà existé pour "
-
-#: static/js/learning_unit_creation.js:4
-msgid "existing_acronym"
-msgstr "Code déjà existant en "
-
-#: static/js/learning_unit_creation.js:6
-msgid "field_is_required"
-msgstr "Ce champ est obligatoire."
-
-#: static/js/learning_unit_creation.js:5
-msgid "invalid_acronym"
-msgstr "Code non valide"
-
-#: static/js/learning_unit_creation.js:8
-msgid "max_for_field"
-msgstr "Veuillez entrer une valeur inférieur ou égale à 500."
-
-#: static/js/learning_unit_creation.js:7
-msgid "min_for_field"
-msgstr "Veuillez entrer une valeur supérieure ou égale à 0."
-
-#: static/js/learning_unit_creation.js:9
-msgid "step_for_field"
-msgstr "Veuillez entrer une valeur qui est un multiple de 0,5."
