@@ -46,8 +46,8 @@ from base.models.academic_year import AcademicYear
 from base.models.campus import Campus
 from base.models.entity_container_year import EntityContainerYear
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
-from base.models.enums import entity_container_year_link_type, learning_unit_year_subtypes, active_status, entity_type, \
-    learning_container_year_types
+from base.models.enums import entity_container_year_link_type, learning_unit_year_subtypes, active_status, \
+    entity_type, learning_container_year_types
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import convert_status_bool, LearningUnitYear
