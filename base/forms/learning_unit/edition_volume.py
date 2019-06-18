@@ -108,14 +108,15 @@ class VolumeEditionForm(forms.Form):
             self.fields["opening_brackets_entities_field"] = EmptyField(label='[')
         for i, key in enumerate(entities_to_add):
             entity = self.entities[key]
-            self.fields["volume_" + key.lower()] = VolumeField(
-                label=entity.acronym,
-                help_text=entity.title,
-                widget=FloatFormatInput(render_value=True),
-                required=False
-            )
-            if i != len(entities_to_add) - 1:
-                self.fields["add" + key.lower()] = EmptyField(label='+')
+            if entity:
+                self.fields["volume_" + key.lower()] = VolumeField(
+                    label=entity.acronym,
+                    help_text=entity.title,
+                    widget=FloatFormatInput(render_value=True),
+                    required=False
+                )
+                if i != len(entities_to_add) - 1:
+                    self.fields["add" + key.lower()] = EmptyField(label='+')
         if size_entities_to_add > 1:
             self.fields["closing_brackets_entities_field"] = EmptyField(label=']')
 
