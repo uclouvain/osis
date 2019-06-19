@@ -27,6 +27,7 @@ from behave import *
 from behave.runner import Context
 from django.contrib.auth.models import Group
 
+from base.business.learning_unit_proposal import copy_learning_unit_data
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.campus import Campus
@@ -195,6 +196,7 @@ def step_impl(context, acronym, year, entity):
         type=ProposalType.MODIFICATION.name,
         state=ProposalState.FACULTY.name,
         entity=e,
+        initial_data=copy_learning_unit_data(luy)
     )
 
 
@@ -208,6 +210,7 @@ def step_impl(context, acronym, year, entity):
         type=ProposalType.SUPPRESSION.name,
         state=ProposalState.FACULTY.name,
         entity=e,
+        initial_data=copy_learning_unit_data(luy)
     )
 
 
