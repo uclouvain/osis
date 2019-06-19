@@ -61,7 +61,8 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
 
     actions = [
         'resend_messages_to_queue',
-        'copy_reddot_data'
+        'copy_reddot_data',
+        'postpone_n6'
     ]
 
     def copy_reddot_data(self, request, queryset):
@@ -84,6 +85,12 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
             ))
 
     copy_reddot_data.short_description = _("Copy Reddot data from previous academic year.")
+
+    def postpone_n6(self, request, queryset):
+        from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponementToN6
+        process = EducationGroupAutomaticPostponementToN6()
+        process.postpone()
+        return process.serialize_postponement_results()
 
 
 class EducationGroupYearQueryset(SerializableQuerySet):
