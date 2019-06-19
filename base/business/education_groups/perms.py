@@ -64,7 +64,7 @@ def is_eligible_to_add_group(person, education_group, raise_exception=False):
 def _is_eligible_to_add_education_group(person, education_group, category, education_group_type=None,
                                         raise_exception=False):
     return check_permission(person, "base.add_educationgroup", raise_exception) and \
-           _is_eligible_to_add_education_group_with_category(person, category, raise_exception) and \
+           _is_eligible_to_add_education_group_with_category(person, education_group, category, raise_exception) and \
            _is_eligible_education_group(person, education_group, raise_exception) and \
            (not management.is_max_child_reached(education_group, education_group_type.name)
             if education_group_type and education_group
@@ -154,10 +154,13 @@ def _is_eligible_certificate_aims(person, education_group, raise_exception):
     return check_link_to_management_entity(education_group, person, raise_exception)
 
 
-def _is_eligible_to_add_education_group_with_category(person, category, raise_exception):
+def _is_eligible_to_add_education_group_with_category(person, education_group, category, raise_exception):
     # TRAINING/MINI_TRAINING can only be added by central managers | Faculty manager must make a proposition of creation
     # based on US OSIS-2592, Faculty manager can add a MINI-TRAINING
-    result = person.is_central_manager or (person.is_faculty_manager and category == Categories.MINI_TRAINING)
+    result = person.is_central_manager or (
+            person.is_faculty_manager and (category == Categories.MINI_TRAINING or
+                                           (category == Categories.GROUP and education_group))
+    )
 
     msg = pgettext(
         "male" if category == Categories.GROUP else "female",
@@ -200,18 +203,18 @@ def check_authorized_type(education_group, category, raise_exception=False):
         category=category.name,
         parents=[education_group]
     ).exists()
-
     parent_category = education_group.education_group_type.category
     can_raise_exception(
         raise_exception, result,
         pgettext(
             "female" if parent_category in [TRAINING, MINI_TRAINING] else "male",
-            _("No type of %(child_category)s can be created as child of %(category)s of type %(type)s")
-        ) % {
-            "child_category": category.value,
-            "category": education_group.education_group_type.get_category_display(),
-            "type": education_group.education_group_type.get_name_display(),
-        })
+            "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
+            % {
+                "child_category": category.value,
+                "category": education_group.education_group_type.get_category_display(),
+                "type": education_group.education_group_type.get_name_display(),
+            }
+        ))
 
     return result
 

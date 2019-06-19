@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-19 09:34+0200\n"
+"POT-Creation-Date: 2019-06-19 11:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -411,9 +411,9 @@ msgid "Acronym existed in %(academic_year)s"
 msgstr ""
 
 #: forms/education_groups.py:89 models/education_group_year.py:166
-#: tests/templatetags/test_education_group.py:465
-#: tests/templatetags/test_education_group.py:472
-#: tests/templatetags/test_education_group.py:481
+#: tests/templatetags/test_education_group.py:466
+#: tests/templatetags/test_education_group.py:473
+#: tests/templatetags/test_education_group.py:482
 msgid "Acronym/Short title"
 msgstr ""
 
@@ -1286,12 +1286,12 @@ msgid "Description fiche submission dates updated"
 msgstr ""
 
 #: templates/education_group/blocks/content_actions.html:43
-#: tests/templatetags/test_education_group.py:226
 #: tests/templatetags/test_education_group.py:227
-#: tests/templatetags/test_education_group.py:238
-#: tests/templatetags/test_education_group.py:249
+#: tests/templatetags/test_education_group.py:228
+#: tests/templatetags/test_education_group.py:239
 #: tests/templatetags/test_education_group.py:250
-#: tests/templatetags/test_education_group.py:264
+#: tests/templatetags/test_education_group.py:251
+#: tests/templatetags/test_education_group.py:265
 msgid "Detach"
 msgstr ""
 
@@ -1908,9 +1908,9 @@ msgstr ""
 msgid "General informations"
 msgstr ""
 
-#: templatetags/education_group.py:237
-#: tests/templatetags/test_education_group.py:274
-#: tests/templatetags/test_education_group.py:276
+#: templatetags/education_group.py:236
+#: tests/templatetags/test_education_group.py:275
+#: tests/templatetags/test_education_group.py:277
 msgid "Generate pdf"
 msgstr ""
 
@@ -2148,13 +2148,13 @@ msgstr ""
 msgid "It is necessary to indicate the internship subtype."
 msgstr ""
 
-#: templatetags/education_group.py:214
-#: tests/templatetags/test_education_group.py:249
+#: templatetags/education_group.py:213
+#: tests/templatetags/test_education_group.py:250
 #, python-format
 msgid "It is not possible to %(action)s the root element."
 msgstr ""
 
-#: tests/templatetags/test_education_group.py:262
+#: tests/templatetags/test_education_group.py:263
 msgid "It is not possible to detach the root element."
 msgstr ""
 
@@ -2691,9 +2691,9 @@ msgstr ""
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:85
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:70
-#: templatetags/education_group.py:153
-#: tests/templatetags/test_education_group.py:310
-#: tests/templatetags/test_education_group.py:450
+#: templatetags/education_group.py:152
+#: tests/templatetags/test_education_group.py:311
+#: tests/templatetags/test_education_group.py:451
 msgid "Modify"
 msgstr ""
 
@@ -2878,8 +2878,9 @@ msgstr ""
 msgid "No result!"
 msgstr ""
 
-#: business/education_groups/perms.py:209
+#: business/education_groups/perms.py:211
 #, python-format
+msgctxt "female"
 msgid ""
 "No type of %(child_category)s can be created as child of %(category)s of "
 "type %(type)s"
@@ -2960,8 +2961,8 @@ msgstr ""
 msgid "One of the partial volumes must have a value to 0."
 msgstr ""
 
-#: templatetags/education_group.py:147
-#: tests/templatetags/test_education_group.py:446 views/education_group.py:70
+#: templatetags/education_group.py:146
+#: tests/templatetags/test_education_group.py:447 views/education_group.py:70
 msgid ""
 "Only program managers of the education group OR central manager linked to "
 "entity can edit."
@@ -4151,7 +4152,7 @@ msgstr ""
 
 #: business/education_groups/perms.py:139
 #: tests/templatetags/test_education_group.py:48
-#: tests/templatetags/test_education_group.py:350
+#: tests/templatetags/test_education_group.py:351
 msgid "The education group edition period is not open."
 msgstr ""
 
@@ -4194,16 +4195,16 @@ msgstr ""
 msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr ""
 
-#: business/education_groups/perms.py:332
+#: business/education_groups/perms.py:335
 msgid "The faculty manager cannot modify admission which are lower than N"
 msgstr ""
 
-#: business/education_groups/perms.py:300
+#: business/education_groups/perms.py:303
 msgid ""
 "The faculty manager cannot modify general information which are lower than N"
 msgstr ""
 
-#: business/education_groups/perms.py:334
+#: business/education_groups/perms.py:337
 msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
@@ -4452,31 +4453,31 @@ msgid ""
 "the volume of parent learning unit for this professor"
 msgstr ""
 
-#: business/education_groups/perms.py:263
+#: business/education_groups/perms.py:266
 msgid "The user cannot modify data which are greater than N+1"
 msgstr ""
 
-#: business/education_groups/perms.py:312
+#: business/education_groups/perms.py:315
 msgid "The user doesn't have right to update admission condition"
 msgstr ""
 
-#: business/education_groups/perms.py:280
+#: business/education_groups/perms.py:283
 msgid "The user doesn't have right to update general information"
 msgstr ""
 
-#: business/education_groups/perms.py:44 templatetags/education_group.py:212
-#: tests/templatetags/test_education_group.py:237
-#: tests/templatetags/test_education_group.py:261
+#: business/education_groups/perms.py:44 templatetags/education_group.py:211
+#: tests/templatetags/test_education_group.py:238
+#: tests/templatetags/test_education_group.py:262
 msgid "The user has not permission to change education groups."
 msgstr ""
 
-#: tests/templatetags/test_education_group.py:424
+#: tests/templatetags/test_education_group.py:425
 #, python-format
 msgctxt "female"
 msgid "The user has not permission to create a %(category)s."
 msgstr ""
 
-#: business/education_groups/perms.py:164
+#: business/education_groups/perms.py:167
 #, python-format
 msgctxt "male"
 msgid "The user has not permission to create a %(category)s."
@@ -4490,8 +4491,8 @@ msgstr ""
 msgid "The user has not permission to delete education groups."
 msgstr ""
 
-#: business/education_groups/perms.py:178
-#: business/education_groups/perms.py:265
+#: business/education_groups/perms.py:181
+#: business/education_groups/perms.py:268
 msgid "The user is not attached to the management entity"
 msgstr ""
 
@@ -5413,6 +5414,13 @@ msgstr ""
 #: templates/education_group/blocks/form/training_tab_diploma.html:37
 #: templates/education_group/tab_diplomas.html:48
 msgid "certificate aims"
+msgstr ""
+
+#: tests/templatetags/test_education_group.py:166
+#: tests/templatetags/test_education_group.py:186
+#: tests/templatetags/test_education_group.py:205
+msgctxt "female"
+msgid "child_category"
 msgstr ""
 
 #: business/learning_units/xls_generator.py:50 business/proposal_xls.py:89
