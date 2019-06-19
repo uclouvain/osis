@@ -26,7 +26,6 @@
 from django.conf import settings
 
 from base.models import academic_year
-from base.models import teaching_material
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
 
@@ -66,6 +65,7 @@ def delete_teaching_material(teach_material):
 
 def check_teaching_materials_postponement(luy):
     if is_pedagogy_data_must_be_postponed(luy):
+        from base.models import teaching_material
         teaching_material.postpone_teaching_materials(luy)
     # For sync purpose, we need to trigger an update of the bibliography when we update teaching materials
     update_bibliography_changed_field_in_cms(luy)
