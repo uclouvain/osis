@@ -43,7 +43,7 @@ class SessionExamCalendar(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     number_session = models.IntegerField(choices=number_session.NUMBERS_SESSION)
-    academic_calendar = models.OneToOneField('AcademicCalendar')
+    academic_calendar = models.OneToOneField('AcademicCalendar', on_delete=models.CASCADE)
 
     def __str__(self):
         return u"%s - %s" % (self.academic_calendar, self.number_session)

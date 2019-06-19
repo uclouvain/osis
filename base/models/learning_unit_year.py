@@ -29,6 +29,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
 from django.db.models import Q, Sum
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
@@ -50,6 +51,41 @@ AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
 MINIMUM_CREDITS = 0.0
 MAXIMUM_CREDITS = 500
+
+# This query can be used as annotation in a LearningUnitYearQuerySet with a RawSql.
+# It return a dictionary with the closest trainings and mini_training (except 'option')
+# through the recursive database structure
+# ! It is a raw SQL : Use it only in last resort !
+# The returned structure is :
+# { id, gs_origin, child_branch_id, child_leaf_id, parent_id, acronym,
+#   title, category, name, id (for education_group_type) and level }
+SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS = """\
+WITH RECURSIVE group_element_year_parent AS (
+    SELECT gs.id, gs.id AS gs_origin, child_branch_id, child_leaf_id, parent_id, educ.acronym, educ.title,
+    educ_type.category, educ_type.name, educ_type.id, 0 AS level
+    
+    FROM base_groupelementyear AS gs
+    INNER JOIN base_educationgroupyear AS educ ON gs.parent_id = educ.id
+    INNER JOIN base_educationgrouptype AS educ_type on educ.education_group_type_id = educ_type.id
+    WHERE gs.child_leaf_id = "base_learningunityear"."id" 
+    
+    UNION ALL
+    
+    SELECT parent.id, gs_origin, parent.child_branch_id, parent.child_leaf_id, parent.parent_id, 
+    educ.acronym, educ.title, educ_type.category, educ_type.name, educ_type.id, child.level + 1
+    
+    FROM base_groupelementyear AS parent
+    INNER JOIN base_educationgroupyear AS educ ON parent.parent_id = educ.id
+    INNER JOIN base_educationgrouptype AS educ_type ON educ.education_group_type_id = educ_type.id
+    INNER JOIN base_educationgroupyear AS educ_child ON parent.child_branch_id = educ_child.id
+    INNER JOIN base_educationgrouptype AS educ_type_child ON educ_child.education_group_type_id = educ_type_child.id
+    INNER JOIN group_element_year_parent AS child on parent.child_branch_id = child.parent_id
+    WHERE not(educ_type_child.name != 'OPTION' AND educ_type_child.category IN ('MINI_TRAINING', 'TRAINING'))
+)
+
+SELECT array_to_json(array_agg(row_to_json(group_element_year_parent))) FROM group_element_year_parent 
+WHERE name != 'OPTION' AND category IN ('MINI_TRAINING', 'TRAINING') 
+"""
 
 
 def academic_year_validator(value):
@@ -90,10 +126,10 @@ class ExtraManagerLearningUnitYear(models.Model):
 class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
-                                      validators=[academic_year_validator])
-    learning_unit = models.ForeignKey('LearningUnit')
+                                      validators=[academic_year_validator], on_delete=models.CASCADE)
+    learning_unit = models.ForeignKey('LearningUnit', on_delete=models.CASCADE)
 
-    learning_container_year = models.ForeignKey('LearningContainerYear', null=True)
+    learning_container_year = models.ForeignKey('LearningContainerYear', null=True, on_delete=models.CASCADE)
 
     changed = models.DateTimeField(null=True, auto_now=True)
     acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('Code'),
@@ -108,7 +144,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
                                   validators=[MinValueValidator(MINIMUM_CREDITS), MaxValueValidator(MAXIMUM_CREDITS)],
                                   verbose_name=_('Credits'))
     decimal_scores = models.BooleanField(default=False)
-    structure = models.ForeignKey('Structure', blank=True, null=True)
+    structure = models.ForeignKey('Structure', blank=True, null=True, on_delete=models.CASCADE)
     internship_subtype = models.CharField(max_length=250, blank=True, null=True,
                                           verbose_name=_('Internship subtype'),
                                           choices=internship_subtypes.INTERNSHIP_SUBTYPES)
@@ -129,9 +165,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     professional_integration = models.BooleanField(default=False, verbose_name=_('professional integration'))
 
-    campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"))
+    campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"), on_delete=models.CASCADE)
 
-    language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'))
+    language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'), on_delete=models.CASCADE)
 
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
                                    verbose_name=_('Periodicity'))
@@ -139,7 +175,8 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     class Meta:
         unique_together = (('learning_unit', 'academic_year'), ('acronym', 'academic_year'))
-
+        ordering = 'acronym',
+        verbose_name = _("Learning unit year")
         permissions = (
             ("can_receive_emails_about_automatic_postponement", "Can receive emails about automatic postponement"),
         )
@@ -226,7 +263,8 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
             if self.is_external_of_mobility():
                 verbose_type = _('Mobility')
 
-            if self.learning_container_year.container_type in (COURSE, INTERNSHIP):
+            if self.learning_container_year.container_type in (COURSE, INTERNSHIP) or \
+                    self.is_external_with_co_graduation():
                 verbose_type += " ({subtype})".format(subtype=self.get_subtype_display())
 
         return verbose_type
@@ -377,9 +415,8 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         components_queryset = LearningComponentYear.objects.filter(
             learning_unit_year__learning_container_year=self.learning_container_year
         )
-        all_components = components_queryset.order_by('acronym')\
-            .select_related('learning_unit_year')\
-            .annotate(vol_global=Sum('entitycomponentyear__repartition_volume'))
+        all_components = components_queryset.order_by('acronym') \
+            .select_related('learning_unit_year')
         for learning_component_year in all_components:
             _warnings.extend(learning_component_year.warnings)
 
@@ -398,6 +435,12 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def is_external(self):
         return hasattr(self, "externallearningunityear")
 
+    def is_external_with_co_graduation(self):
+        return self.is_external() and self.externallearningunityear.co_graduation
+
+    def is_external_mobility(self):
+        return self.is_external() and self.externallearningunityear.mobility
+
     def is_prerequisite(self):
         return PrerequisiteItem.objects.filter(
             Q(learning_unit=self.learning_unit) | Q(prerequisite__learning_unit_year=self)
@@ -409,6 +452,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
             Q(prerequisite__learning_unit_year=self, prerequisite__education_group_year__in=formations) |
             Q(prerequisite__education_group_year__in=formations, learning_unit=self.learning_unit)
         ).exists()
+
+    def get_absolute_url(self):
+        return reverse('learning_unit', args=[self.pk])
 
 
 def get_by_id(learning_unit_year_id):

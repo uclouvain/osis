@@ -40,6 +40,7 @@ from base.business.education_groups.learning_units.prerequisite import \
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
+from base.models.group_element_year import find_learning_unit_formations
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.prerequisite import Prerequisite
@@ -82,6 +83,10 @@ class LearningUnitUtilization(LearningUnitGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["group_element_years"] = self.object.child_leaf.select_related("parent")
+        context["formations"] = find_learning_unit_formations(
+            list(grp.parent for grp in self.object.child_leaf.select_related("parent")),
+            parents_as_instances=True
+        )
         return context
 
 
@@ -101,12 +106,20 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-
+        luy = self.object
+        root = context["root"]
         context["prerequisite"] = get_object_or_none(Prerequisite,
-                                                     learning_unit_year=context["learning_unit_year"],
-                                                     education_group_year=context["root"])
-        context["can_modify_prerequisite"] = perms.is_eligible_to_change_education_group(context['person'],
-                                                                                         context["root"])
+                                                     learning_unit_year=luy,
+                                                     education_group_year=root)
+        context["can_modify_prerequisite"] = perms.is_eligible_to_change_education_group(
+            context['person'],
+            context["root"]
+        )
+
+        context['is_prerequisites_list'] = Prerequisite.objects.filter(
+            prerequisiteitem__learning_unit=luy.learning_unit,
+            education_group_year=root
+        )
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -138,7 +151,7 @@ class LearningUnitPrerequisiteGroup(LearningUnitGenericDetailView):
         context = super().get_context_data()
 
         learning_unit_year = context["learning_unit_year"]
-        formations_id = group_element_year.find_learning_unit_formations([learning_unit_year]).\
+        formations_id = group_element_year.find_learning_unit_formations([learning_unit_year]). \
             get(learning_unit_year.id, [])
         qs = EducationGroupYear.objects.filter(id__in=formations_id)
         prefetch_prerequisites = Prefetch("prerequisite_set",

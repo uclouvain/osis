@@ -23,24 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections.__init__ import OrderedDict
+from collections import OrderedDict
 
 from dal import autocomplete
 from django import forms
+from django.db.models import Q
+from django.utils import timezone
 from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
 
 from base.forms.utils.choice_field import add_blank, add_all
 from base.models.entity_container_year import EntityContainerYear
-from base.models.entity_version import get_last_version, find_all_current_entities_version
+from base.models.entity_version import get_last_version, find_pedagogical_entities_version, EntityVersion
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2, ENTITY_TYPE_LIST, EntityContainerYearLinkTypes
+from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
+from base.models.learning_component_year import LearningComponentYear
 from reference.models.country import Country
 
 
 def _get_section_choices():
     return add_blank(
-        add_all(Country.objects.filter(entity__isnull=False).values_list('id', 'name') .distinct().order_by('name'))
+        add_all(Country.objects.filter(entity__isnull=False).values_list('id', 'name').distinct().order_by('name')),
+        blank_choice_display="UCLouvain"
     )
 
 
@@ -56,6 +61,14 @@ class EntitiesVersionChoiceField(forms.ModelChoiceField):
         return ev_data.entity if ev_data else None
 
 
+def find_additional_requirement_entities_choices():
+    date = timezone.now()
+    return EntityVersion.objects.current(date).filter(
+        Q(entity__organization__type=MAIN) |
+        (Q(entity__organization__type=ACADEMIC_PARTNER) & Q(entity__organization__is_current_partner=True))
+    ).select_related('entity', 'entity__organization').order_by('acronym')
+
+
 class EntityContainerYearModelForm(forms.ModelForm):
     entity = EntitiesVersionChoiceField(
         widget=autocomplete.ModelSelect2(
@@ -63,7 +76,7 @@ class EntityContainerYearModelForm(forms.ModelForm):
             attrs={'data-html': True},
             forward=['country']
         ),
-        queryset=find_all_current_entities_version()
+        queryset=find_additional_requirement_entities_choices()
     )
     entity_type = ''
     country = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False, label=_("Country"))
@@ -92,6 +105,15 @@ class EntityContainerYearModelForm(forms.ModelForm):
         elif self.instance.pk:
             # if the instance has no entity, it must be deleted
             self.instance.delete()
+            self._assert_repartition_volumes_consistency()
+
+    def _assert_repartition_volumes_consistency(self):
+        """In case EntityContainerYear was removed, need to reset repartition volumes to None."""
+        repartition_attr_by_type = LearningComponentYear.repartition_volume_attrs_by_entity_container_type()
+        attr_name = repartition_attr_by_type[self.entity_type]
+        qs = LearningComponentYear.objects.filter(
+            learning_unit_year__learning_container_year=self.instance.learning_container_year)
+        qs.update(**{attr_name: None})
 
     @property
     def entity_version(self):
@@ -105,12 +127,20 @@ class EntityContainerYearModelForm(forms.ModelForm):
 
 class RequirementEntityContainerYearModelForm(EntityContainerYearModelForm):
     entity_type = REQUIREMENT_ENTITY
+    entity = EntitiesVersionChoiceField(
+        widget=autocomplete.ModelSelect2(
+            url='entity_requirement_autocomplete',
+            attrs={'data-html': True},
+            forward=['country']
+        ),
+        queryset=find_additional_requirement_entities_choices()
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        field = self.fields['entity']
-        field.queryset = self.person.find_main_entities_version
-        field.widget.attrs = {
+        entity_field = self.fields['entity']
+        entity_field.queryset = self.person.find_main_entities_version
+        entity_field.widget.attrs = {
             'onchange': (
                 'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_1", false);'
                 'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_1_country", false);'
@@ -124,8 +154,9 @@ class AllocationEntityContainerYearModelForm(EntityContainerYearModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        field = self.fields['entity']
-        field.widget.attrs = {'id': 'allocation_entity'}
+        entity_field = self.fields['entity']
+        entity_field.queryset = find_pedagogical_entities_version()
+        entity_field.widget.attrs = {'id': 'allocation_entity'}
 
 
 class Additional1EntityContainerYearModelForm(EntityContainerYearModelForm):
@@ -133,17 +164,30 @@ class Additional1EntityContainerYearModelForm(EntityContainerYearModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        field = self.fields['entity']
-        field.required = False
-        field.widget.attrs = {
+        entity = self.fields['entity']
+        entity.required = False
+        entity.widget.attrs = {
             'onchange': (
                 'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", false);'
                 'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2_country", false);'
+                'updateAdditionalEntityEditability(this.value, "id_component-0-repartition_volume_additional_entity_1",'
+                ' false);'
+                'updateAdditionalEntityEditability(this.value, "id_component-1-repartition_volume_additional_entity_1",'
+                ' false);'
+                'updateAdditionalEntityEditability(this.value, "id_component-0-repartition_volume_additional_entity_2",'
+                ' true);'
+                'updateAdditionalEntityEditability(this.value, "id_component-1-repartition_volume_additional_entity_2",'
+                ' true);'
             ),
             'id': 'id_additional_requirement_entity_1'
         }
         country = self.fields['country']
-        country.widget.attrs = {'id': 'id_additional_requirement_entity_1_country'}
+        country.widget.attrs = {
+            'id': 'id_additional_requirement_entity_1_country',
+            'onchange': 'clearAdditionalEntity("id_additional_requirement_entity_1", false);'
+        }
+        if hasattr(self.instance, 'entity') and self.instance.entity.organization.type != MAIN:
+            country.initial = self.instance.entity.country.pk
 
 
 class Additional2EntityContainerYearModelForm(EntityContainerYearModelForm):
@@ -151,11 +195,23 @@ class Additional2EntityContainerYearModelForm(EntityContainerYearModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        field = self.fields['entity']
-        field.required = False
-        field.widget.attrs = {'id': 'id_additional_requirement_entity_2'}
+        entity = self.fields['entity']
+        entity.required = False
+        entity.widget.attrs = {
+            'onchange': (
+                'updateAdditionalEntityEditability(this.value, "id_component-0-repartition_volume_additional_entity_2",'
+                ' false);'
+                'updateAdditionalEntityEditability(this.value, "id_component-1-repartition_volume_additional_entity_2",'
+                ' false);'
+            ),
+            'id': 'id_additional_requirement_entity_2'}
         country = self.fields['country']
-        country.widget.attrs = {'id': 'id_additional_requirement_entity_2_country'}
+        country.widget.attrs = {
+            'id': 'id_additional_requirement_entity_2_country',
+            'onchange': 'clearAdditionalEntity("id_additional_requirement_entity_2", false);'
+        }
+        if hasattr(self.instance, 'entity') and self.instance.entity.organization.type != MAIN:
+            country.initial = self.instance.entity.country.pk
 
 
 class EntityContainerBaseForm:

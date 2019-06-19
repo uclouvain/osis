@@ -38,7 +38,7 @@ class MandateAdmin(OsisModelAdmin):
 class Mandate(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    education_group = models.ForeignKey('EducationGroup', blank=True, null=True)
+    education_group = models.ForeignKey('EducationGroup', blank=True, null=True, on_delete=models.CASCADE)
     function = models.CharField(max_length=20, choices=mandate_types.MANDATE_TYPES)
     qualification = models.CharField(max_length=50, blank=True, null=True)
 

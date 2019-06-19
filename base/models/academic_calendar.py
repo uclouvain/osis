@@ -74,7 +74,7 @@ class AcademicCalendarQuerySet(models.QuerySet):
 class AcademicCalendar(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    academic_year = models.ForeignKey('AcademicYear')
+    academic_year = models.ForeignKey('AcademicYear', on_delete=models.CASCADE)
     title = models.CharField(max_length=50, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     start_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
@@ -116,6 +116,7 @@ class AcademicCalendar(SerializableModel):
         permissions = (
             ("can_access_academic_calendar", "Can access academic calendar"),
         )
+        unique_together = ("academic_year", "title")
 
 
 def find_highlight_academic_calendar():

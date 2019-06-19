@@ -23,12 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.http import HttpResponse
-from django.http import HttpResponseForbidden
-from django.http import HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag

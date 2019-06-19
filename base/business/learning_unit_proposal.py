@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import functools
-import json
 
 from django.contrib.messages import ERROR, SUCCESS
 from django.contrib.messages import INFO
@@ -33,27 +32,25 @@ from django.forms import model_to_dict
 from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl_base
+from base.business import learning_unit_year_with_context
+from base.business.learning_unit import compose_components_dict
+from base.business.learning_unit_year_with_context import volume_from_initial_learning_component_year
 from base.business.learning_units import perms
 from base.business.learning_units.edition import update_or_create_entity_container_year_with_components, \
     edit_learning_unit_end_date, update_learning_unit_year_with_report
 from base.business.learning_units.simple import deletion as business_deletion
 from base.models import entity_container_year, campus, entity
 from base.models.academic_year import find_academic_year_by_year
+from base.models.entity import find_by_id
 from base.models.entity_container_year import find_entities_grouped_by_linktype
 from base.models.enums import proposal_state, proposal_type
+from base.models.enums import vacant_declaration_type, attribution_procedure
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.proposal_type import ProposalType
 from base.utils import send_mail as send_mail_util
 from reference.models import language
-from base.business.learning_unit_year_with_context import volume_learning_component_year
-from base.business.learning_unit import compose_components_dict
-from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
-from base.models.entity import find_by_id
-from reference.models.language import find_by_id as language_find_by_id
-from base.business.learning_unit_year_with_context import volume_from_initial_learning_component_year
-from base.models.enums import vacant_declaration_type, attribution_procedure
-from base.business import learning_unit_year_with_context
 
 BOOLEAN_FIELDS = ('professional_integration', 'is_vacant', 'team')
 FOREIGN_KEY_NAME = (
@@ -83,7 +80,8 @@ INITIAL_DATA_FIELDS = {
     ],
     'learning_component_year': [
         "id", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2", "planned_classes",
-        "type"
+        "type", "repartition_volume_requirement_entity", "repartition_volume_additional_entity_1",
+        "repartition_volume_additional_entity_2"
     ],
 }
 
@@ -92,6 +90,7 @@ def compute_proposal_type(proposal_learning_unit_year, learning_unit_year):
     if proposal_learning_unit_year.type in [ProposalType.CREATION.name, ProposalType.SUPPRESSION.name]:
         return proposal_learning_unit_year.type
     differences = get_difference_of_proposal(proposal_learning_unit_year, learning_unit_year)
+    differences.pop('components_initial_data', None)
     if differences.get('acronym') and len(differences) == 1:
         return ProposalType.TRANSFORMATION.name
     elif differences.get('acronym'):
@@ -468,6 +467,9 @@ def get_components_initial_data(learning_unit_year):
         data.update(convert_volume_to_float(data, 'hourly_volume_total_annual'))
         data.update(convert_volume_to_float(data, 'hourly_volume_partial_q1'))
         data.update(convert_volume_to_float(data, 'hourly_volume_partial_q2'))
+        data.update(convert_volume_to_float(data, 'repartition_volume_requirement_entity'))
+        data.update(convert_volume_to_float(data, 'repartition_volume_additional_entity_1'))
+        data.update(convert_volume_to_float(data, 'repartition_volume_additional_entity_2'))
         component_values_list.append(data)
     return component_values_list
 
@@ -478,17 +480,12 @@ def get_components_identification_initial_data(proposal):
     learning_component_year_list_from_initial = proposal.initial_data.get('learning_component_years')
     if learning_component_year_list_from_initial:
         for learning_component_year in learning_component_year_list_from_initial:
-            entity_components_yr = mdl_base.entity_component_year.EntityComponentYear.objects.filter(
-                learning_component_year=learning_component_year.get('id')
-            )
-
             components.append(
                 {
                     'learning_component_year': learning_component_year,
-                    'entity_component_yr': entity_components_yr.first(),
                     'volumes': volume_from_initial_learning_component_year(
                         learning_component_year,
-                        entity_components_yr
+                        proposal.initial_data.get('volumes')[learning_component_year['type']]
                     )
                 }
             )

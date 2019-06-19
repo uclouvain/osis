@@ -27,21 +27,19 @@ from collections import OrderedDict
 
 from django import forms
 from django.db import transaction
-from django.db.models import Prefetch
 from django.forms import formset_factory, modelformset_factory
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units import edition
 from base.business.learning_units.edition import check_postponement_conflict_report_errors
-from base.forms.common import STEP_HALF_INTEGER
 from base.forms.utils.emptyfield import EmptyField
-from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT, COMPONENT_TYPES
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY, \
     CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
 from base.models.learning_component_year import LearningComponentYear
+from osis_common.forms.widgets import FloatFormatInput
 
 
 class VolumeField(forms.DecimalField):
@@ -59,14 +57,14 @@ class VolumeEditionForm(forms.Form):
     volume_q1 = VolumeField(
         label=_('Q1'),
         help_text=_('Volume Q1'),
-        widget=forms.TextInput(),
+        widget=FloatFormatInput(render_value=True),
         required=False,
     )
     add_field = EmptyField(label='+')
     volume_q2 = VolumeField(
         label=_('Q2'),
         help_text=_('Volume Q2'),
-        widget=forms.TextInput(),
+        widget=FloatFormatInput(render_value=True),
         required=False,
     )
     closing_parenthesis_field = EmptyField(label=')')
@@ -74,13 +72,13 @@ class VolumeEditionForm(forms.Form):
     volume_total = VolumeField(
         label=_('Vol. annual'),
         help_text=_('The annual volume must be equal to the sum of the volumes Q1 and Q2'),
-        widget=forms.TextInput(),
+        widget=FloatFormatInput(render_value=True),
         required=False,
     )
     help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('Volume Q1'), _('Volume Q2'))
     closing_brackets_field = EmptyField(label=']')
     mult_field = EmptyField(label='*')
-    planned_classes = forms.IntegerField(label=_('Classes'), help_text=_('Planned classes'), min_value=0,
+    planned_classes = forms.IntegerField(label=_('Planned classes'), help_text=_('Planned classes'), min_value=0,
                                          widget=forms.TextInput(), required=False)
     equal_field_2 = EmptyField(label='=')
 
@@ -113,7 +111,7 @@ class VolumeEditionForm(forms.Form):
             self.fields["volume_" + key.lower()] = VolumeField(
                 label=entity.acronym,
                 help_text=entity.title,
-                widget=forms.TextInput(),
+                widget=FloatFormatInput(render_value=True),
                 required=False
             )
             if i != len(entities_to_add) - 1:
@@ -191,30 +189,22 @@ class VolumeEditionForm(forms.Form):
         component.hourly_volume_partial_q1 = self.cleaned_data['volume_q1']
         component.hourly_volume_partial_q2 = self.cleaned_data['volume_q2']
         component.planned_classes = self.cleaned_data['planned_classes']
-        component.save()
-        self._save_requirement_entities(component.entity_components_year)
+        self._set_requirement_entities(component)
+        return component.save()
 
-    def _save_requirement_entities(self, entity_components_year):
-        for ecy in entity_components_year:
-            link_type = ecy.entity_container_year.type
-            repartition_volume = self.cleaned_data.get('volume_' + link_type.lower())
+    def _set_requirement_entities(self, component):
+        updated_repartition_volumes = {}
+        for entity_container_type in component.repartition_volumes.keys():
+            repartition_volume = self.cleaned_data.get('volume_' + entity_container_type.lower())
+            updated_repartition_volumes[entity_container_type] = repartition_volume
 
-            if repartition_volume is None:
-                continue
-
-            ecy.repartition_volume = repartition_volume
-            ecy.save()
+        component.set_repartition_volumes(updated_repartition_volumes)
 
     def _find_learning_components_year(self, luy_to_update_list):
-        prefetch = Prefetch(
-            'entitycomponentyear_set',
-            queryset=EntityComponentYear.objects.all(),
-            to_attr='entity_components_year'
-        )
         return [
             lcy
             for lcy in LearningComponentYear.objects.filter(
-                learning_unit_year__in=luy_to_update_list).prefetch_related(prefetch)
+                learning_unit_year__in=luy_to_update_list)
             if lcy.type == self.component.type
         ]
 
@@ -325,13 +315,22 @@ class SimplifiedVolumeForm(forms.ModelForm):
             'hourly_volume_total_annual',
             'hourly_volume_partial_q1',
             'hourly_volume_partial_q2',
-            'planned_classes'
+            'planned_classes',
+            'repartition_volume_requirement_entity',
+            'repartition_volume_additional_entity_1',
+            'repartition_volume_additional_entity_2'
         )
         widgets = {
-            'hourly_volume_total_annual': forms.TextInput(),
-            'hourly_volume_partial_q1': forms.TextInput(),
-            'hourly_volume_partial_q2': forms.TextInput(),
-            'planned_classes': forms.TextInput()
+            'hourly_volume_total_annual': FloatFormatInput(
+                attrs={'title': _("The annual volume must be equal to the sum of the volumes Q1 and Q2")},
+                render_value=True
+            ),
+            'hourly_volume_partial_q1': FloatFormatInput(attrs={'title': _("Volume Q1")}, render_value=True),
+            'hourly_volume_partial_q2': FloatFormatInput(attrs={'title': _("Volume Q2")}, render_value=True),
+            'planned_classes': forms.TextInput(attrs={'title': _("Planned classes")}),
+            'repartition_volume_requirement_entity': FloatFormatInput(render_value=True),
+            'repartition_volume_additional_entity_1': FloatFormatInput(render_value=True),
+            'repartition_volume_additional_entity_2': FloatFormatInput(render_value=True),
         }
 
     def clean(self):
@@ -374,39 +373,21 @@ class SimplifiedVolumeForm(forms.ModelForm):
             # In case of untyped component, we just need to create only 1 component (not more)
             if self.index != 0:
                 return None
-        return self._create_structure_components(commit)
+
+        self.instance.learning_unit_year = self._learning_unit_year
+        self._assert_repartition_volumes_consistency()
+        return super().save(commit)
+
+    def _assert_repartition_volumes_consistency(self):
+        """In case EntityContainerYear does not exist (or was removed), need to reset repartition volumes to None."""
+        existing_entity_container_types = {ec.type for ec in self._entity_containers if ec}
+        for entity_container_type in LearningComponentYear.repartition_volume_attrs_by_entity_container_type().keys():
+            if entity_container_type not in existing_entity_container_types:
+                self.instance.set_repartition_volume(entity_container_type, None)
 
     def need_to_create_untyped_component(self):
         container_type = self._learning_unit_year.learning_container_year.container_type
         return container_type not in CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
-
-    def _create_structure_components(self, commit):
-        self.instance.learning_unit_year = self._learning_unit_year
-
-        instance = super().save(commit)
-
-        requirement_entity_containers = self._get_requirement_entity_container()
-        for requirement_entity_container in requirement_entity_containers:
-            learning_components = LearningComponentYear.objects.filter(
-                learning_unit_year__learning_container_year=self._learning_unit_year.learning_container_year
-            )
-            self._create_entity_component_years(learning_components, requirement_entity_container)
-        return instance
-
-    @staticmethod
-    def _create_entity_component_years(learning_components, requirement_entity_container):
-        for component_year in learning_components:
-            EntityComponentYear.objects.update_or_create(
-                entity_container_year=requirement_entity_container,
-                learning_component_year=component_year
-            )
-
-    def _get_requirement_entity_container(self):
-        requirement_entity_containers = []
-        for entity_container_year in self._entity_containers:
-            if entity_container_year and entity_container_year.type != entity_types.ALLOCATION_ENTITY:
-                requirement_entity_containers.append(entity_container_year)
-        return requirement_entity_containers
 
 
 class SimplifiedVolumeFormset(forms.BaseModelFormSet):
@@ -454,6 +435,7 @@ class SimplifiedVolumeFormset(forms.BaseModelFormSet):
         for form in self.forms:
             form._learning_unit_year = learning_unit_year
             form._entity_containers = entity_container_years
+            form.save()
         return super().save(commit)
 
 

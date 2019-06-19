@@ -32,7 +32,6 @@ from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.urlresolvers import reverse
-from django.db import IntegrityError, transaction
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.test import TestCase, RequestFactory
 from django.utils.translation import ugettext_lazy as _
@@ -236,9 +235,10 @@ class TestLearningUnitModificationProposal(TestCase):
 
         messages_list = [str(message) for message in get_messages(response.wsgi_request)]
         self.assertIn(
-            _("You proposed a modification of type {} for the learning unit {}.").format(
-                _(proposal_type.ProposalType.MODIFICATION.name),
-                self.learning_unit_year.acronym),
+            _("You proposed a modification of type %(type)s for the learning unit %(acronym)s.") % {
+                'type': proposal_type.ProposalType.MODIFICATION.value,
+                'acronym': self.learning_unit_year.acronym
+            },
             list(messages_list))
 
     def test_initial_data_fields(self):
@@ -257,7 +257,8 @@ class TestLearningUnitModificationProposal(TestCase):
             ],
             'learning_component_year': [
                 "id", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
-                "planned_classes", "type"
+                "planned_classes", "type", "repartition_volume_requirement_entity",
+                "repartition_volume_additional_entity_1", "repartition_volume_additional_entity_2"
             ],
         }
 
@@ -362,9 +363,10 @@ class TestLearningUnitSuppressionProposal(TestCase):
 
         messages = [str(message) for message in get_messages(response.wsgi_request)]
         self.assertIn(
-            _("You proposed a modification of type {} for the learning unit {}.").format(
-                _(proposal_type.ProposalType.SUPPRESSION.name),
-                self.learning_unit_year.acronym),
+            _("You proposed a modification of type %(type)s for the learning unit %(acronym)s.") % {
+                'type': proposal_type.ProposalType.SUPPRESSION.value,
+                'acronym': self.learning_unit_year.acronym
+            },
             list(messages)
         )
 
@@ -943,7 +945,7 @@ class TestLearningUnitProposalDisplay(TestCase):
 
     def test_get_str_representing_old_data_from_foreign_key(self):
         differences = proposal_business._get_str_representing_old_data_from_foreign_key('campus', self.campus.id)
-        self.assertEqual(differences, str(self.campus))
+        self.assertEqual(differences, str(self.campus.name))
 
     def test_get_str_representing_old_data_from_foreign_key_equals_no_value(self):
         differences = proposal_business._get_str_representing_old_data_from_foreign_key(
@@ -959,7 +961,7 @@ class TestLearningUnitProposalDisplay(TestCase):
 
     def test_get_old_value_of_foreign_key_for_campus(self):
         differences = proposal_business._get_old_value_of_foreign_key('campus', self.campus.id)
-        self.assertEqual(differences, str(self.campus))
+        self.assertEqual(differences, str(self.campus.name))
 
     def test_get_old_value_of_foreign_key_for_language(self):
         differences = proposal_business._get_old_value_of_foreign_key('language', self.language_it.pk)

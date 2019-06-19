@@ -51,7 +51,7 @@ class PrerequisiteItem(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
-    learning_unit = models.ForeignKey("LearningUnit")
+    learning_unit = models.ForeignKey("LearningUnit", on_delete=models.CASCADE)
     prerequisite = models.ForeignKey("Prerequisite", on_delete=models.CASCADE)
 
     group_number = models.PositiveIntegerField()

@@ -25,15 +25,15 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<form id="achievement-form" role="form" method="POST"
+<form id="form_achievement" role="form" method="POST"
         {% if learning_achievement %}
             {% if not create %}
-      action="{% url 'achievement_edit' learning_unit_year_id=learning_unit_year.id learning_achievement_id=learning_achievement.id %}"
+      action="{% url 'achievement_edit' learning_unit_year.id learning_achievement.id %}"
             {% else %}
-      action="{% url 'achievement_create' learning_unit_year_id=learning_unit_year.id learning_achievement_id=learning_achievement.id %}"
+      action="{% url 'achievement_create' learning_unit_year.id learning_achievement.id %}"
             {% endif %}
         {% else %}
-      action="{% url 'achievement_create_first' learning_unit_year_id=learning_unit_year.id %}"
+      action="{% url 'achievement_create_first' learning_unit_year.id %}"
         {% endif %}>
     <input type="hidden" name="language_code" id="language_code" value="{{ language_code }}">
     <input type="hidden" id="hdn_learning_achievement_id" value="{{ learning_achievement.id }}">
@@ -45,12 +45,11 @@
         {% csrf_token %}
         {% bootstrap_form form %}
     </div>
+
     <div class="modal-footer">
-        <button class="btn btn-primary" type="submit">
-            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>
-            {% trans 'save' %}
-        </button>
-        <button type="submit" class="btn" data-dismiss="modal">{% trans 'cancel' %} </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
+        <input type="submit" value="{% trans "Save" %}" class="btn btn-primary"
+               onclick="CKupdate();$('#form_achievement').submit();"/>
     </div>
 </form>
 

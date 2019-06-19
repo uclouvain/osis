@@ -24,17 +24,12 @@
 #
 ##############################################################################
 import json
-from unittest import mock
 
-import factory
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.test.client import RequestFactory
-from django.utils.translation import ugettext_lazy as _
 
 from base.models import organization_address
-from base.models.organization_address import OrganizationAddress
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -206,7 +201,7 @@ class TestCampusAutocomplete(TestCase):
         self.client.force_login(user=self.super_user)
         response = self.client.get(
             self.url,
-            data={'forward': '{"country": "%s"}' % self.organization_address.country.pk}
+            data={'forward': '{"country_external_institution": "%s"}' % self.organization_address.country.pk}
         )
         expected_results = [{'text': "{} ({})".format(self.organization.name, self.campus.name),
                              'id': str(self.campus.pk)}]
@@ -220,7 +215,7 @@ class TestCampusAutocomplete(TestCase):
         self.client.force_login(user=self.super_user)
         response = self.client.get(
             self.url,
-            data={'forward': '{"country": "%s"}' % country.pk}
+            data={'forward': '{"country_external_institution": "%s"}' % country.pk}
         )
 
         self.assertEqual(response.status_code, 200)

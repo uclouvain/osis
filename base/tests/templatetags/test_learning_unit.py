@@ -40,6 +40,7 @@ from base.templatetags.learning_unit import th_tooltip, CSS_PROPOSAL_VALUE, LABE
 from reference.tests.factories.language import LanguageFactory
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, ANNUAL
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from base.enums.component_detail import VOLUME_Q1
 
 ENTITY_ACRONYM = "AGRO"
 VOLUME = 20
@@ -134,7 +135,7 @@ class LearningUnitTagTest(TestCase):
     def test_numeric_format(self):
         self.assertEqual(volume_format(None), '')
         self.assertEqual(volume_format(20), 20)
-        self.assertEqual(volume_format(20.50), '20.5')
+        self.assertEqual(volume_format(20.50), '20.50')
 
     def test_get_component_volume_css(self):
         values = {'param1': 20, 'param2': 'test2'}
@@ -187,7 +188,7 @@ class LearningUnitTagTest(TestCase):
                     {
                         'learning_component_year': {'id': lcy.id,
                                                     'hourly_volume_partial_q1': lcy.hourly_volume_partial_q1},
-                        'volumes': {'VOLUME_Q1': OTHER_VOLUME}}
+                        'volumes': {VOLUME_Q1: OTHER_VOLUME}}
                     ,
                 ]
             }
@@ -197,5 +198,5 @@ class LearningUnitTagTest(TestCase):
                         "title=''>{}</p></dd></dl>". \
             format(LABEL_VALUE_BEFORE_PROPOSAL, OTHER_VOLUME, CSS_PROPOSAL_VALUE, VOLUME)
         self.assertEqual(
-            dl_component_tooltip({'differences': context}, "VOLUME_Q1", value=VOLUME, id=lcy.id),
+            dl_component_tooltip({'differences': context}, VOLUME_Q1, value=VOLUME, id=lcy.id),
             expected_html)

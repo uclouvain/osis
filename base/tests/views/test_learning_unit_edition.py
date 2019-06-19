@@ -39,10 +39,10 @@ from waffle.testutils import override_flag
 from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
     LearningContainerYearModelForm
-from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import learning_unit_year_periodicity, learning_container_year_types, \
     learning_unit_year_subtypes, \
     entity_container_year_link_type, vacant_declaration_type, attribution_procedure, entity_type, organization_type
+from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -53,12 +53,12 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.tests.forms.test_edition_form import get_valid_formset_data
 from base.views.learning_unit import learning_unit_components
 from base.views.learning_units.update import learning_unit_edition_end_date, learning_unit_volumes_management, \
     update_learning_unit, _get_learning_units_for_context
+from reference.tests.factories.country import CountryFactory
 
 
 @override_flag('learning_unit_update', active=True)
@@ -246,14 +246,6 @@ class TestEditLearningUnit(TestCase):
 
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-    def test_template_used_for_get_request_learning_unit_on_modification_proposal(self):
-        ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year)
-
-        response = self.client.get(self.url)
-
-        self.assertTemplateUsed(response, "learning_unit/simple/update.html")
-        self.assertEqual(response.status_code, HttpResponse.status_code)
 
     def test_template_used_for_get_request(self):
         response = self.client.get(self.url)
@@ -492,10 +484,9 @@ class TestLearningUnitVolumesManagement(TestCase):
         learning_component_year.refresh_from_db()
         self.assertEqual(learning_component_year.planned_classes, 1)
         self.assertEqual(learning_component_year.hourly_volume_partial_q1, 0)
-        self.assertEqual(EntityComponentYear.objects.get(
-            learning_component_year=learning_component_year,
-            entity_container_year__type=entity_container_year_link_type.REQUIREMENT_ENTITY
-        ).repartition_volume, 1)
+        self.assertEqual(learning_component_year.repartition_volume_requirement_entity, 1)
+        self.assertEqual(learning_component_year.repartition_volume_additional_entity_1, 0.5)
+        self.assertEqual(learning_component_year.repartition_volume_additional_entity_2, 0.5)
 
     @mock.patch('base.models.program_manager.is_program_manager')
     @mock.patch('base.views.layout.render')
@@ -597,31 +588,76 @@ class TestEntityAutocomplete(TestCase):
         self.super_user = SuperUserFactory()
         self.url = reverse("entity_autocomplete")
         today = datetime.date.today()
-        self.entity_version = EntityVersionFactory(
+        self.external_entity_version = EntityVersionFactory(
             entity_type=entity_type.SCHOOL,
             start_date=today.replace(year=1900),
             end_date=None,
-            acronym="DRT"
+            acronym="DRT",
+            entity__organization__type=ACADEMIC_PARTNER
         )
 
     def test_when_param_is_digit_assert_searching_on_code(self):
         # When searching on "code"
         self.client.force_login(user=self.super_user)
         response = self.client.get(
-            self.url, data={'q': 'DRT', 'forward': '{"country": "%s"}' % self.entity_version.entity.country.id}
+            self.url, data={'q': 'DRT', 'forward': '{"country": "%s"}' % self.external_entity_version.entity.country.id}
         )
         self._assert_result_is_correct(response)
 
     def test_with_filter_by_section(self):
         self.client.force_login(user=self.super_user)
         response = self.client.get(
-            self.url, data={'forward': '{"country": "%s"}' % self.entity_version.entity.country.id}
+            self.url, data={'forward': '{"country": "%s"}' % self.external_entity_version.entity.country.id}
         )
         self._assert_result_is_correct(response)
 
     def _assert_result_is_correct(self, response):
+        results = self._get_list_of_entities_from_response(response)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['text'], str(self.external_entity_version.verbose_title))
+
+    def _get_list_of_entities_from_response(self, response):
         self.assertEqual(response.status_code, 200)
         json_response = str(response.content, encoding='utf8')
-        results = json.loads(json_response)['results']
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['text'], str(self.entity_version.verbose_title))
+        return json.loads(json_response)['results']
+
+    def test_ordering_external_entities(self):
+        country = CountryFactory()
+
+        for letter in ['C', 'A', 'B']:
+            EntityVersionFactory(
+                entity_type=entity_type.SCHOOL,
+                start_date=datetime.date.today().replace(year=1900),
+                end_date=None,
+                title="{} title".format(letter),
+                entity__organization__type=ACADEMIC_PARTNER,
+                entity__country=country,
+            )
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(
+            self.url, data={'forward': '{"country": "%s"}' % country.id}
+        )
+        results = self._get_list_of_entities_from_response(response)
+        self.assertEqual(results[0]['text'], "A title")
+        self.assertEqual(results[1]['text'], "B title")
+        self.assertEqual(results[2]['text'], "C title")
+
+    def test_ordering_main_entities(self):
+        for letter in ['C', 'A', 'B']:
+            EntityVersionFactory(
+                entity_type=entity_type.FACULTY,
+                start_date=datetime.date.today().replace(year=1900),
+                end_date=None,
+                acronym="{letter}{letter}{letter}".format(letter=letter),
+                entity__organization__type=MAIN
+            )
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(
+            self.url, data={'forward': '{"country": ""}'}
+        )
+        results = self._get_list_of_entities_from_response(response)
+        # Assert order and assert that acronym is displayed
+        self.assertIn('AAA - ', results[0]['text'])
+        self.assertIn('BBB - ', results[1]['text'])
+        self.assertIn('CCC - ', results[2]['text'])
+

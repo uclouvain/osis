@@ -25,6 +25,8 @@
 ##############################################################################
 import datetime
 
+from django.db.models.expressions import RawSQL, Subquery, OuterRef
+from django.template.defaultfilters import yesno
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
@@ -34,15 +36,17 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPOSAL_LINE_STYLES, \
     _get_significant_volume, _prepare_legend_ws_data, _get_wrapped_cells, \
-    _get_colored_rows, _get_attribution_line, _get_col_letter, _get_trainings_by_educ_group_year, _add_training_data, \
+    _get_colored_rows, _get_attribution_line, _get_col_letter, _add_training_data, \
     _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
-    _get_data_part2, annotate_qs, learning_unit_titles_part1
+    _get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content
+from base.models.entity_version import EntityVersion
 from base.models.enums import education_group_categories
 from base.models.enums import entity_type, organization_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import proposal_type, proposal_state
-from base.models.learning_unit_year import LearningUnitYear
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY
+from base.models.learning_unit_year import LearningUnitYear, SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -197,17 +201,15 @@ class TestLearningUnitXls(TestCase):
         }
         self.assertEqual(_prepare_legend_ws_data(), expected)
 
-    def test_get_formations_by_educ_group_year(self):
-        formations = _get_trainings_by_educ_group_year(self.learning_unit_yr_1)
-        self.assertCountEqual(formations.get(self.an_education_group_parent.id),
-                              [self.an_education_group])
-
     def test_add_training_data(self):
-        formations = _add_training_data(self.learning_unit_yr_1)
-        expected = " {} ({}) - {} - {}\n".format(self.an_education_group_parent.partial_acronym,
-                                                 "{0:.2f}".format(self.learning_unit_yr_1.credits),
-                                                 PARENT_ACRONYM,
-                                                 PARENT_TITLE)
+        luy_1 = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_1.pk).annotate(
+            closest_trainings=RawSQL(SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ())
+        ).get()
+        formations = _add_training_data(luy_1)
+        expected = "{} ({}) - {} - {}\n".format(self.an_education_group_parent.partial_acronym,
+                                                "{0:.2f}".format(luy_1.credits),
+                                                self.an_education_group_parent.acronym,
+                                                self.an_education_group_parent.title)
         self.assertEqual(formations, expected)
 
     def test_get_data_part1(self):
@@ -282,7 +284,6 @@ class TestLearningUnitXls(TestCase):
         luy.attribution_charge_news = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
             luy)
 
-
         expected_common = [
             str(_(luy.periodicity.title())),
             str(_('yes')) if luy.status else str(_('no')),
@@ -323,6 +324,65 @@ class TestLearningUnitXls(TestCase):
                 str(_('Credits')),
                 str(_('Alloc. Ent.')),
                 str(_('Title in English')),
+            ]
+        )
+
+    def test_prepare_xls_content(self):
+        entity_requirement = EntityVersion.objects.filter(
+            entity__entitycontaineryear__learning_container_year__learningunityear=OuterRef('pk'),
+            entity__entitycontaineryear__type=REQUIREMENT_ENTITY
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+
+        entity_allocation = EntityVersion.objects.filter(
+            entity__entitycontaineryear__learning_container_year__learningunityear=OuterRef('pk'),
+            entity__entitycontaineryear__type=ALLOCATION_ENTITY
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+
+        qs = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_1.pk).annotate(
+            entity_requirement=Subquery(entity_requirement),
+            entity_allocation=Subquery(entity_allocation),
+        )
+
+        result = prepare_xls_content(qs, with_grp=True, with_attributions=True)
+        self.assertEqual(len(result), 1)
+
+        luy = annotate_qs(qs).get()
+        self.assertListEqual(
+            result[0],
+            [
+                luy.acronym,
+                luy.academic_year.__str__(),
+                luy.complete_title,
+                luy.get_container_type_display(),
+                luy.get_subtype_display(),
+                luy.entity_requirement,
+                '',  # Proposal
+                '',  # Proposal state
+                luy.credits,
+                luy.entity_allocation,
+                luy.complete_title_english,
+                '',
+                luy.get_periodicity_display(),
+                yesno(luy.status),
+                _get_significant_volume(luy.pm_vol_tot or 0),
+                _get_significant_volume(luy.pm_vol_q1 or 0),
+                _get_significant_volume(luy.pm_vol_q2 or 0),
+                luy.pm_classes or 0,
+                _get_significant_volume(luy.pp_vol_tot or 0),
+                _get_significant_volume(luy.pp_vol_q1 or 0),
+                _get_significant_volume(luy.pp_vol_q2 or 0),
+                luy.pp_classes or 0,
+                luy.get_quadrimester_display() or '',
+                luy.get_session_display() or '',
+                luy.language or "",
+                "{} ({}) - {} - {}\n".format(self.an_education_group_parent.partial_acronym,
+                                             "{0:.2f}".format(luy.credits),
+                                             self.an_education_group_parent.acronym,
+                                             self.an_education_group_parent.title)
             ]
         )
 

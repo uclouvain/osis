@@ -29,10 +29,8 @@ from django.test import TestCase
 
 from base.business.group_element_years.management import compute_number_children_by_education_group_type, \
     check_authorized_relationship
-from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.enums.link_type import LinkTypes
-from base.models.exceptions import MaxChildrenReachedException, MinChildrenReachedException, \
-    AuthorizedRelationshipNotRespectedException
+from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory

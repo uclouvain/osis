@@ -70,7 +70,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         return options_to_detach
 
     def is_valid(self):
-        management.check_authorized_relationship(self.parent, self.link, to_delete=True)
+        management.can_link_be_detached(self.parent, self.link)
         if self._get_options_to_detach() and self.get_parents_program_master():
             self._check_detatch_options_rules()
         return True

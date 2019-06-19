@@ -23,32 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
 import contextlib
-import factory
 import datetime
+import functools
 
+import factory
 from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.test import override_settings
+
 from base.models import person
-from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import person_source_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
-from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.entity import EntityFactory
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
+from base.models.person import get_user_interface_language, \
+    change_language
+from base.tests.factories import user
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory, SICFactory, \
+    UEFacultyManagerFactory, AdministrativeManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory
-from base.models.person import get_user_interface_language, \
-    change_language
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
-from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory, SICFactory
-from base.tests.factories import user
+from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
 
 
 def create_person(first_name, last_name, email=None):
@@ -176,12 +175,26 @@ class PersonTest(PersonTestCase):
         a_person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
         self.assertTrue(a_person.is_faculty_manager)
 
+    def test_is_faculty_manager_for_ue(self):
+        a_person = PersonFactory()
+        self.assertFalse(a_person.is_faculty_manager_for_ue)
+
+        a_person = UEFacultyManagerFactory()
+        self.assertTrue(a_person.is_faculty_manager_for_ue)
+
     def test_is_sic(self):
         a_person = PersonFactory()
         self.assertFalse(a_person.is_sic)
 
         a_person = SICFactory()
         self.assertTrue(a_person.is_sic)
+
+    def test_is_administrative_manager(self):
+        a_person = PersonFactory()
+        self.assertFalse(a_person.is_administrative_manager)
+
+        a_person = AdministrativeManagerFactory()
+        self.assertTrue(a_person.is_administrative_manager)
 
     def test_show_username_from_person_with_user(self):
         self.assertEqual(self.person_with_user.username(), "user_with_person")
@@ -243,14 +256,17 @@ class PersonTest(PersonTestCase):
     def test_is_linked_to_entity_in_charge_of_external_learning_unit_year(self):
         person_entity = PersonEntityFactory(person=self.person_with_user)
         luy = LearningUnitYearFactory()
-        external_luy = ExternalLearningUnitYearFactory(learning_unit_year=luy)
+        ExternalLearningUnitYearFactory(learning_unit_year=luy)
 
         self.assertFalse(
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
         )
 
-        external_luy.requesting_entity = person_entity.entity
-        external_luy.save()
+        EntityContainerYearFactory(
+            learning_container_year=luy.learning_container_year,
+            entity=person_entity.entity,
+            type=REQUIREMENT_ENTITY
+        )
 
         self.assertTrue(
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)

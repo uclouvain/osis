@@ -24,12 +24,12 @@
 #
 ##############################################################################
 import datetime
+import json
 from unittest import mock
 
 import factory.fuzzy
 import reversion
-from django.contrib.auth.models import Permission, Group
-from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import Permission
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden
 from django.http import HttpResponseNotAllowed
@@ -46,6 +46,9 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit as learning_unit_business
 from base.business.learning_unit import learning_unit_titles_part1, learning_unit_titles_part2
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
+    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
+    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit.search_form import LearningUnitYearForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
@@ -59,10 +62,11 @@ from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import EXTERNAL
-from base.models.enums.groups import FACULTY_MANAGER_GROUP
+from base.models.enums.groups import FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.person import Person
+from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -82,7 +86,7 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
     LearningUnitYearFullFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
@@ -342,13 +346,16 @@ class LearningUnitViewTestCase(TestCase):
             type=entity_container_year_link_type.REQUIREMENT_ENTITY,
             entity=cls.entities[0]
         )
-        cls.entity_version = EntityVersionFactory(entity=cls.entities[0], entity_type=entity_type.SCHOOL,
+        cls.entity_version = EntityVersionFactory(acronym="1 acronym", entity=cls.entities[0],
+                                                  entity_type=entity_type.SCHOOL,
                                                   start_date=today - datetime.timedelta(days=1),
                                                   end_date=today.replace(year=today.year + 1))
-        cls.entity_version_2 = EntityVersionFactory(entity=cls.entities[1], entity_type=entity_type.INSTITUTE,
+        cls.entity_version_2 = EntityVersionFactory(acronym="2 acronym", entity=cls.entities[1],
+                                                    entity_type=entity_type.INSTITUTE,
                                                     start_date=today - datetime.timedelta(days=20),
                                                     end_date=today.replace(year=today.year + 1))
-        cls.entity_version_3 = EntityVersionFactory(entity=cls.entities[2], entity_type=entity_type.FACULTY,
+        cls.entity_version_3 = EntityVersionFactory(acronym="3 acronym", entity=cls.entities[2],
+                                                    entity_type=entity_type.FACULTY,
                                                     start_date=today - datetime.timedelta(days=50),
                                                     end_date=today.replace(year=today.year + 1))
 
@@ -362,6 +369,48 @@ class LearningUnitViewTestCase(TestCase):
 
     def setUp(self):
         self.client.force_login(self.a_superuser)
+
+    def test_entity_requirement_autocomplete(self):
+        self.client.force_login(self.person.user)
+        url = reverse("entity_requirement_autocomplete", args=[])
+        response = self.client.get(
+            url, data={}
+        )
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
+        self.assertEqual(results[1]['text'], self.entity_version_2.verbose_title)
+
+    def test_entity_requirement_autocomplete_with_q(self):
+        self.client.force_login(self.person.user)
+        url = reverse("entity_requirement_autocomplete", args=[])
+        response = self.client.get(url, data={"q": "1"})
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
+
+    def test_entity_autocomplete(self):
+        self.client.force_login(self.person.user)
+        url = reverse("entity_autocomplete", args=[])
+        response = self.client.get(
+            url, data={}
+        )
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
+        self.assertEqual(results[1]['text'], self.entity_version_3.verbose_title)
+
+    def test_entity_autocomplete_with_q(self):
+        self.client.force_login(self.person.user)
+        url = reverse("entity_autocomplete", args=[])
+        response = self.client.get(url, data={"q": "1"})
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
 
     def test_learning_units_search(self):
         response = self.client.get(reverse('learning_units'))
@@ -546,7 +595,7 @@ class LearningUnitViewTestCase(TestCase):
 
         response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
 
-        self.assertTemplateUsed(response, 'learning_unit/external/read.html')
+        self.assertTemplateUsed(response, 'learning_unit/identification.html')
         self.assertEqual(response.context['learning_unit_year'], learning_unit_year)
 
     def test_external_learning_unit_read_permission_denied(self):
@@ -592,7 +641,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/identification.html')
         self.assertEqual(len(response.context['warnings']), 3)
 
-    def test_learning_unit__with_faculty_manager_when_can_edit_end_date(self):
+    def test_learning_unit_with_faculty_manager_when_can_edit_end_date(self):
         learning_container_year = LearningContainerYearFactory(
             academic_year=self.current_academic_year, container_type=learning_container_year_types.OTHER_COLLECTIVE)
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
@@ -604,14 +653,24 @@ class LearningUnitViewTestCase(TestCase):
 
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
+        ue_manager = create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_edit_learningunit')
+        ue_manager.user.user_permissions.add(Permission.objects.get(codename='can_access_learningunit'))
+        managers = [
+            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),
+            ue_manager
+        ]
 
-        person_entity = PersonEntityFactory(entity=entity_container.entity)
-        person_entity.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
-        url = reverse("learning_unit", args=[learning_unit_year.id])
-        self.client.force_login(person_entity.person.user)
+        for manager in managers:
+            manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
+            PersonEntityFactory(
+                entity=entity_container.entity,
+                person=manager
+            )
+            url = reverse("learning_unit", args=[learning_unit_year.id])
+            self.client.force_login(manager.user)
 
-        response = self.client.get(url)
-        self.assertEqual(response.context["can_edit_date"], True)
+            response = self.client.get(url)
+            self.assertEqual(response.context["can_edit_date"], True)
 
     def test_learning_unit_of_type_partim_with_faculty_manager(self):
         learning_container_year = LearningContainerYearFactory(
@@ -627,15 +686,20 @@ class LearningUnitViewTestCase(TestCase):
         EntityVersionFactory(entity=entity_container.entity)
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
+        ue_manager = create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_edit_learningunit')
+        ue_manager.user.user_permissions.add(Permission.objects.get(codename='can_access_learningunit'))
+        managers = [
+            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),
+            ue_manager
+        ]
+        for manager in managers:
+            manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
+            PersonEntityFactory(entity=entity_container.entity, person=manager)
+            url = reverse("learning_unit", args=[learning_unit_year.id])
+            self.client.force_login(manager.user)
 
-        person_entity = PersonEntityFactory(entity=entity_container.entity)
-        group, created = Group.objects.get_or_create(name=FACULTY_MANAGER_GROUP)
-        person_entity.person.user.groups.add(group)
-        url = reverse("learning_unit", args=[learning_unit_year.id])
-        self.client.force_login(person_entity.person.user)
-
-        response = self.client.get(url)
-        self.assertEqual(response.context["can_edit_date"], True)
+            response = self.client.get(url)
+            self.assertEqual(response.context["can_edit_date"], True)
 
     def test_learning_unit_with_faculty_manager_when_cannot_edit_end_date(self):
         learning_container_year = \
@@ -649,15 +713,17 @@ class LearningUnitViewTestCase(TestCase):
         EntityVersionFactory(entity=entity_container.entity)
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
+        managers = [
+            FacultyManagerFactory(),
+            create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_access_learningunit')
+        ]
+        for manager in managers:
+            PersonEntityFactory(entity=entity_container.entity, person=manager)
+            url = reverse("learning_unit", args=[learning_unit_year.id])
+            self.client.force_login(manager.user)
 
-        person_entity = PersonEntityFactory(entity=entity_container.entity)
-        group, created = Group.objects.get_or_create(name=FACULTY_MANAGER_GROUP)
-        person_entity.person.user.groups.add(group)
-        url = reverse("learning_unit", args=[learning_unit_year.id])
-        self.client.force_login(person_entity.person.user)
-
-        response = self.client.get(url)
-        self.assertEqual(response.context["can_edit_date"], False)
+            response = self.client.get(url)
+            self.assertEqual(response.context["can_edit_date"], False)
 
     def test_get_components_no_learning_container_yr(self):
         luy_without_components = LearningUnitYearFactory(academic_year=self.current_academic_year)
@@ -1111,8 +1177,8 @@ class TestLearningUnitComponents(TestCase):
                           self.generated_container.generated_container_years[0].list_components)
 
             volumes = component['volumes']
-            self.assertEqual(volumes['VOLUME_Q1'], None)
-            self.assertEqual(volumes['VOLUME_Q2'], None)
+            self.assertEqual(volumes[VOLUME_Q1], None)
+            self.assertEqual(volumes[VOLUME_Q2], None)
 
 
 class TestLearningAchievements(TestCase):
@@ -1308,12 +1374,18 @@ class TestLearningUnitProposalComparison(TestCase):
         self.learning_component_year_lecturing = LearningComponentYearFactory(
             type=learning_component_year_type.LECTURING,
             acronym="TP",
-            learning_unit_year=self.learning_unit_year
+            learning_unit_year=self.learning_unit_year,
+            repartition_volume_requirement_entity=10,
+            repartition_volume_additional_entity_1=10,
+            repartition_volume_additional_entity_2=10
         )
         self.learning_component_year_practical = LearningComponentYearFactory(
             type=learning_component_year_type.PRACTICAL_EXERCISES,
             acronym="PP",
-            learning_unit_year=self.learning_unit_year
+            learning_unit_year=self.learning_unit_year,
+            repartition_volume_requirement_entity=10,
+            repartition_volume_additional_entity_1=10,
+            repartition_volume_additional_entity_2=10
         )
         self.entity_container_year = EntityContainerYearFactory(
             learning_container_year=self.learning_unit_year.learning_container_year,
@@ -1350,8 +1422,8 @@ class TestLearningUnitProposalComparison(TestCase):
             "entities": {
                 entity_container_year_link_type.REQUIREMENT_ENTITY: self.entity_container_year.id,
                 entity_container_year_link_type.ALLOCATION_ENTITY: None,
-                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
-                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
+                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: self.entity_container_year.id,
+                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: self.entity_container_year.id
             },
             "learning_component_years": [
                 {"id": self.learning_component_year_lecturing.id,
@@ -1359,34 +1431,43 @@ class TestLearningUnitProposalComparison(TestCase):
                  "planned_classes": self.learning_component_year_lecturing.planned_classes,
                  "hourly_volume_partial_q1": self.learning_component_year_lecturing.hourly_volume_partial_q1,
                  "hourly_volume_partial_q2": self.learning_component_year_lecturing.hourly_volume_partial_q2,
-                 "hourly_volume_total_annual": self.learning_component_year_lecturing.hourly_volume_total_annual
+                 "hourly_volume_total_annual": self.learning_component_year_lecturing.hourly_volume_total_annual,
+                 "repartition_volume_requirement_entity":
+                     self.learning_component_year_lecturing.repartition_volume_requirement_entity,
+                 "repartition_volume_additional_entity_1":
+                     self.learning_component_year_lecturing.repartition_volume_additional_entity_1,
+                 "repartition_volume_additional_entity_2":
+                     self.learning_component_year_lecturing.repartition_volume_additional_entity_2
                  },
                 {"id": self.learning_component_year_practical.id,
                  "type": "PRACTICAL_EXERCISES",
                  "planned_classes": self.learning_component_year_practical.planned_classes,
                  "hourly_volume_partial_q1": self.learning_component_year_practical.hourly_volume_partial_q1,
                  "hourly_volume_partial_q2": self.learning_component_year_practical.hourly_volume_partial_q2,
-                 "hourly_volume_total_annual": self.learning_component_year_practical.hourly_volume_total_annual
+                 "hourly_volume_total_annual": self.learning_component_year_practical.hourly_volume_total_annual,
+                 "repartition_volume_requirement_entity": self.learning_component_year_practical.repartition_volume_requirement_entity,
+                 "repartition_volume_additional_entity_1": self.learning_component_year_practical.repartition_volume_additional_entity_1,
+                 "repartition_volume_additional_entity_2": self.learning_component_year_practical.repartition_volume_additional_entity_2
                  }
             ],
             "volumes": {
                 'LECTURING': {
-                    'VOLUME_Q1': self.learning_component_year_lecturing.hourly_volume_partial_q1,
-                    'VOLUME_Q2': self.learning_component_year_lecturing.hourly_volume_partial_q2,
-                    'REAL_CLASSES': 1,
-                    'VOLUME_TOTAL': self.learning_component_year_practical.hourly_volume_total_annual,
-                    'PLANNED_CLASSES': self.learning_component_year_lecturing.planned_classes,
-                    'VOLUME_REQUIREMENT_ENTITY': 120.0,
-                    'VOLUME_TOTAL_REQUIREMENT_ENTITIES': 120.0,
-                    'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0,
-                    'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0
+                    VOLUME_Q1: self.learning_component_year_lecturing.hourly_volume_partial_q1,
+                    VOLUME_Q2: self.learning_component_year_lecturing.hourly_volume_partial_q2,
+                    REAL_CLASSES: 1,
+                    VOLUME_TOTAL: self.learning_component_year_practical.hourly_volume_total_annual,
+                    PLANNED_CLASSES: self.learning_component_year_lecturing.planned_classes,
+                    VOLUME_REQUIREMENT_ENTITY: 120.0,
+                    VOLUME_TOTAL_REQUIREMENT_ENTITIES: 120.0,
+                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: 0,
+                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: 0
                 },
                 'PRACTICAL_EXERCISES': {
-                    'VOLUME_Q1': 10, 'VOLUME_Q2': 10, 'REAL_CLASSES': 0, 'VOLUME_TOTAL': 20,
-                    'PLANNED_CLASSES': 0, 'VOLUME_REQUIREMENT_ENTITY': 0,
-                    'VOLUME_TOTAL_REQUIREMENT_ENTITIES': 0,
-                    'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0,
-                    'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0
+                    VOLUME_Q1: 10, VOLUME_Q2: 10, REAL_CLASSES: 0, VOLUME_TOTAL: 20,
+                    PLANNED_CLASSES: 0, VOLUME_REQUIREMENT_ENTITY: 0,
+                    VOLUME_TOTAL_REQUIREMENT_ENTITIES: 0,
+                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: 0,
+                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: 0
                 }
             }
         }

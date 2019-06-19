@@ -33,11 +33,11 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import close_old_connections, transaction
 from django.db.utils import OperationalError as DjangoOperationalError, InterfaceError as DjangoInterfaceError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from psycopg2._psycopg import OperationalError as PsycopOperationalError, InterfaceError as  PsycopInterfaceError
 

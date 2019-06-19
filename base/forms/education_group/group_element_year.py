@@ -29,7 +29,6 @@ from django.core.exceptions import ValidationError
 from base.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
 from base.business.group_element_years.management import check_authorized_relationship
 from base.models.enums import education_group_categories
-from base.models.enums.link_type import LinkTypes
 from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.models.group_element_year import GroupElementYear
 
@@ -70,10 +69,6 @@ class GroupElementYearForm(forms.ModelForm):
                 self.instance.child_branch.education_group_type):
             self.fields.pop("access_condition")
 
-            # Change the initial but (for strange reasons) let the possibility to the user to try with the main link.
-            # Like that he will see the form error.
-            self.fields["link_type"].initial = LinkTypes.REFERENCE.name
-
         elif self._is_education_group_year_a_minor_major_option_list_choice(self.instance.parent) and \
                 not self._is_education_group_year_a_minor_major_option_list_choice(self.instance.child_branch):
             self._keep_only_fields(["access_condition"])
@@ -82,7 +77,12 @@ class GroupElementYearForm(forms.ModelForm):
                 self._is_education_group_year_a_minor_major_option_list_choice(self.instance.child_branch):
             self._keep_only_fields(["block"])
 
+        elif self.instance.child_leaf:
+            self.fields.pop("link_type")
+            self.fields.pop("access_condition")
+
         else:
+            self.fields.pop("relative_credits")
             self.fields.pop("access_condition")
 
     def save(self, commit=True):
@@ -110,7 +110,7 @@ class GroupElementYearForm(forms.ModelForm):
     def clean(self):
         strategy = AttachEducationGroupYearStrategy if self.instance.child_branch else \
             AttachLearningUnitYearStrategy
-        strategy(parent=self.instance.parent, child=self.instance.child).is_valid()
+        strategy(parent=self.instance.parent, child=self.instance.child, instance=self.instance).is_valid()
         return super().clean()
 
     def _check_authorized_relationship(self, child_type):

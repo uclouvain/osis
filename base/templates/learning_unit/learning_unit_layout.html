@@ -7,10 +7,11 @@
 {% load learning_unit %}
 
 {% block breadcrumb %}
-<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
-<li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></li>
-<li><a href="{% url 'learning_unit' learning_unit_year.id %}" id="lnk_learning_units">{{learning_unit_year.acronym}}</a></li>
-<li class="active">{% trans 'Modification' %}</li>
+    <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+    <li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></li>
+    <li><a href="{% url 'learning_unit' learning_unit_year.id %}"
+           id="lnk_learning_units">{{ learning_unit_year.acronym }}</a></li>
+    <li class="active">{% trans 'Modification' %}</li>
 {% endblock %}
 
 {% block header %}
@@ -18,88 +19,109 @@
 
 {% block content %}
 
-{% with disabled_nav=True %}
-  {% include "learning_unit/blocks/header.html" %}
-{% endwith %}
-<div class="page-header">
-    <h2>{% block h2_title %}{% trans 'Modification' %}{% endblock %}</h2>
-</div>
-<div class="panel panel-default">
-    <div class="panel-heading">
-    {% block submit_up %}
-        {% include "learning_unit/blocks/save_cancel_buttons.html" %}
-    {% endblock submit_up %}
+    {% with disabled_nav=True %}
+        {% include "learning_unit/blocks/header.html" %}
+    {% endwith %}
+    <div class="page-header">
+        <h2>{% block h2_title %}{% trans 'Modification' %}{% endblock %}</h2>
     </div>
-    <div class="panel-body" id="tabs" >
-        {% block tabs %}
-        {% endblock tabs %}
-        <div class="tab-content" id="tab_content">
-            <div role="tabpanel" class="tab-pane active">
-                {% block form %}
-                    <form method="post" id="LearningUnitYearForm"
-                          data-validate-url="{% url 'check_acronym' subtype=learning_unit_year.subtype %}">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            {% block submit_up %}
+                {% include "learning_unit/blocks/save_cancel_buttons.html" %}
+            {% endblock submit_up %}
+        </div>
+        <div class="panel-body" id="tabs">
+            {% block tabs %}
+            {% endblock tabs %}
+            <div class="tab-content" id="tab_content">
+                <div role="tabpanel" class="tab-pane active">
+                    {% block form %}
+                        <form method="post" id="LearningUnitYearForm"
+                              data-validate-url="{% url 'check_acronym' subtype=learning_unit_year.subtype %}">
 
-                        {% csrf_token %}
-                        {% bootstrap_form_errors learning_unit_year_form %}
-                        {% bootstrap_form_errors learning_unit_form %}
-                        {% bootstrap_form_errors learning_container_year_form %}
-                        {% if form_proposal %}{% bootstrap_form_errors form_proposal %}{% endif %}
-                        <div class="row">
-                            <div class="col-md-8">
+                            {% csrf_token %}
+                            {% bootstrap_form_errors learning_unit_year_form %}
+                            {% bootstrap_form_errors learning_unit_form %}
+                            {% bootstrap_form_errors learning_container_year_form %}
+                            {% if form_proposal %}{% bootstrap_form_errors form_proposal %}{% endif %}
+                            <div class="row">
+                                <div class="col-md-8">
 
-                                {% block learning_unit_identification %}
-                                    <div class="panel panel-default">
-                                        <div class="panel-body">
-                                            {% include "learning_unit/blocks/learning_unit_identification.html" %}
-                                            <br>
-                                            {% block titles %}
-                                                 {% include "learning_unit/blocks/titles.html" %}
-                                            {% endblock titles %}
+                                    {% block learning_unit_identification %}
+                                        <div class="panel panel-default">
+                                            <div class="panel-body">
+                                                {% include "learning_unit/blocks/learning_unit_identification.html" %}
+                                                <br>
+                                                {% block titles %}
+                                                    {% include "learning_unit/blocks/titles.html" %}
+                                                {% endblock titles %}
+                                            </div>
                                         </div>
-                                    </div>
-                                {% endblock learning_unit_identification %}
+                                    {% endblock learning_unit_identification %}
 
-                                {% include "learning_unit/blocks/components.html" %}
+                                    {% include "learning_unit/blocks/components.html" %}
 
-                                {% block remarks %}
-                                    {% include "learning_unit/blocks/remarks.html" %}
-                                {% endblock remarks %}
-
-                                {% block components %}
-                                    {% if components %}
-                                        {% include "learning_unit/components_identification.html" %}
+                                    {% if not learning_unit_year.is_external_with_co_graduation %}
+                                        {% block remarks %}
+                                            {% include "learning_unit/blocks/remarks.html" %}
+                                        {% endblock remarks %}
                                     {% endif %}
-                                {% endblock components %}
 
-                                {% block partim_attributes %}
-                                    {% if learning_unit_year.subtype != "PARTIM" %}
-                                        {% include "learning_unit/blocks/partim_attributes.html" %}
+                                    {% block components %}
+                                        {% if components %}
+                                            {% include "learning_unit/components_identification.html" %}
+                                        {% endif %}
+                                    {% endblock components %}
+
+                                    {% block partim_attributes %}
+                                        {% if learning_unit_year.subtype != "PARTIM" %}
+                                            {% include "learning_unit/blocks/partim_attributes.html" %}
+                                        {% endif %}
+                                    {% endblock partim_attributes %}
+
+                                    {% if learning_unit_year.is_external_with_co_graduation %}
+                                        <div class="panel panel-default">
+                                            <div class="panel-body">
+                                                <div class="row">
+                                                    {% bootstrap_field learning_unit_external_form.external_acronym form_group_class="form-group col-md-3" %}
+                                                    {% bootstrap_field learning_unit_external_form.url form_group_class="form-group col-md-6" %}
+                                                    <div class="col-md-3 external_credits-group">
+                                                        {% bootstrap_label learning_unit_external_form.external_credits.label label_class="control-label" %}
+                                                        <abbr title="{% trans 'If the partner university does not use ECTS credit units, enter below the number of credit units according to the local system.' %}">
+                                                        <span class="glyphicon glyphicon-question-sign "
+                                                              title="{% trans 'If the partner university does not use ECTS credit units, enter below the number of credit units according to the local system.' %}"
+                                                              style="font-size: 12pt;"></span></abbr>
+                                                        {% bootstrap_field learning_unit_external_form.external_credits show_label=False %}
+                                                    </div>
+                                                </div>
+                                                {% bootstrap_field learning_unit_form.faculty_remark %}
+                                            </div>
+                                        </div>
                                     {% endif %}
-                                {% endblock partim_attributes %}
-                            </div>
+                                </div>
+                                <div class="col-md-4">
+                                    {% block institution %}
+                                        {% include "learning_unit/blocks/institution.html" %}
+                                    {% endblock %}
 
-                            <div class="col-md-4">
-                                {% block institution %}
-                                    {% include "learning_unit/blocks/institution.html" %}
-                                {% endblock %}
-
-                                {% block proposal_management %}
-                                {% endblock proposal_management%}
-                            </div>
-                        </div>
-                        {% block modal %}
-                        {% endblock modal %}
-                    </form>
-                {% endblock form %}
+                                    {% block proposal_management %}
+                                    {% endblock proposal_management %}
+                                </div>
+                                </div>
+                                {% block modal %}
+                                {% endblock modal %}
+                        </form>
+                    {% endblock form %}
+                </div>
             </div>
         </div>
+        <div class="panel-footer">
+            {% block submit_down %}
+                {% include "learning_unit/blocks/save_cancel_buttons.html" %}
+            {% endblock submit_down %}
+        </div>
     </div>
-    <div class="panel-footer">
-    {% block submit_down %}
-        {% include "learning_unit/blocks/save_cancel_buttons.html" %}
-    {% endblock submit_down %}
-    </div>
-</div>
 
 
 {% endblock content %}
