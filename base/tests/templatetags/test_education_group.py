@@ -162,11 +162,11 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     def test_li_with_create_perm_training_disabled(self):
         result = li_with_create_perm_training(self.context, self.url, "")
 
-        msg = pgettext("female", UNAUTHORIZED_TYPE_MSG % {
+        msg = pgettext("female", UNAUTHORIZED_TYPE_MSG) % {
             "child_category": Categories.TRAINING.value,
             "category": self.education_group_year.education_group_type.get_category_display(),
             "type": self.education_group_year.education_group_type.get_name_display()
-        })
+        }
         msg = msg.capitalize()
         self.assertEqual(
             result, {
@@ -181,11 +181,11 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
 
     def test_li_with_create_perm_mini_training_disabled(self):
         result = li_with_create_perm_mini_training(self.context, self.url, "")
-        msg = pgettext("female", UNAUTHORIZED_TYPE_MSG % {
+        msg = pgettext("female", UNAUTHORIZED_TYPE_MSG) % {
             "child_category": Categories.MINI_TRAINING.value,
             "category": self.education_group_year.education_group_type.get_category_display(),
             "type": self.education_group_year.education_group_type.get_name_display()
-        })
+        }
         msg = msg.capitalize()
         self.assertEqual(
             result, {
@@ -200,11 +200,11 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
 
     def test_li_with_create_perm_group_disabled(self):
         result = li_with_create_perm_group(self.context, self.url, "")
-        msg = pgettext("female", UNAUTHORIZED_TYPE_MSG % {
+        msg = pgettext("female", UNAUTHORIZED_TYPE_MSG) % {
             "child_category": Categories.GROUP.value,
             "category": self.education_group_year.education_group_type.get_category_display(),
             "type": self.education_group_year.education_group_type.get_name_display()
-        })
+        }
         msg = msg.capitalize()
         self.assertEqual(
             result, {

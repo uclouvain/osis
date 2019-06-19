@@ -204,17 +204,18 @@ def check_authorized_type(education_group, category, raise_exception=False):
         parents=[education_group]
     ).exists()
     parent_category = education_group.education_group_type.category
+
     can_raise_exception(
         raise_exception, result,
         pgettext(
             "female" if parent_category in [TRAINING, MINI_TRAINING] else "male",
-            "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
+            "No type of %(child_category)s can be created as child of %(category)s of type %(type)s")
             % {
                 "child_category": category.value,
                 "category": education_group.education_group_type.get_category_display(),
                 "type": education_group.education_group_type.get_name_display(),
             }
-        ))
+        )
 
     return result
 

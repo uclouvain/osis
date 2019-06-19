@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-19 11:35+0200\n"
+"POT-Creation-Date: 2019-06-19 11:51+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -447,9 +447,9 @@ msgid "Acronym existed in %(academic_year)s"
 msgstr "Code a déjà existé en %(academic_year)s"
 
 #: forms/education_groups.py:89 models/education_group_year.py:166
-#: tests/templatetags/test_education_group.py:466
-#: tests/templatetags/test_education_group.py:473
-#: tests/templatetags/test_education_group.py:482
+#: tests/templatetags/test_education_group.py:465
+#: tests/templatetags/test_education_group.py:472
+#: tests/templatetags/test_education_group.py:481
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
 
@@ -1329,12 +1329,12 @@ msgid "Description fiche submission dates updated"
 msgstr "Date de soumission des fiches descriptives mis à jour"
 
 #: templates/education_group/blocks/content_actions.html:43
+#: tests/templatetags/test_education_group.py:226
 #: tests/templatetags/test_education_group.py:227
-#: tests/templatetags/test_education_group.py:228
-#: tests/templatetags/test_education_group.py:239
+#: tests/templatetags/test_education_group.py:238
+#: tests/templatetags/test_education_group.py:249
 #: tests/templatetags/test_education_group.py:250
-#: tests/templatetags/test_education_group.py:251
-#: tests/templatetags/test_education_group.py:265
+#: tests/templatetags/test_education_group.py:264
 msgid "Detach"
 msgstr "Détacher"
 
@@ -1965,8 +1965,8 @@ msgid "General informations"
 msgstr "Infos générales"
 
 #: templatetags/education_group.py:236
-#: tests/templatetags/test_education_group.py:275
-#: tests/templatetags/test_education_group.py:277
+#: tests/templatetags/test_education_group.py:274
+#: tests/templatetags/test_education_group.py:276
 msgid "Generate pdf"
 msgstr "Générer le pdf"
 
@@ -2212,12 +2212,12 @@ msgid "It is necessary to indicate the internship subtype."
 msgstr "Il est nécessaire d'indiquer le sous-type de stage."
 
 #: templatetags/education_group.py:213
-#: tests/templatetags/test_education_group.py:250
+#: tests/templatetags/test_education_group.py:249
 #, python-format
 msgid "It is not possible to %(action)s the root element."
 msgstr "Il n'est pas possible de %(action)s l'élément racine."
 
-#: tests/templatetags/test_education_group.py:263
+#: tests/templatetags/test_education_group.py:262
 msgid "It is not possible to detach the root element."
 msgstr "Il n'est pas possible de détacher l'élément racine."
 
@@ -2770,8 +2770,8 @@ msgstr "Modifié par"
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:70
 #: templatetags/education_group.py:152
-#: tests/templatetags/test_education_group.py:311
-#: tests/templatetags/test_education_group.py:451
+#: tests/templatetags/test_education_group.py:310
+#: tests/templatetags/test_education_group.py:450
 msgid "Modify"
 msgstr "Modifier"
 
@@ -2968,6 +2968,16 @@ msgstr ""
 "Aucun type de %(child_category)s ne peut être créé comme enfant d'une "
 "%(category)s de type %(type)s"
 
+#: business/education_groups/perms.py:211
+#, python-format
+msgctxt "male"
+msgid ""
+"No type of %(child_category)s can be created as child of %(category)s of "
+"type %(type)s"
+msgstr ""
+"Aucun type de %(child_category)s ne peut être créé comme enfant d'un "
+"%(category)s de type %(type)s"
+
 #: templates/student/exams_enrollments.html:49
 msgid "No. Session"
 msgstr "No. session"
@@ -3046,7 +3056,7 @@ msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
 
 #: templatetags/education_group.py:146
-#: tests/templatetags/test_education_group.py:447 views/education_group.py:70
+#: tests/templatetags/test_education_group.py:446 views/education_group.py:70
 msgid ""
 "Only program managers of the education group OR central manager linked to "
 "entity can edit."
@@ -4257,7 +4267,7 @@ msgstr "La valeur du champ crédits doit être un entier"
 
 #: business/education_groups/perms.py:139
 #: tests/templatetags/test_education_group.py:48
-#: tests/templatetags/test_education_group.py:351
+#: tests/templatetags/test_education_group.py:350
 msgid "The education group edition period is not open."
 msgstr ""
 "La période de modification d'organisation de formation n'est pas ouverte."
@@ -4609,12 +4619,12 @@ msgstr ""
 "L’utilisateur n’a pas le droit de mettre à jour les informations générales"
 
 #: business/education_groups/perms.py:44 templatetags/education_group.py:211
-#: tests/templatetags/test_education_group.py:238
-#: tests/templatetags/test_education_group.py:262
+#: tests/templatetags/test_education_group.py:237
+#: tests/templatetags/test_education_group.py:261
 msgid "The user has not permission to change education groups."
 msgstr "L'utilisateur n'a pas la permission de modifier les formations."
 
-#: tests/templatetags/test_education_group.py:425
+#: tests/templatetags/test_education_group.py:424
 #, python-format
 msgctxt "female"
 msgid "The user has not permission to create a %(category)s."
@@ -5616,15 +5626,6 @@ msgstr "ne peut pas être consolidé"
 msgid "certificate aims"
 msgstr "attendus du diplôme"
 
-#: tests/templatetags/test_education_group.py:166
-#: tests/templatetags/test_education_group.py:186
-#: tests/templatetags/test_education_group.py:205
-#, fuzzy
-#| msgid "Category"
-msgctxt "female"
-msgid "child_category"
-msgstr "Catégorie"
-
 #: business/learning_units/xls_generator.py:50 business/proposal_xls.py:89
 #: business/proposal_xls.py:99 models/abstracts/abstract_achievement.py:44
 #: models/abstracts/abstract_education_group_achievement.py:53
@@ -6154,11 +6155,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:166
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgctxt "male"
-#~ msgid ""
-#~ "No type of %(child_category)s can be created as child of %(category)s of "
-#~ "type %(type)s"
-#~ msgstr ""
-#~ "Aucun type de %(child_category)s ne peut être créé comme enfant d'un "
-#~ "%(category)s de type %(type)s"
