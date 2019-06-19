@@ -46,16 +46,6 @@ class LearningContainerYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_filter = ('academic_year', 'in_charge', 'is_vacant',)
 
 
-class ForeignKeyEntityField(models.ForeignKey):
-    def __init__(self, *args, **kwargs):
-        kwargs.update({
-            'to': 'base.Entity',
-            'null': True,
-            'on_delete': models.PROTECT,
-        })
-        super(ForeignKeyEntityField, self).__init__(*args, **kwargs)
-
-
 class LearningContainerYear(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey('AcademicYear', on_delete=models.CASCADE)
@@ -80,10 +70,30 @@ class LearningContainerYear(SerializableModel):
                                                choices=vacant_declaration_type.DECLARATION_TYPE)
     in_charge = models.BooleanField(default=False)
 
-    requirement_entity = ForeignKeyEntityField(blank=False, related_name='requirement_entities')
-    allocation_entity = ForeignKeyEntityField(blank=True, related_name='allocation_entities')
-    additional_entity_1 = ForeignKeyEntityField(blank=True, related_name='additional_entities_1')
-    additional_entity_2 = ForeignKeyEntityField(blank=True, related_name='additional_entities_2')
+    requirement_entity = models.ForeignKey(
+        to="base.Entity",
+        null=True, blank=False,
+        related_name='requirement_entities',
+        on_delete=models.PROTECT,
+    )
+    allocation_entity = models.ForeignKey(
+        to="base.Entity",
+        null=True, blank=True,
+        related_name='allocation_entities',
+        on_delete=models.PROTECT,
+    )
+    additional_entity_1 = models.ForeignKey(
+        to="base.Entity",
+        null=True, blank=True,
+        related_name='additional_entities_1',
+        on_delete=models.PROTECT,
+    )
+    additional_entity_2 = models.ForeignKey(
+        to="base.Entity",
+        null=True, blank=True,
+        related_name='additional_entities_2',
+        on_delete=models.PROTECT,
+    )
 
     _warnings = None
 

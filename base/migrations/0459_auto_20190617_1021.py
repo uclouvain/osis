@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 import base.models.learning_container_year
-from django.db import migrations
+from django.db import migrations, models
 import django.db.models.deletion
 
 
@@ -17,21 +17,21 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='learningcontaineryear',
             name='additional_entity_1',
-            field=base.models.learning_container_year.ForeignKeyEntityField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='additional_entities_1', to='base.Entity'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='additional_entities_1', to='base.Entity'),
         ),
         migrations.AddField(
             model_name='learningcontaineryear',
             name='additional_entity_2',
-            field=base.models.learning_container_year.ForeignKeyEntityField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='additional_entities_2', to='base.Entity'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='additional_entities_2', to='base.Entity'),
         ),
         migrations.AddField(
             model_name='learningcontaineryear',
             name='allocation_entity',
-            field=base.models.learning_container_year.ForeignKeyEntityField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='allocation_entities', to='base.Entity'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='allocation_entities', to='base.Entity'),
         ),
         migrations.AddField(
             model_name='learningcontaineryear',
             name='requirement_entity',
-            field=base.models.learning_container_year.ForeignKeyEntityField(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='requirement_entities', to='base.Entity'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='requirement_entities', to='base.Entity'),
         ),
     ]
