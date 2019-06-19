@@ -10,6 +10,7 @@ $(document).ready(function () {
     let $documentTree = $('#panel_file_tree');
 
     $documentTree.bind("state_ready.jstree", function (event, data) {
+        data.instance.deselect_all();
         // if the tree has never been loaded, execute close_all by default.
         if ($.vakata.storage.get(data.instance.settings.state.key) === null) {
             $(this).jstree('close_all');
@@ -17,7 +18,7 @@ $(document).ready(function () {
 
         $("a.jstree-anchor").click(function( event ) {
             let pageLocator = '_self';
-            if (event.ctrlKey) pageLocator = '_blank';
+            if (event.ctrlKey || event.metaKey) pageLocator = '_blank';
             data.instance.deselect_all();
             window.open($(this).attr('href'), pageLocator);
         });
@@ -28,6 +29,7 @@ $(document).ready(function () {
             obj = inst.get_node(data.reference);
 
         return {
+            instance: inst,
             group_element_year_id: obj.a_attr.group_element_year,
             element_id: obj.a_attr.element_id,
             element_type: obj.a_attr.element_type,
@@ -98,6 +100,7 @@ $(document).ready(function () {
                         "label": gettext("Open"),
                         "action": function (data) {
                             let __ret = get_data_from_tree(data);
+                            __ret.instance.deselect_all();
                             window.open(__ret.view_url, '_blank');
                         }
                     },

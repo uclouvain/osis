@@ -216,7 +216,6 @@ class LearningUnitYearForm(LearningUnitSearchForm):
         super().__init__(*args, **kwargs)
 
         if self.borrowed_course_search:
-            self.fields["academic_year_id"].required = True
             self.fields["academic_year_id"].empty_label = None
 
         self.fields["with_entity_subordinated"].initial = True
