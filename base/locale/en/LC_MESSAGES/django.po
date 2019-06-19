@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-18 10:07+0200\n"
+"POT-Creation-Date: 2019-06-19 09:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -641,7 +641,6 @@ msgstr ""
 #: models/learning_unit.py:84
 msgid "Apply postponement on learning unit year"
 msgstr ""
-
 
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:140
 msgid "Are you certain that you want to cancel the learning unit proposal ?"
@@ -2881,7 +2880,6 @@ msgstr ""
 
 #: business/education_groups/perms.py:209
 #, python-format
-msgctxt "female"
 msgid ""
 "No type of %(child_category)s can be created as child of %(category)s of "
 "type %(type)s"
@@ -4466,7 +4464,7 @@ msgstr ""
 msgid "The user doesn't have right to update general information"
 msgstr ""
 
-#: templatetags/education_group.py:212
+#: business/education_groups/perms.py:44 templatetags/education_group.py:212
 #: tests/templatetags/test_education_group.py:237
 #: tests/templatetags/test_education_group.py:261
 msgid "The user has not permission to change education groups."
@@ -4482,6 +4480,14 @@ msgstr ""
 #, python-format
 msgctxt "male"
 msgid "The user has not permission to create a %(category)s."
+msgstr ""
+
+#: business/education_groups/perms.py:43
+msgid "The user has not permission to create education groups."
+msgstr ""
+
+#: business/education_groups/perms.py:45
+msgid "The user has not permission to delete education groups."
 msgstr ""
 
 #: business/education_groups/perms.py:178

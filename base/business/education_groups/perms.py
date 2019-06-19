@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext
 
-from django.conf import settings
 from base.business.group_element_years import management
 from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.models.academic_calendar import AcademicCalendar
@@ -40,9 +40,9 @@ from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING
 from base.models.person import Person
 
 ERRORS_MSG = {
-    "base.add_educationgroup": "The user has not permission to create education groups.",
-    "base.change_educationgroup": "The user has not permission to change education groups.",
-    "base.delete_educationgroup": "The user has not permission to delete education groups.",
+    "base.add_educationgroup": _("The user has not permission to create education groups."),
+    "base.change_educationgroup": _("The user has not permission to change education groups."),
+    "base.delete_educationgroup": _("The user has not permission to delete education groups."),
 }
 
 
@@ -206,7 +206,7 @@ def check_authorized_type(education_group, category, raise_exception=False):
         raise_exception, result,
         pgettext(
             "female" if parent_category in [TRAINING, MINI_TRAINING] else "male",
-            "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
+            _("No type of %(child_category)s can be created as child of %(category)s of type %(type)s")
         ) % {
             "child_category": category.value,
             "category": education_group.education_group_type.get_category_display(),

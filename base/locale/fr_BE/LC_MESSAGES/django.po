@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-18 10:07+0200\n"
+"POT-Creation-Date: 2019-06-19 09:34+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -564,7 +564,6 @@ msgstr "Infos complémentaires"
 
 #: models/enums/entity_container_year_link_type.py:46
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:50
-
 #: templates/learning_unit/identification.html:235 views/learning_unit.py:242
 #: views/learning_unit.py:352 views/learning_unit.py:370
 msgid "Additional requirement entity 1"
@@ -2960,8 +2959,6 @@ msgid "No result!"
 msgstr "Aucun résultat!"
 
 #: business/education_groups/perms.py:209
-#, python-format
-msgctxt "female"
 msgid ""
 "No type of %(child_category)s can be created as child of %(category)s of "
 "type %(type)s"
@@ -4609,7 +4606,7 @@ msgid "The user doesn't have right to update general information"
 msgstr ""
 "L’utilisateur n’a pas le droit de mettre à jour les informations générales"
 
-#: templatetags/education_group.py:212
+#: business/education_groups/perms.py:44 templatetags/education_group.py:212
 #: tests/templatetags/test_education_group.py:237
 #: tests/templatetags/test_education_group.py:261
 msgid "The user has not permission to change education groups."
@@ -4626,6 +4623,14 @@ msgstr "L'utilisateur n'a pas la permission de créer une %(category)s."
 msgctxt "male"
 msgid "The user has not permission to create a %(category)s."
 msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
+
+#: business/education_groups/perms.py:43
+msgid "The user has not permission to create education groups."
+msgstr "L'utilisateur n'a pas la permission de créer des formations."
+
+#: business/education_groups/perms.py:45
+msgid "The user has not permission to delete education groups."
+msgstr "L'utilisateur n'a pas la permission de supprimer les formations."
 
 #: business/education_groups/perms.py:178
 #: business/education_groups/perms.py:265
