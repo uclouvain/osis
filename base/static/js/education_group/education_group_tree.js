@@ -29,6 +29,7 @@ $(document).ready(function () {
             obj = inst.get_node(data.reference);
 
         return {
+            instance: inst,
             group_element_year_id: obj.a_attr.group_element_year,
             element_id: obj.a_attr.element_id,
             element_type: obj.a_attr.element_type,
@@ -99,6 +100,7 @@ $(document).ready(function () {
                         "label": gettext("Open"),
                         "action": function (data) {
                             let __ret = get_data_from_tree(data);
+                            __ret.instance.deselect_all();
                             window.open(__ret.view_url, '_blank');
                         }
                     },
