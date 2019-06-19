@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+import random
 from unittest import mock
 
 from django.core.exceptions import PermissionDenied
@@ -31,7 +32,8 @@ from django.test import TestCase
 
 from base.business.education_groups.perms import is_education_group_edit_period_opened, check_permission, \
     check_authorized_type, is_eligible_to_edit_general_information, is_eligible_to_edit_admission_condition, \
-    GeneralInformationPerms, CommonEducationGroupStrategyPerms, AdmissionConditionPerms
+    GeneralInformationPerms, CommonEducationGroupStrategyPerms, AdmissionConditionPerms, \
+    _is_eligible_to_add_education_group_with_category
 from base.models.enums import academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING, Categories
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
@@ -105,6 +107,42 @@ class TestPerms(TestCase):
     def test_check_authorized_type_without_parent(self):
         result = check_authorized_type(None, TRAINING)
         self.assertTrue(result)
+
+    def test_faculty_manager_is_not_eligible_to_add_groups_in_search_page(self):
+        result = _is_eligible_to_add_education_group_with_category(
+            FacultyManagerFactory(),
+            None,
+            Categories.GROUP,
+            raise_exception=False
+        )
+        self.assertFalse(result)
+
+    def test_faculty_manager_is_eligible_to_add_groups_in_tree_of_offer_of_its_entity(self):
+        result = _is_eligible_to_add_education_group_with_category(
+            FacultyManagerFactory(),
+            EducationGroupYearFactory(),
+            Categories.GROUP,
+            raise_exception=False
+        )
+        self.assertTrue(result)
+
+    def test_faculty_manager_is_eligible_to_add_mini_training(self):
+        result = _is_eligible_to_add_education_group_with_category(
+            FacultyManagerFactory(),
+            random.choice([EducationGroupYearFactory(), None]),
+            Categories.MINI_TRAINING,
+            raise_exception=False
+        )
+        self.assertTrue(result)
+
+    def test_faculty_manager_is_not_eligible_to_add_training(self):
+        result = _is_eligible_to_add_education_group_with_category(
+            FacultyManagerFactory(),
+            random.choice([EducationGroupYearFactory(), None]),
+            Categories.TRAINING,
+            raise_exception=False
+        )
+        self.assertFalse(result)
 
 
 class TestCommonEducationGroupStrategyPerms(TestCase):
