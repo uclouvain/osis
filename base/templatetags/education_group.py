@@ -134,7 +134,6 @@ def _get_permission(context, permission):
     except PermissionDenied as e:
         result = False
         permission_denied_message = str(e)
-
     return permission_denied_message, "" if result else "disabled", root
 
 
@@ -143,7 +142,7 @@ def button_edit_administrative_data(context):
     education_group_year = context.get('education_group_year')
 
     permission_denied_message, is_disabled, root = _get_permission(context, can_user_edit_administrative_data)
-    if not permission_denied_message:
+    if not permission_denied_message and is_disabled:
         permission_denied_message = _("Only program managers of the education group OR "
                                       "central manager linked to entity can edit.")
 
@@ -151,7 +150,8 @@ def button_edit_administrative_data(context):
         'class_li': is_disabled,
         'title': permission_denied_message,
         'text': _('Modify'),
-        'url': reverse('education_group_edit_administrative', args=[root.pk, education_group_year.pk])
+        'url': '#' if is_disabled else
+        reverse('education_group_edit_administrative', args=[root.pk, education_group_year.pk])
     }
 
 

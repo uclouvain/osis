@@ -363,7 +363,7 @@ class LearningUnitPostponementForm:
 
                     self.consistency_errors.setdefault(luy.academic_year, []).append(
                         _("The repartition volume of %(col_name)s has been already modified. "
-                          "({%(new_value)s} instead of {%(current_value)s})") % {
+                          "(%(new_value)s instead of %(current_value)s)") % {
                             'col_name': name,
                             'new_value': new_repartition_volume,
                             'current_value': current_repartition
@@ -372,7 +372,7 @@ class LearningUnitPostponementForm:
 
     def _check_differences(self, current_form, next_form, ac_year):
         differences = [
-            _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+            _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                 'col_name': next_form.label_fields.get(col_name, col_name),
                 'new_value': self._get_translated_value(next_form.instances_data.get(col_name)),
                 'current_value': self._get_translated_value(value)

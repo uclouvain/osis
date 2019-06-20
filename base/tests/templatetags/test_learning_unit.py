@@ -135,7 +135,7 @@ class LearningUnitTagTest(TestCase):
     def test_numeric_format(self):
         self.assertEqual(volume_format(None), '')
         self.assertEqual(volume_format(20), 20)
-        self.assertEqual(volume_format(20.50), '20.5')
+        self.assertEqual(volume_format(20.50), '20.50')
 
     def test_get_component_volume_css(self):
         values = {'param1': 20, 'param2': 'test2'}

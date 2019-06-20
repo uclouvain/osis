@@ -150,6 +150,9 @@ class Person(SerializableModel):
 
         return entities_id
 
+    def get_managed_programs(self):
+        return set(pgm_manager.offer_year for pgm_manager in self.programmanager_set.all())
+
     class Meta:
         permissions = (
             ("is_administrator", "Is administrator"),
@@ -255,3 +258,4 @@ def find_by_firstname_or_lastname(name):
 
 def is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person, raise_exception=False):
     return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+

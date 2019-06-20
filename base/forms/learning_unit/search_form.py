@@ -48,7 +48,7 @@ from base.models.entity_version import EntityVersion, build_current_entity_versi
 from base.models.enums import entity_container_year_link_type, learning_unit_year_subtypes, active_status, entity_type,\
     learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
-from base.models.learning_unit_year import convert_status_bool
+from base.models.learning_unit_year import convert_status_bool, LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
 from base.models.organization_address import find_distinct_by_country
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -210,7 +210,6 @@ class LearningUnitYearForm(LearningUnitSearchForm):
         super().__init__(*args, **kwargs)
 
         if self.borrowed_course_search:
-            self.fields["academic_year_id"].required = True
             self.fields["academic_year_id"].empty_label = None
 
         self.fields["with_entity_subordinated"].initial = True
@@ -245,6 +244,7 @@ class LearningUnitYearForm(LearningUnitSearchForm):
         service_course_search = service_course_search or self.service_course_search
 
         learning_units = self.get_queryset()
+
         if not service_course_search and self.cleaned_data and learning_units.count() > self.MAX_RECORDS:
             raise TooManyResultsException
 
@@ -255,7 +255,6 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             build_entity_container_prefetch(entity_container_year_link_type.ALLOCATION_ENTITY),
             build_entity_container_prefetch(entity_container_year_link_type.REQUIREMENT_ENTITY),
         )
-
         for learning_unit in learning_units:
             append_latest_entities(learning_unit, service_course_search)
 
@@ -307,7 +306,7 @@ class LearningUnitYearForm(LearningUnitSearchForm):
                 faculty_borrowing_id = EntityVersion.objects.current(academic_year.start_date). \
                     get(acronym=faculty_borrowing_acronym).entity.id
             except EntityVersion.DoesNotExist:
-                return []
+                return LearningUnitYear.objects.none()
 
         ids = filter_is_borrowed_learning_unit_year(
             qs_learning_units,

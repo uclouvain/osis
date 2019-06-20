@@ -75,9 +75,12 @@
                                 <li class="divider"></li>
                             {%  endflag %}
                         {% url "learning_unit_comparison" learning_unit_year_id=learning_unit_year.id as url_lus_comparison %}
-                        <li id="link_lus_comparison">
+                        <li id="link_lus_comparison" {% if proposal.type == 'CREATION' %} class="disabled"{% endif %}>
                             <a href="{{ url_lus_comparison }}"
-                               data-toggle="tooltip">{% trans 'Learning units comparison' %}</a>
+                               data-toggle="tooltip"
+                               {% if proposal.type == 'CREATION' %} title="{% trans 'Proposal of creation, so nothing to compare to'%}"{% endif %}>
+                                {% trans 'Learning units comparison' %}
+                            </a>
                         </li>
                         {% if proposal %}
                             {% url "learning_unit_proposal_comparison" learning_unit_year_id=learning_unit_year.id as url_proposal_comparison %}

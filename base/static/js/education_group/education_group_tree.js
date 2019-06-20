@@ -1,6 +1,6 @@
 $(document).ready(function () {
     // open or hide the sidebar.
-    let treeVisibility = sessionStorage.getItem("treeVisibility") || "0";
+    let treeVisibility = localStorage.getItem("treeVisibility") || "0";
     if (treeVisibility === "1") {
         openNav();
     } else {
@@ -10,17 +10,17 @@ $(document).ready(function () {
     let $documentTree = $('#panel_file_tree');
 
     $documentTree.bind("state_ready.jstree", function (event, data) {
-
-        // Bind the redirection only when the tree is ready,
-        // however, it reload the page during the loading
-        $documentTree.bind("select_node.jstree", function (event, data) {
-            document.location.href = data.node.a_attr.href;
-        });
-
         // if the tree has never been loaded, execute close_all by default.
         if ($.vakata.storage.get(data.instance.settings.state.key) === null) {
             $(this).jstree('close_all');
         }
+
+        $("a.jstree-anchor").click(function( event ) {
+            let pageLocator = '_self';
+            if (event.ctrlKey || event.metaKey) pageLocator = '_blank';
+            data.instance.deselect_all();
+            window.open($(this).attr('href'), pageLocator);
+        });
     });
 
     function get_data_from_tree(data) {
@@ -33,6 +33,7 @@ $(document).ready(function () {
             element_type: obj.a_attr.element_type,
             has_prerequisite: obj.a_attr.has_prerequisite,
             is_prerequisite: obj.a_attr.is_prerequisite,
+            view_url: obj.a_attr.href,
             attach_url: obj.a_attr.attach_url,
             detach_url: obj.a_attr.detach_url,
             modify_url: obj.a_attr.modify_url
@@ -69,7 +70,7 @@ $(document).ready(function () {
                 "selected": false,
             },
             "contextmenu": {
-                "select_node": false,
+                "select_node": true,
                 "items": {
                     "select": {
                         "label": gettext("Select"),
@@ -90,6 +91,14 @@ $(document).ready(function () {
                                     displayInfoMessage(jsonResponse, 'message_info_container')
                                 }
                             });
+                        }
+                    },
+
+                    "open" : {
+                        "label": gettext("Open"),
+                        "action": function (data) {
+                            let __ret = get_data_from_tree(data);
+                            window.open(__ret.view_url, '_blank');
                         }
                     },
 
@@ -198,9 +207,8 @@ $(document).ready(function () {
     });
 });
 
-
 function toggleNav() {
-    let treeVisibility = sessionStorage.getItem("treeVisibility") || "0";
+    let treeVisibility = localStorage.getItem("treeVisibility") || "0";
     if (treeVisibility === "0") {
         openNav();
     } else {
@@ -209,17 +217,17 @@ function toggleNav() {
 }
 
 function openNav() {
-    let size = sessionStorage.getItem("sidenav_size") || "300px";
+    let size = localStorage.getItem("sidenav_size") || "300px";
     document.getElementById("mySidenav").style.width = size;
     document.getElementById("main").style.marginLeft = size;
-    sessionStorage.setItem("treeVisibility", "1");
+    localStorage.setItem("treeVisibility", "1");
 
 }
 
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
     document.getElementById("main").style.marginLeft = "0";
-    sessionStorage.setItem("treeVisibility", "0");
+    localStorage.setItem("treeVisibility", "0");
 }
 
 const min = 300;
@@ -237,7 +245,7 @@ $('#split-bar').mousedown(function (e) {
             sidebar.css("width", x);
             $('#main').css("margin-left", x);
         }
-        sessionStorage.setItem("sidenav_size", sidebar.width().toString() + "px")
+        localStorage.setItem("sidenav_size", sidebar.width().toString() + "px")
     })
 });
 $(document).mouseup(function () {

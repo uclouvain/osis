@@ -28,7 +28,11 @@
 {% bootstrap_form_errors form_education_group %}
 <form method="post" id="UpdateTrainingForm"
       class="education_group_form"
-      data-validate-url="{% if education_group_year %}{% url 'validate_education_group_field' form_education_group_year.category education_group_year.pk %} {% else %}{% url 'validate_education_group_field' form_education_group_year.category %}{% endif %}">
+      data-validate-url="
+
+
+
+              {% if education_group_year %}{% url 'validate_education_group_field' form_education_group_year.category education_group_year.pk %} {% else %}{% url 'validate_education_group_field' form_education_group_year.category %}{% endif %}">
     {% csrf_token %}
     <div class="panel panel-default">
 
@@ -41,14 +45,14 @@
         </div>
 
         <div class="panel-footer text-right">
-            {% include "education_group/blocks/form/create_cancel_buttons.html" with btn_submit_name="btn_submit_UpdateTrainingForm"  %}
+            {% include "education_group/blocks/form/create_cancel_buttons.html" with btn_submit_name="btn_submit_UpdateTrainingForm" %}
         </div>
 
     </div>
     <script type="text/javascript" src="{% static 'js/education_group/validation.js' %}"></script>
 
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('button[name="btn_submit_UpdateTrainingForm"]').click(function (e) {
                 $("#spn_identification_errors").empty();
                 $("#spn_diploma_errors").empty();
@@ -56,29 +60,38 @@
 
             var form = document.getElementById("UpdateTrainingForm");
 
-            form.addEventListener('invalid', (e)=>{
+            form.addEventListener('invalid', (e) => {
                 var el = e.target;
                 while (el && el.parentNode) {
                     el = el.parentNode;
-                    document.getElementById(e.target.id).style.borderColor='#e52213';
-                    if(el.parentNode.id == "tab_identification"){
+                    let element = document.getElementById(e.target.id);
+                    if (! element.parentElement.getAttribute('class').includes('has-error')) {
+                        element.style.borderColor = '#e52213';
+                        element.parentElement.setAttribute('class', 'form-group required_field has-error');
+                        let error_msg = document.createElement("div");
+                        error_msg.setAttribute('class', 'help-block');
+                        let newContent = document.createTextNode(gettext("This field is required"));
+                        error_msg.appendChild(newContent);
+                        element.parentElement.append(error_msg);
+                    }
+                    if (el.parentNode.id == "tab_identification") {
                         $("#spn_identification_errors").append('<i class="fa fa-circle" aria-hidden="true"></i>');
                         return false;
                     }
-                    if(el.parentNode.id == "div_tab_diploma"){
+                    if (el.parentNode.id == "div_tab_diploma") {
                         $("#spn_diploma_errors").append('<i class="fa fa-circle" aria-hidden="true"></i>');
                         return false;
                     }
 
                 }
 
-            },true);
+            }, true);
             let tab_identification = document.getElementById('tab_identification');
             let tab_diploma = document.getElementById('tab_diploma');
 
-            if(tab_identification.getElementsByClassName('has-error').length > 0)
+            if (tab_identification.getElementsByClassName('has-error').length > 0)
                 $("#spn_identification_errors").append('<i class="fa fa-circle" aria-hidden="true"></i>');
-            if(tab_diploma.getElementsByClassName('has-error').length > 0)
+            if (tab_diploma.getElementsByClassName('has-error').length > 0)
                 $("#spn_diploma_errors").append('<i class="fa fa-circle" aria-hidden="true"></i>');
         });
 

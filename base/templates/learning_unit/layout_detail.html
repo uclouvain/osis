@@ -25,6 +25,10 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+{% block title %}
+    <title>OSIS - {{ learning_unit_year.acronym }}</title>
+{% endblock %}
+
 {% block breadcrumb %}
     {% include "learning_unit/breadcrumb.html" %}
 {% endblock %}

@@ -29,7 +29,7 @@
     <div class="row">
         <div class="col-md-12">
             <label id="label_{{ label.label }}"
-                   {% if label.type == 'common' %}class="education_group_year-common italic"{% endif %}>{{ label.translation }}</label>
+                   {% if label.type == 'common' %}class="education_group_year-common italic"{% endif %}><b>{{ label.translation }}</b></label>
             {% if label.type == 'specific' and can_edit_information %}
                 <a class="pedagogy-edit-btn" href="#"
                    data-form="{{ post_url }}?label={{ label.label }}"
