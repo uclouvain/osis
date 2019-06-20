@@ -241,16 +241,9 @@ urlpatterns = [
     url(r'^offers/', include([
         url(r'^$', offer.offers, name='offers'),
         url(r'^search$', offer.offers_search, name='offers_search'),
-        url(r'^(?P<offer_year_id>[0-9]+)/', include([
-            url(r'^$', offer.offer_read, name='offer_read'),
-            url(r'^academic_calendar/$', offer.offer_academic_calendar_tab, name='offer_academic_calendar_tab'),
-            url(r'^program_managers/$', offer.offer_program_managers_tab, name='offer_program_managers_tab'),
-        ]))
     ])),
 
     url(r'^educationgroups/', include(education_groups.urls.urlpatterns)),
-
-    url(r'^offer_year_calendars/([0-9]+)/$', offer.offer_year_calendar_read, name='offer_year_calendar_read'),
 
     url(r'^organizations/', include([
         url(r'^$', organization.OrganizationSearch.as_view(), name='organizations'),
