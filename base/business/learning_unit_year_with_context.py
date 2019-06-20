@@ -32,7 +32,6 @@ from base.models import entity_container_year, learning_unit_year
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.learning_component_year import LearningComponentYear
-from osis_common.utils.numbers import to_float_or_zero
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
@@ -93,9 +92,9 @@ def append_components(learning_unit_year):
             planned_classes = component.planned_classes or 0
 
             learning_unit_year.components[component] = {
-                VOLUME_TOTAL: to_float_or_zero(component.hourly_volume_total_annual),
-                VOLUME_Q1: to_float_or_zero(component.hourly_volume_partial_q1),
-                VOLUME_Q2: to_float_or_zero(component.hourly_volume_partial_q2),
+                VOLUME_TOTAL: component.hourly_volume_total_annual,
+                VOLUME_Q1: component.hourly_volume_partial_q1,
+                VOLUME_Q2: component.hourly_volume_partial_q2,
                 PLANNED_CLASSES: planned_classes,
                 VOLUME_REQUIREMENT_ENTITY: vol_req_entity,
                 VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: vol_add_req_entity_1,
