@@ -292,7 +292,6 @@ def get_learning_unit_comparison_context(learning_unit_year):
     context = dict({'learning_unit_year': learning_unit_year})
     context['campus'] = learning_unit_year.campus
     context['organization'] = get_organization_from_learning_unit_year(learning_unit_year)
-    context['experimental_phase'] = True
     components = get_components_identification(learning_unit_year)
     context['components'] = components.get('components')
     context['learning_container_year_partims'] = learning_unit_year.get_partims_related()

@@ -420,7 +420,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(len(context['types']),
                          len(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES))
         self.assertEqual(len(context['container_types']), len(LearningContainerYearType.choices()))
-        self.assertTrue(context['experimental_phase'])
         self.assertEqual(context['learning_units_count'], 0)
 
     def test_learning_units_search_with_acronym_filtering(self):
