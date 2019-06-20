@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-18 16:42+0200\n"
+"POT-Creation-Date: 2019-06-19 11:51+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1972,7 +1972,7 @@ msgstr "Informations générales et Conditions d'admission"
 msgid "General informations"
 msgstr "Infos générales"
 
-#: templatetags/education_group.py:237
+#: templatetags/education_group.py:236
 #: tests/templatetags/test_education_group.py:274
 #: tests/templatetags/test_education_group.py:276
 msgid "Generate pdf"
@@ -2219,7 +2219,7 @@ msgstr ""
 msgid "It is necessary to indicate the internship subtype."
 msgstr "Il est nécessaire d'indiquer le sous-type de stage."
 
-#: templatetags/education_group.py:214
+#: templatetags/education_group.py:213
 #: tests/templatetags/test_education_group.py:249
 #, python-format
 msgid "It is not possible to %(action)s the root element."
@@ -2777,7 +2777,7 @@ msgstr "Modifié par"
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:85
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:70
-#: templatetags/education_group.py:153
+#: templatetags/education_group.py:152
 #: tests/templatetags/test_education_group.py:310
 #: tests/templatetags/test_education_group.py:450
 msgid "Modify"
@@ -2966,7 +2966,7 @@ msgstr "Aucune proposition n'a été sélectionnée."
 msgid "No result!"
 msgstr "Aucun résultat!"
 
-#: business/education_groups/perms.py:209
+#: business/education_groups/perms.py:211
 #, python-format
 msgctxt "female"
 msgid ""
@@ -2974,6 +2974,16 @@ msgid ""
 "type %(type)s"
 msgstr ""
 "Aucun type de %(child_category)s ne peut être créé comme enfant d'une "
+"%(category)s de type %(type)s"
+
+#: business/education_groups/perms.py:211
+#, python-format
+msgctxt "male"
+msgid ""
+"No type of %(child_category)s can be created as child of %(category)s of "
+"type %(type)s"
+msgstr ""
+"Aucun type de %(child_category)s ne peut être créé comme enfant d'un "
 "%(category)s de type %(type)s"
 
 #: templates/student/exams_enrollments.html:49
@@ -3053,7 +3063,7 @@ msgstr ""
 msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
 
-#: templatetags/education_group.py:147
+#: templatetags/education_group.py:146
 #: tests/templatetags/test_education_group.py:446 views/education_group.py:70
 msgid ""
 "Only program managers of the education group OR central manager linked to "
@@ -4312,16 +4322,16 @@ msgstr "L'entité '%(acronym)s' n'existe plus en %(year)s"
 msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr "L'événement \"%(event)s\" a été supprimé avec succès"
 
-#: business/education_groups/perms.py:332
+#: business/education_groups/perms.py:335
 msgid "The faculty manager cannot modify admission which are lower than N"
 msgstr ""
 
-#: business/education_groups/perms.py:300
+#: business/education_groups/perms.py:303
 msgid ""
 "The faculty manager cannot modify general information which are lower than N"
 msgstr ""
 
-#: business/education_groups/perms.py:334
+#: business/education_groups/perms.py:337
 msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
@@ -4610,21 +4620,21 @@ msgstr ""
 "La somme des volumes des partims pour le professeur %(tutor)s est supérieure "
 "au volume de l'unité d'apprentissage parent pour ce professeur"
 
-#: business/education_groups/perms.py:263
+#: business/education_groups/perms.py:266
 msgid "The user cannot modify data which are greater than N+1"
 msgstr "L’utilisateur ne peut pas modifier les données supérieures à N + 1"
 
-#: business/education_groups/perms.py:312
+#: business/education_groups/perms.py:315
 msgid "The user doesn't have right to update admission condition"
 msgstr ""
 "L’utilisateur n’a pas le droit de mettre à jour la condition d’admission"
 
-#: business/education_groups/perms.py:280
+#: business/education_groups/perms.py:283
 msgid "The user doesn't have right to update general information"
 msgstr ""
 "L’utilisateur n’a pas le droit de mettre à jour les informations générales"
 
-#: templatetags/education_group.py:212
+#: business/education_groups/perms.py:44 templatetags/education_group.py:211
 #: tests/templatetags/test_education_group.py:237
 #: tests/templatetags/test_education_group.py:261
 msgid "The user has not permission to change education groups."
@@ -4636,14 +4646,22 @@ msgctxt "female"
 msgid "The user has not permission to create a %(category)s."
 msgstr "L'utilisateur n'a pas la permission de créer une %(category)s."
 
-#: business/education_groups/perms.py:164
+#: business/education_groups/perms.py:167
 #, python-format
 msgctxt "male"
 msgid "The user has not permission to create a %(category)s."
 msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
 
-#: business/education_groups/perms.py:178
-#: business/education_groups/perms.py:265
+#: business/education_groups/perms.py:43
+msgid "The user has not permission to create education groups."
+msgstr "L'utilisateur n'a pas la permission de créer des formations."
+
+#: business/education_groups/perms.py:45
+msgid "The user has not permission to delete education groups."
+msgstr "L'utilisateur n'a pas la permission de supprimer les formations."
+
+#: business/education_groups/perms.py:181
+#: business/education_groups/perms.py:268
 msgid "The user is not attached to the management entity"
 msgstr "L’utilisateur n’est pas attaché à l’entité de gestion"
 

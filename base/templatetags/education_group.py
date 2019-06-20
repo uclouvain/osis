@@ -134,7 +134,6 @@ def _get_permission(context, permission):
     except PermissionDenied as e:
         result = False
         permission_denied_message = str(e)
-
     return permission_denied_message, "" if result else "disabled", root
 
 

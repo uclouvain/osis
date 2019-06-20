@@ -17,7 +17,7 @@ $(document).ready(function () {
 
         $("a.jstree-anchor").click(function( event ) {
             let pageLocator = '_self';
-            if (event.ctrlKey) pageLocator = '_blank';
+            if (event.ctrlKey || event.metaKey) pageLocator = '_blank';
             data.instance.deselect_all();
             window.open($(this).attr('href'), pageLocator);
         });
@@ -70,7 +70,7 @@ $(document).ready(function () {
                 "selected": false,
             },
             "contextmenu": {
-                "select_node": false,
+                "select_node": true,
                 "items": {
                     "select": {
                         "label": gettext("Select"),

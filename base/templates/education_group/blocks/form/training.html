@@ -70,7 +70,7 @@
                         element.parentElement.setAttribute('class', 'form-group required_field has-error');
                         let error_msg = document.createElement("div");
                         error_msg.setAttribute('class', 'help-block');
-                        let newContent = document.createTextNode(gettext("Field is required"));
+                        let newContent = document.createTextNode(gettext("This field is required"));
                         error_msg.appendChild(newContent);
                         element.parentElement.append(error_msg);
                     }
