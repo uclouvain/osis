@@ -27,7 +27,7 @@
 from django.test import TestCase
 
 from base.models.enums import entity_container_year_link_type as entity_types
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 
 
@@ -49,17 +49,13 @@ class LearningUnitYearWithContextTestCase(TestCase):
         )
 
     def test_repartition_volumes_property(self):
-        entity_types_list = [
-            entity_types.REQUIREMENT_ENTITY,
-            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
-            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
-        ]
-        entity_containers_year = [
-            EntityContainerYearFactory(
-                type=entity_types_list[x],
-                learning_container_year=self.component_with_repartition.learning_unit_year.learning_container_year
-            ) for x in range(3)
-        ]
+        container_year = self.component_with_repartition.learning_unit_year.learning_container_year
+        container_year.set_entities({
+            entity_types.REQUIREMENT_ENTITY: EntityFactory(),
+            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1: EntityFactory(),
+            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2: EntityFactory(),
+        })
+        container_year.save()
         expected_result = {
             "REQUIREMENT_ENTITY": 20.0,
             "ADDITIONAL_REQUIREMENT_ENTITY_1": 10.0,

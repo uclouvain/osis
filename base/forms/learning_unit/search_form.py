@@ -44,11 +44,9 @@ from base.forms.utils.dynamic_field import DynamicChoiceField
 from base.models import learning_unit_year, group_element_year
 from base.models.academic_year import AcademicYear
 from base.models.campus import Campus
-from base.models.entity_container_year import EntityContainerYear
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
-from base.models.enums import entity_container_year_link_type, learning_unit_year_subtypes, active_status, \
-    entity_type, learning_container_year_types
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY
+from base.models.enums import entity_container_year_link_type, learning_unit_year_subtypes, active_status, entity_type,\
+    learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import convert_status_bool, LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
@@ -101,15 +99,13 @@ class LearningUnitSearchForm(BaseSearchForm):
             learning_unit_year=OuterRef('pk'),
         )
         entity_requirement = EntityVersion.objects.filter(
-            entity__entitycontaineryear__learning_container_year__learningunityear=OuterRef('pk'),
-            entity__entitycontaineryear__type=REQUIREMENT_ENTITY
+            entity=OuterRef('learning_container_year__requirement_entity'),
         ).current(
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
         entity_allocation = EntityVersion.objects.filter(
-            entity__entitycontaineryear__learning_container_year__learningunityear=OuterRef('pk'),
-            entity__entitycontaineryear__type=ALLOCATION_ENTITY
+            entity=OuterRef('learning_container_year__allocation_entity'),
         ).current(
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
@@ -161,16 +157,14 @@ class LearningUnitSearchForm(BaseSearchForm):
             requirement_entity_ids = get_entities_ids(requirement_entity_acronym, with_entity_subordinated)
 
             qs = qs.filter(
-                learning_container_year__entitycontaineryear__entity__in=requirement_entity_ids,
-                learning_container_year__entitycontaineryear__type=REQUIREMENT_ENTITY
+                learning_container_year__requirement_entity__in=requirement_entity_ids,
             )
 
         if allocation_entity_acronym:
             allocation_entity_ids = get_entities_ids(allocation_entity_acronym, with_entity_subordinated)
 
             qs = qs.filter(
-                learning_container_year__entitycontaineryear__entity__in=allocation_entity_ids,
-                learning_container_year__entitycontaineryear__type=ALLOCATION_ENTITY
+                learning_container_year__allocation_entity__in=allocation_entity_ids,
             )
 
         return qs
@@ -258,10 +252,8 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             learning_units = self._filter_borrowed_learning_units(learning_units)
 
         learning_units = learning_units.prefetch_related(
-            build_entity_container_prefetch([
-                entity_container_year_link_type.ALLOCATION_ENTITY,
-                entity_container_year_link_type.REQUIREMENT_ENTITY
-            ])
+            build_entity_container_prefetch(entity_container_year_link_type.ALLOCATION_ENTITY),
+            build_entity_container_prefetch(entity_container_year_link_type.REQUIREMENT_ENTITY),
         )
         for learning_unit in learning_units:
             append_latest_entities(learning_unit, service_course_search)
@@ -279,10 +271,8 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             raise TooManyResultsException
 
         queryset = queryset.prefetch_related(
-            build_entity_container_prefetch([
-                entity_container_year_link_type.ALLOCATION_ENTITY,
-                entity_container_year_link_type.REQUIREMENT_ENTITY
-            ]),
+            build_entity_container_prefetch(entity_container_year_link_type.ALLOCATION_ENTITY),
+            build_entity_container_prefetch(entity_container_year_link_type.REQUIREMENT_ENTITY),
             Prefetch(
                 'attribution_set',
                 queryset=Attribution.objects.filter(summary_responsible=True),
@@ -369,11 +359,9 @@ def __search_faculty_for_entity(entity_id, entities):
 
 
 def map_learning_unit_year_with_requirement_entity(learning_unit_year_qs):
-    entity_container_years = EntityContainerYear.objects. \
-        filter(learning_container_year__pk=OuterRef("learning_container_year__pk"),
-               type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-    learning_unit_years_with_entity = learning_unit_year_qs.values_list("id"). \
-        annotate(entity=Subquery(entity_container_years.values("entity")))
+    learning_unit_years_with_entity = learning_unit_year_qs\
+        .select_related('learning_container_year__requirement_entity')\
+        .values_list("id", 'learning_container_year__requirement_entity')
     return {luy_id: entity_id for luy_id, entity_id in learning_unit_years_with_entity}
 
 

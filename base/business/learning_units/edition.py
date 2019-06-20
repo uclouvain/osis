@@ -34,9 +34,9 @@ from base.business.learning_units.simple.deletion import delete_from_given_learn
     check_learning_unit_year_deletion
 from base.business.utils.model import update_instance_model_from_data, update_related_object
 from base.enums.component_detail import COMPONENT_DETAILS
-from base.models import entity_container_year, learning_class_year
+from base.models import learning_class_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
-from base.models.entity_version import EntityVersion
+from base.models.entity import Entity
 from base.models.enums import learning_unit_year_periodicity, learning_unit_year_subtypes
 from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
@@ -178,30 +178,38 @@ def _get_or_create_container_year(new_learn_unit_year, new_academic_year):
     )
     # Sometimes, the container already exists, we can directly use it and its entitycontaineryear
     if not queryset.exists():
-        duplicated_lcy = update_related_object(new_learn_unit_year.learning_container_year,
-                                               'academic_year', new_academic_year)
+        duplicated_lcy = update_related_object(
+            new_learn_unit_year.learning_container_year,
+            'academic_year',
+            new_academic_year,
+            commit_save=False,
+        )
         duplicated_lcy.is_vacant = False
         duplicated_lcy.type_declaration_vacant = None
-
-        _duplicate_entity_container_year(duplicated_lcy, new_academic_year)
+        _raise_if_entity_version_does_not_exist(duplicated_lcy, new_academic_year)
+        duplicated_lcy.save()
     else:
         duplicated_lcy = queryset.get()
         duplicated_lcy.copied_from = new_learn_unit_year.learning_container_year
     return duplicated_lcy
 
 
-def _duplicate_entity_container_year(new_lcy, new_academic_year):
-    for entity_container_y in entity_container_year.search(learning_container_year=new_lcy.copied_from):
-        entity_versions = EntityVersion.objects.entity(entity_container_y.entity)
-        if not entity_versions.current(new_academic_year.end_date).exists():
+def _raise_if_entity_version_does_not_exist(new_lcy, new_academic_year):
+    prefetched_entities_previous_year = Entity.objects.filter(
+        pk__in=[ent.id for ent in new_lcy.copied_from.get_map_entity_by_type().values() if ent]
+    ).prefetch_related(
+        "entityversion_set"
+    )
+    for entity in prefetched_entities_previous_year:
+        if not any(obj.exists_at_specific_date(new_academic_year.end_date) for obj in entity.entityversion_set.all()):
             raise IntegrityError(
                 _('The entity %(entity_acronym)s does not exist for the selected academic year %(academic_year)s') % {
-                    'entity_acronym': entity_versions.last().acronym,
+                    'entity_acronym': entity.most_recent_acronym,
                     'academic_year': new_academic_year
                 })
-        update_related_object(entity_container_y, 'learning_container_year', new_lcy)
 
 
+# TODO :: remove unused param
 def _duplicate_learning_component_year(new_learn_container_year, new_learn_unit_year, old_learn_unit_year):
     old_components = old_learn_unit_year.learningcomponentyear_set.all()
     for old_component in old_components:
@@ -286,8 +294,7 @@ def update_learning_unit_year_with_report(luy_to_update, fields_to_update, entit
 
     # Update luy which doesn't have conflict
     for luy in luy_to_update_list:
-        _update_learning_unit_year(luy, fields_to_update, with_report=(luy != luy_to_update))
-        _update_learning_unit_year_entities(luy, entities_by_type_to_update)
+        _update_learning_unit_year(luy, fields_to_update, (luy != luy_to_update), entities_by_type_to_update)
 
     # Show conflict error if exists
     check_postponement_conflict_report_errors(conflict_report)
@@ -321,43 +328,25 @@ def check_postponement_conflict_report_errors(conflict_report):
 
 
 # FIXME should used include and not exclude
-def _update_learning_unit_year(luy_to_update, fields_to_update, with_report):
+def _update_learning_unit_year(luy_to_update, fields_to_update, with_report, entities_to_update_by_type):
     fields_to_exclude = ()
     if with_report:
         fields_to_exclude = FIELDS_TO_EXCLUDE_WITH_REPORT
 
     update_instance_model_from_data(luy_to_update.learning_unit, fields_to_update, exclude=('acronym',))
 
+    luy_to_update.learning_container_year.set_entities(entities_to_update_by_type)
+
     # Only the subtype FULL can edit the container
     if luy_to_update.subtype == learning_unit_year_subtypes.FULL:
-        update_instance_model_from_data(luy_to_update.learning_container_year, fields_to_update,
-                                        exclude=fields_to_exclude)
+        update_instance_model_from_data(
+            luy_to_update.learning_container_year,
+            fields_to_update,
+            exclude=fields_to_exclude
+        )
 
     update_instance_model_from_data(luy_to_update, fields_to_update,
                                     exclude=fields_to_exclude + ("in_charge",))
-
-
-def _update_learning_unit_year_entities(luy, entities_by_type_to_update):
-    for entity_link_type, entity, in entities_by_type_to_update.items():
-        if entity:
-            entity_container_yr = _update_entity_container_year(entity, luy.learning_container_year, entity_link_type)
-        else:
-            _delete_entity_container_year(luy.learning_container_year, entity_link_type)
-
-
-def update_or_create_entity_container_year_with_components(an_entity, learning_container_year, type_entity):
-    return _update_entity_container_year(an_entity, learning_container_year, type_entity)
-
-
-def _update_entity_container_year(an_entity, learning_container_year, type_entity):
-    entity_container_yr, created = entity_container_year.EntityContainerYear.objects.update_or_create(
-        type=type_entity, learning_container_year=learning_container_year, defaults={"entity": an_entity})
-    return entity_container_yr
-
-
-def _delete_entity_container_year(learning_container_year, type_entity):
-    entity_container_year.EntityContainerYear.objects.filter(
-        type=type_entity, learning_container_year=learning_container_year).delete()
 
 
 def _check_postponement_conflict(luy, next_luy):
@@ -434,10 +423,15 @@ def _check_postponement_learning_unit_year_proposal_state(nex_luy):
     return [error_msg] if is_learning_unit_year_in_proposal(nex_luy) else []
 
 
+# TODO :: should remove this function and add requirement_entity, allocation_entity, additional_entities
+# TODO ::  in _check_postponement_conflict_on_learning_container_year
 def _check_postponement_conflict_on_entity_container_year(lcy, next_lcy):
-    current_entities = entity_container_year.find_entities_grouped_by_linktype(lcy)
-    next_year_entities = entity_container_year.find_entities_grouped_by_linktype(next_lcy)
-    error_list = _check_if_all_entities_exist(next_lcy, list(next_year_entities.values()))
+    current_entities = lcy.get_map_entity_by_type()
+    next_year_entities = next_lcy.get_map_entity_by_type()
+    error_list = _check_if_all_entities_exist(
+        next_lcy,
+        list(filter(lambda entity: entity, next_year_entities.values()))
+    )
     entity_type_diff = filter(lambda type: _is_different_value(current_entities, next_year_entities, type),
                               ENTITY_TYPE_LIST)
     for entity_type in entity_type_diff:

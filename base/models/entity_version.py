@@ -200,7 +200,10 @@ class EntityVersion(SerializableModel):
 
     def exists_now(self):
         now = datetime.datetime.now().date()
-        return (not self.end_date) or (self.end_date and self.start_date < now < self.end_date)
+        return self.exists_at_specific_date(now)
+
+    def exists_at_specific_date(self, date):
+        return (not self.end_date) or (self.end_date and self.start_date < date < self.end_date)
 
     @property
     def verbose_title(self):
@@ -503,17 +506,6 @@ def find_pedagogical_entities_version():
 
 def find_latest_version_by_entity(entity, date):
     return EntityVersion.objects.current(date).entity(entity).select_related('entity', 'parent').first()
-
-
-def find_last_entity_version_by_learning_unit_year_id(learning_unit_year_id, entity_type):
-    now = datetime.datetime.now(get_tzinfo())
-    try:
-        return EntityVersion.objects.current(now). \
-            filter(entity__entitycontaineryear__learning_container_year__learningunityear__id=learning_unit_year_id,
-                   entity__entitycontaineryear__type=entity_type). \
-            latest('start_date')
-    except EntityVersion.DoesNotExist:
-        return None
 
 
 def find_entity_version_according_academic_year(an_entity, an_academic_year):
