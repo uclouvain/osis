@@ -30,14 +30,14 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from base.business.learning_units.comparison import get_keys, get_value, \
-    compare_learning_component_year, compare_volumes, get_entity_by_type
+    compare_learning_component_year, compare_volumes
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import quadrimesters, learning_unit_year_session, attribution_procedure
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -175,12 +175,11 @@ class LearningUnitYearComparaisonTest(TestCase):
         self.assertEqual(len(list(data.keys())), 2)
 
     def test_get_entity_by_type(self):
-        learning_cont_yr = LearningContainerYearFactory(academic_year=self.academic_year)
-        entity_container_yr = EntityContainerYearFactory(
-            learning_container_year=learning_cont_yr,
-            type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1
+        learning_cont_yr = LearningContainerYearFactory(
+            academic_year=self.academic_year,
+            additional_entity_1=EntityFactory()
         )
-        luy = LearningUnitYear(academic_year=self.academic_year, learning_container_year=learning_cont_yr)
-        self.assertEqual(get_entity_by_type(luy, entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1),
-                         entity_container_yr.entity)
-        self.assertIsNone(get_entity_by_type(luy, entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2))
+        result = learning_cont_yr.get_entity_from_type(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1)
+        self.assertEqual(result, learning_cont_yr.additional_entity_1)
+        result = learning_cont_yr.get_entity_from_type(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2)
+        self.assertIsNone(result)

@@ -94,8 +94,8 @@ def get_valid_external_learning_unit_form_data(academic_year, person, learning_u
         'is_vacant': learning_unit_year.learning_container_year.is_vacant,
 
         # External learning unit model form
-        'requirement_entity-entity': requesting_entity.id,
-        'allocation_entity-entity': requesting_entity.id,
+        'requirement_entity': requesting_entity.id,
+        'allocation_entity': requesting_entity.id,
         'external_acronym': 'Gorzyne',
         'external_credits': '5',
 

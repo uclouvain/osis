@@ -31,7 +31,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
-from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
     LearningContainerModelForm, LearningContainerYearModelForm
 from base.models import academic_year
@@ -77,7 +76,6 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
         LearningUnitYearModelForm,
         LearningContainerModelForm,
         LearningContainerYearModelForm,
-        EntityContainerBaseForm,
         SimplifiedVolumeManagementForm
     ]
 
@@ -98,8 +96,8 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
 
         self.learning_unit_year_form.post_clean(self.learning_container_year_form.instance.container_type)
         self.learning_container_year_form.post_clean(self.learning_unit_year_form.cleaned_data["specific_title"])
-        additional_entity_1 = self.entity_container_form.forms[2].entity_version
-        additional_entity_2 = self.entity_container_form.forms[3].entity_version
+        additional_entity_1 = self.learning_container_year_form.additionnal_entity_version_1
+        additional_entity_2 = self.learning_container_year_form.additionnal_entity_version_2
 
         for form in self.simplified_volume_management_form:
             volume_requirement_entity = form.cleaned_data.get("repartition_volume_requirement_entity") or 0
@@ -201,7 +199,6 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
             'learning_unit_form': self.learning_unit_form,
             'learning_unit_year_form': self.learning_unit_year_form,
             'learning_container_year_form': self.learning_container_year_form,
-            'entity_container_form': self.entity_container_form,
             'simplified_volume_management_form': self.simplified_volume_management_form
         }
 
@@ -228,10 +225,6 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
     @property
     def learning_container_year_form(self):
         return self.forms[LearningContainerYearModelForm]
-
-    @property
-    def entity_container_form(self):
-        return self.forms.get(EntityContainerBaseForm)
 
     @property
     def simplified_volume_management_form(self):
@@ -311,11 +304,6 @@ class FullForm(LearningUnitBaseForm):
             },
             LearningUnitYearModelForm: self._build_instance_data_learning_unit_year(data, default_ac_year),
             LearningContainerYearModelForm: self._build_instance_data_learning_container_year(data, proposal),
-            EntityContainerBaseForm: {
-                'data': data,
-                'learning_container_year': self.instance.learning_container_year if self.instance else None,
-                'person': self.person
-            },
             SimplifiedVolumeManagementForm: {
                 'data': data,
                 'proposal': proposal,
@@ -353,15 +341,6 @@ class FullForm(LearningUnitBaseForm):
             'subtype': self.subtype
         }
 
-    def is_valid(self):
-        result = super().is_valid()
-        if result:
-            result = self.entity_container_form.post_clean(
-                self.learning_container_year_form.cleaned_data['container_type'],
-                self.learning_unit_year_form.instance.academic_year)
-
-        return result
-
     def save(self, commit=True):
         academic_year = self.academic_year
 
@@ -385,14 +364,8 @@ class FullForm(LearningUnitBaseForm):
             commit=commit
         )
 
-        entity_container_years = self.entity_container_form.save(
-            commit=commit,
-            learning_container_year=learning_unit_yr.learning_container_year
-        )
-
         self.simplified_volume_management_form.save_all_forms(
             learning_unit_yr,
-            entity_container_years,
             commit=commit
         )
 

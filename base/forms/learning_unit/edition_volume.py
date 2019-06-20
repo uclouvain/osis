@@ -108,14 +108,15 @@ class VolumeEditionForm(forms.Form):
             self.fields["opening_brackets_entities_field"] = EmptyField(label='[')
         for i, key in enumerate(entities_to_add):
             entity = self.entities[key]
-            self.fields["volume_" + key.lower()] = VolumeField(
-                label=entity.acronym,
-                help_text=entity.title,
-                widget=DecimalFormatInput(render_value=True),
-                required=False
-            )
-            if i != len(entities_to_add) - 1:
-                self.fields["add" + key.lower()] = EmptyField(label='+')
+            if entity:
+                self.fields["volume_" + key.lower()] = VolumeField(
+                    label=entity.acronym,
+                    help_text=entity.title,
+                    widget=DecimalFormatInput(render_value=True),
+                    required=False
+                )
+                if i != len(entities_to_add) - 1:
+                    self.fields["add" + key.lower()] = EmptyField(label='+')
         if size_entities_to_add > 1:
             self.fields["closing_brackets_entities_field"] = EmptyField(label=']')
 
@@ -294,7 +295,6 @@ class VolumeEditionFormsetContainer:
 
 class SimplifiedVolumeForm(forms.ModelForm):
     _learning_unit_year = None
-    _entity_containers = []
 
     add_field = EmptyField(label="+")
     equal_field = EmptyField(label='=')
@@ -379,8 +379,13 @@ class SimplifiedVolumeForm(forms.ModelForm):
         return super().save(commit)
 
     def _assert_repartition_volumes_consistency(self):
-        """In case EntityContainerYear does not exist (or was removed), need to reset repartition volumes to None."""
-        existing_entity_container_types = {ec.type for ec in self._entity_containers if ec}
+        """In case EntityContainer link is not set, need to reset repartition volumes to None."""
+        container_year = self._learning_unit_year.learning_container_year
+        existing_entity_container_types = {
+            link_type
+            for link_type, entity_id in container_year.get_map_entity_by_type().items()
+            if entity_id
+        }
         for entity_container_type in LearningComponentYear.repartition_volume_attrs_by_entity_container_type().keys():
             if entity_container_type not in existing_entity_container_types:
                 self.instance.set_repartition_volume(entity_container_type, None)
@@ -431,10 +436,9 @@ class SimplifiedVolumeFormset(forms.BaseModelFormSet):
             })
         return data
 
-    def save_all_forms(self, learning_unit_year, entity_container_years, commit=True):
+    def save_all_forms(self, learning_unit_year, commit=True):
         for form in self.forms:
             form._learning_unit_year = learning_unit_year
-            form._entity_containers = entity_container_years
             form.save()
         return super().save(commit)
 

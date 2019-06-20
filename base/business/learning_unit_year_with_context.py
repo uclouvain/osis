@@ -26,11 +26,13 @@
 from collections import OrderedDict
 
 from django.db import models
+from django.db.models import Prefetch
 
 from base.business import entity_version as business_entity_version
-from base.models import entity_container_year, learning_unit_year
+from base.models import learning_unit_year
+from base.models.entity import Entity
 from base.models.enums import entity_container_year_link_type as entity_types
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
+
 from base.models.learning_component_year import LearningComponentYear
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
@@ -38,19 +40,27 @@ from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLAN
 
 
 def get_with_context(**learning_unit_year_data):
-    entity_container_prefetch = models.Prefetch(
-        'learning_container_year__entitycontaineryear_set',
-        queryset=entity_container_year.search(
-            link_type=REQUIREMENT_ENTITIES
-        ).prefetch_related(
-            models.Prefetch('entity__entityversion_set', to_attr='entity_versions')
-        ),
-        to_attr='entity_containers_year'
+    entity_version_prefetch = Entity.objects.all().prefetch_related(
+        Prefetch('entityversion_set', to_attr='entity_versions')
+    )
+    requirement_entity_prefetch = models.Prefetch(
+        'learning_container_year__requirement_entity',
+        queryset=entity_version_prefetch
+    )
+    additional_entity_1_prefetch = models.Prefetch(
+        'learning_container_year__additional_entity_1',
+        queryset=entity_version_prefetch
+    )
+    additional_entity_2_prefetch = models.Prefetch(
+        'learning_container_year__additional_entity_2',
+        queryset=entity_version_prefetch
     )
 
     learning_unit_years = learning_unit_year.search(**learning_unit_year_data) \
         .select_related('academic_year', 'learning_container_year') \
-        .prefetch_related(entity_container_prefetch) \
+        .prefetch_related(requirement_entity_prefetch) \
+        .prefetch_related(additional_entity_1_prefetch) \
+        .prefetch_related(additional_entity_2_prefetch) \
         .prefetch_related(get_learning_component_prefetch()) \
         .order_by('academic_year__year', 'acronym')
 
@@ -63,9 +73,10 @@ def get_with_context(**learning_unit_year_data):
 def append_latest_entities(learning_unit_yr, service_course_search=False):
     learning_unit_yr.entities = {}
 
-    for entity_container_yr in learning_unit_yr.learning_container_year.entitycontaineryear_set.all():
-        link_type = entity_container_yr.type
-        learning_unit_yr.entities[link_type] = entity_container_yr.get_latest_entity_version()
+    for link_type in entity_types.ENTITY_TYPE_LIST:
+        container = learning_unit_yr.learning_container_year
+        entity = container.get_entity_from_type(link_type)
+        learning_unit_yr.entities[link_type] = entity.get_latest_entity_version() if entity else None
 
     requirement_entity_version = learning_unit_yr.entities.get(entity_types.REQUIREMENT_ENTITY)
     allocation_entity_version = learning_unit_yr.entities.get(entity_types.ALLOCATION_ENTITY)

@@ -32,25 +32,20 @@ from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units import edition as business_edition
-from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.learning_component_year import LearningComponentYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from reference.tests.factories.language import LanguageFactory
 from base.enums.component_detail import COMPONENT_DETAILS
-from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
-    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
-    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1
 
 
 class LearningUnitEditionTestCase(TestCase):
@@ -66,60 +61,27 @@ class LearningUnitEditionTestCase(TestCase):
                                                                              create_lecturing_component=True,
                                                                              create_pratical_component=True)
 
-        an_entity = EntityFactory()
-        self.entity_version = EntityVersionFactory(entity=an_entity, parent=None, end_date=None, acronym="DRT")
+        self.entity_version = EntityVersionFactory(parent=None, end_date=None, acronym="DRT")
+        self.entity_version.refresh_from_db()
         self.allocation_entity = _create_entity_container_with_components(
             self.learning_unit_year,
             entity_container_year_link_type.ALLOCATION_ENTITY,
-            an_entity
+            self.entity_version.entity
         )
         self.requirement_entity = _create_entity_container_with_components(
             self.learning_unit_year,
             entity_container_year_link_type.REQUIREMENT_ENTITY,
-            an_entity,
+            self.entity_version.entity,
             repartition_lecturing=30,
             repartition_practical_exercises=10
         )
         self.add_requirement_entity_1 = _create_entity_container_with_components(
             self.learning_unit_year,
             entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-            an_entity,
+            self.entity_version.entity,
             repartition_lecturing=10,
             repartition_practical_exercises=5
         )
-
-    def test_update_or_create_entity_container_year_with_components_type_requirement(self):
-        """In this test, we ensure that when we create an entity_container type requirement,
-           we have an entity_container created"""
-        an_entity = EntityFactory()
-        a_learning_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
-        LearningComponentYearFactory(acronym="PM",
-                                     learning_unit_year__learning_container_year=a_learning_container_year)
-        LearningComponentYearFactory(acronym="PP",
-                                     learning_unit_year__learning_container_year=a_learning_container_year)
-        link_type = random.choice(REQUIREMENT_ENTITIES)
-
-        business_edition.update_or_create_entity_container_year_with_components(
-            an_entity, a_learning_container_year, link_type
-        )
-        self.assertEqual(EntityContainerYear.objects.filter(
-            learning_container_year=a_learning_container_year).count(), 1)
-
-    def test_update_or_create_entity_container_year_with_components_type_allocation(self):
-        """In this test, we ensure that when we create an entity_container type allocation,
-           we have NO entity_container created"""
-        an_entity = EntityFactory()
-        a_learning_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
-        LearningComponentYearFactory(acronym="PM",
-                                     learning_unit_year__learning_container_year=a_learning_container_year)
-        LearningComponentYearFactory(acronym="PP",
-                                     learning_unit_year__learning_container_year=a_learning_container_year)
-        link_type = entity_container_year_link_type.ALLOCATION_ENTITY
-
-        business_edition.update_or_create_entity_container_year_with_components(an_entity, a_learning_container_year,
-                                                                                link_type)
-        self.assertEqual(EntityContainerYear.objects.filter(
-            learning_container_year=a_learning_container_year).count(), 1)
 
     def test_check_postponement_conflict_learning_unit_year_no_differences(self):
         # Copy the same learning unit + change academic year
@@ -277,17 +239,10 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertIn(error_campus, error_list)
 
     def test_check_postponement_conflict_entity_container_year_no_difference_found(self):
-        # Copy the same container + change academic year
+        # Copy the same container and entities + change academic year
         another_learning_container_year = _build_copy(self.learning_container_year)
         another_learning_container_year.academic_year = self.next_academic_year
         another_learning_container_year.save()
-
-        # Copy same entity
-        for entity_container_to_copy in [self.allocation_entity, self.requirement_entity,
-                                         self.add_requirement_entity_1]:
-            entity_copied = _build_copy(entity_container_to_copy)
-            entity_copied.learning_container_year = another_learning_container_year
-            entity_copied.save()
 
         # No diff found
         error_list = business_edition._check_postponement_conflict_on_entity_container_year(
@@ -301,13 +256,6 @@ class LearningUnitEditionTestCase(TestCase):
         another_learning_container_year = _build_copy(self.learning_container_year)
         another_learning_container_year.academic_year = self.next_academic_year
         another_learning_container_year.save()
-
-        # Copy same entity
-        for entity_container_to_copy in [self.allocation_entity, self.requirement_entity,
-                                         self.add_requirement_entity_1]:
-            entity_copied = _build_copy(entity_container_to_copy)
-            entity_copied.learning_container_year = another_learning_container_year
-            entity_copied.save()
 
         # Modify end_date of entity_version
         self.entity_version.end_date = self.next_academic_year.start_date - timedelta(days=1)
@@ -324,24 +272,19 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertIn(error_entity_not_exist, error_list)
 
     def test_check_postponement_conflict_entity_container_year_differences_found(self):
-        # Copy the same container + change academic year
+
+        # Copy the same container and entities + change academic year
         another_learning_container_year = _build_copy(self.learning_container_year)
         another_learning_container_year.academic_year = self.next_academic_year
-        another_learning_container_year.save()
-
-        # Copy same allocation entity
-        allocation_entity = _build_copy(self.allocation_entity)
-        allocation_entity.learning_container_year = another_learning_container_year
-        allocation_entity.save()
 
         # Link to another entity for requirement
-        entityversion = EntityVersionFactory(parent=None, end_date=None, acronym="AREC")
+        requirement_entity_version = EntityVersionFactory(parent=None, end_date=None, acronym="AREC")
+        requirement_entity_version.refresh_from_db()
+        another_learning_container_year.requirement_entity = requirement_entity_version.entity
 
-        requirement_entity = EntityContainerYearFactory(
-            learning_container_year=another_learning_container_year,
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY,
-            entity=entityversion.entity
-        )
+        another_learning_container_year.additional_entity_1 = None
+
+        another_learning_container_year.save()
 
         error_list = business_edition._check_postponement_conflict_on_entity_container_year(
             self.learning_container_year, another_learning_container_year
@@ -351,7 +294,7 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertEqual(len(error_list), 2)
 
         # invalidate cache
-        del self.requirement_entity.entity.most_recent_acronym
+        del self.requirement_entity.most_recent_acronym
 
         generic_error = "The value of field '%(field)s' is different between year %(year)s - %(value)s " \
                         "and year %(next_year)s - %(next_value)s"
@@ -359,9 +302,9 @@ class LearningUnitEditionTestCase(TestCase):
         error_requirement_entity = _(generic_error) % {
             'field': _(entity_container_year_link_type.REQUIREMENT_ENTITY.lower()),
             'year': self.learning_container_year.academic_year,
-            'value': self.requirement_entity.entity.most_recent_acronym,
+            'value': self.requirement_entity.most_recent_acronym,
             'next_year': another_learning_container_year.academic_year,
-            'next_value': requirement_entity.entity.most_recent_acronym
+            'next_value': requirement_entity_version.entity.most_recent_acronym
         }
         self.assertIn(error_requirement_entity, error_list)
 
@@ -369,7 +312,7 @@ class LearningUnitEditionTestCase(TestCase):
         error_requirement_entity = _(generic_error) % {
             'field': _(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1.lower()),
             'year': self.learning_container_year.academic_year,
-            'value': self.add_requirement_entity_1.entity.most_recent_acronym,
+            'value': self.add_requirement_entity_1.most_recent_acronym,
             'next_year': another_learning_container_year.academic_year,
             'next_value': _('No data')
         }
@@ -390,15 +333,15 @@ class LearningUnitEditionTestCase(TestCase):
 
         _create_entity_container_with_components(another_learning_unit_year,
                                                  entity_container_year_link_type.ALLOCATION_ENTITY,
-                                                 self.allocation_entity.entity)
+                                                 self.allocation_entity)
         _create_entity_container_with_components(another_learning_unit_year,
                                                  entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                                 self.requirement_entity.entity,
+                                                 self.requirement_entity,
                                                  repartition_lecturing=30,
                                                  repartition_practical_exercises=10)
         _create_entity_container_with_components(another_learning_unit_year,
                                                  entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                                                 self.add_requirement_entity_1.entity,
+                                                 self.add_requirement_entity_1,
                                                  repartition_lecturing=10,
                                                  repartition_practical_exercises=5)
 
@@ -436,15 +379,15 @@ class LearningUnitEditionTestCase(TestCase):
 
         _create_entity_container_with_components(another_learning_unit_year,
                                                  entity_container_year_link_type.ALLOCATION_ENTITY,
-                                                 self.allocation_entity.entity)
+                                                 self.allocation_entity)
         _create_entity_container_with_components(another_learning_unit_year,
                                                  entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                                 self.requirement_entity.entity,
+                                                 self.requirement_entity,
                                                  repartition_lecturing=30,
                                                  repartition_practical_exercises=10)
         _create_entity_container_with_components(another_learning_unit_year,
                                                  entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                                                 self.add_requirement_entity_1.entity,
+                                                 self.add_requirement_entity_1,
                                                  repartition_lecturing=20,
                                                  repartition_practical_exercises=10)
 
@@ -493,14 +436,14 @@ class LearningUnitEditionTestCase(TestCase):
 
         _create_entity_container_with_components(another_learning_unit_year,
                                                  entity_container_year_link_type.ALLOCATION_ENTITY,
-                                                 self.allocation_entity.entity)
+                                                 self.allocation_entity)
         _create_entity_container_with_components(another_learning_unit_year,
                                                  entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                                 self.requirement_entity.entity,
+                                                 self.requirement_entity,
                                                  repartition_practical_exercises=10)
         _create_entity_container_with_components(another_learning_unit_year,
                                                  entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                                                 self.add_requirement_entity_1.entity,
+                                                 self.add_requirement_entity_1,
                                                  repartition_practical_exercises=5)
 
         error_list = business_edition._check_postponement_conflict_on_volumes(self.learning_container_year,
@@ -534,15 +477,15 @@ class LearningUnitEditionTestCase(TestCase):
 
         _create_entity_container_with_components(another_learning_unit_year,
                                                  entity_container_year_link_type.ALLOCATION_ENTITY,
-                                                 self.allocation_entity.entity)
+                                                 self.allocation_entity)
         _create_entity_container_with_components(another_learning_unit_year,
                                                  entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                                 self.requirement_entity.entity,
+                                                 self.requirement_entity,
                                                  repartition_lecturing=30,
                                                  repartition_practical_exercises=10)
         _create_entity_container_with_components(another_learning_unit_year,
                                                  entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                                                 self.add_requirement_entity_1.entity,
+                                                 self.add_requirement_entity_1,
                                                  repartition_lecturing=10,
                                                  repartition_practical_exercises=5)
 
@@ -576,19 +519,14 @@ class LearningUnitEditionTestCase(TestCase):
         another_learning_unit_year.specific_title = "Specific title modified"
         another_learning_unit_year.save()
 
-        # ENTITY - Same allocation but NOT same requirement entity
-        allocation_entity = _build_copy(self.allocation_entity)
-        allocation_entity.learning_container_year = another_learning_container_year
-        allocation_entity.save()
         an_entity = EntityFactory()
         EntityVersionFactory(entity=an_entity, parent=None, end_date=None, acronym="AREC")
-        EntityContainerYearFactory(learning_container_year=another_learning_container_year,
-                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                   entity=an_entity)
+        another_learning_container_year.requirement_entity = an_entity
+        another_learning_container_year.save()
 
         error_list = business_edition._check_postponement_conflict(self.learning_unit_year, another_learning_unit_year)
         self.assertIsInstance(error_list, list)
-        self.assertEqual(len(error_list), 6)
+        self.assertEqual(len(error_list), 5)
 
     def test_extends_only_components_of_learning_unit_year(self):
         # Creating partim with components for the same learningContainerYear
@@ -640,11 +578,9 @@ def _create_learning_unit_year_with_components(l_container, create_lecturing_com
 
 def _create_entity_container_with_components(a_learning_unit_year, entity_container_type, an_entity,
                                              repartition_lecturing=None, repartition_practical_exercises=None):
-    an_entity_container = EntityContainerYearFactory(
-        learning_container_year=a_learning_unit_year.learning_container_year,
-        type=entity_container_type,
-        entity=an_entity
-    )
+    container = a_learning_unit_year.learning_container_year
+    container.set_entity(entity_container_type, an_entity)
+    container.save()
 
     if repartition_lecturing is not None:
         _create_component_year(
@@ -661,7 +597,7 @@ def _create_entity_container_with_components(a_learning_unit_year, entity_contai
             entity_container_type,
             repartition_practical_exercises
         )
-    return an_entity_container
+    return an_entity
 
 
 def _create_component_year(luy, component_type, entity_container_type, repartition_volume):
