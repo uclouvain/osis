@@ -28,11 +28,11 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
-from base.business.utils.convert import volume_format
 from base.models.enums.learning_unit_year_subtypes import PARTIM
 from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.utils import get_verbose_field_value
+from osis_common.utils.numbers import normalize_fraction
 
 register = template.Library()
 DIFFERENCE_CSS = "style='color:#5CB85C;'"
@@ -201,12 +201,12 @@ def dl_component_tooltip(context, key, **kwargs):
                 break
 
         difference = get_component_volume_css(volumes, key, default_if_none, value) or 'title="{}"'.format(_(title))
-        value = get_style_of_value("", "", volume_format(value))
+        value = get_style_of_value("", "", normalize_fraction(value))
         html_id = "id='id_{}'".format(key.lower())
 
         return mark_safe("<dl><dd {difference} {id}>{value}</dd></dl>".format(
             difference=difference, id=html_id, value=str(value)))
-    return volume_format(value) if value else default_if_none
+    return normalize_fraction(value) if value else default_if_none
 
 
 @register.filter
@@ -215,7 +215,7 @@ def get_component_volume_css(values, parameter, default_if_none="", value=None):
         return mark_safe(
             " data-toggle=tooltip title='{} : {}' class='{}' ".format(
                 LABEL_VALUE_BEFORE_PROPOSAL,
-                volume_format(values[parameter]) or default_if_none,
+                normalize_fraction(values[parameter]) or default_if_none,
                 CSS_PROPOSAL_VALUE
             )
         )

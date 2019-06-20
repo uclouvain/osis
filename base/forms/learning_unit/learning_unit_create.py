@@ -48,7 +48,7 @@ from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit, REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
-from osis_common.forms.widgets import FloatFormatInput
+from osis_common.forms.widgets import DecimalFormatInput
 from reference.models.country import Country
 from reference.models.language import find_all_languages
 
@@ -135,7 +135,7 @@ class LearningUnitYearModelForm(forms.ModelForm):
             }
         }
         widgets = {
-            'credits': FloatFormatInput(render_value=True),
+            'credits': DecimalFormatInput(render_value=True),
         }
 
     def __clean_acronym_external(self):
