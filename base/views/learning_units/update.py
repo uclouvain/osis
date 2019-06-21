@@ -152,7 +152,6 @@ def learning_unit_volumes_management(request, learning_unit_year_id, form_type):
     context['tab_active'] = 'components'
     context['entity_types_volume'] = REQUIREMENT_ENTITIES
     context['luy_url'] = 'learning_unit_components' if form_type == "full" else 'learning_unit'
-    context['experimental_phase'] = True
     if request.is_ajax():
         return JsonResponse({'errors': volume_edition_formset_container.errors})
 

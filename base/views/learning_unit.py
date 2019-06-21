@@ -91,7 +91,6 @@ def learning_unit_formations(request, learning_unit_year_id):
     context['group_elements_years'] = group_elements_years
 
     context['root_formations'] = education_group_year.find_with_enrollments_count(learn_unit_year)
-    context['experimental_phase'] = True
 
     return render(request, "learning_unit/formations.html", context)
 
@@ -110,7 +109,6 @@ def learning_unit_components(request, learning_unit_year_id):
     context['ADDITIONAL_REQUIREMENT_ENTITY_2'] = data_components.get('ADDITIONAL_REQUIREMENT_ENTITY_2')
     context['tab_active'] = 'components'
     context['can_manage_volume'] = business_perms.is_eligible_for_modification(context["learning_unit_year"], person)
-    context['experimental_phase'] = True
     return render(request, "learning_unit/components.html", context)
 
 
@@ -126,8 +124,6 @@ def learning_unit_attributions(request, learning_unit_year_id):
     context["can_manage_attribution"] = business_perms.is_eligible_to_manage_attributions(
         context["learning_unit_year"], request.user.person
     )
-    context['experimental_phase'] = True
-
     warning_msgs = get_charge_repartition_warning_messages(context["learning_unit_year"].learning_container_year)
     display_warning_messages(request, warning_msgs)
     return render(request, "learning_unit/attributions.html", context)
@@ -144,7 +140,6 @@ def learning_unit_specifications(request, learning_unit_year_id):
     context.update(get_achievements_group_by_language(learning_unit_year))
     context.update(get_languages_settings())
     context['can_update_learning_achievement'] = can_update_learning_achievement(learning_unit_year, person)
-    context['experimental_phase'] = True
     return render(request, "learning_unit/specifications.html", context)
 
 

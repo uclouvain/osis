@@ -177,7 +177,6 @@ class TestLearningUnitModificationProposal(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'learning_unit/proposal/create_modification.html')
         self.assertEqual(response.context['learning_unit_year'], self.learning_unit_year)
-        self.assertEqual(response.context['experimental_phase'], True)
         self.assertEqual(response.context['person'], self.person)
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
@@ -201,7 +200,6 @@ class TestLearningUnitModificationProposal(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'learning_unit/proposal/create_modification.html')
         self.assertEqual(response.context['learning_unit_year'], self.learning_unit_year)
-        self.assertEqual(response.context['experimental_phase'], True)
         self.assertEqual(response.context['person'], self.person)
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
@@ -313,7 +311,6 @@ class TestLearningUnitSuppressionProposal(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'learning_unit/proposal/create_suppression.html')
         self.assertEqual(response.context['learning_unit_year'], self.learning_unit_year)
-        self.assertEqual(response.context['experimental_phase'], True)
         self.assertEqual(response.context['person'], self.person)
 
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)

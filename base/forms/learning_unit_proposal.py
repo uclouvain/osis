@@ -158,7 +158,6 @@ class ProposalBaseForm:
     def get_context(self):
         context = self.learning_unit_form_container.get_context()
         context['learning_unit_year'] = self.learning_unit_year
-        context['experimental_phase'] = True
         context['person'] = self.person
         context['form_proposal'] = self.form_proposal
         return context

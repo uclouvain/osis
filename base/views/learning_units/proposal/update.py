@@ -124,7 +124,7 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
         'person': person,
         'form_end_date': form_end_date,
         'form_proposal': form_proposal,
-        'experimental_phase': True})
+    })
 
     if proposal:
         return render(request, 'learning_unit/proposal/update_suppression.html', context)
