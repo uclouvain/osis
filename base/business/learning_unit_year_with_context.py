@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from collections import OrderedDict
+from decimal import Decimal
 
 from django.db import models
 from django.db.models import Prefetch
@@ -96,9 +97,11 @@ def append_components(learning_unit_year):
     if learning_unit_year.learning_components:
         for component in learning_unit_year.learning_components:
             req_entities_volumes = component.repartition_volumes
-            vol_req_entity = req_entities_volumes.get(entity_types.REQUIREMENT_ENTITY, 0) or 0
-            vol_add_req_entity_1 = req_entities_volumes.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0) or 0
-            vol_add_req_entity_2 = req_entities_volumes.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0) or 0
+            vol_req_entity = req_entities_volumes.get(entity_types.REQUIREMENT_ENTITY, 0) or Decimal(0)
+            vol_add_req_entity_1 = req_entities_volumes.get(
+                entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0) or Decimal(0)
+            vol_add_req_entity_2 = req_entities_volumes.get(
+                entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0) or Decimal(0)
             volume_global = vol_req_entity + vol_add_req_entity_1 + vol_add_req_entity_2
             planned_classes = component.planned_classes or 0
 
@@ -155,14 +158,14 @@ def get_learning_component_prefetch():
 
 def volume_from_initial_learning_component_year(learning_component_year, repartition_volumes):
     return {
-        VOLUME_TOTAL: learning_component_year['hourly_volume_total_annual'],
-        VOLUME_Q1: learning_component_year['hourly_volume_partial_q1'],
-        VOLUME_Q2: learning_component_year['hourly_volume_partial_q2'],
+        VOLUME_TOTAL: Decimal(learning_component_year['hourly_volume_total_annual'] or 0),
+        VOLUME_Q1: Decimal(learning_component_year['hourly_volume_partial_q1'] or 0),
+        VOLUME_Q2: Decimal(learning_component_year['hourly_volume_partial_q2'] or 0),
         PLANNED_CLASSES: learning_component_year.get('planned_classes'),
-        VOLUME_REQUIREMENT_ENTITY: repartition_volumes.get(VOLUME_REQUIREMENT_ENTITY, 0),
-        VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
-        VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, 0),
-        VOLUME_GLOBAL: sum([repartition_volumes.get(VOLUME_REQUIREMENT_ENTITY, 0),
-                            repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
-                            repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, 0)])
+        VOLUME_REQUIREMENT_ENTITY: Decimal(repartition_volumes.get(VOLUME_REQUIREMENT_ENTITY, 0)),
+        VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, 0)),
+        VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, 0)),
+        VOLUME_GLOBAL: sum([Decimal(repartition_volumes.get(VOLUME_REQUIREMENT_ENTITY, 0)),
+                            Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, 0)),
+                            Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, 0))])
     }

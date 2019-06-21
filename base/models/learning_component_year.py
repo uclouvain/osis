@@ -130,7 +130,7 @@ class LearningComponentYear(SerializableModel):
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
                 _('The annual volume must be equal to the sum of the volumes Q1 and Q2')))
-        if self.vol_global != float(sum(self.repartition_volumes.values())):
+        if self.vol_global != sum(self.repartition_volumes.values()):
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
                 _('the sum of repartition volumes must be equal to the global volume')))
@@ -164,7 +164,7 @@ class LearningComponentYear(SerializableModel):
 
     @cached_property
     def vol_global(self):
-        return self.hourly_volume_total_annual or Decimal(0) * self.planned_classes or Decimal(0)
+        return (self.hourly_volume_total_annual or Decimal(0)) * (self.planned_classes or Decimal(0))
 
     @property
     def repartition_volumes(self):
