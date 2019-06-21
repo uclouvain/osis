@@ -27,7 +27,6 @@ import abc
 from collections import Counter
 
 from django.core.exceptions import ValidationError
-from django.db.models import Q
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _, ngettext
 
@@ -193,12 +192,13 @@ class DetachLearningUnitYearStrategy(DetachStrategy):
         self.parent = link.parent
         self.learning_unit_year = link.child
         self.warnings = []
+        self.errors = []
 
     def is_valid(self):
         if self.learning_unit_year.has_or_is_prerequisite(self.parent):
-            raise ValidationError(
+            self.errors.append(
                 _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
                     "acronym": self.learning_unit_year.acronym
                 }
             )
-        return True
+        return len(self.errors) == 0

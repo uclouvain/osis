@@ -34,7 +34,6 @@ from base.business.group_element_years.detach import DetachEducationGroupYearStr
 from base.business.group_element_years.management import extract_child_from_cache
 from base.forms.education_group.group_element_year import GroupElementYearForm
 from base.models.education_group_year import EducationGroupYear
-from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
