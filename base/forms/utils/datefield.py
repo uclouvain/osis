@@ -75,8 +75,8 @@ class DateTimePickerInput(forms.MultiWidget):
             ),
             forms.TimeInput(
                 attrs={
-                    'class': 'timepicker',
-                    'data-format': TIME_FORMAT_JS
+                    'data-format': TIME_FORMAT_JS,
+                    'type': 'time'
                 },
                 format=TIME_FORMAT,
             ),

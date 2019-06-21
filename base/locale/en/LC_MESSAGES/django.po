@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-19 11:51+0200\n"
+"POT-Creation-Date: 2019-06-20 14:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -522,7 +522,7 @@ msgid "Add/Modify a line"
 msgstr ""
 
 #: templates/education_group/tab_administrative_data.html:147
-#: templates/education_group/tab_edit_administrative_data.html:83
+#: templates/education_group/tab_edit_administrative_data.html:87
 msgid "Additional info"
 msgstr ""
 
@@ -864,6 +864,7 @@ msgstr ""
 #: templates/education_group/group_element_year_comment_inner.html:64
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:45
 #: templates/education_group/organization_edit_inner.html:51
+#: templates/education_group/tab_edit_administrative_data.html:100
 #: templates/learning_unit/achievement_edit.html:50
 #: templates/learning_unit/add_charge_repartition_inner.html:66
 #: templates/learning_unit/blocks/form/volumes_management_form.html:84
@@ -950,7 +951,7 @@ msgstr ""
 msgid "Choose academic years"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:421 models/organization_address.py:47
+#: forms/learning_unit/search_form.py:420 models/organization_address.py:47
 #: templates/organization/organization_address.html:58
 msgid "City"
 msgstr ""
@@ -1135,7 +1136,7 @@ msgstr ""
 #: forms/education_group/coorganization.py:40
 #: forms/learning_unit/entity_form.py:82
 #: forms/learning_unit/external_learning_unit.py:70
-#: forms/learning_unit/search_form.py:418 models/organization_address.py:48
+#: forms/learning_unit/search_form.py:417 models/organization_address.py:48
 #: templates/learning_unit/external/read.html:58
 #: templates/learning_unit/identification.html:209
 #: templates/organization/organization_address.html:62
@@ -2048,7 +2049,7 @@ msgid "Institute"
 msgstr ""
 
 #: business/proposal_xls.py:71 forms/education_group/coorganization.py:46
-#: forms/learning_unit/search_form.py:420 templates/academic_actors.html:30
+#: forms/learning_unit/search_form.py:419 templates/academic_actors.html:30
 #: templates/academic_calendar/academic_calendar.html:31
 #: templates/academic_calendar/academic_calendar_form.html:34
 #: templates/academic_calendar/academic_calendars.html:37
@@ -2205,7 +2206,7 @@ msgstr ""
 msgid "LU"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:228 tests/views/test_learning_unit.py:463
+#: forms/learning_unit/search_form.py:227 tests/views/test_learning_unit.py:463
 msgid "LU_ERRORS_INVALID_REGEX_SYNTAX"
 msgstr ""
 
@@ -2885,7 +2886,7 @@ msgstr ""
 msgid "No result!"
 msgstr ""
 
-#: business/education_groups/perms.py:211
+#: business/education_groups/perms.py:213
 #, python-format
 msgctxt "female"
 msgid ""
@@ -3363,6 +3364,10 @@ msgstr ""
 msgid "Program commission"
 msgstr ""
 
+#: api/serializers/person.py:65
+msgid "Program manager"
+msgstr ""
+
 #: templates/education_group/tab_administrative_data.html:186
 msgid "Program managers"
 msgstr ""
@@ -3699,7 +3704,7 @@ msgstr ""
 #: templates/education_group/group_element_year_comment_inner.html:56
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:41
 #: templates/education_group/organization_edit_inner.html:52
-#: templates/education_group/tab_edit_administrative_data.html:92
+#: templates/education_group/tab_edit_administrative_data.html:96
 #: templates/entity/blocks/educational_summary_calendar_widget.html:39
 #: templates/learning_unit/achievement_edit.html:51
 #: templates/learning_unit/add_charge_repartition_inner.html:67
@@ -4202,16 +4207,16 @@ msgstr ""
 msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr ""
 
-#: business/education_groups/perms.py:335
+#: business/education_groups/perms.py:337
 msgid "The faculty manager cannot modify admission which are lower than N"
 msgstr ""
 
-#: business/education_groups/perms.py:303
+#: business/education_groups/perms.py:305
 msgid ""
 "The faculty manager cannot modify general information which are lower than N"
 msgstr ""
 
-#: business/education_groups/perms.py:337
+#: business/education_groups/perms.py:339
 msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
@@ -4467,15 +4472,15 @@ msgid ""
 "the volume of parent learning unit for this professor"
 msgstr ""
 
-#: business/education_groups/perms.py:266
+#: business/education_groups/perms.py:268
 msgid "The user cannot modify data which are greater than N+1"
 msgstr ""
 
-#: business/education_groups/perms.py:315
+#: business/education_groups/perms.py:317
 msgid "The user doesn't have right to update admission condition"
 msgstr ""
 
-#: business/education_groups/perms.py:283
+#: business/education_groups/perms.py:285
 msgid "The user doesn't have right to update general information"
 msgstr ""
 
@@ -4505,8 +4510,8 @@ msgstr ""
 msgid "The user has not permission to delete education groups."
 msgstr ""
 
-#: business/education_groups/perms.py:181
-#: business/education_groups/perms.py:268
+#: business/education_groups/perms.py:182
+#: business/education_groups/perms.py:270
 msgid "The user is not attached to the management entity"
 msgstr ""
 
@@ -5390,7 +5395,6 @@ msgstr ""
 #: templates/education_group/blocks/modal/modal_publication_contact_entity_edit_inner.html:40
 #: templates/education_group/group_element_year/confirm_postpone_content_inner.html:10
 #: templates/education_group/protect_delete_inner.html:24
-#: templates/education_group/tab_edit_administrative_data.html:96
 #: templates/learning_unit/attribution_inner.html:68
 #: templates/learning_unit/blocks/modal/modal_back_to_initial.html:40
 #: templates/learning_unit/blocks/modal/modal_confirm_delete.html:36
@@ -5462,6 +5466,10 @@ msgstr ""
 #: tests/views/education_groups/group_element_year/test_read.py:94
 #: tests/views/education_groups/group_element_year/test_read.py:108
 msgid "credits"
+msgstr ""
+
+#: templates/education_group/tab_edit_administrative_data.html:68
+msgid "date and time"
 msgstr ""
 
 #: forms/academic_calendar.py:83 tests/forms/test_academic_calendar.py:77
