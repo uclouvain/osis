@@ -36,6 +36,7 @@ from base.business.group_element_years import management
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
+from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
@@ -57,11 +58,23 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         self.warnings = []
 
     def is_valid(self):
-        management.can_link_be_detached(self.parent, self.link)
+        """
+                The user cannot delete the link if :
+                    - the child has or is prerequisite
+                    - the minimum of children is reached
+                    - try to remove option (2m) which are present in one of its finality
+        """
+        try:
+            management.can_link_be_detached(self.parent, self.link)
+        except AuthorizedRelationshipNotRespectedException as e:
+            self.errors.append(str(e))
+
         self._check_detach_prerequisite_rules()
+
         if self._options_to_detach() and self.get_parents_program_master():
             self._check_detach_options_rules()
-        return True
+
+        return len(self.errors) == 0
 
     def delete_prerequisites(self):
         prerequisites = Prerequisite.objects.filter(
@@ -112,12 +125,13 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                 )
             )
             luys_that_cannot_be_detached = [luy for luy in luys_that_are_prerequisites
-                                           if luy not in luys_inside_formation_after_detach]
+                                            if luy not in luys_inside_formation_after_detach]
             if luys_that_cannot_be_detached:
                 self.errors.append(
                     _("Cannot detach education group year %(acronym)s as the following learning units "
-                      "are prerequisite: %(learning_units)s") % {
+                      "are prerequisite in %(formation)s: %(learning_units)s") % {
                         "acronym": self.education_group_year.acronym,
+                        "formation": formation.acronym,
                         "learning_units": ", ".join([luy.acronym for luy in luys_that_cannot_be_detached])
                     }
                 )
@@ -126,13 +140,12 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
             learning_unit__prerequisiteitem__prerequisite__learning_unit_year__in=self._learning_units_year_to_detach,
             learning_unit__prerequisiteitem__prerequisite__education_group_year__in=self._parents
         )
-        luy_in_errors = list(luys_that_have_prerequisites)
-        if luy_in_errors:
+        if luys_that_have_prerequisites:
             self.warnings.append(
                 _("The prerequisites for the following learning units contained in education group year "
                   "%(acronym)s will we deleted: %(learning_units)s") % {
                     "acronym": self.education_group_year.acronym,
-                    "learning_units": ", ".join([luy.acronym for luy in luy_in_errors])
+                    "learning_units": ", ".join([luy.acronym for luy in luys_that_have_prerequisites])
                 }
             )
 
@@ -143,7 +156,6 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         """
         options_to_detach = self._options_to_detach()
 
-        errors = []
         for master_2m in self.get_parents_program_master():
             master_2m_tree = EducationGroupHierarchy(root=master_2m)
 
@@ -161,7 +173,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                 missing_options = set(options_to_check) & set(mandatory_options)
 
                 if missing_options:
-                    errors.append(
+                    self.errors.append(
                         ValidationError(
                             ngettext(
                                 "Option \"%(acronym)s\" cannot be detach because it is contained in"
@@ -174,9 +186,6 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                                 "finality_acronym": finality.acronym
                             })
                     )
-
-        if errors:
-            raise ValidationError(errors)
 
 
 class DetachLearningUnitYearStrategy(DetachStrategy):

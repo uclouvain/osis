@@ -112,16 +112,14 @@ class MoveGroupElementYearView(CreateGroupElementYearView):
     template_name = "education_group/group_element_year_comment_inner.html"
 
     def get_form_kwargs(self):
-        """ For the creation, the group_element_year needs a parent and a child """
         kwargs = super().get_form_kwargs()
-        try:
-            obj = self.get_object()
-            delete_strategy = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
-            delete_strategy(obj).is_valid()
-        except AuthorizedRelationshipNotRespectedException as e:
-            display_error_messages(self.request, e.messages)
-        except ValidationError as e:
-            display_error_messages(self.request, e.messages)
+
+        obj = self.get_object()
+        strategy_class = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
+        strategy = strategy_class(obj)
+        if not strategy.is_valid():
+            display_error_messages(self.request, strategy.errors)
+
         return kwargs
 
     def form_valid(self, form):

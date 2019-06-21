@@ -25,13 +25,11 @@
 ##############################################################################
 from unittest import mock
 
-from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from base.business.group_element_years.detach import DetachEducationGroupYearStrategy
 from base.models.enums import education_group_types
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
-from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.models.prerequisite import Prerequisite
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
@@ -121,8 +119,7 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
         )
 
         strategy = DetachEducationGroupYearStrategy(link=master_120_link_option)
-        with self.assertRaises(ValidationError):
-            strategy.is_valid()
+        self.assertFalse(strategy.is_valid())
 
     def test_is_not_valid_case_detach_group_which_contains_option_which_are_within_finality_master_120(self):
         """
@@ -139,8 +136,7 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
         master_120_link_option = GroupElementYearFactory(parent=self.master_120, child_branch=option)
 
         strategy = DetachEducationGroupYearStrategy(link=master_120_link_option)
-        with self.assertRaises(ValidationError):
-            strategy.is_valid()
+        self.assertFalse(strategy.is_valid())
 
     def test_is_not_valid_case_detach_group_which_contains_option_which_are_reused_in_multiple_2M(self):
         """
@@ -181,8 +177,7 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
 
         # We try to detach OPT1 from GROUP1 but it is not allowed because another 2M structure won't be valid anymore
         strategy = DetachEducationGroupYearStrategy(link=group1_link_opt1)
-        with self.assertRaises(ValidationError):
-            strategy.is_valid()
+        self.assertFalse(strategy.is_valid())
 
     def test_not_valid_detach_technical_group(self):
         gey = GroupElementYearFactory(parent=self.master_120)
@@ -193,8 +188,7 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
         )
 
         strategy = DetachEducationGroupYearStrategy(link=gey)
-        with self.assertRaises(AuthorizedRelationshipNotRespectedException):
-            strategy.is_valid()
+        self.assertFalse(strategy.is_valid())
 
 
 class TestDetachPrerequisiteCheck(TestCase):
