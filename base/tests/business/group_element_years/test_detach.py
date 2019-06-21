@@ -258,13 +258,20 @@ class TestDetachPrerequisiteCheck(TestCase):
 
     def test_raise_error_when_has_prerequisite_in_formation(self):
         strategy = DetachEducationGroupYearStrategy(self.children_level_2[0])
-        with self.assertRaises(ValidationError):
-            strategy._check_detach_prerequisite_rules()
+        self.assertIsNone(strategy._check_detach_prerequisite_rules())
 
     def test_raise_error_when_is_prerequisite_in_formation(self):
         strategy = DetachEducationGroupYearStrategy(self.children_level_1[1])
         with self.assertRaises(ValidationError):
             strategy._check_detach_prerequisite_rules()
+
+    def test_can_detach_if_duplicate_luy(self):
+        GroupElementYearChildLeafFactory(
+            parent=self.children_level_1[0].child_branch,
+            child_leaf=self.lu_children_level_2[0].child_leaf
+        )
+        strategy = DetachEducationGroupYearStrategy(self.children_level_1[1])
+        self.assertIsNone(strategy._check_detach_prerequisite_rules())
 
     def test_warnings_when_prerequisites_in_group_that_is_detached(self):
         strategy = DetachEducationGroupYearStrategy(self.children_level_0[0])

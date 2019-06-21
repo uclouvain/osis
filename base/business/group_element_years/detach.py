@@ -37,6 +37,8 @@ from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.group_element_year import GroupElementYear
+from base.models.learning_unit_year import LearningUnitYear
+from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
 
 
@@ -61,17 +63,17 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         )[self.parent.pk] + [self.parent]
 
     @cached_property
-    def _learning_unit_year_children(self):
+    def _get_learning_unit_year_to_detach(self):
         return EducationGroupHierarchy(root=self.education_group_year).get_learning_unit_year_list()
 
     @cached_property
     def _prerequisites_of_children(self):
         formations = self._parents
         return PrerequisiteItem.objects.filter(
-            Q(prerequisite__learning_unit_year__in=self._learning_unit_year_children,
+            Q(prerequisite__learning_unit_year__in=self._get_learning_unit_year_to_detach,
               prerequisite__education_group_year__in=formations) |
             Q(prerequisite__education_group_year__in=formations,
-              learning_unit__in=[luy.learning_unit for luy in self._learning_unit_year_children])
+              learning_unit__in=[luy.learning_unit for luy in self._get_learning_unit_year_to_detach])
         ).select_related("prerequisite")
 
     def get_parents_program_master(self):
@@ -94,22 +96,45 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         return True
 
     def _check_detach_prerequisite_rules(self):
-        has_or_is_prerequisite_in_descendants = self._prerequisites_of_children.exclude(
-            learning_unit__in=[luy.learning_unit for luy in self._learning_unit_year_children],
-            prerequisite__learning_unit_year__in=self._learning_unit_year_children
-        ).exists()
-        has_or_is_prerequisite_outside_descendants = self._prerequisites_of_children.exists()
-        if has_or_is_prerequisite_in_descendants:
+        luy_in_fault = []
+        luy_in_error = []
+        parent_formations = self._parents
+        luy_prerequisites = LearningUnitYear.objects.filter(
+            learning_unit__id__in=PrerequisiteItem.objects.filter(
+                learning_unit__in=[luy.learning_unit for luy in self._get_learning_unit_year_to_detach]
+            ).values(
+                "learning_unit"
+            )
+        )
+        luy_has_prerequisites = LearningUnitYear.objects.filter(
+            id__in=[luy.id for luy in self._get_learning_unit_year_to_detach],
+            learning_unit__prerequisiteitem__prerequisite__education_group_year__in=parent_formations
+        )
+        luy_in_error = list(luy_has_prerequisites)
+        for formation in parent_formations:
+            luy_contained_in_formation = Counter(EducationGroupHierarchy(root=formation).get_learning_unit_year_list())
+            luy_removed = Counter(self._get_learning_unit_year_to_detach)
+            luy_contained_in_formation.subtract(luy_removed)
+            luy_contained = [luy for luy, counter in luy_contained_in_formation.items() if counter > 0]
+
+            for luy in luy_prerequisites:
+                if luy not in luy_contained:
+                    luy_in_fault.append(luy)
+
+        if luy_in_fault:
             raise ValidationError(
-                _("Cannot detach education group year %(acronym)s as some of "
-                  "its learning units has prerequisites or are prerequisite.") % {
-                    "acronym": self.education_group_year.acronym
+                _("Cannot detach education group year %(acronym)s as the following learning units "
+                  "are prerequisite: %(learning_units)s") % {
+                    "acronym": self.education_group_year.acronym,
+                    "learning_units": ", ".join([luy.acronym for luy in luy_in_fault])
                 }
             )
-        elif has_or_is_prerequisite_outside_descendants:
+        if luy_in_error:
             self.warnings.append(
-                _("The prerequisites contained in education group year %(acronym)s will be deleted.") % {
-                    "acronym": self.education_group_year.acronym
+                _("The prerequisites for the following learning units contained in education group year "
+                  "%(acronym)s will we deleted: %(learning_units)s") % {
+                    "acronym": self.education_group_year.acronym,
+                    "learning_units": ", ".join([luy.acronym for luy in luy_in_error])
                 }
             )
 
