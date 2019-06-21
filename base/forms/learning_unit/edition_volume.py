@@ -41,6 +41,8 @@ from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_Y
 from base.models.learning_component_year import LearningComponentYear
 from osis_common.forms.widgets import DecimalFormatInput
 
+STYLE_MIN_WIDTH_VOLUME = 'min-width:55px;'
+
 
 class VolumeField(forms.DecimalField):
     def __init__(self, *args, **kwargs):
@@ -325,12 +327,21 @@ class SimplifiedVolumeForm(forms.ModelForm):
                 attrs={'title': _("The annual volume must be equal to the sum of the volumes Q1 and Q2")},
                 render_value=True
             ),
-            'hourly_volume_partial_q1': DecimalFormatInput(attrs={'title': _("Volume Q1")}, render_value=True),
-            'hourly_volume_partial_q2': DecimalFormatInput(attrs={'title': _("Volume Q2")}, render_value=True),
+            'hourly_volume_partial_q1': DecimalFormatInput(attrs={'title': _("Volume Q1"),
+                                                                  'style': STYLE_MIN_WIDTH_VOLUME
+                                                                  },
+                                                           render_value=True),
+            'hourly_volume_partial_q2': DecimalFormatInput(attrs={'title': _("Volume Q2"),
+                                                                  'style': STYLE_MIN_WIDTH_VOLUME
+                                                                  },
+                                                           render_value=True),
             'planned_classes': forms.TextInput(attrs={'title': _("Planned classes")}),
-            'repartition_volume_requirement_entity': DecimalFormatInput(render_value=True),
-            'repartition_volume_additional_entity_1': DecimalFormatInput(render_value=True),
-            'repartition_volume_additional_entity_2': DecimalFormatInput(render_value=True),
+            'repartition_volume_requirement_entity': DecimalFormatInput(attrs={'style': STYLE_MIN_WIDTH_VOLUME},
+                                                                        render_value=True),
+            'repartition_volume_additional_entity_1': DecimalFormatInput(attrs={'style': STYLE_MIN_WIDTH_VOLUME},
+                                                                         render_value=True),
+            'repartition_volume_additional_entity_2': DecimalFormatInput(attrs={'style': STYLE_MIN_WIDTH_VOLUME},
+                                                                         render_value=True),
         }
 
     def clean(self):

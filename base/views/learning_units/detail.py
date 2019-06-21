@@ -103,7 +103,6 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         context['warnings'] = self.object.warnings
 
         context['learning_container_year_partims'] = self.object.get_partims_related()
-        context['experimental_phase'] = True
         context.update(get_all_attributions(self.object))
         components = get_components_identification(self.object)
 
