@@ -59,12 +59,15 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
     def is_valid(self):
         management.can_link_be_detached(self.parent, self.link)
         self._check_detach_prerequisite_rules()
-        if self._get_options_to_detach() and self.get_parents_program_master():
-            self._check_detatch_options_rules()
+        if self._options_to_detach() and self.get_parents_program_master():
+            self._check_detach_options_rules()
         return True
 
     def delete_prerequisites(self):
-        prerequisites = set(prerequisite_item.prerequisite for prerequisite_item in self._prerequisites_of_children)
+        prerequisites = Prerequisite.objects.filter(
+            education_group_year__in=self._parents,
+            learning_unit_year__in=self._learning_units_year_to_detach
+        )
         for prerequisite in prerequisites:
             prerequisite.delete()
 
@@ -82,55 +85,48 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
         )[self.parent.pk] + [self.parent]
 
     @cached_property
-    def _get_learning_unit_year_to_detach(self):
+    def _learning_units_year_to_detach(self):
         return EducationGroupHierarchy(root=self.education_group_year).get_learning_unit_year_list()
 
-    @cached_property
-    def _prerequisites_of_children(self):
-        formations = self._parents
-        return PrerequisiteItem.objects.filter(
-            Q(prerequisite__learning_unit_year__in=self._get_learning_unit_year_to_detach,
-              prerequisite__education_group_year__in=formations) |
-            Q(prerequisite__education_group_year__in=formations,
-              learning_unit__in=[luy.learning_unit for luy in self._get_learning_unit_year_to_detach])
-        ).select_related("prerequisite")
-
-    def _get_options_to_detach(self):
+    def _options_to_detach(self):
         options_to_detach = EducationGroupHierarchy(root=self.education_group_year).get_option_list()
         if self.education_group_year.education_group_type.name == MiniTrainingType.OPTION.name:
             options_to_detach += [self.education_group_year]
         return options_to_detach
 
     def _check_detach_prerequisite_rules(self):
-        parent_formations = self._parents
-        luy_has_prerequisites = LearningUnitYear.objects.filter(
-            learning_unit__prerequisiteitem__prerequisite__learning_unit_year__in=self._get_learning_unit_year_to_detach,
-            learning_unit__prerequisiteitem__prerequisite__education_group_year__in=parent_formations
-        )
-        luy_in_errors = list(luy_has_prerequisites)
         for formation in self._parents:
-            luys_contained_in_formation = Counter(EducationGroupHierarchy(root=formation).get_learning_unit_year_list())
-            luys_to_remove = Counter(self._get_learning_unit_year_to_detach)
-            luy_prerequisites = LearningUnitYear.objects.filter(
+            luys_inside_formation = Counter(EducationGroupHierarchy(root=formation).get_learning_unit_year_list())
+            luys_to_detach = Counter(self._learning_units_year_to_detach)
+            luys_inside_formation_after_detach = luys_inside_formation - luys_to_detach
+
+            luys_that_are_prerequisites = LearningUnitYear.objects.filter(
                 learning_unit__id__in=PrerequisiteItem.objects.filter(
-                    learning_unit__in=[luy.learning_unit for luy in self._get_learning_unit_year_to_detach
-                                       if luys_contained_in_formation.get(luy, 0) > 0]
+                    learning_unit__in=[luy.learning_unit for luy in self._learning_units_year_to_detach]
                 ).values(
                     "learning_unit"
                 )
+            ).filter(
+                learning_unit__prerequisiteitem__prerequisite__learning_unit_year__in=list(
+                    luys_inside_formation_after_detach.keys()
+                )
             )
-            luys_contained_in_formation.subtract(luys_to_remove)
-            luy_contained = [luy for luy, counter in luys_contained_in_formation.items() if counter > 0]
-            luy_in_error = [luy for luy in luy_prerequisites if luy not in luy_contained]
-            if luy_in_error:
+            luys_that_cannot_be_detached = [luy for luy in luys_that_are_prerequisites
+                                           if luy not in luys_inside_formation_after_detach]
+            if luys_that_cannot_be_detached:
                 self.errors.append(
                     _("Cannot detach education group year %(acronym)s as the following learning units "
                       "are prerequisite: %(learning_units)s") % {
                         "acronym": self.education_group_year.acronym,
-                        "learning_units": ", ".join([luy.acronym for luy in luy_in_error])
+                        "learning_units": ", ".join([luy.acronym for luy in luys_that_cannot_be_detached])
                     }
                 )
 
+        luys_that_have_prerequisites = LearningUnitYear.objects.filter(
+            learning_unit__prerequisiteitem__prerequisite__learning_unit_year__in=self._learning_units_year_to_detach,
+            learning_unit__prerequisiteitem__prerequisite__education_group_year__in=self._parents
+        )
+        luy_in_errors = list(luys_that_have_prerequisites)
         if luy_in_errors:
             self.warnings.append(
                 _("The prerequisites for the following learning units contained in education group year "
@@ -140,12 +136,12 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                 }
             )
 
-    def _check_detatch_options_rules(self):
+    def _check_detach_options_rules(self):
         """
         In context of 2M when we detach an option [or group which contains option], we must ensure that
         these options are not present in MA/MD/MS
         """
-        options_to_detach = self._get_options_to_detach()
+        options_to_detach = self._options_to_detach()
 
         errors = []
         for master_2m in self.get_parents_program_master():
