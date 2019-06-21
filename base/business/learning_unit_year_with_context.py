@@ -163,8 +163,10 @@ def volume_from_initial_learning_component_year(learning_component_year, reparti
         VOLUME_Q2: Decimal(learning_component_year['hourly_volume_partial_q2'] or 0),
         PLANNED_CLASSES: learning_component_year.get('planned_classes'),
         VOLUME_REQUIREMENT_ENTITY: Decimal(repartition_volumes.get(VOLUME_REQUIREMENT_ENTITY, 0)),
-        VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, 0)),
-        VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, 0)),
+        VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1,
+                                                                                0)),
+        VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2,
+                                                                                0)),
         VOLUME_GLOBAL: sum([Decimal(repartition_volumes.get(VOLUME_REQUIREMENT_ENTITY, 0)),
                             Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, 0)),
                             Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, 0))])
