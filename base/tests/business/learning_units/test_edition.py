@@ -26,6 +26,7 @@
 import random
 from copy import deepcopy
 from datetime import timedelta
+from decimal import Decimal
 from uuid import uuid4
 
 from django.test import TestCase

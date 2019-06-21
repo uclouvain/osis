@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 from django.utils.translation import ugettext_lazy as _
 
 from base.business import learning_unit_year_with_context
@@ -74,4 +76,4 @@ def volumes_are_inconsistent_between_partim_and_full(partim, full):
 
 
 def volumes_are_inconsistent_between_components(partim_component_values, full_component_values):
-    return any(partim_component_values.get(key) > full_value for key, full_value in full_component_values.items())
+    return any((partim_component_values.get(key) or Decimal(0)) > (full_value or Decimal(0)) for key, full_value in full_component_values.items())
