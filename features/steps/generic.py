@@ -40,7 +40,6 @@ from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person_entity import PersonEntity
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
 from base.tests.factories.person import FacultyManagerFactory, PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
@@ -170,18 +169,6 @@ def step_impl(context, acronym, year, entity):
         type=ProposalType.CREATION.name,
         state=ProposalState.FACULTY.name,
         entity=e,
-    )
-
-    EntityContainerYearFactory(
-        learning_container_year=luy.learning_container_year,
-        entity=e,
-        type=EntityContainerYearLinkTypes.REQUIREMENT_ENTITY.name,
-    )
-
-    EntityContainerYearFactory(
-        learning_container_year=luy.learning_container_year,
-        entity=e,
-        type=EntityContainerYearLinkTypes.ALLOCATION_ENTITY.name,
     )
 
 
