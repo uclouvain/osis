@@ -57,7 +57,7 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
             }
             display_warning_messages(self.request, self.strategy.warnings)
         else:
-            display_error_messages(self.request, self.strategy.warnings)
+            display_error_messages(self.request, self.strategy.errors)
         return context
 
     def delete(self, request, *args, **kwargs):

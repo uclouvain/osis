@@ -39,7 +39,6 @@ from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
-from base.models.prerequisite_item import PrerequisiteItem
 
 
 class DetachStrategy(metaclass=abc.ABCMeta):
@@ -113,15 +112,11 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
             luys_inside_formation_after_detach = luys_inside_formation - luys_to_detach
 
             luys_that_are_prerequisites = LearningUnitYear.objects.filter(
-                learning_unit__id__in=PrerequisiteItem.objects.filter(
-                    learning_unit__in=[luy.learning_unit for luy in self._learning_units_year_to_detach]
-                ).values(
-                    "learning_unit"
-                )
-            ).filter(
                 learning_unit__prerequisiteitem__prerequisite__learning_unit_year__in=list(
                     luys_inside_formation_after_detach.keys()
-                )
+                ),
+                learning_unit__prerequisiteitem__prerequisite__education_group_year=formation,
+                id__in=[luy.id for luy in self._learning_units_year_to_detach]
             )
             luys_that_cannot_be_detached = [luy for luy in luys_that_are_prerequisites
                                             if luy not in luys_inside_formation_after_detach]
@@ -136,8 +131,12 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                 )
 
         luys_that_have_prerequisites = LearningUnitYear.objects.filter(
-            learning_unit__prerequisiteitem__prerequisite__learning_unit_year__in=self._learning_units_year_to_detach,
-            learning_unit__prerequisiteitem__prerequisite__education_group_year__in=self._parents
+            id__in=Prerequisite.objects.filter(
+                education_group_year__in=self._parents,
+                learning_unit_year__in=self._learning_units_year_to_detach
+            ).values(
+                "learning_unit_year__id"
+            )
         )
         if luys_that_have_prerequisites:
             self.warnings.append(
