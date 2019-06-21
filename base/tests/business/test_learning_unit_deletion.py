@@ -37,7 +37,6 @@ from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY, CMS_LABEL_SUMMARY
 from base.business.learning_units.simple import deletion
-from base.models.enums import entity_container_year_link_type
 from base.models.enums import entity_type
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
@@ -48,7 +47,6 @@ from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
@@ -345,10 +343,11 @@ class LearningUnitYearDeletion(TestCase):
 
             # Creation UE
             learning_unit = LearningUnitFactory()
-            l_containeryear = LearningContainerYearFactory(academic_year=self.academic_year,
-                                                           container_type=learning_container_year_types.COURSE)
-            EntityContainerYearFactory(learning_container_year=l_containeryear, entity=entity_version.entity,
-                                       type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+            l_containeryear = LearningContainerYearFactory(
+                academic_year=self.academic_year,
+                container_type=learning_container_year_types.COURSE,
+                requirement_entity=entity_version.entity
+            )
             learning_unit_year = LearningUnitYearFactory(learning_unit=learning_unit,
                                                          academic_year=self.academic_year,
                                                          learning_container_year=l_containeryear,
@@ -397,9 +396,8 @@ class LearningUnitYearDeletion(TestCase):
         # Creation UE
         learning_unit = LearningUnitFactory()
         l_containeryear = LearningContainerYearFactory(academic_year=self.academic_year,
-                                                       container_type=learning_container_year_types.COURSE)
-        EntityContainerYearFactory(learning_container_year=l_containeryear, entity=entity_version.entity,
-                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+                                                       container_type=learning_container_year_types.COURSE,
+                                                       requirement_entity=entity_version.entity)
         learning_unit_year = LearningUnitYearFactory(learning_unit=learning_unit,
                                                      academic_year=self.academic_year,
                                                      learning_container_year=l_containeryear,

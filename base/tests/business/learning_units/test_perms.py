@@ -37,7 +37,7 @@ from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -51,18 +51,17 @@ class TestPerms(TestCase):
         self.learning_unit = LearningUnitFactory()
         self.current_academic_year = create_current_academic_year()
         self.next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year+1)
-        self.lcy = LearningContainerYearFactory(academic_year=self.current_academic_year,
-                                                container_type=learning_container_year_types.COURSE)
+        self.lcy = LearningContainerYearFactory(
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            requirement_entity=EntityVersionFactory().entity
+        )
         self.central_manager = CentralManagerFactory()
         self.luy = LearningUnitYearFactory(
             learning_unit=self.learning_unit,
             learning_container_year=self.lcy,
         )
-        self.ecy = EntityContainerYearFactory(
-            learning_container_year=self.luy.learning_container_year,
-            type=REQUIREMENT_ENTITY
-        )
-        self.central_manager.linked_entities = [Entity.objects.get(entitycontaineryear=self.ecy).id]
+        self.central_manager.linked_entities = [self.lcy.requirement_entity.id]
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_create_modification_proposal", return_value=True)
     def test_not_is_eligible_to_modify_end_year_by_proposal(self, mock_perm):

@@ -32,11 +32,9 @@ from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFact
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.models import proposal_learning_unit
 from base.models.enums import proposal_state, proposal_type
-from base.models.enums import entity_container_year_link_type
 
 
 class TestSearch(TestCase):
@@ -66,14 +64,14 @@ class TestSearchCases(TestCase):
     def setUp(self):
         yr = timezone.now().year
         self.entity_1 = EntityFactory()
-        entity_version_1 = EntityVersionFactory(entity=self.entity_1)
+        EntityVersionFactory(entity=self.entity_1)
         self.an_academic_year = AcademicYearFactory(year=yr)
         self.an_acronym = "LBIO1212"
 
-        self.learning_container_yr = LearningContainerYearFactory(academic_year=self.an_academic_year)
-        entity_version_container_ye = EntityContainerYearFactory(learning_container_year=self.learning_container_yr,
-                                                                 entity=self.entity_1,
-                                                                 type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+        self.learning_container_yr = LearningContainerYearFactory(
+            academic_year=self.an_academic_year,
+            requirement_entity=self.entity_1,
+        )
         a_learning_unit_year = LearningUnitYearFactory(acronym=self.an_acronym,
                                                        academic_year=self.an_academic_year,
                                                        learning_container_year=self.learning_container_yr)

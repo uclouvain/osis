@@ -32,15 +32,13 @@ from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.campus import Campus
 from base.models.entity import Entity
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
-from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
-from base.models.enums.groups import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP
+from base.models.enums.groups import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person_entity import PersonEntity
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
 from base.tests.factories.person import FacultyManagerFactory, PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
@@ -157,31 +155,21 @@ def step_impl(context, acronym, year):
 def step_impl(context, acronym, year, entity):
     campus = Campus.objects.filter(organization__type='MAIN').first()
 
+    e = Entity.objects.filter(entityversion__acronym=entity).first()
     luy = LearningUnitYearFullFactory(
         acronym=acronym,
         campus=campus,
         academic_year=AcademicYear.objects.get(year=year[:4]),
         internship_subtype=None,
+        learning_container_year__requirement_entity=e,
+        learning_container_year__allocation_entity=e,
     )
-    e = Entity.objects.filter(entityversion__acronym=entity).first()
 
     ProposalLearningUnitFactory(
         learning_unit_year=luy,
         type=ProposalType.CREATION.name,
         state=ProposalState.FACULTY.name,
         entity=e,
-    )
-
-    EntityContainerYearFactory(
-        learning_container_year=luy.learning_container_year,
-        entity=e,
-        type=EntityContainerYearLinkTypes.REQUIREMENT_ENTITY.name,
-    )
-
-    EntityContainerYearFactory(
-        learning_container_year=luy.learning_container_year,
-        entity=e,
-        type=EntityContainerYearLinkTypes.ALLOCATION_ENTITY.name,
     )
 
 

@@ -152,7 +152,6 @@ def learning_unit_volumes_management(request, learning_unit_year_id, form_type):
     context['tab_active'] = 'components'
     context['entity_types_volume'] = REQUIREMENT_ENTITIES
     context['luy_url'] = 'learning_unit_components' if form_type == "full" else 'learning_unit'
-    context['experimental_phase'] = True
     if request.is_ajax():
         return JsonResponse({'errors': volume_edition_formset_container.errors})
 
@@ -201,6 +200,24 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
 
     def get_result_label(self, result):
         return format_html(result.verbose_title)
+
+
+class AllocationEntityAutocomplete(EntityAutocomplete):
+    def get_queryset(self):
+        self.forwarded['country'] = self.forwarded.get('country_allocation_entity')
+        return super(AllocationEntityAutocomplete, self).get_queryset()
+
+
+class AdditionnalEntity1Autocomplete(EntityAutocomplete):
+    def get_queryset(self):
+        self.forwarded['country'] = self.forwarded.get('country_additional_entity_1')
+        return super(AdditionnalEntity1Autocomplete, self).get_queryset()
+
+
+class AdditionnalEntity2Autocomplete(EntityAutocomplete):
+    def get_queryset(self):
+        self.forwarded['country'] = self.forwarded.get('country_additional_entity_2')
+        return super(AdditionnalEntity2Autocomplete, self).get_queryset()
 
 
 class EntityRequirementAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
