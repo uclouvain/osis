@@ -3457,10 +3457,8 @@ msgid "Program commission"
 msgstr "Commission du programme"
 
 #: api/serializers/person.py:65
-#, fuzzy
-#| msgid "Program managers"
 msgid "Program manager"
-msgstr "Gestionnaires de parcours étudiant"
+msgstr "Gestionnaire de parcours étudiant"
 
 #: templates/education_group/tab_administrative_data.html:186
 msgid "Program managers"
