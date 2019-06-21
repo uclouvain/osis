@@ -42,11 +42,10 @@ def get_attributions_list(attributions, responsibles_order):
 
 
 def _get_entity_version(learning_container_year_prefetched):
-    if learning_container_year_prefetched.entities_containers_year:
-        entity = learning_container_year_prefetched.entities_containers_year[0].entity
-        if entity.entity_versions:
-            return find_entity_version_according_academic_year(entity.entity_versions,
-                                                               learning_container_year_prefetched.academic_year)
+    entity = learning_container_year_prefetched.allocation_entity
+    if entity.entity_versions:
+        return find_entity_version_according_academic_year(entity.entity_versions,
+                                                           learning_container_year_prefetched.academic_year)
     return None
 
 

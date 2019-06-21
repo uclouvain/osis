@@ -32,14 +32,12 @@ from django.forms import ModelChoiceField
 from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
-from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningContainerModelForm, \
     LearningContainerYearModelForm, LearningUnitYearModelForm
 from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
 from base.forms.learning_unit.learning_unit_partim import PARTIM_FORM_READ_ONLY_FIELD, LearningUnitPartimModelForm, \
     merge_data
 from base.forms.utils.acronym_field import ExternalAcronymField, split_acronym, ExternalPartimAcronymField
-from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
@@ -130,7 +128,6 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
         LearningUnitYearForExternalModelForm,
         LearningContainerModelForm,
         LearningContainerYearExternalModelForm,
-        EntityContainerBaseForm,
         SimplifiedVolumeManagementForm,
         CograduationExternalLearningUnitModelForm
     ]
@@ -176,11 +173,6 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             },
             LearningUnitYearForExternalModelForm: self._build_instance_data_learning_unit_year(data),
             LearningContainerYearExternalModelForm: self._build_instance_data_learning_container_year(data, proposal),
-            EntityContainerBaseForm: {
-                'data': data,
-                'learning_container_year': self.instance.learning_container_year if self.instance else None,
-                'person': self.person
-            },
             SimplifiedVolumeManagementForm: {
                 'data': data,
                 'proposal': proposal,
@@ -231,7 +223,6 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             'learning_unit_form': self.learning_unit_form,
             'learning_unit_year_form': self.learning_unit_year_form,
             'learning_container_year_form': self.learning_container_year_form,
-            'entity_container_form': self.entity_container_form,
             'simplified_volume_management_form': self.simplified_volume_management_form,
             'learning_unit_external_form': self.learning_unit_external_form
         }
@@ -260,14 +251,8 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             commit=commit
         )
 
-        entity_container_years = self.entity_container_form.save(
-            commit=commit,
-            learning_container_year=container_year
-        )
-
         self.simplified_volume_management_form.save_all_forms(
             learning_unit_year,
-            entity_container_years,
             commit=commit
         )
 
@@ -285,7 +270,6 @@ class ExternalPartimForm(LearningUnitBaseForm):
         LearningUnitYearForExternalModelForm,
         LearningContainerModelForm,
         LearningContainerYearExternalModelForm,
-        EntityContainerBaseForm,
         SimplifiedVolumeManagementForm,
         CograduationExternalLearningUnitModelForm,
     ]
@@ -349,10 +333,6 @@ class ExternalPartimForm(LearningUnitBaseForm):
             },
             LearningContainerYearExternalModelForm: {
                 'instance': self.learning_unit_year_full.learning_container_year,
-                'person': self.person
-            },
-            EntityContainerBaseForm: {
-                'learning_container_year': self.learning_unit_year_full.learning_container_year,
                 'person': self.person
             },
             SimplifiedVolumeManagementForm: {
@@ -440,7 +420,6 @@ class ExternalPartimForm(LearningUnitBaseForm):
 
         self.simplified_volume_management_form.save_all_forms(
             learning_unit_yr,
-            EntityContainerYear.objects.filter(learning_container_year=lcy),
             commit=commit
         )
 
@@ -449,9 +428,6 @@ class ExternalPartimForm(LearningUnitBaseForm):
 
         return learning_unit_yr
 
-    def _get_entity_container_year(self):
-        return self.learning_unit_year_full.learning_container_year.entitycontaineryear_set.all()
-
     def get_context(self):
         return {
             'learning_unit_year': self.instance,
@@ -459,7 +435,6 @@ class ExternalPartimForm(LearningUnitBaseForm):
             'learning_unit_form': self.learning_unit_form,
             'learning_unit_year_form': self.learning_unit_year_form,
             'learning_container_year_form': self.learning_container_year_form,
-            'entity_container_form': self.entity_container_form,
             'simplified_volume_management_form': self.simplified_volume_management_form,
             'learning_unit_external_form': self.learning_unit_external_form
         }

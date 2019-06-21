@@ -27,6 +27,7 @@ import datetime
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.db.models import Subquery, OuterRef
 from django.utils.translation import ugettext_lazy as _
 from waffle.models import Flag
 
@@ -36,7 +37,7 @@ from base.models import proposal_learning_unit, tutor
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, \
     starting_academic_year, current_academic_year
 from base.models.entity import Entity
-from base.models.entity_version import find_last_entity_version_by_learning_unit_year_id
+from base.models.entity_version import EntityVersion
 from base.models.enums import learning_container_year_types, entity_container_year_link_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.proposal_state import ProposalState
@@ -412,11 +413,13 @@ def _is_attached_to_initial_or_current_requirement_entity(proposal, person, rais
 
 
 def _is_attached_to_initial_entity(learning_unit_proposal, a_person):
-    if not learning_unit_proposal.initial_data.get("entities") or \
-            not learning_unit_proposal.initial_data["entities"].get(REQUIREMENT_ENTITY):
+    initial_container_year = learning_unit_proposal.initial_data.get("learning_container_year")
+    if not initial_container_year:
         return False
-    initial_entity_requirement_id = learning_unit_proposal.initial_data["entities"][REQUIREMENT_ENTITY]
-    return a_person.is_attached_entities(Entity.objects.filter(pk=initial_entity_requirement_id))
+    requirement_entity = initial_container_year.get('requirement_entity')
+    if not requirement_entity:
+        return False
+    return a_person.is_attached_entities(Entity.objects.filter(pk=requirement_entity))
 
 
 def _is_container_type_course_dissertation_or_internship(learning_unit_year, _, raise_exception):
@@ -512,14 +515,29 @@ def _is_calendar_opened_to_edit_educational_information(*, learning_unit_year_id
 
 
 def find_educational_information_submission_dates_of_learning_unit_year(learning_unit_year_id):
-    requirement_entity_version = find_last_entity_version_by_learning_unit_year_id(
+    requirement_entity_version = find_last_requirement_entity_version(
         learning_unit_year_id=learning_unit_year_id,
-        entity_type=entity_container_year_link_type.REQUIREMENT_ENTITY
     )
     if requirement_entity_version is None:
         return {}
 
     return find_summary_course_submission_dates_for_entity_version(requirement_entity_version)
+
+
+def find_last_requirement_entity_version(learning_unit_year_id):
+    now = datetime.datetime.now(get_tzinfo())
+    # TODO :: merge code below to get only 1 hit on database
+    requirement_entity_id = LearningUnitYear.objects.filter(
+        pk=learning_unit_year_id
+    ).select_related(
+        'learning_container_year'
+    ).only(
+        'learning_container_year'
+    ).get().learning_container_year.requirement_entity_id
+    try:
+        return EntityVersion.objects.current(now).filter(entity=requirement_entity_id).get()
+    except EntityVersion.DoesNotExist:
+        return None
 
 
 class can_user_edit_educational_information(BasePerm):

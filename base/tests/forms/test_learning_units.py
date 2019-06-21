@@ -30,9 +30,8 @@ from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.business.learning_unit_year_with_context import is_service_course
 from base.forms.learning_unit import search_form
-from base.models.enums import entity_container_year_link_type, entity_type
+from base.models.enums import entity_type
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -52,9 +51,10 @@ class TestLearningUnitForm(TestCase):
         self.list_learning_unit_year = self._create_list_learning_units_from_containers(
             self.list_learning_unit_container_year)
         self.list_entity_version = self._create_list_entities_version()
-        self.list_entity_container_year = self._create_list_entity_container_years(
+        self._add_entities_to_containers(
             self.list_entity_version,
-            self.list_learning_unit_container_year)
+            self.list_learning_unit_container_year
+        )
         self.tutor = TutorFactory()
         self.attribution = AttributionNewFactory(tutor=self.tutor)
         self.learning_component = LearningComponentYearFactory(learning_unit_year=self.list_learning_unit_year[0])
@@ -118,7 +118,7 @@ class TestLearningUnitForm(TestCase):
         list_entity_version.append(evf_child_2)
         return list_entity_version
 
-    def _create_list_entity_container_years(self, list_entity_version, list_lu_container_year):
+    def _add_entities_to_containers(self, list_entity_version, list_lu_container_year):
         """
         Associate the entities to the Learning Units.
         The last Learning Unit LUY2 must be associated with an entity which has a related parent.
@@ -132,41 +132,25 @@ class TestLearningUnitForm(TestCase):
             7. LUY3 -associated to LC3- has 'BUDR' for REQUIREMENT Entity
             8. LUY3 -associated to LC3- has 'BAXR' for ALLOCATION Entity
         """
-        list_entity_container_year = [
-            EntityContainerYearFactory(
-                entity=list_entity_version[0].entity,
-                learning_container_year=list_lu_container_year[0],
-                type=entity_container_year_link_type.REQUIREMENT_ENTITY),
-            EntityContainerYearFactory(
-                entity=list_entity_version[1].entity,
-                learning_container_year=list_lu_container_year[0],
-                type=entity_container_year_link_type.ALLOCATION_ENTITY),
-            EntityContainerYearFactory(
-                entity=list_entity_version[2].entity,
-                learning_container_year=list_lu_container_year[1],
-                type=entity_container_year_link_type.REQUIREMENT_ENTITY),
-            EntityContainerYearFactory(
-                entity=list_entity_version[0].entity,
-                learning_container_year=list_lu_container_year[1],
-                type=entity_container_year_link_type.ALLOCATION_ENTITY),
-            EntityContainerYearFactory(
-                entity=list_entity_version[2].entity,
-                learning_container_year=list_lu_container_year[2],
-                type=entity_container_year_link_type.REQUIREMENT_ENTITY),
-            EntityContainerYearFactory(
-                entity=list_entity_version[3].entity,
-                learning_container_year=list_lu_container_year[2],
-                type=entity_container_year_link_type.ALLOCATION_ENTITY),
-            EntityContainerYearFactory(
-                entity=list_entity_version[3].entity,
-                learning_container_year=list_lu_container_year[3],
-                type=entity_container_year_link_type.REQUIREMENT_ENTITY),
-            EntityContainerYearFactory(
-                entity=list_entity_version[5].entity,
-                learning_container_year=list_lu_container_year[3],
-                type=entity_container_year_link_type.ALLOCATION_ENTITY)
-        ]
-        return list_entity_container_year
+        list_lu_container_year[0].requirement_entity = list_entity_version[0].entity
+        list_lu_container_year[0].allocation_entity = list_entity_version[1].entity
+        list_lu_container_year[0].save()
+
+        list_lu_container_year[0].requirement_entity = list_entity_version[0].entity
+        list_lu_container_year[0].allocation_entity = list_entity_version[1].entity
+        list_lu_container_year[0].save()
+
+        list_lu_container_year[1].requirement_entity = list_entity_version[2].entity
+        list_lu_container_year[1].allocation_entity = list_entity_version[0].entity
+        list_lu_container_year[1].save()
+
+        list_lu_container_year[2].requirement_entity = list_entity_version[2].entity
+        list_lu_container_year[2].allocation_entity = list_entity_version[3].entity
+        list_lu_container_year[2].save()
+
+        list_lu_container_year[3].requirement_entity = list_entity_version[3].entity
+        list_lu_container_year[3].allocation_entity = list_entity_version[5].entity
+        list_lu_container_year[3].save()
 
     def test_is_service_course(self):
         self.assertTrue(
