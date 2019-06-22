@@ -29,23 +29,23 @@ from django.http import QueryDict
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
+from base.forms.common import TooManyResultsException
 from base.forms.learning_unit.search_form import filter_is_borrowed_learning_unit_year, LearningUnitSearchForm, \
     LearningUnitYearForm, ExternalLearningUnitYearForm
-from base.models.enums import entity_container_year_link_type, entity_type, learning_container_year_types
+from base.forms.search.search_form import get_research_criteria
+from base.models.enums import entity_type, learning_container_year_types
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateAcademicYear
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_year_entity import OfferYearEntityFactory
-from base.forms.search.search_form import get_research_criteria
-from base.forms.common import TooManyResultsException
-from base.tests.factories.campus import CampusFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
 from reference.tests.factories.country import CountryFactory
@@ -130,7 +130,7 @@ class TestSearchForm(TestCase):
 
     def test_search_too_many_results(self):
         cpt = 0
-        max_limit_of_results = 2000
+        max_limit_of_results = LearningUnitYearForm.MAX_RECORDS
         while cpt < max_limit_of_results + 1:
             LearningUnitYearFactory(
                 acronym="L{}".format(cpt),
@@ -240,6 +240,19 @@ class TestFilterIsBorrowedLearningUnitYear(TestCase):
 
         self.assertEqual(results[0].id, self.luys_in_different_faculty_than_education_group[:1][0].id)
 
+    def test_with_faculty_borrowing_set_and_no_entity_version(self):
+        group = GroupElementYear.objects.get(child_leaf=self.luys_in_different_faculty_than_education_group[0])
+        data = {
+            "academic_year_id": self.academic_year.id,
+            "faculty_borrowing_acronym": group.parent.acronym
+        }
+
+        form = LearningUnitYearForm(data, borrowed_course_search=True)
+
+        form.is_valid()
+        result = list(form.get_activity_learning_units())
+        self.assertEqual(result, [])
+
     def assert_filter_borrowed_luys_returns_empty_qs(self, learning_unit_years):
         qs = LearningUnitYear.objects.filter(pk__in=[luy.pk for luy in learning_unit_years])
         result = list(filter_is_borrowed_learning_unit_year(qs, self.academic_year.start_date))
@@ -247,12 +260,13 @@ class TestFilterIsBorrowedLearningUnitYear(TestCase):
 
 
 def generate_learning_unit_year_with_associated_education_group(academic_year, same_faculty=True, same_entity=True):
-    luy = LearningUnitYearFactory(academic_year=academic_year, learning_container_year__academic_year=academic_year)
+    luy = LearningUnitYearFactory(
+        academic_year=academic_year,
+        learning_container_year__academic_year=academic_year,
+        learning_container_year__requirement_entity=EntityFactory()
+    )
 
-    entity_container_year = EntityContainerYearFactory(learning_container_year=luy.learning_container_year,
-                                                       type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-
-    entity_version = EntityVersionFactory(entity=entity_container_year.entity,
+    entity_version = EntityVersionFactory(entity=luy.learning_container_year.requirement_entity,
                                           entity_type=entity_type.SCHOOL)
     parent_entity = EntityVersionFactory(entity=entity_version.parent, parent=None, entity_type=entity_type.FACULTY)
 

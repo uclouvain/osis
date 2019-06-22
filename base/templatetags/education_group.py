@@ -31,8 +31,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from base.business.education_group import can_user_edit_administrative_data
-from base.business.education_groups.perms import is_eligible_to_delete_education_group, \
-    is_eligible_to_change_education_group, is_eligible_to_add_training, \
+from base.business.education_groups.perms import is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_postpone_education_group, \
     _is_eligible_certificate_aims, is_eligible_to_delete_education_group_year
 from base.models.academic_year import AcademicYear, current_academic_year
@@ -135,7 +134,6 @@ def _get_permission(context, permission):
     except PermissionDenied as e:
         result = False
         permission_denied_message = str(e)
-
     return permission_denied_message, "" if result else "disabled", root
 
 
@@ -144,15 +142,16 @@ def button_edit_administrative_data(context):
     education_group_year = context.get('education_group_year')
 
     permission_denied_message, is_disabled, root = _get_permission(context, can_user_edit_administrative_data)
-    if not permission_denied_message:
+    if not permission_denied_message and is_disabled:
         permission_denied_message = _("Only program managers of the education group OR "
                                       "central manager linked to entity can edit.")
 
     return {
-        'is_disabled': is_disabled,
-        'message': permission_denied_message,
+        'class_li': is_disabled,
+        'title': permission_denied_message,
         'text': _('Modify'),
-        'url': reverse('education_group_edit_administrative', args=[root.pk, education_group_year.pk])
+        'url': '#' if is_disabled else
+        reverse('education_group_edit_administrative', args=[root.pk, education_group_year.pk])
     }
 
 

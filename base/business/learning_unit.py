@@ -32,9 +32,7 @@ from django.utils.translation import ugettext_lazy as _
 from base import models as mdl_base
 from base.business.entity import get_entity_calendar
 from base.business.learning_unit_year_with_context import volume_learning_component_year
-from base.business.learning_units.comparison import get_entity_by_type
 from base.business.xls import get_name_or_username
-from base.models import entity_container_year
 from base.models import learning_achievement
 from base.models.academic_calendar import AcademicCalendar
 from base.models.enums import academic_calendar_type
@@ -42,6 +40,7 @@ from base.models.enums import entity_container_year_link_type
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.learning_component_year import LearningComponentYear
+from base.models.learning_container_year import find_last_entity_version_grouped_by_linktypes
 from base.models.utils.utils import get_object_or_none
 from cms import models as mdl_cms
 from cms.enums import entity_name
@@ -141,7 +140,7 @@ def get_organization_from_learning_unit_year(learning_unit_year):
 def get_all_attributions(learning_unit_year):
     attributions = {}
     if learning_unit_year.learning_container_year:
-        all_attributions = entity_container_year.find_last_entity_version_grouped_by_linktypes(
+        all_attributions = find_last_entity_version_grouped_by_linktypes(
             learning_unit_year.learning_container_year)
 
         attributions['requirement_entity'] = all_attributions.get(entity_container_year_link_type.REQUIREMENT_ENTITY)
@@ -244,9 +243,9 @@ def compose_components_dict(components, additional_entities):
 
 def get_entities(container_year):
     return {
-        ecy.type: ecy.entity.most_recent_acronym
-        for ecy in container_year.entitycontaineryear_set.all().select_related('entity')
-        if ecy.type in REQUIREMENT_ENTITIES
+        link_type: entity.most_recent_acronym if entity else None
+        for link_type, entity in container_year.get_map_entity_by_type().items()
+        if link_type in REQUIREMENT_ENTITIES
     }
 
 
@@ -293,16 +292,8 @@ def get_learning_unit_comparison_context(learning_unit_year):
     context = dict({'learning_unit_year': learning_unit_year})
     context['campus'] = learning_unit_year.campus
     context['organization'] = get_organization_from_learning_unit_year(learning_unit_year)
-    context['experimental_phase'] = True
     components = get_components_identification(learning_unit_year)
     context['components'] = components.get('components')
-    context['REQUIREMENT_ENTITY'] = get_entity_by_type(learning_unit_year,
-                                                       entity_container_year_link_type.REQUIREMENT_ENTITY)
-    context['ALLOCATION_ENTITY'] = get_entity_by_type(learning_unit_year,
-                                                      entity_container_year_link_type.ALLOCATION_ENTITY)
-    context['ADDITIONAL_REQUIREMENT_ENTITY_1'] = \
-        get_entity_by_type(learning_unit_year, entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1)
-    context['ADDITIONAL_REQUIREMENT_ENTITY_2'] = \
-        get_entity_by_type(learning_unit_year, entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2)
     context['learning_container_year_partims'] = learning_unit_year.get_partims_related()
+    context.update(learning_unit_year.learning_container_year.get_map_entity_by_type())
     return context

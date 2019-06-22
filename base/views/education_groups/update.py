@@ -54,6 +54,11 @@ from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 @waffle_flag("education_group_update")
 def update_education_group(request, root_id, education_group_year_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+
+    # Store root in the instance to avoid to pass the root in methods
+    # it will be used in the templates.
+    education_group_year.root = root_id
+
     if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and\
             education_group_year.academic_year.year < current_academic_year().year:
         return update_certificate_aims(request, root_id, education_group_year)

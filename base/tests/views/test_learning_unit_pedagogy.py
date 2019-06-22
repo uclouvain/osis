@@ -42,7 +42,6 @@ from attribution.tests.factories.attribution import AttributionFactory
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.models.academic_year import current_academic_year, starting_academic_year
 from base.models.enums import academic_calendar_type
-from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_container_year_types, organization_type
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
@@ -50,7 +49,6 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_calendar import EntityCalendarFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -261,12 +259,12 @@ class LearningUnitPedagogyTestCase(TestCase):
                               end_date=an_academic_calendar.end_date)
 
     def _create_learning_unit_year_for_entity(self, an_entity, acronym):
-        l_container_yr = LearningContainerYearFactory(acronym=acronym,
-                                                      academic_year=self.current_academic_year,
-                                                      container_type=learning_container_year_types.COURSE)
-        EntityContainerYearFactory(learning_container_year=l_container_yr,
-                                   entity=an_entity,
-                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+        l_container_yr = LearningContainerYearFactory(
+            acronym=acronym,
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            requirement_entity=an_entity,
+        )
         return LearningUnitYearFactory(acronym=acronym,
                                        learning_container_year=l_container_yr,
                                        academic_year=self.current_academic_year)

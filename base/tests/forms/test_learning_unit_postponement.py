@@ -33,14 +33,12 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelF
 from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm, FIELDS_TO_NOT_POSTPONE
-from base.models import entity_container_year
 from base.models.academic_year import AcademicYear
-from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import attribution_procedure, entity_container_year_link_type, learning_unit_year_subtypes, \
     vacant_declaration_type
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.learning_component_year import LearningComponentYear
+from base.models.learning_container_year import find_last_entity_version_grouped_by_linktypes, LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -450,16 +448,14 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         return initial_status_value, new_status_value
 
     def _change_requirement_entity_value(self, academic_year):
-        entity_version_by_type = entity_container_year.find_last_entity_version_grouped_by_linktypes(
-            self.learning_unit_year_full.learning_container_year
+        container_year = LearningContainerYear.objects.get(
+            learning_container=self.learning_unit_year_full.learning_container_year.learning_container,
+            academic_year=academic_year
         )
-        initial_status_value = entity_version_by_type.get(entity_container_year_link_type.REQUIREMENT_ENTITY).entity
+        initial_status_value = container_year.requirement_entity
         new_entity_value = self.learn_unit_structure.entities[2]
-        EntityContainerYear.objects.filter(
-            learning_container_year__learning_container=self.learning_unit_year_full.learning_container_year.learning_container,
-            learning_container_year__academic_year=academic_year,
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY
-        ).update(entity=new_entity_value)
+        container_year.requirement_entity = new_entity_value
+        container_year.save()
         return initial_status_value, new_entity_value
 
     def _change_cm_component_value(self, academic_year, new_hourly_total_value):
@@ -480,12 +476,10 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
 
     def _remove_additional_requirement_entity_2(self, academic_year):
         # Remove additional requirement entity 2 container year
-        initial_entity_container_year = EntityContainerYear.objects.get(
-            type=ADDITIONAL_REQUIREMENT_ENTITY_2,
-            learning_container_year__academic_year=academic_year
-        )
-        initial_entity = initial_entity_container_year.entity
-        initial_entity_container_year.delete()
+        learn_container_year = LearningContainerYear.objects.filter(academic_year=academic_year).get()
+        initial_entity = learn_container_year.additional_entity_2
+        learn_container_year.additional_entity_2 = None
+        learn_container_year.save()
         return initial_entity
 
     def test_when_no_differences_found_in_future(self):
@@ -528,7 +522,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         result = form.consistency_errors
         expected_result = OrderedDict({
             next_academic_year: [
-                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+                _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                     'col_name': _('French title proper'),
                     'new_value': '-',
                     'current_value': instance_luy_base_form.data['specific_title']
@@ -542,7 +536,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         initial_status_value, new_status_value = self._change_status_value(next_academic_year)
         expected_result = OrderedDict({
             next_academic_year: [
-                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+                _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                     'col_name': _('Active'),
                     'new_value': _('yes') if new_status_value else _('no'),
                     'current_value': _('yes') if initial_status_value else _('no')
@@ -566,14 +560,14 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         initial_credits_value_2, new_credits_value_2 = self._change_credits_value(next_academic_year)
         expected_result = OrderedDict({
             next_academic_year: [
-                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+                _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                     'col_name': "Crédits",
                     'current_value': initial_credits_value,
                     'new_value': new_credits_value
                 }
             ],
             next_academic_year_2: [
-                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+                _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                     'col_name': "Crédits",
                     'current_value': initial_credits_value_2,
                     'new_value': new_credits_value_2
@@ -596,7 +590,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         initial_requirement_entity, new_requirement_entity = self._change_requirement_entity_value(next_academic_year)
         expected_result = OrderedDict({
             next_academic_year: [
-                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+                _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                     'col_name': _('Requirement entity'),
                     'current_value': initial_requirement_entity,
                     'new_value': new_requirement_entity
@@ -616,15 +610,12 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 1)
         component = self._change_requirement_entity_repartition_vlume(next_academic_year, 24)
 
-        requirement_entity = EntityContainerYear.objects.filter(
-            learning_container_year=component.learning_unit_year.learning_container_year,
-            type=REQUIREMENT_ENTITY
-        ).select_related('entity').get().entity
+        requirement_entity = component.learning_unit_year.learning_container_year.requirement_entity
 
         expected_result = OrderedDict({
             next_academic_year: [
                 _("The repartition volume of %(col_name)s has been already modified. "
-                  "({%(new_value)s} instead of {%(current_value)s})") % {
+                  "(%(new_value)s instead of %(current_value)s)") % {
                     'col_name': component.acronym + "-" + requirement_entity.most_recent_acronym,
                     'new_value': float(component.repartition_volume_requirement_entity),
                     'current_value': float('0.00')
@@ -680,7 +671,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
 
         expected_result = OrderedDict({
             next_academic_year: [
-                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+                _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                     'col_name': _('Additional requirement entity 2'),
                     'new_value': '-',
                     'current_value': initial_entity
@@ -697,9 +688,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
 
 
 def _instantiate_base_learning_unit_form(learning_unit_year_instance, person):
-    entity_version_by_type = entity_container_year.find_last_entity_version_grouped_by_linktypes(
-        learning_unit_year_instance.learning_container_year
-    )
+    container_year = learning_unit_year_instance.learning_container_year
     learning_unit_instance = learning_unit_year_instance.learning_unit
     if learning_unit_year_instance.subtype == learning_unit_year_subtypes.FULL:
         form = FullForm
@@ -745,21 +734,17 @@ def _instantiate_base_learning_unit_form(learning_unit_year_instance, person):
             'other_remark': learning_unit_instance.other_remark,
 
             # Learning container year data model form
-            'common_title': learning_unit_year_instance.learning_container_year.common_title,
-            'common_title_english': learning_unit_year_instance.learning_container_year.common_title_english,
-            'container_type': learning_unit_year_instance.learning_container_year.container_type,
-            'type_declaration_vacant': learning_unit_year_instance.learning_container_year.type_declaration_vacant,
-            'team': learning_unit_year_instance.learning_container_year.team,
-            'is_vacant': learning_unit_year_instance.learning_container_year.is_vacant,
+            'common_title': container_year.common_title,
+            'common_title_english': container_year.common_title_english,
+            'container_type': container_year.container_type,
+            'type_declaration_vacant': container_year.type_declaration_vacant,
+            'team': container_year.team,
+            'is_vacant': container_year.is_vacant,
 
-            'requirement_entity-entity':
-                entity_version_by_type.get(entity_container_year_link_type.REQUIREMENT_ENTITY).id,
-            'allocation_entity-entity':
-                entity_version_by_type.get(entity_container_year_link_type.ALLOCATION_ENTITY).id,
-            'additional_requirement_entity_1-entity':
-                entity_version_by_type.get(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1).id,
-            'additional_requirement_entity_2-entity':
-                entity_version_by_type.get(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2).id,
+            'requirement_entity': container_year.requirement_entity.get_latest_entity_version().id,
+            'allocation_entity': container_year.allocation_entity.get_latest_entity_version().id,
+            'additional_entity_1': container_year.additional_entity_1.get_latest_entity_version().id,
+            'additional_entity_2': container_year.additional_entity_2.get_latest_entity_version().id,
         },
         'person': person
     }

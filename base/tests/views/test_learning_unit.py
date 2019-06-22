@@ -73,7 +73,6 @@ from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -324,10 +323,18 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
 class LearningUnitViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.organization = OrganizationFactory(type=organization_type.MAIN)
+        cls.country = CountryFactory()
+
+        cls.entities = EntityFactory.create_batch(3, country=cls.country, organization=cls.organization)
+
         today = datetime.date.today()
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
 
-        cls.learning_container_yr = LearningContainerYearFactory(academic_year=cls.current_academic_year)
+        cls.learning_container_yr = LearningContainerYearFactory(
+            academic_year=cls.current_academic_year,
+            requirement_entity=cls.entities[0],
+        )
         cls.luy = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
             learning_container_year=cls.learning_container_yr
@@ -336,16 +343,7 @@ class LearningUnitViewTestCase(TestCase):
                                                                  hourly_volume_total_annual=10,
                                                                  hourly_volume_partial_q1=5,
                                                                  hourly_volume_partial_q2=5)
-        cls.organization = OrganizationFactory(type=organization_type.MAIN)
-        cls.country = CountryFactory()
 
-        cls.entities = EntityFactory.create_batch(3, country=cls.country, organization=cls.organization)
-
-        cls.entity_container_yr = EntityContainerYearFactory(
-            learning_container_year=cls.learning_container_yr,
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY,
-            entity=cls.entities[0]
-        )
         cls.entity_version = EntityVersionFactory(acronym="1 acronym", entity=cls.entities[0],
                                                   entity_type=entity_type.SCHOOL,
                                                   start_date=today - datetime.timedelta(days=1),
@@ -422,7 +420,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(len(context['types']),
                          len(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES))
         self.assertEqual(len(context['container_types']), len(LearningContainerYearType.choices()))
-        self.assertTrue(context['experimental_phase'])
         self.assertEqual(context['learning_units_count'], 0)
 
     def test_learning_units_search_with_acronym_filtering(self):
@@ -621,8 +618,14 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_warnings_learning_unit_read(self):
-        learning_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year,
-                                                               container_type=learning_container_year_types.INTERNSHIP)
+        learning_container_year = LearningContainerYearFactory(
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.INTERNSHIP,
+            requirement_entity=EntityVersionFactory().entity,
+            allocation_entity=EntityVersionFactory().entity,
+            additional_entity_1=EntityVersionFactory().entity,
+            additional_entity_2=EntityVersionFactory().entity,
+        )
         LearningUnitYearFactory(academic_year=self.current_academic_year,
                                 learning_container_year=learning_container_year,
                                 internship_subtype=internship_subtypes.TEACHING_INTERNSHIP,
@@ -643,13 +646,14 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_unit_with_faculty_manager_when_can_edit_end_date(self):
         learning_container_year = LearningContainerYearFactory(
-            academic_year=self.current_academic_year, container_type=learning_container_year_types.OTHER_COLLECTIVE)
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.OTHER_COLLECTIVE,
+            requirement_entity=EntityFactory(),
+        )
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=learning_container_year,
                                                      subtype=learning_unit_year_subtypes.FULL)
-        entity_container = EntityContainerYearFactory(learning_container_year=learning_container_year,
-                                                      type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-        EntityVersionFactory(entity=entity_container.entity)
+        EntityVersionFactory(entity=learning_container_year.requirement_entity)
 
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
@@ -663,7 +667,7 @@ class LearningUnitViewTestCase(TestCase):
         for manager in managers:
             manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
             PersonEntityFactory(
-                entity=entity_container.entity,
+                entity=learning_container_year.requirement_entity,
                 person=manager
             )
             url = reverse("learning_unit", args=[learning_unit_year.id])
@@ -674,16 +678,17 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_unit_of_type_partim_with_faculty_manager(self):
         learning_container_year = LearningContainerYearFactory(
-            academic_year=self.current_academic_year, container_type=learning_container_year_types.COURSE)
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            requirement_entity=EntityFactory(),
+        )
         LearningUnitYearFactory(academic_year=self.current_academic_year,
                                 learning_container_year=learning_container_year,
                                 subtype=learning_unit_year_subtypes.FULL)
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=learning_container_year,
                                                      subtype=learning_unit_year_subtypes.PARTIM)
-        entity_container = EntityContainerYearFactory(learning_container_year=learning_container_year,
-                                                      type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-        EntityVersionFactory(entity=entity_container.entity)
+        EntityVersionFactory(entity=learning_container_year.requirement_entity)
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
         ue_manager = create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_edit_learningunit')
@@ -694,7 +699,7 @@ class LearningUnitViewTestCase(TestCase):
         ]
         for manager in managers:
             manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
-            PersonEntityFactory(entity=entity_container.entity, person=manager)
+            PersonEntityFactory(entity=learning_container_year.requirement_entity, person=manager)
             url = reverse("learning_unit", args=[learning_unit_year.id])
             self.client.force_login(manager.user)
 
@@ -702,15 +707,15 @@ class LearningUnitViewTestCase(TestCase):
             self.assertEqual(response.context["can_edit_date"], True)
 
     def test_learning_unit_with_faculty_manager_when_cannot_edit_end_date(self):
-        learning_container_year = \
-            LearningContainerYearFactory(academic_year=self.current_academic_year,
-                                         container_type=learning_container_year_types.COURSE)
+        learning_container_year = LearningContainerYearFactory(
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            requirement_entity=EntityFactory(),
+        )
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=learning_container_year,
                                                      subtype=learning_unit_year_subtypes.FULL)
-        entity_container = EntityContainerYearFactory(learning_container_year=learning_container_year,
-                                                      type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-        EntityVersionFactory(entity=entity_container.entity)
+        EntityVersionFactory(entity=learning_container_year.requirement_entity)
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
         managers = [
@@ -718,7 +723,7 @@ class LearningUnitViewTestCase(TestCase):
             create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_access_learningunit')
         ]
         for manager in managers:
-            PersonEntityFactory(entity=entity_container.entity, person=manager)
+            PersonEntityFactory(entity=learning_container_year.requirement_entity, person=manager)
             url = reverse("learning_unit", args=[learning_unit_year.id])
             self.client.force_login(manager.user)
 
@@ -858,10 +863,12 @@ class LearningUnitViewTestCase(TestCase):
                                             end_date=None)
 
         # Create UE and put entity charge [AGRO]
-        l_container_yr = LearningContainerYearFactory(acronym="LBIR1100", academic_year=self.current_academic_year,
-                                                      container_type=learning_container_year_types.COURSE)
-        EntityContainerYearFactory(learning_container_year=l_container_yr, entity=agro_entity_v.entity,
-                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+        l_container_yr = LearningContainerYearFactory(
+            acronym="LBIR1100",
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            requirement_entity=agro_entity_v.entity,
+        )
         LearningUnitYearFactory(acronym="LBIR1100", learning_container_year=l_container_yr,
                                 academic_year=self.current_academic_year, subtype=learning_unit_year_subtypes.FULL)
         LearningUnitYearFactory(acronym="LBIR1100A", learning_container_year=l_container_yr,
@@ -873,48 +880,56 @@ class LearningUnitViewTestCase(TestCase):
                                 status=False)
 
         # Create another UE and put entity charge [ENV]
-        l_container_yr_2 = LearningContainerYearFactory(acronym="CHIM1200", academic_year=self.current_academic_year,
-                                                        container_type=learning_container_year_types.COURSE)
-        EntityContainerYearFactory(learning_container_year=l_container_yr_2, entity=envi_entity_v.entity,
-                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-        EntityContainerYearFactory(learning_container_year=l_container_yr_2, entity=ages_entity_v.entity,
-                                   type=entity_container_year_link_type.ALLOCATION_ENTITY)
+        l_container_yr_2 = LearningContainerYearFactory(
+            acronym="CHIM1200",
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            requirement_entity=envi_entity_v.entity,
+            allocation_entity=ages_entity_v.entity,
+        )
         LearningUnitYearFactory(acronym="CHIM1200", learning_container_year=l_container_yr_2,
                                 academic_year=self.current_academic_year, subtype=learning_unit_year_subtypes.FULL)
 
         # Create another UE and put entity charge [DRT]
-        l_container_yr_3 = LearningContainerYearFactory(acronym="DRT1500", academic_year=self.current_academic_year,
-                                                        container_type=learning_container_year_types.COURSE)
-        EntityContainerYearFactory(learning_container_year=l_container_yr_3, entity=drt_entity_v.entity,
-                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+        l_container_yr_3 = LearningContainerYearFactory(
+            acronym="DRT1500",
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            requirement_entity=drt_entity_v.entity,
+        )
         LearningUnitYearFactory(acronym="DRT1500", learning_container_year=l_container_yr_3,
                                 academic_year=self.current_academic_year, subtype=learning_unit_year_subtypes.FULL)
         LearningUnitYearFactory(acronym="DRT1500A", learning_container_year=l_container_yr_3,
                                 academic_year=self.current_academic_year, subtype=learning_unit_year_subtypes.PARTIM)
 
         # Create another UE and put entity charge [ESPO]
-        l_container_yr_4 = LearningContainerYearFactory(acronym="ESPO1500", academic_year=self.current_academic_year,
-                                                        container_type=learning_container_year_types.DISSERTATION)
-        EntityContainerYearFactory(learning_container_year=l_container_yr_4, entity=espo_entity_v.entity,
-                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+        l_container_yr_4 = LearningContainerYearFactory(
+            acronym="ESPO1500",
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.DISSERTATION,
+            requirement_entity=espo_entity_v.entity,
+        )
         LearningUnitYearFactory(acronym="ESPO1500", learning_container_year=l_container_yr_4,
                                 academic_year=self.current_academic_year, subtype=learning_unit_year_subtypes.FULL)
 
         # Create another UE and put entity charge [AGES]
-        l_container_yr_4 = LearningContainerYearFactory(acronym="AGES1500", academic_year=self.current_academic_year,
-                                                        container_type=learning_container_year_types.MASTER_THESIS)
-        EntityContainerYearFactory(learning_container_year=l_container_yr_4, entity=ages_entity_v.entity,
-                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+        l_container_yr_4 = LearningContainerYearFactory(
+            acronym="AGES1500",
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.MASTER_THESIS,
+            requirement_entity=ages_entity_v.entity,
+        )
         LearningUnitYearFactory(acronym="AGES1500", learning_container_year=l_container_yr_4,
                                 academic_year=self.current_academic_year, subtype=learning_unit_year_subtypes.FULL)
 
         # Create another UE and put entity charge [ELOG] and allocation charge [LOGO]
-        l_container_yr_5 = LearningContainerYearFactory(acronym="LOGO1200", academic_year=self.current_academic_year,
-                                                        container_type=learning_container_year_types.COURSE)
-        EntityContainerYearFactory(learning_container_year=l_container_yr_5, entity=elog_entity_v.entity,
-                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-        EntityContainerYearFactory(learning_container_year=l_container_yr_5, entity=logo_entity_v.entity,
-                                   type=entity_container_year_link_type.ALLOCATION_ENTITY)
+        l_container_yr_5 = LearningContainerYearFactory(
+            acronym="LOGO1200",
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            requirement_entity=elog_entity_v.entity,
+            allocation_entity=logo_entity_v.entity,
+        )
         LearningUnitYearFactory(acronym="LOGO1200", learning_container_year=l_container_yr_5,
                                 academic_year=self.current_academic_year, subtype=learning_unit_year_subtypes.FULL)
 
@@ -1103,14 +1118,11 @@ class LearningUnitViewTestCase(TestCase):
 
 class TestCreateXls(TestCase):
     def setUp(self):
-        self.learning_unit_year = LearningUnitYearFactory(learning_container_year=LearningContainerYearFactory(),
-                                                          acronym="LOSI1452")
-        self.requirement_entity_container = EntityContainerYearFactory(
-            learning_container_year=self.learning_unit_year.learning_container_year,
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-        self.allocation_entity_container = EntityContainerYearFactory(
-            learning_container_year=self.learning_unit_year.learning_container_year,
-            type=entity_container_year_link_type.ALLOCATION_ENTITY)
+        self.learning_unit_year = LearningUnitYearFactory(
+            learning_container_year__requirement_entity=EntityFactory(),
+            learning_container_year__allocation_entity=EntityFactory(),
+            acronym="LOSI1452"
+        )
 
         self.user = UserFactory()
 
@@ -1323,7 +1335,8 @@ class TestLearningUnitProposalComparison(TestCase):
             academic_year=self.current_academic_year,
             container_type=learning_container_year_types.COURSE,
             common_title="common_title",
-            type_declaration_vacant=DO_NOT_ASSIGN
+            type_declaration_vacant=DO_NOT_ASSIGN,
+            requirement_entity=EntityVersionFactory().entity
         )
         self.learning_unit_year = LearningUnitYearFakerFactory(
             credits=5,
@@ -1387,11 +1400,8 @@ class TestLearningUnitProposalComparison(TestCase):
             repartition_volume_additional_entity_1=10,
             repartition_volume_additional_entity_2=10
         )
-        self.entity_container_year = EntityContainerYearFactory(
-            learning_container_year=self.learning_unit_year.learning_container_year,
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY
-        )
 
+        requirement_entity = self.learning_unit_year.learning_container_year.requirement_entity
         initial_data_expected = {
             "learning_container_year": {
                 "id": self.learning_unit_year.learning_container_year.id,
@@ -1400,7 +1410,11 @@ class TestLearningUnitProposalComparison(TestCase):
                 "common_title_english": self.learning_unit_year.learning_container_year.common_title_english,
                 "container_type": self.learning_unit_year.learning_container_year.container_type,
                 "in_charge": self.learning_unit_year.learning_container_year.in_charge,
-                "type_declaration_vacant": self.learning_unit_year.learning_container_year.type_declaration_vacant
+                "type_declaration_vacant": self.learning_unit_year.learning_container_year.type_declaration_vacant,
+                "requirement_entity": requirement_entity.id,
+                "allocation_entity": None,
+                "additional_entity_1": requirement_entity.id,
+                "additional_entity_2": requirement_entity.id,
             },
             "learning_unit_year": {
                 "id": self.learning_unit_year.id,
@@ -1418,12 +1432,6 @@ class TestLearningUnitProposalComparison(TestCase):
             },
             "learning_unit": {
                 "id": self.learning_unit_year.learning_unit.id
-            },
-            "entities": {
-                entity_container_year_link_type.REQUIREMENT_ENTITY: self.entity_container_year.id,
-                entity_container_year_link_type.ALLOCATION_ENTITY: None,
-                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: self.entity_container_year.id,
-                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: self.entity_container_year.id
             },
             "learning_component_years": [
                 {"id": self.learning_component_year_lecturing.id,
@@ -1508,10 +1516,8 @@ class TestLearningUnitProposalComparison(TestCase):
         )
 
     def test_learning_unit_proposal_comparison_with_volumes_data_modified(self):
-        EntityContainerYearFactory(
-            learning_container_year=self.learning_unit_year.learning_container_year,
-            type=entity_container_year_link_type.ALLOCATION_ENTITY
-        )
+        self.learning_unit_year.learning_container_year.allocation_entity = EntityVersionFactory().entity
+        self.learning_unit_year.learning_container_year.save()
         response = self.client.get(reverse(learning_unit_proposal_comparison, args=[self.learning_unit_year.pk]))
         self.assertEqual(response.context['components'][1][0], _("Practical exercises"))
         self.assertEqual(response.context['components'][1][1][_('Volume total annual')], [20, 0])

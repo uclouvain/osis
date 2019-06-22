@@ -30,6 +30,7 @@ from django.test import TestCase
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.models import test_person, test_academic_year, test_offer_year, \
@@ -83,6 +84,15 @@ class TestSendMessage(TestCase):
         self.luys_to_postpone = LearningUnitYear.objects.all()
         self.luys_already_existing = LearningUnitYear.objects.all()
         self.luys_ending_this_year = LearningUnitYear.objects.all()
+        self.ending_on_max_adjournment = LearningUnitYear.objects.all()
+
+        self.statistics_data = {
+            'max_academic_year_to_postpone': self.academic_year,
+            'to_duplicate': self.luys_to_postpone,
+            'already_duplicated': self.luys_already_existing,
+            'to_ignore': self.luys_ending_this_year,
+            'ending_on_max_academic_year': self.ending_on_max_adjournment
+        }
 
         add_message_template_html()
         add_message_template_txt()
@@ -102,12 +112,7 @@ class TestSendMessage(TestCase):
 
     @patch("osis_common.messaging.send_message.send_messages")
     def test_send_mail_before_annual_procedure_of_automatic_postponement_of_luy(self, mock_send_messages):
-        send_mail.send_mail_before_annual_procedure_of_automatic_postponement_of_luy(
-            self.academic_year,
-            self.luys_to_postpone,
-            self.luys_already_existing,
-            self.luys_ending_this_year
-        )
+        send_mail.send_mail_before_annual_procedure_of_automatic_postponement_of_luy(self.statistics_data)
         args = mock_send_messages.call_args[0][0]
         self.assertEqual(self.academic_year.year, args.get('template_base_data').get('end_academic_year'))
         self.assertEqual(len(args.get('receivers')), 1)
@@ -116,11 +121,9 @@ class TestSendMessage(TestCase):
     @patch("osis_common.messaging.send_message.send_messages")
     def test_send_mail_after_annual_procedure_of_automatic_postponement_of_luy(self, mock_send_messages):
         send_mail.send_mail_after_annual_procedure_of_automatic_postponement_of_luy(
-            self.academic_year,
-            self.luys_to_postpone,
-            self.luys_already_existing,
-            self.luys_ending_this_year,
-            self.msg_list
+            self.statistics_data,
+            LearningUnitYear.objects.all(),
+            LearningUnitYear.objects.none()
         )
         args = mock_send_messages.call_args[0][0]
         self.assertEqual(self.academic_year.year, args.get('template_base_data').get('end_academic_year'))
@@ -129,12 +132,7 @@ class TestSendMessage(TestCase):
 
     @patch("osis_common.messaging.send_message.send_messages")
     def test_send_mail_before_annual_procedure_of_automatic_postponement_of_egy(self, mock_send_messages):
-        send_mail.send_mail_before_annual_procedure_of_automatic_postponement_of_egy(
-            self.academic_year,
-            self.egys_to_postpone,
-            self.egys_already_existing,
-            self.egys_ending_this_year
-        )
+        send_mail.send_mail_before_annual_procedure_of_automatic_postponement_of_egy(self.statistics_data)
         args = mock_send_messages.call_args[0][0]
         self.assertEqual(self.academic_year.year, args.get('template_base_data').get('end_academic_year'))
         self.assertEqual(len(args.get('receivers')), 1)
@@ -142,17 +140,23 @@ class TestSendMessage(TestCase):
 
     @patch("osis_common.messaging.send_message.send_messages")
     def test_send_mail_after_annual_procedure_of_automatic_postponement_of_egy(self, mock_send_messages):
+        edgy_same_year = EducationGroupYearFactory(academic_year=self.academic_year)
+        edgy_not_same_year = EducationGroupYearFactory(academic_year=self.academic_year.past())
+
         send_mail.send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
-            self.academic_year,
-            self.egys_to_postpone,
-            self.egys_already_existing,
-            self.egys_ending_this_year,
-            EducationGroup.objects.all()
+            self.statistics_data,
+            [edgy_same_year, edgy_not_same_year],
+            []
         )
         args = mock_send_messages.call_args[0][0]
         self.assertEqual(self.academic_year.year, args.get('template_base_data').get('end_academic_year'))
         self.assertEqual(len(args.get('receivers')), 1)
         self.assertIsNone(args.get('attachment'))
+
+        # Ensure that the mail contains only postponed of academic year
+        # (Doesn't contains previous which are technical problem)
+        self.assertEqual(args['template_base_data']['egys_postponed'], 1)
+        self.assertEqual(args['template_base_data']['egys_postponed_qs'][0], edgy_same_year)
 
     @patch("osis_common.messaging.send_message.send_messages")
     def test_with_one_enrollment(self, mock_send_messages):

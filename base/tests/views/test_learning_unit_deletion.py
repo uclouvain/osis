@@ -38,13 +38,11 @@ from waffle.testutils import override_flag
 
 from attribution.tests.factories.attribution import AttributionFactory, AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from base.models.enums import entity_container_year_link_type
 from base.models.enums import entity_type
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
@@ -81,9 +79,10 @@ class LearningUnitDelete(TestCase):
         learning_unit_years = []
         for year in range(4):
             ac_year = AcademicYearFactory(year=settings.YEAR_LIMIT_LUE_MODIFICATION + year)
-            l_containeryear = LearningContainerYearFactory(academic_year=ac_year)
-            EntityContainerYearFactory(learning_container_year=l_containeryear, entity=self.entity_version.entity,
-                                       type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+            l_containeryear = LearningContainerYearFactory(
+                academic_year=ac_year,
+                requirement_entity=self.entity_version.entity,
+            )
             learning_unit_year = LearningUnitYearFactory(acronym=acronym, learning_unit=l1, academic_year=ac_year,
                                                          learning_container_year=l_containeryear)
             learning_unit_years.append(learning_unit_year)

@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext
 
-from django.conf import settings
 from base.business.group_element_years import management
 from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.models.academic_calendar import AcademicCalendar
@@ -40,9 +40,9 @@ from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING
 from base.models.person import Person
 
 ERRORS_MSG = {
-    "base.add_educationgroup": "The user has not permission to create education groups.",
-    "base.change_educationgroup": "The user has not permission to change education groups.",
-    "base.delete_educationgroup": "The user has not permission to delete education groups.",
+    "base.add_educationgroup": _("The user has not permission to create education groups."),
+    "base.change_educationgroup": _("The user has not permission to change education groups."),
+    "base.delete_educationgroup": _("The user has not permission to delete education groups."),
 }
 
 
@@ -64,7 +64,7 @@ def is_eligible_to_add_group(person, education_group, raise_exception=False):
 def _is_eligible_to_add_education_group(person, education_group, category, education_group_type=None,
                                         raise_exception=False):
     return check_permission(person, "base.add_educationgroup", raise_exception) and \
-           _is_eligible_to_add_education_group_with_category(person, category, raise_exception) and \
+           _is_eligible_to_add_education_group_with_category(person, education_group, category, raise_exception) and \
            _is_eligible_education_group(person, education_group, raise_exception) and \
            (not management.is_max_child_reached(education_group, education_group_type.name)
             if education_group_type and education_group
@@ -154,10 +154,13 @@ def _is_eligible_certificate_aims(person, education_group, raise_exception):
     return check_link_to_management_entity(education_group, person, raise_exception)
 
 
-def _is_eligible_to_add_education_group_with_category(person, category, raise_exception):
+def _is_eligible_to_add_education_group_with_category(person, education_group, category, raise_exception):
     # TRAINING/MINI_TRAINING can only be added by central managers | Faculty manager must make a proposition of creation
     # based on US OSIS-2592, Faculty manager can add a MINI-TRAINING
-    result = person.is_central_manager or (person.is_faculty_manager and category == Categories.MINI_TRAINING)
+    result = person.is_central_manager or (
+            person.is_faculty_manager and (category == Categories.MINI_TRAINING or
+                                           (category == Categories.GROUP and education_group is not None))
+    )
 
     msg = pgettext(
         "male" if category == Categories.GROUP else "female",
@@ -165,6 +168,7 @@ def _is_eligible_to_add_education_group_with_category(person, category, raise_ex
     ) % {"category": category.value}
 
     can_raise_exception(raise_exception, result, msg)
+
     return result
 
 
@@ -200,18 +204,19 @@ def check_authorized_type(education_group, category, raise_exception=False):
         category=category.name,
         parents=[education_group]
     ).exists()
-
     parent_category = education_group.education_group_type.category
+
     can_raise_exception(
         raise_exception, result,
         pgettext(
             "female" if parent_category in [TRAINING, MINI_TRAINING] else "male",
-            "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
-        ) % {
+            "No type of %(child_category)s can be created as child of %(category)s of type %(type)s")
+        % {
             "child_category": category.value,
             "category": education_group.education_group_type.get_category_display(),
             "type": education_group.education_group_type.get_name_display(),
-        })
+        }
+        )
 
     return result
 

@@ -36,6 +36,7 @@ from base.models.enums.education_group_types import GroupType
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
+from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -190,9 +191,36 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
             education_group_type=edy_type
         )
         GroupElementYear.objects.create(parent=self.egy, child_branch=child_egy)
-        self.assertTrue(GroupElementYear.objects.filter(parent=self.egy, child_branch=child_egy).count(), 1)
+        self.assertEqual(GroupElementYear.objects.filter(parent=self.egy, child_branch=child_egy).count(), 1)
         _get_or_create_branch(edy_type, "TITLE", "PARTIAL", self.egy)
-        self.assertTrue(GroupElementYear.objects.filter(parent=self.egy, child_branch=child_egy).count(), 1)
+        self.assertEqual(GroupElementYear.objects.filter(parent=self.egy, child_branch=child_egy).count(), 1)
+
+    def test_should_create_education_group_if_not_existing(self):
+        acronym = "{child_title}{parent_acronym}".format(
+            child_title="TITLE",
+            parent_acronym=self.egy.acronym
+        )
+        self.assertFalse(EducationGroup.objects.filter(educationgroupyear__acronym=acronym).exists())
+        edy_type = EducationGroupType.objects.get(name=GroupType.FINALITY_120_LIST_CHOICE.name)
+        _get_or_create_branch(edy_type, "TITLE", "PARTIAL", self.egy)
+        self.assertTrue(EducationGroup.objects.filter(educationgroupyear__acronym=acronym).exists())
+
+    def test_should_not_create_education_group_if_existing(self):
+        acronym = "{child_title}{parent_acronym}".format(
+            child_title="TITLE",
+            parent_acronym=self.egy.acronym
+        )
+        EducationGroupYearFactory(
+            acronym=acronym,
+            education_group=EducationGroupFactory(
+                start_year=self.egy.academic_year.year,
+                end_year=self.egy.academic_year.year
+            )
+        )
+        self.assertEqual(EducationGroup.objects.filter(educationgroupyear__acronym=acronym).count(), 1)
+        edy_type = EducationGroupType.objects.get(name=GroupType.FINALITY_120_LIST_CHOICE.name)
+        _get_or_create_branch(edy_type, "TITLE", "PARTIAL", self.egy)
+        self.assertEqual(EducationGroup.objects.filter(educationgroupyear__acronym=acronym).distinct().count(), 1)
 
     def test_should_create_children_for_education_group_year_equal_to_number_of_authorized_relationships(self):
         AuthorizedRelationshipFactory(

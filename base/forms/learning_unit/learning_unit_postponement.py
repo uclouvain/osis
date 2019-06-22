@@ -37,7 +37,6 @@ from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.models import academic_year
 from base.models.academic_year import AcademicYear
-from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.learning_component_year import LearningComponentYear
@@ -54,8 +53,8 @@ FIELDS_TO_NOT_POSTPONE = {
 FIELDS_TO_CHECK = ['faculty_remark', 'other_remark', 'acronym', 'specific_title', 'specific_title_english',
                    'credits', 'session', 'quadrimestre', 'status', 'internship_subtype', 'professional_integration',
                    'campus', 'language', 'periodicity', 'container_type', 'common_title', 'common_title_english',
-                   'team', 'requirement_entity', 'allocation_entity', 'additional_requirement_entity_1',
-                   'additional_requirement_entity_2']
+                   'team', 'requirement_entity', 'allocation_entity', 'additional_entity_1',
+                   'additional_entity_2']
 
 
 # @TODO: Use LearningUnitPostponementForm to manage END_DATE of learning unit year
@@ -347,10 +346,8 @@ class LearningUnitPostponementForm:
         This volume is never edited in the form, so we have to load data separably
         """
         initial_learning_unit_year = self._forms_to_upsert[0].instance
-        entity_containers = EntityContainerYear.objects.filter(
-            learning_container_year=initial_learning_unit_year.learning_container_year,
-        ).select_related("entity")
-        entity_by_type = {ec.type: ec.entity for ec in entity_containers}
+        # TODO :: select_related entities
+        entity_by_type = initial_learning_unit_year.learning_container_year.get_map_entity_by_type()
 
         for current_component in initial_learning_unit_year.learningcomponentyear_set.all():
             component_type = current_component.type
@@ -366,7 +363,7 @@ class LearningUnitPostponementForm:
 
                     self.consistency_errors.setdefault(luy.academic_year, []).append(
                         _("The repartition volume of %(col_name)s has been already modified. "
-                          "({%(new_value)s} instead of {%(current_value)s})") % {
+                          "(%(new_value)s instead of %(current_value)s)") % {
                             'col_name': name,
                             'new_value': new_repartition_volume,
                             'current_value': current_repartition
@@ -375,7 +372,7 @@ class LearningUnitPostponementForm:
 
     def _check_differences(self, current_form, next_form, ac_year):
         differences = [
-            _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+            _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                 'col_name': next_form.label_fields.get(col_name, col_name),
                 'new_value': self._get_translated_value(next_form.instances_data.get(col_name)),
                 'current_value': self._get_translated_value(value)

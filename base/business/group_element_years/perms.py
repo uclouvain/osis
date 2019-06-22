@@ -47,3 +47,7 @@ def _can_user_update_education_group_year_child(person, egy_child, raise_excepti
                                                 str(GroupType.MINOR_LIST_CHOICE.value)])
         })
     return result
+
+
+def is_eligible_to_detach_group_element_year(person, group_element_year, raise_exception):
+    return is_eligible_to_change_education_group(person, group_element_year.parent, raise_exception)

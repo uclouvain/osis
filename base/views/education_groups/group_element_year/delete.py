@@ -39,7 +39,7 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     # DeleteView
     template_name = "education_group/group_element_year/confirm_detach_inner.html"
 
-    rules = [group_element_year_perms.can_update_group_element_year]
+    rules = [group_element_year_perms.can_detach_group_element_year]
 
     def _call_rule(self, rule):
         return rule(self.request.user, self.get_object())

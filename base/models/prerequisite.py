@@ -31,7 +31,7 @@ from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from base.models import learning_unit
+from base.models import learning_unit, learning_unit_year
 from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -107,11 +107,17 @@ class Prerequisite(models.Model):
 
     @property
     def prerequisite_string(self):
+        return self._get_acronyms_string(False)
+
+    @property
+    def prerequisite_string_as_href(self):
+        return self._get_acronyms_string(True)
+
+    def _get_acronyms_string(self, as_href=False):
         main_operator = self.main_operator
         secondary_operator = OR if main_operator == AND else AND
         prerequisite_items = self.prerequisiteitem_set.all().order_by('group_number', 'position')
         prerequisites_fragments = []
-
         for num_group, records_in_group in itertools.groupby(prerequisite_items, lambda rec: rec.group_number):
             list_records = list(records_in_group)
             predicate_format = "({})" if len(list_records) > 1 else "{}"
@@ -119,12 +125,24 @@ class Prerequisite(models.Model):
             predicate = predicate_format.format(
                 join_secondary_operator.join(
                     map(
-                        lambda rec: rec.learning_unit.acronym,
+                        lambda rec: _get_acronym_as_href(rec,
+                                                         self.learning_unit_year.academic_year)
+                        if as_href else rec.learning_unit.acronym,
                         list_records
                     )
                 )
             )
             prerequisites_fragments.append(predicate)
-
         join_main_operator = " {} ".format(_(main_operator))
         return join_main_operator.join(prerequisites_fragments)
+
+
+def _get_acronym_as_href(prerequisite_item, academic_yr):
+    luy = learning_unit_year.search(
+        academic_year_id=academic_yr.id,
+        learning_unit=prerequisite_item.learning_unit,
+    ).first()
+
+    if luy:
+        return "<a href='/learning_units/{}/'>{}</a>".format(luy.id, prerequisite_item.learning_unit.acronym)
+    return ''
