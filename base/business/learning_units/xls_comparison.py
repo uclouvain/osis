@@ -118,12 +118,10 @@ def _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison, learning
     ).prefetch_related(
         get_learning_component_prefetch()
     ).prefetch_related(
-        build_entity_container_prefetch([
-            entity_types.ALLOCATION_ENTITY,
-            entity_types.REQUIREMENT_ENTITY,
-            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
-            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
-        ])
+        build_entity_container_prefetch(entity_types.ALLOCATION_ENTITY),
+        build_entity_container_prefetch(entity_types.REQUIREMENT_ENTITY),
+        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1),
+        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2),
     ).order_by('learning_unit', 'academic_year__year')
     [append_latest_entities(learning_unit) for learning_unit in learning_unit_years]
     [append_components(learning_unit) for learning_unit in learning_unit_years]
@@ -333,12 +331,10 @@ def _get_learning_unit_yr_with_component(learning_unit_years):
     ).prefetch_related(
         get_learning_component_prefetch()
     ).prefetch_related(
-        build_entity_container_prefetch([
-            entity_types.ALLOCATION_ENTITY,
-            entity_types.REQUIREMENT_ENTITY,
-            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
-            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
-        ])
+        build_entity_container_prefetch(entity_types.ALLOCATION_ENTITY),
+        build_entity_container_prefetch(entity_types.REQUIREMENT_ENTITY),
+        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1),
+        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2),
     ).order_by('learning_unit', 'academic_year__year')
     [append_latest_entities(learning_unit) for learning_unit in learning_unit_years]
     [append_components(learning_unit) for learning_unit in learning_unit_years]
@@ -379,10 +375,12 @@ def prepare_xls_content_for_comparison(luy_with_proposals):
 
 def _get_data_from_initial_data(initial_data):
     learning_unit_yr = get_by_id(initial_data.get('learning_unit_year')['id'])
-    requirement_entity = find_by_id(initial_data.get('entities')['REQUIREMENT_ENTITY'])
-    allocation_entity = find_by_id(initial_data.get('entities')['ALLOCATION_ENTITY'])
-    add1_requirement_entity = find_by_id(initial_data.get('entities')['ADDITIONAL_REQUIREMENT_ENTITY_1'])
-    add2_requirement_entity = find_by_id(initial_data.get('entities')['ADDITIONAL_REQUIREMENT_ENTITY_2'])
+    learning_container_year = initial_data.get('learning_container_year') or {}
+
+    requirement_entity = find_by_id(learning_container_year['requirement_entity'])
+    allocation_entity = find_by_id(learning_container_year['allocation_entity'])
+    add1_requirement_entity = find_by_id(learning_container_year['additional_entity_1'])
+    add2_requirement_entity = find_by_id(learning_container_year['additional_entity_2'])
     campus = find_campus_by_id(initial_data.get('learning_unit_year')['campus'])
 
     organization = get_organization_from_learning_unit_year(learning_unit_yr)

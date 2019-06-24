@@ -81,7 +81,7 @@ class TestEducationGroupSearchView(TestCase):
 
     def test_search_education_group_keys_exists_in_context(self):
         response = self.client.get(self.url)
-        expected_keys_found = ["form", "object_list", "object_list_count", "experimental_phase", "enums", "person"]
+        expected_keys_found = ["form", "object_list", "object_list_count", "enums", "person"]
         self.assertTrue(all(key in response.context.keys() for key in expected_keys_found))
 
     def test_search_education_group_cache_filter(self):
@@ -163,7 +163,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["object_list_count"], 0)
-        self.assertEqual(context["experimental_phase"], True)
 
     def test_without_get_data(self):
         response = self.client.get(self.url)
@@ -173,7 +172,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["object_list_count"], 0)
-        self.assertEqual(context["experimental_phase"], True)
 
     def test_initial_form_data(self):
         response = self.client.get(self.url)
@@ -189,7 +187,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
 
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
-        self.assertEqual(context["experimental_phase"], True)
         self.assertEqual(len(context["object_list"]), 0)
         messages = [str(m) for m in context["messages"]]
         self.assertIn(_('No result!'), messages)
@@ -201,7 +198,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
 
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
-        self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(context["object_list"],
                               [self.education_group_arke2a, self.education_group_arke2a_previous_year])
 
@@ -212,7 +208,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
 
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
-        self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(context["object_list"],
                               [self.education_group_arke2a, self.education_group_edph2, self.education_group_hist2a])
 
@@ -223,7 +218,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
 
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
-        self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(context["object_list"], [self.education_group_edph2])
 
     def test_search_with_management_entity(self):
@@ -233,7 +227,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
 
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
-        self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(context["object_list"],
                               [self.education_group_arke2a, self.education_group_arke2a_previous_year,
                                self.education_group_hist2a])
@@ -251,7 +244,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
 
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
-        self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(
             context["object_list"],
             [
@@ -270,7 +262,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
 
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
-        self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(context["object_list"], [self.education_group_hist2a, self.education_group_edph2])
 
     def test_search_by_education_group_category(self):
@@ -281,7 +272,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
 
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
-        self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(context["object_list"],
                               [self.education_group_arke2a, self.education_group_arke2a_previous_year])
 
@@ -299,7 +289,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
 
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
-        self.assertEqual(context["experimental_phase"], True)
         self.assertCountEqual(context["object_list"], [self.education_group_arke2a])
 
     def test_search_case_get_ajax_request(self):
