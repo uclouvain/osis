@@ -74,6 +74,9 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
 
         return len(self.errors) == 0
 
+    def post_valid(self):
+        self.delete_prerequisites()
+
     def delete_prerequisites(self):
         prerequisites = Prerequisite.objects.filter(
             education_group_year__in=self._parents,
@@ -201,3 +204,6 @@ class DetachLearningUnitYearStrategy(DetachStrategy):
                 }
             )
         return len(self.errors) == 0
+
+    def post_valid(self):
+        pass

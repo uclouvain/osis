@@ -25,6 +25,7 @@
 ############################################################################
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView
 from django.views.generic.base import TemplateView
@@ -110,18 +111,22 @@ class MoveGroupElementYearView(CreateGroupElementYearView):
     form_class = GroupElementYearForm
     template_name = "education_group/group_element_year_comment_inner.html"
 
+    @cached_property
+    def strategy(self):
+        obj = self.get_object()
+        strategy_class = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
+        return strategy_class(obj)
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
 
-        obj = self.get_object()
-        strategy_class = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
-        strategy = strategy_class(obj)
-        if not strategy.is_valid():
-            display_error_messages(self.request, strategy.errors)
+        if not self.strategy.is_valid():
+            display_error_messages(self.request, self.strategy.errors)
 
         return kwargs
 
     def form_valid(self, form):
+        self.strategy.post_valid()
         obj = self.get_object()
         obj.delete()
         return super().form_valid(form)

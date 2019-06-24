@@ -63,6 +63,7 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
         obj = self.get_object()
         if not self.strategy.is_valid():
             return JsonResponse({"error": True})
+        self.strategy.post_valid()
 
         success_msg = _("\"%(child)s\" has been detached from \"%(parent)s\"") % {
             'child': obj.child,
