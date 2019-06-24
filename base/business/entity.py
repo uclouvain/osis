@@ -28,9 +28,10 @@ from django.utils import timezone
 
 from base.models import entity_calendar, entity_version
 from base.models.entity import Entity
-from base.models.entity_container_year import EntityContainerYear
 from base.models.entity_version import EntityVersion
 from base.models.enums import academic_calendar_type
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
+    ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
 
 
 def get_entities_ids(entity_acronym, with_entity_subordinated):
@@ -68,19 +69,23 @@ def get_entity_calendar(an_entity_version, academic_yr):
         return None
 
 
-def build_entity_container_prefetch(entity_container_year_link_types):
+def build_entity_container_prefetch(entity_container_year_link_type):
     parent_version_prefetch = Prefetch(
         'parent__entityversion_set',
         to_attr='entity_versions'
     )
     entity_version_prefetch = Prefetch(
-        'entity__entityversion_set',
+        'entityversion_set',
         queryset=EntityVersion.objects.prefetch_related(parent_version_prefetch),
         to_attr='entity_versions')
+    prefetch_relation = {
+        REQUIREMENT_ENTITY: 'learning_container_year__requirement_entity',
+        ALLOCATION_ENTITY: 'learning_container_year__allocation_entity',
+        ADDITIONAL_REQUIREMENT_ENTITY_1: 'learning_container_year__additional_entity_1',
+        ADDITIONAL_REQUIREMENT_ENTITY_2: 'learning_container_year__additional_entity_2',
+    }[entity_container_year_link_type]
     entity_container_prefetch = Prefetch(
-        'learning_container_year__entitycontaineryear_set',
-        queryset=EntityContainerYear.objects.filter(
-            type__in=entity_container_year_link_types
-        ).prefetch_related(entity_version_prefetch)
+        prefetch_relation,
+        queryset=Entity.objects.all().prefetch_related(entity_version_prefetch)
     )
     return entity_container_prefetch

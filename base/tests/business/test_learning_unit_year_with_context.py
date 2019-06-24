@@ -28,17 +28,14 @@ import datetime
 from django.test import TestCase
 
 from base.business import learning_unit_year_with_context
-from base.models.enums import organization_type, entity_container_year_link_type
+from base.models.enums import organization_type
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from reference.tests.factories.country import CountryFactory
-from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
-    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
-    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, VOLUME_REQUIREMENT_ENTITY
 
 
 class LearningUnitYearWithContextTestCase(TestCase):
@@ -47,13 +44,13 @@ class LearningUnitYearWithContextTestCase(TestCase):
         self.current_academic_year = AcademicYearFactory(start_date=today,
                                                          end_date=today.replace(year=today.year + 1),
                                                          year=today.year)
-        self.learning_container_yr = LearningContainerYearFactory(academic_year=self.current_academic_year)
         self.organization = OrganizationFactory(type=organization_type.MAIN)
         self.country = CountryFactory()
         self.entity = EntityFactory(country=self.country, organization=self.organization)
-        self.entity_container_yr = EntityContainerYearFactory(learning_container_year=self.learning_container_yr,
-                                                              type=entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                                              entity=self.entity)
+        self.learning_container_yr = LearningContainerYearFactory(
+            academic_year=self.current_academic_year,
+            requirement_entity=self.entity
+        )
         self.learning_component_yr = LearningComponentYearFactory(
             learning_unit_year__learning_container_year=self.learning_container_yr,
             hourly_volume_partial_q1=-1,

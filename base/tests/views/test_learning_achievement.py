@@ -33,10 +33,9 @@ from waffle.testutils import override_flag
 
 from base.business.learning_units.achievement import DELETE, DOWN, UP, HTML_ANCHOR
 from base.forms.learning_achievement import LearningAchievementEditForm
-from base.models.enums import learning_unit_year_subtypes, entity_container_year_link_type
+from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_achievement import LearningAchievement
 from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
@@ -51,20 +50,17 @@ from reference.tests.factories.language import LanguageFactory
 @override_flag('learning_achievement_update', active=True)
 class TestLearningAchievementView(TestCase):
     def setUp(self):
-        self.academic_year = create_current_academic_year()
-        self.learning_unit_year = LearningUnitYearFactory(
-            academic_year=self.academic_year,
-            subtype=learning_unit_year_subtypes.FULL
-        )
-
         self.language_fr = LanguageFactory(code="FR")
         self.user = UserFactory()
         self.person = PersonFactory(user=self.user)
         self.person_entity = PersonEntityFactory(person=self.person)
 
-        EntityContainerYearFactory(learning_container_year=self.learning_unit_year.learning_container_year,
-                                   entity=self.person_entity.entity,
-                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+        self.academic_year = create_current_academic_year()
+        self.learning_unit_year = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+            subtype=learning_unit_year_subtypes.FULL,
+            learning_container_year__requirement_entity=self.person_entity.entity,
+        )
 
         self.client.force_login(self.user)
         self.achievement_fr = LearningAchievementFactory(language=self.language_fr,
@@ -144,27 +140,24 @@ class TestLearningAchievementView(TestCase):
 
 class TestLearningAchievementActions(TestCase):
     def setUp(self):
-        self.academic_year = create_current_academic_year()
-        self.learning_unit_year = LearningUnitYearFactory(
-            academic_year=self.academic_year,
-            subtype=learning_unit_year_subtypes.FULL
-        )
-
         self.language_fr = LanguageFactory(code="FR")
         self.language_en = LanguageFactory(code="EN")
         self.user = UserFactory()
         self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
-
         self.person = PersonFactory(user=self.user)
         self.a_superuser = SuperUserFactory()
         self.client.force_login(self.a_superuser)
         self.superperson = PersonFactory(user=self.a_superuser)
 
         self.person_entity = PersonEntityFactory(person=self.superperson)
-        EntityContainerYearFactory(learning_container_year=self.learning_unit_year.learning_container_year,
-                                   entity=self.person_entity.entity,
-                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+
+        self.academic_year = create_current_academic_year()
+        self.learning_unit_year = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+            subtype=learning_unit_year_subtypes.FULL,
+            learning_container_year__requirement_entity=self.person_entity.entity,
+        )
 
     def test_delete(self):
         achievement_fr_0 = LearningAchievementFactory(language=self.language_fr,

@@ -34,14 +34,12 @@ from base.business.learning_unit_year_with_context import append_latest_entities
 from base.business.learning_units.xls_comparison import prepare_xls_content_for_comparison
 from base.business.proposal_xls import XLS_DESCRIPTION, XLS_FILENAME, WORKSHEET_TITLE, basic_titles_part_1, \
     basic_titles_part_2, components_titles, basic_titles
-from base.models.enums import entity_container_year_link_type
 from base.models.enums import entity_type
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.organization_type import MAIN
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -94,7 +92,7 @@ class TestProposalXls(TestCase):
         self.assertEqual(len(proposals_data['data']), 1)
 
     def test_prepare_xls_comparison_content_with_data_with_initial_data(self):
-        self.proposal_1.initial_data = build_initial_data(self.l_unit_yr_1, self.entity_container_year)
+        self.proposal_1.initial_data = build_initial_data(self.l_unit_yr_1, self.entity_version.entity)
         self.proposal_1.save()
         proposals_data = prepare_xls_content_for_comparison([self.l_unit_yr_1])
         self.assertEqual(len(proposals_data['data']), 2)
@@ -207,16 +205,11 @@ class TestProposalXls(TestCase):
         self.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL,
                                                    start_date=today.replace(year=1900),
                                                    end_date=None)
-        self.entity_container_year = EntityContainerYearFactory(
-            learning_container_year=self.l_unit_yr_1.learning_container_year,
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY,
-            entity=self.entity_version.entity
-        )
-        self.entity_container_year = EntityContainerYearFactory(
-            learning_container_year=self.l_unit_yr_1.learning_container_year,
-            type=entity_container_year_link_type.ALLOCATION_ENTITY,
-            entity=self.entity_version.entity
-        )
+
+        self.l_unit_yr_1.learning_container_year.requirement_entity = self.entity_version.entity
+        self.l_unit_yr_1.learning_container_year.allocation_entity = self.entity_version.entity
+        self.l_unit_yr_1.learning_container_year.save()
+
         append_latest_entities(self.proposal_1.learning_unit_year)
 
 
