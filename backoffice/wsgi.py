@@ -78,3 +78,11 @@ if hasattr(settings, 'QUEUES') and settings.QUEUES:
                                                      send_json_scores_sheets_to_response_queue).start()
         except (ConnectionClosed, ChannelClosed, AMQPConnectionError, ConnectionError) as e:
             LOGGER.exception("Couldn't connect to the QueueServer")
+
+    if 'continuing_education' in settings.INSTALLED_APPS:
+        from continuing_education.business.registration_queue import save_role_registered_in_admission
+        try:
+            queue_listener.SynchronousConsumerThread(settings.QUEUES.get('QUEUES_NAME').get('EPC_TO_IUFC'),
+                                                     save_role_registered_in_admission).start()
+        except (ConnectionClosed, ChannelClosed, AMQPConnectionError, ConnectionError) as e:
+            LOGGER.exception("Couldn't connect to the QueueServer")
