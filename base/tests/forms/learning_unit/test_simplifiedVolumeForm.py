@@ -48,6 +48,8 @@ class TestSimplifiedVolumeManagementForm(TestCase):
             'component-1-hourly_volume_total_annual': 20,
             'component-1-hourly_volume_partial_q1': 10,
             'component-1-hourly_volume_partial_q2': 10,
+            'component-0-planned_classes': 1,
+            'component-1-planned_classes': 1,
         }
         generator = GenerateContainer(get_current_year(), get_current_year())
         self.learning_unit_year = generator[0].learning_unit_year_full
@@ -116,7 +118,7 @@ class TestSimplifiedVolumeForm(TestCase):
     def test_clean(self):
         self.instance.hourly_volume_partial_q1 = 0
         form = SimplifiedVolumeForm(
-            data={"hourly_volume_partial_q1": 12}, is_faculty_manager=True, instance=self.instance,
+            data={"hourly_volume_partial_q1": 5}, is_faculty_manager=True, instance=self.instance,
             index=0,
             component_type=COMPONENT_TYPES[0]
         )
