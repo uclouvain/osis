@@ -35,7 +35,6 @@ from base.views.education_groups.group_element_year.common import GenericGroupEl
 
 
 class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
-    # DeleteView
     template_name = "education_group/group_element_year/confirm_detach_inner.html"
 
     rules = [group_element_year_perms.can_detach_group_element_year]
