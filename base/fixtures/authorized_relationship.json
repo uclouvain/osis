@@ -991,21 +991,6 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 238,
-    "fields": {
-        "parent_type": [
-            "COMPLEMENTARY_MODULE"
-        ],
-        "child_type": [
-            "COMMON_CORE"
-        ],
-        "changed": "2018-12-03T09:00:27.004",
-        "min_count_authorized": 1,
-        "max_count_authorized": 1
-    }
-},
-{
-    "model": "base.authorizedrelationship",
     "pk": 239,
     "fields": {
         "parent_type": [
