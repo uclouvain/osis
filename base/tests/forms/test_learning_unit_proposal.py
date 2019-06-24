@@ -76,7 +76,7 @@ class TestSave(TestCase):
             requirement_entity=self.entity_version.entity,
         )
         self.learning_unit_year = LearningUnitYearFakerFactory(
-            credits=5,
+            credits=Decimal(5),
             subtype=learning_unit_year_subtypes.FULL,
             academic_year=current_academic_year,
             learning_container_year=learning_container_year,
@@ -99,7 +99,7 @@ class TestSave(TestCase):
             "specific_title_english": "New title english",
             "container_type": self.learning_unit_year.learning_container_year.container_type,
             "internship_subtype": "",
-            "credits": "4",
+            "credits": self.learning_unit_year.credits,
             "periodicity": learning_unit_year_periodicity.BIENNIAL_ODD,
             "status": False,
             "language": self.language.pk,
@@ -117,12 +117,12 @@ class TestSave(TestCase):
             'component-TOTAL_FORMS': '2',
             'component-INITIAL_FORMS': '0',
             'component-MAX_NUM_FORMS': '2',
-            'component-0-hourly_volume_total_annual': 20,
-            'component-0-hourly_volume_partial_q1': 10,
-            'component-0-hourly_volume_partial_q2': 10,
-            'component-1-hourly_volume_total_annual': 20,
-            'component-1-hourly_volume_partial_q1': 10,
-            'component-1-hourly_volume_partial_q2': 10,
+            'component-0-hourly_volume_total_annual': Decimal(20),
+            'component-0-hourly_volume_partial_q1': Decimal(10),
+            'component-0-hourly_volume_partial_q2': Decimal(10),
+            'component-1-hourly_volume_total_annual': Decimal(20),
+            'component-1-hourly_volume_partial_q1': Decimal(10),
+            'component-1-hourly_volume_partial_q2': Decimal(10),
         }
 
     def test_learning_unit_proposal_form_get_as_faculty_manager(self):
@@ -255,6 +255,7 @@ class TestSave(TestCase):
 
     def _get_initial_data_expected(self):
         initial_data_expected = build_initial_data(self.learning_unit_year, self.entity_version.entity)
+        initial_data_expected["learning_unit_year"]["credits"] = '5.00'
         initial_data_expected['entities'] = {
             entity_container_year_link_type.REQUIREMENT_ENTITY: self.entity_version.entity.id,
             entity_container_year_link_type.ALLOCATION_ENTITY: None,
@@ -308,7 +309,7 @@ def build_initial_data(learning_unit_year, entity):
             "specific_title": learning_unit_year.specific_title,
             "internship_subtype": learning_unit_year.internship_subtype,
             "language": learning_unit_year.language.pk,
-            "credits": learning_unit_year.credits,
+            "credits": Decimal(5),
             "campus": learning_unit_year.campus.id,
             "periodicity": learning_unit_year.periodicity,
             "status": learning_unit_year.status,

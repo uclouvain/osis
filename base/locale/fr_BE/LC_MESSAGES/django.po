@@ -4644,12 +4644,12 @@ msgstr "L’utilisateur n’est pas attaché à l’entité de gestion"
 #, python-format
 msgid ""
 "The value of field '%(field)s' for the learning unit %(acronym)s "
-"(%(component_type)s) is different between year %(year)s - %(value)s and year "
-"%(next_year)s - %(next_value)s"
+"(%(component_type)s) is different between year %(year)s - %(value)d and year "
+"%(next_year)s - %(next_value)d"
 msgstr ""
 "La valeur du champ '%(field)s' de l'unité d'enseignement %(acronym)s "
-"(%(component_type)s) différe entre l'année %(year)s - %(value)s et l'année "
-"%(next_year)s - %(next_value)s"
+"(%(component_type)s) différe entre l'année %(year)s - %(value)d et l'année "
+"%(next_year)s - %(next_value)d"
 
 #: business/learning_units/edition.py:398
 #: business/learning_units/edition.py:440
