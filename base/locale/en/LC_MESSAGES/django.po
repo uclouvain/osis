@@ -4495,8 +4495,8 @@ msgstr ""
 #, python-format
 msgid ""
 "The value of field '%(field)s' for the learning unit %(acronym)s "
-"(%(component_type)s) is different between year %(year)s - %(value)s and year "
-"%(next_year)s - %(next_value)s"
+"(%(component_type)s) is different between year %(year)s - %(value)d and year "
+"%(next_year)s - %(next_value)d"
 msgstr ""
 
 #: business/learning_units/edition.py:398

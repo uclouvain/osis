@@ -24,27 +24,24 @@
 #
 ##############################################################################
 from collections import OrderedDict
+from decimal import Decimal
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import mark_safe
+
+from base.enums.component_detail import VOLUME_Q1
 from base.templatetags.learning_unit import get_difference_css, has_proposal, get_previous_acronym, value_label, \
-    DIFFERENCE_CSS, volume_format, get_component_volume_css, dl_component_tooltip, changed_label
+    DIFFERENCE_CSS, normalize_fraction, get_component_volume_css, dl_component_tooltip, changed_label
+from base.templatetags.learning_unit import th_tooltip, CSS_PROPOSAL_VALUE, LABEL_VALUE_BEFORE_PROPOSAL
+from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from base.tests.factories.learning_unit import LearningUnitFactory
-from base.models.proposal_learning_unit import ProposalLearningUnit
-from django.utils.safestring import mark_safe
-from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_version import EntityVersionFactory
-from base.templatetags.learning_unit import th_tooltip, CSS_PROPOSAL_VALUE, LABEL_VALUE_BEFORE_PROPOSAL
-from reference.tests.factories.language import LanguageFactory
-from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, ANNUAL
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.enums.component_detail import VOLUME_Q1
 
 ENTITY_ACRONYM = "AGRO"
-VOLUME = 20
-OTHER_VOLUME = 25
+VOLUME = Decimal(20)
+OTHER_VOLUME = Decimal(25)
 
 
 class LearningUnitTagTest(TestCase):
@@ -133,15 +130,15 @@ class LearningUnitTagTest(TestCase):
                               mark_safe("<label {}>{}</label>".format(DIFFERENCE_CSS, 'campus 2')))
 
     def test_numeric_format(self):
-        self.assertEqual(volume_format(None), '')
-        self.assertEqual(volume_format(20), 20)
-        self.assertEqual(volume_format(20.50), '20.50')
+        self.assertEqual(normalize_fraction(None), '')
+        self.assertEqual(normalize_fraction(Decimal(20)), Decimal(20))
+        self.assertEqual(normalize_fraction(Decimal(20.50)), Decimal(20.5))
 
     def test_get_component_volume_css(self):
-        values = {'param1': 20, 'param2': 'test2'}
-        self.assertEqual(get_component_volume_css(values, 'param1', None, 25), mark_safe(
+        values = {'param1': Decimal(20), 'param2': 'test2'}
+        self.assertEqual(get_component_volume_css(values, 'param1', None, Decimal(25)), mark_safe(
             " data-toggle=tooltip title='{} : {}' class='{}' ".format(LABEL_VALUE_BEFORE_PROPOSAL,
-                                                                      20,
+                                                                      Decimal(20),
                                                                       CSS_PROPOSAL_VALUE)))
 
     def test_th_tooltip(self):
