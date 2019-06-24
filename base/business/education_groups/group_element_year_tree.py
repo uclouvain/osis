@@ -98,7 +98,6 @@ class EducationGroupHierarchy:
                             'parent').order_by("order", "parent__partial_acronym")
 
     def to_json(self):
-        group_element_year_pk = self.group_element_year.pk if self.group_element_year else '#'
         return {
             'text': self.education_group_year.verbose,
             'icon': self.icon,
@@ -118,7 +117,6 @@ class EducationGroupHierarchy:
                     self.root.pk, self.education_group_year.pk, self.group_element_year.pk
                 ]) if self.group_element_year else '#',
             },
-            'id': 'id_{}_{}'.format(self.education_group_year.pk, group_element_year_pk),
         }
 
     def to_list(self, flat=False, pruning_function=None):
@@ -183,7 +181,6 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         return
 
     def to_json(self):
-        group_element_year_pk = self.group_element_year.pk if self.group_element_year else '#'
         return {
             'text': self._get_acronym(),
             'icon': self.icon,
@@ -204,7 +201,6 @@ class NodeLeafJsTree(EducationGroupHierarchy):
                 ]) if self.group_element_year else '#',
                 'class': self._get_class()
             },
-            'id': 'id_{}_{}'.format(self.learning_unit_year.pk, group_element_year_pk),
         }
 
     def _get_tooltip_text(self):
