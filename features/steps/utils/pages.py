@@ -372,7 +372,6 @@ class EducationGroupPage(CommonPageMixin, pypom.Page):
             parent = self.find_node_tree_by_acronym(parent)
 
         for node in parent.find_elements(By.CSS_SELECTOR, 'li.jstree-node'):
-            print(node.text.split('-'))
             if acronym == node.text.split('-')[0].strip():
                 return node
         raise Exception("Node not found")
