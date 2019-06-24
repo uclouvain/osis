@@ -991,17 +991,17 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 238,
+    "pk": 239,
     "fields": {
         "parent_type": [
             "COMPLEMENTARY_MODULE"
         ],
         "child_type": [
-            "COMMON_CORE"
+            "SUB_GROUP"
         ],
-        "changed": "2018-12-03T09:00:27.004",
-        "min_count_authorized": 1,
-        "max_count_authorized": 1
+        "changed": "2019-06-24T10:17:27.004",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
     }
 },
 {
