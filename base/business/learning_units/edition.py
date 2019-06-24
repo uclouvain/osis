@@ -555,7 +555,7 @@ def _get_volumes_diff(current_volumes_data, next_year_volumes_data):
 
 def _get_error_volume_field_diff(field_diff, current_component, next_year_component, values_diff):
     return _("The value of field '%(field)s' for the learning unit %(acronym)s (%(component_type)s) "
-             "is different between year %(year)s - %(value)s and year %(next_year)s - %(next_value)s") % \
+             "is different between year %(year)s - %(value)d and year %(next_year)s - %(next_value)d") % \
            {
                'field': COMPONENT_DETAILS[field_diff].lower(),
                'acronym': current_component.learning_unit_year.acronym,
