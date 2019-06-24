@@ -255,6 +255,7 @@ class TestSave(TestCase):
 
     def _get_initial_data_expected(self):
         initial_data_expected = build_initial_data(self.learning_unit_year, self.entity_version.entity)
+        initial_data_expected["learning_unit_year"]["credits"] = '5.00'
         initial_data_expected['entities'] = {
             entity_container_year_link_type.REQUIREMENT_ENTITY: self.entity_version.entity.id,
             entity_container_year_link_type.ALLOCATION_ENTITY: None,
@@ -308,7 +309,7 @@ def build_initial_data(learning_unit_year, entity):
             "specific_title": learning_unit_year.specific_title,
             "internship_subtype": learning_unit_year.internship_subtype,
             "language": learning_unit_year.language.pk,
-            "credits": '5.00',
+            "credits": Decimal(5),
             "campus": learning_unit_year.campus.id,
             "periodicity": learning_unit_year.periodicity,
             "status": learning_unit_year.status,
