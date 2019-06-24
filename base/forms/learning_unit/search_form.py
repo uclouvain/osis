@@ -404,8 +404,10 @@ class ExternalLearningUnitYearForm(LearningUnitYearForm):
         queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
         required=False, label=_("Country")
     )
-    campus = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("Institution"))
-    city = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("City"))
+    campus = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("Institution"),
+                                help_text=_("Please select a country and a city first"))
+    city = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("City"),
+                              help_text=_("Please select a country first"))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -435,6 +437,7 @@ class ExternalLearningUnitYearForm(LearningUnitYearForm):
             cities_choice_list.append(tuple((city_name, city_name)))
 
         self.fields['city'].choices = add_blank(cities_choice_list)
+        # self.fields['city'].attrs.update({'title': _("Please select a country first")})
 
     def get_queryset(self):
         learning_units = super().get_queryset().filter(
