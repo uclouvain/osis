@@ -166,6 +166,9 @@ class EducationGroupHierarchy:
             if element.child_branch.education_group_type.name == MiniTrainingType.OPTION.name
         ]
 
+    def get_learning_unit_year_list(self):
+        return [element.child_leaf for element in self.to_list(flat=True) if element.child_leaf]
+
 
 class NodeLeafJsTree(EducationGroupHierarchy):
     element_type = LEARNING_UNIT_YEAR

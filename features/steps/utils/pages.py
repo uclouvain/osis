@@ -358,8 +358,8 @@ class EducationGroupPage(CommonPageMixin, pypom.Page):
     quick_search = Link(QuickSearchPage, By.ID, 'quick-search', 1)
     save_modal = Link('EducationGroupPage', By.CSS_SELECTOR, '.modal-footer > .btn-primary', 4)
 
-    attach = Link(CopyModalPage, By.CSS_SELECTOR, 'body > ul > li:nth-child(4) > a', 2)
-    detach = Link(DetachModalPage, By.CSS_SELECTOR, 'body > ul > li:nth-child(5) > a', 2)
+    attach = Link(CopyModalPage, By.CSS_SELECTOR, 'body > ul > li:nth-child(5) > a', 2)
+    detach = Link(DetachModalPage, By.CSS_SELECTOR, 'body > ul > li:nth-child(6) > a', 2)
 
     def get_name_first_children(self) -> list:
         children = self.find_elements(By.CSS_SELECTOR, '#panel_file_tree > ul > li > ul > li')
