@@ -30,6 +30,8 @@ from django.db import transaction
 from django.forms import formset_factory, modelformset_factory
 from django.utils.translation import ugettext_lazy as _
 
+from base.business.education_groups.volume_strategy import VolumeEditionNoFacultyStrategy, \
+    CompleteVolumeEditionFacultyStrategy, SimpleVolumeEditionFacultyStrategy
 from base.business.learning_units import edition
 from base.business.learning_units.edition import check_postponement_conflict_report_errors
 from base.forms.utils.emptyfield import EmptyField
@@ -150,7 +152,12 @@ class VolumeEditionForm(forms.Form):
             'volume_additional_requirement_entity_2': 'volume_additional_requirement_entity_2',
         }
 
-        _check_volumes_edition(self, input_names)
+        strategy = {
+            True: CompleteVolumeEditionFacultyStrategy,
+            False: VolumeEditionNoFacultyStrategy,
+        }
+
+        strategy[self.is_faculty_manager](self, input_names).is_valid()
 
         return cleaned_data
 
@@ -351,7 +358,14 @@ class SimplifiedVolumeForm(forms.ModelForm):
             'volume_additional_requirement_entity_2': 'repartition_volume_additional_entity_2',
         }
 
-        _check_volumes_edition(self, input_names)
+        strategy = {
+            True: {False: SimpleVolumeEditionFacultyStrategy,
+                   True: VolumeEditionNoFacultyStrategy},
+            False: {False: VolumeEditionNoFacultyStrategy,
+                    True: VolumeEditionNoFacultyStrategy},
+        }
+
+        strategy[self.is_faculty_manager][self.proposal](self, input_names).is_valid()
 
         return cleaned_data
 
@@ -439,78 +453,3 @@ SimplifiedVolumeManagementForm = modelformset_factory(
     extra=2,
     max_num=2
 )
-
-
-def _check_volumes_edition(obj, input_names):
-    raw_volume_q1 = obj.cleaned_data.get(input_names['volume_q1'])
-    volume_q1 = raw_volume_q1 or 0
-    raw_volume_q2 = obj.cleaned_data.get(input_names['volume_q2'])
-    volume_q2 = raw_volume_q2 or 0
-    volume_total = obj.cleaned_data.get(input_names['volume_total']) or 0
-    planned_classes = obj.cleaned_data.get(input_names['planned_classes']) or 0
-    raw_volume_requirement_entity = obj.cleaned_data.get(input_names['volume_requirement_entity'])
-    volume_requirement_entity = raw_volume_requirement_entity or 0
-    raw_volume_additional_requirement_entity_1 = obj.cleaned_data.get(
-        input_names['volume_additional_requirement_entity_1'])
-    volume_additional_requirement_entity_1 = raw_volume_additional_requirement_entity_1 or 0
-    raw_volume_additional_requirement_entity_2 = obj.cleaned_data.get(
-        input_names['volume_additional_requirement_entity_2'])
-    volume_additional_requirement_entity_2 = raw_volume_additional_requirement_entity_2 or 0
-
-    if raw_volume_q1 is not None or raw_volume_q2 is not None:
-        if volume_total != volume_q1 + volume_q2:
-            obj.add_error(input_names['volume_total'],
-                          _('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
-            if raw_volume_q1 is not None:
-                obj.add_error(input_names['volume_q1'], "")
-            if raw_volume_q2 is not None:
-                obj.add_error(input_names['volume_q2'], "")
-
-    if planned_classes > 0 and volume_total == 0:
-        obj.add_error(input_names['planned_classes'],
-                      _('planned classes cannot be greather than 0 while volume is equal to 0'))
-    if planned_classes == 0 and volume_total > 0:
-        obj.add_error(input_names['planned_classes'],
-                      _('planned classes cannot be 0 while volume is greater than 0'))
-
-    if raw_volume_requirement_entity is not None or \
-            raw_volume_additional_requirement_entity_1 is not None or \
-            raw_volume_additional_requirement_entity_2 is not None:
-        if volume_total * planned_classes != volume_requirement_entity + volume_additional_requirement_entity_1 + \
-                volume_additional_requirement_entity_2:
-            if raw_volume_additional_requirement_entity_1 is None and \
-                    raw_volume_additional_requirement_entity_2 is None:
-                obj.add_error(input_names['volume_requirement_entity'],
-                              _('The volume of the entity must be equal to the global volume'))
-            else:
-                obj.add_error(input_names['volume_requirement_entity'],
-                              _('The sum of the volumes of the entities must be equal to the global volume'))
-                if raw_volume_additional_requirement_entity_1 is not None:
-                    obj.add_error(input_names['volume_additional_requirement_entity_1'], '')
-                if raw_volume_additional_requirement_entity_2 is not None:
-                    obj.add_error(input_names['volume_additional_requirement_entity_2'], '')
-
-    is_fac = None
-    initial_volume_q1 = None
-    initial_volume_q2 = None
-    if isinstance(obj, VolumeEditionForm):
-        is_fac = obj.is_faculty_manager
-        initial_volume_q1 = obj.initial.get(input_names['volume_q1'])
-        initial_volume_q2 = obj.initial.get(input_names['volume_q2'])
-
-    if isinstance(obj, SimplifiedVolumeForm):
-        is_fac = obj.is_faculty_manager and not obj.proposal
-        initial_volume_q1 = obj.instance.hourly_volume_partial_q1
-        initial_volume_q2 = obj.instance.hourly_volume_partial_q2
-
-    if is_fac:
-        if 0 in [initial_volume_q1, initial_volume_q2]:
-            if 0 not in [raw_volume_q1, raw_volume_q2]:
-                obj.add_error(input_names['volume_q1'], _("One of the partial volumes must have a value to 0."))
-                obj.add_error(input_names['volume_q2'], _("One of the partial volumes must have a value to 0."))
-
-        else:
-            if raw_volume_q1 == 0:
-                obj.add_error(input_names['volume_q1'], _("The volume can not be set to 0."))
-            if raw_volume_q2 == 0:
-                obj.add_error(input_names['volume_q2'], _("The volume can not be set to 0."))
