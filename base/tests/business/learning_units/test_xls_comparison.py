@@ -35,8 +35,6 @@ from base.business.learning_units.xls_comparison import prepare_xls_content, \
     _check_changes_other_than_code_and_year, CELLS_TOP_BORDER, _check_changes, _get_proposal_data, \
     get_representing_string
 from base.business.proposal_xls import components_titles, basic_titles
-from base.models.entity_container_year import EntityContainerYear
-from base.models.enums import entity_container_year_link_type
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
@@ -93,12 +91,8 @@ class TestComparisonXls(TestCase):
         self.assertEqual(data[0][14], learning_unit_yr.specific_title_english)
         self.assertEqual(data[0][15], learning_unit_yr.requirement_entity.most_recent_acronym)
         self.assertEqual(data[0][16], learning_unit_yr.allocation_entity.most_recent_acronym)
-        self.assertEqual(data[0][17], EntityContainerYear.objects.get(
-            learning_container_year=learning_unit_yr.learning_container_year,
-            type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1).entity.most_recent_acronym)
-        self.assertEqual(data[0][18], EntityContainerYear.objects.get(
-            learning_container_year=learning_unit_yr.learning_container_year,
-            type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2).entity.most_recent_acronym)
+        self.assertEqual(data[0][17], learning_unit_yr.learning_container_year.additional_entity_1.most_recent_acronym)
+        self.assertEqual(data[0][18], learning_unit_yr.learning_container_year.additional_entity_2.most_recent_acronym)
         self.assertEqual(data[0][19], _('Yes') if learning_unit_yr.professional_integration else _('No'))
         if learning_unit_yr.campus:
             self.assertEqual(data[0][20], learning_unit_yr.campus.organization.name)

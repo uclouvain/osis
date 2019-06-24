@@ -34,9 +34,10 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from base.models import entity_container_year as mdl_entity_container_year, group_element_year
+from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
+from base.models.entity import Entity
 from base.models.enums import active_status, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
@@ -335,9 +336,10 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def get_entity(self, entity_type):
         # @TODO: Remove this condition when classes will be removed from learning unit year
         if self.learning_container_year:
-            entity_container_yr = self.learning_container_year.entitycontaineryear_set.filter(
-                type=entity_type).prefetch_related('entity__entityversion_set').first()
-            return entity_container_yr.entity if entity_container_yr else None
+            entity = self.learning_container_year.get_entity_from_type(entity_type)
+            if entity:
+                # TODO :: prefetch entityversion_set before call to this function
+                return Entity.objects.filter(pk=entity.pk).prefetch_related('entityversion_set').get()
 
     def clean(self):
         learning_unit_years = find_gte_year_acronym(self.academic_year, self.acronym)
@@ -362,7 +364,6 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
             self._warnings.extend(self._check_partim_parent_periodicity())
             self._warnings.extend(self._check_learning_component_year_warnings())
             self._warnings.extend(self._check_learning_container_year_warnings())
-            self._warnings.extend(self._check_entity_container_year_warnings())
         return self._warnings
 
     # TODO: Currently, we should warning user that the credits is not an integer
@@ -425,13 +426,6 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def _check_learning_container_year_warnings(self):
         return self.learning_container_year.warnings
 
-    def _check_entity_container_year_warnings(self):
-        _warnings = []
-        entity_container_years = mdl_entity_container_year.find_by_learning_container_year(self.learning_container_year)
-        for entity_container_year in entity_container_years:
-            _warnings.extend(entity_container_year.warnings)
-        return _warnings
-
     def is_external(self):
         return hasattr(self, "externallearningunityear")
 
@@ -491,8 +485,8 @@ def search(academic_year_id=None, acronym=None, learning_container_year_id=None,
 
     if requirement_entities:
         queryset = queryset.filter(
-            learning_container_year__entitycontaineryear__entity__entityversion__in=requirement_entities,
-            learning_container_year__entitycontaineryear__type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+            learning_container_year__requirement_entity__entityversion__in=requirement_entities,
+        )
 
     if learning_unit:
         queryset = queryset.filter(learning_unit=learning_unit)

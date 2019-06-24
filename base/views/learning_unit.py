@@ -32,6 +32,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
@@ -42,16 +43,17 @@ from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language, \
     get_components_identification
-from base.business.learning_unit_proposal import _get_value_from_enum
+from base.business.learning_unit_proposal import _get_value_from_enum, clean_attribute_initial_value
 from base.business.learning_units import perms as business_perms
-from base.business.learning_units.comparison import get_entity_by_type, \
-    FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON
+from base.business.learning_units.comparison import FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, \
+    FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON
 from base.business.learning_units.perms import can_update_learning_achievement
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models import education_group_year, campus, proposal_learning_unit, entity
 from base.models import learning_component_year as mdl_learning_component_year
+from base.models.entity_version import EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import ATTRIBUTION_PROCEDURES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, EntityContainerYearLinkTypes
@@ -89,7 +91,6 @@ def learning_unit_formations(request, learning_unit_year_id):
     context['group_elements_years'] = group_elements_years
 
     context['root_formations'] = education_group_year.find_with_enrollments_count(learn_unit_year)
-    context['experimental_phase'] = True
 
     return render(request, "learning_unit/formations.html", context)
 
@@ -108,7 +109,6 @@ def learning_unit_components(request, learning_unit_year_id):
     context['ADDITIONAL_REQUIREMENT_ENTITY_2'] = data_components.get('ADDITIONAL_REQUIREMENT_ENTITY_2')
     context['tab_active'] = 'components'
     context['can_manage_volume'] = business_perms.is_eligible_for_modification(context["learning_unit_year"], person)
-    context['experimental_phase'] = True
     return render(request, "learning_unit/components.html", context)
 
 
@@ -124,8 +124,6 @@ def learning_unit_attributions(request, learning_unit_year_id):
     context["can_manage_attribution"] = business_perms.is_eligible_to_manage_attributions(
         context["learning_unit_year"], request.user.person
     )
-    context['experimental_phase'] = True
-
     warning_msgs = get_charge_repartition_warning_messages(context["learning_unit_year"].learning_container_year)
     display_warning_messages(request, warning_msgs)
     return render(request, "learning_unit/attributions.html", context)
@@ -142,7 +140,6 @@ def learning_unit_specifications(request, learning_unit_year_id):
     context.update(get_achievements_group_by_language(learning_unit_year))
     context.update(get_languages_settings())
     context['can_update_learning_achievement'] = can_update_learning_achievement(learning_unit_year, person)
-    context['experimental_phase'] = True
     return render(request, "learning_unit/specifications.html", context)
 
 
@@ -250,16 +247,24 @@ def get_volumes_comparison_context(component, initial_data):
 
 def get_all_entities_comparison_context(initial_data, learning_unit_year):
     entities_fields = []
-    for link_type in ENTITY_TYPE_LIST:
-        link = EntityContainerYearLinkTypes[link_type].value
-        new_entity = get_entity_by_type(learning_unit_year, link_type).most_recent_acronym if get_entity_by_type(
-            learning_unit_year, link_type) else None
-        initial_entity = entity.find_by_id(
-            initial_data['entities'][link_type]).most_recent_acronym if entity.find_by_id(
-            initial_data['entities'][link_type]) else None
-        if initial_entity != new_entity:
-            entities_fields.append([link, initial_entity, new_entity])
+    new_container_year = learning_unit_year.learning_container_year
+    for entity_link, attr in new_container_year.get_attrs_by_entity_container_type().items():
+        new_entity = getattr(new_container_year, attr, None)
+        new_entity_acronym = new_entity.most_recent_acronym if new_entity else None
+        initial_entity_acronym = _get_initial_entity_acronym(initial_data, attr)
+        if initial_entity_acronym != new_entity_acronym:
+            translated_value = EntityContainerYearLinkTypes[entity_link].value
+            entities_fields.append([translated_value, initial_entity_acronym, new_entity_acronym])
     return entities_fields
+
+
+def _get_initial_entity_acronym(initial_data, entity_key_field_name):
+    initial_entity_acronym = None
+    initial_entity_id = initial_data['learning_container_year'][entity_key_field_name]
+    if initial_entity_id:
+        now = timezone.now().date()
+        initial_entity_acronym = EntityVersion.objects.current(now).get(entity_id=initial_entity_id).acronym
+    return initial_entity_acronym
 
 
 def get_learning_container_year_comparison_context(initial_data, learning_unit_year):
@@ -377,16 +382,14 @@ def reinitialize_learning_unit_year(components_list, context, initial_data, lear
 
 def get_entities_context(initial_data, learning_unit_year):
     entities_fields = {}
-    for link_type in ENTITY_TYPE_LIST:
-        link = EntityContainerYearLinkTypes[link_type].value
+    container_year = learning_unit_year.learning_container_year
+    for entity_link, attr in container_year.get_attrs_by_entity_container_type().items():
         if initial_data:
-            entity_data = entity.find_by_id(
-                initial_data['entities'][link_type]).most_recent_acronym if entity.find_by_id(
-                initial_data['entities'][link_type]) else None
+            entity_acronym = _get_initial_entity_acronym(initial_data, attr)
         else:
-            entity_data = get_entity_by_type(learning_unit_year, link_type).most_recent_acronym if get_entity_by_type(
-                learning_unit_year, link_type) else None
-        entities_fields[link] = entity_data
+            entity_acronym = container_year.get_most_recent_entity_acronym(entity_link)
+        translated_value = EntityContainerYearLinkTypes[entity_link].value
+        entities_fields[translated_value] = entity_acronym
     return entities_fields
 
 
@@ -428,17 +431,8 @@ def build_context_comparison(current_context, learning_unit_year, next_context, 
 def _reinitialize_model(obj_model, attribute_initial_values):
     for attribute_name, attribute_value in attribute_initial_values.items():
         if attribute_name != "id":
-            cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+            cleaned_initial_value = clean_attribute_initial_value(attribute_name, attribute_value)
             setattr(obj_model, attribute_name, cleaned_initial_value)
-
-
-def _clean_attribute_initial_value(attribute_name, attribute_value):
-    clean_attribute_value = attribute_value
-    if attribute_name == "campus":
-        clean_attribute_value = campus.find_by_id(attribute_value)
-    elif attribute_name == "language":
-        clean_attribute_value = language.find_by_id(attribute_value)
-    return clean_attribute_value
 
 
 def _reinitialize_components(initial_components):
@@ -448,7 +442,7 @@ def _reinitialize_components(initial_components):
         )
         for attribute_name, attribute_value in initial_data_by_model.items():
             if attribute_name != "id":
-                cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+                cleaned_initial_value = clean_attribute_initial_value(attribute_name, attribute_value)
                 setattr(learning_component_year, attribute_name, cleaned_initial_value)
 
 
