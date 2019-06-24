@@ -117,6 +117,8 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         finalities_pks = finalities_qs.filter(
             education_group_type__name__in=TrainingType.finality_types()
         ).values_list('pk', flat=True)
+        if self.child.education_group_type.name in TrainingType.finality_types():
+            finalities_pks = list(finalities_pks) + [self.parent.pk]
         if finalities_pks:
             root_2m_qs = EducationGroupYear.hierarchy.filter(pk__in=finalities_pks).get_parents().filter(
                 education_group_type__name__in=TrainingType.root_master_2m_types()
