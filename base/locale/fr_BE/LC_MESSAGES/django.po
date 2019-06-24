@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-24 08:34+0200\n"
+"POT-Creation-Date: 2019-06-24 09:54+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -657,8 +657,6 @@ msgid "Alloc. Ent."
 msgstr "Ent. attrib."
 
 #: forms/learning_unit/learning_unit_create.py:250
-#, fuzzy
-#| msgid "Attribution entity"
 msgid "Allocation entity"
 msgstr "Entité d'attribution"
 
@@ -3304,16 +3302,12 @@ msgstr ""
 "dans un ordre croissant, sans duplications. Exemples: 12, 23, 46"
 
 #: forms/learning_unit/search_form.py:408
-#, fuzzy
-#| msgid "Please select an item before attach it"
 msgid "Please select a country and a city first"
-msgstr "Veuillez Sélectionner ou Déplacer un élément avant d'Attacher"
+msgstr "Veuillez d'abord choisir un pays et une ville"
 
 #: forms/learning_unit/search_form.py:410
-#, fuzzy
-#| msgid "Please select an item before attach it"
 msgid "Please select a country first"
-msgstr "Veuillez Sélectionner ou Déplacer un élément avant d'Attacher"
+msgstr "Veuillez d'abord choisir un pays"
 
 #: models/learning_unit_year.py:97
 #, python-format
@@ -6135,32 +6129,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:166
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Grade"
-#~ msgstr "Niveau"
-
-#~ msgid "International title"
-#~ msgstr "Titre international"
-
-#~ msgid "Person"
-#~ msgstr "Personne"
-
-#~ msgid "Printable title"
-#~ msgstr "Titre imprimable"
-
-#~ msgid "Scores encoding"
-#~ msgstr "Encodage des notes"
-
-#~ msgid "Short title"
-#~ msgstr "Titre abrégé"
-
-#~ msgid "Structure"
-#~ msgstr "Structure"
-
-#~ msgctxt "male"
-#~ msgid ""
-#~ "No type of %(child_category)s can be created as child of %(category)s of "
-#~ "type %(type)s"
-#~ msgstr ""
-#~ "Aucun type de %(child_category)s ne peut être créé comme enfant d'un "
-#~ "%(category)s de type %(type)s"
