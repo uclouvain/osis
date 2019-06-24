@@ -110,7 +110,7 @@ class TestVolumeEditionForm(TestCase):
                 initial=component_values,
                 component=component,
                 entities=self.learning_unit_with_context.entities)
-            self.assertTrue(form.is_valid())  # Accept that vol_global is not equal to sum of volumes of entities
+            self.assertFalse(form.is_valid())  # Don't accept that vol_global is not equal to sum of volumes of entities
 
     def test_post_volume_form_partim_q1(self):
         for component, component_values in self.learning_unit_with_context.components.items():

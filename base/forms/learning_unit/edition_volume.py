@@ -495,7 +495,7 @@ def _check_volumes_edition(obj, input_names):
                 obj.add_error(input_names['volume_q2'], _("One of the partial volumes must have a value to 0."))
 
         else:
-            if volume_q1 == 0:
+            if raw_volume_q1 == 0:
                 obj.add_error(input_names['volume_q1'], _("The volume can not be set to 0."))
-            if volume_q2 == 0:
+            if raw_volume_q2 == 0:
                 obj.add_error(input_names['volume_q2'], _("The volume can not be set to 0."))
