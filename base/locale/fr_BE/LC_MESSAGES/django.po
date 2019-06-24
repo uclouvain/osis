@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-21 16:04+0200\n"
+"POT-Creation-Date: 2019-06-24 10:50+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,7 +20,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 2.2.1\n"
 
-#: views/education_groups/group_element_year/delete.py:68
+#: views/education_groups/group_element_year/delete.py:67
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" a été détaché de \"%(parent)s\""
@@ -657,8 +657,6 @@ msgid "Alloc. Ent."
 msgstr "Ent. attrib."
 
 #: forms/learning_unit/learning_unit_create.py:250
-#, fuzzy
-#| msgid "Attribution entity"
 msgid "Allocation entity"
 msgstr "Entité d'attribution"
 
@@ -722,7 +720,7 @@ msgstr "Êtes-vous certain de vouloir supprimer l'événement"
 msgid "Are you sure you want to delete the teaching material?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours?"
 
-#: views/education_groups/group_element_year/delete.py:55
+#: views/education_groups/group_element_year/delete.py:54
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr "Êtes-vous sûr·e de vouloir détacher %(acronym)s ?"
@@ -939,11 +937,10 @@ msgid ""
 "units are prerequisite in %(formation)s: %(learning_units)s"
 msgstr ""
 "L'organisation de formations annualisée %(acronym)s ne peut pas être "
-"détachée car les unités d'enseignement suivantes sont des prérequis dans %(formation)s: %(learning_units)s"
+"détachée car les unités d'enseignement suivantes sont des prérequis dans "
+"%(formation)s: %(learning_units)s"
 
 #: business/group_element_years/detach.py:199
-#: tests/views/group_element_years/test_detach.py:159
-#: tests/views/group_element_years/test_detach.py:178
 #, python-format
 msgid ""
 "Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a "
@@ -1001,7 +998,7 @@ msgstr "Triche"
 msgid "Choose academic years"
 msgstr "Choisir les années"
 
-#: forms/learning_unit/search_form.py:408 models/organization_address.py:47
+#: forms/learning_unit/search_form.py:409 models/organization_address.py:47
 #: templates/organization/organization_address.html:58
 msgid "City"
 msgstr "Ville"
@@ -1395,7 +1392,7 @@ msgstr "Mineure complément disciplinaire"
 msgid "Dissertation"
 msgstr "Mémoire"
 
-#: templates/academic_actors.html:62
+#: templates/academic_actors.html:60
 msgid "Dissertation Managers"
 msgstr "Gestionnaire de programme pour Dissertation"
 
@@ -2596,7 +2593,7 @@ msgstr ""
 "Gestion du parcours des étudiants depuis leur inscription jusqu'à leur "
 "diplôme."
 
-#: templates/academic_actors.html:63
+#: templates/academic_actors.html:61
 msgid "Management of the dissertation managers"
 msgstr ""
 "Permet d'administrer la liste des gestionnaires qui ont accès à Dissertation"
@@ -2605,13 +2602,13 @@ msgstr ""
 msgid "Management of the institution."
 msgstr "Gestion de l'institution."
 
-#: templates/academic_actors.html:45 templates/academic_actors.html:58
+#: templates/academic_actors.html:46
 msgid "Management of the program managers"
 msgstr ""
 "Permet d'administrer la liste des gestionnaires qui ont accès à l'encodage "
 "en ligne"
 
-#: templates/academic_actors.html:50
+#: templates/academic_actors.html:52
 msgid "Management of the scores responsibles managers"
 msgstr ""
 "Permet d'administrer la liste des responsables de notes qui ont accès à "
@@ -3312,6 +3309,14 @@ msgstr ""
 "Veuillez entrer des chiffres compris entre 1 et %(max_authorized_value)s "
 "dans un ordre croissant, sans duplications. Exemples: 12, 23, 46"
 
+#: forms/learning_unit/search_form.py:408
+msgid "Please select a country and a city first"
+msgstr "Veuillez d'abord sélectionner un pays et une ville"
+
+#: forms/learning_unit/search_form.py:410
+msgid "Please select a country first"
+msgstr "Veuillez d'abord sélectionner un pays"
+
 #: models/learning_unit_year.py:97
 #, python-format
 msgid "Please select an academic year lower than %(academic_year_max)d."
@@ -3441,7 +3446,7 @@ msgstr "Titre professionnel"
 msgid "Profile"
 msgstr "Profil"
 
-#: templates/academic_actors.html:44 templates/academic_actors.html:57
+#: templates/academic_actors.html:44
 msgid "Program Managers"
 msgstr "Gestionnaires de parcours étudiant"
 
@@ -3832,7 +3837,7 @@ msgstr "Soumission des feuilles de note"
 msgid "Scores must be between 0 and 20"
 msgstr "Les scores doivent être compris entre 0 et 20"
 
-#: templates/academic_actors.html:49
+#: templates/academic_actors.html:51
 msgid "Scores responsibles"
 msgstr "Responsables de notes"
 
@@ -4533,8 +4538,9 @@ msgid ""
 "The prerequisites for the following learning units contained in education "
 "group year %(acronym)s will we deleted: %(learning_units)s"
 msgstr ""
-"Les prérequis des unités d'enseignement suivantes contenues dans l'organisation de "
-"formation annualisé %(acronym)s seront supprimés: %(learning_units)s"
+"Les prérequis des unités d'enseignement suivantes contenues dans "
+"l'organisation de formation annualisé %(acronym)s seront supprimés: "
+"%(learning_units)s"
 
 #: views/education_groups/detail.py:387
 #, python-format
@@ -6141,32 +6147,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:166
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Grade"
-#~ msgstr "Niveau"
-
-#~ msgid "International title"
-#~ msgstr "Titre international"
-
-#~ msgid "Person"
-#~ msgstr "Personne"
-
-#~ msgid "Printable title"
-#~ msgstr "Titre imprimable"
-
-#~ msgid "Scores encoding"
-#~ msgstr "Encodage des notes"
-
-#~ msgid "Short title"
-#~ msgstr "Titre abrégé"
-
-#~ msgid "Structure"
-#~ msgstr "Structure"
-
-#~ msgctxt "male"
-#~ msgid ""
-#~ "No type of %(child_category)s can be created as child of %(category)s of "
-#~ "type %(type)s"
-#~ msgstr ""
-#~ "Aucun type de %(child_category)s ne peut être créé comme enfant d'un "
-#~ "%(category)s de type %(type)s"
