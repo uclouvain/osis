@@ -32,13 +32,14 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DeleteView, FormView
 from django.views.generic.edit import BaseUpdateView
 
 from base import models as mdl
 from base.models.entity_manager import is_entity_manager, has_perm_entity_manager
+from base.models.offer_type import OfferType
 from base.models.offer_year import OfferYear
 from base.models.person import Person
 from base.models.program_manager import ProgramManager
@@ -46,6 +47,8 @@ from base.views.mixins import AjaxTemplateMixin
 
 ALL_OPTION_VALUE = "-"
 ALL_OPTION_VALUE_ENTITY = "all_"
+
+EXCLUDE_OFFER_TYPE_SEARCH = ('Master approfondi', "Master didactique", "Master spécialisé")
 
 
 class ProgramManagerListView(ListView):
@@ -190,7 +193,7 @@ def pgm_manager_administration(request):
         'academic_year': current_academic_yr,
         'administrator_entities_string': _get_administrator_entities_acronym_list(administrator_entities),
         'entities_managed_root': administrator_entities,
-        'offer_types': mdl.offer_type.find_all(),
+        'offer_types': OfferType.objects.exclude(name_in=EXCLUDE_OFFER_TYPE_SEARCH),
         'managers': _get_entity_program_managers(administrator_entities, current_academic_yr),
         'init': '1'})
 
@@ -200,7 +203,7 @@ def pgm_manager_search(request):
     person_id = get_filter_value(request, 'person')
     manager_person = None
     if person_id:
-        manager_person = mdl.person.find_by_id(person_id)
+        manager_person = get_object_or_404(Person, pk=person_id)
 
     entity_selected = get_filter_value(request, 'entity')  # if an acronym is selected this value is not none
     entity_root_selected = None  # if an 'all hierarchy of' is selected this value is not none
@@ -221,7 +224,7 @@ def pgm_manager_search(request):
         'entities_managed_root': administrator_entities,
         'entity_selected': entity_selected,
         'entity_root_selected': entity_root_selected,
-        'offer_types': mdl.offer_type.find_all(),
+        'offer_types': OfferType.objects.exclude(name__in=EXCLUDE_OFFER_TYPE_SEARCH),
         'pgms': _get_programs(current_academic_yr,
                               get_entity_list(entity_selected, get_entity_root(entity_root_selected)),
                               manager_person,

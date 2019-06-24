@@ -334,13 +334,11 @@ class LearningUnitYearWarningsTest(TestCase):
         self.luy_full.get_partims_related().update(quadrimester=None)
 
     def test_warning_volumes_vol_tot(self):
-        self.component_full_lecturing.hourly_volume_partial_q1 = 15.0
-        self.component_full_lecturing.hourly_volume_partial_q2 = 15.0
-        self.component_full_lecturing.hourly_volume_total_annual = 40.0
+        self.component_full_lecturing.hourly_volume_partial_q1 = Decimal(15)
+        self.component_full_lecturing.hourly_volume_partial_q2 = Decimal(15)
+        self.component_full_lecturing.hourly_volume_total_annual = Decimal(40)
         self.component_full_lecturing.planned_classes = 1
-        self.component_full_lecturing.save()
-
-        self.component_full_lecturing.repartition_volume_requirement_entity = 30.0
+        self.component_full_lecturing.repartition_volume_requirement_entity = Decimal(30)
         self.component_full_lecturing.save()
 
         complete_acronym = self.component_full_lecturing.complete_acronym
@@ -350,13 +348,11 @@ class LearningUnitYearWarningsTest(TestCase):
         self.assertIn(excepted_error, self.luy_full.warnings)
 
     def test_warning_volumes_vol_global(self):
-        self.component_full_lecturing.hourly_volume_partial_q1 = 15.0
-        self.component_full_lecturing.hourly_volume_partial_q2 = 15.0
-        self.component_full_lecturing.hourly_volume_total_annual = 30.0
+        self.component_full_lecturing.hourly_volume_partial_q1 = Decimal(15)
+        self.component_full_lecturing.hourly_volume_partial_q2 = Decimal(15)
+        self.component_full_lecturing.hourly_volume_total_annual = Decimal(30)
         self.component_full_lecturing.planned_classes = 1
-        self.component_full_lecturing.save()
-
-        self.component_full_lecturing.repartition_volume_requirement_entity = 40.0
+        self.component_full_lecturing.repartition_volume_requirement_entity = Decimal(40)
         self.component_full_lecturing.save()
 
         complete_acronym = self.component_full_lecturing.complete_acronym
@@ -367,12 +363,10 @@ class LearningUnitYearWarningsTest(TestCase):
         self.assertIn(excepted_error, self.luy_full.warnings)
 
     def test_warning_volumes_vol_global_and_total(self):
-        self.component_full_lecturing.repartition_volume_requirement_entity = 42.0
-        self.component_full_lecturing.save()
-
-        self.component_full_lecturing.hourly_volume_partial_q1 = 10.0
-        self.component_full_lecturing.hourly_volume_partial_q2 = 15.0
-        self.component_full_lecturing.hourly_volume_total_annual = 36.0
+        self.component_full_lecturing.repartition_volume_requirement_entity = Decimal(42)
+        self.component_full_lecturing.hourly_volume_partial_q1 = Decimal(10)
+        self.component_full_lecturing.hourly_volume_partial_q2 = Decimal(15)
+        self.component_full_lecturing.hourly_volume_total_annual = Decimal(36)
         self.component_full_lecturing.planned_classes = 2
         self.component_full_lecturing.save()
 
@@ -604,10 +598,9 @@ class LearningUnitYearWarningsTest(TestCase):
                 self.component_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
                 self.component_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
                 self.component_full_lecturing.planned_classes = case.get('planned_classes')
-                self.component_full_lecturing.save()
-
                 self.component_full_lecturing.repartition_volume_requirement_entity = 0
                 self.component_full_lecturing.save()
+
         excepted_error = "{} ({})".format(
             _('Volumes of {} are inconsistent').format(self.component_full_lecturing.complete_acronym),
             _('planned classes cannot be 0 while volume is greater than 0'))

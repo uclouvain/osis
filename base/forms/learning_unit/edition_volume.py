@@ -41,7 +41,7 @@ from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITI
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY, \
     CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
 from base.models.learning_component_year import LearningComponentYear
-from osis_common.forms.widgets import FloatFormatInput
+from osis_common.forms.widgets import DecimalFormatInput
 
 STYLE_MIN_WIDTH_VOLUME = 'min-width:55px;'
 
@@ -61,14 +61,14 @@ class VolumeEditionForm(forms.Form):
     volume_q1 = VolumeField(
         label=_('Q1'),
         help_text=_('Volume Q1'),
-        widget=FloatFormatInput(render_value=True),
+        widget=DecimalFormatInput(render_value=True),
         required=False,
     )
     add_field = EmptyField(label='+')
     volume_q2 = VolumeField(
         label=_('Q2'),
         help_text=_('Volume Q2'),
-        widget=FloatFormatInput(render_value=True),
+        widget=DecimalFormatInput(render_value=True),
         required=False,
     )
     closing_parenthesis_field = EmptyField(label=')')
@@ -76,7 +76,7 @@ class VolumeEditionForm(forms.Form):
     volume_total = VolumeField(
         label=_('Vol. annual'),
         help_text=_('The annual volume must be equal to the sum of the volumes Q1 and Q2'),
-        widget=FloatFormatInput(render_value=True),
+        widget=DecimalFormatInput(render_value=True),
         required=False,
     )
     help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('Volume Q1'), _('Volume Q2'))
@@ -116,7 +116,7 @@ class VolumeEditionForm(forms.Form):
                 self.fields["volume_" + key.lower()] = VolumeField(
                     label=entity.acronym,
                     help_text=entity.title,
-                    widget=FloatFormatInput(render_value=True),
+                    widget=DecimalFormatInput(render_value=True),
                     required=False
                 )
                 if i != len(entities_to_add) - 1:
@@ -320,25 +320,25 @@ class SimplifiedVolumeForm(forms.ModelForm):
             'repartition_volume_additional_entity_2'
         )
         widgets = {
-            'hourly_volume_total_annual': FloatFormatInput(
+            'hourly_volume_total_annual': DecimalFormatInput(
                 attrs={'title': _("The annual volume must be equal to the sum of the volumes Q1 and Q2")},
                 render_value=True
             ),
-            'hourly_volume_partial_q1': FloatFormatInput(attrs={'title': _("Volume Q1"),
-                                                                'style': STYLE_MIN_WIDTH_VOLUME
-                                                                },
-                                                         render_value=True),
-            'hourly_volume_partial_q2': FloatFormatInput(attrs={'title': _("Volume Q2"),
-                                                                'style': STYLE_MIN_WIDTH_VOLUME
-                                                                },
-                                                         render_value=True),
+            'hourly_volume_partial_q1': DecimalFormatInput(attrs={'title': _("Volume Q1"),
+                                                                  'style': STYLE_MIN_WIDTH_VOLUME
+                                                                  },
+                                                           render_value=True),
+            'hourly_volume_partial_q2': DecimalFormatInput(attrs={'title': _("Volume Q2"),
+                                                                  'style': STYLE_MIN_WIDTH_VOLUME
+                                                                  },
+                                                           render_value=True),
             'planned_classes': forms.TextInput(attrs={'title': _("Planned classes")}),
-            'repartition_volume_requirement_entity': FloatFormatInput(attrs={'style': STYLE_MIN_WIDTH_VOLUME},
-                                                                      render_value=True),
-            'repartition_volume_additional_entity_1': FloatFormatInput(attrs={'style': STYLE_MIN_WIDTH_VOLUME},
-                                                                       render_value=True),
-            'repartition_volume_additional_entity_2': FloatFormatInput(attrs={'style': STYLE_MIN_WIDTH_VOLUME},
-                                                                       render_value=True),
+            'repartition_volume_requirement_entity': DecimalFormatInput(attrs={'style': STYLE_MIN_WIDTH_VOLUME},
+                                                                        render_value=True),
+            'repartition_volume_additional_entity_1': DecimalFormatInput(attrs={'style': STYLE_MIN_WIDTH_VOLUME},
+                                                                         render_value=True),
+            'repartition_volume_additional_entity_2': DecimalFormatInput(attrs={'style': STYLE_MIN_WIDTH_VOLUME},
+                                                                         render_value=True),
         }
 
     def clean(self):
