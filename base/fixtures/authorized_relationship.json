@@ -1009,6 +1009,21 @@
     "pk": 239,
     "fields": {
         "parent_type": [
+            "COMPLEMENTARY_MODULE"
+        ],
+        "child_type": [
+            "SUB_GROUP"
+        ],
+        "changed": "2019-06-24T10:17:27.004",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 240,
+    "fields": {
+        "parent_type": [
             "MINOR_LIST_CHOICE"
         ],
         "child_type": [
@@ -1021,7 +1036,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 240,
+    "pk": 241,
     "fields": {
         "parent_type": [
             "MINOR_LIST_CHOICE"
@@ -1036,7 +1051,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 241,
+    "pk": 242,
     "fields": {
         "parent_type": [
             "MINOR_LIST_CHOICE"
@@ -1051,7 +1066,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 242,
+    "pk": 243,
     "fields": {
         "parent_type": [
             "MINOR_LIST_CHOICE"
@@ -1066,7 +1081,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 243,
+    "pk": 244,
     "fields": {
         "parent_type": [
             "MINOR_LIST_CHOICE"
@@ -1081,7 +1096,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 244,
+    "pk": 245,
     "fields": {
         "parent_type": [
             "MINOR_LIST_CHOICE"
@@ -1096,7 +1111,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 245,
+    "pk": 246,
     "fields": {
         "parent_type": [
             "MAJOR_LIST_CHOICE"
@@ -1111,7 +1126,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 246,
+    "pk": 247,
     "fields": {
         "parent_type": [
             "MAJOR_LIST_CHOICE"
@@ -1126,7 +1141,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 247,
+    "pk": 248,
     "fields": {
         "parent_type": [
             "OPTION_LIST_CHOICE"
@@ -1141,7 +1156,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 248,
+    "pk": 249,
     "fields": {
         "parent_type": [
             "OPTION_LIST_CHOICE"
@@ -1156,7 +1171,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 249,
+    "pk": 250,
     "fields": {
         "parent_type": [
             "FINALITY_120_LIST_CHOICE"
@@ -1171,7 +1186,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 250,
+    "pk": 251,
     "fields": {
         "parent_type": [
             "FINALITY_120_LIST_CHOICE"
@@ -1186,7 +1201,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 251,
+    "pk": 252,
     "fields": {
         "parent_type": [
             "FINALITY_120_LIST_CHOICE"
@@ -1201,7 +1216,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 252,
+    "pk": 253,
     "fields": {
         "parent_type": [
             "FINALITY_120_LIST_CHOICE"
@@ -1216,7 +1231,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 253,
+    "pk": 254,
     "fields": {
         "parent_type": [
             "FINALITY_180_LIST_CHOICE"
@@ -1231,7 +1246,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 254,
+    "pk": 255,
     "fields": {
         "parent_type": [
             "FINALITY_180_LIST_CHOICE"
@@ -1246,7 +1261,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 255,
+    "pk": 256,
     "fields": {
         "parent_type": [
             "FINALITY_180_LIST_CHOICE"
@@ -1261,28 +1276,13 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 256,
-    "fields": {
-        "parent_type": [
-            "FINALITY_180_LIST_CHOICE"
-        ],
-        "child_type": [
-            "FINALITY_180_LIST_CHOICE"
-        ],
-        "changed": "2019-01-16T09:33:27.600",
-        "min_count_authorized": 0,
-        "max_count_authorized": null
-    }
-},
-{
-    "model": "base.authorizedrelationship",
     "pk": 257,
     "fields": {
         "parent_type": [
-            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
+            "FINALITY_180_LIST_CHOICE"
         ],
         "child_type": [
-            "MOBILITY_PARTNERSHIP"
+            "FINALITY_180_LIST_CHOICE"
         ],
         "changed": "2019-01-16T09:33:27.600",
         "min_count_authorized": 0,
@@ -1297,6 +1297,21 @@
             "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
         "child_type": [
+            "MOBILITY_PARTNERSHIP"
+        ],
+        "changed": "2019-01-16T09:33:27.600",
+        "min_count_authorized": 0,
+        "max_count_authorized": null
+    }
+},
+{
+    "model": "base.authorizedrelationship",
+    "pk": 259,
+    "fields": {
+        "parent_type": [
+            "MOBILITY_PARTNERSHIP_LIST_CHOICE"
+        ],
+        "child_type": [
             "MOBILITY_PARTNERSHIP_LIST_CHOICE"
         ],
         "changed": "2019-01-16T09:33:27.601",
@@ -1306,7 +1321,7 @@
 },
 {
     "model": "base.authorizedrelationship",
-    "pk": 259,
+    "pk": 260,
     "fields": {
         "parent_type": [
             "SUB_GROUP"
