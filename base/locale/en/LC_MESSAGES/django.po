@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-21 16:04+0200\n"
+"POT-Creation-Date: 2019-06-24 10:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: views/education_groups/group_element_year/delete.py:68
+#: views/education_groups/group_element_year/delete.py:67
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr ""
@@ -682,7 +682,7 @@ msgstr ""
 msgid "Are you sure you want to delete the teaching material?"
 msgstr ""
 
-#: views/education_groups/group_element_year/delete.py:55
+#: views/education_groups/group_element_year/delete.py:54
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr ""
@@ -897,8 +897,6 @@ msgid ""
 msgstr ""
 
 #: business/group_element_years/detach.py:199
-#: tests/views/group_element_years/test_detach.py:159
-#: tests/views/group_element_years/test_detach.py:178
 #, python-format
 msgid ""
 "Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a "
@@ -954,7 +952,7 @@ msgstr ""
 msgid "Choose academic years"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:408 models/organization_address.py:47
+#: forms/learning_unit/search_form.py:409 models/organization_address.py:47
 #: templates/organization/organization_address.html:58
 msgid "City"
 msgstr ""
@@ -1348,7 +1346,7 @@ msgstr ""
 msgid "Dissertation"
 msgstr ""
 
-#: templates/academic_actors.html:62
+#: templates/academic_actors.html:60
 msgid "Dissertation Managers"
 msgstr ""
 
@@ -2519,7 +2517,7 @@ msgid ""
 "Management of students' path from their registration until their diploma."
 msgstr ""
 
-#: templates/academic_actors.html:63
+#: templates/academic_actors.html:61
 msgid "Management of the dissertation managers"
 msgstr ""
 
@@ -2527,11 +2525,11 @@ msgstr ""
 msgid "Management of the institution."
 msgstr ""
 
-#: templates/academic_actors.html:45 templates/academic_actors.html:58
+#: templates/academic_actors.html:46
 msgid "Management of the program managers"
 msgstr ""
 
-#: templates/academic_actors.html:50
+#: templates/academic_actors.html:52
 msgid "Management of the scores responsibles managers"
 msgstr ""
 
@@ -3212,6 +3210,14 @@ msgid ""
 "12, 23, 46"
 msgstr ""
 
+#: forms/learning_unit/search_form.py:408
+msgid "Please select a country and a city first"
+msgstr ""
+
+#: forms/learning_unit/search_form.py:410
+msgid "Please select a country first"
+msgstr ""
+
 #: models/learning_unit_year.py:97
 #, python-format
 msgid "Please select an academic year lower than %(academic_year_max)d."
@@ -3338,7 +3344,7 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: templates/academic_actors.html:44 templates/academic_actors.html:57
+#: templates/academic_actors.html:44
 msgid "Program Managers"
 msgstr ""
 
@@ -3727,7 +3733,7 @@ msgstr ""
 msgid "Scores must be between 0 and 20"
 msgstr ""
 
-#: templates/academic_actors.html:49
+#: templates/academic_actors.html:51
 msgid "Scores responsibles"
 msgstr ""
 

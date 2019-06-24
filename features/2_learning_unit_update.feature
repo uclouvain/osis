@@ -140,7 +140,6 @@ Feature: Mise à jour en gestion journalière
     And Cliquer sur le bouton « Enregistrer »
     Then Vérifier que à la ligne 1, l'enseignant a comme fonction Coordinateur(trice) avec un volume en Q1 de 2,00 et en Q2 de 0,00
 
-
   Scenario: 16. En tant que gestionnaire facultaire, je dois pouvoir mettre à jour les fiches descriptives.
     Given L’utilisateur est attaché à l’entité FARM
     And Aller sur la page de detail de l'ue: WFARM1003 en 2019-20
@@ -183,4 +182,3 @@ Feature: Mise à jour en gestion journalière
 
     Then Vérifier que Test AA2 est bien présent à la ligne 1 des acquis d'apprentissage.
     And Vérifier que Test AA1 est bien présent à la ligne 2 des acquis d'apprentissage.
-

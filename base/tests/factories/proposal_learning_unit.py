@@ -41,8 +41,7 @@ class ProposalLearningUnitFactory(factory.django.DjangoModelFactory):
         django_get_or_create = ('learning_unit_year',)
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     learning_unit_year = factory.SubFactory(LearningUnitYearFakerFactory)
     type = factory.Iterator(ProposalType.choices(), getter=operator.itemgetter(0))
     state = factory.Iterator(ProposalState.choices(), getter=operator.itemgetter(0))
