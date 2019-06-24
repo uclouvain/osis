@@ -94,12 +94,10 @@ class TestDetach(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "education_group/group_element_year/confirm_detach_inner.html")
 
-    @mock.patch("base.views.education_groups.group_element_year.delete.DetachGroupElementYearView._check_if_deletable")
     @mock.patch("base.models.group_element_year.GroupElementYear.delete")
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
-    def test_detach_case_post_success(self, mock_permission, mock_delete, mock_is_deletable):
+    def test_detach_case_post_success(self, mock_permission, mock_delete):
         mock_permission.return_value = True
-        mock_is_deletable.return_value = True
 
         response = self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
@@ -142,9 +140,7 @@ class TestDetachLearningUnitPrerequisite(TestCase):
         self.mocked_perm = self.perm_patcher.start()
         self.addCleanup(self.perm_patcher.stop)
 
-    @mock.patch("base.models.group_element_year.GroupElementYear.delete")
-    def test_detach_case_learning_unit_being_prerequisite(self, mock_delete):
-
+    def test_detach_case_learning_unit_being_prerequisite(self):
         PrerequisiteItemFactory(
             prerequisite__education_group_year=self.group_element_year_root.parent,
             learning_unit=self.luy.learning_unit
@@ -152,18 +148,9 @@ class TestDetachLearningUnitPrerequisite(TestCase):
 
         response = self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        messages = [m.message for m in get_messages(response.wsgi_request)]
-        self.assertEqual(
-            messages[0],
-            _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
-                "acronym": self.luy.acronym}
-        )
-        self.assertFalse(mock_delete.called)
+        self.assertEqual(response.json(), {"error": True})
 
-    @mock.patch("base.models.group_element_year.GroupElementYear.delete")
-    def test_detach_case_learning_unit_having_prerequisite(self, mock_delete):
-
+    def test_detach_case_learning_unit_having_prerequisite(self):
         PrerequisiteItemFactory(
             prerequisite__learning_unit_year=self.luy,
             prerequisite__education_group_year=self.group_element_year_root.parent
@@ -171,11 +158,4 @@ class TestDetachLearningUnitPrerequisite(TestCase):
 
         response = self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        messages = [m.message for m in get_messages(response.wsgi_request)]
-        self.assertEqual(
-            messages[0],
-            _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
-                "acronym": self.luy.acronym}
-        )
-        self.assertFalse(mock_delete.called)
+        self.assertEqual(response.json(), {"error": True})
