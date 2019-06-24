@@ -437,7 +437,6 @@ class ExternalLearningUnitYearForm(LearningUnitYearForm):
             cities_choice_list.append(tuple((city_name, city_name)))
 
         self.fields['city'].choices = add_blank(cities_choice_list)
-        # self.fields['city'].attrs.update({'title': _("Please select a country first")})
 
     def get_queryset(self):
         learning_units = super().get_queryset().filter(
