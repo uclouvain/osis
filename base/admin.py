@@ -73,9 +73,6 @@ admin.site.register(entity.Entity,
 admin.site.register(entity_calendar.EntityCalendar,
                     entity_calendar.EntityCalendarAdmin)
 
-admin.site.register(entity_container_year.EntityContainerYear,
-                    entity_container_year.EntityContainerYearAdmin)
-
 admin.site.register(entity_manager.EntityManager,
                     entity_manager.EntityManagerAdmin)
 

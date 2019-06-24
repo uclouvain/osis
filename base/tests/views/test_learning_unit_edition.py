@@ -36,17 +36,14 @@ from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from waffle.testutils import override_flag
 
-from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
     LearningContainerYearModelForm
 from base.models.enums import learning_unit_year_periodicity, learning_container_year_types, \
-    learning_unit_year_subtypes, \
-    entity_container_year_link_type, vacant_declaration_type, attribution_procedure, entity_type, organization_type
+    learning_unit_year_subtypes, vacant_declaration_type, attribution_procedure, entity_type, organization_type
 from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -135,10 +132,33 @@ class TestEditLearningUnit(TestCase):
     def setUpTestData(cls):
         today = datetime.date.today()
         an_academic_year = create_current_academic_year()
+
+        cls.requirement_entity = EntityVersionFactory(
+            entity_type=entity_type.SCHOOL,
+            start_date=today.replace(year=1900),
+            entity__organization__type=organization_type.MAIN,
+        )
+        cls.allocation_entity = EntityVersionFactory(
+            start_date=today.replace(year=1900),
+            entity__organization__type=organization_type.MAIN,
+        )
+        cls.additional_entity_1 = EntityVersionFactory(
+            start_date=today.replace(year=1900),
+            entity__organization__type=organization_type.MAIN,
+        )
+        cls.additional_entity_2 = EntityVersionFactory(
+            start_date=today.replace(year=1900),
+            entity__organization__type=organization_type.MAIN,
+        )
+
         learning_container_year = LearningContainerYearFactory(
             academic_year=an_academic_year,
             container_type=learning_container_year_types.COURSE,
             type_declaration_vacant=vacant_declaration_type.DO_NOT_ASSIGN,
+            requirement_entity=cls.requirement_entity.entity,
+            allocation_entity=cls.allocation_entity.entity,
+            additional_entity_1=cls.additional_entity_1.entity,
+            additional_entity_2=cls.additional_entity_2.entity,
         )
 
         cls.learning_unit_year = LearningUnitYearFactory(
@@ -161,36 +181,7 @@ class TestEditLearningUnit(TestCase):
             campus=CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN))
         )
 
-        cls.requirement_entity_container = EntityContainerYearFactory(
-            learning_container_year=learning_container_year, type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-        cls.requirement_entity_container.entity.organization.type = organization_type.MAIN
-        cls.requirement_entity_container.entity.organization.save()
-        cls.requirement_entity = EntityVersionFactory(entity=cls.requirement_entity_container.entity,
-                                                      entity_type=entity_type.SCHOOL,
-                                                      start_date=today.replace(year=1900),
-                                                      end_date=None)
-
-        cls.allocation_entity_container = EntityContainerYearFactory(
-            learning_container_year=learning_container_year, type=entity_container_year_link_type.ALLOCATION_ENTITY)
-        cls.allocation_entity = EntityVersionFactory(entity=cls.allocation_entity_container.entity,
-                                                     start_date=today.replace(year=1900),
-                                                     end_date=None)
-
-        cls.additional_entity_container_1 = EntityContainerYearFactory(
-            learning_container_year=learning_container_year,
-            type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1)
-        cls.additional_entity_1 = EntityVersionFactory(entity=cls.additional_entity_container_1.entity,
-                                                       start_date=today.replace(year=1900),
-                                                       end_date=None)
-
-        cls.additional_entity_container_2 = EntityContainerYearFactory(
-            learning_container_year=learning_container_year,
-            type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2)
-        cls.additional_entity_2 = EntityVersionFactory(entity=cls.additional_entity_container_2.entity,
-                                                       start_date=today.replace(year=1900),
-                                                       end_date=None)
-
-        cls.person = PersonEntityFactory(entity=cls.requirement_entity_container.entity).person
+        cls.person = PersonEntityFactory(entity=cls.requirement_entity.entity).person
         cls.user = cls.person.user
         cls.user.user_permissions.add(Permission.objects.get(codename="can_edit_learningunit"),
                                       Permission.objects.get(codename="can_access_learningunit"))
@@ -261,21 +252,26 @@ class TestEditLearningUnit(TestCase):
         self.assertIsInstance(context["learning_unit_form"], LearningUnitModelForm)
         self.assertIsInstance(context["learning_unit_year_form"], LearningUnitYearModelForm)
         self.assertIsInstance(context["learning_container_year_form"], LearningContainerYearModelForm)
-        self.assertIsInstance(context["entity_container_form"], EntityContainerBaseForm)
 
     def test_form_initial_data(self):
+        self.maxDiff = None
         response = self.client.get(self.url)
         context = response.context[-1]
         acronym = self.learning_unit_year.acronym
         # Expected initials form
+        container_year = self.learning_unit_year.learning_container_year
         expected_initials = {
             'learning_container_year_form': {
-                "container_type": self.learning_unit_year.learning_container_year.container_type,
-                "common_title": self.learning_unit_year.learning_container_year.common_title,
-                "common_title_english": self.learning_unit_year.learning_container_year.common_title_english,
-                "team": self.learning_unit_year.learning_container_year.team,
-                "is_vacant": self.learning_unit_year.learning_container_year.is_vacant,
-                "type_declaration_vacant": self.learning_unit_year.learning_container_year.type_declaration_vacant
+                "container_type": container_year.container_type,
+                "common_title": container_year.common_title,
+                "common_title_english": container_year.common_title_english,
+                "team": container_year.team,
+                "is_vacant": container_year.is_vacant,
+                "type_declaration_vacant": container_year.type_declaration_vacant,
+                "requirement_entity": self.requirement_entity.id,
+                "allocation_entity": self.allocation_entity.id,
+                "additional_entity_1": self.additional_entity_1.id,
+                "additional_entity_2": self.additional_entity_2.id,
             },
             'learning_unit_year_form': {
                 "acronym": [acronym[0], acronym[1:]],
@@ -302,17 +298,6 @@ class TestEditLearningUnit(TestCase):
             initial_data = context[form_name].initial
             self.assertDictEqual(initial_data, expected_initial)
 
-        expected_initials = [
-            {'entity': self.requirement_entity.pk},
-            {'entity': self.allocation_entity.pk},
-            {'entity': self.additional_entity_1.pk},
-            {'entity': self.additional_entity_2.pk},
-        ]
-        entity_container_formset = context['entity_container_form']
-        for idx, expected_initial in enumerate(expected_initials):
-            initial_data = entity_container_formset.forms[idx].initial
-            self.assertDictEqual(initial_data, expected_initial)
-
     def test_valid_post_request(self):
         credits = 18
         form_data = self._get_valid_form_data()
@@ -337,9 +322,9 @@ class TestEditLearningUnit(TestCase):
             "language": self.learning_unit_year.language.pk,
             "status": True,
 
-            'requirement_entity-entity': self.requirement_entity.id,
-            'allocation_entity-entity': self.requirement_entity.id,
-            'additional_requirement_entity_1-entity': '',
+            'requirement_entity': self.requirement_entity.id,
+            'allocation_entity': self.allocation_entity.id,
+            'additional_entity_1': '',
             # Learning component year data model form
             'component-TOTAL_FORMS': '2',
             'component-INITIAL_FORMS': '0',

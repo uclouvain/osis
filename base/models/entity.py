@@ -53,6 +53,9 @@ class Entity(SerializableModel):
     fax = models.CharField(max_length=255, blank=True, null=True)
     website = models.CharField(max_length=255, blank=True, null=True)
 
+    def __str__(self):
+        return "{0}".format(self.most_recent_acronym)
+
     @cached_property
     def most_recent_acronym(self):
         try:
@@ -68,8 +71,12 @@ class Entity(SerializableModel):
     def has_address(self):
         return self.location and self.postal_code and self.city
 
-    def __str__(self):
-        return "{0}".format(self.most_recent_acronym)
+    # TODO :: remove this function and use annotation (most_recent_entity_version)
+    def get_latest_entity_version(self):
+        # Sometimes, entity-versions is prefetch to optimized queries
+        if getattr(self, "entity_versions", None):
+            return self.entity_versions[-1]
+        return self.entityversion_set.order_by('start_date').last()
 
 
 def search(**kwargs):

@@ -329,15 +329,13 @@ class TestLearningUnitXls(TestCase):
 
     def test_prepare_xls_content(self):
         entity_requirement = EntityVersion.objects.filter(
-            entity__entitycontaineryear__learning_container_year__learningunityear=OuterRef('pk'),
-            entity__entitycontaineryear__type=REQUIREMENT_ENTITY
+            entity=OuterRef('learning_container_year__requirement_entity'),
         ).current(
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
         entity_allocation = EntityVersion.objects.filter(
-            entity__entitycontaineryear__learning_container_year__learningunityear=OuterRef('pk'),
-            entity__entitycontaineryear__type=ALLOCATION_ENTITY
+            entity=OuterRef('learning_container_year__allocation_entity'),
         ).current(
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
