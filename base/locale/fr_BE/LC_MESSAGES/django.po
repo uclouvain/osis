@@ -4748,7 +4748,7 @@ msgstr "Ce champ ne peut pas être défini"
 #: tests/views/learning_units/proposals/test_creation.py:189
 #: tests/views/learning_units/proposals/test_creation.py:190
 msgid "This field is required."
-msgstr "Ce champ est vide."
+msgstr "Ce champ est obligatoire."
 
 #: templates/education_group/pdf_content.html:65
 msgid ""
