@@ -27,6 +27,7 @@ class VolumeEditionStrategy(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def is_valid(self):
+        # TODO: reduce cognitive complexity (at 29 now)
         if self.raw_volume_q1 is not None or self.raw_volume_q2 is not None:
             if self.volume_total != self.volume_q1 + self.volume_q2:
                 self.obj.add_error(self.input_names['volume_total'],
