@@ -106,6 +106,7 @@ Feature: Modification d'offre
 
     And Dans l'arbre et dans LDRCC900R, cliquer sur Détacher sur LDROI2108.
     And Cliquer sur « Enregistrer » dans la modal
+    And Ouvrir LDRMM900R dans l’arbre
     And LDROI2108 se trouve bien dans l'arbre sous LDRMM900R
     And LDROI2108 ne se trouve plus bien dans l'arbre sous LDRCC900R
 

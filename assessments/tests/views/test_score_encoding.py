@@ -38,7 +38,9 @@ from django.utils.translation import ugettext_lazy as _
 from assessments.business.score_encoding_list import ScoresEncodingList
 from assessments.tests.views.test_upload_xls_utils import generate_exam_enrollments
 from assessments.views import score_encoding
+from assessments.views.score_encoding import online_encoding_submission
 from base.models.enums import exam_enrollment_justification_type
+from base.models.enums import exam_enrollment_state
 from base.models.enums import number_session, academic_calendar_type
 from base.models.exam_enrollment import ExamEnrollment
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
@@ -306,6 +308,31 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
         self.assertEqual(learning_unit_acronym, self.learning_unit_year.acronym)
         offer_year = self.enrollments[1].learning_unit_enrollment.offer_enrollment.offer_year
         self.assertEqual(offer_acronym, offer_year.acronym)
+
+    @patch("base.utils.send_mail.send_mail_after_scores_submission")
+    def test_online_encoding_submission_not_all_encoded(self, mock_send_mail_after_scores_submission):
+        self.client.force_login(self.tutor.person.user)
+        url = reverse(online_encoding_submission, args=[self.learning_unit_year.id])
+        response = self.client.get(url)
+        self.assertTrue(mock_send_mail_after_scores_submission.called)
+        all_encoded_arg = mock_send_mail_after_scores_submission.call_args[0][3]
+        self.assertFalse(all_encoded_arg)
+        self.assertEqual(response.status_code, 302)
+
+    @patch("base.utils.send_mail.send_mail_after_scores_submission")
+    def test_online_encoding_submission_all_encoded(self, mock_send_mail_after_scores_submission):
+        self.client.force_login(self.tutor.person.user)
+
+        for enrollment in self.enrollments:
+            enrollment.enrollment_state = exam_enrollment_state.NOT_ENROLLED
+            enrollment.save()
+
+        url = reverse(online_encoding_submission, args=[self.learning_unit_year.id])
+        response = self.client.get(url)
+        self.assertTrue(mock_send_mail_after_scores_submission.called)
+        all_encoded_arg = mock_send_mail_after_scores_submission.call_args[0][3]
+        self.assertTrue(all_encoded_arg)
+        self.assertEqual(response.status_code, 302)
 
 
 class OutsideEncodingPeriodTest(AcademicYearMockMixin, SessionExamCalendarMockMixin, TestCase):
