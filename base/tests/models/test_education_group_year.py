@@ -23,8 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils.translation import ugettext_lazy as _
 
 from base.models.education_group_year import search, find_with_enrollments_count
@@ -44,7 +45,6 @@ from base.tests.factories.offer_year import OfferYearFactory
 
 
 class EducationGroupYearTest(TestCase):
-
     def setUp(self):
         self.academic_year = AcademicYearFactory()
         self.education_group_type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
@@ -252,6 +252,19 @@ class EducationGroupYearCleanTest(TestCase):
 
         with self.assertRaises(ValidationError):
             e.clean()
+
+    @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2016)
+    def test_clean_case_academic_year_before_settings(self):
+        e = EducationGroupYearFactory(academic_year__year=2015)
+
+        with self.assertRaises(ValidationError) as context_error:
+            e.clean()
+
+        self.assertListEqual(
+            context_error.exception.messages,
+            [_("You cannot create/update an education group before %(limit_year)s") % {
+                                "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}]
+        )
 
 
 class TestCleanPartialAcronym(TestCase):

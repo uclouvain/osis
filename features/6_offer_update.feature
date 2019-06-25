@@ -45,7 +45,7 @@ Feature: Modification d'offre
 
     Given Aller sur la page de detail de la formation: DROI2M en 2018-2019
     When Ouvrir l'arbre
-    And Ouvrir LDROI2M dans l’arbre
+    And Ouvrir LDROI200M dans l’arbre
     And Ouvrir LDROI220T dans l’arbre
     And Ouvrir LDRMM900R dans l’arbre
 
@@ -79,7 +79,7 @@ Feature: Modification d'offre
     Given Aller sur la page de detail de la formation: DROI2M en 2018-2019
 
     When Ouvrir l'arbre
-    And Ouvrir LDROI2M dans l’arbre
+    And Ouvrir LDROI200M dans l’arbre
     And Ouvrir LDROI220T dans l’arbre
     And Dans l'arbre, cliquer sur Attacher sur LDROI220T.
     And Cliquer sur Copier dans la modal
@@ -94,7 +94,7 @@ Feature: Modification d'offre
     And L’utilisateur est attaché à l’entité DRT
     Given Aller sur la page de detail de la formation: DROI2M en 2018-2019
     When Ouvrir l'arbre
-    And Ouvrir LDROI2M dans l’arbre
+    And Ouvrir LDROI200M dans l’arbre
     And Ouvrir LDROI220T dans l’arbre
     And Ouvrir LDRCC900R dans l’arbre
     And Dans l'arbre, cliquer sur Sélectionner sur LDROI2108.
