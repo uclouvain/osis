@@ -27,13 +27,15 @@ from unittest import mock
 
 from django.test import TestCase
 
+from osis_common.queue.queue_listener import SynchronousConsumerThread
+
 
 class WSGITestCase(TestCase):
-    @mock.patch('osis_common.queue.queue_listener.SynchronousConsumerThread.start')
+    @mock.patch.object(SynchronousConsumerThread, 'start', return_value=None)
     def test_listen_to_queue_with_callback(self, mock_queue):
         from backoffice.wsgi import _listen_to_queue_with_callback
         _listen_to_queue_with_callback(
             callback=lambda: None,
             queue_name='QUEUE'
         )
-        mock_queue.assert_called()
+        self.assertTrue(mock_queue.called)
