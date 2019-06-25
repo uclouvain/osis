@@ -25,11 +25,18 @@
 ##############################################################################
 from unittest import mock
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from osis_common.queue.queue_listener import SynchronousConsumerThread
 
 
+@override_settings(
+    QUEUES={
+        'QUEUES_NAME': {
+            'QUEUE': 'NAME'
+        }
+    }
+)
 class WSGITestCase(TestCase):
     @mock.patch.object(SynchronousConsumerThread, 'start', return_value=None)
     def test_listen_to_queue_with_callback(self, mock_queue):
