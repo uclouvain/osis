@@ -69,7 +69,6 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
             'child': obj.child,
             'parent': obj.parent,
         }
-        self.strategy.delete_prerequisites()
         display_success_messages(request, success_msg)
         return super().delete(request, *args, **kwargs)
 
