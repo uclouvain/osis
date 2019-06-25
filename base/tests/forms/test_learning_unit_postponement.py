@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from collections import OrderedDict
+from decimal import Decimal
 from unittest import mock
 
 from django.contrib.auth.models import Group
@@ -618,8 +619,8 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
                 _("The repartition volume of %(col_name)s has been already modified. "
                   "(%(new_value)s instead of %(current_value)s)") % {
                     'col_name': component.acronym + "-" + requirement_entity.most_recent_acronym,
-                    'new_value': float(component.repartition_volume_requirement_entity),
-                    'current_value': float('0.00')
+                    'new_value': component.repartition_volume_requirement_entity,
+                    'current_value': Decimal(0)
                 }
             ],
         })

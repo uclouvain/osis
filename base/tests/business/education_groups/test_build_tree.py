@@ -183,26 +183,6 @@ class TestBuildTree(TestCase):
         ])
         self.assertEqual(json['children'][0]['a_attr']['detach_url'], expected_detach_url)
 
-    def test_tree_to_json_ids(self):
-        node = EducationGroupHierarchy(self.parent)
-        json = node.to_json()
-
-        self.assertEquals(
-            json['children'][1]['id'],
-            "id_{}_{}".format(
-                node.children[1].education_group_year.pk,
-                node.children[1].group_element_year.pk if node.children[1].group_element_year else '#'
-            )
-        )
-
-        self.assertEquals(
-            json['children'][1]['children'][0]['id'],
-            "id_{}_{}".format(
-                node.children[1].children[0].learning_unit_year.pk,
-                node.children[1].children[0].group_element_year.pk if node.children[1].group_element_year else '#'
-            )
-        )
-
     def test_build_tree_reference(self):
         """
         This tree contains a reference link.
@@ -212,7 +192,7 @@ class TestBuildTree(TestCase):
 
         node = EducationGroupHierarchy(self.parent)
 
-        self.assertEqual(node.children[0]._get_icon(),  static('img/reference.jpg'))
+        self.assertEqual(node.children[0]._get_icon(), static('img/reference.jpg'))
 
         list_children = node.to_list()
         self.assertEqual(list_children, [

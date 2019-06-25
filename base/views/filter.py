@@ -36,7 +36,10 @@ from osis_common.decorators.ajax import ajax_required
 def filter_cities_by_country(request):
     """ Ajax request to filter the cities choice field """
     country = request.GET.get('country')
-    cities = find_distinct_by_country(country)
+    cities = []
+    if country != '':
+        cities = find_distinct_by_country(country)
+
     return JsonResponse(list(cities), safe=False)
 
 

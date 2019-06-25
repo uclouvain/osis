@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Sum
@@ -128,7 +130,7 @@ class LearningComponentYear(SerializableModel):
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
                 _('The annual volume must be equal to the sum of the volumes Q1 and Q2')))
-        if self.vol_global != float(sum(self.repartition_volumes.values())):
+        if self.vol_global != sum(self.repartition_volumes.values()):
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
                 _('the sum of repartition volumes must be equal to the global volume')))
@@ -162,15 +164,15 @@ class LearningComponentYear(SerializableModel):
 
     @cached_property
     def vol_global(self):
-        return float(float(self.hourly_volume_total_annual or 0.0) * float(self.planned_classes or 0.0))
+        return (self.hourly_volume_total_annual or Decimal(0)) * (self.planned_classes or Decimal(0))
 
     @property
     def repartition_volumes(self):
-        default_value = 0.0
+        default_value = Decimal(0)
         return {
-            REQUIREMENT_ENTITY: float(self.repartition_volume_requirement_entity or default_value),
-            ADDITIONAL_REQUIREMENT_ENTITY_1: float(self.repartition_volume_additional_entity_1 or default_value),
-            ADDITIONAL_REQUIREMENT_ENTITY_2: float(self.repartition_volume_additional_entity_2 or default_value),
+            REQUIREMENT_ENTITY: self.repartition_volume_requirement_entity or default_value,
+            ADDITIONAL_REQUIREMENT_ENTITY_1: self.repartition_volume_additional_entity_1 or default_value,
+            ADDITIONAL_REQUIREMENT_ENTITY_2: self.repartition_volume_additional_entity_2 or default_value,
         }
 
     def set_repartition_volume(self, entity_container_type, repartition_volume):
