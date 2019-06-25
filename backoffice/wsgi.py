@@ -62,6 +62,7 @@ LOGGER = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 def _listen_to_queue_with_callback(callback, queue_name):
+    from osis_common.queue import queue_listener
     try:
         queue_listener.SynchronousConsumerThread(
             settings.QUEUES.get('QUEUES_NAME').get(queue_name),
@@ -72,7 +73,7 @@ def _listen_to_queue_with_callback(callback, queue_name):
 
 
 if hasattr(settings, 'QUEUES') and settings.QUEUES:
-    from osis_common.queue import queue_listener, callbacks
+    from osis_common.queue import callbacks
     # migration queue used to migrate data between osis ans osis_portal
     _listen_to_queue_with_callback(
         callback=callbacks.process_message,
