@@ -152,8 +152,6 @@ class TestLearningUnitModificationProposal(TestCase):
             'component-1-hourly_volume_total_annual': 20,
             'component-1-hourly_volume_partial_q1': 10,
             'component-1-hourly_volume_partial_q2': 10,
-            'component-0-planned_classes': 1,
-            'component-1-planned_classes': 1,
         }
 
     def setUp(self):
@@ -726,8 +724,6 @@ class TestEditProposal(TestCase):
             'component-1-hourly_volume_total_annual': 20,
             'component-1-hourly_volume_partial_q1': 10,
             'component-1-hourly_volume_partial_q2': 10,
-            'component-0-planned_classes': 1,
-            'component-1-planned_classes': 1,
         }
 
     def get_modify_data(self):
@@ -808,42 +804,42 @@ class TestEditProposal(TestCase):
 
 class TestLearningUnitProposalDisplay(TestCase):
     @classmethod
-    def setUp(self):
-        self.language_pt = LanguageFactory(code='PT')
-        self.language_it = LanguageFactory(code='IT')
-        self.campus = CampusFactory()
-        self.academic_year = create_current_academic_year()
-        self.l_container_year = LearningContainerYearFactory(
+    def setUpTestData(cls):
+        cls.language_pt = LanguageFactory(code='PT')
+        cls.language_it = LanguageFactory(code='IT')
+        cls.campus = CampusFactory()
+        cls.academic_year = create_current_academic_year()
+        cls.l_container_year = LearningContainerYearFactory(
             acronym="LBIR1212",
-            academic_year=self.academic_year,
+            academic_year=cls.academic_year,
         )
-        self.learning_unit = LearningUnitFactory(learning_container=self.l_container_year.learning_container)
+        cls.learning_unit = LearningUnitFactory(learning_container=cls.l_container_year.learning_container)
 
-        self.learning_unit_yr = LearningUnitYearFactory(
+        cls.learning_unit_yr = LearningUnitYearFactory(
             acronym="LBIR1212",
-            learning_unit=self.learning_unit,
-            learning_container_year=self.l_container_year,
-            academic_year=self.academic_year,
+            learning_unit=cls.learning_unit,
+            learning_container_year=cls.l_container_year,
+            academic_year=cls.academic_year,
             subtype=learning_unit_year_subtypes.FULL,
             status=True,
             quadrimester="Q3",
             credits=4,
-            campus=self.campus,
-            language=self.language_pt,
+            campus=cls.campus,
+            language=cls.language_pt,
             periodicity=learning_unit_year_periodicity.BIENNIAL_EVEN
         )
 
-        self.proposal_learning_unit = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_yr)
-        self.initial_credits = 3.0
-        self.initial_quadrimester = 'Q1'
-        self.initial_language = self.language_it.pk
-        self.initial_periodicity = learning_unit_year_periodicity.ANNUAL
-        self.initial_data_learning_unit_year = {'credits': self.initial_credits, 'periodicity': self.initial_periodicity}
+        cls.proposal_learning_unit = ProposalLearningUnitFactory(learning_unit_year=cls.learning_unit_yr)
+        cls.initial_credits = 3.0
+        cls.initial_quadrimester = 'Q1'
+        cls.initial_language = cls.language_it.pk
+        cls.initial_periodicity = learning_unit_year_periodicity.ANNUAL
+        cls.initial_data_learning_unit_year = {'credits': cls.initial_credits, 'periodicity': cls.initial_periodicity}
 
-        self.initial_language_en = self.language_it
-        self.generator_learning_container = GenerateContainer(start_year=self.academic_year.year,
-                                                              end_year=self.academic_year.year + 1)
-        self.l_container_year_with_entities = self.generator_learning_container.generated_container_years[0]
+        cls.initial_language_en = cls.language_it
+        cls.generator_learning_container = GenerateContainer(start_year=cls.academic_year.year,
+                                                             end_year=cls.academic_year.year + 1)
+        cls.l_container_year_with_entities = cls.generator_learning_container.generated_container_years[0]
 
     def test_is_foreign_key(self):
         current_data = {"language{}".format(proposal_business.END_FOREIGN_KEY_NAME): self.language_it.pk}
